@@ -185,13 +185,13 @@
 
                                                 </td>
                                                 <td class="checkable" >
-                                                    <g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
+                                                    <g:link controller="inventoryItem" action="showStockCard" params="['product.id': dataEntry?.inventoryItem?.product?.id]">
                                                         ${dataEntry.inventoryItem?.product?.productCode}
                                                     </g:link>
 
                                                 </td>
                                                 <td class="checkable" >
-                                                    <g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
+                                                    <g:link controller="inventoryItem" action="showStockCard" params="['product.id': dataEntry?.inventoryItem?.product?.id]">
                                                         <format:displayName product="${dataEntry.inventoryItem?.product}" showTooltip="${true}" />
                                                     </g:link>
 

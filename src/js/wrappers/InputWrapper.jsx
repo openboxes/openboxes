@@ -18,6 +18,7 @@ const InputWrapper = ({
   className,
   inputId,
   labelPosition,
+  hideErrorMessageWrapper,
 }) => (
   <div className={`input-wrapper-container ${className} input-wrapper-label-position-${labelPosition}`}>
     <div className="input-wrapper-title">
@@ -51,9 +52,11 @@ const InputWrapper = ({
       )}
     </div>
     {children}
-    <div className="input-wrapper-error-message">
-      {errorMessage}
-    </div>
+    {!hideErrorMessageWrapper && (
+      <div className="input-wrapper-error-message">
+        {errorMessage}
+      </div>
+    )}
   </div>
 );
 
@@ -87,6 +90,7 @@ InputWrapper.propTypes = {
   inputId: PropTypes.string,
   // input label position
   labelPosition: PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
+  hideErrorMessageWrapper: PropTypes.bool,
 };
 
 InputWrapper.defaultProps = {
@@ -98,4 +102,5 @@ InputWrapper.defaultProps = {
   className: '',
   inputId: undefined,
   labelPosition: 'top',
+  hideErrorMessageWrapper: false,
 };

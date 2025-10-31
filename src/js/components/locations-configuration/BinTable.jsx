@@ -15,7 +15,6 @@ const INITIAL_STATE = {
   binLoading: true,
 };
 
-
 class BinTable extends Component {
   constructor(props) {
     super(props);
@@ -64,10 +63,10 @@ class BinTable extends Component {
         accessor: 'actions',
         className: 'action-cell',
         headerClassName: 'header ',
-        Cell: row => (
+        Cell: (row) => (
           <div className="d-flex justify-content-center align-items-center">
             <ModalWrapper
-              onSave={values => this.props.handleLocationEdit(values)}
+              onSave={(values) => this.props.handleLocationEdit(values)}
               fields={this.props.FIELDS}
               validate={this.props.validate}
               initialValues={
@@ -126,7 +125,7 @@ class BinTable extends Component {
         onFetchData={(state) => {
           const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
           apiClient.get('/api/internalLocations/search', {
-            paramsSerializer: parameters => queryString.stringify(parameters),
+            paramsSerializer: (parameters) => queryString.stringify(parameters),
             params: {
               locationTypeCode: ['BIN_LOCATION', 'INTERNAL'],
               offset: `${offset}`,
@@ -149,7 +148,7 @@ class BinTable extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 

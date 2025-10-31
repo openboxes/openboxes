@@ -13,7 +13,7 @@ const useConnectionListener = () => {
   const timeoutId = useRef(null);
 
   const dispatch = useDispatch();
-  const { translate, online, browserConnectionTimeout } = useSelector(state => ({
+  const { translate, online, browserConnectionTimeout } = useSelector((state) => ({
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
     online: state.connection.online,
     browserConnectionTimeout: state.session.browserConnectionTimeout,
@@ -71,7 +71,6 @@ const useConnectionListener = () => {
   const onChangeStatusToOffline = () => {
     checkOnlineStatus();
   };
-
 
   useEffect(() => {
     window.addEventListener('offline', onChangeStatusToOffline);

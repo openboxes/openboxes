@@ -26,7 +26,7 @@ const useOutboundFilters = (sourceType) => {
     currentLocale,
     shipmentTypes,
     availableApprovers,
-  } = useSelector(state => ({
+  } = useSelector((state) => ({
     requisitionStatuses: state.requisitionStatuses.data,
     currentLocation: state.session.currentLocation,
     currentUser: state.session.user,
@@ -134,7 +134,6 @@ const useOutboundFilters = (sourceType) => {
   // Custom hook for changing location/filters rebuilding logic
   useCommonFiltersCleaner({ clearFilterValues, filtersInitialized, initializeDefaultFilterValues });
 
-
   const selectFiltersForMyStockMovements = () => {
     const currentUserValue = {
       id: currentUser.id,
@@ -153,7 +152,7 @@ const useOutboundFilters = (sourceType) => {
       search: queryString.stringify(searchQuery),
     });
 
-    setDefaultFilterValues(values => ({
+    setDefaultFilterValues((values) => ({
       ...values,
       requestedBy: currentUserValue,
       createdBy: currentUserValue,

@@ -17,6 +17,7 @@ import org.pih.warehouse.core.EntityTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
+import org.pih.warehouse.data.ProductSupplierIdentifierService
 import org.pih.warehouse.data.ProductSupplierService
 
 import java.math.RoundingMode
@@ -27,7 +28,7 @@ class ProductSupplierController {
 
     def dataService
     def documentService
-    def identifierService
+    ProductSupplierIdentifierService productSupplierIdentifierService
     ProductSupplierDataService productSupplierGormService
     ProductSupplierService productSupplierService
 
@@ -157,8 +158,10 @@ class ProductSupplierController {
             updateAttributes(productSupplierInstance, params)
 
             if (!productSupplierInstance.code) {
-                String prefix = productSupplierInstance?.product?.productCode
-                productSupplierInstance.code = identifierService.generateProductSupplierIdentifier(prefix)
+                productSupplierInstance.code = productSupplierIdentifierService.generate(
+                        productSupplierInstance,
+                        productSupplierInstance?.product?.productCode,
+                        "")
             }
 
             if (params.defaultPreferenceType) {
@@ -309,6 +312,15 @@ class ProductSupplierController {
                         property("price", "contractPrice.price")
                         property("toDate", "contractPrice.toDate")
                     }
+                    defaultProductPackage(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        uom(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                            property("code", "defaultProductPackage.uom.code")
+                        }
+                        property("quantity", "defaultProductPackage.quantity")
+                        productPrice(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                            property("price", "defaultProductPackage.productPrice.price")
+                        }
+                    }
                     property("ratingTypeCode", "ratingTypeCode")
                     property("dateCreated", "dateCreated")
                     property("lastUpdated", "lastUpdated")
@@ -351,9 +363,15 @@ class ProductSupplierController {
         // Now, let's take the data we've gathered and build the model to use for
         productSuppliers.collect { Map entry ->
             ProductSupplier productSupplier = ProductSupplier.load(entry.id)
+            ProductPackage productPackage = defaultProductPackages[productSupplier?.id]
+            boolean useDerivedPackage = !entry["defaultProductPackage.uom.code"]
             entry["product"] = ["productCode": entry["productCode"], "name": productSupplier?.product?.displayNameWithLocaleCode ?: entry["productName"]]
             entry["productCode"] = entry["legacyProductCode"]
-            entry["defaultProductPackage"] = defaultProductPackages[productSupplier?.id]
+            if (useDerivedPackage) {
+                entry["defaultProductPackage.uom.code"] = productPackage?.uom?.code
+                entry["defaultProductPackage.quantity"] = productPackage?.quantity
+                entry["defaultProductPackage.productPrice.price"] = productPackage?.productPrice?.price
+            }
             entry["globalProductSupplierPreference"] = globalPreferencesByProductSupplier[productSupplier?.id]
         }
 
@@ -370,7 +388,7 @@ class ProductSupplierController {
             default:
                 response.contentType = "text/csv"
                 response.setHeader("Content-disposition",
-                    "attachment; filename=\"ProductSuppliers-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
+                        "attachment; filename=\"ProductSuppliers-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
                 render(contentType: "text/csv", text: dataService.generateCsv(data))
                 response.outputStream.flush()
                 return;

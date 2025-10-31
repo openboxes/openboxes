@@ -1,0 +1,24 @@
+name: Slack Notification on Failures
+
+# Sends a Slack notification whenever the on-change job fails or times out.
+on:
+  workflow_run:
+    workflows: [On Change]
+    types: [completed]
+
+jobs:
+  slack-notify:
+    runs-on: ubuntu-latest
+
+    if: github.event.workflow_run.conclusion == 'failure' || github.event.workflow_run.conclusion == 'timed_out'
+
+    steps:
+      - name: Send Slack Message
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ github.event.workflow_run.conclusion }}
+          notification_title: "${{github.event.workflow_run.name}} - ${{github.event.workflow_run.conclusion}} on ${{github.event.workflow_run.head_branch}} - <${{github.server_url}}/${{github.repository}}/actions/runs/${{github.event.workflow_run.id}}|View Failure>"
+          message_format: "{emoji} *${{github.event.workflow_run.name}}* ${{github.event.workflow_run.conclusion}} on commit <{commit_url}|{commit_sha}>"
+          footer: "<${{github.server_url}}/${{github.repository}}|${{github.repository}}>"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_BUILD_STATUS_WEBHOOK }}

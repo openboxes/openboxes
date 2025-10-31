@@ -21,7 +21,12 @@
                 <g:set var="isAdjustmentCanceled" value="${orderAdjustment.canceled}"/>
                 <tr class="${status % 2 == 0 ? 'odd' : 'even'}" style="${isAdjustmentCanceled ? 'background-color: #ffcccb;' : ''}">
                     <td>
-                        ${orderAdjustment?.orderItem?.product?:g.message(code:'default.all.label')}
+                        <g:if test="${orderAdjustment?.orderItem?.product}">
+                            <format:displayName product="${orderAdjustment?.orderItem?.product}" productSupplier="${orderAdjustment?.orderItem?.productSupplier}" showTooltip="${true}" />
+                        </g:if>
+                        <g:else>
+                            <g:message code="default.all.label" default="All" />
+                        </g:else>
                     </td>
                     <td>
                         ${orderAdjustment?.orderAdjustmentType?.name}
@@ -50,7 +55,7 @@
                         ${orderAdjustment?.budgetCode?.code}
                     </td>
                     <td>
-                        ${orderAdjustment?.isInvoiced ? g.message(code:'default.yes.label') : g.message(code:'default.no.label')}
+                        <format:metadata obj="${orderAdjustment.derivedPaymentStatus}"/>
                     </td>
                     </g:if>
                     <g:else>

@@ -104,6 +104,8 @@ class FieldArrayComponent extends Component {
               const { hide, headerHtml } = dynamicAttr;
               const flexWidth = dynamicAttr.flexWidth || config.flexWidth;
               const fixedWidth = dynamicAttr.fixedWidth || config.fixedWidth;
+              const headerLabel = dynamicAttr.label || config.label;
+              const headerDefaultMessage = dynamicAttr.defaultMessage || config.defaultMessage;
 
               if (!hide) {
                 return (
@@ -121,10 +123,12 @@ class FieldArrayComponent extends Component {
                         <div>
                           {this.props.translate(config.headerTooltip, config.headerDefaultTooltip)}
                         </div>
-                      ) : (config.label &&
+                      ) : (headerLabel
+                        && (
                         <div>
-                          {this.props.translate(config.label, config.defaultMessage)}
+                          {this.props.translate(headerLabel, headerDefaultMessage)}
                         </div>
+                        )
                       )}
                       theme="transparent"
                       arrow="true"
@@ -133,20 +137,21 @@ class FieldArrayComponent extends Component {
                       hideDelay="50"
                     >
                       <div
-                        className={`mx-2 text-truncate ${config.required ? 'arrayfield-header-required' : ''}`}
+                        className={`mx-2 ${config.multilineHeader ? '' : 'text-truncate'} ${config.required ? 'arrayfield-header-required' : ''}`}
                         style={{
                           fontSize: fieldsConfig.headerFontSize ? fieldsConfig.headerFontSize : '0.875rem',
                         }}
                       >
                         { headerHtml && headerHtml() }
-                        { config.label && !headerHtml &&
-                          <Translate id={config.label} defaultMessage={config.defaultMessage} />}
+                        { headerLabel && !headerHtml
+                          && <Translate id={headerLabel} defaultMessage={headerDefaultMessage} />}
                       </div>
                     </Tooltip>
-                  </div>);
+                  </div>
+                );
               }
               return null;
-})}
+            })}
           </div>
         </div>
         <div
@@ -172,23 +177,29 @@ class FieldArrayComponent extends Component {
             }}
           />
         </div>
-        { AddButton &&
+        { AddButton
+          && (
           <div className="text-center add-button">
             {
-              typeof AddButton === 'string' ?
-                <button type="button" className="btn btn-outline-success btn-xs" onClick={() => addRow()}>
-                  <span><i className="fa fa-plus pr-2" /><Translate id={AddButton} /></span>
-                </button>
+              typeof AddButton === 'string'
+                ? (
+                  <button type="button" className="btn btn-outline-success btn-xs" onClick={() => addRow()}>
+                    <span>
+                      <i className="fa fa-plus pr-2" />
+                      <Translate id={AddButton} />
+                    </span>
+                  </button>
+                )
                 : <AddButton {...properties} addRow={addRow} />
             }
           </div>
-        }
+          )}
       </div>
     );
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   isPaginated: state.session.isPaginated,
 });

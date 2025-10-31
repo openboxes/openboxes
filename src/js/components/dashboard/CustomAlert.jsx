@@ -1,7 +1,9 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { RiAlertLine, RiCheckboxCircleLine, RiCloseLine, RiErrorWarningFill, RiInformationLine } from 'react-icons/ri';
+import {
+  RiAlertLine, RiCheckboxCircleLine, RiCloseLine, RiErrorWarningFill, RiInformationLine,
+} from 'react-icons/ri';
 
 import NotificationType from 'consts/notificationTypes';
 
@@ -31,12 +33,12 @@ const CustomAlert = ({
           {getIcon()}
         </div>
         <span className="alert-title">{message}</span>
-        {customFields?.detailsArray?.length ?
-          (
+        {customFields?.detailsArray?.length
+          ? (
             <div className="d-flex flex-column array-errors-wrapper">
               {customFields.detailsArray
                 .filter(Boolean)
-                .map(detail => (<p key={detail}>{detail}</p>))}
+                .map((detail) => (<p key={detail}>{detail}</p>))}
             </div>
           ) : null}
         {customFields?.details && <span className="alert-details">{customFields?.details}</span>}
@@ -50,9 +52,7 @@ const CustomAlert = ({
   );
 };
 
-
 export default CustomAlert;
-
 
 CustomAlert.propTypes = {
   classNames: PropTypes.string.isRequired,

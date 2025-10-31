@@ -11,7 +11,7 @@ const useCommonFiltersCleaner = ({
 }) => {
   const {
     currentLocation, shouldRebuildParams,
-  } = useSelector(state => ({
+  } = useSelector((state) => ({
     currentLocation: state.session.currentLocation,
     shouldRebuildParams: state.filterForm.shouldRebuildParams,
   }));

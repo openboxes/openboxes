@@ -11,10 +11,9 @@ export const checkActiveSection = ({
   const { pathname, search } = path;
   // removing custom params from URL fe. stockMovementId
   const pathParams = _.drop(Object.values(params), 2);
-  const pathnameWithoutParams =
-    pathParams
-      .reduce((acc, param) => acc.replace(param, ''), pathname)
-      .replace(/\/$/, '');
+  const pathnameWithoutParams = pathParams
+    .reduce((acc, param) => acc.replace(param, ''), pathname)
+    .replace(/\/$/, '');
   const matchedPath = Object.keys(menuUrls)
     .find((section) => {
       // find matching URL from sections
@@ -42,9 +41,9 @@ export const checkActiveSection = ({
           // if direction is not specified
           // then compare current url with sectionPath without direction
           if (!direction) {
-            return Object.values(otherParams).every(param => sectionSearch.includes(param));
+            return Object.values(otherParams).every((param) => sectionSearch.includes(param));
           }
-          return sectionSearch.split('&').every(param => search.includes(param));
+          return sectionSearch.split('&').every((param) => search.includes(param));
         }
         return true;
       });
@@ -52,16 +51,16 @@ export const checkActiveSection = ({
     });
 
   // check if url match section parts from config
-  const matchingFromSectionsUrlParts = menuSectionsUrlParts &&
-    Object.keys(menuSectionsUrlParts)
-      .find(sectionName => !!menuSectionsUrlParts[sectionName]
-        .some(section => pathname.includes(section)));
+  const matchingFromSectionsUrlParts = menuSectionsUrlParts
+    && Object.keys(menuSectionsUrlParts)
+      .find((sectionName) => !!menuSectionsUrlParts[sectionName]
+        .some((section) => pathname.includes(section)));
 
   // if matched path not found then use matching from section url parts
   return matchedPath || matchingFromSectionsUrlParts || 'dashboard';
 };
 
-export const getAllMenuUrls = menuConfig => Object.entries(menuConfig)
+export const getAllMenuUrls = (menuConfig) => Object.entries(menuConfig)
   .reduce((acc, [, section]) => {
     if (!acc[section.label]) {
       if (section.href) {
@@ -74,7 +73,7 @@ export const getAllMenuUrls = menuConfig => Object.entries(menuConfig)
         return {
           ...acc,
           // eslint-disable-next-line max-len
-          [section.id]: section.subsections.flatMap(subsection => subsection.menuItems.map(item => item.href)),
+          [section.id]: section.subsections.flatMap((subsection) => subsection.menuItems.map((item) => item.href)),
         };
       }
       if (section.menuItems) {

@@ -15,6 +15,7 @@ const InfoBarVersionBox = ({
 
   return (
     <button
+      type="button"
       className={`version-box version-box-${variant}`}
       onClick={() => dispatch(showInfoBarModal(name))}
     >

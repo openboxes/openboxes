@@ -162,7 +162,7 @@ class InboundReturns extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
   location: state.session.currentLocation,
   inboundReturnsTranslationsFetched: state.session.fetchedTranslations.inboundReturns,

@@ -47,15 +47,15 @@ class InventoryLevel {
     BigDecimal forecastPeriodDays = 30
 
     // Lead time in days (safety stock is lead time days x daily forecast quantity)
-    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "expectedLeadTimeDays")})
+    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "expectedLeadTimeDays") })
     BigDecimal expectedLeadTimeDays
 
     // Replenishment period in days
-    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "replenishmentPeriodDays")})
+    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "replenishmentPeriodDays") })
     BigDecimal replenishmentPeriodDays
 
     // Demand time period in days
-    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "demandTimePeriodDays")})
+    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "demandTimePeriodDays") })
     BigDecimal demandTimePeriodDays
 
     // Preferred bin location
@@ -68,6 +68,7 @@ class InventoryLevel {
     String binLocation
 
     // ABC analysis class
+    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "abcClass") })
     String abcClass
 
     // Additional comments about
@@ -90,8 +91,9 @@ class InventoryLevel {
 
     static constraints = {
         status(nullable: true)
-        product(nullable: true, unique: ["inventory", "internalLocation"])
-        internalLocation(nullable:true)
+        inventory(nullable: false)
+        product(nullable: false)
+        internalLocation(nullable: true, unique: ["inventory", "product"])
         minQuantity(nullable: true, range: 0..2147483646)
         reorderQuantity(nullable: true, range: 0..2147483646)
         maxQuantity(nullable: true, range: 0..2147483646)
@@ -101,7 +103,7 @@ class InventoryLevel {
         preferredBinLocation(nullable: true)
         replenishmentLocation(nullable: true)
         binLocation(nullable: true)
-        abcClass(nullable: true)
+        abcClass(nullable: true, blank: false)
         preferred(nullable: true)
         comments(nullable: true)
         replenishmentPeriodDays(nullable: true)
@@ -120,4 +122,17 @@ class InventoryLevel {
         return forecastPeriodDays ? Math.ceil(((Double) (forecastQuantity) / forecastPeriodDays) * 30) : (forecastQuantity * 30)
     }
 
+    static PROPERTIES = [
+            productCode          : "product.productCode",
+            productName          : "product.name",
+            facility             : "inventory",
+            status               : "status",
+            internalLocation     : "internalLocation",
+            preferredBinLocation : "preferredBinLocation",
+            replenishmentLocation: "replenishmentLocation",
+            abcClass             : "abcClass",
+            minQuantity          : "minQuantity",
+            reorderQuantity      : "reorderQuantity",
+            maxQuantity          : "maxQuantity"
+    ]
 }

@@ -6,13 +6,16 @@ import { RiArrowDropDownLine } from 'react-icons/ri';
 
 import useCheckRightSpace from 'hooks/useCheckRightSpace';
 
-
 const DropdownMenu = ({ section, active }) => {
   const { elementReference, setIsVisible, shouldAlignLeft } = useCheckRightSpace();
 
   return (
-    <li className={`nav-item dropdown d-none d-md-flex justify-content-center align-items-center ${active && 'active-section'}`} onMouseEnter={() => setIsVisible(true)} onMouseLeave={() => setIsVisible(false)}>
-      <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" aria-haspopup="true" aria-expanded="false">
+    <li
+      className={`nav-item dropdown d-none d-md-flex justify-content-center align-items-center ${active && 'active-section'}`}
+      onMouseEnter={() => setIsVisible(true)}
+      onMouseLeave={() => setIsVisible(false)}
+    >
+      <a role="menuitem" className="nav-link dropdown-toggle" href="#" id="navbarDropdown" aria-haspopup="true" aria-expanded="false">
         {section.label}
       </a>
       <div ref={elementReference} className={`dropdown-menu dropdown-menu-wrapper ${shouldAlignLeft() ? 'dropdown-menu-left' : 'dropdown-menu-right'}`} aria-labelledby="navbarDropdown">
@@ -21,7 +24,13 @@ const DropdownMenu = ({ section, active }) => {
             <div className="padding-8" key={subsectionKey}>
               {subsection.label && <span className="subsection-section-title">{subsection.label}</span>}
               {_.map(subsection.menuItems, (menuItem, menuItemKey) => (
-                <a className="dropdown-item" key={menuItemKey} href={menuItem.href} target={menuItem.target}>
+                <a
+                  role="menuitem"
+                  className="dropdown-item"
+                  key={menuItemKey}
+                  href={menuItem.href}
+                  target={menuItem.target}
+                >
                   {menuItem.label}
                 </a>
               ))}
@@ -36,7 +45,7 @@ const DropdownMenu = ({ section, active }) => {
 const CollapseMenu = ({ section, active }) => {
   const id = `collapse-${section?.label?.replaceAll(' ', '-')}`;
   return (
-    <li className="collapse-nav-item nav-item justify-content-center align-items-center d-flex d-md-none" >
+    <li className="collapse-nav-item nav-item justify-content-center align-items-center d-flex d-md-none">
       <a
         className={`nav-link d-flex justify-content-between align-items-center w-100 ${active && 'active-section'}`}
         data-toggle="collapse"
@@ -66,10 +75,12 @@ const CollapseMenu = ({ section, active }) => {
   );
 };
 
-const MenuSubsection = props => (<>
-  <DropdownMenu {...props} />
-  <CollapseMenu {...props} />
-</>);
+const MenuSubsection = (props) => (
+  <>
+    <DropdownMenu {...props} />
+    <CollapseMenu {...props} />
+  </>
+);
 
 export default MenuSubsection;
 
@@ -82,7 +93,6 @@ const subsectionsPropTypes = PropTypes.shape({
   label: PropTypes.string,
   menuItems: PropTypes.arrayOf(menuItemPropType),
 });
-
 
 MenuSubsection.propTypes = {
   section: PropTypes.shape({

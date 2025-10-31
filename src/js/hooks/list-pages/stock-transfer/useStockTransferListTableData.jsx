@@ -51,7 +51,7 @@ const useStockTransferListTableData = (filterParams) => {
   });
 
   const dispatch = useDispatch();
-  const { translate } = useSelector(state => ({
+  const { translate } = useSelector((state) => ({
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
   }));
 

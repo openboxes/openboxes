@@ -13,6 +13,7 @@ import grails.core.GrailsApplication
 import grails.util.Holders
 import grails.validation.Validateable
 import org.pih.warehouse.core.MailService
+import org.pih.warehouse.jobs.SendStockAlertsJob
 import org.springframework.boot.info.GitProperties
 import org.springframework.web.multipart.MultipartFile
 
@@ -49,6 +50,12 @@ class AdminController {
         }
 
         [actionNames: actionNames]
+    }
+
+    def triggerStockAlerts = {
+        SendStockAlertsJob.triggerNow([:])
+        flash.message = "Triggered send stock alerts job in background"
+        redirect(controller: "admin", action: "showSettings")
     }
 
     def cache() {

@@ -84,7 +84,7 @@
             <div class="yui-u">
 
                 <g:hasErrors bean="${command}">
-                    <div class="errors">
+                    <div class="errors" role="alert" aria-label="error-message">
                         <g:renderErrors bean="${command}" as="list" />
                     </div>
                 </g:hasErrors>

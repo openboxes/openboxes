@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Dropzone from 'react-dropzone';
+import { useDropzone } from 'react-dropzone';
 
 import BaseField from 'components/form-elements/BaseField';
 import Translate from 'utils/Translate';
@@ -14,21 +14,30 @@ const FileField = (props) => {
       }
     };
 
+    const {
+      getRootProps, getInputProps, open,
+    } = useDropzone({
+      onDrop,
+      noClick: true,
+      noKeyboard: true,
+    });
+
     return (
       <div className="form-element-container">
-        <Dropzone
-          onDrop={onDrop}
+        <div
+          {...getRootProps()}
           className="form-control form-control-xs file-field"
         >
+          <input {...getInputProps()} />
           <div>
-            <button type="button" className="btn btn-primary btn-xs">
+            <button onClick={open} type="button" className="btn btn-primary btn-xs">
               <Translate id="react.default.button.chooseFile.label" defaultMessage="Choose File" />
             </button>
             <span className="ml-3">
               {value ? value.name : <Translate id="react.default.button.noFileChosen.label" defaultMessage="No file chosen" />}
             </span>
           </div>
-        </Dropzone>
+        </div>
       </div>
     );
   };

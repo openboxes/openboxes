@@ -2,12 +2,12 @@
 <div id="synonyms">
     <div class="box">
         <g:hasErrors bean="${productInstance}">
-            <div class="errors">
+            <div class="errors" role="alert" aria-label="error-message">
                 <g:renderErrors bean="${productInstance}" as="list"/>
             </div>
         </g:hasErrors>
         <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
+            <div class="message" role="status" aria-label="message">${flash.message}</div>
         </g:if>
         <g:if test="${flash.error}">
             <div class="errors p-1">${flash.error}</div>

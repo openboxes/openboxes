@@ -33,7 +33,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-
 const BTN_CLASS_MAPPER = {
   YES: 'btn btn-outline-success',
   NO: 'btn btn-outline-secondary',
@@ -57,8 +56,8 @@ const AD_HOCK_FIELDS = {
         className += 'font-weight-bold';
       }
       const filterOutItems = itemFilter && !(
-        rowValues.product.name.toLowerCase().includes(itemFilter.toLowerCase()) ||
-        rowValues.productCode.toLowerCase().includes(itemFilter.toLowerCase())
+        rowValues.product.name.toLowerCase().includes(itemFilter.toLowerCase())
+        || rowValues.productCode.toLowerCase().includes(itemFilter.toLowerCase())
       );
       const hideRow = (showOnlyErroredItems && !rowValues.hasError) || filterOutItems;
       return { className, hideRow };
@@ -102,7 +101,7 @@ const AD_HOCK_FIELDS = {
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
         attributes: {
-          formatValue: value => (
+          formatValue: (value) => (
             <Tooltip
               html={<div className="text-truncate">{value.name}</div>}
               theme="dark"
@@ -129,7 +128,7 @@ const AD_HOCK_FIELDS = {
         defaultMessage: 'Requester QOH',
         flexWidth: '1',
         attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
           numberField: true,
         },
       },
@@ -139,7 +138,7 @@ const AD_HOCK_FIELDS = {
         defaultMessage: 'Demand',
         flexWidth: '1',
         attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
           numberField: true,
         },
       },
@@ -174,7 +173,7 @@ const AD_HOCK_FIELDS = {
         defaultMessage: 'Qty Requested',
         flexWidth: '1',
         attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
           numberField: true,
         },
       },
@@ -186,7 +185,7 @@ const AD_HOCK_FIELDS = {
         fieldKey: '',
         headerClassName: 'left-border',
         attributes: {
-          formatValue: value => (value.quantityOnHand ? (value.quantityOnHand.toLocaleString('en-US')) : value.quantityOnHand),
+          formatValue: (value) => (value.quantityOnHand ? (value.quantityOnHand.toLocaleString('en-US')) : value.quantityOnHand),
           numberField: true,
           className: 'left-border',
         },
@@ -199,8 +198,8 @@ const AD_HOCK_FIELDS = {
         fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => {
           let className = '';
-          if (fieldValue && (!fieldValue.quantityAvailable ||
-              fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
+          if (fieldValue && (!fieldValue.quantityAvailable
+              || fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
             className += 'text-danger';
           }
           return {
@@ -208,7 +207,7 @@ const AD_HOCK_FIELDS = {
           };
         },
         attributes: {
-          formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
+          formatValue: (value) => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
           numberField: true,
         },
       },
@@ -316,12 +315,13 @@ const AD_HOCK_FIELDS = {
           fieldValue, subfield, reasonCodes, updateRow, values, rowIndex, showOnly,
         }) => {
           const isSubstituted = fieldValue && fieldValue.statusCode === 'SUBSTITUTED';
+          const selectedReasonCode = values?.editPageItems[rowIndex]?.reasonCode;
+
           return {
-            disabled: fieldValue === null ||
-              fieldValue === undefined ||
-              subfield ||
-              isSubstituted ||
-              showOnly,
+            disabled: ((fieldValue === null || fieldValue === undefined) && !selectedReasonCode)
+              || subfield
+              || isSubstituted
+              || showOnly,
             options: reasonCodes,
             showValueTooltip: true,
             onBlur: () => updateRow(values, rowIndex),
@@ -339,8 +339,8 @@ const AD_HOCK_FIELDS = {
         getDynamicAttr: ({
           fieldValue, revertItem, values, showOnly,
         }) => ({
-          onClick: fieldValue && fieldValue.requisitionItemId ?
-            () => revertItem(values, fieldValue.requisitionItemId) : () => null,
+          onClick: fieldValue && fieldValue.requisitionItemId
+            ? () => revertItem(values, fieldValue.requisitionItemId) : () => null,
           hidden: fieldValue && fieldValue.statusCode ? !_.includes(['CHANGED', 'CANCELED'], fieldValue.statusCode) : false,
           disabled: showOnly,
         }),
@@ -368,8 +368,8 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         className += 'font-weight-bold';
       }
       const filterOutItems = itemFilter && !(
-        rowValues.product.name.toLowerCase().includes(itemFilter.toLowerCase()) ||
-        rowValues.productCode.toLowerCase().includes(itemFilter.toLowerCase())
+        rowValues.product.name.toLowerCase().includes(itemFilter.toLowerCase())
+        || rowValues.productCode.toLowerCase().includes(itemFilter.toLowerCase())
       );
       const hideRow = (showOnlyErroredItems && !rowValues.hasError) || filterOutItems;
       return { className, hideRow };
@@ -428,7 +428,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         defaultMessage: 'Stocklist QTY',
         flexWidth: '1',
         attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
           numberField: true,
         },
       },
@@ -438,7 +438,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         defaultMessage: 'Requester QOH',
         flexWidth: '1',
         attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
           numberField: true,
         },
       },
@@ -473,7 +473,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         defaultMessage: 'Qty Requested',
         flexWidth: '1',
         attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
           numberField: true,
         },
       },
@@ -485,7 +485,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         fieldKey: '',
         headerClassName: 'left-border',
         attributes: {
-          formatValue: value => (value.quantityOnHand ? (value.quantityOnHand.toLocaleString('en-US')) : value.quantityOnHand),
+          formatValue: (value) => (value.quantityOnHand ? (value.quantityOnHand.toLocaleString('en-US')) : value.quantityOnHand),
           numberField: true,
           className: 'left-border',
         },
@@ -498,8 +498,8 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => {
           let className = '';
-          if (fieldValue && (!fieldValue.quantityAvailable ||
-              fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
+          if (fieldValue && (!fieldValue.quantityAvailable
+              || fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
             className += 'text-danger';
           }
           return {
@@ -507,7 +507,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
           };
         },
         attributes: {
-          formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
+          formatValue: (value) => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
           numberField: true,
         },
       },
@@ -615,12 +615,13 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
           fieldValue, subfield, reasonCodes, updateRow, values, rowIndex, showOnly,
         }) => {
           const isSubstituted = fieldValue && fieldValue.statusCode === 'SUBSTITUTED';
+          const selectedReasonCode = values?.editPageItems[rowIndex]?.reasonCode;
+
           return {
-            disabled: fieldValue === null ||
-              fieldValue === undefined ||
-              subfield ||
-              isSubstituted ||
-              showOnly,
+            disabled: ((fieldValue === null || fieldValue === undefined) && !selectedReasonCode)
+              || subfield
+              || isSubstituted
+              || showOnly,
             options: reasonCodes,
             showValueTooltip: true,
             onBlur: () => updateRow(values, rowIndex),
@@ -638,8 +639,8 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         getDynamicAttr: ({
           fieldValue, revertItem, values, showOnly,
         }) => ({
-          onClick: fieldValue && fieldValue.requisitionItemId ?
-            () => revertItem(values, fieldValue.requisitionItemId) : () => null,
+          onClick: fieldValue && fieldValue.requisitionItemId
+            ? () => revertItem(values, fieldValue.requisitionItemId) : () => null,
           hidden: fieldValue && fieldValue.statusCode ? !_.includes(['CHANGED', 'CANCELED'], fieldValue.statusCode) : false,
           disabled: showOnly,
         }),
@@ -667,8 +668,8 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         className += 'font-weight-bold';
       }
       const filterOutItems = itemFilter && !(
-        rowValues.product.name.toLowerCase().includes(itemFilter.toLowerCase()) ||
-        rowValues.productCode.toLowerCase().includes(itemFilter.toLowerCase())
+        rowValues.product.name.toLowerCase().includes(itemFilter.toLowerCase())
+        || rowValues.productCode.toLowerCase().includes(itemFilter.toLowerCase())
       );
       const hideRow = (showOnlyErroredItems && !rowValues.hasError) || filterOutItems;
       return { className, hideRow };
@@ -727,7 +728,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         defaultMessage: 'Demand per Replenishment Period',
         flexWidth: '1',
         attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
           numberField: true,
         },
       },
@@ -737,7 +738,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         defaultMessage: 'Requester QOH',
         flexWidth: '1',
         attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
           numberField: true,
         },
       },
@@ -772,7 +773,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         defaultMessage: 'Qty Requested',
         flexWidth: '1',
         attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
           numberField: true,
         },
       },
@@ -784,7 +785,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         fieldKey: '',
         headerClassName: 'left-border',
         attributes: {
-          formatValue: value => (value.quantityOnHand ? (value.quantityOnHand.toLocaleString('en-US')) : value.quantityOnHand),
+          formatValue: (value) => (value.quantityOnHand ? (value.quantityOnHand.toLocaleString('en-US')) : value.quantityOnHand),
           numberField: true,
           className: 'left-border',
         },
@@ -797,8 +798,8 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => {
           let className = '';
-          if (fieldValue && (!fieldValue.quantityAvailable ||
-              fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
+          if (fieldValue && (!fieldValue.quantityAvailable
+              || fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
             className += 'text-danger';
           }
           return {
@@ -806,7 +807,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
           };
         },
         attributes: {
-          formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
+          formatValue: (value) => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
           numberField: true,
         },
       },
@@ -914,12 +915,13 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
           fieldValue, subfield, reasonCodes, updateRow, values, rowIndex, showOnly,
         }) => {
           const isSubstituted = fieldValue && fieldValue.statusCode === 'SUBSTITUTED';
+          const selectedReasonCode = values?.editPageItems[rowIndex]?.reasonCode;
+
           return {
-            disabled: fieldValue === null ||
-              fieldValue === undefined ||
-              subfield ||
-              isSubstituted ||
-              showOnly,
+            disabled: ((fieldValue === null || fieldValue === undefined) && !selectedReasonCode)
+              || subfield
+              || isSubstituted
+              || showOnly,
             options: reasonCodes,
             showValueTooltip: true,
             onBlur: () => updateRow(values, rowIndex),
@@ -937,8 +939,8 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         getDynamicAttr: ({
           fieldValue, revertItem, values, showOnly,
         }) => ({
-          onClick: fieldValue && fieldValue.requisitionItemId ?
-            () => revertItem(values, fieldValue.requisitionItemId) : () => null,
+          onClick: fieldValue && fieldValue.requisitionItemId
+            ? () => revertItem(values, fieldValue.requisitionItemId) : () => null,
           hidden: fieldValue && fieldValue.statusCode ? !_.includes(['CHANGED', 'CANCELED'], fieldValue.statusCode) : false,
           disabled: showOnly,
         }),
@@ -967,8 +969,8 @@ function validateForSave(values) {
         quantityRevised: 'react.stockMovement.errors.sameRevisedQty.label',
       };
     }
-    if (!_.isEmpty(item.quantityRevised) && item.quantityAvailable >= 0 &&
-      (item.quantityRevised > item.quantityAvailable)) {
+    if (!_.isEmpty(item.quantityRevised) && item.quantityAvailable >= 0
+      && (item.quantityRevised > item.quantityAvailable)) {
       errors.editPageItems[key] = { quantityRevised: 'react.stockMovement.errors.higherQty.label' };
     }
     if (!_.isEmpty(item.quantityRevised) && (item.quantityRevised < 0)) {
@@ -1035,7 +1037,7 @@ class EditItemsPage extends Component {
     const { data } = response.data;
     const editPageItems = _.map(
       data,
-      val => ({
+      (val) => ({
         ...val,
         disabled: true,
         quantityOnHand: val.quantityOnHand > 0 ? val.quantityOnHand : 0,
@@ -1048,7 +1050,7 @@ class EditItemsPage extends Component {
         },
         // eslint-disable-next-line max-len
         reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(val.reasonCode, value)),
-        substitutionItems: _.map(val.substitutionItems, sub => ({
+        substitutionItems: _.map(val.substitutionItems, (sub) => ({
           ...sub,
           requisitionItemId: val.requisitionItemId,
           product: {
@@ -1061,15 +1063,15 @@ class EditItemsPage extends Component {
       }),
     );
 
-    this.setState({
-      revisedItems: _.filter(editPageItems, item => item.statusCode === 'CHANGED'),
+    this.setState((prev) => ({
+      revisedItems: _.filter(editPageItems, (item) => item.statusCode === 'CHANGED'),
       values: {
-        ...this.state.values,
-        editPageItems: _.uniqBy(_.concat(this.state.values.editPageItems, editPageItems), 'requisitionItemId'),
+        ...prev.values,
+        editPageItems: _.uniqBy(_.concat(prev.values.editPageItems, editPageItems), 'requisitionItemId'),
       },
-      hasItemsLoaded: this.state.hasItemsLoaded
-      || this.state.totalCount === _.uniqBy(_.concat(this.state.values.editPageItems, editPageItems), 'requisitionItemId').length,
-    }, () => {
+      hasItemsLoaded: prev.hasItemsLoaded
+      || prev.totalCount === _.uniqBy(_.concat(prev.values.editPageItems, editPageItems), 'requisitionItemId').length,
+    }), () => {
       // eslint-disable-next-line max-len
       if (!_.isNull(startIndex) && this.state.values.editPageItems.length !== this.state.totalCount) {
         this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
@@ -1118,10 +1120,10 @@ class EditItemsPage extends Component {
       });
     });
 
-    this.setState({
+    this.setState((prev) => ({
       values: updatedValues,
-      showOnlyErroredItems: !errors.editPageItems.length ? false : this.state.showOnlyErroredItems,
-    });
+      showOnlyErroredItems: !errors.editPageItems.length ? false : prev.showOnlyErroredItems,
+    }));
   }
 
   dataFetched = false;
@@ -1140,14 +1142,14 @@ class EditItemsPage extends Component {
       const { statusCode, associations } = resp.data.data;
       const { totalCount } = resp.data;
 
-      this.setState({
+      this.setState((prev) => ({
         statusCode,
         totalCount,
         values: {
-          ...this.state.values,
+          ...prev.values,
           associations,
         },
-      }, () => {
+      }), () => {
         if (!this.props.isPaginated || forceFetch) {
           this.fetchItems();
         }
@@ -1173,18 +1175,18 @@ class EditItemsPage extends Component {
     apiClient.get(url)
       .then((response) => {
         const { data } = response.data;
-        this.setState({
+        this.setState((prev) => ({
           hasItemsLoaded: true,
           values: {
-            ...this.state.values,
+            ...prev.values,
             associations: data?.associations,
-            editPageItems: _.map(data, item => ({
+            editPageItems: _.map(data, (item) => ({
               ...item,
               quantityOnHandRequesting: item.quantityCounted,
               quantityOnHand: item.quantityOnHand || 0,
               // eslint-disable-next-line max-len
               reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(item.reasonCode, value)),
-              substitutionItems: _.map(item.substitutionItems, sub => ({
+              substitutionItems: _.map(item.substitutionItems, (sub) => ({
                 ...sub,
                 requisitionItemId: item.requisitionItemId,
                 // eslint-disable-next-line max-len
@@ -1192,7 +1194,7 @@ class EditItemsPage extends Component {
               })),
             })),
           },
-        }, () => {
+        }), () => {
           this.fetchAllData(false);
           this.props.hideSpinner();
         });
@@ -1230,11 +1232,11 @@ class EditItemsPage extends Component {
         if (item.quantityRevised && item.reasonCode) {
           const oldRevision = _.find(
             this.state.revisedItems,
-            revision => revision.requisitionItemId === item.requisitionItemId,
+            (revision) => revision.requisitionItemId === item.requisitionItemId,
           );
-          return _.isEmpty(oldRevision) ? true :
-            ((_.toInteger(oldRevision.quantityRevised) !== _.toInteger(item.quantityRevised)) ||
-              (oldRevision.reasonCode !== item.reasonCode));
+          return _.isEmpty(oldRevision) ? true
+            : ((_.toInteger(oldRevision.quantityRevised) !== _.toInteger(item.quantityRevised))
+              || (oldRevision.reasonCode !== item.reasonCode));
         }
         return false;
       },
@@ -1243,7 +1245,7 @@ class EditItemsPage extends Component {
     let updatedValues = values;
 
     _.forEach(itemsToRevise, (item) => {
-      const editPageItemIndex = _.findIndex(this.state.values.editPageItems, editPageItem =>
+      const editPageItemIndex = _.findIndex(this.state.values.editPageItems, (editPageItem) =>
         item.requisitionItemId === editPageItem.requisitionItemId);
 
       updatedValues = update(updatedValues, {
@@ -1263,7 +1265,7 @@ class EditItemsPage extends Component {
 
     const url = `/api/stockMovements/${this.state.values.stockMovementId}/reviseItems`;
     const payload = {
-      lineItems: _.map(itemsToRevise, item => ({
+      lineItems: _.map(itemsToRevise, (item) => ({
         id: item.requisitionItemId,
         quantityRevised: item.quantityRevised,
         reasonCode: item.reasonCode.value,
@@ -1310,10 +1312,10 @@ class EditItemsPage extends Component {
         // If reponse 200, then save revise items taken from the payload
         const payload = JSON.parse(resp.config.data);
         if (payload.lineItems && payload.lineItems.length) {
-          const savedItemIds = payload.lineItems.map(item => item.id);
+          const savedItemIds = payload.lineItems.map((item) => item.id);
           // Map to have the required field
           // (requisitionItemId, quantityRevised and reasonCode as obj)
-          const savedItems = payload.lineItems.map(item => ({
+          const savedItems = payload.lineItems.map((item) => ({
             ...item,
             requisitionItemId: item.id,
             reasonCode: _.find(
@@ -1324,7 +1326,7 @@ class EditItemsPage extends Component {
           // Get old revise items, that were not changed in this request
           const oldItems = _.filter(
             this.state.values.editPageItems,
-            item => savedItemIds.indexOf(item.requisitionItemId) < 0,
+            (item) => savedItemIds.indexOf(item.requisitionItemId) < 0,
           );
           this.setState({
             revisedItems: [...oldItems, ...savedItems],
@@ -1392,8 +1394,8 @@ class EditItemsPage extends Component {
     const url = `/api/stockMovements/${this.state.values.stockMovementId}`;
 
     return apiClient.get(url)
-      .then(resp => resp)
-      .catch(err => err);
+      .then((resp) => resp)
+      .catch((err) => err);
   }
 
   /**
@@ -1417,12 +1419,12 @@ class EditItemsPage extends Component {
    * @public
    */
   updateEditPageItem(values, editPageItem) {
-    const editPageItemIndex = _.findIndex(this.state.values.editPageItems, item =>
+    const editPageItemIndex = _.findIndex(this.state.values.editPageItems, (item) =>
       item.requisitionItemId === editPageItem.requisitionItemId);
-    const revisedItemIndex = _.findIndex(this.state.revisedItems, item =>
+    const revisedItemIndex = _.findIndex(this.state.revisedItems, (item) =>
       item.requisitionItemId === editPageItem.requisitionItemId);
 
-    this.setState({
+    this.setState((prev) => ({
       values: {
         ...values,
         editPageItems: update(values.editPageItems, {
@@ -1433,7 +1435,7 @@ class EditItemsPage extends Component {
               quantityOnHandRequesting: editPageItem.quantityCounted,
               quantityOnHand: editPageItem.quantityOnHand || 0,
               quantityAvailable: editPageItem.quantityAvailable || 0,
-              substitutionItems: _.map(editPageItem.substitutionItems, sub => ({
+              substitutionItems: _.map(editPageItem.substitutionItems, (sub) => ({
                 ...sub,
                 requisitionItemId: editPageItem.requisitionItemId,
               })),
@@ -1441,10 +1443,10 @@ class EditItemsPage extends Component {
           },
         }),
       },
-      revisedItems: update(this.state.revisedItems, revisedItemIndex > -1 ? {
+      revisedItems: update(prev.revisedItems, revisedItemIndex > -1 ? {
         $splice: [[revisedItemIndex, 1]],
       } : {}),
-    });
+    }));
   }
 
   /**
@@ -1465,7 +1467,9 @@ class EditItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = STOCK_MOVEMENT_URL.show(formValues.stockMovementId); },
+            onClick: () => {
+              window.location = STOCK_MOVEMENT_URL.show(formValues.stockMovementId);
+            },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -1526,7 +1530,7 @@ class EditItemsPage extends Component {
     const { showOnlyErroredItems, itemFilter } = this.state;
     const { showOnly } = this.props;
     const isAddingItemsAllowed = this.isAddingItemsAllowed();
-    const erroredItemsCount = this.state.values && this.state.values.editPageItems.length > 0 ? _.filter(this.state.values.editPageItems, item => item.hasError).length : '0';
+    const erroredItemsCount = this.state.values && this.state.values.editPageItems.length > 0 ? _.filter(this.state.values.editPageItems, (item) => item.hasError).length : '0';
     return (
       <Form
         onSubmit={() => {}}
@@ -1535,17 +1539,20 @@ class EditItemsPage extends Component {
         initialValues={this.state.values}
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
-            { !showOnly ?
-              <span className="buttons-container">
-                <div className="d-flex mr-auto justify-content-center align-items-center">
-                  <input
-                    value={itemFilter}
-                    onChange={event => this.setState({ itemFilter: event.target.value })}
-                    className="float-left btn btn-outline-secondary btn-xs filter-input mr-1 mb-1"
-                    placeholder={this.props.translate('react.stockMovement.searchPlaceholder.label', 'Search...')}
-                  />
-                  {itemFilter &&
+            { !showOnly
+              ? (
+                <span className="buttons-container">
+                  <div className="d-flex mr-auto justify-content-center align-items-center">
+                    <input
+                      value={itemFilter}
+                      onChange={(event) => this.setState({ itemFilter: event.target.value })}
+                      className="float-left btn btn-outline-secondary btn-xs filter-input mr-1 mb-1"
+                      placeholder={this.props.translate('react.stockMovement.searchPlaceholder.label', 'Search...')}
+                    />
+                    {itemFilter
+                    && (
                     <i
+                      aria-label="Clear filter"
                       role="button"
                       className="fa fa-times-circle"
                       style={{ color: 'grey', cursor: 'pointer' }}
@@ -1553,63 +1560,80 @@ class EditItemsPage extends Component {
                       onKeyPress={() => this.setState({ itemFilter: '' })}
                       tabIndex={0}
                     />
-                  }
-                </div>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => this.setState({ showOnlyErroredItems: !showOnlyErroredItems })}
+                    className={`float-right mb-1 btn btn-outline-secondary align-self-end ml-3 btn-xs ${showOnlyErroredItems ? 'active' : ''}`}
+                  >
+                    <span>
+                      {erroredItemsCount}
+                      {' '}
+                      <Translate id="react.stockMovement.erroredItemsCount.label" defaultMessage="item(s) require your attention" />
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => this.refresh()}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end ml-3 btn-xs"
+                  >
+                    <span>
+                      <i className="fa fa-refresh pr-2" />
+                      <Translate
+                        id="react.default.button.refresh.label"
+                        defaultMessage="Reload"
+                      />
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => this.save(values)}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end ml-3 btn-xs"
+                  >
+                    <span>
+                      <i className="fa fa-save pr-2" />
+                      <Translate
+                        id="react.default.button.saveProgress.label"
+                        defaultMessage="Save Progress"
+                      />
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => this.saveAndExit(values)}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                  >
+                    <span>
+                      <i className="fa fa-sign-out pr-2" />
+                      <Translate
+                        id="react.default.button.saveAndExit.label"
+                        defaultMessage="Save and exit"
+                      />
+                    </span>
+                  </button>
+                </span>
+              )
+              : (
                 <button
                   type="button"
-                  onClick={() => this.setState({ showOnlyErroredItems: !showOnlyErroredItems })}
-                  className={`float-right mb-1 btn btn-outline-secondary align-self-end ml-3 btn-xs ${showOnlyErroredItems ? 'active' : ''}`}
+                  onClick={() => {
+                    if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
+                      this.props.history.push(DASHBOARD_URL.base);
+                    } else {
+                      this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
+                    }
+                  }}
+                  className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                 >
-                  <span>{erroredItemsCount} <Translate id="react.stockMovement.erroredItemsCount.label" defaultMessage="item(s) require your attention" /></span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => this.refresh()}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-3 btn-xs"
-                >
-                  <span><i className="fa fa-refresh pr-2" /><Translate
-                    id="react.default.button.refresh.label"
-                    defaultMessage="Reload"
-                  />
+                  <span>
+                    <i className="fa fa-sign-out pr-2" />
+                    {' '}
+                    <Translate id="react.default.button.exit.label" defaultMessage="Exit" />
+                    {' '}
                   </span>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => this.save(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-3 btn-xs"
-                >
-                  <span><i className="fa fa-save pr-2" /><Translate
-                    id="react.default.button.saveProgress.label"
-                    defaultMessage="Save Progress"
-                  />
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => this.saveAndExit(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
-                >
-                  <span><i className="fa fa-sign-out pr-2" /><Translate
-                    id="react.default.button.saveAndExit.label"
-                    defaultMessage="Save and exit"
-                  />
-                  </span>
-                </button>
-              </span>
-                :
-              <button
-                type="button"
-                onClick={() => {
-                  if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-                    this.props.history.push(DASHBOARD_URL.base);
-                  } else {
-                    this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
-                  }
-                }}
-                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
-              >
-                <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
-              </button> }
+              ) }
             <form onSubmit={handleSubmit}>
               <div className="table-form">
                 {_.map(this.getFields(), (fieldConfig, fieldName) =>
@@ -1631,17 +1655,21 @@ class EditItemsPage extends Component {
                     showOnly,
                     showOnlyErroredItems,
                     itemFilter,
-                }))}
+                  }))}
               </div>
               <div className={`submit-buttons ${isAddingItemsAllowed ? 'd-flex justify-content-between' : ''}`}>
-                {isAddingItemsAllowed &&
+                {isAddingItemsAllowed
+                  && (
                   <Button
                     label="react.stockMovement.editRequestItems.label"
                     defaultLabel="Edit request items"
                     variant="primary-outline"
-                    onClick={() => this.props.history.push(STOCK_MOVEMENT_URL.editRequest(this.state.values?.id))}
+                    onClick={() => {
+                      const { history } = this.props;
+                      history.push(STOCK_MOVEMENT_URL.editRequest(this.state.values?.id));
+                    }}
                   />
-                }
+                  )}
                 <button
                   type="submit"
                   disabled={!this.state.hasItemsLoaded || showOnly || invalid}
@@ -1663,7 +1691,7 @@ class EditItemsPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   reasonCodes: state.reasonCodes.data,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,

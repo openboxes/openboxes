@@ -11,6 +11,7 @@ import { withRouter } from 'react-router-dom';
 import { hideSpinner, showSpinner } from 'actions';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import activityCode from 'consts/activityCode';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
@@ -18,7 +19,6 @@ import { debounceLocationsFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
 
 const { orderId } = queryString.parse(window.location.search);
 
@@ -58,9 +58,9 @@ const FIELDS = {
       autoload: false,
       cache: false,
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
-    getDynamicAttr: props => ({
+    getDynamicAttr: (props) => ({
       loadOptions: props.debouncedOriginLocationsFetch,
       disabled: !_.isNil(props.stockMovementId),
     }),
@@ -77,12 +77,12 @@ const FIELDS = {
       autoload: false,
       cache: false,
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
-    getDynamicAttr: props => ({
+    getDynamicAttr: (props) => ({
       loadOptions: props.debouncedDestinationLocationsFetch,
-      disabled: (!props.isSuperuser || !_.isNil(props.stockMovementId)) &&
-        !props.hasCentralPurchasingEnabled,
+      disabled: (!props.isSuperuser || !_.isNil(props.stockMovementId))
+        && !props.hasCentralPurchasingEnabled,
     }),
   },
 };
@@ -96,23 +96,26 @@ class CreateStockMovement extends Component {
       values: this.props.initialValues,
     };
 
-    this.debouncedOriginLocationsFetch =
-      debounceLocationsFetch(
-        this.props.debounceTime,
-        this.props.minSearchLength,
-        null, // activityCodes
-        false, // fetchAll
-        true, // withOrgCode
-        false, // withTypeDescription
-      );
+    this.debouncedOriginLocationsFetch = debounceLocationsFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+      null, // activityCodes
+      false, // fetchAll
+      true, // withOrgCode
+      false, // withTypeDescription
+    );
 
-    this.debouncedDestinationLocationsFetch =
-      debounceLocationsFetch(
-        this.props.debounceTime,
-        this.props.minSearchLength,
-        null,
-        true,
-      );
+    this.debouncedDestinationLocationsFetch = debounceLocationsFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+      [activityCode.RECEIVE_STOCK], // activityCodes
+      true, // fetchAll
+      false, // withOrgCode
+      true, // withTypeDescription
+      false, // isReturnOrder
+      null, // direction
+      true, // withOrganization
+    );
   }
 
   componentDidMount() {
@@ -123,7 +126,7 @@ class CreateStockMovement extends Component {
           const { data } = resp.data;
           this.setInitialValues(data.origin, data.destination);
         })
-        .catch(err => err);
+        .catch((err) => err);
     }
   }
 
@@ -213,7 +216,7 @@ class CreateStockMovement extends Component {
   render() {
     return (
       <Form
-        onSubmit={values => this.saveStockMovement(values)}
+        onSubmit={(values) => this.saveStockMovement(values)}
         validate={validate}
         initialValues={this.state.values}
         render={({ handleSubmit, values }) => (
@@ -242,7 +245,7 @@ class CreateStockMovement extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   location: state.session.currentLocation,
   isSuperuser: state.session.isSuperuser,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),

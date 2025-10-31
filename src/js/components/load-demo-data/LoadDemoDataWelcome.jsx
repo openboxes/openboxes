@@ -2,15 +2,14 @@ import React, { useState } from 'react';
 
 import PropTypes from 'prop-types';
 
+import LOAD_DATA_STEPS from 'consts/loadDataStep';
 import Translate from 'utils/Translate';
-
-import { LOAD_DATA_STEPS } from './LoadDemoDataPage';
 
 const LoadDemoDataWelcome = ({ skipConfiguration, goToStep }) => {
   const [loadDataOption, setLoadDataOption] = useState(null);
 
   return (
-    <React.Fragment>
+    <>
       <h3 className="font-weight-bold my-3">
         <Translate id="react.loadData.welcomeHeader.label" defaultMessage="Welcome to OpenBoxes!" />
       </h3>
@@ -20,7 +19,7 @@ const LoadDemoDataWelcome = ({ skipConfiguration, goToStep }) => {
           options={{ renderInnerHtml: true }}
         />
       </p>
-      <div onChange={e => setLoadDataOption(e.target.value)}>
+      <div onChange={(e) => setLoadDataOption(e.target.value)}>
         <div>
           <input
             name="location-data"
@@ -68,7 +67,7 @@ const LoadDemoDataWelcome = ({ skipConfiguration, goToStep }) => {
           <Translate id="default.button.next.label" defaultMessage="Next" />
         </button>
       </div>
-    </React.Fragment>
+    </>
   );
 };
 

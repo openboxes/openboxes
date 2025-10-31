@@ -14,10 +14,10 @@
 		<g:render template="summary"/>
 
 		<g:if test="${flash.message}">
-			<div class="message">${flash.message}</div>
+			<div class="message" role="status" aria-label="message">${flash.message}</div>
 		</g:if>
 		<g:hasErrors bean="${shipmentInstance}">
-			<div class="errors">
+			<div class="errors" role="alert" aria-label="error-message">
 				<g:renderErrors bean="${shipmentInstance}" as="list" />
 			</div>
 		</g:hasErrors>

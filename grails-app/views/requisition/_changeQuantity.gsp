@@ -2,7 +2,7 @@
     <h2>${warehouse.message(code:'requisitionItem.changeQuantity.label', default:'Change quantity')}</h2>
 
     <g:hasErrors bean="${flash.errors}">
-        <div class="errors">
+        <div class="errors" role="alert" aria-label="error-message">
             <g:renderErrors bean="${flash.errors}" as="list" />
         </div>
     </g:hasErrors>

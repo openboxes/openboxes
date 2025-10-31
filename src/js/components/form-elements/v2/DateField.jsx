@@ -1,18 +1,22 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
+import { useSelector } from 'react-redux';
+import { getCurrentLocale } from 'selectors';
 
 import DateFieldInput from 'components/form-elements/v2/DateFieldInput';
+import componentType from 'consts/componentType';
 import { DateFormat, TimeFormat } from 'consts/timeFormat';
+import useFocusOnMatch from 'hooks/useFocusOnMatch';
+import useTranslate from 'hooks/useTranslate';
 import InputWrapper from 'wrappers/InputWrapper';
 import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import 'components/form-elements/DateFilter/DateFilter.scss';
 import './style.scss';
-import useTranslate from 'hooks/useTranslate';
 
 const DateField = ({
   title,
@@ -25,19 +29,46 @@ const DateField = ({
   className,
   value,
   onChange,
+  showTimeSelect,
+  hideErrorMessageWrapper,
+  customDateFormat,
+  onChangeRaw,
+  clearable,
+  wrapperClassName,
+  focusProps = {},
   ...fieldProps
 }) => {
   const translate = useTranslate();
   const onClear = () => onChange(null);
-
-  const onChangeHandler = date => onChange(date?.format(DateFormat.MMM_DD_YYYY));
+  const onChangeHandler = (date) => {
+    if (showTimeSelect) {
+      onChange(date?.format(DateFormat.MMM_DD_YYYY_HH_MM_SS));
+      return;
+    }
+    onChange(date?.format(DateFormat.MMM_DD_YYYY));
+  };
+  const locale = useSelector(getCurrentLocale);
 
   const formatDate = (dateToFormat) => {
     if (!dateToFormat) {
       return null;
     }
 
-    return moment(new Date(dateToFormat), DateFormat.MMM_DD_YYYY);
+    const format = showTimeSelect
+      ? DateFormat.MMM_DD_YYYY_HH_MM_SS
+      : DateFormat.MMM_DD_YYYY;
+
+    // The locale has to be lower cased, because moment.js accepts arguments like: 'es-mx', not
+    // 'es-MX' we can't just return null if the locale is not already loaded, because the date needs
+    // to have value, so we default to 'en' in that case
+    const language = (locale || 'en').toLowerCase();
+    // If the date is not valid in the given format, we try to parse it without format
+    const date = moment(dateToFormat, format, language, true);
+    if (date.isValid()) {
+      return date;
+    }
+    // Fallback to default parsing
+    return moment(dateToFormat);
   };
 
   const selectedDate = formatDate(value);
@@ -47,6 +78,17 @@ const DateField = ({
     ? translate(placeholder?.id, placeholder?.default)
     : placeholder;
 
+  const datePickerRef = useRef(null);
+
+  const getDateFormat = () => {
+    if (showTimeSelect) {
+      return customDateFormat ? `${customDateFormat} HH:mm:ss` : DateFormat.MMM_DD_YYYY_HH_MM_SS;
+    }
+    return customDateFormat || DateFormat.MMM_DD_YYYY;
+  };
+
+  useFocusOnMatch({ ...focusProps, ref: datePickerRef, type: componentType.DATE_FIELD });
+
   return (
     <InputWrapper
       title={title}
@@ -54,13 +96,19 @@ const DateField = ({
       tooltip={tooltip}
       errorMessage={errorMessage}
       button={button}
+      hideErrorMessageWrapper={hideErrorMessageWrapper}
+      className={wrapperClassName}
     >
       <DatePicker
         {...fieldProps}
-        customInput={<DateFieldInput onClear={onClear} />}
+        // Temporary workaround: using 'ar' locale causes the app to crash when selecting a date.
+        // Fallback to 'en' to avoid the crash
+        locale={locale === 'ar' ? 'en' : locale}
+        showTimeSelect={showTimeSelect}
+        customInput={<DateFieldInput onClear={onClear} clearable={clearable} />}
         className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
         dropdownMode="scroll"
-        dateFormat={DateFormat.MMM_DD_YYYY}
+        dateFormat={getDateFormat()}
         timeFormat={TimeFormat.HH_MM}
         disabled={disabled}
         timeIntervals={15}
@@ -73,7 +121,16 @@ const DateField = ({
         popperContainer={RootPortalWrapper}
         selected={selectedDate}
         highlightDates={highlightedDates}
-        onChange={onChangeHandler}
+        onChange={onChangeRaw || onChangeHandler}
+        onSelect={() => {
+          // Close date picker on select - this is somewhat a workaround to close the datepicker
+          // when using showTimeSelect, when we are expecting to close the datepicker
+          // after picking the date without picking the time.
+          datePickerRef.current?.setOpen(false);
+        }}
+        ref={(el) => {
+          datePickerRef.current = el;
+        }}
       />
     </InputWrapper>
   );
@@ -116,6 +173,18 @@ DateField.propTypes = {
   className: PropTypes.string,
   value: PropTypes.string,
   onChange: PropTypes.func,
+  showTimeSelect: PropTypes.bool,
+  hideErrorMessageWrapper: PropTypes.bool,
+  customDateFormat: PropTypes.string,
+  focusProps: PropTypes.shape({
+    fieldIndex: PropTypes.string,
+    fieldId: PropTypes.string,
+    rowIndex: PropTypes.string,
+    columnId: PropTypes.string,
+  }),
+  onChangeRaw: PropTypes.func,
+  clearable: PropTypes.bool,
+  wrapperClassName: PropTypes.string,
 };
 
 DateField.defaultProps = {
@@ -127,6 +196,13 @@ DateField.defaultProps = {
   disabled: false,
   placeholder: '',
   className: '',
+  wrapperClassName: '',
   value: null,
   onChange: () => {},
+  showTimeSelect: false,
+  hideErrorMessageWrapper: false,
+  customDateFormat: null,
+  focusProps: {},
+  onChangeRaw: null,
+  clearable: true,
 };

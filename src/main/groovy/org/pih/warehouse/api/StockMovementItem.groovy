@@ -2,6 +2,7 @@ package org.pih.warehouse.api
 
 import grails.util.Holders
 import org.apache.commons.lang.math.NumberUtils
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -9,6 +10,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.ShipmentItem
 
@@ -23,6 +25,7 @@ class StockMovementItem {
 
     StockMovement stockMovement
     RequisitionItem requisitionItem
+    ProductSupplier productSupplier
 
     BigDecimal quantityRequested
     BigDecimal quantityOnHand
@@ -31,6 +34,8 @@ class StockMovementItem {
     BigDecimal quantityCanceled
     BigDecimal quantityPicked
     BigDecimal quantityShipped
+
+    String unitOfMeasure
 
     // saved QOH in ward request
     Integer quantityCounted
@@ -75,6 +80,13 @@ class StockMovementItem {
             it?.product?.productCode == requisitionItem?.product?.productCode
         }
         return stocklistItem?.quantity ?: null
+    }
+
+    BigDecimal getPacksRequested () {
+        if (packSize == null || packSize == 0 || quantityRequested == null) {
+            return null
+        }
+        return quantityRequested?.toBigDecimal() / packSize.toBigDecimal()
     }
 
 
@@ -130,6 +142,8 @@ class StockMovementItem {
                 quantityCanceled          : quantityCanceled,
                 quantityRevised           : quantityRevised,
                 quantityPicked            : quantityPicked,
+                unitOfMeasure             : unitOfMeasure,
+                packsRequested            : packsRequested,
                 quantityRequired          : quantityRequired,
                 reasonCode                : reasonCode,
                 comments                  : comments,
@@ -137,6 +151,11 @@ class StockMovementItem {
                 substitutionItems         : substitutionItems,
                 sortOrder                 : sortOrder,
                 orderItemId               : orderItemId,
+                productSupplier           : productSupplier ? [
+                        id            : productSupplier.id,
+                        name          : productSupplier.name,
+                        code          : productSupplier.code,
+                ] : null,
                 orderNumber               : orderNumber,
                 orderId                   : orderId,
                 packSize                  : packSize,
@@ -171,6 +190,7 @@ class StockMovementItem {
                 palletName: palletName,
                 boxName: boxName,
                 orderItemId: shipmentItem.orderItemId,
+                productSupplier: shipmentItem.orderItem?.productSupplier,
                 comments: null,
                 lotNumber: shipmentItem?.inventoryItem?.lotNumber ?: "",
                 expirationDate: shipmentItem?.inventoryItem?.expirationDate,
@@ -178,6 +198,7 @@ class StockMovementItem {
                 orderNumber: shipmentItem?.orderNumber,
                 orderId: shipmentItem?.orderId,
                 quantityAvailable: shipmentItem.quantityRemainingToShip,
+                unitOfMeasure: shipmentItem.unitOfMeasure,
                 packSize: shipmentItem.quantityPerUom,
         )
     }
@@ -233,6 +254,7 @@ class StockMovementItem {
                 quantityRequested: orderItem.quantityRemainingToShip * orderItem.quantityPerUom,
                 recipient: orderItem.recipient,
                 orderItemId: orderItem.id,
+                productSupplier: orderItem.productSupplier,
                 orderNumber: orderItem.order.orderNumber,
         )
     }
@@ -323,17 +345,21 @@ class AvailableItem {
         quantityAvailable(nullable: true)
     }
 
+    String getBinLocationName() {
+        binLocation?.name?:Constants.DEFAULT_BIN_LOCATION_NAME
+    }
+
     AvailableItemStatus getStatus() {
-        if (inventoryItem?.recalled) {
+        if (recalled) {
             return AvailableItemStatus.RECALLED
         }
-        if (binLocation?.onHold) {
+        if (onHold) {
             return AvailableItemStatus.HOLD
         }
-        if (quantityAvailable > 0 && quantityAvailable < quantityOnHand) {
+        if (available && quantityAvailable < quantityOnHand) {
             return AvailableItemStatus.PICKED
         }
-        if (quantityAvailable > 0) {
+        if (available) {
             return AvailableItemStatus.AVAILABLE
         }
         if (quantityOnHand <= 0) {
@@ -353,6 +379,42 @@ class AvailableItem {
 
     Boolean isRecalled() {
         return inventoryItem?.recalled
+    }
+
+    Boolean getIsDefaultInventoryItem() {
+        return inventoryItem?.isDefault
+    }
+
+    Boolean getIsDefaultLocation() {
+        return binLocation == null
+    }
+
+    // TODO Need to test this thoroughly to make sure it works as expected
+    Boolean getIsPhysicalLocation() {
+        return !isVirtualLocation && !isOnHold()
+    }
+
+    /**
+     * Virtual locations are the default or receiving locations.
+     *
+     * @return
+     */
+    Boolean getIsVirtualLocation() {
+        return isDefaultLocation || isReceivingLocation
+    }
+
+    // TODO This may not actually be the correct logic, but it's all we have for now. The
+    //  side effect of this is that it may return true in cases that we don't want it to.
+    Boolean getIsReceivingLocation() {
+        return binLocation?.supports(ActivityCode.RECEIVE_STOCK)
+    }
+
+    Boolean isAvailable() {
+        return quantityAvailable > 0
+    }
+
+    Boolean isQuantityPickable(Integer quantity) {
+        return available && pickable && quantity <= quantityAvailable
     }
 
     Map toJson() {
@@ -375,10 +437,44 @@ class AvailableItem {
         ]
     }
 
+    @Override
+    boolean equals(Object other) {
+        if (this.is(other)) return true
+        if (!(other instanceof AvailableItem)) return false
+
+        AvailableItem that = (AvailableItem) other
+
+        if (binLocation != that.binLocation) return false
+        if (inventoryItem != that.inventoryItem) return false
+        if (pickedRequisitionNumbers != that.pickedRequisitionNumbers) return false
+        if (quantityAvailable != that.quantityAvailable) return false
+        if (quantityOnHand != that.quantityOnHand) return false
+
+        return true
+    }
+
+    @Override
+    int hashCode() {
+        int result
+        result = (inventoryItem != null ? inventoryItem.hashCode() : 0)
+        result = 31 * result + (binLocation != null ? binLocation.hashCode() : 0)
+        result = 31 * result + (quantityAvailable != null ? quantityAvailable.hashCode() : 0)
+        result = 31 * result + (quantityOnHand != null ? quantityOnHand.hashCode() : 0)
+        result = 31 * result + (pickedRequisitionNumbers != null ? pickedRequisitionNumbers.hashCode() : 0)
+        return result
+    }
 }
 
 enum AvailableItemStatus {
     AVAILABLE, PICKED, RECALLED, HOLD, NOT_AVAILABLE
+
+    static list() {
+        [AVAILABLE, PICKED, RECALLED, HOLD, NOT_AVAILABLE]
+    }
+
+    static listUnavailable() {
+        [RECALLED, HOLD, NOT_AVAILABLE]
+    }
 }
 
 class SuggestedItem extends AvailableItem {
@@ -578,6 +674,7 @@ class PickPageItem {
                 productId           : requisitionItem?.product?.id,
                 product             : requisitionItem?.product,
                 reasonCode          : requisitionItem?.cancelReasonCode,
+                autoAllocated       : requisitionItem?.autoAllocated,
                 comments            : requisitionItem?.cancelComments,
                 quantityRequested   : requisitionItem.quantity,
                 quantityRequired    : quantityRequired,
@@ -620,10 +717,59 @@ class PickPageItem {
         return picklistItems ? picklistItems?.sum { it.quantity } : 0
     }
 
+    // TODO Document the reason why the default value is null instead of 0? See OBPIH-912.
     Integer getQuantityAvailable() {
         return availableItems ? availableItems?.sum { it.quantityAvailable } : null
     }
 
+    /**
+     * @deprecated Not the correct way to find available items.
+     * @param binLocationName
+     * @param lotNumber
+     * @return
+     */
+    // TODO Remove this method if we decide that it's no longer required. There's logic here
+    //  that I don't fully understand so I want to make sure the alternate solution takes what I
+    //  assume is the "default" bin and lot number logic into account.
+    //  i.e. (!item.binLocation and !item.inventoryItem?.lotNumber)
+//    AvailableItem getAvailableItem(String binLocationName, String lotNumber) {
+//        return availableItems?.find { item ->
+//            Boolean binLocationMatches = binLocationName ? item.binLocation?.name == binLocationName : !item.binLocation
+//            Boolean lotMatches = lotNumber ? item.inventoryItem?.lotNumber == lotNumber : !item.inventoryItem?.lotNumber
+//            binLocationMatches && lotMatches
+//        }
+//    }
+
+    /**
+     * Get all available items for the given inventory item.
+     * @param inventoryItem
+     * @return
+     */
+    List<AvailableItem> getAvailableItems(InventoryItem inventoryItem) {
+        return availableItems.findAll { availableItem ->
+            availableItem.inventoryItem == inventoryItem
+        }
+    }
+
+    List<AvailableItem> getAvailableItemsInDefaultLocation(InventoryItem inventoryItem) {
+        return availableItems.findAll { availableItem ->
+            availableItem.inventoryItem == inventoryItem && availableItem.binLocation == null
+        }
+    }
+
+    /**
+     * Get all available items for the given inventory item and internal location.
+     * @param inventoryItem
+     * @param internalLocation
+     * @return
+     */
+    AvailableItem getAvailableItem(InventoryItem inventoryItem, Location internalLocation) {
+        // Return only exact matches on inventory item and internal location
+        return availableItems?.find { availableItem ->
+            availableItem.inventoryItem == inventoryItem &&
+                    availableItem.binLocation == internalLocation
+        }
+    }
 
     String getStatusCode() {
 

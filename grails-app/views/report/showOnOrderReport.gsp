@@ -9,10 +9,10 @@
 <div class="body">
 
     <g:if test="${flash.message}">
-        <div class="message">${flash.message}</div>
+        <div class="message" role="status" aria-label="message">${flash.message}</div>
     </g:if>
     <g:hasErrors bean="${reportInstance}">
-        <div class="errors">
+        <div class="errors" role="alert" aria-label="error-message">
             <g:renderErrors bean="${reportInstance}" as="list" />
         </div>
     </g:hasErrors>
@@ -76,7 +76,7 @@
         </div>
         <div class="yui-u">
             <g:hasErrors bean="${command}">
-                <div class="errors">
+                <div class="errors" role="alert" aria-label="error-message">
                     <g:renderErrors bean="${command}" as="list" />
                 </div>
             </g:hasErrors>

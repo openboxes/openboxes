@@ -5,7 +5,6 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import { fetchTranslations } from 'actions';
-import Forecasting from 'components/locations-configuration/Forecasting';
 import LocationAddress from 'components/locations-configuration/LocationAddress';
 import LocationDetails from 'components/locations-configuration/LocationDetails';
 import ZoneAndBinLocations from 'components/locations-configuration/ZoneAndBinLocations';
@@ -14,12 +13,10 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/stock-movement-wizard/StockMovement.scss';
 
-
 const SUPPORT_LINKS = {
   locationDetails: 'Location Details',
   locationAddress: 'Address',
   zoneAndBinLocations: 'Zone and Bin Locations',
-  forecasting: 'Forecasting',
 };
 
 class LocationsConfigurationWizard extends Component {
@@ -49,7 +46,6 @@ class LocationsConfigurationWizard extends Component {
       this.props.translate('react.locationsConfiguration.locationDetails.label', 'Details'),
       this.props.translate('react.locationsConfiguration.address.label', 'Address'),
       this.props.translate('react.locationsConfiguration.zoneAndBin.label', 'Zone and Bin Locations'),
-      this.props.translate('react.locationsConfiguration.forecasting.label', 'Forecasting'),
     ];
   }
 
@@ -59,7 +55,7 @@ class LocationsConfigurationWizard extends Component {
 
   render() {
     const { values, currentPage } = this.state;
-    const pageList = [LocationDetails, LocationAddress, ZoneAndBinLocations, Forecasting];
+    const pageList = [LocationDetails, LocationAddress, ZoneAndBinLocations];
     const { history } = this.props;
 
     return (
@@ -78,7 +74,7 @@ class LocationsConfigurationWizard extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
   location: state.session.currentLocation,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),

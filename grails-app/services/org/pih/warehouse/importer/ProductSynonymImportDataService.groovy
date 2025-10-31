@@ -11,6 +11,7 @@ package org.pih.warehouse.importer
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.product.Product
@@ -58,7 +59,7 @@ class ProductSynonymImportDataService implements ImportDataService {
             if (params['locale']) {
                 List<String> supportedLocales = grailsApplication.config.openboxes.locale.supportedLocales
                 String foundLocale = supportedLocales.find {
-                    it.toLowerCase() == params['locale']?.toLowerCase() || new Locale(it).displayName?.toLowerCase() == params['locale']?.toLowerCase()
+                    it.toLowerCase() == params['locale']?.toLowerCase() || LocalizationUtil.getLocale(it).displayName?.toLowerCase() == params['locale']?.toLowerCase()
                 }
                 if (foundLocale) {
                     params['locale'] = foundLocale
@@ -72,7 +73,7 @@ class ProductSynonymImportDataService implements ImportDataService {
             // before we check the duplicates
             if (!command.errors.allErrors && synonymTypeCode == SynonymTypeCode.DISPLAY_NAME) {
                 Synonym duplicate = product?.synonyms?.find { Synonym synonym ->
-                    synonym.locale == new Locale(params['locale']) && synonym.synonymTypeCode == SynonymTypeCode.DISPLAY_NAME
+                    synonym.locale == LocalizationUtil.getLocale(params['locale']) && synonym.synonymTypeCode == SynonymTypeCode.DISPLAY_NAME
                 }
                 // If the product already has a synonym of type DISPLAY_NAME and a locale
                 // or we are trying to add it in any of the line above for this single import, throw a validation error

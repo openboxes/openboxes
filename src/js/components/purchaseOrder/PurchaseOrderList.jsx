@@ -11,7 +11,6 @@ import PurchaseOrderListTable from 'components/purchaseOrder/PurchaseOrderListTa
 import usePurchaseOrderFilters from 'hooks/list-pages/purchase-order/usePurchaseOrderFilters';
 import useTranslation from 'hooks/useTranslation';
 
-
 const PurchaseOrderList = (props) => {
   const {
     defaultFilterValues, setFilterValues, filterParams, isCentralPurchasingEnabled,
@@ -38,7 +37,7 @@ const PurchaseOrderList = (props) => {
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   buyers: state.organizations.buyers,
   statuses: state.purchaseOrder.statuses,
   paymentTerms: state.purchaseOrder.paymentTerms,
@@ -48,7 +47,6 @@ export default connect(mapStateToProps, {
   fetchStatuses: fetchPurchaseOrderStatuses,
   fetchBuyerOrganizations: fetchBuyers,
 })(PurchaseOrderList);
-
 
 PurchaseOrderList.propTypes = {
   statuses: PropTypes.arrayOf(PropTypes.shape({
@@ -70,4 +68,3 @@ PurchaseOrderList.propTypes = {
     variant: PropTypes.string,
   })).isRequired,
 };
-

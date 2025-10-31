@@ -15,7 +15,7 @@
             	<div class="message">${flash.message}</div>
             </g:if>
             <g:hasErrors bean="${eventTypeInstance}">
-	            <div class="errors">
+	            <div class="errors" role="alert" aria-label="error-message">
 	                <g:renderErrors bean="${eventTypeInstance}" as="list" />
 	            </div>
             </g:hasErrors>
@@ -26,7 +26,7 @@
 	                <div class="dialog">
 	                    <table>
 	                        <tbody>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="name"><warehouse:message code="eventType.name.label" default="Name" /></label>
@@ -35,7 +35,7 @@
 	                                    <g:textField name="name" value="${eventTypeInstance?.name}" />
 	                                </td>
 	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="description"><warehouse:message code="eventType.description.label" default="Description" /></label>
@@ -44,7 +44,7 @@
 	                                    <g:textField name="description" value="${eventTypeInstance?.description}" />
 	                                </td>
 	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="sortOrder"><warehouse:message code="eventType.sortOrder.label" default="Sort Order" /></label>
@@ -53,7 +53,7 @@
 	                                    <g:textField name="sortOrder" value="${fieldValue(bean: eventTypeInstance, field: 'sortOrder')}" />
 	                                </td>
 	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="eventCode"><warehouse:message code="eventType.eventCode.label" default="Event Status" /></label>
@@ -62,17 +62,17 @@
 	                                    <g:select name="eventCode" from="${org.pih.warehouse.core.EventCode?.values()}" value="${eventTypeInstance?.eventCode}" noSelection="['': '']" />
 	                                </td>
 	                            </tr>
-	                        
+
 
                             	<tr class="prop">
 		                        	<td valign="top"></td>
-		                        	<td valign="top">                        	
+		                        	<td valign="top">
 						                <div class="buttons">
 						                    <g:actionSubmit class="save" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
 						                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 						                </div>
-		    						</td>                    	
-	                        	</tr>	                        
+		    						</td>
+	                        	</tr>
 	                        </tbody>
 	                    </table>
 	                </div>

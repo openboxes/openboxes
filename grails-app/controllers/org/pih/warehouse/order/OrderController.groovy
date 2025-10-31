@@ -13,11 +13,14 @@ import fr.opensagres.xdocreport.converter.ConverterTypeTo
 import grails.converters.JSON
 import grails.validation.ValidationException
 import grails.gorm.transactions.Transactional
+import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.DocumentTemplateService
+import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.ValidationCode
 import org.pih.warehouse.data.ProductSupplierService
@@ -34,12 +37,12 @@ import org.pih.warehouse.core.User
 import org.springframework.web.multipart.MultipartFile
 import java.math.RoundingMode
 
-@Transactional
 class OrderController {
     OrderService orderService
     StockMovementService stockMovementService
     ProductSupplierService productSupplierService
     DocumentTemplateService documentTemplateService
+    DocumentService documentService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -220,6 +223,7 @@ class OrderController {
         redirect(controller: 'purchaseOrder', action: 'index')
     }
 
+    @Transactional
     def save() {
         def orderInstance = new Order(params)
         if (orderInstance.save(flush: true)) {
@@ -266,7 +270,7 @@ class OrderController {
         }
     }
 
-
+    @Transactional
     def update() {
         def orderInstance = Order.get(params.id)
         if (orderInstance) {
@@ -354,6 +358,7 @@ class OrderController {
         }
     }
 
+    @Transactional
     def saveAdjustment() {
         def orderInstance = Order.get(params?.order?.id)
         def currentLocation = Location.get(session?.warehouse.id)
@@ -443,6 +448,7 @@ class OrderController {
         }
     }
 
+    @Transactional
     def deleteComment() {
         def orderInstance = Order.get(params.order.id)
         if (!orderInstance) {
@@ -465,6 +471,7 @@ class OrderController {
         }
     }
 
+    @Transactional
     def saveComment() {
         log.info("params " + params)
 
@@ -497,30 +504,39 @@ class OrderController {
     }
 
     def addDocument() {
-        def orderInstance = Order.get(params.id)
+        Order orderInstance = Order.get(params.id)
+        List<DocumentType> documentTypes = documentService.getNonTemplateDocumentTypes()
+
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
             redirect(action: "list")
         } else {
-            return [orderInstance: orderInstance]
+            return [orderInstance: orderInstance, documentTypes: documentTypes]
         }
     }
 
     def editDocument() {
-        def orderInstance = Order.get(params?.order?.id)
+        Order orderInstance = Order.get(params?.order?.id)
+        List<DocumentType> documentTypes = documentService.getNonTemplateDocumentTypes()
+
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
             redirect(action: "list")
         } else {
-            def documentInstance = Document.get(params?.id)
+            Document documentInstance = Document.get(params?.id)
             if (!documentInstance) {
                 flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), documentInstance.id])}"
                 redirect(action: "show", id: orderInstance?.id)
             }
-            render(view: "addDocument", model: [orderInstance: orderInstance, documentInstance: documentInstance])
+            render(view: "addDocument", model: [
+                    orderInstance: orderInstance,
+                    documentInstance: documentInstance,
+                    documentTypes: documentTypes
+            ])
         }
     }
 
+    @Transactional
     def deleteDocument() {
         def orderInstance = Order.get(params.order.id)
         if (!orderInstance) {
@@ -580,6 +596,7 @@ class OrderController {
         }
     }
 
+    @Transactional
     def addOrderItemToShipment() {
 
         def orderInstance = Order.get(params?.id)
@@ -708,6 +725,7 @@ class OrderController {
         render (status: 200, text: "Successfully deleted order item")
     }
 
+    @Transactional
     def saveOrderItem() {
         Order order = Order.get(params.order.id)
         OrderItem orderItem = OrderItem.get(params.orderItem.id)
@@ -747,6 +765,10 @@ class OrderController {
         else {
             if (!orderService.isOrderEditable(orderItem.order, session.user)) {
                 throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
+            }
+            if (params.quantity && orderItem.quantity != (params.quantity as Integer)) {
+                // if existing item's quantity is edited we have to trigger the order summary refresh
+                orderItem.disableRefresh = false
             }
             orderItem.properties = params
             orderItem.refreshPendingShipmentItemRecipients()
@@ -798,7 +820,7 @@ class OrderController {
                     dateCreated: it.dateCreated,
                     canEdit: canEditOrder,
                     manufacturerName: it.productSupplier?.manufacturer?.name,
-                    text: it.toString(),
+                    text: it.product?.displayNameOrDefaultName,
                     orderItemStatusCode: it.orderItemStatusCode.name(),
                     hasShipmentAssociated: it.hasShipmentAssociated(),
                     budgetCode: it.budgetCode,
@@ -819,7 +841,8 @@ class OrderController {
             def date = new Date()
             response.setHeader("Content-disposition", "attachment; filename=\"${orderInstance.orderNumber}-${date.format("MM-dd-yyyy")}.csv\"")
             response.contentType = "text/csv"
-
+            Locale currentLocale = LocalizationUtil.currentLocale
+            String dateFormat = LocalizationUtil.getLocalizedOrderImportDateFormat(currentLocale)
             def csv = CSVUtils.getCSVPrinter()
             csv.printRecord(
                     warehouse.message(code: 'orderItem.id.label'),
@@ -835,8 +858,8 @@ class OrderController {
                     warehouse.message(code: 'default.cost.label'),
                     warehouse.message(code: 'orderItem.totalCost.label'),
                     warehouse.message(code: 'order.recipient.label'),
-                    warehouse.message(code: 'orderItem.estimatedReadyDate.label'),
-                    warehouse.message(code: 'orderItem.actualReadyDate.label'),
+                    "${warehouse.message(code: 'orderItem.quotedShipDate.label')} (${dateFormat})",
+                    "${warehouse.message(code: 'orderItem.currentExpectedShipDate.label')} (${dateFormat})",
                     warehouse.message(code: 'orderItem.budgetCode.label')
             )
 
@@ -844,7 +867,7 @@ class OrderController {
                 csv.printRecord(
                         orderItem?.id,
                         orderItem?.product?.productCode,
-                        orderItem?.product?.name,
+                        orderItem?.product?.displayNameWithLocaleCode,
                         orderItem?.productSupplier?.code,
                         orderItem?.productSupplier?.name,
                         orderItem?.productSupplier?.supplierCode,
@@ -855,8 +878,8 @@ class OrderController {
                         CSVUtils.formatCurrency(number: orderItem?.unitPrice, currencyCode: orderItem?.currencyCode, isUnitPrice: true),
                         CSVUtils.formatCurrency(number: orderItem?.totalPrice(), currencyCode: orderItem?.currencyCode),
                         orderItem?.recipient?.name,
-                        orderItem?.estimatedReadyDate?.format("MM/dd/yyyy"),
-                        orderItem?.actualReadyDate?.format("MM/dd/yyyy"),
+                        orderItem?.estimatedReadyDate?.format(dateFormat),
+                        orderItem?.actualReadyDate?.format(dateFormat),
                         orderItem?.budgetCode?.code
                 )
             }
@@ -999,6 +1022,7 @@ class OrderController {
         }
     }
 
+    @Transactional
     def cancelOrderItem() {
         OrderItem orderItem = OrderItem.get(params.id)
         def canEdit = orderService.isOrderEditable(orderItem.order, session.user)
@@ -1011,6 +1035,7 @@ class OrderController {
         }
     }
 
+    @Transactional
     def restoreOrderItem() {
         OrderItem orderItem = OrderItem.get(params.id)
         def canEdit = orderService.isOrderEditable(orderItem.order, session.user)
@@ -1028,6 +1053,7 @@ class OrderController {
         render order.total
     }
 
+    @Transactional
     def cancelOrderAdjustment() {
         OrderAdjustment orderAdjustment = OrderAdjustment.get(params.id)
         User user = User.get(session?.user?.id)
@@ -1041,6 +1067,7 @@ class OrderController {
         }
     }
 
+    @Transactional
     def restoreOrderAdjustment() {
         OrderAdjustment orderAdjustment = OrderAdjustment.get(params.id)
         User user = User.get(session?.user?.id)

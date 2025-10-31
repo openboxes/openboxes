@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 
 import apiClient from 'utils/apiClient';
 
-
 class Filter extends Component {
   constructor(props) {
     super(props);
@@ -38,9 +37,9 @@ class Filter extends Component {
         let newListCategoryData = response.data.data || [];
 
         // Remove from list of filter availables if filter already selected
-        newListCategoryData = newListCategoryData.filter(categoryData =>
+        newListCategoryData = newListCategoryData.filter((categoryData) =>
           !this.state.listFilterSelected
-            .some(filterSelected => filterSelected.id === categoryData.id));
+            .some((filterSelected) => filterSelected.id === categoryData.id));
         this.setState({
           listCategoryData: newListCategoryData,
           listCategoryDataFiltered: newListCategoryData,
@@ -53,8 +52,9 @@ class Filter extends Component {
   }
 
   searchOnChange = (event) => {
-    const filteredList = this.state.listCategoryData
-      .filter(categoryData => categoryData.name
+    const { listCategoryData } = this.state;
+    const filteredList = listCategoryData
+      .filter((categoryData) => categoryData.name
         .toLowerCase()
         .includes(event.target.value.toLowerCase()));
     this.setState({
@@ -65,19 +65,19 @@ class Filter extends Component {
 
   toggleAddingFilter = () => {
     // Popup add filter shows up or close
-    this.setState({ addingFilter: !this.state.addingFilter });
+    this.setState((prev) => ({ addingFilter: !prev.addingFilter }));
   }
 
   toggleCategorySelected = (nameCategory, categoryData) => {
     if (categoryData) this.getCategoryRows(categoryData.endpoint);
-    this.setState({
+    this.setState((prev) => ({
       titlePopup: nameCategory || 'Add Filter',
       categorySelected: nameCategory || '',
       // Value in the searchBar removed
       searchTerm: '',
       // Popup filterSelection show up or close
-      filterCategorySelected: !this.state.filterCategorySelected,
-    });
+      filterCategorySelected: !prev.filterCategorySelected,
+    }));
   }
 
   loadStoredFilters = () => {
@@ -148,9 +148,9 @@ class Filter extends Component {
 
     // Management of the filterList in the session storage
     const newFilterList = JSON.parse(sessionStorage.getItem('pageConfig'));
-    newFilterList[activeConfig][elementToDelete.nameCategory] =
-    newFilterList[activeConfig][elementToDelete.nameCategory]
-      .filter(item => item.id !== elementToDelete.id);
+    const { nameCategory, id } = elementToDelete;
+    newFilterList[activeConfig][nameCategory] = newFilterList[activeConfig][nameCategory]
+      .filter((item) => item.id !== id);
     sessionStorage.setItem('pageConfig', JSON.stringify(newFilterList));
 
     // Management of the list of the filter in the DOM
@@ -170,105 +170,122 @@ class Filter extends Component {
 
   render() {
     return (
-      this.state.filterAvailable ?
-        <div className="category-filter">
-          {
-              this.state.listFilterSelected.map((value, key) => (value &&
+      this.state.filterAvailable
+        ? (
+          <div className="category-filter">
+            {
+              this.state.listFilterSelected.map((value, key) => (value
+                && (
                 <div
                   key={`${value.id} - ${value.name}`}
                   className="category-item"
                 >
-                  <div className="category-title"> {value.name}</div>
+                  <div className="category-title">
+                    {' '}
+                    {value.name}
+                  </div>
                   <div
                     className="delete-button"
                     role="button"
                     tabIndex={0}
                     onClick={() => this.removeFilterFromList(key)}
                     onKeyPress={() => this.removeFilterFromList(key)}
-                  > x
+                  >
+                    {' '}
+                    x
                   </div>
                 </div>
+                )
               ))
               }
 
-          <div
-            className="category-item add-category-btn"
-            role="button"
-            tabIndex={0}
-            onClick={this.toggleAddingFilter}
-            onKeyPress={this.toggleAddingFilter}
-            hidden={this.state.addingFilter}
-          >
+            <div
+              className="category-item add-category-btn"
+              role="button"
+              tabIndex={0}
+              onClick={this.toggleAddingFilter}
+              onKeyPress={this.toggleAddingFilter}
+              hidden={this.state.addingFilter}
+            >
               + Add filter
-          </div>
-          <div
-            className="add-category-popup"
-            hidden={!this.state.addingFilter}
-          >
-            <div>
-              <span
-                role="button"
-                tabIndex={0}
-                onClick={() => this.toggleCategorySelected()}
-                onKeyPress={() => this.toggleCategorySelected()}
-                hidden={!this.state.filterCategorySelected}
-              > {'<'}
-              </span> {this.state.titlePopup}
-              <span
-                role="button"
-                tabIndex={0}
-                onClick={() => {
-                    this.toggleAddingFilter();
-                    this.setState({ filterCategorySelected: false });
-                    }}
-                onKeyPress={() => {
+            </div>
+            <div
+              className="add-category-popup"
+              hidden={!this.state.addingFilter}
+            >
+              <div>
+                <span
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => this.toggleCategorySelected()}
+                  onKeyPress={() => this.toggleCategorySelected()}
+                  hidden={!this.state.filterCategorySelected}
+                >
+                  {' '}
+                  {'<'}
+                </span>
+                {' '}
+                {this.state.titlePopup}
+                <span
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => {
                     this.toggleAddingFilter();
                     this.setState({ filterCategorySelected: false });
                   }}
-              > X
-              </span>
-            </div>
-            <input
-              type="text"
-              placeholder="search..."
-              onChange={this.searchOnChange}
-              hidden={!this.state.filterCategorySelected}
-              value={this.state.searchTerm}
-            />
-            <ul className={`filter-menu ${this.state.filterCategorySelected ? 'scrollable' : ''}`}>
-              {
+                  onKeyPress={() => {
+                    this.toggleAddingFilter();
+                    this.setState({ filterCategorySelected: false });
+                  }}
+                >
+                  {' '}
+                  X
+                </span>
+              </div>
+              <input
+                type="text"
+                placeholder="search..."
+                onChange={this.searchOnChange}
+                hidden={!this.state.filterCategorySelected}
+                value={this.state.searchTerm}
+              />
+              <ul className={`filter-menu ${this.state.filterCategorySelected ? 'scrollable' : ''}`}>
+                {
                   // If filter not selected
-                  !this.state.filterCategorySelected ?
-                   Object.entries(this.props.configs).map(([key, value]) => (
-                     // We select the filters availables for this page
-                     key === this.props.activeConfig ?
-                       value.filters && Object.entries(value.filters).map(([nameCategory, categoryData]) => (
-                         <li
-                           key={categoryData.endpoint}
-                         >
-                           <div
-                             role="button"
-                             tabIndex={0}
-                             onClick={() =>
-                            this.toggleCategorySelected(nameCategory, categoryData)}
-                             onKeyPress={() =>
-                            this.toggleCategorySelected(nameCategory, categoryData)}
-                           >
-                             {nameCategory}
-                             <span > {'>'}
-                             </span>
-                           </div>
-                         </li>
-                       )) : null
-                      )) :
-                      // Once the filter is selected
-                      this.props.pageFilters.map(category => (
-                        // Find in all filters available the one selected
-                        category.name === this.state.categorySelected ?
+                  !this.state.filterCategorySelected
+                    ? Object.entries(this.props.configs).map(([key, value]) => (
+                      // We select the filters availables for this page
+                      key === this.props.activeConfig
+                        ? value.filters
+                          && Object.entries(value.filters).map(([nameCategory, categoryData]) => (
+                            <li
+                              key={categoryData.endpoint}
+                            >
+                              <div
+                                role="button"
+                                tabIndex={0}
+                                onClick={() =>
+                                  this.toggleCategorySelected(nameCategory, categoryData)}
+                                onKeyPress={() =>
+                                  this.toggleCategorySelected(nameCategory, categoryData)}
+                              >
+                                {nameCategory}
+                                <span>
+                                  {' '}
+                                  {'>'}
+                                </span>
+                              </div>
+                            </li>
+                          )) : null
+                    ))
+                  // Once the filter is selected
+                    : this.props.pageFilters.map((category) => (
+                      // Find in all filters available the one selected
+                      category.name === this.state.categorySelected
                         // category[1][0] --> name of the category
-                        Object.entries(this.state.listCategoryDataFiltered
+                        ? Object.entries(this.state.listCategoryDataFiltered
                           .sort((a, b) => a.name.localeCompare(b.name)))
-                          .map(categoryData => (
+                          .map((categoryData) => (
                             <li
                               key={categoryData[1].id}
                             >
@@ -279,23 +296,26 @@ class Filter extends Component {
                                 onClick={
                                 () => this.addFilterToTheList(
                                   this.state.categorySelected,
-                                   categoryData[1],
-                                  )}
+                                  categoryData[1],
+                                )
+}
                                 onKeyPress={
                                 () => this.addFilterToTheList(
                                   this.state.categorySelected,
                                   categoryData[1],
-                                  )}
+                                )
+}
                               >
                                 {categoryData[1].name}
                               </span>
                             </li>
-                        )) : null
-                      ))
+                          )) : null
+                    ))
                     }
-            </ul>
+              </ul>
+            </div>
           </div>
-        </div> : null
+        ) : null
     );
   }
 }

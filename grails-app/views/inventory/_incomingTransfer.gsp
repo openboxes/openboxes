@@ -163,7 +163,7 @@
 											</td>
 											<td>
 									            <g:hasErrors bean="${transactionEntry}">
-										            <div class="errors">
+										            <div class="errors" role="alert" aria-label="error-message">
 										                <g:renderErrors bean="${transactionEntry}" as="list" />
 										            </div>
 									            </g:hasErrors>

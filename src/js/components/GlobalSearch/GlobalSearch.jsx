@@ -15,12 +15,12 @@ import 'components/GlobalSearch/GlobalSearch.scss';
 
 // eslint-disable-next-line react/prop-types
 const ValueContainer = ({ children, ...props }) => (
-  <React.Fragment>
+  <>
     <RiSearchLine className="app-global-search__search-icon" />
     <components.ValueContainer {...props}>
       {children}
     </components.ValueContainer>
-  </React.Fragment>
+  </>
 );
 
 const GlobalSearch = ({
@@ -87,7 +87,6 @@ const GlobalSearch = ({
     );
   };
 
-
   const DropdownIndicator = (props) => {
     const clearOrHide = () => {
       // eslint-disable-next-line react/prop-types
@@ -103,6 +102,7 @@ const GlobalSearch = ({
     return (
       <components.IndicatorsContainer {...props}>
         <button
+          type="button"
           className="app-global-search__clear-btn"
           onClick={clearOrHide}
         >
@@ -111,7 +111,6 @@ const GlobalSearch = ({
       </components.IndicatorsContainer>
     );
   };
-
 
   return (
     <div className="position-relative d-flex">
@@ -134,11 +133,13 @@ const GlobalSearch = ({
             DropdownIndicator,
             Option,
           }}
-        />)}
-    </div>);
+        />
+      )}
+    </div>
+  );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),

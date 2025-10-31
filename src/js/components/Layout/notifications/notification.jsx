@@ -1,11 +1,13 @@
 import React from 'react';
 
-import { RiAlertLine, RiCheckboxCircleLine, RiErrorWarningFill, RiErrorWarningLine, RiInformationLine } from 'react-icons/ri';
+import {
+  RiAlertLine, RiCheckboxCircleLine, RiErrorWarningFill, RiErrorWarningLine, RiInformationLine,
+} from 'react-icons/ri';
 import Alert from 'react-s-alert';
 
 import NotificationType from 'consts/notificationTypes';
 
-const notification = type => ({
+const notification = (type) => ({
   message, details, icon, detailsArray,
 }) => {
   const alertsProps = {

@@ -74,12 +74,12 @@ const AsyncStockRequestDashboard = Loadable({
 
 // TODO add megamenu and menu config
 const AsyncInvoice = Loadable({
-  loader: () => import('components/invoice/InvoiceWizard'),
+  loader: () => import('components/invoice/create/InvoiceWizard'),
   loading: Loading,
 });
 
 const AsyncInvoiceList = Loadable({
-  loader: () => import('components/invoice/InvoiceList'),
+  loader: () => import('components/invoice/list/InvoiceList'),
   loading: Loading,
 });
 
@@ -138,7 +138,6 @@ const AsyncPurchaseOrderList = Loadable({
   loading: Loading,
 });
 
-
 const AsyncStockList = Loadable({
   loader: () => import('components/stock-list/StockList'),
   loading: Loading,
@@ -169,6 +168,36 @@ const AsyncProductSupplierCreatePage = Loadable({
   loading: Loading,
 });
 
+const AsyncOutboundImport = Loadable({
+  loader: () => import('components/stock-movement-wizard/outboundImport/OutboundImport'),
+  loading: Loading,
+});
+
+const AsyncCycleCount = Loadable({
+  loader: () => import('components/cycleCount/CycleCount'),
+  loading: Loading,
+});
+
+const AsyncCycleCountCountStep = Loadable({
+  loader: () => import('components/cycleCount/toCountTab/CountStep'),
+  loading: Loading,
+});
+
+const AsyncCycleCountResolveStep = Loadable({
+  loader: () => import('components/cycleCount/toResolveTab/ResolveStep'),
+  loading: Loading,
+});
+
+const AsyncCycleCountReporting = Loadable({
+  loader: () => import('components/cycleCountReporting/CycleCountReporting'),
+  loading: Loading,
+});
+
+const AsyncReorderReport = Loadable({
+  loader: () => import('components/reporting/reorderReport/ReorderReport'),
+  loading: Loading,
+});
+
 const StockMovementList = (props) => {
   const parsedSearchQuery = queryString.parse(props?.location?.search);
   const direction = parsedSearchQuery?.direction?.toUpperCase();
@@ -176,22 +205,22 @@ const StockMovementList = (props) => {
     case 'INBOUND':
       return <AsyncStockMovementInboundList {...props} />;
     case 'OUTBOUND': {
-      return (<AsyncStockMovementOutboundList
-        {...props}
-        sourceType={parsedSearchQuery?.sourceType?.toUpperCase()}
-      />);
+      return (
+        <AsyncStockMovementOutboundList
+          {...props}
+          sourceType={parsedSearchQuery?.sourceType?.toUpperCase()}
+        />
+      );
     }
     default:
       return <Redirect to={DASHBOARD_URL.base} />;
   }
 };
 
-
 const AsyncStockTransferList = Loadable({
   loader: () => import('components/stock-transfer/list/StockTransferList'),
   loading: Loading,
 });
-
 
 const Router = (props) => {
   useConnectionListener();
@@ -208,6 +237,12 @@ const Router = (props) => {
             <MainLayoutRoute path="**/putAway/create/:putAwayId?" component={AsyncPutAwayMainPage} />
             <MainLayoutRoute path="**/stockMovement/list" component={StockMovementList} />
             <MainLayoutRoute path="**/stockMovement/createOutbound/:stockMovementId?" component={AsyncStockMovement} />
+            <MainLayoutRoute path="**/stockMovement/importOutboundStockMovement" component={AsyncOutboundImport} />
+            <MainLayoutRoute path="**/inventory/reorderReport" component={AsyncReorderReport} />
+            <MainLayoutRoute path="**/inventory/cycleCount/count" component={AsyncCycleCountCountStep} />
+            <MainLayoutRoute path="**/inventory/cycleCount/resolve" component={AsyncCycleCountResolveStep} />
+            <MainLayoutRoute path="**/inventory/cycleCount/reporting" component={AsyncCycleCountReporting} />
+            <MainLayoutRoute path="**/inventory/cycleCount" component={AsyncCycleCount} />
             <MainLayoutRoute path="**/stockMovement/createInbound/:stockMovementId?" component={AsyncStockMovementInbound} />
             <MainLayoutRoute path="**/stockMovement/createCombinedShipments/:stockMovementId?" component={AsyncStockMovementCombinedShipments} />
             <MainLayoutRoute path="**/stockMovement/createRequest/:stockMovementId?" component={AsyncStockMovementRequest} />
@@ -224,10 +259,10 @@ const Router = (props) => {
             <MainLayoutRoute path="**/productsConfiguration/index" component={AsyncProductsConfiguration} />
             <MainLayoutRoute path="**/locationsConfiguration/create/:locationId?" component={AsyncLocationsConfiguration} />
             <MainLayoutRoute path="**/locationsConfiguration/upload" component={AsyncImportLocations} />
-            <Route path="**/locationsConfiguration/index" >
+            <Route path="**/locationsConfiguration/index">
               <AsyncWelcomePage />
             </Route>
-            <Route path="**/loadData/index" ><AsyncLoadDataPage /></Route>
+            <Route path="**/loadData/index"><AsyncLoadDataPage /></Route>
             <Route path="**/resettingInstanceInfo/index">
               <AsyncResetInstancePage />
             </Route>
@@ -261,7 +296,7 @@ const Router = (props) => {
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   spinner: state.spinner.show,
   supportedActivities: state.session.supportedActivities,
   notificationAutohideDelay: state.session.notificationAutohideDelay,

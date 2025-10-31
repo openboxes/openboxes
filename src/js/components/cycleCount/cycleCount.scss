@@ -1,0 +1,267 @@
+@import "src/css/colors";
+
+@mixin
+limit-lines($lines-number) {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: $lines-number;
+  line-clamp: $lines-number;
+  -webkit-box-orient: vertical;
+}
+
+.all-products-tab-footer {
+
+  p {
+    font-weight: 500;
+    color: var(--blue-700);
+    font-size: 14px;
+    margin: auto 0;
+
+    span {
+      font-weight: 400;
+    }
+  }
+
+  .suggestion-button {
+    color: var(--blue-primary);
+
+    &:hover {
+      background: transparent;
+    }
+  }
+}
+
+.sorting-arrows {
+  display: flex !important;
+}
+
+.rt-tr > .checkbox-column {
+  width: 100px !important;
+}
+
+.header-cell {
+  > div:first-child {
+    height: 46px;
+  }
+}
+
+.selected-rows-indicator {
+  font-weight: 400;
+  color: var(--gray-600);
+  font-size: 14px;
+}
+
+@for $i from 1 through 10 {
+  .limit-lines-#{$i} {
+    @include limit-lines($i);
+  }
+}
+
+.resolve-table-limit-lines {
+  max-height: calc(1.5em* 3 + 20px);
+}
+
+.count-step-title {
+  color: var(--gray-600);
+  font-weight: 600 !important;
+  font-size: 20px;
+}
+
+.count-step-label {
+  color: var(--gray-500);
+}
+
+.count-step-value {
+  font-weight: 500;
+  color: var(--gray-600);
+}
+
+.count-step-date {
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+.count-step-select-counted-by {
+  > div:first-of-type {
+    width: 160px;
+  }
+}
+
+.count-step-table {
+
+  .split-table-right {
+    box-shadow: 0 0 15px #00000040;
+    clip-path: inset(0 -15px 0 0);
+    margin-right: 5px;
+  }
+
+  .count-step-actions {
+    width: 50px !important;
+    align-items: center;
+    color: var(--red-500);
+  }
+
+  .static-cell-count-step {
+    padding: 15px;
+  }
+
+  .react-datepicker-wrapper {
+    width: 100%;
+  }
+
+  .rt-tr {
+    align-items: stretch;
+  }
+
+  .rt-td {
+    padding: 0 !important;
+  }
+
+  .rt-th-count-step {
+    text-align: left;
+    white-space: break-spaces;
+  }
+
+  .rt-td-count-step {
+    position: relative;
+    margin-left: 5px;
+    margin-bottom: 5px;
+    align-items: center;
+    white-space: break-spaces;
+  }
+
+  .cell-inner-wrapper {
+    padding: 10px 3px 3px 3px;
+  }
+
+  .date-field-input__value {
+    font-weight: normal;
+  }
+}
+
+.resolve-step-table {
+
+  .rt-th-count-step {
+    text-align: left;
+    white-space: break-spaces;
+  }
+  .rt-td-count-step {
+    position: relative;
+    margin-left: 14px;
+    display: flex;
+    align-items: center;
+    white-space: break-spaces;
+  }
+
+  .input-wrapper-error-message {
+    text-wrap: balance;
+  }
+}
+
+.count-step-label-select {
+  white-space: nowrap;
+}
+
+.header-container {
+
+  .date-counted-date-picker {
+    width: 150px;
+
+    .date-field-input__value {
+      font-weight: normal;
+    }
+  }
+}
+
+.zone-label {
+  color: $black-alpha;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.tooltip-icon {
+  position: absolute;
+  left: 10px;
+  top: 55%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  cursor: pointer;
+
+  &--error {
+    color: var(--color-red);
+  }
+
+  &--warning {
+    color: var(--blue-primary);
+  }
+
+  &--top-40 {
+    top: 40%;
+    left: 5px;
+  }
+
+  &--top-60 {
+    top: 60%;
+    left: 5px;
+  }
+}
+
+.input-has-error {
+
+  .react-select__value-container {
+    padding-left: 20px;
+  }
+
+  .date-field-input__value {
+    padding-left: 15px;
+  }
+}
+
+/* Chrome, Safari, Edge, Opera */
+input.hide-arrows::-webkit-outer-spin-button,
+input.hide-arrows::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input.hide-arrows[type=number] {
+  -moz-appearance: textfield;
+}
+
+.draft-modal {
+  background-color: var(--blue-200);
+  margin: 10px 16px;
+  padding: 10px 16px;
+  color: var(--blue-700);
+}
+
+.modal-content {
+  min-width: 1000px;
+
+  .assign-count-modal-header {
+    font-size: 24px;
+    margin-left: 6px;
+  }
+
+  .assign-count-modal-container {
+    padding: 0 4px 0 4px;
+    overflow-y: auto;
+    max-height: 400px;
+
+    &::-webkit-scrollbar {
+      width: 0.5em;
+      height: 0.5em;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--blue-200);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--blue-301);
+      border-radius: 4px;
+    }
+  }
+}
+

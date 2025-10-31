@@ -2,15 +2,15 @@
 
 </style>
 <g:if test="${loginLocationsMap && !loginLocationsMap.isEmpty() }">
-    <div class="tabs tabs-left">
-        <ul class="scrollbar">
+    <div data-testid="location-chooser-modal" class="tabs tabs-left">
+        <ul class="scrollbar" data-testid="location-organization-list">
              <g:if test="${savedLocations}">
-                <li class="organization-tab">
+                <li role="tab" class="organization-tab">
                     <a href="#saved-locations"><g:message code="user.savedLocations.label"/></a>
                 </li>
              </g:if>
             <g:each var="organizationName" in="${loginLocationsMap.keySet()}" status="i">
-                <li class="organization-tab">
+                <li role="tab" class="organization-tab">
                     <a href="#organization-${i}">${organizationName?:'No organization'}</a>
                 </li>
             </g:each>
@@ -44,7 +44,7 @@
         <g:each var="entry" in="${loginLocationsMap}" status="i">
             <g:set var="locationMap" value="${entry.value.sort()}"/>
             <g:set var="organizationName" value="${entry.key }"/>
-            <div id="organization-${i}" class="organization-group scrollbar">
+            <div id="organization-${i}" class="organization-group scrollbar" data-testid="location-list" >
                 <g:set var="locations" value="${entry.value}"/>
                 <g:set var="locationGroups" value="${locations.collect { it?.locationGroup }.unique()}"/>
                 <g:each var="locationGroup" in="${locationGroups.sort() { a,b ->  !a ? !b ? 0 : 1 : !b ? -1 : a <=> b }}" status="status">

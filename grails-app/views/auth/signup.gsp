@@ -16,15 +16,15 @@
 </head>
 <body>
 	<div class="body">
-		<g:form name="handleSignup" controller="auth" action="handleSignup" method="POST">
+		<g:form name="handleSignup" controller="auth" action="handleSignup" method="POST" autocomplete="off">
 		    <div class="dialog">
 				<div id="signupForm">
 					<g:if test="${flash.message}">
-					    <div class="message">${flash.message}</div>
+					    <div class="message" role="status" aria-label="message">${flash.message}</div>
 					</g:if>
 
 					<g:hasErrors bean="${userInstance}">
-					   <div class="errors">
+					   <div class="errors" role="alert" aria-label="error-message">
 					       <g:renderErrors bean="${userInstance}" as="list" />
 					   </div>
 					</g:hasErrors>
@@ -60,7 +60,7 @@
 										<label for="email"><warehouse:message code="user.email.label" default="Email" /></label>
 									</td>
 									<td class="value ${hasErrors(bean: userInstance, field: 'username', 'errors')}">
-										<g:textField name="email" value="${userInstance?.email}" class="text" size="40"/>
+										<g:textField name="email" value="${userInstance?.email}" class="text" size="40" autocomplete="off"/>
 									</td>
 								</tr>
 
@@ -70,7 +70,7 @@
 					                    <label for="password"><warehouse:message code="user.password.label" default="Password" /></label>
 					                </td>
 					                <td class="value ${hasErrors(bean: userInstance, field: 'password', 'errors')}">
-					                    <g:passwordField name="password" value="${userInstance?.password}" class="text" size="40"/>
+					                    <g:passwordField name="password" value="${userInstance?.password}" class="text" size="40" autocomplete="off"/>
 					                </td>
 					            </tr>
 

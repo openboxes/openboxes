@@ -32,7 +32,7 @@ class LocationTypeController {
 
     def save() {
         LocationType locationTypeInstance = new LocationType(params)
-        if (locationTypeDataService.save(locationTypeInstance)) {
+        if (locationTypeInstance.validate() && locationTypeDataService.save(locationTypeInstance)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'locationType.label', default: 'LocationType'), locationTypeInstance.id])}"
             redirect(action: "list", id: locationTypeInstance.id)
         }
@@ -76,7 +76,7 @@ class LocationTypeController {
                 }
             }
             locationTypeInstance.properties = params
-            if (!locationTypeInstance.hasErrors() && locationTypeDataService.save(locationTypeInstance)) {
+            if (locationTypeInstance.validate() && locationTypeDataService.save(locationTypeInstance)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'locationType.label', default: 'LocationType'), locationTypeInstance.id])}"
                 redirect(action: "list", id: locationTypeInstance.id)
             }

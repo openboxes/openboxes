@@ -161,7 +161,7 @@ describe('findActions()', () => {
   });
 
   it('should filter using custom filters', () => {
-    const customFilter = action => action.id % 2;
+    const customFilter = (action) => action.id % 2;
     const actionList = [
       {
         id: 1,

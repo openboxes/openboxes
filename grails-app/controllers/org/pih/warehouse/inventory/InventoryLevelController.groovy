@@ -9,16 +9,24 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.converters.JSON
 import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
+import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.data.DataService
+import org.pih.warehouse.importer.InventoryLevelImportDataService
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductService
+import org.springframework.http.HttpStatus
 
 @Transactional
 class InventoryLevelController {
 
-    def productService
-    def dataService
+    DataService dataService
+    ProductService productService
+    DocumentService documentService
+    InventoryLevelImportDataService inventoryLevelImportDataService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -50,7 +58,7 @@ class InventoryLevelController {
 
         if (params.format && inventoryLevels) {
             def filename = "inventoryLevels.csv"
-            String text = dataService.exportInventoryLevels(inventoryLevels)
+            String text = inventoryLevelImportDataService.exportInventoryLevels(inventoryLevels)
             response.contentType = "text/csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
             render(contentType: "text/csv", text: text)
@@ -77,8 +85,7 @@ class InventoryLevelController {
             eq("inventory", location.inventory)
             if (internalLocation) {
                 eq("internalLocation", internalLocation)
-            }
-            else {
+            } else {
                 isNull("internalLocation")
             }
         }
@@ -140,8 +147,7 @@ class InventoryLevelController {
                 // FIXME Should do this in a filter
                 if (params.redirectUrl) {
                     redirect(url: params.redirectUrl)
-                }
-                else {
+                } else {
                     redirect(controller: "product", action: "edit", id: inventoryLevelInstance?.product?.id)
                 }
 
@@ -244,36 +250,47 @@ class InventoryLevelController {
     }
 
     def export() {
-        def date = new Date()
-        def dateFormatted = "${date.format('yyyyMMdd-hhmmss')}"
-        def inventoryLevels = []
-        def product = Product.get(params.id)
-        def location = Location.get(params?.location?.id ?: session?.warehouse?.id)
-        def filename = "Inventory Levels - ${dateFormatted}"
 
-        if (product) {
-            filename = "Inventory Levels - ${product?.name} - ${dateFormatted}"
-            inventoryLevels = product.inventoryLevels
-        } else if (location) {
-            filename = "Inventory Levels - ${location?.name} - ${dateFormatted}"
-            inventoryLevels = InventoryLevel.findAllByInventory(location.inventory)
-        } else if (location) {
-            filename = "Inventory Levels - ${dateFormatted}"
-            inventoryLevels = InventoryLevel.findAll()
+        Product product = Product.load(params.id)
+        Location facility = Location.load(params?.location?.id)
+
+        def inventoryLevels = InventoryLevel.createCriteria().list() {
+            if (facility) {
+                eq("inventory", facility.inventory)
+            }
+            if (product) {
+                eq("product", product)
+            }
         }
 
-
-        if (inventoryLevels) {
-            String text = dataService.exportInventoryLevels(inventoryLevels)
-            response.contentType = "text/csv"
-            response.setHeader("Content-disposition", "attachment; filename=\"${filename}.csv\"")
-            render(contentType: "text/csv", text: text)
+        if (!inventoryLevels) {
+            response.status = HttpStatus.NOT_FOUND.value()
+            render text: 'Resource not found'
             return
-        } else {
-            render(text: 'No inventory levels found', status: 404)
+        }
+
+        withFormat {
+
+            json {
+                render([data: inventoryLevels] as JSON)
+            }
+
+            xls {
+                def data = dataService.transformObjects(inventoryLevels, InventoryLevel.PROPERTIES)
+                documentService.generateExcel(response.outputStream, data)
+                response.setHeader 'Content-disposition', "attachment; filename=\"inventory-levels.xls\""
+                response.outputStream.flush()
+            }
+
+            csv {
+                String text = inventoryLevelImportDataService.exportInventoryLevels(inventoryLevels)
+                response.contentType = "text/csv"
+                response.setHeader("Content-disposition", "attachment; filename=\"inventory-levels.csv\"")
+                render(contentType: "text/csv", text: text)
+            }
+
         }
 
     }
-
 
 }

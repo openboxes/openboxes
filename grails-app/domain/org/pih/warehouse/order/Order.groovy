@@ -102,6 +102,8 @@ class Order implements Serializable {
             "invoices",
             "hasInvoice",
             "invoiceItems",
+            "invoiceableOrderItems",
+            "invoiceableAdjustments",
             "invoicedOrderItems",
             "hasPrepaymentInvoice",
             "hasRegularInvoice",
@@ -286,7 +288,13 @@ class Order implements Serializable {
     }
 
     def getShipments() {
-        return orderItems.collect { it.listShipments() }.flatten().unique() { it?.id }
+        // .findAll { it?.id } is supposed to filter out null objects that might be in the list,
+        // when we would attempt to call this method before a shipment item is associated with a shipment (OBPIH-6559)
+        return orderItems
+                .collect { it.listShipments() }
+                .flatten()
+                .unique() { it?.id }
+                .findAll { it?.id }
     }
 
     List getShipmentsByStatus(ShipmentStatusCode statusCode) {
@@ -384,6 +392,10 @@ class Order implements Serializable {
         return name
     }
 
+    BigDecimal getPrepaymentPercent() {
+        return (paymentTerm?.prepaymentPercent ?: Constants.DEFAULT_PAYMENT_PERCENT) / 100
+    }
+
     /**
      * Should only use in the context of displaying a single order (i.e. do not invoke on a list of orders).
      *
@@ -400,11 +412,17 @@ class Order implements Serializable {
         return invoiceItems
     }
 
+    /**
+     * Function returning items so that prepayment invoices are at the bottom.
+     * Final invoices at the top: the newest submitted at the top, the oldest submitted at the bottom.
+     * Method used for displaying items on PO view page
+     */
     List<InvoiceItem> getSortedInvoiceItems() {
-        invoiceItems?.sort { a, b ->
+        return invoiceItems?.sort { a, b ->
+            b?.invoice?.dateCreated <=> a?.invoice?.dateCreated ?:
             a?.invoice?.invoiceNumber <=> b?.invoice?.invoiceNumber ?:
-                a?.product?.productCode <=> b?.product?.productCode ?:
-                    a.id <=> b.id
+                    a?.inverse <=> b?.inverse ?:
+                            a?.id <=> b?.id
         } ?: []
     }
 
@@ -456,8 +474,42 @@ class Order implements Serializable {
         return !hasInvoice && isPrepaymentRequired && hasActiveItemsOrAdjustments
     }
 
+    Set<OrderItem> getInvoiceableOrderItems() {
+        return orderItems.findAll { it.invoiceable }
+    }
+
+    Set<OrderAdjustment> getInvoiceableAdjustments() {
+        return orderAdjustments.findAll { it.invoiceable }
+    }
+
+    /**
+        Should return true if at least one PO item is invoiceable.
+        A PO item is invoiceable if the order has a prepayment invoice and at least one of those requirements are fulfilled:
+            1. There is an order adjustment which hasn’t already been invoiced (can be not tied with order item)
+            2. The item’s shipment has been cancelled and that cancellation hasn’t already been invoiced
+            3. Quantity greater than 0 of the item has been shipped and not all of that quantity has already been invoiced.
+    **/
     Boolean getCanGenerateInvoice() {
-        return hasPrepaymentInvoice && isShipped() && !hasRegularInvoice
+        // If prepayment invoice for this order doesn't exist we can't generate invoice
+        if (!hasPrepaymentInvoice) {
+            return false
+        }
+
+        // If any order adjustment is invoiceable we can generate invoice
+        if (hasInvoiceableOrderAdjustment()) {
+            return true
+        }
+
+        // If any order item is invoiceable we can generate invoice
+        return hasInvoiceableOrderItem()
+    }
+
+    Boolean hasInvoiceableOrderItem() {
+        return orderItems.any { it.canBeOnRegularInvoice() && it.invoiceable }
+    }
+
+    Boolean hasInvoiceableOrderAdjustment() {
+        return orderAdjustments.any { it.canBeOnRegularInvoice() && it.invoiceable }
     }
 
     def getActiveOrderItems() {
@@ -484,6 +536,26 @@ class Order implements Serializable {
         return orderType?.isTransferOrder()
     }
 
+    /**
+     * Order is fully invoiceable if all items and adjustment that can be added to regular invoice,
+     *  that are not yet fully invoiced are fully invoiceable.
+     * */
+    Boolean isFullyInvoiceable() {
+        if (!orderItems && !orderAdjustments) {
+            return false
+        }
+
+        Boolean areAllOrderItemsInvoiceable = !orderItems ?: orderItems
+                .findAll { it.canBeOnRegularInvoice() && !it.fullyInvoiced }
+                .every { it.invoiceable && it.quantityRemaining == 0 }
+
+        Boolean areAllOrderAdjustmentsInvoiceable = !orderAdjustments ?: orderAdjustments
+                .findAll { it.canBeOnRegularInvoice() && !it.hasRegularInvoice }
+                .every { it.invoiceable }
+
+        return areAllOrderItemsInvoiceable && areAllOrderAdjustmentsInvoiceable
+    }
+
     // isInbound is temporary distinction between outbound and inbound used only for Outbound and Inbound Returns
     Boolean isInbound(Location currentLocation) {
         return isReturnOrder && destination == currentLocation && origin != currentLocation
@@ -505,13 +577,16 @@ class Order implements Serializable {
 
     Map toJson() {
         return [
-                id         : id,
-                orderNumber: orderNumber,
-                name       : name,
-                status     : status,
-                origin     : origin,
-                destination: destination,
-                orderItems : orderItems,
+                id                : id,
+                orderNumber       : orderNumber,
+                name              : name,
+                status            : status,
+                origin            : origin,
+                destination       : destination,
+                paymentMethodType : paymentMethodType ? [
+                        name: paymentMethodType?.name
+                ] : null,
+                orderItems        : orderItems,
         ]
     }
 
@@ -527,7 +602,7 @@ class Order implements Serializable {
                     dateCreated     : dateCreated,
                     origin          : origin?.name,
                     destination     : destination?.name,
-                    orderItemsCount : orderItems?.size(),
+                    orderItemsCount : orderItems?.count { it.orderItemStatusCode != OrderItemStatusCode.CANCELED },
                 ]
             default:
                 return toJson()

@@ -110,4 +110,6 @@ function getArrayOfColors(length, config, hover = false) {
   return colorsArray;
 }
 
-export { getArrayOfColors, getColor, getColorByName, getRandomColor };
+export {
+  getArrayOfColors, getColor, getColorByName, getRandomColor,
+};

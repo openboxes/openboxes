@@ -7,7 +7,6 @@ import Translate from 'utils/Translate';
 
 import 'components/location/LocationChooser/LocationChooserButton/LocationChooserButton.scss';
 
-
 const LocationChooserButton = ({ onToggle, location, envTag }) => {
   const buttonStyle = () => {
     if (!location.backgroundColor) return { '--location-color': 'unset' };
@@ -21,6 +20,7 @@ const LocationChooserButton = ({ onToggle, location, envTag }) => {
     <button
       type="button"
       className="location-chooser__button"
+      aria-label="location-chooser"
       style={buttonStyle()}
       onClick={onToggle}
     >
@@ -38,11 +38,13 @@ const LocationChooserButton = ({ onToggle, location, envTag }) => {
             </Tooltip>
           ) : (
             <span className="location-chooser__button-title">
-              { location.name ||
+              { location.name
+              || (
               <Translate
                 id="react.dashboard.chooseLocation.label"
                 defaultMessage="Choose Location"
-              /> }
+              />
+              ) }
             </span>
           )
       }

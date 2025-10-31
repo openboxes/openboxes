@@ -16,7 +16,7 @@
 	<div class="body">
 
 		<g:if test="${flash.message}">
-			<div class="message">
+			<div class="message" role="status" aria-label="message">
 				${flash.message}
 			</div>
 		</g:if>
@@ -35,13 +35,13 @@
 								<td valign="top" class="name"><warehouse:message
 										code="user.photo.label" />
 								</td>
-								<td>								
+								<td>
 									<img id="thumb"
-	            						src="${createLink(controller:'user', action:'viewThumb', id:userInstance.id)}" 
+	            						src="${createLink(controller:'user', action:'viewThumb', id:userInstance.id)}"
 	            						style="vertical-align: middle" />
 
 									<img id="image"
-	            						src="${createLink(controller:'user', action:'viewPhoto', id:userInstance.id)}" 
+	            						src="${createLink(controller:'user', action:'viewPhoto', id:userInstance.id)}"
 	            						style="vertical-align: middle" />
 								</td>
 							</tr>
@@ -51,22 +51,22 @@
 									<div class="buttons left">
 										<input class="positive"
 											type="submit"
-											value="${warehouse.message(code:'default.button.update.label')}" />									
-										&nbsp;	
+											value="${warehouse.message(code:'default.button.update.label')}" />
+										&nbsp;
 										<g:link class="show" action="show" id="${userInstance?.id}">
 											${warehouse.message(code: 'default.button.cancel.label')}
 										</g:link>
 									</div>
-	
+
 								</td>
 							</tr>
-	
+
 						</tbody>
 					</table>
 				</div>
 			</fieldset>
 		</g:form>
-		
+
 	</div>
 </body>
 </html>

@@ -58,6 +58,7 @@
     <include file="0.5.x/add-column-inventory-snapshot-date.xml"/>
     <include file="0.5.x/add-column-inventory-level-preferred.xml"/>
     <include file="0.5.x/add-column-address-description.xml"/>
+    <include file="0.5.x/changelog-2024-09-24-0000-05x-final.xml"/>
 
     <!--
     <include file="0.5.x/create-table-reason-code.xml"/>

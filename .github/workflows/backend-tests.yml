@@ -1,0 +1,48 @@
+name: Backend Tests
+
+# Is only runnable via other workflows
+on:
+  workflow_call:
+    secrets:
+      CODECOV_TOKEN:
+        # If we're running tests for a PR from a fork, this will not be available.
+        required: false
+
+jobs:
+  run-backend-tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        # If we start actively supporting other databases, they should be added here so that we can test against them.
+        testdatabase: ["mysql:8.0.36", "mariadb:10.3.39"]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{vars.JAVA_VERSION}}
+          distribution: zulu
+          cache: gradle
+
+      # Run all tests against each of the databases defined in the above matrix. We could split the integration
+      # tests into a separate job and run the matrix only on that job (because unit tests don't care about the
+      # underlying database and so running them against multiple databases is pointless), but matrix jobs are run
+      # in parallel, so it wouldn't save us any running time to do that. Plus it would overcomplicate the flow.
+      # The jacocoTestReport task dependsOn all tests, and so will run them before generating the report.
+      - name: Run All Tests (with coverage)
+        run: TEST_DATABASE=${{ matrix.testdatabase }} ./gradlew jacocoTestReport --no-daemon
+
+      # Tests are run for each database in the above matrix, but we only want to publish a code coverage report once.
+      # "strategy.job-index" gives us the index of the current job in the matrix. Any index is fine. We use the first.
+      # Additionally, because we're using pull_request instead of pull_request_target (for security purposes) when
+      # running tests on PRs (see test-pull-request.yml), forks won't have access to GitHub secrets, so this step will
+      # fail if we try to run it. As such, we have to skip publishing Codecov reports when running tests from forks.
+      - name: Upload results to Codecov
+        if: ${{ strategy.job-index == 0 && github.event.pull_request.head.repo.full_name == github.repository }}
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

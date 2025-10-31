@@ -19,13 +19,13 @@
 <div class="body">
 
     <g:if test="${flash.message}">
-        <div class="message">${flash.message}</div>
+        <div class="message" role="status" aria-label="message">${flash.message}</div>
     </g:if>
     <g:if test="${flash.warning}">
-        <div class="warning">${raw(flash.warning)}</div>
+        <div class="warning" role="status" aria-label="warning-message">${raw(flash.warning)}</div>
     </g:if>
     <g:hasErrors bean="${locationInstance}">
-        <div class="errors">
+        <div class="errors" role="alert" aria-label="error-message">
             <g:renderErrors bean="${locationInstance}" as="list"/>
         </div>
     </g:hasErrors>
@@ -37,20 +37,20 @@
         <div class="dialog">
             <div id="location-tabs" class="tabs">
                 <ul>
-                    <li><a href="#location-details-tab"><g:message code="location.label"/></a></li>
-                    <li><a href="#location-configuration-tab"><g:message code="location.configuration.label"
+                    <li role="tab" aria-label="Location"><a href="#location-details-tab"><g:message code="location.label"/></a></li>
+                    <li role="tab"  aria-label="Configuration"><a href="#location-configuration-tab"><g:message code="location.configuration.label"
                                                                   default="Configuration"/></a></li>
                     <g:if test="${!locationInstance?.isInternalLocation()}">
                         <g:if test="${!locationInstance?.isZoneLocation()}">
-                            <li><a href="#location-address-tab"><g:message code="location.address.label"
+                            <li role="tab" aria-label="Address"><a href="#location-address-tab"><g:message code="location.address.label"
                                                                        default="Address"/></a></li>
-                            <li><a href="${request.contextPath}/location/showZoneLocations/${locationInstance?.id}"
+                            <li role="tab" aria-label="Zone Locations"><a href="${request.contextPath}/location/showZoneLocations/${locationInstance?.id}"
                                    id="location-zoneLocations-tab">
                                 <g:message code="location.zoneLocations.label" default="Zone Locations"/></a>
                             </li>
                         </g:if>
                     <%--<li><a href="#location-binLocations-tab"><g:message code="location.binLocations.label" default="Bin Locations"/></a></li>--%>
-                        <li><a href="${request.contextPath}/location/showBinLocations/${locationInstance?.id}"
+                        <li role="tab" aria-label="Bin Locations"><a href="${request.contextPath}/location/showBinLocations/${locationInstance?.id}"
                                id="location-binLocations-tab">
                             <g:message code="location.binLocations.label"
                                        default="Bin Locations"/></a>
@@ -58,17 +58,12 @@
 
                     </g:if>
                     <g:else>
-                        <li><a href="${request.contextPath}/location/showContents/${locationInstance?.id}"><warehouse:message
+                        <li role="tab" aria-label="Contents"><a href="${request.contextPath}/location/showContents/${locationInstance?.id}"><warehouse:message
                                 code="binLocation.contents.label" default="Contents"/></a></li>
                     </g:else>
-                    <li><a href="${request.contextPath}/location/showForecastingConfiguration/${locationInstance?.id}"
-                           id="location-forecastingConfiguration-tab">
-                        <g:message code="forecasting.label"
-                                   default="Forecasting"/></a>
-                    </li>
                 </ul>
 
-                <div id="location-details-tab">
+                <section id="location-details-tab" aria-label="Location">
                     <div class="box">
                         <h2>
                             <img src="${resource(dir: 'images/icons/silk', file: 'application_view_detail.png')}"/>
@@ -79,7 +74,7 @@
                             <g:if test="${locationInstance?.id}">
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                        <label for="name"><warehouse:message code="default.id.label"/></label>
+                                        <label><warehouse:message code="default.id.label"/></label>
                                     </td>
                                     <td valign="top"
                                         class="value ${hasErrors(bean: locationInstance, field: 'id', 'errors')}">
@@ -114,34 +109,36 @@
                             <g:if test="${locationInstance?.isInternalLocation() || locationInstance.isZoneLocation()}">
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                        <label for="name"><warehouse:message
+                                        <label for="parentLocation.id"><warehouse:message
                                                 code="location.parentLocation.label"/></label>
                                     </td>
                                     <td valign="top"
                                         class="value ${hasErrors(bean: locationInstance, field: 'parentLocation', 'errors')}">
-
-                                        <g:selectLocation name="parentLocation.id"
-                                                          value="${locationInstance?.parentLocation?.id}"
-                                                          noSelection="['null': '']"
-                                                          class="chzn-select-deselect"/>
+                                        <div data-testid="parent-location-select">
+                                            <g:selectLocation name="parentLocation.id"
+                                                              value="${locationInstance?.parentLocation?.id}"
+                                                              noSelection="['null': '']"
+                                                              class="chzn-select-deselect"/>
+                                        </div>
                                     </td>
                                 </tr>
                             </g:if>
                             <g:if test="${locationInstance?.isInternalLocation()}">
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                        <label for="name"><warehouse:message
+                                        <label for="zone.id"><warehouse:message
                                                 code="location.zoneLocation.label"/></label>
                                     </td>
                                     <td valign="top"
                                         class="value ${hasErrors(bean: locationInstance, field: 'zone', 'errors')}">
-
-                                        <g:selectZoneLocationByLocation
-                                                name="zone.id"
-                                                id="${locationInstance?.parentLocation?.id}"
-                                                value="${locationInstance?.zone?.id}"
-                                                noSelection="['null': '']"
-                                                class="chzn-select-deselect"/>
+                                        <div data-testid="zone-select">
+                                            <g:selectZoneLocationByLocation
+                                                    name="zone.id"
+                                                    id="${locationInstance?.parentLocation?.id}"
+                                                    value="${locationInstance?.zone?.id}"
+                                                    noSelection="['null': '']"
+                                                    class="chzn-select-deselect"/>
+                                        </div>
                                     </td>
                                 </tr>
                             </g:if>
@@ -151,47 +148,52 @@
                                             code="organization.label"/></label>
                                 </td>
                                 <td valign="top" class="value">
-
-                                    <g:selectOrganization name="organization.id"
-                                              class="chzn-select-deselect"
-                                              optionKey="id"
-                                              value="${locationInstance?.organization?.id}"
-                                              optionValue="${{ format.metadata(obj: it) }}"
-                                              noSelection="['null': '']"
-                                              active="${true}"
-                                              currentOrganizationId="${locationInstance?.organization?.id ?: ''}"
-                                    />
+                                    <div data-testid="organization-select">
+                                        <g:selectOrganization name="organization.id"
+                                                  class="chzn-select-deselect"
+                                                  optionKey="id"
+                                                  value="${locationInstance?.organization?.id}"
+                                                  optionValue="${{ format.metadata(obj: it) }}"
+                                                  noSelection="['null': '']"
+                                                  active="${true}"
+                                                  currentOrganizationId="${locationInstance?.organization?.id ?: ''}"
+                                        />
+                                    </div>
                                 </td>
                             </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="name"><warehouse:message
+                                    <label for="locationType.id"><warehouse:message
                                             code="location.locationType.label"/></label>
 
                                 </td>
                                 <td valign="top" class="value">
-                                    <g:select name="locationType.id"
-                                              from="${org.pih.warehouse.core.LocationType.list()}"
-                                              class="chzn-select-deselect"
-                                              optionKey="id"
-                                              optionValue="${{ format.metadata(obj: it) }}"
-                                              value="${locationInstance?.locationType?.id}"
-                                              noSelection="['null': '']"/>
+                                    <div data-testid="location-type-select">
+                                        <g:select name="locationType.id"
+                                                  from="${org.pih.warehouse.core.LocationType.list()}"
+                                                  class="chzn-select-deselect"
+                                                  optionKey="id"
+                                                  optionValue="${{ format.metadata(obj: it) }}"
+                                                  value="${locationInstance?.locationType?.id}"
+                                                  noSelection="['null': '']"/>
+                                    </div>
                                 </td>
                             </tr>
                             <g:if test="${!locationInstance?.isInternalLocation() && !locationInstance.isZoneLocation()}">
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                        <label for="name"><warehouse:message
+                                        <label for="locationGroup.id"><warehouse:message
                                                 code="location.locationGroup.label"/></label>
                                     </td>
                                     <td valign="top" class="value">
-                                        <g:select class="chzn-select-deselect"
-                                                  name="locationGroup.id"
-                                                  from="${org.pih.warehouse.core.LocationGroup.list()}"
-                                                  optionKey="id"
-                                                  value="${locationInstance?.locationGroup?.id}"
-                                                  noSelection="['null': '']"/>
+                                      <div data-testid="location-group-select">
+                                          <g:select class="chzn-select-deselect"
+                                                    name="locationGroup.id"
+                                                    from="${org.pih.warehouse.core.LocationGroup.list()}"
+                                                    optionKey="id"
+                                                    value="${locationInstance?.locationGroup?.id}"
+                                                    noSelection="['null': '']"/>
+                                      </div>
                                     </td>
                                 </tr>
                                 <tr class="prop">
@@ -201,13 +203,15 @@
                                     </td>
                                     <td valign="top"
                                         class="value ${hasErrors(bean: locationInstance, field: 'manager', 'errors')}">
-                                        <g:select class="chzn-select-deselect"
-                                                  name="manager.id"
-                                                  from="${org.pih.warehouse.core.User.list().sort {
-                                                      it.lastName
-                                                  }}" optionKey="id"
-                                                  value="${locationInstance?.manager?.id}"
-                                                  noSelection="['null': '']"/>
+                                        <div data-testid="manager-select">
+                                            <g:select class="chzn-select-deselect"
+                                                      name="manager.id"
+                                                      from="${org.pih.warehouse.core.User.list().sort {
+                                                          it.lastName
+                                                      }}" optionKey="id"
+                                                      value="${locationInstance?.manager?.id}"
+                                                      noSelection="['null': '']"/>
+                                        </div>
                                     </td>
                                 </tr>
                             </g:if>
@@ -235,9 +239,9 @@
 
                         </table>
                     </div>
-                </div>
+                </section>
 
-                <div id="location-configuration-tab">
+                <section id="location-configuration-tab" aria-label="Configuration">
                     <div class="box">
                         <h2>
                             <img src="${resource(dir: 'images/icons/silk', file: 'flag_red.png')}"
@@ -335,19 +339,21 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <select id="supported-activities" name="supportedActivities"
-                                            class="chzn-select-deselect"
-                                            multiple="true" ${useDefault ? 'disabled' : ''}>
-                                        <g:each var="activity" in="${activityList}">
-                                            <g:set var="isDefault"
-                                                   value="${locationInstance?.locationType?.supportedActivities?.contains(activity.toString())}"/>
-                                            <g:set var="isSelected"
-                                                   value="${supportedActivities?.contains(activity.toString())}"/>
-                                            <option value="${activity}" ${isSelected ? 'selected' : ''}>
-                                                ${format.metadata(obj: activity)}
-                                            </option>
-                                        </g:each>
-                                    </select>
+                                    <div data-testid="supported-activities-select">
+                                        <select id="supported-activities" name="supportedActivities"
+                                                class="chzn-select-deselect"
+                                                multiple="true" ${useDefault ? 'disabled' : ''}>
+                                            <g:each var="activity" in="${activityList}">
+                                                <g:set var="isDefault"
+                                                       value="${locationInstance?.locationType?.supportedActivities?.contains(activity.toString())}"/>
+                                                <g:set var="isSelected"
+                                                       value="${supportedActivities?.contains(activity.toString())}"/>
+                                                <option value="${activity}" ${isSelected ? 'selected' : ''}>
+                                                    ${format.metadata(obj: activity)}
+                                                </option>
+                                            </g:each>
+                                        </select>
+                                    </div>
 
                                 </td>
                             </tr>
@@ -374,14 +380,14 @@
 
                         </table>
                     </div>
-                </div>
+                </section>
 
                 <g:if test="${!locationInstance?.isInternalLocation() && !locationInstance?.isZoneLocation()}">
 
-                    <div id="location-address-tab">
-                    <g:if test="${locationInstance?.address}">
-                        <g:hiddenField name="address.id" value="${locationInstance?.address?.id}"/>
-                    </g:if>
+                    <section id="location-address-tab" aria-label="Address">
+                        <g:if test="${locationInstance?.address}">
+                            <g:hiddenField name="address.id" value="${locationInstance?.address?.id}"/>
+                        </g:if>
                         <div class="box">
                             <h2>
                                 <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}"
@@ -392,7 +398,7 @@
                                 <tbody>
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                        <label for="name"><warehouse:message
+                                        <label for="address.address"><warehouse:message
                                                 code="address.address.label"/></label>
                                     </td>
                                     <td valign="top"
@@ -404,7 +410,7 @@
                                 </tr>
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                        <label for="name"><warehouse:message
+                                        <label for="address.address2"><warehouse:message
                                                 code="address.address2.label"/></label>
                                     </td>
                                     <td valign="top"
@@ -416,7 +422,7 @@
                                 </tr>
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                        <label for="name"><warehouse:message
+                                        <label for="address.city"><warehouse:message
                                                 code="address.city.label"/></label>
                                     </td>
                                     <td valign="top"
@@ -428,7 +434,7 @@
                                 </tr>
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                        <label for="name"><warehouse:message
+                                        <label for="address.stateOrProvince"><warehouse:message
                                                 code="address.stateOrProvince.label"/></label>
                                     </td>
                                     <td valign="top"
@@ -440,7 +446,7 @@
                                 </tr>
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                        <label for="name"><warehouse:message
+                                        <label for="address.postalCode"><warehouse:message
                                                 code="address.postalCode.label"/></label>
                                     </td>
                                     <td valign="top"
@@ -453,7 +459,7 @@
 
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                        <label for="name"><warehouse:message
+                                        <label for="address.country"><warehouse:message
                                                 code="address.country.label"/></label>
                                     </td>
                                     <td valign="top"
@@ -465,7 +471,7 @@
                                 </tr>
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                        <label for="name"><warehouse:message
+                                        <label for="address.description"><warehouse:message
                                                 code="address.description.label"/></label>
                                     </td>
                                     <td valign="top"
@@ -498,7 +504,7 @@
                                 </tfoot>
                             </table>
                         </div>
-                    </div>
+                    </section>
                 </g:if>
             </div>
 

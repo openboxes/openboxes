@@ -24,6 +24,10 @@ export const getInvoiceDescription = (rowValue) => {
   return rowValue?.description;
 };
 
+export const formatProductSupplierSubtext = (productSupplier) => (
+  productSupplier?.name ? `(source: ${productSupplier?.name})` : null
+);
+
 export const formatProductDisplayName = (rowValue) => (
   <div className="d-flex">
     <span className="text-truncate">
@@ -60,9 +64,9 @@ export const matchesProductCodeOrName = ({
 }) => {
   const { productCode, name, displayNames } = product;
   const value = filterValue?.toLowerCase();
-  return (productCode?.toLowerCase()?.includes(value) ||
-    name?.toLowerCase()?.includes(value) ||
-    displayNames?.default?.toLowerCase()?.includes(value)
+  return (productCode?.toLowerCase()?.includes(value)
+    || name?.toLowerCase()?.includes(value)
+    || displayNames?.default?.toLowerCase()?.includes(value)
   );
 };
 
@@ -86,3 +90,6 @@ export const omitEmptyValues = (values) => _.omitBy(values, (val) => {
   }
   return _.isEmpty(val);
 });
+
+export const mapStringToLimitedList = (value, elementsSeparator, lengthLimit) =>
+  (value?.length > lengthLimit ? `${_.take(value, lengthLimit).join('')}...` : value)?.split(elementsSeparator);

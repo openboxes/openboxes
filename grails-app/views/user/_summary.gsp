@@ -1,5 +1,5 @@
 <g:if test="${userInstance}">
-    <div class="${(userInstance?.active) ? 'active':'inactive'} summary">
+    <section class="${(userInstance?.active) ? 'active':'inactive'} summary" aria-label="summary">
         <table>
             <tr>
                 <td class="top" width="1%">
@@ -19,14 +19,14 @@
                 </td>
                 <td class="top right">
                     <div class="right">
-                        <span class="tag">
+                        <span class="tag" aria-label="active-status">
                             ${userInstance?.active ? warehouse.message(code:'user.active.label') : warehouse.message(code:'user.inactive.label')}
                         </span>
                     </div>
                 </td>
             </tr>
         </table>
-    </div>
+    </section>
 </g:if>
 <g:else>
     <div class="summary">

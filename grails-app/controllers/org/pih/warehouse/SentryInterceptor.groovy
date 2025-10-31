@@ -17,6 +17,12 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 
+/**
+ * Intercepts HTTP requests, adding user information to the Sentry transaction that will be created for the request.
+ *
+ * If we ever switch to use the Spring Security plugin, this code will need to be moved to a Spring Component
+ * that implements SentryUserProvider.
+ */
 @CompileStatic
 class SentryInterceptor {
 
@@ -25,25 +31,18 @@ class SentryInterceptor {
 
     AuthService authService
 
-    public SentryInterceptor() {
+    SentryInterceptor() {
         matchAll().except(uri: '/static/**').except(uri: "/info").except(uri: "/health")
     }
 
     @Override
-    /**
-     * Update user/location data for Sentry at each page load.
-     *
-     * This method doesn't actually send any events to Sentry; rather,
-     * it attaches various data to the Sentry global for later use in
-     * case an error or logging event occurs. (A logback plugin sends the
-     * actual events; see the SentryAppender definition in logback.xml.)
-     *
-     * N.B. Sentry also loads some user-agent/url information by itself
-     * from Tomcat (see SentryServletContainerInitializer).
-     */
     boolean before() {
-        def startTime = System.currentTimeMillis()
+        long startTime = System.currentTimeMillis()
         try {
+            if (!Sentry.isEnabled()) {
+                return true
+            }
+
             User user = authService.currentUser
             Location location = authService.currentLocation
             Map<String, String> additionalData = [:]
@@ -83,6 +82,7 @@ class SentryInterceptor {
 
         } catch (Exception e) {
             log.warn("Error setting Sentry user data for ${request.requestURI}", e)
+            return true
         }
 
         log.debug "updated Sentry context for ${request.requestURI} in ${System.currentTimeMillis() - startTime} ms"

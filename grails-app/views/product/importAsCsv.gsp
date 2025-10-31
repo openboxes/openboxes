@@ -13,10 +13,10 @@
 	<body>
 		<div class="body">
 			<g:if test="${flash.message}">
-				<div class="message">${flash.message}</div>
+				<div class="message" role="status" aria-label="message">${flash.message}</div>
 			</g:if>
 			<g:hasErrors bean="${command}">
-				<div class="errors"><g:renderErrors bean="${command}" as="list" /></div>
+				<div class="errors" role="alert" aria-label="error-message"><g:renderErrors bean="${command}" as="list" /></div>
 			</g:hasErrors>
 
 
@@ -132,6 +132,9 @@
                                                                         <g:else>
                                                                             <span class="modified">${warehouse.message(code: 'default.new.label') }</span>
                                                                         </g:else>
+                                                                    </td>
+                                                                    <td class="${productProperties?.active!=existingProduct?.active?'modified':'' }">
+                                                                        <span title="${existingProduct?.active }">${productProperties?.active }</span>
                                                                     </td>
                                                                     <td class="${productProperties?.productCode!=existingProduct?.productCode?'modified':'' }">
                                                                         <span title="${existingProduct?.productCode }">${productProperties?.productCode }</span>

@@ -7,11 +7,10 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
-import FileDrop from 'components/form-elements/FileDrop';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
+import DropzoneFileSelect from 'components/form-elements/v2/DropzoneFileSelect';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-
 
 class ImportBinModal extends Component {
   constructor(props) {
@@ -115,15 +114,14 @@ class ImportBinModal extends Component {
             data={this.state.supportLinks}
             options={{ renderInnerHtml: true }}
           />
-          <FileDrop className="my-3" onDrop={this.onDrop} file={this.state.file} />
+          <DropzoneFileSelect className="my-3" onChange={this.onDrop} />
         </div>
       </ModalWrapper>
     );
   }
 }
 
-
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 

@@ -30,7 +30,11 @@ class ImportDataCommand implements Validateable {
     def transaction
 
     static constraints = {
-        date(nullable: true)
+        date(nullable: true, validator: { val, obj ->
+            if (val != null && val.after(new Date())) {
+                return ['future']
+            }
+        })
         filename(nullable: true)
         importNow(nullable: true)
         importFile(nullable: true, validator: { val, obj ->

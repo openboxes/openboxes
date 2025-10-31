@@ -23,6 +23,7 @@ exports[`menuConfigurationSubsection component should match snapshot 1`] = `
   <a
     className="dropdown-item"
     href="/openboxes/admin/showSettings"
+    role="menuitem"
   >
     Settings
   </a>
@@ -41,6 +42,7 @@ exports[`menuItem component should match snapshot 1`] = `
       className="nav-link dropdown-toggle"
       href="#"
       id="navbarDropdown"
+      role="menuitem"
     />
     <div
       aria-labelledby="navbarDropdown"

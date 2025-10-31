@@ -2,11 +2,10 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-
 const StatusIndicator = ({ status, variant }) => {
   // Replace _ with [spaces] and capitalize each word
   const statusToDisplay = status?.split('_')
-    .map(word => word.charAt(0) + word.toLowerCase().substring(1))
+    .map((word) => word.charAt(0) + word.toLowerCase().substring(1))
     .join(' ');
 
   return (
@@ -18,7 +17,6 @@ const StatusIndicator = ({ status, variant }) => {
     </div>
   );
 };
-
 
 export default StatusIndicator;
 

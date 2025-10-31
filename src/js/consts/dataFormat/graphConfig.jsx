@@ -59,7 +59,7 @@ function loadGraphColors(payload) {
 
     if (payload.config.colors && payload.config.colors.datasets) {
       colorConfig.data.color = Object.keys(payload.config.colors.datasets)
-        .find(key => payload.config.colors.datasets[key].includes(datasets[i].label));
+        .find((key) => payload.config.colors.datasets[key].includes(datasets[i].label));
     }
 
     if (payload.config.colors && payload.config.colors.labels) {

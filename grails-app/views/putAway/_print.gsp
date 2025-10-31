@@ -104,15 +104,33 @@
         <table>
             <thead>
                 <tr>
-                    <th>Code</th>
-                    <th style="width: 100px;" >Name</th>
-                    <th style="white-space: nowrap;">Lot/Serial No.</th>
-                    <th>Expiry</th>
-                    <th style="width: 30px;">Total Quantity</th>
-                    <th style="width: 50px;">Putaway Quantity</th>
-                    <th style="white-space: nowrap; width: 50px;">Preferred Bin</th>
-                    <th style="white-space: nowrap; width: 70px;">Current Bins</th>
-                    <th style="white-space: nowrap; width: 130px;">Putaway Bin</th>
+                    <th>
+                        <g:message code="putawayOrder.code.label" default="Code" />
+                    </th>
+                    <th style="width: 100px;" >
+                        <g:message code="putawayOrder.name.label" default="Name" />
+                    </th>
+                    <th style="white-space: nowrap;">
+                        <g:message code="putawayOrder.lotNumber.label" default="Lot/Serial No." />
+                    </th>
+                    <th>
+                        <g:message code="putawayOrder.expiry.label" default="Expiry" />
+                    </th>
+                    <th style="width: 30px;">
+                        <g:message code="putawayOrder.totalQuantity.label" default="Total Quantity" />
+                    </th>
+                    <th style="width: 50px;">
+                        <g:message code="putawayOrder.putawayQuantity.label" default="Putaway Quantity" />
+                    </th>
+                    <th style="width: 50px;">
+                        <g:message code="putawayOrder.preferredBin.label" default="Preferred Bin" />
+                    </th>
+                    <th style="width: 70px">
+                        <g:message code="putawayOrder.currentBins.label" default="Current Bins" />
+                    </th>
+                    <th style="width: 130px;">
+                        <g:message code="putawayOrder.putAwayBin.label" default="Putaway Bin" />
+                    </th>
                 </tr>
             </thead>
             <g:each var="putawayItem" in="${jsonObject.putawayItems}">
@@ -124,9 +142,15 @@
                         <wordwrap:td>${putawayItem["inventoryItem.expirationDate"]}</wordwrap:td>
                         <wordwrap:td>${putawayItem?.quantity}</wordwrap:td>
                         <wordwrap:td>${putawayItem?.quantity}</wordwrap:td>
-                        <wordwrap:td>${(putawayItem["preferredBin.zoneName"] ? putawayItem["preferredBin.zoneName"] + ": " : '') + putawayItem["preferredBin.name"]}</wordwrap:td>
+                        <wordwrap:td>
+                            ${(putawayItem["preferredBin.zoneName"] ? putawayItem["preferredBin.zoneName"] + ": " : '') +
+                                    (putawayItem["preferredBin.name"] ?: "")}
+                        </wordwrap:td>
                         <wordwrap:td>${putawayItem["currentBins"]}</wordwrap:td>
-                        <wordwrap:td>${(putawayItem["putawayLocation.zoneName"] ? putawayItem["putawayLocation.zoneName"] + ": " : '') + putawayItem["putawayLocation.name"]}</wordwrap:td>
+                        <wordwrap:td>
+                            ${(putawayItem["putawayLocation.zoneName"] ? putawayItem["putawayLocation.zoneName"] + ": " : '') +
+                                    (putawayItem["putawayLocation.name"] ?: "")}
+                        </wordwrap:td>
                     </tr>
                 </g:if>
                 <g:else>

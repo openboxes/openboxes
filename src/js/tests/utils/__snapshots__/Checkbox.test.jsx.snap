@@ -29,15 +29,16 @@ exports[`custom checkbox should match snapshot 1`] = `
   className="custom-checkbox"
   data-testid="custom-checkbox"
 >
-  <input
-    checked={false}
-    id=""
-    onChange={[Function]}
-    type="checkbox"
-  />
   <label
     htmlFor=""
-  />
+  >
+    <input
+      checked={false}
+      id=""
+      onChange={[Function]}
+      type="checkbox"
+    />
+  </label>
 </div>
 `;
 

@@ -48,4 +48,13 @@ class UnitOfMeasure implements Serializable {
     }
 
     String toString() { return name }
+
+    @Override
+    boolean equals(Object o) {
+        if (o instanceof UnitOfMeasure) {
+            UnitOfMeasure that = (UnitOfMeasure) o
+            return this.id == that.id
+        }
+        return false
+    }
 }

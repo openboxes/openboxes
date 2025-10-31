@@ -17,17 +17,18 @@ import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import TextField from 'components/form-elements/TextField';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, getReceivingPayloadContainers } from 'utils/form-values-utils';
 import Translate from 'utils/Translate';
-
+import { formatDate } from 'utils/translation-utils';
 
 const SHIPMENT_FIELDS = {
   'origin.name': {
     label: 'react.partialReceiving.origin.label',
     defaultMessage: 'Origin',
-    type: params => <TextField {...params} />,
+    type: (params) => <TextField {...params} />,
     attributes: {
       disabled: true,
     },
@@ -35,7 +36,7 @@ const SHIPMENT_FIELDS = {
   'destination.name': {
     label: 'react.partialReceiving.destination.label',
     defaultMessage: 'Destination',
-    type: params => <TextField {...params} />,
+    type: (params) => <TextField {...params} />,
     attributes: {
       disabled: true,
     },
@@ -43,16 +44,21 @@ const SHIPMENT_FIELDS = {
   dateShipped: {
     label: 'react.partialReceiving.shippedOn.label',
     defaultMessage: 'Shipped on',
-    type: params => <DateField {...params} />,
+    type: (params) => <DateField {...params} />,
     attributes: {
+      localizeDate: true,
+      localizedDateFormat: DateFormat.COMMON,
       disabled: true,
     },
   },
   dateDelivered: {
     label: 'react.partialReceiving.deliveredOn.label',
     defaultMessage: 'Delivered on',
-    type: params => <DateField {...params} />,
+    type: (params) => <DateField {...params} />,
     attributes: {
+      localizeDate: true,
+      localizedDateFormat: DateFormat.DEFAULT,
+      // It's necessary for properly setting up the time part of the localized date format
       dateFormat: 'MM/DD/YYYY HH:mm Z',
       required: true,
       showTimeSelect: true,
@@ -71,25 +77,25 @@ const TABLE_FIELDS = {
       'parentContainer.name': {
         fieldKey: '',
         flexWidth: '1',
-        type: params => (!params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.packLevel1.label',
         defaultMessage: 'Pack level 1',
         attributes: {
-          formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') || _.get(fieldValue, 'container.name') || 'Unpacked'),
+          formatValue: (fieldValue) => (_.get(fieldValue, 'parentContainer.name') || _.get(fieldValue, 'container.name') || 'Unpacked'),
         },
       },
       'container.name': {
         fieldKey: '',
         flexWidth: '1',
-        type: params => (!params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.packLevel2.label',
         defaultMessage: 'Pack level 2',
         attributes: {
-          formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') ? _.get(fieldValue, 'container.name') || '' : ''),
+          formatValue: (fieldValue) => (_.get(fieldValue, 'parentContainer.name') ? _.get(fieldValue, 'container.name') || '' : ''),
         },
       },
       'product.productCode': {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.code.label',
         defaultMessage: 'Code',
         headerAlign: 'left',
@@ -99,7 +105,7 @@ const TABLE_FIELDS = {
         },
       },
       product: {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.product.label',
         defaultMessage: 'Product',
         headerAlign: 'left',
@@ -114,19 +120,22 @@ const TABLE_FIELDS = {
         }),
       },
       lotNumber: {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.lotSerialNo.label',
         defaultMessage: 'Lot/Serial No.',
         flexWidth: '1',
       },
       expirationDate: {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.expirationDate.label',
         defaultMessage: 'Expiration date',
         flexWidth: '1',
+        getDynamicAttr: ({ formatLocalizedDate }) => ({
+          formatValue: (value) => (value ? formatLocalizedDate(value, DateFormat.COMMON) : value),
+        }),
       },
       binLocation: {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.binLocation.label',
         defaultMessage: 'Bin Location',
         flexWidth: '1.5',
@@ -135,36 +144,39 @@ const TABLE_FIELDS = {
         }),
         attributes: {
           showValueTooltip: true,
-          formatValue: fieldValue => (
+          formatValue: (fieldValue) => (
             <div className="d-flex">
               {fieldValue.zoneName ? <div className="text-truncate" style={{ minWidth: 30, flexShrink: 20 }}>{fieldValue.zoneName}</div> : ''}
               <div className="text-truncate">{fieldValue.zoneName ? `: ${fieldValue.name}` : fieldValue.name}</div>
-            </div>),
+            </div>
+          ),
         },
       },
       'recipient.name': {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.recipient.label',
         defaultMessage: 'Recipient',
         flexWidth: '1.5',
       },
       quantityReceiving: {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.receivingNow.label',
         defaultMessage: 'Receiving now',
         flexWidth: '1',
         attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          cellClassName: 'text-right',
+          formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
         },
       },
       quantityRemaining: {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.remaining.label',
         defaultMessage: 'Remaining',
         fieldKey: '',
         flexWidth: '1',
         attributes: {
-          formatValue: fieldValue => (fieldValue && fieldValue.quantityRemaining ? fieldValue.quantityRemaining.toLocaleString('en-US') : fieldValue.quantityRemaining),
+          cellClassName: 'text-right',
+          formatValue: (fieldValue) => (fieldValue && fieldValue.quantityRemaining ? fieldValue.quantityRemaining.toLocaleString('en-US') : fieldValue.quantityRemaining),
         },
         getDynamicAttr: ({ fieldValue }) => ({
           className: fieldValue && (fieldValue.cancelRemaining || !fieldValue.quantityRemaining) ? 'strike-through' : 'text-danger',
@@ -172,7 +184,7 @@ const TABLE_FIELDS = {
       },
       cancelRemaining: {
         fieldKey: 'quantityRemaining',
-        type: params => (params.subfield ? <CheckboxField {...params} /> : null),
+        type: (params) => (params.subfield ? <CheckboxField {...params} /> : null),
         label: 'react.partialReceiving.cancelRemaining.label',
         defaultMessage: 'Cancel remaining',
         flexWidth: '1',
@@ -182,7 +194,7 @@ const TABLE_FIELDS = {
         }),
       },
       comment: {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.comment.label',
         defaultMessage: 'Comment',
         flexWidth: '1',
@@ -240,8 +252,8 @@ class ReceivingCheckScreen extends Component {
   }
 
   onSubmit(formValues) {
-    const isBinLocationChosen = !_.some(formValues.containers, container =>
-      _.some(container.shipmentItems, shipmentItem => _.isNull(shipmentItem.binLocation.id)));
+    const isBinLocationChosen = !_.some(formValues.containers, (container) =>
+      _.some(container.shipmentItems, (shipmentItem) => _.isNull(shipmentItem.binLocation.id)));
 
     if (!isBinLocationChosen && this.props.hasBinLocationSupport && !(formValues.shipmentStatus === 'RECEIVED')) {
       this.confirmReceive(formValues);
@@ -263,14 +275,14 @@ class ReceivingCheckScreen extends Component {
    */
   fetchPartialReceiptCandidates() {
     this.props.showSpinner();
-    const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=2`;
+    const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=2&sort=${this.props.sort}`;
 
     return apiClient.get(url)
       .then((response) => {
         const values = parseResponse(response.data.data);
 
         if (!this.props.hasPartialReceivingSupport) {
-          values.containers = _.map(values.containers, container => ({
+          values.containers = _.map(values.containers, (container) => ({
             ...container,
             shipmentItems: _.chain(container.shipmentItems)
               .map((item) => {
@@ -281,7 +293,7 @@ class ReceivingCheckScreen extends Component {
                 }
                 return item;
               })
-              .filter(item => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== '').value(),
+              .filter((item) => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== '').value(),
           }));
         }
 
@@ -320,9 +332,9 @@ class ReceivingCheckScreen extends Component {
 
   cancelAllRemaining() {
     const containers = update(this.state.values.containers, {
-      $apply: items => (!items ? [] : items.map(item => update(item, {
+      $apply: (items) => (!items ? [] : items.map((item) => update(item, {
         shipmentItems: {
-          $apply: shipmentItems => (!shipmentItems ? [] : shipmentItems.map(shipmentItem => (
+          $apply: (shipmentItems) => (!shipmentItems ? [] : shipmentItems.map((shipmentItem) => (
             {
               ...shipmentItem,
               cancelRemaining: shipmentItem.quantityRemaining > 0,
@@ -332,9 +344,10 @@ class ReceivingCheckScreen extends Component {
       }))),
     });
 
-    const values = JSON.parse(JSON.stringify(this.state.values));
-    values.containers = containers;
-    this.setState({ values });
+    const { values } = this.state;
+    const parsedValues = JSON.parse(JSON.stringify(values));
+    parsedValues.containers = containers;
+    this.setState({ values: parsedValues });
     window.setFormValue('containers', containers);
   }
 
@@ -390,100 +403,110 @@ class ReceivingCheckScreen extends Component {
     return (
       <div>
         <Form
-          onSubmit={values => this.onSubmit(values)}
+          onSubmit={(values) => this.onSubmit(values)}
           validate={validate}
           mutators={{
-          ...arrayMutators,
-          setValue: ([field, value], state, { changeValue }) => {
-            changeValue(state, field, () => value);
-          },
-         }}
+            ...arrayMutators,
+            setValue: ([field, value], state, { changeValue }) => {
+              changeValue(state, field, () => value);
+            },
+          }}
           initialValues={this.state.values}
           render={({ handleSubmit, values, form }) => {
-          if (!window.setFormValue) {
-            window.setFormValue = form.mutators.setValue;
-          }
-          return (
-            <form onSubmit={handleSubmit}>
-              <div className="classic-form classic-form-condensed">
-                <span className="buttons-container classic-form-buttons">
-                  <button
-                    type="button"
-                    className="btn btn-outline-secondary float-right btn-form btn-xs"
-                    onClick={() => this.saveAndExit(this.state.values)}
-                    disabled={this.state.completed || !_.size(this.state.values.containers)}
-                  >
-                    <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-outline-secondary float-right btn-form btn-xs"
-                    onClick={() => this.onSave()}
-                    disabled={this.state.completed || !_.size(this.state.values.containers)}
-                  ><Translate id="react.default.button.save.label" defaultMessage="Save" />
-                  </button>
-                  {this.props.hasPartialReceivingSupport ?
+            if (!window.setFormValue) {
+              window.setFormValue = form.mutators.setValue;
+            }
+            return (
+              <form onSubmit={handleSubmit}>
+                <div className="classic-form classic-form-condensed">
+                  <span className="buttons-container classic-form-buttons">
                     <button
                       type="button"
-                      className="btn btn-outline-danger float-right btn-form btn-xs"
-                      onClick={() => this.cancelAllRemaining()}
+                      className="btn btn-outline-secondary float-right btn-form btn-xs"
+                      onClick={() => this.saveAndExit(this.state.values)}
                       disabled={this.state.completed || !_.size(this.state.values.containers)}
-                    ><Translate
-                      id="react.partialReceiving.cancelAllRemaining.label"
-                      defaultMessage="Cancel all remaining"
-                    />
+                    >
+                      <span>
+                        <i className="fa fa-sign-out pr-2" />
+                        <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
+                      </span>
                     </button>
-              : null}
-                </span>
-                <div className="form-title">
-                  <Translate
-                    id="react.partialReceiving.shipmentInformation.label"
-                    defaultMessage="Shipment information"
-                  />
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary float-right btn-form btn-xs"
+                      onClick={() => this.onSave()}
+                      disabled={this.state.completed || !_.size(this.state.values.containers)}
+                    >
+                      <Translate id="react.default.button.save.label" defaultMessage="Save" />
+                    </button>
+                    {this.props.hasPartialReceivingSupport
+                      ? (
+                        <button
+                          type="button"
+                          className="btn btn-outline-danger float-right btn-form btn-xs"
+                          onClick={() => this.cancelAllRemaining()}
+                          disabled={this.state.completed || !_.size(this.state.values.containers)}
+                        >
+                          <Translate
+                            id="react.partialReceiving.cancelAllRemaining.label"
+                            defaultMessage="Cancel all remaining"
+                          />
+                        </button>
+                      )
+                      : null}
+                  </span>
+                  <div className="form-title">
+                    <Translate
+                      id="react.partialReceiving.shipmentInformation.label"
+                      defaultMessage="Shipment information"
+                    />
+                  </div>
+                  {_.map(SHIPMENT_FIELDS, (fieldConfig, fieldName) =>
+                    renderFormField(fieldConfig, fieldName, {
+                      saveDisabled: this.state.completed
+                    || !_.size(this.state.values.containers),
+                      hasBinLocationSupport: this.props.hasBinLocationSupport,
+                      hasPartialReceivingSupport: this.props.hasPartialReceivingSupport,
+                    }))}
                 </div>
-                {_.map(SHIPMENT_FIELDS, (fieldConfig, fieldName) =>
-                renderFormField(fieldConfig, fieldName, {
-                  saveDisabled: this.state.completed ||
-                    !_.size(this.state.values.containers),
-                  hasBinLocationSupport: this.props.hasBinLocationSupport,
-                  hasPartialReceivingSupport: this.props.hasPartialReceivingSupport,
-                }))}
-              </div>
-              <div className="my-2 table-form">
-                {_.map(TABLE_FIELDS, (fieldConfig, fieldName) =>
-                renderFormField(fieldConfig, fieldName, {
-                  saveDisabled: this.state.completed ||
-                    !_.size(this.state.values.containers),
-                    saveAndExit: this.onExit,
-                    hasBinLocationSupport: this.props.hasBinLocationSupport,
-                    cancelAllRemaining: this.cancelAllRemaining,
-                    hasPartialReceivingSupport: this.props.hasPartialReceivingSupport,
-                    values,
-                }))}
-              </div>
-              <div className="submit-buttons">
-                <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.prevPage(values)}>
-                  <Translate id="react.partialReceiving.backToEdit.label" defaultMessage="Back to edit" />
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-outline-success btn-form float-right btn-xs"
-                  disabled={this.state.completed || !_.size(this.state.values.containers)}
-                ><Translate id="react.partialReceiving.receiveShipment.label" defaultMessage="Receive shipment" />
-                </button>
-              </div>
-            </form>
-          );
-        }}
+                <div className="my-2 table-form" data-testid="items-table">
+                  {_.map(TABLE_FIELDS, (fieldConfig, fieldName) =>
+                    renderFormField(fieldConfig, fieldName, {
+                      saveDisabled: this.state.completed
+                    || !_.size(this.state.values.containers),
+                      saveAndExit: this.onExit,
+                      hasBinLocationSupport: this.props.hasBinLocationSupport,
+                      cancelAllRemaining: this.cancelAllRemaining,
+                      hasPartialReceivingSupport: this.props.hasPartialReceivingSupport,
+                      formatLocalizedDate: this.props.formatLocalizedDate,
+                      values,
+                    }))}
+                </div>
+                <div className="submit-buttons">
+                  <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.prevPage(values)}>
+                    <Translate id="react.partialReceiving.backToEdit.label" defaultMessage="Back to edit" />
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-outline-success btn-form float-right btn-xs"
+                    disabled={this.state.completed || !_.size(this.state.values.containers)}
+                  >
+                    <Translate id="react.partialReceiving.receiveShipment.label" defaultMessage="Receive shipment" />
+                  </button>
+                </div>
+              </form>
+            );
+          }}
         />
       </div>
     );
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
   hasPartialReceivingSupport: state.session.currentLocation.hasPartialReceivingSupport,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps, {
@@ -502,16 +525,12 @@ ReceivingCheckScreen.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      shipmentId: PropTypes.string,
-    }),
-  }).isRequired,
   translate: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
+  sort: PropTypes.string.isRequired,
 };
 
 ReceivingCheckScreen.defaultProps = {
   completed: false,
-  match: {},
 };

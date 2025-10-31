@@ -12,7 +12,7 @@
 
 <div class="body">
     <g:if test="${flash.message}">
-        <div class="message">${flash.message}</div>
+        <div class="message" role="status" aria-label="message">${flash.message}</div>
     </g:if>
     <g:if test="${flash.error}">
         <div class="error">${flash.error}</div>
@@ -130,7 +130,7 @@
                                 <g:message code="stockMovement.status.label"/>
                             </td>
                             <td class="value">
-                                <format:metadata obj="${stockMovement?.status ?: (stockMovement?.shipment?.status?.code ?: stockMovement?.statusCode)}"/>
+                                ${stockMovement?.displayStatus?.label}
                             </td>
                         </tr>
                         <tr class="prop">
@@ -278,18 +278,15 @@
                         <tr class="prop">
                             <td class="name">
                                 <g:message code="stockMovement.dateShipped.label"/>
-                                <g:if test="${stockMovement?.shipment?.status?.code==org.pih.warehouse.shipping.ShipmentStatusCode.PENDING}">
-                                    <small><g:message code="default.expected.label"/></small>
-                                </g:if>
                             </td>
                             <td class="value">
-                                <g:if test="${stockMovement?.dateShipped}">
+                                <g:if test="${stockMovement?.shipment?.hasShipped()}">
                                     <span title="${g.formatDate(date:stockMovement?.dateShipped)}">
                                         <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.dateShipped}"/>
                                     </span>
-                                    <g:if test="${stockMovement?.shipment?.createdBy}">
+                                    <g:if test="${stockMovement?.shipment?.shippedBy}">
                                         <g:message code="default.by.label"/>
-                                        ${stockMovement?.shipment?.createdBy?.name}
+                                        ${stockMovement?.shipment?.shippedBy}
                                     </g:if>
                                 </g:if>
                                 <g:else>

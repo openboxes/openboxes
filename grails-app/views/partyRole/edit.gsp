@@ -13,7 +13,7 @@
             	<div class="message">${flash.message}</div>
             </g:if>
             <g:hasErrors bean="${partyRoleInstance}">
-	            <div class="errors">
+	            <div class="errors" role="alert" aria-label="error-message">
 	                <g:renderErrors bean="${partyRoleInstance}" as="list" />
 	            </div>
             </g:hasErrors>
@@ -30,7 +30,7 @@
 					<h2><warehouse:message code="default.edit.label" args="[entityName]" /></h2>
 					<table>
 						<tbody>
-						
+
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="party"><warehouse:message code="partyRole.party.label" default="Party" /></label>
@@ -39,7 +39,7 @@
 									<g:select class="chzn-select-deselect" name="party.id" from="${org.pih.warehouse.core.Party.list()}" optionKey="id" value="${partyRoleInstance?.party?.id}"  />
 								</td>
 							</tr>
-						
+
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="roleType"><warehouse:message code="partyRole.roleType.label" default="Role Type" /></label>
@@ -48,25 +48,33 @@
 									<g:select class="chzn-select-deselect" name="roleType" from="${org.pih.warehouse.core.RoleType?.values()}" value="${partyRoleInstance?.roleType}"  />
 								</td>
 							</tr>
-						
+
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="startDate"><warehouse:message code="partyRole.startDate.label" default="Start Date" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: partyRoleInstance, field: 'startDate', 'errors')}">
-									<g:datePicker name="startDate" precision="minute" value="${partyRoleInstance?.startDate}" noSelection="['': '']" />
+									<g:datePicker name="startDate"
+                                                  precision="minute"
+                                                  default="none"
+                                                  value="${partyRoleInstance?.startDate}"
+                                                  noSelection="['': '']" />
 								</td>
 							</tr>
-						
+
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="endDate"><warehouse:message code="partyRole.endDate.label" default="End Date" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: partyRoleInstance, field: 'endDate', 'errors')}">
-									<g:datePicker name="endDate" precision="minute" value="${partyRoleInstance?.endDate}" noSelection="['': '']" />
+									<g:datePicker name="endDate"
+                                                  precision="minute"
+                                                  default="none"
+                                                  value="${partyRoleInstance?.endDate}"
+                                                  noSelection="['': '']" />
 								</td>
 							</tr>
-						
+
 							<tr class="prop">
 								<td valign="top"></td>
 								<td valign="top left">

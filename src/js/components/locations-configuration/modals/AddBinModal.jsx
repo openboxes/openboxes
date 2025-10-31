@@ -10,7 +10,6 @@ import ModalWrapper from 'components/form-elements/ModalWrapper';
 import apiClient, { flattenRequest } from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
-
 class AddBinModal extends Component {
   constructor(props) {
     super(props);
@@ -20,7 +19,6 @@ class AddBinModal extends Component {
       },
     };
   }
-
 
   handleSubmit(values) {
     this.props.showSpinner();
@@ -44,11 +42,11 @@ class AddBinModal extends Component {
   render() {
     return (
       <ModalWrapper
-        onSave={values => this.handleSubmit(values)}
+        onSave={(values) => this.handleSubmit(values)}
         fields={this.props.FIELDS}
         validate={this.props.validate}
-        initialValues={this.props.binTypes.length === 1 ?
-          { ...this.state.values, locationType: this.props.binTypes[0] }
+        initialValues={this.props.binTypes.length === 1
+          ? { ...this.state.values, locationType: this.props.binTypes[0] }
           : this.state.values}
         formProps={{
           binTypes: this.props.binTypes,
@@ -79,8 +77,7 @@ class AddBinModal extends Component {
   }
 }
 
-
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 

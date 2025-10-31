@@ -37,7 +37,7 @@ Copied to modify it to link to the jobs/show action
 		</g:else>
 	</h1>
 	<g:if test="${flash.message}">
-		<div class="message">${flash.message}</div>
+		<div class="message" role="status" aria-label="message">${flash.message}</div>
 	</g:if>
 	<div id="clock" data-time="${now.time}">
 		<h3>Current Time: ${now}</h3>

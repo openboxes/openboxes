@@ -26,7 +26,6 @@ const SupportButton = ({ locale, text, className }) => {
       });
   }, [locale]);
 
-
   const toggleOpenChat = () => window.Beacon('toggle');
 
   return (
@@ -43,7 +42,7 @@ const SupportButton = ({ locale, text, className }) => {
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
 });
 
@@ -52,6 +51,5 @@ SupportButton.propTypes = {
   className: PropTypes.string.isRequired,
   text: PropTypes.string.isRequired,
 };
-
 
 export default connect(mapStateToProps)(SupportButton);

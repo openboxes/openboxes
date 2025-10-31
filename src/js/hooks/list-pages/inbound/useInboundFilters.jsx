@@ -24,7 +24,7 @@ const useInboundFilters = () => {
     currentUser,
     currentLocale,
     shipmentTypes,
-  } = useSelector(state => ({
+  } = useSelector((state) => ({
     currentLocation: state.session.currentLocation,
     shipmentStatuses: state.shipmentStatuses.data,
     currentUser: state.session.user,
@@ -38,7 +38,6 @@ const useInboundFilters = () => {
     dispatch(fetchShipmentStatusCodes());
     dispatch(fetchShipmentTypes());
   }, [currentLocale]);
-
 
   const clearFilterValues = () => {
     const defaultValues = Object.keys(filterFields)
@@ -129,7 +128,7 @@ const useInboundFilters = () => {
       search: queryString.stringify(searchQuery),
     });
 
-    setDefaultFilterValues(values => ({
+    setDefaultFilterValues((values) => ({
       ...values,
       requestedBy: currentUserValue,
       createdBy: currentUserValue,

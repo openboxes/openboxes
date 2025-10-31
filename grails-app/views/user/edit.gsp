@@ -1,4 +1,6 @@
-<%@ page import="org.pih.warehouse.core.*" %>
+<%@ page import="org.pih.warehouse.core.Role" %>
+<%@ page import="org.pih.warehouse.LocalizationUtil" %>
+
 <g:set var="adminAndBrowser" value="${[Role.browser(), Role.assistant(), Role.manager(), Role.admin(), Role.superuser()]}" />
 <g:set var="allRoles" value="${[Role.admin(), Role.browser(), Role.manager()]}" />
 <g:set var="locationRolePairs" value="${userInstance?.locationRolePairs()}" />
@@ -13,15 +15,15 @@
 <div class="body">
 
     <g:if test="${flash.message}">
-        <div class="message">${flash.message}</div>
+        <div class="message" role="status" aria-label="message">${flash.message}</div>
     </g:if>
 
     <g:if test="${flash.error}">
-        <div class="errors">${flash.error}</div>
+        <div class="errors" role="alert" aria-label="error-message">${flash.error}</div>
     </g:if>
 
     <g:hasErrors bean="${userInstance}">
-        <div class="errors">
+        <div class="errors" role="alert" aria-label="error-message">
             <g:renderErrors bean="${userInstance}" as="list" />
         </div>
     </g:hasErrors>
@@ -32,11 +34,11 @@
             <div class="yui-u first">
                 <div id="user-tabs" class="tabs">
                     <ul>
-                        <li><a href="#details-tab"><warehouse:message code="user.details.label" default="User Details"/></a></li>
-                        <li><a href="#password-tab"><warehouse:message code="user.changePassword.label" default="Change Password"/></a></li>
-                        <li><a href="#authorization-tab"><warehouse:message code="user.authorization.label" default="Authorization"/></a></li>
+                        <li><a href="#details-tab" role="tab"><warehouse:message code="user.details.label" default="User Details"/></a></li>
+                        <li><a href="#password-tab" role="tab"><warehouse:message code="user.changePassword.label" default="Change Password"/></a></li>
+                        <li><a href="#authorization-tab" role="tab"><warehouse:message code="user.authorization.label" default="Authorization"/></a></li>
                     </ul>
-                    <div id="details-tab">
+                    <section id="details-tab" aria-label="User Details">
 
                         <div class="box">
                             <h2><warehouse:message code="user.details.label" default="Details"/></h2>
@@ -93,8 +95,8 @@
                                             <td valign="top" class="name">
                                               <label for="locale"><warehouse:message code="default.locale.label"/></label>
                                             </td>
-                                            <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'locale', 'errors')}">
-                                                <g:select name="locale" from="${ grailsApplication.config.openboxes.locale.supportedLocales.collect{ new Locale(it) } }"
+                                            <td data-testid="locale-select" valign="top" class="value ${hasErrors(bean: userInstance, field: 'locale', 'errors')}">
+                                                <g:select name="locale" from="${ grailsApplication.config.openboxes.locale.supportedLocales.collect{ LocalizationUtil.getLocale(it) } }"
                                                           optionValue="displayName" value="${userInstance?.locale}" noSelection="['':'']" class="chzn-select-deselect"/>
                                             </td>
                                         </tr>
@@ -102,7 +104,7 @@
                                             <td valign="top" class="name">
                                                 <label for="locale"><warehouse:message
                                                     code="default.timezone.label" default="Timezone" /></label></td>
-                                            <td valign="top" class="value">
+                                            <td data-testid="timezone-select" valign="top" class="value">
                                                 <g:selectTimezone id="timezone" name="timezone" value="${userInstance?.timezone}"
                                                                   noSelection="['':'']"/>
                                             </td>
@@ -126,8 +128,8 @@
 
                             </g:form>
                         </div>
-                    </div>
-                    <div id="password-tab">
+                    </section>
+                    <section id="password-tab" aria-label="Change Password">
                         <div class="box">
                             <h2><g:message code="user.changePassword.label" default="Change Password"/></h2>
 
@@ -176,8 +178,8 @@
 
                             </g:form>
                         </div>
-                    </div>
-                    <div id="authorization-tab">
+                    </section>
+                    <section id="authorization-tab" aria-label="Authorization">
                         <div class="box">
                             <h2><warehouse:message code="user.authorization.label" default="Authorization"/></h2>
 
@@ -192,13 +194,15 @@
                                             <td valign="top" class="name">
                                                 <label for="email"><warehouse:message code="user.defaultLocation.label" /></label>
                                             </td>
-                                            <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'warehouse', 'errors')}">
+                                            <td data-testid="default-location-select" valign="top" class="value ${hasErrors(bean: userInstance, field: 'warehouse', 'errors')}">
                                                 <g:select name="warehouse.id" from="${locations}"
                                                           optionKey="id" value="${userInstance?.warehouse?.id}" noSelection="['null':'']" class="chzn-select-deselect"/>
 
                                                 <div class="fade">
                                                     <g:checkBox name="rememberLastLocation" value="${userInstance?.rememberLastLocation}" />
-                                                    <warehouse:message code="user.rememberLastLocation.label" />
+                                                    <label class="fade font-weight-normal" for="rememberLastLocation">
+                                                        <warehouse:message code="user.rememberLastLocation.label" />
+                                                    </label>
                                                 </div>
 
                                             </td>
@@ -208,9 +212,9 @@
                                                 <td valign="top" class="name">
                                                     <label for="roles"><warehouse:message code="user.roles.label" /></label>
                                                 </td>
-                                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'roles', 'errors')}">
+                                                <td data-testid="default-roles-select" valign="top" class="value ${hasErrors(bean: userInstance, field: 'roles', 'errors')}">
                                                     <g:set var="noAccessLabel" value="${warehouse.message(code: 'no.access.label')}" />
-                                                    <g:select name="roles" from="${org.pih.warehouse.core.Role.list()?.sort({it.description})}"
+                                                    <g:select name="roles" from="${Role.list()?.sort({it.description})}"
                                                               optionKey="id" value="${userInstance?.roles}"
                                                               noSelection="${['null': noAccessLabel]}" multiple="true" class="chzn-select-deselect"/>
                                                     <span class="fade"><g:message code="user.clearDefaultRole.message"/></span>
@@ -221,7 +225,7 @@
                                                     <label><warehouse:message code="user.locationRoles.label"/></label>
                                                 </td>
                                                 <td valign="top" class="value" style="padding: 0px">
-                                                    <table>
+                                                    <table aria-label="Location Roles">
                                                         <thead>
                                                             <tr class="odd">
                                                                 <th><warehouse:message code="location.label"/></th>
@@ -290,6 +294,7 @@
                                                                 <td colspan="5" class="buttons right">
                                                                     <a href="javascript:void(0);"
                                                                        class="button btn-show-dialog"
+                                                                       role="button"
                                                                        data-title="${g.message(code:'default.add.label', args: [g.message(code: 'user.locationRoles.label')])}"
                                                                        data-url="${request.contextPath}/user/createLocationRoles?user.id=${userInstance?.id}">
                                                                         <img src="${resource(dir:'images/icons/silk',file:'add.png')}"/>&nbsp;
@@ -321,7 +326,7 @@
                                 </table>
                             </g:form>
                         </div>
-                    </div>
+                    </section>
                 </div>
             </div>
         </div>

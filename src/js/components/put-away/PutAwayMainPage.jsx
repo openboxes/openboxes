@@ -16,7 +16,6 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/put-away/PutAway.scss';
 
-
 /** Main put-away form's component. */
 class PutAwayMainPage extends Component {
   constructor(props) {
@@ -88,7 +87,6 @@ class PutAwayMainPage extends Component {
 
   dataFetched = false;
 
-
   fetchPutAway() {
     if (this.props.match.params.putAwayId) {
       this.props.showSpinner();
@@ -134,7 +132,7 @@ class PutAwayMainPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   location: state.session.currentLocation,
   locale: state.session.activeLanguage,
   putAwayTranslationsFetched: state.session.fetchedTranslations.putAway,

@@ -5,117 +5,415 @@ site_url: https://docs.openboxes.com/en/
 repo_url: https://github.com/openboxes/openboxes
 theme:
   name: material
-  logo: img/logo.svg
+  custom_dir: docs/overrides
+  language: en
+  logo: assets/img/logo.svg
+#  favicon: assets/img/logo.ico
+  icon:
+    admonition:
+      note: octicons/tag-16
+      abstract: octicons/checklist-16
+      info: octicons/info-16
+      tip: octicons/squirrel-16
+      success: octicons/check-16
+      question: octicons/question-16
+      warning: octicons/alert-16
+      failure: octicons/x-circle-16
+      danger: octicons/zap-16
+      bug: octicons/bug-16
+      example: octicons/beaker-16
+      quote: octicons/quote-16
   palette:
-    primary: white
-    accent: blue
+    # Palette toggle for light mode
+    - scheme: default
+      toggle:
+        icon: material/toggle-switch-outline
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - scheme: slate
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to light mode
   features:
+    #- content.tabs.link
+    - content.code.annotation
+    - content.code.copy
+    - content.code.select
+    - header.autohide
+    #- navigation.indexes
+    #- navigation.instant
+    #- navigation.instant.progress
+    - navigation.expand
+    - navigation.footer
+    - navigation.header
+    - navigation.path
+    #- navigation.prune
+    - navigation.sections
     - navigation.tabs
-    - toc.integration
+    - navigation.top
+    - navigation.tracking
+    - search.suggest
+    - search.highlight
+    - toc.follow
 use_directory_urls: true
-copyright: Copyright &copy; 2010-2021, OpenBoxes
-google_analytics: ['UA-37396941-2', 'openboxes.com']
+copyright: Copyright &copy; 2010-2024, OpenBoxes
+extra:
+  stylesheet: stylesheets/extra.css
+  status:
+    new: Recently added
+  analytics:
+    provider: google
+    property: G-4244ZMRC67
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/openboxes/openboxes
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/openboxes_
+    - icon: fontawesome/brands/linkedin
+      link: https://linkedin.com/openboxes
+  version: mike
+plugins:
+#  - blog
+  - search
+  - macros
+  - glightbox
+  - open-in-new-tab
 markdown_extensions:
-  - attr_list
   - admonition
+  - attr_list
+  - markdown_include.include:
+      base_path: docs
+  - md_in_html
   - footnotes
   - tables
+  - toc:
+      toc_depth: 3
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.blocks.html
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tasklist:
+      custom_checkbox: true
+      clickable_checkbox: true
+  - pymdownx.tilde
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      url_download: true
+  # Allow nesting of code and content blocks
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
   - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 nav:
-  - About:
-    - Introduction: index.md
-    - Architecture: about/architecture.md
+
+  - OpenBoxes:
+    - Home: index.md
+    - Features: about/features.md
     - Benefits: about/benefits.md
     - Considerations: about/considerations.md
     - Release Notes: about/release-notes.md
-  - Installation Guide:
-    - Getting Started: installation/index.md
+
+    # Other potential (Architecture, Scalability, Integration, Implementation Timeline, Security and Compliance)
+    #    - Use Cases: about/use-cases.md
+    #    - Case Studies: about/case-studies.md
+    #    - Cost Analysis: about/cost-analysis.md
+    #    - Alternatives: about/alternatives.md
+
+
+  # Quickstart Guide
+  - Quickstart:
+    - System Requirements: admin-guide/quickstart/requirements.md
+    - Quickstart on Ubuntu 22.04: admin-guide/quickstart/ubuntu2204/index.md
+    - Quickstart on Mac OS: admin-guide/quickstart/macos/index.md
+#      - Quickstart on Windows: admin-guide/quickstart/windows/
+#      - Quickstart using Docker: admin-guide/quickstart/docker/
+
+  # Installation Guide
+  # Need to add a discussion re: self-hosted on-premise vs cloud vs managed hosting
+  - Install:
+    - Introduction: admin-guide/installation/index.md
+    - Getting Started:
+      - Basic Instructions: admin-guide/installation/basic-instructions.md
+      - System Requirements: admin-guide/installation/requirements.md
+      - Knowledge Requirements: admin-guide/installation/knowledge-requirements.md
+      - Cloud vs On-Premise: admin-guide/installation/hosting.md
+      - Provision Resources: admin-guide/hosting/provisioning.md
+      #- Deployment Strategy: admin-guide/installation/deployment-strategies.md
     - Installation:
-      - Ubuntu:
-        - Ubuntu 18.04:
-          - Overview: installation/ubuntu1804/index.md
-          - Requirements: installation/ubuntu1804/requirements.md
-          - Hosting: installation/ubuntu1804/hosting.md
-          - Ubuntu: installation/ubuntu1804/ubuntu.md
-          - Java: installation/ubuntu1804/java.md
-          - Tomcat: installation/ubuntu1804/tomcat.md
-          - MySQL: installation/ubuntu1804/mysql.md
-          - Apache: installation/ubuntu1804/apache.md
-          - Configuration: installation/ubuntu1804/configuration.md
-          - Deployment: installation/ubuntu1804/deployment.md
-          - Troubleshooting: installation/ubuntu1804/troubleshooting.md
-        - Ubuntu 18.04 (Grails v3):
-          - Overview: installation/ubuntu1804-grails3/index.md
-          - Hosting: installation/ubuntu1804-grails3/hosting.md
-          - Ubuntu: installation/ubuntu1804-grails3/ubuntu.md
-          - Java: installation/ubuntu1804-grails3/java.md
-          - MySQL: installation/ubuntu1804-grails3/mysql.md
-          - Application: installation/ubuntu1804-grails3/application.md
-          - Apache/Nginx: installation/ubuntu1804-grails3/webserver.md
-          - Deployment: installation/ubuntu1804-grails3/deployment.md
-          - Configuration: installation/ubuntu1804-grails3/configuration.md
-          - Troubleshooting: installation/ubuntu1804-grails3/troubleshooting.md
-        - Ubuntu 16.04:
-          - Instructions: installation/ubuntu1604.md
-          - Notes: installation/ubuntu1604-notes.md
-        - Ubuntu 14.04: installation/ubuntu1404.md
-        - Advanced: installation/advanced.md
-      - Docker: installation/docker.md
-      - Mac OS: installation/macos.md
-      - Windows: installation/windows.md
-    - Upgrading: upgrading/index.md
-  - Configuration Guide:
-    - Overview: configuration/index.md
-    - Tomcat AJP: configuration/ajp.md
-    - Apache HTTPS: configuration/https.md
-    - Database Connection: configuration/database.md
-    - Email: configuration/email.md
-    - OpenBoxes: configuration/application.md
-    - Sentry: configuration/sentry.md
-    - Example: configuration/example.md
-  - User Guide: user-guide/index.md
-  - Developer Guide:
-    - Introduction: developer-guide/index.md
-    - Getting Started: developer-guide/getting-started.md
-    - Contributing: developer-guide/contributing.md
-    - Syncing a Fork: developer-guide/syncing-a-fork.md
-    - Tagging a Release: developer-guide/tagging.md
-    - Troubleshooting: developer-guide/troubleshooting.md
-    - Release Lifecycle:
-      - Overview: developer-guide/release/index.md
-      - Plan: developer-guide/release/plan.md
-      - Develop: developer-guide/release/develop.md
-      - Prepare: developer-guide/release/prepare.md
-      - Test: developer-guide/release/testing.md
-      - Finalize: developer-guide/release/finalize.md
-      - Document: developer-guide/release/document.md
-      - Publish: developer-guide/release/publish.md
-      - Deploy: developer-guide/release/deploy.md
-      - Cleanup: developer-guide/release/cleanup.md
-    - Hotfix Lifecycle: developer-guide/hotfix/index.md
+      - Update System: admin-guide/installation/ubuntu2204/dependencies.md
+      - Install Java: admin-guide/installation/ubuntu2204/java.md
+      - Install Tomcat: admin-guide/installation/ubuntu2204/tomcat.md
+      - Install MySQL: admin-guide/installation/ubuntu2204/mysql.md
+    - Configuration:
+      - Setup Database: admin-guide/installation/ubuntu2204/database.md
+      - Configure Application: admin-guide/installation/ubuntu2204/configuration.md
+      #- Configure Tomcat: admin-guide/installation/ubuntu2204/tomcat-configuration.md
+    - Deployment:
+      - Deploy Application: admin-guide/installation/ubuntu2204/deployment.md
+      - Verify Deployment: admin-guide/installation/ubuntu2204/verification.md
+    #- Onboarding:
+      #- Introduction:  admin-guide/installation/ubuntu2204/onboarding/index.md
+      # Should delete this version of the deployment instructions
+      #- Deploy Application: admin-guide/installation/ubuntu2204/application.md
+    - Post-Deployment:
+      - Introduction:  admin-guide/installation/ubuntu2204/post-deployment.md
+      - Configure Reverse Proxy: admin-guide/installation/ubuntu2204/reverse-proxy.md
+      - Enable HTTPS: admin-guide/installation/ubuntu2204/https.md
+      # Other post-deployment topics to document which should also go in Configuration Guide
+        #- Rotate Logs:
+        #- Tune Performance:
+        #- Secure Database:
+        #- Configure Tomcat:
+        #- Configure Database:
+    - Troubleshooting:
+      - Known Issues: admin-guide/installation/ubuntu2204/troubleshooting.md
+
+  # Configuration Guide - needs a lot of work
+  - Configure:
+    - Introduction: admin-guide/configuration/index.md
+    - Core Concepts:
+      - Default Settings: admin-guide/configuration/basics.md
+      - Configuration Sources: admin-guide/configuration/locations.md
+      - Modifying Configuration: admin-guide/configuration/overrides.md
+#      - Configuration Reloading: admin-guide/configuration/reloading.md
+    - General Settings:
+      - Data Source: admin-guide/configuration/database.md
+      - Connection Pool: admin-guide/configuration/connection-pool.md
+      - Server URL: admin-guide/configuration/server-url.md
+      - Server Context Path: admin-guide/configuration/context-path.md
+      - SMTP (Email): admin-guide/configuration/email.md
+    - Customization Settings:
+#       - Application: admin-guide/configuration/application.md
+#       - Feature Flags: admin-guide/configuration/feature-flags.md
+#      - Internationalization: admin-guide/configuration/i18n.md
+      - File Uploads Location: admin-guide/configuration/uploads.md
+      - File Uploads Size: admin-guide/configuration/upload-max-file-size.md
+      - Localization: admin-guide/configuration/localization.md
+
+    - White-labeling:
+      - Default Logo: admin-guide/configuration/logo.md
+      - Document Logo: admin-guide/configuration/document-logo.md
+      - Label: admin-guide/configuration/label.md
+
+#    - Integration:
+#      - Webhooks: admin-guide/configuration/webhooks.md
+#      - CrowdIn: admin-guide/configuration/crowdin.md
+#      - Currency API: admin-guide/configuration/crowdin.md
+#      - Translation API :deprecated: : admin-guide/configuration/crowdin.md
+#     - Load Balancer:
+#       - Proxy Server: admin-guide/configuration/ajp.md
+#     - Logging:
+#       - Logging: admin-guide/configuration/logging.md
+#       - Logrotate.d: admin-guide/configuration/logrotate.md
+#    - Feature-Specific Settings:
+#        - Bill of Materials: admin-guide/configuration/bom.md
+#        - Product Merge: admin-guide/configuration/product-merge.md
+#    - Performance:
+#       - Caching: admin-guide/configuration/caching.md
+#       - Tomcat Server: admin-guide/configuration/tomcat.md
+#       - Thread Pool: admin-guide/configuration/thread-pool.md
+#     - Security:
+#       - Anonymization: admin-guide/configuration/anonymize.md
+#       - Access Control: admin-guide/configuration/access-control.md
+#       - CORS: admin-guide/configuration/cors.md
+#       - Firewall Rules: admin-guide/configuration/firewall.md
+#       - Recaptcha: admin-guide/configuration/recaptcha.md
+#       - SSL/HTTPS: admin-guide/configuration/https.md
+#     - Observability:
+#       - Full Story: admin-guide/configuration/fullstory.md
+#       - Google Analytics: admin-guide/configuration/analytics.md
+#       - Health Check: admin-guide/configuration/health.md
+#       - Monitoring: admin-guide/configuration/apm.md
+#       - Sentry: admin-guide/configuration/sentry.md
+#     - User Feedback:
+#       - Zendesk Chat: admin-guide/configuration/zendesk.md
+#       - UserVoice: admin-guide/configuration/zendesk.md
+#       - Zendesk Chat: admin-guide/configuration/zendesk.md
+#     - Advanced:
+#       - Job Scheduling: admin-guide/configuration/job-scheduling.md
+#       - Hibernate: admin-guide/configuration/hibernate.md
+#       - Notifications: admin-guide/configuration/notifications.md
+#       - Performance: admin-guide/configuration/performance.md
+#       - Tomcat: admin-guide/configuration/tomcat.md
+#       - Unattended Updates: admin-guide/configuration/unattended-updates.md
+#      - Monitoring:
+#      - Analytics:
+#      - Logrotate.d:
+#    - Advanced:
+#      - admin-guide/installation/advanced.md
+#      - Tomcat AJP: admin-guide/configuration/ajp.md
+#      - Apache HTTPS: admin-guide/configuration/https.md
+#       - Advanced:
+#       - Example: admin-guide/configuration/example.md
+#     #- Onboarding: admin-guide/onboarding/index.md
+#       #- Locations:
+#       #- :
+#       #- Language:
+#     #- Data Model:
+
+  # Upgrade Guide
+  - Upgrade:
+    - Introduction: admin-guide/upgrading/introduction.md
+    - Plan:
+      - Upgrade Strategies:
+        - Overview: admin-guide/upgrading/plan/upgrade-strategies/overview.md
+        - Parallel Upgrade Overview: admin-guide/upgrading/plan/upgrade-strategies/parallel-upgrade-overview.md
+        - In-Place Upgrade Overview: admin-guide/upgrading/plan/upgrade-strategies/in-place-upgrade-overview.md
+      - Rollback Strategies:
+        - Overview: admin-guide/upgrading/plan/rollback-strategies/overview.md
+        - Backup Your Database: admin-guide/upgrading/plan/rollback-strategies/backup-database.md
+        - Backup Your Custom Configuration: admin-guide/upgrading/plan/rollback-strategies/backup-config.md
+    - Execute:
+      - Parallel Upgrade Guide:
+        - Introduction: admin-guide/upgrading/execute/parallel/introduction.md
+        - 1. Install The New Server: admin-guide/upgrading/execute/parallel/install-new-server.md
+        - 2. Copy Custom Config : admin-guide/upgrading/execute/parallel/copy-custom-config.md
+        - 3. Import Database Backup: admin-guide/upgrading/execute/parallel/import-database-backup.md
+        - 4. Start The New Server: admin-guide/upgrading/execute/parallel/start-server.md
+        - 5. Reimport Database Backup: admin-guide/upgrading/execute/parallel/reimport-database-backup.md
+        - 6. Route Requests To New Installation: admin-guide/upgrading/execute/parallel/reroute-requests.md
+        - 7. Deprovision Old Instance: admin-guide/upgrading/execute/parallel/deprovision-old-instance.md
+      - In-Place Upgrade Guide:
+        - Introduction: admin-guide/upgrading/execute/in-place/introduction.md
+        - 1. Upgrade Dependencies: admin-guide/upgrading/execute/in-place/upgrade-dependencies.md
+        - 2. Upgrade The App: admin-guide/upgrading/execute/in-place/upgrade-app.md
+        - 3. Start The Server: admin-guide/upgrading/execute/in-place/start-server.md
+        - 4. Remove Old Dependencies: admin-guide/upgrading/execute/in-place/remove-old-dependencies.md
+      - Version-Specific Upgrade Guide:
+          - Introduction: admin-guide/upgrading/execute/version-specific/index.md
+          - 0.8.x to 0.9.x:
+            - Introduction: admin-guide/upgrading/execute/version-specific/08x-to-09x/introduction.md
+            - Parallel Upgrade: admin-guide/upgrading/execute/version-specific/08x-to-09x/parallel.md
+            - In-Place Upgrade: admin-guide/upgrading/execute/version-specific/08x-to-09x/in-place.md
+    - Validate:
+      - Verifying An Upgrade: admin-guide/upgrading/validate/verifying-upgrade.md
+      - Known Issues: admin-guide/upgrading/validate/known-issues.md
+
+#   - Upgrade (WIP):
+#     - admin-guide/upgrading/index.md
+#     - Upgrading Ubuntu: admin-guide/upgrading/ubuntu.md
+#     - Upgrading Tomcat: admin-guide/upgrading/tomcat.md
+#     - Upgrading OpenBoxes:
+#       - Minor version upgrade: admin-guide/upgrading/minor.md
+#       - Major version upgrade: admin-guide/upgrading/major.md
+#     - Migrating to a new server:
+#       - Version-Specific Upgrade Guide:
+#         - Introduction: admin-guide/upgrading/execute/version-specific/index.md
+#         - 0.8.x to 0.9.x:
+#           - Introduction: admin-guide/upgrading/execute/version-specific/08x-to-09x/introduction.md
+#           - Parallel Upgrade: admin-guide/upgrading/execute/version-specific/08x-to-09x/parallel.md
+#           - In-Place Upgrade: admin-guide/upgrading/execute/version-specific/08x-to-09x/in-place.md
+#     - Migration Process:
+#       - Plan:
+#         - Upgrade Strategies:
+#           - Overview: admin-guide/upgrading/plan/upgrade-strategies/overview.md
+#           - Parallel Upgrade Overview: admin-guide/upgrading/plan/upgrade-strategies/parallel-upgrade-overview.md
+#           - In-Place Upgrade Overview: admin-guide/upgrading/plan/upgrade-strategies/in-place-upgrade-overview.md
+#         - Rollback Strategies:
+#           - Overview: admin-guide/upgrading/plan/rollback-strategies/overview.md
+#           - Backup Your Database: admin-guide/upgrading/plan/rollback-strategies/backup-database.md
+#           - Backup Your Custom Configuration: admin-guide/upgrading/plan/rollback-strategies/backup-config.md
+#       - Execute:
+#         - Parallel Upgrade Guide:
+#           - Introduction: admin-guide/upgrading/execute/parallel/introduction.md
+#           - Install Server: admin-guide/upgrading/execute/parallel/install-new-server.md
+#           - Copy Configuration : admin-guide/upgrading/execute/parallel/copy-custom-config.md
+#           - Import Database: admin-guide/upgrading/execute/parallel/import-database-backup.md
+#           - Start Application: admin-guide/upgrading/execute/parallel/start-server.md
+#           - Reimport Database: admin-guide/upgrading/execute/parallel/reimport-database-backup.md
+#           - Re-route Traffic: admin-guide/upgrading/execute/parallel/reroute-requests.md
+#           - Deprovision Old Instance: admin-guide/upgrading/execute/parallel/deprovision-old-instance.md
+#         - In-Place Upgrade Guide:
+#           - Introduction: admin-guide/upgrading/execute/in-place/introduction.md
+#           - Upgrade Dependencies: admin-guide/upgrading/execute/in-place/upgrade-dependencies.md
+#           - Upgrade Application: admin-guide/upgrading/execute/in-place/upgrade-app.md
+#           - Start Application: admin-guide/upgrading/execute/in-place/start-server.md
+#           - Remove Dependencies: admin-guide/upgrading/execute/in-place/remove-old-dependencies.md
+#       - Validate:
+#         - Verifying Upgrade: admin-guide/upgrading/validate/verifying-upgrade.md
+#         - Known Issues: admin-guide/upgrading/validate/known-issues.md
+
+  # User Guide
+  - User Guide:
+    - Resources: user-guide/index.md
+    - Onboarding: user-guide/onboarding/index.md
+    - Contributing: user-guide/contributing.md
+    - Glossary: user-guide/glossary.md
+
+  # API Guide
   - API Guide:
-    - Overview: api-guide/index.md
-    - Generic API: api-guide/generic.md
     - Getting Started: api-guide/getting-started.md
-    - Searching: api-guide/lookup.md
-    - Core:
-        - Identifiers: api-guide/identifier.md
-        - Internal Locations: api-guide/internalLocation.md
-        - Localizations: api-guide/localization.md
-        - Locations: api-guide/location.md
-        - Reason Codes: api-guide/reasonCode.md
-    - Products:
-        - Categories: api-guide/category.md
-        - Products: api-guide/product.md
-    - Stock Movements:
-        - Stock Movement: api-guide/stockMovement.md
-        - Stock Movement Item: api-guide/stockMovementItem.md
-        - Stock Movement Status: api-guide/stockMovementStatus.md
-        - Putaway: api-guide/putaway.md
-        - Receiving: api-guide/receiving.md
-  - Support:
-    - Overview: support/index.md
+    - Authentication: api-guide/authentication.md
+    - Pagination: api-guide/pagination.md
+    - Filtering: api-guide/lookup.md
+    - Formatting: api-guide/formatting.md
+    - Testing:
+      - OpenAPI/Swagger: apt-guide/openapi.md
+      - Postman: apt-guide/postman.md
+    - Core API:
+      - Locations: api-guide/core/location.md
+      - Identifiers: api-guide/core/identifier.md
+      - Internal Locations: api-guide/core/internalLocation.md
+      - Localizations: api-guide/core/localization.md
+      - Reason Codes: api-guide/core/reasonCode.md
+    - Products API:
+        - Categories: api-guide/products/category.md
+        - Products: api-guide/products/product.md
+    - Inbound API:
+        - Putaways: api-guide/inbound/putaway.md
+        - Receiving: api-guide/inbound/receiving.md
+    - Outbound API:
+        - Stock Movements: api-guide/outbound/stockMovement.md
+        - Stock Movement Items: api-guide/outbound/stockMovementItem.md
+        - Stock Movement Status: api-guide/outbound/stockMovementStatus.md
+    - Generic API:
+      - Overview: api-guide/generic/index.md
+      - Standard Actions:
+        - Get Resources: api-guide/generic/get-resources.md
+        - Get Resource: api-guide/generic/get-resource.md
+        - Create Resource: api-guide/generic/create-resource.md
+        - Update Resource: api-guide/generic/update-resource.md
+        - Delete Resource: api-guide/generic/delete-resource.md
+      - Bulk Actions:
+        - Create Resources: api-guide/generic/create-resources.md
+        - Update Resources: api-guide/generic/update-resources.md
 
+  # Developer Guide - needs a lot of work
+#   - Developer Guide:
+#     - Getting Started: developer-guide/getting-started.md
+#     - Architecture: developer-guide/architecture/index.md
+#     - Contributing: developer-guide/contributing.md
+#     - Forking: developer-guide/syncing-a-fork.md
+#     - Tagging a Release: developer-guide/tagging.md
+#     - Troubleshooting: developer-guide/troubleshooting.md
+#     - Releases:
+#       - Release Guide:
+#         - Overview: developer-guide/release/index.md
+#         - Planning: developer-guide/release/plan.md
+#         - Development: developer-guide/release/develop.md
+#         - Preparation: developer-guide/release/prepare.md
+#         - Testing: developer-guide/release/testing.md
+#         - Finalization: developer-guide/release/finalize.md
+#         - Documentation: developer-guide/release/document.md
+#         - Publishing: developer-guide/release/publish.md
+#         - Deploying: developer-guide/release/deploy.md
+#         - Cleanup: developer-guide/release/cleanup.md
+#       - Hotfix Guide: developer-guide/hotfix/index.md
 
+  - Support: support/index.md

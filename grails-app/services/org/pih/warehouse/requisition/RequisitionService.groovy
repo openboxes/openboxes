@@ -11,6 +11,7 @@ package org.pih.warehouse.requisition
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.plugins.csv.CSVWriter
 import grails.validation.ValidationException
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.joda.time.LocalDate
@@ -26,6 +27,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
@@ -34,12 +36,14 @@ import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 
+import java.text.SimpleDateFormat
+
 @Transactional
 class RequisitionService {
 
     GrailsApplication grailsApplication
     AuthService authService
-    def identifierService
+    RequisitionIdentifierService requisitionIdentifierService
     def inventoryService
 
     def getRequisitionStatistics(Location destination, Location origin, User user) {
@@ -352,7 +356,7 @@ class RequisitionService {
      */
     def saveRequisition(Requisition requisition) {
         if (!requisition.requestNumber) {
-            requisition.requestNumber = identifierService.generateRequisitionIdentifier()
+            requisition.requestNumber = requisitionIdentifierService.generate(requisition)
         }
 
         def savedRequisition = requisition.save(flush: true)
@@ -402,7 +406,7 @@ class RequisitionService {
         if (!outboundTransaction) {
             // Create a new transaction
             outboundTransaction = new Transaction()
-            outboundTransaction.transactionNumber = inventoryService.generateTransactionNumber()
+            outboundTransaction.transactionNumber = inventoryService.generateTransactionNumber(outboundTransaction)
             outboundTransaction.transactionDate = new Date()
             outboundTransaction.requisition = requisition
             // requisition origin is where the requisition originated from (the destination of stock transfer)
@@ -478,7 +482,7 @@ class RequisitionService {
         try {
             requisition.properties = data
             if (!requisition.requestNumber) {
-                requisition.requestNumber = identifierService.generateRequisitionIdentifier()
+                requisition.requestNumber = requisitionIdentifierService.generate(requisition)
             }
             def requisitionItems = itemsData.collect { itemData ->
                 println "itemData: " + itemData
@@ -661,7 +665,7 @@ class RequisitionService {
                     eq("origin", origin)
                 }
                 not {
-                    'in'("status", [RequisitionStatus.ISSUED, RequisitionStatus.CANCELED])
+                    'in'("status", [RequisitionStatus.ISSUED, RequisitionStatus.CANCELED, RequisitionStatus.REJECTED])
                 }
             }
             eq("product", product)
@@ -977,4 +981,146 @@ class RequisitionService {
         }
         return false
     }
+
+    /**
+     * Export the given requisitions to CSV.
+     *
+     * @param requisitions
+     * @return
+     */
+    String exportRequisitions(requisitions) {
+        def formatDate = new SimpleDateFormat("dd/MMM/yyyy hh:mm:ss")
+        def sw = new StringWriter()
+
+        def csvWriter = new CSVWriter(sw, {
+            "Requisition Number" { it.requisitionNumber }
+            "Status" { it.status }
+            "Type" { it.type }
+            "Class" { it.commodityClass }
+            "Name" { it.name }
+            "Origin" { it.origin }
+            "Destination" { it.destination }
+
+            "Requested by" { it?.requestedBy?.name ?: "" }
+            "Date Requested" { it.dateRequested }
+
+            "Verified" { it?.verifiedBy?.name ?: "" }
+            "Date Verified" { it.dateVerified }
+
+            "Picked" { it?.pickedBy?.name ?: "" }
+            "Date Picked" { it.datePicked }
+
+            "Checked" { it?.checkedBy?.name ?: "" }
+            "Date Checked" { it.dateChecked }
+
+            "Issued" { it?.issuedBy?.name ?: "" }
+            "Date Issued" { it.dateIssued }
+
+            "Created" { it?.createdBy?.name ?: "" }
+            "Date Created" { it.dateCreated }
+
+            "Updated" { it?.updatedBy?.name ?: "" }
+            "Date Updated" { it.lastUpdated }
+        })
+
+        requisitions.each { requisition ->
+            def row = [
+                    requisitionNumber: requisition.requestNumber,
+                    type             : requisition?.type,
+                    commodityClass   : requisition?.commodityClass,
+                    status           : requisition.status,
+                    name             : requisition.name,
+                    origin           : requisition.origin,
+                    destination      : requisition.destination,
+
+                    requestedBy      : requisition.requestedBy,
+                    dateRequested    : requisition.dateRequested ? "${formatDate.format(requisition.dateRequested)}" : "",
+
+                    reviewedBy       : requisition.reviewedBy,
+                    dateReviewed     : requisition.dateReviewed ? "${formatDate.format(requisition.dateReviewed)}" : "",
+
+                    verifiedBy       : requisition.verifiedBy,
+                    dateVerified     : requisition.dateVerified ? "${formatDate.format(requisition.dateVerified)}" : "",
+
+                    checkedBy        : requisition.checkedBy,
+                    dateChecked      : requisition.dateChecked ? "${formatDate.format(requisition.dateChecked)}" : "",
+
+                    deliveredBy      : requisition.deliveredBy,
+                    dateDelivered    : requisition.dateDelivered ? "${formatDate.format(requisition.dateDelivered)}" : "",
+
+                    pickedBy         : requisition?.picklist?.picker,
+                    datePicked       : requisition?.picklist?.datePicked ? "${formatDate.format(requisition?.picklist?.datePicked)}" : "",
+
+                    issuedBy         : requisition.issuedBy,
+                    dateIssued       : requisition.dateIssued ? "${formatDate.format(requisition.dateIssued)}" : "",
+
+                    receivedBy       : requisition.receivedBy,
+                    dateReceived     : requisition.dateReceived ? "${formatDate.format(requisition.dateReceived)}" : "",
+
+                    createdBy        : requisition.createdBy,
+                    dateCreated      : requisition.dateCreated ? "${formatDate.format(requisition.dateCreated)}" : "",
+
+                    updatedBy        : requisition.updatedBy,
+                    lastUpdated      : requisition.lastUpdated ? "${formatDate.format(requisition.lastUpdated)}" : "",
+            ]
+            csvWriter << row
+        }
+        return CSVUtils.prependBomToCsvString(sw.toString())
+    }
+
+    String exportRequisitionItems(requisitions) {
+        def formatDate = new SimpleDateFormat("dd/MMM/yyyy hh:mm:ss")
+        def sw = new StringWriter()
+
+        def csvWriter = new CSVWriter(sw, {
+            "Requisition Number" { it.requisitionNumber }
+            "Status" { it.status }
+            "Type" { it.type }
+            "Class" { it.commodityClass }
+            "Name" { it.name }
+            "Origin" { it.origin }
+            "Destination" { it.destination }
+            "Requested by" { it?.requestedBy?.name }
+            "Date Requested" { it.dateRequested }
+            "Product code" { it.productCode }
+            "Product name" { it.productName }
+            "Status" { it.itemStatus ?: "" }
+            "Requested" { it.quantity ?: "" }
+            "Approved" { it.quantityApproved ?: "" }
+            "Picked" { it.quantityPicked ?: "" }
+            "Canceled" { it.quantityCanceled ?: "" }
+            "Reason Code" { it.reasonCode ?: "" }
+            "Comments" { it.comments ?: "" }
+
+        })
+
+        requisitions.each { requisition ->
+            requisition.requisitionItems.each { requisitionItem ->
+                def row = [
+                        requisitionNumber: requisition.requestNumber,
+                        type             : requisition?.type,
+                        commodityClass   : requisition?.commodityClass,
+                        status           : requisition.status,
+                        name             : requisition.name,
+                        requestedBy      : requisition.requestedBy ?: "",
+                        dateRequested    : requisition.dateRequested ? "${formatDate.format(requisition.dateRequested)}" : "",
+                        origin           : requisition.origin,
+                        destination      : requisition.destination,
+                        productCode      : requisitionItem.product.productCode,
+                        productName      : requisitionItem.product.name,
+                        itemStatus       : requisitionItem.status,
+                        quantity         : requisitionItem.quantity,
+                        quantityCanceled : requisitionItem.quantityCanceled,
+                        quantityApproved : requisitionItem.quantityApproved,
+                        quantityPicked   : requisitionItem.calculateQuantityPicked(),
+                        reasonCode       : requisitionItem.cancelReasonCode,
+                        comments         : requisitionItem.cancelComments,
+                ]
+                csvWriter << row
+            }
+        }
+        return CSVUtils.prependBomToCsvString(sw.toString())
+    }
+
+
 }

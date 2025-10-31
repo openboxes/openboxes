@@ -21,12 +21,12 @@
         </g:if>
 
         <g:hasErrors bean="${receiptInstance}">
-            <div class="errors">
+            <div class="errors" role="alert" aria-label="error-message">
                 <g:renderErrors bean="${receiptInstance}" as="list" />
             </div>
         </g:hasErrors>
         <g:hasErrors bean="${shipmentInstance}">
-            <div class="errors">
+            <div class="errors" role="alert" aria-label="error-message">
                 <g:renderErrors bean="${shipmentInstance}" as="list" />
             </div>
         </g:hasErrors>

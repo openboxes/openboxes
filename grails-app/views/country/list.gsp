@@ -4,15 +4,15 @@
         <g:set var="entityName" value="${warehouse.message(code: 'country.label', default: 'Country')}" />
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
-        <title><warehouse:message code="default.list.label" args="[entityName]" /></title>        
+        <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
 		<content tag="pageTitle">${entityName}</content>
-		<content tag="menuTitle">${entityName}</content>		
+		<content tag="menuTitle">${entityName}</content>
 		<content tag="globalLinksMode">append</content>
 		<content tag="localLinksMode">override</content>
 		<content tag="globalLinks"><g:render template="global" model="[entityName:entityName]"/></content>
 		<content tag="localLinks"><g:render template="local" model="[entityName:entityName]"/></content>
-				
+
 		<!-- Combo-handled YUI CSS files: -->
 		<link rel="stylesheet" type="text/css" href="//yui.yahooapis.com/combo?2.8.0r4/build/datatable/assets/skins/sam/datatable.css">
 		<!-- Combo-handled YUI JS files: -->
@@ -50,7 +50,7 @@
     <body>
 	<div class="body">
             <g:if test="${flash.message}">
-		<div class="message">${flash.message}</div>
+		<div class="message" role="status" aria-label="message">${flash.message}</div>
             </g:if>
 
 	    <div class="list">
@@ -60,7 +60,7 @@
 	    </div>
 	</div>
     </body>
-    
-  
+
+
 
 </html>

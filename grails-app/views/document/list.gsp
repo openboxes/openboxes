@@ -10,10 +10,10 @@
     <body>
         <div class="body">
             <g:if test="${flash.message}">
-            	<div class="message">${flash.message}</div>
+            	<div class="message" role="status" aria-label="message">${flash.message}</div>
             </g:if>
             <div class="dialog">
-            
+
 				<div class="button-bar">
                     <g:link class="button" action="list"><warehouse:message code="default.list.label" args="['documents']"/></g:link>
                     <g:link class="button" action="create"><warehouse:message code="default.add.label" args="['document']"/></g:link>

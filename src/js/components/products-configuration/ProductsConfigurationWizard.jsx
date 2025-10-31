@@ -13,7 +13,6 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/stock-movement-wizard/StockMovement.scss';
 
-
 class ProductsConfigurationWizard extends Component {
   constructor(props) {
     super(props);
@@ -77,7 +76,7 @@ class ProductsConfigurationWizard extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
   location: state.session.currentLocation,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),

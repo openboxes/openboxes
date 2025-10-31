@@ -29,11 +29,11 @@ const LocationChooser = (props) => {
     * */
     const noOrganizationTag = 'NO_ORGANIZATION';
     const noGroupTag = 'NO_GROUP';
-    const locationsGroupedByOrganization = _.groupBy(data, location =>
+    const locationsGroupedByOrganization = _.groupBy(data, (location) =>
       _.get(location, 'organizationName', noOrganizationTag) || noOrganizationTag);
     return Object.entries(locationsGroupedByOrganization)
       .map(([organization, locations]) => {
-        const locationsGroupedByGroup = _.groupBy(locations, location =>
+        const locationsGroupedByGroup = _.groupBy(locations, (location) =>
           _.get(location, 'locationGroup.name', noGroupTag) || noGroupTag);
         const groups = Object.entries(locationsGroupedByGroup)
           .map(([group, locationList]) => ({ group, locations: locationList }))
@@ -81,11 +81,11 @@ const LocationChooser = (props) => {
   };
 
   const toggleModalHandler = () => {
-    setIsOpen(isOpenModal => !isOpenModal);
+    setIsOpen((isOpenModal) => !isOpenModal);
   };
 
   return (
-    <React.Fragment>
+    <>
       <LocationChooserButton
         onToggle={toggleModalHandler}
         location={props.currentLocation}
@@ -98,11 +98,11 @@ const LocationChooser = (props) => {
         locations={locationData}
         onSelectLocation={selectLocation}
       />
-    </React.Fragment>
+    </>
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   currentLocation: state.session.currentLocation,
   logoLabel: state.session.logoLabel,
 });

@@ -13,7 +13,7 @@
             	<div class="message">${flash.message}</div>
             </g:if>
             <g:hasErrors bean="${partyTypeInstance}">
-	            <div class="errors">
+	            <div class="errors" role="alert" aria-label="error-message">
 	                <g:renderErrors bean="${partyTypeInstance}" as="list" />
 	            </div>
             </g:hasErrors>
@@ -46,7 +46,7 @@
 									<g:textField class="text" size="80" name="name" maxlength="255" value="${partyTypeInstance?.name}" />
 								</td>
 							</tr>
-						
+
 							<tr class="prop">
 								<td valign="top" class="name">
 									<label for="description"><warehouse:message code="partyType.description.label" default="Description" /></label>
@@ -55,7 +55,7 @@
 									<g:textField class="text" size="80" name="description" maxlength="255" value="${partyTypeInstance?.description}" />
 								</td>
 							</tr>
-						
+
 							<tr class="prop">
 								<td valign="top" class="name">
 									<label for="partyTypeCode"><warehouse:message code="partyType.partyTypeCode.label" default="Party Type Code" /></label>
@@ -64,7 +64,7 @@
 									<g:select class="chzn-select-deselect" name="partyTypeCode" from="${org.pih.warehouse.core.PartyTypeCode?.values()}" value="${partyTypeInstance?.partyTypeCode}"  />
 								</td>
 							</tr>
-						
+
 
 							<tr class="prop">
 								<td valign="top"></td>

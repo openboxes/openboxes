@@ -3,13 +3,16 @@ import { combineReducers } from 'redux';
 
 import approversReducer from 'reducers/approversReducer';
 import connectionReducer from 'reducers/connectionReducer';
+import cycleCountReducer from 'reducers/cycleCountReducer';
 import filterFormReducer from 'reducers/filterFormReducer';
 import indicatorsReducer from 'reducers/indicatorsReducer';
 import infoBarReducer from 'reducers/infoBarReducer';
 import infoBarVisibilityReducer from 'reducers/infoBarVisibilityReducer';
 import invoiceReducer from 'reducers/invoiceReducer';
 import locationReducer from 'reducers/locationReducer';
+import lotNumbersReducer from 'reducers/lotNumbersReducer';
 import organizationsReducer from 'reducers/organizationsReducer';
+import outboundImportReducer from 'reducers/outboundImportReducer';
 import productSupplierReducer from 'reducers/productSupplierReducer';
 import purchaseOrderReducer from 'reducers/purchaseOrderReducer';
 import reasonCodesReducer from 'reducers/reasonCodesReducer';
@@ -22,7 +25,6 @@ import stockMovementDraftReducer from 'reducers/stockMovementDraftReducer';
 import stockTransferReducer from 'reducers/stockTransferReducer';
 import unitOfMeasureReducer from 'reducers/unitOfMeasureReducer';
 import usersReducer from 'reducers/usersReducer';
-
 
 const rootReducer = combineReducers({
   localize: localizeReducer,
@@ -47,6 +49,9 @@ const rootReducer = combineReducers({
   infoBarVisibility: infoBarVisibilityReducer,
   productSupplier: productSupplierReducer,
   unitOfMeasure: unitOfMeasureReducer,
+  outboundImport: outboundImportReducer,
+  cycleCount: cycleCountReducer,
+  lotNumbers: lotNumbersReducer,
 });
 
 export default rootReducer;

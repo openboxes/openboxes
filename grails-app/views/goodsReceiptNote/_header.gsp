@@ -7,7 +7,9 @@
         </td>
         <td>
             <div class="header">
-                <div style="font-size: 25px; margin-bottom: 10px; font-weight: bold;">${shipment?.status}</div>
+                <div style="font-size: 25px; margin-bottom: 10px; font-weight: bold;">
+                    <g:message code="enum.ShipmentStatusCode.${shipment?.status?.code?.name}" default="${shipment?.status?.code?.name}" />
+                </div>
                 <h1>${title}</h1>
                 <h3>${shipment?.shipmentNumber} - ${shipment?.name }
                 <g:if test="${shipment.shipmentNumber}">
@@ -45,7 +47,7 @@
                 </tr>
                 <tr>
                     <td class="name right">
-                        <label><warehouse:message code="default.datePrinted.label" default="Date printed"/>:</label>
+                        <label><g:message code="default.datePrinted.label" default="Date printed"/>:</label>
                     </td>
                     <td>
                         <g:formatDate date="${new Date()}" format="d MMMMM yyyy hh:mma"/>

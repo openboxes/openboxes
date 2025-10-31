@@ -15,7 +15,6 @@ import TextField from 'components/form-elements/TextField';
 import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
-
 const FIELDS = {
   recipients: {
     type: SelectField,
@@ -102,8 +101,8 @@ class EmailModal extends Component {
     this.setState({
       formValues: {
         subject: this.props.translate('react.stockListManagement.emailSubject.label', 'STOCK LIST UPDATE'),
-        text: this.props.translate('react.stockListManagement.emailMessage.label', 'Please find attached a new' +
-          ' version of your stock list reflecting recent updates. Please use this version for your next replenishment request.'),
+        text: this.props.translate('react.stockListManagement.emailMessage.label', 'Please find attached a new'
+          + ' version of your stock list reflecting recent updates. Please use this version for your next replenishment request.'),
         recipients: manager ? [{ id: manager.id, email: manager.email, label: manager.name }] : [],
         includePdf: true,
         includeXls: true,
@@ -123,11 +122,11 @@ class EmailModal extends Component {
     const url = `/api/stocklists/sendMail/${this.props.stocklistId}?includePdf=${this.state.formValues.includePdf}?includeXls=${this.state.formValues.includeXls}`;
     const payload = {
       ...values,
-      recipients: _.map(_.filter(values.recipients, val => val.email), val => val.email),
+      recipients: _.map(_.filter(values.recipients, (val) => val.email), (val) => val.email),
     };
     const { manager } = this.props;
 
-    if (!_.some(values.recipients, recipient => recipient.email === manager.email)) {
+    if (!_.some(values.recipients, (recipient) => recipient.email === manager.email)) {
       this.props.hideSpinner();
       Alert.error(this.props.translate('react.stockListManagement.alert.noManagerSelected.label', 'Please add a manager as a recipient and resend.'), { timeout: 1000 });
       this.setState({ showModal: true });
@@ -172,7 +171,7 @@ class EmailModal extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 

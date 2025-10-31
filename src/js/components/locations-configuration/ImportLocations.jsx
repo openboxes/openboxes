@@ -11,7 +11,7 @@ import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { LOCATION_IMPORT, LOCATION_TEMPLATE, SUPPORT_LINKS } from 'api/urls';
-import FileDrop from 'components/form-elements/FileDrop';
+import DropzoneFileSelect from 'components/form-elements/v2/DropzoneFileSelect';
 import { DASHBOARD_URL, LOCATION_URL, PRODUCT_CONFIGURATION_URL } from 'consts/applicationUrls';
 import AlertMessage from 'utils/AlertMessage';
 import { handleError, handleSuccess } from 'utils/apiClient';
@@ -103,7 +103,7 @@ class ImportLocations extends Component {
       <div className="content-wrap">
         <div className="d-flex flex-column p-5 m-4 classic-card">
           {this.state.showSuccessMessage ? (
-            <React.Fragment>
+            <>
               <h3 className="align-self-center">
                 <Translate
                   id="react.locationsConfiguration.importSuccess.label"
@@ -136,37 +136,43 @@ class ImportLocations extends Component {
               >
                 <Translate id="react.locationsConfiguration.exitToDashboard.label" defaultMessage="Exit to Dashboard" />
               </Link>
-            </React.Fragment>
+            </>
           ) : (
-            <React.Fragment>
+            <>
               <h3><Translate id="react.locationsConfiguration.importLocationCsv.label" defaultMessage="Import Locations" /></h3>
               <div>
                 <Translate
                   id="react.locationsConfiguration.csvUpload.label"
                   defaultMessage="On this screen, you can import a list of locations from .csv file."
-                />&nbsp;
+                />
+&nbsp;
                 <Translate
                   id="react.locationsConfiguration.click.label"
                   defaultMessage="Click"
-                />&nbsp;
+                />
+&nbsp;
                 <a href="#" onClick={() => this.downloadLocationsTemplate()}>
                   <Translate id="react.locationsConfiguration.here.label" defaultMessage="here" />
-                </a>&nbsp;
+                </a>
+&nbsp;
                 <Translate
                   id="react.locationsConfiguration.templateInstructions.label"
                   defaultMessage="to download a template with instructions."
-                />&nbsp;
-                <Translate id="react.locationsConfiguration.click.label" defaultMessage="Click" />&nbsp;
+                />
+&nbsp;
+                <Translate id="react.locationsConfiguration.click.label" defaultMessage="Click" />
+&nbsp;
                 <a target="_blank" rel="noopener noreferrer" href={this.state.supportLinks.configureOrganizationsAndLocations || '#'}>
                   <Translate id="react.locationsConfiguration.here.label" defaultMessage="here" />
-                </a>&nbsp;
+                </a>
+&nbsp;
                 <Translate
                   id="react.locationsConfiguration.createInstructions.label"
                   defaultMessage="to read more about location creation."
                 />
               </div>
-              <FileDrop className="my-3" onDrop={this.onDrop} file={this.state.file} />
-              <AlertMessage className="mt-2" show={this.state.showAlert} message={this.state.alertMessage} danger />
+              <DropzoneFileSelect className="my-2 p-5" onChange={this.onDrop} allowedExtensions={['csv']} />
+              <AlertMessage className="m-3" show={this.state.showAlert} message={this.state.alertMessage} danger />
               <div className="align-self-end mt-5">
                 <button
                   type="button"
@@ -177,7 +183,7 @@ class ImportLocations extends Component {
                   <Translate id="react.locationsConfiguration.upload.label" defaultMessage="Upload" />
                 </button>
               </div>
-            </React.Fragment>
+            </>
           )}
         </div>
       </div>
@@ -185,7 +191,7 @@ class ImportLocations extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 

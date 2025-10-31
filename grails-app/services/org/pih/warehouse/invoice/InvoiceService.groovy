@@ -21,7 +21,6 @@ import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
-import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
@@ -32,7 +31,7 @@ import org.joda.time.LocalDate
 class InvoiceService {
 
     def authService
-    def identifierService
+    InvoiceIdentifierService invoiceIdentifierService
     GrailsApplication grailsApplication
 
     ApplicationTagLib getApplicationTagLib() {
@@ -100,10 +99,14 @@ class InvoiceService {
         if (max != null && offset != null) {
             invoiceItems = InvoiceItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
                 eq("invoice", invoice)
+                order("inverse", "asc")
+                order("id", "asc")
             }
         } else {
             invoiceItems = InvoiceItem.createCriteria().list() {
                 eq("invoice", invoice)
+                order("inverse", "asc")
+                order("id", "asc")
             }
         }
 
@@ -217,6 +220,7 @@ class InvoiceService {
             if (invoiceItem) {
                 if (item.quantity > 0) {
                     invoiceItem.quantity = item.quantity
+                    invoiceItem.amount = invoiceItem.unitPrice != null ? item.quantity * invoiceItem.unitPrice : null
                 } else {
                     removeInvoiceItem(invoiceItem.id)
                 }
@@ -229,6 +233,7 @@ class InvoiceService {
                     }
                     invoiceItem = createFromInvoiceItemCandidate(candidateItem)
                     invoiceItem.quantity = item.quantityToInvoice
+                    invoiceItem.amount = invoiceItem.unitPrice != null ? item.quantityToInvoice * invoiceItem.unitPrice : null
                     invoice.addToInvoiceItems(invoiceItem)
                 }
             }
@@ -249,63 +254,8 @@ class InvoiceService {
         invoice.save()
     }
 
-    Invoice generatePrepaymentInvoice(Order order) {
-        if (order.orderItems.any { it.hasInvoices } || order.orderAdjustments.any { it.hasInvoices }) {
-            throw new Exception("Some order items or order adjustments for this order already have been invoiced")
-        }
-
-        Invoice invoice = createFromOrder(order)
-        invoice.invoiceType = InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)
-        createOrUpdateVendorInvoiceNumber(invoice, order.orderNumber + Constants.PREPAYMENT_INVOICE_SUFFIX)
-
-        if (order?.orderItems?.empty && order?.orderAdjustments?.empty) {
-            throw new Exception("No order items or order adjustments found for given order")
-        }
-
-        order.activeOrderItems.each { OrderItem orderItem ->
-            InvoiceItem invoiceItem = createFromOrderItem(orderItem)
-            invoice.addToInvoiceItems(invoiceItem)
-        }
-
-        order.activeOrderAdjustments.each { OrderAdjustment orderAdjustment ->
-            InvoiceItem invoiceItem = createFromOrderAdjustment(orderAdjustment)
-            invoice.addToInvoiceItems(invoiceItem)
-        }
-
-        return invoice.save()
-    }
-
-    Invoice generateInvoice(Order order) {
-        if (!order.hasPrepaymentInvoice) {
-            throw new Exception("This order has no prepayment invoice")
-        }
-
-        Invoice invoice = createFromOrder(order)
-        createOrUpdateVendorInvoiceNumber(invoice, order.orderNumber)
-
-        order.orderItems.each { OrderItem orderItem ->
-            if (orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED) {
-                InvoiceItem invoiceItem = createFromOrderItem(orderItem)
-                invoice.addToInvoiceItems(invoiceItem)
-            } else {
-                orderItem?.shipmentItems?.each { ShipmentItem shipmentItem ->
-                    InvoiceItem invoiceItem = createFromShipmentItem(shipmentItem)
-                    invoice.addToInvoiceItems(invoiceItem)
-                }
-            }
-        }
-
-        order.orderAdjustments.each { OrderAdjustment orderAdjustment ->
-            InvoiceItem invoiceItem = createFromOrderAdjustment(orderAdjustment)
-            invoice.addToInvoiceItems(invoiceItem)
-        }
-
-        return invoice.save()
-    }
-
     Invoice createFromOrder(Order order) {
         Invoice invoice = new Invoice()
-        invoice.invoiceNumber = identifierService.generateInvoiceIdentifier()
         invoice.name = order.name
         invoice.description = order.description
         invoice.partyFrom = order.destinationParty
@@ -313,37 +263,8 @@ class InvoiceService {
         invoice.dateInvoiced = LocalDate.now().toDate()
         invoice.currencyUom = UnitOfMeasure.findByCode(order.currencyCode)
         invoice.invoiceType = InvoiceType.findByCode(InvoiceTypeCode.INVOICE)
+        invoice.invoiceNumber = invoiceIdentifierService.generate(invoice)
         return invoice
-    }
-
-    def refreshInvoiceItems(Invoice invoice) {
-        invoice.invoiceItems?.each { item ->
-            if (item.orderAdjustment) {
-                OrderAdjustment orderAdjustment = item.orderAdjustment
-
-                item.budgetCode = orderAdjustment.budgetCode
-                item.quantityUom = orderAdjustment.orderItem?.quantityUom
-                item.quantityPerUom = orderAdjustment.orderItem?.quantityPerUom ?: 1
-                item.unitPrice = orderAdjustment.totalAdjustments
-            } else if (item.shipmentItem) {
-                ShipmentItem shipmentItem = item.shipmentItem
-                OrderItem orderItem = shipmentItem.orderItems?.find { it }
-
-                item.quantity = shipmentItem.quantity ? shipmentItem.quantity/orderItem.quantityPerUom : 0
-                item.budgetCode = orderItem?.budgetCode
-                item.quantityUom = orderItem?.quantityUom
-                item.quantityPerUom = orderItem?.quantityPerUom ?: 1
-                item.unitPrice = orderItem?.unitPrice
-            } else {
-                OrderItem orderItem = item.orderItem
-
-                item.quantity = orderItem.quantity
-                item.budgetCode = orderItem.budgetCode
-                item.quantityUom = orderItem.quantityUom
-                item.quantityPerUom = orderItem.quantityPerUom ?: 1
-                item.unitPrice = orderItem.unitPrice
-            }
-        }
     }
 
     InvoiceItem createFromInvoiceItemCandidate(InvoiceItemCandidate candidate) {
@@ -354,7 +275,7 @@ class InvoiceService {
             quantity: candidate.quantity,
             quantityUom: candidate.quantityUom,
             quantityPerUom: candidate.quantityPerUom ?: 1,
-            unitPrice: candidate.candidateUnitPrice
+            unitPrice: candidate.candidateUnitPrice,
         )
 
         ShipmentItem shipmentItem = ShipmentItem.get(candidate.id)
@@ -367,63 +288,6 @@ class InvoiceService {
             }
         }
 
-        return invoiceItem
-    }
-
-    InvoiceItem createFromOrderItem(OrderItem orderItem) {
-        if (orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED) {
-            InvoiceItem invoiceItem = new InvoiceItem(
-                    quantity: 0,
-                    product: orderItem.product,
-                    glAccount: orderItem.glAccount ?: orderItem.product.glAccount,
-                    budgetCode: orderItem?.budgetCode,
-                    quantityUom: orderItem?.quantityUom,
-                    quantityPerUom: orderItem.quantityPerUom ?: 1,
-                    unitPrice: orderItem.unitPrice
-            )
-            invoiceItem.addToOrderItems(orderItem)
-            return invoiceItem
-        }
-
-        InvoiceItem invoiceItem = new InvoiceItem(
-            quantity: orderItem.quantity,
-            product: orderItem.product,
-            glAccount: orderItem.glAccount ?: orderItem.product.glAccount,
-            budgetCode: orderItem?.budgetCode,
-            quantityUom: orderItem?.quantityUom,
-            quantityPerUom: orderItem.quantityPerUom ?: 1,
-            unitPrice: orderItem.unitPrice
-        )
-        invoiceItem.addToOrderItems(orderItem)
-        return invoiceItem
-    }
-
-    InvoiceItem createFromShipmentItem(ShipmentItem shipmentItem) {
-        OrderItem orderItem = shipmentItem.orderItems?.find { it }
-        InvoiceItem invoiceItem = new InvoiceItem(
-            quantity: shipmentItem.quantity ? shipmentItem.quantity/orderItem.quantityPerUom : 0,
-            product: shipmentItem.product,
-            glAccount: shipmentItem.product.glAccount,
-            budgetCode: orderItem?.budgetCode,
-            quantityUom: orderItem?.quantityUom,
-            quantityPerUom: orderItem?.quantityPerUom ?: 1,
-            unitPrice: orderItem?.unitPrice
-        )
-        invoiceItem.addToShipmentItems(shipmentItem)
-        return invoiceItem
-    }
-
-    InvoiceItem createFromOrderAdjustment(OrderAdjustment orderAdjustment) {
-        InvoiceItem invoiceItem = new InvoiceItem(
-            budgetCode: orderAdjustment.budgetCode,
-            product: orderAdjustment.orderItem?.product,
-            glAccount: orderAdjustment.glAccount ?: orderAdjustment.orderItem?.glAccount ?: orderAdjustment.orderAdjustmentType?.glAccount,
-            quantity: orderAdjustment?.canceled ? 0 : 1,
-            quantityUom: orderAdjustment.orderItem?.quantityUom,
-            quantityPerUom: orderAdjustment.orderItem?.quantityPerUom ?: 1,
-            unitPrice: orderAdjustment.totalAdjustments
-        )
-        invoiceItem.addToOrderAdjustments(orderAdjustment)
         return invoiceItem
     }
 
@@ -440,6 +304,9 @@ class InvoiceService {
     def deleteInvoice(Invoice invoice) {
         if (!invoice) {
             throw new IllegalArgumentException("Missing invoice to delete")
+        }
+        if (invoice.isPrepaymentInvoice && invoice.hasRegularInvoice) {
+            throw new IllegalArgumentException("Prepayment invoice has associated final invoice")
         }
         invoice.invoiceItems?.each { InvoiceItem invoiceItem ->
             deleteInvoiceItem(invoiceItem)
@@ -523,9 +390,20 @@ class InvoiceService {
                     invoiceItem?.quantity,
                     invoiceItem?.quantityPerUom,
                     invoiceItem?.unitPrice ?: 0,
-                    invoiceItem?.totalAmount ?: 0,
+                    invoiceItem?.amount ?: 0,
             )
         }
         return csv
+    }
+
+    def rollbackInvoice(Invoice invoice) {
+        if (invoice.isPrepaymentInvoice && invoice.hasRegularInvoice) {
+            throw new IllegalArgumentException("Prepayment invoice has associated final invoice")
+        }
+
+        invoice.datePosted = null
+        invoice.disableRefresh = invoice.isPrepaymentInvoice
+
+        invoice.save()
     }
 }

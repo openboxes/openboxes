@@ -9,9 +9,9 @@
 		<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
     </head>
     <body>
-        <div class="body">  
+        <div class="body">
             <g:if test="${flash.message}">
-	            <div class="message">${flash.message}</div>
+	            <div class="message" role="status" aria-label="message">${flash.message}</div>
             </g:if>
 
 
@@ -29,50 +29,50 @@
 
                 <table>
                     <tbody>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="default.id.label" default="Id" /></td>
-                            
+
                             <td valign="top" class="value">${fieldValue(bean: attributeInstance, field: "id")}</td>
-                            
+
                         </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="default.name.label" default="Name" /></td>
-                            
+
                             <td valign="top" class="value"><format:metadata obj="${attributeInstance}"/></td>
-                            
+
                         </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="default.dateCreated.label" default="Date Created" /></td>
-                            
+
                             <td valign="top" class="value"><format:datetime obj="${attributeInstance?.dateCreated}" /></td>
-                            
+
                         </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="default.lastUpdated.label" default="Last Updated" /></td>
-                            
+
                             <td valign="top" class="value"><format:datetime obj="${attributeInstance?.lastUpdated}" /></td>
-                            
+
                         </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="attribute.allowOther.label" default="Allow Other" /></td>
-                            
+
                             <td valign="top" class="value"><g:formatBoolean boolean="${attributeInstance?.allowOther}" /></td>
-                            
+
                         </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="attribute.options.label" default="Options" /></td>
-                            
+
                             <td valign="top" class="value">${attributeInstance.options.join(", ")}</td>
-                            
+
                         </tr>
-                    
-                    
+
+
 						<tr class="prop">
                         	<td valign="top" colspan="2">
 					            <div class="buttons">
@@ -83,7 +83,7 @@
 					                </g:form>
 					            </div>
 							</td>
-						</tr>                    
+						</tr>
                     </tbody>
                 </table>
             </div>

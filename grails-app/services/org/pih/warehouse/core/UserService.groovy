@@ -18,6 +18,7 @@ import groovy.sql.Sql
 import org.apache.commons.collections.ListUtils
 import org.apache.http.auth.AuthenticationException
 import org.hibernate.sql.JoinType
+import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.auth.AuthService
 import org.grails.plugins.web.taglib.ApplicationTagLib
 
@@ -56,7 +57,7 @@ class UserService {
         userInstance.passwordConfirm = userInstance.password
         // Do not allow user to set his/her locale to translation mode locale
         def localizationModeLocale = new Locale(grailsApplication.config.openboxes.locale.localizationModeLocale)
-        if (params.locale && new Locale(params.locale) == localizationModeLocale) {
+        if (params.locale && LocalizationUtil.getLocale(params.locale) == localizationModeLocale) {
             userInstance.errors.rejectValue("locale", "user.errors.cannotSetLocaleToTranslationLocale.message", "You cannot set your default locale for translation mode locale")
             throw new ValidationException("user.errors.cannotSetLocaleToTranslationLocale.message", userInstance.errors)
         }
@@ -236,6 +237,16 @@ class UserService {
         return false
     }
 
+    Boolean hasRoleProductManager(User u) {
+        if (u) {
+            def user = User.get(u.id)
+            def roleTypes = [RoleType.ROLE_PRODUCT_MANAGER]
+            def co = getEffectiveRoles(user).any { Role role -> roleTypes.contains(role.roleType) }
+            return co
+        }
+        return false
+    }
+
     Boolean hasRoleBrowser(User u) {
         if (u) {
             def user = User.get(u.id)
@@ -280,7 +291,7 @@ class UserService {
         User user = getUser(userId)
         return getEffectiveRoles(user).any { Role role ->
             boolean acceptedRoleType = acceptedRoleTypes.contains(role.roleType)
-            log.info "Is role ${role.roleType} in ${acceptedRoleTypes} = ${acceptedRoleType}"
+            log.debug "Is role ${role.roleType} in ${acceptedRoleTypes} = ${acceptedRoleType}"
             return acceptedRoleType
         }
     }

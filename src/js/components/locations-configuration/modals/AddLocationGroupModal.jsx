@@ -79,10 +79,11 @@ class AddLocationGroupModal extends Component {
             <Translate id="react.locationsConfiguration.locationGroupModal.subtitle.label" defaultMessage="Location groups allow users with large numbers of locations to group them into networks or geographical areas. Depots within a location group will be able to ship to any other depot, but they will only be able to see and ship to receiving locations within their group. Learn more about location groups" />
             <a target="_blank" rel="noopener noreferrer" href="https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1744732161/Location+Groups">
               <Translate id="react.locationsConfiguration.here.label" defaultMessage="here" />
-            </a>.&nbsp;
+            </a>
+            .&nbsp;
           </div>
           <Form
-            onSubmit={values => this.save(values)}
+            onSubmit={(values) => this.save(values)}
             initialValues={this.initialValues}
             validate={validate}
             render={({ handleSubmit, values }) =>
@@ -108,8 +109,7 @@ class AddLocationGroupModal extends Component {
                     </button>
                   </div>
                 </form>
-              )
-            }
+              )}
           />
         </div>
       </Modal>
@@ -117,7 +117,7 @@ class AddLocationGroupModal extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });

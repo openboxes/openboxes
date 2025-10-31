@@ -12,7 +12,6 @@ package org.pih.warehouse.shipping
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import grails.validation.ValidationException
-import org.apache.commons.validator.EmailValidator
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
@@ -20,6 +19,7 @@ import org.apache.poi.ss.usermodel.Row
 import org.hibernate.FetchMode
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.StockTransfer
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
@@ -35,6 +35,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionIdentifierService
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
@@ -49,7 +50,6 @@ import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
 
-import javax.mail.internet.InternetAddress
 import java.math.RoundingMode
 
 @Transactional
@@ -59,7 +59,8 @@ class ShipmentService {
     def sessionFactory
     def productService
     def inventoryService
-    def identifierService
+    TransactionIdentifierService transactionIdentifierService
+    ShipmentIdentifierService shipmentIdentifierService
     def documentService
     def personService
     def productAvailabilityService
@@ -430,7 +431,7 @@ class ShipmentService {
             if (shipments) {
                 shipments.each {
                     it.currentStatus = it.status.code
-                    it.currentEvent = it.mostRecentEvent
+                    it.currentEvent = it.mostRecentSystemEvent
                     if (it.save(flush: true)) {
                         count++
                     }
@@ -508,7 +509,7 @@ class ShipmentService {
      */
     void saveShipment(Shipment shipment) {
         if (!shipment.shipmentNumber) {
-            shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
+            shipment.shipmentNumber = shipmentIdentifierService.generate(shipment)
         }
         shipment.save()
     }
@@ -1187,7 +1188,8 @@ class ShipmentService {
         }
 
         // Attempt to add the event to the shipment
-        def eventInstance = new Event(eventDate: eventDate, eventType: eventType, eventLocation: location)
+        User currentUser = AuthService.currentUser
+        Event eventInstance = new Event(eventDate: eventDate, eventType: eventType, eventLocation: location, createdBy: currentUser)
         if (!eventInstance.hasErrors()) {
             shipmentInstance.addToEvents(eventInstance)
             shipmentInstance.save()
@@ -1440,7 +1442,7 @@ class ShipmentService {
         creditTransaction.transactionDate = shipment.receipt.actualDeliveryDate
         creditTransaction.receipt = shipment?.receipt
         creditTransaction.requisition = shipment?.requisition
-        creditTransaction.transactionNumber = identifierService.generateTransactionIdentifier()
+        creditTransaction.transactionNumber = transactionIdentifierService.generate(creditTransaction)
 
         shipment?.receipt?.receiptItems.each {
             def inventoryItem =
@@ -1500,8 +1502,8 @@ class ShipmentService {
             debitTransaction.inventory = shipmentInstance?.origin?.inventory
             debitTransaction.transactionDate = shipmentInstance.getActualShippingDate()
             debitTransaction.requisition = shipmentInstance.requisition
-            debitTransaction.transactionNumber = identifierService.generateTransactionIdentifier()
             debitTransaction.outgoingShipment = shipmentInstance
+            debitTransaction.transactionNumber = transactionIdentifierService.generate(debitTransaction)
 
             addTransactionEntries(debitTransaction, shipmentInstance)
 
@@ -1809,7 +1811,7 @@ class ShipmentService {
 
     void rollbackLastEvent(Shipment shipmentInstance) {
 
-        def eventInstance = shipmentInstance.mostRecentEvent
+        Event eventInstance = shipmentInstance.mostRecentSystemEvent
 
         if (!eventInstance) {
             throw new RuntimeException("Cannot rollback shipment status because there are no recent events")
@@ -2042,45 +2044,6 @@ class ShipmentService {
         return true
     }
 
-    /**
-     * Finds (or creates) a person record given the provided address (e.g. Justin Miranda <justin@openboxes.com>)
-     *
-     * @param address address string in RFC822 format
-     * @return
-     */
-    Person findOrCreatePerson(String recipient) {
-        log.info "Find or create person: ${recipient}"
-
-        Person person
-        if (recipient) {
-            // Recipient string includes email and name,
-            if (EmailValidator.getInstance().isValid(recipient)) {
-                InternetAddress emailAddress = new InternetAddress(recipient, false)
-                person = Person.findByEmail(emailAddress.address)
-
-                // Person record not found, creating a new person as long as the name is provided
-                if (!person) {
-                    // If there's no personal attribute we cannot determine the first and last name of the recipient.
-                    // This will return null and should throw an error
-                    if (!emailAddress.personal) {
-                        throw new RuntimeException("Cannot find a recipient with email address ${recipient}")
-                    }
-                    String[] names = emailAddress.personal.split(" ", 2)
-                    person = new Person(firstName: names[0], lastName: names[1], email: emailAddress.address)
-                    if (!person.save(flush: true)) {
-                        throw new ValidationException("Cannot save recipient ${recipient} due to errors", person.errors)
-                    }
-                }
-            }
-            // Recipient string only includes name
-            else {
-                person = personService.getOrCreatePersonFromNames(recipient)
-            }
-        }
-        return person
-
-    }
-
     boolean importPackingList(String shipmentId, InputStream inputStream) {
         int lineNumber = 0
 
@@ -2105,10 +2068,12 @@ class ShipmentService {
                 // The container assigned to the shipment item should be the one that contains the item (e.g. box contains item, pallet contains boxes)
                 Container container = box ?: pallet ?: null
 
-                Person recipient
-                if (item.recipient) {
-                    recipient = findOrCreatePerson(item.recipient)
+                // Set the recipient of the item. Don't allow for an inactive recipients to be used.
+                Person recipient = personService.getOrCreatePersonByRecipient(item.recipient)
+                if (recipient && !recipient.active) {
+                    throw new IllegalArgumentException("Cannot set an inactive person as recipient: ${item.recipient}")
                 }
+
                 // Check to see if a shipment item already exists within the given container
                 ShipmentItem shipmentItem = shipment.shipmentItems.find {
                     it.inventoryItem == inventoryItem &&

@@ -1,6 +1,6 @@
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <%@ page import="org.pih.warehouse.core.User" %>
-<div id="logo-wrapper" class="d-flex align-items-center gap-8">
+<div id="logo-wrapper" class="d-flex align-items-center gap-8" aria-label="logo">
     <g:if test="${attrs.includeLink}">
         <g:hasHighestRoleAuthenticated>
             <div id="logo-square">

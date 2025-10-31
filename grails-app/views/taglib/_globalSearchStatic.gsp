@@ -49,8 +49,7 @@
             window.location = ui.item.url;
             return false;
           },
-          focus: function (event, ui) {
-            this.value = ui.item.label;
+          focus: function (event) {
             event.preventDefault(); // Prevent the default focus behavior.
           }
         })

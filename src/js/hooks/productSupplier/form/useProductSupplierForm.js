@@ -11,6 +11,7 @@ import {
   hideSpinner,
   showSpinner,
 } from 'actions';
+import productApi from 'api/services/ProductApi';
 import productPackageApi from 'api/services/ProductPackageApi';
 import productSupplierApi from 'api/services/ProductSupplierApi';
 import productSupplierAttributeApi from 'api/services/ProductSupplierAttributeApi';
@@ -23,6 +24,7 @@ import useOptionsFetch from 'hooks/options-data/useOptionsFetch';
 import useCalculateEachPrice from 'hooks/productSupplier/form/useCalculateEachPrice';
 import useProductSupplierAttributes from 'hooks/productSupplier/form/useProductSupplierAttributes';
 import useProductSupplierValidation from 'hooks/productSupplier/form/useProductSupplierValidation';
+import useQueryParams from 'hooks/useQueryParams';
 import useTranslate from 'hooks/useTranslate';
 import { omitEmptyValues } from 'utils/form-values-utils';
 import { splitPreferenceTypes } from 'utils/list-utils';
@@ -32,6 +34,7 @@ const useProductSupplierForm = () => {
   const { mapFetchedAttributes } = useProductSupplierAttributes();
   // Check if productSupplierId is provided in the URL (determine whether it is create or edit)
   const { productSupplierId } = useParams();
+  const queryParams = useQueryParams();
 
   const history = useHistory();
   const translate = useTranslate();
@@ -73,6 +76,14 @@ const useProductSupplierForm = () => {
         active: productSupplier?.active,
         dateCreated: productSupplier?.dateCreated ?? undefined,
         lastUpdated: productSupplier?.lastUpdated ?? undefined,
+        createdBy: {
+          id: productSupplier?.createdBy?.id ?? undefined,
+          name: productSupplier?.createdBy?.name ?? undefined,
+        },
+        updatedBy: {
+          id: productSupplier?.updatedBy?.id ?? undefined,
+          name: productSupplier?.updatedBy?.name ?? undefined,
+        },
       },
       additionalDetails: {
         manufacturer: productSupplier?.manufacturer
@@ -139,13 +150,39 @@ const useProductSupplierForm = () => {
     };
   };
 
-  const defaultValues = {
-    basicDetails: {
-      active: true,
-    },
-    fixedPrice: {
-      tieredPricing: false,
-    },
+  const initializeDefaultValues = async () => {
+    if (productSupplierId) {
+      return getProductSupplier();
+    }
+
+    if (queryParams.productId) {
+      const productResponse = await productApi.getProduct(queryParams.productId);
+      const product = productResponse?.data?.data;
+      return {
+        basicDetails: {
+          active: true,
+          product: {
+            id: product?.id,
+            value: product?.id,
+            label: `${product?.productCode} - ${product?.name}`,
+          },
+        },
+        fixedPrice: {
+          tieredPricing: false,
+        },
+        productSupplierPreferences: [],
+      };
+    }
+
+    return {
+      basicDetails: {
+        active: true,
+      },
+      fixedPrice: {
+        tieredPricing: false,
+      },
+      productSupplierPreferences: [],
+    };
   };
 
   const {
@@ -154,12 +191,13 @@ const useProductSupplierForm = () => {
     trigger,
     setValue,
     formState: { errors, isValid },
+    getValues,
   } = useForm({
     // We want the validation errors to occur onBlur of any field
     mode: 'onBlur',
     // If there is a productSupplier param, it means we are editing a product supplier, so fetch it,
     // otherwise the only default value should be the active field
-    defaultValues: productSupplierId ? getProductSupplier : defaultValues,
+    defaultValues: initializeDefaultValues,
     resolver: (values, context, options) =>
       zodResolver(validationSchema(values))(values, context, options),
   });
@@ -229,6 +267,7 @@ const useProductSupplierForm = () => {
     return {
       ...omitEmptyValues(packageSpecification),
       ...omitEmptyValues(fixedPrice),
+      contractPricePrice: fixedPrice?.contractPricePrice ?? null,
       contractPriceValidUntil: fixedPrice?.contractPriceValidUntil
         ? moment(fixedPrice?.contractPriceValidUntil).format(DateFormat.MM_DD_YYYY)
         : null,
@@ -275,17 +314,19 @@ const useProductSupplierForm = () => {
       const productSupplier = detailsResponse.data?.data?.id;
 
       // Build package and pricing payload and send a request
-      const packagePayload =
-        buildPackagePayload({ packageSpecification, fixedPrice, productSupplier });
+      const packagePayload = buildPackagePayload({
+        packageSpecification,
+        fixedPrice,
+        productSupplier,
+      });
       await productPackageApi.save(packagePayload);
 
       // Build preferences payload and if payload array is not empty, send a request
-      const preferencesPayload =
-        buildPreferencesPayload({
-          defaultPreferenceType,
-          productSupplierPreferences,
-          productSupplier,
-        });
+      const preferencesPayload = buildPreferencesPayload({
+        defaultPreferenceType,
+        productSupplierPreferences,
+        productSupplier,
+      });
 
       if (preferencesPayload.productSupplierPreferences?.length) {
         await productSupplierPreferenceApi.saveOrUpdateBatch(preferencesPayload);
@@ -324,6 +365,7 @@ const useProductSupplierForm = () => {
     onSubmit,
     setProductPackageQuantity,
     setValue,
+    getValues,
   };
 };
 

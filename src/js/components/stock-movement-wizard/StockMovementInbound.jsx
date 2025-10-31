@@ -9,8 +9,10 @@ import AddItemsPage from 'components/stock-movement-wizard/inbound/AddItemsPage'
 import CreateStockMovement from 'components/stock-movement-wizard/inbound/CreateStockMovement';
 import SendMovementPage from 'components/stock-movement-wizard/inbound/SendMovementPage';
 import Wizard from 'components/wizard/Wizard';
+import DateFormat from 'consts/dateFormat';
 import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 import 'components/stock-movement-wizard/StockMovement.scss';
 
@@ -82,7 +84,10 @@ class StockMovements extends Component {
         delimeter: ', ',
       },
       {
-        text: values.dateRequested,
+        text: this.props.formatLocalizedDate(
+          values.dateRequested,
+          DateFormat.COMMON,
+        ),
         color: '#4a148c',
         delimeter: ', ',
       },
@@ -205,10 +210,11 @@ class StockMovements extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps, {
@@ -232,6 +238,7 @@ StockMovements.propTypes = {
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };
 
 StockMovements.defaultProps = {

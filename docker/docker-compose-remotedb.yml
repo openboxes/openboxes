@@ -2,12 +2,12 @@ version: "3.8"
 services:
     app:
       extends: 
-        file: docker-compose-generic.yml
+        file: docker-compose-base.yml
         service: app
 
     nginx:
       extends: 
-        file: docker-compose-generic.yml
+        file: docker-compose-base.yml
         service: nginx
       depends_on:
           - app

@@ -12,11 +12,14 @@ package org.pih.warehouse.inventory
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.orm.PagedResultList
+import grails.plugins.csv.CSVMapReader
 import grails.validation.ValidationException
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.sql.JoinType
+import org.pih.warehouse.allocation.AllocationRequest
+import org.pih.warehouse.api.OutboundWorkflowState
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.AvailableItemStatus
 import org.pih.warehouse.api.DocumentGroupCode
@@ -34,61 +37,72 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.DocumentType
+import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.StockMovementItemParamsCommand
+import org.pih.warehouse.core.StockMovementItemsParamsCommand
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
+import org.pih.warehouse.data.DataService
+import org.pih.warehouse.forecasting.ForecastingService
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
-import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
+import org.pih.warehouse.picklist.PicklistImportDataCommand
+import org.pih.warehouse.picklist.PicklistItemCommand
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
+import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.ReplenishmentTypeCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionDataService
+import org.pih.warehouse.requisition.RequisitionIdentifierService
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.requisition.RequisitionItemType
+import org.pih.warehouse.requisition.RequisitionService
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionStatusTransitionEvent
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentIdentifierService
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentService
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.shipping.ShipmentWorkflow
 import org.pih.warehouse.PaginatedList
 import org.springframework.web.multipart.MultipartFile
 
-
-
 @Transactional
 class StockMovementService {
 
-    def authService
-    def productService
-    def identifierService
-    def requisitionService
-    def shipmentService
-    def inventoryService
-    def productAvailabilityService
-    def locationService
-    def dataService
-    def forecastingService
-    def outboundStockMovementService
+    AuthService authService
+    ProductService productService
+    RequisitionIdentifierService requisitionIdentifierService
+    ShipmentIdentifierService shipmentIdentifierService
+    RequisitionService requisitionService
+    ShipmentService shipmentService
+    InventoryService inventoryService
+    ProductAvailabilityService productAvailabilityService
+    LocationService locationService
+    DataService dataService
+    ForecastingService forecastingService
+    OutboundStockMovementService outboundStockMovementService
     UserService userService
     RequisitionDataService requisitionDataService
-
     GrailsApplication grailsApplication
 
     def createStockMovement(StockMovement stockMovement) {
@@ -334,6 +348,8 @@ class StockMovementService {
         if (stockMovement.dateRequested) requisition.dateRequested = stockMovement.dateRequested
         if (stockMovement.requestType) requisition.type = stockMovement.requestType
         if (stockMovement.approvers != null) requisition.approvers = stockMovement.approvers
+
+        requisition.dateDeliveryRequested = stockMovement.dateDeliveryRequested
         requisition.name = stockMovement.generateName()
 
         if (requisition.requisitionTemplate?.id != stockMovement.stocklist?.id) {
@@ -416,8 +432,19 @@ class StockMovementService {
         Date createdAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
         Date createdBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
         List<ShipmentType> shipmentTypes = params.list("shipmentType") ? params.list("shipmentType").collect{ ShipmentType.read(it) } : null
+        Location currentLocation = AuthService.currentLocation
 
         PagedResultList shipments = Shipment.createCriteria().list(max: max, offset: offset) {
+            // OBPIH-6403: We want to hide SMs with requisition of status REJECTED from the inbound list (only for the depot-depot case!!)
+            // The "or" is needed, because otherwise, SMs without requisition were also filtered out from the list (e.g. shipment from PO)
+            if (!currentLocation?.downstreamConsumer) {
+                or {
+                    requisition(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        ne("status", RequisitionStatus.REJECTED)
+                    }
+                    isNull("requisition")
+                }
+            }
 
             if (criteria?.identifier || criteria.name || criteria?.description) {
                 or {
@@ -700,17 +727,17 @@ class StockMovementService {
         return results
     }
 
-    def getStockMovementItem(String id, String stepNumber) {
-        return getStockMovementItem(id, stepNumber, false)
+    def getStockMovementItem(StockMovementItemParamsCommand command) {
+        getStockMovementItem(command.id, command.stepNumber, command.showDetails, command.refreshPicklistItems)
     }
 
-    def getStockMovementItem(String id, String stepNumber, Boolean showDetails) {
+    def getStockMovementItem(String id, Integer stepNumber, Boolean showDetails, Boolean refreshPicklistItems) {
         RequisitionItem requisitionItem = RequisitionItem.get(id)
         StockMovementItem stockMovementItem = null
         Requisition requisition = null
         ShipmentItem shipmentItem = null
 
-        if (stepNumber == '3') {
+        if (OutboundWorkflowState.fromStepNumber(stepNumber) == OutboundWorkflowState.REVISE_ITEMS) {
             return getEditPageItem(requisitionItem)
         }
 
@@ -729,14 +756,17 @@ class StockMovementService {
             }
         }
 
-        switch(stepNumber) {
-            case "2":
+        switch(OutboundWorkflowState.fromStepNumber(stepNumber)) {
+            case OutboundWorkflowState.ADD_ITEMS:
                 return getAddPageItem(requisition, stockMovementItem)
-            case "4":
+            case OutboundWorkflowState.PICK_ITEMS:
+                if (refreshPicklistItems) {
+                    allocatePicklistItems(requisition.requisitionItems?.asList())
+                }
                 return buildPickPageItem(requisitionItem, stockMovementItem.sortOrder, showDetails)
-            case "5":
+            case OutboundWorkflowState.PACK_ITEMS:
                 return buildPackPageItem(shipmentItem)
-            case "6":
+            case OutboundWorkflowState.SEND_SHIPMENT:
                 if (requisition && !requisition.origin.isSupplier() && requisition.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
                     return buildPackPageItem(shipmentItem)
                 }
@@ -745,19 +775,23 @@ class StockMovementService {
         }
     }
 
-    def getStockMovementItems(String id, String stepNumber, String max, String offset) {
+    def getStockMovementItems(StockMovementItemsParamsCommand command) {
+        getStockMovementItems(command.id, command.stepNumber, command.max, command.offset, command.refreshPicklistItems)
+    }
+
+    def getStockMovementItems(String id, Integer stepNumber, Integer max, Integer offset, Boolean refreshPicklistItems) {
         // FIXME should get stock movement instead of requisition
         Requisition requisition = Requisition.get(id)
         List<StockMovementItem> stockMovementItems = []
 
-        if (stepNumber == '3') {
+        if (OutboundWorkflowState.fromStepNumber(stepNumber) == OutboundWorkflowState.REVISE_ITEMS) {
             return getEditPageItems(requisition, max, offset)
         }
 
         if (requisition) {
             List <RequisitionItem> requisitionItems = []
             if (max != null && offset != null) {
-                requisitionItems = RequisitionItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
+                requisitionItems = RequisitionItem.createCriteria().list(max: max, offset: offset) {
                     eq("requisition", requisition)
                     isNull("parentRequisitionItem")
                     order("orderIndex", 'asc')
@@ -782,7 +816,7 @@ class StockMovementService {
             Shipment shipment = Shipment.get(id)
             List <ShipmentItem> shipmentItems = []
             if (max != null && offset != null) {
-                shipmentItems = ShipmentItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
+                shipmentItems = ShipmentItem.createCriteria().list(max: max, offset: offset) {
                     eq("shipment", shipment)
                     order("sortOrder", 'asc')
                 }
@@ -802,14 +836,17 @@ class StockMovementService {
             }
         }
 
-        switch(stepNumber) {
-            case "2":
+        switch(OutboundWorkflowState.fromStepNumber(stepNumber)) {
+            case OutboundWorkflowState.ADD_ITEMS:
                 return getAddPageItems(requisition, stockMovementItems)
-            case "4":
+            case OutboundWorkflowState.PICK_ITEMS:
+                if (refreshPicklistItems) {
+                    allocatePicklistItems(requisition.requisitionItems?.asList())
+                }
                 return getPickPageItems(id, max, offset)
-            case "5":
+            case OutboundWorkflowState.PACK_ITEMS:
                 return getPackPageItems(id, max, offset)
-            case "6":
+            case OutboundWorkflowState.SEND_SHIPMENT:
                 if (requisition && !requisition.origin.isSupplier() && requisition.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
                     return getPackPageItems(id, max, offset)
                 }
@@ -918,15 +955,15 @@ class StockMovementService {
         return editPageItem
     }
 
-    List getEditPageItems(Requisition requisition, String max, String offset) {
+    List getEditPageItems(Requisition requisition, Integer max, Integer offset) {
         def query = offset ?
                 """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY sort_order limit :offset, :max; """ :
                 """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY sort_order """
 
         def data = dataService.executeQuery(query, [
                 'requisition': requisition.id,
-                'offset'     : offset ? offset.toInteger() : null,
-                'max'        : max ? max.toInteger() : null,
+                'offset'     : offset,
+                'max'        : max,
         ])
 
         List editPageItems = buildEditPageItems(data)
@@ -1052,7 +1089,7 @@ class StockMovementService {
         return editPageItems
     }
 
-    List<PickPageItem> getPickPageItems(String id, String max, String offset) {
+    List<PickPageItem> getPickPageItems(String id, Integer max, Integer offset) {
         List<PickPageItem> pickPageItems = []
 
         StockMovement stockMovement = getStockMovement(id)
@@ -1063,13 +1100,13 @@ class StockMovementService {
         }
 
         if (max != null && offset != null) {
-            return pickPageItems.subList(offset.toInteger(), offset.toInteger() + max.toInteger() > pickPageItems.size() ? pickPageItems.size() : offset.toInteger() + max.toInteger());
+            return pickPageItems.subList(offset, offset + max > pickPageItems.size() ? pickPageItems.size() : offset + max);
         }
 
         return pickPageItems
     }
 
-    List<PackPageItem> getPackPageItems(String id, String max, String offset) {
+    List<PackPageItem> getPackPageItems(String id, Integer max, Integer offset) {
         Set<PackPageItem> items = new LinkedHashSet<PackPageItem>()
 
         StockMovement stockMovement = getStockMovement(id)
@@ -1083,10 +1120,502 @@ class StockMovementService {
         List<PackPageItem> packPageItems = new ArrayList<PackPageItem>(items)
 
         if (max != null && offset != null) {
-            return packPageItems.subList(offset.toInteger(), offset.toInteger() + max.toInteger() > packPageItems.size() ? packPageItems.size() : offset.toInteger() + max.toInteger())
+            return packPageItems.subList(offset, offset + max > packPageItems.size() ? packPageItems.size() : offset + max)
         }
 
         return packPageItems
+    }
+
+    List<PicklistItemCommand> parsePickCsvTemplateImport(PicklistImportDataCommand command) {
+
+        try {
+            // FIXME We should probably do some additional validation on the import file here or
+            //  at least catch any exceptions that might happen
+            String text = new String(command.importFile.bytes)
+
+            List<String> fieldKeys = [
+                    'id',
+                    'code', // code => productCode
+                    'name', // name => productName
+                    'lotNumber',
+                    'expirationDate',
+                    'binLocation',
+                    'quantity',
+            ]
+            char separatorChar = CSVUtils.getSeparator(text, fieldKeys.size())
+
+            CSVMapReader csvMapReader = new CSVMapReader(
+                    new StringReader(text),
+                    [skipLines: 1, separatorChar: separatorChar]
+            )
+            csvMapReader.fieldKeys = fieldKeys
+            return csvMapReader.toList().collect { it ->
+                new PicklistItemCommand(
+                        id: it.id,
+                        code: it.code,
+                        name: it.name,
+                        lotNumber: it.lotNumber,
+                        expirationDate: it.expirationDate ? new Date(it.expirationDate) : null,
+                        binLocation: it.binLocation,
+                        quantityAsText: it.quantity
+                )
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing order item CSV: " + e.message, e)
+        }
+    }
+
+    /**
+     * This method needs to be broken down into multiple smaller methods.
+     *
+     * @param command
+     */
+    void validatePicklistListImport(PicklistImportDataCommand command) {
+
+        StockMovement stockMovement = command.stockMovement
+
+        // The parent requisition items that picklist items are associated with
+        List<PickPageItem> pickPageItems = command.pickPageItems
+
+        // FIXME Remove this if it's no longer being used
+        // Configuration property that allows overpick for a given location
+        Boolean supportsOverpick = command.location.supports(ActivityCode.ALLOW_OVERPICK)
+
+        // TODO Do we handle the case where ID is null?
+        // Group the picklist items from the CSV by requisition item ID
+        Map<String, List> picklistItemsGroupedByRequisitionItem = command.picklistItems.groupBy { it.id }
+
+        // Iterate over the parent requisition items
+        picklistItemsGroupedByRequisitionItem.each { requisitionItemId, picklistItems ->
+
+            // Iterate over each separate pick
+            picklistItems.each { PicklistItemCommand data ->
+
+                // FIXME Make sure we also check that the quantity provided is not greater than the
+                //  quantity requested. Should add this to the ImportPickCommand validator.
+                Integer quantityRequired = data.quantity
+
+                // FIXME Add proper comment to explain what this is for
+                // Base validation, creates errors object?
+                data.validate()
+
+                // TODO What happens if ID is null. We should throw an exception if we don't have a good answer.
+                //  skip validation if id is empty since most of the validation relies on an existing requisition id
+                // skip validation if id is empty since mos tof the validation relies on an existing requisition id
+                if (!data.id) {
+                    return
+                }
+
+                // Find the pick page item by ID (pick page item represents the requisition item)
+                PickPageItem pickPageItem = pickPageItems.find { it.requisitionItem?.id == data.id }
+                if (!pickPageItem) {
+                    data.errors.rejectValue(
+                            "id",
+                            "importPickCommand.requisitionItem.notFound.error",
+                            [data.id] as Object[],
+                            "Requisition item id: ${data.id} not found"
+                    )
+                }
+                if (pickPageItem) {
+
+                    // TODO Add guidance for developers - we ALWAYS need to resolve to an inventory
+                    //  item when we're working with a lot number.
+                    // Resolve given lot number to an inventory item
+                    InventoryItem inventoryItem =
+                            pickPageItem.requisitionItem.product.getInventoryItem(data.lotNumber, data.expirationDate)
+
+                    // If there's no inventory item for the provide lot number, we throw a validation error
+                    if (!inventoryItem) {
+                        // FIXME Add error code to messages.properties
+                        data.errors.rejectValue(
+                                "lotNumber",
+                                "importPickCommand.inventoryItem.notFound.error",
+                                [data.lotNumber] as Object[],
+                                "Unable to find inventory item with lot number {0}")
+                    }
+                    else {
+
+                        // If there is an inventory item found, let's check to see if there's more
+                        // than one picklist item with an empty bin
+                        Integer countEmptyBinLocations = picklistItems.findAll { it.lotNumber == inventoryItem.lotNumber }.count { !it.binLocation }
+                        if (countEmptyBinLocations > 1) {
+                            data.errors.rejectValue(
+                                    "binLocation",
+                                    "importPickCommand.binLocation.multipleEmpty.error",
+                                    [data.lotNumber] as Object[],
+                                    "Bin location cannot be empty for the same lot number {0} across multiple rows."
+                            )
+                        }
+                    }
+
+                    // OBPIH-6331 Resolve bin location, if a bin location value was provided. Otherwise,
+                    // if the user-provided bin location is null or ambiguous then we need to apply
+                    // allocation rules
+                    Location internalLocation = command.location.getInternalLocation(data.binLocation)
+
+                    // If a bin location value is provided and it not the default bin location name
+                    // FIXME Could add this logic to the command class but I'm not sure what to call
+                    //  the method (isUserProvidedButNotDefault is a bit of a mouthful). Open to
+                    //  suggestions.
+                    if (data.binLocation && !data.binLocation?.equalsIgnoreCase(Constants.DEFAULT_BIN_LOCATION_NAME)) {
+                        // ... but the internal location is not found
+                        if (!internalLocation) {
+                            // FIXME Add error code to messages.properties
+                            data.errors.rejectValue(
+                                    "binLocation",
+                                    "importPickCommand.binLocation.notFound.error",
+                                    [data.binLocation] as Object[],
+                                    "Unable to find internal location with name {0}")
+                        }
+                    }
+
+                    // FIXME It's probably ok to use product availability data here. However, we
+                    //  probably want to validate against actual inventory items (calculated from
+                    //  transactions) before the stock movement is shipped (i.e. transactions created).
+                    //  Otherwise we could encounter a situation where the picklist item is valid based on
+                    //  the product availability, but this data might be stale for some reason
+
+                    // TODO Need to test whether this satisfies the requirement when passing a NULL
+                    //  bin location. We also probably want to deal with the case where the provided
+                    //  bin location is provided, but not found.
+
+                    // If there was a bin location provided then we'll want to check if there's an
+                    // available item at that location
+                    if (data.binLocation) {
+
+                        // Let's try to determine whether there's a specific available inventory item
+                        //  associated with the lot number and bin data provided by the user.
+                        AvailableItem availableItem = pickPageItem.getAvailableItem(inventoryItem, internalLocation)
+                        ApplicationTagLib g = grailsApplication.mainContext.getBean(ApplicationTagLib.class)
+
+                        // FIXME This is only necessary if we cannot find a happy case from OBPIH-6331
+                        if (!availableItem) {
+                            String lotNumberName = data.lotNumber ?: g.message(code: "default.noLotNumber.label", default: Constants.DEFAULT_LOT_NUMBER)
+                            String binLocationName = data.binLocation ?: g.message(code: "default.noBinLocation.label", default: Constants.DEFAULT_BIN_LOCATION_NAME)
+                            data.errors.rejectValue(
+                                    "id",
+                                    "importPickCommand.availableItem.notFound.error",
+                                    [lotNumberName, binLocationName] as Object[],
+                                    "There is no available item for lot number {0} and bin location {1}"
+                            )
+                        }
+
+                        // If there is an available item for the location but it's unavailable
+                        if (availableItem && !availableItem.isQuantityPickable(data?.quantity)) {
+                            String lotNumberName = data.lotNumber ?: g.message(code: "default.noLotNumber.label", default: Constants.DEFAULT_LOT_NUMBER)
+                            String binLocationName = data.binLocation ?: g.message(code: "default.noBinLocation.label", default: Constants.DEFAULT_BIN_LOCATION_NAME)
+                            data.errors.rejectValue(
+                                    "id",
+                                    "importPickCommand.quantity.insuffientQuantityAvailable",
+                                    [lotNumberName, binLocationName, availableItem.quantityAvailable, data.quantity] as Object[],
+                                    "Insufficient quantity available for lot number {0} " +
+                                            "and bin location {1} [Available: {2}, Required: {3}]. Please review pick."
+                            )
+                        }
+                    }
+
+                    // OBPIH-6331 This is the main driver for the infer bin location mechanism
+                    // If the internal location is NULL at this point, that means the user left
+                    // the cell blank and would like the system to allocate based on our rules
+                    if (!data.binLocation && !internalLocation) {
+
+                        // FIXME THis feels a bit weird because we should allow the allocation
+                        //  algorithm to sort and decide which location is best
+                        // First attempt to get the available items in the default location
+                        //List<AvailableItem> availableItems = pickPageItem.getAvailableItemsInDefaultLocation(inventoryItem)
+
+                        // It was in fact premature to be doing the above filtering as it was
+                        // causing some major issues when there were available items in multiple locations
+                        List<AvailableItem> availableItems =
+                                pickPageItem.getAvailableItems(inventoryItem)
+
+                        // Create an allocation request and validate that it
+                        AllocationRequest allocationRequest = new AllocationRequest(
+                                product: inventoryItem?.product,
+                                inventoryItem: inventoryItem,
+                                picklistItemCommand: data,
+                                availableItems: availableItems,
+                                quantityRequired: quantityRequired)
+
+                        // Validate allocation request
+                        validateAllocationRequest(allocationRequest)
+
+                        // Add validation errors to command object
+                        if (allocationRequest.hasErrors()) {
+                            allocationRequest.errors.allErrors.each { it
+                                data.errors.reject(it.code)
+                            }
+                        }
+                    }
+
+                    // FIXME This validation should happen only on the first line for the
+                    //  requisition item. I tried to implement it in the outer loop but had trouble
+                    //  with adding errors to command object. The side-effect of not fixing this
+                    //  is that we have to see this error for every row which is infinitely better
+                    //  than not seeing it.
+                    Integer totalQuantityPicked = picklistItemsGroupedByRequisitionItem[data.id].sum { it.quantity }
+
+                    // TODO Should we really be using requisitonItem.quantity here?
+                    if (totalQuantityPicked > pickPageItem.requisitionItem.quantity) {
+                        Boolean allowsOverPick = stockMovement.origin.supports(ActivityCode.ALLOW_OVERPICK)
+                        if (!allowsOverPick) {
+                            data.errors.rejectValue(
+                                    "quantity",
+                                    "importPickCommand.quantity.error",
+                                    [totalQuantityPicked, data.code, quantityRequired] as Object[],
+                                    "Total quantity picked {0} for product {1} must match the expected quantity {2}. Please review pick."
+                            )
+                        }
+                    } else if (totalQuantityPicked != pickPageItem.requisitionItem.quantity) {
+                        data.errors.rejectValue(
+                                "quantity",
+                                "importPickCommand.quantity.error",
+                                [totalQuantityPicked, data.code, quantityRequired] as Object[],
+                                "Total quantity picked {0} for product {1} must match the expected quantity {2}. Please review pick."
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    // TODO Test whether the sum of an empty available items list returns 0
+    //  If we want to be more strict we can check to see if there's enough quantity in at least
+    //  one item
+    boolean validateQuantityAvailable(List<AvailableItem> availableItems, Integer quantityRequired) {
+        return availableItems?.any { it.quantityAvailable >= quantityRequired }
+    }
+
+    void validateAllocationRequest(AllocationRequest allocationRequest) {
+
+        Product product = allocationRequest.product
+        InventoryItem inventoryItem = allocationRequest.inventoryItem
+        Integer quantityRequired = allocationRequest.quantityRequired
+        List<AvailableItem> availableItems = allocationRequest.availableItems
+        PicklistItemCommand picklistItemCommand = allocationRequest.picklistItemCommand
+
+        // Building blocks for validation logic
+        // FIXME Could probably move these to custom validators on AllocationRequest
+        Integer countInBinLocations = availableItems.findAll { it.isPhysicalLocation }?.size()
+        boolean isInDefaultLocation = availableItems.every { it.isDefaultLocation }
+        boolean isInReceivingLocations = availableItems.every { it.isReceivingLocation }
+        boolean isInBinLocations = availableItems.every { it.isPhysicalLocation && !it.isDefaultLocation }
+        boolean hasAllHoldLocations = !availableItems.empty ? availableItems.every { it.onHold } : false
+        boolean hasAnyPhysicalLocations = availableItems?.any { it?.isPhysicalLocation }
+        boolean hasAnyVirtualLocations = availableItems?.any { it?.isVirtualLocation }
+
+        // Scenario 4: Any other scenario (stock in “real” bin and virtual bin, stock in multiple real bins)
+        if (hasAnyPhysicalLocations && hasAnyVirtualLocations) {
+            picklistItemCommand.errors.rejectValue("binLocation",
+                    "importPickCommand.availableItems.inMultipleBinLocations",
+                    [product.productCode, inventoryItem?.lotNumber, availableItems.binLocationName] as Object [],
+                    "Product {0} with lot number {1} has stock in multiple physical and virtual locations {2}. Please indicate the bin location to pick from."
+            )
+        }
+
+        // Scenario 2: All stock in one bin (or in one real bin and 1 or more hold bins - ignore hold bins)
+        else if (countInBinLocations > 1) {
+            picklistItemCommand.errors.rejectValue("binLocation",
+                    "importPickCommand.availableItems.inMultipleLocations",
+                    [product.productCode, inventoryItem?.lotNumber, availableItems.binLocationName] as Object [],
+                    "Product {0} with lot number {1} has stock in multiple bin locations {2}. Please indicate the bin location to pick from."
+            )
+        }
+
+        // FIXME I'm not sure if it's necessary, but I couldn't figure out a way to handle
+        //  validation where stock is not in the default or receiving locations (needs to take
+        //  bin locations into account, but couldn't get the logic right.
+        // Scenario 1: All stock in default (no bin)
+//        if (!isAllStockInReceivingOrDefault) {
+//            picklistItemCommand.errors.rejectValue("binLocation",
+//                    "allocationRequest.availableItems.notInReceivingOrDefaultLocation",
+//                    [product.productCode, availableItems.binLocationName] as Object [],
+//                    "Product {0} must only have stock in a single bin location, the default location or receiving locations {1}"
+//            )
+//        }
+
+        // Scenario 3: All stock in receiving or default bin > if lot has stock entries only in hold bin > invalid
+        else if (hasAllHoldLocations) {
+            picklistItemCommand.errors.rejectValue("binLocation",
+                    "allocationRequest.availableItems.inHoldLocations",
+                    [product.productCode, inventoryItem?.lotNumber, availableItems.binLocationName] as Object [],
+                    "Product {0} with lot number {1} only has stock in hold locations."
+            )
+        }
+
+        // FIXME This might need to be moved to the code that actually filters the available item
+        //  otherwise it probably doesn't make sense in this context. It's probably not hurting
+        //  anything, but it's definitely not doing what I originally intended for it to do.
+
+        // Validate the quantity available for all available items
+        boolean canAllocateQuantity = validateQuantityAvailable(availableItems, quantityRequired)
+        if (!canAllocateQuantity) {
+            Integer quantityAvailable = availableItems.quantityAvailable.max()?:0
+            picklistItemCommand.errors.rejectValue(
+                "quantity",
+                "importPickCommand.quantity.insuffientQuantityAvailable",
+                [picklistItemCommand.code, picklistItemCommand.lotNumber?:Constants.DEFAULT_LOT_NUMBER, quantityAvailable, quantityRequired] as Object[],
+                "Insufficient quantity available for product code {0} and lot number {1} " +
+                    "[Maximum Available: {2}, Required: {3}]. Please review pick.")
+        }
+
+    }
+
+    // FIXME not sure if we should return available items or suggested items
+    // TODO SO the idea here is that we want to first apply filtering rules to the available items
+    //  according to the ticket (OBPIH-6331) and then have another method actually check whether
+    //  there's enough quantity in these locations. I was initially trying to do everything at once
+    //  but it got really confusing because we would have to apply a rule and then check, apply
+    //  the next rule and check, on and on. Eventually I want these to be implemented using the
+    //  Strategy pattern but I was trying hard not to implement that here.
+    // FIXME One other issue here is that it would be much easier to implement if we had a parent
+    //  parent object above available items that was responsible for answering questions
+    List<AvailableItem> applyAllocationRulesOnAvailableItems(List<AvailableItem> availableItems, Integer quantityRequired) {
+
+        // TODO Remove unnecessary logging before merging
+        log.info "Apply allocation rules on available items "
+        log.info "Quantity Required = " + quantityRequired
+        log.info "Available items = " + availableItems.size()
+
+        availableItems.each {
+            log.info " - Available item " + it.toJson()
+        }
+
+        // filter out hold locations
+        availableItems = availableItems.findAll { !it.isOnHold() }
+
+        // If there's only one pickable location, it should either be a default location or
+        if (availableItems.count { it.pickable } == 1) {
+
+            // Scenario 1: All stock in default (no bin)
+            // TODO Could we have more than one available items in a default location?
+            // TODO If there's enough available quantity in the default bin, then allocate
+            //  quantity from the default location
+            boolean isInDefaultLocationOrReceivingLocation = availableItems.every { it.isDefaultLocation || it.isReceivingLocation }
+            if (isInDefaultLocationOrReceivingLocation) {
+                return availableItems
+            }
+
+            // Scenario 2: All stock in one bin
+            // TODO If there's enough available quantity in one internal location, then
+            //  then allocate stock from that location. Otherwise return an error?
+            boolean isInPhysicalLocation = availableItems.every { it.isPhysicalLocation }
+            if (isInPhysicalLocation) {
+                return availableItems
+            }
+        }
+        // If there are more than one internal locations, then we apply the following rules
+        else {
+
+            // Scenario 3a: if lot has stock entries in receiving bins
+            // TODO Are receiving locations configured to be picking locations?
+            // TODO If there's available quantity in default + receiving locations, then
+            //  allocate using FIFO algorithm. Need to check with Manon if this is what is
+            //  expected.
+            boolean isAllStockInReceivingLocations = availableItems.every { it.isReceivingLocation }
+            if (isAllStockInReceivingLocations) {
+                return availableItems
+            }
+            // Scenario 3b: if lot has stock entries in default bin
+            // TODO If there's enough quantity available in default location, then
+            //  allocate from default location.
+
+            // Scenario 3c: if lot has stock entries only in hold bins
+            // TODO If lot has stock entries only in hold bin, then throw an exception.
+
+            // Scenario 4: Any other scenario (stock in “real” bin and virtual bin, stock in multiple real bins)
+            // TODO If there's not enough available quantity in default + receiving
+            //  locations, then throw an exception
+            boolean isAllStockInReceivingOrDefault = availableItems.every { it.isReceivingLocation || it.isDefaultLocation }
+            if (isAllStockInReceivingOrDefault) {
+                return availableItems
+            }
+        }
+
+        // FIXME Consider throwing an exception here because we've fallen through all
+        //  of the expected scenarios
+        return []
+    }
+
+    void importPicklistItems(PicklistImportDataCommand command) {
+
+        StockMovement stockMovement = command.stockMovement
+        List<PickPageItem> pickPageItems = command.pickPageItems
+        List<PicklistItemCommand> picklistItems = command.picklistItems
+
+        Map<String, List<PicklistItemCommand>> picklistItemsGroupedByRequisitionItem = picklistItems.groupBy { it.id }
+
+        picklistItemsGroupedByRequisitionItem.each { String requisitionItemId, List<PicklistItemCommand> picklistItemsToImport  ->
+            // skip rows with errors
+            if (picklistItemsToImport.any{ it.hasErrors() }) {
+                return
+            }
+
+            PickPageItem pickPageItem = pickPageItems.find {
+                it.requisitionItem?.id == requisitionItemId
+            }
+
+            // TODO Decide whether we want to use revert pick or clear picklist (below)
+            //if (pickPageItem?.requisitionItem?.picklistItems?.size()) {
+            //    picklistService.revertPick(requisitionItemId)
+            //}
+
+            // TODO Does the order of operations matter (remove shipment items vs picklist items)
+            // Remove existing shipment items and picklist items
+            removeShipmentItemsForModifiedRequisitionItem(pickPageItem.requisitionItem)
+
+            // TODO Need to test this thoroughly as it does not feel like a good idea. For example,
+            //  we don't necessarily want to clear picklist if there's no picklist items to import
+            //  so this might need to go inside a check on !picklistItemsToImport.empty
+            clearPicklist(pickPageItem.requisitionItem)
+
+            // Iterate over all of the picklist items to import and attempt to create a picklist item
+            picklistItemsToImport.each { params ->
+
+                InventoryItem inventoryItem = pickPageItem.requisitionItem.product.getInventoryItem(params.lotNumber, params.expirationDate)
+                Location internalLocation = command.location.getInternalLocation(params.binLocation)
+
+                // Get the available item for the provide lot number and bin location
+                AvailableItem availableItem = pickPageItem.getAvailableItem(inventoryItem, internalLocation)
+
+                // If there is an available item with enough we allocate that item to the outbound order
+                if (availableItem) {
+                    Picklist picklist = stockMovement.requisition?.picklist
+                    // find existing picklist to update
+                    PicklistItem picklistItem = picklist.picklistItems.find {
+                        it.inventoryItem?.id == availableItem.inventoryItem?.id &&
+                                it.binLocation?.id == availableItem.binLocation?.id
+                    }
+                    createOrUpdatePicklistItem(
+                            pickPageItem.requisitionItem,
+                            picklistItem,
+                            availableItem.inventoryItem,
+                            availableItem.binLocation,
+                            params.quantity,
+                            null,
+                            null,
+                            false,
+                    )
+
+                }
+                // Otherwise we may need to allocate a new item based on the rules
+                else {
+                    // If there's no internal location then we should apply allocation rules to find
+                    // any available items that might satisfy the quantity required
+                    if (!internalLocation) {
+
+                        // TODO This allocation deserves its own method somewhere, probably on
+                        //  a separate service.
+                        List<AvailableItem> availableItems = pickPageItem.getAvailableItems(inventoryItem)
+                        availableItems = applyAllocationRulesOnAvailableItems(availableItems, params.quantity)
+                        List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, params.quantity)
+                        allocateSuggestedItems(pickPageItem.requisitionItem, suggestedItems, false)
+                    }
+                }
+            }
+            createMissingShipmentItem(pickPageItem.requisitionItem)
+        }
     }
 
     List<ReceiptItem> getStockMovementReceiptItems(def stockMovement) {
@@ -1107,6 +1636,7 @@ class StockMovementService {
         return receiptItems
     }
 
+    // It expects to receive a stock movement id
     void clearPicklist(String id) {
         StockMovement stockMovement = getStockMovement(id)
         clearPicklist(stockMovement)
@@ -1265,7 +1795,9 @@ class StockMovementService {
                             suggestedItem.binLocation,
                             suggestedItem.quantityPicked.intValueExact(),
                             null,
-                            null)
+                            null,
+                            true
+                    )
                 }
             }
             if (validateQtyAvailable && !suggestedItems) {
@@ -1290,7 +1822,7 @@ class StockMovementService {
 
     void createOrUpdatePicklistItem(RequisitionItem requisitionItem, PicklistItem picklistItem,
                                     InventoryItem inventoryItem, Location binLocation,
-                                    Integer quantity, String reasonCode, String comment) {
+                                    Integer quantity, String reasonCode, String comment, Boolean isAutoAllocated = true) {
 
         Requisition requisition = requisitionItem.requisition
 
@@ -1298,6 +1830,7 @@ class StockMovementService {
         if (!picklist) {
             picklist = new Picklist()
             picklist.requisition = requisition
+            requisition.picklist = picklist
         }
 
         // If one does not exist create it and add it to the list
@@ -1310,6 +1843,8 @@ class StockMovementService {
         if (reasonCode && requisitionItem.pickReasonCode != reasonCode) {
             requisitionItem.pickReasonCode = reasonCode
         }
+
+        requisitionItem.autoAllocated = isAutoAllocated
 
         // Remove from picklist
         if (quantity == null) {
@@ -1344,6 +1879,7 @@ class StockMovementService {
         if (!picklist) {
             picklist = new Picklist()
             picklist.requisition = requisition
+            requisition.picklist = picklist
         }
         pickPageItems.each { pickPageItem ->
             pickPageItem.picklistItems?.toArray()?.each { PicklistItem picklistItem ->
@@ -1383,6 +1919,7 @@ class StockMovementService {
 
     void updatePicklistItem(StockMovementItem stockMovementItem, List picklistItems, String reasonCode) {
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+        Boolean isAutoAllocated = requisitionItem.autoAllocated ?: false
 
         clearPicklist(requisitionItem)
 
@@ -1403,7 +1940,7 @@ class StockMovementService {
             String comment = picklistItemMap.comment
 
             createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation,
-                    quantityPicked?.intValueExact(), reasonCode, comment)
+                    quantityPicked?.intValueExact(), reasonCode, comment, isAutoAllocated)
         }
     }
 
@@ -1552,6 +2089,37 @@ class StockMovementService {
         return availableSubstitutions.findAll { availableItems -> availableItems.quantityAvailable > 0 }
     }
 
+
+    void allocateSuggestedItems(RequisitionItem requisitionItem, List<SuggestedItem> suggestedItems, Boolean isAutoAllocated = true) {
+
+        for (SuggestedItem suggestedItem : suggestedItems) {
+            createOrUpdatePicklistItem(
+                    requisitionItem,
+                    null,
+                    suggestedItem.inventoryItem,
+                    suggestedItem.binLocation,
+                    suggestedItem.quantityPicked?.intValueExact(),
+                    null,
+                    null,
+                    isAutoAllocated
+            )
+        }
+    }
+
+    void allocatePicklistItems(List<RequisitionItem> requisitionItems) {
+        requisitionItems.each { RequisitionItem requisitionItem ->
+            if (requisitionItem.isSubstituted()) {
+                requisitionItem.substitutionItems.collect { allocateMissingPicklistItems(it) }
+            } else if (requisitionItem.modificationItem) {
+                allocateMissingPicklistItems(requisitionItem.modificationItem)
+            } else {
+                if (!requisitionItem.isCanceled()) {
+                    allocateMissingPicklistItems(requisitionItem)
+                }
+            }
+        }
+    }
+
     /**
      * Get a list of pick page items for the given stock movement item.
      *
@@ -1585,11 +2153,6 @@ class StockMovementService {
      * @return
      */
     PickPageItem buildPickPageItem(RequisitionItem requisitionItem, Integer sortOrder, Boolean showDetails) {
-
-        if (!requisitionItem.picklistItems || (requisitionItem.picklistItems && requisitionItem.totalQuantityPicked() != requisitionItem.quantity &&
-                !requisitionItem.picklistItems.reasonCode)) {
-            createPicklist(requisitionItem, false)
-        }
         PickPageItem pickPageItem = new PickPageItem(requisitionItem: requisitionItem,
                 picklistItems: requisitionItem.picklistItems)
         Location location = requisitionItem?.requisition?.origin
@@ -1604,6 +2167,15 @@ class StockMovementService {
         return pickPageItem
     }
 
+    void allocateMissingPicklistItems(RequisitionItem requisitionItem) {
+        Boolean hasPicklistItems = requisitionItem.picklistItems
+        Boolean isQuantityPickedOtherThanRequested = requisitionItem.totalQuantityPicked() != requisitionItem.quantity
+        Boolean hasReasonCode = requisitionItem.picklistItems.reasonCode
+
+        if (!hasPicklistItems || (hasPicklistItems && isQuantityPickedOtherThanRequested && !hasReasonCode)) {
+            createPicklist(requisitionItem, false)
+        }
+    }
 
     List getPackPageItems(PicklistItem picklistItem) {
         List packPageItems = []
@@ -1640,7 +2212,6 @@ class StockMovementService {
     Shipment createInboundShipment(ShipOrderCommand command) {
         Order order = command.order
         Shipment shipment = new Shipment()
-        shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
         shipment.expectedShippingDate = new Date()
         shipment.name = order.name ?: order.orderNumber
         shipment.description = order.orderNumber
@@ -1648,6 +2219,7 @@ class StockMovementService {
         shipment.destination = order.destination
         shipment.createdBy = order.orderedBy
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
+        shipment.shipmentNumber = shipmentIdentifierService.generate(shipment)
 
         command.shipOrderItems.each { ShipOrderItemCommand orderItemCommand ->
             if (orderItemCommand.quantityToShip > 0) {
@@ -1681,13 +2253,13 @@ class StockMovementService {
     Shipment createInboundShipment(StockMovement stockMovement) {
 
         Shipment shipment = new Shipment()
-        shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
         shipment.expectedShippingDate = new Date()
         shipment.name = stockMovement.generateName()
         shipment.description = stockMovement.description
         shipment.origin = stockMovement.origin
         shipment.destination = stockMovement.destination
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
+        shipment.shipmentNumber = shipmentIdentifierService.generate(shipment)
 
         // Save shipment before adding the items to avoid referencing an unsaved transient instance
         shipment.save()
@@ -1734,10 +2306,6 @@ class StockMovementService {
             requisition.status = RequisitionStatus.CREATED
         }
 
-        // Generate identifier if one has not been provided
-        if (!stockMovement.identifier && !requisition.requestNumber) {
-            requisition.requestNumber = identifierService.generateRequisitionIdentifier()
-        }
         requisition.type = stockMovement.requestType
         requisition.sourceType = stockMovement.sourceType
         requisition.requisitionTemplate = stockMovement.stocklist
@@ -1746,9 +2314,15 @@ class StockMovementService {
         requisition.origin = stockMovement.origin
         requisition.requestedBy = stockMovement.requestedBy
         requisition.dateRequested = stockMovement.dateRequested
+        requisition.dateDeliveryRequested = stockMovement.dateDeliveryRequested
         requisition.name = stockMovement.generateName()
         requisition.requisitionItems = []
         requisition.approvers = stockMovement.approvers
+
+        // Generate identifier if one has not been provided
+        if (!stockMovement.identifier && !requisition.requestNumber) {
+            requisition.requestNumber = requisitionIdentifierService.generate(requisition)
+        }
 
         stockMovement.lineItems.each { stockMovementItem ->
             RequisitionItem requisitionItem = RequisitionItem.createFromStockMovementItem(stockMovementItem)
@@ -1907,30 +2481,23 @@ class StockMovementService {
                     requisitionItem.quantityCounted = stockMovementItem.quantityCounted
                     removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
 
-                    if (!stockMovementItem.quantityRequested) {
-                        log.info "Item deleted " + requisitionItem.id
+                    if (stockMovementItem.quantityRequested != requisitionItem.quantity) {
                         requisitionItem.undoChanges()
-                        requisition.removeFromRequisitionItems(requisitionItem)
-                        requisitionItem.delete(flush: true)
-                    } else {
-                        if (stockMovementItem.quantityRequested != requisitionItem.quantity) {
-                            requisitionItem.undoChanges()
-                        }
-
-                        requisitionItem.quantity = stockMovementItem.quantityRequested
-                        requisitionItem.quantityApproved = stockMovementItem.quantityRequested
-
-                        if (stockMovementItem.product) requisitionItem.product = stockMovementItem.product
-                        if (stockMovementItem.inventoryItem) requisitionItem.inventoryItem = stockMovementItem.inventoryItem
-                        if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
-
-                        requisitionItem.recipient = stockMovementItem.recipient
-                        requisitionItem.palletName = stockMovementItem.palletName
-                        requisitionItem.boxName = stockMovementItem.boxName
-                        requisitionItem.lotNumber = stockMovementItem.lotNumber
-                        requisitionItem.expirationDate = stockMovementItem.expirationDate
-                        requisitionItem.comment = stockMovementItem.comments
                     }
+
+                    requisitionItem.quantity = stockMovementItem.quantityRequested
+                    requisitionItem.quantityApproved = stockMovementItem.quantityRequested
+
+                    if (stockMovementItem.product) requisitionItem.product = stockMovementItem.product
+                    if (stockMovementItem.inventoryItem) requisitionItem.inventoryItem = stockMovementItem.inventoryItem
+                    if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
+
+                    requisitionItem.recipient = stockMovementItem.recipient
+                    requisitionItem.palletName = stockMovementItem.palletName
+                    requisitionItem.boxName = stockMovementItem.boxName
+                    requisitionItem.lotNumber = stockMovementItem.lotNumber
+                    requisitionItem.expirationDate = stockMovementItem.expirationDate
+                    requisitionItem.comment = stockMovementItem.comments
                 }
                 // Otherwise we create a new one
                 else {
@@ -2701,6 +3268,13 @@ class StockMovementService {
                             stepNumber  : 4,
                             uri         : g.createLink(controller: 'picklist', action: "renderPdf", id: stockMovement?.requisition?.id, absolute: true),
                             hidden      : true
+                    ],
+                    [
+                            name        : g.message(code: "picklist.button.printSortedByBins.label"),
+                            documentType: DocumentGroupCode.PICKLIST.name(),
+                            contentType : "text/html",
+                            stepNumber  : null,
+                            uri         : g.createLink(controller: 'picklist', action: "print", id: stockMovement?.requisition?.id, absolute: true, params: [sorted: true])
                     ]
             ])
 
@@ -2720,11 +3294,34 @@ class StockMovementService {
 
             if (!stockMovement?.origin?.isSupplier() && stockMovement?.origin?.supports(ActivityCode.MANAGE_INVENTORY)) {
                 documentList.add([
-                        name        : g.message(code: "deliveryNote.label", default: "Delivery Note"),
-                        documentType: DocumentGroupCode.DELIVERY_NOTE.name(),
-                        contentType : "text/html",
-                        stepNumber  : 5,
-                        uri         : g.createLink(controller: 'deliveryNote', action: "print", id: stockMovement?.requisition?.id, absolute: true)
+                        name           : g.message(code: "requisition.deliveryNote.label", default: "Delivery Note"),
+                        documentType   : DocumentGroupCode.DELIVERY_NOTE.name(),
+                        contentType    : "text/html",
+                        stepNumber     : 5,
+                        // We provide multiple sorting options for the delivery note as different download options so we
+                        // need to return a list of uris. The singular 'uri' is maintained for backwards compatability.
+                        uri            : g.createLink(controller: 'deliveryNote', action: "print", id: stockMovement?.requisition?.id, absolute: true),
+                        downloadOptions: [
+                                [
+                                        name: g.message(code: "requisition.deliveryNote.sortOrder.orderIndex.label", default: "Delivery Note (shipment order)"),
+                                        uri: g.createLink(
+                                                controller: 'deliveryNote',
+                                                action: "print",
+                                                id: stockMovement?.requisition?.id,
+                                                absolute: true,
+                                        ),
+                                ],
+                                [
+                                        name: g.message(code: "requisition.deliveryNote.sortOrder.product.label", default: "Delivery Note (alphabetical by product)"),
+                                        uri: g.createLink(
+                                                controller: 'deliveryNote',
+                                                action: "print",
+                                                id: stockMovement?.requisition?.id,
+                                                params: [sortOrder: 'PRODUCT'],
+                                                absolute: true,
+                                        ),
+                                ],
+                        ],
                 ])
             }
         }
@@ -2920,6 +3517,23 @@ class StockMovementService {
                 userService.isUserAdmin(user) ||
                 user?.id == stockMovement?.requestedBy?.id) &&
                 stockMovement.isInApprovalState()
+    }
+
+    void deleteComment(Comment comment, StockMovement stockMovement) {
+        Event event = Event.findByComment(comment)
+        if (event) {
+            event.comment = null
+        }
+        def associatedObject = stockMovement?.requisition ?: stockMovement?.shipment
+        associatedObject?.removeFromComments(comment)
+    }
+
+    Comment saveComment(Comment comment, StockMovement stockMovement) {
+        def associatedObject  = stockMovement?.requisition ?: stockMovement?.shipment
+        if (!comment.id) {
+            associatedObject?.addToComments(comment)
+        }
+        return comment.save()
     }
 
     ApplicationTagLib getApplicationTagLib() {

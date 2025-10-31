@@ -6,6 +6,7 @@ exports[`logo component should match snapshot 1`] = `
   data-testid="logo-wrapper"
 >
   <div
+    aria-label="logo"
     className="logo-square"
   >
     <a

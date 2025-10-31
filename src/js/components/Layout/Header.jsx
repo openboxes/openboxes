@@ -20,7 +20,7 @@ const Header = ({
   <div className="navbar p-0">
     {isImpersonated && <ImpersonateInfo />}
     {localizationModeEnabled && <LocalizationModeInfo />}
-    <nav className="navbar navbar-expand-md navbar-light bg-light bg-white main-wrapper p-0 px-md-4">
+    <nav className="navbar navbar-expand-md navbar-light bg-light bg-white main-wrapper p-0 px-md-4" aria-label="main">
       <div className="d-flex p-2 justify-content-between flex-1">
         <div className="d-flex align-items-center">
           <Logo />
@@ -49,9 +49,10 @@ const Header = ({
       ? <InfoBar {...values} key={bar} />
       : null
     )))}
-  </div>);
+  </div>
+);
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   isImpersonated: state.session.isImpersonated,
   localizationModeEnabled: state.session.localizationModeEnabled,
   bars: state.infoBar.bars,

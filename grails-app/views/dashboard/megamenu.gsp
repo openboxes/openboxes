@@ -5,7 +5,7 @@
         <g:each var="menuItem" in="${menu}">
             <g:if test="${menuItem?.href}">
                 <li id="${menuItem?.id}" class="nav-item dropdown align-items-center d-flex">
-                    <a href="${menuItem?.href}" class="nav-link flex-grow-1">
+                    <a href="${menuItem?.href}" class="nav-link flex-grow-1" role="menuitem" >
                         ${menuItem?.label}
                     </a>
                 </li>
@@ -13,7 +13,7 @@
             <g:else>
                 %{-- DROPDOWN NAV-ITEM ( show > break point ) browser view --}%
                 <li id="${menuItem?.id}" class="nav-item dropdown align-items-center d-none d-${breakPoint}-flex">
-                    <a class="nav-link dropdown-toggle">
+                    <a class="nav-link dropdown-toggle" role="menuitem">
                         ${menuItem?.label}
                     </a>
                     <div class="dropdown-menu d-block dropdown-menu-wrapper">
@@ -24,7 +24,7 @@
                                         <span class="subsection-title">${subsection?.label}</span>
                                     </g:if>
                                     <g:each in="${subsection?.menuItems}" var="item">
-                                        <a href="${item?.href}" class="dropdown-item">
+                                        <a href="${item?.href}" class="dropdown-item" role="menuitem">
                                             ${item?.label}
                                         </a>
                                     </g:each>
@@ -32,7 +32,7 @@
                             </g:each>
                             <div class="padding-8">
                                 <g:each in="${menuItem?.menuItems}" var="item">
-                                    <a href="${item?.href}" class="dropdown-item">
+                                    <a href="${item?.href}" class="dropdown-item" role="menuitem" >
                                         ${item?.label}
                                     </a>
                                 </g:each>
@@ -60,7 +60,7 @@
                                         <span class="subsection-title">${subsection?.label}</span>
                                     </g:if>
                                     <g:each in="${subsection?.menuItems}" var="item">
-                                        <a href="${item?.href}" class="dropdown-item">
+                                        <a href="${item?.href}" class="dropdown-item" role="menuitem" >
                                             ${item?.label}
                                         </a>
                                     </g:each>
@@ -68,7 +68,7 @@
                             </g:each>
                             <div class="padding-8">
                                 <g:each in="${menuItem?.menuItems}" var="item">
-                                    <a href="${item?.href}" class="dropdown-item">
+                                    <a href="${item?.href}" class="dropdown-item" role="menuitem">
                                         ${item?.label}
                                     </a>
                                 </g:each>

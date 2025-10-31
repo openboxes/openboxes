@@ -9,13 +9,8 @@ import LoadDemoDataInfo from 'components/load-demo-data/LoadDemoDataInfo';
 import LoadDemoDataProgressScreen from 'components/load-demo-data/LoadDemoDataProgressScreen';
 import LoadDemoDataWelcome from 'components/load-demo-data/LoadDemoDataWelcome';
 import { DASHBOARD_URL, LOCATION_CONFIGURATION_URL } from 'consts/applicationUrls';
+import LOAD_DATA_STEPS from 'consts/loadDataStep';
 import apiClient from 'utils/apiClient';
-
-export const LOAD_DATA_STEPS = {
-  createFirstLocation: 'CREATE_FIRST_LOCATION',
-  loadDemoData: 'LOAD_DEMO_DATA',
-  proceedLoadingDemoData: 'PROCEED_LOAD_DEMO_DATA',
-};
 
 class LoadDemoDataPage extends Component {
   constructor(props) {
@@ -64,6 +59,7 @@ class LoadDemoDataPage extends Component {
       <div className="modal-page">
         <div className="modal-page__content position-relative" style={{ minHeight: '450px' }}>
           <button
+            type="button"
             className="btn btn-lg position-absolute"
             style={{ right: '1rem' }}
             onClick={this.skipConfiguration}
@@ -71,23 +67,27 @@ class LoadDemoDataPage extends Component {
             <i className="fa fa-close" />
           </button>
           {
-            !this.state.currentStep &&
+            !this.state.currentStep
+            && (
             <LoadDemoDataWelcome
               skipConfiguration={this.skipConfiguration}
               goToStep={this.stepHandler}
             />
+            )
           }
           {
-            this.state.currentStep === LOAD_DATA_STEPS.loadDemoData &&
+            this.state.currentStep === LOAD_DATA_STEPS.loadDemoData
+            && (
             <LoadDemoDataInfo
               summaryItemsTitle={this.state.summaryData.title}
               summaryItemsList={this.state.summaryData.description}
               goToStep={this.stepHandler}
             />
+            )
           }
           {
-            this.state.currentStep === LOAD_DATA_STEPS.proceedLoadingDemoData &&
-              <LoadDemoDataProgressScreen goToStep={this.stepHandler} />
+            this.state.currentStep === LOAD_DATA_STEPS.proceedLoadingDemoData
+              && <LoadDemoDataProgressScreen goToStep={this.stepHandler} />
           }
         </div>
       </div>
@@ -95,7 +95,7 @@ class LoadDemoDataPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
 });
 

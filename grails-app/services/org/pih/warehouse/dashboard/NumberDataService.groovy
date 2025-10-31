@@ -4,6 +4,8 @@ import grails.core.GrailsApplication
 import grails.plugin.cache.Cacheable
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.joda.time.LocalDate
+
+import org.pih.warehouse.DateUtil
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -102,22 +104,48 @@ class NumberDataService {
 
     @Cacheable(value = "dashboardCache", key = { "getItemsInventoried-${location?.id}" })
     NumberData getItemsInventoried(Location location) {
-        Date firstOfMonth = LocalDate.now().withDayOfMonth(1).toDate();
+        Date firstOfMonth = LocalDate.now().withDayOfMonth(1).toDate()
+        return getItemsInventoriedInRange(location, firstOfMonth)
+    }
 
-        def itemsInventoried = TransactionEntry.executeQuery("""
+    /**
+     * Fetch the count of distinct products that have been inventoried in the given time range.
+     * "Inventoried" means any operation that performs a full quantity count for the product.
+     *
+     * @param location The facility that we want the count at.
+     * @param startDate The datetime in the past to start the check at. If null, will use the start of time.
+     * @param endDate The datetime in the past to check up until. If null, will use the current time.
+     */
+    NumberData getItemsInventoriedInRange(Location location, Date startDate=null, Date endDate=null) {
+        /**
+        * After migrating from single product inventory transaction to baseline + adjustment transactions
+        * there is a case when we might have only an adjustment if it's first inventory record
+        * and we can't rely on CREDIT type code for this case and ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID
+        * is only used for baseline + adjustment and for manual stock adjustment
+        */
+        List<String> transactionTypeIds = [
+                Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
+                Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID,
+                Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID
+        ]
+
+        List<TransactionEntry> itemsInventoried = TransactionEntry.executeQuery("""
             SELECT COUNT(distinct ii.product.id) from TransactionEntry te
             INNER JOIN te.inventoryItem ii
             INNER JOIN te.transaction t
             WHERE t.inventory = :inventory
-            AND t.transactionType.transactionCode = :transactionCode 
-            AND t.transactionDate >= :firstOfMonth""",
+            AND t.transactionType.id IN :transactionTypeIds
+            AND (t.comment <> :commentToFilter OR t.comment IS NULL)
+            AND t.transactionDate BETWEEN :startDate AND :endDate""",
                 [
-                        inventory      : location?.inventory,
-                        transactionCode: TransactionCode.PRODUCT_INVENTORY,
-                        firstOfMonth   : firstOfMonth,
+                        inventory          : location?.inventory,
+                        transactionTypeIds : transactionTypeIds,
+                        startDate          : startDate ?: DateUtil.EPOCH_DATE,
+                        endDate            : endDate ?: new Date(),
+                        commentToFilter    : Constants.INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT
                 ])
 
-        return new NumberData(itemsInventoried[0])
+        return new NumberData(itemsInventoried[0] as Double)
     }
 
     @Cacheable(value = "dashboardCache", key = { "getDefaultBin-${location?.id}" })

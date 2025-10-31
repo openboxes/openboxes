@@ -15,7 +15,6 @@ const INITIAL_STATE = {
   categoriesCount: 0,
 };
 
-
 class ReviewCategories extends Component {
   constructor(props) {
     super(props);
@@ -72,15 +71,16 @@ class ReviewCategories extends Component {
                 <a href={CATEGORY_URL.tree()} className="btn btn-primary float-right mt-3" rel="noopener noreferrer" target="_blank">
                   <Translate id="react.productsConfiguration.viewCategoryPage.label" defaultMessage="View Category Page" />
                 </a>
-              </div>) : (
-                <div className="d-flex flex-column justify-content-middle align-items-center col-6 offset-3">
-                  <h3>
-                    <Translate id="react.productsConfiguration.missingCategories.title" defaultMessage="No categories found" />
-                  </h3>
-                  <span style={{ textAlign: 'center' }}>
-                    <Translate id="react.productsConfiguration.missingCategories.message" />
-                  </span>
-                </div>
+              </div>
+            ) : (
+              <div className="d-flex flex-column justify-content-middle align-items-center col-6 offset-3">
+                <h3>
+                  <Translate id="react.productsConfiguration.missingCategories.title" defaultMessage="No categories found" />
+                </h3>
+                <span style={{ textAlign: 'center' }}>
+                  <Translate id="react.productsConfiguration.missingCategories.message" />
+                </span>
+              </div>
             )}
           </div>
         </div>

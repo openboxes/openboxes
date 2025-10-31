@@ -44,7 +44,11 @@ function addButton({
         addRow({ sortOrder: getSortOrder() });
         newItemAdded();
       }}
-    ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
+    >
+      <span>
+        <i className="fa fa-plus pr-2" />
+        <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
+      </span>
     </button>
   );
 }
@@ -72,6 +76,7 @@ const FIELDS = {
     flexWidth: '9',
     attributes: {
       showSelectedOptionColor: true,
+      includeUom: true,
     },
   },
   quantityOnHand: {
@@ -206,7 +211,6 @@ const LINE_ITEMS_ATTR = {
   addButton,
 };
 
-
 const NO_STOCKLIST_FIELDS = {
   lineItems: {
     ...LINE_ITEMS_ATTR,
@@ -218,7 +222,7 @@ const NO_STOCKLIST_FIELDS = {
         getDynamicAttr: ({
           rowIndex, rowCount, updateProductData, values, originId, focusField,
         }) => ({
-          onChange: value => updateProductData(value, values, rowIndex),
+          onChange: (value) => updateProductData(value, values, rowIndex),
           autoFocus: rowIndex === rowCount - 1,
           locationId: originId,
           onExactProductSelected: ({ product }) => {
@@ -356,13 +360,12 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PUSH_TYPE = {
           fieldValue, rowIndex, values, updateRow, calculateQtyRequested,
         }) => ({
           onBlur: () => {
-            const valuesWithUpdatedQtyRequested =
-              calculateQtyRequested(
-                values,
-                rowIndex,
-                fieldValue,
-                RequestFromWardTypes.STOCKLIST_PUSH_TYPE,
-              );
+            const valuesWithUpdatedQtyRequested = calculateQtyRequested(
+              values,
+              rowIndex,
+              fieldValue,
+              RequestFromWardTypes.STOCKLIST_PUSH_TYPE,
+            );
             updateRow(valuesWithUpdatedQtyRequested, rowIndex);
           },
         }),
@@ -445,13 +448,12 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PULL_TYPE = {
           fieldValue, rowIndex, values, updateRow, calculateQtyRequested,
         }) => ({
           onBlur: () => {
-            const valuesWithUpdatedQtyRequested =
-              calculateQtyRequested(
-                values,
-                rowIndex,
-                fieldValue,
-                RequestFromWardTypes.STOCKLIST_PULL_TYPE,
-              );
+            const valuesWithUpdatedQtyRequested = calculateQtyRequested(
+              values,
+              rowIndex,
+              fieldValue,
+              RequestFromWardTypes.STOCKLIST_PULL_TYPE,
+            );
             updateRow(valuesWithUpdatedQtyRequested, rowIndex);
           },
         }),
@@ -518,7 +520,7 @@ const REQUEST_FROM_WARD_FIELDS = {
           rowIndex, rowCount, updateProductData, values, newItem, originId, focusField,
         }) => ({
           locationId: originId,
-          onChange: value => updateProductData(value, values, rowIndex),
+          onChange: (value) => updateProductData(value, values, rowIndex),
           autoFocus: newItem && rowIndex === rowCount - 1,
           onExactProductSelected: ({ product }) => {
             if (focusField && product) {
@@ -555,8 +557,12 @@ const REQUEST_FROM_WARD_FIELDS = {
           fieldValue, rowIndex, values, updateRow, calculateQtyRequested,
         }) => ({
           onBlur: () => {
-            const valuesWithUpdatedQtyRequested =
-              calculateQtyRequested(values, rowIndex, fieldValue, RequestFromWardTypes.MANUAL);
+            const valuesWithUpdatedQtyRequested = calculateQtyRequested(
+              values,
+              rowIndex,
+              fieldValue,
+              RequestFromWardTypes.MANUAL,
+            );
             updateRow(valuesWithUpdatedQtyRequested, rowIndex);
           },
         }),
@@ -619,10 +625,11 @@ function calculateQuantityRequested(values, rowIndex, fieldValue, requestType) {
   // Options: quantityAllowed, demandPerReplenishmentPeriod, monthlyDemand
   // depending on request from ward type: stocklist push, stocklist pull, manual respectively
   const baseValue = lineItem[requestType.calculateQtyRequestedFrom];
-  if (baseValue && fieldValue) {
-    valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
-      baseValue - fieldValue >= 0 ?
-        baseValue - fieldValue : 0;
+  if (_.isNumber(baseValue) && fieldValue) {
+    const value = baseValue - fieldValue;
+    valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested = value >= 0
+      ? value
+      : 0;
   }
   return valuesWithUpdatedQtyRequested;
 }
@@ -659,8 +666,7 @@ class AddItemsPage extends Component {
     this.updateRow = this.updateRow.bind(this);
     this.updateProductData = this.updateProductData.bind(this);
     this.submitRequest = this.submitRequest.bind(this);
-    this.calculateQuantityRequested =
-      calculateQuantityRequested.bind(this);
+    this.calculateQuantityRequested = calculateQuantityRequested.bind(this);
     this.cancelRequest = this.cancelRequest.bind(this);
     this.save = this.save.bind(this);
     this.saveAndExit = this.saveAndExit.bind(this);
@@ -715,14 +721,14 @@ class AddItemsPage extends Component {
    */
   getLineItemsToBeSaved(lineItems) {
     // First find items that are new and should be added (don't have status code)
-    const lineItemsToBeAdded = _.filter(lineItems, item =>
+    const lineItemsToBeAdded = _.filter(lineItems, (item) =>
       !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product);
     // Then get a list of items that already exist in this request (have status code)
-    const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
+    const lineItemsWithStatus = _.filter(lineItems, (item) => item.statusCode);
     const lineItemsToBeUpdated = [];
     // For each already existing items - find the ones that have changed
     _.forEach(lineItemsWithStatus, (item) => {
-      const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
+      const oldItem = _.find(this.state.currentLineItems, (old) => old.id === item.id);
       const oldQty = parseInt(oldItem.quantityRequested, 10);
       const newQty = parseInt(item.quantityRequested, 10);
       const oldQtyOnHand = parseInt(oldItem.quantityOnHand, 10);
@@ -733,27 +739,27 @@ class AddItemsPage extends Component {
           _.keys(oldItem),
           _.keys(item),
         ),
-        key => key !== 'product',
+        (key) => key !== 'product',
       );
 
       if (
-        (this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory) &&
-        (
-          !_.isEqual(_.pick(item, keyIntersection), _.pick(oldItem, keyIntersection)) ||
-          (item.product.id !== oldItem.product.id)
+        (this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory)
+        && (
+          !_.isEqual(_.pick(item, keyIntersection), _.pick(oldItem, keyIntersection))
+          || (item.product.id !== oldItem.product.id)
         )
       ) {
         lineItemsToBeUpdated.push(item);
-      } else if (newQty !== oldQty || !item.quantityRequested ||
-        (oldItem.comments !== item.comments && !_.isNil(item.comments))
+      } else if (newQty !== oldQty || !item.quantityRequested
+        || (oldItem.comments !== item.comments && !_.isNil(item.comments))
         || oldQtyOnHand !== newQtyOnHand) {
         lineItemsToBeUpdated.push(item);
       }
     });
 
     const mapPropertiesOfItemsToBeAdded = (item) => {
-      const itemQuantityCounted = item.quantityOnHand ?
-        { quantityCounted: parseInt(item.quantityOnHand, 10) } : {};
+      const itemQuantityCounted = item.quantityOnHand
+        ? { quantityCounted: parseInt(item.quantityOnHand, 10) } : {};
       return {
         product: { id: item.product.id },
         quantityRequested: item.quantityRequested,
@@ -766,7 +772,7 @@ class AddItemsPage extends Component {
     // Combine items to be added and items to be updated into one list to be saved
     return [].concat(
       _.map(lineItemsToBeAdded, mapPropertiesOfItemsToBeAdded),
-      _.map(lineItemsToBeUpdated, item => ({
+      _.map(lineItemsToBeUpdated, (item) => ({
         id: item.id,
         ...mapPropertiesOfItemsToBeAdded(item),
       })),
@@ -774,9 +780,9 @@ class AddItemsPage extends Component {
   }
 
   getSortOrder() {
-    this.setState({
-      sortOrder: this.state.sortOrder + 100,
-    });
+    this.setState((prev) => ({
+      sortOrder: prev.sortOrder + 100,
+    }));
 
     return this.state.sortOrder;
   }
@@ -819,40 +825,40 @@ class AddItemsPage extends Component {
         data,
         (val) => {
           const { quantityRequested, demandPerReplenishmentPeriod, quantityAvailable } = val;
-          const qtyRequested =
-              quantityRequested || demandPerReplenishmentPeriod - quantityAvailable;
+          const qtyRequested = quantityRequested
+            || demandPerReplenishmentPeriod - quantityAvailable;
           return {
             ...val,
             disabled: true,
             quantityRequested: qtyRequested >= 0 ? qtyRequested : 0,
-            quantityOnHand: this.state.isRequestFromWard || isRequestOrigin ?
-              val.quantityCounted : val.quantityOnHand,
+            quantityOnHand: this.state.isRequestFromWard || isRequestOrigin
+              ? val.quantityCounted : val.quantityOnHand,
           };
         },
       );
     } else {
       lineItemsData = _.map(
         data,
-        val => ({
+        (val) => ({
           ...val,
           disabled: true,
-          quantityOnHand: this.state.isRequestFromWard || isRequestOrigin ?
-            val.quantityCounted : val.quantityOnHand,
+          quantityOnHand: this.state.isRequestFromWard || isRequestOrigin
+            ? val.quantityCounted : val.quantityOnHand,
         }),
       );
     }
 
     const sortOrder = _.toInteger(_.last(lineItemsData).sortOrder) + 100;
-    this.setState({
-      currentLineItems: this.props.isPaginated ?
-        _.uniqBy(_.concat(this.state.currentLineItems, data), 'id') : data,
+    this.setState((prev) => ({
+      currentLineItems: this.props.isPaginated
+        ? _.uniqBy(_.concat(prev.currentLineItems, data), 'id') : data,
       values: {
-        ...this.state.values,
-        lineItems: this.props.isPaginated ?
-          _.uniqBy(_.concat(this.state.values.lineItems, lineItemsData), 'id') : lineItemsData,
+        ...prev.values,
+        lineItems: this.props.isPaginated
+          ? _.uniqBy(_.concat(prev.values.lineItems, lineItemsData), 'id') : lineItemsData,
       },
       sortOrder,
-    }, () => {
+    }), () => {
       if (!_.isNull(startIndex) && this.state.values.lineItems.length !== this.state.totalCount) {
         this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
       }
@@ -864,7 +870,7 @@ class AddItemsPage extends Component {
     const printError = (lineItem, idx) => `${idx + 1}: ${this.props.translate('react.stockMovement.product.label', 'Product')} ${lineItem?.productCode} 
       ${this.props.translate('react.stockMovement.product.inactive.validation.label', 'has been discontinued. Please remove it from the requisition')}`;
     const inactiveProducts = lineItems
-      .filter(lineItem => !lineItem.product?.active)
+      .filter((lineItem) => !lineItem.product?.active)
       .map(printError);
     if (inactiveProducts.length) {
       return notification(NotificationType.ERROR_FILLED)({
@@ -876,9 +882,9 @@ class AddItemsPage extends Component {
   }
 
   updateTotalCount(value) {
-    this.setState({
-      totalCount: this.state.totalCount + value === 0 ? 1 : this.state.totalCount + value,
-    });
+    this.setState((prev) => ({
+      totalCount: prev.totalCount + value === 0 ? 1 : prev.totalCount + value,
+    }));
   }
 
   updateRow(values, index) {
@@ -891,7 +897,6 @@ class AddItemsPage extends Component {
   }
 
   dataFetched = false;
-
 
   validate(values) {
     const errors = {};
@@ -936,7 +941,7 @@ class AddItemsPage extends Component {
    * @public
    */
   exportTemplate(formValues) {
-    const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
+    const lineItems = _.filter(formValues.lineItems, (item) => !_.isEmpty(item));
 
     this.saveItemsAndExportTemplate(formValues, lineItems);
   }
@@ -984,12 +989,12 @@ class AddItemsPage extends Component {
 
     return apiClient.post(url, formData, config)
       .then(() => {
-        this.setState({
+        this.setState((prev) => ({
           values: {
-            ...this.state.values,
+            ...prev.values,
             lineItems: [],
           },
-        });
+        }));
         this.fetchLineItems();
       })
       .catch(() => {
@@ -1005,16 +1010,10 @@ class AddItemsPage extends Component {
   confirmSave(onConfirm) {
     confirmAlert({
       title: this.props.translate('react.stockMovement.message.confirmSave.label', 'Confirm save'),
-      message: this.state.isRequestFromWard ?
-        this.props.translate(
-          'react.stockMovement.QOHWillNotBeSaved.message',
-          'If there are any empty or zero quantity lines, those lines will be deleted. Are you sure you want to proceed?',
-        )
-        :
-        this.props.translate(
-          'react.stockMovement.confirmSave.message',
-          'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
-        ),
+      message: this.props.translate(
+        'react.stockMovement.QOHWillNotBeSaved.message',
+        'If there are any empty or zero quantity lines, those lines will be deleted. Are you sure you want to proceed?',
+      ),
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
@@ -1036,10 +1035,11 @@ class AddItemsPage extends Component {
   confirmTransition(onConfirm, items) {
     confirmAlert({
       title: this.props.translate('react.stockMovement.confirmTransition.label', 'You have entered the same code twice. Do you want to continue?'),
-      message: _.map(items, item => (
+      message: _.map(items, (item) => (
         <p key={item.sortOrder}>
           {`${item.product.productCode} ${item.product.displayNames?.default || item.product.name} ${item.quantityRequested}`}
-        </p>)),
+        </p>
+      )),
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
@@ -1081,7 +1081,7 @@ class AddItemsPage extends Component {
           totalCount: response.data.data.length,
         }, () => this.setLineItems(response, null));
       })
-      .catch(err => err);
+      .catch((err) => err);
   }
 
   isRowLoaded({ index }) {
@@ -1100,19 +1100,19 @@ class AddItemsPage extends Component {
       .then((resp) => {
         const { data: { hasManageInventory, statusCode }, totalCount } = resp.data;
 
-        this.setState({
+        this.setState((prev) => ({
           values: {
-            ...this.state.values,
+            ...prev.values,
             hasManageInventory,
             statusCode,
           },
           totalCount: totalCount === 0 ? 1 : totalCount,
           isRequestFromWard: isRequestFromWard(
             this.props.currentLocationId,
-            this.state.values.destination.id,
+            prev.values.destination.id,
             this.props.supportedActivities,
           ),
-        });
+        }));
         this.props.hideSpinner();
       })
       .catch(() => this.props.hideSpinner());
@@ -1135,9 +1135,9 @@ class AddItemsPage extends Component {
    * @public
    */
   nextPage(formValues) {
-    const lineItems = _.filter(formValues.lineItems, val => !_.isEmpty(val) && val.product);
+    const lineItems = _.filter(formValues.lineItems, (val) => !_.isEmpty(val) && val.product);
 
-    if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
+    if (_.some(lineItems, (item) => !item.quantityRequested || item.quantityRequested === '0')) {
       this.confirmSave(() =>
         this.checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems));
     } else {
@@ -1154,9 +1154,9 @@ class AddItemsPage extends Component {
         itemsMap[item.product.productCode] = [item];
       }
     });
-    const itemsWithSameCode = _.filter(itemsMap, item => item.length > 1);
+    const itemsWithSameCode = _.filter(itemsMap, (item) => item.length > 1);
 
-    if (_.some(itemsMap, item => item.length > 1) && !(this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory)) {
+    if (_.some(itemsMap, (item) => item.length > 1) && !(this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory)) {
       this.confirmTransition(
         () => this.saveAndTransitionToNextStep(formValues, lineItems),
         _.reduce(itemsWithSameCode, (a, b) => a.concat(b), []),
@@ -1229,7 +1229,7 @@ class AddItemsPage extends Component {
   }
 
   submitRequest(lineItems) {
-    const nonEmptyLineItems = _.filter(lineItems, val => !_.isEmpty(val) && val.product);
+    const nonEmptyLineItems = _.filter(lineItems, (val) => !_.isEmpty(val) && val.product);
     this.saveRequisitionItems(nonEmptyLineItems)
       .then(() => {
         if (supports(this.state.values.origin?.supportedActivities, ActivityCode.APPROVE_REQUEST)) {
@@ -1254,13 +1254,13 @@ class AddItemsPage extends Component {
     };
     if (payload.lineItems.length) {
       return apiClient.post(updateItemsUrl, payload)
-        .then(() => this.setState({
+        .then(() => this.setState((prev) => ({
           currentLineItems: [],
-          values: { ...this.state.values, lineItems: [] },
+          values: { ...prev.values, lineItems: [] },
           sortOrder: 0,
           newItem: false,
           totalCount: 0,
-        }, () => this.fetchAllData()))
+        }), () => this.fetchAllData()))
         .catch(() => Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items'))));
     }
     return Promise.resolve();
@@ -1272,9 +1272,8 @@ class AddItemsPage extends Component {
    * @public
    */
   save(formValues) {
-    const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
-    const zeroedLines = _.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0');
-    if (zeroedLines || this.state.isRequestFromWard) {
+    const lineItems = _.filter(formValues.lineItems, (item) => !_.isEmpty(item));
+    if (this.state.isRequestFromWard) {
       this.confirmSave(() => this.saveItems(lineItems));
     } else {
       this.saveItems(lineItems);
@@ -1344,8 +1343,8 @@ class AddItemsPage extends Component {
     };
     const errors = this.validate(formValues).lineItems;
     if (!errors.length) {
-      const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
-      const zeroedLines = _.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0');
+      const lineItems = _.filter(formValues.lineItems, (item) => !_.isEmpty(item));
+      const zeroedLines = _.some(lineItems, (item) => !item.quantityRequested || item.quantityRequested === '0');
       if (zeroedLines || this.state.isRequestFromWard) {
         this.confirmSave(() => {
           saveAndRedirect(lineItems);
@@ -1443,14 +1442,14 @@ class AddItemsPage extends Component {
 
     return apiClient.delete(removeItemsUrl)
       .then(() => {
-        this.setState({
+        this.setState((prev) => ({
           totalCount: 1,
           currentLineItems: [],
           values: {
-            ...this.state.values,
+            ...prev.values,
             lineItems: new Array(1).fill({ sortOrder: 100 }),
           },
-        });
+        }));
       })
       .catch(() => {
         this.fetchLineItems();
@@ -1502,9 +1501,8 @@ class AddItemsPage extends Component {
         });
     };
     if (!invalid) {
-      const lineItems = _.filter(values.lineItems, item => !_.isEmpty(item));
-      const zeroedLines = _.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0');
-      if (zeroedLines || this.state.isRequestFromWard) {
+      const lineItems = _.filter(values.lineItems, (item) => !_.isEmpty(item));
+      if (this.state.isRequestFromWard) {
         this.confirmSave(() => {
           saveAndRedirect(lineItems);
         });
@@ -1557,8 +1555,8 @@ class AddItemsPage extends Component {
         apiClient.get(url)
           .then((response) => {
             const { monthlyDemand, quantityAvailable, quantityOnHand } = response.data;
-            const quantityRequested = monthlyDemand - quantityAvailable > 0 ?
-              monthlyDemand - quantityAvailable : 0;
+            const quantityRequested = monthlyDemand - quantityAvailable > 0
+              ? monthlyDemand - quantityAvailable : 0;
             this.setState({
               values: update(values, {
                 lineItems: {
@@ -1608,7 +1606,10 @@ class AddItemsPage extends Component {
                 className={`float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs ${this.state.isRequestFromWard ? 'disabled' : ''}`}
                 title={this.state.isRequestFromWard ? 'Temporarily disabled' : ''}
               >
-                <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
+                <span>
+                  <i className="fa fa-download pr-2" />
+                  <Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" />
+                </span>
                 <input
                   id="csvInput"
                   type="file"
@@ -1721,19 +1722,18 @@ class AddItemsPage extends Component {
                 <button
                   type="submit"
                   onClick={() => this.inactiveProductValidation({
-                      lineItems: values.lineItems,
-                      callback: () => this.submitRequest(values.lineItems),
-                    })}
+                    lineItems: values.lineItems,
+                    callback: () => this.submitRequest(values.lineItems),
+                  })}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={
-                    invalid || !_.some(values.lineItems, item =>
-                        item.product && _.parseInt(item.quantityRequested))
+                    invalid || !_.some(values.lineItems, (item) =>
+                      item.product && _.parseInt(item.quantityRequested))
                   }
                 >
                   {supports(origin?.supportedActivities, ActivityCode.APPROVE_REQUEST)
                     ? <Translate id="react.default.button.submitForApproval.label" defaultMessage="Submit for approval" />
-                    : <Translate id="react.default.button.submitRequest.label" defaultMessage="Submit request" />
-                  }
+                    : <Translate id="react.default.button.submitRequest.label" defaultMessage="Submit request" />}
                 </button>
               </div>
             </form>
@@ -1744,7 +1744,7 @@ class AddItemsPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   minimumExpirationDate: state.session.minimumExpirationDate,

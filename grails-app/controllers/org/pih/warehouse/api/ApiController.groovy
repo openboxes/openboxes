@@ -14,6 +14,7 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.util.Environment
 import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
@@ -66,7 +67,12 @@ class ApiController {
             throw new ObjectNotFoundException(params.id, Locale.class.toString())
         }
         session.locale = locale
-        render([status: 200, text: "Current language is ${locale}"])
+        render([
+            data: [
+                activeLanguage: locale.toString(),
+                activeLanguageTag: locale.toLanguageTag()
+            ]
+        ] as JSON)
     }
 
     def getMenuConfig() {
@@ -91,7 +97,7 @@ class ApiController {
     def getAppContext() {
 
         def localizationMode
-        def locale = localizationService.getCurrentLocale()
+        def currentLocale = localizationService.getCurrentLocale()
         Object[] emptyArgs = [] as Object []
         def localizationModeLocale = grailsApplication.config.openboxes.locale.localizationModeLocale
         def displayDateFormat = grailsApplication.config.openboxes.display.date.format
@@ -102,7 +108,7 @@ class ApiController {
         if (session.useDebugLocale) {
 
             localizationMode = [
-                "label"      : messageSource.getMessage('localization.disable.label', emptyArgs, 'Disable translation mode', locale),
+                "label"      : messageSource.getMessage('localization.disable.label', emptyArgs, 'Disable translation mode', currentLocale),
                 "linkIcon"   : resource(dir: 'images/icons/silk', file: 'world_delete.png'),
                 "linkAction" : "${request.contextPath}/user/disableLocalizationMode",
                 "linkReactIcon" : "localization-mode",
@@ -111,7 +117,7 @@ class ApiController {
         else {
 
             localizationMode = [
-                    "label"     : messageSource.getMessage('localization.enable.label', emptyArgs, 'Enable translation mode', locale),
+                    "label"     : messageSource.getMessage('localization.enable.label', emptyArgs, 'Enable translation mode', currentLocale),
                     "linkIcon"  : resource(dir: 'images/icons/silk', file: 'world_add.png'),
                     "linkAction": "${request.contextPath}/user/enableLocalizationMode",
                     "linkReactIcon" : "localization-mode",
@@ -120,21 +126,21 @@ class ApiController {
         List<Map> menuItems = [
             [
                 "label"      : messageSource.getMessage('default.edit.label',
-                        [messageSource.getMessage('user.profile.label', emptyArgs, 'Profile', locale)] as Object[],
-                        'Enable translation mode', locale),
+                        [messageSource.getMessage('user.profile.label', emptyArgs, 'Profile', currentLocale)] as Object[],
+                        'Enable translation mode', currentLocale),
                 "linkIcon"   : resource(dir: 'images/icons/silk', file: 'user.png'),
                 "linkAction" : "${request.contextPath}/user/edit/${session?.user?.id}",
                 "linkReactIcon" : "profile",
             ],
             localizationMode,
             [
-                "label"      : messageSource.getMessage('cache.flush.label', emptyArgs, 'Refresh caches', locale),
+                "label"      : messageSource.getMessage('cache.flush.label', emptyArgs, 'Refresh caches', currentLocale),
                 "linkIcon"   : resource(dir: 'images/icons/silk', file: 'database_wrench.png'),
                 "linkAction" : "${request.contextPath}/dashboard/flushCache",
                 "linkReactIcon" : "flush-cache",
             ],
             [
-                "label"      : messageSource.getMessage('default.logout.label', emptyArgs, 'Logout', locale),
+                "label"      : messageSource.getMessage('default.logout.label', emptyArgs, 'Logout', currentLocale),
                 "linkIcon"   : resource(dir: 'images/icons/silk', file: 'door.png'),
                 "linkAction" : "${request.contextPath}/auth/logout",
                 "linkReactIcon" : "logout",
@@ -155,7 +161,7 @@ class ApiController {
         def supportedActivities = location.supportedActivities ?: location.locationType.supportedActivities
         boolean isImpersonated = session.impersonateUserId ? true : false
         def buildNumber = gitProperties.shortCommitId
-        def buildDate = grailsApplication.metadata.getProperty('build.time') ?: messageSource.getMessage('application.realTimeBuild.label', null, locale)
+        def buildDate = grailsApplication.metadata.getProperty('build.time') ?: messageSource.getMessage('application.realTimeBuild.label', null, currentLocale)
         def branchName = ConfigHelper.getBranchName(gitProperties)
         def grailsVersion = grailsApplication.metadata.getProperty('info.app.grailsVersion')
         def appVersion = grailsApplication.metadata.getProperty('info.app.version')
@@ -174,10 +180,11 @@ class ApiController {
         def browserConnectionTimeout = grailsApplication.config.openboxes.browser.connection.status.timeout
         def isAutosaveEnabled = grailsApplication.config.openboxes.client.autosave.enabled &&
                 supportedActivities.contains(ActivityCode.AUTOSAVE.name())
+        int cycleCountMaxSelectedProducts = grailsApplication.config.openboxes.cycleCount.products.maxAmount
         def defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale ?: "en")
         def supportedLocales = locales.collect {
-            def defaultName = new Locale(it)?.getDisplayName(locale ?: defaultLocale)
-            def name =  messageSource.getMessage("locale.${it}.label", null,  defaultName, (locale ?: defaultLocale))
+            def defaultName = LocalizationUtil.getLocale(it)?.getDisplayName(currentLocale ?: defaultLocale)
+            def name =  "${warehouse.message(code: "locale.${it}.label", default: defaultName)}"
             [code: it, name: name]
         }
         String currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
@@ -187,44 +194,46 @@ class ApiController {
 
         render([
             data: [
-                user                 : user,
-                location             : location,
-                currentLocationRoles: currentLocationRoles,
-                isSuperuser          : isSuperuser,
-                isUserAdmin          : isUserAdmin,
-                isUserApprover       : isUserApprover,
-                isUserRequestApprover: isUserRequestApprover,
-                isUserManager        : isUserManager,
-                supportedActivities  : supportedActivities,
-                isImpersonated       : isImpersonated,
-                grailsVersion        : grailsVersion,
-                appVersion           : appVersion,
-                branchName           : branchName,
-                buildNumber          : buildNumber,
-                environment          : environment.name,
-                buildDate            : buildDate,
-                ipAddress            : ipAddress,
-                hostname             : hostname,
-                timezone             : timezone,
-                minimumExpirationDate: minimumExpirationDate,
-                activeLanguage       : locale.language,
-                isPaginated          : isPaginated,
-                logoLabel            : logoLabel,
-                menuItems            : menuItems,
-                highestRole          : highestRole,
-                pageSize             : pageSize,
-                logoUrl              : logoUrl,
-                supportedLocales     : supportedLocales,
-                currencyCode         : currencyCode,
-                localizedHelpScoutKey: localizedHelpScoutKey,
-                isHelpScoutEnabled   : isHelpScoutEnabled,
-                localizationModeEnabled  : localizationModeEnabled,
-                localizationModeLocale   : localizationModeLocale,
-                displayDateFormat        : displayDateFormat,
-                displayDateDefaultValue  : displayDateDefaultValue,
-                notificationAutohideDelay: notificationAutohideDelay,
-                browserConnectionTimeout : browserConnectionTimeout,
-                isAutosaveEnabled        : isAutosaveEnabled
+                user                          : user,
+                location                      : location,
+                currentLocationRoles          : currentLocationRoles,
+                isSuperuser                   : isSuperuser,
+                isUserAdmin                   : isUserAdmin,
+                isUserApprover                : isUserApprover,
+                isUserRequestApprover         : isUserRequestApprover,
+                isUserManager                 : isUserManager,
+                supportedActivities           : supportedActivities,
+                isImpersonated                : isImpersonated,
+                grailsVersion                 : grailsVersion,
+                appVersion                    : appVersion,
+                branchName                    : branchName,
+                buildNumber                   : buildNumber,
+                environment                   : environment.name,
+                buildDate                     : buildDate,
+                ipAddress                     : ipAddress,
+                hostname                      : hostname,
+                timezone                      : timezone,
+                minimumExpirationDate         : minimumExpirationDate,
+                activeLanguage                : currentLocale.toString(),
+                activeLanguageTag             : currentLocale.toLanguageTag(),
+                isPaginated                   : isPaginated,
+                logoLabel                     : logoLabel,
+                menuItems                     : menuItems,
+                highestRole                   : highestRole,
+                pageSize                      : pageSize,
+                logoUrl                       : logoUrl,
+                supportedLocales              : supportedLocales,
+                currencyCode                  : currencyCode,
+                localizedHelpScoutKey         : localizedHelpScoutKey,
+                isHelpScoutEnabled            : isHelpScoutEnabled,
+                localizationModeEnabled       : localizationModeEnabled,
+                localizationModeLocale        : localizationModeLocale,
+                displayDateFormat             : displayDateFormat,
+                displayDateDefaultValue       : displayDateDefaultValue,
+                notificationAutohideDelay     : notificationAutohideDelay,
+                browserConnectionTimeout      : browserConnectionTimeout,
+                isAutosaveEnabled             : isAutosaveEnabled,
+                cycleCountMaxSelectedProducts : cycleCountMaxSelectedProducts,
             ],
         ] as JSON)
     }

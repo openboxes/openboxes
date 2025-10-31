@@ -5,7 +5,7 @@
 	 ${location.name}
 </div>
 <h2>Error Details</h2>
-<div class="message">
+<div class="message" role="status" aria-label="message">
 	<g:if test="${exception}">
 		<strong>Exception Message:</strong> ${exception.message} <br />
 		<strong>Caused by:</strong> ${exception.cause?.message} <br />

@@ -13,9 +13,11 @@ exports[`alert message should match snapshot 1`] = `
     }
   }
 >
-  <i
-    className="fa fa-exclamation-circle pr-2"
-  />
-  test message
+  <div>
+    <i
+      className="fa fa-exclamation-circle pr-2"
+    />
+    test message
+  </div>
 </div>
 `;

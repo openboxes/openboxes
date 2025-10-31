@@ -4,7 +4,7 @@ import BaseField from 'components/form-elements/BaseField';
 import Textarea from 'utils/Textarea';
 
 const TextareaField = (props) => {
-  const renderInput = attributes => (
+  const renderInput = (attributes) => (
     <Textarea
       {...attributes}
     />

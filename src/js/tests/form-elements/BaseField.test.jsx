@@ -62,7 +62,7 @@ xdescribe('BaseField component is correctly rendering', () => {
         getDynamicAttr: ({ dynamicProp }) => ({ hidden: true, dynamicAttr: dynamicProp }),
       },
       dynamicProp: 'dynamic property',
-      renderInput: attr => (<input {...attr} />),
+      renderInput: (attr) => (<input {...attr} />),
     };
 
     const rendered = renderer.create(<BaseField {...props} />);
@@ -70,4 +70,3 @@ xdescribe('BaseField component is correctly rendering', () => {
     expect(rendered.toJSON()).toMatchSnapshot();
   });
 });
-

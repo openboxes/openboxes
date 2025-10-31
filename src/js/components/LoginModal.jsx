@@ -8,7 +8,6 @@ import store from 'store';
 import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
-
 class LoginForm extends Component {
   constructor(props) {
     super(props);
@@ -48,7 +47,10 @@ class LoginForm extends Component {
     return (
       <div className="login-modal-container">
         <div className="login-modal-header px-3 py-2">
-          <span><i className="fa fa-unlock-alt pr-2" />{this.props.translate('react.default.login.label', 'Login')}</span>
+          <span>
+            <i className="fa fa-unlock-alt pr-2" />
+            {this.props.translate('react.default.login.label', 'Login')}
+          </span>
         </div>
         <div className="px-3">
           <input
@@ -74,10 +76,12 @@ class LoginForm extends Component {
             }}
           />
           <button
+            type="button"
             className="btn btn-outline-primary btn-block my-3"
             disabled={!this.state.username || !this.state.password}
             onClick={this.onLogin}
-          >{this.props.translate('react.default.button.login.label', 'Login')}
+          >
+            {this.props.translate('react.default.button.login.label', 'Login')}
           </button>
         </div>
       </div>
@@ -91,13 +95,13 @@ LoginForm.propTypes = {
   currentLocationId: PropTypes.string.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   currentLocationId: state.session.currentLocation.id,
 });
 
 const ConnectedLoginForm = connect(mapStateToProps)(LoginForm);
 
-const LoginModal = props => (<ConnectedLoginForm {...props} store={store} />);
+const LoginModal = (props) => (<ConnectedLoginForm {...props} store={store} />);
 
 export default LoginModal;

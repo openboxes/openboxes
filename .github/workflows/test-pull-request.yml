@@ -1,0 +1,17 @@
+name: Test Pull Request
+
+# Runs all tests whenever a pull request is created or updated.
+on:
+  # Use pull_request instead of pull_request_target for security purposes and so that tests run on the source branch
+  # (ie the PR branch), not the target branch.
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  run-frontend-tests:
+    uses: ./.github/workflows/frontend-tests.yml
+    secrets: inherit
+
+  run-backend-tests:
+    uses: ./.github/workflows/backend-tests.yml
+    secrets: inherit

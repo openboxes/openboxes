@@ -1,0 +1,23 @@
+name: 'Dependency Review'
+on:
+  pull_request:
+    branches: [ feature/upgrade-to-grails-3.3.10 ]
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+      - name: 'Dependency Review'
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: critical
+          # Remove the line below when npm will be bumped up to at least 8.3.0
+          # to be able to use the override section in package.json to fix critical vulnerabilities
+          # in nested dependencies of actually used dependencies. The line below prevents the action
+          # from failing, but still, all the critical vulnerabilities will be listed.
+          # https://docs.npmjs.com/cli/v8/configuring-npm/package-json#overrides
+          warn-only: true
+          base-ref: ${{ github.event.pull_request.base.sha || 'feature/upgrade-to-grails-3.3.10' }}
+          head-ref: ${{ github.event.pull_request.head.sha || github.ref }}

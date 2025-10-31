@@ -102,10 +102,10 @@ class StockTransferService {
         return orders
     }
 
-    def getStockTransferCandidates(Location location, params) {
+    def getStockTransferCandidates(Location location, Map params, Boolean showExpiredItemsOnly = false) {
         List<StockTransferItem> stockTransferItems = []
 
-        List stockTransferCandidates = productAvailabilityService.getStockTransferCandidates(location, params)
+        List stockTransferCandidates = productAvailabilityService.getStockTransferCandidates(location, params, showExpiredItemsOnly)
 
         stockTransferCandidates?.each { ProductAvailability productAvailability ->
             stockTransferItems << StockTransferItem.createFromProductAvailability(productAvailability)
@@ -417,7 +417,7 @@ class StockTransferService {
 
     def setQuantityOnHand(StockTransfer stockTransfer) {
         stockTransfer?.stockTransferItems?.each { StockTransferItem stockTransferItem ->
-            ProductAvailability pa = ProductAvailability.findByInventoryItemAndBinLocation(stockTransferItem.inventoryItem, stockTransferItem.originBinLocation)
+            ProductAvailability pa = ProductAvailability.findByInventoryItemAndBinLocationAndLocation(stockTransferItem.inventoryItem, stockTransferItem.originBinLocation, stockTransferItem.location)
             stockTransferItem.quantityOnHand = pa ? pa.quantityOnHand : 0
             stockTransferItem.quantityNotPicked = pa && pa.quantityNotPicked > 0 ? pa.quantityNotPicked: 0
             stockTransferItem.productAvailabilityId = pa ? pa.id : stockTransferItem.id

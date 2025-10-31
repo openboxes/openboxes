@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
 import renderer from 'react-test-renderer';
 
-import CreateInvoicePage from 'components/invoice/CreateInvoicePage';
+import CreateInvoicePage from 'components/invoice/create/CreateInvoicePage';
 import Wizard from 'components/wizard/Wizard';
 import WizardPage from 'components/wizard/WizardPage';
 import WizardSteps from 'components/wizard/WizardSteps';
@@ -18,7 +18,6 @@ let renderedWizardPage;
 let renderedWizardSteps;
 let renderedWizardTitle;
 
-
 describe('wizard component', () => {
   beforeEach(() => {
     const props = {
@@ -28,11 +27,15 @@ describe('wizard component', () => {
       pageList: [CreateInvoicePage],
       stepList: ['Create', 'Add items', 'Confirm'],
     };
-    renderedWizard = renderer.create(<Router><Provider
-      store={store}
-    ><Wizard {...props} />
-    </Provider>
-    </Router>);
+    renderedWizard = renderer.create(
+      <Router>
+        <Provider
+          store={store}
+        >
+          <Wizard {...props} />
+        </Provider>
+      </Router>,
+    );
   });
 
   it('should match snapshot', () => {
@@ -48,17 +51,21 @@ describe('wizard component', () => {
 
 describe('wizardPage component', () => {
   beforeEach(() => {
-    renderedWizardPage = renderer.create(<Router><Provider
-      store={store}
-    ><WizardPage
-      pageList={[CreateInvoicePage]}
-      nextPage={CreateInvoicePage}
-      prevPage={CreateInvoicePage}
-      goToPage={CreateInvoicePage}
-      currentPage={1}
-    />
-    </Provider>
-    </Router>);
+    renderedWizardPage = renderer.create(
+      <Router>
+        <Provider
+          store={store}
+        >
+          <WizardPage
+            pageList={[CreateInvoicePage]}
+            nextPage={CreateInvoicePage}
+            prevPage={CreateInvoicePage}
+            goToPage={CreateInvoicePage}
+            currentPage={1}
+          />
+        </Provider>
+      </Router>,
+    );
   });
 
   it('should match snapshot', () => {
@@ -74,11 +81,15 @@ describe('wizardPage component', () => {
 
 describe('wizardSteps component', () => {
   beforeEach(() => {
-    renderedWizardSteps = renderer.create(<Router><Provider
-      store={store}
-    ><WizardSteps steps={['firstTestStep', 'secondTestStep']} currentStep={1} />
-    </Provider>
-    </Router>);
+    renderedWizardSteps = renderer.create(
+      <Router>
+        <Provider
+          store={store}
+        >
+          <WizardSteps steps={['firstTestStep', 'secondTestStep']} currentStep={1} />
+        </Provider>
+      </Router>,
+    );
   });
 
   it('should match snapshot', () => {
@@ -87,23 +98,27 @@ describe('wizardSteps component', () => {
   });
 
   it('should have an active element', () => {
-    expect(renderedWizardSteps.root.findByProps({ 'data-testid': 'active' }))
+    expect(renderedWizardSteps.root.findByProps({ 'data-stepstate': 'active' }))
       .toBeTruthy();
   });
 
   it('should have an inactive element', () => {
-    expect(renderedWizardSteps.root.findByProps({ 'data-testid': 'inactive' }))
+    expect(renderedWizardSteps.root.findByProps({ 'data-stepstate': 'inactive' }))
       .toBeTruthy();
   });
 });
 
 describe('wizardTitle component', () => {
   beforeEach(() => {
-    renderedWizardTitle = renderer.create(<Router><Provider store={store}><WizardTitle
-      title={[{ title: '' }]}
-    />
-    </Provider>
-    </Router>);
+    renderedWizardTitle = renderer.create(
+      <Router>
+        <Provider store={store}>
+          <WizardTitle
+            title={[{ title: '' }]}
+          />
+        </Provider>
+      </Router>,
+    );
   });
 
   it('should match snapshot', () => {
@@ -117,13 +132,17 @@ describe('wizardTitle component', () => {
   });
 
   it('should display text correctly', () => {
-    render(<Router><Provider store={store}><WizardTitle title={[{
-      title: '',
-      text: 'test',
-    }]}
-    />
-    </Provider>
-    </Router>);
+    render(
+      <Router>
+        <Provider store={store}>
+          <WizardTitle title={[{
+            title: '',
+            text: 'test',
+          }]}
+          />
+        </Provider>
+      </Router>,
+    );
     expect(screen.getByText('test'))
       .toBeTruthy();
   });

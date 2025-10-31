@@ -1,12 +1,13 @@
 <%@ page import="util.ConfigHelper" %>
 <div id="inventoryForm">
-	<g:form action="saveRecordInventory" autocomplete="off">
+    %{--  OBPIH-7551: Disable the submit button once clicked to avoid multiple submits when multi-clicked  --}%
+	<g:form action="saveRecordInventory" autocomplete="off" onsubmit="saveInventoryItem.disabled = true; return true;">
 
 		<g:hiddenField name="product.id" value="${commandInstance.product?.id}"/>
 		<g:hiddenField name="inventory.id" value="${commandInstance?.inventory?.id}"/>
 
 		<div class="dialog">
-			<div class="box">
+			<section class="box" aria-label="Record Stock">
 				<h2><g:message code="inventory.record.label" default="Record Stock"/></h2>
 				<table>
 					<tr class="prop">
@@ -50,9 +51,9 @@
 						</td>
 					</tr>
 				</table>
-			</div>
+			</section>
 
-			<div class="box">
+			<section class="box" aria-label="Line Items">
 				<h2><warehouse:message code="default.lineItems.label" default="Line Items"/></h2>
 				<table id="inventoryItemsTable">
 					<thead>
@@ -71,7 +72,7 @@
                             <g:each var="recordInventoryRow" in="${commandInstance.recordInventoryRows}" status="status">
                                 <g:set var="styleClass" value="${params?.inventoryItem?.id && recordInventoryRow?.id == params?.inventoryItem?.id ? 'selected-row' : ''}"/>
                                 <tr class="${styleClass} ${status%2==0?'odd':'even'}" style="${recordInventoryRow.error ? 'background-color: #ffcccb;' : ''}">
-                                    <td>
+                                    <td aria-label="Bin Location">
 									<g:if test ="${!recordInventoryRow?.oldQuantity}">
 										<g:selectBinLocation  id="binLocation-${status}" class="binLocation" name="recordInventoryRows[${status}].binLocation.id"
 															  value="${recordInventoryRow?.binLocation?.id}" noSelection="['':'']"/>
@@ -103,7 +104,7 @@
 											</g:else>
 									</g:else>
                                     </td>
-                                    <td>
+                                    <td aria-label="Lot Number">
 										<g:if test ="${!recordInventoryRow?.oldQuantity}">
 											<g:textField id="lotNumber-${status}" class="lotNumber text" name="recordInventoryRows[${status}].lotNumber"
 														 size="25" value="${recordInventoryRow?.lotNumber}"/>
@@ -121,7 +122,7 @@
 											</g:else>
 										</g:else>
                                     </td>
-                                    <td>
+                                    <td aria-label="Expires">
 										<g:if test ="${!recordInventoryRow?.oldQuantity}">
 											<g:set var="currentYear" value="${new Date()[Calendar.YEAR]}"/>
 											<g:set var="minimumYear" value="${ConfigHelper.minimumExpirationDate[Calendar.YEAR]}"/>
@@ -139,19 +140,19 @@
 											</g:else>
 										</g:else>
                                     </td>
-                                    <td class="middle center">
+                                    <td aria-label="Previous Quantity" class="middle center">
                                         ${recordInventoryRow?.oldQuantity }
                                         <g:hiddenField name="recordInventoryRows[${status}].oldQuantity"
                                                        value="${recordInventoryRow?.oldQuantity }"/>
                                     </td>
-                                    <td class="middle center">
+                                    <td aria-label="New Quantity" class="middle center">
                                         <g:textField id="newQuantity-${status}" type="number"
                                                      class="newQuantity text"
                                                      name="recordInventoryRows[${status }].newQuantity" size="8"
                                                      value="${recordInventoryRow?.newQuantity }" />
 
                                     </td>
-									<td class="middle center">
+									<td aria-label="Comment" class="middle center">
 										<g:textField id="comment-${status }" class="text"
 													  name="recordInventoryRows[${status }].comment"
                                                       placeholder="${g.message(code:'transactionEntry.comment.message')}"
@@ -198,13 +199,10 @@
                                     </g:link>
 
                                 </div>
-							</div>
 						</td>
 					</tr>
 				</table>
-			</div>
-
-
+			</section>
 		</div>
 	</g:form>
 </div>
@@ -445,16 +443,16 @@
 <script id="newRowTemplate" type="x-jquery-tmpl">
 <tr id="row-{{= getIndex()}}" class="{{= getClass()}}">
 
-	<td style="max-width: 200px;">
+	<td aria-label="Bin Location" style="max-width: 200px;">
 		<g:selectBinLocationWithOptGroup id="binLocation-{{= getIndex()}}" class="binLocation" name="recordInventoryRows[{{= getIndex()}}].binLocation.id"
                              value="{{= BinLocation}}" noSelection="['':'']"/>
 
 	</td>
 
-	<td>
+	<td aria-label="Lot Number">
 		<g:textField id="lotNumber-{{= getIndex()}}" class="lotNumber text" name="recordInventoryRows[{{= getIndex()}}].lotNumber" value="{{= LotNumber}}" size="25" />
 	</td>
-	<td class="nowrap">
+	<td aria-label="Expires" class="nowrap">
         <style>
             .expirationDate {
                 background-image: url("${resource(dir: 'images/icons/silk', file: 'calendar.png')}");
@@ -472,23 +470,23 @@
                       precision="day"/>
 
     </td>
-	<td style="text-align: center; vertical-align: middle;">
+	<td aria-label="Previous Quantity" style="text-align: center; vertical-align: middle;">
 		{{= Qty}}
 		<g:hiddenField id="oldQuantity-{{= getIndex()}}" class="oldQuantity"
 			name="recordInventoryRows[{{= getIndex()}}].oldQuantity" value="{{= Qty}}"/>
 	</td>
-	<td style="text-align: center; vertical-align: middle;">
+	<td aria-label="New Quantity" style="text-align: center; vertical-align: middle;">
 		<g:textField
         id="newQuantity-{{= getIndex()}}" type="number" class="newQuantity text"
         name="recordInventoryRows[{{= getIndex()}}].newQuantity"
         size="8" value="{{= Qty}}" />
 	</td>
-	<td class="center middle">
+	<td aria-label="Comment" class="center middle">
 	    <g:textField id="comment-{{= getIndex()}}" class="text"
                      placeholder="${g.message(code:'transactionEntry.comment.message')}"
                      name="recordInventoryRows[{{= getIndex()}}].comment" style="width:100%;" value="" />
 	</td>
-	<td class="center">
+	<td aria-label="Delete" class="center">
 		<button onclick="removeRow({{= getIndex()}});" class="button icon trash" tabIndex="-1">
 			${warehouse.message(code: 'default.button.delete.label')}&nbsp;
 		</button>

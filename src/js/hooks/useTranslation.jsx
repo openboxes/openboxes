@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchTranslations } from 'actions';
 
 const useTranslation = (...toTranslate) => {
-  const { locale } = useSelector(state => ({
+  const { locale } = useSelector((state) => ({
     locale: state.session.activeLanguage,
   }));
 

@@ -15,29 +15,46 @@ const Checkbox = ({
   labelPosition,
   id,
   name,
+  noWrapper,
+  indeterminate,
+  className,
   ...fieldProps
-}) => (
-  <InputWrapper
-    title={title}
-    tooltip={tooltip}
-    button={button}
-    errorMessage={errorMessage}
-    inputId={id || name}
-    labelPosition={labelPosition}
-  >
-    <div className="form-element-checkbox">
-      <input
-        id={id || name}
-        name={name}
-        type="checkbox"
-        disabled={disabled}
-        className={`${errorMessage ? 'has-errors' : ''}`}
-        {...fieldProps}
-        checked={fieldProps.value}
-      />
-    </div>
-  </InputWrapper>
-);
+}) => {
+  const checkbox = (
+    <input
+      id={id || name}
+      name={name}
+      type="checkbox"
+      disabled={disabled}
+      className={`checkbox-v2 ${errorMessage ? 'has-errors' : ''} ${className}`}
+      {...fieldProps}
+      checked={fieldProps.value}
+      ref={(checkboxRef) => {
+        if (checkboxRef) {
+          // eslint-disable-next-line no-param-reassign
+          checkboxRef.indeterminate = indeterminate;
+        }
+      }}
+    />
+  );
+
+  return (
+    noWrapper ? checkbox : (
+      <InputWrapper
+        title={title}
+        tooltip={tooltip}
+        button={button}
+        errorMessage={errorMessage}
+        inputId={id || name}
+        labelPosition={labelPosition}
+      >
+        <div className="form-element-checkbox">
+          {checkbox}
+        </div>
+      </InputWrapper>
+    )
+  );
+};
 
 export default Checkbox;
 
@@ -69,6 +86,11 @@ Checkbox.propTypes = {
   id: PropTypes.string,
   // html element name
   name: PropTypes.string,
+  // Indicator whether we want to remove the wrapper from the checkbox
+  // it is needed to remove additional padding
+  noWrapper: PropTypes.bool,
+  indeterminate: PropTypes.bool,
+  className: PropTypes.string,
 };
 
 Checkbox.defaultProps = {
@@ -80,4 +102,7 @@ Checkbox.defaultProps = {
   id: undefined,
   name: undefined,
   labelPosition: 'right',
+  noWrapper: false,
+  indeterminate: false,
+  className: '',
 };

@@ -21,9 +21,9 @@ const canEditRequest = (currentUser, request, location) => {
       StockMovementStatus.PICKING,
     ];
     if (!statusesWithAbilityToEdit.includes(request?.statusCode)) {
-      return isUserRequestor &&
-        (isLocationDestination || isLocationOrigin) &&
-        request.statusCode !== StockMovementStatus.REJECTED;
+      return isUserRequestor
+        && (isLocationDestination || isLocationOrigin)
+        && request.statusCode !== StockMovementStatus.REJECTED;
     }
     // If the request is approved, everyone from the fulfilling location can edit
     return isLocationOrigin;

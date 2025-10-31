@@ -9,7 +9,9 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
-import { fetchLocationTypes, fetchTranslations, hideSpinner, showSpinner } from 'actions';
+import {
+  fetchLocationTypes, fetchTranslations, hideSpinner, showSpinner,
+} from 'actions';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import ActivityCode from 'consts/activityCode';
@@ -110,7 +112,7 @@ class AddDestinationModal extends Component {
   }
 
   mapToOptionsList(list) {
-    return _.map(list, locationType => ({
+    return _.map(list, (locationType) => ({
       ...locationType,
       label: splitTranslation(locationType.name, this.props.locale),
     }));
@@ -159,7 +161,7 @@ class AddDestinationModal extends Component {
             <Translate id="react.stockMovement.addDestination.label" defaultMessage="Add Destination" />
           </h4>
           <Form
-            onSubmit={values => this.save(values)}
+            onSubmit={(values) => this.save(values)}
             validate={validate}
             render={({ handleSubmit, values }) =>
               (
@@ -190,8 +192,7 @@ class AddDestinationModal extends Component {
                     </button>
                   </div>
                 </form>
-              )
-            }
+              )}
           />
         </div>
       </Modal>
@@ -199,7 +200,7 @@ class AddDestinationModal extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   locationTypes: state.location.locationTypes,

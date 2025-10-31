@@ -1,7 +1,7 @@
 <html>
   <head>
 	  <title>Unsupported Operation Error</title>
-	  <meta name="layout" content="custom" />	  
+	  <meta name="layout" content="custom" />
 	  <style type="text/css">
 	  		.message {
 	  			border: 1px solid black;
@@ -28,7 +28,7 @@
 
     <h2>Unsupported Operation</h2>
 
-  	<div class="message">
+  	<div class="message" role="status" aria-label="message">
 		<strong>Error ${request.'javax.servlet.error.status_code'}:</strong> ${request.'javax.servlet.error.message'}<br/>
 		<strong>Servlet:</strong> ${request.'javax.servlet.error.servlet_name'}<br/>
 		<strong>URI:</strong> ${request.'javax.servlet.error.request_uri'}<br/>

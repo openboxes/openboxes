@@ -1,0 +1,36 @@
+# Specifies the format of GitHub's auto-generated release notes
+# https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes
+changelog:
+  exclude:
+    labels:
+      - 'flag: ignore in release notes'
+      - 'type: release'
+
+  categories:
+    - title: 🚀 Features
+      labels:
+        - 'type: feature'
+
+    - title: 🐛 Bugfixes
+      labels:
+        - 'type: bug'
+
+    - title: 🛠️ Maintenance
+      labels:
+        - 'type: maintenance'
+
+    - title: ⬆️ Dependencies
+      labels:
+        - 'dependencies'
+        - 'type: dependency'
+
+    - title: 🎈 Miscellaneous
+      labels:
+        - '*'
+      exclude:
+        labels:
+          - 'type: feature'
+          - 'type: bug'
+          - 'type: maintenance'
+          - 'dependencies'
+          - 'type: dependency'

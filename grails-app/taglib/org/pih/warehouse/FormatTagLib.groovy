@@ -20,9 +20,12 @@ class FormatTagLib {
     static namespace = "format"
 
     /**
+     * @deprecated use g:formatDate from DateTagLib
+     *
      * Formats a Date
      * @attr obj REQUIRED the date to format
      */
+    @Deprecated
     def date = { attrs, body ->
         if (attrs.obj != null) {
             DateFormat df = new SimpleDateFormat((attrs.format) ?: Constants.DEFAULT_DATE_FORMAT)
@@ -31,9 +34,12 @@ class FormatTagLib {
     }
 
     /**
+     * @deprecated use g:formatDate from DateTagLib
+     *
      * Formats a DateTime
      * @attr obj REQUIRED the date to format
      */
+    @Deprecated
     def datetime = { attrs, body ->
         if (attrs.obj != null) {
             DateFormat df = new SimpleDateFormat(Constants.DEFAULT_DATE_TIME_FORMAT)
@@ -46,9 +52,12 @@ class FormatTagLib {
     }
 
     /**
+     * @deprecated use g:formatDate from DateTagLib
+     *
      * Formats an Expiration Date
      * @attr obj REQUIRED the date to format
      */
+    @Deprecated
     def expirationDate = { attrs, body ->
         if (attrs.obj) {
             DateFormat df = new SimpleDateFormat(Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT)
@@ -106,6 +115,7 @@ class FormatTagLib {
                         template: '/taglib/productDisplayName',
                         model: [
                                 product         : [ name: attrs.product?.name, productCode: attrs.product?.productCode ],
+                                productSupplier : [ name: attrs.productSupplier?.name, code: attrs.productSupplier?.code ],
                                 displayName     : displayNames[attrs.locale],
                                 showProductCode : attrs.showProductCode,
                         ],

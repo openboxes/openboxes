@@ -21,7 +21,7 @@ import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import { REQUISITION_TEMPLATE_URL } from 'consts/applicationUrls';
 import useStockListTableData from 'hooks/list-pages/stock-list/useStockListTableData';
-import ActionDots from 'utils/ActionDots';
+import ContextMenu from 'utils/ContextMenu';
 import { findActions } from 'utils/list-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -139,50 +139,53 @@ const StockListTable = ({
       sortable: false,
       style: { overflow: 'visible', zIndex: 1 },
       fixed: 'left',
-      Cell: row => (
-        <ActionDots
-          dropdownPlacement="right"
+      Cell: (row) => (
+        <ContextMenu
+          positions={['right']}
           dropdownClasses="action-dropdown-offset"
           actions={findActions(actions, row, { customFilter: customActionFilter, highestRole })}
           id={row.original.id}
-        />),
+        />
+      ),
     },
     {
       Header: <Translate id="react.stocklists.column.status.label" defaultMessage="Status" />,
       accessor: 'isPublished',
       fixed: 'left',
       width: 150,
-      Cell: row => (
+      Cell: (row) => (
         <StatusIndicator
           status={row.original.isPublished ? 'Published' : 'Draft'}
           variant={row.original.isPublished ? 'success' : 'danger'}
-        />),
+        />
+      ),
     },
     {
       Header: <Translate id="react.stocklists.column.name.label" defaultMessage="Name" />,
       accessor: 'name',
       fixed: 'left',
       minWidth: 250,
-      Cell: row => (
+      Cell: (row) => (
         <TableCell
           {...row}
           tooltip
           link={REQUISITION_TEMPLATE_URL.show(row.original.id)}
-        />),
+        />
+      ),
     },
     {
       Header: <Translate id="react.stocklists.filters.origin.label" defaultMessage="Origin" />,
       accessor: 'origin',
       minWidth: 250,
       fixed: 'left',
-      Cell: row => (<TableCell {...row} tooltip />),
+      Cell: (row) => (<TableCell {...row} tooltip />),
     },
     {
       Header: <Translate id="react.stocklists.filters.destination.label" defaultMessage="Destination" />,
       accessor: 'destination',
       minWidth: 250,
       fixed: 'left',
-      Cell: row => (<TableCell {...row} tooltip />),
+      Cell: (row) => (<TableCell {...row} tooltip />),
     },
     {
       Header: <Translate id="react.stocklists.column.requisitionItems.label" defaultMessage="Requisition items" />,
@@ -252,13 +255,12 @@ const StockListTable = ({
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   highestRole: state.session.highestRole,
 });
 
 export default connect(mapStateToProps)(StockListTable);
-
 
 StockListTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,

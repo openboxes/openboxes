@@ -56,9 +56,9 @@ const FIELDS = {
       autoload: false,
       cache: false,
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
-    getDynamicAttr: props => ({
+    getDynamicAttr: (props) => ({
       loadOptions: props.debouncedOriginLocationsFetch,
       disabled: !!props.inboundReturnId,
     }),
@@ -75,9 +75,9 @@ const FIELDS = {
       autoload: false,
       cache: false,
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
-    getDynamicAttr: props => ({
+    getDynamicAttr: (props) => ({
       loadOptions: props.debouncedDestinationLocationsFetch,
       disabled: !!props.inboundReturnId || !props.isSuperuser,
     }),
@@ -91,24 +91,22 @@ class CreateInboundReturn extends Component {
       values: this.props.initialValues,
     };
 
-    this.debouncedOriginLocationsFetch =
-      debounceLocationsFetch(
-        this.props.debounceTime,
-        this.props.minSearchLength,
-        [], // activityCodes
-        false, // fetchAll
-        false, // withOrgCode
-        true, // withTypeDescription
-        true, // isReturnOrder
-      );
+    this.debouncedOriginLocationsFetch = debounceLocationsFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+      [], // activityCodes
+      false, // fetchAll
+      false, // withOrgCode
+      true, // withTypeDescription
+      true, // isReturnOrder
+    );
 
-    this.debouncedDestinationLocationsFetch =
-      debounceLocationsFetch(
-        this.props.debounceTime,
-        this.props.minSearchLength,
-        [], // activityCodes
-        true, // fetchAll
-      );
+    this.debouncedDestinationLocationsFetch = debounceLocationsFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+      [], // activityCodes
+      true, // fetchAll
+    );
   }
 
   componentDidMount() {
@@ -177,10 +175,10 @@ class CreateInboundReturn extends Component {
 
   saveInboundReturns(values) {
     if (
-      values.origin &&
-      values.destination &&
-      values.description &&
-      !this.props.match.params.inboundReturnId
+      values.origin
+      && values.destination
+      && values.description
+      && !this.props.match.params.inboundReturnId
     ) {
       this.props.showSpinner();
 
@@ -216,7 +214,7 @@ class CreateInboundReturn extends Component {
   render() {
     return (
       <Form
-        onSubmit={values => this.saveInboundReturns(values)}
+        onSubmit={(values) => this.saveInboundReturns(values)}
         validate={validate}
         initialValues={this.state.values}
         mutators={{
@@ -252,7 +250,7 @@ class CreateInboundReturn extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   location: state.session.currentLocation,
   isSuperuser: state.session.isSuperuser,
   debounceTime: state.session.searchConfig.debounceTime,

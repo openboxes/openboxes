@@ -77,7 +77,7 @@
         </div>
     </g:if>
     <g:if test="${session.impersonateUserId}">
-        <div class="impersonate-box d-flex justify-content-between align-items-center">
+        <div class="impersonate-box d-flex justify-content-between align-items-center" role="alert" aria-label="impersonate">
             <div class="info d-flex align-items-center">
                 <i class="ri-shield-user-line"></i>
                 <span>
@@ -123,7 +123,7 @@
 
     <!-- Header "hd" includes includes logo, global navigation -->
     <g:if test="${session?.user && session?.warehouse}">
-        <div id="main-wrapper" class="navbar navbar-expand-md navbar-light bg-light bg-white p-0 px-md-4">
+        <nav aria-label="main" id="main-wrapper" class="navbar navbar-expand-md navbar-light bg-light bg-white p-0 px-md-4">
             <div class="d-flex p-2 p-md-0 justify-content-between flex-grow-1">
                 <div class="d-flex align-items-center">
                 <g:displayLogo location="${session?.warehouse?.id}" includeLink="${true}" />
@@ -139,6 +139,7 @@
                     <button
                         class="btn-show-dialog location-chooser__button"
                         style="${locationColorVariable}"
+                        aria-label="location-chooser"
                         data-dialog-class="location-chooser"
                         data-resizable="false"
                         data-draggable="true"
@@ -173,7 +174,7 @@
             <div class="collapse navbar-collapse w-100" id="navbarToggler">
                 <g:include controller="dashboard" action="megamenu" />
             </div>
-        </div>
+        </nav>
     </g:if>
 
 
@@ -398,6 +399,9 @@
                         .removeClass("ui-icon")
                         .addClass("ri-close-line")
                         .empty();
+
+                $(".ui-dialog-titlebar-close")
+                        .attr('aria-label', 'close');
             },
             close: function(event, ui) {
               if (reload) {
@@ -490,7 +494,11 @@
       });
 
       // Select 2 default configuration
-      $(".select2")
+      // Note that we only apply the default configuration to <select> elements that have the "select2" class because
+      // we only want this default config to be applied to old selectors in the SelectTagLib (users of the taglib set
+      // the "select2", "select2withTag", or "ajaxSelect2" classes to invoke specific defaults).
+      // New flows use the g:selectAjax taglib as defined in SelectTagLib which handles setting its own defaults.
+      $("select.select2")
       .select2({
         placeholder: $(this).data("placeholder") || 'Select an option',
         width: '100%',

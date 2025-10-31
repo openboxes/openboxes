@@ -30,7 +30,7 @@ changes.
 1. Select openboxes-release
 1. Change the Branch to release/x.y.z
 
-![Change Release Branch](../../img/bamboo-change-release-branch.png "Change Release Branch")
+![Change Release Branch](../../assets/img/bamboo-change-release-branch.png "Change Release Branch")
 
 Bamboo should automatically trigger a build for OBNAVSTAGE, but if that doesn't happen within a 
 few minutes just go to the build plan page and trigger it manually.

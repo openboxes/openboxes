@@ -3,11 +3,12 @@
 import React, { Component } from 'react';
 
 import PropTypes from 'prop-types';
-import { Bar, Doughnut, HorizontalBar, Line } from 'react-chartjs-2';
+import {
+  Bar, Doughnut, HorizontalBar, Line,
+} from 'react-chartjs-2';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { SortableElement } from 'react-sortable-hoc';
-import { Tooltip } from 'react-tippy';
 
 import DragHandle from 'components/dashboard/DragHandle';
 import LoadingCard from 'components/dashboard/LoadingCard';
@@ -16,6 +17,7 @@ import NumbersRAG from 'components/dashboard/NumbersRAG';
 import NumbersTableCard from 'components/dashboard/NumbersTableCard';
 import TableCard from 'components/dashboard/TableCard';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 // TODO: OBPIH-4384 Refactor FilterComponent to be more generic.
 // It should be built from config instead of being hardcoded (and move it out to separate file)
@@ -39,7 +41,7 @@ class FilterComponent extends Component {
     if (dropdown.id === 'locationSelector') {
       params = timeFrame !== null ? `querySize=${timeFrame}&` : params;
       params = `${params}destinationLocation=${dropdown.value}`;
-      const locationSelected = this.props.allLocations.find(value => value.id === dropdown.value);
+      const locationSelected = this.props.allLocations.find((value) => value.id === dropdown.value);
       this.setState({ locationSelected });
     }
     if (element.target.id === 'timeFrameSelector') {
@@ -62,13 +64,14 @@ class FilterComponent extends Component {
   render() {
     return (
       <div className="data-filter">
-        { this.props.locationFilter &&
+        { this.props.locationFilter
+          && (
           <select
             className="location-filter custom-select"
             size="1"
             onFocus={(e) => { e.target.size = 3; }}
             onBlur={(e) => { e.target.size = 1; }}
-            onChange={e => this.handleChange(e, this.props.cardId, this.props.loadIndicator)}
+            onChange={(e) => this.handleChange(e, this.props.cardId, this.props.loadIndicator)}
             disabled={!this.props.locationFilter}
             value={this.state.locationSelected.id}
             id="locationSelector"
@@ -79,17 +82,23 @@ class FilterComponent extends Component {
                   <option key={value.id} value={value.id}>
                     {this.props.translate(value.name.code, value.name.message)}
                   </option>
-                      );
+                );
               }
-              return <option key={value.id} value={value.id}> {value.name}</option>;
+              return (
+                <option key={value.id} value={value.id}>
+                  {' '}
+                  {value.name}
+                </option>
+              );
             })}
 
           </select>
-        }
-        { this.props.timeFilter &&
+          )}
+        { this.props.timeFilter
+          && (
           <select
             className="time-filter custom-select"
-            onChange={e => this.handleChange(e, this.props.cardId, this.props.loadIndicator)}
+            onChange={(e) => this.handleChange(e, this.props.cardId, this.props.loadIndicator)}
             disabled={!this.props.timeFilter}
             defaultValue={this.state.timeFrame}
             id="timeFrameSelector"
@@ -98,11 +107,11 @@ class FilterComponent extends Component {
               {this.props.translate(
                 this.props.label[0],
                 this.props.label[1],
-              {
-                number: '',
-                timeUnit: this.props.translate('react.dashboard.timeFilter.month.label', 'Month'),
-              },
-            )}
+                {
+                  number: '',
+                  timeUnit: this.props.translate('react.dashboard.timeFilter.month.label', 'Month'),
+                },
+              )}
             </option>
             <option value="3">
               {this.props.translate(
@@ -124,18 +133,23 @@ class FilterComponent extends Component {
                 },
               )}
             </option>
-            <option value="12">
-              {this.props.translate(
-                this.props.label[0],
-                this.props.label[1],
-                {
-                  number: '',
-                  timeUnit: this.props.translate('react.dashboard.timeFilter.year.label', 'Year'),
-                },
-              )}
-            </option>
             {
-              this.props.timeLimit === 24 &&
+              (this.props.timeLimit >= 12 || !this.props.timeLimit) && (
+              <option value="12">
+                {this.props.translate(
+                  this.props.label[0],
+                  this.props.label[1],
+                  {
+                    number: '',
+                    timeUnit: this.props.translate('react.dashboard.timeFilter.year.label', 'Year'),
+                  },
+                )}
+              </option>
+              )
+            }
+            {
+              this.props.timeLimit === 24
+              && (
               <option value="24">
                 {this.props.translate(
                   this.props.label[0],
@@ -146,22 +160,24 @@ class FilterComponent extends Component {
                   },
                 )}
               </option>
+              )
             }
           </select>
-        }
+          )}
         {this.props.yearTypeFilter && (
           <select
             className="time-filter custom-select"
-            onChange={e => this.handleChange(e, this.props.cardId, this.props.loadIndicator)}
+            onChange={(e) => this.handleChange(e, this.props.cardId, this.props.loadIndicator)}
             disabled={!this.props.yearTypeFilter}
             defaultValue={this.state.yearType || this.props.yearTypeFilter.defaultValue}
             id="yearTypeSelector"
           >
-            {this.props.yearTypeFilter.options && this.props.yearTypeFilter.options.map(option => (
-              <option value={option.value}>
-                {this.props.translate(option.label, option.label)}
-              </option>
-            ))}
+            {this.props.yearTypeFilter.options
+              && this.props.yearTypeFilter.options.map((option) => (
+                <option value={option.value}>
+                  {this.props.translate(option.label, option.label)}
+                </option>
+              ))}
           </select>
         )}
       </div>
@@ -200,7 +216,7 @@ const GraphCard = SortableElement(({
   let label = ['react.dashboard.timeFilter.last.label', 'last ${0} ${1}'];
 
   const translateDataLabels = (listLabels) => {
-    const listTranslated = listLabels.map(labelToTranslate =>
+    const listTranslated = listLabels.map((labelToTranslate) =>
       translate(labelToTranslate.code, labelToTranslate.message));
     return listTranslated;
   };
@@ -216,7 +232,7 @@ const GraphCard = SortableElement(({
       <Line
         data={data}
         options={options}
-        onElementsClick={elements => handleChartClick(elements)}
+        onElementsClick={(elements) => handleChartClick(elements)}
       />
     );
     // eslint-disable-next-line no-template-curly-in-string
@@ -226,11 +242,13 @@ const GraphCard = SortableElement(({
   } else if (cardType === 'doughnut') {
     graph = <Doughnut data={data} options={options} />;
   } else if (cardType === 'horizontalBar') {
-    graph = (<HorizontalBar
-      data={data}
-      options={options}
-      onElementsClick={elements => handleChartClick(elements)}
-    />);
+    graph = (
+      <HorizontalBar
+        data={data}
+        options={options}
+        onElementsClick={(elements) => handleChartClick(elements)}
+      />
+    );
   } else if (cardType === 'numbers') {
     graph = <Numbers data={data} options={options} />;
   } else if (cardType === 'numbersCustomColors') {
@@ -242,7 +260,11 @@ const GraphCard = SortableElement(({
   } else if (cardType === 'loading') {
     graph = <LoadingCard />;
   } else if (cardType === 'error') {
-    graph = <button onClick={() => loadIndicator(widgetId)} ><i className="fa fa-repeat" /></button>;
+    graph = (
+      <button type="button" onClick={() => loadIndicator(widgetId)}>
+        <i className="fa fa-repeat" />
+      </button>
+    );
   }
 
   return (
@@ -261,21 +283,16 @@ const GraphCard = SortableElement(({
             </span>
           )}
         {
-          cardInfo ?
-            <div className="graph-infos">
-              <Tooltip
-                html={
-                  <p>
-                    {translate(cardInfo, cardInfo)}
-                  </p>
-                }
-                theme="transparent"
-                arrow="true"
-              >
-                <i className="fa fa-info-circle" />
-              </Tooltip>
-            </div>
-        : null}
+          cardInfo
+            ? (
+              <div className="graph-infos">
+                <CustomTooltip content={translate(cardInfo, cardInfo)}>
+                  <i className="fa fa-info-circle" />
+                </CustomTooltip>
+              </div>
+            )
+            : null
+}
         {!hideDraghandle && <DragHandle />}
       </div>
       <div className="content-card">
@@ -301,7 +318,7 @@ const GraphCard = SortableElement(({
   );
 });
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 

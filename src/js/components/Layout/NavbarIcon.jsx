@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip } from 'react-tippy';
 
-const NavbarIcon = ({ tooltip, component }) => {
+const NavbarIcon = ({ tooltip, component, name }) => {
   const [isTooltipDisabled, setIsTooltipDisabled] = useState(false);
 
   return (
@@ -12,7 +12,9 @@ const NavbarIcon = ({ tooltip, component }) => {
       theme="transparent"
       disabled={isTooltipDisabled}
     >
-      {component({ setIsTooltipDisabled })}
+      <div data-testid="navbar-icon" aria-label={name}>
+        {component({ setIsTooltipDisabled })}
+      </div>
     </Tooltip>
   );
 };
@@ -22,5 +24,5 @@ export default NavbarIcon;
 NavbarIcon.propTypes = {
   tooltip: PropTypes.string.isRequired,
   component: PropTypes.func.isRequired,
+  name: PropTypes.string.isRequired,
 };
-

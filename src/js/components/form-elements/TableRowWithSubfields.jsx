@@ -7,7 +7,6 @@ import { FieldArray } from 'react-final-form-arrays';
 import TableBody from 'components/form-elements/TableBody';
 import TableRow from 'components/form-elements/TableRow';
 
-
 class TableRowWithSubfields extends Component {
   constructor(props) {
     super(props);
@@ -45,19 +44,19 @@ class TableRowWithSubfields extends Component {
     }
   }
 
-
   render() {
     const {
       fieldsConfig, index, field, properties, rowValues = {},
     } = this.props;
-    const dynamicAttr = fieldsConfig.getDynamicRowAttr ?
-      fieldsConfig.getDynamicRowAttr({ ...properties, index, rowValues }) : {};
+    const dynamicAttr = fieldsConfig.getDynamicRowAttr
+      ? fieldsConfig.getDynamicRowAttr({ ...properties, index, rowValues }) : {};
     const { subfieldKey } = fieldsConfig;
 
     return (
       <div>
         <TableRow {...this.props} />
-        { !dynamicAttr.hideSubfields &&
+        { !dynamicAttr.hideSubfields
+          && (
           <FieldArray
             name={`${field}.${subfieldKey}`}
             component={TableBody}
@@ -77,7 +76,7 @@ class TableRowWithSubfields extends Component {
               this.fieldRefs[elIndex][fieldName] = el;
             }}
           />
-        }
+          )}
       </div>
     );
   }

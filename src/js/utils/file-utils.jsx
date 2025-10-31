@@ -6,6 +6,6 @@ export const convertToBase64 = (file) => {
 
   return new Promise((resolve, reject) => {
     reader.onload = () => resolve(reader.result.split(',')[1]);
-    reader.onerror = error => reject(error);
+    reader.onerror = (error) => reject(error);
   });
 };

@@ -1,0 +1,79 @@
+# Automatically adds labels to a pull request.
+# https://github.com/actions/labeler
+
+"type: bug":
+  - head-branch: ['^bug/', '^bugfix/']
+
+"type: feature":
+  - head-branch: ['^feature/', '^feat/', '^ft/']
+
+"type: maintenance":
+  - head-branch: ['^maintenance/', '^techdebt/', '^td/', '^chore/']
+
+"type: release":
+  - head-branch: ['^release/']
+
+"warn: do not squash":
+  - head-branch: ['^release/', '^develop', '^master']
+
+"domain: l10n":
+  - head-branch: ['l10n']
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'grails-app/i18n/**/*'
+
+"flag: ignore in release notes":
+  - head-branch: ['l10n']
+
+"domain: backend":
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/main/groovy/**/*'
+      - 'grails-app/controllers/**/*'
+      - 'grails-app/domain/**/*'
+      - 'grails-app/jobs/**/*'
+      - 'grails-app/services/**/*'
+      - 'grails-app/utils/**/*'
+
+"domain: frontend":
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'grails-app/taglib/**/*'
+      - '**/*.js'
+      - '**/*.jsx'
+      - '**/*.scss'
+      - '**/*.css'
+      - '**/*.html'
+      - '**/*.gsp'
+
+"domain: devops":
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/**/*'
+      - 'docker/**/*'
+
+"domain: documentation":
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'docs/**/*'
+      - '**/*.md'
+      - 'readthedocs.yml'
+      - 'mkdocs.yml'
+
+"flag: config change":
+- all:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'grails-app/conf/**/*'
+      - 'grails-app/init/**/*'
+      - '**/*.gradle'
+      - '**/*.properties'
+      - 'package.json'
+      - 'package-lock.json'
+    - all-globs-to-all-files:
+      - '!grails-app/i18n/**/*'
+
+"flag: schema change":
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'grails-app/migrations/**/*'

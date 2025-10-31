@@ -19,7 +19,7 @@
             	<div class="message">${flash.message}</div>
             </g:if>
             <g:hasErrors bean="${glAccount}">
-	            <div class="errors">
+	            <div class="errors" role="alert" aria-label="error-message">
 	                <g:renderErrors bean="${glAccount}" as="list" />
 	            </div>
             </g:hasErrors>
@@ -40,7 +40,7 @@
 					<h2><warehouse:message code="default.create.label" args="[entityName]" /></h2>
 					<table>
 						<tbody>
-						
+
 							<tr class="prop">
 								<td valign="middle" class="name">
 									<label for="code"><warehouse:message code="glAccount.code.label" default="Code" /></label>
@@ -49,7 +49,7 @@
 									<g:textField class="text" size="80" name="code" value="${glAccount?.code}" />
 								</td>
 							</tr>
-						
+
 							<tr class="prop">
 								<td valign="middle" class="name">
 									<label for="name"><warehouse:message code="glAccount.name.label" default="Name" /></label>
@@ -58,7 +58,7 @@
 									<g:textField class="text" size="80" name="name" value="${glAccount?.name}" />
 								</td>
 							</tr>
-						
+
 							<tr class="prop">
 								<td valign="middle" class="name">
 									<label for="description"><warehouse:message code="glAccount.description.label" default="Description" /></label>
@@ -67,7 +67,7 @@
 									<g:textField class="text" size="80" name="description" value="${glAccount?.description}" />
 								</td>
 							</tr>
-						
+
 							<tr class="prop">
 								<td valign="middle" class="name">
 									<label for="glAccountType.id"><warehouse:message code="glAccount.glAccountType.label" default="GL Account Type" /></label>
@@ -79,7 +79,7 @@
 														  class="chzn-select-deselect" />
 								</td>
 							</tr>
-						
+
 							<tr class="prop">
 								<td valign="middle"></td>
 								<td valign="middle">

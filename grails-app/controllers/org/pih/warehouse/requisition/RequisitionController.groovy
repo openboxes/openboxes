@@ -20,7 +20,6 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
-import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
@@ -32,6 +31,7 @@ class RequisitionController {
 
     def dataService
     def requisitionService
+    RequisitionIdentifierService requisitionIdentifierService
     def inventoryService
     def productService
 
@@ -103,7 +103,7 @@ class RequisitionController {
                 requisition.commodityClass = params.commodityClass as CommodityClass
             }
             requisition.name = getName(requisition)
-            requisition.requestNumber = requisitionService.getIdentifierService().generateRequisitionIdentifier()
+            requisition.requestNumber = requisitionIdentifierService.generate(requisition)
             requisition = requisitionService.saveRequisition(requisition)
             if (!requisition.hasErrors()) {
                 redirect(controller: "requisition", action: "edit", id: requisition?.id)
@@ -583,7 +583,7 @@ class RequisitionController {
             response.setHeader("Content-disposition",
                     "attachment; filename=\"Requisitions-${date ? date.format("yyyyMMdd-hhmmss") : ""}.csv\"")
             response.contentType = "text/csv"
-            def csv = dataService.exportRequisitions(requisitions)
+            def csv = requisitionService.exportRequisitions(requisitions)
             println "export requisitions: " + csv
             render(contentType: "text/csv", text: csv, encoding: "UTF-8")
         } else {
@@ -599,7 +599,7 @@ class RequisitionController {
             response.setHeader("Content-disposition",
                     "attachment; filename=\"Requisitions-${date ? date.format("yyyyMMdd-hhmmss") : ""}.csv\"")
             response.contentType = "text/csv"
-            def csv = dataService.exportRequisitionItems(requisitions)
+            def csv = requisitionService.exportRequisitionItems(requisitions)
             println "export requisitions: " + csv
             render(contentType: "text/csv", text: csv, encoding: "UTF-8")
         } else {
@@ -615,7 +615,7 @@ class RequisitionController {
             response.setHeader("Content-disposition",
                     "attachment; filename=\"Requisitions-${date ? date.format("yyyyMMdd-hhmmss") : ""}.csv\"")
             response.contentType = "text/csv"
-            def csv = dataService.exportRequisitions(requisitions)
+            def csv = requisitionService.exportRequisitions(requisitions)
             println "export requisitions: " + csv
             render(contentType: "text/csv", text: csv, encoding: "UTF-8")
         } else {

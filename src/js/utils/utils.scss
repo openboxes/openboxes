@@ -3,6 +3,7 @@
   min-width: 600px;
   box-shadow: 0 0 4px 0 #00000040;
   padding: 20px;
+  max-width: 1200px;
 
   div {
     gap: 15px;
@@ -55,4 +56,72 @@
 
 .product-supplier-buttons-container {
   height: 100px;
+}
+
+.text-blue-primary {
+  color: var(--blue-primary);
+}
+
+.text-blue-400 {
+  color: var(--blue-400);
+}
+
+.context-menu {
+  background-color: white;
+  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+
+  .dropdown-item {
+    color: var(--blue-700) !important;;
+
+    &:hover {
+      background-color: var(--blue-300) !important;
+    }
+  }
+
+  .font-red-ob {
+    color: var(--color-red) !important;
+  }
+}
+
+.react-tiny-popover-container {
+  z-index: 999;
+}
+
+.badge-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 2px;
+
+  &.disabled {
+    .badge {
+      background-color: var(--gray-200);
+      color: var(--gray-350);
+    }
+  }
+
+  .badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    max-width: 150px;
+
+    @media (max-width: 1550px) {
+      max-width: 120px;
+    }
+
+    &--purple {
+      background-color: var(--purple-100);
+      color: var(--purple-600);
+    }
+
+    &--blue {
+      background-color: var(--blue-202);
+      color: var(--blue-401);
+    }
+  }
 }

@@ -16,8 +16,24 @@ class RoleInterceptor {
 
     // this interceptor depends on SecurityInterceptor
     int order = LOWEST_PRECEDENCE
-    def static changeActions = ['delete', 'create', 'add', 'process', 'save',
-                                'update', 'importData', 'receive', 'showRecordInventory', 'withdraw', 'cancel', 'change', 'toggle', 'exportAsCsv']
+    def static changeActions = [
+            'delete',
+            'create',
+            'add',
+            'process',
+            'save',
+            'update',
+            'importData',
+            'receive',
+            'showRecordInventory',
+            'withdraw',
+            'cancel',
+            'change',
+            'toggle',
+            'exportAsCsv',
+            'importOutboundStockMovement'
+    ]
+
     def static changeControllers = ['createProductFromTemplate']
 
     def static managerActions = [
@@ -33,7 +49,8 @@ class RoleInterceptor {
         'location'     : ['edit'],
         'shipper'      : ['create'],
         'locationGroup': ['create'],
-        'locationType' : ['create']
+        'locationType' : ['create'],
+        'productSupplier': ['create', 'delete', 'edit']
     ]
 
     def static superuserControllers = []
@@ -52,6 +69,10 @@ class RoleInterceptor {
 
     def static invoiceActions = [
         'invoice': ['*']
+    ]
+
+    def static productManagerActions = [
+            'productSupplier': ['create', 'delete', 'edit']
     ]
 
     def static requestorOrManagerActions = [
@@ -78,7 +99,7 @@ class RoleInterceptor {
         'stockMovement'       : ['list'],
     ]
 
-    public RoleInterceptor() {
+    RoleInterceptor() {
         matchAll().except(uri: '/static/**').except(controller: "errors").except(uri: "/info").except(uri: "/health")
     }
 
@@ -91,9 +112,9 @@ class RoleInterceptor {
         }
 
         if (!rule) {
-            log.info "No rule for ${controllerName}:${actionName} -> allow anonymous"
+            log.debug "No rule for ${controllerName}:${actionName} -> allow anonymous"
         } else {
-            log.info "Found rule matching controller ${controllerName}, action ${actionName}: " + rule
+            log.debug "Found rule matching controller ${controllerName}, action ${actionName}: " + rule
             def minimumRequiredRole = rule.accessRules?.minimumRequiredRole
             def supplementalRoles = rule.accessRules?.supplementalRoles ?: []
 
@@ -110,7 +131,7 @@ class RoleInterceptor {
             }
 
             if (isAnonymous || (session.user && isMinimumRequiredRole && isUserInRole)) {
-                log.info "User has access to ${controllerName}.${actionName}"
+                log.debug "User has access to ${controllerName}.${actionName}"
                 return true
             }
             redirect(controller: "errors", action: "handleForbidden")
@@ -132,8 +153,9 @@ class RoleInterceptor {
         def hasNoRoleInvoice = needInvoice(controllerName, actionName) && !userService.hasRoleInvoice(session.user)
         def isNotRequestor = needRequestorOrManager(controllerName, actionName) && !userService.isUserRequestor(session.user)
         def isNotRequestorOrManager = needRequestorOrManager(controllerName, actionName) ? !userService.isUserManager(session.user) && !userService.isUserRequestor(session.user) : false
+        def hasNoRoleProductManager = needProductManager(controllerName, actionName) && !userService.hasRoleProductManager(session.user)
 
-        if (isNotAuthenticated || isNotBrowser || isNotManager || isNotAdmin || isNotSuperuser || hasNoRoleInvoice || (isNotRequestorOrManager && !userService.hasHighestRole(session.user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED) && !needAuthenticatedActions(controllerName, actionName)) || (isNotRequestor && userService.hasHighestRole(session.user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED) && !needAuthenticatedActions(controllerName, actionName))) {
+        if (isNotAuthenticated || isNotBrowser || isNotManager || isNotAdmin || isNotSuperuser || hasNoRoleInvoice || hasNoRoleProductManager || (isNotRequestorOrManager && !userService.hasHighestRole(session.user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED) && !needAuthenticatedActions(controllerName, actionName)) || (isNotRequestor && userService.hasHighestRole(session.user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED) && !needAuthenticatedActions(controllerName, actionName))) {
             log.info("User ${session?.user?.username} does not have access to ${controllerName}/${actionName} in location ${session?.warehouse?.name}")
             redirect(controller: "errors", action: "handleForbidden")
             return false
@@ -168,6 +190,10 @@ class RoleInterceptor {
         invoiceActions[controllerName]?.contains("*") || invoiceActions[controllerName]?.contains(actionName)
     }
 
+    static Boolean needProductManager(controllerName, actionName) {
+        productManagerActions[controllerName]?.contains("*") || productManagerActions[controllerName]?.contains(actionName)
+    }
+
     static Boolean needRequestorOrManager(controllerName, actionName) {
         requestorOrManagerActions[controllerName]?.contains(actionName)
     }
@@ -175,6 +201,4 @@ class RoleInterceptor {
     static Boolean needAuthenticatedActions(controllerName, actionName) {
         authenticatedActions[controllerName]?.contains(actionName)
     }
-
-
 }

@@ -101,4 +101,3 @@ describe('default checkbox', () => {
     expect(screen.getByRole('checkbox')).toBeChecked();
   });
 });
-

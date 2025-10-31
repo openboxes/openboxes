@@ -10,37 +10,38 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import org.apache.commons.lang.math.NumberUtils
 import org.grails.web.json.JSONObject
+
+import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.ActivityCode
-import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.StockMovementParamsCommand
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.importer.CSVUtils
-import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.OutboundStockMovementService
 import org.pih.warehouse.inventory.StockMovementService
-import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
+import org.pih.warehouse.stockTransfer.StockTransferService
 
 
 class StockMovementApiController {
 
-    def dataService
-    def outboundStockMovementService
-    def stockMovementService
-    def stockTransferService
-    def userService
+    OutboundStockMovementService outboundStockMovementService
+    StockMovementService stockMovementService
+    StockTransferService stockTransferService
+    UserService userService
+    DocumentService documentService
 
     def list() {
         Location destination = params.destination ? Location.get(params.destination) : null
@@ -91,20 +92,26 @@ class StockMovementApiController {
         render([data: stockMovements, totalCount: stockMovements?.totalCount] as JSON)
     }
 
-    def read() {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        String stepNumber = params.stepNumber
-        def totalCount = stockMovement.lineItems.size()
+    def read(StockMovementParamsCommand command) {
+        StockMovement stockMovement = stockMovementService.getStockMovement(command.id)
+        Integer totalCount = stockMovement.lineItems.size()
 
         // FIXME this should happen in the service
-        if (params.stepNumber == "4") {
-            totalCount = stockMovementService.getPickPageItems(params.id, null, null).size()
-        }
-        if (params.stepNumber == "5") {
-            totalCount = stockMovementService.getPackPageItems(params.id, null, null).size()
-        }
-        if (params.stepNumber == "6" && !stockMovement.origin.isSupplier() && stockMovement.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
-            totalCount = stockMovementService.getPackPageItems(params.id, null, null).size()
+        switch (OutboundWorkflowState.fromStepNumber(command.stepNumber)) {
+            case OutboundWorkflowState.PICK_ITEMS:
+                if (command.refreshPicklistItems) {
+                    stockMovementService.allocatePicklistItems(stockMovement.requisition.requisitionItems?.asList())
+                }
+                totalCount = stockMovementService.getPickPageItems(command.id, null, null).size()
+                break
+            case OutboundWorkflowState.PACK_ITEMS:
+                totalCount = stockMovementService.getPackPageItems(command.id, null, null).size()
+                break
+            case OutboundWorkflowState.SEND_SHIPMENT:
+                if (!stockMovement.origin.isSupplier() && stockMovement.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
+                    totalCount = stockMovementService.getPackPageItems(command.id, null, null).size()
+                }
+                break
         }
 
         // FIXME Debugging
@@ -137,7 +144,7 @@ class StockMovementApiController {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         bindStockMovement(stockMovement, request.JSON)
         stockMovementService.updateStockMovement(stockMovement)
-        forward(action: "read")
+        redirect(action: "read", params: params)
     }
 
     /**
@@ -340,107 +347,6 @@ class StockMovementApiController {
         render status: 200
     }
 
-    def exportPickListItems() {
-        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
-        List<PicklistItem> picklistItems = pickPageItems.inject([]) { result, pickPageItem ->
-            result.addAll(pickPageItem.picklistItems)
-            result
-        }
-        // We need to create at least one row to ensure an empty template
-        if (picklistItems?.empty) {
-            picklistItems.add(new PicklistItem())
-        }
-
-        def lineItems = picklistItems.collect {
-            [
-                    "${g.message(code: 'default.id.label')}": it?.requisitionItem?.id ?: "",
-                    "${g.message(code: 'product.productCode.label')}": it?.requisitionItem?.product?.productCode ?: "",
-                    "${g.message(code: 'product.name.label')}": it?.requisitionItem?.product?.name ?: "",
-                    "${g.message(code: 'inventoryItem.lotNumber.label')}": it?.inventoryItem?.lotNumber ?: "",
-                    "${g.message(code: 'inventoryItem.expirationDate.label')}": it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
-                    "${g.message(code: 'inventoryItem.binLocation.label')}": it?.binLocation?.name ?: "",
-                    "${g.message(code: 'default.quantity.label')}": it?.quantity ?: "",
-            ]
-        }
-        String csv = dataService.generateCsv(lineItems)
-        response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-${params.id}.csv\"")
-        render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
-    }
-
-    def importPickListItems(ImportDataCommand command) {
-
-        try {
-            StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-            List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
-
-            def importFile = command.importFile
-
-            String csv = new String(importFile.bytes)
-            def settings = [separatorChar: ',', skipLines: 1]
-            csv.toCsvReader(settings).eachLine { tokens ->
-                String requisitionItemId = tokens[0]
-                String lotNumber = tokens[3] ?: null
-                String expirationDate = tokens[4] ?: null
-                String binLocation = tokens[5] ?: null
-                Integer quantityPicked = tokens[6] ? tokens[6].toInteger() : null
-
-                if (!requisitionItemId || quantityPicked == null) {
-                    throw new IllegalArgumentException("Requisition item id and quantity picked are required")
-                }
-
-                if (lotNumber?.contains("E") && NumberUtils.isNumber(lotNumber)) {
-                    throw new IllegalArgumentException("Lot numbers must not be specified in scientific notation. " +
-                            "Please reformat field with Lot Number: \"${lotNumber}\" to a number format")
-                }
-
-                PickPageItem pickPageItem = pickPageItems.find {
-                    it.requisitionItem?.id == requisitionItemId
-                }
-
-                if (!pickPageItem) {
-                    throw new IllegalArgumentException("Requisition item id: ${requisitionItemId} not found")
-                }
-
-                // FIXME Should find bin location by name and parent and inventory item by lot number and expiration date
-                // and compare object equality (or at least PK equality) rather than comparing various components
-                AvailableItem availableItem = pickPageItem.availableItems?.find {
-                    (binLocation ? it.binLocation?.name == binLocation : !it.binLocation) && lotNumber == (it.inventoryItem?.lotNumber ?: null) &&
-                            expirationDate == (it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : null)
-                }
-
-                if (!availableItem) {
-                    throw new IllegalArgumentException("There is no item available with lot: ${lotNumber ?: ""}, expiration date: ${tokens[2] ?: ""} and bin: ${binLocation ?: ""}")
-                }
-
-                RequisitionItem requisitionItem = pickPageItem.requisitionItem?.modificationItem ?: pickPageItem.requisitionItem
-
-                pickPageItem.picklistItems.each {
-                    if (it.id) {
-                        it.quantity = 0
-                    }
-                }
-                pickPageItem.picklistItems.add(new PicklistItem(
-                        requisitionItem: requisitionItem,
-                        inventoryItem: availableItem.inventoryItem,
-                        binLocation: availableItem.binLocation,
-                        quantity: quantityPicked,
-                        sortOrder: pickPageItem.sortOrder
-                ))
-            }
-
-            stockMovementService.createOrUpdatePicklistItem(stockMovement, pickPageItems)
-
-        } catch (Exception e) {
-            // FIXME The global error handler does not return JSON for multipart uploads
-            log.warn("Error occurred while importing CSV: " + e.message, e)
-            response.status = 500
-            render([errorCode: 500, errorMessage: e?.message ?: "An unknown error occurred during import"] as JSON)
-            return
-        }
-
-        render([data: "Data will be imported successfully"] as JSON)
-    }
-
     def getPendingRequisitionDetails() {
         Location origin = Location.get(params.origin.id)
         Product product = Product.get(params.product.id)
@@ -454,21 +360,6 @@ class StockMovementApiController {
         render([data: pendingRequisitionDetails] as JSON)
     }
 
-    /**
-     * Bind the date field value to the date object.
-     *
-     * @param dateObject
-     * @param jsonObject
-     * @param dateField
-     */
-    private Date parseDateRequested(String date) {
-        return date ? Constants.EXPIRATION_DATE_FORMATTER.parse(date) : null
-    }
-
-    private Date parseDateShipped(String date) {
-        return date ? Constants.DELIVERY_DATE_FORMATTER.parse(date) : null
-    }
-
     private void bindStockMovement(StockMovement stockMovement, JSONObject jsonObject) {
         // Remove attributes that cause issues in the default grails data binder
         List lineItems = jsonObject.remove("lineItems")
@@ -476,11 +367,11 @@ class StockMovementApiController {
 
         // Dates aren't bound properly using default JSON binding
         if (jsonObject.containsKey("dateShipped")) {
-            stockMovement.dateShipped = parseDateShipped(jsonObject.remove("dateShipped"))
+            stockMovement.dateShipped = DateUtil.asDate(jsonObject.remove("dateShipped") as String)
         }
 
         if (jsonObject.containsKey("dateRequested")) {
-            stockMovement.dateRequested = parseDateRequested(jsonObject.remove("dateRequested"))
+            stockMovement.dateRequested = DateUtil.asDate(jsonObject.remove("dateRequested") as String)
         }
 
         // If the stocklist.id key is present and empty, then we need to remove the stocklist from the stock movement
@@ -549,8 +440,7 @@ class StockMovementApiController {
             // FIXME Lookup inventory item by product, lot number, expiration date
             stockMovementItem.inventoryItem = lineItem?.inventoryItem?.id ? InventoryItem.load(lineItem?.inventoryItem?.id) : null
             stockMovementItem.lotNumber = lineItem["lotNumber"]
-            stockMovementItem.expirationDate = (!isNull(lineItem["expirationDate"])) ?
-                    Constants.EXPIRATION_DATE_FORMATTER.parse(lineItem["expirationDate"]) : null
+            stockMovementItem.expirationDate = DateUtil.asDate(lineItem["expirationDate"] as String)
 
             // Sort order (optional)
             stockMovementItem.sortOrder = lineItem.sortOrder && !lineItem.isNull("sortOrder") ? new Integer(lineItem.sortOrder) : null
@@ -861,5 +751,17 @@ class StockMovementApiController {
             render([errorMessage: errorMessage] as JSON)
         }
         render(status: 200)
+    }
+
+    def downloadPackingListTemplate() {
+        try {
+            String filename = "completedPackingList.xls"
+            File file = documentService.findFile("templates/" + filename)
+            response.setHeader('Content-disposition', "attachment; filename=\"${filename}\"")
+            response.outputStream << file.bytes
+            response.outputStream.flush()
+        } catch (FileNotFoundException e) {
+            render status: 404
+        }
     }
 }

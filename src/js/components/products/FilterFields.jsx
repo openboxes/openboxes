@@ -118,4 +118,20 @@ export default {
       filterElement: true,
     },
   },
+  handlingRequirementId: {
+    type: FilterSelectField,
+    attributes: {
+      valueKey: 'id',
+      filterElement: true,
+      placeholder: 'react.productsList.filters.handlingRequirements.label',
+      defaultPlaceholder: 'Handling Requirements',
+      showLabelTooltip: true,
+      multi: true,
+      closeMenuOnSelect: false,
+      blurInputOnSelect: false,
+    },
+    getDynamicAttr: ({ handlingRequirements }) => ({
+      options: handlingRequirements,
+    }),
+  },
 };

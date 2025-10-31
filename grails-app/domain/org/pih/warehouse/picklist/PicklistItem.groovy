@@ -11,6 +11,7 @@ package org.pih.warehouse.picklist
 
 import grails.util.Holders
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.order.OrderItem
@@ -40,6 +41,10 @@ class PicklistItem implements Serializable {
     InventoryItem inventoryItem
     Location binLocation
 
+    Integer quantityPicked
+    Person pickedBy
+    Date datePicked
+
     Integer quantity
 
     String status
@@ -65,6 +70,9 @@ class PicklistItem implements Serializable {
         binLocation(nullable: true)
         requisitionItem(nullable: true)
         orderItem(nullable: true)
+        quantityPicked(nullable: true)
+        pickedBy(nullable: true)
+        datePicked(nullable: true)
         quantity(nullable: false)
         status(nullable: true)
         reasonCode(nullable: true)
@@ -98,6 +106,9 @@ class PicklistItem implements Serializable {
             binLocationId       : binLocation?.id,
             inventoryItemId     : inventoryItem?.id,
             quantity            : quantity,
+            quantityPicked      : quantityPicked,
+            pickedBy            : pickedBy?.id,
+            datePicked          : datePicked,
             reasonCode          : reasonCode,
             comment             : comment,
             // Used in Bin Replenishment feature

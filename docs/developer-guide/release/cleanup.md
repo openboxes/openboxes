@@ -1,7 +1,7 @@
 
 1. On Bamboo, change openboxes-release back to master 
    
-    ![Change Linked Repo](../../img/bamboo-change-linked-repo-to-master.png)
+    ![Change Linked Repo](../../assets/img/bamboo-change-linked-repo-to-master.png)
 
 1. Merge master into develop
 

@@ -9,7 +9,6 @@ import { changeCurrentLocale } from 'actions';
 import { DISABLE_LOCALIZATION, ENABLE_LOCALIZATION } from 'api/urls';
 import Translate from 'utils/Translate';
 
-
 const Footer = ({
   // eslint-disable-next-line no-shadow
   setLanguage,
@@ -30,16 +29,74 @@ const Footer = ({
 }) => (
   <div className="border-top align-self-end text-center py-2 w-100 footer">
     <div className="d-flex flex-row justify-content-center m-2 flex-wrap">
-      <div className="mx-3">© {(new Date().getFullYear())} <a href="https://openboxes.com"><Translate id="react.default.poweredBy.label" defaultMessage="Powered by OpenBoxes" /></a></div> {'|'}
-      <div className="mx-3"><Translate id="react.default.grailsVersion.label " defaultMessage="Grails Version" />: <b>{grailsVersion}</b></div>{'|'}
-      <div className="mx-3"><Translate id="react.default.version.label " defaultMessage="Application version" />: <b>{appVersion}</b></div> {'|'}
-      <div className="mx-3"><Translate id="react.default.branch.label " defaultMessage="Branch" />: <b>{branchName}</b> </div> {'|'}
-      <div className="mx-3"> <Translate id="react.default.buildNumber.label " defaultMessage="Build Number" />: <b>{buildNumber}</b> </div> {'|'}
-      <div className="mx-3"><Translate id="react.default.environment.label " defaultMessage="Environment" />: <b>{environment}</b></div> {'|'}
-      <div className="mx-3"><Translate id="react.default.buildDate.label " defaultMessage="Build Date" />: <b>{buildDate}</b></div>
+      <div className="mx-3">
+        ©
+        {(new Date().getFullYear())}
+        {' '}
+        <a
+          href="https://openboxes.com"
+          aria-label="Redirect to openboxes"
+        >
+          <Translate id="react.default.poweredBy.label" defaultMessage="Powered by OpenBoxes" />
+        </a>
+      </div>
+      {' '}
+      |
+      <div className="mx-3">
+        <Translate id="react.default.grailsVersion.label " defaultMessage="Grails Version" />
+        :
+        {' '}
+        <b>{grailsVersion}</b>
+      </div>
+      |
+      <div className="mx-3">
+        <Translate id="react.default.version.label " defaultMessage="Application version" />
+        :
+        {' '}
+        <b>{appVersion}</b>
+      </div>
+      {' '}
+      |
+      <div className="mx-3">
+        <Translate id="react.default.branch.label " defaultMessage="Branch" />
+        :
+        {' '}
+        <b>{branchName}</b>
+        {' '}
+      </div>
+      {' '}
+      |
+      <div className="mx-3">
+        {' '}
+        <Translate id="react.default.buildNumber.label " defaultMessage="Build Number" />
+        :
+        {' '}
+        <b>{buildNumber}</b>
+        {' '}
+      </div>
+      {' '}
+      |
+      <div className="mx-3">
+        <Translate id="react.default.environment.label " defaultMessage="Environment" />
+        :
+        {' '}
+        <b>{environment}</b>
+      </div>
+      {' '}
+      |
+      <div className="mx-3">
+        <Translate id="react.default.buildDate.label " defaultMessage="Build Date" />
+        :
+        {' '}
+        <b>{buildDate}</b>
+      </div>
     </div>
     <div className="d-flex flex-row justify-content-center mb-3 flex-wrap">
-      <div className="mx-3"><Translate id="react.default.locale.label " defaultMessage="Locale" />: {' '}
+      <div className="mx-3">
+        <Translate id="react.default.locale.label " defaultMessage="Locale" />
+        :
+        {' '}
+        {' '}
         { _.map(languages, (language) => {
           // When clicking on language that is a translation mode language, enable localization mode
           if (language.code === localizationModeLocale) {
@@ -70,6 +127,7 @@ const Footer = ({
           // we just want to change the language
           return (
             <button
+              type="button"
               className={`${locale === language.code ? 'selected' : ''}`}
               key={language.code}
               onClick={() => {
@@ -81,17 +139,41 @@ const Footer = ({
             </button>
           );
         })}
-      </div> {'|'}
+      </div>
+      {' '}
+      |
 
-      <div className="mx-3"><Translate id="react.default.ipAddress.label " defaultMessage="IP Address" />: <b>{ipAddress}</b></div> {'|'}
+      <div className="mx-3">
+        <Translate id="react.default.ipAddress.label " defaultMessage="IP Address" />
+        :
+        {' '}
+        <b>{ipAddress}</b>
+      </div>
+      {' '}
+      |
 
-      <div className="mx-3"> <Translate id="react.default.hostname.label " defaultMessage="Hostname" />: <b>{hostname}</b></div> {'|'}
-      <div className="mx-3"><Translate id="react.default.timezone.label " defaultMessage="Timezone" />: <b>{timezone}</b></div> {'|'}
+      <div className="mx-3">
+        {' '}
+        <Translate id="react.default.hostname.label " defaultMessage="Hostname" />
+        :
+        {' '}
+        <b>{hostname}</b>
+      </div>
+      {' '}
+      |
+      <div className="mx-3">
+        <Translate id="react.default.timezone.label " defaultMessage="Timezone" />
+        :
+        {' '}
+        <b>{timezone}</b>
+      </div>
+      {' '}
+      |
     </div>
   </div>
 );
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
   grailsVersion: state.session.grailsVersion,
   appVersion: state.session.appVersion,

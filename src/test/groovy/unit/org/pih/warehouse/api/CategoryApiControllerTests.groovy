@@ -9,24 +9,15 @@
 **/ 
 package org.pih.warehouse.api
 
-import grails.test.mixin.TestMixin
-import grails.test.mixin.domain.DomainClassUnitTestMixin
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.testing.gorm.DomainUnitTest
+import grails.testing.gorm.DataTest
 import grails.testing.web.controllers.ControllerUnitTest
 import org.grails.web.json.JSONObject
-import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.product.Category
 import spock.lang.Specification
-import static org.junit.Assert.*;
 
-@TestFor(CategoryApiController)
-@Mock([User, UserService])
-@TestMixin(DomainClassUnitTestMixin)
-class CategoryApiControllerTests extends Specification implements ControllerUnitTest<CategoryApiController> {
+class CategoryApiControllerTests extends Specification implements DataTest, ControllerUnitTest<CategoryApiController> {
 
     Category rootCategory = new Category(name: "ROOT")
     Category childCategory1 = new Category(name: "A category", parentCategory: rootCategory)

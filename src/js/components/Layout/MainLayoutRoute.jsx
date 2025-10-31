@@ -5,15 +5,14 @@ import { Route } from 'react-router-dom';
 
 import MainLayout from 'components/Layout/MainLayout';
 
-
 const MainLayoutRoute = ({ path, component: Component }) => (
   <Route
     path={path}
-    render={matchProps => (
+    render={(matchProps) => (
       <MainLayout>
         <Component {...matchProps} />
       </MainLayout>
-  )}
+    )}
   />
 );
 

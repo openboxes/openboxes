@@ -1,7 +1,7 @@
-const useResetScrollbar = ({ scrollableComponentClassName }) => {
+const useResetScrollbar = ({ selector }) => {
   const resetScrollbar = () => {
-    const element = document.getElementsByClassName(scrollableComponentClassName);
-    element[0].scrollTop = 0;
+    const element = document.querySelector(selector);
+    element.scrollTop = 0;
   };
 
   return {

@@ -1,27 +1,3 @@
-.tabs {
-  height: 53px;
-  gap: 12px;
-  color: var(--gray-600);
-  border-bottom: 2px solid var(--gray-102);
-
-  span {
-    font-weight: 600;
-    font-size: 16px;
-    line-height: 21px;
-    padding: 16px 8px 16px 8px;
-    text-transform: uppercase;
-
-    &:hover {
-      color: var(--blue-primary);
-    }
-  }
-
-  .active-tab {
-    color: var(--blue-primary);
-    box-shadow: 0 2px 0 var(--blue-primary);
-  }
-}
-
 .cell-content {
   color: var(--blue-primary);
   cursor: pointer;

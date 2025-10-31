@@ -101,9 +101,14 @@ class UrlMappings {
             action = [GET: "ratingTypeCodeOptions"]
         }
 
+        "/api/handlingRequirementsOptions" {
+            controller = { "selectOptionsApi" }
+            action = [GET: "handlingRequirementsOptions"]
+        }
+
         "/api/products"(parseRequest: true) {
             controller = { "productApi" }
-            action = [GET: "list"]
+            action = [GET: "list", POST: "save"]
         }
 
         "/api/products/search"(parseRequest: true) {
@@ -118,6 +123,31 @@ class UrlMappings {
         "/api/products/$productId/inventoryItems/$lotNumber"(parseRequest: true) {
             controller = { "productApi" }
             action = [GET: "getInventoryItem"]
+        }
+
+        "/api/products/getLatestInventoryCountDate" {
+            controller = { "productApi" }
+            action = [GET: "getLatestInventoryCountDate"]
+        }
+
+        "/api/products/import" {
+            controller = { "productApi" }
+            action = [POST: "importCsv"]
+        }
+
+        "/api/products/inventoryItems/lotNumbersWithExpirationDate" {
+            controller = { "productApi" }
+            action = [GET: "getLotNumbersWithExpirationDate"]
+        }
+
+        "/api/facilities/$facilityId/products/classifications" {
+            controller = "productClassificationApi"
+            action = [GET: "list"]
+        }
+
+        "/api/facilities/$facilityId/inventory-levels(.$format)?" {
+            controller = "inventoryLevelApi"
+            action = [GET: "list"]
         }
 
         "/api/locations/locationTypes" {
@@ -184,6 +214,11 @@ class UrlMappings {
         "/api/stockMovementItems/$id/updatePicklist"(parseRequest: true) {
             controller = "stockMovementItemApi"
             action = [POST: "updatePicklist"]
+        }
+
+        "/api/stockMovementItems/$id/picklistItems" {
+            controller = "stockMovementItemApi"
+            action = [DELETE: "revertPick"]
         }
 
         "/api/stockMovementItems/$id/createPicklist"(parseRequest: true) {
@@ -269,13 +304,18 @@ class UrlMappings {
         }
 
         "/api/stockMovements/importPickListItems/$id"(parseRequest: true) {
-            controller = "stockMovementApi"
+            controller = "picklist"
             action = [POST: "importPickListItems"]
         }
 
         "/api/stockMovements/exportPickListItems/$id"(parseRequest: true) {
-            controller = "stockMovementApi"
-            action = [GET: "exportPickListItems"]
+            controller = "picklist"
+            action = [GET: "exportPicklistItems"]
+        }
+
+        "/api/stockMovements/picklistTemplate/$id"(parseRequest: true) {
+            controller = "picklist"
+            action = [GET: "exportPicklistTemplate"]
         }
 
         "/api/stockMovements/createPickList/$id"(parseRequest: true) {
@@ -327,6 +367,16 @@ class UrlMappings {
         "/api/stockMovements/$id/rollbackApproval" {
             controller = "stockMovementApi"
             action = [PUT: "rollbackApproval"]
+        }
+
+        "/api/stockMovements/packingList/template" {
+            controller = "stockMovementApi"
+            action = [GET: "downloadPackingListTemplate"]
+        }
+
+        "/api/picklists/$id/items" {
+            controller = "picklistApi"
+            action = [DELETE: "clearPicklist"]
         }
 
         // Partial Receiving API
@@ -511,6 +561,16 @@ class UrlMappings {
         "/api/invoiceItems/$id/validation" {
             controller = "invoiceApi"
             action = [POST: "validateInvoiceItem"]
+        }
+
+        "/api/prepaymentInvoices/$id/invoiceItems" {
+            controller = "prepaymentInvoiceApi"
+            action = [POST: "updateItems"]
+        }
+
+        "/api/prepaymentInvoiceItems/$id" {
+            controller = "prepaymentInvoiceItemApi"
+            action = [POST: "update", DELETE: "delete"]
         }
 
         // Stock Transfer API
@@ -736,6 +796,35 @@ class UrlMappings {
             action = [GET: "getOpenPurchaseOrdersCount"]
         }
 
+        "/api/dashboard/backdatedOutboundShipments" {
+            controller = { "dashboardApi" }
+            action = [GET: "getBackdatedOutboundShipments"]
+        }
+
+        "/api/dashboard/backdatedInboundShipments" {
+            controller = { "dashboardApi" }
+            action = [GET: "getBackdatedInboundShipments"]
+        }
+
+        "/api/dashboard/itemsWithBackdatedShipments" {
+            controller = { "dashboardApi" }
+            action = [GET: "getItemsWithBackdatedShipments"]
+        }
+
+        /**
+         * Inventory API endpoints
+         */
+
+        "/api/facilities/$facilityId/inventories/import" {
+            controller = { "inventoryApi" }
+            action = "importCsv"
+        }
+
+        "/api/facilities/$facilityId/inventories/reorderReport" {
+            controller = { "inventoryApi" }
+            action = [GET: "getReorderReport"]
+        }
+
         /**
         * Purchase Orders API endpoints
         */
@@ -814,11 +903,26 @@ class UrlMappings {
             action = [POST: "updateAttributes"]
         }
 
+        "/api/productSuppliers/export" {
+            controller = { "productSupplierApi" }
+            action = [GET: "export"]
+        }
+
         // Load Data
 
         "/api/loadData/listOfDemoData"(parseRequest: true) {
             controller = { "loadDataApi" }
             action = [GET: "listOfDemoData"]
+        }
+
+        "/api/fulfillments" {
+            controller = { "fulfillmentApi" }
+            action = [POST: "save"]
+        }
+
+        "/api/fulfillments/validate" {
+            controller = { "fulfillmentApi" }
+            action = [POST: "validate"]
         }
 
         // Standard REST APIs
@@ -870,6 +974,131 @@ class UrlMappings {
         "/api/generic/${resource}/$id"(parseRequest: false) {
             controller = "genericApi"
             action = [GET: "read", POST: "update", PUT: "update", DELETE: "delete"]
+        }
+
+        "/api/facilities/$facilityId/cycle-counts/candidates" {
+            controller = "cycleCountApi"
+            action = [GET: "getCandidates"]
+        }
+
+        "/api/facilities/$facilityId/cycle-counts/requests/pending" {
+            controller = "cycleCountApi"
+            action = [GET: "getPendingCycleCountRequests"]
+        }
+
+        "/api/facilities/$facilityId/cycle-counts/requests/batch" {
+            controller = "cycleCountApi"
+            action = [POST: "createRequests", PATCH: "updateRequests", DELETE: "deleteRequests"]
+        }
+
+        "/api/facilities/$facility/cycle-counts/start/batch" {
+            controller = "cycleCountApi"
+            action = [POST: "startCycleCount"]
+        }
+
+        "/api/facilities/$facility/cycle-counts/recount/start/batch" {
+            controller = "cycleCountApi"
+            action = [POST: "startRecount"]
+        }
+
+        "/api/facilities/$facility/cycle-counts" {
+            controller = "cycleCountApi"
+            action = [GET: "list"]
+        }
+
+        "/api/facilities/$facility/cycle-counts/$cycleCountId/count" {
+            controller = "cycleCountApi"
+            action = [POST: "submitCount"]
+        }
+
+        "/api/facilities/$facility/cycle-counts/$cycleCountId/recount" {
+            controller = "cycleCountApi"
+            action = [POST: "submitRecount"]
+        }
+
+        "/api/facilities/$facility/cycle-counts/items/$cycleCountItemId" {
+            controller = "cycleCountApi"
+            action = [PATCH: "updateCycleCountItem", DELETE: "deleteCycleCountItem"]
+        }
+
+        "/api/facilities/$facility/cycle-counts/items/upload/count" {
+            controller = "cycleCountApi"
+            action = [POST: "uploadCycleCountItems"]
+        }
+
+        "/api/facilities/$facility/cycle-counts/$cycleCountId/items" {
+            controller = "cycleCountApi"
+            action = [POST: "createCycleCountItem"]
+        }
+
+        "/api/facilities/$facility/cycle-counts/$cycleCountId/items/batch" {
+            controller = "cycleCountApi"
+            action = [POST: "createCycleCountItemBatch", PATCH: "updateCycleCountItemBatch"]
+        }
+
+        "/api/facilities/$facility/cycle-counts/items/batch" {
+            controller = "cycleCountApi"
+            action = [POST: "createCycleCountItemBatch", PATCH: "updateCycleCountItemBatch"]
+        }
+
+        "/api/facilities/$facility/cycle-counts/$cycleCountId/refresh" {
+            controller = "cycleCountApi"
+            action = [POST: "refreshCycleCount"]
+        }
+
+        "/api/reports/cycle-count-details" {
+            controller = "cycleCountApi"
+            action = [POST: "getCycleCountDetails", GET: "getCycleCountDetails"]
+        }
+
+        "/api/reports/cycle-count-summary" {
+            controller = "cycleCountApi"
+            action = [POST: "getCycleCountSummary", GET: "getCycleCountSummary"]
+        }
+
+        "/api/reports/inventory-audit-details" {
+            controller = "inventoryAuditReport"
+            action = [POST: "getInventoryAuditDetails", GET: "getInventoryAuditDetails"]
+
+        }
+
+        "/api/reports/inventory-audit-summary(.$format)?" {
+            controller = "inventoryAuditReport"
+            action = [POST: "getInventoryAuditSummary", GET: "getInventoryAuditSummary"]
+        }
+
+        "/api/reports/inventory-transactions-summary" {
+            controller = "inventoryTransactionSummaryApi"
+            action = [GET: "getInventoryTransactionsSummary"]
+        }
+
+        "/api/reports/indicators/productsInventoried" {
+            controller = "indicatorApi"
+            action = [GET: "getProductsInventoried"]
+        }
+
+        "/api/reports/indicators/inventoryAccuracy" {
+            controller = "indicatorApi"
+            action = [GET: "getInventoryAccuracy"]
+        }
+
+        "/api/reports/indicators/inventoryShrinkage" {
+            controller = "indicatorApi"
+            action = [GET: "getInventoryShrinkage"]
+        }
+
+        "/api/facilities/$facility/inventory/record-stock/save" {
+            controller = "recordStockApi"
+            action = [POST: "saveRecordStock"]
+        }
+
+        /**
+         * Inventory API endpoints
+         */
+
+        "/api/inventories/expirationHistoryReport" {
+            controller = { "inventoryApi" }
+            action = [GET: "getExpirationHistoryReport"]
         }
 
         // Error handling

@@ -6,7 +6,7 @@ import { RiArrowDropDownLine } from 'react-icons/ri';
 
 const DropdownMenuItem = ({ section, active }) => (
   <li className={`nav-item dropdown d-none d-md-flex justify-content-center align-items-center ${active && 'active-section'}`} data-testid="dropdownMenuItem">
-    <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" aria-haspopup="true" aria-expanded="false">
+    <a role="menuitem" className="nav-link dropdown-toggle" href="#" id="navbarDropdown" aria-haspopup="true" aria-expanded="false">
       {section.label}
     </a>
     <div className="dropdown-menu dropdown-menu-wrapper" aria-labelledby="navbarDropdown">
@@ -15,7 +15,7 @@ const DropdownMenuItem = ({ section, active }) => (
           <a className="dropdown-item" key={menuItemKey} href={menuItem.href} target={menuItem.target}>
             {menuItem.label}
           </a>
-          ))}
+        ))}
       </div>
     </div>
   </li>
@@ -49,10 +49,12 @@ const CollapseMenuItem = ({ section, active }) => {
   );
 };
 
-const MenuItem = props => (<>
-  <DropdownMenuItem {...props} />
-  <CollapseMenuItem {...props} />
-  </>);
+const MenuItem = (props) => (
+  <>
+    <DropdownMenuItem {...props} />
+    <CollapseMenuItem {...props} />
+  </>
+);
 
 export default MenuItem;
 

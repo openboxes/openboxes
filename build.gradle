@@ -38,6 +38,7 @@ buildscript {
         classpath "org.grails.plugins:database-migration:${databaseMigrationVersion}"
         classpath "org.grails.plugins:views-gradle:${grailsViewsVersion}"
         classpath "org.owasp:dependency-check-gradle:${owaspVersion}"
+        classpath "org.grails.plugins:hibernate5:${gormVersion - '.RELEASE'}"
     }
     repositories {
         mavenCentral()
@@ -64,7 +65,8 @@ plugins {
     // find outdated dependencies with `grails gradle dependencyUpdates`
     id 'com.github.ben-manes.versions' version '0.27.0'
 
-    // git magic, but releases past v2.3.0 require Gradle 5.1+
+    // Generates a "git.properties" file that provides info on the current git commit. Used by SpringBoot Actuator's
+    // "info" endpoint and by Sentry to tag issues with a release. Version 2.3.0+ requires Gradle 5.1+
     id 'com.gorylenko.gradle-git-properties' version '2.2.4'
 
     // enable `npmInstall` and `npm_run_*` targets, and the `node` block below
@@ -75,6 +77,10 @@ plugins {
 
     // enable `grails gradle autoLintGradle`
     id 'nebula.lint' version '17.8.0'
+
+    // Adds the "jacocoTestReport" command for generating code coverage reports as well as the
+    // "jacocoTestCoverageVerification" command for validating coverage percentage minimums.
+    id 'jacoco'
 }
 
 // prevent warfile issues by applying this before `asset-pipeline`. OBGM-353
@@ -304,6 +310,10 @@ configurations {
     }
 }
 
+configurations.integrationTestImplementation {
+    extendsFrom(configurations.implementation)
+}
+
 // app servers, other than jetty, expose this api directly
 if (targetWebServer() != 'jetty') {
     configurations.configureEach {
@@ -364,6 +374,7 @@ repositories {
     maven { url 'https://repo.grails.org/grails/core' }
     // deprecated; only used to fetch code-coverage plugin
     maven { url 'https://repo.grails.org/grails/plugins' }
+    maven { url 'https://jitpack.io' }
 }
 
 /*
@@ -374,7 +385,7 @@ repositories {
 sourceSets {
     main {
         resources {
-            srcDir 'grails-app/migrations'
+            srcDirs 'grails-app/migrations', 'src/integration-test/resources/migrations'
         }
     }
 }
@@ -382,6 +393,7 @@ sourceSets {
 springBoot {
     buildInfo()
     mainClass = 'org.pih.warehouse.Application'
+    executable = true
 }
 
 war {
@@ -481,16 +493,24 @@ dependencies {
      */
     testCompile 'io.micronaut:micronaut-http-client:1.2.11'
 
-    implementation "io.sentry:sentry:${sentryVersion}"
     implementation "io.sentry:sentry-logback:${sentryVersion}"
     implementation "io.sentry:sentry-servlet:${sentryVersion}"
+    // Uses P6Spy to capture database queries.
+    implementation "io.sentry:sentry-jdbc:${sentryVersion}"
+    // TODO: We can't use "io.sentry:sentry-spring-boot-starter" because it causes a null pointer on transaction name in
+    // io.sentry.spring.boot.SentryAutoConfiguration$HubConfiguration$SentryWebMvcConfiguration.transactionNameProvider
+    // but only when deploying to an external Servlet. Once this is resolved we can switch to sentry-spring-boot-starter
+    // which will give us automatic Sentry releases and allow us to configure sentry in application.yml
+    implementation "io.sentry:sentry-spring:${sentryVersion}"
 
     // incorporate latest timezone changes
     implementation 'joda-time:joda-time:2.12.5'
 
     testCompile 'junit:junit:4.13.2'
 
+    // Database jdbc connectors (Connector/J)
     compile "mysql:mysql-connector-java:${mySqlConnectorVersion}"
+    implementation 'org.mariadb.jdbc:mariadb-java-client'
 
     testRuntime "net.sourceforge.htmlunit:htmlunit:${htmlUnitVersion}"
 
@@ -746,6 +766,15 @@ dependencies {
     // security patch
     compile 'org.yaml:snakeyaml:1.33'
     console 'org.yaml:snakeyaml:1.33'
+
+    // For integration tests
+    testCompile 'org.apache.commons:commons-compress:1.21'  // Needed to avoid a dependency conflict
+    testCompile "org.testcontainers:mysql:1.17.3"
+    testCompile "org.testcontainers:mariadb:1.17.3"
+    testCompile "org.testcontainers:spock:1.17.3"
+    testCompile 'org.springframework:spring-test'
+    testCompile 'io.rest-assured:rest-assured:3.2.0'
+    testCompile "org.grails.plugins:build-test-data:3.3.1"
 }
 
 /*
@@ -821,13 +850,62 @@ task writePom {
     }
 }
 
+// Jacoco code coverage reporting. https://docs.gradle.org/4.10.3/userguide/jacoco_plugin.html
+// Running "./gradlew jacocoTestReport" will execute all unit and integration tests, then generate a code
+// coverage report under the "/build/reports/jacoco" folder.
+jacoco {
+    // Jacoco 0.7.7 requires ASM Version 5.1+ https://www.eclemma.org/jacoco/trunk/doc/changes.html
+    toolVersion = '0.7.6.201602180812'
+}
+// Note that the paths here are by package name (as they are in "build/classes/groovy/main"). As such, we cannot
+// filter by Grails folders such as "**/controller/**" (but we could filter by "**/*Controller.class").
+List jacocoExcludes = [
+        // This filters out all the Groovy-generated closure elements from Jacoco, which helps de-clutter the report but
+        // also prevents any closures from being counted in the report. Leave them in to get a more accurate percentage.
+        //'**/*$*_closure*',
+]
+jacocoTestReport {
+    // Makes sure that tests are always run before a report is generated (because otherwise the report will be blank or
+    // out of date). This allows us to run both tests and coverage with "./gradlew jacocoTestReport"
+    dependsOn test, integrationTest
+
+    // Generates a combined report based on the coverage results generated from both unit tests and integration tests.
+    executionData test, integrationTest
+
+    reports {
+        xml.enabled true  // Needed so that we can upload to Codecov.
+        html.enabled true  // Useful for verifying locally during development.
+    }
+
+    doFirst {
+        // Our source code builds to both "build/classes/groovy" and "build/classes/java" so we need to filter one of
+        // the two class paths out to avoid "Can't add different class with same name" errors. It's dirty to do this
+        // in the "doFirst" block, but it's the only way to tell Jacoco to ONLY use this path.
+        classDirectories = files(files("build/classes/groovy/main").collect {
+            // Then also exclude any packages from the report that we didn't actually generate any coverage % for.
+            fileTree(dir: it, exclude: jacocoExcludes)
+        })
+    }
+}
+
+// Configuration for both "test" and "integrationTest" tasks.
 tasks.withType(Test) {
     systemProperty 'geb.build.reportsDir', reporting.file('geb/integrationTest')
     systemProperty 'geb.env', System.getProperty('geb.env')
     systemProperty 'webdriver.chrome.driver', System.getProperty('webdriver.chrome.driver')
     systemProperty 'webdriver.firefox.driver', System.getProperty('webdriver.firefox.driver')
+    systemProperty "username", System.getProperty("username")
+    systemProperty "password", System.getProperty("password")
+
     testLogging {
         events 'failed', 'passed', 'skipped'
         exceptionFormat 'full'
+        showStackTraces = true
+        showStandardStreams = true
+    }
+
+    jacoco {
+        // When running tests, exclude the given folders from Jacoco coverage % generation.
+        excludes = jacocoExcludes
     }
 }

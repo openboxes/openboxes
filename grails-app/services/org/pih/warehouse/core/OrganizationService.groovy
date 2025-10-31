@@ -15,7 +15,7 @@ import org.apache.commons.lang.StringUtils
 @Transactional
 class OrganizationService {
 
-    def identifierService
+    OrganizationIdentifierService organizationIdentifierService
 
     List selectOrganizations(ArrayList<RoleType> roleTypes, Boolean active = false, currentOrganizationId) {
         return Organization.createCriteria().list {
@@ -67,7 +67,7 @@ class OrganizationService {
             organization = new Organization()
             organization.name = name
             organization.partyType = PartyType.findByCode(Constants.DEFAULT_ORGANIZATION_CODE)
-            organization.code = code?:identifierService.generateOrganizationIdentifier(name)
+            organization.code = code?:organizationIdentifierService.generate(name)
         }
 
         if (roleTypes) {
@@ -90,8 +90,7 @@ class OrganizationService {
 
     Organization createOrganization(Organization organization) {
         if (!organization.code) {
-            organization.code =
-                    identifierService.generateOrganizationIdentifier(organization.name)
+            organization.code = organizationIdentifierService.generate(organization.name)
         }
 
         if (!organization.partyType) {

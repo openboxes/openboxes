@@ -11,7 +11,7 @@
 <div id="settings" role="main" class="yui-ga">
 
     <g:if test="${flash.message}">
-        <div class="message">${flash.message}</div>
+        <div class="message" role="status" aria-label="message">${flash.message}</div>
     </g:if>
     <div class="yui-u first">
         <div class="tabs">

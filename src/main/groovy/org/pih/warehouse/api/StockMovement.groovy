@@ -5,14 +5,11 @@ import org.apache.commons.collections.list.LazyList
 import grails.util.Holders
 import grails.validation.Validateable
 import org.pih.warehouse.core.ActivityCode
-import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
-import org.pih.warehouse.core.UserService
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItemStatusCode
@@ -28,6 +25,7 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.auth.AuthService
 import util.ConfigHelper
+import util.StockMovementStatusResolver
 
 
 class StockMovement implements Validateable{
@@ -49,7 +47,7 @@ class StockMovement implements Validateable{
     Date expectedDeliveryDate
     Date dateCreated
     Date lastUpdated
-
+    Date dateDeliveryRequested
 
     ShipmentType shipmentType
     ShipmentStatusCode receiptStatusCode
@@ -106,6 +104,7 @@ class StockMovement implements Validateable{
         createdBy(nullable: true)
         updatedBy(nullable: true)
         dateRequested(nullable: false)
+        dateDeliveryRequested(nullable: true)
 
         stockMovementDirection(nullable: true)
         stockMovementStatusCode(nullable: true)
@@ -135,7 +134,7 @@ class StockMovement implements Validateable{
             name                : name,
             description         : description,
             statusCode          : statusCode,
-            displayStatus       : getDisplayStatus(),
+            displayStatus       : displayStatus,
             identifier          : identifier,
             origin              : [
                 id                  : origin?.id,
@@ -173,6 +172,7 @@ class StockMovement implements Validateable{
             dateCreated         : dateCreated?.format("MM/dd/yyyy"),
             dateShipped         : dateShipped?.format("MM/dd/yyyy HH:mm XXX"),
             expectedDeliveryDate: expectedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
+            dateDeliveryRequested : requisition?.dateDeliveryRequested,
             lastUpdated         : lastUpdated,
             shipmentType        : shipmentType,
             currentStatus       : currentStatus,
@@ -204,6 +204,9 @@ class StockMovement implements Validateable{
             received            : isReceived,
             requestType         : requestType,
             sourceType          : sourceType?.name,
+            picklist            : [
+                id: requisition?.picklist?.id
+            ],
         ]
     }
 
@@ -471,23 +474,17 @@ class StockMovement implements Validateable{
         ]
     }
 
-    String getDisplayStatus() {
-        def status
-        switch(requisition?.status) {
-            case RequisitionStatus.APPROVED:
-                status =  StockMovementStatusCode.APPROVED
-                break
-            case RequisitionStatus.REJECTED:
-                status = StockMovementStatusCode.REJECTED
-                break
-            case RequisitionStatus.PENDING_APPROVAL:
-                status = StockMovementStatusCode.PENDING_APPROVAL
-                break
-            default:
-                status = shipment?.status?.code
-        }
-        def g = Holders.grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
-        return "${g.message(code: 'enum.' + status?.getClass()?.getSimpleName() + '.' + status)}"
+    @Deprecated
+    Map<String, String> getDisplayStatus() {
+        StockMovementStatusContext stockMovementContext = new StockMovementStatusContext(
+                order: order,
+                requisition: requisition,
+                shipment: shipment,
+                origin: origin,
+                destination: destination
+        )
+        Enum status = StockMovementStatusResolver.getListStatus(stockMovementContext)
+        return StockMovementStatusResolver.getStatusMetaData(status)
     }
 
     Boolean canUserRollbackApproval(User user) {

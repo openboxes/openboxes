@@ -8,7 +8,6 @@ import DateCell from 'components/DataTable/DateCell';
 
 import '@testing-library/jest-dom';
 
-
 describe('date cell', () => {
   it('should contain proper text when date provided', () => {
     const dateCell = (

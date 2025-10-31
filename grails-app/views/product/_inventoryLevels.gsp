@@ -1,6 +1,6 @@
 <%@ page import="org.pih.warehouse.inventory.InventoryLevel" %>
 <g:hasErrors bean="${inventoryLevelInstance}">
-    <div class="errors">
+    <div class="errors" role="alert" aria-label="error-message">
         <g:renderErrors bean="${inventoryLevelInstance}" as="list" />
     </div>
 </g:hasErrors>
@@ -115,7 +115,7 @@
                         <img src="${resource(dir:'images/icons/silk', file: 'add.png')}"/>&nbsp;
                         ${warehouse.message(code:'inventoryLevel.create.label', default: 'Create stock level')}</a>
 
-                    <g:link class="button" controller="inventoryLevel" action="export" id="${productInstance?.id}">
+                    <g:link class="button" controller="inventoryLevel" action="export" id="${productInstance?.id}" params="[format:'xls']">
                         <img src="${resource(dir:'images/icons/silk', file: 'page_excel.png')}"/>&nbsp;
                         ${warehouse.message(code:'inventoryLevel.export.label', default: 'Export stock levels')}
                     </g:link>

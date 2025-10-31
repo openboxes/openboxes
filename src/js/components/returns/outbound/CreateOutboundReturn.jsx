@@ -56,9 +56,9 @@ const FIELDS = {
       autoload: false,
       cache: false,
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
-    getDynamicAttr: props => ({
+    getDynamicAttr: (props) => ({
       loadOptions: props.debouncedLocationsFetch,
       disabled: !!props.outboundReturnId,
     }),
@@ -75,9 +75,9 @@ const FIELDS = {
       autoload: false,
       cache: false,
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
-    getDynamicAttr: props => ({
+    getDynamicAttr: (props) => ({
       loadOptions: props.debouncedLocationsFetch,
       disabled: !!props.outboundReturnId,
     }),
@@ -91,13 +91,12 @@ class CreateOutboundReturn extends Component {
       values: this.props.initialValues,
     };
 
-    this.debouncedLocationsFetch =
-      debounceLocationsFetch(
-        this.props.debounceTime,
-        this.props.minSearchLength,
-        [], // activityCodes
-        true, // fetchAll
-      );
+    this.debouncedLocationsFetch = debounceLocationsFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+      [], // activityCodes
+      true, // fetchAll
+    );
   }
 
   componentDidMount() {
@@ -166,10 +165,10 @@ class CreateOutboundReturn extends Component {
 
   saveOutboundReturns(values) {
     if (
-      values.origin &&
-      values.destination &&
-      values.description &&
-      !this.props.match.params.outboundReturnId
+      values.origin
+      && values.destination
+      && values.description
+      && !this.props.match.params.outboundReturnId
     ) {
       this.props.showSpinner();
 
@@ -205,7 +204,7 @@ class CreateOutboundReturn extends Component {
   render() {
     return (
       <Form
-        onSubmit={values => this.saveOutboundReturns(values)}
+        onSubmit={(values) => this.saveOutboundReturns(values)}
         validate={validate}
         initialValues={this.state.values}
         mutators={{
@@ -240,7 +239,7 @@ class CreateOutboundReturn extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   location: state.session.currentLocation,
   isSuperuser: state.session.isSuperuser,
   debounceTime: state.session.searchConfig.debounceTime,

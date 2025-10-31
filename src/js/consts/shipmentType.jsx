@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { RiFlightTakeoffLine, RiInformationLine, RiShipLine, RiSuitcaseLine, RiTruckLine } from 'react-icons/ri';
-
+import {
+  RiFlightTakeoffLine, RiInformationLine, RiShipLine, RiSuitcaseLine, RiTruckLine,
+} from 'react-icons/ri';
 
 const ShipmentType = {
   AIR: {
@@ -22,4 +23,3 @@ const ShipmentType = {
 };
 
 export default ShipmentType;
-

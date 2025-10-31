@@ -391,9 +391,12 @@ class InventoryItemController {
             DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
             // By default set last 12 months
             Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:365
-            Map defaultDateRange = DateUtil.getDateRange(new Date(), -1)
-            params.startDate = params.startDate ? dateFormat.parse(params.startDate) : defaultDateRange.endDate - demandPeriod.days
-            params.endDate = params.endDate ? dateFormat.parse(params.endDate) : defaultDateRange.endDate
+            // Use the first day of current month as the starting point for the start date calculation
+            Map defaultStartDateRange = DateUtil.getDateRange(new Date(), 0)
+            params.startDate = params.startDate ? dateFormat.parse(params.startDate) : defaultStartDateRange.startDate - demandPeriod.days
+            // Use the last day of previous month as the end date
+            Map defaultEndDateRange = DateUtil.getDateRange(new Date(), -1)
+            params.endDate = params.endDate ? dateFormat.parse(params.endDate) : defaultEndDateRange.endDate
         }
 
         // add the current warehouse to the command object
@@ -540,7 +543,27 @@ class InventoryItemController {
         if (!commandInstance.inventory) {
             commandInstance.inventory = locationInstance?.inventory
         }
-        inventoryService.populateRecordInventoryCommand(commandInstance, params)
+
+        // We need if/else statement to avoid duplication data (OBPIH-7438)
+        if (flash.recordInventoryRows) {
+            commandInstance.recordInventoryRows = flash.recordInventoryRows.collect { RecordInventoryRowCommand it ->
+                Location binLocation = it?.binLocation ? Location.get(it.binLocation.id) : null
+                [
+                    id: it.id,
+                    lotNumber: it.lotNumber,
+                    binLocation: binLocation,
+                    inventoryItem: it.inventoryItem,
+                    expirationDate: it.expirationDate,
+                    description: it.description,
+                    oldQuantity: it.oldQuantity,
+                    newQuantity: it.newQuantity,
+                    comment: it.comment,
+                    error: it.error,
+                ]
+            }
+        } else {
+            inventoryService.populateRecordInventoryCommand(commandInstance, params)
+        }
 
         Product productInstance = commandInstance.product
         List transactionEntryList = inventoryService.getTransactionEntriesByInventoryAndProduct(commandInstance?.inventory, [productInstance])
@@ -580,26 +603,10 @@ class InventoryItemController {
             return
         }
 
-        log.info("User chose to validate or there are errors")
-        def warehouseInstance = Location.get(session?.warehouse?.id)
-
-        commandInstance.inventory = warehouseInstance?.inventory
-        commandInstance.inventoryLevel = InventoryLevel.findByProductAndInventory(commandInstance?.product, commandInstance?.inventory)
-
-        Product productInstance = commandInstance.product
-        List transactionEntryList = inventoryService.getTransactionEntriesByInventoryAndProduct(commandInstance?.inventory, [productInstance])
-
-        // Get the inventory warning level for the given product and inventory
-        commandInstance.inventoryLevel = InventoryLevel.findByProductAndInventory(commandInstance?.product, commandInstance?.inventory)
-
-        commandInstance.totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[productInstance] ?: 0
-
-        log.info "commandInstance.recordInventoryRows: "
-        commandInstance?.recordInventoryRows.each {
-            log.info "it ${it?.id}:${it?.lotNumber}:${it?.oldQuantity}:${it?.newQuantity}"
-        }
-
-        render(view: "showRecordInventory", model: [commandInstance: commandInstance])
+        // We pass the data to flash to preserve data after a redirect, so it can be used in the showRecordInventory method (OBPIH-7438)
+        flash.recordInventoryRows = commandInstance.recordInventoryRows
+        flash.errors = commandInstance.errors
+        redirect(action: "showRecordInventory", params: ['product.id': commandInstance.product.id])
     }
 
     def showTransactions() {

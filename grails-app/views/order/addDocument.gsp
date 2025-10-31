@@ -10,12 +10,12 @@
 
 	<div class="body">
 		<g:if test="${flash.message}">
-			<div class="message">
+			<div class="message" role="status" aria-label="message">
 				${flash.message}
 			</div>
 		</g:if>
 		<g:hasErrors bean="${orderInstance}">
-			<div class="errors">
+			<div class="errors" role="alert" aria-label="error-message">
 				<g:renderErrors bean="${orderInstance}" as="list" />
 			</div>
 		</g:hasErrors>
@@ -58,7 +58,7 @@
 											name="typeId"
 											class="chzn-select-deselect"
 											noSelection="['':'']"
-											from="${org.pih.warehouse.core.DocumentType.list().sort { it.name }}"
+											from="${documentTypes}"
 											value="${documentInstance?.documentType?.id}"
 											optionKey="id" optionValue="${{format.metadata(obj:it)}}"
 											data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option')}"

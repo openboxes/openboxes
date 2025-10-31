@@ -15,10 +15,10 @@
         <div class="body">
 
             <g:if test="${flash.message}">
-	            <div class="message">${flash.message}</div>
+	            <div class="message" role="status" aria-label="message">${flash.message}</div>
             </g:if>
             <g:hasErrors bean="${locationGroupInstance}">
-	            <div class="errors">
+	            <div class="errors" role="alert" aria-label="error-message">
 	                <g:renderErrors bean="${locationGroupInstance}" as="list" />
 	            </div>
             </g:hasErrors>
@@ -49,7 +49,7 @@
                             </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="name"><warehouse:message code="address.address.label" /></label>
+                                    <label for="address.address"><warehouse:message code="address.address.label" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: locationGroupInstance?.address, field: 'address', 'errors')}">
                                     <g:textField name="address.address" value="${locationGroupInstance?.address?.address}" class="text" size="80"/>
@@ -57,7 +57,7 @@
                             </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="name"><warehouse:message code="address.address2.label" /></label>
+                                    <label for="address.address2"><warehouse:message code="address.address2.label" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: locationInstance?.address, field: 'address2', 'errors')}">
                                     <g:textField name="address.address2" value="${locationGroupInstance?.address?.address2}" class="text" size="80"/>
@@ -65,7 +65,7 @@
                             </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="name"><warehouse:message code="address.city.label" /></label>
+                                    <label for="address.city"><warehouse:message code="address.city.label" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: locationGroupInstance?.address, field: 'city', 'errors')}">
                                     <g:textField name="address.city" value="${locationGroupInstance?.address?.city}" class="text" size="80"/>
@@ -73,7 +73,7 @@
                             </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="name"><warehouse:message code="address.stateOrProvince.label" /></label>
+                                    <label for="address.stateOrProvince"><warehouse:message code="address.stateOrProvince.label" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: locationInstance?.address, field: 'stateOrProvince', 'errors')}">
                                     <g:textField name="address.stateOrProvince" value="${locationInstance?.address?.stateOrProvince}" class="text" size="80"/>
@@ -81,7 +81,7 @@
                             </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="name"><warehouse:message code="address.postalCode.label" /></label>
+                                    <label for="address.postalCode"><warehouse:message code="address.postalCode.label" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: locationGroupInstance?.address, field: 'postalCode', 'errors')}">
                                     <g:textField name="address.postalCode" value="${locationGroupInstance?.address?.postalCode}" class="text" size="80"/>
@@ -90,7 +90,7 @@
 
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="name"><warehouse:message code="address.country.label" /></label>
+                                    <label for="address.country"><warehouse:message code="address.country.label" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: locationGroupInstance?.address, field: 'country', 'errors')}">
                                     <g:textField name="address.country" value="${locationGroupInstance?.address?.country}" class="text" size="80"/>
@@ -98,7 +98,7 @@
                             </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="name"><warehouse:message code="address.description.label" /></label>
+                                    <label for="address.description"><warehouse:message code="address.description.label" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: locationGroupInstance?.address, field: 'description', 'errors')}">
                                     <g:textArea name="address.description" value="${locationGroupInstance?.address?.description}" class="text" rows="6" cols="80"/>

@@ -6,11 +6,11 @@
         <g:set var="entityName" value="${warehouse.message(code: 'locationGroups.label', default: 'Location Groups')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
     </head>
-    <body>        
+    <body>
         <div class="body">
-        
+
             <g:if test="${flash.message}">
-				<div class="message">${flash.message}</div>
+				<div class="message" role="status" aria-label="message">${flash.message}</div>
             </g:if>
 
             <div class="button-bar">
@@ -22,7 +22,7 @@
                 <h2><warehouse:message code="default.edit.label" args="[entityName]" /></h2>
                 <table>
                     <thead>
-                        <tr>      
+                        <tr>
                             <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" class="bottom"/>
                             <g:sortableColumn property="description" title="${warehouse.message(code: 'default.description.label')}" class="bottom"/>
                             <g:sortableColumn property="locations" title="${warehouse.message(code: 'locations.label')}" class="bottom"/>
@@ -31,20 +31,20 @@
                     <tbody>
 	                    <g:each in="${locationGroupInstanceList}" status="i" var="locationGroupInstance">
 							<tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'}">
-								<td>
+								<td aria-label="Name">
 									<g:link action="edit" id="${locationGroupInstance.id}">${fieldValue(bean: locationGroupInstance, field: "name")}</g:link>
 								</td>
-								<td>
+								<td aria-label="Description">
                                     ${locationGroupInstance?.address?.description}
 								</td>
-                                <td>
+                                <td aria-label="Location Count">
                                     ${locationGroupInstance.locations.size()}
                                 </td>
 							</tr>
 	                    </g:each>
                     </tbody>
                 </table>
-                <div class="paginateButtons">
+                <div class="paginateButtons" aria-label="pagination">
                     <g:paginate total="${locationGroupInstanceTotal}" />
                 </div>
             </div>

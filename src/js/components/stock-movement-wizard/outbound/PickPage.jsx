@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 
 import arrayMutators from 'final-form-arrays';
 import update from 'immutability-helper';
-import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
@@ -12,6 +11,12 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
+import picklistApi from 'api/services/PicklistApi';
+import stockMovementItemApi from 'api/services/StockMovementItemApi';
+import {
+  STOCK_MOVEMENT_BY_ID, STOCK_MOVEMENT_CREATE_PICKLIST, STOCK_MOVEMENT_ITEM_BY_ID,
+  STOCK_MOVEMENT_ITEMS,
+} from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import FilterInput from 'components/form-elements/FilterInput';
@@ -19,6 +24,8 @@ import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import EditPickModal from 'components/stock-movement-wizard/modals/EditPickModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
+import { OutboundWorkflowState } from 'consts/WorkflowState';
 import AlertMessage from 'utils/AlertMessage';
 import {
   apiClientCustomResponseHandler as apiClient,
@@ -29,6 +36,7 @@ import {
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -47,8 +55,8 @@ const FIELDS = {
     }) => {
       let className = rowValues.initial ? 'crossed-out ' : '';
       if (!subfield) { className += 'font-weight-bold'; }
-      const filterOutItems = itemFilter &&
-        !matchesProductCodeOrName({
+      const filterOutItems = itemFilter
+        && !matchesProductCodeOrName({
           product: rowValues?.product,
           filterValue: itemFilter,
         });
@@ -89,12 +97,18 @@ const FIELDS = {
         flexWidth: '1.1',
         label: 'react.stockMovement.lot.label',
         defaultMessage: 'Lot',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       expirationDate: {
         type: LabelField,
         flexWidth: '0.9',
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
+        getDynamicAttr: ({ formatLocalizedDate }) => ({
+          formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
+        }),
       },
       binLocation: {
         type: LabelField,
@@ -106,11 +120,12 @@ const FIELDS = {
         }),
         attributes: {
           showValueTooltip: true,
-          formatValue: fieldValue => fieldValue && (
+          formatValue: (fieldValue) => fieldValue && (
             <div className="d-flex">
               {fieldValue.zoneName ? <div className="text-truncate" style={{ minWidth: 30, flexShrink: 20 }}>{fieldValue.zoneName}</div> : ''}
               <div className="text-truncate">{fieldValue.zoneName ? `: ${fieldValue.name}` : fieldValue.name}</div>
-            </div>),
+            </div>
+          ),
         },
       },
       quantityRequired: {
@@ -119,7 +134,7 @@ const FIELDS = {
         defaultMessage: 'Qty required',
         flexWidth: '0.8',
         attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
         },
       },
       quantityPicked: {
@@ -128,18 +143,22 @@ const FIELDS = {
         defaultMessage: 'Qty picked',
         flexWidth: '0.7',
         attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          formatValue: (value) => (
+            <div className={!value ? 'text-danger' : null}>
+              {value.toLocaleString('en-US')}
+            </div>
+          ),
         },
       },
       buttonEditPick: {
-        label: 'react.stockMovement.editPick.label',
-        defaultMessage: 'Edit pick',
+        label: 'react.stockMovement.pick.label',
+        defaultMessage: 'Pick',
         type: EditPickModal,
         fieldKey: '',
         flexWidth: '0.7',
         attributes: {
-          title: 'react.stockMovement.editPick.label',
-          defaultTitleMessage: 'Edit Pick',
+          title: 'react.stockMovement.pick.label',
+          defaultTitleMessage: 'Pick',
         },
         getDynamicAttr: ({
           fieldValue, subfield, updatePickPageItem,
@@ -148,8 +167,8 @@ const FIELDS = {
           itemId: _.get(fieldValue, 'requisitionItem.id'),
           btnOpenDisabled: showOnly,
           subfield,
-          btnOpenText: fieldValue && fieldValue.hasChangedPick ? '' : 'react.default.button.edit.label',
-          btnOpenDefaultText: fieldValue && fieldValue.hasChangedPick ? '' : 'Edit',
+          btnOpenText: fieldValue && fieldValue.hasChangedPick ? '' : 'react.stockMovement.pick.label',
+          btnOpenDefaultText: fieldValue && fieldValue.hasChangedPick ? '' : 'Pick',
           btnOpenClassName: fieldValue && fieldValue.hasChangedPick ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
           onResponse: updatePickPageItem,
           reasonCodes,
@@ -184,7 +203,7 @@ const FIELDS = {
         getDynamicAttr: ({
           fieldValue, revertUserPick, subfield, showOnly,
         }) => ({
-          onClick: _.get(fieldValue, 'requisitionItem.id') ? () => revertUserPick(_.get(fieldValue, 'requisitionItem.id')) : () => null,
+          onClick: _.get(fieldValue, 'requisitionItem.id') ? () => revertUserPick(fieldValue?.requisitionItem?.id) : () => null,
           hidden: subfield,
           disabled: showOnly,
         }),
@@ -195,6 +214,18 @@ const FIELDS = {
     },
   },
 };
+
+// Returns indexes of rows with quantity picked 0, and without subitems.
+const getIndexesOfRowsWithEmptyPicks = (pickPageItems) =>
+  pickPageItems.reduce((acc, item, index) => {
+  // When the quantity picked is equal to 0 we have to check its subitems,
+  // because the item can be edited to 0, not cleared.
+    if (!item.quantityPicked && !item.picklistItems.length) {
+      return [...acc, index];
+    }
+
+    return acc;
+  }, []);
 
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["checkForInitialPicksChanges"] }] */
 /**
@@ -214,6 +245,9 @@ class PickPage extends Component {
       showAlert: false,
       alertMessage: '',
       itemFilter: '',
+      showOnlyErroredItems: false,
+      isExportDropdownVisible: false,
+      isPicklistCleared: false,
     };
 
     this.revertUserPick = this.revertUserPick.bind(this);
@@ -252,22 +286,22 @@ class PickPage extends Component {
 
   setPickPageItems(response, startIndex) {
     const { data } = response.data;
-    this.setState({
+    this.setState((prev) => ({
       values: {
-        ...this.state.values,
+        ...prev.values,
         pickPageItems: this.props.isPaginated ? _.uniqBy(_.concat(
-          this.state.values.pickPageItems,
+          prev.values.pickPageItems,
           _.map(
             parseResponse(data),
-            item => this.checkForInitialPicksChanges(item),
+            (item) => this.checkForInitialPicksChanges(item),
           ),
         ), 'requisitionItem.id') : _.map(
           parseResponse(data),
-          item => this.checkForInitialPicksChanges(item),
+          (item) => this.checkForInitialPicksChanges(item),
         ),
       },
       sorted: false,
-    }, () => {
+    }), () => {
       // eslint-disable-next-line max-len
       if (!_.isNull(startIndex) && this.state.values.pickPageItems.length !== this.state.totalCount) {
         this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
@@ -291,12 +325,12 @@ class PickPage extends Component {
     if (!this.props.isPaginated) {
       this.fetchPickPageItems();
     } else if (forceFetch) {
-      this.setState({
+      this.setState((prev) => ({
         values: {
-          ...this.state.values,
+          ...prev.values,
           pickPageItems: [],
         },
-      }, () => {
+      }), () => {
         this.loadMoreRows({ startIndex: 0 });
       });
     }
@@ -308,7 +342,7 @@ class PickPage extends Component {
    * @public
    */
   checkForInitialPicksChanges(pickPageItem) {
-    if (pickPageItem.picklistItems.length) {
+    if (pickPageItem.picklistItems.length && pickPageItem.autoAllocated) {
       const initialPicks = [];
       _.forEach(pickPageItem.suggestedItems, (suggestion) => {
         // search if suggested picks are inside picklist
@@ -316,7 +350,7 @@ class PickPage extends Component {
         // if yes -> compare quantityPicked of item in picklist with sugestion
         const pick = _.find(
           pickPageItem.picklistItems,
-          item => _.get(suggestion, 'inventoryItem.id') === _.get(item, 'inventoryItem.id') && _.get(item, 'binLocation.id') === _.get(suggestion, 'binLocation.id'),
+          (item) => _.get(suggestion, 'inventoryItem.id') === _.get(item, 'inventoryItem.id') && _.get(item, 'binLocation.id') === _.get(suggestion, 'binLocation.id'),
         );
         if (_.isEmpty(pick) || (pick.quantityPicked !== suggestion.quantityPicked)) {
           initialPicks.push({
@@ -337,49 +371,53 @@ class PickPage extends Component {
    * @public
    */
   fetchPickPageData() {
-    const url = `/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=4`;
-
-    return apiClient.get(url)
+    return apiClient.get(STOCK_MOVEMENT_BY_ID(this.state.values.stockMovementId), {
+      params: { stepNumber: OutboundWorkflowState.PICK_ITEMS },
+    })
       .then((resp) => {
         const { totalCount } = resp.data;
-        const { associations } = resp.data.data;
+        const { associations, picklist } = resp.data.data;
         const printPicks = _.find(
           associations.documents,
-          doc => doc.documentType === 'PICKLIST' && doc.uri.includes('print'),
+          (doc) => doc.documentType === 'PICKLIST' && doc.uri.includes('print'),
         );
-        this.setState({
+        this.setState((prev) => ({
           totalCount,
           printPicksUrl: printPicks ? printPicks.uri : '/',
           sorted: false,
-        }, () => this.props.hideSpinner());
+          values: {
+            ...prev.values,
+            picklist,
+          },
+        }), () => this.props.hideSpinner());
       })
       .catch(() => this.props.hideSpinner());
   }
 
   fetchPickPageItems() {
-    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=4`;
-    apiClient.get(url)
-      .then((response) => {
-        this.setPickPageItems(response, null);
-      });
+    apiClient.get(STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId), {
+      params: { stepNumber: OutboundWorkflowState.PICK_ITEMS },
+    }).then((response) => {
+      this.setPickPageItems(response, null);
+    });
   }
 
   fetchItemsAfterImport() {
-    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=4`;
-    apiClient.get(url)
-      .then((response) => {
-        const { data } = response.data;
-        this.setState({
-          values: {
-            ...this.state.values,
-            pickPageItems: _.map(
-              parseResponse(data),
-              item => this.checkForInitialPicksChanges(item),
-            ),
-          },
-          sorted: false,
-        });
-      });
+    apiClient.get(STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId), {
+      params: { stepNumber: OutboundWorkflowState.PICK_ITEMS, refreshPicklistItems: false },
+    }).then((response) => {
+      const { data } = response.data;
+      this.setState((prev) => ({
+        values: {
+          ...prev.values,
+          pickPageItems: _.map(
+            parseResponse(data),
+            (item) => this.checkForInitialPicksChanges(item),
+          ),
+        },
+        sorted: false,
+      }));
+    });
   }
 
   loadMoreRows({ startIndex }) {
@@ -387,11 +425,15 @@ class PickPage extends Component {
       this.setState({
         isFirstPageLoaded: true,
       });
-      const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=4`;
-      apiClient.get(url)
-        .then((response) => {
-          this.setPickPageItems(response, startIndex);
-        });
+      apiClient.get(STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId), {
+        params: {
+          offset: startIndex,
+          max: this.props.pageSize,
+          stepNumber: OutboundWorkflowState.PICK_ITEMS,
+        },
+      }).then((response) => {
+        this.setPickPageItems(response, startIndex);
+      });
     }
   }
 
@@ -404,14 +446,14 @@ class PickPage extends Component {
       .then((resp) => {
         const { pickPageItems } = resp.data.data.pickPage;
 
-        this.setState({
+        this.setState((prev) => ({
           values: {
-            ...this.state.values,
-            pickPageItems: _.map(parseResponse(pickPageItems), item =>
+            ...prev.values,
+            pickPageItems: _.map(parseResponse(pickPageItems), (item) =>
               this.checkForInitialPicksChanges(item)),
           },
           sorted: false,
-        }, () => this.props.hideSpinner());
+        }), () => this.props.hideSpinner());
       })
       .catch(() => { this.props.hideSpinner(); });
   }
@@ -439,9 +481,9 @@ class PickPage extends Component {
     const { pickPageItems } = lineItems;
     const invalidItem = _.find(
       pickPageItems,
-      pickPageItem => pickPageItem.quantityRequired > pickPageItem.quantityPicked && _.find(
+      (pickPageItem) => pickPageItem.quantityRequired > pickPageItem.quantityPicked && _.find(
         pickPageItem.picklistItems,
-        item => !item.reasonCode && !item.initial,
+        (item) => !item.reasonCode && !item.initial,
       ),
     );
 
@@ -463,6 +505,11 @@ class PickPage extends Component {
    * @public
    */
   nextPage(formValues) {
+    if (!this.validateEmptyPicks(formValues)) {
+      this.showEmptyPicksErrorMessage(formValues);
+      return;
+    }
+
     if (this.validateReasonCodes(formValues)) {
       this.props.showSpinner();
       this.validatePicklist()
@@ -480,19 +527,49 @@ class PickPage extends Component {
    * @public
    */
   updatePickPageItem(pickPageItem) {
-    const pickPageItemIndex =
-      _.findIndex(this.state.values.pickPageItems, item => _.get(item, 'requisitionItem.id') === _.get(pickPageItem, 'requisitionItem.id'));
+    const pickPageItemIndex = _.findIndex(this.state.values.pickPageItems, (item) => _.get(item, 'requisitionItem.id') === _.get(pickPageItem, 'requisitionItem.id'));
 
-    this.setState({
+    this.setState((prev) => ({
       values: {
-        ...this.state.values,
-        pickPageItems: update(this.state.values.pickPageItems, {
+        ...prev.values,
+        pickPageItems: update(prev.values.pickPageItems, {
           [pickPageItemIndex]: {
             $set: this.checkForInitialPicksChanges(parseResponse(pickPageItem)),
           },
         }),
       },
+    }), () => {
+      const { values, showOnlyErroredItems } = this.state;
+      const indexesOfEmptyPicks = getIndexesOfRowsWithEmptyPicks(values.pickPageItems);
+      this.setState({
+        showOnlyErroredItems: indexesOfEmptyPicks.length ? showOnlyErroredItems : false,
+      });
     });
+  }
+
+  async revertToClearedPick(itemId) {
+    try {
+      await stockMovementItemApi.revertPick(itemId);
+      await this.fetchRevertedItem(itemId);
+    } finally {
+      this.props.hideSpinner();
+    }
+  }
+
+  async revertToAutoPick(itemId) {
+    try {
+      await apiClient.post(STOCK_MOVEMENT_CREATE_PICKLIST(itemId));
+      await this.fetchRevertedItem(itemId);
+    } finally {
+      this.props.hideSpinner();
+    }
+  }
+
+  async fetchRevertedItem(itemId) {
+    const { data } = await apiClient.get(STOCK_MOVEMENT_ITEM_BY_ID(itemId), {
+      params: { stepNumber: OutboundWorkflowState.PICK_ITEMS, refreshPicklistItems: false },
+    });
+    this.updatePickPageItem(data.data);
   }
 
   /**
@@ -502,22 +579,55 @@ class PickPage extends Component {
    */
   revertUserPick(itemId) {
     this.props.showSpinner();
+    const { isPicklistCleared } = this.state;
 
-    const createPicklistUrl = `/api/stockMovementItems/${itemId}/createPicklist`;
-    const itemsUrl = `/api/stockMovementItems/${itemId}?stepNumber=4`;
+    if (isPicklistCleared) {
+      this.revertToClearedPick(itemId);
+      return;
+    }
 
-    apiClient.post(createPicklistUrl)
-      .then(() => {
-        apiClient.get(itemsUrl)
-          .then((resp) => {
-            const pickPageItem = resp.data.data;
+    this.revertToAutoPick(itemId);
+  }
 
-            this.updatePickPageItem(pickPageItem);
-            this.props.hideSpinner();
-          })
-          .catch(() => { this.props.hideSpinner(); });
-      })
-      .catch(() => { this.props.hideSpinner(); });
+  // Displaying an error message when an item with a quantity picked equal to 0 exists
+  showEmptyPicksErrorMessage(formValues) {
+    const emptyPicks = getIndexesOfRowsWithEmptyPicks(formValues.pickPageItems);
+    const emptyPickLinesNumber = emptyPicks.map((index) => index + 1).join(', ');
+    const alertMessage = this.props.translate(
+      'react.stockMovement.missingPickedLot.label',
+      `The picked lot is missing at rows: ${emptyPickLinesNumber}`,
+      {
+        rows: emptyPickLinesNumber,
+      },
+    );
+
+    this.setState({
+      alertMessage,
+      showAlert: emptyPicks.length,
+    });
+  }
+
+  // Managing hasError property depending on the value of quantity
+  // picked and on the existing subitems
+  validateEmptyPicks(formValues) {
+    const emptyPicks = getIndexesOfRowsWithEmptyPicks(formValues.pickPageItems);
+
+    const pickPageItems = formValues.pickPageItems.map((item, index) => {
+      if (emptyPicks.includes(index)) {
+        return { ...item, hasError: true };
+      }
+
+      return { ...item, hasError: false };
+    });
+
+    this.setState((prev) => ({
+      values: {
+        ...prev.values,
+        pickPageItems,
+      },
+    }));
+
+    return !emptyPicks.length;
   }
 
   sortByBins() {
@@ -530,51 +640,56 @@ class PickPage extends Component {
       sortedValues = _.orderBy(this.state.values.pickPageItems, ['sortOrder'], ['asc']);
     }
 
-    this.setState({
+    this.setState((prev) => ({
       values: {
-        ...this.state.values,
+        ...prev.values,
         pickPageItems: [],
       },
-    }, () => this.setState({
+    }), () => this.setState((prev) => ({
       values: {
-        ...this.state.values,
+        ...prev.values,
         pickPageItems: sortedValues,
       },
-      sorted: !this.state.sorted,
-    }));
+      sorted: !prev.sorted,
+    })));
   }
 
   exportTemplate(formValues) {
     this.props.showSpinner();
-
     const { movementNumber, stockMovementId } = formValues;
-    const url = `/api/stockMovements/exportPickListItems/${stockMovementId}`;
 
-    apiClient.get(url, { responseType: 'blob' })
-      .then((response) => {
-        fileDownload(response.data, `PickListItems${movementNumber ? `-${movementNumber}` : ''}.csv`, 'text/csv');
-        this.props.hideSpinner();
-      })
-      .catch(() => this.props.hideSpinner());
+    const fileName = `PickListItems${movementNumber ? `-${movementNumber}` : ''}-template`;
+    picklistApi.exportPicklistTemplate(stockMovementId, { fileName })
+      .finally(() => this.props.hideSpinner());
+  }
+
+  exportPick(formValues) {
+    this.props.showSpinner();
+    const { movementNumber, stockMovementId } = formValues;
+
+    const fileName = `PickListItems${movementNumber ? `-${movementNumber}` : ''}`;
+    picklistApi.exportPicklistItems(stockMovementId, { fileName })
+      .finally(() => this.props.hideSpinner());
   }
 
   importTemplate(event) {
     this.props.showSpinner();
-    const formData = new FormData();
+    if (this.state.showAlert) {
+      this.setState({ alertMessage: null, showAlert: false });
+    }
     const file = event.target.files[0];
     const { stockMovementId } = this.state.values;
 
-    formData.append('importFile', file.slice(0, file.size, 'text/csv'));
-    const config = {
-      headers: {
-        'content-type': 'multipart/form-data',
-      },
-    };
+    return picklistApi.importPicklist(stockMovementId, file)
+      .then((resp) => {
+        const { errors } = resp.data;
+        if (errors) {
+          this.setState({
+            showAlert: true,
+            alertMessage: errors,
+          });
+        }
 
-    const url = `/api/stockMovements/importPickListItems/${stockMovementId}`;
-
-    return apiClient.post(url, formData, config)
-      .then(() => {
         this.props.hideSpinner();
         this.fetchItemsAfterImport();
       })
@@ -587,9 +702,15 @@ class PickPage extends Component {
     const url = `/api/stockMovements/createPickList/${this.state.values.stockMovementId}`;
     this.props.showSpinner();
 
+    if (this.state.showAlert) {
+      this.setState({ alertMessage: null, showAlert: false });
+    }
     apiClient.get(url)
       .then(() => this.fetchAllData(true))
-      .catch(() => this.props.hideSpinner());
+      .finally(() => {
+        this.setState({ isPicklistCleared: false });
+        this.props.hideSpinner();
+      });
   }
 
   /**
@@ -617,87 +738,305 @@ class PickPage extends Component {
     });
   }
 
+  confirmClearPicklist() {
+    confirmAlert({
+      title: this.props.translate('react.stockMovement.confirmAlert.clearPick.title.label', 'Confirm clear pick'),
+      message: this.props.translate(
+        'react.stockMovement.confirmAlert.clearPick.label',
+        'Clear pick will make all the pick lines on this page empty. You will have to enter the pick information manually. You should use this option when you have already picked or sent the items physically. Are you sure you want to proceed?',
+      ),
+      buttons: [
+        {
+          label: this.props.translate('react.default.yes.label', 'Yes'),
+          onClick: () => {
+            this.clearPicklist();
+          },
+        },
+        {
+          label: this.props.translate('react.default.no.label', 'No'),
+        },
+      ],
+    });
+  }
+
+  confirmPreviousPage(values, emptyPicksCount) {
+    confirmAlert({
+      title: this.props.translate('react.default.areYouSure.label', 'Are you sure?'),
+      message: this.props.translate(
+        'react.stockMovement.confirmAlert.pickPage.previousPage.label',
+        `You have ${emptyPicksCount} line/lines with an empty pick. If you go back, autopick will be generated for all empty lines. All other edits will remain saved. Are you sure you want to proceed?`,
+        {
+          emptyPicksCount,
+        },
+      ),
+      buttons: [
+        {
+          label: this.props.translate('react.default.yes.label', 'Yes'),
+          onClick: () => {
+            this.props.previousPage(values);
+          },
+        },
+        {
+          label: this.props.translate('react.default.no.label', 'No'),
+        },
+      ],
+    });
+  }
+
+  async clearPicklist() {
+    const { picklist } = this.state.values;
+    if (this.state.showAlert) {
+      this.setState({ alertMessage: null, showAlert: false });
+    }
+    this.props.showSpinner();
+    try {
+      await picklistApi.clearPicklist(picklist?.id);
+      this.setState({ isPicklistCleared: true });
+      const picklistItems = this.state.values.pickPageItems;
+      this.setState((prevState) => ({
+        values: ({
+          ...prevState.values,
+          pickPageItems: picklistItems
+            .map((item) => ({ ...item, picklistItems: [], quantityPicked: 0 })),
+        }),
+      }));
+    } finally {
+      this.props.hideSpinner();
+    }
+  }
+
+  /**
+   * Method to check if any item is missing the pick
+   */
+  isMissingPick() {
+    const { pickPageItems } = this.state.values;
+    // Check if any item has an empty pick (picklistItems array empty)
+    return pickPageItems.some((item) => !item.picklistItems?.length);
+  }
+
+  onSaveAndExit(values) {
+    if (!this.validateEmptyPicks(values)) {
+      this.showEmptyPicksErrorMessage(values);
+      return;
+    }
+
+    window.location = STOCK_MOVEMENT_URL.show(values.stockMovementId);
+  }
+
+  handleExportDropdown() {
+    this.setState((prevState) => ({ isExportDropdownVisible: !prevState.isExportDropdownVisible }));
+  }
+
   render() {
-    const { itemFilter } = this.state;
+    const {
+      showOnlyErroredItems,
+      itemFilter,
+      showAlert,
+      alertMessage,
+      isExportDropdownVisible,
+    } = this.state;
     const { showOnly } = this.props;
+    const emptyPicksCount = getIndexesOfRowsWithEmptyPicks(this.state.values?.pickPageItems).length;
+
     return (
       <Form
-        onSubmit={values => this.nextPage(values)}
+        onSubmit={(values) => this.nextPage(values)}
         mutators={{ ...arrayMutators }}
         initialValues={this.state.values}
         render={({ handleSubmit, values }) => (
           <div className="d-flex flex-column">
-            <AlertMessage show={this.state.showAlert} message={this.state.alertMessage} danger />
-            { !showOnly ?
-              <span className="buttons-container">
-                <FilterInput
-                  itemFilter={itemFilter}
-                  onChange={e => this.setState({ itemFilter: e.target.value })}
-                  onClear={() => this.setState({ itemFilter: '' })}
-                />
-                <label
-                  htmlFor="csvInput"
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                >
-                  <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
-                  <input
-                    id="csvInput"
-                    type="file"
-                    style={{ display: 'none' }}
-                    onChange={this.importTemplate}
-                    onClick={(event) => {
-                      // eslint-disable-next-line no-param-reassign
-                      event.target.value = null;
-                    }}
-                    accept=".csv"
+            <AlertMessage show={showAlert} message={alertMessage} danger />
+            { !showOnly
+              ? (
+                <span className="buttons-container">
+                  <FilterInput
+                    itemFilter={itemFilter}
+                    onChange={(e) => this.setState({ itemFilter: e.target.value })}
+                    onClear={() => this.setState({ itemFilter: '' })}
                   />
-                </label>
+                  {this.isMissingPick() && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (emptyPicksCount) {
+                          this.validateEmptyPicks(values);
+                          this.setState({ showOnlyErroredItems: !showOnlyErroredItems });
+                        }
+                      }}
+                      className={`float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-3 ${showOnlyErroredItems ? 'active' : ''}`}
+                    >
+                      <span>
+                        {emptyPicksCount}
+                        {' '}
+                        <Translate
+                          id="react.stockMovement.erroredItemsCount.label"
+                          defaultMessage="item(s) require your attention"
+                        />
+                      </span>
+                    </button>
+                  )}
+                  <label
+                    htmlFor="csvInput"
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs mr-1"
+                  >
+                    <span>
+                      <i className="fa fa-download pr-2" />
+                      <Translate
+                        id="react.default.button.importTemplate.label"
+                        defaultMessage="Import template"
+                      />
+                    </span>
+                    <input
+                      id="csvInput"
+                      type="file"
+                      style={{ display: 'none' }}
+                      onChange={this.importTemplate}
+                      onClick={(event) => {
+                        // eslint-disable-next-line no-param-reassign
+                        event.target.value = null;
+                      }}
+                      accept=".csv"
+                    />
+                  </label>
+                  <div className="dropdown">
+                    <button
+                      type="button"
+                      onClick={() => this.handleExportDropdown()}
+                      className="dropdown-button float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                    >
+                      <span>
+                        <i className="fa fa-sign-out pr-2" />
+                        Export
+                      </span>
+                    </button>
+                    <div className={`dropdown-content print-buttons-container col-md-3 flex-grow-1
+                      ${isExportDropdownVisible ? 'visible' : ''}`}
+                    >
+                      <a
+                        href="#"
+                        className="py-1 mb-1 btn btn-outline-secondary"
+                        rel="noopener noreferrer"
+                        onClick={() => this.exportPick(values)}
+                      >
+                        <span>
+                          <i className="fa fa-upload pr-2" />
+                          <Translate
+                            id="react.stockMovement.pickListItem.export.label"
+                            defaultMessage="Export Pick"
+                          />
+                        </span>
+                      </a>
+                      <a
+                        href="#"
+                        className="py-1 mb-1 btn btn-outline-secondary"
+                        rel="noopener noreferrer"
+                        onClick={() => this.exportTemplate(values)}
+                      >
+                        <span>
+                          <i className="fa fa-upload pr-2" />
+                          <Translate
+                            id="react.default.button.exportTemplate.label"
+                            defaultMessage="Export template"
+                          />
+                        </span>
+                      </a>
+                    </div>
+                  </div>
+                  <a
+                    href={`${this.state.printPicksUrl}${this.state.sorted ? '?sorted=true' : ''}`}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <span>
+                      <i className="fa fa-print pr-2" />
+                      <Translate
+                        id="react.stockMovement.printPicklist.label"
+                        defaultMessage="Print picklist"
+                      />
+                    </span>
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => this.confirmClearPicklist()}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
+                  >
+                    <span>
+                      <i className="fa fa-refresh pr-2" />
+                      <Translate
+                        id="react.stockMovement.clearPick.label"
+                        defaultMessage="Clear pick"
+                      />
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => this.refresh()}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
+                  >
+                    <span>
+                      <i className="fa fa-refresh pr-2" />
+                      <Translate
+                        id="react.stockMovement.button.redoAutopick.label"
+                        defaultMessage="Redo Autopick"
+                      />
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => this.onSaveAndExit(values)}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
+                    disabled={emptyPicksCount}
+                  >
+                    <span>
+                      <i className="fa fa-sign-out pr-2" />
+                      <Translate
+                        id="react.default.button.saveAndExit.label"
+                        defaultMessage="Save and exit"
+                      />
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => this.sortByBins()}
+                    className="float-right ml-1 mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                  >
+                    {this.state.sorted && (
+                      <span>
+                        <i className="fa fa-sort pr-2" />
+                        <Translate
+                          id="react.stockMovement.originalOrder.label"
+                          defaultMessage="Original order"
+                        />
+                      </span>
+                    )}
+                    {!this.state.sorted && (
+                      <span>
+                        <i className="fa fa-sort pr-2" />
+                        <Translate
+                          id="react.stockMovement.sortByBins.label"
+                          defaultMessage="Sort by bins"
+                        />
+                      </span>
+                    )}
+                  </button>
+                </span>
+              )
+              : (
                 <button
                   type="button"
-                  onClick={() => this.exportTemplate(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                  onClick={() => this.props.history.push(STOCK_MOVEMENT_URL.listRequest())}
+                  className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                 >
-                  <span><i className="fa fa-upload pr-2" /><Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" /></span>
+                  <span>
+                    <i className="fa fa-sign-out pr-2" />
+                    <Translate
+                      id="react.default.button.exit.label"
+                      defaultMessage="Exit"
+                    />
+                  </span>
                 </button>
-                <a
-                  href={`${this.state.printPicksUrl}${this.state.sorted ? '?sorted=true' : ''}`}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <span><i className="fa fa-print pr-2" /><Translate id="react.stockMovement.printPicklist.label" defaultMessage="Print picklist" /></span>
-                </a>
-                <button
-                  type="button"
-                  onClick={() => this.refresh()}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
-                >
-                  <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { window.location = STOCK_MOVEMENT_URL.show(values.stockMovementId); }}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
-                >
-                  <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => this.sortByBins()}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
-                >
-                  {this.state.sorted && <span><i className="fa fa-sort pr-2" /><Translate id="react.stockMovement.originalOrder.label" defaultMessage="Original order" /></span>}
-                  {!this.state.sorted && <span><i className="fa fa-sort pr-2" /><Translate id="react.stockMovement.sortByBins.label" defaultMessage="Sort by bins" /></span>}
-                </button>
-              </span>
-                :
-              <button
-                type="button"
-                onClick={() => this.props.history.push(STOCK_MOVEMENT_URL.listRequest())}
-                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
-              >
-                <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
-              </button> }
+              )}
             <form onSubmit={handleSubmit} className="print-mt">
               <div className="table-form">
                 {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
@@ -713,13 +1052,22 @@ class PickPage extends Component {
                   loadMoreRows: this.loadMoreRows,
                   isRowLoaded: this.isRowLoaded,
                   isPaginated: this.props.isPaginated,
+                  showOnlyErroredItems,
                   showOnly,
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
                   itemFilter,
+                  formatLocalizedDate: this.props.formatLocalizedDate,
                 }))}
               </div>
               <div className="d-print-none submit-buttons">
-                <button type="button" disabled={showOnly} className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
+                <button
+                  type="button"
+                  disabled={showOnly}
+                  className="btn btn-outline-primary btn-form btn-xs"
+                  onClick={() => (emptyPicksCount
+                    ? this.confirmPreviousPage(values, emptyPicksCount)
+                    : this.props.previousPage(values))}
+                >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button type="submit" disabled={showOnly} className="btn btn-outline-primary btn-form float-right btn-xs">
@@ -734,7 +1082,7 @@ class PickPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   reasonCodes: state.reasonCodes.data,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
@@ -742,6 +1090,7 @@ const mapStateToProps = state => ({
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
   currentLocale: state.session.activeLanguage,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner, fetchReasonCodes })(PickPage);
@@ -777,4 +1126,5 @@ PickPage.propTypes = {
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };
