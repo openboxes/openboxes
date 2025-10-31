@@ -88,8 +88,8 @@ const useExpirationHistoryReport = ({
     loading,
   } = useTableDataV2({
     url: EXPIRATION_HISTORY_REPORT,
-    errorMessageId: 'react.cycleCount.table.errorMessage.label',
-    defaultErrorMessage: 'Unable to fetch products',
+    errorMessageId: 'react.report.expirationHistory.unableToLoadData.label',
+    defaultErrorMessage: 'Unable to load data',
     shouldFetch: shouldFetch
       && (filterParams.endDate || defaultFilterValues.endDate)
       && (filterParams.startDate || defaultFilterValues.startDate),
