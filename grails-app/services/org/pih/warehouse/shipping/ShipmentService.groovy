@@ -26,7 +26,6 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventType
-import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.ListCommand
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.MailService
