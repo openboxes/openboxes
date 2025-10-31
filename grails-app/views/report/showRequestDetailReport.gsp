@@ -1,4 +1,5 @@
 <%@ page import="org.pih.warehouse.core.ActivityCode" %>
+<%@ page contentType="text/html;charset=UTF-8" defaultCodec="html" %>
 <html>
 <head>
     <title><g:message code="report.requestDetailReport.label" default="Request Detail Report"/></title>
