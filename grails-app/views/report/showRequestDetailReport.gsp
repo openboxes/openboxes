@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" defaultCodec="html" %>
+<%@ page import="org.pih.warehouse.core.ActivityCode" %>
 <html>
 <head>
     <title><g:message code="report.requestDetailReport.label" default="Request Detail Report"/></title>
@@ -23,6 +23,7 @@
                                                   noSelection="['':'']"
                                                   groupBy="locationType"
                                                   multiple="multiple"
+                                                  activityCode="${ActivityCode.MANAGE_INVENTORY}"
                                                   value="${params?.origin}"/>
                             </div>
                             <div class="filter-list-item">
@@ -50,6 +51,17 @@
                                                       name="category"
                                                       noSelection="['':'']"
                                                       value="${params?.category}"/>
+                                </p>
+                                <p>
+                                    <label>
+                                        <g:checkBox name="includeCategoryChildren"
+                                                    value="${params?.includeCategoryChildren}"
+                                                    checked="true"/>
+                                        ${warehouse.message(
+                                                code:'report.search.includeCategoryChildren.label',
+                                                default: 'Include all products in all subcategories',
+                                        )}
+                                    </label>
                                 </p>
                             </div>
                             <div class="filter-list-item">
@@ -179,6 +191,9 @@
           data.push({ name: "category", value: $("#category").val() });
           data.push({ name: "tags", value: $("#tags").val() });
           data.push({ name: "catalogs", value: $("#catalogs").val() });
+          if($('#includeCategoryChildren').is(':checked')) {
+            data.push({ name: "includeCategoryChildren", value: $("#includeCategoryChildren").val() });
+          }
         },
         "fnServerData": function ( sSource, aoData, fnCallback ) {
           $.ajax( {
@@ -233,7 +248,7 @@
             { "mData": "reasonCodeClassification"},
           ],
         "dom": '<"top"i>rt<"bottom"flp><"clear">',
-        "aaSorting": [[ 0, "asc" ]],
+        "aaSorting": [[ 3, "asc" ], [ 2, "desc" ]],  // sort by: origin, date issued
       };
 
       $('#requestDetailReportTable').dataTable(options);
@@ -270,6 +285,9 @@
                 catalogs: $("#catalogs").val(),
                 format: "text/csv"
               };
+              if($('#includeCategoryChildren').is(':checked')) {
+                params.includeCategoryChildren = $("#includeCategoryChildren").val();
+              }
               var queryString = $.param(params, true);
               window.location.href = '${request.contextPath}/json/getRequestDetailReport?' + queryString;
           }
