@@ -30,12 +30,7 @@ const AsyncStockMovement = Loadable({
 });
 
 const AsyncStockMovementInbound = Loadable({
-  loader: () => import('components/stock-movement-wizard/StockMovementInbound'),
-  loading: Loading,
-});
-
-const AsyncStockMovementInbound2 = Loadable({
-  loader: () => import('components/stock-movement-wizard/inboundV2/InboundV2'),
+  loader: () => import('components/stock-movement-wizard/inboundV2/Inbound'),
   loading: Loading,
 });
 
@@ -250,8 +245,7 @@ const Router = (props) => {
             <MainLayoutRoute path="**/inventory/cycleCount/resolve" component={AsyncCycleCountResolveStep} />
             <MainLayoutRoute path="**/inventory/cycleCount/reporting" component={AsyncCycleCountReporting} />
             <MainLayoutRoute path="**/inventory/cycleCount" component={AsyncCycleCount} />
-            <MainLayoutRoute path="**/stockMovement/createInbound/:stockMovementId?" component={AsyncStockMovementInbound} />
-            <MainLayoutRouteV2 path="**/stockMovement/createInboundV2/:stockMovementId?" component={AsyncStockMovementInbound2} />
+            <MainLayoutRouteV2 path="**/stockMovement/createInbound/:stockMovementId?" component={AsyncStockMovementInbound} />
             <MainLayoutRoute path="**/stockMovement/createCombinedShipments/:stockMovementId?" component={AsyncStockMovementCombinedShipments} />
             <MainLayoutRoute path="**/stockMovement/createRequest/:stockMovementId?" component={AsyncStockMovementRequest} />
             <MainLayoutRoute path="**/stockMovement/verifyRequest/:stockMovementId?" component={AsyncStockMovementVerifyRequest} />

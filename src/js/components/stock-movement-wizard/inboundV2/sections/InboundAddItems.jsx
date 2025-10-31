@@ -19,7 +19,7 @@ import useInboundAddItemsColumns from 'hooks/inboundV2/addItems/useInboundAddIte
 import useInboundAddItemsForm from 'hooks/inboundV2/addItems/useInboundAddItemsForm';
 import useResetScrollbar from 'hooks/useResetScrollbar';
 
-const InboundV2AddItems = ({
+const InboundAddItems = ({
   next,
   previous,
 }) => {
@@ -209,9 +209,9 @@ const InboundV2AddItems = ({
   );
 };
 
-export default InboundV2AddItems;
+export default InboundAddItems;
 
-InboundV2AddItems.propTypes = {
+InboundAddItems.propTypes = {
   next: PropTypes.func.isRequired,
   previous: PropTypes.func.isRequired,
 };
