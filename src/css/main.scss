@@ -1659,6 +1659,47 @@ div.search-input:focus-within {
   padding: 20px;
   display: flex;
   flex-direction: column;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    padding-left: 6px;
+
+    &__title {
+      font-size: 24px;
+    }
+
+    &__subtitle {
+      font-size: 16px;
+    }
+  }
+
+  &__main {
+    padding: 0 4px;
+    overflow-y: auto;
+    max-height: 400px;
+    margin-bottom: 15px;
+
+    &::-webkit-scrollbar {
+      width: 0.5em;
+      height: 0.5em;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--blue-200);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--blue-301);
+      border-radius: 4px;
+    }
+  }
+
+  &__buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
 }
 
 // Disabling resizing of textarea
@@ -1704,6 +1745,10 @@ div.search-input:focus-within {
 
 .min-width-250 {
   min-width: 250px;
+}
+
+.min-width-1000 {
+  min-width: 1000px;
 }
 
 .w-90 {
