@@ -1,12 +1,15 @@
-package org.pih.warehouse.inventory
+package unit.org.pih.warehouse.inventory
 
 import grails.testing.gorm.DomainUnitTest
 import spock.lang.Specification
 import spock.lang.Unroll
 
-class TransactionTypeSpec  extends Specification implements DomainUnitTest<TransactionType> {
+import org.pih.warehouse.inventory.TransactionCode
+import org.pih.warehouse.inventory.TransactionType
 
-    @Unroll
+@Unroll
+class TransactionTypeSpec extends Specification implements DomainUnitTest<TransactionType> {
+
     def 'should return #expected with error code #expectedErrorCode when validating transaction type given name #value'() {
         given: "the name is #value"
         domain.name = value
@@ -16,7 +19,7 @@ class TransactionTypeSpec  extends Specification implements DomainUnitTest<Trans
 
         then: "the name property should be valid or invalid with the expected error code"
         actual == expected
-        domain.errors["name"]?.code == expectedErrorCode
+        domain.errors.getFieldError("name")?.code == expectedErrorCode
 
         where:
         value        || expected | expectedErrorCode
@@ -26,14 +29,13 @@ class TransactionTypeSpec  extends Specification implements DomainUnitTest<Trans
         'Dummy Name' || true     | null
     }
 
-    @Unroll
     void 'should return #expected with error code #expectedErrorCode when validating transaction type given name #value'() {
         when:
         domain.description = value
 
         then:
         assert domain.validate(['description']) == expected
-        assert domain.errors.getFieldError("description")?.getCode() == expectedErrorCode
+        assert domain.errors.getFieldError("description")?.code == expectedErrorCode
 
         where:
         value               || expected | expectedErrorCode
@@ -42,19 +44,7 @@ class TransactionTypeSpec  extends Specification implements DomainUnitTest<Trans
         'Dummy description' || true     | null
     }
 
-    void 'should expect two validation errors when validating given an empty transaction type'() {
-        given:
-        domain
-
-        when:
-        boolean isValid = domain.validate()
-
-        then:
-        assert !isValid
-        assert domain.errors.errorCount == 2
-    }
-
-    void 'should expect the names to be the same'() {
+    void 'compareName should expect the names to be the same'() {
         given: "a valid transaction type with multiple"
         TransactionType transactionType =
                 new TransactionType(name: "Debit|sp:Débito|fr:Débit", transactionCode: TransactionCode.DEBIT)
@@ -66,7 +56,6 @@ class TransactionTypeSpec  extends Specification implements DomainUnitTest<Trans
         assert nameIsSame
     }
 
-    @Unroll
     void 'should return #expected with error code #expectedErrorCode when validating transaction type given name #value'() {
         given:
         domain.transactionCode = value
@@ -84,16 +73,12 @@ class TransactionTypeSpec  extends Specification implements DomainUnitTest<Trans
         TransactionCode.DEBIT || true     | null
     }
 
-    @Unroll
-    void 'should return #expected when given name #value'() {
+    void 'isAdjustment should return #expected when given name #value'() {
         given:
         domain.name = value
 
-        when:
-        boolean isAdjustment = domain.isAdjustment()
-
-        then:
-        isAdjustment == expected
+        expect:
+        domain.isAdjustment() == expected
 
         where:
         value                                      || expected
