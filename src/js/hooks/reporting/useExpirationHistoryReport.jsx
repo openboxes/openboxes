@@ -1,134 +1,283 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
+import _ from 'lodash';
+import { useSelector } from 'react-redux';
+import { getCurrentLocation } from 'selectors';
 
+import { EXPIRATION_HISTORY_REPORT } from 'api/urls';
+import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
+import { INVENTORY_ITEM_URL, INVENTORY_URL } from 'consts/applicationUrls';
+import { DateFormatDateFns } from 'consts/timeFormat';
+import useSpinner from 'hooks/useSpinner';
+import useTableDataV2 from 'hooks/useTableDataV2';
+import useTablePagination from 'hooks/useTablePagination';
+import useTranslate from 'hooks/useTranslate';
+import dateWithoutTimeZone, { formatDateToDateOnlyString, formatISODate } from 'utils/dateUtils';
+import exportFileFromAPI from 'utils/file-download-util';
 
-const useExpirationHistoryReport = () => {
+const useExpirationHistoryReport = ({
+  filterParams,
+  defaultFilterValues,
+  shouldFetch,
+  setShouldFetch,
+  filtersInitialized,
+}) => {
   const columnHelper = createColumnHelper();
 
+  const translate = useTranslate();
+
+  const spinner = useSpinner();
+
+  const [totalCount, setTotalCount] = useState(0);
+
+  const currentLocation = useSelector(getCurrentLocation);
+
+  const {
+    paginationProps,
+    offset,
+    pageSize,
+    serializedParams,
+    setSerializedParams,
+  } = useTablePagination({
+    defaultPageSize: 10,
+    totalCount,
+    filterParams,
+    setShouldFetch,
+    disableAutoUpdateFilterParams: true,
+  });
+
+  const paginationParams = (paginate) => (paginate ? {
+    'paginationParams.offset': `${offset}`,
+    'paginationParams.max': `${pageSize}`,
+  } : {});
+
+  const getParams = ({
+    paginate = true,
+  }) => _.omitBy({
+    ...paginationParams(paginate),
+    endDate: dateWithoutTimeZone({
+      date: filterParams.endDate || defaultFilterValues.endDate,
+    }),
+    startDate: dateWithoutTimeZone({
+      date: filterParams.startDate || defaultFilterValues.startDate,
+    }),
+  }, (val) => {
+    if (typeof val === 'boolean') {
+      return !val;
+    }
+    return _.isEmpty(val);
+  });
+
+  const exportData = () => {
+    spinner.show();
+    const date = new Date();
+    const [month, day, year] = [date.getMonth(), date.getDate(), date.getFullYear()];
+    const [hour, minutes, seconds] = [date.getHours(), date.getMinutes(), date.getSeconds()];
+    exportFileFromAPI({
+      url: EXPIRATION_HISTORY_REPORT,
+      params: getParams({ paginate: false }),
+      filename: `ExpirationHistoryReport-${currentLocation?.name}-${year}${month}${day}-${hour}${minutes}${seconds}`,
+      afterExporting: spinner.hide,
+    });
+  };
+
+  const {
+    tableData,
+    loading,
+  } = useTableDataV2({
+    url: EXPIRATION_HISTORY_REPORT,
+    errorMessageId: 'react.cycleCount.table.errorMessage.label',
+    defaultErrorMessage: 'Unable to fetch products',
+    shouldFetch: shouldFetch
+      && (filterParams.endDate || defaultFilterValues.endDate)
+      && (filterParams.startDate || defaultFilterValues.startDate),
+    disableInitialLoading: true,
+    getParams,
+    pageSize,
+    offset,
+    searchTerm: null,
+    filterParams,
+    serializedParams,
+    setShouldFetch,
+    filtersInitialized,
+  });
+
+  useEffect(() => {
+    setTotalCount(tableData.totalCount);
+  }, [tableData]);
+
   const columns = useMemo(() => [
-    columnHelper.accessor('transactionId', {
+    columnHelper.accessor('transactionNumber', {
       header: () => (
-        <TableHeaderCell columnId="transactionId">
-          Transaction Id
+        <TableHeaderCell columnId="transactionNumber">
+          {translate('react.report.expirationHistory.transactionId.label', 'Transaction Id')}
         </TableHeaderCell>
       ),
-      cell: () => (
-        <div className="rt-td pb-0 d-flex align-items-start">
-          1
-        </div>
+      cell: ({ getValue, row: { original: { transactionId } } }) => (
+        <TableCell
+          link={INVENTORY_URL.showTransaction(transactionId)}
+          className="rt-td pb-0"
+        >
+          <div>
+            {getValue()}
+          </div>
+        </TableCell>
       ),
+      meta: {
+        pinned: 'left',
+      },
+      size: 145,
     }),
     columnHelper.accessor('transactionDate', {
       header: () => (
         <TableHeaderCell columnId="transactionDate">
-          Transaction Date
+          {translate('react.report.expirationHistory.transactionDate.label', 'Transaction Date')}
         </TableHeaderCell>
       ),
-      cell: () => (
+      cell: ({ getValue }) => (
         <div className="rt-td pb-0 d-flex align-items-start">
-          1
+          {formatISODate(getValue(), DateFormatDateFns.DD_MMM_YYYY)}
         </div>
       ),
-    }), columnHelper.accessor('code', {
+      meta: {
+        pinned: 'left',
+      },
+      size: 145,
+    }), columnHelper.accessor('productCode', {
       header: () => (
-        <TableHeaderCell columnId="code">
-          Code
+        <TableHeaderCell columnId="productCode">
+          {translate('react.report.expirationHistory.code.label', 'Code')}
         </TableHeaderCell>
       ),
-      cell: () => (
-        <div className="rt-td pb-0 d-flex align-items-start">
-          1
-        </div>
+      cell: ({ getValue, row: { original: { productId } } }) => (
+        <TableCell
+          link={INVENTORY_ITEM_URL.showStockCard(productId)}
+          className="rt-td pb-0"
+        >
+          <div>
+            {getValue()}
+          </div>
+        </TableCell>
       ),
+      meta: {
+        pinned: 'left',
+      },
+      size: 80,
     }), columnHelper.accessor('productName', {
       header: () => (
         <TableHeaderCell columnId="productName">
-          Product Name
+          {translate('react.report.expirationHistory.productName.label', 'Product Name')}
         </TableHeaderCell>
       ),
-      cell: () => (
-        <div className="rt-td pb-0 d-flex align-items-start">
-          Category
-        </div>
+      cell: ({ getValue, row: { original: { productId } } }) => (
+        <TableCell
+          link={INVENTORY_ITEM_URL.showStockCard(productId)}
+          className="rt-td pb-0 multiline-cell"
+          customTooltip
+          tooltipLabel={getValue()}
+        >
+          <div className="limit-lines-2">
+            {getValue()}
+          </div>
+        </TableCell>
       ),
+      size: 360,
     }),
-    columnHelper.accessor('category', {
+    columnHelper.accessor('category.name', {
       header: () => (
-        <TableHeaderCell columnId="category">
-          Category
+        <TableHeaderCell columnId="category.name">
+          {translate('react.report.expirationHistory.category.label', 'Category')}
         </TableHeaderCell>
       ),
-      cell: () => (
-        <div className="rt-td pb-0 d-flex align-items-start">
-          1
-        </div>
+      cell: ({ getValue }) => (
+        <TableCell
+          className="rt-td multiline-cell"
+          tooltip
+          tooltipLabel={getValue()}
+        >
+          <div className="truncate-text">{getValue()}</div>
+        </TableCell>
       ),
+      size: 180,
     }),
     columnHelper.accessor('lotNumber', {
       header: () => (
         <TableHeaderCell columnId="lotNumber">
-          Lot Number
+          {translate('react.report.expirationHistory.lotNumber.label', 'Lot Number')}
         </TableHeaderCell>
       ),
-      cell: () => (
+      cell: ({ getValue }) => (
         <div className="rt-td pb-0 d-flex align-items-start">
-          1
+          {getValue()}
         </div>
       ),
     }), columnHelper.accessor('expirationDate', {
       header: () => (
         <TableHeaderCell columnId="expirationDate">
-          Expiration Date
+          {translate('react.report.expirationHistory.expirationDate.label', 'Expiration Date')}
         </TableHeaderCell>
       ),
-      cell: () => (
+      cell: ({ getValue }) => (
         <div className="rt-td pb-0 d-flex align-items-start">
-          1
+          {formatDateToDateOnlyString(getValue())}
         </div>
       ),
     }), columnHelper.accessor('quantityLostToExpiry', {
       header: () => (
         <TableHeaderCell columnId="quantityLostToExpiry">
-          Quantity Lost to Expiry
+          {translate('react.report.expirationHistory.quantityLostToExpiry.label', 'Quantity Lost to Expiry')}
         </TableHeaderCell>
       ),
-      cell: () => (
+      cell: ({ getValue }) => (
         <div className="rt-td pb-0 d-flex align-items-start">
-          1
+          {getValue() || '0'}
         </div>
       ),
     }), columnHelper.accessor('unitPrice', {
       header: () => (
         <TableHeaderCell columnId="unitPrice">
-          Unit Price
+          {translate('react.report.expirationHistory.unitPrice.label', 'Unit Price')}
         </TableHeaderCell>
       ),
-      cell: () => (
+      cell: ({ getValue }) => (
         <div className="rt-td pb-0 d-flex align-items-start">
-          1
+          {getValue() || '0'}
         </div>
       ),
     }), columnHelper.accessor('valueLostToExpiry', {
       header: () => (
         <TableHeaderCell columnId="valueLostToExpiry">
-          Value Lost to Expiry
+          {translate('react.report.expirationHistory.valueLostToExpiry.label', 'Value Lost to Expiry')}
         </TableHeaderCell>
       ),
-      cell: () => (
+      cell: ({ getValue }) => (
         <div className="rt-td pb-0 d-flex align-items-start">
-          1
+          {getValue() || '0'}
         </div>
       ),
     }),
   ], []);
 
+  const emptyTableMessage = !filterParams.startDate && !filterParams.endDate
+    ? {
+      id: 'react.report.expirationHistory.selectATimeRange.label',
+      defaultMessage: 'Select a time range from above filters to load the table.',
+    }
+    : {
+      id: 'react.report.expirationHistory.noResultFound.label',
+      defaultMessage: 'No result found.',
+    };
+
   return {
-    tableData: { totalCount: 0, data: [] },
     columns,
-    loading: false,
-    emptyTableMessage: 'No data available',
+    loading,
+    emptyTableMessage,
+    tableData,
+    paginationProps,
+    setSerializedParams,
+    exportData,
   };
 };
 
