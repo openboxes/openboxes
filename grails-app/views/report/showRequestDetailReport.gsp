@@ -249,7 +249,7 @@
             { "mData": "reasonCodeClassification"},
           ],
         "dom": '<"top"i>rt<"bottom"flp><"clear">',
-        "aaSorting": [[ 3, "asc" ], [ 2, "desc" ]],  // sort by: origin, date issued
+        "aaSorting": [[ 3, "asc" ], [ 0, "asc" ]],  // sort by: origin, request number
       };
 
       $('#requestDetailReportTable').dataTable(options);

@@ -327,7 +327,7 @@ class ForecastingService {
                     " quantity_requested, quantity_picked, reason_code_classification, quantity_demand"
         }
 
-        query += " ORDER BY origin_name ASC, date_issued DESC"
+        query += " ORDER BY origin_name ASC, request_number ASC"
 
         try {
             data = persistenceService.list(query, queryParams)
