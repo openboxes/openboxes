@@ -97,7 +97,7 @@ const useExpirationHistoryReport = ({
     getParams,
     pageSize,
     offset,
-    searchTerm: null,
+    searchTerm: filterParams.searchTerm,
     filterParams,
     serializedParams,
     setShouldFetch,
