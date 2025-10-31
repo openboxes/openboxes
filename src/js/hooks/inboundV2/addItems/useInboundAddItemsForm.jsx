@@ -14,16 +14,16 @@ import stockMovementApi from 'api/services/StockMovementApi';
 import {
   STOCK_MOVEMENT_BY_ID,
   STOCK_MOVEMENT_ITEM_REMOVE,
-  STOCK_MOVEMENT_ITEMS,
   STOCK_MOVEMENT_REMOVE_ALL_ITEMS,
   STOCK_MOVEMENT_UPDATE_INVENTORY_ITEMS,
   STOCK_MOVEMENT_UPDATE_ITEMS,
   STOCK_MOVEMENT_UPDATE_STATUS,
 } from 'api/urls';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
-import InboundV2Step from 'consts/InboundV2Step';
+import InboundV2Step from 'consts/InboundStep';
 import RequisitionStatus from 'consts/requisitionStatus';
 import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
+import { OutboundWorkflowState } from 'consts/WorkflowState';
 import useInboundAddItemsValidation from 'hooks/inboundV2/addItems/useInboundAddItemsValidation';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
@@ -209,8 +209,8 @@ const useInboundAddItemsForm = ({
     );
 
     const lineItemsToBeUpdated = lineItems.filter((item) =>
-      item.statusCode &&
-      getValues('currentLineItems').some((oldItem) => oldItem.id === item.id && !_.isEqual(item, oldItem)));
+      item.statusCode
+      && getValues('currentLineItems').some((oldItem) => oldItem.id === item.id && !_.isEqual(item, oldItem)));
 
     const formatItem = (item) => ({
       id: item.id,
@@ -505,18 +505,6 @@ const useInboundAddItemsForm = ({
     }
   };
 
-  const loadMoreRows = async ({ startIndex }) => {
-    setValue('isFirstPageLoaded', true);
-    try {
-      spinner.show();
-      const response = await apiClient.get(`${STOCK_MOVEMENT_ITEMS(queryParams.id)}?offset=${startIndex}&max=${getValues().pageSize}&stepNumber=2`);
-      // eslint-disable-next-line no-use-before-define
-      setLineItems(response, startIndex);
-    } finally {
-      spinner.hide();
-    }
-  };
-
   const setLineItems = (response, startIndex, showOnlyImportedItems) => {
     const { data } = response.data;
     const transformedData = data.map(transformLineItem);
@@ -529,16 +517,12 @@ const useInboundAddItemsForm = ({
     setValue('sortOrder', newSortOrder);
     setValue('currentLineItems', getValues().isPaginated ? _.uniqBy(_.concat(transformedData, ...getValues('currentLineItems')), 'id') : transformedData);
     setValue('values.lineItems', getValues().isPaginated && !showOnlyImportedItems ? _.uniqBy(_.concat(lineItemsData, ...getValues('values.lineItems')), 'id') : lineItemsData);
-
-    if (startIndex !== null && getValues('values.lineItems').length !== getValues().totalCount) {
-      loadMoreRows({ startIndex: startIndex + getValues().pageSize });
-    }
   };
 
   const fetchLineItems = async (showOnlyImportedItems = false) => {
     if (queryParams.id) {
-      const url = `${STOCK_MOVEMENT_ITEMS(queryParams.id)}?stepNumber=2`;
-      const response = await apiClient.get(url);
+      const response = await stockMovementApi.getStockMovementItems(queryParams.id,
+        { stepNumber: OutboundWorkflowState.ADD_ITEMS });
       setValue('totalCount', response.data.data.length);
       setLineItems(response, null, showOnlyImportedItems);
       await trigger();
@@ -684,10 +668,8 @@ const useInboundAddItemsForm = ({
   };
 
   useEffect(() => {
-    if (queryParams.step === InboundV2Step.ADD_ITEMS) {
-      fetchData();
-    }
-  }, [queryParams.step]);
+    fetchData();
+  }, []);
 
   return {
     control,
