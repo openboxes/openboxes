@@ -18,12 +18,15 @@ import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfield
 import TextField from 'components/form-elements/TextField';
 import EditLineModal from 'components/receiving/modals/EditLineModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
+import receivingSortOptions from 'consts/receivingSortOptions';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, getReceivingPayloadContainers } from 'utils/form-values-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 const isReceived = (subfield, fieldValue) => {
   if (!fieldValue) {
@@ -31,8 +34,8 @@ const isReceived = (subfield, fieldValue) => {
   }
 
   if (fieldValue && subfield) {
-    return (_.toInteger(fieldValue.quantityReceived) + _.toInteger(fieldValue.quantityCanceled)) >=
-      _.toInteger(fieldValue.quantityShipped);
+    return (_.toInteger(fieldValue.quantityReceived) + _.toInteger(fieldValue.quantityCanceled))
+      >= _.toInteger(fieldValue.quantityShipped);
   }
 
   if (fieldValue && !fieldValue.shipmentItems) {
@@ -40,8 +43,8 @@ const isReceived = (subfield, fieldValue) => {
   }
 
   return _.every(fieldValue && fieldValue.shipmentItems, (item) =>
-    _.toInteger(item.quantityReceived) + _.toInteger(item.quantityCanceled) >=
-      _.toInteger(item.quantityShipped));
+    _.toInteger(item.quantityReceived) + _.toInteger(item.quantityCanceled)
+      >= _.toInteger(item.quantityShipped));
 };
 
 const isReceiving = (subfield, fieldValue) => {
@@ -101,6 +104,11 @@ const TABLE_FIELDS = {
   containers: {
     type: ArrayField,
     arrowsNavigation: true,
+    virtualized: true,
+    totalCount: ({ totalCount }) => totalCount,
+    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
+    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
+    isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     rowComponent: TableRowWithSubfields,
     headerFontSize: '0.775rem',
     subfieldKey: 'shipmentItems',
@@ -204,14 +212,17 @@ const TABLE_FIELDS = {
         label: 'react.partialReceiving.expirationDate.label',
         defaultMessage: 'Expiration date',
         flexWidth: '1',
+        getDynamicAttr: ({ formatLocalizedDate }) => ({
+          formatValue: (value) => (value ? formatLocalizedDate(value, DateFormat.COMMON) : value),
+        }),
       },
       binLocation: {
         type: (params) => (
-          params.subfield ?
-            <SelectField {...params} /> : (
+          params.subfield
+            ? <SelectField {...params} /> : (
               <Select
-                disabled={!params.hasBinLocationSupport ||
-              params.shipmentReceived || isReceived(false, params.fieldValue)}
+                disabled={!params.hasBinLocationSupport
+              || params.shipmentReceived || isReceived(false, params.fieldValue)}
                 options={params.bins}
                 onChange={(value) => params.setLocation(params.rowIndex, value)}
                 valueKey="id"
@@ -248,14 +259,64 @@ const TABLE_FIELDS = {
           showValueTooltip: true,
         },
       },
+      unitOfMeasure: {
+        type: (params) => <LabelField {...params} />,
+        label: 'react.partialReceiving.shippedInPo.label',
+        defaultMessage: 'Shipped (in PO UoM)',
+        multilineHeader: true,
+        flexWidth: '1',
+        attributes: {
+          cellClassName: 'text-right',
+          showValueTooltip: true,
+        },
+        getDynamicAttr: ({ values, parentIndex, rowIndex }) => {
+          const shipmentItem = _.get(
+            values,
+            `containers[${parentIndex}].shipmentItems[${rowIndex}]`,
+            {},
+          );
+          const packsReceived = shipmentItem?.quantityReceived
+            ? _.round(shipmentItem?.quantityReceived / shipmentItem?.packSize, 2)
+            : 0;
+
+          const packsRequested = _.round(shipmentItem?.packsRequested, 2);
+          const unitOfMeasure = shipmentItem?.unitOfMeasure;
+
+          return {
+            tooltipValue: unitOfMeasure ? `${packsRequested - packsReceived} ${unitOfMeasure}` : undefined,
+            formatValue: () => {
+              if (!unitOfMeasure) {
+                return null;
+              }
+              return (
+                <span>
+                  {packsRequested - packsReceived}
+                  <small className="text-muted ml-1">{unitOfMeasure}</small>
+                </span>
+              );
+            },
+            hide: !values?.isShipmentFromPurchaseOrder,
+          };
+        },
+      },
       quantityShipped: {
         type: (params) => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.shipped.label',
-        defaultMessage: 'Shipped',
+        defaultMessage: 'Shipped (each)',
+        multilineHeader: true,
         flexWidth: '1',
         attributes: {
+          cellClassName: 'text-right',
           formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
         },
+        getDynamicAttr: ({ values }) => ({
+          label: values?.isShipmentFromPurchaseOrder
+            ? 'react.partialReceiving.shippedEach.label'
+            : 'react.partialReceiving.shipped.label',
+          defaultMessage: values?.isShipmentFromPurchaseOrder
+            ? 'Shipped (each)'
+            : 'Shipped',
+        }),
       },
       quantityReceived: {
         type: (params) => (params.subfield ? <LabelField {...params} /> : null),
@@ -276,8 +337,8 @@ const TABLE_FIELDS = {
         fieldKey: '',
         flexWidth: '0.8',
         getDynamicAttr: ({ fieldValue, shipmentReceived, hasPartialReceivingSupport }) => ({
-          className: _.toInteger(fieldValue &&
-            fieldValue.quantityRemaining) < 0 && !shipmentReceived
+          className: _.toInteger(fieldValue
+            && fieldValue.quantityRemaining) < 0 && !shipmentReceived
             && !isReceived(true, fieldValue) ? 'text-danger' : '',
           formatValue: (val) => {
             if (!val.quantityRemaining) {
@@ -297,18 +358,24 @@ const TABLE_FIELDS = {
       quantityReceiving: {
         type: (params) => (params.subfield ? <TextField {...params} /> : null),
         fieldKey: '',
-        label: 'react.partialReceiving.receivingNow.label',
-        defaultMessage: 'Receiving now',
+        multilineHeader: true,
         flexWidth: '1',
         attributes: {
           autoComplete: 'off',
+          inputClassName: 'text-right',
         },
-        getDynamicAttr: ({ shipmentReceived, fieldValue }) => ({
+        getDynamicAttr: ({ shipmentReceived, fieldValue, values }) => ({
           disabled: shipmentReceived || isReceived(true, fieldValue),
           formatValue: (val) => {
             const { quantityShipped, quantityRemaining } = fieldValue;
             return quantityShipped === 0 && quantityRemaining === quantityShipped ? null : val;
           },
+          label: values?.isShipmentFromPurchaseOrder
+            ? 'react.partialReceiving.receivingNowEach.label'
+            : 'react.partialReceiving.receivingNow.label',
+          defaultMessage: values?.isShipmentFromPurchaseOrder
+            ? 'Receiving now (each)'
+            : 'Receiving now',
         }),
       },
       edit: {
@@ -389,6 +456,82 @@ function validate(values) {
   return errors;
 }
 
+const rewriteQuantitiesAfterSave = ({
+  formValues,
+  editLines,
+  fetchedContainers,
+  editLinesIndex,
+  parentIndex,
+}) => {
+  // Get list of shipment items from all of containers
+  const flattenedShipmentItems = formValues.containers.reduce((acc, container) => [
+    ...acc,
+    ...container.shipmentItems,
+  ], []);
+
+  // Calculate index of line items coming from modal. When there are
+  // more than one container, the index is relative to the container, so as an example:
+  // There are two containers: First has 3 shipment items, second has 2. When we are
+  // adding new lines to the second container at second index, the "editLinesIndex" is 2,
+  // so we have to add sizes of previous containers.
+  const getContainerEditLineIndex = formValues.containers.reduce((acc, container, idx) => {
+    if (idx < parentIndex) {
+      return acc + container.shipmentItems.length;
+    }
+
+    return acc;
+  }, 0) + editLinesIndex;
+
+  // Get list of shipment items from all containers. It's fetched data with actual quantities etc.
+  const flattenedFetchedShipmentItems = fetchedContainers.reduce((acc, container) => [
+    ...acc,
+    container.shipmentItems,
+  ], []);
+
+  // We want to clear quantity receiving after using the edit modal
+  // to force users to enter new quantity to avoid mistakes in
+  // autofilling / copying old values not appropriate for the
+  // current quantity shipped
+  const clearedTableLines = editLines.map((line) => ({
+    ...line,
+    quantityReceiving: null,
+  }));
+
+  // Concatenated values from first table part (lines after those coming from modal),
+  // with those lines from modal and with values after that lines.
+  const newTableValue = [
+    ..._.take(flattenedShipmentItems, getContainerEditLineIndex),
+    ...clearedTableLines,
+    ..._.takeRight(
+      flattenedShipmentItems,
+      flattenedShipmentItems.length - getContainerEditLineIndex - 1,
+    ),
+  ];
+
+  // Updating line items in the table. All values are taken from fetched
+  // items (updating all quantities) except the quantityReceiving which determines
+  // whether the line should be checked
+  const rewroteTableValue = _.zip(newTableValue, _.flatten(flattenedFetchedShipmentItems))
+    .map(([shipmentItem, fetchedShipmentItem]) => ({
+      ...fetchedShipmentItem,
+      quantityReceiving: shipmentItem?.quantityReceiving,
+    }));
+
+  // Splitting values into containers
+  const { shipmentItems } = fetchedContainers.reduce((acc, container) => ({
+    shipmentItems: [
+      ...acc.shipmentItems,
+      _.slice(rewroteTableValue, acc.startIndex, acc.startIndex + container.shipmentItems.length),
+    ],
+    startIndex: acc.startIndex + container.shipmentItems.length,
+  }), { shipmentItems: [], startIndex: 0 });
+
+  return formValues.containers.map((container, idx) => ({
+    ...container,
+    shipmentItems: shipmentItems[idx],
+  }));
+};
+
 /** The first page of partial receiving where user can see receipt lines and complete it in
  * different ways depending on how they receive it.
  * - If the user is receiving everything with no changes, they click "autofill all quantities"
@@ -406,8 +549,8 @@ class PartialReceivingPage extends Component {
     if (isReceived(true, shipmentItem)) {
       return shipmentItem;
     }
-    const autofillQuantity = _.toInteger(shipmentItem.quantityShipped) -
-          _.toInteger(shipmentItem.quantityReceived);
+    const autofillQuantity = _.toInteger(shipmentItem.quantityShipped)
+          - _.toInteger(shipmentItem.quantityReceived);
 
     return {
       ...shipmentItem,
@@ -417,9 +560,9 @@ class PartialReceivingPage extends Component {
 
   constructor(props) {
     super(props);
-
     this.state = {
       values: {},
+      isFirstPageLoaded: false,
     };
     this.autofillLines = this.autofillLines.bind(this);
     this.setLocation = this.setLocation.bind(this);
@@ -429,21 +572,11 @@ class PartialReceivingPage extends Component {
     this.saveEditLine = this.saveEditLine.bind(this);
     this.exportTemplate = this.exportTemplate.bind(this);
     this.importTemplate = this.importTemplate.bind(this);
-    this.rewriteQuantitiesAfterSave = this.rewriteQuantitiesAfterSave.bind(this);
+    this.isRowLoaded = this.isRowLoaded.bind(this);
   }
 
   componentDidMount() {
     this.fetchPartialReceiptCandidates();
-    if (this.props.partialReceivingTranslationsFetched) {
-      this.dataFetched = true;
-    }
-    this.props.hideSpinner();
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.partialReceivingTranslationsFetched && !this.dataFetched) {
-      this.dataFetched = true;
-    }
   }
 
   confirmReceive(formValues, emptyLinesCount) {
@@ -452,9 +585,9 @@ class PartialReceivingPage extends Component {
       title: translate('react.partialReceiving.message.confirmReceive.label', 'Confirm receiving'),
       message: translate(
         'react.partialReceiving.confirmReceive.notSupportingPartialReceiving.message',
-        `You have not entered a value in the receiving quantity for ${emptyLinesCount} line/lines on this shipment. ` +
-        'These lines will be received as zero. ' +
-        'You will not be able to go back and receive them later. Do you want to continue?.',
+        `You have not entered a value in the receiving quantity for ${emptyLinesCount} line/lines on this shipment. `
+        + 'These lines will be received as zero. '
+        + 'You will not be able to go back and receive them later. Do you want to continue?.',
         {
           count: emptyLinesCount,
         },
@@ -540,14 +673,18 @@ class PartialReceivingPage extends Component {
    * Fetches available receipts from API.
    * @public
    */
-  fetchPartialReceiptCandidates() {
+  fetchPartialReceiptCandidates(selectedOption) {
     this.props.showSpinner();
-    const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1`;
+    const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1&sort=${selectedOption || this.props.sort}`;
 
-    return apiClient.get(url)
+    apiClient.get(url)
       .then((response) => {
         this.setState({ values: {} }, () => {
-          this.setState({ values: parseResponse(response.data.data) });
+          this.setState({
+            values: parseResponse(response.data.data),
+            initialReceiptCandidates: parseResponse(response.data.data),
+            isFirstPageLoaded: true,
+          }, () => this.props.hideSpinner());
         });
       })
       .catch(() => this.props.hideSpinner());
@@ -557,10 +694,16 @@ class PartialReceivingPage extends Component {
     this.props.showSpinner();
     const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1`;
 
+    const emptyLinesCount = emptyLinesCounter(formValues);
+
+    const containers = emptyLinesCount
+      ? this.buildShipmentItems(formValues.containers)
+      : formValues.containers;
+
     const payload = {
       ...formValues,
       recipient: formValues?.recipient?.id,
-      containers: getReceivingPayloadContainers(formValues),
+      containers: getReceivingPayloadContainers({ ...formValues, containers }),
     };
     return apiClient.post(url, flattenRequest(payload));
   }
@@ -591,8 +734,6 @@ class PartialReceivingPage extends Component {
       })
       .catch(() => this.props.hideSpinner());
   }
-
-  dataFetched = false;
 
   /**
    * Autofills "to receive" cells in different ways depending on what user did.
@@ -642,71 +783,81 @@ class PartialReceivingPage extends Component {
     }
   }
 
-  rewriteQuantitiesAfterSave({
-    formValues,
-    editLines,
-    fetchedContainers,
-    editLinesIndex,
-    parentIndex,
-  }) {
-    // Get list of shipment items from all of containers
-    const flattenedShipmentItems = formValues.containers.reduce((acc, container) => [
-      ...acc,
-      ...container.shipmentItems,
-    ], []);
-
-    // Calculate index of line items coming from modal. When there are
-    // more than one container, the index is relative to the container, so as an example:
-    // There are two container: First has 3 shipment items, second has 2. When we are
-    // adding new lines to the second container at second index, the "editLinesIndex" is 2,
-    // so we have to add sizes of previous containers.
-    const getContainerEditLineIndex = formValues.containers.reduce((acc, container, idx) => {
-      if (idx < parentIndex) {
-        return acc + container.shipmentItems.length;
+  static mapShipmentItems(shipmentItems, rowIndex, editedLines) {
+    // Group items for: before edited row, the edited row's original item, items after edited row
+    // To be able to append a new item just underneath (or replace) the original item
+    const shipmentItemsGrouped = shipmentItems.reduce((acc, item, idx) => {
+      if (idx < rowIndex) {
+        return {
+          ...acc,
+          itemsBeforeCurrentRow: [...acc.itemsBeforeCurrentRow, item],
+        };
       }
+      if (idx === rowIndex) {
+        return {
+          ...acc,
+          originalItem: item,
+        };
+      }
+      return {
+        ...acc,
+        itemsAfterCurrentRow: [...acc.itemsAfterCurrentRow, item],
+      };
+    }, { itemsBeforeCurrentRow: [], originalItem: null, itemsAfterCurrentRow: [] });
 
-      return acc;
-    }, 0) + editLinesIndex;
+    /** If an original item is already persisted,
+      we don't want to replace it with a new item, but we want to keep the original item
+      This is the case if you pick one of the items,
+      go to check step, go back, edit the line and split it
+      (we want to keep the persisted item + add a new one underneath)
+      To keep the order (originalItem and then the new item),
+      we just add the original item at the end of the items before the current row
+    */
+    if (shipmentItemsGrouped.originalItem?.receiptItemId) {
+      shipmentItemsGrouped.itemsBeforeCurrentRow.push(shipmentItemsGrouped.originalItem);
+    }
 
-    // Get list of shipment items from all containers. It's fetched data with actual quantities etc.
-    const flattenedFetchedShipmentItems = fetchedContainers.reduce((acc, container) => [
-      ...acc,
-      container.shipmentItems,
-    ], []);
-
-    // Concatenated values from first table part (lines after those coming from modal),
-    // with those lines from modal and with values after that lines.
-    const newTableValue = [
-      ..._.take(flattenedShipmentItems, getContainerEditLineIndex),
-      ...editLines,
-      ..._.takeRight(
-        flattenedShipmentItems,
-        flattenedShipmentItems.length - getContainerEditLineIndex - 1,
-      ),
-    ];
-
-    // Updating line items in the table. All values are taken from fetched
-    // items (updating all quantities) except the quantityReceiving which determines
-    // whether the line should be checked
-    const rewroteTableValue = _.zip(newTableValue, _.flatten(flattenedFetchedShipmentItems))
-      .map(([shipmentItem, fetchedShipmentItem]) => ({
-        ...fetchedShipmentItem,
-        quantityReceiving: shipmentItem?.quantityReceiving,
-      }));
-
-    // Splitting values into containers
-    const { shipmentItems } = fetchedContainers.reduce((acc, container) => ({
-      shipmentItems: [
-        ...acc.shipmentItems,
-        _.slice(rewroteTableValue, acc.startIndex, acc.startIndex + container.shipmentItems.length),
-      ],
-      startIndex: acc.startIndex + container.shipmentItems.length,
-    }), { shipmentItems: [], startIndex: 0 });
-
-    return formValues.containers.map((container, idx) => ({
-      ...container,
-      shipmentItems: shipmentItems[idx],
+    /** Since the edited items are not immedietaly sent to the API,
+        and a few fields are not calculated and returned by the API, we have to set them statically
+    */
+    const editedLinesWithQuantities = editedLines.map((item) => ({
+      ...item,
+      quantityReceiving: null,
+      quantityRemaining: item.quantityShipped,
+      unitOfMeasure: shipmentItemsGrouped.originalItem?.unitOfMeasure,
+      // This helper id is needed for mismatching quantity shipped indicator in edit modal
+      rowId: _.uniqueId(),
+      packSize: shipmentItemsGrouped.originalItem?.packSize,
+      packsRequested: shipmentItemsGrouped.originalItem?.packSize
+        ? item.quantityShipped / shipmentItemsGrouped.originalItem?.packSize
+        : null,
     }));
+
+    /**
+     * Returned merged lists
+     * (items before current row that might include the original item,
+     * edited items (new items),
+     * items that were displayed under the edited item)
+     */
+
+    return [
+      ...shipmentItemsGrouped.itemsBeforeCurrentRow,
+      ...editedLinesWithQuantities,
+      ...shipmentItemsGrouped.itemsAfterCurrentRow,
+    ];
+  }
+
+  static mapContainers(containers, parentIndex, rowIndex, items) {
+    return containers.map((container, idx) => {
+      if (idx === parentIndex) {
+        const { shipmentItems } = container;
+        return {
+          ...container,
+          shipmentItems: PartialReceivingPage.mapShipmentItems(shipmentItems, rowIndex, items),
+        };
+      }
+      return container;
+    });
   }
 
   /*
@@ -716,24 +867,60 @@ class PartialReceivingPage extends Component {
    * @public
    */
   saveEditLine(editLines, parentIndex, formValues, rowIndex) {
+    const { containers } = this.state.values;
+    const editLinesGrouped = editLines.reduce((acc, line) => {
+      if (line.receiptItemId) {
+        return {
+          ...acc,
+          itemsToSave: [...acc.itemsToSave, line],
+        };
+      }
+      return {
+        ...acc,
+        newItems: [...acc.newItems, line],
+      };
+    }, { itemsToSave: [], newItems: [] });
+    if (!editLinesGrouped.itemsToSave.length) {
+      const { newItems } = editLinesGrouped;
+      const mappedContainers = PartialReceivingPage.mapContainers(
+        containers,
+        parentIndex,
+        rowIndex,
+        newItems,
+      );
+      this.setState((prevState) =>
+        ({ values: { ...prevState.values, containers: mappedContainers } }));
+      return;
+    }
     this.props.showSpinner();
+
     const editedLinesToSave = {
       ...this.state.values,
-      containers: [{ ...this.state.values.containers[parentIndex], shipmentItems: editLines }],
+      containers: [
+        {
+          ...this.state.values.containers[parentIndex],
+          shipmentItems: editLinesGrouped.itemsToSave,
+        },
+      ],
     };
+
     this.saveValues(editedLinesToSave)
       .then((response) => {
-        const containers = this.rewriteQuantitiesAfterSave({
+        const updatedContainersAfterSave = rewriteQuantitiesAfterSave({
           formValues,
           editLines,
           parentIndex,
           fetchedContainers: response.data.data.containers,
           editLinesIndex: rowIndex,
         });
+        const mappedContainers = PartialReceivingPage.mapContainers(updatedContainersAfterSave,
+          parentIndex,
+          rowIndex,
+          editLinesGrouped.newItems);
         this.setState({
           values: parseResponse({
             ...response.data.data,
-            containers,
+            containers: mappedContainers,
           }),
         });
       })
@@ -816,7 +1003,18 @@ class PartialReceivingPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  isRowLoaded({ index }) {
+    return !!this.state.values.containers[index];
+  }
+
+  handleSortChange = async (selectedOption, formValues) => {
+    await this.saveValues(formValues);
+    await this.fetchPartialReceiptCandidates(selectedOption.value);
+    this.props.updateSort(selectedOption.value);
+  };
+
   render() {
+    const { translate } = this.props;
     return (
       <div>
         <Form
@@ -845,8 +1043,20 @@ class PartialReceivingPage extends Component {
             return (
               <form onSubmit={handleSubmit}>
                 <div className="d-flex flex-column">
-                  <div>
-                    <span className="buttons-container">
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div className="width-250">
+                      <Select
+                        onChange={(selectedOption) => this.handleSortChange(selectedOption, values)}
+                        value={this.props.sort}
+                        dataTestId="custom-select-ordering"
+                        options={receivingSortOptions.map((option) => ({
+                          value: option.value,
+                          label: translate(option.label, option.defaultLabel),
+                        }))}
+                        clearable={false}
+                      />
+                    </div>
+                    <div className="buttons-container">
                       <button type="button" className="btn btn-outline-secondary float-right btn-form btn-xs" disabled={this.state.values.shipmentStatus === 'RECEIVED'} onClick={() => this.autofillLines(values)}>
                         <Translate id="react.partialReceiving.autofillQuantities.label" defaultMessage="Autofill quantities" />
                       </button>
@@ -856,7 +1066,7 @@ class PartialReceivingPage extends Component {
                           <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
                         </span>
                       </button>
-                      <button type="button" className="btn btn-outline-secondary float-right btn-form btn-xs" disabled={!isAnyItemSelected(values.containers) || values.shipmentStatus === 'RECEIVED'} onClick={() => this.save(values)}>
+                      <button type="button" className="btn btn-outline-secondary float-right btn-form btn-xs" disabled={!isAnyItemSelected(values.containers) || values.shipmentStatus === 'RECEIVED'} onClick={() => this.save(values, this.props.updateSort(receivingSortOptions[0].value))}>
                         <Translate id="react.default.button.save.label" defaultMessage="Save" />
                       </button>
                       <button
@@ -889,11 +1099,15 @@ class PartialReceivingPage extends Component {
                           accept=".csv"
                         />
                       </label>
-                    </span>
+                    </div>
                   </div>
-                  <div className="my-2 table-form">
+                  <div className="my-2 table-form" data-testid="items-table">
                     {_.map(TABLE_FIELDS, (fieldConfig, fieldName) =>
                       renderFormField(fieldConfig, fieldName, {
+                        totalCount: this.state.values?.containers?.length || 0,
+                        loadMoreRows: () => {},
+                        isRowLoaded: this.isRowLoaded,
+                        isFirstPageLoaded: this.state.isFirstPageLoaded,
                         autofillLines: this.autofillLines,
                         saveEditLine: this.saveEditLine,
                         setLocation: this.setLocation,
@@ -904,6 +1118,8 @@ class PartialReceivingPage extends Component {
                         values,
                         hasPartialReceivingSupport: this.props.hasPartialReceivingSupport,
                         translate: this.props.translate,
+                        formatLocalizedDate: this.props.formatLocalizedDate,
+                        initialReceiptCandidates: this.state.initialReceiptCandidates,
                       }))}
                   </div>
                   <div className="submit-buttons">
@@ -923,9 +1139,9 @@ class PartialReceivingPage extends Component {
 
 const mapStateToProps = (state) => ({
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
-  partialReceivingTranslationsFetched: state.session.fetchedTranslations.partialReceiving,
   hasPartialReceivingSupport: state.session.currentLocation.hasPartialReceivingSupport,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps, {
@@ -942,19 +1158,15 @@ PartialReceivingPage.propTypes = {
   bins: PropTypes.arrayOf(PropTypes.shape({})),
   /** Location ID (destination). Needs to be used in /api/products request. */
   locationId: PropTypes.string.isRequired,
-  partialReceivingTranslationsFetched: PropTypes.bool.isRequired,
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      shipmentId: PropTypes.string,
-    }),
-  }).isRequired,
   nextPage: PropTypes.func.isRequired,
   /** Is true when currently selected location supports partial receiving */
   hasPartialReceivingSupport: PropTypes.bool.isRequired,
   translate: PropTypes.func.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
+  sort: PropTypes.string.isRequired,
+  updateSort: PropTypes.func.isRequired,
 };
 
 PartialReceivingPage.defaultProps = {
   bins: [],
-  match: {},
 };

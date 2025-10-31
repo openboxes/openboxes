@@ -25,6 +25,7 @@ const PRODUCT_URL = {
   base: `${CONTEXT_PATH}/product`,
   list: () => `${PRODUCT_URL.base}/list`,
   create: () => `${PRODUCT_URL.base}/create`,
+  edit: (id) => `${PRODUCT_URL.base}/edit/${id}`,
   importCSV: () => `${PRODUCT_URL.base}/importAsCsv`,
 };
 
@@ -49,6 +50,7 @@ const STOCK_MOVEMENT_URL = {
   editRequest: (id) => `${STOCK_MOVEMENT_URL.createRequest()}/${id}`,
   editCombinedShipments: (id) => `${STOCK_MOVEMENT_URL.createCombinedShipments()}/${id}`,
   show: (id) => `${STOCK_MOVEMENT_URL.base}/show/${id}`,
+  importOutbound: () => `${STOCK_MOVEMENT_URL.base}/importOutboundStockMovement`,
 };
 
 const INVOICE_URL = {
@@ -105,6 +107,11 @@ const INVENTORY_ITEM_URL = {
   }),
 };
 
+const INVENTORY_URL = {
+  base: `${CONTEXT_PATH}/inventory`,
+  showTransaction: (id) => `${INVENTORY_URL.base}/showTransaction/${id}`,
+};
+
 const REQUISITION_TEMPLATE_URL = {
   base: `${CONTEXT_PATH}/requisitionTemplate`,
   create: () => `${REQUISITION_TEMPLATE_URL.base}/create`,
@@ -140,10 +147,19 @@ const PRODUCT_SUPPLIER_URL = {
   export: () => `${PRODUCT_SUPPLIER_URL.base}/export?format=xls`,
 };
 
+const CYCLE_COUNT = {
+  base: `${CONTEXT_PATH}/inventory/cycleCount`,
+  list: (tab) => `${CYCLE_COUNT.base}?tab=${tab}`,
+  countStep: () => `${CYCLE_COUNT.base}/count`,
+  resolveStep: () => `${CYCLE_COUNT.base}/resolve`,
+};
+
 export {
   CATEGORY_URL,
+  CYCLE_COUNT,
   DASHBOARD_URL,
   INVENTORY_ITEM_URL,
+  INVENTORY_URL,
   INVOICE_URL,
   LOCATION_CONFIGURATION_URL,
   LOCATION_URL,

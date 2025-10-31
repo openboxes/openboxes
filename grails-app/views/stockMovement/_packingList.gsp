@@ -1,4 +1,7 @@
-<%@page import="org.pih.warehouse.inventory.LotStatusCode" %>
+<%@ page import="org.pih.warehouse.LocalizationUtil" %>
+<%@ page import="org.pih.warehouse.inventory.LotStatusCode" %>
+<%@ page import="org.pih.warehouse.core.Constants" %>
+
 <g:set var="shipmentInstance" value="${stockMovement?.shipment}"/>
 <g:set var="shipmentItemsByContainer" value="${shipmentInstance?.shipmentItems?.groupBy { it.container } }"/>
 <style>
@@ -6,7 +9,7 @@
         background-color: #ffcccb;
     }
 </style>
-<div id="packingList" class="box dialog">
+<section id="packingList" class="box dialog" aria-label="Packing List">
     <h2>
         <img src="${resource(dir:'images/icons/silk',file:'package.png')}" alt="contents" style="vertical-align: middle"/>
         ${warehouse.message(code:'shipping.packingList.label')}
@@ -48,7 +51,7 @@
                 <g:set var="rowspan" value="${shipmentItemsByContainer[shipmentItem?.container]?.size() }"/>
                 <g:set var="newContainer" value="${previousContainer != shipmentItem?.container }"/>
                 <tr class="prop ${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'new-container':''} ${shipmentItem?.hasRecalledLot?'recalled':''} shipmentItem">
-                    <td>
+                    <td aria-label="Recalled" data-testid="recalled">
                         <g:if test="${shipmentItem?.hasRecalledLot}">
                             <div data-toggle="tooltip" data-placement="top" title="${g.message(code:'inventoryItem.recalledLot.label')}">
                                 %{-- &#x24C7; = hexadecimal circled letter R --}%
@@ -57,7 +60,7 @@
                         </g:if>
                     </td>
                     <g:if test="${newContainer }">
-                        <td class="top left" rowspan="${rowspan}">
+                        <td aria-label="Details" class="top left" rowspan="${rowspan}" data-testid="details">
                             <g:set var="container" value="${shipmentItem?.container}"/>
                             <label><g:if test="${container?.parentContainer}">${container?.parentContainer?.name }&nbsp;&rsaquo;&nbsp;</g:if><g:if test="${container?.name }">${container?.name }</g:if><g:else><warehouse:message code="shipping.unpacked.label"/></g:else></label>
                             <g:if test="${showDetails}">
@@ -75,22 +78,24 @@
                         </td>
                     </g:if>
                     <g:if test="${shipmentInstance?.isFromPurchaseOrder}">
-                        <td>
+                        <td aria-label="Order Number" data-testid="order-number">
                             ${shipmentItem?.orderNumber}
                         </td>
                     </g:if>
-                    <td>
+                    <td aria-label="Product Code" data-testid="product-code">
                         ${shipmentItem?.inventoryItem?.product?.productCode}
                     </td>
-                    <td class="product">
-                        <g:link controller="inventoryItem" action="showStockCard" id="${shipmentItem?.inventoryItem?.product?.id}">
-                            <cache:block key="${shipmentItem?.id}">
-                                <format:displayNameWithColor product="${shipmentItem?.inventoryItem?.product}" showTooltip="${true}" />
+                    <td aria-label="Product" class="product" data-testid="product">
+                        <g:set var="productId" value="${shipmentItem?.inventoryItem?.product?.id}" />
+                        <g:set var="cacheKey" value="${shipmentItem?.id}-${productId}-${LocalizationUtil.currentLocale}" />
+                        <g:link controller="inventoryItem" action="showStockCard" id="${productId}">
+                            <cache:block key="${cacheKey}">
+                                <format:displayNameWithColor product="${shipmentItem?.inventoryItem?.product}" productSupplier="${shipmentItem?.orderItem?.productSupplier}" showTooltip="${true}" />
                                 <g:renderHandlingIcons product="${shipmentItem?.inventoryItem?.product}" />
                             </cache:block>
                         </g:link>
                     </td>
-                    <td>
+                    <td aria-label="Bin Location" data-testid="bin-location">
                         <g:if test="${shipmentInstance?.origin?.id == session.warehouse?.id}">
                             <g:if test="${shipmentItem?.binLocation}">
                                 ${shipmentItem?.binLocation?.name}
@@ -109,7 +114,7 @@
                             </g:if>
                         </g:elseif>
                     </td>
-                    <td class="lotNumber">
+                    <td aria-label="Lot Number" class="lotNumber" data-testid="lot-number">
                         <g:if test="${shipmentItem?.receiptItems}">
                             <g:each var="receiptItem" in="${shipmentItem?.receiptItems.sort { it.sortOrder }}">
                                 <div style="margin-bottom: 10px;" title="${receiptItem?.quantityReceived} ${receiptItem?.inventoryItem?.product?.unitOfMeasure?:'EA'}">
@@ -121,13 +126,16 @@
                             ${shipmentItem?.inventoryItem?.lotNumber}
                         </g:else>
                     </td>
-                    <td class="center expirationDate" nowrap="nowrap">
+                    <td aria-label="Expiration Date" class="center expirationDate" nowrap="nowrap" data-testid="expiration-date">
                         <g:if test="${shipmentItem?.receiptItems}">
                             <g:each var="receiptItem" in="${shipmentItem?.receiptItems.sort { it.sortOrder }}">
                                 <div style="margin-bottom: 10px;" title="${receiptItem?.quantityReceived} ${receiptItem?.inventoryItem?.product?.unitOfMeasure?:'EA'}">
                                     <g:if test="${receiptItem?.expirationDate}">
                                         <span class="expirationDate">
-                                            <g:formatDate date="${receiptItem?.expirationDate}" format="d MMM yyyy"/>
+                                            <g:formatDate
+                                                    date="${receiptItem?.expirationDate}"
+                                                    format="${Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"
+                                            />
                                         </span>
                                     </g:if>
                                     <g:else>
@@ -140,7 +148,10 @@
                         </g:if>
                         <g:elseif test="${shipmentItem?.inventoryItem?.expirationDate}">
                             <span class="expirationDate">
-                                <g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate}" format="d MMM yyyy"/>
+                                <g:formatDate
+                                        date="${shipmentItem?.inventoryItem?.expirationDate}"
+                                        format="${Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"
+                                />
                             </span>
                         </g:elseif>
                         <g:else>
@@ -149,21 +160,21 @@
                             </span>
                         </g:else>
                     </td>
-                    <td class="center quantity">
+                    <td aria-label="Quantity Shipped" class="center quantity" data-testid="quantity-shipped">
                         <g:formatNumber number="${shipmentItem?.quantity}" format="###,##0" />
                     </td>
                     <g:if test="${shipmentInstance?.wasReceived()||shipmentInstance?.wasPartiallyReceived()}">
-                        <td class="center" style="white-space:nowrap;${shipmentItem?.quantityReceived() != shipmentItem?.quantity ? ' color:red;' : ''}">
+                        <td aria-label="Quantity Received" class="center" style="white-space:nowrap;${shipmentItem?.quantityReceived() != shipmentItem?.quantity ? ' color:red;' : ''}" data-testid="quantity-received">
                             <g:formatNumber number="${shipmentItem?.quantityReceived()}" format="###,##0"/>
                         </td>
-                        <td class="center" style="white-space:nowrap;${shipmentItem?.quantityReceived() != shipmentItem?.quantity ? ' color:red;' : ''}">
+                        <td aria-label="Quantity Canceled" class="center" style="white-space:nowrap;${shipmentItem?.quantityReceived() != shipmentItem?.quantity ? ' color:red;' : ''}" data-testid="quantity-canceled">
                             <g:formatNumber number="${shipmentItem?.quantityCanceled()}" format="###,##0"/>
                         </td>
                     </g:if>
-                    <td>
+                    <td aria-label="Unit Of Measure" data-testid="uom">
                         ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                     </td>
-                    <td class="left" nowrap="nowrap">
+                    <td aria-label="Recipient" class="left" nowrap="nowrap" data-testid="recipient">
                         <g:if test="${shipmentItem?.receiptItems}">
                             <g:each var="receiptItem" in="${shipmentItem?.receiptItems.sort { it.sortOrder }}">
                                 <div style="margin-bottom: 10px;" title="${receiptItem?.quantityReceived} ${receiptItem?.inventoryItem?.product?.unitOfMeasure?:'EA'}">
@@ -178,7 +189,7 @@
                             <div class="fade"><warehouse:message code="default.none.label"/></div>
                         </g:else>
                     </td>
-                    <td class="left" >
+                    <td aria-label="Comment" class="left" data-testid="comment">
                         <g:if test="${shipmentItem?.comments}">
                             <div title="${shipmentItem?.comments.join("\r\n")}">
                                 <img src="${resource(dir:'images/icons/silk',file:'note.png')}" />
@@ -188,7 +199,7 @@
                             <div class="fade"><warehouse:message code="default.empty.label"/></div>
                         </g:else>
                     </td>
-                    <td>
+                    <td aria-label="Is Fully Received" data-testid="is-fully-received">
                         <g:message code="default.boolean.${shipmentItem?.isFullyReceived()}"/>
                     </td>
                 </tr>
@@ -204,4 +215,4 @@
         </g:else>
 
     </table>
-</div>
+</section>

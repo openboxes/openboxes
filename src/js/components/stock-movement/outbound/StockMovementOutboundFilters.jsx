@@ -45,7 +45,7 @@ const StockMovementOutboundFilters = ({
         filterFields={filterFields}
         defaultValues={defaultValues}
         ignoreClearFilters={['origin', 'direction', 'sourceType']}
-        updateFilterParams={values => setFilterParams({ ...values })}
+        updateFilterParams={(values) => setFilterParams({ ...values })}
         hidden={false}
         formProps={{
           ...formProps,
@@ -58,7 +58,7 @@ const StockMovementOutboundFilters = ({
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
 });

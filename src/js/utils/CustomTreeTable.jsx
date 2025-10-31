@@ -11,7 +11,9 @@ export default (Component) => {
       super(props);
       this.getWrappedInstance.bind(this);
       this.TrComponent.bind(this);
+      this.TdComponent.bind(this);
       this.getTrProps.bind(this);
+      this.getTdProps.bind(this);
     }
 
     // this is so we can expose the underlying ReactTable to get at the sortedData for selectAll
@@ -22,6 +24,8 @@ export default (Component) => {
     }
 
     getTrProps = (state, ri, ci, instance) => ({ ri })
+
+    getTdProps = (state, { index }, { name }) => ({ rowIndex: index, name });
 
     TrComponent = (props) => {
       const { ri, ...rest } = props;
@@ -35,7 +39,11 @@ export default (Component) => {
         cell.props.style.borderBottom = '1px solid rgba(128,128,128,0.2)';
 
         return (
-          <div className={`rt-tr ${rest.className}`} style={rest.style}>
+          <div
+            data-testid={`table-group-${ri.level}`}
+            className={`rt-tr ${rest.className}`}
+            style={rest.style}
+          >
             {cell}
           </div>
         );
@@ -43,9 +51,42 @@ export default (Component) => {
       return <Component.defaultProps.TrComponent {...rest} />;
     }
 
+    TdComponent = (props) => {
+      const {
+        name,
+        rowIndex,
+        className,
+        style,
+        onClick,
+        onDoubleClick,
+        children,
+        onKeyDown,
+      } = props;
+
+      const testId = `cell-${rowIndex}-${name}`;
+
+      return (
+        <div
+          role="button"
+          tabIndex={0}
+          data-testid={testId}
+          className={`rt-td ${className}`}
+          style={style}
+          onClick={onClick}
+          onDoubleClick={onDoubleClick}
+          onKeyDown={onKeyDown}
+        >
+          {children}
+        </div>
+      );
+    }
+
     render() {
       const { columns, treeTableIndent, ...rest } = this.props;
-      const { TrComponent, getTrProps } = this;
+      const {
+        TrComponent, TdComponent, getTrProps, getTdProps,
+      } = this;
+
       const extra = {
         columns: columns.map((col) => {
           let column = col;
@@ -63,11 +104,21 @@ export default (Component) => {
           return column;
         }),
         TrComponent,
+        TdComponent,
         getTrProps,
+        getTdProps,
       };
-      return <Component {...rest} {...extra} ref={r => (this.wrappedInstance = r)} />;
+
+      return (
+        <Component
+          {...rest}
+          {...extra}
+          ref={(r) => (this.wrappedInstance = r)}
+        />
+      );
     }
   };
+
   wrapper.displayName = 'RTTreeTable';
   wrapper.defaultProps = {
     treeTableIndent: 10,

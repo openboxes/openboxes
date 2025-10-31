@@ -49,9 +49,10 @@ const Header = ({
       ? <InfoBar {...values} key={bar} />
       : null
     )))}
-  </div>);
+  </div>
+);
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   isImpersonated: state.session.isImpersonated,
   localizationModeEnabled: state.session.localizationModeEnabled,
   bars: state.infoBar.bars,

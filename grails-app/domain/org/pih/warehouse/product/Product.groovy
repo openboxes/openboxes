@@ -9,13 +9,16 @@
  * */
 package org.pih.warehouse.product
 
+import grails.databinding.BindUsing
 import grails.util.Holders
+import java.time.Instant
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
 import org.grails.plugins.web.taglib.ApplicationTagLib
-import org.pih.warehouse.MessageTagLib
+import org.pih.warehouse.EmptyStringsToNullBinder
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
@@ -30,6 +33,7 @@ import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.LocalizationUtil
 
@@ -153,6 +157,7 @@ class Product implements Comparable, Serializable {
     Category category
 
     // Default ABC Classification
+    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "abcClass") })
     String abcClass
 
     // For better or worse, unit of measure and dosage form are used somewhat interchangeably
@@ -226,8 +231,8 @@ class Product implements Comparable, Serializable {
     GlAccount glAccount
 
     // Auditing
-    Date dateCreated
-    Date lastUpdated
+    Instant dateCreated
+    Instant lastUpdated
     User createdBy
     User updatedBy
 
@@ -294,7 +299,23 @@ class Product implements Comparable, Serializable {
         unitOfMeasure(nullable: true, maxSize: 255)
         category(nullable: false)
         productType(nullable: false)
-        active(nullable: true)
+        active(nullable: true, validator: { value, obj ->
+            if (value) {
+                return true
+            }
+            // Don't allow a product to be deactivated if it is in an active stocklist.
+            int numActiveStocklistsForProduct = RequisitionItem.createCriteria().count {
+                eq('product', obj)
+                requisition {
+                    eq('isTemplate', true)
+                    eq('isPublished', true)
+                }
+            }
+            if (numActiveStocklistsForProduct > 0) {
+                return ['invalid.inStocklist']
+            }
+            return true
+        })
         coldChain(nullable: true)
         reconditioned(nullable: true)
         controlledSubstance(nullable: true)
@@ -308,7 +329,7 @@ class Product implements Comparable, Serializable {
         upc(nullable: true, maxSize: 255)
         ndc(nullable: true, maxSize: 255)
 
-        abcClass(nullable: true)
+        abcClass(nullable: true, blank: false)
         packageSize(nullable: true)
         brandName(nullable: true, maxSize: 255)
         vendor(nullable: true, maxSize: 255)
@@ -453,6 +474,43 @@ class Product implements Comparable, Serializable {
         }
     }
 
+    InventoryItem getDefaultInventoryItem() {
+        return getInventoryItem(Constants.DEFAULT_LOT_NUMBER)
+    }
+
+
+    InventoryItem getInventoryItem(String lotNumber) {
+        return getInventoryItem(lotNumber, null)
+    }
+
+    // FIXME we could also just traverse the inventoryItems association rather than making an extra query
+    // FIXME but i wanted to move towards a detached criteria / named query fetch
+    // FIXME the expiration date should be involved here, but we don't require it in other places
+    //  so i'll leave that for as a problem for future me
+    InventoryItem getInventoryItem(String lotNumber, Date expirationDate) {
+
+        // Treat the default lot number (DEFAULT) as null
+        if (Constants.DEFAULT_LOT_NUMBER.equalsIgnoreCase(lotNumber)) {
+            lotNumber = null
+        }
+
+        // Find an inventory that matches the provided lot number
+        return InventoryItem.createCriteria().get {
+            and {
+                eq("product", this)
+                if (lotNumber) {
+                    eq("lotNumber", lotNumber)
+                } else {
+                    or {
+                        isNull("lotNumber")
+                        eq("lotNumber", "")
+                    }
+                }
+            }
+        } as InventoryItem
+    }
+
+
     /**
      * Get ABC classification for this product at the given location.
      * @param locationId
@@ -506,7 +564,18 @@ class Product implements Comparable, Serializable {
 
 
     Date latestInventoryDate(String locationId) {
-        return latestTransactionDate(locationId, [TransactionCode.PRODUCT_INVENTORY])
+        /**
+         * After migrating from single product inventory transaction to baseline + adjustment transactions
+         * there is a case when we might have only an adjustment if it's first inventory record
+         * and we can't rely on CREDIT type code for this case and ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID
+         * is only used for baseline + adjustment and for manual stock adjustment
+         */
+        List<String> transactionTypeIds = [
+                Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
+                Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID,
+                Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID
+        ]
+        return latestTransactionDate(locationId, transactionTypeIds)
     }
 
     Date earliestReceivingDate(String locationId) {
@@ -519,7 +588,7 @@ class Product implements Comparable, Serializable {
      * @param locationId
      * @return
      */
-    Date latestTransactionDate(String locationId, List<TransactionCode> transactionCodes) {
+    Date latestTransactionDate(String locationId, List<String> transactionTypeIds) {
         def inventory = Location.get(locationId).inventory
         def date = TransactionEntry.executeQuery("""
           select 
@@ -529,8 +598,12 @@ class Product implements Comparable, Serializable {
           left join te.transaction as t 
           where ii.product= :product 
           and t.inventory = :inventory 
-          and t.transactionType.transactionCode in (:transactionCodes)
-          """, [product: this, inventory: inventory, transactionCodes: transactionCodes]).first()
+          and t.transactionType.id in (:transactionTypeIds)
+          and (t.comment <> :commentToFilter or t.comment IS NULL)
+          """, [product: this,
+                inventory: inventory,
+                transactionTypeIds: transactionTypeIds,
+                commentToFilter: Constants.INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT]).first()
         return date
     }
 
@@ -761,6 +834,64 @@ class Product implements Comparable, Serializable {
                 lastUpdated         : lastUpdated,
                 color               : color,
                 handlingIcons       : handlingIcons,
+                lotAndExpiryControl : lotAndExpiryControl,
+        ]
+    }
+
+    Map toFullJson() {
+        [
+                id                  : id,
+                productCode         : productCode,
+                name                : name,
+                description         : description,
+                productType         : [
+                        id: productType?.id,
+                ],
+                category            : [
+                        id: category?.id,
+                ],
+                defaultUom          : [
+                        id: defaultUom?.id,
+                ],
+                glAccount           : [
+                        id: glAccount?.id,
+                ],
+                productFamily       : [
+                        id: productFamily?.id,
+                ],
+                createdBy           : [
+                        id: createdBy?.id,
+                ],
+                updatedBy           : [
+                        id: updatedBy?.id,
+                ],
+                unitOfMeasure       : unitOfMeasure,
+                abcClass            : abcClass,
+                upc                 : upc,
+                ndc                 : ndc,
+                attributes          : attributes,
+                costPerUnit         : costPerUnit,
+                controlledSubstance : controlledSubstance,
+                hazardousMaterial   : hazardousMaterial,
+                active              : active,
+                coldChain           : coldChain,
+                serialized          : serialized,
+                lotControl          : lotControl,
+                essential           : essential,
+                reconditioned       : reconditioned,
+                manufacturer        : manufacturer,
+                manufacturerCode    : manufacturerCode,
+                manufacturerName    : manufacturerName,
+                brandName           : brandName,
+                modelNumber         : modelNumber,
+                vendor              : vendor,
+                vendorCode          : vendorCode,
+                vendorName          : vendorName,
+                packageSize         : packageSize,
+                pricePerUnit        : pricePerUnit,
+                dateCreated         : dateCreated,
+                lastUpdated         : lastUpdated,
+                color               : color,
                 lotAndExpiryControl : lotAndExpiryControl,
         ]
     }

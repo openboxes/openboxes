@@ -18,7 +18,7 @@
             </tr>
             </thead>
             <tbody>
-            <g:each var="invoiceItem" in="${invoiceInstance.invoiceItems.sort { it.dateCreated }}" status="status">
+            <g:each var="invoiceItem" in="${invoiceInstance.getSortedInvoiceItems()}" status="status">
                 <tr class="${status%2==0?'odd':'even'}">
                     <td>
                         ${invoiceItem?.product?.productCode?:g.message(code:'default.all.label')}
@@ -50,7 +50,7 @@
                         ${g.formatNumber(number: invoiceItem?.unitPrice?:0, format: '##,##0.00') }
                     </td>
                     <td>
-                        ${g.formatNumber(number: invoiceItem?.totalAmount, format: '##,##0.00') }
+                        ${g.formatNumber(number: invoiceItem?.amount, format: '##,##0.00') }
                     </td>
                 </tr>
             </g:each>

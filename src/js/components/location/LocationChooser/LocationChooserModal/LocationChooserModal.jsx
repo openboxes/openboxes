@@ -3,7 +3,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { RiCloseLine } from 'react-icons/ri';
 import Modal from 'react-modal';
-import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+import {
+  Tab, TabList, TabPanel, Tabs,
+} from 'react-tabs';
 
 import LocationButton
   from 'components/location/LocationChooser/LocationChooserModal/LocationButton';
@@ -12,13 +14,12 @@ import Translate from 'utils/Translate';
 
 import 'components/location/LocationChooser/LocationChooserModal/LocationChooserModal.scss';
 
-
 Modal.setAppElement('#root');
 
 const LocationChooserModal = ({
   locations, onClose, isLoading, isOpen, onSelectLocation,
 }) => {
-  const renderGroupedLocations = groupedLocations => (
+  const renderGroupedLocations = (groupedLocations) => (
     <div
       key={`${groupedLocations.group}-group`}
       className="location-chooser__modal__group d-flex flex-column mb-4"
@@ -30,19 +31,23 @@ const LocationChooserModal = ({
             <Translate
               id="react.dashboard.noLocationGroup.label"
               defaultMessage="No location group"
-            />)}
+            />
+          )}
       </h3>
       <div className="location-chooser__modal__group-container d-flex flex-wrap flex-row">
-        {groupedLocations.locations.map(location =>
-          (<LocationButton
-            key={`${location.name}-location`}
-            onClick={onSelectLocation}
-            location={location}
-          />))}
+        {groupedLocations.locations.map((location) =>
+          (
+            <LocationButton
+              key={`${location.name}-location`}
+              onClick={onSelectLocation}
+              location={location}
+            />
+          ))}
       </div>
-    </div>);
+    </div>
+  );
 
-  const renderOrganizationTabs = locationGroups => (
+  const renderOrganizationTabs = (locationGroups) => (
     <Tabs className="react-tabs">
       <TabList data-testid="location-organization-list" className="react-tabs__tab-list m-0 list-unstyled scrollbar">
         {locations.map(({ organization }) => (
@@ -56,8 +61,10 @@ const LocationChooserModal = ({
                 <Translate
                   id="react.dashboard.noOrganization.label"
                   defaultMessage="No organization"
-                />)}
-          </Tab>))}
+                />
+              )}
+          </Tab>
+        ))}
       </TabList>
       <div>
         {locationGroups.map(({
@@ -70,9 +77,11 @@ const LocationChooserModal = ({
             key={`${organization}-org-panel`}
           >
             {groups.map(renderGroupedLocations)}
-          </TabPanel>))}
+          </TabPanel>
+        ))}
       </div>
-    </Tabs>);
+    </Tabs>
+  );
 
   return (
     <Modal
@@ -106,7 +115,8 @@ const LocationChooserModal = ({
           {isLoading ? <Spinner /> : renderOrganizationTabs(locations)}
         </section>
       </div>
-    </Modal>);
+    </Modal>
+  );
 };
 LocationChooserModal.defaultProps = {
   isLoading: false,

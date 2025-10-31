@@ -11,12 +11,14 @@ import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
 import PartialReceivingPage from 'components/receiving/PartialReceivingPage';
 import ReceivingCheckScreen from 'components/receiving/ReceivingCheckScreen';
 import Wizard from 'components/wizard/Wizard';
+import DateFormat from 'consts/dateFormat';
+import receivingSortOptions from 'consts/receivingSortOptions';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/stock-movement-wizard/StockMovement.scss';
-
 
 /** Main partial receiving form's component. */
 class ReceivingPage extends Component {
@@ -29,6 +31,7 @@ class ReceivingPage extends Component {
       locationId: '',
       shipmentNumber: '',
       currentPage: 1,
+      sort: receivingSortOptions[0].value,
     };
   }
 
@@ -101,7 +104,10 @@ class ReceivingPage extends Component {
         delimeter: ', ',
       },
       {
-        text: dateShipped,
+        text: this.props.formatLocalizedDate(
+          dateShipped,
+          DateFormat.COMMON,
+        ),
         color: '#4a148c',
         delimeter: ', ',
       },
@@ -143,12 +149,12 @@ class ReceivingPage extends Component {
    */
   fetchBins() {
     const url = '/api/internalLocations/receiving';
-    const mapBins = bins => (_.chain(bins)
+    const mapBins = (bins) => (_.chain(bins)
       .orderBy(['name'], ['asc']).value()
     );
 
     return apiClient.get(url, {
-      paramsSerializer: parameters => queryString.stringify(parameters),
+      paramsSerializer: (parameters) => queryString.stringify(parameters),
       params: {
         locationTypeCode: ['BIN_LOCATION', 'INTERNAL'],
         'location.id': this.state.locationId,
@@ -156,7 +162,7 @@ class ReceivingPage extends Component {
       },
     })
       .then((response) => {
-        const binGroups = _.partition(response.data.data, bin => (bin.zoneName));
+        const binGroups = _.partition(response.data.data, (bin) => (bin.zoneName));
         const binsWithZone = _.chain(binGroups[0]).groupBy('zoneName')
           .map((value, key) => ({ name: key, options: mapBins(value) }))
           .orderBy(['label'], ['asc'])
@@ -170,9 +176,13 @@ class ReceivingPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  updateSort = (newSortValue) => {
+    this.setState({ sort: newSortValue });
+  };
+
   render() {
     const {
-      formData, locationId, currentPage, bins,
+      formData, locationId, currentPage, bins, sort,
     } = this.state;
     const { match, translate } = this.props;
     const pageList = [PartialReceivingPage, ReceivingCheckScreen];
@@ -187,7 +197,7 @@ class ReceivingPage extends Component {
           currentPage={currentPage}
           prevPage={currentPage === 1 ? 1 : currentPage - 1}
           additionalProps={{
-            bins, locationId, match, translate,
+            bins, locationId, match, translate, sort, updateSort: this.updateSort,
           }}
         />
       );
@@ -197,12 +207,13 @@ class ReceivingPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
   locale: state.session.activeLanguage,
   partialReceivingTranslationsFetched: state.session.fetchedTranslations.partialReceiving,
   hasPartialReceivingSupport: state.session.currentLocation.hasPartialReceivingSupport,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps, {
@@ -210,7 +221,7 @@ export default connect(mapStateToProps, {
 })(ReceivingPage);
 
 ReceivingPage.propTypes = {
-  /** React router's object which contains information about url varaiables and params */
+  /** React router's object which contains information about url variables and params */
   match: PropTypes.shape({
     params: PropTypes.shape({ shipmentId: PropTypes.string }),
   }).isRequired,
@@ -222,4 +233,5 @@ ReceivingPage.propTypes = {
   locale: PropTypes.string.isRequired,
   partialReceivingTranslationsFetched: PropTypes.bool.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };

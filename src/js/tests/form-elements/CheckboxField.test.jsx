@@ -34,4 +34,3 @@ xdescribe('CheckboxField component is correctly rendering', () => {
     expect(rendered.toJSON()).toMatchSnapshot();
   });
 });
-

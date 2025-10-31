@@ -24,6 +24,7 @@ $state-5 : #0288d1;
 $state-6 : #303f9f;
 $state-7 : #7b1fa2;
 $state-8 : #b80d57;
+$state-9 : var(--color-red);
 
 $dark-state-1 : #e65100;
 $dark-state-2 : #bc5b10;
@@ -79,6 +80,7 @@ $light-error : #ef5350;
   state6: $state-6;
   state7: $state-7;
   state8: $state-8;
+  state9: $state-9;
 
   darkState1: $dark-state-1;
   darkState2: $dark-state-2;

@@ -10,6 +10,8 @@
 package org.pih.warehouse
 
 import org.grails.core.artefact.DomainClassArtefactHandler
+import org.springframework.beans.factory.annotation.Value
+
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
@@ -54,6 +56,138 @@ class SelectTagLib {
     def shipmentService
     def requisitionService
     def organizationService
+
+    /**
+     * The minimum number of characters input into the search field before a request will be sent.
+     */
+    @Value('${openboxes.typeahead.minLength}')
+    String minSearchValueLength
+
+    /**
+     * How long to wait after the user has stopped typing before sending the request.
+     */
+    @Value('${openboxes.typeahead.delay}')
+    String searchDelay
+
+    def selectProductAjax = { attrs, body ->
+        attrs.id = attrs.id ?: "products-select"
+        attrs.url = "/api/products/search"
+        attrs.searchParameter = "name"
+        attrs.displayValue = "'[' + item.productCode + '] ' + item.name"
+        out << selectAjax(attrs, body)
+    }
+
+    /**
+     * A search and select field. Searches via AJAX API request using the Select2 jQuery plugin.
+     *
+     * @attr id Required. A unique identifier (within the current page) for the generated select element
+     * @attr url Required. The path of the API request
+     * @attr name The name of the select element. Defaults to the value of the id attr.
+     * @attr searchParameter The name of the query parameter to use when making the API request
+     * @attr displayValue Stringified Javascript for formatting the API response for display. The "item" key can be
+     *                    used to access response fields. Defaults to displaying the value of the searchParameter attr.
+     * @attr multiple True if the select box should allow multiple items to be selected
+     */
+    def selectAjax = { attrs, body ->
+        if (!attrs.containsKey('id')) {
+            throwTagError("Attribute [id] is required.")
+        }
+        if (!attrs.containsKey('url')) {
+            throwTagError("Attribute [url] is required.")
+        }
+
+        String id = attrs.id
+        String name = attrs.name ?: attrs.id
+        attrs.put('data-testid', attrs.get('data-testid') ?: attrs.id)
+        String url = attrs.url
+        String searchParameter = attrs.searchParameter ?: "name"
+        boolean multiple = attrs.multiple?.asBoolean() ?: false
+        String placeholder = "${g.message(code: 'default.selectOptions.label', default: 'Select Options')}"
+        Object values = attrs.value
+        String displayValue = attrs.displayValue ?: "item.${searchParameter}"
+        String selectedOptionsHtml = ""
+
+        if (values && values.any { it?.hasProperty('id') }) {
+            selectedOptionsHtml = values.collect { val ->
+                String text = val.name ?: val.toString()
+                "<option value='${val.id}' selected='true'>${text.encodeAsHTML()}</option>"
+            }.join("\n")
+        }
+
+        def html = """
+            <select id="${id}"
+                    name="${name}"
+                    ${multiple ? "multiple" : ""}
+                    type="text">
+            ${selectedOptionsHtml}
+            </select>
+
+            <script type=\'text/javascript\'>
+
+                jQuery(document).ready(function() {
+
+                    // If we upgrade to select2 4.1 we can replace this with a "selectionCssClass: "some-class"
+                    // config option below and then style .some-class with {"white-space": normal}.
+                    function formatSelectedOptions (state) {
+                        if (!state.id) {
+                            return state.text;
+                        }
+
+                        var \$state = \$(
+                            "<span><span></span></span>"
+                        );
+
+                        \$state.find("span").text(state.text);
+                        \$state.find("span").css("white-space", "normal");
+
+                        return \$state;
+                    };
+
+                    // https://select2.org/configuration/options-api
+                    jQuery('#${id}').select2({
+
+                        placeholder: "${placeholder}",
+                        minimumInputLength: "${minSearchValueLength ?: "3"}",
+                        width: "100%",
+                        allowClear: false,
+                        cache: true,
+                        templateSelection: formatSelectedOptions,
+
+                        ajax: {
+                            url: "${request.contextPath}${url}",
+                            dataType: "json",
+                            delay: "${searchDelay ?: "300"}",
+
+                            // 'term' is the field that Select2 uses as the user-typed search value, so re-map it
+                            // to the query parameter that the API accepts.
+                            data: function (params) {
+                                return {
+                                    ${searchParameter}: params.term,
+                                };
+                            },
+
+                            // Process the API response. Expects a response formatted like: { data: [{}, ...]}
+                            processResults: function (data, params) {
+                                var results = data.data.map(function (item) {
+                                    return {
+                                        id: item.id,
+                                        ${searchParameter}: item.${searchParameter},
+                                        text: ${displayValue}, 
+                                        value: item.id,
+                                    };
+                                });
+                                return {
+                                    results: results,
+                                };
+                            },
+                        },
+                    });
+                });
+            </script>
+        """
+
+        out << html
+    }
 
     //@Cacheable("selectCategoryCache")
     def selectCategory = { attrs, body ->
@@ -306,7 +440,7 @@ class SelectTagLib {
         }
         attrs.from = order.listOrderItems()
         attrs.optionKey = 'id'
-        attrs.optionValue = { it.toString() }
+        attrs.optionValue = { it.product?.displayNameOrDefaultName }
         out << g.select(attrs)
     }
 
@@ -614,7 +748,7 @@ class SelectTagLib {
 
     def selectLocale = { attrs, body ->
         attrs.from = grailsApplication.config.openboxes.locale.supportedLocales?.sort()
-        attrs.optionValue = { new Locale(it).displayName }
+        attrs.optionValue = { LocalizationUtil.getLocale(it).getDisplayName(LocalizationUtil.currentLocale) }
         out << g.select(attrs)
     }
 

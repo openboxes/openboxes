@@ -47,7 +47,7 @@
 					<g:if test="${comment?.id}">
 						<g:hiddenField name="id" value="${comment?.id}" />
 					</g:if>
-					<g:hiddenField name="requisition" value="${stockMovement?.id}" />
+					<g:hiddenField name="stockMovementId" value="${stockMovement?.id}" />
 
 					<table>
 						<tbody>

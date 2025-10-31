@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 
 import { hideUserActions, showUserActions } from 'actions';
 
-
 class UserActionMenu extends Component {
   constructor(props) {
     super(props);
@@ -20,7 +19,6 @@ class UserActionMenu extends Component {
       this.props.showUserActions();
     }
   }
-
 
   render() {
     return (
@@ -39,20 +37,21 @@ class UserActionMenu extends Component {
           className="dropdown"
           hidden={!this.props.userActionMenuOpen}
         >
-          {this.props.menuItems.map(item => (
+          {this.props.menuItems.map((item) => (
             <li key={item.label}>
               <a href={item.linkAction}>
                 <img alt={item.label} src={item.linkIcon} />
                 {item.label}
               </a>
-            </li>))}
+            </li>
+          ))}
         </ul>
       </div>
     );
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   userActionMenuOpen: state.session.userActionMenuOpen,
   menuItems: state.session.menuItems,
   currentUser: state.session.user,

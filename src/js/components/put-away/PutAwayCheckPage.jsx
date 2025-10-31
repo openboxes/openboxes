@@ -9,12 +9,15 @@ import Alert from 'react-s-alert';
 import ReactTable from 'react-table';
 
 import { hideSpinner, showSpinner } from 'actions';
+import { TableCell } from 'components/DataTable';
 import { ORDER_URL, PUTAWAY_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
 import apiClient from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import showLocationChangedAlert from 'utils/location-change-alert';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -83,16 +86,15 @@ class PutAwayCheckPage extends Component {
       () => { window.location = `${ORDER_URL.list()}?orderType=PUTAWAY_ORDER&status=PENDING`; },
     );
 
-    const location = this.state.location.id ? this.state.location : nextProps.location;
-    this.setState({
+    this.setState((prev) => ({
       putAway: {
         ...nextProps.initialValues.putAway,
         putawayItems: PutAwayCheckPage
           .processSplitLines(nextProps.initialValues.putAway.putawayItems),
       },
       completed: nextProps.initialValues.putAway.putawayStatus === 'COMPLETED',
-      location,
-    });
+      location: prev.location.id ? prev.location : nextProps.location,
+    }));
   }
 
   /**
@@ -124,7 +126,15 @@ class PutAwayCheckPage extends Component {
       Filter,
     }, {
       Header: <Translate id="react.putAway.name.label" defaultMessage="Name" />,
-      accessor: 'product.name',
+      accessor: 'product',
+      Cell: (row) => (
+        <TableCell
+          {...row}
+          value={row.value?.displayNameOrDefaultName}
+          tooltip={row.value?.name !== row.value?.displayNameOrDefaultName}
+          tooltipLabel={row.value?.name}
+        />
+      ),
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
@@ -136,6 +146,15 @@ class PutAwayCheckPage extends Component {
       Header: <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />,
       accessor: 'inventoryItem.expirationDate',
       style: { whiteSpace: 'normal' },
+      Cell: (props) => (
+        <span>
+          {
+            props?.value
+              ? this.props.formatLocalizedDate(props.value, DateFormat.COMMON)
+              : props.value
+          }
+        </span>
+      ),
       Filter,
     }, {
       Header: <Translate id="react.putAway.recipient.label" defaultMessage="Recipient" />,
@@ -146,15 +165,20 @@ class PutAwayCheckPage extends Component {
       Header: <Translate id="react.putAway.qty.label" defaultMessage="QTY" />,
       accessor: 'quantity',
       style: { whiteSpace: 'normal' },
-      Cell: props => <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>,
+      Cell: (props) => <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>,
       Filter,
     }, {
       Header: <Translate id="react.putAway.preferredBin.label" defaultMessage="Preferred bin" />,
       accessor: 'preferredBin',
       style: { whiteSpace: 'normal' },
-      Cell: props => (
+      Cell: (props) => (
         <div>
-          {props.value && props.value.zoneName ? <div>{props.value.zoneName}:&nbsp;</div> : ''}
+          {props.value && props.value.zoneName ? (
+            <div>
+              {props.value.zoneName}
+              :&nbsp;
+            </div>
+          ) : ''}
           <div>{props.value ? props.value.name : ''}</div>
         </div>
       ),
@@ -168,9 +192,14 @@ class PutAwayCheckPage extends Component {
       Header: <Translate id="react.putAway.putAwayBin.label" defaultMessage="Putaway Bin" />,
       accessor: 'putawayLocation',
       style: { whiteSpace: 'normal' },
-      Cell: props => (
+      Cell: (props) => (
         <div>
-          {props.value && props.value.zoneName ? <div>{props.value.zoneName}:&nbsp;</div> : ''}
+          {props.value && props.value.zoneName ? (
+            <div>
+              {props.value.zoneName}
+              :&nbsp;
+            </div>
+          ) : ''}
           <div>{props.value ? props.value.name : ''}</div>
         </div>
       ),
@@ -210,8 +239,17 @@ class PutAwayCheckPage extends Component {
    * @public
    */
   // eslint-disable-next-line no-underscore-dangle
-  filterMethod = (filter, row) => (row._aggregated || row._groupedByPivot
-    || _.toString(row[filter.id]).toLowerCase().includes(filter.value.toLowerCase()));
+  filterMethod = (filter, row) => {
+    let val = row[filter.id];
+    if (filter.id === 'inventoryItem.expirationDate') {
+      val = this.props.formatLocalizedDate(val, DateFormat.COMMON);
+    }
+    if (filter.id === 'product') {
+      val = val ? `${val.name} ${val.displayNameOrDefaultName}` : null;
+    }
+    return row._aggregated || row._groupedByPivot
+      || _.toString(val).toLowerCase().includes(filter.value.toLowerCase());
+  };
 
   /**
    * Sends all changes made by user in this step of put-away to API and updates data.
@@ -220,13 +258,13 @@ class PutAwayCheckPage extends Component {
   completePutAway() {
     const isBinLocationChosen = !_.some(
       this.props.initialValues.putAway.putawayItems,
-      putAwayItem =>
+      (putAwayItem) =>
         _.isNull(putAwayItem.putawayLocation.id) && _.isEmpty(putAwayItem.splitItems),
     );
 
     const itemsWithLowerQuantity = _.filter(
       this.props.initialValues.putAway.putawayItems,
-      putAwayItem => putAwayItem.quantity < putAwayItem.quantityAvailable,
+      (putAwayItem) => putAwayItem.quantity < putAwayItem.quantityAvailable,
     );
 
     if (!_.isEmpty(itemsWithLowerQuantity)) {
@@ -244,10 +282,10 @@ class PutAwayCheckPage extends Component {
     const payload = {
       ...this.props.initialValues.putAway,
       putawayStatus: 'COMPLETED',
-      putawayItems: _.map(this.props.initialValues.putAway.putawayItems, item => ({
+      putawayItems: _.map(this.props.initialValues.putAway.putawayItems, (item) => ({
         ...item,
         putawayStatus: item.splitItems.length ? 'CANCELLED' : 'COMPLETED',
-        splitItems: _.map(item.splitItems, splitItem => ({
+        splitItems: _.map(item.splitItems, (splitItem) => ({
           ...splitItem,
           putawayStatus: 'COMPLETED',
         })),
@@ -298,11 +336,20 @@ class PutAwayCheckPage extends Component {
   confirmLowerQuantity(items) {
     confirmAlert({
       title: this.props.translate('react.putAway.message.confirmPutAway.label', 'Confirm putaway'),
-      message: _.map(items, item =>
+      message: _.map(items, (item) =>
         (
-          <p>Qty {item.quantityAvailable - item.quantity} {this.props.translate('react.putAway.alert.lowerQty1.label', 'of item')} {' '}
-            {item.product.name} {this.props.translate('react.putAway.alert.lowerQty2.label', 'is still in the receiving bin. Do you want to continue?')}
-          </p>)),
+          <p>
+            Qty
+            {item.quantityAvailable - item.quantity}
+            {' '}
+            {this.props.translate('react.putAway.alert.lowerQty1.label', 'of item')}
+            {' '}
+            {' '}
+            {item.product.displayNameOrDefaultName}
+            {' '}
+            {this.props.translate('react.putAway.alert.lowerQty2.label', 'is still in the receiving bin. Do you want to continue?')}
+          </p>
+        )),
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
@@ -322,101 +369,126 @@ class PutAwayCheckPage extends Component {
     const {
       putAway, columns, pivotBy, expanded,
     } = this.state;
-    const extraProps =
-      {
-        pivotBy,
-        expanded,
-        onExpandedChange,
-      };
+    const extraProps = {
+      pivotBy,
+      expanded,
+      onExpandedChange,
+    };
 
     return (
       <div className="putaway">
         <div className="d-flex justify-content-between mb-2 putaway-buttons">
           <div>
-            <Translate id="react.putAway.showBy.label" defaultMessage="Show by" />:
+            <Translate id="react.putAway.showBy.label" defaultMessage="Show by" />
+            :
             <button
+              type="button"
               className="btn btn-primary ml-2 btn-xs"
               data-toggle="button"
               aria-pressed="false"
               onClick={toggleTree}
+              data-testid="show-by-button"
             >
-              {pivotBy && pivotBy.length ?
-                <Translate id="react.putAway.stockMovement.label" defaultMessage="Stock Movement" />
-                    : <Translate id="react.putAway.product.label" defaultMessage="Product" /> }
+              {pivotBy && pivotBy.length
+                ? <Translate id="react.putAway.stockMovement.label" defaultMessage="Stock Movement" />
+                : <Translate id="react.putAway.product.label" defaultMessage="Product" /> }
             </button>
           </div>
           <span className="buttons-container classic-form-buttons">
-            {this.state.completed ?
-              <button
-                type="button"
-                className="btn btn-outline-secondary btn-xs mr-3"
-                onClick={() => this.goToFirstPage()}
-              ><Translate id="react.putAway.goBack.label" defaultMessage="Go back to putaway list" />
-              </button> :
-              <div>
+            {this.state.completed
+              ? (
                 <button
                   type="button"
-                  onClick={() => this.props.previousPage({
-                    putAway: this.state.putAway,
-                    pivotBy: this.state.pivotBy,
-                    expanded: this.state.expanded,
-                  })}
                   className="btn btn-outline-secondary btn-xs mr-3"
-                ><Translate id="react.default.button.edit.label" defaultMessage="Edit" />
+                  onClick={() => this.goToFirstPage()}
+                  data-testid="back-button"
+                >
+                  <Translate id="react.putAway.goBack.label" defaultMessage="Go back to putaway list" />
                 </button>
-                <button
-                  type="button"
-                  onClick={() => this.completePutAway()}
-                  className="btn btn-outline-secondary btn-xs mr-3"
-                ><Translate id="react.putAway.completePutAway.label" defaultMessage="Complete Putaway" />
-                </button>
-              </div>
-            }
+              )
+              : (
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => this.props.previousPage({
+                      putAway: this.state.putAway,
+                      pivotBy: this.state.pivotBy,
+                      expanded: this.state.expanded,
+                    })}
+                    className="btn btn-outline-secondary btn-xs mr-3"
+                    data-testid="edit-button"
+                  >
+                    <Translate id="react.default.button.edit.label" defaultMessage="Edit" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => this.completePutAway()}
+                    className="btn btn-outline-secondary btn-xs mr-3"
+                    data-testid="complete-putaway-button"
+                  >
+                    <Translate id="react.putAway.completePutAway.label" defaultMessage="Complete Putaway" />
+                  </button>
+                </div>
+              )}
           </span>
         </div>
         {
-          putAway.putawayItems ?
-            <SelectTreeTable
-              data={putAway.putawayItems}
-              columns={columns}
-              ref={(r) => { this.selectTable = r; }}
-              className="-striped -highlight"
-              {...extraProps}
-              defaultPageSize={Number.MAX_SAFE_INTEGER}
-              minRows={0}
-              showPaginationBottom={false}
-              filterable
-              defaultFilterMethod={this.filterMethod}
-            />
+          putAway.putawayItems
+            ? (
+              <SelectTreeTable
+                data={putAway.putawayItems}
+                columns={columns}
+                ref={(r) => { this.selectTable = r; }}
+                className="-striped -highlight"
+                {...extraProps}
+                defaultPageSize={Number.MAX_SAFE_INTEGER}
+                minRows={0}
+                showPaginationBottom={false}
+                filterable
+                defaultFilterMethod={this.filterMethod}
+                getTdProps={(state, rowInfo) => ({
+                  'data-testid': `row-${rowInfo.level}-${rowInfo.index}`,
+                })}
+              />
+            )
             : null
         }
         <div className="submit-buttons">
           {
-            this.state.completed ?
-              <button
-                type="button"
-                className="btn btn-outline-primary btn-form btn-xs"
-                onClick={() => this.goToFirstPage()}
-              ><Translate id="react.putAway.goBack.label" defaultMessage="Go back to putaway list" />
-              </button> :
-              <div className="submit-buttons">
+            this.state.completed
+              ? (
                 <button
                   type="button"
-                  onClick={() => this.completePutAway()}
-                  className="btn btn-outline-primary btn-form float-right btn-xs"
-                ><Translate id="react.putAway.completePutAway.label" defaultMessage="Complete Putaway" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => this.props.previousPage({
-                    putAway: this.state.putAway,
-                    pivotBy: this.state.pivotBy,
-                    expanded: this.state.expanded,
-                  })}
                   className="btn btn-outline-primary btn-form btn-xs"
-                ><Translate id="react.default.button.edit.label" defaultMessage="Edit" />
+                  onClick={() => this.goToFirstPage()}
+                >
+                  <Translate id="react.putAway.goBack.label" defaultMessage="Go back to putaway list" />
                 </button>
-              </div>
+              )
+              : (
+                <div className="submit-buttons">
+                  <button
+                    type="button"
+                    onClick={() => this.completePutAway()}
+                    className="btn btn-outline-primary btn-form float-right btn-xs"
+                    data-testid="complete-putaway-button"
+                  >
+                    <Translate id="react.putAway.completePutAway.label" defaultMessage="Complete Putaway" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => this.props.previousPage({
+                      putAway: this.state.putAway,
+                      pivotBy: this.state.pivotBy,
+                      expanded: this.state.expanded,
+                    })}
+                    className="btn btn-outline-primary btn-form btn-xs"
+                    data-testid="edit-button"
+                  >
+                    <Translate id="react.default.button.edit.label" defaultMessage="Edit" />
+                  </button>
+                </div>
+              )
           }
         </div>
       </div>
@@ -424,8 +496,9 @@ class PutAwayCheckPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(PutAwayCheckPage);
@@ -450,6 +523,7 @@ PutAwayCheckPage.propTypes = {
   translate: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
   goToPage: PropTypes.func.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };
 
 PutAwayCheckPage.defaultProps = {};

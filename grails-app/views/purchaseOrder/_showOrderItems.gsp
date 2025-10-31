@@ -106,7 +106,7 @@
                                 <th class="center"><warehouse:message code="default.cost.label"/></th>
                                 <th class="center"><warehouse:message code="orderItem.totalCost.label"/></th>
                                 <th class="center"><warehouse:message code="order.recipient.label"/></th>
-                                <th class="center"><warehouse:message code="orderItem.estimatedReadyDate.label"/></th>
+                                <th class="center"><warehouse:message code="orderItem.quotedShipDate.label"/></th>
                                 <th class="center"><warehouse:message code="orderItem.budgetCode.label"/></th>
                                 <th class="center"><warehouse:message code="default.actions.label"/></th>
                             </tr>
@@ -201,7 +201,7 @@
                                     />
                                 </td>
                                 <td class="center middle">
-                                    <button type="button" class="button" onclick="saveOrderAdjustment()">
+                                    <button type="button" class="button" id="save-adjustment-button" onclick="saveOrderAdjustment()">
                                         <img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}" />&nbsp
                                         <warehouse:message code="default.button.save.label"/>
                                     </button>
@@ -502,6 +502,8 @@
         }
 
         function saveOrderItem() {
+          const saveButton = $("#save-item-button");
+            saveButton.attr('disabled', 'disabled');
             var data = $("#orderItemForm").serialize();
             data += '&orderIndex=' + $("#orderItemsTable tbody tr").length;
             if (validateItemsForm()) {
@@ -515,6 +517,7 @@
                * TODO localized strings? Further discussion at OBGM-343.
                */
               if ($("#validationCode").val() == 'WARN' && !confirm(htmlDecode(`${g.message(code: 'orderItem.warningSupplier.label')}`))) {
+                saveButton.removeAttr('disabled');
                 return false
               } else {
                 $.ajax({
@@ -544,19 +547,26 @@
                     } else {
                       $.notify("Error saving your item");
                     }
-                  }
+                  },
+                  complete: function() {
+                    saveButton.removeAttr('disabled');
+                  },
                 });
               }
             }
             else {
+              saveButton.removeAttr('disabled');
               $.notify(htmlDecode("${g.message(code: 'order.errors.allRequiredFields.label', default: 'Please enter a proper value for all required fields')}"));
             }
-            return false
+          return false
         }
 
         function saveOrderAdjustment() {
+            const saveButton = $("#save-adjustment-button");
+            saveButton.attr('disabled', 'disabled');
             const data = $("#orderAdjustmentForm").serialize();
             if (!validateAdjustmentsForm()) {
+              saveButton.removeAttr('disabled');
               return
             }
             $.ajax({
@@ -574,6 +584,9 @@
                     } else {
                         $.notify("Error saving adjustment");
                     }
+                },
+                complete: function () {
+                    saveButton.removeAttr('disabled');
                 }
             });
             return false;
@@ -1032,7 +1045,13 @@
 	</td>
 	<td class="left middle" style="color: {{= product.color }}">
         {{= product.productCode }}
-        {{= product.displayNames.default || product.name }}
+        {{if product.displayNames.default}}
+            <span title="{{= product.name}}">
+                {{= product.displayNames.default}}
+            </span>
+        {{else}}
+            {{= product.name}}
+        {{/if}}
 	</td>
 	<td class="center middle">
     	{{if productSupplier }}
@@ -1131,8 +1150,14 @@
         {{= type.name }}
 	</td>
 	<td>
-    	{{if orderItem }}
-	    {{= orderItem.product.name }}
+    	{{if orderItem}}
+    	    {{if orderItem.product.displayNames.default}}
+                <span title="{{= orderItem.product.name}}">
+                    {{= orderItem.product.displayNames.default}}
+                </span>
+    	    {{else}}
+    	            {{= orderItem.product.name}}
+    	    {{/if}}
 	    {{else}}
         ALL
 	    {{/if}}

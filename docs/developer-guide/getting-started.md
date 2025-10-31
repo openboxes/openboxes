@@ -1,22 +1,26 @@
 # Getting Started
 
+!!!danger
+    These developer instructions might be slightly outdated, so please use the instructions found on our main repository's README file.
+
 ## Dependencies
 
 ### Required
 * Java 7
-* MySQL 5.5+
-* [SDK Man] (http://sdkman.io/install.html)
+* MySQL 5.7+
+* [SDK Man](http://sdkman.io/install.html)
 * [Grails 1.3.9](http://grails.org/download/archive/Grails)
 * NPM
 
-NOTE: We are in the process of upgrading to Grails 2.5.5 [(see this feature branch).](https://github.com/openboxes/openboxes/tree/feature/94-upgrade-to-grails-2.5.x) Once that is complete you will be able to use Java 8. 
+!!! note
+    NOTE: We are in the process of migration the application from Grails 1.3.9 to Grails 3.3.10 [(see this feature branch).](https://github.com/openboxes/openboxes/tree/feature/upgrade-to-grails-3.3.10) Once that is complete you will be able to use Java 8. 
 
 ### Optional, but recommended
-* [IntelliJ IDEA] (https://www.jetbrains.com/idea/download/)
+* [IntelliJ IDEA](https://www.jetbrains.com/idea/download/)
 
 ## Instructions
 These instructions are for developers only.  If you are a system administrator looking to install OpenBoxes on your
-own server, please check out our [Installation](installation/index) page.
+own server, please check out our [Installation](../admin-guide/installation/index.md) page.
 
 ### 1. Install Dependencies
 Install dependencies above

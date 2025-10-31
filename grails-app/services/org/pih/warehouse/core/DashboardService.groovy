@@ -11,12 +11,23 @@ package org.pih.warehouse.core
 
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
+import grails.util.Holders
+import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.hibernate.sql.JoinType
+
+import org.pih.warehouse.DateUtil
+import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.localization.MessageLocalizer
+import org.pih.warehouse.forecasting.ForecastingService
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.InventoryLevelStatus
 import org.pih.warehouse.inventory.InventoryStatus
-import org.pih.warehouse.inventory.TransactionCode
+import org.pih.warehouse.inventory.ReorderReportFilterCommand
+import org.pih.warehouse.inventory.ReorderReportItemDto
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.product.availability.InventoryByProduct
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.report.InventoryReportCommand
@@ -28,7 +39,11 @@ import java.text.SimpleDateFormat
 @Transactional(readOnly=true)
 class DashboardService {
 
+    ConfigService configService
     def productAvailabilityService
+    ForecastingService forecastingService
+    UserService userService
+    MessageLocalizer messageLocalizer
 
     /**
      * Get fast moving items based on requisition data.
@@ -163,11 +178,11 @@ class DashboardService {
             }
 
             if (command.startDate) {
-                ge("expirationDate", command.startDate + 1)
+                ge("expirationDate", DateUtil.asDate(command.startDate.plusDays(1)))
             }
 
             if (command.endDate) {
-                le("expirationDate", command.endDate)
+                le("expirationDate", DateUtil.asDate(command.endDate))
             }
 
             order("expirationDate", "desc")
@@ -206,11 +221,11 @@ class DashboardService {
             }
 
             if (command.startDate) {
-                ge("expirationDate", command.startDate + 1)
+                ge("expirationDate", DateUtil.asDate(command.startDate.plusDays(1)))
             }
 
             if (command.endDate) {
-                le("expirationDate", command.endDate)
+                le("expirationDate", DateUtil.asDate(command.endDate))
             }
 
             order("expirationDate", "asc")
@@ -333,17 +348,19 @@ class DashboardService {
         Map<Product, Object> inventoryItemsMap = getTotalStock(location).collectEntries { [it.product, it ] }
         Set<Product> products = inventoryItemsMap.keySet()
 
-        List<Object> latestInventoryDates = TransactionEntry.executeQuery("""
+        List<String> transactionTypes = configService.getProperty('openboxes.inventoryCount.transactionTypes', List) as List<String>
+
+        List<Object[]> latestInventoryDates = TransactionEntry.executeQuery("""
                 select ii.product.id, max(t.transactionDate)
                 from TransactionEntry as te
                 left join te.inventoryItem as ii
                 left join te.transaction as t
                 where t.inventory = :inventory
-                and t.transactionType.transactionCode in (:transactionCodes)
+                and t.transactionType.id in (:transactionTypeIds)
+                and (t.comment <> :commentToFilter or t.comment IS NULL)
                 group by ii.product
                 """,
-                [inventory: location.inventory, transactionCodes: [TransactionCode.PRODUCT_INVENTORY, TransactionCode.INVENTORY]])
-
+                [inventory: location.inventory, transactionTypeIds: transactionTypes, commentToFilter: Constants.INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT])
 
         // Convert to map
         Map<String, Timestamp> latestInventoryDateMap = latestInventoryDates.collectEntries { [it[0], it[1]] }
@@ -567,6 +584,129 @@ class DashboardService {
             inventoryLevel?.status >= InventoryStatus.SUPPORTED && reorderQuantity && quantity <= reorderQuantity
         }
         return reorderStock
+    }
+
+    List<ReorderReportItemDto> getReorderReport(ReorderReportFilterCommand command) {
+        // Find inventory levels that don't have bin location set and have AT LEAST one of min/max qty set
+        List<InventoryLevel> inventoryLevels = InventoryLevel.createCriteria().list {
+            // Current location is a "central" one, we want to get inventory level values (max/min qty) only from the current location
+            // additionaLocations are supposed to be used only for the quantity available to promise calculation,
+            // where we sum the QATP for currentLocation + additionalLocations
+            eq("inventory", AuthService.currentLocation.inventory)
+            isNull("internalLocation")
+            or {
+                and {
+                    isNotNull("minQuantity")
+                    gt("minQuantity", 0)
+                }
+                and {
+                    isNotNull("reorderQuantity")
+                    gt("reorderQuantity", 0)
+                }
+            }
+        }
+        List<InventoryByProduct> inventoriesByProduct = productAvailabilityService.getInventoriesByProduct(command.additionalLocations,
+                command.categories,
+                command.tags,
+                command.expiration)
+
+        // Build a map of inventory levels keyed on product to have O(1) read access in the .findResults below instead of O(n) if we were to do .find on List
+        Map<Product, InventoryLevel> inventoryLevelByProduct = inventoryLevels.collectEntries { [it.product, it] }
+
+        // .findResults is a shortened way of doing .findAll{...}.collect{...}
+        List<ReorderReportItemDto> reorderReportItems = inventoriesByProduct.findResults { InventoryByProduct item ->
+            InventoryLevel inventoryLevel = inventoryLevelByProduct[item.product]
+
+            // Depending on the provided inventory level status filter value, we have a different condition for filtering out the items
+            Map<InventoryLevelStatus, Closure<Boolean>> inventoryLevelStatusFilterCondition = [
+                    (InventoryLevelStatus.IN_STOCK): { item.quantityAvailableToPromise > 0 },
+                    (InventoryLevelStatus.BELOW_MAXIMUM): { inventoryLevel?.maxQuantity && item.quantityAvailableToPromise <= inventoryLevel?.maxQuantity },
+                    (InventoryLevelStatus.BELOW_REORDER): { inventoryLevel?.reorderQuantity && item.quantityAvailableToPromise <= inventoryLevel?.reorderQuantity },
+                    (InventoryLevelStatus.BELOW_MINIMUM): { inventoryLevel?.minQuantity && item.quantityAvailableToPromise <= inventoryLevel?.minQuantity }
+            ]
+
+            // If an item satisfies the predicate, call the buildReorderReportItem, otherwise return null so that .findResults filters out the record in the end
+            return inventoryLevelStatusFilterCondition[command.inventoryLevelStatus](item) ? buildReorderReportItem(item, inventoryLevel) : null
+        }
+
+        return reorderReportItems
+    }
+
+    private ReorderReportItemDto buildReorderReportItem(InventoryByProduct item, InventoryLevel inventoryLevel) {
+        Map<String, Number> monthlyDemand = forecastingService.getDemand(AuthService.currentLocation, null, item.product)
+        Integer quantityToOrder = inventoryLevel?.maxQuantity != null ? inventoryLevel.maxQuantity - item.quantityAvailableToPromise : null
+        Boolean hasRoleFinance = userService.hasRoleFinance(AuthService.currentUser)
+        BigDecimal unitCost = hasRoleFinance ? item.product.pricePerUnit : null
+        BigDecimal expectedReorderCost = hasRoleFinance && quantityToOrder && item.product.pricePerUnit != null
+                ? quantityToOrder * unitCost
+                : null
+        Closure determineInventoryStatus = { InventoryLevel inventoryLevel1, Integer quantityOnHand ->
+            if (inventoryLevel1) {
+                return inventoryLevel1.statusMessage(quantityOnHand)
+            }
+            return quantityOnHand > 0 ? "IN_STOCK" : "STOCK_OUT"
+        }
+        return new ReorderReportItemDto(
+                inventoryStatus: determineInventoryStatus(inventoryLevel, item.quantityOnHand),
+                product: item.product,
+                tags: item.product.tags,
+                inventoryLevel: inventoryLevel,
+                monthlyDemand: monthlyDemand?.monthlyDemand ?: 0,
+                quantityAvailableToPromise: item.quantityAvailableToPromise,
+                quantityToOrder: quantityToOrder,
+                unitCost: unitCost,
+                expectedReorderCost: expectedReorderCost
+        )
+    }
+
+    String getReorderReportCsv(List<ReorderReportItemDto> reorderReport) {
+        StringWriter sw = new StringWriter()
+        Boolean hasRoleFinance = userService.hasRoleFinance(AuthService.currentUser)
+        CSVWriter csv = new CSVWriter(sw, {
+            "${messageLocalizer.localize("inventoryLevel.status.label")}" { it?.status }
+            "${messageLocalizer.localize("product.productCode.label")}" { it?.productCode }
+            "${messageLocalizer.localize("product.label")}" { it?.product }
+            "${messageLocalizer.localize("category.label")}" { it?.category }
+            "${messageLocalizer.localize("product.tags.label", "Tags")}" { it?.tags }
+            "${messageLocalizer.localize("product.unitOfMeasure.label", "Unit of measure")}" { it?.unitOfMeasure }
+            "${messageLocalizer.localize("product.vendor.label", "Vendor")}" { it?.vendor }
+            "${messageLocalizer.localize("product.vendorCode.label", "Vendor code")}" { it?.vendorCode }
+            "${messageLocalizer.localize("inventoryLevel.minQuantity.label", "Min quantity")}" { it?.minQuantity }
+            "${messageLocalizer.localize("inventoryLevel.reorderQuantity.label", "Reorder quantity")}" { it?.reorderQuantity }
+            "${messageLocalizer.localize("inventoryLevel.maxQuantity.label", "Max quantity")}" { it?.maxQuantity }
+            "${messageLocalizer.localize("report.averageMonthlyDemand.label", "Average Monthly Demand")}" { it?.averageMonthlyDemand }
+            "${messageLocalizer.localize("product.quantityAvailableToPromise.label", "Quantity Available")}" { it?.quantityAvailableToPromise }
+            "${messageLocalizer.localize("inventory.quantityToOrder.message", "Quantity to Order")}" { it?.quantityToOrder }
+
+            if (hasRoleFinance) {
+                "${messageLocalizer.localize("product.unitCost.label", "Unit Cost")}" { it?.unitCost }
+                "${messageLocalizer.localize("inventory.expectedReorderCost.label", "Expected Reorder Cost")}" { it?.expectedReorderCost }
+            }
+        })
+        Closure getQuantityToOrderDisplayValue = { Integer maxQuantity, Integer quantityToOrder ->
+            return maxQuantity == null ? messageLocalizer.localize("reorderReport.noMaxQtySet.label") : quantityToOrder
+        }
+        reorderReport.each { ReorderReportItemDto item ->
+            csv << [
+                    status: "${messageLocalizer.localize("enum.InventoryLevelStatusCsv." + item.inventoryStatus)}",
+                    productCode: item.product.productCode,
+                    product: item.product.displayNameOrDefaultName,
+                    category: item.product.category?.name ?: "",
+                    tags: item.product.tagsToString(),
+                    unitOfMeasure: item.product.unitOfMeasure ?: "",
+                    vendor: item.product.vendor ?: "",
+                    vendorCode: item.product.vendorCode ?: "",
+                    minQuantity: item.inventoryLevel?.minQuantity ?: "",
+                    reorderQuantity: item.inventoryLevel?.reorderQuantity ?: "",
+                    maxQuantity: item.inventoryLevel?.maxQuantity ?: "",
+                    averageMonthlyDemand: item.monthlyDemand ?: 0,
+                    quantityAvailableToPromise: item.quantityAvailableToPromise,
+                    quantityToOrder: getQuantityToOrderDisplayValue(item.inventoryLevel?.maxQuantity, item.quantityToOrder) ?: "",
+                    unitCost: item.unitCost ?: "",
+                    expectedReorderCost: item.expectedReorderCost ?: "",
+            ]
+        }
+        return CSVUtils.prependBomToCsvString(csv.writer.toString())
     }
 
     def getReorderReport(Location location) {

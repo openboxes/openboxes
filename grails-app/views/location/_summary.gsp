@@ -1,4 +1,4 @@
-<div class="summary">
+<section class="summary" aria-label="Summary">
 	<table style="width:auto;">
 		<tr>
 			<td class="middle" width="1%">
@@ -21,7 +21,7 @@
 			</td>
 			<td class="right">
 				<div class="right">
-                    <span class="tag">
+                    <span class="tag" aria-label="active-status">
                         ${locationInstance?.active ? warehouse.message(code:'warehouse.active.label') : warehouse.message(code:'warehouse.inactive.label')}
                     </span>
                 </div>
@@ -30,7 +30,7 @@
 			</td>
 		</tr>
 	</table>
-</div>
+</section>
 <div class="button-bar">
     <g:link class="button" action="list" controller="location">
         <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;

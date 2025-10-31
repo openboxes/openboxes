@@ -404,9 +404,11 @@ class DocumentService {
     void createExcelRow(HSSFSheet sheet, int rowNumber, Map dataRow) {
         Row excelRow = sheet.createRow(rowNumber)
         dataRow.keySet().eachWithIndex { columnName, index ->
-            def cellValue = dataRow.get(columnName) ?: ""
-            // POI can't handle objects so we need to convert all objects to strings unless they are numeric
-            if (!(cellValue instanceof Number)) {
+            def actualValue = dataRow.get(columnName)
+            // We can't just check the truthiness of the actualValue, because the false boolean would be evaluated to an empty string
+            def cellValue = actualValue == null ? "" : actualValue
+            // POI can't handle objects so we need to convert all objects to strings unless they are numeric or boolean
+            if (!(cellValue instanceof Number) && !(cellValue instanceof Boolean)) {
                 cellValue = cellValue.toString()
             }
             excelRow.createCell(index).setCellValue(cellValue)
@@ -596,6 +598,7 @@ class DocumentService {
             sheet.setColumnWidth((short) counter++, (short) ((50 * 3) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) counter++, (short) ((50 * 12) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) counter++, (short) ((50 * 5) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short) counter++, (short) ((50 * 12) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) counter++, (short) ((50 * 5) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) counter++, (short) ((50 * 6) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) counter++, (short) ((50 * 5) / ((double) 1 / 20)))
@@ -834,6 +837,9 @@ class DocumentService {
             row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'productSupplier.supplierCode.label', default: 'Supplier code'))
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
 
+            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'productSupplier.supplierName.label', default: 'Supplier Product Name'))
+            row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
+
             row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'productSupplier.manufacturer.label', default: 'Manufacturer'))
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
 
@@ -922,6 +928,9 @@ class DocumentService {
 
                 row.createCell(CELL_INDEX).setCellValue(supplier?.supplierCode ?: '')
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
+
+                row.createCell(CELL_INDEX).setCellValue(supplier?.name ?: '')
+                row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle)
 
                 row.createCell(CELL_INDEX).setCellValue(supplier?.manufacturer?.toString() ?: '')
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
@@ -1618,4 +1627,16 @@ class DocumentService {
 
         return documents
     }
+
+    List<DocumentType> getNonTemplateDocumentTypes() {
+        return DocumentType.createCriteria().list() {
+            or {
+                isNull("documentCode")
+                not {
+                    'in'('documentCode', DocumentCode.templateList())
+                }
+            }
+        }.sort { it.name }
+    }
+
 }

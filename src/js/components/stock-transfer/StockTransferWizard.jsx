@@ -20,7 +20,6 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/stock-transfer/StockTransfer.scss';
 
-
 /** Main stock transfer form's wizard component. */
 class StockTransferWizard extends Component {
   constructor(props) {
@@ -92,7 +91,6 @@ class StockTransferWizard extends Component {
 
   dataFetched = false;
 
-
   fetchStockTransfer() {
     if (this.props.match.params.stockTransferId) {
       this.props.showSpinner();
@@ -137,7 +135,7 @@ class StockTransferWizard extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   location: state.session.currentLocation,
   locale: state.session.activeLanguage,
   stockTransferTranslationsFetched: state.session.fetchedTranslations.stockTransfer,

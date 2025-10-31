@@ -15,6 +15,7 @@ const LocationButton = ({ location, onClick }) => {
 
   return (
     <button
+      type="button"
       onClick={() => onClick(location)}
       className="location-chooser__location-button"
       style={buttonStyle()}
@@ -23,7 +24,8 @@ const LocationButton = ({ location, onClick }) => {
       <span className="location-chooser__location-button__title">
         {location.name}
       </span>
-    </button>);
+    </button>
+  );
 };
 
 LocationButton.defaultProps = {

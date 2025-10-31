@@ -3,7 +3,6 @@ import React from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 
-
 const WizardTitle = (props) => {
   if (!props.title && !props.additionalTitle) {
     return null;
@@ -11,11 +10,11 @@ const WizardTitle = (props) => {
 
   return (
     <div className="panel-heading movement-number" data-testid="wizardTitle">
-      {props.title ?
-        (
+      {props.title
+        ? (
           <div>
             {
-              _.map(props.title, element => (
+              _.map(props.title, (element) => (
                 <span key={element.text} style={{ color: element.color }}>
                   {element.text}
                   <span style={{ color: 'black' }}>
@@ -26,7 +25,7 @@ const WizardTitle = (props) => {
             }
           </div>
         )
-      : null}
+        : null}
       {props.additionalTitle}
     </div>
   );

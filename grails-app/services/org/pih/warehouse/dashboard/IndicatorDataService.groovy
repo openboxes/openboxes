@@ -4,11 +4,15 @@ import grails.compiler.GrailsTypeChecked
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.plugin.cache.Cacheable
+import grails.util.Holders
 import groovy.transform.TypeCheckingMode
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.json.JSONObject
+import org.hibernate.SessionFactory
 import org.joda.time.LocalDate
 import org.pih.warehouse.LocalizationUtil
+import org.pih.warehouse.api.StockMovementDirection
+import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.TransactionCode
@@ -32,6 +36,12 @@ class IndicatorDataService {
     def dataService
     GrailsApplication grailsApplication
     def messageService
+    ConfigService configService
+    SessionFactory sessionFactory
+
+    ApplicationTagLib getApplicationTagLib() {
+        return Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
+    }
 
     @Cacheable(value = "dashboardCache", key = { "getExpirationSummaryData-${location?.id}${params?.querySize}" })
     Map getExpirationSummaryData(Location location, def params) {
@@ -1109,6 +1119,220 @@ class IndicatorDataService {
         // It is moved here because grails-cache parsing it's value to
         // LinkedHashMap instead of IndicatorData, so we can't use toJSON in the controller
         return graphData.toJson()
+    }
+
+    Map getBackdatedShipmentsChart(String locationId, Integer monthsLimit, StockMovementDirection direction) {
+        Map<String, Integer> data = [
+                (Constants.TWO_DAYS)        : 0,
+                (Constants.THREE_DAYS)      : 0,
+                (Constants.FOUR_DAYS)       : 0,
+                (Constants.FIVE_DAYS)       : 0,
+                (Constants.SIX_DAYS)        : 0,
+                (Constants.SEVEN_DAYS)      : 0,
+                (Constants.SEVEN_MORE_DAYS) : 0,
+        ]
+        Date timeLimit = LocalDate.now().minusMonths(monthsLimit).toDate()
+        String transactionProperty = direction == StockMovementDirection.OUTBOUND ? 'outgoing_shipment_id' : 'incoming_shipment_id'
+        String shipmentLocationProperty = direction == StockMovementDirection.OUTBOUND ? 'origin_id' : 'destination_id'
+        String query = """
+            SELECT (
+                CASE 
+                    WHEN DATEDIFF(t.date_created, t.transaction_date) > 7 THEN '7+ days'
+                    ELSE CONCAT(DATEDIFF(t.date_created, t.transaction_date), ' days')
+                END
+            ) as days_backdated, COUNT(DISTINCT s.id) as shipments FROM shipment s
+            INNER JOIN transaction t ON t.${transactionProperty} = s.id
+            WHERE s.${shipmentLocationProperty} = :locationId 
+            AND t.date_created > :timeLimit
+            GROUP BY days_backdated
+            HAVING days_backdated > :daysOffset
+        """
+        List queryData = dataService.executeQuery(query, [
+                locationId: locationId,
+                timeLimit: timeLimit,
+                daysOffset: Holders.config.openboxes.dashboard.backdatedShipments.daysOffset
+        ])
+
+        queryData.each {
+            data[it[0]] = it[1]
+        }
+
+        List<IndicatorDatasets> datasets = [
+                new IndicatorDatasets('Backdated shipments', data*.value.toList())
+        ]
+        IndicatorData indicatorData = new IndicatorData(datasets, data*.key.toList())
+        GraphData graphData = new GraphData(indicatorData)
+
+        return graphData.toJson()
+    }
+
+    @Cacheable(value = "dashboardCache", key = { "getBackdatedOutboundShipments-${locationId}${monthsLimit}" })
+    Map getBackdatedOutboundShipmentsData(String locationId, Integer monthsLimit) {
+        return getBackdatedShipmentsChart(locationId, monthsLimit, StockMovementDirection.OUTBOUND)
+    }
+
+    @Cacheable(value = "dashboardCache", key = { "getBackdatedInboundShipments-${locationId}${monthsLimit}" })
+    Map getBackdatedInboundShipmentsData(String locationId, Integer monthsLimit) {
+        return getBackdatedShipmentsChart(locationId, monthsLimit, StockMovementDirection.INBOUND)
+    }
+
+    @Cacheable(value = "dashboardCache", key = { "getItemsWithBackdatedShipments-${location?.id}" })
+    GraphData getItemsWithBackdatedShipments(Location location) {
+        String urlContextPath = ConfigHelper.contextPath
+        Integer monthsLimit = Holders.config.openboxes.dashboard.backdatedShipments.monthsLimit
+        Date timeLimit = LocalDate.now().minusMonths(monthsLimit).toDate()
+        Map<String, Integer> amountOfItemsWithBackdatedShipments = [
+            (Constants.ONE)            : 0,
+            (Constants.TWO)            : 0,
+            (Constants.THREE)          : 0,
+            (Constants.FOUR_OR_MORE)   : 0,
+        ]
+        List<String> transactionTypeIds = configService.getProperty('openboxes.inventoryCount.transactionTypes', List) as List<String>
+
+        String query = '''
+            SELECT 
+                product_code,
+                COUNT(DISTINCT backdated_shipment) as shipments_with_backdated_product,
+                GROUP_CONCAT(DISTINCT backdated_shipment SEPARATOR " "),
+                DATE_FORMAT(last_stock_count, "%d-%b-%Y"),
+                GROUP_CONCAT(DISTINCT backdated_shipment, ' ', shipment_id SEPARATOR ';') as shipment_ids
+            FROM (
+                SELECT 
+                    p.product_code,
+                    backdated_transaction.shipment_number as backdated_shipment,
+                    backdated_transaction.date_created,
+                    stock_count.last_stock_count,
+                    backdated_transaction.shipment_id
+                FROM (
+                (
+                    SELECT 
+                        t.id as transaction_id,
+                        s.shipment_number,
+                        t.date_created,
+                        s.id as shipment_id 
+                    FROM shipment s
+                    INNER JOIN `transaction` t ON t.outgoing_shipment_id  = s.id
+                    WHERE DATE_ADD(t.transaction_date, INTERVAL :daysOffset DAY) < t.date_created
+                    AND t.date_created > :timeLimit
+                    AND s.origin_id = :locationId
+                ) UNION (
+                    SELECT 
+                        t.id as transaction_id,
+                        s.shipment_number,
+                        t.date_created,
+                        s.id as shipment_id
+                    FROM shipment s
+                    INNER JOIN `transaction` t ON t.incoming_shipment_id  = s.id
+                    WHERE DATE_ADD(t.transaction_date, INTERVAL :daysOffset DAY) < t.date_created
+                    AND t.date_created > :timeLimit
+                    AND s.destination_id = :locationId
+                )) AS backdated_transaction
+                INNER JOIN transaction_entry te ON te.transaction_id = backdated_transaction.transaction_id
+                INNER JOIN inventory_item ii ON te.inventory_item_id = ii.id
+                INNER JOIN product p ON ii.product_id = p.id 
+                LEFT JOIN (
+                    SELECT 
+                        ii.product_id,
+                        MAX(t.transaction_date) as last_stock_count 
+                    FROM transaction_entry te 
+                    LEFT JOIN inventory_item ii ON te.inventory_item_id = ii.id 
+                    LEFT JOIN `transaction` t ON t.id = te.transaction_id
+                    WHERE t.inventory_id = :inventoryId
+                    AND t.transaction_type_id IN (:transactionTypeIds)
+                    AND (t.comment <> :commentToFilter OR t.comment IS NULL)
+                    GROUP BY ii.product_id 
+                ) as stock_count ON stock_count.product_id = ii.product_id
+            ) as dashboard_data
+            WHERE dashboard_data.date_created > dashboard_data.last_stock_count OR dashboard_data.last_stock_count IS NULL
+            GROUP BY product_code, last_stock_count
+            ORDER BY shipments_with_backdated_product DESC
+        '''
+
+        List<Object[]> results = sessionFactory.getCurrentSession().createNativeQuery(query)
+                .setParameter("locationId", location?.id)
+                .setParameter("inventoryId", location?.inventory?.id)
+                .setParameter("daysOffset", Holders.config.openboxes.dashboard.backdatedShipments.daysOffset)
+                .setParameter("timeLimit", timeLimit)
+                .setParameter("transactionTypeIds", transactionTypeIds)
+                .setParameter("commentToFilter", Constants.INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT)
+                .list()
+
+        List<TableData> tableData = results.collect {
+            List<String> shipmentNumbers = it[2].split(' ')
+            List<String> shipmentUrls = it[4].split(';').collect { result -> "${urlContextPath}/stockMovement/show/${result.split(' ')[1]}" }
+            new TableData(
+                number: it[0] as String,                  // Item
+                listNameData: shipmentNumbers,            // Shipments
+                value: it[3] as String ?: Constants.NONE, // Last count
+                numberLink: "${urlContextPath}/inventoryItem/showStockCard/${it[0]}",
+                nameLinksList: shipmentUrls,
+        ) }
+
+        results.each {
+            if (it[1] >= 4) {
+                amountOfItemsWithBackdatedShipments[Constants.FOUR_OR_MORE] += 1
+                return
+            }
+
+            amountOfItemsWithBackdatedShipments[it[1] as String] += 1
+        }
+
+        Table table = new Table(
+                applicationTagLib.message(code: 'indicator.itemsWithBackdatedShipments.item.label', default: 'Item'),
+                applicationTagLib.message(code: 'indicator.itemsWithBackdatedShipments.shipments.label', default: 'Shipments'),
+                applicationTagLib.message(code: 'indicator.itemsWithBackdatedShipments.lastCount.label', default: 'Last Count'),
+                tableData.toList()
+        )
+
+        ColorNumber oneDelayedShipment = new ColorNumber(
+                value: amountOfItemsWithBackdatedShipments[Constants.ONE],
+                subtitle: applicationTagLib.message(
+                        code: 'indicator.itemsWithBackdatedShipments.shipment.subtitle',
+                        default: '1 shipment',
+                        args: ['1']
+                ),
+                order: 1
+        )
+        ColorNumber twoDelayedShipments = new ColorNumber(
+                value: amountOfItemsWithBackdatedShipments[Constants.TWO],
+                subtitle: applicationTagLib.message(
+                        code: 'indicator.itemsWithBackdatedShipments.shipments.subtitle',
+                        default:'2 shipments',
+                        args: ['2']
+                ),
+                order: 2
+        )
+        ColorNumber threeDelayedShipments = new ColorNumber(
+                value: amountOfItemsWithBackdatedShipments[Constants.THREE],
+                subtitle: applicationTagLib.message(
+                        code: 'indicator.itemsWithBackdatedShipments.shipments.subtitle',
+                        default: '3 shipments',
+                        args: [3]
+                ),
+                order: 3
+        )
+        ColorNumber fourOrMoreDelayedShipments = new ColorNumber(
+                value: amountOfItemsWithBackdatedShipments[Constants.FOUR_OR_MORE],
+                subtitle: applicationTagLib.message(
+                        code: 'indicator.itemsWithBackdatedShipments.moreShipment.subtitle',
+                        default: '4 or more',
+                        args: ['4']
+                ),
+                order: 4
+        )
+
+        NumbersIndicator numbersIndicator = new NumbersIndicator(
+                oneDelayedShipment,
+                twoDelayedShipments,
+                threeDelayedShipments,
+                fourOrMoreDelayedShipments
+        )
+
+        NumberTableData numberTableData = new NumberTableData(table, numbersIndicator)
+
+        GraphData graphData = new GraphData(numberTableData)
+
+        return graphData
     }
 
     private List fillLabels(int querySize) {

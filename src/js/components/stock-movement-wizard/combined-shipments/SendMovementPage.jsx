@@ -18,22 +18,22 @@ import DateField from 'components/form-elements/DateField';
 import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import activityCode from 'consts/activityCode';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import { formatProductDisplayName } from 'utils/form-values-utils';
+import { formatProductDisplayName, formatProductSupplierSubtext } from 'utils/form-values-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-
 const SHIPMENT_FIELDS = {
   'origin.name': {
     label: 'react.stockMovement.origin.label',
     defaultMessage: 'Origin',
-    type: params => <TextField {...params} />,
+    type: (params) => <TextField {...params} />,
     attributes: {
       disabled: true,
     },
@@ -59,10 +59,10 @@ const SHIPMENT_FIELDS = {
           loadOptions: debouncedLocationsFetch,
           cache: false,
           options: [],
-          filterOptions: options => options,
+          filterOptions: (options) => options,
         };
       }
-      return { formatValue: fieldValue => _.get(fieldValue, 'name') };
+      return { formatValue: (fieldValue) => _.get(fieldValue, 'name') };
     },
   },
   'destination.name': {
@@ -180,11 +180,21 @@ const SUPPLIER_FIELDS = {
         defaultMessage: 'Product',
         headerAlign: 'left',
         flexWidth: '7',
-        getDynamicAttr: ({ fieldValue, isBoxNameEmpty, isPalletNameEmpty }) => ({
-          showValueTooltip: !!fieldValue?.displayNames?.default,
-          tooltipValue: fieldValue?.name,
-          flexWidth: 7 + (isBoxNameEmpty ? 3 : 0) + (isPalletNameEmpty ? 3 : 0),
-        }),
+        getDynamicAttr: ({
+          isBoxNameEmpty, isPalletNameEmpty, tableItems, rowIndex,
+        }) => {
+          const row = tableItems[rowIndex] || {};
+          const productDisplayNameLabel = row?.product?.displayNames?.default
+            ? row?.product?.name
+            : null;
+          const productSupplierNameLabel = formatProductSupplierSubtext(row?.productSupplier);
+          const tooltipValue = [productDisplayNameLabel, productSupplierNameLabel].join(' ').trim();
+          return {
+            showValueTooltip: Boolean(tooltipValue),
+            tooltipValue,
+            flexWidth: 7 + (isBoxNameEmpty ? 3 : 0) + (isPalletNameEmpty ? 3 : 0),
+          };
+        },
         attributes: {
           className: 'text-left',
           formatValue: formatProductDisplayName,
@@ -202,11 +212,27 @@ const SUPPLIER_FIELDS = {
         defaultMessage: 'Expiry',
         flexWidth: '3.5',
       },
+      quantityPickedPerUom: {
+        type: LabelField,
+        label: 'react.stockMovement.quantityPickedPOUom.label',
+        defaultMessage: 'Qty Picked (in PO UoM)',
+        multilineHeader: true,
+        fixedWidth: '100px',
+        attributes: {
+          disabled: true,
+        },
+        getDynamicAttr: ({ rowIndex, tableItems }) => ({
+          formatValue: () => {
+            const row = tableItems[rowIndex] || {};
+            return `${row.packsRequested} ${row.unitOfMeasure}`;
+          },
+        }),
+      },
       quantityRequested: {
         type: LabelField,
         fixedWidth: '150px',
-        label: 'react.stockMovement.quantityPicked.label',
-        defaultMessage: 'Qty Picked',
+        label: 'react.stockMovement.quantityPickedEach.label',
+        defaultMessage: 'Qty Picked (each)',
       },
       'recipient.name': {
         type: LabelField,
@@ -240,8 +266,17 @@ class SendMovementPage extends Component {
     this.toggleDropdown = this.toggleDropdown.bind(this);
     this.validate = this.validate.bind(this);
 
-    this.debouncedLocationsFetch =
-      debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedLocationsFetch = debounceLocationsFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+      [activityCode.RECEIVE_STOCK], // activityCodes
+      true, // fetchAll
+      false, // withOrgCode
+      true, // withTypeDescription
+      false, // isReturnOrder
+      null, // direction
+      true, // withOrganization
+    );
   }
 
   componentDidMount() {
@@ -312,7 +347,7 @@ class SendMovementPage extends Component {
    */
   removeFile(name) {
     const { files } = this.state;
-    _.remove(files, file => file.name === name);
+    _.remove(files, (file) => file.name === name);
     this.setState({ files });
   }
 
@@ -324,7 +359,7 @@ class SendMovementPage extends Component {
   removeFiles(names) {
     const { files } = this.state;
     _.forEach(names, (name) => {
-      _.remove(files, file => file.name === name);
+      _.remove(files, (file) => file.name === name);
     });
     this.setState({ files });
   }
@@ -351,19 +386,18 @@ class SendMovementPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-
   fetchStockMovementItems() {
     const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=6`;
     apiClient.get(url)
       .then((response) => {
         const { data } = response.data;
         const tableItems = data;
-        this.setState({
+        this.setState((prev) => ({
           values: {
-            ...this.state.values,
+            ...prev.values,
             tableItems,
           },
-        });
+        }));
       });
   }
 
@@ -375,19 +409,19 @@ class SendMovementPage extends Component {
           const { data } = response.data;
           const tableItemsData = _.map(
             data,
-            val => ({
+            (val) => ({
               ...val,
               productName: val.productName ? val.productName : val.product.name,
             }),
           );
 
-          this.setState({
+          this.setState((prev) => ({
             values: {
-              ...this.state.values,
-              tableItems: _.uniqBy(_.concat(this.state.values.tableItems, tableItemsData), 'id'),
+              ...prev.values,
+              tableItems: _.uniqBy(_.concat(prev.values.tableItems, tableItemsData), 'id'),
             },
             isFirstPageLoaded: true,
-          }, () => {
+          }), () => {
             if (this.state.values.tableItems.length !== this.state.totalCount) {
               this.loadMoreRows({
                 startIndex: startIndex + this.props.pageSize,
@@ -415,13 +449,13 @@ class SendMovementPage extends Component {
         const { associations } = response.data.data;
         const { totalCount } = response.data;
 
-        const documents = _.filter(associations.documents, doc => doc.stepNumber === 5);
+        const documents = _.filter(associations.documents, (doc) => doc.stepNumber === 5);
         const destinationType = stockMovementData.destination.locationType;
-        this.setState({
+        this.setState((prev) => ({
           documents,
           totalCount,
           values: {
-            ...this.state.values,
+            ...prev.values,
             dateShipped: stockMovementData.dateShipped,
             shipmentType: {
               ...stockMovementData.shipmentType,
@@ -443,7 +477,7 @@ class SendMovementPage extends Component {
             },
             shipmentStatus: stockMovementData.shipmentStatus,
           },
-        }, () => {
+        }), () => {
           this.props.nextPage(this.state.values);
           this.fetchShipmentTypes();
           if (!this.props.isPaginated) {
@@ -520,7 +554,7 @@ class SendMovementPage extends Component {
         this.sendFiles(files)
           .then(() => {
             Alert.success(this.props.translate('react.stockMovement.alert.filesSuccess.label', 'Files uploaded successfuly!'), { timeout: 3000 });
-            this.removeFiles(_.map(files, file => file.name));
+            this.removeFiles(_.map(files, (file) => file.name));
             this.prepareRequestAndSubmitStockMovement(values);
           })
           .catch(() => Alert.error(this.props.translate('react.stockMovement.alert.filesError.label', 'Error occured during files upload!')))
@@ -557,7 +591,7 @@ class SendMovementPage extends Component {
         'You are not able to send shipment from a location other than origin. Change your current location.',
       ));
       this.props.hideSpinner();
-    } else if (values.shipmentType.id === _.find(this.state.shipmentTypes, shipmentType => shipmentType.label === 'Default').id) {
+    } else if (values.shipmentType.id === _.find(this.state.shipmentTypes, (shipmentType) => shipmentType.label === 'Default').id) {
       Alert.error(this.props.translate(
         'react.stockMovement.alert.populateShipmentType.label',
         'Please populate shipment type before continuing',
@@ -667,9 +701,9 @@ class SendMovementPage extends Component {
    * Toggle the downloadable files
    */
   toggleDropdown() {
-    this.setState({
-      isDropdownVisible: !this.state.isDropdownVisible,
-    });
+    this.setState((prev) => ({
+      isDropdownVisible: !prev.isDropdownVisible,
+    }));
   }
 
   validate(values) {
@@ -710,37 +744,49 @@ class SendMovementPage extends Component {
             <form onSubmit={handleSubmit}>
               <div className="classic-form classic-form-condensed">
                 <span className="buttons-container classic-form-buttons">
-                  <div className="dropzone float-right mb-1 btn btn-outline-secondary align-self-end btn-xs">
+                  <div
+                    className={`dropzone float-right mb-1 btn btn-outline-secondary ${values.statusCode === 'ISSUED' ? 'disabled' : ''} align-self-end btn-xs mr-1`}
+                  >
                     <Dropzone
                       disabled={values.statusCode === 'ISSUED'}
                       onDrop={this.onDrop}
                       multiple
                     >
-                      <span><i className="fa fa-upload pr-2" /><Translate id="react.stockMovement.uploadDocuments.label" defaultMessage="Upload Documents" /></span>
-                      {_.map(this.state.files, file => (
-                        <div key={file.name} className="chosen-file d-flex justify-content-center align-items-center">
-                          <div className="text-truncate">{file.name}</div>
-                          <a
-                            href="#"
-                            className="remove-button"
-                            onClick={(event) => {
-                              this.removeFile(file.name);
-                              event.stopPropagation();
-                            }}
-                          >
-                            <span className="fa fa-remove" />
-                          </a>
+                      {({ getRootProps }) => (
+                        <div {...getRootProps()}>
+                          <span>
+                            <i className="fa fa-upload pr-2" />
+                            <Translate id="react.stockMovement.uploadDocuments.label" defaultMessage="Upload Documents" />
+                          </span>
+                          {_.map(this.state.files, (file) => (
+                            <div key={file.name} className="chosen-file d-flex justify-content-center align-items-center">
+                              <div className="text-truncate">{file.name}</div>
+                              <a
+                                href="#"
+                                className="remove-button"
+                                onClick={(event) => {
+                                  this.removeFile(file.name);
+                                  event.stopPropagation();
+                                }}
+                              >
+                                <span className="fa fa-remove" />
+                              </a>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      )}
                     </Dropzone>
                   </div>
                   <div className="dropdown">
                     <button
                       type="button"
                       onClick={this.toggleDropdown}
-                      className="dropdown-button float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                      className="dropdown-button float-right mb-1 btn btn-outline-secondary align-self-end btn-xs mr-1"
                     >
-                      <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.download.label" defaultMessage="Download" /></span>
+                      <span>
+                        <i className="fa fa-sign-out pr-2" />
+                        <Translate id="react.default.button.download.label" defaultMessage="Download" />
+                      </span>
                     </button>
                     <div className={`dropdown-content print-buttons-container col-md-3 flex-grow-1 
                       ${this.state.isDropdownVisible ? 'visible' : ''}`}
@@ -751,13 +797,34 @@ class SendMovementPage extends Component {
                           if (document.hidden) {
                             return null;
                           }
-                          return (<DocumentButton
-                            link={document.uri}
-                            buttonTitle={document.name}
-                            {...document}
-                            key={idx}
-                            onClick={() => this.saveValues(values)}
-                          />);
+
+                          // TODO: index shouldn't be used as the key for DocumentButton but the
+                          //       document doesn't have a unique key so we have no better option.
+                          //       StockMovementService.getDocuments should be modified to return
+                          //       an id field that we can use here.
+
+                          // Some documents have multiple download options so list them all out.
+                          if (document.downloadOptions) {
+                            return _.map(document.downloadOptions, (downloadOption, idy) => (
+                              <DocumentButton
+                                link={downloadOption.uri}
+                                buttonTitle={downloadOption.name}
+                                {...document}
+                                key={`${idx}-${idy}`}
+                                onClick={() => this.saveValues(values)}
+                              />
+                            ));
+                          }
+
+                          return (
+                            <DocumentButton
+                              link={document.uri}
+                              buttonTitle={document.name}
+                              {...document}
+                              key={idx}
+                              onClick={() => this.saveValues(values)}
+                            />
+                          );
                         },
                       )}
                     </div>
@@ -766,17 +833,23 @@ class SendMovementPage extends Component {
                     <button
                       type="button"
                       onClick={() => this.onSave(values)}
-                      className="btn btn-outline-secondary float-right btn-form btn-xs"
+                      className="btn btn-outline-secondary float-right btn-form btn-xs ml-1"
                       disabled={invalid}
                     >
-                      <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
+                      <span>
+                        <i className="fa fa-save pr-2" />
+                        <Translate id="react.default.button.save.label" defaultMessage="Save" />
+                      </span>
                     </button>
                     <button
                       type="button"
                       onClick={() => this.saveAndExit(values)}
                       className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
                     >
-                      <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+                      <span>
+                        <i className="fa fa-sign-out pr-2" />
+                        <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
+                      </span>
                     </button>
                   </span>
                 </span>
@@ -805,18 +878,23 @@ class SendMovementPage extends Component {
                     onClick={() => { this.sendFilesAndSave(values); }}
                     className={`${values.shipped ? 'btn btn-outline-secondary' : 'btn btn-outline-success'} float-right btn-form btn-xs`}
                     disabled={values.statusCode === 'ISSUED'}
-                  ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
+                  >
+                    <Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
                   </button>
-                  {values.shipped && this.props.isUserAdmin ?
-                    <button
-                      type="submit"
-                      onClick={() => { this.rollbackStockMovement(values); }}
-                      className="btn btn-outline-success float-right btn-xs"
-                      disabled={invalid || values.statusCode !== 'ISSUED'}
-                    >
-                      <span><i className="fa fa-undo pr-2" /><Translate id="react.default.button.rollback.label" defaultMessage="Rollback" /></span>
-                    </button> : null
-                  }
+                  {values.shipped && this.props.isUserAdmin
+                    ? (
+                      <button
+                        type="submit"
+                        onClick={() => { this.rollbackStockMovement(values); }}
+                        className="btn btn-outline-success float-right btn-xs"
+                        disabled={invalid || values.statusCode !== 'ISSUED'}
+                      >
+                        <span>
+                          <i className="fa fa-undo pr-2" />
+                          <Translate id="react.default.button.rollback.label" defaultMessage="Rollback" />
+                        </span>
+                      </button>
+                    ) : null}
                 </div>
                 <div className="my-2 table-form">
                   {_.map(SUPPLIER_FIELDS, (fieldConfig, fieldName) =>
@@ -831,6 +909,7 @@ class SendMovementPage extends Component {
                       isBoxNameEmpty: _.every(this.state.values.tableItems, ({ boxName }) => !boxName),
                       // eslint-disable-next-line max-len
                       isPalletNameEmpty: _.every(this.state.values.tableItems, ({ palletName }) => !palletName),
+                      tableItems: values.tableItems,
                     }))}
                 </div>
               </div>
@@ -842,7 +921,7 @@ class SendMovementPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   currentLocationId: state.session.currentLocation.id,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,

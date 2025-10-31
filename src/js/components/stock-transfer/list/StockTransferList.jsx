@@ -30,14 +30,13 @@ const StockTransferList = (props) => {
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   currentUser: state.session.user,
   statuses: state.stockTransfer.statuses,
   currentLocation: state.session.currentLocation,
 });
 
 export default withRouter(connect(mapStateToProps)(StockTransferList));
-
 
 StockTransferList.propTypes = {
   statuses: PropTypes.arrayOf(PropTypes.shape({

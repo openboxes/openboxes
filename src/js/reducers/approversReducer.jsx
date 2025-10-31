@@ -10,7 +10,7 @@ const initialState = {
 export default function (state = initialState, action) {
   switch (action.type) {
     case FETCH_APPROVERS: {
-      const users = _.map(action.payload, user => (
+      const users = _.map(action.payload, (user) => (
         {
           value: user.id,
           id: user.id,

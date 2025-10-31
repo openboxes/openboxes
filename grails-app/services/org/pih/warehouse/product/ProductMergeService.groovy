@@ -13,8 +13,11 @@ import grails.gorm.transactions.Transactional
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.InventoryCountService
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryTransactionSummaryService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
@@ -31,6 +34,8 @@ class ProductMergeService {
     def invoiceService
     def productAvailabilityService
     def requisitionService
+    InventoryCountService inventoryCountService
+    InventoryTransactionSummaryService inventoryTransactionSummaryService
 
     /**
      * Preforms product swapping for a product pairs passed as params
@@ -39,20 +44,62 @@ class ProductMergeService {
     @Transactional
     def mergeProduct(String primaryId, String obsoleteId) {
         /**
-         * ================================
-         * === Swap Product's relations ===
-         * ================================
+         * ====================================
+         * ============= Preface ==============
+         * ====================================
+         * This method implements a product merge functionality. The main (primary) product will retain all
+         * transaction data and other relationships. Secondary (obsolete) product will be deactivated and all
+         * shipments, receipts, transactions, inventory items, stock lists, purchase orders, invoices, associated
+         * with the secondary product will be applied to main product. All non-transactional data for secondary
+         * product (ie product package, associations, inventory levels, documents) will not be applied to the main
+         * product.
+         * Epic ticket for reference: https://pihemr.atlassian.net/browse/OBPIH-3186
+         * Test case ticket: https://pihemr.atlassian.net/browse/OBPIH-5258
+         *
+         * Can be enabled with system config openboxes.products.merge.enabled (disabled by default!)
+         *
+         * User story - As a superuser, I want to be able to choose two products that are duplicates of one another,
+         * and merge all of the transactions and inventory data into one chosen product.
+         *
+         * Validation - beside basic validation if both products exist, we have to ensure that obsolete product
+         * does not have any pending requisitions (transactions) and is not on a pending invoices (not yet posted).
+         * WARNING - the product merge action is global!!! If you merge two products in one location this means
+         * that these products will be merged together everywhere - stock history, pending stock movements, product
+         * availability, etc, all need to be checked on all locations, not only on the one that you have
+         * currently selected.
+         *
+         * For logging purposes and potential future rollback (or fixing issues with problematic merge action) each
+         * product swap on related object creates a log entry in a database. Using ProductMergeLogger domain, which
+         * contains information about primary product, obsolete prodcut, related object id (id of object that had
+         * product swapped, for example id of order item), class name of related object (name of object that had
+         * product swapped, for example: OrderItem) and the date the merge was performed.
+         *
+         * ====================================
+         * === Swapping Product's relations ===
+         * ====================================
+         * I distinguished two relation types here: "Easy"/"Trivial" and "Complex".
+         *
+         * By easy or trivial relation I mean usually a simple relations that are non-transactional data and can be
+         * easily copied and beside checking if there is a similar object already existing, we can just swap
+         * the products on the related object and we don't care about any repercussions (or it even should not have
+         * any repercussions at all).
+         *
+         * By complex relation I mean either inventory or workflow related objects (transactional data) that
+         * swapping might cause some serious issues or discrepancies in other places (basically anything that is
+         * InventoryItem or Transaction related).
          *
          * === "Easy" relations ===
+         * We are swapping here:
          * - ProductSupplier - Swap product if this supplier does not exist for primary (check product and code pair)
          * - ProductComponent (additionally, not mentioned in the ticket)
          *
          * === "Complex" relations ===
+         * We are swapping here (directly or indirectly):
          * - Transaction (with PRODUCT_INVENTORY and INVENTORY types)
          * - InventoryItem <-- find inventory items and replace product only for InventoryItems with lotNumber that are not exisitng for primary product
          *                     But if we're gonna use the InventoryItem from primary Product, then obsoleted InventoryItem relations should be updated accordingly.
          *                     (ShipmentItems, TransactionEntries and so on)
-         * - InventorySnapshot <-- Skipped for now
+         * - PicklistItem <-- these are migrated during migration of inventory items
          * - ProductAvailability <-- Adjusted during InventoryItems management for specific inventory items and products
          * - TransactionEntry
          *
@@ -63,6 +110,9 @@ class ProductMergeService {
          * - InvoiceItem
          *
          * === Ignored relations (see: https://pihemr.atlassian.net/browse/OBPIH-3187 description) ===
+         * These are ignored because we don't need to move them to primary, or these might already exist for primary
+         * (for example product package or tag, etc), so for simplicity these are just skipped. These should be rather
+         * "Easy" type of relation swapping (in most cases), but according to feature requirements are not required.
          * - Document
          * - ProductPackage
          * - ProductAssociation
@@ -75,14 +125,19 @@ class ProductMergeService {
          * - Category (additionally, not mentioned in the ticket)
          * - ProductGroup (additionally, not mentioned in the ticket)
          *
-         * === Post processing ===
+         * ====================================
+         * ========= Post processing ==========
+         * ====================================
          * - Mark obsolete product as inactive
          *
          * === Tables potentially requiring refresh ===
          * - StockoutData - skipped for now
          * - DemandData - skipped for now
-         * - OrderSummary - product merge should not affect the order summary data since it is not product bound
-         *
+         * - InventorySnapshot - skipped for now (might be potentially handled by refresh, but not required)
+         * - OrderSummary - product merge should not affect the order summary data since it is not product bound (it is
+         * OrderItem, OrderAdjustment, ShipmentItem, ReceiptItem and InvoiceItem dependant, but what is behind the
+         * product does not matter as long as all items have the same product - which should be already handled by the
+         * "complex" relation swapping)
          * */
 
         /**
@@ -118,6 +173,7 @@ class ProductMergeService {
             // Swap assemblyProduct to primary
             obsoletedSupplier.product = primary
             // Note: needs flush because of "User.locationRoles not processed by flush"
+            // (this was an issue on grails 1.3.9, might not be a case anymore)
             obsoletedSupplier.save(flush: true)
         }
 
@@ -140,6 +196,7 @@ class ProductMergeService {
             // Swap assemblyProduct to primary
             obsoletedComponent.assemblyProduct = primary
             // Note: needs flush because of "User.locationRoles not processed by flush"
+            // (this was an issue on grails 1.3.9, might not be a case anymore)
             obsoletedComponent.save(flush: true)
         }
 
@@ -148,7 +205,7 @@ class ProductMergeService {
          * */
 
         // 1. Create a new common transaction that will contain current stock of both products. This is required
-        //    for inventories that have transaction entries for bot products. If this transaction won't be created,
+        //    for inventories that have transaction entries for both products. If this transaction won't be created,
         //    then current stock for primary after merge might not be a proper sum of current stock of obsolete
         //    and primary before merge action.
 
@@ -197,8 +254,8 @@ class ProductMergeService {
             log.info "Creating transaction for ${inventory.warehouse.name}"
             Transaction transaction = new Transaction()
             transaction.inventory = inventory
-            transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
-            transaction.transactionNumber = inventoryService.generateTransactionNumber()
+            transaction.transactionType = TransactionType.get(Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID)
+            transaction.transactionNumber = inventoryService.generateTransactionNumber(transaction)
             transaction.transactionDate = new Date()
             transaction.comment = "Created while merging product ${obsolete.productCode} into ${primary.productCode} " +
                 "(this happens if both products have transaction entries in the same inventory)"
@@ -237,6 +294,7 @@ class ProductMergeService {
             obsoleteInventoryItem.product = primary
             obsoleteInventoryItem.disableRefresh = true
             // Note: needs flush because of "User.locationRoles not processed by flush"
+            // (this was an issue on grails 1.3.9, might not be a case anymore)
             obsoleteInventoryItem.save(flush: true)
 
             // Swap product availability product for the records with inventory item that had changed products
@@ -263,8 +321,34 @@ class ProductMergeService {
                 obsoleteTransactionEntry.inventoryItem = primaryInventoryItem
             }
             // Note: needs flush because of "User.locationRoles not processed by flush"
+            // (this was an issue on grails 1.3.9, might not be a case anymore)
             obsoleteTransactionEntry.save(flush: true)
         }
+
+        // 3.1. Refresh inventory count and inventory transaction summary views (reporting section)
+        // Collect unique transactions for obsolete product
+        Set<Transaction> obsoleteTransactions = obsoleteTransactionEntries.transaction
+        // Group transactions by transaction type, and loop through every transaction type and its associated transactions
+        Map<TransactionType, List<Transaction>> obsoleteTransactionsByTransactionType = obsoleteTransactions.groupBy { it.transactionType }
+        obsoleteTransactionsByTransactionType.each { TransactionType transactionType, List<Transaction> transactions ->
+            // For adjustment transactions we have to refresh adjustment_candidate and inventory_movement_summary views
+            if (transactionType.id == Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID) {
+                inventoryCountService.refreshAdjustmentCandidatesViewAfterProductMerge(transactions.id.toSet(), obsolete.id, primary.id)
+                inventoryTransactionSummaryService.refreshInventoryMovementSummaryViewAfterProductMerge(transactions.id.toSet(), obsolete, primary)
+                return
+            }
+            // For baseline transactions we have to refresh product_inventory_summary views
+            if (transactionType.id == Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID) {
+                inventoryTransactionSummaryService.refreshProductInventorySummaryViewAfterProductMerge(transactions.id.toSet(), obsolete, primary)
+                inventoryCountService.refreshInventoryBaselineCandidatesViewAfterProductMerge(transactions.id.toSet(), obsolete.id, primary.id)
+                return
+            }
+            // For transfer in/out transactions we have to refresh inventory_movement_summary view
+            if (transactionType.id in [Constants.TRANSFER_IN_TRANSACTION_TYPE_ID, Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID]) {
+                inventoryTransactionSummaryService.refreshInventoryMovementSummaryViewAfterProductMerge(transactions.id.toSet(), obsolete, primary)
+            }
+        }
+
 
         // 4. Find all items with obsolete product and swap products and inventory items
 
@@ -284,6 +368,7 @@ class ProductMergeService {
                 obsoleteRequisitionItem.inventoryItem = primaryInventoryItem
             }
             // Note: needs flush because of "User.locationRoles not processed by flush"
+            // (this was an issue on grails 1.3.9, might not be a case anymore)
             obsoleteRequisitionItem.save(flush: true)
         }
 
@@ -305,6 +390,7 @@ class ProductMergeService {
                 obsoleteShipmentItem.expirationDate = primaryInventoryItem?.expirationDate
             }
             // Note: needs flush because of "User.locationRoles not processed by flush"
+            // (this was an issue on grails 1.3.9, might not be a case anymore)
             obsoleteShipmentItem.save(flush: true)
         }
 
@@ -324,6 +410,7 @@ class ProductMergeService {
                 obsoleteOrderItem.inventoryItem = primaryInventoryItem
             }
             // Note: needs flush because of "User.locationRoles not processed by flush"
+            // (this was an issue on grails 1.3.9, might not be a case anymore)
             obsoleteOrderItem.save(flush: true)
         }
 
@@ -345,6 +432,7 @@ class ProductMergeService {
                 obsoleteReceiptItem.expirationDate = primaryInventoryItem?.expirationDate
             }
             // Note: needs flush because of "User.locationRoles not processed by flush"
+            // (this was an issue on grails 1.3.9, might not be a case anymore)
             obsoleteReceiptItem.save(flush: true)
         }
 
@@ -359,6 +447,7 @@ class ProductMergeService {
             obsoleteInvoiceItem.product = primary
 
             // Note: needs flush because of "User.locationRoles not processed by flush"
+            // (this was an issue on grails 1.3.9, might not be a case anymore)
             obsoleteInvoiceItem.save(flush: true)
         }
 
@@ -489,13 +578,6 @@ class ProductMergeService {
             throw new IllegalArgumentException("Cannot merge the product with itself")
         }
 
-        def primaryRequisitionItems = requisitionService.getPendingRequisitionItems(primary)
-        if (primaryRequisitionItems) {
-            def primaryPendingRequisitions = primaryRequisitionItems.requisition?.unique()?.requestNumber
-                throw new IllegalArgumentException("Primary product has pending stock movements or requisitions (${primaryPendingRequisitions?.join(', ')}). " +
-                    "Please finish or cancel these stock movements or requisitions before merging products.")
-        }
-
         def obsoleteRequisitionItems = requisitionService.getPendingRequisitionItems(obsolete)
         if (obsoleteRequisitionItems) {
             def obsoletePendingRequisitions = obsoleteRequisitionItems.requisition?.unique()?.requestNumber
@@ -509,5 +591,10 @@ class ProductMergeService {
             throw new IllegalArgumentException("Obsolete product has pending invoices (${pendingInvoiceNumbers?.join(', ')}). " +
                 "Please post these invoices before merging products.")
         }
+    }
+
+    List<Location> getLocationsWithPendingTransactions(Product product) {
+        List<RequisitionItem> requisitionItems = requisitionService.getPendingRequisitionItems(product)
+        return requisitionItems?.requisition.origin.unique()
     }
 }

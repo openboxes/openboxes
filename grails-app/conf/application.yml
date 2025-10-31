@@ -36,12 +36,11 @@ grails:
     plugin:
         console:
             enabled: true  # https://github.com/sheehan/grails-console#security
+
+        # Grails Liquibase database migration support. https://grails.github.io/grails-database-migration/latest/
+        # Automatic migrations are disabled by default. We run them manually in BootStrap.groovy
         databasemigration:
-            updateOnStart: false
-            updateOnStartFileName: changelog.groovy
-        sentry:
-            active: false
-            dsn: https://{PUBLIC_KEY}:{SECRET_KEY}@app.getsentry.com/{PATH}{PROJECT_ID}
+            changelogFileName: changelog.groovy
 
 info:
     app:
@@ -80,7 +79,9 @@ management:
 server:
     contextPath: "/openboxes"
     session:
-        timeout: 3600
+        # The time (in seconds) of inactivity before we invalidate the user's session. (7200 is two hours.)
+        # For future reference, this setting has been renamed to "server.servlet.session.timeout" in SpringBoot 2+
+        timeout: 7200
 ---
 grails:
     #
@@ -143,6 +144,9 @@ grails:
             css: text/css
             csv: text/csv
             form: application/x-www-form-urlencoded
+            hal:
+                - application/hal+json
+                - application/hal+xml
             html:
               - text/html
               - application/xhtml+xml
@@ -154,9 +158,8 @@ grails:
             pdf: application/pdf
             rss: application/rss+xml
             text: text/plain
-            hal:
-              - application/hal+json
-              - application/hal+xml
+            xls:
+              - application/vnd.ms-excel
             xml:
               - text/xml
               - application/xml
@@ -199,8 +202,34 @@ grails:
         javascript:
             library: jquery
     databinding:
+        # The formats that Grails will attempt to use when binding input Strings to java.util.Date fields.
+        # We now use the java.time classes instead (ex: Instant, LocalDate). Those fields define their own
+        # ValueConverter classes and so don't use the formats defined here.
         dateFormats:
+            # Date formats used by Excel and our old APIs. Kept first in the list to maintain backwards compatability.
+            - 'MM/dd/yyyy HH:mm:ss XXX'
+            - 'MM/dd/yyyy HH:mm:ss XX'
+            - 'MM/dd/yyyy HH:mm:ss X'
+            - 'MM/dd/yyyy HH:mm XXX'
+            - 'MM/dd/yyyy HH:mm XX'
+            - 'MM/dd/yyyy HH:mm X'
+            # Note that Grails will treat this format as midnight in the local server timezone. For zones that are
+            # ahead of UTC, this can cause the date to actually become the next day. It can also cause
+            # inconsistencies across hosts/environments if they're configured for different local timezones.
+            # Avoid using this format going forward! Only kept to maintain backwards compatability.
             - 'MM/dd/yyyy'
+            # ISO-8601 formats. These are better than the old formats, but new APIs should still use Instant instead
+            # of Date whenever possible. Note that a format without time and timezone is NOT allowed here because that
+            # would be ambiguous and would lead to Date conversion weirdness. If you need a date only, use LocalDate.
+            - "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+            - "yyyy-MM-dd'T'HH:mm:ss.SSSXX"
+            - "yyyy-MM-dd'T'HH:mm:ss.SSSX"
+            - "yyyy-MM-dd'T'HH:mm:ssXXX"
+            - "yyyy-MM-dd'T'HH:mm:ssXX"
+            - "yyyy-MM-dd'T'HH:mm:ssX"
+            - "yyyy-MM-dd'T'HH:mmXXX"
+            - "yyyy-MM-dd'T'HH:mmXX"
+            - "yyyy-MM-dd'T'HH:mmX"
         convertEmptyStringsToNull: false
 endpoints:
     jmx:
@@ -213,6 +242,8 @@ slf4j.detectLoggerNameMismatch: true
 
 ---
 hibernate:
+    show_sql: false  # Logs Hibernate queries to the console. We configure this via Logback instead.
+    format_sql: false
     allow_update_outside_transaction: false
     cache:
         queries: false
@@ -229,8 +260,16 @@ dataSource:
     dbCreate: none
     dialect: org.hibernate.dialect.MySQL57InnoDBDialect
     factory: org.apache.tomcat.jdbc.pool.DataSourceFactory
-    logger: com.mysql.cj.jdbc.log.StandardLogger
     type: org.apache.tomcat.jdbc.pool.DataSource
+
+    # Settings for database logging
+    logger: com.mysql.cj.jdbc.log.StandardLogger
+    dumpQueriesOnException: false
+    logSql: false  # Logs SQL queries to the console. We configure this via Logback instead.
+    formatSql: false
+    logSlowQueries: false
+    includeInnodbStatusInDeadlockExceptions: true
+
     properties:
         # from https://docs.grails.org/3.3.16/guide/conf.html#dataSource
         jmxEnabled: true
@@ -256,10 +295,7 @@ environments:
     development:
         dataSource:
             dumpQueriesOnException: true
-            formatSql: true
-            includeInnodbStatusInDeadlockExceptions: true
             logAbandoned: true
-            logSql: false
             logSlowQueries: true
             username: "openboxes"
             password: "openboxes"
@@ -267,21 +303,19 @@ environments:
     test:
         dataSource:
             dumpQueriesOnException: true
-            formatSql: false
-            includeInnodbStatusInDeadlockExceptions: true
             logAbandoned: true
-            logSql: false
-            logSlowQueries: false
-            username: "openboxes"
-            password: "openboxes"
-            url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
+            # Our integration tests run against a containerized database: https://java.testcontainers.org/modules/databases/jdbc/.
+            # Note that testcontainers auto-disable SSL when connecting via jdbc: https://github.com/testcontainers/testcontainers-java/pull/561
+            # For more information, see /src/integration-test/README.md
+            url: jdbc:tc:${TEST_DATABASE:mysql:8.0.36}:///openboxes?TC_MY_CNF=testcontainers
+            driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+        grails:
+            plugin:
+                databasemigration:
+                    changelogFileName: changelog-test.xml
+                    changelogLocation: src/integration-test/resources/migrations
     production:
         dataSource:
-            dumpQueriesOnException: false
-            formatSql: false
-            includeInnodbStatusInDeadlockExceptions: true
-            logSql: false
-            logSlowQueries: false
             username: "openboxes"
             password: "openboxes"
             url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
@@ -518,7 +552,7 @@ openboxes:
             enabled: false
         defaultLocale: 'en'
         localizationModeLocale: 'ach'
-        supportedLocales: ['ar','ach','de','en','es','fr', 'ht', 'it','pt','fi','zh']
+        supportedLocales: ['ar', 'ach', 'de', 'en', 'es', 'es_MX', 'fr', 'ht', 'it', 'pt', 'fi', 'zh']
         # Currency configuration
         defaultCurrencyCode: "USD"
         defaultCurrencySymbol: '\$'
@@ -542,7 +576,7 @@ openboxes:
 
     # Allow users to customize logo image url as well as label
     logo:
-        url: "/assets/openboxes_logo_40x40.jpg"
+        url: "${server.contextPath}/assets/openboxes_logo_40x40.jpg"
         label: ""
     report:
         logo:
@@ -581,6 +615,24 @@ openboxes:
             enabled: true
             pageSize: 10
 
+    transactions:
+        inventoryBaseline:
+            # OBPIH-7194
+            recordStock:
+                enabled: true
+            # OBPIH-7195
+            inventoryImport:
+                enabled: true
+            # OBPIH-7254
+            loadDemoData:
+                enabled: true
+            # OBPIH-7198
+            migration:
+                enabled: true
+                batchSize: 5000
+                # this one is for testing and should be always set to true on production
+                cleanupAdjustment: true
+
 mail:
     error:
         enabled: false
@@ -615,11 +667,24 @@ grails:
     logging:
         jul:
             usebridge: true
-#    validateable:
-#        packages: [
-#        'org.pih.warehouse.inventory',
-#        'org.pih.warehouse.fulfillment',
-#        'org.pih.warehouse.order',
-#        'org.pih.warehouse.request',
-#        'org.pih.warehouse.shipment',
-#]
+
+sentry:
+    # TODO: For some reason adding the "sentry-spring-boot-starter" dependency causes:
+    #       - java.lang.IllegalStateException: Error processing condition on io.sentry.spring.boot.SentryAutoConfiguration$HubConfiguration$SentryWebMvcConfiguration.transactionNameProvider
+    #       - Caused by: java.lang.reflect.MalformedParameterizedTypeException: null
+    #       https://github.com/getsentry/sentry-java/blob/6.34.0/sentry-spring-boot/src/main/java/io/sentry/spring/boot/SentryAutoConfiguration.java#L268-L272
+    #       Find a way to bypass this auto-configuration or provide a default implementation of transactionNameProvider.
+    #       Possibly related to: https://github.com/getsentry/sentry-java/issues/1863
+    #       Until this is resolved, all sentry related properties must be defined in sentry.properties.
+    dsn: ${SENTRY_DSN_BACKEND:${SENTRY_DSN:""}}
+
+    # A custom setting that defines the format of Sentry HTTP transaction names
+    httpTransactionNameFormat: CONTROLLER_METHOD
+
+# Application-level logger config. See logback.xml for Logback-specific configuration.
+logging:
+    # How the logs are formatted. See https://logback.qos.ch/manual/layouts.html for config options.
+    pattern:
+        console: "%date{ISO8601} %-5level [%thread] %logger{40}: %message%n%xException"
+    level:
+        root: INFO

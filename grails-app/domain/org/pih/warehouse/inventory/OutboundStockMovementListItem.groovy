@@ -46,6 +46,8 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
     RequisitionSourceType sourceType // temporary sourceType field for ELECTRONIC and PAPER types
 
     StockMovementType stockMovementType
+
+    @Deprecated
     StockMovementStatusCode statusCode
 
     Requisition requisition

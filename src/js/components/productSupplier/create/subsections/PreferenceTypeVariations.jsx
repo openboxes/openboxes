@@ -32,7 +32,7 @@ const PreferenceTypeVariations = ({
   });
 
   const { resetScrollbar } = useResetScrollbar({
-    scrollableComponentClassName: 'rt-table',
+    selector: '.rt-table',
   });
 
   const {
@@ -85,6 +85,13 @@ const PreferenceTypeVariations = ({
             isFiltered={isFiltered}
             setIsFiltered={setIsFiltered}
             triggerValidation={triggerValidation}
+            handleOnFilterButtonClick={() => {
+              triggerValidation('productSupplierPreferences');
+              if (invalidRowCount) {
+                setIsFiltered((value) => !value);
+                resetScrollbar();
+              }
+            }}
           />
           <Button
             onClick={addNewLine}

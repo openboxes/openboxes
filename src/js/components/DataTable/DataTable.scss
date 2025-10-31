@@ -14,7 +14,8 @@
   border: none;
   border-radius: 4px;
 
-  &.hide-data .rt-tbody {
+  &.hide-data .rt-tbody,
+  &.hide-data .rt-tbody-v2 {
     display: none;
   }
 
@@ -100,7 +101,7 @@
 
     }
 
-    .rt-tbody {
+    .rt-tbody, .rt-tbody-v2 {
       .rt-tr-group {
         border-bottom: 1px solid var(--gray-100);
       }
@@ -114,6 +115,17 @@
         color: var(--gray-600);
         &:hover, &:hover .rt-td {
           background-color: #F8FAFF;
+        }
+
+        &.rt-invalid {
+
+          .rt-td {
+            background: var(--red-100);
+          }
+
+          .invalid-cell {
+            color: var(--red-500);
+          }
         }
       }
 
@@ -209,4 +221,84 @@
     -webkit-transform: unset;
     order: 1;
   }
+}
+
+.table-v2 {
+
+  .table-footer {
+    background-color: var(--page-background);
+
+    div {
+      background-color: var(--blue-100);
+    }
+  }
+
+  .table-pagination-bottom {
+    background-color: var(--blue-100) !important;
+    padding: 0.75rem !important;
+  }
+
+  .cell-wrapper {
+
+    .multiline-cell {
+      white-space: break-spaces;
+      text-overflow: clip;
+    }
+
+    .truncate-text {
+      max-width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      @media (min-width: 1450px) {
+        max-width: 150px;
+      }
+    }
+  }
+
+  .pages-selector {
+    position: absolute;
+    right: 10px;
+  }
+}
+
+.arrow-value-indicator, .value-indicator {
+
+  &--positive {
+    color: var(--color-green);
+  }
+
+  &--negative {
+    color: var(--color-red);
+  }
+
+  &--equal {
+    background-color: var(--blue-200);
+    color: var(--blue-primary);
+  }
+
+  &--empty {
+    min-width: 64px;
+    background-color: var(--gray-100);
+    color: var(--gray-600);
+  }
+
+  &--more {
+    background-color: var(--green-800);
+    color: var(--color-green);
+  }
+
+  &--less {
+    background-color: var(--red-800);
+    color: var(--color-red);
+  }
+
+  &--transaction {
+    background-color: var(--blue-300);
+    color: var(--blue-800);
+  }
+}
+
+.value-indicator {
+  font-weight: 600;
 }

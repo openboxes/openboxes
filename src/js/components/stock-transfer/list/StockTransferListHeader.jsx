@@ -13,7 +13,8 @@ const StockTransferListHeader = ({ isUserManager }) => (
     <span className="d-flex align-self-center title">
       <Translate id="react.stockTransfer.list.label" defaultMessage="List Stock Transfers" />
     </span>
-    {isUserManager &&
+    {isUserManager
+      && (
       <div className="d-flex justify-content-end buttons align-items-center">
         <Link to={STOCK_TRANSFER_URL.create()}>
           <Button
@@ -23,11 +24,11 @@ const StockTransferListHeader = ({ isUserManager }) => (
           />
         </Link>
       </div>
-    }
+      )}
   </div>
 );
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   isUserManager: state.session.isUserManager,
 });
 
@@ -36,4 +37,3 @@ export default withRouter(connect(mapStateToProps)(StockTransferListHeader));
 StockTransferListHeader.propTypes = {
   isUserManager: PropTypes.bool.isRequired,
 };
-

@@ -2,10 +2,10 @@ import React from 'react';
 
 import Tabs from 'components/listPagesUtils/Tabs';
 import { DETAILS_TAB, PREFERENCE_TYPES_TAB } from 'consts/productSupplierList';
-import useProductSupplierTabs from 'hooks/list-pages/productSupplier/useProductSupplierTabs';
+import useSwitchTabs from 'hooks/useSwitchTabs';
 
 const ProductSupplierTabs = () => {
-  const { switchTab } = useProductSupplierTabs();
+  const { switchTab } = useSwitchTabs({ defaultTab: DETAILS_TAB });
 
   const tabs = {
     [DETAILS_TAB]: {

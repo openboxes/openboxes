@@ -14,7 +14,6 @@ import {
 import { loadNumbersOptions } from 'consts/dataFormat/customGraphConfig';
 import { loadGraphColors, loadGraphOptions } from 'consts/dataFormat/graphConfig';
 
-
 function arrayArchive(array = [], index) {
   let newArray = update(array, { $splice: [[index, 1]] });
   newArray = _.map(newArray, (value, ind) => {

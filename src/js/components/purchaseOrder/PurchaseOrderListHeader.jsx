@@ -19,23 +19,23 @@ const PurchaseOrderListHeader = ({ history, supportedActivities }) => (
         label="react.purchaseOrder.createShipmentFromPo.label"
         onClick={() => history.push({ pathname: STOCK_MOVEMENT_URL.createCombinedShipments(), search: 'direction=INBOUND' })}
       />
-      {supportedActivities.includes('PLACE_ORDER') &&
+      {supportedActivities.includes('PLACE_ORDER')
+        && (
         <a href={ORDER_URL.create()}>
           <Button
             defaultLabel="Create Order"
             label="react.purchaseOrder.createOrder.label"
           />
         </a>
-      }
+        )}
 
     </div>
   </div>
 );
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   supportedActivities: state.session.supportedActivities,
 });
-
 
 export default withRouter(connect(mapStateToProps)(PurchaseOrderListHeader));
 

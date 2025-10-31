@@ -31,16 +31,18 @@ import LabelField from 'components/form-elements/LabelField';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import ConfirmExpirationDateModal from 'components/modals/ConfirmExpirationDateModal';
 import CombinedShipmentItemsModal from 'components/stock-movement-wizard/modals/CombinedShipmentItemsModal';
 import { ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import AlertMessage from 'utils/AlertMessage';
 import apiClient from 'utils/apiClient';
-import { renderFormField } from 'utils/form-utils';
+import { renderFormField, setColumnValue } from 'utils/form-utils';
+import { formatProductSupplierSubtext } from 'utils/form-values-utils';
 import { debounceProductsFetch } from 'utils/option-utils';
+import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
@@ -71,20 +73,20 @@ const FIELDS = {
     type: ArrayField,
     arrowsNavigation: true,
     virtualized: true,
-    totalCount: ({ totalCount }) => totalCount,
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     // eslint-disable-next-line react/prop-types
     addButton: ({
       // eslint-disable-next-line react/prop-types
-      values, onResponse, saveItems, invalid,
+      values, onResponse, saveItems, invalid, overrideFormValue,
     }) => (
       <CombinedShipmentItemsModal
         shipment={values.stockMovementId}
         vendor={values.origin.id}
         destination={values.destination.id}
         onResponse={onResponse}
+        overrideFormValue={overrideFormValue}
         btnOpenText="react.default.button.addLines.label"
         btnOpenDefaultText="Add lines"
         onOpen={() => saveItems(values.lineItems)}
@@ -106,7 +108,7 @@ const FIELDS = {
           url: fieldValue?.orderId ? ORDER_URL.show(fieldValue.orderId) : '',
         }),
         attributes: {
-          formatValue: fieldValue => fieldValue && fieldValue.orderNumber,
+          formatValue: (fieldValue) => fieldValue && fieldValue.orderNumber,
         },
       },
       product: {
@@ -121,6 +123,14 @@ const FIELDS = {
           showValueTooltip: true,
           disabled: true,
         },
+        getDynamicAttr: ({ rowIndex, values }) => {
+          const row = values.lineItems[rowIndex] || {};
+          const productSupplierNameLabel = formatProductSupplierSubtext(row?.productSupplier);
+
+          return {
+            tooltipValue: [row?.product?.name, productSupplierNameLabel].join(' '),
+          };
+        },
       },
       lotNumber: {
         type: TextField,
@@ -130,12 +140,10 @@ const FIELDS = {
         getDynamicAttr: ({
           rowIndex,
           values,
-          updateRow,
           fetchInventoryItem,
           debouncedInventoryItemFetch,
         }) => ({
           onBlur: () => {
-            updateRow(values, rowIndex);
             fetchInventoryItem(values, rowIndex);
           },
           onChange: () => {
@@ -156,27 +164,51 @@ const FIELDS = {
         getDynamicAttr: ({
           rowIndex,
           values,
-          updateRow,
           validateExpirationDate,
         }) => ({
           onBlur: () => {
-            updateRow(values, rowIndex);
             validateExpirationDate(values?.lineItems, rowIndex);
           },
         }),
       },
-      quantityRequested: {
+      packsRequested: {
         type: TextField,
-        label: 'react.stockMovement.quantity.label',
-        defaultMessage: 'Qty',
-        flexWidth: '1',
+        label: 'react.stockMovement.quantityPOUom.label',
+        defaultMessage: 'Quantity (in PO UoM)',
+        fixedWidth: '120px',
         required: true,
+        headerTooltip: 'react.stockMovement.quantityPerUom.InputTooltip.label',
+        multilineHeader: true,
         attributes: {
           type: 'number',
           showError: true,
         },
-        getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
-          onBlur: () => updateRow(values, rowIndex),
+      },
+      unitOfMeasure: {
+        type: TextField,
+        label: 'react.stockMovement.POUom.label',
+        defaultMessage: 'PO UoM',
+        fixedWidth: '110px',
+        attributes: {
+          disabled: true,
+        },
+      },
+      calculatedQuantityRequested: {
+        type: TextField,
+        label: 'react.stockMovement.quantityEach.label',
+        defaultMessage: 'Quantity (each)',
+        multilineHeader: true,
+        flexWidth: 1,
+        attributes: {
+          disabled: true,
+        },
+        getDynamicAttr: ({ rowIndex, values }) => ({
+          formatValue: () => {
+            const row = values.lineItems[rowIndex] || {};
+            const packsRequested = _.toInteger(row.packsRequested);
+            const packSize = _.toInteger(row.packSize);
+            return packsRequested * packSize;
+          },
         }),
       },
       palletName: {
@@ -185,10 +217,9 @@ const FIELDS = {
         defaultMessage: 'Pack level 1',
         flexWidth: '1',
         getDynamicAttr: ({
-          rowIndex, rowCount, values, updateRow,
+          rowIndex, rowCount,
         }) => ({
           autoFocus: rowIndex === rowCount - 1,
-          onBlur: () => updateRow(values, rowIndex),
         }),
       },
       boxName: {
@@ -196,9 +227,6 @@ const FIELDS = {
         label: 'react.stockMovement.packLevel2.label',
         defaultMessage: 'Pack level 2',
         flexWidth: '1',
-        getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
-          onBlur: () => updateRow(values, rowIndex),
-        }),
       },
       recipient: {
         type: SelectField,
@@ -206,10 +234,24 @@ const FIELDS = {
         defaultMessage: 'Recipient',
         flexWidth: '1.5',
         getDynamicAttr: ({
-          recipients, rowIndex, values, updateRow,
+          recipients,
+          translate,
+          setRecipientValue,
         }) => ({
+          headerHtml: () => (
+            <Select
+              placeholder={translate('react.stockMovement.recipient.label', 'Recipient')}
+              className="select-xs my-2"
+              classNamePrefix="react-select"
+              options={recipients}
+              onChange={(val) => {
+                if (val) {
+                  setRecipientValue(val);
+                }
+              }}
+            />
+          ),
           options: recipients,
-          onBlur: () => updateRow(values, rowIndex),
         }),
         attributes: {
           labelKey: 'name',
@@ -237,6 +279,7 @@ const FIELDS = {
               referenceId: fieldValue.orderItemId,
               orderNumber: fieldValue.orderNumber,
               packSize: fieldValue.packSize,
+              unitOfMeasure: fieldValue.unitOfMeasure,
               quantityAvailable: fieldValue.quantityAvailable,
             }, rowIndex);
           },
@@ -251,11 +294,6 @@ const FIELDS = {
 };
 
 const LOT_AND_EXPIRY_ERROR = 'react.stockMovement.error.lotAndExpiryControl.label';
-
-// It cannot be in the state, because updating state is not an atomic operation,
-// so the value of this can be changed after triggering the second modal
-// (when the modal is triggered onChange, onBlur triggers it second time)
-let isModalOpen = false;
 
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["getLineItemsToBeSaved"] }] */
 /**
@@ -274,11 +312,15 @@ class AddItemsPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      values: { ...this.props.initialValues, lineItems: [] },
+      values: this.props.initialValues,
       totalCount: 0,
       isFirstPageLoaded: false,
       showAlert: false,
       alertMessage: '',
+      isExpirationModalOpen: false,
+      // Stores the resolve function for the ConfirmExpirationDateModal promise
+      resolveExpirationModal: null,
+      itemsWithMismatchedExpiry: [],
     };
 
     this.props.showSpinner();
@@ -287,9 +329,7 @@ class AddItemsPage extends Component {
     this.validateWithAlertMessage = this.validateWithAlertMessage.bind(this);
     this.isValidForSave = this.isValidForSave.bind(this);
     this.isRowLoaded = this.isRowLoaded.bind(this);
-    this.loadMoreRows = this.loadMoreRows.bind(this);
     this.updateTotalCount = this.updateTotalCount.bind(this);
-    this.updateRow = this.updateRow.bind(this);
     this.removeItem = this.removeItem.bind(this);
     this.fetchLineItems = this.fetchLineItems.bind(this);
     this.saveRequisitionItemsInCurrentStep = this.saveRequisitionItemsInCurrentStep.bind(this);
@@ -336,10 +376,10 @@ class AddItemsPage extends Component {
   getLineItemsToBeSaved(lineItems) {
     const items = AddItemsPage.updateSortOrder(lineItems);
 
-    return _.map(items, item => ({
+    return _.map(items, (item) => ({
       id: item.id || null,
       product: { id: item.product.id },
-      quantityRequested: item.quantityRequested,
+      quantityRequested: item.packsRequested * item.packSize,
       palletName: item.palletName,
       boxName: item.boxName,
       lotNumber: item.lotNumber,
@@ -350,60 +390,45 @@ class AddItemsPage extends Component {
     }));
   }
 
-  setLineItems(response, startIndex) {
+  setLineItems({
+    response,
+    setTableData,
+  }) {
     const { data } = response.data;
     const lineItemsData = _.map(
       data,
-      val => ({
+      (val) => ({
         ...val,
         disabled: true,
         referenceId: val.orderItemId,
       }),
     );
 
-    this.setState({
-      values: {
-        ...this.state.values,
-        lineItems: this.props.isPaginated && !_.isNull(startIndex) ?
-          _.uniqBy(_.concat(this.state.values.lineItems, lineItemsData), 'id') : lineItemsData,
-      },
-    }, () => {
-      if (!_.isNull(startIndex) && this.state.values.lineItems.length !== this.state.totalCount) {
-        this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
-      }
-      this.props.hideSpinner();
-    });
+    setTableData?.('lineItems', lineItemsData);
+
+    this.props.hideSpinner();
   }
 
   updateTotalCount(value) {
-    this.setState({
-      totalCount: this.state.totalCount + value,
-    });
-  }
-
-  updateRow(values, index) {
-    const item = values.lineItems[index];
-    this.setState({
-      values: update(values, {
-        lineItems: { [index]: { $set: item } },
-      }),
-    });
+    this.setState((prev) => ({
+      totalCount: prev.totalCount + value,
+    }));
   }
 
   dataFetched = false;
 
-
   validate(values, ignoreLotAndExpiry) {
+    if (!this.dataFetched) {
+      return {};
+    }
+
     const errors = {};
     errors.lineItems = [];
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
 
     _.forEach(values.lineItems, (item, key) => {
-      if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested <= 0)) {
-        errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
-      }
-      if (_.toInteger(item.quantityRequested) % item.packSize !== 0) {
-        errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.multipleOfPackSize.label' };
+      if (!_.isNil(item.product) && (!item.packsRequested || item.packsRequested <= 0)) {
+        errors.lineItems[key] = { packsRequested: 'react.stockMovement.error.enterQuantity.label' };
       }
       if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
         errors.lineItems[key] = { boxName: 'react.stockMovement.error.boxWithoutPallet.label' };
@@ -415,26 +440,29 @@ class AddItemsPage extends Component {
       if (moment().startOf('day').diff(dateRequested) > 0) {
         errors.lineItems[key] = { expirationDate: 'react.stockMovement.error.pastDate.label' };
       }
-      const splitItems = _.filter(values.lineItems, lineItem =>
+      const splitItems = _.filter(values.lineItems, (lineItem) =>
         lineItem.referenceId === item.referenceId);
       if (!item.id || splitItems.length > 1) {
         const requestedQuantity = _.reduce(
           splitItems, (sum, val) =>
-            (sum + (val.quantityRequested ? _.toInteger(val.quantityRequested) : 0)),
+            (sum + (val.packsRequested
+              ? _.toInteger(val.packsRequested * val.packSize)
+              : 0
+            )),
           0,
         );
         if (requestedQuantity > item.quantityAvailable) {
           _.forEach(values.lineItems, (lineItem, lineItemKey) => {
             _.forEach(splitItems, (splitItem) => {
               if (lineItem === splitItem) {
-                errors.lineItems[lineItemKey] = { quantityRequested: 'react.stockMovement.error.higherSplitQuantity.label' };
+                errors.lineItems[lineItemKey] = { packsRequested: 'react.stockMovement.error.higherSplitQuantity.label' };
               }
             });
           });
         }
-      } else if (splitItems.length === 1 &&
-        item && item.quantityAvailable < _.toInteger(item.quantityRequested)) {
-        errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.higherQuantity.label' };
+      } else if (splitItems.length === 1
+        && item && item.quantityAvailable < _.toInteger(item.packsRequested * item.packSize)) {
+        errors.lineItems[key] = { packsRequested: 'react.stockMovement.error.higherQuantity.label' };
       }
       if (!ignoreLotAndExpiry) {
         if (item.expirationDate && (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber))) {
@@ -509,35 +537,6 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Shows Inventory item expiration date update confirmation dialog.
-   * @param {function} onConfirm
-   * @param {function} onReject
-   * @public
-   */
-  confirmInventoryItemExpirationDateUpdate(onConfirm, onReject) {
-    confirmAlert({
-      title: this.props.translate('react.stockMovement.message.confirmSave.label', 'Confirm save'),
-      message: this.props.translate(
-        'react.stockMovement.confirmExpiryDateUpdate.message',
-        'This will update the expiry date across all depots in the system. Are you sure you want to proceed?',
-      ),
-      buttons: [
-        {
-          label: this.props.translate('react.default.yes.label', 'Yes'),
-          onClick: onConfirm,
-        },
-        {
-          label: this.props.translate('react.default.no.label', 'No'),
-          onClick: onReject,
-        },
-      ],
-      afterClose: () => {
-        isModalOpen = false;
-      },
-    });
-  }
-
-  /**
    * Fetches all required data.
    * @public
    */
@@ -547,21 +546,25 @@ class AddItemsPage extends Component {
     if (!this.props.isPaginated) {
       this.fetchLineItems();
     }
+    this.props.hideSpinner();
   }
 
   /**
    * Fetches 2nd step data from current stock movement.
    * @public
    */
-  fetchLineItems() {
+  fetchLineItems(mutateTableData) {
     const url = `${STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId)}?stepNumber=2`;
 
     return apiClient.get(url)
       .then((response) => {
         this.setState({ totalCount: response.data.data.length });
-        this.setLineItems(response, null);
+        this.setLineItems({
+          response,
+          setTableData: mutateTableData,
+        });
       })
-      .catch(err => err);
+      .catch((err) => err);
   }
 
   /**
@@ -575,34 +578,32 @@ class AddItemsPage extends Component {
     apiClient.get(STOCK_MOVEMENT_BY_ID(this.state.values.stockMovementId))
       .then((resp) => {
         const { hasManageInventory } = resp.data.data;
-        const { statusCode } = resp.data.data;
+        const { statusCode, lineItems } = resp.data.data;
         const { totalCount } = resp.data;
 
-        this.setState({
+        const sortedLineItems = _.map(
+          _.sortBy(lineItems, ['sortOrder']),
+          (val) => ({
+            ...val,
+            disabled: true,
+            referenceId: val.orderItemId,
+          }),
+        );
+
+        this.setState((prev) => ({
           values: {
-            ...this.state.values,
+            ...prev.values,
             hasManageInventory,
             statusCode,
+            // setting initial values for the form
+            lineItems: sortedLineItems,
           },
           totalCount,
-        }, () => this.props.hideSpinner());
+        }), () => this.props.hideSpinner());
       });
   }
 
-  isRowLoaded({ index }) {
-    return !!this.state.values.lineItems[index];
-  }
-
-  loadMoreRows({ startIndex }) {
-    this.setState({
-      isFirstPageLoaded: true,
-    });
-    const url = `${STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId)}?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=2`;
-    apiClient.get(url)
-      .then((response) => {
-        this.setLineItems(response, startIndex);
-      });
-  }
+  isRowLoaded = (values) => ({ index }) => !!values.lineItems[index]
 
   /**
    * Saves current stock movement progress (line items) and goes to the next stock movement step.
@@ -616,9 +617,9 @@ class AddItemsPage extends Component {
       return;
     }
 
-    const lineItems = _.filter(formValues.lineItems, val => !_.isEmpty(val) && val.product);
+    const lineItems = _.filter(formValues.lineItems, (val) => !_.isEmpty(val) && val.product);
 
-    if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
+    if (_.some(lineItems, (item) => !item.packsRequested || item.packsRequested === '0')) {
       this.confirmSave(() =>
         this.saveAndTransitionToNextStep(formValues, lineItems));
     } else {
@@ -636,7 +637,7 @@ class AddItemsPage extends Component {
     this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems);
   }
 
-  async fetchInventoryItem(values, rowIndex) {
+  async fetchInventoryItem(values, rowIndex, shouldValidateExpirationDate = true) {
     this.debouncedInventoryItemFetch.cancel();
     const lotNumber = values?.lineItems[rowIndex]?.lotNumber;
     const productId = values?.lineItems[rowIndex]?.product?.id;
@@ -659,7 +660,7 @@ class AddItemsPage extends Component {
       return lineItem;
     });
 
-    this.setState(previousState => ({
+    this.setState((previousState) => ({
       ...previousState,
       values: {
         ...previousState.values,
@@ -669,34 +670,69 @@ class AddItemsPage extends Component {
       if (!values.lineItems?.[rowIndex]?.expirationDate) {
         this.changeExpirationDate(mappedLineItems, rowIndex, data?.inventoryItem?.expirationDate);
       }
-      this.validateExpirationDate(mappedLineItems, rowIndex);
+
+      // Prevent an infinite loop between fetchInventoryItem() and validateExpirationDate()
+      if (shouldValidateExpirationDate) {
+        this.validateExpirationDate(mappedLineItems, rowIndex);
+      }
     });
   }
 
-  validateExpirationDate(lineItems, rowIndex) {
-    const lineItem = lineItems?.[rowIndex];
-    const inventoryItem = lineItem?.fetchedInventoryItem?.inventoryItem ||
-      lineItem?.inventoryItem;
-    const quantity = (lineItem?.fetchedInventoryItem ?
-      lineItem?.fetchedInventoryItem?.quantity : lineItem?.inventoryItem?.quantity) || 0;
-    const expirationDateHasChanged = inventoryItem?.expirationDate &&
-      lineItem?.expirationDate &&
-      lineItem?.lotNumber &&
-      lineItem?.expirationDate !== inventoryItem?.expirationDate &&
-      quantity > 0;
+  /**
+   * Shows Inventory item expiration date update confirmation modal.
+   * @param {Array} itemsWithMismatchedExpiry - Array of elements with mismatched expiration dates.
+   * @returns {Promise} - Resolves to true if user confirms the update, false if not.
+   * @public
+   */
+  confirmExpirationDateSave(itemsWithMismatchedExpiry) {
+    return new Promise((resolve) => {
+      this.setState({
+        isExpirationModalOpen: true,
+        resolveExpirationModal: resolve,
+        itemsWithMismatchedExpiry,
+      });
+    });
+  }
 
-    if (expirationDateHasChanged && !isModalOpen) {
-      isModalOpen = true;
-      this.confirmInventoryItemExpirationDateUpdate(
-        () => this.saveRequisitionItems(this.state.values.lineItems),
-        () => this.cancelSavingRequisitionItem(lineItems, rowIndex),
-      );
+  async validateExpirationDate(lineItems, rowIndex) {
+    const lineItem = lineItems?.[rowIndex];
+    const inventoryItem = lineItem?.fetchedInventoryItem?.inventoryItem
+      || lineItem?.inventoryItem;
+    const quantity = (lineItem?.fetchedInventoryItem
+      ? lineItem?.fetchedInventoryItem?.quantity : lineItem?.inventoryItem?.quantity) || 0;
+    const expirationDateHasChanged = inventoryItem?.expirationDate
+      && lineItem?.expirationDate
+      && lineItem?.lotNumber
+      && lineItem?.expirationDate !== inventoryItem?.expirationDate
+      && quantity > 0;
+
+    if (expirationDateHasChanged) {
+      // Despite we have only one item here, we are place it in an array
+      // because the ConfirmExpirationDateModal expects an array
+      const itemsWithMismatchedExpiry = [{
+        code: lineItem?.product?.productCode,
+        product: lineItem?.product,
+        lotNumber: lineItem?.lotNumber,
+        previousExpiry: inventoryItem?.expirationDate,
+        newExpiry: lineItem?.expirationDate,
+      }];
+
+      const shouldUpdateExpirationDate =
+        await this.confirmExpirationDateSave(itemsWithMismatchedExpiry);
+      if (!shouldUpdateExpirationDate) {
+        this.cancelSavingRequisitionItem(lineItems, rowIndex);
+        return Promise.reject();
+      }
+
+      return this.saveRequisitionItems([lineItems[rowIndex]])
+        .then((response) => this.fetchInventoryItem(response.data.data, rowIndex, false));
     }
+    return null;
   }
 
   changeExpirationDate(lineItems, rowIndex, newDate) {
     const updatedLineItem = { ...lineItems?.[rowIndex], expirationDate: newDate };
-    this.setState(previousState => ({
+    this.setState((previousState) => ({
       ...previousState,
       values: {
         ...previousState.values,
@@ -710,20 +746,20 @@ class AddItemsPage extends Component {
   cancelSavingRequisitionItem(lineItems, rowIndex) {
     const mappedLineItems = lineItems?.map((item, index) => {
       if (index === rowIndex) {
-        const expirationDate = item?.fetchedInventoryItem?.inventoryItem?.expirationDate ||
-          item?.inventoryItem?.expirationDate;
+        const expirationDate = item?.fetchedInventoryItem?.inventoryItem?.expirationDate
+          || item?.inventoryItem?.expirationDate;
         return { ...item, expirationDate };
       }
       return item;
     });
 
-    this.setState({
-      ...this.state,
+    this.setState((prev) => ({
+      ...prev,
       values: {
-        ...this.state.values,
+        ...prev.values,
         lineItems: mappedLineItems,
       },
-    });
+    }));
   }
 
   /**
@@ -761,7 +797,7 @@ class AddItemsPage extends Component {
         if (resp) {
           values = {
             ...formValues,
-            lineItems: _.map(resp.data.data.lineItems, item => ({
+            lineItems: _.map(resp.data.data.lineItems, (item) => ({
               ...item,
               referenceId: item.orderItemId,
             })),
@@ -795,10 +831,15 @@ class AddItemsPage extends Component {
 
           const lineItemsBackendData = _.map(
             _.sortBy(lineItems, ['sortOrder']),
-            val => ({ ...val, referenceId: val.orderItemId }),
+            (val) => ({ ...val, referenceId: val.orderItemId }),
           );
 
-          this.setState({ values: { ...this.state.values, lineItems: lineItemsBackendData } });
+          this.setState((prev) => ({
+            values: {
+              ...prev.values,
+              lineItems: lineItemsBackendData,
+            },
+          }));
         })
         .catch(() => Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items'))));
     }
@@ -812,9 +853,9 @@ class AddItemsPage extends Component {
    * @public
    */
   save(formValues) {
-    const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
+    const lineItems = _.filter(formValues.lineItems, (item) => !_.isEmpty(item));
     if (lineItems.length > 0) {
-      if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
+      if (_.some(lineItems, (item) => !item.packsRequested || item.packsRequested === '0')) {
         this.confirmSave(() => this.saveItems(lineItems));
       } else {
         this.saveItems(lineItems);
@@ -902,13 +943,13 @@ class AddItemsPage extends Component {
 
     return apiClient.delete(STOCK_MOVEMENT_REMOVE_ALL_ITEMS(this.state.values.stockMovementId))
       .then(() => {
-        this.setState({
+        this.setState((prev) => ({
           totalCount: 0,
           values: {
-            ...this.state.values,
+            ...prev.values,
             lineItems: [],
           },
-        }, () => this.props.hideSpinner());
+        }), () => this.props.hideSpinner());
       })
       .catch(() => {
         this.fetchLineItems();
@@ -985,10 +1026,9 @@ class AddItemsPage extends Component {
 
   /**
    * Imports chosen file to backend and then fetches line items.
-   * @param {object} event
-   * @public
+   * @param mutateTableData
    */
-  importTemplate(event) {
+  importTemplate = (mutateTableData) => (event) => {
     this.props.showSpinner();
     const formData = new FormData();
     const file = event.target.files[0];
@@ -1004,14 +1044,13 @@ class AddItemsPage extends Component {
     return apiClient
       .post(COMBINED_SHIPMENT_ITEMS_IMPORT_TEMPLATE(stockMovementId), formData, config)
       .then(() => {
-        this.fetchLineItems();
+        this.fetchLineItems(mutateTableData);
         if (_.isNil(_.last(this.state.values.lineItems).product)) {
-          this.setState({
+          this.setState((prev) => ({
             values: {
-              ...this.state.values,
-              lineItems: [],
+              ...prev.values,
             },
-          });
+          }));
         }
       })
       .catch(() => {
@@ -1023,7 +1062,7 @@ class AddItemsPage extends Component {
     const url = `${COMBINED_SHIPMENT_ITEMS_EXPORT_TEMPLATE}?vendor=${this.state.values.origin.id}&destination=${this.state.values.destination.id}${blank ? '&blank=true' : ''}`;
     apiClient.get(url, { responseType: 'blob' })
       .then((response) => {
-        fileDownload(response.data, 'Order-items-template.csv', 'text/csv');
+        fileDownload(response.data, `${this.props.translate('react.combinedShipments.template.fileName.label', 'Order-items-template')}.csv`, 'text/csv');
         this.props.hideSpinner();
       })
       .catch(() => this.props.hideSpinner());
@@ -1033,21 +1072,47 @@ class AddItemsPage extends Component {
    * Toggle the downloadable files
    */
   toggleDropdown() {
+    this.setState((prev) => ({
+      isDropdownVisible: !prev.isDropdownVisible,
+    }));
+  }
+
+  /**
+   * Handles the response from the expiration date confirmation modal.
+   * @param {boolean} shouldUpdate - True if the user confirmed the update, false if not.
+   * @public
+   */
+  handleExpirationModalResponse(shouldUpdate) {
+    // Resolve the promise returned by confirmExpirationDateSave.
+    if (this.state.resolveExpirationModal) {
+      this.state.resolveExpirationModal(shouldUpdate);
+    }
+
+    // Close the modal and reset its state.
     this.setState({
-      isDropdownVisible: !this.state.isDropdownVisible,
+      isExpirationModalOpen: false,
+      resolveExpirationModal: null,
+      itemsWithMismatchedExpiry: [],
     });
   }
 
   render() {
     const { showAlert, alertMessage } = this.state;
-
     return (
       <Form
         onSubmit={() => {}}
         validate={this.validate}
-        mutators={{ ...arrayMutators }}
+        mutators={{
+          ...arrayMutators,
+          override: ([field, value], state, { changeValue }) => {
+            changeValue(state, field, () => value);
+          },
+          setColumnValue,
+        }}
         initialValues={this.state.values}
-        render={({ handleSubmit, values, invalid }) => (
+        render={({
+          form, handleSubmit, values, invalid,
+        }) => (
           <div className="d-flex flex-column">
             <AlertMessage show={showAlert} message={alertMessage} danger />
             <span className="buttons-container">
@@ -1055,12 +1120,15 @@ class AddItemsPage extends Component {
                 htmlFor="csvInput"
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
+                <span>
+                  <i className="fa fa-download pr-2" />
+                  <Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" />
+                </span>
                 <input
                   id="csvInput"
                   type="file"
                   style={{ display: 'none' }}
-                  onChange={this.importTemplate}
+                  onChange={this.importTemplate(form.mutators.override)}
                   onClick={(event) => {
                     // eslint-disable-next-line no-param-reassign
                     event.target.value = null;
@@ -1072,9 +1140,12 @@ class AddItemsPage extends Component {
                 <button
                   type="button"
                   onClick={this.toggleDropdown}
-                  className="dropdown-button float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                  className="dropdown-button float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                 >
-                  <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.download.label" defaultMessage="Download" /></span>
+                  <span>
+                    <i className="fa fa-sign-out pr-2" />
+                    <Translate id="react.default.button.download.label" defaultMessage="Download" />
+                  </span>
                 </button>
                 <div className={`dropdown-content print-buttons-container col-md-3 flex-grow-1 
                         ${this.state.isDropdownVisible ? 'visible' : ''}`}
@@ -1084,14 +1155,20 @@ class AddItemsPage extends Component {
                     className="py-1 mb-1 btn btn-outline-secondary"
                     onClick={() => { this.exportTemplate(false); }}
                   >
-                    <span><i className="pr-2 fa fa-download" /><Translate id="react.combinedShipments.availableItems.label" defaultMessage="Available order items" /></span>
+                    <span>
+                      <i className="pr-2 fa fa-download" />
+                      <Translate id="react.combinedShipments.availableItems.label" defaultMessage="Available order items" />
+                    </span>
                   </a>
                   <a
                     href="#"
                     className="py-1 mb-1 btn btn-outline-secondary"
                     onClick={() => { this.exportTemplate(true); }}
                   >
-                    <span><i className="pr-2 fa fa-download" /><Translate id="react.combinedShipments.blankTemplate.label" defaultMessage="Blank import template" /></span>
+                    <span>
+                      <i className="pr-2 fa fa-download" />
+                      <Translate id="react.combinedShipments.blankTemplate.label" defaultMessage="Blank import template" />
+                    </span>
                   </a>
                 </div>
               </div>
@@ -1100,7 +1177,10 @@ class AddItemsPage extends Component {
                 onClick={() => this.refresh()}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
+                <span>
+                  <i className="fa fa-refresh pr-2" />
+                  <Translate id="react.default.button.refresh.label" defaultMessage="Reload" />
+                </span>
               </button>
               <button
                 type="button"
@@ -1108,7 +1188,10 @@ class AddItemsPage extends Component {
                 onClick={() => this.save(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
+                <span>
+                  <i className="fa fa-save pr-2" />
+                  <Translate id="react.default.button.save.label" defaultMessage="Save" />
+                </span>
               </button>
               <button
                 type="button"
@@ -1116,15 +1199,21 @@ class AddItemsPage extends Component {
                 onClick={() => this.saveAndExit(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+                <span>
+                  <i className="fa fa-sign-out pr-2" />
+                  <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
+                </span>
               </button>
               <button
                 type="button"
                 disabled={invalid}
                 onClick={() => this.removeAll()}
-                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs"
+                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs ml-1"
               >
-                <span><i className="fa fa-remove pr-2" /><Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" /></span>
+                <span>
+                  <i className="fa fa-remove pr-2" />
+                  <Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" />
+                </span>
               </button>
             </span>
             <form onSubmit={handleSubmit}>
@@ -1133,14 +1222,13 @@ class AddItemsPage extends Component {
                   renderFormField(fieldConfig, fieldName, {
                     stocklist: values.stocklist,
                     recipients: this.props.recipients,
+                    loadMoreRows: () => {},
                     debouncedProductsFetch: this.debouncedProductsFetch,
                     totalCount: this.state.totalCount,
-                    loadMoreRows: this.loadMoreRows,
-                    isRowLoaded: this.isRowLoaded,
+                    isRowLoaded: this.isRowLoaded(values),
                     updateTotalCount: this.updateTotalCount,
                     isPaginated: this.props.isPaginated,
-                    isFromOrder: this.state.values.isFromOrder,
-                    updateRow: this.updateRow,
+                    isFromOrder: this.state.values?.isFromOrder,
                     values,
                     isFirstPageLoaded: this.state.isFirstPageLoaded,
                     removeItem: this.removeItem,
@@ -1150,6 +1238,9 @@ class AddItemsPage extends Component {
                     fetchInventoryItem: this.fetchInventoryItem,
                     debouncedInventoryItemFetch: this.debouncedInventoryItemFetch,
                     validateExpirationDate: this.validateExpirationDate,
+                    setRecipientValue: (val) => form.mutators.setColumnValue('lineItems', 'recipient', val),
+                    translate: this.props.translate,
+                    overrideFormValue: form.mutators.override,
                   }))}
               </div>
               <div className="submit-buttons">
@@ -1165,11 +1256,18 @@ class AddItemsPage extends Component {
                   type="submit"
                   onClick={() => this.nextPage(values)}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                  disabled={!_.some(values.lineItems, item => !_.isEmpty(item))}
-                ><Translate id="react.default.button.next.label" defaultMessage="Next" />
+                  disabled={!_.some(values.lineItems, (item) => !_.isEmpty(item))}
+                >
+                  <Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
             </form>
+            <ConfirmExpirationDateModal
+              isOpen={this.state.isExpirationModalOpen}
+              itemsWithMismatchedExpiry={this.state.itemsWithMismatchedExpiry}
+              onConfirm={() => this.handleExpirationModalResponse(true)}
+              onCancel={() => this.handleExpirationModalResponse(false)}
+            />
           </div>
         )}
       />
@@ -1177,7 +1275,7 @@ class AddItemsPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   recipients: state.users.data,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
@@ -1223,5 +1321,4 @@ AddItemsPage.propTypes = {
   isPaginated: PropTypes.bool.isRequired,
   /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
-  pageSize: PropTypes.number.isRequired,
 };

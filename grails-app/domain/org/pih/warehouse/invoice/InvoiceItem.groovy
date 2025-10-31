@@ -18,7 +18,6 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
-import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
@@ -46,6 +45,7 @@ class InvoiceItem implements Serializable {
     BigDecimal quantityPerUom = 1
     BigDecimal amount
     BigDecimal unitPrice
+    Boolean inverse = false
 
     // Audit fields
     Date dateCreated
@@ -71,10 +71,8 @@ class InvoiceItem implements Serializable {
         'shipment',
         'order',
         'description',
-        'totalAmount',
         'unitOfMeasure',
         'isPrepaymentInvoice',
-        'totalPrepaymentAmount'
     ]
 
     static constraints = {
@@ -83,10 +81,14 @@ class InvoiceItem implements Serializable {
         glAccount(nullable: true)
         budgetCode(nullable: true)
         quantity(nullable: false, min: 0, validator: { Integer quantity, InvoiceItem obj ->
-            // If the invoice is a prepayment or the item is an order adjustment,
-            // the validation below doesn't make sense, because
+            // Order adjustments are not quantity-based, they should always have quantity = 1
+            if (obj.orderAdjustment && quantity > 1) {
+                return ['invoiceItem.invalidQuantity.label']
+            }
+
+            // If the invoice is a prepayment, the validation below doesn't make sense, because
             // we do not have shipmentItem at this point.
-            if (obj.invoice?.isPrepaymentInvoice || obj.orderAdjustment) {
+            if (obj.invoice?.isPrepaymentInvoice || obj.inverse) {
                 return true
             }
 
@@ -110,6 +112,7 @@ class InvoiceItem implements Serializable {
         quantityPerUom(nullable: false)
         amount(nullable: true)
         unitPrice(nullable: true)
+        inverse(nullable: false)
 
         updatedBy(nullable: true)
         createdBy(nullable: true)
@@ -145,20 +148,6 @@ class InvoiceItem implements Serializable {
         return orderAdjustment ? orderAdjustment.description : product?.name
     }
 
-    // Total shipment item value
-    def getTotalAmount() {
-        def total = (quantity ?: 0.0) * (unitPrice ?: 0.0)
-        if (isPrepaymentInvoice) {
-            return total * ((order.paymentTerm?.prepaymentPercent?:100) / 100)
-        }
-
-        return total
-    }
-
-    def getTotalPrepaymentAmount() {
-        return isPrepaymentInvoice ? totalAmount * (-1) : 0.0
-    }
-
     String getUnitOfMeasure() {
         if (quantityUom) {
             return "${quantityUom?.code}/${quantityPerUom as Integer}"
@@ -170,7 +159,44 @@ class InvoiceItem implements Serializable {
     }
 
     boolean getIsPrepaymentInvoice() {
-        return invoice.isPrepaymentInvoice
+        return invoice?.isPrepaymentInvoice
+    }
+
+    Integer getQuantityAvailableToInvoice() {
+        return shipmentItem ? (shipmentItem.quantityToInvoiceInStandardUom / quantityPerUom) + quantity : null
+    }
+
+    InvoiceItem clone() {
+        InvoiceItem clone = new InvoiceItem(
+                invoice: invoice,
+                product: product,
+                glAccount: glAccount,
+                budgetCode: budgetCode,
+                quantity: quantity,
+                quantityUom: quantityUom,
+                quantityPerUom: quantityPerUom,
+                amount: amount,
+                unitPrice: unitPrice,
+                inverse: inverse,
+        )
+
+        // A cloned invoice item retains all the same shipment items, and order items and adjustments as the original
+        // invoice. We also make sure to update the other side of the relationship to include the newly cloned invoice
+        // item since the relationship is bidirectional.
+        for (ShipmentItem shipmentItem : shipmentItems) {
+            clone.addToShipmentItems(shipmentItem)
+            shipmentItem.addToInvoiceItems(clone)
+        }
+        for (OrderItem orderItem : orderItems) {
+            clone.addToOrderItems(orderItem)
+            orderItem.addToInvoiceItems(clone)
+        }
+        for (OrderAdjustment orderAdjustment : orderAdjustments) {
+            clone.addToOrderAdjustments(orderAdjustment)
+            orderAdjustment.addToInvoiceItems(clone)
+        }
+
+        return clone
     }
 
     Map toJson() {
@@ -188,11 +214,17 @@ class InvoiceItem implements Serializable {
                 uom: unitOfMeasure,
                 amount: amount,
                 unitPrice: unitPrice,
-                totalAmount: totalAmount,
-                totalPrepaymentAmount: totalPrepaymentAmount,
                 orderAdjustment: orderAdjustment,
                 productName: product?.name,
-                displayNames: product?.displayNames
+                displayNames: product?.displayNames,
+                inverse: inverse,
+                isCanceled: orderItem?.canceled ?: orderAdjustment?.canceled,
+                quantityAvailableToInvoice: quantityAvailableToInvoice,
+                unitPriceAvailableToInvoice: orderAdjustment?.unitPriceAvailableToInvoice,
+                // Total amount and total prepayment amount are deprecated and amount field
+                // should be used instead (OBPIH-6398, OBPIH-6499)
+                totalAmount: amount,
+                totalPrepaymentAmount: isPrepaymentInvoice ? amount * (-1) : 0.0
         ]
     }
 }

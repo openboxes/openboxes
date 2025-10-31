@@ -1,20 +1,28 @@
 package unit.org.pih.warehouse.product
 
 import grails.testing.gorm.DataTest
-import grails.testing.services.ServiceUnitTest
 import spock.lang.Ignore
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductIdentifierService
 import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.product.ProductType
 
 @Unroll
-class ProductServiceSpec extends Specification implements ServiceUnitTest<ProductService>, DataTest {
+class ProductServiceSpec extends Specification implements DataTest {
+
+    @Shared
+    ProductService service
+
     void setupSpec() {
         mockDomain Product
+    }
+
+    void setup() {
+        service = new ProductService()
     }
 
     void 'getProducts returns the requested products'() {
@@ -46,8 +54,8 @@ class ProductServiceSpec extends Specification implements ServiceUnitTest<Produc
 
         and: 'the following mocks'
         // Product.metaClass.static.executeQuery = {String query, List params -> return [0]}
-        service.identifierService = Stub(IdentifierService) {
-            generateProductIdentifier(productType) >> productCode
+        service.productIdentifierService = Stub(ProductIdentifierService) {
+            generate(_ as Product) >> productCode
         }
 
         when:

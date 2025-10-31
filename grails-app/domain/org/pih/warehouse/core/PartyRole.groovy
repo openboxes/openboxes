@@ -9,12 +9,14 @@
  **/
 package org.pih.warehouse.core
 
+import java.time.Instant
+
 class PartyRole implements Serializable {
 
     String id
     RoleType roleType
-    Date startDate
-    Date endDate
+    Instant startDate
+    Instant endDate
 
     static belongsTo = [party: Party]
 

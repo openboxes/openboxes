@@ -14,8 +14,12 @@ import com.google.zxing.BarcodeFormat
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.sql.Sql
+import org.apache.commons.lang.text.StrSubstitutor
+
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.DocumentService
+import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.Location
@@ -35,14 +39,11 @@ class ShipmentController {
     static scaffold = Shipment
     def shipmentService
     def userService
-    def identifierService
     def inventoryService
     MailService mailService
-
     def barcodeService
-
     def sessionFactory
-
+    DocumentService documentService
 
     def redirect() {
         redirect(controller: "shipment", action: "showDetails", id: params.id)
@@ -248,8 +249,7 @@ class ShipmentController {
             trackingUrl = String.format(trackingUrlTemplate, trackingNumber)
         }
         else {
-            trackingUrl =
-                    identifierService.renderTemplate(trackingUrlTemplate, [trackingNumber:trackingNumber])
+            trackingUrl = StrSubstitutor.replace(trackingUrlTemplate, [trackingNumber:trackingNumber])
         }
 
         render(template: "showTracking", model: [shipmentInstance: shipmentInstance, trackingUrl: trackingUrl])
@@ -812,9 +812,10 @@ class ShipmentController {
 
 
     def addDocument() {
+        Shipment shipmentInstance = Shipment.get(params.id)
+        Document documentInstance = Document.get(params?.document?.id)
+        List<DocumentType> documentTypes = documentService.getNonTemplateDocumentTypes()
 
-        def shipmentInstance = Shipment.get(params.id)
-        def documentInstance = Document.get(params?.document?.id)
         if (!documentInstance) {
             documentInstance = new Document()
         }
@@ -822,12 +823,18 @@ class ShipmentController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
             redirect(action: "list")
         }
-        render(view: "addDocument", model: [shipmentInstance: shipmentInstance, documentInstance: documentInstance])
+        render(view: "addDocument", model: [
+                shipmentInstance: shipmentInstance,
+                documentInstance: documentInstance,
+                documentTypes: documentTypes
+        ])
     }
 
     def editDocument() {
-        def shipmentInstance = Shipment.get(params?.shipmentId)
-        def documentInstance = Document.get(params?.documentId)
+        Shipment shipmentInstance = Shipment.get(params?.shipmentId)
+        Document documentInstance = Document.get(params?.documentId)
+        List<DocumentType> documentTypes = documentService.getNonTemplateDocumentTypes()
+
         if (!shipmentInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.shipmentId])}"
             redirect(action: "list")
@@ -836,7 +843,11 @@ class ShipmentController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.documentId])}"
             redirect(action: "showDetails", id: shipmentInstance?.id)
         }
-        render(view: "addDocument", model: [shipmentInstance: shipmentInstance, documentInstance: documentInstance])
+        render(view: "addDocument", model: [
+                shipmentInstance: shipmentInstance,
+                documentInstance: documentInstance,
+                documentTypes: documentTypes
+        ])
     }
 
 
@@ -1029,7 +1040,8 @@ class ShipmentController {
             shipmentInstance.addToEvents(eventInstance).save(flush: true)
         }
 
-        redirect(action: 'showDetails', id: shipmentInstance.id)
+        // Redirect to the page from where the request came
+        redirect(uri: request.getHeader('referer'))
     }
 
     def addShipmentItem() {

@@ -14,10 +14,9 @@
     <link rel="stylesheet" href="${resource(dir:'css',file:'buttons.css')}" type="text/css" media="all" />
     <style>
         .product-name {
-            text-overflow: ellipsis;
-            overflow: hidden;
+            white-space: normal;
+            overflow-wrap: break-word;
             max-width: 350px;
-            white-space: nowrap;
         }
     </style>
 

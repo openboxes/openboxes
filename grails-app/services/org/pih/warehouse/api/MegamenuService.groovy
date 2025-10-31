@@ -87,6 +87,9 @@ class MegamenuService {
     List buildAndTranslateMenuItems(List menuItems, User user, Location location) {
         def builtMenuItems = []
         menuItems.each {
+            if (it.enabled == false) {
+                return
+            }
             def minRole = it.minimumRequiredRole
             if (minRole && !userService.isUserInRole(user, minRole)) {
                 return

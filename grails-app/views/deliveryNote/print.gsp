@@ -34,17 +34,16 @@
             text-align: center;
             position: running(header);
         }
-        div.footer {
-            display: block;
-            text-align: center;
-            position: running(footer);
-        }
 
         @page {
             size: letter;
             background: white;
             @top-center { content: element(header) }
-            @bottom-center { content: element(footer) }
+            @bottom-center {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: 12px;
+                font-family: sans-serif;
+            }
         }
 
         .small {font-size: xx-small;}
@@ -221,7 +220,7 @@
                                     </tr>
                                     <tr>
                                         <td class="name">
-                                            <label><warehouse:message code="deliveryNote.receivedDate.label" default="Received date"/>:</label>
+                                            <label><g:message code="deliveryNote.receivedDate.label" default="Received date"/>:</label>
                                         </td>
                                         <td>
                                             <g:formatDate date="${requisition?.shipment?.receipt?.actualDeliveryDate}" format="d MMMMM yyyy  hh:mma"/>
@@ -348,6 +347,7 @@
                 ${warehouse.message(code:'product.coldChain.label', default:'Cold chain')}
             </h2>
             <g:render template="printPage" model="[requisitionItems:requisitionItemsColdChain,
+                                                   sortOrder:sortOrder,
                                                    pageBreakAfter: (requisitionItemsControlled||requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid']"/>
         </g:if>
         <g:if test="${requisitionItemsControlled}">
@@ -355,6 +355,7 @@
                 ${warehouse.message(code:'product.controlledSubstance.label', default:'Controlled Substance')}
             </h2>
             <g:render template="printPage" model="[requisitionItems:requisitionItemsControlled,
+                                                   sortOrder:sortOrder,
                                                    pageBreakAfter: (requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid']"/>
         </g:if>
         <g:if test="${requisitionItemsHazmat}">
@@ -362,6 +363,7 @@
                 ${warehouse.message(code:'product.hazardousMaterial.label', default:'Hazardous Material')}
             </h2>
             <g:render template="printPage" model="[requisitionItems:requisitionItemsHazmat,
+                                                   sortOrder:sortOrder,
                                                    pageBreakAfter: (requisitionItemsOther)?'always':'avoid']"/>
         </g:if>
         <g:if test="${requisitionItemsOther}">
@@ -369,13 +371,17 @@
                 ${warehouse.message(code:'product.generalGoods.label', default:'General Goods')}
             </h2>
             <g:render template="printPage" model="[requisitionItems:requisitionItemsOther,
+                                                   sortOrder:sortOrder,
                                                    pageBreakAfter: (requisitionItemsCanceled)?'always':'avoid']"/>
         </g:if>
         <g:if test="${requisitionItemsCanceled}">
             <h2 class="${requisitionItemsOther ? 'mt' : ''}">
                 ${warehouse.message(code:'default.canceled.label', default:'Canceled Items')}
             </h2>
-            <g:render template="printPage" model="[requisitionItems:requisitionItemsCanceled, location:location, pageBreakAfter: 'avoid']"/>
+            <g:render template="printPage" model="[requisitionItems:requisitionItemsCanceled,
+                                                   location:location,
+                                                   sortOrder:sortOrder,
+                                                   pageBreakAfter: 'avoid']"/>
         </g:if>
 
         <table class="w100 fixed-layout b-0">

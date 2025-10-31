@@ -43,11 +43,14 @@ class ImportCategories extends Component {
           </a>
         </div>
         <div className="my-3">
-          <Translate id="react.productsConfiguration.downloadProductTemplate1.label" />&nbsp;
+          <Translate id="react.productsConfiguration.downloadProductTemplate1.label" />
+&nbsp;
           <a href="#" onClick={() => this.downloadProductTemplate()}>
             <Translate id="react.productsConfiguration.here.label" defaultMessage="here" />
-          </a>.&nbsp;
-          <Translate id="react.productsConfiguration.downloadProductTemplate2.label" />&nbsp;
+          </a>
+          .&nbsp;
+          <Translate id="react.productsConfiguration.downloadProductTemplate2.label" />
+&nbsp;
         </div>
         <div className="align-self-end">
           <a className="btn btn-primary" target="_blank" rel="noopener noreferrer" href={PRODUCT_URL.importCSV()}>

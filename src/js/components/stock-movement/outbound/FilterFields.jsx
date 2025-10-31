@@ -1,7 +1,8 @@
 import DateFilter from 'components/form-elements/DateFilter/DateFilter';
 import FilterSelectField from 'components/form-elements/FilterSelectField';
+import DateFormat from 'consts/dateFormat';
 
-export default isRequest => ({
+export default (isRequest) => ({
   requisitionStatusCode: {
     type: FilterSelectField,
     attributes: {
@@ -39,7 +40,7 @@ export default isRequest => ({
       valueKey: 'id',
       labelKey: 'name',
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
       filterElement: true,
       placeholder: 'react.stockMovement.destination.label',
       defaultPlaceholder: 'Destination',
@@ -79,7 +80,7 @@ export default isRequest => ({
       valueKey: 'id',
       labelKey: 'name',
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
       filterElement: true,
       placeholder: 'react.stockMovement.requestedBy.label',
       defaultPlaceholder: 'Requested By',
@@ -102,7 +103,7 @@ export default isRequest => ({
         valueKey: 'id',
         labelKey: 'name',
         options: [],
-        filterOptions: options => options,
+        filterOptions: (options) => options,
         filterElement: true,
         placeholder: 'react.stockMovement.request.approvers.label',
         defaultPlaceholder: 'Approvers',
@@ -128,7 +129,7 @@ export default isRequest => ({
       valueKey: 'id',
       labelKey: 'name',
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
       filterElement: true,
       placeholder: 'react.stockMovement.createdBy.label',
       defaultPlaceholder: 'Created By',
@@ -150,7 +151,7 @@ export default isRequest => ({
       valueKey: 'id',
       labelKey: 'name',
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
       filterElement: true,
       placeholder: 'react.stockMovement.updatedBy.label',
       defaultPlaceholder: 'Updated By',
@@ -181,8 +182,11 @@ export default isRequest => ({
     attributes: {
       label: 'react.stockMovement.filter.createdAfter.label',
       defaultMessage: 'Created after',
-      dateFormat: 'MM/DD/YYYY',
+      localizeDate: true,
+      localizedDateFormat: DateFormat.COMMON,
       filterElement: true,
+      // date format in which the date will be sent to the API
+      dateFormat: 'MM/DD/YYYY',
     },
   },
   createdBefore: {
@@ -190,8 +194,11 @@ export default isRequest => ({
     attributes: {
       label: 'react.stockMovement.filter.createdBefore.label',
       defaultMessage: 'Created before',
-      dateFormat: 'MM/DD/YYYY',
+      localizeDate: true,
+      localizedDateFormat: DateFormat.COMMON,
       filterElement: true,
+      // date format in which the date will be sent to the API
+      dateFormat: 'MM/DD/YYYY',
     },
   },
 });

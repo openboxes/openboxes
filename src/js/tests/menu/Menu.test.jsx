@@ -22,12 +22,15 @@ describe('menu component', () => {
       label: 'Configuration',
       href: '/openboxes/configuration/index',
     }];
-    renderedMenu = renderer.create(<Router><Menu
-      menuConfig={menuConfig}
-      location={[]}
-      store={store}
-    />
-    </Router>);
+    renderedMenu = renderer.create(
+      <Router>
+        <Menu
+          menuConfig={menuConfig}
+          location={[]}
+          store={store}
+        />
+      </Router>,
+    );
   });
 
   it('should match snapshot', () => {
@@ -35,7 +38,6 @@ describe('menu component', () => {
       .toMatchSnapshot();
   });
 });
-
 
 describe('menuConfigurationSubsection component', () => {
   beforeEach(() => {
@@ -61,7 +63,6 @@ describe('menuConfigurationSubsection component', () => {
       .toMatchSnapshot();
   });
 });
-
 
 describe('menuItem component', () => {
   beforeEach(() => {

@@ -9,13 +9,14 @@ import Modal from 'react-modal';
 import connect from 'react-redux/es/connect/connect';
 import { Tooltip } from 'react-tippy';
 
+import DateFormat from 'consts/dateFormat';
 import Input from 'utils/Input';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'react-tippy/dist/tippy.css';
-
 
 /**
  * Modal window where user can split put-away's line. It has details of the line
@@ -81,7 +82,6 @@ class SplitLineModal extends Component {
 
     return '';
   }
-
 
   /**
    * Saves split items added by user in this modal.
@@ -153,7 +153,7 @@ class SplitLineModal extends Component {
    */
 
   isNegativeQuantity() {
-    return _.some(this.state.splitItems, items => _.toInteger(items.quantity) <= 0);
+    return _.some(this.state.splitItems, (items) => _.toInteger(items.quantity) <= 0);
   }
 
   isQuantityGreaterThanOriginalPutaway() {
@@ -180,7 +180,7 @@ class SplitLineModal extends Component {
    * @public
    */
   isBinSelected() {
-    return _.every(this.state.splitItems, splitItem =>
+    return _.every(this.state.splitItems, (splitItem) =>
       _.get(splitItem, 'putawayLocation.id'));
   }
 
@@ -188,10 +188,12 @@ class SplitLineModal extends Component {
     return (
       <div>
         <button
+          data-testid="open-modal"
           type="button"
           className="btn btn-outline-success btn-xs mr-1 mb-1"
           onClick={() => this.openModal()}
-        ><Translate id="react.putAway.splitLine.label" defaultMessage="Split line" />
+        >
+          <Translate id="react.putAway.splitLine.label" defaultMessage="Split line" />
         </button>
         <Modal
           isOpen={this.state.showModal}
@@ -200,15 +202,43 @@ class SplitLineModal extends Component {
           shouldCloseOnOverlayClick={false}
         >
           <div>
-            <h3 className="font-weight-bold">{`${this.props.putawayItem.product.productCode} ${this.props.putawayItem.product.name}`}</h3>
-            <div className="font-weight-bold">
-              <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />: {this.props.putawayItem.inventoryItem.expirationDate}
+            <h3 className="font-weight-bold">
+              <span>{this.props.putawayItem.product.productCode}</span>
+              <Tooltip
+                arrow="true"
+                delay="150"
+                duration="250"
+                hideDelay="50"
+                className="text-overflow-ellipsis"
+                disabled={this.props.putawayItem.product?.name
+                  === this.props.putawayItem.product?.displayNameOrDefaultName}
+                html={this.props.putawayItem.product?.name}
+              >
+                {' '}
+                {this.props.putawayItem.product.displayNameOrDefaultName}
+              </Tooltip>
+            </h3>
+            <div className="font-weight-bold" data-testid="expiration-date">
+              <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />
+              :
+              {
+                this.props.putawayItem.inventoryItem.expirationDate
+                  ? this.props.formatLocalizedDate(
+                    this.props.putawayItem.inventoryItem.expirationDate,
+                    DateFormat.COMMON,
+                  )
+                  : this.props.putawayItem.inventoryItem.expirationDate
+              }
             </div>
-            <div className="font-weight-bold">
-              <Translate id="react.putAway.totalQty.label" defaultMessage="Total QTY" />: {this.props.putawayItem.quantity}
+            <div className="font-weight-bold" data-testid="total-qty">
+              <Translate id="react.putAway.totalQty.label" defaultMessage="Total QTY" />
+              :
+              {this.props.putawayItem.quantity}
             </div>
-            <div className="font-weight-bold">
-              <Translate id="react.putAway.putAwayQty.label" defaultMessage="Putaway QTY" />: {this.calculatePutAwayQty()}
+            <div className="font-weight-bold" data-testid="putaway-qty">
+              <Translate id="react.putAway.putAwayQty.label" defaultMessage="Putaway QTY" />
+              :
+              {this.calculatePutAwayQty()}
             </div>
           </div>
           <hr />
@@ -217,31 +247,33 @@ class SplitLineModal extends Component {
             <table className="table table-striped text-center border">
               <thead>
                 <tr>
-                  <th className="py-1"><Translate id="react.putAway.putAwayBin.label" defaultMessage="Putaway Bin" /></th>
-                  <th className="py-1"><Translate id="react.putAway.quantity.label" defaultMessage="Quantity" /></th>
-                  <th className="py-1"><Translate id="react.default.button.delete.label" defaultMessage="Delete" /></th>
+                  <th aria-label="Putaway Bin" className="py-1"><Translate id="react.putAway.putAwayBin.label" defaultMessage="Putaway Bin" /></th>
+                  <th aria-label="Quantity" className="py-1"><Translate id="react.putAway.quantity.label" defaultMessage="Quantity" /></th>
+                  <th aria-label="Delete" className="py-1"><Translate id="react.default.button.delete.label" defaultMessage="Delete" /></th>
                 </tr>
               </thead>
               <tbody>
                 { _.map(this.state.splitItems, (item, index) => (
-                !item.delete &&
+                  !item.delete
+                && (
                 <tr
                   // eslint-disable-next-line react/no-array-index-key
                   key={index}
                 >
                   <td className={`py-1 ${!_.get(item, 'putawayLocation.id') ? 'has-error align-middle' : 'align-middle'}`}>
                     <Select
+                      dataTestId="bin-select"
                       options={this.props.bins}
                       valueKey="id"
                       labelKey="name"
                       value={item.putawayLocation}
-                      onChange={value => this.setState({
-                        splitItems: update(this.state.splitItems, {
+                      onChange={(value) => this.setState((prev) => ({
+                        splitItems: update(prev.splitItems, {
                           [index]: {
                             putawayLocation: { $set: value },
                           },
                         }),
-                      })}
+                      }))}
                       className="select-xs"
                     />
                   </td>
@@ -257,49 +289,55 @@ class SplitLineModal extends Component {
                     >
                       <div className={this.isQuantityGreaterThanOriginalPutaway() || item.quantity <= 0 ? 'has-error' : ''}>
                         <Input
+                          dataTestId="quantity-input"
                           type="number"
                           value={item.quantity}
-                          onChange={value => this.setState({
-                              splitItems: update(this.state.splitItems, {
-                                [index]: { quantity: { $set: value } },
-                              }),
-                            })
-                          }
+                          onChange={(value) => this.setState((prev) => ({
+                            splitItems: update(prev.splitItems, {
+                              [index]: { quantity: { $set: value } },
+                            }),
+                          }))}
                         />
                       </div>
                     </Tooltip>
                   </td>
                   <td width="120px" className="py-1">
                     <button
+                      data-testid="delete-button"
+                      type="button"
                       className="btn btn-outline-danger btn-xs"
                       onClick={() => {
                         if (this.state.splitItems[index].id) {
-                          this.setState({
-                            splitItems: update(this.state.splitItems, {
+                          this.setState((prev) => ({
+                            splitItems: update(prev.splitItems, {
                               [index]: { delete: { $set: true } },
                             }),
-                          });
+                          }));
                         } else {
-                          this.setState({
-                            splitItems: update(this.state.splitItems, {
+                          this.setState((prev) => ({
+                            splitItems: update(prev.splitItems, {
                               $splice: [
                                 [index, 1],
                               ],
                             }),
-                          });
+                          }));
                         }
                       }}
-                    ><Translate id="react.default.button.delete.label" defaultMessage="Delete" />
+                    >
+                      <Translate id="react.default.button.delete.label" defaultMessage="Delete" />
                     </button>
                   </td>
                 </tr>
-              ))}
+                )
+                ))}
               </tbody>
             </table>
             <button
+              type="button"
+              data-testid="add-line-button"
               className="btn btn-outline-success btn-xs"
-              onClick={() => this.setState({
-                splitItems: update(this.state.splitItems, {
+              onClick={() => this.setState((prev) => ({
+                splitItems: update(prev.splitItems, {
                   $push: [{
                     quantity: '',
                     putawayFacility: {
@@ -311,29 +349,34 @@ class SplitLineModal extends Component {
                     inventoryItem: { id: this.props.putawayItem.inventoryItem.id },
                     currentLocation: {
                       id: this.props.putawayItem.currentLocation
-                      ? this.props.putawayItem.currentLocation.id : null,
+                        ? this.props.putawayItem.currentLocation.id : null,
                     },
                   }],
                 }),
-              })}
-            ><Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
+              }))}
+            >
+              <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
             </button>
           </div>
 
           <hr />
           <div className="btn-group float-right" role="group">
             <button
+              data-testid="save-button"
               type="button"
               className="btn btn-outline-success btn-sm"
               disabled={!this.isValid() || !this.isBinSelected()}
               onClick={() => this.onSave()}
-            ><Translate id="react.default.button.save.label" defaultMessage="Save" />
+            >
+              <Translate id="react.default.button.save.label" defaultMessage="Save" />
             </button>
             <button
+              data-testid="cancel-button"
               type="button"
               className="btn btn-outline-secondary btn-sm"
               onClick={() => this.closeModal()}
-            ><Translate id="react.default.button.cancel.label" defaultMessage="Cancel" />
+            >
+              <Translate id="react.default.button.cancel.label" defaultMessage="Cancel" />
             </button>
           </div>
         </Modal>
@@ -342,8 +385,9 @@ class SplitLineModal extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps)(SplitLineModal);
@@ -358,6 +402,7 @@ SplitLineModal.propTypes = {
       id: PropTypes.string,
       productCode: PropTypes.string,
       name: PropTypes.string,
+      displayNameOrDefaultName: PropTypes.string,
     }),
     /** Inventory's data */
     inventoryItem: PropTypes.shape({
@@ -389,6 +434,7 @@ SplitLineModal.propTypes = {
   /** An array of available bin locations */
   bins: PropTypes.arrayOf(PropTypes.shape({})),
   translate: PropTypes.func.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };
 
 SplitLineModal.defaultProps = {

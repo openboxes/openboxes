@@ -13,6 +13,7 @@ import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.RatingTypeCode
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.product.Product
@@ -29,6 +30,7 @@ class ProductSupplierImportDataService implements ImportDataService {
     void validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->
+            boolean productSupplierExists = params.id ? ProductSupplier.exists(params.id) : null
             if (params.active && !(params.active instanceof Boolean)) {
                 command.errors.reject("Row ${index + 1}: Active field has to be either empty or a boolean value (true/false)")
             }
@@ -43,12 +45,35 @@ class ProductSupplierImportDataService implements ImportDataService {
                 command.errors.reject("Row ${index + 1}: Product with productCode ${params.productCode} does not exist")
             }
 
-            if (params.supplierName && !Organization.findByName(params.supplierName)) {
+            if (!params.supplierName) {
+                command.errors.reject("Row ${index + 1}: Supplier Name is required")
+            }
+
+            Organization supplier = params.supplierName ? Organization.findByName(params.supplierName) : null
+
+            /**
+             *  Prevent from assigning an inactive supplier to a source that is about to become active or while creating a new source
+                "to become active" means that an existing source is active and we don't change it, or a source is inactive and we are activating it during the import
+                Allow assigning an inactive supplier to an inactive source (or to a source that is about to become inactive)
+             */
+            if (supplier && !supplier.active && (params.active || !productSupplierExists)) {
+                command.errors.reject("Row ${index + 1}: Supplier '${supplier.name}' is no longer active. Choose an active supplier")
+            }
+
+            if (params.supplierName && !supplier) {
                 command.errors.reject("Row ${index + 1}: Supplier with name '${params.supplierName}' does not exist")
             }
 
-            if (params.manufacturerName && !Organization.findByName(params.manufacturerName)) {
-                command.errors.reject("Row ${index + 1}: Manufacturer with name '${params.manufacturerName}' does not exist")
+            if (params.manufacturerName) {
+                Organization manufacturer = Organization.findByName(params.manufacturerName)
+
+                if (!manufacturer) {
+                    command.errors.reject("Row ${index + 1}: Manufacturer with name '${params.manufacturerName}' does not exist")
+                }
+
+                if (manufacturer && !manufacturer.hasRoleType(RoleType.ROLE_MANUFACTURER)) {
+                    command.errors.reject("Row ${index + 1}: Organization '${params.manufacturerName}' is not a manufacturer")
+                }
             }
 
             try {
@@ -64,6 +89,14 @@ class ProductSupplierImportDataService implements ImportDataService {
 
             if (params.globalPreferenceTypeName && !PreferenceType.findByName(params.globalPreferenceTypeName)) {
                 command.errors.reject("Row ${index + 1}: Preference Type with name '${params.globalPreferenceTypeName}' does not exist")
+            }
+
+            if (!params.defaultProductPackageUomCode) {
+                command.errors.reject("Row ${index + 1}: Default Package Type is required")
+            }
+
+            if (!params.defaultProductPackageQuantity) {
+                command.errors.reject("Row ${index + 1}: Default Package Size is required")
             }
 
             log.info("uomCode " + params.defaultProductPackageUomCode)

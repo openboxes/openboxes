@@ -16,8 +16,7 @@ const NumbersRAG = ({ data }) => (
           </div>
           <div className="subtitle">{value.subtitle}</div>
         </a>
-      ))
-    }
+      ))}
   </div>
 );
 

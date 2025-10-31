@@ -12,8 +12,10 @@ import PackingPage from 'components/stock-movement-wizard/outbound/PackingPage';
 import PickPage from 'components/stock-movement-wizard/outbound/PickPage';
 import SendMovementPage from 'components/stock-movement-wizard/outbound/SendMovementPage';
 import Wizard from 'components/wizard/Wizard';
+import DateFormat from 'consts/dateFormat';
 import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 import 'components/stock-movement-wizard/StockMovement.scss';
 
@@ -136,7 +138,7 @@ class StockMovements extends Component {
         delimeter: ', ',
       },
       {
-        text: values.dateRequested,
+        text: this.props.formatLocalizedDate(values.dateRequested, DateFormat.COMMON),
         color: '#4a148c',
         delimeter: ', ',
       },
@@ -152,8 +154,8 @@ class StockMovements extends Component {
     const { currentPage, values } = this.state;
     const shipped = values.shipped ? this.props.translate('react.stockMovement.status.shipped.label', 'SHIPPED') : '';
     const received = values.received ? this.props.translate('react.stockMovement.status.received.label', 'RECEIVED') : '';
-    if ((this.props.hasPackingSupport && currentPage === 6) ||
-      (!this.props.hasPackingSupport && currentPage === 5)) {
+    if ((this.props.hasPackingSupport && currentPage === 6)
+      || (!this.props.hasPackingSupport && currentPage === 5)) {
       return (
         <span className="shipment-status float-right">
           {`${shipped || received || this.props.translate('react.stockMovement.status.pending.label', 'PENDING')}`}
@@ -262,12 +264,13 @@ class StockMovements extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   hasPackingSupport: state.session.currentLocation.hasPackingSupport,
   currentLocation: state.session.currentLocation,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps, {
@@ -296,6 +299,7 @@ StockMovements.propTypes = {
   initialValues: PropTypes.shape({
     shipmentStatus: PropTypes.string,
   }),
+  formatLocalizedDate: PropTypes.func.isRequired,
 };
 
 StockMovements.defaultProps = {

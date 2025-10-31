@@ -15,6 +15,7 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FileManagerPlugin = require('filemanager-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
     cache: true,
@@ -34,8 +35,12 @@ module.exports = {
     stats: {
       colors: false,
     },
+    /* We generate source maps so Sentry can map errors to lines of code, even when the code is minified */
+    devtool: 'source-map',
     plugins: [
-      new ESLintPlugin({}),
+      new ESLintPlugin({
+        extensions: ['js', 'jsx'],
+      }),
       new FileManagerPlugin({
         events: {
           onStart: {
@@ -71,6 +76,15 @@ module.exports = {
           cssSource: `\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.css')}`,
           receivingIfStatement: '',
         }),
+      }),
+      // We need to explicitly define our environment variables here so that they can be referenced
+      // in the frontend.
+      new webpack.DefinePlugin({
+        'process.env.REACT_APP_WEB_SENTRY_DSN': JSON.stringify(process.env.REACT_APP_WEB_SENTRY_DSN),
+        'process.env.REACT_APP_SENTRY_ENVIRONMENT': JSON.stringify(process.env.REACT_APP_SENTRY_ENVIRONMENT),
+        'process.env.REACT_APP_WEB_SENTRY_TRACES_SAMPLE_RATE': JSON.stringify(process.env.REACT_APP_WEB_SENTRY_TRACES_SAMPLE_RATE),
+        'process.env.REACT_APP_WEB_SENTRY_REPLAYS_SAMPLE_RATE': JSON.stringify(process.env.REACT_APP_WEB_SENTRY_REPLAYS_SAMPLE_RATE),
+        'process.env.REACT_APP_WEB_SENTRY_REPLAYS_ERROR_SAMPLE_RATE': JSON.stringify(process.env.REACT_APP_WEB_SENTRY_REPLAYS_ERROR_SAMPLE_RATE),
       }),
       new HtmlWebpackPlugin({
         filename: `${RECEIVING_VIEW}/create.gsp`,
@@ -173,6 +187,7 @@ module.exports = {
       components: path.resolve(SRC, 'components'),
       hooks: path.resolve(SRC, 'hooks'),
       reducers: path.resolve(SRC, 'reducers'),
+      selectors: path.resolve(SRC, 'selectors'),
       actions: path.resolve(SRC, 'actions'),
       consts: path.resolve(SRC, 'consts'),
       tests: path.resolve(SRC, 'tests'),

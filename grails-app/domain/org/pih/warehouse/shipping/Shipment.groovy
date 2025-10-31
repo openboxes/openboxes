@@ -13,13 +13,7 @@ import grails.util.Holders
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import org.pih.warehouse.core.*
-import org.pih.warehouse.core.Event
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.Comment
-import org.pih.warehouse.core.Document
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Person
-import org.pih.warehouse.core.User
 import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
@@ -27,8 +21,9 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
+import util.StringUtil
 
-class Shipment implements Comparable, Serializable {
+class Shipment implements Comparable, Serializable, Historizable {
 
     def publishRefreshEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this))
@@ -37,13 +32,13 @@ class Shipment implements Comparable, Serializable {
     def beforeInsert() {
         createdBy = AuthService.currentUser
         updatedBy = AuthService.currentUser
-        currentEvent = mostRecentEvent
+        currentEvent = mostRecentSystemEvent
         currentStatus = status.code
     }
 
     def beforeUpdate() {
         updatedBy = AuthService.currentUser
-        currentEvent = mostRecentEvent
+        currentEvent = mostRecentSystemEvent
         currentStatus = status.code
     }
 
@@ -196,12 +191,12 @@ class Shipment implements Comparable, Serializable {
             })?.unique({ a, b -> a <=> b })?.size() == referenceNumbers?.size()
         })
 
-        // a shipment can't have two events with the same event code (this should be the case for the current event codes: CREATED, SHIPPED, RECEIVED)
-        // we may want to change this in the future?
+        // a shipment can't have two system events with the same event code
         events(validator: { events ->
-            events?.collect({
-                it.eventType?.eventCode
-            })?.unique({ a, b -> a <=> b })?.size() == events?.size()
+            Set<Event> systemEvents = events.findAll {
+                it?.eventType?.eventCode in EventCode.listSystemEventTypeCodes()
+            }
+            return systemEvents.unique().size() == systemEvents.size()
         })
         requisition(nullable: true)
         shipmentItemCount(nullable: true)
@@ -415,6 +410,10 @@ class Shipment implements Comparable, Serializable {
     User getShippedBy() {
         Event shippedEvent = events?.find { it.eventType?.eventCode == EventCode.SHIPPED }
         if (shippedEvent) {
+            // For the e-requests we want to have the fallback to the user, who last updated the shipment
+            if (requisition?.electronicType) {
+                return shippedEvent.createdBy ?: requisition.updatedBy
+            }
             // The fallback for createdBy is done, because there was a bug at Event level,
             // which didn't persist the event.createdBy, so for SMs from the past, we might not have the shippedEvent.createdBy
             return shippedEvent?.createdBy ?: createdBy
@@ -426,6 +425,14 @@ class Shipment implements Comparable, Serializable {
     Event getMostRecentEvent() {
         if (events && events.size() > 0) {
             return events.iterator().next()
+        }
+        return null
+    }
+
+    Event getMostRecentSystemEvent() {
+        Set<Event> systemEvents = events.findAll { EventCode.listSystemEventTypeCodes().contains(it.eventType?.eventCode) }.sort()
+        if (systemEvents?.size()) {
+            return systemEvents.first()
         }
         return null
     }
@@ -692,6 +699,79 @@ class Shipment implements Comparable, Serializable {
 
     Boolean hasChildContainer() {
         shipmentItems?.any { it?.container }
+    }
+
+    Set<Event> getCustomEvents() {
+        return events.findAll { EventCode.listCustomEventTypeCodes().contains(it.eventType?.eventCode) }
+    }
+
+    @Override
+    ReferenceDocument getReferenceDocument() {
+        return new ReferenceDocument(
+                label: shipmentNumber,
+                url: "/stockMovement/show/${requisition?.id ?: id}",
+                id: id,
+                identifier: shipmentNumber,
+                description: description,
+                name: name,
+        )
+    }
+
+    @Override
+    List<HistoryItem> getHistory() {
+        List<HistoryItem> histories = []
+        // First collect history of CREATED event
+        histories.add(new HistoryItem<Shipment>(
+                date: dateCreated,
+                location: origin,
+                eventType: new EventTypeDto(
+                        name: StringUtil.format(EventCode.CREATED.name()),
+                        eventCode: EventCode.CREATED,
+                ),
+                referenceDocument: referenceDocument,
+                createdBy: createdBy,
+        ))
+        // Then collect history of a shipped event if any
+        if (hasShipped()) {
+            histories.add(new HistoryItem<Shipment>(
+                    date: dateShipped(),
+                    location: origin,
+                    eventType: new EventTypeDto(
+                            name: StringUtil.format(EventCode.SHIPPED.name()),
+                            eventCode: EventCode.SHIPPED,
+                    ),
+                    referenceDocument: referenceDocument,
+                    createdBy: shippedBy,
+            ))
+        }
+        // Then collect history of a partially_received events if any
+        if (wasPartiallyReceived()) {
+            // If there is a received event, exclude it from the set
+            Set<Receipt> partialReceipts = wasReceived() ? (receipts - receipts.last()) : receipts
+            List<HistoryItem<Receipt>> partiallyReceivedHistoryItem = partialReceipts.collect { it.getHistory() }.flatten()
+            partiallyReceivedHistoryItem.each {
+                it.eventType = new EventTypeDto(
+                        name: StringUtil.format(EventCode.PARTIALLY_RECEIVED.name()),
+                        eventCode: EventCode.PARTIALLY_RECEIVED,
+                )
+            }
+            histories.addAll(partiallyReceivedHistoryItem)
+        }
+        // Then collect history of a received event if any
+        if (wasReceived()) {
+            List<HistoryItem<Receipt>> receivedHistoryItem = receipts.last().getHistory()
+            receivedHistoryItem.each {
+                it.eventType = new EventTypeDto(
+                        name: StringUtil.format(EventCode.RECEIVED.name()),
+                        eventCode: EventCode.RECEIVED,
+                )
+            }
+            histories.addAll(receivedHistoryItem)
+        }
+        // At the end collect history of custom events
+        List<HistoryItem<Event>> customEventsHistory = getCustomEvents().collect { it.getHistory() }.flatten()
+        histories.addAll(customEventsHistory)
+        return histories
     }
 }
 

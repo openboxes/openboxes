@@ -12,7 +12,8 @@ const ProductsListHeader = ({ isUserAdmin }) => (
     <span className="d-flex align-self-center title">
       <Translate id="react.productsList.header.label" defaultMessage="Product List" />
     </span>
-    {isUserAdmin &&
+    {isUserAdmin
+      && (
       <div className="d-flex justify-content-end buttons align-items-center">
         <a href={PRODUCT_URL.importCSV()}>
           <Button
@@ -28,11 +29,11 @@ const ProductsListHeader = ({ isUserAdmin }) => (
           />
         </a>
       </div>
-    }
+      )}
   </div>
 );
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   isUserAdmin: state.session.isUserAdmin,
 });
 
@@ -41,4 +42,3 @@ export default connect(mapStateToProps)(ProductsListHeader);
 ProductsListHeader.propTypes = {
   isUserAdmin: PropTypes.bool.isRequired,
 };
-

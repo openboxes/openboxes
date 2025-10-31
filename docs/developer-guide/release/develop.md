@@ -5,20 +5,20 @@ and the velocity of the development team (number of stories / story points) comp
 
 ### Create Release Backlog
 
-![Release Backlog](../../img/jira-show-release-backlog.png)
+![Release Backlog](../../assets/img/jira-show-release-backlog.png)
 
 ### Create Sprint 
 
-![Create Sprint](../../img/jira-create-sprint.png)
+![Create Sprint](../../assets/img/jira-create-sprint.png)
 
 ### Execute Sprint 
 
-![Execute Sprint](../../img/jira-view-sprint.png)
+![Execute Sprint](../../assets/img/jira-view-sprint.png)
 
 ### Monitor Sprint 
 
-![Monitor](../../img/jira-monitor-sprint.png)
+![Monitor](../../assets/img/jira-monitor-sprint.png)
 
 ### Analyze Velocity
 
-![Analyze Velocity](../../img/jira-show-velocity-chart.png)
+![Analyze Velocity](../../assets/img/jira-show-velocity-chart.png)

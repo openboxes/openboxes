@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 
 import Translate from 'utils/Translate';
 
-
 class VerticalTabs extends Component {
   constructor(props) {
     super(props);
@@ -21,7 +20,7 @@ class VerticalTabs extends Component {
   }
 
   getTabTitles() {
-    return _.map(Object.keys(this.props.tabs), tabTitle => (
+    return _.map(Object.keys(this.props.tabs), (tabTitle) => (
       <div
         role="button"
         className={`p-3 d-flex justify-content-start align-items-center ${this.isActive(tabTitle) ? 'active ' : ''}`}

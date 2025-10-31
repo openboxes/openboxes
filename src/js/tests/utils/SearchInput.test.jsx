@@ -7,7 +7,6 @@ import SearchInput from 'utils/SearchInput';
 
 import '@testing-library/jest-dom';
 
-
 let searchInput;
 let searchInputWithValue;
 let onChangeFunc;

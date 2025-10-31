@@ -5,6 +5,7 @@ import {
   CHANGE_CURRENT_LOCATION,
   FETCH_MENU_CONFIG,
   FETCH_SESSION_INFO,
+  START_FETCHING_TRANSLATIONS,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
 } from 'actions/types';
@@ -27,6 +28,7 @@ const initialState = {
   menuConfig: [],
   menuSectionsUrlParts: {},
   activeLanguage: '',
+  activeLanguageTag: '',
   fetchedTranslations: {
     default: false,
     invoice: false,
@@ -40,6 +42,7 @@ const initialState = {
     inboundReturns: false,
     productsConfiguration: false,
     locationsConfiguration: false,
+    cycleCount: false,
   },
   searchConfig: {
     debounceTime: 500,
@@ -80,6 +83,7 @@ const initialState = {
   notificationAutohideDelay: 8000,
   browserConnectionTimeout: 0,
   isAutosaveEnabled: false,
+  cycleCountMaxSelectedProducts: 50,
 };
 
 export default function (state = initialState, action) {
@@ -96,6 +100,7 @@ export default function (state = initialState, action) {
         isUserManager: _.get(action, 'payload.data.data.isUserManager', false),
         supportedActivities: _.get(action, 'payload.data.data.supportedActivities'),
         activeLanguage: _.get(action, 'payload.data.data.activeLanguage'),
+        activeLanguageTag: _.get(action, 'payload.data.data.activeLanguageTag'),
         user: _.get(action, 'payload.data.data.user'),
         isImpersonated: _.get(action, 'payload.data.data.isImpersonated'),
         grailsVersion: _.get(action, 'payload.data.data.grailsVersion'),
@@ -126,6 +131,7 @@ export default function (state = initialState, action) {
         notificationAutohideDelay: _.get(action, 'payload.data.data.notificationAutohideDelay', 8000),
         browserConnectionTimeout: _.get(action, 'payload.data.data.browserConnectionTimeout', 0),
         isAutosaveEnabled: _.get(action, 'payload.data.data.isAutosaveEnabled', false),
+        cycleCountMaxSelectedProducts: _.get(action, 'payload.data.data.cycleCountMaxSelectedProducts', 50),
       };
     case FETCH_MENU_CONFIG:
       return {
@@ -136,11 +142,20 @@ export default function (state = initialState, action) {
     case CHANGE_CURRENT_LOCATION:
       return { ...state, currentLocation: action.payload, loading: true };
     case CHANGE_CURRENT_LOCALE:
-      return { ...state, activeLanguage: action.payload };
+      return {
+        ...state,
+        activeLanguage: action.payload.data.data.activeLanguage,
+        activeLanguageTag: action.payload.data.data.activeLanguageTag,
+      };
     case TRANSLATIONS_FETCHED:
       return {
         ...state,
         fetchedTranslations: { ...state.fetchedTranslations, [action.payload]: true },
+      };
+    case START_FETCHING_TRANSLATIONS:
+      return {
+        ...state,
+        fetchedTranslations: { ...state.fetchedTranslations, [action.payload]: false },
       };
     case TOGGLE_USER_ACTION_MENU:
       return {

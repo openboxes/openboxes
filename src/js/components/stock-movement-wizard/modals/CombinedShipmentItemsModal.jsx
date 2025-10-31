@@ -15,10 +15,10 @@ import ProductSelect from 'components/product-select/ProductSelect';
 import { ORDER_URL } from 'consts/applicationUrls';
 import apiClient from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
+import { formatProductSupplierSubtext } from 'utils/form-values-utils';
 import { debounceProductsInOrders } from 'utils/option-utils';
 import Select from 'utils/Select';
 import { translateWithDefaultMessage } from 'utils/Translate';
-
 
 const FIELDS = {
   orderItems: {
@@ -51,7 +51,7 @@ const FIELDS = {
             disabled={false}
             style={{ marginLeft: '1.1rem' }}
             value={fieldValue.checked}
-            onChange={value => selectRow(value, rowIndex)}
+            onChange={(value) => selectRow(value, rowIndex)}
           />
         ),
       },
@@ -67,7 +67,7 @@ const FIELDS = {
           url: fieldValue?.orderId ? ORDER_URL.show(fieldValue.orderId) : '',
         }),
         attributes: {
-          formatValue: fieldValue => fieldValue && fieldValue.orderNumber,
+          formatValue: (fieldValue) => fieldValue && fieldValue.orderNumber,
         },
       },
       productCode: {
@@ -86,10 +86,14 @@ const FIELDS = {
         },
         getDynamicAttr: ({ values, rowIndex }) => {
           const orderItem = values.orderItems[rowIndex];
+          const productSupplierName = formatProductSupplierSubtext({
+            name: orderItem?.productSupplierName,
+          });
+
           return {
             color: orderItem?.color,
             showValueTooltip: true,
-            tooltipValue: orderItem?.productName,
+            tooltipValue: [orderItem?.productName, productSupplierName].join(' ')?.trim(),
             formatValue: () => orderItem?.displayName || orderItem?.productName,
           };
         },
@@ -151,10 +155,10 @@ function validate(values) {
 
   _.forEach(values.orderItems, (item, key) => {
     if (
-      item.checked &&
-      (
-        (_.toInteger(item.quantityToShip) > item.quantityAvailable) ||
-        _.toInteger(item.quantityToShip) < 0
+      item.checked
+      && (
+        (_.toInteger(item.quantityToShip) > item.quantityAvailable)
+        || _.toInteger(item.quantityToShip) < 0
       )
     ) {
       errors.orderItems[key] = { quantityToShip: 'react.combinedShipments.errors.quantityToShip.label' };
@@ -219,16 +223,16 @@ class CombinedShipmentItemsModal extends Component {
       .then(() => {
         this.setState(INITIAL_STATE, () => {
           this.props.hideSpinner();
-          this.props.onResponse();
+          this.props.onResponse(this.props.overrideFormValue);
         });
       })
       .catch(() => this.props.hideSpinner());
   }
 
   getSortOrder() {
-    this.setState({
-      sortOrder: this.state.sortOrder + 1,
-    });
+    this.setState((prev) => ({
+      sortOrder: prev.sortOrder + 1,
+    }));
 
     return this.state.sortOrder;
   }
@@ -236,7 +240,7 @@ class CombinedShipmentItemsModal extends Component {
   getOrderNumberOptions() {
     const { vendor, destination } = this.props;
     const url = `/api/orderNumberOptions?vendor=${vendor}&destination=${destination}`;
-    apiClient.get(url).then(resp => this.setState({ orderNumberOptions: resp.data.data }));
+    apiClient.get(url).then((resp) => this.setState({ orderNumberOptions: resp.data.data }));
   }
 
   setSelectedOrders(selectedOrders) {
@@ -254,11 +258,14 @@ class CombinedShipmentItemsModal extends Component {
     const { vendor, destination } = this.props;
     const url = '/api/combinedShipmentItems/findOrderItems';
     const payload = {
-      orderIds: _.map(selectedOrders, o => o.id), productId: selectedProductId, vendor, destination,
+      orderIds: _.map(selectedOrders, (o) => o.id),
+      productId: selectedProductId,
+      vendor,
+      destination,
     };
-    return apiClient.post(url, payload).then(resp => this.setState({
+    return apiClient.post(url, payload).then((resp) => this.setState({
       formValues: {
-        orderItems: _.map(resp.data.orderItems, item => ({
+        orderItems: _.map(resp.data.orderItems, (item) => ({
           ...item,
           checked: !!selectedOrderItems[item.orderItemId],
           quantityToShip: selectedOrderItems[item.orderItemId] ? selectedOrderItems[item.orderItemId].quantityToShip : '',
@@ -322,14 +329,15 @@ class CombinedShipmentItemsModal extends Component {
   }
 
   allItemsSelected() {
-    return this.state.formValues.orderItems.every(item => item.checked);
+    return this.state.formValues.orderItems.every((item) => item.checked);
   }
 
   selectAllItems() {
     const allItemsSelected = this.allItemsSelected();
+    const { orderItems } = this.state.formValues;
     this.setState({
       formValues: {
-        orderItems: this.state.formValues.orderItems.map(item => ({
+        orderItems: orderItems.map((item) => ({
           ...item,
           checked: !allItemsSelected,
           quantityToShip: !allItemsSelected ? item.quantityAvailable : '',
@@ -340,8 +348,9 @@ class CombinedShipmentItemsModal extends Component {
   }
 
   updateAllSelectedItems() {
+    const { orderItems } = this.state.formValues;
     const allItemsSelected = this.allItemsSelected();
-    const updatedSelectedOrderItems = this.state.formValues.orderItems.reduce((acc, curr) => {
+    const updatedSelectedOrderItems = orderItems.reduce((acc, curr) => {
       if (allItemsSelected) {
         return {
           ...acc,
@@ -385,7 +394,7 @@ class CombinedShipmentItemsModal extends Component {
         btnOpenText={btnOpenText}
         btnOpenDefaultText={btnOpenDefaultText}
         btnOpenDisabled={btnOpenDisabled}
-        btnSaveDisabled={!_.find(formValues.orderItems, item => item.checked)}
+        btnSaveDisabled={!_.find(formValues.orderItems, (item) => item.checked)}
       >
         <div className="d-flex mb-3 justify-content-start align-items-center w-100 combined-shipment-filter">
           <Select
@@ -395,7 +404,7 @@ class CombinedShipmentItemsModal extends Component {
             multi
             options={orderNumberOptions}
             showValueTooltip
-            onChange={value => this.setSelectedOrders(value)}
+            onChange={(value) => this.setSelectedOrders(value)}
             valueKey="id"
             labelKey="orderNumber"
             classes=""
@@ -406,7 +415,7 @@ class CombinedShipmentItemsModal extends Component {
             showSelectedOptionColor
             placeholder={translate('react.combinedShipments.selectProduct.label', 'Select product...')}
             loadOptions={this.debounceProductsInOrders}
-            onChange={value => this.setSelectedProduct(value)}
+            onChange={(value) => this.setSelectedProduct(value)}
           />
         </div>
       </ModalWrapper>
@@ -414,7 +423,7 @@ class CombinedShipmentItemsModal extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
@@ -436,6 +445,7 @@ CombinedShipmentItemsModal.propTypes = {
   btnOpenText: PropTypes.string,
   btnOpenDefaultText: PropTypes.string,
   btnOpenDisabled: PropTypes.bool,
+  overrideFormValue: PropTypes.func.isRequired,
 };
 
 CombinedShipmentItemsModal.defaultProps = {

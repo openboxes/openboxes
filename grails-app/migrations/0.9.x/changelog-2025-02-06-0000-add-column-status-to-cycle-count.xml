@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="ewaterman" id="060220250000-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="cycle_count" columnName="status"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="cycle_count">
+            <column name="status" type="VARCHAR(100)">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

@@ -19,10 +19,11 @@ import Button from 'components/form-elements/Button';
 import ShipmentIdentifier from 'components/stock-movement/common/ShipmentIdentifier';
 import RejectRequestModal from 'components/stock-movement/modals/RejectRequestModal';
 import ActivityCode from 'consts/activityCode';
-import RequisitionStatus from 'consts/requisitionStatus';
 import { STOCK_MOVEMENT_URL, STOCK_TRANSFER_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
+import RequisitionStatus from 'consts/requisitionStatus';
 import useOutboundListTableData from 'hooks/list-pages/outbound/useOutboundListTableData';
-import ActionDots from 'utils/ActionDots';
+import ContextMenu from 'utils/ContextMenu';
 import { getShipmentTypeTooltip } from 'utils/list-utils';
 import { mapShipmentTypes } from 'utils/option-utils';
 import canEditRequest from 'utils/permissionUtils';
@@ -56,7 +57,7 @@ const StockMovementOutboundTable = ({
   } = useOutboundListTableData(filterParams);
   const [isOpenRejectionModal, setIsOpenRejectionModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const getStatusTooltip = status => translate(
+  const getStatusTooltip = (status) => translate(
     `react.stockMovement.status.${status.toLowerCase()}.description.label`,
     status.toLowerCase(),
   );
@@ -104,7 +105,7 @@ const StockMovementOutboundTable = ({
           defaultLabel: 'Approve',
           label: 'react.stockMovement.action.approve.label',
           leftIcon: <RiCheckFill />,
-          onClick: id => approveRequest(id, identifier),
+          onClick: (id) => approveRequest(id, identifier),
         };
         actions.push(approveAction);
 
@@ -119,9 +120,9 @@ const StockMovementOutboundTable = ({
         };
         actions.push(rejectAction);
       }
-      if ((statusCode === RequisitionStatus.APPROVED ||
-          statusCode === RequisitionStatus.REJECTED) &&
-        (isUserRequestApprover || isUserRequestor || isUserAdmin)) {
+      if ((statusCode === RequisitionStatus.APPROVED
+          || statusCode === RequisitionStatus.REJECTED)
+        && (isUserRequestApprover || isUserRequestor || isUserAdmin)) {
         const rollbackAction = {
           defaultLabel: 'Rolllback',
           label: 'react.stockMovement.action.rollback.label',
@@ -134,7 +135,6 @@ const StockMovementOutboundTable = ({
     },
     [],
   );
-
 
   // List of all actions for outbound Stock Movement rows
   const getActions = useCallback((row) => {
@@ -167,8 +167,8 @@ const StockMovementOutboundTable = ({
 
     // Edit
     if (
-      !isReceived && !isPartiallyReceived &&
-      canEditRequest(currentUser, row.original, currentLocation)
+      !isReceived && !isPartiallyReceived
+      && canEditRequest(currentUser, row.original, currentLocation)
     ) {
       const editAction = {
         defaultLabel: 'Edit Stock Movement',
@@ -209,13 +209,14 @@ const StockMovementOutboundTable = ({
       sortable: false,
       style: { overflow: 'visible', zIndex: 1 },
       fixed: 'left',
-      Cell: row => (
-        <ActionDots
-          dropdownPlacement="right"
+      Cell: (row) => (
+        <ContextMenu
+          positions={['right']}
           dropdownClasses="action-dropdown-offset"
           actions={getActions(row)}
           id={row.original.id}
-        />),
+        />
+      ),
     },
     {
       Header: <Translate id="react.stockMovement.column.itemsCount.label" defaultMessage="# items" />,
@@ -225,7 +226,7 @@ const StockMovementOutboundTable = ({
       headerClassName: 'header justify-content-center',
       width: 80,
       sortable: false,
-      Cell: row => (
+      Cell: (row) => (
         <TableCell {...row} defaultValue={0} className="items-count-circle" />),
     },
     {
@@ -234,7 +235,7 @@ const StockMovementOutboundTable = ({
       fixed: 'left',
       width: 170,
       sortable: false,
-      Cell: row => (
+      Cell: (row) => (
         <TableCell
           {...row}
           tooltip
@@ -252,7 +253,7 @@ const StockMovementOutboundTable = ({
       accessor: 'identifier',
       fixed: 'left',
       headerClassName: 'header justify-content-center',
-      minWidth: 100,
+      minWidth: 130,
       Cell: (row) => {
         const { id, shipmentType } = row.original;
         return (
@@ -275,7 +276,7 @@ const StockMovementOutboundTable = ({
       accessor: 'name',
       minWidth: 250,
       sortable: false,
-      Cell: row => (
+      Cell: (row) => (
         <TableCell
           {...row}
           tooltip
@@ -290,26 +291,27 @@ const StockMovementOutboundTable = ({
           </span>
           <RiArrowRightSLine />
           <span>{row.original.description || row.original.name}</span>
-        </TableCell>),
+        </TableCell>
+      ),
     },
     {
       Header: <Translate id="react.stockMovement.destination.label" defaultMessage="Destination" />,
       accessor: 'destination.name',
       minWidth: 250,
-      Cell: row => (<TableCell {...row} tooltip />),
+      Cell: (row) => (<TableCell {...row} tooltip />),
     },
     {
       Header: <Translate id="react.stockMovement.stocklist.label" defaultMessage="Stocklist" />,
       accessor: 'stocklist.name',
       minWidth: 150,
-      Cell: row => (<TableCell {...row} tooltip defaultValue="None" />),
+      Cell: (row) => (<TableCell {...row} tooltip defaultValue="None" />),
     },
     {
       Header: <Translate id="react.stockMovement.requestedBy.label" defaultMessage="Requested by" />,
       accessor: 'requestedBy.name',
       minWidth: 250,
       sortable: false,
-      Cell: row => (<TableCell {...row} defaultValue="None" />),
+      Cell: (row) => (<TableCell {...row} defaultValue="None" />),
     },
     {
       Header: <Translate id="react.stockMovement.request.approvers.label" defaultMessage="Approvers" />,
@@ -317,27 +319,41 @@ const StockMovementOutboundTable = ({
       minWidth: 250,
       sortable: false,
       show: isRequestsOpen,
-      Cell: row =>
-        (<TableCell
-          {...row}
-          tooltip
-          defaultValue="None"
-          value={row.value?.map(approver => approver.name)?.join(', ')}
-        />),
+      Cell: (row) =>
+        (
+          <TableCell
+            {...row}
+            tooltip
+            defaultValue="None"
+            value={row.value?.map((approver) => approver.name)?.join(', ')}
+          />
+        ),
     },
     {
       Header: <Translate id="react.stockMovement.outbound.column.dateRequested.label" defaultMessage="Date Requested" />,
       accessor: 'dateRequested',
       width: 150,
-      Cell: row => (<DateCell {...row} />),
+      Cell: (row) => (
+        <DateCell
+          localizeDate
+          formatLocalizedDate={DateFormat.DISPLAY}
+          {...row}
+        />
+      ),
     },
     {
       Header: <Translate id="react.stockMovement.column.dateCreated.label" defaultMessage="Date Created" />,
       accessor: 'dateCreated',
       width: 150,
-      Cell: row => (<DateCell {...row} />),
+      Cell: (row) => (
+        <DateCell
+          localizeDate
+          formatLocalizedDate={DateFormat.DISPLAY}
+          {...row}
+        />
+      ),
     },
-  ], [requisitionStatuses, translate]);
+  ], [requisitionStatuses, translate, isRequestsOpen]);
 
   return (
     <>
@@ -400,7 +416,7 @@ const StockMovementOutboundTable = ({
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   requisitionStatuses: state.requisitionStatuses.data,
   currentLocation: state.session.currentLocation,
@@ -411,7 +427,6 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps)(StockMovementOutboundTable);
-
 
 StockMovementOutboundTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,

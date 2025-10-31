@@ -10,10 +10,12 @@ import PickPage from 'components/stock-movement-wizard/outbound/PickPage';
 import SendMovementPage from 'components/stock-movement-wizard/outbound/SendMovementPage';
 import EditPage from 'components/stock-movement-wizard/request/EditPage';
 import Wizard from 'components/wizard/Wizard';
+import DateFormat from 'consts/dateFormat';
 import RequisitionStatus from 'consts/requisitionStatus';
 import apiClient from 'utils/apiClient';
 import canEditRequest from 'utils/permissionUtils';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 import 'components/stock-movement-wizard/StockMovement.scss';
 
@@ -126,7 +128,7 @@ class StockMovementVerifyRequest extends Component {
         delimeter: ', ',
       },
       {
-        text: values.dateRequested,
+        text: this.props.formatLocalizedDate(values.dateRequested, DateFormat.COMMON),
         color: '#4a148c',
         delimeter: ', ',
       },
@@ -142,8 +144,8 @@ class StockMovementVerifyRequest extends Component {
     const { currentPage, values } = this.state;
     const shipped = values.shipped ? 'SHIPPED' : '';
     const received = values.received ? 'RECEIVED' : '';
-    if ((this.props.hasPackingSupport && currentPage === 4) ||
-      (!this.props.hasPackingSupport && currentPage === 3)) {
+    if ((this.props.hasPackingSupport && currentPage === 4)
+      || (!this.props.hasPackingSupport && currentPage === 3)) {
       return (
         <span className="shipment-status float-right">
           {`${shipped || received || 'PENDING'}`}
@@ -229,9 +231,9 @@ class StockMovementVerifyRequest extends Component {
   render() {
     const { values, currentPage } = this.state;
     const { currentLocation, currentUser } = this.props;
-    const showOnly = (values.origin && values.origin.id !== currentLocation.id) ||
-      ((values?.isElectronicType && !canEditRequest(currentUser, values, currentLocation)) ||
-        values.statusCode === RequisitionStatus.PENDING_APPROVAL);
+    const showOnly = (values.origin && values.origin.id !== currentLocation.id)
+      || ((values?.isElectronicType && !canEditRequest(currentUser, values, currentLocation))
+        || values.statusCode === RequisitionStatus.PENDING_APPROVAL);
 
     if (values.stockMovementId) {
       return (
@@ -252,13 +254,14 @@ class StockMovementVerifyRequest extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   hasPackingSupport: state.session.currentLocation.hasPackingSupport,
   currentLocation: state.session.currentLocation,
   currentUser: state.session.user,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps, {
@@ -290,6 +293,7 @@ StockMovementVerifyRequest.propTypes = {
   currentUser: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }).isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };
 
 StockMovementVerifyRequest.defaultProps = {

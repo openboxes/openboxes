@@ -32,6 +32,7 @@ const Dropdown = ({
   return (
     <div
       ref={dropdownRef}
+      data-testid="custom-select-dropdown-menu"
       className="filter-select__dropdown"
       style={{
         ...style,
@@ -96,16 +97,17 @@ Menu.propTypes = {
     PropTypes.shape({})])).isRequired,
 };
 
-const Option = props => (
+const Option = (props) => (
   <components.Option {...props}>
-    <div className="d-flex flex-row align-items-center">
-      {props.isMulti &&
-        <input
-          type="checkbox"
-          checked={props.isSelected}
-          className="mr-1"
-        />
-      }
+    <div role="listitem" className="d-flex flex-row align-items-center">
+      {props.isMulti
+        && (
+          <input
+            type="checkbox"
+            checked={props.isSelected}
+            className="mr-1"
+          />
+        )}
       <span className="option-label">
         {props.data.label}
       </span>
@@ -123,13 +125,14 @@ Option.propTypes = {
 
 const IndicatorsContainer = ({ children, ...props }) => (
   <components.IndicatorsContainer {...props}>
-    {props.selectProps.isMulti && props.selectProps.value?.length > 0 &&
-      <div className="d-flex flex-column justify-content-center align-items-center selected-count-indicator-container">
-        <div className="selected-count-indicator-inner">
-          { props.selectProps.value.length }
+    {props.selectProps.isMulti && props.selectProps.value?.length > 0
+      && (
+        <div className="d-flex flex-column justify-content-center align-items-center selected-count-indicator-container">
+          <div className="selected-count-indicator-inner" data-testid="filter-count-indicator">
+            { props.selectProps.value.length }
+          </div>
         </div>
-      </div>
-    }
+      )}
     {children}
   </components.IndicatorsContainer>
 );
@@ -154,21 +157,38 @@ IndicatorsContainer.propTypes = {
 };
 
 const FilterSelectField = (props) => {
-  const renderInput = ({ className, ...attributes }) => (
-    <Select
-      name={attributes.id}
-      {...attributes}
-      className={`filter-select ${!_.isEmpty(attributes?.value) ? 'filter-select-has-value' : ''} ${className}`}
-      classNamePrefix="filter-select"
-      hideSelectedOptions={false}
-      controlShouldRenderValue={!attributes.multi}
-      customSelectComponents={{
+  const renderInput = ({ className, ...attributes }) => {
+    const [input, setInput] = useState('');
+
+    const handleInputChange = (value) => {
+      setInput(value);
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Backspace' && !input) {
+        event.preventDefault();
+      }
+    };
+
+    return (
+      <Select
+        name={attributes.id}
+        {...attributes}
+        className={`filter-select ${!_.isEmpty(attributes?.value) ? 'filter-select-has-value' : ''} ${className}`}
+        classNamePrefix="filter-select"
+        hideSelectedOptions={false}
+        controlShouldRenderValue={!attributes.multi}
+        customSelectComponents={{
           Menu,
           Option,
           IndicatorsContainer,
         }}
-    />
-  );
+        inputValue={input}
+        onInputChange={handleInputChange}
+        onKeyDown={handleKeyDown}
+      />
+    );
+  };
 
   return (
     <BaseField

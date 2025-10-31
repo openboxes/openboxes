@@ -4,7 +4,7 @@ import BaseField from 'components/form-elements/BaseField';
 import SearchInput from 'utils/SearchInput';
 
 const SearchField = (props) => {
-  const renderInput = attributes => (
+  const renderInput = (attributes) => (
     <SearchInput
       {...attributes}
     />

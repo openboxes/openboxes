@@ -21,6 +21,7 @@ import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.glAccount.GlAccountService
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductField
 import org.pih.warehouse.product.ProductGroup
 
 class SelectOptionsApiController {
@@ -30,44 +31,60 @@ class SelectOptionsApiController {
     UserService userService
 
     def glAccountOptions() {
-        List<GlAccount> glAccounts = glAccountService.getGlAccounts(params).collect {
-            [id: it.id, label: "${it.code} - ${it.name}"]
-        }
+        List<GlAccount> glAccounts = glAccountService.getGlAccounts(params)
+                .findAll { it?.code }
+                .collect {
+                    [id: it.id, label: "${it.code} - ${it.name}"]
+                }
         render([data: glAccounts] as JSON)
     }
 
     def productGroupOptions() {
-        List<ProductGroup> productGroups = genericApiService.getList(ProductGroup.class.simpleName, [:]).collect {
-            [id: it.id, label: "${it.name}"]
-        }
+        List<ProductGroup> productGroups = genericApiService.getList(ProductGroup.class.simpleName, [:])
+                .findAll { it?.name }
+                .collect {
+                    [id: it.id, label: "${it.name}"]
+                }
         render([data: productGroups] as JSON)
     }
 
     def catalogOptions() {
-        List<ProductCatalog> catalogs = genericApiService.getList(ProductCatalog.class.simpleName, [sort: "name"]).collect {
-            [id: it.id, label: "${it.name} (${it?.productCatalogItems?.size()})"]
-        }
+        boolean hideNumbers = params.boolean("hideNumbers", false)
+
+        def catalogs = genericApiService.getList(ProductCatalog.class.simpleName, [sort: "name"])
+                .findAll { it?.name }
+                .collect {
+                    [id: it.id, label: hideNumbers ? it.name : "${it.name} (${it?.productCatalogItems?.size()})"]
+                }
         render([data: catalogs] as JSON)
     }
 
     def categoryOptions() {
-        List<Category> categories = genericApiService.getList(Category.class.simpleName, [:]).collect {
-            [id: it.id, label: it.getHierarchyAsString(" > ")]
-        }
+        List<Category> categories = genericApiService.getList(Category.class.simpleName, [:])
+                .findAll { it.name }
+                .collect {
+                    [id: it.id, label: it.getHierarchyAsString(" > ")]
+                }
         render([data: categories] as JSON)
     }
 
     def tagOptions() {
-        List<Tag> tags = genericApiService.getList(Tag.class.simpleName, [sort: "tag"]).collect {
-            [id: it.id, label: "${it.tag} (${it?.products?.size()})"]
-        }
+        boolean hideNumbers = params.boolean("hideNumbers", false)
+
+        def tags = genericApiService.getList(Tag.class.simpleName, [sort: "tag"])
+                .findAll { it?.tag }
+                .collect {
+                    [id: it.id, label: hideNumbers ? it.tag : "${it.tag} (${it?.products?.size()})"]
+                }
         render([data: tags] as JSON)
     }
 
     def paymentTermOptions() {
-        List<PaymentTerm> paymentTerms = genericApiService.getList(PaymentTerm.class.simpleName, [sort: "name"]).collect {
-            [id: it.id, label: it.name, value: it.id ]
-        }
+        List<PaymentTerm> paymentTerms = genericApiService.getList(PaymentTerm.class.simpleName, [sort: "name"])
+                .findAll { it?.name }
+                .collect {
+                    [id: it.id, label: it.name, value: it.id ]
+                }
         render([data: paymentTerms] as JSON)
     }
 
@@ -101,13 +118,11 @@ class SelectOptionsApiController {
             ])
         }
 
-        List<Map<String, String>> preferenceTypes = genericApiService.getList(PreferenceType.class.simpleName, [:]).collect {
-            [
-                id: it.id,
-                value: it.id,
-                label: it.name
-            ]
-        }
+        List<Map<String, String>> preferenceTypes = genericApiService.getList(PreferenceType.class.simpleName, [:])
+                .findAll { it?.name }
+                .collect {
+                    [id: it.id, label: it.name, value: it.id ]
+                }
 
         preferenceTypeOptions.addAll(preferenceTypes)
 
@@ -119,5 +134,17 @@ class SelectOptionsApiController {
             [id: it.name, value: it.name, label: g.message(code: "enum.RatingTypeCode.$it.name", default: it.name)]
         }
         render([data: ratingTypeCodeOptions] as JSON)
+    }
+
+    def handlingRequirementsOptions() {
+        List<ProductField> handlingRequirements = [
+                ProductField.COLD_CHAIN,
+                ProductField.CONTROLLED_SUBSTANCE,
+                ProductField.HAZARDOUS_MATERIAL,
+                ProductField.RECONDITIONED
+        ].collect {
+            [id: it.name(), value: it.name(), label: g.message(code: "enum.ProductField.${it.name()}", default: it.name())]
+        }
+        render([data: handlingRequirements] as JSON)
     }
 }

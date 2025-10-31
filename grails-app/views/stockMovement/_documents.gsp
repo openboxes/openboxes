@@ -1,4 +1,4 @@
-<div id="documents-tab">
+<section id="documents-tab" aria-label="Documents">
 
     <div class="box">
         <h2>
@@ -52,9 +52,27 @@
                                         <warehouse:message code="default.button.delete.label"/>
                                     </g:link>
                                 </g:if>
-                                <g:link url="${document.uri}" target="_blank" class="button">
-                                    <warehouse:message code="default.button.download.label"/>
-                                </g:link>
+                                <g:if test="${document.downloadOptions}">
+                                    <span class="action-menu">
+                                        <button class="action-btn button">
+                                            <warehouse:message code="default.button.download.label"/>
+                                        </button>
+                                        <div class="actions">
+                                            <g:each var="downloadOption" in="${document.downloadOptions}">
+                                                <div class="action-menu-item">
+                                                    <g:link url="${downloadOption.uri}" target="_blank">
+                                                        ${downloadOption.name}
+                                                    </g:link>
+                                                </div>
+                                            </g:each>
+                                        </div>
+                                    </span>
+                                </g:if>
+                                <g:else>
+                                    <g:link url="${document.uri}" target="_blank" class="button">
+                                        <warehouse:message code="default.button.download.label"/>
+                                    </g:link>
+                                </g:else>
                             </td>
                         </tr>
                     </g:if>
@@ -109,4 +127,4 @@
             </table>
         </div>
     </g:if>
-</div>
+</section>

@@ -1,3 +1,8 @@
+---
+hide:
+  - navigation
+---
+
 # Support
 
 ## Community Support

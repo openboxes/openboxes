@@ -13,7 +13,11 @@ import grails.core.GrailsApplication
 import grails.util.Holders
 import groovy.sql.Sql
 import groovy.time.TimeCategory
+import org.springframework.beans.factory.annotation.Autowired
+import util.RequestParamsUtil
+
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.data.PersistenceService
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.DateUtil
@@ -27,6 +31,9 @@ import org.pih.warehouse.core.SynonymTypeCode
 
 class ForecastingService {
 
+    @Autowired
+    PersistenceService persistenceService
+
     def dataSource
     GrailsApplication grailsApplication
     def productAvailabilityService
@@ -35,12 +42,15 @@ class ForecastingService {
         boolean forecastingEnabled = Holders.config.openboxes.forecasting.enabled ?: false
         Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod ?: 365
         if (forecastingEnabled) {
-            Map defaultDateRange = DateUtil.getDateRange(new Date(), -1)
+            // Use the first day of current month as the starting point for the start date calculation
+            Map defaultStartDateRange = DateUtil.getDateRange(new Date(), 0)
             use(TimeCategory) {
-                defaultDateRange.startDate = defaultDateRange.endDate - demandPeriod.days
+                defaultStartDateRange.startDate = defaultStartDateRange.startDate - demandPeriod.days
             }
+            // Use the last day of previous month as the end date
+            Map defaultEndDateRange = DateUtil.getDateRange(new Date(), -1)
 
-            def rows = getDemandDetails(origin, destination, product, defaultDateRange.startDate, defaultDateRange.endDate)
+            def rows = getDemandDetails(origin, destination, product, defaultStartDateRange.startDate, defaultEndDateRange.endDate)
             def totalDemand = rows.sum { it.quantity_demand } ?: 0
             def dailyDemand = (totalDemand && demandPeriod) ? (totalDemand / demandPeriod) : 0
             def monthlyDemand = totalDemand / Math.floor((demandPeriod / 30))
@@ -245,6 +255,7 @@ class ForecastingService {
 
     def getRequestDetailReport(Map params) {
         List data = []
+        Map<String, Object> queryParams = [:]
         String query = """
             select 
                 request_number,
@@ -272,30 +283,41 @@ class ForecastingService {
             query += " LEFT JOIN product_catalog_item ON product_catalog_item.product_id = product_demand_details.product_id"
         }
 
-        query += " WHERE date_issued BETWEEN :startDate AND :endDate AND origin_id = :originId"
+        query += " WHERE date_issued BETWEEN :startDate AND :endDate"
+        queryParams.put("startDate", params.startDate)
+        queryParams.put("endDate", params.endDate)
+
+        query += " AND origin_id IN (:origins)"
+        queryParams.put("origins", RequestParamsUtil.asList(params.originId))
 
         if (params.destinationId) {
             query += " AND destination_id = :destinationId"
+            queryParams.put("destinationId", params.destinationId)
         }
         if (params.productId) {
             query += " AND product_id = :productId"
+            queryParams.put("productId", params.productId)
         }
         if (params.reasonCode) {
             query += " AND reason_code_classification = :reasonCode"
+            queryParams.put("reasonCode", params.reasonCode)
         }
         if (params.category) {
             Category category = Category.get(params.category)
             if (category) {
-                def categories = category.children
+                List<Category> categories = category.children as List<Category>
                 categories << category
-                query += " AND product.category_id in (${categories.collect { "'$it.id'" }.join(',')})"
+                query += " AND product.category_id in (:categories)"
+                queryParams.put("categories", categories.id)
             }
         }
         if (params.tags && params.tags != "null") {
-            query += " AND product_tag.tag_id in (${params.tags.split(",").collect { "'$it'" }.join(',')})"
+            query += " AND product_tag.tag_id in (:tags)"
+            queryParams.put("tags", params.tags)
         }
         if (params.catalogs && params.catalogs != "null") {
-            query += " AND product_catalog_item.product_catalog_id in (${params.catalogs.split(",").collect { "'$it'" }.join(',')})"
+            query += " AND product_catalog_item.product_catalog_id in (:catalogs)"
+            queryParams.put("catalogs", params.catalogs)
         }
 
         if ((params.tags && params.tags != "null") || (params.catalogs && params.catalogs != "null")) {
@@ -304,9 +326,8 @@ class ForecastingService {
                     " quantity_requested, quantity_picked, reason_code_classification, quantity_demand"
         }
 
-        Sql sql = new Sql(dataSource)
         try {
-            data = sql.rows(query, params)
+            data = persistenceService.list(query, queryParams)
 
         } catch (Exception e) {
             log.error("Unable to execute query: " + e.message, e)

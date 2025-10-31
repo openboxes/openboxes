@@ -331,6 +331,14 @@
                       orderItemId => $("." + orderItemId).text(data[orderItemId])
                     );
                   }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                  console.error(jqXHR, textStatus, errorThrown);
+                  if (jqXHR.responseText) {
+                    $.notify(jqXHR.responseText, "error");
+                  } else {
+                    $.notify("An error occurred", "error");
+                  }
                 }
               });
             }

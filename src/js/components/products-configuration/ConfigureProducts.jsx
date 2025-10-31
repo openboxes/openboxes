@@ -20,7 +20,6 @@ const INITIAL_STATE = {
   importSuccessful: false,
 };
 
-
 class ConfigureProducts extends Component {
   constructor(props) {
     super(props);
@@ -56,14 +55,18 @@ class ConfigureProducts extends Component {
             <Translate id="react.productsConfiguration.importSuccessDetails.label" />
           </div>
           <div className="my-3">
-            <Translate id="react.productsConfiguration.productListInfo1.label" />&nbsp;
+            <Translate id="react.productsConfiguration.productListInfo1.label" />
+&nbsp;
             <a className="font-weight-bold" target="_blank" rel="noopener noreferrer" href="https://openboxes.helpscoutdocs.com/article/27-product-configuration-basics">
               <Translate id="react.productsConfiguration.basics.label" defaultMessage="Products Configuration Basics" />
-            </a>&nbsp;
-            <Translate id="react.productsConfiguration.and.label" />&nbsp;
+            </a>
+&nbsp;
+            <Translate id="react.productsConfiguration.and.label" />
+&nbsp;
             <a className="font-weight-bold" target="_blank" rel="noopener noreferrer" href="https://openboxes.helpscoutdocs.com/article/37-create-a-product">
               <Translate id="react.productsConfiguration.createProduct.label" defaultMessage="Create a Product" />
-            </a>.&nbsp;
+            </a>
+            .&nbsp;
             <Translate id="react.productsConfiguration.productListInfo2.label" />
           </div>
           <div>
@@ -141,7 +144,7 @@ class ConfigureProducts extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 

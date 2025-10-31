@@ -12,6 +12,7 @@ package org.pih.warehouse.picklist
 import grails.gorm.transactions.Transactional
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
@@ -21,6 +22,7 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
 
 @Transactional
@@ -106,6 +108,7 @@ class PicklistService {
         }
         itemsToRemove.each {
             picklist.removeFromPicklistItems(it)
+            it.requisitionItem.autoAllocated = null
             it.delete(flush: true)
         }
 
@@ -321,5 +324,36 @@ class PicklistService {
             eq("inventory", warehouse.inventory)
             order("lastUpdated", "desc")
         }
+    }
+
+    void revertPick(String requisitionItemId) {
+        RequisitionItem requisitionItem = RequisitionItem.get(requisitionItemId)
+
+        if (!requisitionItem) {
+            throw new ObjectNotFoundException(requisitionItemId, RequisitionItem.class.toString())
+        }
+
+        Set<PicklistItem> picklistItemsToRemove = []
+        List<String> binLocations = []
+
+        requisitionItem?.picklistItems?.each { PicklistItem picklistItem ->
+            picklistItem.disableRefresh = true
+            picklistItemsToRemove.add(picklistItem)
+            binLocations.add(picklistItem.binLocation?.id)
+        }
+
+        picklistItemsToRemove.each {
+            it.disableRefresh = true
+            it.picklist?.removeFromPicklistItems(it)
+            requisitionItem?.removeFromPicklistItems(it)
+            it.delete(flush: true)
+        }
+
+        productAvailabilityService.refreshProductsAvailability(
+                requisitionItem?.requisition?.origin?.id,
+                [requisitionItem?.product?.id],
+                binLocations,
+                false
+        )
     }
 }

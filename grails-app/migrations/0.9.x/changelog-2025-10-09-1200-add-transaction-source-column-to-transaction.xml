@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="kchelstowski" id="091020251200-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="transaction" columnName="transaction_source_id"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="transaction">
+            <column name="transaction_source_id" type="CHAR(38)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="kchelstowski" id="091020251200-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_transaction_transaction_source"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseColumnNames="transaction_source_id"
+                baseTableName="transaction"
+                constraintName="fk_transaction_transaction_source"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="transaction_source"
+        />
+    </changeSet>
+</databaseChangeLog>

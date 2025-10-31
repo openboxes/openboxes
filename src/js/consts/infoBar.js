@@ -1,19 +1,28 @@
+import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+
 export const InfoBar = {
-  AUTOSAVE: 'AUTOSAVE',
+  FULL_OUTBOUND_IMPORT: 'FULL_OUTBOUND_IMPORT',
   STOCK_TRANSFER_DESCRIPTION: 'STOCK_TRANSFER_DESCRIPTION',
   STOCK_REPLENISHMENT_DESCRIPTION: 'STOCK_REPLENISHMENT_DESCRIPTION',
 };
 
 export const InfoBarConfigs = {
-  [InfoBar.AUTOSAVE]: {
-    name: InfoBar.AUTOSAVE,
+  [InfoBar.FULL_OUTBOUND_IMPORT]: {
+    name: InfoBar.FULL_OUTBOUND_IMPORT,
+    isCloseable: true,
+    hasModalToDisplay: false,
+    redirect: {
+      label: 'react.infoBar.tryItNow.label',
+      defaultLabel: 'Try it now!',
+      link: STOCK_MOVEMENT_URL.importOutbound(),
+    },
     versionLabel: {
-      label: 'react.infoBar.version.beta.label',
-      defaultLabel: 'BETA',
+      label: 'react.infoBar.version.new.label',
+      defaultLabel: 'NEW!',
     },
     title: {
-      label: 'react.infoBar.autosave.title.label',
-      defaultLabel: 'New autosave feature is here',
+      label: 'react.infoBar.fullOutboundImport.title.label',
+      defaultLabel: 'Do you know that you can now import a full outbound in one step from your packing list in a spreadsheet?',
     },
   },
   [InfoBar.STOCK_TRANSFER_DESCRIPTION]: {

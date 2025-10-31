@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 import grails.util.Holders
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
@@ -285,6 +286,24 @@ class Location implements Comparable<Location>, java.io.Serializable {
         Location.list().findAll { it.isDepotWardOrPharmacy() }.sort { it.name }
     }
 
+    Location getDefaultLocation() {
+        return null
+    }
+
+    /**
+     * Find any internal location with the given name.
+     * @param name
+     * @return
+     */
+    Location getInternalLocation(String name) {
+        if (name?.equalsIgnoreCase(Constants.DEFAULT_BIN_LOCATION_NAME)) {
+            return defaultLocation
+        }
+
+        // FIXME If location.name is not unique then we need to do some error handling
+        return locations.find { it.name.equalsIgnoreCase(name) }
+    }
+
     List<Location> getInternalLocations() {
         return locations?.toList()?.findAll { it.isInternalLocation() }
     }
@@ -344,6 +363,18 @@ class Location implements Comparable<Location>, java.io.Serializable {
 
     Boolean isApprovalRequired() {
         return supports(ActivityCode.APPROVE_REQUEST)
+    }
+
+    static List<Location> listNonInternalLocations() {
+        return createCriteria().list {
+            createAlias("locationType", "locationType", JoinType.LEFT_OUTER_JOIN)
+            and {
+                eq('active', true)
+                not {
+                    'in'('locationType.locationTypeCode', LocationTypeCode.listInternalTypeCodes())
+                }
+            }
+        }
     }
 
     Map toBaseJson() {

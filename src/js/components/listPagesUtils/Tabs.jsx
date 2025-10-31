@@ -5,10 +5,10 @@ import PropTypes from 'prop-types';
 import useQueryParams from 'hooks/useQueryParams';
 import Translate from 'utils/Translate';
 
-const Tabs = ({ config }) => {
+const Tabs = ({ config, className }) => {
   const parsedQueryParams = useQueryParams();
   return (
-    <div className="tabs d-flex align-items-center">
+    <div className={`tabs d-flex align-items-center ${className}`}>
       {Object.entries(config).map(([key, value]) => (
         <span
           key={key}
@@ -35,6 +35,12 @@ Tabs.propTypes = {
         defaultMessage: PropTypes.string.isRequired,
       }).isRequired,
       onClick: PropTypes.func,
-    }).isRequired,
-  }).isRequired,
+    }),
+  }),
+  className: PropTypes.string,
+};
+
+Tabs.defaultProps = {
+  className: '',
+  config: {},
 };

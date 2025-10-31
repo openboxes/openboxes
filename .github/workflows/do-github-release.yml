@@ -1,0 +1,53 @@
+name: Create GitHub Release With Artifacts
+
+on:
+  # We want releases to be triggered automatically whenever we push a new tag that starts with "vX.Y.Z"
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+**'
+
+  # And let us trigger this manually if we ever need to.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: The tag associated with the release
+        required: true
+        default: v0.0.0
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  TAG_NAME: ${{ (contains(github.ref, 'tag') && github.ref_name) || github.event.inputs.tag }}
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # Needed for publishing the release notes
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{env.TAG_NAME}}  # Needed for manual runs to ensure we build from the tagged commit
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{vars.JAVA_VERSION}}
+          distribution: zulu
+          cache: 'gradle'
+
+      - name: Build WAR file
+        run: ./grailsw war --info --no-daemon
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{env.TAG_NAME}}
+          tag_name: ${{env.TAG_NAME}}
+          files: ./build/libs/openboxes.war
+          fail_on_unmatched_files: true
+          body_path: ./.github/templates/release-notes-template.md
+          generate_release_notes: true  # Adds GitHub's auto-generated release notes from release.yml
+          draft: true  # Require manual validation before publishing

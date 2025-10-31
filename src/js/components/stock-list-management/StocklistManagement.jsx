@@ -19,7 +19,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-table/react-table.css';
 
-
 class StocklistManagement extends Component {
   constructor(props) {
     super(props);
@@ -72,8 +71,8 @@ class StocklistManagement extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if ((!prevState.usersFetched || !prevState.stocklistsFetched) &&
-      this.state.usersFetched && this.state.stocklistsFetched) {
+    if ((!prevState.usersFetched || !prevState.stocklistsFetched)
+      && this.state.usersFetched && this.state.stocklistsFetched) {
       this.props.hideSpinner();
     }
   }
@@ -128,9 +127,9 @@ class StocklistManagement extends Component {
   }
 
   addItem(stocklist) {
-    this.setState({
+    this.setState((prev) => ({
       selectedStocklist: null,
-      data: update(this.state.data, {
+      data: update(prev.data, {
         $push: [{
           stocklistId: stocklist.id,
           name: stocklist.name,
@@ -151,27 +150,27 @@ class StocklistManagement extends Component {
           new: true,
         }],
       }),
-    });
+    }));
   }
 
   editItem(index) {
-    this.setState({
-      data: update(this.state.data, {
+    this.setState((prev) => ({
+      data: update(prev.data, {
         [index]: {
           edit: { $set: true },
         },
       }),
-    });
+    }));
   }
 
   updateItemField(index, itemField, fieldValue) {
-    this.setState({
-      data: update(this.state.data, {
+    this.setState((prev) => ({
+      data: update(prev.data, {
         [index]: {
           [itemField]: { $set: fieldValue },
         },
       }),
-    });
+    }));
   }
 
   saveItem(index, item) {
@@ -183,13 +182,13 @@ class StocklistManagement extends Component {
 
     apiClient.post(url, flattenRequest(item))
       .then((response) => {
-        this.setState({
-          data: update(this.state.data, {
+        this.setState((prev) => ({
+          data: update(prev.data, {
             [index]: {
               $set: parseResponse(response.data.data),
             },
           }),
-        });
+        }));
       })
       .catch(this.props.hideSpinner());
   }
@@ -212,20 +211,21 @@ class StocklistManagement extends Component {
   }
 
   removeItem(index) {
-    this.setState({
-      data: update(this.state.data, {
+    this.setState((prev) => ({
+      data: update(prev.data, {
         $splice: [
           [index, 1],
         ],
       }),
-    });
+    }));
   }
 
   render() {
     const { data } = this.state;
     return (
       <div className="main-container">
-        { this.state.productInfo &&
+        { this.state.productInfo
+        && (
         <div className="mb-2">
           <div className="d-flex flex-row justify-content-between">
             <div className="d-flex flex-row align-items-end">
@@ -234,17 +234,21 @@ class StocklistManagement extends Component {
             </div>
             <div className="align-self-center">
               <button
+                type="button"
                 className="btn btn-outline-primary btn-xs"
-                onClick={() => { window.location = INVENTORY_ITEM_URL.showStockCard(this.state.productInfo.id); }}
-              ><Translate id="react.stockListManagement.returnStockCard.label" defaultMessage="Return to stock card" />
+                onClick={() => {
+                  window.location = INVENTORY_ITEM_URL.showStockCard(this.state.productInfo.id);
+                }}
+              >
+                <Translate id="react.stockListManagement.returnStockCard.label" defaultMessage="Return to stock card" />
               </button>
             </div>
           </div>
           <div className="d-flex flex-row">
-            { _.map(this.state.productInfo.catalogs, catalog => (<div key={catalog.id} className="stocklist-category px-1 mr-1">{catalog.name}</div>)) }
+            { _.map(this.state.productInfo.catalogs, (catalog) => (<div key={catalog.id} className="stocklist-category px-1 mr-1">{catalog.name}</div>)) }
           </div>
         </div>
-        }
+        )}
         <ReactTable
           data={data}
           pivotBy={['locationGroup.name', 'location.name']}
@@ -253,16 +257,16 @@ class StocklistManagement extends Component {
           sortable={false}
           noDataText={this.state.isDataLoading ? 'Loading...' : 'No rows found'}
           style={{
-             maxHeight: this.state.productInfo && _.some(
-            this.state.productInfo.catalogs,
-                            catalog => !_.isEmpty(catalog),
+            maxHeight: this.state.productInfo && _.some(
+              this.state.productInfo.catalogs,
+              (catalog) => !_.isEmpty(catalog),
             ) ? 'calc(100vh - 275px)' : 'calc(100vh - 250px)',
-            }}
+          }}
           collapseOnDataChange={false}
           defaultSorted={[{
             id: 'locationGroup.name',
           }]}
-          resolveData={values => values.map((row) => {
+          resolveData={(values) => values.map((row) => {
             if (!_.get(row, 'locationGroup.name')) {
               return { ...row, locationGroup: { name: 'No location group' } };
             }
@@ -278,7 +282,8 @@ class StocklistManagement extends Component {
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="react.stockListManagement.locationGroup.label" defaultMessage="Location Group Name" />
+  >
+    <Translate id="react.stockListManagement.locationGroup.label" defaultMessage="Location Group Name" />
   </Tooltip>,
               accessor: 'locationGroup.name',
               className: 'w-space-normal',
@@ -291,7 +296,8 @@ class StocklistManagement extends Component {
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="react.stockListManagement.locationName.label" defaultMessage="Location Name" />
+  >
+    <Translate id="react.stockListManagement.locationName.label" defaultMessage="Location Name" />
   </Tooltip>,
               accessor: 'location.name',
               aggregate: () => '',
@@ -305,7 +311,8 @@ class StocklistManagement extends Component {
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="react.stockListManagement.stockListName.label" defaultMessage="Stocklist Name" />
+  >
+    <Translate id="react.stockListManagement.stockListName.label" defaultMessage="Stocklist Name" />
   </Tooltip>,
               accessor: 'name',
               aggregate: () => '',
@@ -323,7 +330,8 @@ class StocklistManagement extends Component {
                       delay="150"
                       duration="250"
                       hideDelay="50"
-                    >{original.name}
+                    >
+                      {original.name}
                     </Tooltip>
                   </a>
                 );
@@ -337,10 +345,11 @@ class StocklistManagement extends Component {
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="react.stockListManagement.monthlyStockListQty.label" defaultMessage="Monthly Stocklist Qty" />
+  >
+    <Translate id="react.stockListManagement.monthlyStockListQty.label" defaultMessage="Monthly Stocklist Qty" />
   </Tooltip>,
               accessor: 'monthlyDemand',
-              aggregate: vals => _.sum(vals),
+              aggregate: (vals) => _.sum(vals),
               className: 'text-center',
               Cell: ({ aggregated, original }) => {
                 if (aggregated) {
@@ -354,7 +363,8 @@ class StocklistManagement extends Component {
                     delay="150"
                     duration="250"
                     hideDelay="50"
-                  >{original.monthlyDemand}
+                  >
+                    {original.monthlyDemand}
                   </Tooltip>
                 );
               },
@@ -367,7 +377,8 @@ class StocklistManagement extends Component {
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="react.stockListManagement.manager.label" defaultMessage="Manager" />
+  >
+    <Translate id="react.stockListManagement.manager.label" defaultMessage="Manager" />
   </Tooltip>,
               accessor: 'manager.name',
               aggregate: () => '',
@@ -383,7 +394,8 @@ class StocklistManagement extends Component {
                     delay="150"
                     duration="250"
                     hideDelay="50"
-                  >{original.manager.name}
+                  >
+                    {original.manager.name}
                   </Tooltip>
                 );
               },
@@ -396,7 +408,8 @@ class StocklistManagement extends Component {
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="react.stockListManagement.replenishmentPeriod.label" defaultMessage="Replenishment period" />
+  >
+    <Translate id="react.stockListManagement.replenishmentPeriod.label" defaultMessage="Replenishment period" />
   </Tooltip>,
               accessor: 'replenishmentPeriod',
               aggregate: () => '',
@@ -413,7 +426,8 @@ class StocklistManagement extends Component {
                     delay="150"
                     duration="250"
                     hideDelay="50"
-                  >{original.replenishmentPeriod}
+                  >
+                    {original.replenishmentPeriod}
                   </Tooltip>
                 );
               },
@@ -426,10 +440,11 @@ class StocklistManagement extends Component {
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="react.stockListManagement.replenishmentQty.label" defaultMessage="Replenishment Qty" />
+  >
+    <Translate id="react.stockListManagement.replenishmentQty.label" defaultMessage="Replenishment Qty" />
   </Tooltip>,
               accessor: 'maxQuantity',
-              aggregate: vals => _.sum(vals),
+              aggregate: (vals) => _.sum(vals),
               className: 'text-center',
               // eslint-disable-next-line react/prop-types
               Cell: ({ aggregated, index, original }) => {
@@ -452,7 +467,7 @@ class StocklistManagement extends Component {
                     >
                       <Input
                         value={original.maxQuantity || ''}
-                        onChange={value => this.updateItemField(index, 'maxQuantity', value)}
+                        onChange={(value) => this.updateItemField(index, 'maxQuantity', value)}
                       />
                     </Tooltip>
                   </div>
@@ -467,7 +482,8 @@ class StocklistManagement extends Component {
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="react.stockListManagement.uom.label" defaultMessage="Unit of measure" />
+  >
+    <Translate id="react.stockListManagement.uom.label" defaultMessage="Unit of measure" />
   </Tooltip>,
               accessor: 'uom',
               aggregate: () => '',
@@ -484,7 +500,8 @@ class StocklistManagement extends Component {
                     delay="150"
                     duration="250"
                     hideDelay="50"
-                  >{original.uom}
+                  >
+                    {original.uom}
                   </Tooltip>
                 );
               },
@@ -497,7 +514,8 @@ class StocklistManagement extends Component {
     delay="150"
     duration="250"
     hideDelay="50"
-  ><Translate id="react.stockListManagement.actions.label" defaultMessage="Actions" />
+  >
+    <Translate id="react.stockListManagement.actions.label" defaultMessage="Actions" />
   </Tooltip>,
               accessor: 'edit',
               minWidth: 230,
@@ -511,88 +529,105 @@ class StocklistManagement extends Component {
 
                 return (
                   <div className="d-flex flex-wrap">
-                    {this.props.isUserAdmin ?
-                      <div>
-                        <button
-                          className="btn btn-outline-primary btn-xs mr-1"
-                          disabled={original.edit || original.new || !this.props.isUserAdmin}
-                          onClick={() => this.editItem(index)}
-                        ><Translate id="react.default.button.edit.label" defaultMessage="Edit" />
-                        </button>
-                        <button
-                          className="btn btn-outline-primary btn-xs mr-1"
-                          disabled={(!original.edit && !original.new) || !original.stocklistId
+                    {this.props.isUserAdmin
+                      ? (
+                        <div>
+                          <button
+                            type="button"
+                            className="btn btn-outline-primary btn-xs mr-1"
+                            disabled={original.edit || original.new || !this.props.isUserAdmin}
+                            onClick={() => this.editItem(index)}
+                          >
+                            <Translate id="react.default.button.edit.label" defaultMessage="Edit" />
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-outline-primary btn-xs mr-1"
+                            disabled={(!original.edit && !original.new) || !original.stocklistId
                           || _.isNil(original.maxQuantity) || original.maxQuantity === '' || !this.props.isUserAdmin}
-                          onClick={() => this.saveItem(index, original)}
-                        ><Translate id="react.default.button.save.label" defaultMessage="Save" />
-                        </button>
-                        <button
-                          className="btn btn-outline-danger btn-xs mr-1"
-                          disabled={!this.props.isUserAdmin}
-                          onClick={() => this.deleteItem(index)}
-                        ><Translate id="react.default.button.delete.label" defaultMessage="Delete" />
-                        </button>
-                      </div> : null
-                    }
+                            onClick={() => this.saveItem(index, original)}
+                          >
+                            <Translate id="react.default.button.save.label" defaultMessage="Save" />
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-outline-danger btn-xs mr-1"
+                            disabled={!this.props.isUserAdmin}
+                            onClick={() => this.deleteItem(index)}
+                          >
+                            <Translate id="react.default.button.delete.label" defaultMessage="Delete" />
+                          </button>
+                        </div>
+                      ) : null}
                     <a
                       className="btn btn-outline-secondary btn-xs mr-1"
                       disabled={original.edit || original.new}
                       href={STOCKLIST_URL.pdf(original.stocklistId)}
-                    ><Translate id="react.default.button.printPdf.label" defaultMessage="Print PDF" />
+                    >
+                      <Translate id="react.default.button.printPdf.label" defaultMessage="Print PDF" />
                     </a>
                     <a
                       className="btn btn-outline-secondary btn-xs mr-1"
                       disabled={original.edit || original.new}
                       href={STOCKLIST_URL.csv(original.stocklistId)}
-                    ><Translate id="react.default.button.printXls.label" defaultMessage="Print XLS" />
+                    >
+                      <Translate id="react.default.button.printXls.label" defaultMessage="Print XLS" />
                     </a>
-                    {original.manager ?
-                      <EmailModal
-                        stocklistId={original.stocklistId}
-                        users={this.state.users}
-                        manager={original.manager}
-                      /> :
-                      <button
-                        className="btn btn-outline-secondary btn-xs mr-1"
-                        onClick={() => Alert.error(this.props.translate('react.stockListManagement.alert.noManagerAssociated.label', 'There is no manager associated with this stock list. Please add a manager and try again.'))}
-                      ><Translate id="react.default.button.email.label" defaultMessage="Email" />
-                      </button>
-                    }
+                    {original.manager
+                      ? (
+                        <EmailModal
+                          stocklistId={original.stocklistId}
+                          users={this.state.users}
+                          manager={original.manager}
+                        />
+                      )
+                      : (
+                        <button
+                          type="button"
+                          className="btn btn-outline-secondary btn-xs mr-1"
+                          onClick={() => Alert.error(this.props.translate('react.stockListManagement.alert.noManagerAssociated.label', 'There is no manager associated with this stock list. Please add a manager and try again.'))}
+                        >
+                          <Translate id="react.default.button.email.label" defaultMessage="Email" />
+                        </button>
+                      )}
                   </div>
                 );
               },
             },
           ]}
         />
-        {this.props.isUserAdmin ?
-          <div className="d-flex flex-row my-1">
-            <Select
-              value={this.state.selectedStocklist}
-              onChange={value => this.setState({ selectedStocklist: value })}
-              options={this.state.availableStocklists}
-              valueKey="id"
-              labelKey="name"
-              className="select-xs stocklist-select"
-            />
-            <button
-              className="btn btn-outline-success btn-xs ml-1"
-              disabled={!this.state.selectedStocklist}
-              onClick={() => {
-              this.addItem(this.state.selectedStocklist);
-            }}
-            ><Translate
-              id="react.stockListManagement.addStockList.label"
-              defaultMessage="Add stocklist"
-            />
-            </button>
-          </div> : null
-        }
+        {this.props.isUserAdmin
+          ? (
+            <div className="d-flex flex-row my-1">
+              <Select
+                value={this.state.selectedStocklist}
+                onChange={(value) => this.setState({ selectedStocklist: value })}
+                options={this.state.availableStocklists}
+                valueKey="id"
+                labelKey="name"
+                className="select-xs stocklist-select"
+              />
+              <button
+                type="button"
+                className="btn btn-outline-success btn-xs ml-1"
+                disabled={!this.state.selectedStocklist}
+                onClick={() => {
+                  this.addItem(this.state.selectedStocklist);
+                }}
+              >
+                <Translate
+                  id="react.stockListManagement.addStockList.label"
+                  defaultMessage="Add stocklist"
+                />
+              </button>
+            </div>
+          ) : null}
       </div>
     );
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   locale: state.session.activeLanguage,
   stockListManagementTranslationsFetched: state.session.fetchedTranslations.stockListManagement,

@@ -56,12 +56,11 @@ const useInboundListTableData = (filterParams) => {
   });
 
   const dispatch = useDispatch();
-  const { isShipmentStatusesFetched, shipmentStatuses, translate } = useSelector(state => ({
+  const { isShipmentStatusesFetched, shipmentStatuses, translate } = useSelector((state) => ({
     isShipmentStatusesFetched: state.shipmentStatuses.data,
     shipmentStatuses: state.shipmentStatuses.data,
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
   }));
-
 
   useEffect(() => {
     if (!isShipmentStatusesFetched || !shipmentStatuses.length) {

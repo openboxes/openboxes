@@ -10,20 +10,22 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
+import org.pih.warehouse.order.OrderService
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderSummary
+import org.pih.warehouse.order.OrderSummaryService
 import org.pih.warehouse.order.OrderSummaryStatus
 
 import java.math.RoundingMode
 
 class PurchaseOrderApiController {
 
-    def orderService
+    OrderService orderService
+    OrderSummaryService orderSummaryService
 
     def list() {
         List<OrderSummary> purchaseOrders = orderService.getPurchaseOrders(params)
@@ -219,7 +221,7 @@ class PurchaseOrderApiController {
                     orderItem?.quantity,
                     orderItem?.quantityShipped,
                     orderItem?.quantityReceived,
-                    orderItem?.quantityInvoicedInStandardUom,
+                    orderItem?.postedQuantityInvoiced,
                     orderItem?.unitPrice,
                     orderItem?.total,
                     orderItem?.order?.currencyCode,
@@ -235,7 +237,9 @@ class PurchaseOrderApiController {
     }
 
     def orderItemsDerivedStatus = {
-        Order order = Order.get(params.id)
-        render order?.getOrderItemsDerivedStatus() as JSON
+        if (!Order.read(params.id)) {
+            throw new IllegalArgumentException("Order with id '$params.id' does not exist")
+        }
+        render orderSummaryService.getOrderItemsDerivedStatus(params.id) as JSON
     }
 }

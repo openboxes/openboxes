@@ -10,16 +10,16 @@
                 <g:if test="${requisitionItems.find { it.requisition?.shipment?.shipmentItems?.any { it.container && it.container?.parentContainer }}}">
                     <th><warehouse:message code="packLevel2.label"/></th>
                 </g:if>
-                <th>${warehouse.message(code: 'product.productCode.label')}</th>
-                <th class="left">${warehouse.message(code: 'product.label')}</th>
-                <th>${warehouse.message(code: 'deliveryNote.totalRequested.label', default: "Total Requested")}</th>
-                <th>${warehouse.message(code: 'deliveryNote.totalDelivered.label', default: "Total Delivered")}</th>
-                <th>${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
-                <th>${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
-                <th>${warehouse.message(code: 'deliveryNote.deliveredByLot.label', default: "Delivered by Lot")}</th>
-                <th>${warehouse.message(code: 'requisitionItem.cancelReasonCode.label')}</th>
-                <th>${warehouse.message(code: 'deliveryNote.received.label', default: "Received")}</th>
-                <th>${warehouse.message(code: 'deliveryNote.comment.label', default: "Comment")}</th>
+                <th>${g.message(code: 'product.productCode.label')}</th>
+                <th class="left">${g.message(code: 'product.label')}</th>
+                <th>${g.message(code: 'deliveryNote.totalRequested.label', default: "Total Requested")}</th>
+                <th>${g.message(code: 'deliveryNote.totalDelivered.label', default: "Total Delivered")}</th>
+                <th>${g.message(code: 'inventoryItem.lotNumber.label')}</th>
+                <th>${g.message(code: 'inventoryItem.expirationDate.label')}</th>
+                <th>${g.message(code: 'deliveryNote.splitQuantity.label', default: "Split Quantity")}</th>
+                <th>${g.message(code: 'requisitionItem.cancelReasonCode.label')}</th>
+                <th>${g.message(code: 'deliveryNote.received.label', default: "Received")}</th>
+                <th>${g.message(code: 'deliveryNote.comment.label', default: "Comment")}</th>
             </tr>
         </thead>
         <tbody>
@@ -32,54 +32,50 @@
                     </td>
                 </tr>
             </g:unless>
-            <g:each in="${requisitionItems?.sort()}" status="i" var="requisitionItem">
+            <g:if test="${"PRODUCT".equalsIgnoreCase(sortOrder as String)}">
+                %{-- Requisition items are already sorted by product at this point so no need to re-sort. --}%
+            </g:if>
+            <g:else>
+                <g:set var="requisitionItems" value="${requisitionItems?.sort()}"/>
+            </g:else>
+            <g:each in="${requisitionItems}" status="i" var="requisitionItem">
                 <g:if test="${picklist}">
                     <g:set var="inventoryItemMap" value="${requisitionItem?.retrievePicklistItems()?.findAll { it.quantity > 0 }?.groupBy { it?.inventoryItem }}"/>
                     <g:set var="shipmentItems" value="${requisitionItem?.requisition?.shipment?.shipmentItems?.findAll { it.requisitionItem == requisitionItem }}"/>
                     <g:set var="picklistItemsGroup" value="${inventoryItemMap?.values()?.toList()}"/>
-                    <g:set var="numInventoryItem" value="${inventoryItemMap?.size() ?: 1}"/>
+                    <g:set var="shipmentItemCount" value="${shipmentItems.size() ?: 1}"/>
                 </g:if>
-                <g:else>
-                    <g:set var="numInventoryItem" value="${1}"/>
-                </g:else>
                 <g:set var="backgroundColor" value="${(i % 2) == 0 ? '#fff' : '#f7f7f7'}"/>
                 <g:set var="j" value="${0}"/>
-                <g:while test="${j < numInventoryItem}">
-                    <g:if test="${picklistItemsGroup}">
-                        <g:set var="inventoryItem" value="${picklistItemsGroup[j]?.first()?.inventoryItem}" />
+                <g:while test="${j < shipmentItemCount}">
+                    <g:if test="${shipmentItems}">
+                        <g:set var="shipmentItem" value="${shipmentItems[j]}"/>
+                        <g:set var="inventoryItem" value="${shipmentItems[j].inventoryItem}"/>
                     </g:if>
+                    <g:elseif test="${picklistItemsGroup}">
+                        <g:set var="inventoryItem" value="${picklistItemsGroup[j]?.first()?.inventoryItem}" />
+                    </g:elseif>
                     <g:else>
-                        <g:set var="inventoryItem" value="${requisitionItem?.shipmentItems?.size() > 0 ? requisitionItem?.shipmentItems?.toList()?.first()?.inventoryItem : null}" />
+                        <g:set var="inventoryItem" value="${requisitionItem?.shipmentItems?.size() > 0 ? requisitionItem?.shipmentItems?.toList()?.first()?.inventoryItem : null}"/>
                     </g:else>
                     <tr class="prop" style="background-color: ${backgroundColor}">
                         <g:if test="${j==0}">
-                            <td class="center middle" rowspan="${numInventoryItem}">
-                                    ${i + 1}
+                            <td class="center middle" rowspan="${shipmentItemCount}">
+                                ${i + 1}
                             </td>
-                            <g:if test="${requisitionItems.find { it.requisition?.shipment?.hasChildContainer()}}">
-                                <td class="middle center" rowspan="${numInventoryItem}">
-                                    <g:each in="${shipmentItems}" var="shipmentItem">
-                                        <div>
-                                            ${shipmentItem.container?.parentContainer?.name ?: shipmentItem?.container?.name}
-                                        </div>
-                                    </g:each>
-                                </td>
-                            </g:if>
-                            <g:if test="${requisitionItems.find { it.requisition?.shipment?.hasParentContainer()}}">
-                                <td class="center middle" rowspan="${numInventoryItem}">
-                                    <g:each in="${shipmentItems}" var="shipmentItem">
-                                        <div>
-                                            <g:if test="${shipmentItem?.container?.parentContainer && shipmentItem.container}">
-                                                ${shipmentItem.container?.name}
-                                            </g:if>
-                                            <g:elseif test="${shipmentItem?.container}">
-                                                -
-                                            </g:elseif>
-                                        </div>
-                                    </g:each>
-                                </td>
-                            </g:if>
-                            <td class="center middle" rowspan="${numInventoryItem}">
+                        </g:if>
+                        <g:if test="${requisitionItems.find { it.requisition?.shipment?.hasChildContainer()}}">
+                            <td class="middle center">
+                                ${shipmentItem?.container?.parentContainer?.name ?: shipmentItem?.container?.name}
+                            </td>
+                        </g:if>
+                        <g:if test="${requisitionItems.find { it.requisition?.shipment?.hasParentContainer()}}">
+                            <td class="center middle">
+                                ${shipmentItem?.container?.parentContainer ? shipmentItem?.container?.name : ''}
+                            </td>
+                        </g:if>
+                        <g:if test="${j==0}">
+                            <td class="center middle" rowspan="${shipmentItemCount}">
                                 <g:if test="${requisitionItem?.parentRequisitionItem?.isSubstituted()}">
                                     <div class="canceled">
                                         ${requisitionItem?.parentRequisitionItem?.product?.productCode}
@@ -87,7 +83,7 @@
                                 </g:if>
                                 ${requisitionItem?.product?.productCode}
                             </td>
-                            <td class="middle" rowspan="${numInventoryItem}">
+                            <td class="middle" rowspan="${shipmentItemCount}">
                                 <g:if test="${requisitionItem?.parentRequisitionItem?.isSubstituted()}">
                                     <div class="canceled">
                                         ${requisitionItem?.parentRequisitionItem?.product?.displayNameOrDefaultName}
@@ -95,27 +91,23 @@
                                 </g:if>
                                 ${requisitionItem?.product?.displayNameOrDefaultName}
                             </td>
-                            <td class="center middle" rowspan="${numInventoryItem}">
-                                <g:if test="${j==0}">
-                                    <g:if test="${requisitionItem.parentRequisitionItem?.isChanged()}">
-                                        <div>
-                                            ${requisitionItem?.parentRequisitionItem?.quantity ?: 0}
-                                            ${requisitionItem?.parentRequisitionItem?.product?.unitOfMeasure ?: "EA"}
-                                        </div>
-                                    </g:if>
-                                    <g:else>
-                                        <div class="${requisitionItem?.status}">
-                                            ${requisitionItem?.quantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
-                                        </div>
-                                    </g:else>
-                                </g:if>
-                            </td>
-                            <td class="center middle" rowspan="${numInventoryItem}">
-                                <g:if test="${j==0}">
-                                    <div class="${requisitionItem?.status}">
-                                        ${requisitionItem?.totalQuantityPicked() ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
+                            <td class="center middle" rowspan="${shipmentItemCount}">
+                                <g:if test="${requisitionItem.parentRequisitionItem?.isChanged()}">
+                                    <div>
+                                        ${requisitionItem?.parentRequisitionItem?.quantity ?: 0}
+                                        ${requisitionItem?.parentRequisitionItem?.product?.unitOfMeasure ?: "EA"}
                                     </div>
                                 </g:if>
+                                <g:else>
+                                    <div class="${requisitionItem?.status}">
+                                        ${requisitionItem?.quantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
+                                    </div>
+                                </g:else>
+                            </td>
+                            <td class="center middle" rowspan="${shipmentItemCount}">
+                                <div class="${requisitionItem?.status}">
+                                    ${requisitionItem?.totalQuantityPicked() ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
+                                </div>
                             </td>
                         </g:if>
                         <td class="middle center">
@@ -129,13 +121,16 @@
                             </g:if>
                         </td>
                         <td class="center middle">
-                            <g:if test="${picklistItemsGroup}">
+                            <g:if test="${shipmentItem}">
+                                ${shipmentItem?.quantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
+                            </g:if>
+                            <g:elseif test="${picklistItemsGroup}">
                                 <g:set var="picklistItemsGroupQuantity" value="${picklistItemsGroup[j]?.sum { it?.quantity }}"/>
                                 ${picklistItemsGroupQuantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
-                            </g:if>
+                            </g:elseif>
                         </td>
                         <g:if test="${j==0}">
-                            <td class="middle" rowspan="${numInventoryItem}">
+                            <td class="middle" rowspan="${shipmentItemCount}">
                                 <g:if test="${requisitionItem?.parentRequisitionItem?.cancelReasonCode}">
                                     <g:if test="${requisitionItem.parentRequisitionItem?.isSubstituted()}">
                                         ${warehouse.message(code:'requisitionItem.substituted.label')}
@@ -174,12 +169,15 @@
                             </td>
                         </g:if>
                         <td class="middle">
-                            ${requisitionItem?.getReceiptItems(inventoryItem)?.quantityReceived?.sum()}
+                            <g:if test="${shipmentItem?.quantityReceived}">
+                                ${shipmentItem.quantityReceived}
+                            </g:if>
                         </td>
                         <td>
-                            ${requisitionItem?.getReceiptItems(inventoryItem)?.comment?.join(', ')}
+                            <g:if test="${shipmentItem?.comments}">
+                                ${shipmentItem?.getComments()?.join(', ')}
+                            </g:if>
                         </td>
-
                         <% j++ %>
                     </tr>
                 </g:while>

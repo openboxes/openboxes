@@ -16,14 +16,14 @@ const ColorPicker = ({ value, onChange }) => {
 
   return (
     <Tooltip
-      html={
+      html={(
         <div style={{ width: 350 }}>
           <SliderPicker
             color={colorHex}
             onChangeComplete={handleChange}
           />
         </div>
-      }
+      )}
       theme="transparent"
       arrow="true"
       trigger="click"
@@ -35,7 +35,7 @@ const ColorPicker = ({ value, onChange }) => {
         <div className="input-group-prepend">
           <span className="input-group-text" style={{ backgroundColor: colorHex }}>&nbsp;&nbsp;</span>
         </div>
-        <Input value={value} onChange={val => onChange(val)} />
+        <Input value={value} onChange={(val) => onChange(val)} />
         <div className="input-group-append">
           <button type="button" className="input-group-text" onClick={() => onChange(null)}>
             <i className="fa fa-close" />

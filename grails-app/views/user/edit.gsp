@@ -1,4 +1,6 @@
-<%@ page import="org.pih.warehouse.core.*" %>
+<%@ page import="org.pih.warehouse.core.Role" %>
+<%@ page import="org.pih.warehouse.LocalizationUtil" %>
+
 <g:set var="adminAndBrowser" value="${[Role.browser(), Role.assistant(), Role.manager(), Role.admin(), Role.superuser()]}" />
 <g:set var="allRoles" value="${[Role.admin(), Role.browser(), Role.manager()]}" />
 <g:set var="locationRolePairs" value="${userInstance?.locationRolePairs()}" />
@@ -94,7 +96,7 @@
                                               <label for="locale"><warehouse:message code="default.locale.label"/></label>
                                             </td>
                                             <td data-testid="locale-select" valign="top" class="value ${hasErrors(bean: userInstance, field: 'locale', 'errors')}">
-                                                <g:select name="locale" from="${ grailsApplication.config.openboxes.locale.supportedLocales.collect{ new Locale(it) } }"
+                                                <g:select name="locale" from="${ grailsApplication.config.openboxes.locale.supportedLocales.collect{ LocalizationUtil.getLocale(it) } }"
                                                           optionValue="displayName" value="${userInstance?.locale}" noSelection="['':'']" class="chzn-select-deselect"/>
                                             </td>
                                         </tr>
@@ -212,7 +214,7 @@
                                                 </td>
                                                 <td data-testid="default-roles-select" valign="top" class="value ${hasErrors(bean: userInstance, field: 'roles', 'errors')}">
                                                     <g:set var="noAccessLabel" value="${warehouse.message(code: 'no.access.label')}" />
-                                                    <g:select name="roles" from="${org.pih.warehouse.core.Role.list()?.sort({it.description})}"
+                                                    <g:select name="roles" from="${Role.list()?.sort({it.description})}"
                                                               optionKey="id" value="${userInstance?.roles}"
                                                               noSelection="${['null': noAccessLabel]}" multiple="true" class="chzn-select-deselect"/>
                                                     <span class="fade"><g:message code="user.clearDefaultRole.message"/></span>
@@ -223,7 +225,7 @@
                                                     <label><warehouse:message code="user.locationRoles.label"/></label>
                                                 </td>
                                                 <td valign="top" class="value" style="padding: 0px">
-                                                    <table>
+                                                    <table aria-label="Location Roles">
                                                         <thead>
                                                             <tr class="odd">
                                                                 <th><warehouse:message code="location.label"/></th>

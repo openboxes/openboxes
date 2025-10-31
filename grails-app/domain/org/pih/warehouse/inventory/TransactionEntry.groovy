@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.util.Holders
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
@@ -36,6 +38,33 @@ class TransactionEntry implements Comparable, Serializable {
         reasonCode(nullable: true)
         comments(nullable: true, maxSize: 255)
     }
+
+    static namedQueries = {
+        countByTransactionTypes { Location facility, Product product, List<TransactionType> transactionTypes, Date startDate, Date endDate ->
+            createAlias 'transaction', 'transaction'
+            createAlias 'inventoryItem', 'inventoryItem'
+            projections {
+                countDistinct('transaction.id', 'transactionCount')
+            }
+            eq 'product', product
+            eq 'transaction.inventory', facility.inventory
+            'in'('transaction.transactionType', transactionTypes)
+            between 'transaction.transactionDate', startDate, endDate
+        }
+        dateLastCounted { Location facility, Product product ->
+            createAlias "transaction", "transaction"
+            createAlias "inventoryItem", "inventoryItem"
+            createAlias "transaction.transactionType", "transactionType"
+            projections {
+                max("transaction.transactionDate", "dateLastCounted")
+            }
+            eq 'inventoryItem.product', product
+            eq 'transaction.inventory', facility.inventory
+            inList "transactionType.id", Holders.grailsApplication.config.openboxes.inventoryCount.transactionTypes
+        }
+
+    }
+
 
     /**
      * Sort by the sort parameters of the parent transaction

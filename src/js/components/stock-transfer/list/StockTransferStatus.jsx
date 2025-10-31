@@ -16,8 +16,8 @@ const StockTransferStatus = ({
   const [statusLabel, setStatusLabel] = useState('');
   const findStatusCircle = (statusProp) => {
     // Example ids: "PENDING", "PRIMARY"
-    const matchedStatus = allStatuses?.length > 0 &&
-      allStatuses.find(stat => stat.label === statusProp);
+    const matchedStatus = allStatuses?.length > 0
+      && allStatuses.find((stat) => stat.label === statusProp);
     if (matchedStatus && matchedStatus.variant) {
       setCircle(matchedStatus.variant);
       setStatusLabel(matchedStatus.label);
@@ -37,7 +37,7 @@ const StockTransferStatus = ({
   return (<StatusIndicator status={statusLabel} variant={circle} />);
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   // All possible stock transfer statuses from store
   allStatuses: state.stockTransfer.statuses,
   stockTransferSessionVersion: state.stockTransfer.sessionVersion,

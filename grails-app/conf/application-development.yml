@@ -1,0 +1,8 @@
+
+# Only add richly formatted logs when developing locally. Some terminals can't handle ANSI colors, so
+# we don't want to break any log processors in production. https://logback.qos.ch/manual/layouts.html
+logging:
+    pattern:
+        console: "%cyan(%date{ISO8601}) %highlight(%-5level) %magenta([%thread]) %yellow(%logger{40}): %message%n%xException"
+    level:
+        root: DEBUG

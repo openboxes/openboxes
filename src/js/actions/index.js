@@ -8,8 +8,10 @@ import {
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
   CLOSE_INFO_BAR,
+  ERASE_DRAFT,
   FETCH_APPROVERS,
   FETCH_ATTRIBUTES,
+  FETCH_BIN_LOCATIONS,
   FETCH_BUYERS,
   FETCH_CONFIG,
   FETCH_CONFIG_AND_SET_ACTIVE,
@@ -17,6 +19,7 @@ import {
   FETCH_INVOICE_STATUSES,
   FETCH_INVOICE_TYPE_CODES,
   FETCH_LOCATION_TYPES,
+  FETCH_LOT_NUMBERS_BY_PRODUCT_IDS,
   FETCH_MENU_CONFIG,
   FETCH_NUMBERS,
   FETCH_PAYMENT_TERMS,
@@ -45,12 +48,17 @@ import {
   SET_ACTIVE_CONFIG,
   SET_OFFLINE,
   SET_ONLINE,
+  SET_SCROLL_TO_BOTTOM,
   SHOW_INFO_BAR,
   SHOW_INFO_BAR_MODAL,
   SHOW_SPINNER,
+  START_COUNT,
+  START_FETCHING_TRANSLATIONS,
+  START_RESOLUTION,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
 } from 'actions/types';
+import cycleCountApi from 'api/services/CycleCountApi';
 import genericApi from 'api/services/GenericApi';
 import locationApi from 'api/services/LocationApi';
 import productSupplierApi from 'api/services/ProductSupplierApi';
@@ -61,7 +69,7 @@ import { ORGANIZATION_API } from 'api/urls';
 import RoleType from 'consts/roleType';
 import { UnitOfMeasureType } from 'consts/UnitOfMeasureType';
 import apiClient, { parseResponse } from 'utils/apiClient';
-import { mapShipmentTypes } from 'utils/option-utils';
+import { fetchBins, getLotNumbersByProductIds, mapShipmentTypes } from 'utils/option-utils';
 
 export function showSpinner() {
   return {
@@ -98,13 +106,21 @@ export function hideUserActions() {
   };
 }
 
-export function fetchReasonCodes() {
-  const url = '/api/reasonCodes';
+export function fetchReasonCodes(activityCode = null, dispatchType = FETCH_REASONCODES) {
+  const url = `/api/reasonCodes${activityCode ? `?activityCode=${activityCode}` : ''}`;
+
   return (dispatch) => {
     apiClient.get(url).then((res) => {
+      const reasonCodes = res.data.data.map((reasonCode) => (
+        {
+          id: reasonCode.id,
+          value: reasonCode.id,
+          label: reasonCode.name,
+        }
+      ));
       dispatch({
-        type: FETCH_REASONCODES,
-        payload: res.data,
+        type: dispatchType,
+        payload: reasonCodes || [],
       });
     });
   };
@@ -197,10 +213,21 @@ export function changeCurrentLocation(location) {
   };
 }
 
-export function fetchTranslations(lang, prefix) {
+export function fetchTranslations(languageCode, prefix) {
   return (dispatch) => {
-    const url = `/api/localizations?lang=${lang ||
-      ''}&prefix=react.${prefix || ''}`;
+    /**
+     * Before fetching/refetching the translations, set the flag of fetched translations to false,
+     * so that dependencies that rely on fetched translations will be rendered properly when
+     * the flag is set to true after the fetch. Without it the initial false
+     * flag would only work for the initial render because redux-persist would store it later on
+     * regardless the refreshes of the page
+     */
+    dispatch({
+      type: START_FETCHING_TRANSLATIONS,
+      payload: prefix,
+    });
+    const url = `/api/localizations?languageCode=${languageCode
+      || ''}&prefix=react.${prefix || ''}`;
 
     apiClient.get(url).then((response) => {
       const { messages, currentLocale } = parseResponse(response.data);
@@ -219,10 +246,10 @@ export function changeCurrentLocale(locale) {
   return (dispatch) => {
     const url = `/api/chooseLocale/${locale}`;
 
-    apiClient.put(url).then(() => {
+    apiClient.put(url).then((response) => {
       dispatch({
         type: CHANGE_CURRENT_LOCALE,
-        payload: locale,
+        payload: response,
       });
     });
   };
@@ -248,7 +275,7 @@ function getParameterList(params = '', locationId = '', userId = '') {
   // filter[1] represent the values
   Object.entries(pageConfig[dashboardKey]).forEach((filter) => {
     listFiltersSelected.push(filter[0]);
-    filter[1].forEach(value => listValues.push(value));
+    filter[1].forEach((value) => listValues.push(value));
   });
   // Add condition to check if currentPage has any filter
   listFiltersSelected.forEach((filter) => {
@@ -306,6 +333,9 @@ function fetchGraphIndicator(
           stacked: indicatorConfig.stacked,
           datalabel: indicatorConfig.datalabel,
           colors: indicatorConfig.colors,
+          columnsSize: indicatorConfig.columnsSize,
+          truncationLength: indicatorConfig.truncationLength,
+          disableTruncation: indicatorConfig.disableTruncation,
         },
         size: indicatorConfig.size,
       },
@@ -365,14 +395,14 @@ function getData(dispatch, dashboardConfig, locationId, config = 'personal', use
   // new reference so that the original config is not modified
 
   const dashboard = dashboardConfig.dashboard[config] || {};
-  const widgets = _.map(dashboard.widgets, widget => ({
+  const widgets = _.map(dashboard.widgets, (widget) => ({
     ...dashboardConfig.dashboardWidgets[widget.widgetId],
     order: widget.order,
     widgetId: widget.widgetId,
   }));
 
   const visibleWidgets = _.chain(widgets)
-    .filter(widget => widget.enabled)
+    .filter((widget) => widget.enabled)
     .sortBy(['order']).value();
 
   _.forEach(visibleWidgets, (widgetConfig) => {
@@ -516,7 +546,7 @@ export function fetchBuyers(active = false) {
     apiClient.get(`/api/organizations?roleType=ROLE_BUYER&active=${active}`)
       .then((res) => {
         if (res.data.data) {
-          const buyers = res.data.data.map(obj => (
+          const buyers = res.data.data.map((obj) => (
             {
               id: obj.id,
               value: obj.id,
@@ -537,6 +567,15 @@ export function fetchBuyers(active = false) {
       });
   };
 }
+
+export const fetchBinLocations = (currentLocationId, ignoreActivityCodes = [], sort = null) =>
+  async (dispatch) => {
+    const fetchedBins = await fetchBins(currentLocationId, ignoreActivityCodes, sort);
+    dispatch({
+      type: FETCH_BIN_LOCATIONS,
+      payload: fetchedBins,
+    });
+  };
 
 export function fetchInvoiceStatuses() {
   return (dispatch) => {
@@ -614,7 +653,7 @@ export const addStockMovementDraft = ({
   lineItems,
   id,
   statusCode,
-}) => dispatch => dispatch({
+}) => (dispatch) => dispatch({
   type: ADD_STOCK_MOVEMENT_DRAFT,
   payload: {
     workflow,
@@ -624,7 +663,7 @@ export const addStockMovementDraft = ({
   },
 });
 
-export const removeStockMovementDraft = id => dispatch => dispatch({
+export const removeStockMovementDraft = (id) => (dispatch) => dispatch({
   type: REMOVE_STOCK_MOVEMENT_DRAFT,
   payload: {
     id,
@@ -640,7 +679,7 @@ export const fetchShipmentTypes = () => async (dispatch) => {
   });
 };
 
-export const fetchLocationTypes = config => async (dispatch) => {
+export const fetchLocationTypes = (config) => async (dispatch) => {
   const response = await locationApi.getLocationTypes(config);
   const data = response?.data?.data;
   return dispatch({
@@ -655,6 +694,7 @@ export const createInfoBar = ({
   title,
   isCloseable,
   hasModalToDisplay,
+  redirect,
 }) => ({
   type: ADD_INFO_BAR,
   payload: {
@@ -663,39 +703,40 @@ export const createInfoBar = ({
     title,
     isCloseable,
     hasModalToDisplay,
+    redirect,
     show: true,
   },
 });
 
-export const hideInfoBar = name => ({
+export const hideInfoBar = (name) => ({
   type: HIDE_INFO_BAR,
   payload: {
     name,
   },
 });
 
-export const closeInfoBar = name => ({
+export const closeInfoBar = (name) => ({
   type: CLOSE_INFO_BAR,
   payload: {
     name,
   },
 });
 
-export const showInfoBar = name => ({
+export const showInfoBar = (name) => ({
   type: SHOW_INFO_BAR,
   payload: {
     name,
   },
 });
 
-export const showInfoBarModal = name => ({
+export const showInfoBarModal = (name) => ({
   type: SHOW_INFO_BAR_MODAL,
   payload: {
     name,
   },
 });
 
-export const hideInfoBarModal = name => ({
+export const hideInfoBarModal = (name) => ({
   type: HIDE_INFO_BAR_MODAL,
   payload: {
     name,
@@ -723,5 +764,57 @@ export const fetchAttributes = (config) => async (dispatch) => {
   return dispatch({
     type: FETCH_ATTRIBUTES,
     payload: attributes?.data?.data,
+  });
+};
+
+export const setScrollToBottom = (payload) => ({
+  type: SET_SCROLL_TO_BOTTOM,
+  payload,
+});
+
+export const startCount = (payload, locationId) => async (dispatch) => {
+  const cycleCounts = await cycleCountApi.startCount({ payload, locationId });
+  const cycleCountIds = cycleCounts?.data?.data?.map?.((cycleCount) => cycleCount.id);
+  return dispatch({
+    type: START_COUNT,
+    payload: {
+      locationId,
+      requests: cycleCountIds,
+    },
+  });
+};
+
+export const startResolution = (requestIds, locationId) => async (dispatch) => {
+  const payload = {
+    requests: requestIds.map((cycleCountRequestId) => ({
+      cycleCountRequest: cycleCountRequestId,
+      countIndex: 1,
+    })),
+  };
+  const cycleCounts = await cycleCountApi.startRecount({
+    payload,
+    locationId,
+  });
+  const cycleCountIds = cycleCounts?.data?.data?.map?.((cycleCount) => cycleCount.id);
+  return dispatch({
+    type: START_RESOLUTION,
+    payload: {
+      locationId,
+      cycleCounts: cycleCountIds,
+    },
+  });
+};
+
+export const eraseDraft = (locationId, tab) => ({
+  type: ERASE_DRAFT,
+  payload: { locationId, tab },
+});
+
+export const fetchLotNumbersByProductIds = (productIds) => async (dispatch) => {
+  const lotNumbersWithExpiration = await getLotNumbersByProductIds(productIds);
+
+  dispatch({
+    type: FETCH_LOT_NUMBERS_BY_PRODUCT_IDS,
+    payload: lotNumbersWithExpiration,
   });
 };

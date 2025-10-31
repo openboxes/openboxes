@@ -6,7 +6,6 @@ import { connect } from 'react-redux';
 import FilterForm from 'components/Filter/FilterForm';
 import { debouncePeopleFetch } from 'utils/option-utils';
 
-
 const StockTransferListFilters = ({
   setFilterParams,
   debounceTime,
@@ -24,7 +23,7 @@ const StockTransferListFilters = ({
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
         filterFields={filterFields}
-        updateFilterParams={values => setFilterParams({ ...values })}
+        updateFilterParams={(values) => setFilterParams({ ...values })}
         formProps={{
           ...formProps,
           debouncedPeopleFetch,
@@ -40,11 +39,10 @@ const StockTransferListFilters = ({
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
 });
-
 
 export default connect(mapStateToProps)(StockTransferListFilters);
 

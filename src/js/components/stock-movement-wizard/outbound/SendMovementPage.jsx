@@ -9,7 +9,7 @@ import Dropzone from 'react-dropzone';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { withRouter } from "react-router-dom";
+import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
 import { Tooltip } from 'react-tippy';
 
@@ -21,6 +21,7 @@ import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
 import AlertMessage from 'utils/AlertMessage';
 import {
   apiClientCustomResponseHandler as apiClient,
@@ -32,16 +33,15 @@ import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName } from 'utils/form-values-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-import splitTranslation from 'utils/translation-utils';
+import splitTranslation, { formatDate } from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
 
 const SHIPMENT_FIELDS = {
   'origin.name': {
     label: 'react.stockMovement.origin.label',
     defaultMessage: 'Origin',
-    type: params => <TextField {...params} />,
+    type: (params) => <TextField {...params} />,
     attributes: {
       disabled: true,
     },
@@ -67,10 +67,10 @@ const SHIPMENT_FIELDS = {
           loadOptions: debouncedLocationsFetch,
           cache: false,
           options: [],
-          filterOptions: options => options,
+          filterOptions: (options) => options,
         };
       }
-      return { formatValue: fieldValue => _.get(fieldValue, 'name') };
+      return { formatValue: (fieldValue) => _.get(fieldValue, 'name') };
     },
   },
   'destination.name': {
@@ -91,6 +91,9 @@ const SHIPMENT_FIELDS = {
     label: 'react.stockMovement.shipDate.label',
     defaultMessage: 'Shipment date',
     attributes: {
+      localizeDate: true,
+      localizedDateFormat: DateFormat.DEFAULT,
+      // It's necessary for properly setting up the time part of the localized date format
       dateFormat: 'MM/DD/YYYY HH:mm Z',
       required: true,
       showTimeSelect: true,
@@ -145,7 +148,7 @@ const SHIPMENT_FIELDS = {
     label: 'react.stockMovement.expectedDeliveryDate.label',
     defaultMessage: 'Expected receipt date',
     attributes: {
-      dateFormat: 'MM/DD/YYYY',
+      localizeDate: true,
       required: true,
       showTimeSelect: false,
       autoComplete: 'off',
@@ -234,6 +237,9 @@ const FIELDS = {
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
         flexWidth: '3.5',
+        getDynamicAttr: ({ formatLocalizedDate }) => ({
+          formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
+        }),
       },
       quantityShipped: {
         type: LabelField,
@@ -251,11 +257,12 @@ const FIELDS = {
         }),
         attributes: {
           showValueTooltip: true,
-          formatValue: fieldValue => fieldValue && (
+          formatValue: (fieldValue) => fieldValue && (
             <div className="d-flex">
               {fieldValue.zoneName ? <div className="text-truncate" style={{ minWidth: 30, flexShrink: 20 }}>{fieldValue.zoneName}</div> : ''}
               <div className="text-truncate">{fieldValue.zoneName ? `: ${fieldValue.name}` : fieldValue.name}</div>
-            </div>),
+            </div>
+          ),
         },
       },
       'recipient.name': {
@@ -294,8 +301,10 @@ class SendMovementPage extends Component {
     this.validate = this.validate.bind(this);
     this.setState = this.setState.bind(this);
 
-    this.debouncedLocationsFetch =
-      debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedLocationsFetch = debounceLocationsFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+    );
 
     apiClient.interceptors.response.use(handleSuccess, handleValidationErrors(this.setState));
   }
@@ -368,7 +377,7 @@ class SendMovementPage extends Component {
    */
   removeFile(name) {
     const { files } = this.state;
-    _.remove(files, file => file.name === name);
+    _.remove(files, (file) => file.name === name);
     this.setState({ files });
   }
 
@@ -380,7 +389,7 @@ class SendMovementPage extends Component {
   removeFiles(names) {
     const { files } = this.state;
     _.forEach(names, (name) => {
-      _.remove(files, file => file.name === name);
+      _.remove(files, (file) => file.name === name);
     });
     this.setState({ files });
   }
@@ -413,12 +422,12 @@ class SendMovementPage extends Component {
       .then((response) => {
         const { data } = response.data;
         const tableItems = data;
-        this.setState({
+        this.setState((prev) => ({
           values: {
-            ...this.state.values,
+            ...prev.values,
             tableItems,
           },
-        });
+        }));
       });
   }
 
@@ -428,13 +437,13 @@ class SendMovementPage extends Component {
       apiClient.get(url)
         .then((response) => {
           const { data } = response.data;
-          this.setState({
+          this.setState((prev) => ({
             values: {
-              ...this.state.values,
-              tableItems: _.uniqBy(_.concat(this.state.values.tableItems, data), 'shipmentItemId'),
+              ...prev.values,
+              tableItems: _.uniqBy(_.concat(prev.values.tableItems, data), 'shipmentItemId'),
             },
             isFirstPageLoaded: true,
-          }, () => {
+          }), () => {
             if (this.state.values.tableItems.length !== this.state.totalCount) {
               this.loadMoreRows({
                 startIndex: startIndex + this.props.pageSize,
@@ -462,13 +471,13 @@ class SendMovementPage extends Component {
         const { associations } = response.data.data;
         const { totalCount } = response.data;
 
-        const documents = _.filter(associations.documents, doc => doc.stepNumber === 5);
+        const documents = _.filter(associations.documents, (doc) => doc.stepNumber === 5);
         const destinationType = stockMovementData.destination.locationType;
-        this.setState({
+        this.setState((prev) => ({
           documents,
           totalCount,
           values: {
-            ...this.state.values,
+            ...prev.values,
             dateShipped: stockMovementData.dateShipped,
             shipmentType: {
               ...stockMovementData.shipmentType,
@@ -494,7 +503,7 @@ class SendMovementPage extends Component {
             },
             shipmentStatus: stockMovementData.shipmentStatus,
           },
-        }, () => {
+        }), () => {
           this.props.nextPage(this.state.values);
           this.fetchShipmentTypes();
           if (!this.props.isPaginated) {
@@ -571,7 +580,7 @@ class SendMovementPage extends Component {
         this.sendFiles(files)
           .then(() => {
             Alert.success(this.props.translate('react.stockMovement.alert.filesSuccess.label', 'Files uploaded successfuly!'), { timeout: 3000 });
-            this.removeFiles(_.map(files, file => file.name));
+            this.removeFiles(_.map(files, (file) => file.name));
             this.prepareRequestAndSubmitStockMovement(values);
           })
           .catch(() => Alert.error(this.props.translate('react.stockMovement.alert.filesError.label', 'Error occured during files upload!')))
@@ -609,7 +618,7 @@ class SendMovementPage extends Component {
         'You are not able to send shipment from a location other than origin. Change your current location.',
       ));
       this.props.hideSpinner();
-    } else if (values.shipmentType.id === _.find(this.state.shipmentTypes, shipmentType => shipmentType.label === 'Default').id) {
+    } else if (values.shipmentType.id === _.find(this.state.shipmentTypes, (shipmentType) => shipmentType.label === 'Default').id) {
       Alert.error(this.props.translate(
         'react.stockMovement.alert.populateShipmentType.label',
         'Please populate shipment type before continuing',
@@ -746,9 +755,9 @@ class SendMovementPage extends Component {
    * Toggle the downloadable files
    */
   toggleDropdown() {
-    this.setState({
-      isDropdownVisible: !this.state.isDropdownVisible,
-    });
+    this.setState((prev) => ({
+      isDropdownVisible: !prev.isDropdownVisible,
+    }));
   }
 
   validate(values) {
@@ -811,37 +820,49 @@ class SendMovementPage extends Component {
               />
               <div className="classic-form classic-form-condensed">
                 <span className="buttons-container classic-form-buttons">
-                  <div className="dropzone float-right mb-1 btn btn-outline-secondary align-self-end btn-xs">
+                  <div
+                    className={`dropzone float-right mb-1 btn btn-outline-secondary ${values.statusCode === 'DISPATCHED' || showOnly ? 'disabled' : ''} align-self-end btn-xs mr-1`}
+                  >
                     <Dropzone
                       disabled={values.statusCode === 'DISPATCHED' || showOnly}
                       onDrop={this.onDrop}
                       multiple
                     >
-                      <span><i className="fa fa-upload pr-2" /><Translate id="react.stockMovement.uploadDocuments.label" defaultMessage="Upload Documents" /></span>
-                      {_.map(this.state.files, file => (
-                        <div key={file.name} className="chosen-file d-flex justify-content-center align-items-center">
-                          <div className="text-truncate">{file.name}</div>
-                          <a
-                            href="#"
-                            className="remove-button"
-                            onClick={(event) => {
-                              this.removeFile(file.name);
-                              event.stopPropagation();
-                            }}
-                          >
-                            <span className="fa fa-remove" />
-                          </a>
+                      {({ getRootProps }) => (
+                        <div {...getRootProps()}>
+                          <span>
+                            <i className="fa fa-upload pr-2" />
+                            <Translate id="react.stockMovement.uploadDocuments.label" defaultMessage="Upload Documents" />
+                          </span>
+                          {_.map(this.state.files, (file) => (
+                            <div key={file.name} className="chosen-file d-flex justify-content-center align-items-center">
+                              <div className="text-truncate">{file.name}</div>
+                              <a
+                                href="#"
+                                className="remove-button"
+                                onClick={(event) => {
+                                  this.removeFile(file.name);
+                                  event.stopPropagation();
+                                }}
+                              >
+                                <span className="fa fa-remove" />
+                              </a>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      )}
                     </Dropzone>
                   </div>
                   <div className="dropdown">
                     <button
                       type="button"
                       onClick={this.toggleDropdown}
-                      className="dropdown-button float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                      className="dropdown-button float-right mb-1 btn btn-outline-secondary align-self-end btn-xs mr-1"
                     >
-                      <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.download.label" defaultMessage="Download" /></span>
+                      <span>
+                        <i className="fa fa-sign-out pr-2" />
+                        <Translate id="react.default.button.download.label" defaultMessage="Download" />
+                      </span>
                     </button>
                     <div className={`dropdown-content print-buttons-container col-md-3 flex-grow-1
                       ${this.state.isDropdownVisible ? 'visible' : ''}`}
@@ -852,45 +873,80 @@ class SendMovementPage extends Component {
                           if (document.hidden) {
                             return null;
                           }
-                          return (<DocumentButton
-                            link={document.uri}
-                            buttonTitle={document.name}
-                            {...document}
-                            key={idx}
-                            onClick={() => this.saveValues(values)}
-                          />);
+
+                          // TODO: index shouldn't be used as the key for DocumentButton but the
+                          //       document doesn't have a unique key so we have no better option.
+                          //       StockMovementService.getDocuments should be modified to return
+                          //       an id field that we can use here.
+
+                          // Some documents have multiple download options so list them all out.
+                          if (document.downloadOptions) {
+                            return _.map(document.downloadOptions, (downloadOption, idy) => (
+                              <DocumentButton
+                                link={downloadOption.uri}
+                                buttonTitle={downloadOption.name}
+                                {...document}
+                                key={`${idx}-${idy}`}
+                                onClick={() => this.saveValues(values)}
+                              />
+                            ));
+                          }
+
+                          return (
+                            <DocumentButton
+                              link={document.uri}
+                              buttonTitle={document.name}
+                              {...document}
+                              key={idx}
+                              onClick={() => this.saveValues(values)}
+                            />
+                          );
                         },
                       )}
                     </div>
                   </div>
-                  { !showOnly ?
-                    <span>
+                  { !showOnly
+                    ? (
+                      <span>
+                        <button
+                          type="button"
+                          onClick={() => this.onSave(values)}
+                          className="btn btn-outline-secondary float-right btn-form btn-xs ml-1"
+                          disabled={invalid}
+                        >
+                          <span>
+                            <i className="fa fa-save pr-2" />
+                            <Translate id="react.default.button.save.label" defaultMessage="Save" />
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => this.saveAndExit(values)}
+                          className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                        >
+                          <span>
+                            <i className="fa fa-sign-out pr-2" />
+                            <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
+                          </span>
+                        </button>
+                      </span>
+                    )
+                    : (
                       <button
                         type="button"
-                        onClick={() => this.onSave(values)}
-                        className="btn btn-outline-secondary float-right btn-form btn-xs"
-                        disabled={invalid}
+                        onClick={() => {
+                          this.props.history.push(STOCK_MOVEMENT_URL.listOutbound());
+                        }}
+                        className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                       >
-                        <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
+                        <span>
+                          <i className="fa fa-sign-out pr-2" />
+                          {' '}
+                          <Translate id="react.default.button.exit.label" defaultMessage="Exit" />
+                          {' '}
+                        </span>
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => this.saveAndExit(values)}
-                        className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
-                      >
-                        <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
-                      </button>
-                    </span>
-                  :
-                    <button
-                      type="button"
-                      onClick={() => {
-                        this.props.history.push( STOCK_MOVEMENT_URL.listOutbound());
-                      }}
-                      className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
-                    >
-                      <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
-                    </button> }
+                    ) }
                 </span>
                 <div className="form-title"><Translate id="react.stockMovement.sendingOptions.label" defaultMessage="Sending options" /></div>
                 {_.map(SHIPMENT_FIELDS, (fieldConfig, fieldName) =>
@@ -919,34 +975,40 @@ class SendMovementPage extends Component {
                     onClick={() => { this.sendFilesAndSave(values); }}
                     className={`${values.shipped ? 'btn btn-outline-secondary' : 'btn btn-outline-success'} float-right btn-form btn-xs`}
                     disabled={values.statusCode === 'DISPATCHED' || showOnly}
-                  ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
+                  >
+                    <Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
                   </button>
-                  {values.shipped && this.props.isUserAdmin ?
-                    <button
-                      type="submit"
-                      onClick={() => { this.rollbackStockMovement(values); }}
-                      className="btn btn-outline-success float-right btn-xs"
-                      disabled={invalid || values.statusCode !== 'DISPATCHED' || showOnly}
-                    >
-                      <span><i className="fa fa-undo pr-2" /><Translate id="react.default.button.rollback.label" defaultMessage="Rollback" /></span>
-                    </button> : null
-                }
+                  {values.shipped && this.props.isUserAdmin
+                    ? (
+                      <button
+                        type="submit"
+                        onClick={() => { this.rollbackStockMovement(values); }}
+                        className="btn btn-outline-success float-right btn-xs"
+                        disabled={invalid || values.statusCode !== 'DISPATCHED' || showOnly}
+                      >
+                        <span>
+                          <i className="fa fa-undo pr-2" />
+                          <Translate id="react.default.button.rollback.label" defaultMessage="Rollback" />
+                        </span>
+                      </button>
+                    ) : null}
                 </div>
                 <div className="my-2 table-form">
                   {_.map(FIELDS, (fieldConfig, fieldName) =>
-                      renderFormField(fieldConfig, fieldName, {
-                        hasBinLocationSupport: this.props.hasBinLocationSupport,
-                        totalCount: this.state.totalCount,
-                        loadMoreRows: this.loadMoreRows,
-                        isRowLoaded: this.isRowLoaded,
-                        isPaginated: this.props.isPaginated,
-                        isFirstPageLoaded: this.state.isFirstPageLoaded,
-                        translate: this.props.translate,
-                        // eslint-disable-next-line max-len
-                        isBoxNameEmpty: _.every(this.state.values.tableItems, ({ boxName }) => !boxName),
-                        // eslint-disable-next-line max-len
-                        isPalletNameEmpty: _.every(this.state.values.tableItems, ({ palletName }) => !palletName),
-                      }))}
+                    renderFormField(fieldConfig, fieldName, {
+                      hasBinLocationSupport: this.props.hasBinLocationSupport,
+                      totalCount: this.state.totalCount,
+                      loadMoreRows: this.loadMoreRows,
+                      isRowLoaded: this.isRowLoaded,
+                      isPaginated: this.props.isPaginated,
+                      isFirstPageLoaded: this.state.isFirstPageLoaded,
+                      translate: this.props.translate,
+                      // eslint-disable-next-line max-len
+                      isBoxNameEmpty: _.every(this.state.values.tableItems, ({ boxName }) => !boxName),
+                      // eslint-disable-next-line max-len
+                      isPalletNameEmpty: _.every(this.state.values.tableItems, ({ palletName }) => !palletName),
+                      formatLocalizedDate: this.props.formatLocalizedDate,
+                    }))}
                 </div>
               </div>
             </form>
@@ -957,7 +1019,7 @@ class SendMovementPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   currentLocationId: state.session.currentLocation.id,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
@@ -969,6 +1031,7 @@ const mapStateToProps = state => ({
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
   minimumExpirationDate: state.session.minimumExpirationDate,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default withRouter(connect(mapStateToProps, { showSpinner, hideSpinner })(SendMovementPage));
@@ -1002,4 +1065,5 @@ SendMovementPage.propTypes = {
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };

@@ -5,15 +5,15 @@ import PropTypes from 'prop-types';
 
 import 'components/wizard/WizardSteps.scss';
 
-
-const WizardSteps = props => (
+const WizardSteps = (props) => (
   <div className="steps-main-box">
     <div className="steps-inside-wrapper">
       {_.map(props.steps, (step, index) => (
         <div
           key={index}
           className={`step-container ${props.currentStep === index + 1 ? 'active' : ''}`}
-          data-testid={props.currentStep === index + 1 ? 'active' : 'inactive'}
+          data-testid="wizard-step"
+          data-stepstate={props.currentStep === index + 1 ? 'active' : 'inactive'}
         >
           <div
             className={props.showStepNumber ? 'circle filled' : 'circle'}
@@ -29,8 +29,7 @@ const WizardSteps = props => (
             {step}
           </div>
         </div>
-      ))
-        }
+      ))}
     </div>
   </div>
 );
@@ -51,7 +50,7 @@ WizardSteps.propTypes = {
 };
 
 WizardSteps.defaultProps = {
-  onClick: stepIdx => stepIdx,
+  onClick: (stepIdx) => stepIdx,
   stepsClickable: false,
   showStepNumber: false,
 };

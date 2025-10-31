@@ -11,7 +11,7 @@ const usePurchaseOrderFiltersCleaner = ({
 }) => {
   const {
     buyers, currentLocation, loading, shouldRebuildParams,
-  } = useSelector(state => ({
+  } = useSelector((state) => ({
     buyers: state.organizations.buyers,
     currentLocation: state.session.currentLocation,
     loading: state.session.loading,

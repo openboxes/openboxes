@@ -12,6 +12,7 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.product.Product
@@ -27,7 +28,7 @@ class PartialReceivingApiController {
     }
 
     def read() {
-        PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id, params.stepNumber)
+        PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id, params.stepNumber, params.sort)
         render([data: partialReceipt] as JSON)
     }
 
@@ -72,19 +73,19 @@ class PartialReceivingApiController {
                             a.receiptItem?.sortOrder <=> b.receiptItem?.sortOrder
         }.collect {
             [
-                    "Receipt item id" : it?.receiptItem?.id ?: "",
-                    "Shipment item id": it?.shipmentItem?.id ?: "",
-                    Code              : it?.shipmentItem?.product?.productCode ?: "",
-                    Name              : it?.shipmentItem?.product?.name ?: "",
-                    "Lot/Serial No."  : it?.lotNumber ?: "",
-                    "Expiration date" : it?.expirationDate?.format("MM/dd/yyyy") ?: "",
-                    "Bin Location"    : it?.binLocation ?: "",
-                    Recipient         : it?.recipient?.id ?: "",
-                    Shipped           : it?.quantityShipped ?: "",
-                    Received          : it?.quantityReceived ?: "",
-                    "To receive"      : it?.quantityRemaining ?: "",
-                    "Receiving now"   : it?.quantityReceiving ?: "",
-                    Comment           : it?.comment ?: ""
+                    "Receipt item id"        : it?.receiptItem?.id ?: "",
+                    "Shipment item id"       : it?.shipmentItem?.id ?: "",
+                    Code                     : it?.shipmentItem?.product?.productCode ?: "",
+                    Name                     : it?.shipmentItem?.product?.name ?: "",
+                    "Lot/Serial No."         : it?.lotNumber ?: "",
+                    "Expiration date"        : it?.expirationDate?.format("MM/dd/yyyy") ?: "",
+                    "Bin Location"           : it?.binLocation ?: "",
+                    Recipient                : it?.recipient?.id ?: "",
+                    "Shipped (each)"         : it?.quantityShipped ?: "",
+                    Received                 : it?.quantityReceived ?: "",
+                    "To receive"             : it?.quantityRemaining ?: "",
+                    "Receiving now (each)"   : it?.quantityReceiving ?: "",
+                    Comment                  : it?.comment ?: ""
             ]
         }
 
@@ -197,7 +198,7 @@ class PartialReceivingApiController {
                     partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
                 }
                 bindData(partialReceiptItem, shipmentItemMap)
-
+                partialReceiptItem.binLocation = partialReceiptItem.binLocation ?: Location.findByNameAndParentLocation(shipmentItemMap['binLocation.name'], partialReceipt?.shipment?.destination)
                 partialReceiptItem.shouldSave = newLine || originalLine || partialReceiptItem.quantityReceiving != null || partialReceiptItem.receiptItem
             }
         }

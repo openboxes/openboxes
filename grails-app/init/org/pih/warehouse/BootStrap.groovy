@@ -11,13 +11,32 @@ package org.pih.warehouse
 
 import grails.converters.JSON
 import grails.util.Holders
+import org.pih.warehouse.inventory.CycleCount
+import org.pih.warehouse.inventory.CycleCountDetails
+import org.pih.warehouse.inventory.CycleCountItem
+import org.pih.warehouse.inventory.CycleCountSummary
+import org.pih.warehouse.inventory.InventoryAuditDetails
+import org.pih.warehouse.inventory.InventoryAuditSummary
+import org.pih.warehouse.inventory.InventoryTransactionsSummary
+import org.pih.warehouse.inventory.PendingCycleCountRequest
+import org.pih.warehouse.reporting.CycleCountProductSummary
+
+import java.math.RoundingMode
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZonedDateTime
+import javax.sql.DataSource
 import liquibase.Contexts
 import liquibase.LabelExpression
 import liquibase.Liquibase
 import liquibase.changelog.DatabaseChangeLog
+import liquibase.database.Database
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
 import liquibase.resource.ClassLoaderResourceAccessor
+import org.quartz.Scheduler
+import util.LiquibaseUtil
+
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.EditPageItem
 import org.pih.warehouse.api.PackPageItem
@@ -47,6 +66,8 @@ import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.CycleCountCandidate
+import org.pih.warehouse.inventory.CycleCountRequest
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.OutboundStockMovementListItem
 import org.pih.warehouse.invoice.InvoiceItem
@@ -79,13 +100,6 @@ import org.pih.warehouse.shipping.ContainerType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentType
-import org.springframework.core.io.Resource
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver
-import org.quartz.Scheduler
-import util.LiquibaseUtil
-
-import javax.sql.DataSource
-import java.math.RoundingMode
 
 class BootStrap {
 
@@ -130,6 +144,16 @@ class BootStrap {
     }
 
     void registerJsonMarshallers() {
+
+        // java.time types. With these marshallers we don't need to call toString() on the java.time fields in the
+        // toJson() methods of Domains/DTOs or in the other object marshallers below. When we're on Grails 5+ we can
+        // add the "jackson-datatype-jsr310" dependency and let SpringBoot handle things automatically (it adds the
+        // JavaTimeModule when it registers the ObjectMapper bean), but that doesn't work with our custom ValueConverter
+        // classes for these types, which we need because Grails 4 and older doesn't support these types out of the box.
+        // https://docs.spring.io/spring-boot/how-to/spring-mvc.html#howto.spring-mvc.customize-jackson-objectmapper
+        JSON.registerObjectMarshaller(Instant) { Instant instant -> instant.toString() }
+        JSON.registerObjectMarshaller(LocalDate) { LocalDate localDate -> localDate.toString() }
+        JSON.registerObjectMarshaller(ZonedDateTime) { ZonedDateTime zonedDateTime -> zonedDateTime.toString() }
 
         // Static data
         JSON.registerObjectMarshaller(ContainerType) { ContainerType containerType ->
@@ -196,7 +220,7 @@ class BootStrap {
                     name       : inventoryItem?.product?.name,
                     productCode: inventoryItem?.product?.productCode
                 ],
-                lotNumber     : inventoryItem.lotNumber,
+                lotNumber     : inventoryItem.lotNumber ?: null,
                 expirationDate: inventoryItem.expirationDate?.format("MM/dd/yyyy")
             ]
         }
@@ -611,6 +635,50 @@ class BootStrap {
         JSON.registerObjectMarshaller(ProductPackage) { ProductPackage productPackage ->
             return productPackage.toJson()
         }
+
+        JSON.registerObjectMarshaller(CycleCount) { CycleCount cycleCount ->
+            return cycleCount.toJson()
+        }
+
+        JSON.registerObjectMarshaller(CycleCountItem) { CycleCountItem cycleCountItem ->
+            return cycleCountItem.toJson()
+        }
+
+        JSON.registerObjectMarshaller(CycleCountCandidate) { CycleCountCandidate cycleCountCandidate ->
+            return cycleCountCandidate.toJson()
+        }
+
+        JSON.registerObjectMarshaller(CycleCountDetails) { CycleCountDetails cycleCountDetails ->
+            return cycleCountDetails.toJson()
+        }
+
+        JSON.registerObjectMarshaller(CycleCountRequest) { CycleCountRequest cycleCountRequest ->
+            return cycleCountRequest.toJson()
+        }
+
+        JSON.registerObjectMarshaller(CycleCountSummary) { CycleCountSummary cycleCountSummary ->
+            return cycleCountSummary.toJson()
+        }
+
+        JSON.registerObjectMarshaller(PendingCycleCountRequest) { PendingCycleCountRequest pendingCycleCountRequest ->
+            return pendingCycleCountRequest.toJson()
+        }
+
+        JSON.registerObjectMarshaller(InventoryAuditDetails) { InventoryAuditDetails inventoryAuditDetails ->
+            return inventoryAuditDetails.toJson()
+        }
+
+        JSON.registerObjectMarshaller(InventoryAuditSummary) { InventoryAuditSummary inventoryAuditSummary ->
+            return inventoryAuditSummary.toJson()
+        }
+
+        JSON.registerObjectMarshaller(CycleCountProductSummary) { CycleCountProductSummary cycleCountProductSummary ->
+            return cycleCountProductSummary.toJson()
+        }
+
+        JSON.registerObjectMarshaller(InventoryTransactionsSummary) { InventoryTransactionsSummary inventoryTransactionsSummary ->
+            return inventoryTransactionsSummary.toJson()
+        }
     }
 
     def destroy = {
@@ -639,12 +707,12 @@ class BootStrap {
         Liquibase liquibase = null
         try {
 
-            def connection = new JdbcConnection(dataSource.getConnection())
+            JdbcConnection connection = new JdbcConnection(dataSource.getConnection())
             if (connection == null) {
                 throw new RuntimeException("Connection could not be created.")
             }
 
-            def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
+            Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
             database.setDefaultSchemaName(connection.catalog)
             boolean isRunningMigrations = LiquibaseUtil.isRunningMigrations()
             log.info("Liquibase running: ${isRunningMigrations}")
@@ -658,53 +726,9 @@ class BootStrap {
             liquibase = new Liquibase(null as DatabaseChangeLog, new ClassLoaderResourceAccessor(), database)
             liquibase.checkLiquibaseTables(false, null, new Contexts(), new LabelExpression())
 
-            def executedChangelogVersions = LiquibaseUtil.getExecutedChangelogVersions()
-            log.info("executedChangelogVersions: " + executedChangelogVersions)
-
-            log.info 'Dropping all views (will rebuild after migrations complete)...'
-            liquibase = new Liquibase('views/drop-all-views.xml', new ClassLoaderResourceAccessor(), database)
-            liquibase.update(null as Contexts, new LabelExpression());
-
-            // Get all directories from /migrations
-            PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver()
-            Resource[] resources = resolver.getResources("file:grails-app/migrations/*")
-
-            // Find directories with names matching current versions pattern which
-            // will match to any version number between 0.0.x to 999.999.x
-            List<String> changelogVersions = resources
-                    .collect { it.filename }
-                    .findAll { it.matches("\\d{1,3}.\\d{1,3}.x") }
-                    .reverse()
-
-            // Exclude the newest changelog version, this one should be run separately
-            List<String> previousChangelogVersions = !changelogVersions.empty ? changelogVersions.tail() : []
-
-            //If nothing has been created yet, let's create all new database objects with the install scripts
-            if (!executedChangelogVersions) {
-                log.info("Running install changelog ...")
-                liquibase = new Liquibase("install/changelog.xml", new ClassLoaderResourceAccessor(), database)
-                liquibase.update(null as Contexts, new LabelExpression());
-            }
-
-            // Check if the executed changelog versions include one of the previous versions
-            // and if so, then we need to keep running the old updates to catch up to 0.9.x
-            boolean hasExecutedAnyPreviousChangesets =
-                executedChangelogVersions.any { previousChangelogVersions.contains(it.version) }
-
-            if (hasExecutedAnyPreviousChangesets) {
-                log.info("Running upgrade changelog ...")
-                liquibase = new Liquibase("upgrade/changelog.xml", new ClassLoaderResourceAccessor(), database)
-                liquibase.update(null as Contexts, new LabelExpression())
-            }
-
-            // And now we need to run changelogs from 0.9.x and beyond
-            log.info("Running latest updates")
-            liquibase = new Liquibase("changelog.groovy", new ClassLoaderResourceAccessor(), database)
-            liquibase.update(null as Contexts, new LabelExpression())
-
-            log.info 'Rebuilding views ...'
-            liquibase = new Liquibase('views/changelog.xml', new ClassLoaderResourceAccessor(), database)
-            liquibase.update(null as Contexts, new LabelExpression());
+            log.info('Executing migrations ...')
+            LiquibaseUtil.executeMigrations()
+            log.info('All migrations ran successfully!')
 
         } finally {
             log.info('Safely closing database')
@@ -712,5 +736,4 @@ class BootStrap {
         }
         log.info("Finished running liquibase changelog(s)!")
     }
-
 }

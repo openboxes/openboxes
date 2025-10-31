@@ -9,9 +9,7 @@ import { AutoSizer, InfiniteLoader, List } from 'react-virtualized';
 import TableRow from 'components/form-elements/TableRow';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
-
 const ROW_HEIGHT = 28;
-
 
 class TableBodyVirtualized extends Component {
   constructor(props) {
@@ -32,14 +30,14 @@ class TableBodyVirtualized extends Component {
   getHeight() {
     const { fieldsConfig: { subfieldKey, getDynamicRowAttr }, fields, properties } = this.props;
     let height = 0;
-    const maxTableHeight = window.innerHeight < 900 ?
+    const maxTableHeight = window.innerHeight < 900
       // 0.35 * window.innerHeight = 35vh from table-content class in StockMovement.scss
-      0.35 * window.innerHeight : 0.40 * window.innerHeight;
+      ? 0.35 * window.innerHeight : 0.40 * window.innerHeight;
 
     if (!subfieldKey) {
       height = fields.value.reduce((acc, field) => {
-        const dynamicAttr = getDynamicRowAttr ?
-          getDynamicRowAttr({ ...properties, rowValues: field }) : {};
+        const dynamicAttr = getDynamicRowAttr
+          ? getDynamicRowAttr({ ...properties, rowValues: field }) : {};
         // If a row is supposed to be hidden or the height is already higher than max height,
         // return this height without increasing it
         if (dynamicAttr.hideRow || acc > maxTableHeight) {
@@ -51,8 +49,8 @@ class TableBodyVirtualized extends Component {
       }, height);
     } else {
       _.forEach(fields.value, (field) => {
-        const dynamicAttr = getDynamicRowAttr ?
-          getDynamicRowAttr({ ...properties, rowValues: field }) : {};
+        const dynamicAttr = getDynamicRowAttr
+          ? getDynamicRowAttr({ ...properties, rowValues: field }) : {};
         const subfields = field[subfieldKey];
 
         if (dynamicAttr.hideRow) {
@@ -75,8 +73,8 @@ class TableBodyVirtualized extends Component {
     const { fieldsConfig: { subfieldKey, getDynamicRowAttr }, fields, properties } = this.props;
     const rowValues = fields?.value?.[index];
 
-    const dynamicAttr = getDynamicRowAttr && rowValues ?
-      getDynamicRowAttr({ ...properties, index, rowValues }) : {};
+    const dynamicAttr = getDynamicRowAttr && rowValues
+      ? getDynamicRowAttr({ ...properties, index, rowValues }) : {};
 
     if (dynamicAttr.hideRow) {
       return 0;
@@ -85,7 +83,6 @@ class TableBodyVirtualized extends Component {
     if (!subfieldKey) {
       return ROW_HEIGHT;
     }
-
 
     const subfields = rowValues ? rowValues[subfieldKey] : null;
 
@@ -111,9 +108,9 @@ class TableBodyVirtualized extends Component {
     const RowComponent = fieldsConfig.rowComponent || TableRow;
     const { totalCount } = properties;
 
-    if (fields.value[index]) {
-      const dynamicRowAttr = fieldsConfig.getDynamicRowAttr ?
-        fieldsConfig.getDynamicRowAttr({
+    if (fields?.value?.[index]) {
+      const dynamicRowAttr = fieldsConfig.getDynamicRowAttr
+        ? fieldsConfig.getDynamicRowAttr({
           ...properties,
           rowValues: fields.value[index],
         }) : {};
@@ -190,7 +187,7 @@ class TableBodyVirtualized extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   pageSize: state.session.pageSize,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });

@@ -11,6 +11,7 @@ const DateFieldInput = forwardRef(({
   onClear,
   className,
   disabled,
+  clearable,
   ...props
 }, ref) => {
   const disabledProps = disabled ? {
@@ -19,6 +20,23 @@ const DateFieldInput = forwardRef(({
     className: `${className} date-field-input`,
     tabIndex: 0,
     role: 'button',
+  };
+
+  const getIcon = () => {
+    if (value && clearable) {
+      return (
+        <button
+          className="border-0 bg-inherit"
+          type="button"
+          aria-label="clear"
+          onClick={onClear}
+        >
+          <RiCloseLine />
+        </button>
+      );
+    }
+
+    return <RiCalendarLine />;
   };
 
   return (
@@ -32,7 +50,7 @@ const DateFieldInput = forwardRef(({
       {!disabled
         && (
           <span className="form-element-icons-wrapper">
-            {value ? <RiCloseLine onClick={onClear} /> : <RiCalendarLine />}
+            {getIcon()}
           </span>
         )}
     </div>
@@ -47,6 +65,7 @@ DateFieldInput.propTypes = {
   onClear: PropTypes.func.isRequired,
   className: PropTypes.string,
   disabled: PropTypes.bool,
+  clearable: PropTypes.bool.isRequired,
 };
 
 DateFieldInput.defaultProps = {

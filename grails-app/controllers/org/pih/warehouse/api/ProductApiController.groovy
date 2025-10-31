@@ -12,9 +12,13 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.core.GrailsApplication
+import grails.util.Holders
+import grails.validation.ValidationException
+import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
@@ -24,6 +28,9 @@ import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductListItem
+import org.pih.warehouse.product.ProductType
+
+import java.sql.Timestamp
 
 @Transactional
 class ProductApiController extends BaseDomainApiController {
@@ -286,5 +293,73 @@ class ProductApiController extends BaseDomainApiController {
             return
         }
         render([inventoryItem: inventoryItem, quantityOnHand: 0] as JSON)
+    }
+
+    def getLatestInventoryCountDate() {
+        Map<String, Timestamp> latestInventoryDateMap = productService.latestInventoryDateForProducts(params.list("productIds"))
+
+        render([data: latestInventoryDateMap] as JSON)
+    }
+
+    // TODO: This was copied almost directly from ProductController. Refactor both methods to shift this logic into
+    //       ProductService (and ideally create some helper classes for the service to use to split up the logic).
+    def save(Product product) {
+        if (product.hasErrors()) {
+            throw new ValidationException("Invalid product", product.errors)
+        }
+        Location location = Location.get(session?.warehouse?.id)
+
+        // TODO: Add this back in once we move this logic to the service
+//        updateTags(product, params)
+
+        ProductType defaultProductType = ProductType.defaultProductType.list()?.first()
+        // Throw an error for product type with empty code and product identifier that is not a default product type
+        if (product.productType?.id != defaultProductType?.id && !product.productType?.code && !product.productType?.productIdentifierFormat) {
+            throw new IllegalArgumentException(g.message(code: "product.productType.emptyCodeAndIdentifier.error.message"))
+        }
+
+        // Need to validate here FIRST otherwise we'll run into an uncaught transient property exception
+        // when the session is closed.
+        if (!product?.id || product.validate()) {
+            if (!product.productCode) {
+                product.productCode = productService.generateProductIdentifier(product)
+            }
+        }
+
+        product.validateRequiredFieldsInLocation(location)
+        if (product.hasErrors() || !productService.saveProduct(product)) {
+            throw new ValidationException("Invalid product", product.errors)
+        }
+        // TODO: Add this back in once we move this logic to the service
+        //sendProductCreatedNotification(product)
+
+        render([product: product.toFullJson()] as JSON)
+    }
+
+    def importCsv() {
+        String fileData = request.inputStream.text
+
+        if (fileData.isEmpty()) {
+            throw new IllegalArgumentException("File cannot be empty")
+        }
+
+        if (request.contentType != "text/csv") {
+            throw new IllegalArgumentException("File must be in CSV format")
+        }
+
+        List<String> tags = CSVUtils.getColumnData(fileData, 'Tags')
+        List<Map<String, Object>> products = productService.validateProducts(fileData)
+
+        List<Product> importedProducts = productService.importProducts(products, tags)
+
+        render([data: importedProducts] as JSON)
+    }
+
+    def getLotNumbersWithExpirationDate() {
+        List<String> productIds = params.list("productIds")
+
+        Map<String, List<Map<String, Object>>> productLotNumbersWithExpiration = productService.getLotNumbersWithExpirationDate(productIds)
+
+        render([data: productLotNumbersWithExpiration] as JSON)
     }
 }

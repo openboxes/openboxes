@@ -16,21 +16,51 @@ import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.DefaultHttpClient
+import org.pih.warehouse.DateUtil
+import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.DashboardService
+import org.pih.warehouse.core.LocalizationService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.SynonymTypeCode
+import org.pih.warehouse.core.VarianceTypeCode
+import org.pih.warehouse.dashboard.NumberData
+import org.pih.warehouse.dashboard.NumberDataService
+import org.pih.warehouse.forecasting.ForecastingService
+import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.UserService
+import org.pih.warehouse.data.DataService
+import org.pih.warehouse.inventory.InventoryCount
+import org.pih.warehouse.inventory.CycleCountItem
 import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.InventoryAuditDetails
+import org.pih.warehouse.inventory.InventoryAuditRollup
+import org.pih.warehouse.inventory.InventoryAuditSummary
+import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.invoice.InvoiceType
 import org.pih.warehouse.invoice.InvoiceTypeCode
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderService
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductService
+import org.pih.warehouse.reporting.CycleCountProductSummary
 import org.pih.warehouse.reporting.DateDimension
 import org.pih.warehouse.LocalizationUtil
+import org.pih.warehouse.reporting.IndicatorApiCommand
+import org.pih.warehouse.reporting.InventoryAccuracyResult
+import org.pih.warehouse.reporting.InventoryAuditCommand
+import org.pih.warehouse.reporting.InventoryShrinkageResult
+import org.pih.warehouse.shipping.ShipmentService
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.xhtmlrenderer.pdf.ITextRenderer
@@ -38,15 +68,21 @@ import util.InventoryUtil
 
 import java.text.NumberFormat
 
+@Transactional
 class ReportService implements ApplicationContextAware {
 
-    def dataService
-    def dashboardService
+    DataService dataService
+    DashboardService dashboardService
 
     GrailsApplication grailsApplication
-    def userService
-    def orderService
-    def shipmentService
+    ProductAvailabilityService productAvailabilityService
+    UserService userService
+    OrderService orderService
+    ShipmentService shipmentService
+    LocalizationService localizationService
+    ForecastingService forecastingService
+    NumberDataService numberDataService
+    ProductService productService
 
     ApplicationContext applicationContext
 
@@ -662,7 +698,7 @@ class ReportService implements ApplicationContextAware {
     }
 
     List getOnOrderSummary(Location location) {
-        String locale = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag()
+        String locale = LocalizationUtil.localizationService.getCurrentLocale().toString()
 
         String query = """
             select 
@@ -897,10 +933,7 @@ class ReportService implements ApplicationContextAware {
                         WHEN shipment.current_status IN ('SHIPPED', 'PARTIALLY_RECEIVED', 'RECEIVED') THEN IFNULL(shipment_item.quantity / order_item.quantity_per_uom, 0)
                         ELSE 0
                     END AS quantity_shipped,
-                    CASE 
-                        WHEN invoice.date_posted IS NULL THEN 0
-                        ELSE IFNULL(SUM(invoice_item.quantity), 0) 
-                    END AS quantity_invoiced
+                    SUM(IF(invoice.date_posted IS NULL, 0, IFNULL(invoice_item.quantity, 0))) AS quantity_invoiced
                 FROM `order` o
                     LEFT OUTER JOIN order_item ON o.id = order_item.order_id
                     LEFT OUTER JOIN order_shipment ON order_item.id = order_shipment.order_item_id
@@ -912,38 +945,45 @@ class ReportService implements ApplicationContextAware {
                 WHERE o.order_type_id = 'PURCHASE_ORDER'
                     AND order_item.order_item_status_code != 'CANCELED'
                     AND (invoice.invoice_type_id != :prepaymentInvoiceId OR invoice.invoice_type_id IS NULL)
+                    AND (invoice_item.inverse IS NULL OR invoice_item.inverse = FALSE)
                     ${additionalFilter}
-                GROUP BY o.id, order_item.id, shipment_item.id, invoice_item.id
+                GROUP BY o.id, order_item.id, shipment_item.id
             ) AS order_item_invoice_summary 
             GROUP BY id
             HAVING order_item_invoice_summary.quantity_ordered > SUM(order_item_invoice_summary.quantity_invoiced);
         """
 
         String orderAdjustmentsQuery = """
-            SELECT 
-                order_adjustment_invoice_summary.id,
-                order_adjustment_invoice_summary.order_id,
-                SUM(order_adjustment_invoice_summary.quantity_invoiced)
-            FROM (
-                SELECT 
-                    order_adjustment.id AS id,
-                    o.id AS order_id,
-                    CASE
-                        WHEN (invoice.invoice_type_id = :prepaymentInvoiceId OR invoice.invoice_type_id IS NULL OR invoice.date_posted IS NULL) THEN 0
-                        ELSE 1
-                    END as quantity_invoiced
-                FROM `order` o
-                    LEFT OUTER JOIN order_adjustment ON order_adjustment.order_id = o.id
-                    LEFT OUTER JOIN order_adjustment_invoice ON order_adjustment_invoice.order_adjustment_id = order_adjustment.id
-                    LEFT OUTER JOIN invoice_item ON invoice_item.id = order_adjustment_invoice.invoice_item_id
-                    LEFT OUTER JOIN invoice ON invoice_item.invoice_id = invoice.id
-                WHERE o.order_type_id = 'PURCHASE_ORDER'
-                    AND order_adjustment.canceled IS NOT TRUE
-                    ${additionalFilter}
-                GROUP BY o.id, order_adjustment.id, invoice_item.id
-            ) AS order_adjustment_invoice_summary
-            GROUP BY id
-            HAVING SUM(order_adjustment_invoice_summary.quantity_invoiced) = 0;
+            SELECT
+                order_adjustment.id AS id,
+                o.id AS order_id
+            FROM `order` o
+                     LEFT OUTER JOIN order_adjustment ON order_adjustment.order_id = o.id
+                     LEFT OUTER JOIN order_adjustment_invoice ON order_adjustment_invoice.order_adjustment_id = order_adjustment.id
+                     LEFT OUTER JOIN invoice_item ON invoice_item.id = order_adjustment_invoice.invoice_item_id
+                     LEFT OUTER JOIN invoice ON invoice_item.invoice_id = invoice.id
+                     LEFT OUTER JOIN (
+                        SELECT adjustment_id, SUM(invoiced_amount) as total_invoiced_amount
+                        FROM order_adjustment_payment_status
+                        GROUP BY adjustment_id
+                    ) as adjustment_invoice_amount ON adjustment_invoice_amount.adjustment_id = order_adjustment.id
+                    LEFT OUTER JOIN order_adjustment_details ON order_adjustment_details.id = order_adjustment.id
+            WHERE o.order_type_id = 'PURCHASE_ORDER'
+              AND order_adjustment.canceled IS NOT TRUE
+              AND (invoice_item.inverse IS NULL OR invoice_item.inverse = FALSE)
+                ${additionalFilter}
+            GROUP BY o.id, order_adjustment.id
+            HAVING SUM(
+                       CASE
+                           WHEN (
+                               invoice.invoice_type_id = :prepaymentInvoiceId
+                                   OR invoice.invoice_type_id IS NULL
+                                   OR invoice.date_posted IS NULL
+                                   OR (invoice.date_posted IS NOT NULL AND ABS(adjustment_invoice_amount.total_invoiced_amount) != order_adjustment_details.total_adjustment)
+                               ) THEN 0
+                           ELSE 1
+                           END
+                   ) = 0;
         """
 
         List orderItemResults = dataService.executeQuery(orderItemsQuery, queryParams)
@@ -1044,7 +1084,7 @@ class ReportService implements ApplicationContextAware {
                 "Value Shipped not invoiced"                        : "",
                 "Total Qty not Invoiced (UOM)"                      : "",
                 "Total Qty not Invoiced (Each)"                     : 1,
-                "Total Value not invoiced"                          : currencyNumberFormat.format((orderAdjustment?.totalAdjustments) ?: 0),
+                "Total Value not invoiced"                          : currencyNumberFormat.format((orderAdjustment?.totalAmountNotInvoiced) ?: 0),
                 "Budget Code"                                       : orderAdjustment?.budgetCode?.code,
                 "Payment Terms"                                     : orderAdjustment?.order?.paymentTerm?.name,
                 "Recipient"                                         : "",
@@ -1065,5 +1105,605 @@ class ReportService implements ApplicationContextAware {
         numberFormat.maximumFractionDigits = 2
         numberFormat.minimumFractionDigits = 2
         return numberFormat
+    }
+
+    def getInventoryAuditDetails(InventoryAuditCommand command) {
+        return InventoryAuditDetails.createCriteria().list(max: command.max, offset: command.offset) {
+            eq("facility", command.facility)
+
+            if (command.product) {
+                'in'("products", command.products)
+            }
+
+            if (command.startDate && command.endDate) {
+                between("transactionDate", command.startDate, command.endDate)
+            }
+            else if (command.startDate) {
+                gte("transactionDate", command.startDate)
+            }
+            else if (command.endDate) {
+                lte("transactionDate", command.endDate)
+            }
+        }
+    }
+
+    Closure buildInventoryAuditSummaryFilters = { InventoryAuditCommand command ->
+        return {
+            eq("facility", command.facility)
+            if (command.products) {
+                'in'("product", command.products)
+            }
+            if (command.startDate && command.endDate) {
+                between("transactionDate", command.startDate, command.endDate)
+            } else if (command.startDate) {
+                gte("transactionDate", command.startDate)
+            } else if (command.endDate) {
+                lte("transactionDate", command.endDate)
+            }
+            ne("varianceTypeCode", VarianceTypeCode.EQUAL)
+        }
+    }
+
+    def getInventoryAuditSummary(InventoryAuditCommand command) {
+        def inventoryAuditFilters = buildInventoryAuditSummaryFilters(command)
+        long rollupCallTime = System.currentTimeMillis()
+        def results = InventoryAuditRollup.createCriteria().list([max: command.max, offset: command.offset]) {
+            projections {
+                groupProperty('facility')
+                groupProperty('product')
+                max('abcClass', 'abcClass')
+                sum('quantityAdjusted', 'quantityAdjusted')
+                countDistinct('transaction', 'adjustmentsCount')
+                max('transactionDate', 'transactionDate')
+            }
+            inventoryAuditFilters.delegate = delegate
+            inventoryAuditFilters.resolveStrategy = Closure.DELEGATE_FIRST
+            inventoryAuditFilters()
+            order('transactionDate', 'desc')
+        }
+        log.info("Fetch from inventory-audit-rollup took " + (System.currentTimeMillis() - rollupCallTime) + " ms")
+
+
+        Integer totalCount = InventoryAuditRollup.createCriteria().get() {
+            projections {
+                countDistinct("product")
+            }
+            inventoryAuditFilters.delegate = delegate
+            inventoryAuditFilters.resolveStrategy = Closure.DELEGATE_FIRST
+            inventoryAuditFilters()
+        }
+
+        long inventoryCountTime = System.currentTimeMillis()
+        List<Object[]> inventoryCountList = results ? InventoryCount.createCriteria().list {
+            projections {
+                rowCount()
+                groupProperty("product")
+            }
+            eq("facility", org.pih.warehouse.auth.AuthService.currentLocation)
+            inList("product", results.collect { it[1] })
+            between("dateRecorded", command.startDate, command.endDate)
+        } : []
+        Map<String, Long> inventoryCountMap = inventoryCountList.collectEntries { [ (it[1]): it[0] ] }
+        log.info("Fetch time for inventory-count call: " + (System.currentTimeMillis() - inventoryCountTime) + " ms")
+
+        // Transform the results to a summary object
+        def data = results.collect {
+
+            Location facility = (Location) it[0]
+            Product product = (Product) it[1]
+            String abcClass = it[2]
+            Integer quantityAdjusted = it[3]
+            Integer countAdjustments = it[4]
+
+            // FIXME We needed to separate queries since there's not an easy way to get the two values in a single query
+            //  at the moment. We created a view for the last counted date for the All Products tab but it's super slow
+            //  so it would be best to materialize the last count date at the facility-product level at some point.
+
+            // Inventory value of adjusted quantity
+            BigDecimal amountAdjusted = (quantityAdjusted?:0) * (product?.pricePerUnit?:0)
+
+            // Retrieve demand data, which includes currently quantity on hand as well
+            def demandData = forecastingService.getDemand(facility, null, product)
+            Integer quantityDemanded = demandData.monthlyDemand?:0
+            Integer quantityOnHand = demandData.quantityOnHand?:0
+            BigDecimal amountOnHand = (quantityOnHand?:0) * (product?.pricePerUnit?:0)
+
+            // Transform response into an inventory audit summary record (one row per facility-product)
+            new InventoryAuditSummary(
+                    facility: facility,
+                    product: product,
+                    countAdjustments: countAdjustments,
+                    countCycleCounts: inventoryCountMap[product],
+                    lastCounted: null, // Last counted is sometimes expected to be an expensive call, and is calculated separately
+                    quantityAdjusted: quantityAdjusted,
+                    amountAdjusted: amountAdjusted,
+                    quantityDemanded: quantityDemanded,
+                    quantityOnHand: quantityOnHand,
+                    amountOnHand: amountOnHand,
+                    abcClass: abcClass
+            )
+        }
+        return new PaginatedList<InventoryAuditSummary>(data, totalCount)
+    }
+
+    /**
+     * Fetch the count of distinct products that have been inventoried in the given time range.
+     * "Inventoried" means any operation that performs a full quantity count for the product.
+     */
+    Map getProductsInventoried(IndicatorApiCommand command) {
+        NumberData numberData = numberDataService.getItemsInventoriedInRange(
+                command.facility, command.startDate, command.endDate)
+
+        return [
+                name  : "productsInventoried",
+                value : numberData?.number?.intValue() ?: 0,
+                type  : TileType.SINGLE.toString(),
+        ]
+    }
+
+    /**
+     * Fetch the percentage of accurate counts (ie counts with no quantity variance) within the given time range.
+     * Each count is on a single product and a product can be counted multiple times within the given time range.
+     *
+     * The quantity variance for a single count represents the sum of quantity discrepancies across all bins + lots
+     * of the product. As such, even if there were multiple quantity discrepancies in the count, they might not result
+     * in a quantity variance if the discrepancies cancel each other out.
+     *
+     * For example, a product with two bins was counted:
+     * - Bin 1 had quantity 10 but 15 was counted -> +5 discrepancy
+     * - Bin 2 had quantity 30 but 25 was counted -> -5 discrepancy
+     *
+     * Then the total variance for the count would be 5 (from bin 1) - 5 (from bin 2) == 0. So from the perspective
+     * of inventory accuracy, this would be an accurate count, even though there were discrepancies.
+     */
+    Map getInventoryAccuracy(IndicatorApiCommand command) {
+        List<Integer> results = CycleCountProductSummary.createCriteria().list {
+            projections {
+                property('quantityVariance')
+            }
+            eq('facility', command.facility)
+
+            if (command.startDate) {
+                ge("transactionDate", command.startDate)
+            }
+            if (command.endDate) {
+                le("transactionDate", command.endDate)
+            }
+        } as List<Integer>
+
+        Integer accurateCount = results.count { it == null || it == 0 } as Integer
+        Integer totalCount = results.size()
+
+        InventoryAccuracyResult accuracyResult = new InventoryAccuracyResult(
+                accurateCount: accurateCount,
+                totalCount: totalCount
+        )
+
+        return [
+                name : "inventoryAccuracy",
+                firstValue  : accuracyResult.accuracyPercentage,
+                secondValue : totalCount,
+                type        : TileType.DOUBLE.toString(),
+        ]
+    }
+
+    Map getInventoryShrinkage(IndicatorApiCommand command) {
+        List<Object[]> results = InventoryAuditDetails.createCriteria().list {
+            projections {
+                groupProperty("product")
+                groupProperty("facility")
+                sum("quantityAdjusted", "quantitySum")
+                property("pricePerUnit", "unitPrice")
+            }
+            eq("facility", command.facility)
+
+            if (command.startDate) {
+                ge("transactionDate", command.startDate)
+            }
+            if (command.endDate) {
+                le("transactionDate", command.endDate)
+            }
+        } as List<Object[]>
+
+        List<InventoryShrinkageResult> inventoryShrinkageResults = results.collect {
+            new InventoryShrinkageResult(
+                    product     : it[0],
+                    facility    : it[1],
+                    quantitySum : it[2],
+                    unitPrice   : it[3]
+            )
+        }
+
+        List<InventoryShrinkageResult> negativeResults = inventoryShrinkageResults.findAll { it.totalAdjustmentNegative }
+
+        int productCount = negativeResults.size()
+
+        BigDecimal totalLoss = negativeResults.sum { it.getTotalLoss() } ?: 0
+
+        return [
+                name        : "inventoryShrinkage",
+                firstValue  : productCount,
+                secondValue : totalLoss.abs(),
+                type        : TileType.DOUBLE.toString(),
+        ]
+    }
+
+    Integer calculateBalance(List<TransactionEntry> transactionEntries, Integer balance) {
+        List<TransactionEntry> credits = getCreditTransactionEntries(transactionEntries)
+        List<TransactionEntry> debits = getDebitTransactionEntries(transactionEntries)
+        Integer quantityFromCredits = credits.sum { Math.abs(it.quantity) } as Integer ?: 0
+        Integer quantityFromDebits = debits.sum { Math.abs(it.quantity) } as Integer ?: 0
+
+        return balance - quantityFromCredits + Math.abs(quantityFromDebits)
+    }
+
+    List<TransactionEntry> getCreditTransactionEntries(List<TransactionEntry> transactionEntries) {
+        return transactionEntries.findAll { isTransactionEntryCredit(it) }
+    }
+
+    List<TransactionEntry> getDebitTransactionEntries(List<TransactionEntry> transactionEntries) {
+        return transactionEntries.findAll { isTransactionEntryDebit(it) }
+    }
+
+    Boolean isTransactionEntryDebit(TransactionEntry transactionEntry) {
+        return transactionEntry.transaction.transactionType.transactionCode == TransactionCode.DEBIT ||
+                (transactionEntry.transaction.transactionType.transactionCode == TransactionCode.CREDIT && transactionEntry.quantity < 0)
+    }
+
+    Boolean isTransactionEntryCredit(TransactionEntry transactionEntry) {
+        return transactionEntry.transaction.transactionType.transactionCode == TransactionCode.CREDIT && transactionEntry.quantity > 0
+    }
+
+    private List<TransactionEntry> getFilteredTransactionEntries(
+            List<TransactionCode> transactionCodes,
+            Date startDate,
+            Date endDate,
+            List<Category> categories,
+            List<Tag> tagsList,
+            List<ProductCatalog> catalogsList,
+            Location location,
+            List<Product> products,
+            String orderBy,
+            String sortOrder = "desc"
+    ) {
+        return TransactionEntry.createCriteria().list {
+            inventoryItem {
+                if (products) {
+                    'in'('product', products)
+                }
+                product {
+                    if (categories) {
+                        'in'('category', categories)
+                    }
+
+                    if (tagsList) {
+                        tags {
+                            'in'("id", tagsList.id)
+                        }
+                    }
+
+                    if (catalogsList) {
+                        productCatalogItems {
+                            productCatalog {
+                                'in'("id", catalogsList*.id)
+                            }
+                        }
+                    }
+                }
+            }
+            transaction {
+                if (transactionCodes) {
+                    transactionType {
+                        'in'('transactionCode', transactionCodes)
+                    }
+                }
+
+                if (startDate) {
+                    gt('transactionDate', startDate)
+                }
+
+                if (endDate) {
+                    lt('transactionDate', endDate)
+                }
+
+                if (location) {
+                    inventory {
+                        eq('warehouse', location)
+                    }
+                }
+
+                if (orderBy && sortOrder) {
+                    order(orderBy, sortOrder)
+                }
+            }
+        } as List<TransactionEntry>
+    }
+
+    private List<TransactionEntry> getFilteredTransactionEntries(List<TransactionCode> transactionCodes, Date startDate, Date endDate, Location location, Product product, String orderBy, String sortOrder = "desc") {
+        List<Product> products = product ? [product] : null
+        return getFilteredTransactionEntries(transactionCodes, startDate, endDate, null, null, null, location, products, orderBy, sortOrder)
+    }
+
+    Map<Product, Map<String, Integer>> getDetailedTransactionReportData(Map<Product, List<TransactionEntry>> transactionEntries) {
+        return transactionEntries.collectEntries { product, entriesForProduct ->
+            Map<String, Integer> totalsByType = entriesForProduct
+                    .groupBy { entry ->
+                        entry.transaction.transactionType.name
+                    }
+                    .collectEntries { transactionTypeName, entriesByType ->
+                        Integer total = entriesByType.sum { entry ->
+                            entry.quantity as Integer
+                        }
+                        [(transactionTypeName): total]
+                    }
+
+            [(product): totalsByType]
+        }
+    }
+
+    Map<String, String> getTransactionReportRow(Map data) {
+        return [
+            "Code": data.productCode,
+            "Name": data.name,
+            "Display Name": data.displayName,
+            "Category": data.categoryName,
+            "Unit Cost": data.pricePerUnit,
+            "Opening": data.openingBalance,
+            "Credits": data.credits,
+            "Debits": data.debits,
+            "Adjustments": data.adjustments,
+            "Closing": data.closingBalance,
+        ]
+    }
+
+    Map<String, String> getTransactionReportDetailedRow(Map data) {
+        List<String> adjustmentTransactionTypes = [
+                Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
+                Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID
+        ]
+
+        TransactionType creditTransactionType = data.availableTransactionTypes.find { it.id ==  Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID }
+        TransactionType debitTransactionType = data.availableTransactionTypes.find { it.id ==  Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID }
+
+        Integer adjustmentCredit = data.detailedReportData?.get(creditTransactionType?.name) ?: 0
+        Integer adjustmentDebit = data.detailedReportData?.get(debitTransactionType?.name) ?: 0
+
+        Map<String, String> row = [
+            "Code": data.productCode,
+            "Name": data.name,
+            "Product Family": data.productFamilyName,
+            "Display Name": data.displayName,
+            "Category": data.categoryName,
+            "Formulary": data.formulary,
+            "Tag": data.tag,
+            "Unit Cost": data.pricePerUnit,
+            "Opening": data.openingBalance,
+            "Credits": data.credits,
+            "Debits": data.debits,
+            "Adjustment (Credit and Debit)": adjustmentCredit - adjustmentDebit
+        ]
+
+        data.availableTransactionTypes.each { transactionType ->
+            if (adjustmentTransactionTypes.contains(transactionType.id)) {
+                return
+            }
+            String columnName = LocalizationUtil.getLocalizedString(transactionType?.name)
+            row[columnName] = data.detailedReportData?.get(transactionType?.name) ?: 0
+        }
+
+        return row + [
+                "Closing": data.closingBalance,
+                "Backdated inventory correction": data.backdatedTransactionEntries?.sum {
+                    isTransactionEntryCredit(it) ? Math.abs(it.quantity) : -Math.abs(it.quantity)
+                } ?: 0
+        ]
+    }
+
+    List<Object> getTransactionReport(Location location,
+                                      List<Category> categories,
+                                      List<Tag> tagsList,
+                                      List<ProductCatalog> catalogsList,
+                                      List<Product> productList,
+                                      Date startDate,
+                                      Date endDate,
+                                      Boolean includeDetails) {
+
+        List<TransactionCode> adjustmentTransactionCodes = [
+                TransactionCode.CREDIT,
+                TransactionCode.DEBIT
+        ]
+
+        // Transaction entries that have relation to the transactions happened between startDate <-> endDate
+        // with appropriate filter applied and with transaction type code that is credit or debit
+        List<TransactionEntry> transactionEntriesWithinDateRange = getFilteredTransactionEntries(
+                adjustmentTransactionCodes,
+                startDate,
+                endDate,
+                categories,
+                tagsList,
+                catalogsList,
+                location,
+                productList,
+                null,
+                null
+        )
+
+        // Grouping transaction entries by product to get the desired report granularity
+        Map<Product, List<TransactionEntry>> productsMap = transactionEntriesWithinDateRange.groupBy {
+            it.inventoryItem.product
+        }
+
+        // Calculate items available at the startDate to get quantity on hand for found products
+        AvailableItemMap availableItemStartDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+                location,
+                productsMap.keySet().toList(),
+                startDate
+        )
+
+        // Calculate items available at the startDate to get quantity on hand for found products
+        AvailableItemMap availableItemEndDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+                location,
+                productsMap.keySet().toList(),
+                endDate.before(new Date()) ? endDate : new Date()
+        )
+
+        // AvailableTransactionTypes and detailedReportData are only used in case of generating CSV.
+        // The CSV file should contain additional information about the product and the transaction
+        // entries should be grouped by transaction types (greater granularity)
+        List<TransactionType> availableTransactionTypes = includeDetails
+                ? TransactionType.createCriteria().list {
+                    'in'("transactionCode", adjustmentTransactionCodes)
+                }
+                : []
+
+        Map<Product, List<Integer>> detailedReportData = includeDetails
+                ? getDetailedTransactionReportData(productsMap)
+                : [:]
+
+        // Final calculations of data:
+        // 1. Get the current QoH
+        // 2. Calculate closing balance using available items at endDate
+        // 3. Calculate opening balance using available items at startDate
+        // Additional calculation info:
+        // 1. CREDITS = transaction entries in relation with transactions that are CREDIT type
+        // and the quantity of that transaction entry is greater than 0
+        // 2. DEBITS = transaction entries in relation with transaction that are DEBIT type
+        // and transaction that are CREDIT type, but with quantity lower than 0
+        return productsMap.collect { key, value ->
+            Integer openingBalance = availableItemStartDateMap.getAllByProduct(key).quantityOnHand.sum() ?: 0
+            Integer closingBalance = availableItemEndDateMap.getAllByProduct(key).quantityOnHand.sum() ?: 0
+            Integer credits = getCreditTransactionEntries(value).sum { it.quantity } as Integer ?: 0
+            Integer debits = getDebitTransactionEntries(value).sum { Math.abs(it.quantity) } as Integer ?: 0
+            // In the new version of the report, it's not based on the inventory snapshot.
+            // So we don't have to calculate it in the following way:
+            // closingBalance - openingBalance - credits + debits,
+            // because the data is accurate, so we can just compare
+            // the closing and opening balance
+            Integer adjustments = closingBalance - openingBalance
+
+            if (includeDetails) {
+                List<TransactionEntry> backdatedTransactionEntries = value.transaction
+                        .unique()
+                        .findAll {it.dateCreated > (it.transactionDate + 1) }
+                        .transactionEntries
+                        .flatten()
+                        .findAll { it.inventoryItem.product == key }
+
+                return getTransactionReportDetailedRow(
+                        productCode: key.productCode,
+                        name: key.name,
+                        productFamilyName: key.productFamily?.name ?: '',
+                        displayName: key.displayName ?: '',
+                        categoryName: key.category.name,
+                        formulary: key.productCatalogsToString(),
+                        tag: key.tagsToString(),
+                        pricePerUnit: key.pricePerUnit ?: '',
+                        openingBalance: openingBalance,
+                        credits: credits,
+                        debits: debits,
+                        closingBalance: closingBalance,
+                        detailedReportData: detailedReportData[key],
+                        availableTransactionTypes: availableTransactionTypes,
+                        backdatedTransactionEntries: backdatedTransactionEntries
+                )
+            }
+
+            return getTransactionReportRow(
+                    productCode: key.productCode,
+                    name: key.name,
+                    displayName: key?.displayName ?: '',
+                    categoryName: key.category.name,
+                    pricePerUnit: key.pricePerUnit ?: '',
+                    openingBalance: openingBalance,
+                    credits: credits,
+                    debits: debits,
+                    adjustments: adjustments,
+                    closingBalance: closingBalance
+            )
+        }
+    }
+
+    List<Object> getTransactionReportModalData(Location location, Product product, Date startDate, Date endDate) {
+        List<TransactionCode> adjustmentTransactionCodes = [
+                TransactionCode.CREDIT,
+                TransactionCode.DEBIT,
+        ]
+
+        // Get transaction entries ordered by transaction date that were created between startDate and endDate
+        List<TransactionEntry> transactionEntriesWithinDateRange = getFilteredTransactionEntries(
+                adjustmentTransactionCodes + TransactionCode.PRODUCT_INVENTORY,
+                startDate,
+                endDate,
+                location,
+                product,
+                "transactionDate",
+                "asc"
+        )
+
+        // Calculate items available at the startDate to get quantity on hand for found products
+        AvailableItemMap availableItemStartDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+                location,
+                [product],
+                startDate
+        )
+
+        // Calculate items available at the endDate to get quantity on hand for found products
+        AvailableItemMap availableItemEndDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+                location,
+                [product],
+                // EndDate cannot be a date in the future, because of the validation
+                // in getAvailableItemsAtDateAsMap. Current endDate value is endDate + 1,
+                // because it's used in that way in the createCriteria (+1 is added in the controller)
+                endDate.before(new Date()) ? endDate : new Date()
+        )
+
+        // Calculating closing & opening balances for selected product
+        Integer openingBalance = availableItemStartDateMap.values().quantityOnHand.sum() ?: 0
+        Integer closingBalance = availableItemEndDateMap.values().quantityOnHand.sum() ?: 0
+
+        // Create a list with only opening balance
+        List<Object> entries = [
+            [
+                transactionDate     : DateUtil.asDateForDisplay(startDate),
+                transactionTime     : DateUtil.asTimeForDisplay(startDate),
+                transactionCode     : "BALANCE_OPENING",
+                transactionTypeName : "Opening Balance",
+                quantity            : null,
+                balance             : openingBalance
+            ]
+        ]
+
+        // Add transaction entries to the list that took place within selected time range
+        transactionEntriesWithinDateRange.each { TransactionEntry it ->
+            if (it.transaction.transactionType.transactionCode != TransactionCode.PRODUCT_INVENTORY) {
+                openingBalance = isTransactionEntryDebit(it)
+                        ? openingBalance - Math.abs(it.quantity)
+                        : openingBalance + Math.abs(it.quantity)
+            }
+
+            entries.add([
+                    transactionDate: DateUtil.asDateForDisplay(it.transaction.transactionDate),
+                    transactionTime: DateUtil.asTimeForDisplay(it.transaction.transactionDate),
+                    transactionCode: it.transaction.transactionType.transactionCode.name(),
+                    transactionTypeName: LocalizationUtil.getLocalizedString(
+                            it.transaction.transactionType.name,
+                            localizationService.getCurrentLocale(),
+                    ),
+                    quantity: it.quantity,
+                    balance: openingBalance,
+            ])
+        }
+
+        // Add closing balance as a last element
+        entries.add([
+            transactionDate     : DateUtil.asDateForDisplay(endDate - 1),
+            transactionTime     : DateUtil.asTimeForDisplay(endDate),
+            transactionCode     : "BALANCE_CLOSING",
+            transactionTypeName : "Closing Balance",
+            quantity            : null,
+            balance             : closingBalance
+        ])
+
+        return entries
     }
 }

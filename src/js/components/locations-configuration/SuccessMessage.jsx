@@ -9,7 +9,6 @@ import Translate from 'utils/Translate';
 
 import 'components/locations-configuration/SuccessMessage.scss';
 
-
 const SuccessMessage = ({ setShowSuccessMessage, history, successMessageOpen }) => (
   <Modal
     isOpen={successMessageOpen}

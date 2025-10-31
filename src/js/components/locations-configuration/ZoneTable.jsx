@@ -16,7 +16,6 @@ const INITIAL_STATE = {
   zoneLoading: true,
 };
 
-
 class ZoneTable extends Component {
   constructor(props) {
     super(props);
@@ -58,10 +57,10 @@ class ZoneTable extends Component {
         accessor: 'actions',
         className: 'action-cell',
         headerClassName: 'header ',
-        Cell: row => (
+        Cell: (row) => (
           <div className="d-flex justify-content-center align-items-center">
             <ModalWrapper
-              onSave={values => this.props.handleLocationEdit(values)}
+              onSave={(values) => this.props.handleLocationEdit(values)}
               fields={this.props.FIELDS}
               validate={this.props.validate}
               initialValues={
@@ -140,7 +139,7 @@ class ZoneTable extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 

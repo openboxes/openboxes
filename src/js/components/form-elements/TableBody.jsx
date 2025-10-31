@@ -59,11 +59,12 @@ const TableBody = (props) => {
         removeRow={() => fields.remove(index)}
         rowValues={fields.value[index]}
         rowRef={(el, fieldName) => tableRef(el, fieldName, index)}
-      />))
+      />
+    ))
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 

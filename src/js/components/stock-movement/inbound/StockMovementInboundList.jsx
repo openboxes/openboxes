@@ -39,7 +39,7 @@ const StockMovementInboundList = (props) => {
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   shipmentStatuses: state.shipmentStatuses.data,
   isShipmentStatusesFetched: state.shipmentStatuses.fetched,
   shipmentTypes: state.stockMovementCommon.shipmentTypes,

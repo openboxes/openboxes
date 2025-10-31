@@ -47,7 +47,7 @@ class StockMovement implements Validateable{
     Date expectedDeliveryDate
     Date dateCreated
     Date lastUpdated
-
+    Date dateDeliveryRequested
 
     ShipmentType shipmentType
     ShipmentStatusCode receiptStatusCode
@@ -104,6 +104,7 @@ class StockMovement implements Validateable{
         createdBy(nullable: true)
         updatedBy(nullable: true)
         dateRequested(nullable: false)
+        dateDeliveryRequested(nullable: true)
 
         stockMovementDirection(nullable: true)
         stockMovementStatusCode(nullable: true)
@@ -171,6 +172,7 @@ class StockMovement implements Validateable{
             dateCreated         : dateCreated?.format("MM/dd/yyyy"),
             dateShipped         : dateShipped?.format("MM/dd/yyyy HH:mm XXX"),
             expectedDeliveryDate: expectedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
+            dateDeliveryRequested : requisition?.dateDeliveryRequested,
             lastUpdated         : lastUpdated,
             shipmentType        : shipmentType,
             currentStatus       : currentStatus,

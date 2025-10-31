@@ -6,8 +6,17 @@
   <changeSet id="1633402273161-1" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
     <comment>Views will be recreated after database migrations are executed.</comment>
     <sql>
+      DROP VIEW IF EXISTS cycle_count_candidate;
+      DROP VIEW IF EXISTS cycle_count_details;
+      DROP VIEW IF EXISTS cycle_count_frequency;
+      DROP VIEW IF EXISTS cycle_count_metadata;
+      DROP VIEW IF EXISTS cycle_count_session;
+      DROP VIEW IF EXISTS cycle_count_summary;
       DROP VIEW IF EXISTS edit_page_item;
       DROP VIEW IF EXISTS fill_rate;
+      DROP VIEW IF EXISTS inventory_audit_details;
+      DROP VIEW IF EXISTS inventory_audit_rollup;
+      DROP VIEW IF EXISTS inventory_audit_summary;
       DROP VIEW IF EXISTS invoice_item_candidate;
       DROP VIEW IF EXISTS invoice_list;
       DROP VIEW IF EXISTS on_order_order_item_summary;
@@ -18,10 +27,14 @@
       DROP VIEW IF EXISTS order_item_payment_status;
       DROP VIEW IF EXISTS order_payment_status_from_adjustments;
       DROP VIEW IF EXISTS order_adjustment_payment_status;
+      DROP VIEW IF EXISTS order_adjustment_details;
       DROP VIEW IF EXISTS order_summary;
       DROP VIEW IF EXISTS order_item_details;
       DROP VIEW IF EXISTS order_item_status;
       DROP VIEW IF EXISTS order_item_summary;
+      DROP VIEW IF EXISTS product_classification;
+      DROP VIEW IF EXISTS product_count_history;
+      DROP VIEW IF EXISTS product_cycle_count_history;
       DROP VIEW IF EXISTS product_demand;
       DROP VIEW IF EXISTS product_expiry_summary;
       DROP VIEW IF EXISTS product_inventory_compare_view;
@@ -29,6 +42,8 @@
       DROP VIEW IF EXISTS product_inventory_extended_view;
       DROP VIEW IF EXISTS product_inventory_pivot_view;
       DROP VIEW IF EXISTS product_inventory_snapshot_view;
+      DROP VIEW IF EXISTS product_physical_count_history;
+      DROP VIEW IF EXISTS product_receipt_history;
       DROP VIEW IF EXISTS product_search;
       DROP VIEW IF EXISTS product_snapshot;
       DROP VIEW IF EXISTS product_stocklist;

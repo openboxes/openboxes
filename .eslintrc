@@ -21,6 +21,7 @@
     "airbnb"
   ],
   "rules": {
+    "react/prop-types": "warn",
     "arrow-parens": "warn",
     "implicit-arrow-linebreak": "off",
     "react/destructuring-assignment": "warn",
@@ -36,6 +37,11 @@
       "components": [ "Label" ],
       "required": "id",
       "allowChildren": false
+    }],
+    "jsx-a11y/label-has-associated-control": ["error", {
+      "required": {
+        "some": ["nesting", "id"]
+      }
     }],
     "operator-linebreak": "warn",
     "no-underscore-dangle": "off",

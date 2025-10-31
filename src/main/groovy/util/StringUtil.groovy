@@ -11,12 +11,15 @@ package util
 
 import groovy.text.SimpleTemplateEngine
 
-import java.text.DateFormat
 import java.text.MessageFormat
-import java.text.SimpleDateFormat
+import org.apache.commons.lang.StringUtils
 
-
+/**
+ * Utility methods for parsing/formatting strings and general string manipulation.
+ */
 class StringUtil {
+
+    private static final String DEFAULT_DELIMITER = ","
 
     static String mask(String value) {
         return mask(value, "*")
@@ -36,21 +39,25 @@ class StringUtil {
         return MessageFormat.format(text, args)
     }
 
-    static Date parseDate(String format, String source) {
-        if (source) {
-            DateFormat dateFormat = new SimpleDateFormat(format)
-            return dateFormat.parse(source)
-        }
-        return null
+    static String format(String text) {
+        return text.replace("_", " ")
+                   .toLowerCase()
+                   .capitalize()
     }
 
-    static String formatString(String format, Date date) {
-        if (date) {
-            DateFormat dateFormat = new SimpleDateFormat(format)
-            return dateFormat.format(date)
+    /**
+     * Splits a given string into a list of strings separated by the given separator.
+     * Ex: Given "x,y,z", returns ["x","y","z"]
+     */
+    static List<String> split(Object value, String delimiter=DEFAULT_DELIMITER) {
+        if (!value) {
+            return null
         }
-        return null
+        if (!(value instanceof String)) {
+            throw new IllegalArgumentException("Expected String but got ${value.class}")
+        }
+
+        String valueString = value as String
+        return StringUtils.isBlank(valueString) ? [] : valueString.split(delimiter).toList()
     }
-
-
 }

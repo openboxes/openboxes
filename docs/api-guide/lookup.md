@@ -1,5 +1,4 @@
 
-# Search APIs
 These are APIs that support lookup requests like listing and read operations (GET). That means that most of these APIs
 don't currently support create (POST), update (PUT) or delete (DELETE) operations.
 

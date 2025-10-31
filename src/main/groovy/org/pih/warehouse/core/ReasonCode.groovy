@@ -68,6 +68,17 @@ enum ReasonCode {
     INSUFFICIENT_QUANTITY_AVAILABLE(36),
     BACKORDER(37),
     DUPLICATE_REQUEST(38),
+    BIN_CORRECTION(39),
+    LOT_CORRECTION(40),
+    INCORRECT_LOT_PICKED(41),
+    FIX_NEGATIVE_INVENTORY(42),
+    INBOUND_NOT_RECORDED(43),
+    OUTBOUND_NOT_RECORDED(44),
+    RETURN_NOT_RECORDED(45),
+    ERROR_IN_INBOUND(46),
+    ERROR_IN_OUTBOUND(47),
+    BIN_LOCATION_MISSING(48),
+    MISPLACED(49),
     OTHER(100)
 
 
@@ -205,6 +216,35 @@ enum ReasonCode {
         [
                 CLINICAL_JUDGMENT,
                 INSUFFICIENT_QUANTITY_AVAILABLE,
+        ]
+    }
+
+    static listCycleCountReasonCodes() {
+        return [
+                CONSUMED,
+                CORRECTION,
+                DAMAGED,
+                DATA_ENTRY_ERROR,
+                EXPIRED,
+                FOUND,
+                MISSING,
+                RECOUNTED,
+                REJECTED,
+                RETURNED,
+                SCRAPPED,
+                STOLEN,
+                BIN_CORRECTION,
+                LOT_CORRECTION,
+                INCORRECT_LOT_PICKED,
+                FIX_NEGATIVE_INVENTORY,
+                INBOUND_NOT_RECORDED,
+                OUTBOUND_NOT_RECORDED,
+                RETURN_NOT_RECORDED,
+                ERROR_IN_INBOUND,
+                ERROR_IN_OUTBOUND,
+                BIN_LOCATION_MISSING,
+                MISPLACED,
+                OTHER
         ]
     }
 }

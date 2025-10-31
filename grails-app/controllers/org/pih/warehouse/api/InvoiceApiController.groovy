@@ -16,6 +16,7 @@ import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.invoice.Invoice
+import org.pih.warehouse.invoice.InvoiceIdentifierService
 import org.pih.warehouse.invoice.InvoiceItemCandidate
 import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.invoice.InvoiceList
@@ -25,7 +26,7 @@ import org.pih.warehouse.invoice.InvoiceStatus
 
 class InvoiceApiController {
 
-    def identifierService
+    InvoiceIdentifierService invoiceIdentifierService
     def invoiceDataService
     def invoiceService
 
@@ -120,7 +121,7 @@ class InvoiceApiController {
         }
 
         if (!invoice.invoiceNumber) {
-            invoice.invoiceNumber = identifierService.generateInvoiceIdentifier()
+            invoice.invoiceNumber = invoiceIdentifierService.generate(invoice)
         }
 
         if (!invoice.invoiceType) {
@@ -192,7 +193,9 @@ class InvoiceApiController {
         render([data: invoice?.toJson()] as JSON)
     }
 
-
+    /**
+     * @deprecated Inverse items are now stored in the final invoice, no longer need to pull these
+     */
     def getPrepaymentItems() {
         Invoice invoice = Invoice.get(params.id)
         List<InvoiceItem> prepaymentItems = invoice.prepaymentItems

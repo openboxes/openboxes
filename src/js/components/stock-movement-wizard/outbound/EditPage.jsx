@@ -29,7 +29,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-
 const BTN_CLASS_MAPPER = {
   YES: 'btn btn-outline-success',
   NO: 'btn btn-outline-secondary',
@@ -54,8 +53,8 @@ const FIELDS = {
       if (rowValues.quantityAvailable < rowValues.quantityRequested) {
         className += 'font-weight-bold';
       }
-      const filterOutItems = itemFilter &&
-        !matchesProductCodeOrName({
+      const filterOutItems = itemFilter
+        && !matchesProductCodeOrName({
           product: rowValues?.product,
           filterValue: itemFilter,
         });
@@ -103,7 +102,7 @@ const FIELDS = {
         headerAlign: 'right',
         attributes: {
           className: 'text-right',
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
         },
       },
       quantityOnHand: {
@@ -114,8 +113,8 @@ const FIELDS = {
         fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => {
           let className = 'text-right';
-          if (fieldValue && (!fieldValue.quantityOnHand ||
-            fieldValue.quantityOnHand < fieldValue.quantityRequested)) {
+          if (fieldValue && (!fieldValue.quantityOnHand
+            || fieldValue.quantityOnHand < fieldValue.quantityRequested)) {
             className = `${className} text-danger`;
           }
           return {
@@ -124,7 +123,7 @@ const FIELDS = {
         },
         headerAlign: 'right',
         attributes: {
-          formatValue: value => (value.quantityOnHand ? (value.quantityOnHand.toLocaleString('en-US')) : value.quantityOnHand),
+          formatValue: (value) => (value.quantityOnHand ? (value.quantityOnHand.toLocaleString('en-US')) : value.quantityOnHand),
         },
       },
       quantityAvailable: {
@@ -135,8 +134,8 @@ const FIELDS = {
         fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => {
           let className = 'text-right';
-          if (fieldValue && (!fieldValue.quantityAvailable ||
-            fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
+          if (fieldValue && (!fieldValue.quantityAvailable
+            || fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
             className = `${className} text-danger`;
           }
           return {
@@ -145,7 +144,7 @@ const FIELDS = {
         },
         headerAlign: 'right',
         attributes: {
-          formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
+          formatValue: (value) => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
       },
       quantityDemandFulfilling: {
@@ -251,8 +250,11 @@ const FIELDS = {
           fieldValue, subfield, reasonCodes, updateRow, values, rowIndex,
         }) => {
           const isSubstituted = fieldValue && fieldValue.statusCode === 'SUBSTITUTED';
+          const selectedReasonCode = values?.editPageItems[rowIndex]?.reasonCode;
           return {
-            disabled: fieldValue === null || fieldValue === undefined || subfield || isSubstituted,
+            disabled: ((fieldValue === null || fieldValue === undefined) && !selectedReasonCode)
+              || subfield
+              || isSubstituted,
             options: reasonCodes,
             showValueTooltip: true,
             onBlur: () => updateRow(values, rowIndex),
@@ -270,8 +272,8 @@ const FIELDS = {
         getDynamicAttr: ({
           fieldValue, revertItem, values, showOnly,
         }) => ({
-          onClick: fieldValue && fieldValue.requisitionItemId ?
-            () => revertItem(values, fieldValue.requisitionItemId) : () => null,
+          onClick: fieldValue && fieldValue.requisitionItemId
+            ? () => revertItem(values, fieldValue.requisitionItemId) : () => null,
           hidden: fieldValue && fieldValue.statusCode ? !_.includes(['CHANGED', 'CANCELED'], fieldValue.statusCode) : false,
           disabled: showOnly,
         }),
@@ -298,8 +300,8 @@ function validateForSave(values) {
         quantityRevised: 'react.stockMovement.errors.sameRevisedQty.label',
       };
     }
-    if (!_.isEmpty(item.quantityRevised) && item.quantityAvailable >= 0 &&
-      (item.quantityRevised > item.quantityAvailable)) {
+    if (!_.isEmpty(item.quantityRevised) && item.quantityAvailable >= 0
+      && (item.quantityRevised > item.quantityAvailable)) {
       errors.editPageItems[key] = { quantityRevised: 'react.stockMovement.errors.higherQty.label' };
     }
     if (!_.isEmpty(item.quantityRevised) && (item.quantityRevised < 0)) {
@@ -364,7 +366,7 @@ class EditItemsPage extends Component {
     const { data } = response.data;
     const editPageItems = _.map(
       data,
-      val => ({
+      (val) => ({
         ...val,
         disabled: true,
         quantityOnHand: val.quantityOnHand > 0 ? val.quantityOnHand : 0,
@@ -376,7 +378,7 @@ class EditItemsPage extends Component {
         },
         // eslint-disable-next-line max-len
         reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(val.reasonCode, value)),
-        substitutionItems: _.map(val.substitutionItems, sub => ({
+        substitutionItems: _.map(val.substitutionItems, (sub) => ({
           ...sub,
           // eslint-disable-next-line max-len
           reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(val.reasonCode, value)),
@@ -389,15 +391,15 @@ class EditItemsPage extends Component {
       }),
     );
 
-    this.setState({
-      revisedItems: _.filter(editPageItems, item => item.statusCode === 'CHANGED'),
+    this.setState((prev) => ({
+      revisedItems: _.filter(editPageItems, (item) => item.statusCode === 'CHANGED'),
       values: {
-        ...this.state.values,
-        editPageItems: _.uniqBy(_.concat(this.state.values.editPageItems, editPageItems), 'requisitionItemId'),
+        ...prev.values,
+        editPageItems: _.uniqBy(_.concat(prev.values.editPageItems, editPageItems), 'requisitionItemId'),
       },
-      hasItemsLoaded: this.state.hasItemsLoaded
-      || this.state.totalCount === _.uniqBy(_.concat(this.state.values.editPageItems, editPageItems), 'requisitionItemId').length,
-    }, () => {
+      hasItemsLoaded: prev.hasItemsLoaded
+      || prev.totalCount === _.uniqBy(_.concat(prev.values.editPageItems, editPageItems), 'requisitionItemId').length,
+    }), () => {
       // eslint-disable-next-line max-len
       if (!_.isNull(startIndex) && this.state.values.editPageItems.length !== this.state.totalCount) {
         this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
@@ -435,10 +437,10 @@ class EditItemsPage extends Component {
       });
     });
 
-    this.setState({
+    this.setState((prev) => ({
       values: updatedValues,
-      showOnlyErroredItems: !errors.editPageItems.length ? false : this.state.showOnlyErroredItems,
-    });
+      showOnlyErroredItems: !errors.editPageItems.length ? false : prev.showOnlyErroredItems,
+    }));
   }
 
   dataFetched = false;
@@ -489,16 +491,16 @@ class EditItemsPage extends Component {
     apiClient.get(url)
       .then((response) => {
         const { data } = response.data;
-        this.setState({
+        this.setState((prev) => ({
           hasItemsLoaded: true,
           values: {
-            ...this.state.values,
-            editPageItems: _.map(data, item => ({
+            ...prev.values,
+            editPageItems: _.map(data, (item) => ({
               ...item,
               quantityOnHand: item.quantityOnHand || 0,
               // eslint-disable-next-line max-len
               reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(item.reasonCode, value)),
-              substitutionItems: _.map(item.substitutionItems, sub => ({
+              substitutionItems: _.map(item.substitutionItems, (sub) => ({
                 ...sub,
                 // eslint-disable-next-line max-len
                 reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(item.reasonCode, value)),
@@ -506,7 +508,7 @@ class EditItemsPage extends Component {
               })),
             })),
           },
-        }, () => {
+        }), () => {
           this.fetchAllData(false);
           this.props.hideSpinner();
         });
@@ -544,11 +546,11 @@ class EditItemsPage extends Component {
         if (item.quantityRevised && item.reasonCode) {
           const oldRevision = _.find(
             this.state.revisedItems,
-            revision => revision.requisitionItemId === item.requisitionItemId,
+            (revision) => revision.requisitionItemId === item.requisitionItemId,
           );
-          return _.isEmpty(oldRevision) ? true :
-            ((_.toInteger(oldRevision.quantityRevised) !== _.toInteger(item.quantityRevised)) ||
-              (oldRevision.reasonCode !== item.reasonCode));
+          return _.isEmpty(oldRevision) ? true
+            : ((_.toInteger(oldRevision.quantityRevised) !== _.toInteger(item.quantityRevised))
+              || (oldRevision.reasonCode !== item.reasonCode));
         }
         return false;
       },
@@ -557,7 +559,7 @@ class EditItemsPage extends Component {
     let updatedValues = values;
 
     _.forEach(itemsToRevise, (item) => {
-      const editPageItemIndex = _.findIndex(this.state.values.editPageItems, editPageItem =>
+      const editPageItemIndex = _.findIndex(this.state.values.editPageItems, (editPageItem) =>
         item.requisitionItemId === editPageItem.requisitionItemId);
 
       updatedValues = update(updatedValues, {
@@ -577,7 +579,7 @@ class EditItemsPage extends Component {
 
     const url = `/api/stockMovements/${this.state.values.stockMovementId}/reviseItems`;
     const payload = {
-      lineItems: _.map(itemsToRevise, item => ({
+      lineItems: _.map(itemsToRevise, (item) => ({
         id: item.requisitionItemId,
         quantityRevised: item.quantityRevised,
         reasonCode: item.reasonCode.value,
@@ -624,10 +626,10 @@ class EditItemsPage extends Component {
         // If reponse 200, then save revise items taken from the payload
         const payload = JSON.parse(resp.config.data);
         if (payload.lineItems && payload.lineItems.length) {
-          const savedItemIds = payload.lineItems.map(item => item.id);
+          const savedItemIds = payload.lineItems.map((item) => item.id);
           // Map to have the required field
           // (requisitionItemId, quantityRevised and reasonCode as obj)
-          const savedItems = payload.lineItems.map(item => ({
+          const savedItems = payload.lineItems.map((item) => ({
             ...item,
             requisitionItemId: item.id,
             reasonCode: _.find(
@@ -638,7 +640,7 @@ class EditItemsPage extends Component {
           // Get old revise items, that were not changed in this request
           const oldItems = _.filter(
             this.state.values.editPageItems,
-            item => savedItemIds.indexOf(item.requisitionItemId) < 0,
+            (item) => savedItemIds.indexOf(item.requisitionItemId) < 0,
           );
           this.setState({
             revisedItems: [...oldItems, ...savedItems],
@@ -712,8 +714,8 @@ class EditItemsPage extends Component {
     const url = `/api/stockMovements/${this.state.values.stockMovementId}`;
 
     return apiClient.get(url)
-      .then(resp => resp)
-      .catch(err => err);
+      .then((resp) => resp)
+      .catch((err) => err);
   }
 
   /**
@@ -737,12 +739,12 @@ class EditItemsPage extends Component {
    * @public
    */
   updateEditPageItem(values, editPageItem) {
-    const editPageItemIndex = _.findIndex(this.state.values.editPageItems, item =>
+    const editPageItemIndex = _.findIndex(this.state.values.editPageItems, (item) =>
       item.requisitionItemId === editPageItem.requisitionItemId);
-    const revisedItemIndex = _.findIndex(this.state.revisedItems, item =>
+    const revisedItemIndex = _.findIndex(this.state.revisedItems, (item) =>
       item.requisitionItemId === editPageItem.requisitionItemId);
 
-    this.setState({
+    this.setState((prev) => ({
       values: {
         ...values,
         editPageItems: update(values.editPageItems, {
@@ -751,7 +753,7 @@ class EditItemsPage extends Component {
               ...editPageItem,
               quantityOnHand: editPageItem.quantityOnHand || 0,
               quantityAvailable: editPageItem.quantityAvailable || 0,
-              substitutionItems: _.map(editPageItem.substitutionItems, sub => ({
+              substitutionItems: _.map(editPageItem.substitutionItems, (sub) => ({
                 ...sub,
                 requisitionItemId: editPageItem.requisitionItemId,
               })),
@@ -759,10 +761,10 @@ class EditItemsPage extends Component {
           },
         }),
       },
-      revisedItems: update(this.state.revisedItems, revisedItemIndex > -1 ? {
+      revisedItems: update(prev.revisedItems, revisedItemIndex > -1 ? {
         $splice: [[revisedItemIndex, 1]],
       } : {}),
-    });
+    }));
   }
 
   /**
@@ -783,7 +785,9 @@ class EditItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = STOCK_MOVEMENT_URL.show(formValues.stockMovementId); },
+            onClick: () => {
+              window.location = STOCK_MOVEMENT_URL.show(formValues.stockMovementId);
+            },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -856,7 +860,7 @@ class EditItemsPage extends Component {
   render() {
     const { showOnlyErroredItems, itemFilter } = this.state;
     const { showOnly } = this.props;
-    const erroredItemsCount = this.state.values && this.state.values.editPageItems.length > 0 ? _.filter(this.state.values.editPageItems, item => item.hasError).length : '0';
+    const erroredItemsCount = this.state.values && this.state.values.editPageItems.length > 0 ? _.filter(this.state.values.editPageItems, (item) => item.hasError).length : '0';
     return (
       <Form
         onSubmit={() => {}}
@@ -865,64 +869,82 @@ class EditItemsPage extends Component {
         initialValues={this.state.values}
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
-            { !showOnly ?
-              <span className="buttons-container">
-                <FilterInput
-                  itemFilter={itemFilter}
-                  onChange={e => this.setState({ itemFilter: e.target.value })}
-                  onClear={() => this.setState({ itemFilter: '' })}
-                />
-                <button
-                  type="button"
-                  onClick={() => this.setState({ showOnlyErroredItems: !showOnlyErroredItems })}
-                  className={`float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-3 ${showOnlyErroredItems ? 'active' : ''}`}
-                >
-                  <span>{erroredItemsCount} <Translate id="react.stockMovement.erroredItemsCount.label" defaultMessage="item(s) require your attention" /></span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => this.refresh()}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-3"
-                >
-                  <span><i className="fa fa-refresh pr-2" /><Translate
-                    id="react.default.button.refresh.label"
-                    defaultMessage="Reload"
+            { !showOnly
+              ? (
+                <span className="buttons-container">
+                  <FilterInput
+                    itemFilter={itemFilter}
+                    onChange={(e) => this.setState({ itemFilter: e.target.value })}
+                    onClear={() => this.setState({ itemFilter: '' })}
                   />
+                  <button
+                    type="button"
+                    onClick={() => this.setState({ showOnlyErroredItems: !showOnlyErroredItems })}
+                    className={`float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-3 ${showOnlyErroredItems ? 'active' : ''}`}
+                  >
+                    <span>
+                      {erroredItemsCount}
+                      {' '}
+                      <Translate id="react.stockMovement.erroredItemsCount.label" defaultMessage="item(s) require your attention" />
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => this.refresh()}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-3"
+                  >
+                    <span>
+                      <i className="fa fa-refresh pr-2" />
+                      <Translate
+                        id="react.default.button.refresh.label"
+                        defaultMessage="Reload"
+                      />
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => this.save(values)}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end ml-3 btn-xs ml-3"
+                  >
+                    <span>
+                      <i className="fa fa-save pr-2" />
+                      <Translate
+                        id="react.default.button.save.label"
+                        defaultMessage="Save"
+                      />
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => this.saveAndExit(values)}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end ml-3 btn-xs ml-3"
+                  >
+                    <span>
+                      <i className="fa fa-sign-out pr-2" />
+                      <Translate
+                        id="react.default.button.saveAndExit.label"
+                        defaultMessage="Save and exit"
+                      />
+                    </span>
+                  </button>
+                </span>
+              )
+              : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    this.props.history.push(STOCK_MOVEMENT_URL.listOutbound());
+                  }}
+                  className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
+                >
+                  <span>
+                    <i className="fa fa-sign-out pr-2" />
+                    {' '}
+                    <Translate id="react.default.button.exit.label" defaultMessage="Exit" />
+                    {' '}
                   </span>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => this.save(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-3 btn-xs ml-3"
-                >
-                  <span><i className="fa fa-save pr-2" /><Translate
-                    id="react.default.button.save.label"
-                    defaultMessage="Save"
-                  />
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => this.saveAndExit(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-3 btn-xs ml-3"
-                >
-                  <span><i className="fa fa-sign-out pr-2" /><Translate
-                    id="react.default.button.saveAndExit.label"
-                    defaultMessage="Save and exit"
-                  />
-                  </span>
-                </button>
-              </span>
-                :
-              <button
-                type="button"
-                onClick={() => {
-                  this.props.history.push(STOCK_MOVEMENT_URL.listOutbound());
-                }}
-                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
-              >
-                <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
-              </button> }
+              ) }
             <form onSubmit={handleSubmit}>
               <div className="table-form">
                 {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
@@ -974,7 +996,7 @@ class EditItemsPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   reasonCodes: state.reasonCodes.data,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,

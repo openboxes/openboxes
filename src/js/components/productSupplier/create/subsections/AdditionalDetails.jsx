@@ -22,11 +22,10 @@ const AdditionalDetails = ({ control, errors }) => {
     ratingTypeCodes: state.productSupplier.ratingTypeCodes,
   }));
 
-  const debounceManufacturersFetch =
-    useCallback(
-      debounceOrganizationsFetch(debounceTime, minSearchLength, [RoleType.ROLE_MANUFACTURER]),
-      [debounceTime, minSearchLength],
-    );
+  const debounceManufacturersFetch = useCallback(
+    debounceOrganizationsFetch(debounceTime, minSearchLength, [RoleType.ROLE_MANUFACTURER]),
+    [debounceTime, minSearchLength],
+  );
 
   return (
     <Subsection

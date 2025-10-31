@@ -2,42 +2,48 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.IdentifierGeneratorTypeCode
 import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.identification.RandomCondition
 
 // OpenBoxes identifier config
-openboxes.identifier.numeric = Constants.RANDOM_IDENTIFIER_NUMERIC_CHARACTERS
-openboxes.identifier.alphabetic = Constants.RANDOM_IDENTIFIER_ALPHABETIC_CHARACTERS
-openboxes.identifier.alphanumeric = Constants.RANDOM_IDENTIFIER_ALPHANUMERIC_CHARACTERS
-openboxes.identifier.transaction.format = Constants.DEFAULT_TRANSACTION_NUMBER_FORMAT
-openboxes.identifier.order.format = Constants.DEFAULT_ORDER_NUMBER_FORMAT
-openboxes.identifier.product.format = Constants.DEFAULT_PRODUCT_NUMBER_FORMAT
-openboxes.identifier.productSupplier.format = Constants.DEFAULT_PRODUCT_SUPPLIER_NUMBER_FORMAT
-openboxes.identifier.productSupplier.prefix.enabled = true
-openboxes.identifier.receipt.format = Constants.DEFAULT_RECEIPT_NUMBER_FORMAT
-openboxes.identifier.requisition.format = Constants.DEFAULT_REQUISITION_NUMBER_FORMAT
-openboxes.identifier.shipment.format = Constants.DEFAULT_SHIPMENT_NUMBER_FORMAT
-openboxes.identifier.sequenceNumber.format = Constants.DEFAULT_SEQUENCE_NUMBER_FORMAT
-openboxes.identifier.invoice.format = Constants.DEFAULT_INVOICE_NUMBER_FORMAT
-openboxes.identifier.location.format = Constants.DEFAULT_LOCATION_NUMBER_FORMAT
+openboxes.identifier.attempts.max = 10
+openboxes.identifier.numeric = "0123456789"
+openboxes.identifier.alphabetic = "ABCDEFGHJKMNPQRSTUVXYZ"
+openboxes.identifier.alphanumeric = "0123456789ABCDEFGHJKMNPQRSTUVWXYZ"
 
-// Product identifier generator configuration for the systems default product
-openboxes.identifier.defaultProductType.id = "DEFAULT"
-openboxes.identifier.productCode.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
+// Default identifier
+openboxes.identifier.default.format = "\${random}"  // By default, simply generate a random id
+openboxes.identifier.default.random.template = "NNNLLL"
+openboxes.identifier.default.random.condition = RandomCondition.ALWAYS  // By default, we always fill in random sections
+openboxes.identifier.default.delimiter = "-"
+openboxes.identifier.default.prefix.enabled = true
+openboxes.identifier.default.sequenceNumber.minSize = 5  // Aka five digits
 
-// Product identifier configuration for all sequential product codes
-openboxes.identifier.productCode.delimiter = Constants.DEFAULT_IDENTIFIER_SEPARATOR
-openboxes.identifier.productCode.format = "\${productTypeCode}\${delimiter}\${sequenceNumber}"
-openboxes.identifier.productCode.properties = ["productTypeCode": "code"]
+// Transaction identifier
+openboxes.identifier.transaction.random.template = "AAA-AAA-AAA"
+
+// Product identifier
+openboxes.identifier.product.random.template = "LLNN"
+openboxes.identifier.product.generatorType = IdentifierGeneratorTypeCode.SEQUENCE  // Controls which of the two below to use.
+openboxes.identifier.product.sequence.format = "\${custom.productTypeCode}\${delimiter}\${sequenceNumber}"
+openboxes.identifier.product.random.format = "\${random}"
+
+// Product Supplier identifier
+openboxes.identifier.productSupplier.format = "\${custom.productCode}\${delimiter}\${custom.organizationCode}\${random}"
+openboxes.identifier.productSupplier.random.template = "-NNNN"
+openboxes.identifier.productSupplier.random.condition = RandomCondition.ON_DUPLICATE
 
 // Organization identifier
-openboxes.identifier.organization.format = Constants.DEFAULT_ORGANIZATION_NUMBER_FORMAT
+openboxes.identifier.organization.random.template = "AAA"
 openboxes.identifier.organization.minSize = 2
 openboxes.identifier.organization.maxSize = 3
 
 // Purchase Order identifier
-openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
-openboxes.identifier.purchaseOrder.sequenceNumber.format = Constants.DEFAULT_PO_SEQUENCE_NUMBER_FORMAT
 openboxes.identifier.purchaseOrder.format = "PO-\${destinationPartyCode}-\${sequenceNumber}"
+openboxes.identifier.purchaseOrder.sequenceNumber.minSize = 6  // Aka six digits
 openboxes.identifier.purchaseOrder.properties = ["destinationPartyCode": "destinationParty.code"]
+
+// Default Product Type Configuration
+openboxes.productType.default.id = "DEFAULT"
 
 // Require approval on purchase orders
 openboxes.purchasing.approval.enabled = false
@@ -59,7 +65,7 @@ openboxes.purchasing.updateUnitPrice.method = UpdateUnitPriceMethodCode.USER_DEF
 openboxes.browser.connection.status.timeout = 8000
 
 // Date configuration (OBPIH-5397)
-openboxes.display.date.format = Constants.DISPLAY_DATE_FORMAT
+openboxes.display.date.format = Constants.JS_DISPLAY_DATE_FORMAT
 openboxes.display.date.defaultValue = Constants.DISPLAY_DATE_DEFAULT_VALUE
 
 // OBPIH-5847
@@ -73,8 +79,16 @@ openboxes.client.notification.autohide.delay = 8000
 // Autosave configuration (OBPIH-5493)
 openboxes.client.autosave.enabled = false
 
+// Backdata configuration (OBPIH-6332)
+openboxes.dashboard.backdatedShipments.daysOffset = 1
+openboxes.dashboard.backdatedShipments.monthsLimit = 6
+openboxes.report.backdatedTransactions.daysOffset = 1
+
 // Merge Products (OBPIH-5453)
 openboxes.products.merge.enabled = false
+
+// Cycle Count configuration (OBPIH-7033)
+openboxes.cycleCount.products.maxAmount = 50
 
 openboxes.security.rbac.rules = [
     [controller: '*', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
@@ -167,6 +181,15 @@ openboxes {
                         [label: "inventory.createReplenishment.label", defaultLabel: "Replenish picking bins", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/replenishment/create"],
                         [label: "inventory.listStockTransfers.label", defaultLabel: "List Stock Transfers", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/stockTransfer/list"],
                     ]
+                ],
+                [
+                        label: "inventory.cycleCount.label",
+                        defaultLabel: "Cycle count",
+                        menuItems: [
+                                [label: "inventory.manageCycleCount.label", defaultLabel: "Manage Cycle Count", href: "/inventory/cycleCount"],
+                                [label: "inventory.performCycleCount.label", defaultLabel: "Perform Cycle Count", href: "/inventory/cycleCount?tab=TO_COUNT"],
+                                [label: "inventory.reporting.label", defaultLabel: "Reporting", href: "/inventory/cycleCount/reporting?tab=PRODUCTS"],
+                        ]
                 ]
             ]
         }
@@ -253,6 +276,7 @@ openboxes {
                     defaultLabel: "Stock Movement",
                     menuItems: [
                         [label: "outbound.create.label", defaultLabel: "Create Outbound Movements", href: "/stockMovement/createOutbound?direction=OUTBOUND"],
+                        [label: "outbound.import.label", defaultLabel: "Import Completed Outbound", href: "/stockMovement/importOutboundStockMovement"],
                         [label: "outbound.list.label", defaultLabel: "List Outbound Movements", href: "/stockMovement/list?direction=OUTBOUND"],
                         [label: "requests.list.label", defaultLabel: "List Requests", href: "/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC"],
                         [label: "outboundReturns.create.label", defaultLabel: "Create Outbound Return", href: "/stockTransfer/createOutboundReturn"]
@@ -315,7 +339,7 @@ openboxes {
                         [label: "product.exportAsCsv.label", defaultLabel: "Export products", href: "/product/exportAsCsv"],
                         [label: "export.productSources.label", defaultLabel: "Export product sources", href: "/productSupplier/export"],
                         [label: "export.latestInventory.label", defaultLabel: "Export latest inventory date", href: "/inventory/exportLatestInventoryDate"],
-                        [label: "export.inventoryLevels.label", defaultLabel: "Export inventory levels", href: "/inventoryLevel/export"],
+                        [label: "export.inventoryLevels.label", defaultLabel: "Export inventory levels", href: "/inventoryLevel/export?format=csv"],
                         [label: "export.requisitions.label", defaultLabel: "Export requisitions", href: "/requisition/export"],
                         [label: "export.binLocations.label", defaultLabel: "Export bin locations", href: "/report/exportBinLocation?downloadFormat=csv"],
                         [label: "export.productDemand.label", defaultLabel: "Export product demand", href: "/report/exportDemandReport?downloadFormat=csv"],
@@ -1105,6 +1129,54 @@ openboxes {
                 type = 'number'
                 endpoint = "/api/dashboard/openPurchaseOrdersCount"
             }
+            backdatedOutboundShipments {
+                enabled = true
+                title = "react.dashboard.backdatedOutboundShipments.title.label"
+                info = "react.dashboard.backdatedOutboundShipments.info.label"
+                graphType = "bar"
+                type = 'graph'
+                endpoint = "/api/dashboard/backdatedOutboundShipments"
+                timeFilter = true
+                timeLimit = 6
+                datalabel = true
+            }
+            backdatedInboundShipments {
+                enabled = true
+                title = "react.dashboard.backdatedInboundShipments.title.label"
+                info = "react.dashboard.backdatedInboundShipments.info.label"
+                graphType = "bar"
+                type = 'graph'
+                endpoint = "/api/dashboard/backdatedInboundShipments"
+                timeFilter = true
+                timeLimit = 6
+                datalabel = true
+            }
+            itemsWithBackdatedShipments {
+                enabled = true
+                title = "react.dashboard.itemsWithBackdatedShipments.title.label"
+                info = "react.dashboard.itemsWithBackdatedShipments.info.label"
+                graphType = "numberTable"
+                type = "graph"
+                endpoint = "/api/dashboard/itemsWithBackdatedShipments"
+                colors {
+                    datasets {
+                        state3 = ["first"]
+                        state5 = ["second"]
+                        state1 = ["third"]
+                        state9 = ["fourth"]
+                    }
+                }
+                columnsSize {
+                    name = 'auto'
+                }
+                truncationLength {
+                    value = 100
+                    number = 5
+                }
+                disableTruncation {
+                    name = true
+                }
+            }
         }
     }
 }
@@ -1318,3 +1390,9 @@ openboxes {
         }
     }
 }
+
+openboxes.inventoryCount.transactionTypes = [
+        Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
+        Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID,
+        Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID
+]

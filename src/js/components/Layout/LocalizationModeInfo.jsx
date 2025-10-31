@@ -28,5 +28,4 @@ const LocalizationModeInfo = () => (
   </div>
 );
 
-
 export default LocalizationModeInfo;

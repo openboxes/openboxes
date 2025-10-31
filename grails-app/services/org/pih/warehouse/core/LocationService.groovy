@@ -19,6 +19,10 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import grails.plugins.csv.CSVMapReader
 import org.hibernate.sql.JoinType
+
+import org.pih.warehouse.sort.SortParamList
+import org.pih.warehouse.sort.SortUtil
+import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.LocationImportDataService
 import util.ConfigHelper
@@ -130,6 +134,10 @@ class LocationService {
             locations = locations.findAll { location -> user.hasPrimaryRole(location) }
         }
 
+        if (params.withOrganization) {
+            locations = locations.findAll { Location location -> location.organization != null }
+        }
+
         if (params.activityCodes) {
             ActivityCode[] activityCodes = params.list("activityCodes") as ActivityCode[]
             return locations.findAll {
@@ -138,39 +146,19 @@ class LocationService {
         }
 
         if (params.isReturnOrder) {
-            if (isSuperuser) {
-                return locations.findAll { Location it ->
-                    !it.supports(ActivityCode.MANAGE_INVENTORY) && it.locationType.locationTypeCode != LocationTypeCode.SUPPLIER
-                }
-            } else {
-                return locations.findAll { Location it ->
-                    !it.supports(ActivityCode.MANAGE_INVENTORY) && it.locationGroup == currentLocation.locationGroup && it.locationType.locationTypeCode != LocationTypeCode.SUPPLIER
-                }
+            return locations.findAll { Location it ->
+                !it.supports(ActivityCode.MANAGE_INVENTORY) && it.locationType.locationTypeCode != LocationTypeCode.SUPPLIER
             }
         }
-
-        def outboundMovementLocations = locations.findAll {
-            (it.locationGroup == currentLocation.locationGroup) ||
-                    (it.locationGroup != currentLocation.locationGroup && it.locationType.locationTypeCode == LocationTypeCode.DEPOT)
+        if (direction == StockMovementDirection.INBOUND.name()) {
+            return locations.findAll {
+                it.locationType.locationTypeCode == LocationTypeCode.SUPPLIER
+            }
         }
-
-        if (!isSuperuser) {
-            if (direction == "INBOUND") {
-                return locations.findAll {
-                    it.locationType.locationTypeCode == LocationTypeCode.SUPPLIER
-                }
-            }
-            if (direction == "OUTBOUND") {
-                return outboundMovementLocations
-            }
-        } else {
-            if (direction == "INBOUND") {
-                return locations.findAll {
-                    it.locationType.locationTypeCode == LocationTypeCode.SUPPLIER || !it.supports(ActivityCode.MANAGE_INVENTORY)
-                }
-            }
-            if (direction == "OUTBOUND") {
-                return outboundMovementLocations
+        if (direction == StockMovementDirection.OUTBOUND.name()) {
+            return locations.findAll {
+                (it.locationGroup == currentLocation.locationGroup) ||
+                        (it.locationGroup != currentLocation.locationGroup && it.locationType.locationTypeCode == LocationTypeCode.DEPOT)
             }
         }
 
@@ -373,29 +361,30 @@ class LocationService {
         return internalLocationsSupportingActivityCodes
     }
 
-    List getInternalLocations(Location parentLocation, LocationTypeCode[] locationTypeCodes, Map params) {
-        getInternalLocations(parentLocation, locationTypeCodes, params, null)
-    }
-
     // FIXME This is a hotfix for issue OBPIH-5466
     // The issue is with including and excluding certain locations like RECEIVING and HOLD.
     // An example for this issue was that we needed to include HOlD BINS and to do that
     // we needed to include LocationTypeCode = BIN_LOCATION and INTERNAL.
     // By including LocationTypeCode INTERNAL we also get a bunch of Receiving Locations which we don't need in most of the places
     // so we needed to have a way to exclude them
-    List getInternalLocations(Location parentLocation, LocationTypeCode[] locationTypeCodes, Map params, String[] locationNames) {
+    List getInternalLocations(InternalLocationSearchCommand command) {
+        List<String> locationNames = command.locationNames
         List<Location> internalLocations = Location.createCriteria().list() {
             eq("active", Boolean.TRUE)
-            eq("parentLocation", parentLocation)
+            eq("parentLocation", command.location)
             or {
                 locationType {
-                    'in'("locationTypeCode", locationTypeCodes)
+                    // For some reason this throws a "String cannot be cast to java.lang.Enum" error if we leave
+                    // command.locationTypeCode as a list. Must be some kind of Grails weirdness...
+                    'in'("locationTypeCode", command.locationTypeCode.toArray() as LocationTypeCode[])
                 }
                 if (locationNames) {
                     'in'("name", locationNames)
                 }
             }
-        }
+        } as List<Location>
+
+        // TODO: Move the rest of these filter conditions to the above query instead of filtering on the results.
 
         // locations that must be included regardless of the conditions set
         List<Location> includedLocations = []
@@ -406,28 +395,37 @@ class LocationService {
         }
 
         // Filter by activity code
-        if (params?.allActivityCodes) {
+        if (command.allActivityCodes) {
             internalLocations = internalLocations.findAll { Location location ->
-                params?.allActivityCodes?.every{ location.supports(it) }
+                command.allActivityCodes?.every{ location.supports(it) }
             }
-        } else if (params?.anyActivityCodes){
+        } else if (command.anyActivityCodes){
             internalLocations = internalLocations.findAll { Location location ->
-                params?.anyActivityCodes?.any{ location.supports(it) }
+                command.anyActivityCodes?.any{ location.supports(it) }
             }
         }
-        if (params?.ignoreActivityCodes) {
+        if (command.ignoreActivityCodes) {
             internalLocations = internalLocations.findAll { Location location ->
-                params?.ignoreActivityCodes?.every{ !location.supports(it) }
+                command.ignoreActivityCodes?.every{ !location.supports(it) }
             }
         }
         internalLocations += includedLocations
 
-        // Sort locations by sort order, then name
-        internalLocations = internalLocations.sort { a, b -> a.sortOrder <=> b.sortOrder ?: a.name <=> b.name }
-
-        return internalLocations
+        return sortLocations(internalLocations, command.sort)
     }
 
+    private List<Location> sortLocations(List<Location> locations, SortParamList sortParams) {
+        if (locations == null) {
+            return null
+        }
+
+        // This is to preserve pre-existing behaviour.
+        if (sortParams == null) {
+            return locations.sort { a, b -> a.sortOrder <=> b.sortOrder ?: a.name <=> b.name }
+        }
+
+        return SortUtil.sort(locations, sortParams)
+    }
 
     List getPutawayLocations(Location parentLocation) {
         return getInternalLocations(parentLocation, [ActivityCode.PUTAWAY_STOCK])

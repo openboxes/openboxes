@@ -6,8 +6,8 @@ export const hasMinimumRequiredRole = (role, highestUserRole) => {
   const roles = ['Superuser', 'Admin', 'Manager', 'Assistant', 'Browser', 'Authenticated', 'Anonymous'];
   const userRoleIndex = roles.indexOf(role);
   const highestUserRoleIndex = roles.indexOf(highestUserRole);
-  return (userRoleIndex !== -1 && highestUserRoleIndex !== -1) &&
-    highestUserRoleIndex <= userRoleIndex;
+  return (userRoleIndex !== -1 && highestUserRoleIndex !== -1)
+    && highestUserRoleIndex <= userRoleIndex;
 };
 
 export const findActions = (actionList, row, props) => {
@@ -21,8 +21,9 @@ export const findActions = (actionList, row, props) => {
   });
   // Filter by activity code if any provided
   const filteredByActivityCode = filteredByStatus.filter((action) =>
-    (action.activityCode ?
-      action.activityCode.every((code) => supportedActivities.some((activity) => activity === code))
+    (action.activityCode
+      ? action.activityCode.every((code) =>
+        supportedActivities.some((activity) => activity === code))
       : true
     ));
   // Filter by required user's role if provided

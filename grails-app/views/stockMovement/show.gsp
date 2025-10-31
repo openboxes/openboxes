@@ -5,6 +5,7 @@
 <%@ page import="org.pih.warehouse.requisition.RequisitionSourceType" %>
 <%@ page import="org.pih.warehouse.inventory.StockMovementStatusCode" %>
 <%@ page import="org.pih.warehouse.core.ActivityCode"%>
+<%@ page import="org.pih.warehouse.core.Constants" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -31,7 +32,7 @@
         <g:if test="${stockMovement?.documents}">
             <div class="right">
                 <div class="button-group">
-                    <g:if test="${stockMovement.electronicType}">
+                    <g:if test="${!stockMovement.isReturn}">
                         <g:link controller="stockMovement" action="addComment" id="${stockMovement?.id}" class="button">
                             <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
                             <warehouse:message code="requisition.addComment.label" default="Add comment" />
@@ -51,10 +52,20 @@
                             <g:each var="document" in="${stockMovement?.documents}">
                                 <g:if test="${!document.hidden}">
                                     <div class="action-menu-item">
-                                        <g:link url="${document.uri}" target="_blank">
-                                            <img src="${resource(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
-                                            ${document.name}
-                                        </g:link>
+                                        <g:if test="${document.downloadOptions}">
+                                            <g:each var="downloadOption" in="${document.downloadOptions}">
+                                                <g:link url="${downloadOption.uri}" target="_blank">
+                                                    <img src="${resource(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
+                                                    ${downloadOption.name}
+                                                </g:link>
+                                            </g:each>
+                                        </g:if>
+                                        <g:else>
+                                            <g:link url="${document.uri}" target="_blank">
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
+                                                ${document.name}
+                                            </g:link>
+                                        </g:else>
                                     </div>
                                 </g:if>
                             </g:each>
@@ -216,7 +227,7 @@
     </div>
     <div class="yui-gf">
         <div class="yui-u first">
-            <div class="box">
+            <aside class="box" aria-label="Details">
                 <h2><warehouse:message code="default.details.label" /></h2>
                 <div class="dialog">
 
@@ -237,6 +248,16 @@
                                 ${stockMovement?.displayStatus?.label}
                             </td>
                         </tr>
+                        <g:if test="${stockMovement?.shipment?.isFromPurchaseOrder}">
+                            <tr class="prop">
+                                <td class="name">
+                                    <g:message code="stockMovement.originCode.label"/>
+                                </td>
+                                <td class="value">
+                                    ${stockMovement?.origin?.organization?.code}
+                                </td>
+                            </tr>
+                        </g:if>
                         <tr class="prop">
                             <td class="name">
                                 <warehouse:message code="stockMovement.origin.label"/>
@@ -260,6 +281,27 @@
                                 </td>
                                 <td class="value">
                                     <format:metadata obj="${stockMovement?.requestType}"/>
+                                </td>
+                            </tr>
+                        </g:if>
+                        <g:if test="${stockMovement?.isElectronicType()}">
+                            <tr class="prop">
+                                <td class="name">
+                                    <g:message
+                                            code="stockMovement.desiredDateOfDelivery"
+                                            default="Desired date of delivery"
+                                    />
+                                </td>
+                                <td class="value">
+                                    <g:if test="${stockMovement?.requisition?.dateDeliveryRequested}">
+                                        <g:formatDate
+                                                format="${Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"
+                                                date="${stockMovement?.requisition?.dateDeliveryRequested}"
+                                        />
+                                    </g:if>
+                                    <g:else>
+                                        <warehouse:message code="default.none.label" />
+                                    </g:else>
                                 </td>
                             </tr>
                         </g:if>
@@ -409,8 +451,8 @@
                         </g:isSuperuser>
                     </table>
                 </div>
-            </div>
-            <div class="box">
+            </aside>
+            <aside class="box" aria-label="Auditing">
                 <h2><warehouse:message code="default.auditing.label"/></h2>
                 <div class="dialog">
 
@@ -422,7 +464,10 @@
                             <td class="value">
                                 <g:if test="${stockMovement?.dateRequested}">
                                     <span title="${g.formatDate(date:stockMovement?.dateRequested)}">
-                                        <g:formatDate format="MMMM dd, yyyy" date="${stockMovement.dateRequested}"/>
+                                        <g:formatDate
+                                                format="${Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"
+                                                date="${stockMovement.dateRequested}"
+                                        />
                                     </span>
                                     <g:if test="${stockMovement?.requestedBy}">
                                         <warehouse:message code="default.by.label"/>
@@ -446,7 +491,7 @@
                                 <td class="value">
                                     <g:if test="${date && person}">
                                         <span title="${g.formatDate(date: date)}">
-                                            <g:formatDate format="MMMM dd, yyyy" date="${date}"/>
+                                            <g:formatDate format="${Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}" date="${date}"/>
                                         </span>
                                         <g:message code="default.by.label"/>
                                         ${person}
@@ -464,8 +509,11 @@
                             </td>
                             <td class="value">
                                 <g:if test="${stockMovement?.shipment?.hasShipped()}">
-                                    <span title="${g.formatDate(date:stockMovement?.dateShipped)}">
-                                        <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.dateShipped}"/>
+                                    <span title="${g.formatDate(date: stockMovement?.dateShipped, format: Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT)}">
+                                        <g:formatDate
+                                                format="${Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"
+                                                date="${stockMovement?.dateShipped}"
+                                        />
                                     </span>
                                     <g:if test="${stockMovement?.shipment?.shippedBy}">
                                         <warehouse:message code="default.by.label"/>
@@ -484,8 +532,11 @@
                             <td class="value">
                                 <g:if test="${stockMovement?.shipment?.receipts}">
                                     <g:each var="receipt" in="${stockMovement?.shipment?.receipts}">
-                                        <span title="${g.formatDate(date:receipt?.actualDeliveryDate)}">
-                                            <g:formatDate format="MMMM dd, yyyy" date="${receipt?.actualDeliveryDate}"/>
+                                        <span title="${g.formatDate(date: receipt?.actualDeliveryDate, format: Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT)}">
+                                            <g:formatDate
+                                                    format="${Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"
+                                                    date="${receipt?.actualDeliveryDate}"
+                                            />
                                         </span>
                                         <g:if test="${receipt.recipient}">
                                             <warehouse:message code="default.by.label"/>
@@ -505,8 +556,11 @@
                             </td>
                             <td class="value">
                                 <g:if test="${stockMovement?.dateCreated}">
-                                    <span title="${g.formatDate(date:stockMovement?.dateCreated)}">
-                                        <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.dateCreated}"/>
+                                    <span title="${g.formatDate(date: stockMovement?.dateCreated, format: Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT)}">
+                                        <g:formatDate
+                                                format="${Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"
+                                                date="${stockMovement?.dateCreated}"
+                                        />
                                     </span>
                                     <g:if test="${stockMovement?.createdBy}">
                                         <warehouse:message code="default.by.label"/>
@@ -524,8 +578,11 @@
                             </td>
                             <td class="value">
                                 <g:if test="${stockMovement?.lastUpdated}">
-                                    <span title="${g.formatDate(date:stockMovement?.lastUpdated)}">
-                                        <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.lastUpdated}"/>
+                                    <span title="${g.formatDate(date: stockMovement?.lastUpdated, format: Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT)}">
+                                        <g:formatDate
+                                                format="${Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"
+                                                date="${stockMovement?.lastUpdated}"
+                                        />
                                     </span>
                                     <g:if test="${stockMovement?.updatedBy}">
                                         <warehouse:message code="default.by.label"/>
@@ -540,41 +597,48 @@
                     </table>
 
                 </div>
-            </div>
+            </aside>
         </div>
         <div class="yui-u">
             <div class="tabs">
-                <ul>
+                <ul aria-label="tabs">
                     <g:if test="${!stockMovement?.origin?.isSupplier()}">
-                        <li>
+                        <li role="tab">
                             <g:link controller="stockMovement" action="requisition" params="${[ id: stockMovement?.id ]}">
-                                <warehouse:message code="requestDetails.label"/>
+                                <g:message code="requestDetails.label"/>
                             </g:link>
                         </li>
                     </g:if>
-                    <li>
+                    <li role="tab">
                         <g:link controller="stockMovement" action="packingList" params="${[ id: stockMovement?.id ]}">
-                            <warehouse:message code="shipping.packingList.label" />
+                            <g:message code="shipping.packingList.label" />
                         </g:link>
                     </li>
-                    <li>
+                    <li role="tab">
                         <g:link controller="stockMovement" action="receipts" params="${[ id: stockMovement?.id ]}">
-                            <warehouse:message code="receipts.label" default="Receipts"/>
+                            <g:message code="receipts.label" default="Receipts"/>
                         </g:link>
                     </li>
-                    <li>
+                    <li role="tab">
+                        <g:link controller="stockMovement" action="events" params="${[ id: stockMovement?.id ]}">
+                            <g:message code="events.label" default="Event"/>
+                        </g:link>
+                    </li>
+                    <li role="tab">
                         <g:link controller="stockMovement" action="documents" params="${[ id: stockMovement?.id ]}">
-                            <warehouse:message code="documents.label" default="Documents"/>
+                            <g:message code="documents.label" default="Documents"/>
                         </g:link>
                     </li>
-                    <g:if test="${stockMovement.electronicType}">
-                        <g:set var="commentCount" value="${stockMovement?.requisition?.comments?.size()}" />
+                    <g:if test="${!stockMovement.isReturn}">
+                        <g:set var="comments" value="${stockMovement?.requisition?.comments ?: stockMovement?.shipment?.comments}" />
+                        <g:set var="commentCount" value="${comments?.size()}" />
                         <li
+                            role="tab"
                             data-count="${commentCount < 1000 ? commentCount : '999+' }"
                             class="${commentCount > 0 ? 'tab-badge' : ''}"
                         >
                             <g:link controller="stockMovement" action="comments" params="${[ id: stockMovement?.id ]}">
-                                <warehouse:message code="comments.label" default="Comments"/>
+                                <g:message code="comments.label" default="Comments"/>
                             </g:link>
                         </li>
                     </g:if>

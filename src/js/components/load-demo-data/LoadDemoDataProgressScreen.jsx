@@ -30,7 +30,7 @@ const LoadDemoDataProgressScreen = () => {
 
   if (isLoading) {
     return (
-      <React.Fragment>
+      <>
         <h3 className="font-weight-bold my-3">
           <Translate
             id="react.loadData.loadingData.label"
@@ -54,7 +54,7 @@ const LoadDemoDataProgressScreen = () => {
             />
           </p>
         </div>
-      </React.Fragment>
+      </>
     );
   }
 
@@ -67,6 +67,5 @@ const LoadDemoDataProgressScreen = () => {
     <LoadDemoDataSuccessMessage supportLinks={supportLinks} />
   );
 };
-
 
 export default LoadDemoDataProgressScreen;

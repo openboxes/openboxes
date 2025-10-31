@@ -6,7 +6,6 @@ import { Link, withRouter } from 'react-router-dom';
 
 import { DASHBOARD_URL } from 'consts/applicationUrls';
 
-
 const Logo = ({
   logoUrl,
 }) => (
@@ -24,13 +23,11 @@ const Logo = ({
   </div>
 );
 
-
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   logoUrl: state.session.logoUrl,
 });
 
 export default withRouter(connect(mapStateToProps)(Logo));
-
 
 Logo.propTypes = {
   logoUrl: PropTypes.string,

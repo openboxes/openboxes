@@ -114,6 +114,12 @@ input, .date-field-input {
   z-index: 999;
 }
 
+.react-datepicker__navigation {
+  width: 15px;
+  height: 15px;
+  top: 8px;
+}
+
 .react-datepicker__input-container {
   width: 100%;
 
@@ -137,7 +143,6 @@ input, .date-field-input {
       color: var(--gray-600);
     }
 
-
     &.disabled {
       background-color: var(--blue-100);
     }
@@ -154,6 +159,10 @@ input, .date-field-input {
       color: var(--gray-600)
     }
   }
+
+  .react-datepicker__aria-live {
+    display: none !important;
+  }
 }
 
 // SELECT FIELD
@@ -162,6 +171,10 @@ input, .date-field-input {
 
   div:nth-child(2) > div:first-child {
     width: 100%;
+  }
+
+  .react-select--is-disabled .react-select__control {
+    background-color: var(--blue-100);
   }
 
   .react-select__control {
@@ -200,6 +213,10 @@ input, .date-field-input {
     }
   }
 
+  .input-has-error {
+    border-radius: 5px;
+  }
+
   .has-errors {
     .react-select__control {
       border: 1px solid var(--color-red) !important;
@@ -208,6 +225,108 @@ input, .date-field-input {
         border-color: var(--color-red) !important;
         box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px var(--color-red) !important;
       }
+    }
+  }
+
+  .has-warning {
+    .react-select__control {
+      border-color: var(--blue-primary) !important;
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px var(--blue-primary) !important;
+    }
+  }
+
+  .react-select__single-value--is-disabled > div {
+    color: var(--gray-600);
+  }
+}
+
+.checkbox-v2 {
+  width: 18px;
+  height: 18px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: 2px solid var(--gray-300);
+  border-radius: 4px;
+  background-color: var(--white-alpha);
+  cursor: pointer;
+  position: relative;
+  outline: none;
+
+  &:hover {
+    border-color: var(--blue-primary);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    transition: all 0.2s ease;
+  }
+
+  &:checked {
+    background-color: var(--blue-primary);
+    border-color: var(--blue-primary);
+
+    &::after {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -60%) rotate(45deg);
+      width: 6px;
+      height: 12px;
+      border: solid #ffffff;
+      border-width: 0 2px 2px 0;
+    }
+  }
+
+  &:indeterminate {
+    background-color: var(--blue-primary);
+    border-color: var(--blue-primary);
+
+    &::after {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 2px;
+      background-color: #ffffff;
+    }
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    border-color: var(--gray-300);
+
+    &:checked {
+      background-color: var(--gray-300);
+    }
+  }
+
+  &.cancel-icon {
+    position: relative;
+    background-color: var(--color-red);
+    border-color: var(--color-red);
+    cursor: pointer;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(45deg);
+      width: 10px;
+      height: 2px;
+      background-color: white !important;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      width: 10px;
+      height: 2px;
+      background-color: white !important;
     }
   }
 }

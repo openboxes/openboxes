@@ -1,2 +1,9 @@
-mkdocs==1.2.3
+mkdocs
 mkdocs-material
+mkdocs-material-extensions
+mkdocs-macros-plugin
+mkdocs-awesome-pages-plugin
+mkdocs-glightbox
+mkdocs-open-in-new-tab
+markdown-include
+materialx

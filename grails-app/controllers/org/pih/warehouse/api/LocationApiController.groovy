@@ -10,13 +10,13 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import grails.validation.ValidationException
 import org.grails.web.json.JSONObject
 import org.hibernate.Criteria
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationDataService
+import org.pih.warehouse.core.LocationIdentifierService
 import org.pih.warehouse.core.LocationRole
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.RoleType
@@ -34,7 +34,7 @@ class LocationApiController extends BaseDomainApiController {
     def locationService
     def userService
     GrailsApplication grailsApplication
-    def identifierService
+    LocationIdentifierService locationIdentifierService
     def inventoryService
     def documentService
     LocationDataService locationGormService
@@ -203,7 +203,7 @@ class LocationApiController extends BaseDomainApiController {
         }
 
         if (!location.locationNumber) {
-            location.locationNumber = identifierService.generateLocationIdentifier()
+            location.locationNumber = locationIdentifierService.generate(location)
         }
 
         if (!location.inventory) {
@@ -211,27 +211,6 @@ class LocationApiController extends BaseDomainApiController {
         }
 
         return location
-    }
-
-    @Transactional
-    def updateForecastingConfiguration() {
-        JSONObject jsonObject = request.JSON
-        Location existingLocation = Location.get(params.id)
-
-        if (!existingLocation) {
-            throw new IllegalArgumentException("No Location found for location ID ${params.id}")
-        }
-
-        def inventoryLevelInstance = InventoryLevel.findByInventoryAndProductIsNull(existingLocation.inventory)
-
-        if (!inventoryLevelInstance) {
-            inventoryLevelInstance = new InventoryLevel(inventory: existingLocation.inventory)
-        }
-        bindData(inventoryLevelInstance, jsonObject)
-
-        inventoryLevelInstance.save()
-
-        render(status: 200)
     }
 
     def delete() {

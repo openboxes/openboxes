@@ -14,8 +14,8 @@ import grails.util.Holders
 import org.pih.warehouse.EmptyStringsToNullBinder
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.GlAccount
+import org.pih.warehouse.invoice.OrderAdjustmentInvoiceStatus
 import org.pih.warehouse.invoice.InvoiceItem
-import org.pih.warehouse.invoice.InvoiceType
 import org.pih.warehouse.invoice.InvoiceTypeCode
 
 class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
@@ -59,12 +59,11 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
     static transients = [
         'totalAdjustments',
         'postedPurchaseInvoiceItems',
-        'isInvoiced',
         "invoices",
         "hasInvoices",
         "hasPrepaymentInvoice",
         "hasRegularInvoice",
-        "disableRefresh"
+        "disableRefresh",
     ]
 
     static belongsTo = [order: Order, orderItem: OrderItem]
@@ -94,18 +93,116 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
         return amount ?: percentage ? orderItem ? orderItem?.subtotal * (percentage/100) : order.subtotal * (percentage/100) : 0
     }
 
+    def getTotalAmountNotInvoiced() {
+        return totalAdjustments - unitPriceOnPostedInvoices
+    }
+
     def getPostedPurchaseInvoiceItems() {
         invoiceItems?.findAll {
             it.invoice.datePosted != null && it.invoice.isRegularInvoice
         }
     }
 
-    Boolean getIsInvoiced() {
-        return !postedPurchaseInvoiceItems.empty
+    Boolean getIsFullyInvoiced() {
+        return Math.abs(unitPriceOnPostedInvoices) >= Math.abs(totalAdjustments)
+    }
+
+    OrderAdjustmentInvoiceStatus getDerivedPaymentStatus() {
+        // An invoiced or partially invoiced adjustment will always have posted invoice items
+        if (postedPurchaseInvoiceItems.empty) {
+            return OrderAdjustmentInvoiceStatus.NOT_INVOICED
+        }
+
+        // check if order adjustment was invoiced as canceled
+        // either with canceled flag or amount 0
+        // then mark this order adjustment as invoiced
+        if (canceled || totalAdjustments == 0) {
+            return OrderAdjustmentInvoiceStatus.INVOICED
+        }
+
+        // if order adjustment was already invoiced but with amount 0
+        // meaning it was invoiced as canceled item
+        if (unitPriceOnPostedInvoices == 0) {
+            return OrderAdjustmentInvoiceStatus.NOT_INVOICED
+        }
+
+        if (isFullyInvoiced) {
+            return OrderAdjustmentInvoiceStatus.INVOICED
+        }
+
+        return OrderAdjustmentInvoiceStatus.PARTIALLY_INVOICED
+    }
+
+    /**
+     * Overall invoiced unit price for this adjustment. Can be positive, negative or 0.
+     * */
+    BigDecimal getInvoicedUnitPrice() {
+        return invoiceItems?.sum {
+            if (it.invoice?.isRegularInvoice && !it.inverse) {
+                return it.unitPrice
+            }
+            return 0
+        } ?: 0
+    }
+
+    /**
+     * Posted invoiced unit price for this adjustment. Can be positive, negative or 0.
+     * */
+    BigDecimal getUnitPriceOnPostedInvoices() {
+        return invoiceItems?.sum {
+            if (it.invoice?.datePosted != null && it.invoice?.isRegularInvoice && !it.inverse) {
+                return it.unitPrice
+            }
+            return 0
+        } ?: 0
+    }
+
+    /**
+     * Overall inversed unit price for this adjustment. Can be positive, negative or 0.
+     * */
+    BigDecimal getInversedUnitPrice() {
+        return invoiceItems?.sum {
+            if (it.inverse) {
+                return it.unitPrice
+            }
+            return 0
+        } ?: 0
     }
 
     def getInvoices() {
         return invoiceItems*.invoice.unique()
+    }
+
+    /**
+     * Adjustment can be on a regular invoice if it is not canceled or if it is canceled, but has prepayment
+     * */
+    Boolean canBeOnRegularInvoice() {
+        if (canceled) {
+            return hasPrepaymentInvoice
+        }
+
+        return true
+    }
+
+    /**
+     * Adjustment is invoiceable on regular invoice if:
+     *  - adjustment is canceled, it has prepayment, does not have full unit price (total adjustment) invoiced in all regular invoices and order is placed
+     *  - adjustment is not canceled, and does not have full unit price (total adjustment) invoiced in all regular invoices
+     *  - adjustment does not have full unit price (total adjustment) invoiced in all regular invoices yet and order is placed
+     * */
+    Boolean isInvoiceable() {
+        Boolean fullyInvoiced = invoicedUnitPrice == totalAdjustments
+
+        if (canceled) {
+            return hasPrepaymentInvoice && !hasRegularInvoice && order.placed && !fullyInvoiced
+        }
+
+        // handle cases when trying to invoice adjustment with amount 0
+        if (totalAdjustments == 0) {
+            return order.placed && !hasRegularInvoice
+        }
+
+        return order.placed && !fullyInvoiced
     }
 
     Boolean getHasInvoices() {
@@ -118,6 +215,14 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
 
     Boolean getHasRegularInvoice() {
         return invoices.any { it.invoiceType == null || it.invoiceType?.code == InvoiceTypeCode.INVOICE }
+    }
+
+    BigDecimal getUnitPriceAvailableToInvoice() {
+        if (totalAdjustments == 0 || canceled) {
+            return 0
+        }
+
+        return totalAdjustments - invoicedUnitPrice
     }
 
     @Override

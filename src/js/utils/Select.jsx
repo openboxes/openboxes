@@ -6,6 +6,7 @@ import { getTranslate } from 'react-localize-redux';
 import { Overlay } from 'react-overlays';
 import { connect } from 'react-redux';
 import ReactSelect, { Async, components } from 'react-select';
+import Creatable from 'react-select/lib/Creatable';
 import { Tooltip } from 'react-tippy';
 
 import { selectNullOption } from 'utils/option-utils';
@@ -39,8 +40,9 @@ const Menu = (props) => {
       container={document.getElementById('root')}
     >
       <Dropdown width={target.offsetWidth.toString()}>
-        <div className="custom-option" {...props.innerProps}>
-          {props.selectProps.createNewFromModal &&
+        <div role="list" data-testid="custom-select-dropdown-menu" className="custom-option" {...props.innerProps}>
+          {props.selectProps.createNewFromModal
+            && (
             <div
               className="add-new-button"
               onClick={props.selectProps.newOptionModalOpen}
@@ -48,9 +50,15 @@ const Menu = (props) => {
               role="button"
               tabIndex={0}
             >
-              <span><i className="fa fa-plus pr-2" /><Translate id={props.selectProps.createNewFromModalLabel} defaultMessage={props.selectProps.defaultMessage} /></span>
+              <span>
+                <i className="fa fa-plus pr-2" />
+                <Translate
+                  id={props.selectProps.createNewFromModalLabel}
+                  defaultMessage={props.selectProps.defaultMessage}
+                />
+              </span>
             </div>
-          }
+            )}
           {props.children}
         </div>
       </Dropdown>
@@ -70,14 +78,15 @@ Menu.propTypes = {
   }).isRequired,
 };
 
-
-const Option = props => (
+const Option = (props) => (
   <components.Option {...props}>
-    {props.selectProps.optionRenderer ? (
-      props.selectProps.optionRenderer(props.data)
-    ) : (
-      <div>{props.data.label}</div>
-    )}
+    <div role="listitem">
+      {props.selectProps.optionRenderer ? (
+        props.selectProps.optionRenderer(props.data)
+      ) : (
+        <div>{props.data.label}</div>
+      )}
+    </div>
   </components.Option>
 );
 
@@ -141,24 +150,56 @@ class Select extends Component {
           }
           // if there are no labels on value item
           // then try to extract these labels from select options
-          const option = this.options.find(it => it?.id && (it?.id === v?.id));
+          const option = this.options.find((it) => it?.id && (it?.id === v?.id));
           return option?.[labelKey] ?? option?.label;
         })
         .join(', ');
     }
 
-    return value.label ?? value.name;
+    const label = value.label ?? value.name;
+    if (label instanceof String) {
+      return label;
+    }
+
+    return value?.label?.props?.id
+      ? this.props.translate(
+        value?.label?.props?.id,
+        value?.id,
+        value?.label?.props?.data,
+      ) : null;
   }
 
   getTooltipHtml() {
-    const { placeholder, showLabelTooltip, defaultPlaceholder } = this.props;
+    const {
+      placeholder,
+      showLabelTooltip,
+      defaultPlaceholder,
+      tooltipValue,
+      tooltipDefaultValue,
+    } = this.props;
+
+    if (tooltipValue?.trim()) {
+      const tooltipTranslatedLabel = this.props.translate(
+        tooltipValue,
+        tooltipDefaultValue ?? tooltipValue,
+      );
+      return (
+        <div className="p-1">
+          {tooltipTranslatedLabel}
+        </div>
+      );
+    }
 
     const valueLabel = this.getValueLabel();
 
     if (showLabelTooltip) {
+      const placeholderTranslatedLabel = this.props.translate(
+        placeholder,
+        defaultPlaceholder ?? placeholder,
+      );
       return (
         <div className="p-1">
-          {`${this.props.translate(placeholder, defaultPlaceholder ?? placeholder)}${valueLabel ? `: ${valueLabel}` : ''}`}
+          {`${placeholderTranslatedLabel}${valueLabel ? `: ${valueLabel}` : ''}`}
         </div>
       );
     }
@@ -166,9 +207,9 @@ class Select extends Component {
     return (
       <div className="p-1">
         {valueLabel}
-      </div>);
+      </div>
+    );
   }
-
 
   mapOptions(values) {
     return (_.map(values, (value) => {
@@ -204,7 +245,7 @@ class Select extends Component {
       if (options?.length) {
         return options.reduce((acc, curr) => {
           // If checked values contain current option, add it to checked options
-          if (checkedValues?.some(val => val.id === curr.id)) {
+          if (checkedValues?.some((val) => val.id === curr.id)) {
             return {
               ...acc,
               checked: [...acc.checked, curr],
@@ -226,21 +267,21 @@ class Select extends Component {
     });
   }
 
-
   render() {
     const {
       options: selectOptions, value: selectValue = this.state.value,
       multi = false, delimiter = ';', async = false, showValueTooltip, showLabelTooltip,
       clearable = true, arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress,
       onEnterPress, customSelectComponents, optionRenderer, classNamePrefix,
-      showSelectedOptionColor, scrollableParentContainerClassName, ...attributes
+      showSelectedOptionColor, scrollableParentContainerClassName, onKeyDown, creatable,
+      ...attributes
     } = this.props;
     const { formatValue, className, showLabel = false } = attributes;
 
     let value = selectValue || null;
 
     if (selectValue && typeof selectValue === 'string') {
-      const selectedOption = _.find(this.options, o => o.value === selectValue);
+      const selectedOption = _.find(this.options, (o) => o.value === selectValue);
       value = { value: selectValue, label: selectedOption ? selectedOption.label : '' };
     }
 
@@ -254,9 +295,16 @@ class Select extends Component {
       }
     }
 
-    const SelectType = async ? Async : ReactSelect;
-
-    const SingleValue = props => (
+    const SelectType = (() => {
+      if (creatable) {
+        return Creatable;
+      }
+      if (async) {
+        return Async;
+      }
+      return ReactSelect;
+    })();
+    const SingleValue = (props) => (
       <components.SingleValue {...props}>
         {this.props.valueRenderer ? (
           this.props.valueRenderer({ ...props.data, showSelectedOptionColor })
@@ -268,8 +316,8 @@ class Select extends Component {
 
     if (attributes.disabled && this.props.value && showLabel) {
       // eslint-disable-next-line no-nested-ternary
-      const formattedValue = formatValue ? formatValue(this.props.value) :
-        (this.props.value.label ? this.props.value.label : this.props.value);
+      const formattedValue = formatValue ? formatValue(this.props.value)
+        : (this.props.value.label ? this.props.value.label : this.props.value);
       return (
         <div id={`${this.state.id}-container`}>
           <Tooltip
@@ -332,7 +380,7 @@ class Select extends Component {
     };
 
     return (
-      <div id={`${this.state.id}-container`}>
+      <div id={`${this.state.id}-container`} data-testid={attributes?.dataTestId ?? 'custom-select-element'}>
         <Tooltip
           html={this.getTooltipHtml()}
           disabled={isTooltipDisabled()}
@@ -369,11 +417,14 @@ class Select extends Component {
             ref={fieldRef}
             classNamePrefix={classNamePrefix}
             loadingMessage={() => this.props.translate('react.default.loading.label', 'Loading...')}
-            noOptionsMessage={() => (async ?
-              this.props.translate('react.default.select.noResultsFound.label', 'No results found') :
-              this.props.translate('react.default.select.typeToSearch.label', 'Type to search'))
-          }
+            noOptionsMessage={() => (async
+              ? this.props.translate('react.default.select.noResultsFound.label', 'No results found')
+              : this.props.translate('react.default.select.typeToSearch.label', 'Type to search'))}
             onKeyDown={(event) => {
+              if (this.props.onKeyDown) {
+                this.props.onKeyDown(event);
+              }
+
               switch (event.keyCode) {
                 case 37: /* arrow left */
                   if (arrowLeft) {
@@ -426,7 +477,7 @@ class Select extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
@@ -445,6 +496,8 @@ Select.propTypes = {
   delimiter: PropTypes.string,
   showValueTooltip: PropTypes.bool,
   showLabelTooltip: PropTypes.bool,
+  tooltipValue: PropTypes.string,
+  tooltipDefaultValue: PropTypes.string,
   placeholder: PropTypes.string,
   initialValue: PropTypes.oneOfType([PropTypes.string,
     PropTypes.shape({}), PropTypes.any]),
@@ -468,6 +521,8 @@ Select.propTypes = {
   nullOptionLabel: PropTypes.string,
   nullOptionDefaultLabel: PropTypes.string,
   scrollableParentContainerClassName: PropTypes.string,
+  onKeyDown: PropTypes.func,
+  creatable: PropTypes.bool,
 };
 
 Select.defaultProps = {
@@ -483,6 +538,8 @@ Select.defaultProps = {
   initialValue: null,
   showValueTooltip: false,
   showLabelTooltip: false,
+  tooltipValue: undefined,
+  tooltipDefaultValue: undefined,
   arrowLeft: null,
   arrowUp: null,
   arrowRight: null,
@@ -500,4 +557,7 @@ Select.defaultProps = {
   nullOption: false,
   nullOptionLabel: '',
   nullOptionDefaultLabel: 'null',
+  scrollableParentContainerClassName: null,
+  onKeyDown: null,
+  creatable: false,
 };

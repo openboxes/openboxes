@@ -10,21 +10,58 @@ import ReactTable from 'react-table';
 import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
+import { TableCell } from 'components/DataTable';
 import { extractStockTransferItems, prepareRequest } from 'components/stock-transfer/utils';
 import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
+import StockTransferStatus from 'consts/stockTransferStatus';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 import 'react-table/react-table.css';
 
-
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
-const APPROVED = 'APPROVED';
-const CANCELED = 'CANCELED';
+// Functions for managing items in state after delete action.
+// 1. When clicking the delete button on the original item:
+//   - Delete the original item and every subitem of it
+// 2. When clicking the delete button on the saved subitem:
+//   - if it is the last subitem: delete it and enable the field on the original item
+//   - if it is not the last subitem: just delete it
+// 3. When clicking the delete button on the not saved subitem:
+//   - delete it just from the state, it is done in the deleteItem function.
+const getItemsAfterDelete = (items, indexToDelete) => {
+  // Reference of deleted line: (if line has referenceId it's not the original one)
+  const { referenceId, id } = items[indexToDelete];
+
+  // Removing deleted item from state
+  const filteredItems = items.filter((el, index) => {
+    // If it's the original line we have to delete all the split lines
+    // coming from the original one line and the original line itself
+    if (!referenceId) {
+      return el.id !== id && el.referenceId !== id;
+    }
+
+    // If it's not the original line we just deleting it
+    return index !== indexToDelete;
+  });
+
+  // grouping items by referenceId for checking if the original item has any existing subitem
+  const itemsGroupedByReferenceId = _.groupBy(filteredItems, 'referenceId');
+
+  // If an item doesn't have any subitems it should be enabled (status PENDING)
+  return filteredItems.map((item) => {
+    if (!itemsGroupedByReferenceId[item?.id]) {
+      return { ...item, status: StockTransferStatus.PENDING };
+    }
+
+    return item;
+  });
+};
 
 /**
  * The second page of stock transfer where user can choose qty and bin to transfer
@@ -77,8 +114,16 @@ class StockTransferSecondPage extends Component {
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.product.label" defaultMessage="Product" />,
-      accessor: 'product.name',
+      accessor: 'product',
       style: { whiteSpace: 'normal' },
+      Cell: (row) => (
+        <TableCell
+          {...row}
+          value={row.value?.displayName ?? row.value?.name}
+          tooltip={row.value?.displayName && row.value?.name !== row.value?.displayName}
+          tooltipLabel={row.value?.name}
+        />
+      ),
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.lot.label" defaultMessage="Lot" />,
@@ -89,6 +134,15 @@ class StockTransferSecondPage extends Component {
       Header: <Translate id="react.stockTransfer.expiry.label" defaultMessage="Expiry" />,
       accessor: 'expirationDate',
       style: { whiteSpace: 'normal' },
+      Cell: (props) => (
+        <span>
+          {
+            props?.value
+              ? this.props.formatLocalizedDate(props.value, DateFormat.COMMON)
+              : props.value
+          }
+        </span>
+      ),
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.quantityAvailableToTransfer.label" defaultMessage="Quantity Available to Transfer" />,
@@ -113,7 +167,7 @@ class StockTransferSecondPage extends Component {
       Cell: (props) => {
         const itemIndex = props.index;
         const { stockTransferItems } = this.state.stockTransfer;
-        const splitItems = _.filter(stockTransferItems, lineItem =>
+        const splitItems = _.filter(stockTransferItems, (lineItem) =>
           lineItem.referenceId && lineItem.referenceId === props.original.referenceId);
         let disabled = false;
         let disabledMessage;
@@ -136,8 +190,8 @@ class StockTransferSecondPage extends Component {
               });
             });
           }
-        } else if (splitItems.length === 1 &&
-          props.original.quantityNotPicked < _.toInteger(props.value)) {
+        } else if (splitItems.length === 1
+          && props.original.quantityNotPicked < _.toInteger(props.value)) {
           disabled = true;
           disabledMessage = this.props.translate(
             'react.stockTransfer.higherQuantity.label',
@@ -175,56 +229,64 @@ class StockTransferSecondPage extends Component {
             duration="250"
             hideDelay="50"
           >
-            <div className={disabled && props.original.status !== CANCELED ? 'has-error' : ''}>
+            <div className={disabled && props.original.status !== StockTransferStatus.CANCELED ? 'has-error' : ''}>
               <input
                 type="number"
                 className="form-control form-control-xs"
                 value={props.value}
-                disabled={props.original.status === CANCELED}
+                disabled={props.original.status === StockTransferStatus.CANCELED}
                 onChange={(event) => {
-              const stockTransfer = update(this.state.stockTransfer, {
-                stockTransferItems: { [itemIndex]: { quantity: { $set: event.target.value } } },
-              });
-              this.changeStockTransfer(stockTransfer);
-            }}
+                  const stockTransfer = update(this.state.stockTransfer, {
+                    stockTransferItems: { [itemIndex]: { quantity: { $set: event.target.value } } },
+                  });
+                  this.changeStockTransfer(stockTransfer);
+                }}
               />
             </div>
-          </Tooltip>);
+          </Tooltip>
+        );
       },
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.transferTo.label" defaultMessage="Transfer to" />,
       accessor: 'destinationBinLocation',
-      Cell: cellInfo => (<Select
-        options={this.state.bins}
-        value={_.get(this.state.stockTransfer.stockTransferItems, `[${cellInfo.index}].${cellInfo.column.id}`) || null}
-        onChange={value => this.changeStockTransfer(update(this.state.stockTransfer, {
-          stockTransferItems: { [cellInfo.index]: { destinationBinLocation: { $set: value } } },
-        }))}
-        valueKey="id"
-        labelKey="name"
-        className="select-xs"
-        disabled={cellInfo.original.status === CANCELED}
-      />),
+      Cell: (cellInfo) => (
+        <Select
+          options={this.state.bins}
+          value={_.get(this.state.stockTransfer.stockTransferItems, `[${cellInfo.index}].${cellInfo.column.id}`) || null}
+          onChange={(value) => this.changeStockTransfer(update(this.state.stockTransfer, {
+            stockTransferItems: { [cellInfo.index]: { destinationBinLocation: { $set: value } } },
+          }))}
+          valueKey="id"
+          labelKey="name"
+          className="select-xs"
+          disabled={cellInfo.original.status === StockTransferStatus.CANCELED}
+        />
+      ),
       Filter,
     }, {
       Header: '',
       accessor: 'splitItems',
-      Cell: cellInfo => (
+      Cell: (cellInfo) => (
         <div className="d-flex flex-row flex-wrap">
           {!cellInfo.original.referenceId && (
             <button
+              type="button"
               className="btn btn-outline-success btn-xs mr-1 mb-1"
               onClick={() => this.splitItem(cellInfo)}
-            ><Translate id="react.stockTransfer.splitItem.label" defaultMessage="Split line" />
+            >
+              <Translate id="react.stockTransfer.splitItem.label" defaultMessage="Split line" />
             </button>
           )}
           <button
+            type="button"
             className="btn btn-outline-danger btn-xs mb-1"
             onClick={() => this.deleteItem(cellInfo.index)}
-          ><Translate id="react.default.button.delete.label" defaultMessage="Delete" />
+          >
+            <Translate id="react.default.button.delete.label" defaultMessage="Delete" />
           </button>
-        </div>),
+        </div>
+      ),
       filterable: false,
     },
   ];
@@ -259,7 +321,9 @@ class StockTransferSecondPage extends Component {
     if (filter.id === 'destinationBinLocation') {
       val = _.get(val, 'name');
     }
-
+    if (filter.id === 'product') {
+      val = val ? `${val.name} ${val.displayName}` : null;
+    }
     return _.toString(val).toLowerCase().includes(filter.value.toLowerCase());
   };
 
@@ -271,12 +335,12 @@ class StockTransferSecondPage extends Component {
     this.props.showSpinner();
     const url = '/api/internalLocations';
 
-    const mapBins = bins => (_.chain(bins)
+    const mapBins = (bins) => (_.chain(bins)
       .orderBy(['label'], ['asc']).value()
     );
 
     return apiClient.get(url, {
-      paramsSerializer: parameters => queryString.stringify(parameters),
+      paramsSerializer: (parameters) => queryString.stringify(parameters),
       params: {
         'location.id': this.props.location.id,
         locationTypeCode: ['BIN_LOCATION', 'INTERNAL'],
@@ -284,7 +348,7 @@ class StockTransferSecondPage extends Component {
       },
     })
       .then((response) => {
-        const binGroups = _.partition(response.data.data, bin => (bin.zoneName));
+        const binGroups = _.partition(response.data.data, (bin) => (bin.zoneName));
         const binsWithZone = _.chain(binGroups[0]).groupBy('zoneName')
           .map((value, key) => ({ name: key, options: mapBins(value) }))
           .orderBy(['name'], ['asc'])
@@ -304,7 +368,7 @@ class StockTransferSecondPage extends Component {
    */
   saveStockTransfer(data, callback) {
     const url = `/api/stockTransfers/${this.props.match.params.stockTransferId}`;
-    const payload = prepareRequest(data, APPROVED);
+    const payload = prepareRequest(data, StockTransferStatus.APPROVED);
     apiClient.put(url, flattenRequest(payload))
       .then((response) => {
         const stockTransfer = parseResponse(response.data.data);
@@ -327,22 +391,6 @@ class StockTransferSecondPage extends Component {
     this.setState({ stockTransfer });
   }
 
-  getItemsAfterDelete(items, indexToDelete) {
-    // Reference of deleted line: (if line has referenceId it's not the original one)
-    const { referenceId, id } = items[indexToDelete];
-
-    return items.filter((el, index) => {
-      // If it's the original line we have to delete all the split lines
-      // coming from the original one line and the original line itself
-      if (!referenceId) {
-        return el.id !== id && el.referenceId !== id;
-      }
-
-      // If it's not the original line we just deleting it
-      return index !== indexToDelete;
-    });
-  }
-
   deleteItem(itemIndex) {
     this.props.showSpinner();
 
@@ -356,7 +404,7 @@ class StockTransferSecondPage extends Component {
           this.setState((previousState) => ({
             stockTransfer: {
               ...stockTransfer,
-              stockTransferItems: this.getItemsAfterDelete(
+              stockTransferItems: getItemsAfterDelete(
                 previousState.stockTransfer.stockTransferItems,
                 itemIndex,
               ),
@@ -366,7 +414,8 @@ class StockTransferSecondPage extends Component {
         })
         .catch(() => this.props.hideSpinner());
     } else {
-      let stockTransfer = update(this.state.stockTransfer, {
+      const { stockTransfer: stockTransferFromState } = this.state;
+      let stockTransfer = update(stockTransferFromState, {
         stockTransferItems: {
           $splice: [
             [itemIndex, 1],
@@ -376,17 +425,23 @@ class StockTransferSecondPage extends Component {
 
       const originalItem = _.find(
         stockTransfer.stockTransferItems,
-        item => item.id === itemToDelete.referenceId,
+        (item) => item.id === itemToDelete.referenceId,
       );
       const splitItems = _.filter(
         stockTransfer.stockTransferItems,
-        item => item.referenceId === originalItem.id,
+        (item) => item.referenceId === originalItem.id,
       );
 
       if (splitItems.length === 0 && originalItem) {
         const originalItemIndex = _.findIndex(stockTransfer.stockTransferItems, originalItem);
         stockTransfer = update(stockTransfer, {
-          stockTransferItems: { [originalItemIndex]: { status: { $set: 'PENDING' } } },
+          stockTransferItems: {
+            [originalItemIndex]: {
+              status: {
+                $set: StockTransferStatus.PENDING,
+              },
+            },
+          },
         });
       }
 
@@ -433,17 +488,19 @@ class StockTransferSecondPage extends Component {
       status: null,
     };
 
-    const stockTransfer = update(this.state.stockTransfer, {
+    const { stockTransfer: stockTransferFromState } = this.state;
+
+    const stockTransfer = update(stockTransferFromState, {
       stockTransferItems: {
         // If splitting not yet canceled item, then cancel original row and add two new split lines
         // else if splitting already CANCELED line add a new line once
-        $splice: original.status !== CANCELED ? [
+        $splice: original.status !== StockTransferStatus.CANCELED ? [
           [index + 1, 0, newLine],
           [index + 1, 0, newLine],
         ] : [
           [index + 1, 0, newLine],
         ],
-        [index]: { $set: original.id ? { ...original, status: CANCELED, quantity: '' } : { ...original, quantity: '' } },
+        [index]: { $set: original.id ? { ...original, status: StockTransferStatus.CANCELED, quantity: '' } : { ...original, quantity: '' } },
       },
     });
 
@@ -455,7 +512,7 @@ class StockTransferSecondPage extends Component {
     this.setState({
       stockTransfer: {
         ...stockTransfer,
-        stockTransferItems: _.map(stockTransfer.stockTransferItems, item => ({
+        stockTransferItems: _.map(stockTransfer.stockTransferItems, (item) => ({
           ...item,
           quantity: item.quantityNotPicked,
         })),
@@ -469,11 +526,12 @@ class StockTransferSecondPage extends Component {
     return stockTransferItems && !!stockTransferItems.find((item) => {
       const { quantity, quantityNotPicked, status } = item;
 
-      if (status !== 'CANCELED' && (!quantity || quantity > quantityNotPicked || quantity <= 0)) {
+      if (status !== StockTransferStatus.CANCELED
+        && (!quantity || quantity > quantityNotPicked || quantity <= 0)) {
         return true;
       }
 
-      const splitItems = _.filter(stockTransferItems, lineItem =>
+      const splitItems = _.filter(stockTransferItems, (lineItem) =>
         lineItem.referenceId && lineItem.referenceId === item.referenceId);
 
       if (!item.id || splitItems.length > 1) {
@@ -494,10 +552,9 @@ class StockTransferSecondPage extends Component {
     const {
       columns, pivotBy,
     } = this.state;
-    const extraProps =
-      {
-        pivotBy,
-      };
+    const extraProps = {
+      pivotBy,
+    };
 
     return (
       <div className="stock-transfer">
@@ -507,7 +564,8 @@ class StockTransferSecondPage extends Component {
               type="button"
               onClick={() => this.autofill(this.state.stockTransfer)}
               className="btn btn-primary btn-form btn-xs"
-            ><Translate id="react.partialReceiving.autofillQuantities.label" defaultMessage="Autofill quantities" />
+            >
+              <Translate id="react.partialReceiving.autofillQuantities.label" defaultMessage="Autofill quantities" />
             </button>
           </div>
           <div className="d-flex mb-3 justify-content-end submit-buttons">
@@ -515,33 +573,42 @@ class StockTransferSecondPage extends Component {
               type="button"
               onClick={() => this.saveStockTransfer(this.state.stockTransfer)}
               className="btn btn-success btn-form btn-xs"
-              disabled={_.some(this.state.stockTransfer.stockTransferItems, stockTransferItem =>
-              stockTransferItem.quantity > stockTransferItem.quantityAvailable)}
-            ><span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
+              disabled={_.some(this.state.stockTransfer.stockTransferItems, (stockTransferItem) =>
+                stockTransferItem.quantity > stockTransferItem.quantityAvailable)}
+            >
+              <span>
+                <i className="fa fa-save pr-2" />
+                <Translate id="react.default.button.save.label" defaultMessage="Save" />
+              </span>
             </button>
             <button
               type="button"
               className="btn btn-outline-secondary btn-xs p-1 ml-3 mb-1"
               onClick={() => this.printStockTransfer()}
             >
-              <span><i className="fa fa-print pr-2" /><Translate id="react.stockTransfer.generateStockTransfer.label" defaultMessage="Generate Stock Transfer" /></span>
+              <span>
+                <i className="fa fa-print pr-2" />
+                <Translate id="react.stockTransfer.generateStockTransfer.label" defaultMessage="Generate Stock Transfer" />
+              </span>
             </button>
           </div>
         </div>
         {
-          this.state.stockTransfer.stockTransferItems ?
-            <SelectTreeTable
-              data={this.state.stockTransfer.stockTransferItems}
-              columns={columns}
-              ref={(r) => { this.selectTable = r; }}
-              className="-striped -highlight"
-              {...extraProps}
-              defaultPageSize={Number.MAX_SAFE_INTEGER}
-              minRows={0}
-              showPaginationBottom={false}
-              filterable
-              defaultFilterMethod={this.filterMethod}
-            />
+          this.state.stockTransfer.stockTransferItems
+            ? (
+              <SelectTreeTable
+                data={this.state.stockTransfer.stockTransferItems}
+                columns={columns}
+                ref={(r) => { this.selectTable = r; }}
+                className="-striped -highlight"
+                {...extraProps}
+                defaultPageSize={Number.MAX_SAFE_INTEGER}
+                minRows={0}
+                showPaginationBottom={false}
+                filterable
+                defaultFilterMethod={this.filterMethod}
+              />
+            )
             : null
         }
         <div className="submit-buttons">
@@ -550,7 +617,8 @@ class StockTransferSecondPage extends Component {
             onClick={() => this.nextPage()}
             disabled={this.isDisabled()}
             className="btn btn-outline-primary btn-form float-right btn-xs"
-          ><Translate id="react.default.button.next.label" defaultMessage="Next" />
+          >
+            <Translate id="react.default.button.next.label" defaultMessage="Next" />
           </button>
         </div>
       </div>
@@ -558,9 +626,10 @@ class StockTransferSecondPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockTransferTranslationsFetched: state.session.fetchedTranslations.stockTransfer,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(
@@ -593,4 +662,5 @@ StockTransferSecondPage.propTypes = {
     id: PropTypes.string,
   }).isRequired,
   stockTransferTranslationsFetched: PropTypes.bool.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };

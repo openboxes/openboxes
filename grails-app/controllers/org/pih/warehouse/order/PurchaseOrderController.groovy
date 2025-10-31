@@ -12,15 +12,12 @@ package org.pih.warehouse.order
 import grails.validation.ValidationException
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 
 class PurchaseOrderController {
 
 
     def orderService
-    def identifierService
-
 
     def index() {
         redirect(action: "create")

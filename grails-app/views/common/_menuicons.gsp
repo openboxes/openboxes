@@ -41,7 +41,7 @@
                                     <span class="subsection-title">${subsection?.label}</span>
                                 </g:if>
                                 <g:each in="${subsection?.menuItems}" var="item">
-                                    <a href="${item?.href}" class="dropdown-item">
+                                    <a href="${item?.href}" class="dropdown-item" role="menuitem">
                                         ${item?.label}
                                     </a>
                                 </g:each>

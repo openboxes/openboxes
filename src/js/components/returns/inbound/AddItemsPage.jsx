@@ -19,11 +19,14 @@ import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import notification from 'components/Layout/notifications/notification';
+import ConfirmExpirationDateModal from 'components/modals/ConfirmExpirationDateModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
 import NotificationType from 'consts/notificationTypes';
 import StockTransferStatus from 'consts/stockTransferStatus';
 import { flattenRequest, parseResponse } from 'utils/apiClient';
-import { renderFormField } from 'utils/form-utils';
+import { renderFormField, setColumnValue } from 'utils/form-utils';
+import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -62,8 +65,12 @@ const FIELDS = {
         className="btn btn-outline-success btn-xs"
         onClick={() => addRow({ sortOrder: getSortOrder() })}
       >
-        <span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
-      </button>),
+        <span>
+          <i className="fa fa-plus pr-2" />
+          <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
+        </span>
+      </button>
+    ),
     fields: {
       product: {
         type: ProductSelectField,
@@ -93,9 +100,10 @@ const FIELDS = {
         defaultMessage: 'Expiry',
         flexWidth: '1.5',
         attributes: {
-          dateFormat: 'MM/DD/YYYY',
+          localizeDate: true,
+          showLocalizedPlaceholder: true,
+          localizedDateFormat: DateFormat.COMMON,
           autoComplete: 'off',
-          placeholderText: 'MM/DD/YYYY',
         },
       },
       quantity: {
@@ -114,8 +122,21 @@ const FIELDS = {
         defaultMessage: 'Recipient',
         flexWidth: '1.5',
         getDynamicAttr: ({
-          recipients, addRow, rowCount, rowIndex, getSortOrder,
+          recipients, addRow, rowCount, rowIndex, getSortOrder, setRecipientValue, translate,
         }) => ({
+          headerHtml: () => (
+            <Select
+              placeholder={translate('react.stockMovement.recipient.label', 'Recipient')}
+              className="select-xs my-2"
+              classNamePrefix="react-select"
+              options={recipients}
+              onChange={(val) => {
+                if (val) {
+                  setRecipientValue(val);
+                }
+              }}
+            />
+          ),
           options: recipients,
           onTabPress: rowCount === rowIndex + 1 ? () =>
             addRow({ sortOrder: getSortOrder() }) : null,
@@ -141,6 +162,10 @@ class AddItemsPage extends Component {
       inboundReturn: {},
       sortOrder: 0,
       formValues: { returnItems: [] },
+      isExpirationModalOpen: false,
+      // Stores the resolve function for the ConfirmExpirationDateModal promise
+      resolveExpirationModal: null,
+      itemsWithMismatchedExpiry: [],
       // isFirstPageLoaded: false,
     };
 
@@ -150,8 +175,8 @@ class AddItemsPage extends Component {
     this.confirmEmptyQuantitySave = this.confirmEmptyQuantitySave.bind(this);
     this.confirmExpirationDateSave = this.confirmExpirationDateSave.bind(this);
     this.confirmEmptyQuantitySave = this.confirmEmptyQuantitySave.bind(this);
-    this.confirmValidationErrorOnPreviousPage =
-      this.confirmValidationErrorOnPreviousPage.bind(this);
+    this.confirmValidationErrorOnPreviousPage = this.confirmValidationErrorOnPreviousPage
+      .bind(this);
     this.validate = this.validate.bind(this);
   }
 
@@ -172,12 +197,13 @@ class AddItemsPage extends Component {
   }
 
   getSortOrder() {
-    this.setState({
-      sortOrder: this.state.sortOrder + 100,
-    });
+    this.setState((prev) => ({
+      sortOrder: prev.sortOrder + 100,
+    }));
 
     return this.state.sortOrder;
   }
+
   dataFetched = false;
 
   validate(values) {
@@ -279,25 +305,18 @@ class AddItemsPage extends Component {
     });
   }
 
-  confirmExpirationDateSave() {
+  /**
+   * Shows Inventory item expiration date update confirmation modal.
+   * @param {Array} itemsWithMismatchedExpiry - Array of elements with mismatched expiration dates.
+   * @returns {Promise} - Resolves to true if user confirms the update, false if not.
+   * @public
+   */
+  confirmExpirationDateSave(itemsWithMismatchedExpiry) {
     return new Promise((resolve) => {
-      confirmAlert({
-        title: this.props.translate('react.inboundReturns.message.confirmSave.label', 'Confirm save'),
-        message: this.props.translate(
-          'react.stockMovement.confirmExpiryDateUpdate.message',
-          'This will update the expiry date across all depots in the system. Are you sure you want to proceed?',
-        ),
-        willUnmount: () => resolve(false),
-        buttons: [
-          {
-            label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => resolve(true),
-          },
-          {
-            label: this.props.translate('react.default.no.label', 'No'),
-            onClick: () => resolve(false),
-          },
-        ],
+      this.setState({
+        isExpirationModalOpen: true,
+        resolveExpirationModal: resolve,
+        itemsWithMismatchedExpiry,
       });
     });
   }
@@ -358,7 +377,10 @@ class AddItemsPage extends Component {
   }
 
   async saveStockTransferInCurrentStep(formValues, status = null) {
-    const returnItems = _.filter(formValues.returnItems, (item) => !_.isEmpty(item) && item.product);
+    const returnItems = _.filter(
+      formValues.returnItems,
+      (item) => !_.isEmpty(item) && item.product,
+    );
 
     const hasEmptyOrZeroValues = _.some(returnItems, (item) => !item.quantity || item.quantity === '0');
 
@@ -369,20 +391,37 @@ class AddItemsPage extends Component {
       }
     }
 
-    const itemsWithLotAndExpirationDate = returnItems.filter(it => it.expirationDate && it.lotNumber);
-
+    const itemsWithLotAndExpirationDate = returnItems.filter(
+      (it) => it.expirationDate && it.lotNumber,
+    );
+    const itemsWithMismatchedExpiry = [];
     // Trying to find at least one instance where the data that we are trying to save
     // does not match the expiration date of the existing inventoryItem in the system
-    for (const it of itemsWithLotAndExpirationDate) {
-      const { data } = await ProductApi.getInventoryItem(it.product?.id, it.lotNumber);
-      if (data.inventoryItem && data.inventoryItem.expirationDate !== it.expirationDate) {
-        // After finding at least a single instance where expiration date we are trying to save
-        // does not match the existing inventoryItem expiration date, we want to inform the user
-        // that certain updates to th expiration date in the system will be performed
-        const shouldUpdateLotExpirationDate = await this.confirmExpirationDateSave();
-        if (!shouldUpdateLotExpirationDate) {
-          return Promise.reject();
+    // eslint-disable-next-line no-restricted-syntax
+    await Promise.all(
+      itemsWithLotAndExpirationDate.map(async (it) => {
+        const { data } = await ProductApi.getInventoryItem(it.product?.id, it.lotNumber);
+        if (data.inventoryItem && data.inventoryItem.expirationDate !== it.expirationDate) {
+          return itemsWithMismatchedExpiry.push({
+            code: it.product?.productCode,
+            product: it.product,
+            lotNumber: it.lotNumber,
+            previousExpiry: data.inventoryItem.expirationDate,
+            newExpiry: it.expirationDate,
+          });
         }
+        return null;
+      }),
+    );
+
+    if (itemsWithMismatchedExpiry.length > 0) {
+      // After finding at least a single instance where expiration date we are trying to save
+      // does not match the existing inventoryItem expiration date, we want to inform the user
+      // that certain updates to th expiration date in the system will be performed
+      const shouldUpdateExpirationDate =
+        await this.confirmExpirationDateSave(itemsWithMismatchedExpiry);
+      if (!shouldUpdateExpirationDate) {
+        return Promise.reject();
       }
     }
 
@@ -467,14 +506,41 @@ class AddItemsPage extends Component {
     this.props.previousPage(this.state.inboundReturn);
   }
 
+  /**
+   * Handles the response from the expiration date confirmation modal.
+   * @param {boolean} shouldUpdate - True if the user confirmed the update, false if not.
+   * @public
+   */
+  handleExpirationModalResponse(shouldUpdate) {
+    // Resolve the promise returned by confirmExpirationDateSave.
+    if (this.state.resolveExpirationModal) {
+      this.state.resolveExpirationModal(shouldUpdate);
+    }
+
+    // Close the modal and reset its state.
+    this.setState({
+      isExpirationModalOpen: false,
+      resolveExpirationModal: null,
+      itemsWithMismatchedExpiry: [],
+    });
+  }
+
   render() {
     return (
       <Form
         onSubmit={() => {}}
         validate={this.validate}
-        mutators={{ ...arrayMutators }}
+        mutators={{
+          ...arrayMutators,
+          setColumnValue,
+        }}
         initialValues={this.state.formValues}
-        render={({ handleSubmit, values, invalid }) => (
+        render={({
+          handleSubmit,
+          values,
+          invalid,
+          form: { mutators },
+        }) => (
           <div className="d-flex flex-column">
             <span className="buttons-container">
               <button
@@ -483,7 +549,10 @@ class AddItemsPage extends Component {
                 onClick={() => this.save(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
+                <span>
+                  <i className="fa fa-save pr-2" />
+                  <Translate id="react.default.button.save.label" defaultMessage="Save" />
+                </span>
               </button>
               <button
                 type="button"
@@ -491,7 +560,10 @@ class AddItemsPage extends Component {
                 onClick={() => this.saveAndExit(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+                <span>
+                  <i className="fa fa-sign-out pr-2" />
+                  <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
+                </span>
               </button>
               <button
                 type="button"
@@ -499,7 +571,10 @@ class AddItemsPage extends Component {
                 onClick={() => this.removeAll()}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs"
               >
-                <span><i className="fa fa-remove pr-2" /><Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" /></span>
+                <span>
+                  <i className="fa fa-remove pr-2" />
+                  <Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" />
+                </span>
               </button>
             </span>
             <form onSubmit={handleSubmit}>
@@ -510,6 +585,8 @@ class AddItemsPage extends Component {
                     removeItem: this.removeItem,
                     getSortOrder: this.getSortOrder,
                     originId: this.props.initialValues.origin.id,
+                    setRecipientValue: (val) => mutators.setColumnValue('returnItems', 'recipient', val),
+                    translate: this.props.translate,
                   }))}
               </div>
               <div className="submit-buttons">
@@ -529,12 +606,19 @@ class AddItemsPage extends Component {
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={
-                    !_.some(values.returnItems, item => item.product && _.parseInt(item.quantity))
+                    !_.some(values.returnItems, (item) => item.product && _.parseInt(item.quantity))
                   }
-                ><Translate id="react.default.button.next.label" defaultMessage="Next" />
+                >
+                  <Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
             </form>
+            <ConfirmExpirationDateModal
+              isOpen={this.state.isExpirationModalOpen}
+              itemsWithMismatchedExpiry={this.state.itemsWithMismatchedExpiry}
+              onConfirm={() => this.handleExpirationModalResponse(true)}
+              onCancel={() => this.handleExpirationModalResponse(false)}
+            />
           </div>
         )}
       />
@@ -542,7 +626,7 @@ class AddItemsPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   recipients: state.users.data,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   inboundReturnsTranslationsFetched: state.session.fetchedTranslations.inboundReturns,

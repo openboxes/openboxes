@@ -11,7 +11,7 @@ export default function (state = initialState, action) {
   switch (action.type) {
     case FETCH_USERS:
       if (action.payload !== undefined) {
-        const users = _.map(action.payload.data, user => (
+        const users = _.map(action.payload.data, (user) => (
           {
             value: user.id, id: user.id, label: user.name, name: user.name,
           }

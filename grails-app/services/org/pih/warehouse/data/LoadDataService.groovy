@@ -11,17 +11,24 @@ package org.pih.warehouse.data
 
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVMapReader
+import grails.validation.ValidationException
+import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.*
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.LocationImportDataService
 import org.pih.warehouse.importer.ProductCatalogItemImportDataService
 import org.pih.warehouse.importer.ProductSupplierImportDataService
+import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.InventoryImportProductInventoryTransactionService
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryService
+import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionIdentifierService
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductService
@@ -30,8 +37,7 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
 
-import java.text.DateFormat
-import java.text.SimpleDateFormat
+import java.time.Instant
 
 @Transactional
 class LoadDataService {
@@ -40,8 +46,12 @@ class LoadDataService {
     ProductSupplierImportDataService productSupplierImportDataService
     ProductService productService
     InventoryService inventoryService
-    IdentifierService identifierService
+    OrganizationIdentifierService organizationIdentifierService
     ProductCatalogItemImportDataService productCatalogItemImportDataService
+    InventoryImportProductInventoryTransactionService inventoryImportProductInventoryTransactionService
+    ProductAvailabilityService productAvailabilityService
+    ConfigService configService
+    TransactionIdentifierService transactionIdentifierService
 
     def importLocations(URL csvURL) {
         CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
@@ -77,7 +87,7 @@ class LoadDataService {
 
             Organization organization = new Organization(
                     name: organizationName,
-                    code: identifierService.generateOrganizationIdentifier(organizationName),
+                    code: organizationIdentifierService.generate(organizationName),
                     partyType: PartyType.findByCode("ORG") // FIXME: Should party type be provided?
             )
 
@@ -200,52 +210,123 @@ class LoadDataService {
         csvReader.close();
     }
 
+    private Transaction createAdjustmentTransaction(Date transactionDate, Inventory inventory) {
+        Transaction transaction =  new Transaction(
+                transactionDate: transactionDate,
+                transactionType: TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID),
+                inventory: inventory
+        )
+        transaction.transactionNumber = transactionIdentifierService.generate(transaction)
+        return transaction
+    }
+
+    private TransactionEntry createAdjustmentTransactionEntry(
+            Map<String, String> csvReaderRow,
+            Product product,
+            Location binLocation,
+            AvailableItemMap availableItems
+    ) {
+        InventoryItem inventoryItem = inventoryService.findAndUpdateOrCreateInventoryItem(
+                product,
+                csvReaderRow["Lot number"],
+                DateUtil.asDate(csvReaderRow["Expiration date"], Constants.EXPIRATION_DATE_FORMATTER)
+        )
+        int newQuantity = csvReaderRow["Physical QOH"] as int
+        int quantityOnHand = availableItems.get(binLocation, inventoryItem)?.quantityOnHand ?: 0
+        int adjustmentQuantity = newQuantity - quantityOnHand
+
+        if (adjustmentQuantity == 0) {
+            return null
+        }
+
+        return new TransactionEntry(
+                quantity: adjustmentQuantity,
+                comments: csvReaderRow["Comment"],
+                inventoryItem: inventoryItem,
+                binLocation: binLocation
+        )
+    }
 
     def importInventory(URL csvURL, Location targetWarehouse) {
-        CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
+        CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader())
+        // Storing stream data as list to avoid closing stream after first reading
+        List<Map<String, String>> rows = csvReader.toList()
 
-        Transaction transaction = new Transaction();
-        transaction.transactionDate = new Date();
-        transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID);
-        transaction.inventory = targetWarehouse.inventory
-        DateFormat dateFormat = new SimpleDateFormat('DD/mm/yyyy');
+        List<String> productCodes = rows.collect { it["Product code"] }.unique() as List<String>
+        List<String> binLocationNames = rows.collect { it["Bin location"] }.unique() as List<String>
 
-        csvReader.eachLine { Map<String, String> attr ->
-            Product product = Product.findByProductCode(attr["Product code"]);
+        // Get all locations and products at one DB call
+        Map<String, Location> locationMap = Location.findAllByParentLocationAndNameInList(targetWarehouse, binLocationNames).collectEntries {
+            [it.name, it]
+        }
+        Map<String, Product> productMap = Product.findAllByProductCodeInList(productCodes).collectEntries {
+            [it.productCode, it]
+        }
+        List<Product> products = productMap.values().toList()
+
+        // Calculate dates for inventory baseline and adjustment transactions
+        Date adjustmentTransactionDate = DateUtil.asDate(Instant.now())
+        Date inventoryBaselineTransactionDate = DateUtil.asDate(DateUtil.asInstant(adjustmentTransactionDate).minusSeconds(1))
+
+        // 1. Calculate the current available items from product availability - one snapshot transaction for all products
+        AvailableItemMap availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
+                targetWarehouse,
+                products,
+                inventoryBaselineTransactionDate
+        )
+
+        Boolean isInventoryBaselineEnabled = configService.getProperty(
+                "openboxes.transactions.inventoryBaseline.loadDemoData.enabled",
+                Boolean
+        )
+
+        // 2a. If there are available items:
+        //   - If inventory snapshot is turned on for load demo data:
+        //       - then create an inventory snapshot transaction with entries made from the current stock calculated in 1st point
+        // 2b. If there are no available items:
+        //   - then no snapshot is being saved
+        if (availableItems.size() && isInventoryBaselineEnabled) {
+            inventoryImportProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
+                    targetWarehouse,
+                    null,
+                    products,
+                    availableItems,
+                    inventoryBaselineTransactionDate
+            )
+        }
+
+        // 3. Create an adjustment (credit) transaction and take the data imported
+        Transaction adjustmentTransaction = createAdjustmentTransaction(adjustmentTransactionDate, targetWarehouse.inventory)
+
+        rows.forEach { Map<String, String> attr ->
+            Product product = productMap[attr["Product code"]]
+            Location binLocation = locationMap[attr["Bin location"]]
+
             if (!product) {
                 throw new IllegalArgumentException("Product not found: " + attr["Product code"])
             }
-
-            Location binLocation = Location.findByName(attr["Bin location"])
 
             if (!binLocation) {
                 throw new IllegalArgumentException("Location not found: " + attr["Bin location"])
             }
 
-            TransactionEntry transactionEntry = new TransactionEntry();
-            transactionEntry.quantity = attr["Physical QOH"] as Integer
-            transactionEntry.comments = attr["Comment"]
-
-            def expirationDate = attr["Expiration date"]
-
-            InventoryItem inventoryItem = inventoryService.findAndUpdateOrCreateInventoryItem(
+            TransactionEntry transactionEntry = createAdjustmentTransactionEntry(
+                    attr,
                     product,
-                    attr["Lot number"],
-                    expirationDate == ""
-                            ? null
-                            : dateFormat.parse(expirationDate)
+                    binLocation,
+                    availableItems
             )
 
-            transactionEntry.inventoryItem = inventoryItem
-            transactionEntry.binLocation = binLocation
+            if (transactionEntry) {
+                adjustmentTransaction.addToTransactionEntries(transactionEntry)
+            }
+        }
 
-            transaction.addToTransactionEntries(transactionEntry)
-        };
+        if (adjustmentTransaction.transactionEntries && !adjustmentTransaction.save()) {
+            throw new ValidationException("Invalid transaction", adjustmentTransaction.errors)
+        }
 
-        transaction.forceRefresh = Boolean.TRUE
-        transaction.save(flush: true, failOnError: true)
-
-        csvReader.close();
+        csvReader.close()
     }
 
     def importInventoryLevels(URL csvURL, Location targetWarehouse) {

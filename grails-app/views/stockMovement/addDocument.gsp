@@ -23,6 +23,7 @@
 		<h2><warehouse:message code="shipping.addDocument.label" /></h2>
 	<!-- process an upload or save depending on whether we are adding a new doc or modifying a previous one -->
 		<g:uploadForm controller="document" action="uploadDocument">
+			<g:hiddenField name="stockMovementId" value="${stockMovementInstance?.id}" />
 			<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
 			<g:hiddenField name="documentId" value="${documentInstance?.id}" />
 			<table>
@@ -40,7 +41,7 @@
 					<td valign="top" class="name"><label><warehouse:message
 							code="document.type.label" /></label></td>
 					<td valign="top" class="value ${hasErrors(bean: documentInstance, field: 'documentType', 'errors')}">
-						<g:select name="typeId" from="${org.pih.warehouse.core.DocumentType.list().sort { it.name }}" noSelection="['':'']"
+						<g:select name="typeId" from="${documentTypes}" noSelection="['':'']"
                                   class="chzn-select-deselect" value="${documentInstance?.documentType?.id}" optionKey="id" optionValue="${{format.metadata(obj:it)}}"/>
 					</td>
 				</tr>

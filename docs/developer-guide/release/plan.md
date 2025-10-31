@@ -8,11 +8,11 @@ To create a new version in Jira:
 
 1. Go to the OpenBoxes PIH project
 
-       ![View Project](../../img/jira-view-project.png "View Project")
+       ![View Project](../../assets/img/jira-view-project.png "View Project")
 
 1. Click on Releases in the left navigation menu
 
-       ![List Releases](../../img/jira-list-releases.png "List Releases")
+       ![List Releases](../../assets/img/jira-list-releases.png "List Releases")
 
 1. Click the Create version button 
 
@@ -20,5 +20,5 @@ To create a new version in Jira:
 
 1. Click Save
 
-       ![Create Release](../../img/create-jira-release.png "Create Release")
+       ![Create Release](../../assets/img/create-jira-release.png "Create Release")
 

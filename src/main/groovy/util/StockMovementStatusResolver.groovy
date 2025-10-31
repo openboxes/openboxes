@@ -11,6 +11,13 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 
 class StockMovementStatusResolver {
 
+    private static def getReturnViewPageStatus(Order order, Shipment shipment) {
+        if (shipment?.hasShipped()) {
+            return shipment?.status?.code
+        }
+        return getOutboundReturnDisplayStatus(order)
+    }
+
     private static RequisitionStatus getOutboundReturnDisplayStatus(Order order) {
         switch (order?.status) {
             case OrderStatus.PENDING:
@@ -38,9 +45,7 @@ class StockMovementStatusResolver {
 
     static Enum getStatus(StockMovementStatusContext context) {
         if (context.isReturn()) {
-            return context.isInbound()
-                    ? getInboundReturnDisplayStatus(context.shipment)
-                    : getOutboundReturnDisplayStatus(context.order)
+            return getReturnViewPageStatus(context.order, context.shipment)
         }
 
         if (context.isFromPurchaseOrder()) {

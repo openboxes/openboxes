@@ -193,6 +193,21 @@ body {
 .filter-group {
   font-size: 14px;
   min-width: 200px;
+
+  &.required {
+    .date-picker__input {
+      position: relative;
+      padding-right: 15px;
+
+      &:after {
+        content: "*";
+        color: red;
+        right: 5px;
+        font-size: 14px;
+        position: absolute;
+      }
+    }
+  }
 }
 
 .filter-form {
@@ -913,6 +928,14 @@ div.crossed-out .table-inner-row:before {
   color: #FFFFFF;
 }
 
+.tooltip-dark-blue {
+  background-color: var(--blue-800);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  max-width: 250px
+}
+
 // Overriding built-in tooltip-style (react-tippy)
 .tippy-tooltip {
   padding: 0 !important;
@@ -1015,6 +1038,18 @@ div.search-input:focus-within {
   }
 }
 
+.grayed-button {
+  @extend %button-base;
+
+  color: $black-alpha;
+  font-weight: 700;
+  border: 1px solid $black-alpha !important;
+
+  &:hover {
+    background-color: var(--gray-200);
+  }
+}
+
 .transparent-button {
   @extend %button-base;
 
@@ -1022,9 +1057,14 @@ div.search-input:focus-within {
   border: none;
   color: var(--blue-700);
 
-  &:hover {
+  &:not(:disabled):hover {
     background-color: var(--blue-200);
     color: var(--blue-primary);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    background: transparent;
   }
 }
 
@@ -1044,6 +1084,11 @@ div.search-input:focus-within {
 
   &:hover {
     background: var(--red-100);
+  }
+
+  &:disabled {
+    background-color: var(--blue-300) !important;
+    color: var(--red-200) !important;
   }
 }
 
@@ -1084,6 +1129,11 @@ div.search-input:focus-within {
   }
 }
 
+.primary-outline-disabled {
+  background-color: var(--blue-300) !important;
+  color: var(--blue-400) !important;
+}
+
 .active-button {
   @extend %button-base;
 
@@ -1118,6 +1168,14 @@ div.search-input:focus-within {
 
 .danger-circle {
   background-color: var(--color-red);
+}
+
+.font-red-ob {
+  color: var(--color-red) !important;
+}
+
+.font-green-ob {
+    color: var(--color-green) !important;
 }
 
 // Action dots box
@@ -1200,10 +1258,6 @@ div.search-input:focus-within {
     .filters-row {
       .filter-group > div:first-child {
         align-items: center;
-
-        label {
-          margin: 0 4px 0 0;
-        }
       }
     }
   }
@@ -1504,6 +1558,11 @@ div.search-input:focus-within {
   justify-content: space-between;
   align-items: center;
 
+  .info-bar-redirect > a {
+      text-decoration: underline;
+      color: #FFFFFF;
+  }
+
   svg {
     width: 18px;
     height: 18px;
@@ -1600,9 +1659,189 @@ div.search-input:focus-within {
   padding: 20px;
   display: flex;
   flex-direction: column;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    padding-left: 6px;
+
+    &__title {
+      font-size: 24px;
+    }
+
+    &__subtitle {
+      font-size: 16px;
+    }
+  }
+
+  &__main {
+    padding: 0 4px;
+    overflow-y: auto;
+    max-height: 400px;
+    margin-bottom: 15px;
+
+    &::-webkit-scrollbar {
+      width: 0.5em;
+      height: 0.5em;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--blue-200);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--blue-301);
+      border-radius: 4px;
+    }
+  }
+
+  &__buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
 }
 
 // Disabling resizing of textarea
 .resizable-false {
   resize: none;
+}
+
+.jipt-login-dialog {
+  inset: 0 auto 0 !important;
+}
+
+.fit-content {
+  width: fit-content;
+}
+
+.ReactVirtualized__List {
+  overflow: auto !important;
+}
+
+.tabs {
+  height: 53px;
+  gap: 12px;
+  color: var(--gray-600);
+  border-bottom: 2px solid var(--gray-102);
+
+  span {
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 21px;
+    padding: 16px 8px;
+    text-transform: uppercase;
+
+    &:hover {
+      color: var(--blue-primary);
+    }
+  }
+
+  .active-tab {
+    color: var(--blue-primary);
+    box-shadow: 0 2px 0 var(--blue-primary);
+  }
+}
+
+.min-width-250 {
+  min-width: 250px;
+}
+
+.min-width-1000 {
+  min-width: 1000px;
+}
+
+.w-90 {
+  width: 90%;
+}
+
+.width-250 {
+  width: 250px;
+}
+
+@for $i from 1 through 100 {
+  .pl-#{$i}px {
+    padding-left: #{$i}px;
+  }
+}
+
+@for $i from 1 through 10 {
+  .t-#{$i} {
+    top: #{$i}rem;
+  }
+}
+
+.bg-inherit {
+  background-color: inherit;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.font-weight-500 {
+  font-weight: 500;
+}
+
+.disabled-icon {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.no-transition {
+  transition: none;
+}
+
+.double-tile {
+  position: relative;
+  margin: 1%;
+  padding: 14.7px;
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.09);
+  background-color: white;
+
+  &__title {
+    color: var(--gray-600);
+    font-size: 14px;
+  }
+
+  &__first-value-block,
+  &__second-value-block {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  &__first-value-block {
+    border-right: 2px solid var(--gray-103);
+    padding-right: 8px;
+    color: var(--blue-primary);
+  }
+  &__second-value-block {
+    padding-left: 8px;
+    color: var(--color-yellow);
+  }
+
+  &__value-number {
+    padding-top: 15px;
+    padding-bottom: 8px;
+    font-weight: bold;
+    font-size: 30px;
+    text-align: center;
+    line-height: 1.1;
+  }
+
+  &__subtitle {
+    color: var(--gray-400) ;
+    font-size: 14px;
+    margin-top: auto;
+    text-align: center;
+  }
+
+  &__tooltip {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    color: var(--gray-400) ;
+  }
 }

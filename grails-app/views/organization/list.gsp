@@ -9,7 +9,7 @@
     <body>
         <div class="body">
             <g:if test="${flash.message}">
-            	<div class="message">${flash.message}</div>
+            	<div class="message" role="status" aria-label="message">${flash.message}</div>
             </g:if>
 
             <div class="button-bar">
@@ -52,7 +52,7 @@
                             <g:each in="${organizationInstanceList}" status="i" var="organizationInstance">
                                 <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-                                    <td>
+                                    <td aria-label="Active">
                                         <g:if test="${organizationInstance?.active}">
                                             <span class="active">
                                                 <warehouse:message code="default.yes.label"/>
@@ -65,21 +65,21 @@
                                         </g:else>
                                     </td>
 
-                                    <td><g:link action="edit" id="${organizationInstance.id}">${fieldValue(bean: organizationInstance, field: "id")}</g:link></td>
+                                    <td aria-label="Id"><g:link action="edit" id="${organizationInstance.id}">${fieldValue(bean: organizationInstance, field: "id")}</g:link></td>
 
-                                    <td><g:link action="edit" id="${organizationInstance.id}">${fieldValue(bean: organizationInstance, field: "code")}</g:link></td>
+                                    <td aria-label="Code"><g:link action="edit" id="${organizationInstance.id}">${fieldValue(bean: organizationInstance, field: "code")}</g:link></td>
 
-                                    <td><g:link action="edit" id="${organizationInstance.id}">${fieldValue(bean: organizationInstance, field: "name")}</g:link></td>
+                                    <td aria-label="Name"><g:link action="edit" id="${organizationInstance.id}">${fieldValue(bean: organizationInstance, field: "name")}</g:link></td>
 
-                                    <td>${organizationInstance?.defaultLocation}</td>
+                                    <td aria-label="Default Location">${organizationInstance?.defaultLocation}</td>
 
-                                    <td>${organizationInstance.roles.join(",")}</td>
+                                    <td aria-label="Roles">${organizationInstance.roles.join(",")}</td>
 
                                 </tr>
                             </g:each>
                             </tbody>
                         </table>
-                        <div class="paginateButtons">
+                        <div aria-label="pagination" class="paginateButtons">
                             <g:set var="pageParams" value="${pageScope.variables['params']}"/>
                             <g:paginate total="${organizationInstanceTotal}" params="${params}" />
                         </div>
