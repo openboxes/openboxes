@@ -1092,6 +1092,15 @@ class UrlMappings {
             action = [POST: "saveRecordStock"]
         }
 
+        /**
+         * Inventory API endpoints
+         */
+
+        "/api/inventories/expirationHistoryReport" {
+            controller = { "inventoryApi" }
+            action = [GET: "getExpirationHistoryReport"]
+        }
+
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")

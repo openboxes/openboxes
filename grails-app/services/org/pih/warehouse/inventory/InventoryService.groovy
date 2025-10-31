@@ -10,16 +10,20 @@
 package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
+import grails.plugins.csv.CSVWriter
 import grails.validation.ValidationException
 import org.hibernate.criterion.CriteriaSpecification
 
 import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.localization.MessageLocalizer
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.ImporterUtil
 import org.pih.warehouse.inventory.product.availability.AvailableItemKey
@@ -48,6 +52,7 @@ class InventoryService implements ApplicationContextAware {
     RecordStockProductInventoryTransactionService recordStockProductInventoryTransactionService
     ProductAvailabilityService productAvailabilityService
     ConfigService configService
+    MessageLocalizer messageLocalizer
 
     def authService
     def dataService
@@ -3448,5 +3453,50 @@ class InventoryService implements ApplicationContextAware {
                     transactionTypeId: latest[2]
             ]
         }
+    }
+
+    PaginatedList<ExpirationHistoryReportRow> getExpirationHistoryReport(ExpirationHistoryReportFilterCommand command) {
+        List<TransactionEntry> entries = TransactionEntry.createCriteria().list(offset: command.paginationParams.offset, max: command.paginationParams.max) {
+            transaction {
+                // Expired transaction type is hardcoded with id = "4"
+                eq("transactionType", TransactionType.read(Constants.EXPIRATION_TRANSACTION_TYPE_ID))
+                eq("inventory", AuthService.currentLocation.inventory)
+                between("transactionDate", command.startDate, command.endDate)
+                order("transactionDate", "desc")
+            }
+        }
+        return new PaginatedList<ExpirationHistoryReportRow>(entries.collect { ExpirationHistoryReportRow.fromTransactionEntry(it) }, entries.totalCount)
+    }
+
+    String getExpirationHistoryReportCsv(ExpirationHistoryReportFilterCommand command) {
+        PaginatedList<ExpirationHistoryReportRow> expirationHistoryReport = getExpirationHistoryReport(command)
+        StringWriter sw = new StringWriter()
+        CSVWriter csv = new CSVWriter(sw, {
+            "${messageLocalizer.localize("transaction.transactionNumber.label")}" { it?.transactionNumber }
+            "${messageLocalizer.localize("transaction.date.label")}" { it?.transactionDate }
+            "${messageLocalizer.localize("product.productCode.label")}" { it?.productCode }
+            "${messageLocalizer.localize("import.productName.label" )}" { it?.productName }
+            "${messageLocalizer.localize("category.label")}" { it?.category }
+            "${messageLocalizer.localize("inventory.lotNumber.label")}" { it?.lotNumber }
+            "${messageLocalizer.localize("inventoryItem.expirationDate.label")}" { it?.expirationDate }
+            "${messageLocalizer.localize("expirationHistoryReport.quantityLostToExpiry.label")}" { it?.quantityLostToExpiry }
+            "${messageLocalizer.localize("product.unitPrice.label")}" { it?.unitPrice }
+            "${messageLocalizer.localize("expirationHistoryReport.valueLostToExpiry.label")}" { it?.valueLostToExpiry }
+        })
+        expirationHistoryReport.list.each { ExpirationHistoryReportRow row ->
+            csv << [
+                    transactionNumber: row.transactionNumber,
+                    transactionDate: row.transactionDate,
+                    productCode: row.productCode,
+                    productName: row.productName,
+                    category: row.category ?: "",
+                    lotNumber: row.lotNumber ?: "",
+                    expirationDate: row.expirationDate ?: "",
+                    quantityLostToExpiry: row.quantityLostToExpiry,
+                    unitPrice: row.unitPrice ?: "",
+                    valueLostToExpiry: row.valueLostToExpiry ?: "",
+            ]
+        }
+        return CSVUtils.prependBomToCsvString(csv.writer.toString())
     }
 }
