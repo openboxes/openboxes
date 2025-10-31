@@ -23,6 +23,7 @@ const ExpirationHistoryReportFilterFields = {
       localizeDate: true,
       localizedDateFormat: DateFormat.COMMON,
       filterElement: true,
+      required: true,
     },
   },
   endDate: {
@@ -33,6 +34,7 @@ const ExpirationHistoryReportFilterFields = {
       localizeDate: true,
       localizedDateFormat: DateFormat.COMMON,
       filterElement: true,
+      required: true,
     },
   },
 };

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useState } from 'react';
 
 import queryString from 'query-string';
@@ -6,15 +5,14 @@ import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { getCurrentLocation } from 'selectors';
 
-import filterFields
-  from 'components/reporting/expirationHistoryReport/ExpirationHistoryReportFilterFields';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import useSpinner from 'hooks/useSpinner';
-import { getParamList, transformFilterParams } from 'utils/list-utils';
+import { transformFilterParams } from 'utils/list-utils';
 
-const useExpirationHistoryReportFilters = () => {
+const useExpirationHistoryReportFilters = ({ filterFields }) => {
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
+  const [shouldFetch, setShouldFetch] = useState(false);
 
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
@@ -27,51 +25,22 @@ const useExpirationHistoryReportFilters = () => {
   const clearFilterValues = () => {
     const { pathname } = history.location;
     history.push({ pathname });
-  };
-
-  const setDefaultValue = (queryPropsParam, elementsList) => {
-    if (queryPropsParam) {
-      const idList = getParamList(queryPropsParam);
-      return elementsList
-        .filter(({ id }) => idList.includes(id))
-        .map(({ id, label }) => ({
-          id, label, name: label, value: id,
-        }));
-    }
-    return null;
-  };
-
-  const getSelectedOption = (selectedId, optionsList, defaultId) => {
-    const selectedOption = optionsList.find(({ id }) => id === selectedId);
-    if (selectedOption) {
-      return selectedOption;
-    }
-
-    if (defaultId) {
-      return optionsList.find(({ id }) => id === defaultId);
-    }
-
-    return null;
+    setShouldFetch(false);
   };
 
   const initializeDefaultFilterValues = async () => {
     spinner.show();
-    // INITIALIZE EMPTY FILTER OBJECT
     const defaultValues = Object.keys(filterFields)
       .reduce((acc, key) => ({ ...acc, [key]: '' }), {});
 
     const queryProps = queryString.parse(history.location.search);
 
-    // console.log(defaultValues)
-    //
-    // defaultValues.location = {
-    //   id: currentLocation?.id,
-    //   value: currentLocation?.id,
-    //   name: currentLocation?.name,
-    //   label: currentLocation?.name,
-    // };
-    //
-    // console.log(defaultValues)
+    defaultValues.location = {
+      id: currentLocation?.id,
+      value: currentLocation?.id,
+      name: currentLocation?.name,
+      label: currentLocation?.name,
+    };
 
     if (queryProps.startDate) {
       defaultValues.startDate = queryProps.startDate;
@@ -81,57 +50,14 @@ const useExpirationHistoryReportFilters = () => {
       defaultValues.endDate = queryProps.endDate;
     }
 
-    // const {
-    //   additionalInventoryLocations,
-    //   expiredStock,
-    //   filterProducts: selectedFilterProducts,
-    //   categories: selectedCategories,
-    //   tags: selectedTags,
-    // } = queryProps;
+    setDefaultFilterValues(defaultValues);
 
-    // If there are no values for catalogs, tags, glAccounts, categories or product family
-    // then set default filters without waiting for those options to load
-    // if (!selectedCategories
-    //   && !selectedTags
-    //   && !selectedFilterProducts
-    //   && !expiredStock
-    //   && !additionalInventoryLocations) {
-      setDefaultFilterValues(defaultValues);
-    // }
-    // const [
-    //   categoryList,
-    //   tagList,
-    //   locationList,
-    // ] = await Promise.all([
-    //   fetchProductsCategories(),
-    //   fetchProductsTags(),
-    //   fetchLocations({ activityCodes: [ActivityCode.MANAGE_INVENTORY] }),
-    // ]);
-
-    // defaultValues.tags = setDefaultValue(selectedTags, tagList);
-    // defaultValues.categories = setDefaultValue(selectedCategories, categoryList);
-    // defaultValues.filterProducts = getSelectedOption(
-    //   selectedFilterProducts,
-    //   getFilterProductOptions(),
-    // );
-    // defaultValues.expiredStock = getSelectedOption(
-    //   expiredStock,
-    //   getExpiredStockOptions(),
-    //   OPTION_ID.REMOVE_EXPIRED_STOCK,
-    // );
-    // defaultValues.additionalInventoryLocations = setDefaultValue(
-    //   additionalInventoryLocations,
-    //   locationList,
-    // );
-
-    // if (selectedTags
-    //   || selectedCategories
-    //   || selectedFilterProducts
-    //   || expiredStock
-    //   || additionalInventoryLocations) {
-    //   setDefaultFilterValues(defaultValues);
-    // }
     setFiltersInitialized(true);
+
+    if (queryProps.startDate && queryProps.endDate) {
+      setShouldFetch(true);
+    }
+
     spinner.hide();
   };
 
@@ -140,11 +66,8 @@ const useExpirationHistoryReportFilters = () => {
 
   const setFilterValues = (values) => {
     const filterAccessors = {
-      // tags: { name: 'tags', accessor: 'id' },
-      // categories: { name: 'categories', accessor: 'id' },
-      // filterProducts: { name: 'filterProducts', accessor: 'id' },
-      // expiredStock: { name: 'expiredStock', accessor: 'id' },
-      // additionalInventoryLocations: { name: 'additionalInventoryLocations', accessor: 'id' },
+      startDate: { name: 'startDate' },
+      endDate: { name: 'endDate' },
     };
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);
@@ -156,6 +79,9 @@ const useExpirationHistoryReportFilters = () => {
   };
 
   return {
+    shouldFetch,
+    filtersInitialized,
+    setShouldFetch,
     defaultFilterValues,
     setFilterValues,
     filterParams,
