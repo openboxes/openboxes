@@ -177,7 +177,13 @@
                 <g:if test="${grailsApplication.config.openboxes.stockMovement.rollbackAndDelete.enabled}">
                     <g:isUserAdmin>
                         <g:if test="${stockMovement?.hasBeenReceived() || stockMovement?.hasBeenPartiallyReceived()}">
-                            <g:link controller="stockMovement" action="rollbackAndDelete" id="${stockMovement?.shipment?.id}" class="button">
+                            <g:link
+                                controller="stockMovement"
+                                action="rollbackAndDelete"
+                                id="${stockMovement?.shipment?.id}"
+                                class="button"
+                                onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                            >
                                 <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
                                 <warehouse:message code="stockMovement.rollbackAndDelete.label" />
                             </g:link>
