@@ -16,8 +16,11 @@ import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.UserService
+import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAttribute
+import org.pih.warehouse.product.ProductBarcodeUpdatedEvent
 
 @Transactional
 class MobileProductApiController extends BaseDomainApiController {
@@ -27,6 +30,7 @@ class MobileProductApiController extends BaseDomainApiController {
     def documentService
     GrailsApplication grailsApplication
     def productAvailabilityService
+    UserService userService
 
     def read() {
         Product product = productService.getProduct(params.id)
@@ -37,7 +41,9 @@ class MobileProductApiController extends BaseDomainApiController {
         def product = productService.getProduct(params.id)
         def location = Location.get(session.warehouse.id)
         def data = product.toJson()
+
         data.location = location
+        data.upc = product.upc
 
         List availableItems = productAvailabilityService.getAvailableItems(location, [product.id])
         Integer quantityAvailable = availableItems.sum { it.quantityAvailable?:0 }
@@ -149,5 +155,65 @@ class MobileProductApiController extends BaseDomainApiController {
         String [] terms = jsonObject.value?.split(" ")
         List products = productService.searchProducts(terms, [])
         render([data: products?.unique()] as JSON)
+    }
+
+    /**
+    * Update a product's barcode (UPC) value.
+    * Endpoint: PUT /mobile/products/{id}/barcode
+    * Request body: { "upc": "123" }
+    */
+    @Transactional
+    def updateBarcode() {
+        def product = Product.get(params.id)
+        if (!product) {
+            render(status: 404, text: "Product was not found")
+            return
+        }
+
+        try {
+            def requestBody = request.JSON
+            def newUpc = requestBody?.upc?.trim()
+            def oldUpc = product.upc
+
+            if (!newUpc) {
+                render(status: 400, text: "Missing 'upc' in request body")
+                return
+            }
+
+            User user = session?.user
+            if (!user) {
+                render(status: 401, text: "Active user session required")
+                return
+            }
+
+            if (!(userService.hasRoleProductManager(user) || userService.isUserAdmin(user))) {
+                render(status: 403, text: "Insufficient privileges")
+                return
+            }
+
+            if (oldUpc?.trim() == newUpc) {
+                log.info "UPC for product ${product.id} unchanged; skipping update"
+                render([data: [id: product.id, upc: product.upc, status: 'no_change']] as JSON)
+                return
+            }
+
+            product.upc = newUpc
+            product.save(flush: true)
+
+            sendProductBarcodeUpdateNotification(product, oldUpc, newUpc)
+
+            render([data: [id: product.id, upc: product.upc]] as JSON)
+        } catch (Exception e) {
+            log.error("Error updating barcode for product ${params.id}: ${e.message}", e)
+            render(status: 500, text: "Server error while updating product barcode")
+        }
+    }
+
+    void sendProductBarcodeUpdateNotification(Product product, String oldUpc, String newUpc) {
+        try {
+            grailsApplication.mainContext.publishEvent(new ProductBarcodeUpdatedEvent(product, oldUpc, newUpc))
+        } catch (Exception e) {
+            log.error("Error while publishing ProductBarcodeUpdatedEvent for product ${product?.id}", e)
+        }
     }
 }
