@@ -574,13 +574,14 @@ class ProductAvailabilityService {
 
     private static Criterion getExpirationCriteria(ExpirationFilter expirationFilter, org.grails.datastore.mapping.query.api.Criteria criteria) {
         criteria.createAlias("inventoryItem", "ii", JoinType.INNER_JOIN)
+        boolean removeExpiredStock = expirationFilter == ExpirationFilter.REMOVE_EXPIRED_STOCK
         Date today = new Date()
-        Date maxDate = expirationFilter == ExpirationFilter.REMOVE_EXPIRED_STOCK ? today : today + expirationFilter.days
+        Date maxDate = removeExpiredStock ? today : today + expirationFilter.days
 
         // We want to include inventory items that either don't have expiration date or have expiration date after maxDate
         Junction expirationDisjunction = Restrictions.disjunction()
             .add(Restrictions.isNull("ii.expirationDate"))
-            .add(Restrictions.gt("ii.expirationDate", maxDate))
+            .add(removeExpiredStock ? Restrictions.ge("ii.expirationDate", maxDate) : Restrictions.gt("ii.expirationDate", maxDate))
         // We have to include the condition for qoh > 0, as we could potentially include items that are out of stock, but have "hidden" associated
         // inventory item with product availability record that is not visible in the stock history at that time
         return Restrictions.and(expirationDisjunction, Restrictions.gt("quantityOnHand", 0))
