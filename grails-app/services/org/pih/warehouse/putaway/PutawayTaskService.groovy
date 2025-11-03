@@ -116,11 +116,12 @@ class PutawayTaskService {
 
             case 'complete':
                 complete(task, data.destination as String, data.completedBy as String, data.isCancelRemaining as Boolean,
-                        data.reasonCode as ReasonCode)
+                        data.reasonCode as ReasonCode, data.isDirectPutaway as Boolean)
                 break
 
             case 'partialComplete':
-                task = partialComplete(task, data.quantity as BigDecimal, data.destination as String, data.reasonCode as ReasonCode)
+                task = partialComplete(task, data.quantity as BigDecimal, data.destination as String,
+                        data.reasonCode as ReasonCode, data.isDirectPutaway as Boolean)
                 break
 
             case 'rollback':
@@ -279,7 +280,8 @@ class PutawayTaskService {
         save(task)
     }
 
-    void complete(PutawayTask task, String destinationId, String completedById, Boolean isCancelRemaining, ReasonCode reasonCode) {
+    void complete(PutawayTask task, String destinationId, String completedById, Boolean isCancelRemaining,
+                  ReasonCode reasonCode, Boolean isDirectPutaway) {
         log.info "complete putaway"
         if (!task) {
             throw new ObjectNotFoundException(task.id, "Unable to locate putaway task with id ${task.id}")
@@ -317,7 +319,7 @@ class PutawayTaskService {
         executeStateTransition(task, PutawayTaskStatus.COMPLETED)
 
         // Transfer stock to destination (either from putaway container or destination)
-        transferToDestination(task)
+        transferToDestination(task, isDirectPutaway)
 
         // Save the task
         save(task)
@@ -327,7 +329,8 @@ class PutawayTaskService {
         }
     }
 
-    PutawayTask partialComplete(PutawayTask task, BigDecimal quantity, String destinationId, ReasonCode reasonCode) {
+    PutawayTask partialComplete(PutawayTask task, BigDecimal quantity, String destinationId, ReasonCode reasonCode,
+                                Boolean isDirectPutaway) {
         log.info "partial complete putaway"
         if (quantity > task.quantity) {
             throw new IllegalArgumentException("Quantity provided is more than requested. Please re-enter quantity")
@@ -375,7 +378,7 @@ class PutawayTaskService {
         putawayService.savePutaway(putaway)
 
         def taskToTransfer = PutawayTaskAdapter.toPutawayTask(completedSplitItem, order)
-        transferToDestination(taskToTransfer)
+        transferToDestination(taskToTransfer, isDirectPutaway)
         save(task)
 
         currentItem.parentOrderItem = currentItemParent
@@ -405,14 +408,17 @@ class PutawayTaskService {
         transfer(task, command)
     }
 
-    void transferToDestination(PutawayTask task) {
+    void transferToDestination(PutawayTask task, Boolean isDirectPutaway) {
         TransferStockCommand command = new TransferStockCommand()
         command.location = task.facility
 
-        // If direct putaway (null container) then we transfer from origin to destination
-        if (!task.container) command.binLocation = task.location
-        // otherwise if we're performing a two-step putaway, we'll transfer from container destination
-        else command.binLocation = task.container
+        // If direct putaway then we transfer from origin to destination
+        if (isDirectPutaway) {
+            command.binLocation = task.location
+        } else {
+            // otherwise if we're performing a two-step putaway, we'll transfer from container destination
+            command.binLocation = task.container
+        }
 
         command.inventoryItem = task.inventoryItem
         command.quantity = task.quantity.toInteger()
