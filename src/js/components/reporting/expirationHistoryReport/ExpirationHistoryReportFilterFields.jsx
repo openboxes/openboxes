@@ -1,6 +1,6 @@
 import DateFilter from 'components/form-elements/DateFilter/DateFilter';
 import FilterSelectField from 'components/form-elements/FilterSelectField';
-import DateFormat from 'consts/dateFormat';
+import { DateFormat } from 'consts/timeFormat';
 
 const ExpirationHistoryReportFilterFields = {
   location: {
@@ -20,8 +20,7 @@ const ExpirationHistoryReportFilterFields = {
     attributes: {
       label: 'react.report.expirationHistory.startDate.label',
       defaultMessage: 'Start Date',
-      localizeDate: true,
-      localizedDateFormat: DateFormat.COMMON,
+      dateFormat: DateFormat.DD_MMM_YYYY,
       filterElement: true,
       required: true,
     },
@@ -31,8 +30,7 @@ const ExpirationHistoryReportFilterFields = {
     attributes: {
       label: 'react.report.expirationHistory.endDate.label',
       defaultMessage: 'End Date',
-      localizeDate: true,
-      localizedDateFormat: DateFormat.COMMON,
+      dateFormat: DateFormat.DD_MMM_YYYY,
       filterElement: true,
       required: true,
     },

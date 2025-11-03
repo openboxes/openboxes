@@ -1,5 +1,20 @@
 @import "src/css/colors";
 
+@mixin
+limit-lines($lines-number) {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: $lines-number;
+  line-clamp: $lines-number;
+  -webkit-box-orient: vertical;
+}
+
+@for $i from 1 through 10 {
+  .limit-lines-#{$i} {
+    @include limit-lines($i);
+  }
+}
+
 body {
   overflow-x: hidden;
   font-family: 'Inter', sans-serif;
