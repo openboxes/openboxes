@@ -647,7 +647,12 @@ class AddItemsPage extends Component {
             this.props.hideSpinner();
             const itemsWithMismatchedExpiry = [];
             values.lineItems.forEach((item) => {
-              if (item.inventoryItem && item.inventoryItem.expirationDate !== item.expirationDate) {
+              if (
+                item.inventoryItem
+                && item.inventoryItem.expirationDate !== item.expirationDate
+                && item.inventoryItem.quantity
+                && item.inventoryItem.quantity !== '0'
+              ) {
                 itemsWithMismatchedExpiry.push({
                   code: item.product?.productCode,
                   product: item.product,
@@ -657,10 +662,13 @@ class AddItemsPage extends Component {
                 });
               }
             });
-            const shouldUpdateExpirationDate = await
-            this.confirmExpirationDateSave(itemsWithMismatchedExpiry);
-            if (!shouldUpdateExpirationDate) {
-              return Promise.reject();
+
+            if (itemsWithMismatchedExpiry.length > 0) {
+              const shouldUpdateExpirationDate = await
+              this.confirmExpirationDateSave(itemsWithMismatchedExpiry);
+              if (!shouldUpdateExpirationDate) {
+                return Promise.reject();
+              }
             }
           }
           return this.updateInventoryItemsAndTransitionToNextStep(values, lineItems);
