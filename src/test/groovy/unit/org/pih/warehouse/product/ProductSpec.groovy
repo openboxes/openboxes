@@ -20,9 +20,6 @@ class ProductSpec extends Specification implements DomainUnitTest<Product> {
         Product.metaClass.getApplicationTagLib = { -> gStub }
     }
 
-    void setup() {
-    }
-
     void toJson() {
         given:
         Category category = new Category(name: "categoryName")
