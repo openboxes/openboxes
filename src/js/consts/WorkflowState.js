@@ -7,5 +7,11 @@ const OutboundWorkflowState = {
   SEND_SHIPMENT: 6,
 };
 
+const InboundWorkflowState = {
+  CREATE_HEADER: 1,
+  ADD_ITEMS: 2,
+  SEND_SHIPMENT: 6,
+};
+
 // eslint-disable-next-line import/prefer-default-export
-export { OutboundWorkflowState };
+export { InboundWorkflowState, OutboundWorkflowState };

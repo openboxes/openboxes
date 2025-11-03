@@ -15,6 +15,7 @@ import {
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
 import Section from 'components/Layout/v2/Section';
+import ConfirmExpirationDateModal from 'components/modals/ConfirmExpirationDateModal';
 import useInboundAddItemsColumns from 'hooks/inboundV2/addItems/useInboundAddItemsColumns';
 import useInboundAddItemsForm from 'hooks/inboundV2/addItems/useInboundAddItemsForm';
 import useResetScrollbar from 'hooks/useResetScrollbar';
@@ -43,6 +44,9 @@ const InboundAddItems = ({
     refresh,
     importTemplate,
     exportTemplate,
+    isExpirationModalOpen,
+    itemsWithMismatchedExpiry,
+    handleExpirationModalResponse,
   } = useInboundAddItemsForm({ next, previous });
   const hasErrors = !!Object.keys(errors).length;
   const {
@@ -205,6 +209,12 @@ const InboundAddItems = ({
           type="submit"
         />
       </div>
+      <ConfirmExpirationDateModal
+        isOpen={isExpirationModalOpen}
+        itemsWithMismatchedExpiry={itemsWithMismatchedExpiry}
+        onConfirm={() => handleExpirationModalResponse(true)}
+        onCancel={() => handleExpirationModalResponse(false)}
+      />
     </form>
   );
 };
