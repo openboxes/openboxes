@@ -641,27 +641,33 @@ class AddItemsPage extends Component {
           values = { ...formValues, lineItems: resp.data.data.lineItems };
         }
 
-        if (_.some(values.lineItems, (item) => item.inventoryItem
-          && item.expirationDate !== item.inventoryItem.expirationDate)) {
-          if (_.some(values.lineItems, (item) => item.inventoryItem.quantity && item.inventoryItem.quantity !== '0')) {
+        const hasExpiryMismatch = values.lineItems.some(
+          (item) => item.inventoryItem && item.expirationDate !== item.inventoryItem.expirationDate,
+        );
+
+        if (hasExpiryMismatch) {
+          const hasNonZeroQuantity = values.lineItems.some(
+            (item) => item.inventoryItem?.quantity && item.inventoryItem.quantity !== '0',
+          );
+
+          if (hasNonZeroQuantity) {
             this.props.hideSpinner();
-            const itemsWithMismatchedExpiry = [];
-            values.lineItems.forEach((item) => {
-              if (
-                item.inventoryItem
-                && item.inventoryItem.expirationDate !== item.expirationDate
-                && item.inventoryItem.quantity
-                && item.inventoryItem.quantity !== '0'
-              ) {
-                itemsWithMismatchedExpiry.push({
-                  code: item.product?.productCode,
-                  product: item.product,
-                  lotNumber: item.lotNumber,
-                  previousExpiry: item.inventoryItem.expirationDate,
-                  newExpiry: item.expirationDate,
-                });
-              }
-            });
+
+            const itemsWithMismatchedExpiry = values.lineItems
+              .filter(
+                (item) =>
+                  item.inventoryItem &&
+                  item.inventoryItem.expirationDate !== item.expirationDate &&
+                  item.inventoryItem.quantity &&
+                  item.inventoryItem.quantity !== '0',
+              )
+              .map((item) => ({
+                code: item.product?.productCode,
+                product: item.product,
+                lotNumber: item.lotNumber,
+                previousExpiry: item.inventoryItem.expirationDate,
+                newExpiry: item.expirationDate,
+              }));
 
             if (itemsWithMismatchedExpiry.length > 0) {
               const shouldUpdateExpirationDate = await
@@ -671,8 +677,10 @@ class AddItemsPage extends Component {
               }
             }
           }
+
           return this.updateInventoryItemsAndTransitionToNextStep(values, lineItems);
         }
+
         return this.transitionToNextStepAndChangePage(formValues);
       })
       .catch(() => this.props.hideSpinner());
