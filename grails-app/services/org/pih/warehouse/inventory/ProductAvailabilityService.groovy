@@ -20,6 +20,7 @@ import org.hibernate.Criteria
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.criterion.Criterion
 import org.hibernate.criterion.DetachedCriteria
+import org.hibernate.criterion.Junction
 import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 import org.hibernate.criterion.Subqueries
@@ -573,12 +574,17 @@ class ProductAvailabilityService {
 
     private static Criterion getExpirationCriteria(ExpirationFilter expirationFilter, org.grails.datastore.mapping.query.api.Criteria criteria) {
         criteria.createAlias("inventoryItem", "ii", JoinType.INNER_JOIN)
+        boolean removeExpiredStock = expirationFilter == ExpirationFilter.REMOVE_EXPIRED_STOCK
+        Date today = new Date()
+        Date maxDate = removeExpiredStock ? today : today + expirationFilter.days
+
+        // We want to include inventory items that either don't have expiration date or have expiration date after maxDate
+        Junction expirationDisjunction = Restrictions.disjunction()
+            .add(Restrictions.isNull("ii.expirationDate"))
+            .add(removeExpiredStock ? Restrictions.ge("ii.expirationDate", maxDate) : Restrictions.gt("ii.expirationDate", maxDate))
         // We have to include the condition for qoh > 0, as we could potentially include items that are out of stock, but have "hidden" associated
         // inventory item with product availability record that is not visible in the stock history at that time
-        if (expirationFilter == ExpirationFilter.REMOVE_EXPIRED_STOCK) {
-            return Restrictions.and(Restrictions.ge("ii.expirationDate", new Date()), Restrictions.gt("quantityOnHand", 0))
-        }
-        return Restrictions.and(Restrictions.between("ii.expirationDate", new Date(), new Date() + expirationFilter.days), Restrictions.gt("quantityOnHand", 0))
+        return Restrictions.and(expirationDisjunction, Restrictions.gt("quantityOnHand", 0))
     }
 
     Map<Product, Integer> getQuantityOnHandByProduct(Location location) {
