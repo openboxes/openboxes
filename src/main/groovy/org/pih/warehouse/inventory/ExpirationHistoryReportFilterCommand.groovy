@@ -9,4 +9,9 @@ class ExpirationHistoryReportFilterCommand implements Validateable {
     PaginationParams paginationParams = new PaginationParams()
     Date startDate
     Date endDate
+    String searchTerm
+
+    static constraints = {
+        searchTerm(nullable: true, blank: true)
+    }
 }

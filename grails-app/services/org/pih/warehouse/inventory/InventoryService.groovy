@@ -13,7 +13,7 @@ import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
 import grails.validation.ValidationException
 import org.hibernate.criterion.CriteriaSpecification
-
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
@@ -3457,13 +3457,21 @@ class InventoryService implements ApplicationContextAware {
 
     PaginatedList<ExpirationHistoryReportRow> getExpirationHistoryReport(ExpirationHistoryReportFilterCommand command) {
         List<TransactionEntry> entries = TransactionEntry.createCriteria().list(offset: command.paginationParams.offset, max: command.paginationParams.max) {
-            transaction {
-                // Expired transaction type is hardcoded with id = "4"
-                eq("transactionType", TransactionType.read(Constants.EXPIRATION_TRANSACTION_TYPE_ID))
-                eq("inventory", AuthService.currentLocation.inventory)
-                between("transactionDate", command.startDate, command.endDate)
-                order("transactionDate", "desc")
+            createAlias("transaction", "t", JoinType.INNER_JOIN)
+            if (command.searchTerm) {
+                createAlias("inventoryItem", "ii", JoinType.INNER_JOIN)
+                createAlias("ii.product", "p", JoinType.INNER_JOIN)
+                or {
+                    ilike("t.transactionNumber", "%" + command.searchTerm + "%")
+                    ilike("p.productCode", "%" + command.searchTerm + "%")
+                    ilike("t.id", "%" + command.searchTerm + "%")
+                }
             }
+            // Expired transaction type is hardcoded with id = "4"
+            eq("t.transactionType", TransactionType.read(Constants.EXPIRATION_TRANSACTION_TYPE_ID))
+            eq("t.inventory", AuthService.currentLocation.inventory)
+            between("t.transactionDate", command.startDate, command.endDate)
+            order("t.transactionDate", "desc")
         }
         return new PaginatedList<ExpirationHistoryReportRow>(entries.collect { ExpirationHistoryReportRow.fromTransactionEntry(it) }, entries.totalCount)
     }
