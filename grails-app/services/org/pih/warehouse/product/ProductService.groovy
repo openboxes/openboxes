@@ -13,6 +13,11 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.xml.Namespace
+import java.time.Instant
+import java.time.ZoneId
+
+import org.pih.warehouse.DateUtil
+import org.pih.warehouse.core.session.SessionManager
 import org.pih.warehouse.importer.CSVUtils
 import java.sql.Timestamp
 import org.apache.commons.lang.StringUtils
@@ -33,7 +38,6 @@ import org.pih.warehouse.core.date.DateFormatterManager
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.TransactionEntry
-import org.springframework.beans.factory.annotation.Autowired
 import util.ReportUtil
 
 /**
@@ -51,8 +55,8 @@ class ProductService {
     ProductGroupService productGroupService
     ConfigService configService
 
-    @Autowired
-    DateFormatterManager dateFormatter
+    DateFormatterManager dateFormatterManager
+    SessionManager sessionManager
 
     def getNdcResults(operation, q) {
         def hipaaspaceApiKey = grailsApplication.config.hipaaspace.api.key
@@ -319,8 +323,16 @@ class ProductService {
         int offset = params.offset ? params.int("offset") : 0
         String sortColumn = params.sort ?: "name"
         String sortOrder = params.order ?: "asc"
-        Date dateCreatedAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
-        Date dateCreatedBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
+
+        // TODO: The date picker on the React size only sends up date information, but Instants need a time and zone.
+        //       To convert the given date to an Instant we need to manually provide the timezone of the user. We could
+        //       remove this zone-defaulting code if we did one (or both) of the following:
+        //       1) Move these params into a proper command object (the Instant fields would be automatically bound)
+        //       2) Modify the date picker on the react side to send a full date + time + zone string
+        ZoneId zone = sessionManager.timezone?.toZoneId()
+        Instant dateCreatedAfter = params.createdAfter ? DateUtil.asInstant(params.createdAfter, zone) : null
+        Instant dateCreatedBefore = params.createdBefore ? DateUtil.asInstant(params.createdBefore, zone) : null
+
         List<ProductField> handlingRequirements = params.list("handlingRequirementId").collect { ProductField.valueOf(it) }
 
         def query = { isCountQuery ->
@@ -912,8 +924,8 @@ class ProductService {
                 VendorName          : product.vendorName ?: '',
                 UPC                 : product.upc ?: '',
                 NDC                 : product.ndc ?: '',
-                Created             : dateFormatter.formatForExport(product.dateCreated),
-                Updated             : dateFormatter.formatForExport(product.lastUpdated),
+                Created             : dateFormatterManager.formatForExport(product.dateCreated),
+                Updated             : dateFormatterManager.formatForExport(product.lastUpdated),
             ]
 
             if (includeAttributes) {
