@@ -30,7 +30,10 @@ class InboundSortationService {
             results.each { PutawayResult result ->
                 if (result.quantity > 0) {
                     Putaway putaway = createPutaway(putawayContext, receipt.shipment?.createdBy)
-                    putaway.putawayItems.add(createPutawayItem(result))
+                    def putawayItem = createPutawayItem(result)
+                    putawayItem.receipt = receiptItem.receipt
+                    putawayItem.receiptItem = receiptItem
+                    putaway.putawayItems.add(putawayItem)
                     putawayService.savePutaway(putaway)
                 }
             }

@@ -52,6 +52,7 @@ import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderService
 import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
 import org.pih.warehouse.picklist.PicklistImportDataCommand
@@ -61,6 +62,8 @@ import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductService
+import org.pih.warehouse.putaway.PutawayService
+import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptService
 import org.pih.warehouse.requisition.ReplenishmentTypeCode
@@ -106,6 +109,8 @@ class StockMovementService {
     RequisitionDataService requisitionDataService
     GrailsApplication grailsApplication
     ReceiptService receiptService
+    PutawayService putawayService
+    OrderService orderService
 
     def createStockMovement(StockMovement stockMovement) {
         if (!stockMovement.validate()) {
@@ -3645,6 +3650,11 @@ class StockMovementService {
             throw new IllegalStateException("Stock Movement with ID ${stockMovementId} has no associated shipment.")
         }
 
+        List<String> receiptIds = shipment.receipts*.id ?: []
+        if (receiptIds) {
+            disconnectOrderItemsFromReceipts(receiptIds)
+        }
+
         Event event = shipment.mostRecentSystemEvent
         while (event && event.eventType?.eventCode != EventCode.CREATED) {
             shipmentService.rollbackLastEvent(shipment)
@@ -3655,6 +3665,10 @@ class StockMovementService {
             shipmentService.deleteShipment(shipment)
         }
 
+        if (receiptIds) {
+            deletePutawayOrdersLinkedToReceipts(receiptIds)
+        }
+
         Requisition requisition = stockMovement?.requisition
         if (requisition) {
             stockMovement?.shipment = null
@@ -3663,5 +3677,44 @@ class StockMovementService {
         }
 
         return stockMovement
+    }
+
+    private void disconnectOrderItemsFromReceipts(List<String> receiptIds) {
+        receiptIds.each { receiptId ->
+            def orderItems = OrderItem.executeQuery(
+                    "from OrderItem oi where oi.receipt.id = :id",
+                    [id: receiptId]
+            )
+
+            if (orderItems) {
+                orderItems.each { OrderItem item ->
+                    item.receipt = null
+                    item.receiptItem = null
+                    item.save(flush: false)
+                }
+            }
+        }
+    }
+
+    private void deletePutawayOrdersLinkedToReceipts(List<String> receiptIds) {
+        receiptIds.each { receiptId ->
+            def orderItems = OrderItem.executeQuery(
+                    "from OrderItem oi where oi.receipt.id = :id",
+                    [id: receiptId]
+            )
+
+            if (orderItems) {
+                def orders = orderItems*.order.unique()
+                orders.each { Order order ->
+                    log.info "Deleting putaway order [${order.id}] linked to receipt [${receiptId}]"
+                    try {
+                        putawayService.rollbackOrder(order)
+                        orderService.deleteOrder(order)
+                    } catch (Exception e) {
+                        log.error("Failed to delete putaway order ${order.id} for receipt ${receiptId}: ${e.message}", e)
+                    }
+                }
+            }
+        }
     }
 }
