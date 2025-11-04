@@ -107,6 +107,11 @@ class PartialReceivingApiController {
         try {
             PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id, "1")
 
+            Shipment shipment = partialReceipt?.shipment
+            if (shipment.status.code == ShipmentStatusCode.RECEIVED) {
+                throw new ShipmentException(message: "Shipment has already been received", shipment: shipment)
+            }
+
             def importFile = command.importFile
 
             String csv = new String(importFile.bytes)
