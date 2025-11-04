@@ -13,6 +13,7 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
+import { STOCK_MOVEMENT_STATUS, STOCK_MOVEMENT_UPDATE_ITEMS } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import DateField from 'components/form-elements/DateField';
@@ -649,10 +650,12 @@ class AddItemsPage extends Component {
    */
   updateInventoryItemsAndTransitionToNextStep(formValues, lineItems) {
     const itemsToSave = this.getLineItemsToBeSaved(lineItems);
-    const updateItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/updateInventoryItems`;
+    const updateItemsUrl = STOCK_MOVEMENT_UPDATE_ITEMS(this.state.values.stockMovementId);
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
+      // We're proceeding to the next step so should not have any zero quantity items at this point.
+      removeEmptyItems: true,
     };
 
     this.props.showSpinner();
@@ -669,10 +672,12 @@ class AddItemsPage extends Component {
    */
   saveRequisitionItemsInCurrentStep(itemCandidatesToSave) {
     const itemsToSave = this.getLineItemsToBeSaved(itemCandidatesToSave);
-    const updateItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
+    const updateItemsUrl = STOCK_MOVEMENT_UPDATE_ITEMS(this.state.values.stockMovementId);
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
+      // We're saving without proceeding so it's fine to have items with no quantity at this point.
+      removeEmptyItems: false,
     };
 
     if (payload.lineItems.length) {
@@ -709,12 +714,7 @@ class AddItemsPage extends Component {
    */
   save(formValues) {
     const lineItems = _.filter(formValues.lineItems, (item) => !_.isEmpty(item));
-
-    if (_.some(lineItems, (item) => !item.quantityRequested || item.quantityRequested === '0')) {
-      this.confirmSave(() => this.saveItems(lineItems));
-    } else {
-      this.saveItems(lineItems);
-    }
+    this.saveItems(lineItems);
   }
 
   /**
@@ -830,13 +830,11 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Transition to next stock movement status:
-   * - 'CHECKING' if origin type is supplier.
-   * - 'VERIFYING' if origin type is other than supplier.
+   * Transition to next stock movement status: CHECKING
    * @public
    */
   transitionToNextStep() {
-    const url = `/api/stockMovements/${this.state.values.stockMovementId}/status`;
+    const url = STOCK_MOVEMENT_STATUS(this.state.values.stockMovementId);
     const payload = { status: 'CHECKING' };
 
     if (this.state.values.statusCode === 'CREATED') {
