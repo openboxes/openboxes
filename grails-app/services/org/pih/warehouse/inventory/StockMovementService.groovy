@@ -164,11 +164,9 @@ class StockMovementService {
                         break
                     //RequisitionStatus.EDITING:
                     case StockMovementStatusCode.REQUESTED:
-//                        removeEmptyRequisitionItemsFromStockMovement(stockMovement)
                         break
                     //RequisitionStatus.PENDING_APPROVAL:
                     case StockMovementStatusCode.PENDING_APPROVAL:
-//                        removeEmptyRequisitionItemsFromStockMovement(stockMovement)
                         break
                     //RequisitionStatus.VERIFYING:
                     case StockMovementStatusCode.VALIDATED:
@@ -213,12 +211,6 @@ class StockMovementService {
                     case StockMovementStatusCode.PICKED:
                     case StockMovementStatusCode.PACKED:
                     case StockMovementStatusCode.CHECKING:
-//                        removeEmptyRequisitionItemsFromStockMovement(stockMovement)
-//                        Shipment shipment = createShipment(stockMovement)
-//                        if (stockMovement?.requisition?.picklist) {
-//                            shipmentService.validateShipment(shipment)
-//                        }
-//                        break
                     case StockMovementStatusCode.CHECKED:
                         def shipment = createShipment(stockMovement)
                         if (stockMovement?.requisition?.picklist) {
@@ -2561,35 +2553,6 @@ class StockMovementService {
         createMissingShipmentItems(updatedStockMovement)
 
         return updatedStockMovement
-    }
-
-    // TODO: currently this code is not used. Can remove if go with a different solution. We want to remove ALL lines
-    //       where quantityRequested == 0 or null, not just ones that were on the stock list (ie also remove the
-    //       custom added lines). How do we do that??
-    private void removeEmptyRequisitionItemsFromStockMovement(StockMovement stockMovement) {
-        if (!stockMovement?.lineItems) {
-            return
-        }
-
-        Requisition requisition = stockMovement.requisition
-        if (!requisition?.requisitionItems) {
-            return
-        }
-
-        for (StockMovementItem stockMovementItem in (stockMovement.lineItems as List<StockMovementItem>)) {
-            if (stockMovementItem.quantityRequested) {
-                continue
-            }
-
-            RequisitionItem requisitionItem = requisition.requisitionItems.find { it.id == stockMovementItem.id }
-            if (!requisitionItem) {
-                continue
-            }
-
-            requisitionItem.undoChanges()
-            requisition.removeFromRequisitionItems(requisitionItem)
-            requisitionItem.delete(flush: true)
-        }
     }
 
     void reviseItems(StockMovement stockMovement) {
