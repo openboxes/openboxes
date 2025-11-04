@@ -305,8 +305,9 @@ class ForecastingService {
         if (params.category) {
             Category category = Category.get(params.category)
             if (category) {
-                List<Category> categories = category.children as List<Category>
-                categories << category
+                List<Category> categories = params.includeCategoryChildren
+                        ? (category.children as List<Category>) + category
+                        : [category]
                 query += " AND product.category_id in (:categories)"
                 queryParams.put("categories", categories.id)
             }
@@ -325,6 +326,8 @@ class ForecastingService {
                     " origin_name, destination_name, product_demand_details.product_code, product_name," +
                     " quantity_requested, quantity_picked, reason_code_classification, quantity_demand"
         }
+
+        query += " ORDER BY origin_name ASC, request_number ASC"
 
         try {
             data = persistenceService.list(query, queryParams)
