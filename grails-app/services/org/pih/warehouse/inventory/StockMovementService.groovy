@@ -3653,6 +3653,7 @@ class StockMovementService {
         List<String> receiptIds = shipment.receipts*.id ?: []
         if (receiptIds) {
             disconnectOrderItemsFromReceipts(receiptIds)
+            deletePutawayOrdersLinkedToReceipts(receiptIds)
         }
 
         Event event = shipment.mostRecentSystemEvent
@@ -3663,10 +3664,6 @@ class StockMovementService {
 
         if (!event || event.eventType.eventCode == EventCode.CREATED) {
             shipmentService.deleteShipment(shipment)
-        }
-
-        if (receiptIds) {
-            deletePutawayOrdersLinkedToReceipts(receiptIds)
         }
 
         Requisition requisition = stockMovement?.requisition
