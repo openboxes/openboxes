@@ -15,7 +15,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import {
   getCurrentLocale,
-  getCurrentLocation, getCurrentUser,
+  getCurrentLocation,
+  getCurrentUser,
   getCycleCountsIds,
   getReasonCodes,
   getUsers,
