@@ -14,7 +14,8 @@ import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import {
-  getCurrentLocation,
+  getCurrentLocale,
+  getCurrentLocation, getCurrentUser,
   getCycleCountsIds,
   getReasonCodes,
   getUsers,
@@ -80,12 +81,14 @@ const useResolveStep = () => {
     reasonCodes,
     users,
     currentUser,
+    locale,
   } = useSelector((state) => ({
     users: getUsers(state),
     cycleCountIds: getCycleCountsIds(state),
     reasonCodes: getReasonCodes(state),
     currentLocation: getCurrentLocation(state),
-    currentUser: state.session.user,
+    currentUser: getCurrentUser(state),
+    locale: getCurrentLocale(state),
   }));
 
   const translate = useTranslate();
@@ -535,6 +538,7 @@ const useResolveStep = () => {
         date: cycleCountItem?.inventoryItem?.expirationDate,
         currentDateFormat: DateFormat.MMM_DD_YYYY,
         outputDateFormat: DateFormat.MM_DD_YYYY,
+        locale,
       }),
     },
     binLocation: cycleCountItem?.binLocation,
