@@ -58,7 +58,7 @@
                                         <g:checkBox name="includeCategoryChildren"
                                                     value="${params?.includeCategoryChildren}"
                                                     checked="true"/>
-                                        ${warehouse.message(
+                                        ${g.message(
                                                 code:'report.search.includeCategoryChildren.label',
                                                 default: 'Include all products in all subcategories',
                                         )}
