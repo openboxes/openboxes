@@ -645,43 +645,43 @@ class AddItemsPage extends Component {
           (item) => item.inventoryItem && item.expirationDate !== item.inventoryItem.expirationDate,
         );
 
-        if (hasExpiryMismatch) {
-          const hasNonZeroQuantity = values.lineItems.some(
-            (item) => item.inventoryItem?.quantity && item.inventoryItem.quantity !== '0',
-          );
-
-          if (hasNonZeroQuantity) {
-            this.props.hideSpinner();
-
-            const itemsWithMismatchedExpiry = values.lineItems
-              .filter(
-                (item) =>
-                  item.inventoryItem &&
-                  item.inventoryItem.expirationDate !== item.expirationDate &&
-                  item.inventoryItem.quantity &&
-                  item.inventoryItem.quantity !== '0',
-              )
-              .map((item) => ({
-                code: item.product?.productCode,
-                product: item.product,
-                lotNumber: item.lotNumber,
-                previousExpiry: item.inventoryItem.expirationDate,
-                newExpiry: item.expirationDate,
-              }));
-
-            if (itemsWithMismatchedExpiry.length > 0) {
-              const shouldUpdateExpirationDate = await
-              this.confirmExpirationDateSave(itemsWithMismatchedExpiry);
-              if (!shouldUpdateExpirationDate) {
-                return Promise.reject();
-              }
-            }
-          }
-
-          return this.updateInventoryItemsAndTransitionToNextStep(values, lineItems);
+        if (!hasExpiryMismatch) {
+          return this.transitionToNextStepAndChangePage(formValues);
         }
 
-        return this.transitionToNextStepAndChangePage(formValues);
+        const hasNonZeroQuantity = values.lineItems.some(
+          (item) => item.inventoryItem?.quantity && item.inventoryItem.quantity !== '0',
+        );
+
+        if (hasNonZeroQuantity) {
+          this.props.hideSpinner();
+
+          const itemsWithMismatchedExpiry = values.lineItems
+            .filter(
+              (item) =>
+                item.inventoryItem
+                  && item.inventoryItem.expirationDate !== item.expirationDate
+                  && item.inventoryItem.quantity
+                  && item.inventoryItem.quantity !== '0',
+            )
+            .map((item) => ({
+              code: item.product?.productCode,
+              product: item.product,
+              lotNumber: item.lotNumber,
+              previousExpiry: item.inventoryItem.expirationDate,
+              newExpiry: item.expirationDate,
+            }));
+
+          if (itemsWithMismatchedExpiry.length > 0) {
+            const shouldUpdateExpirationDate =
+              await this.confirmExpirationDateSave(itemsWithMismatchedExpiry);
+            if (!shouldUpdateExpirationDate) {
+              return Promise.reject();
+            }
+          }
+        }
+
+        return this.updateInventoryItemsAndTransitionToNextStep(values, lineItems);
       })
       .catch(() => this.props.hideSpinner());
   }
