@@ -197,6 +197,12 @@ class MobileProductApiController extends BaseDomainApiController {
                 return
             }
 
+            Product duplicate = Product.findByUpc(newUpc)
+            if (duplicate && duplicate.id != product.id) {
+                render(status: 409, text: "Conflict: UPC '${newUpc}' already assigned to another product (Product Code: ${duplicate.productCode})")
+                return
+            }
+
             product.upc = newUpc
             product.save(flush: true)
 
