@@ -1,10 +1,11 @@
+import _ from 'lodash';
 import { combineReducers } from 'redux';
 
 import {
   ADD_EMPTY_ROW,
-  FETCH_CYCLE_COUNTS,
-  REMOVE_ROW, SET_UPDATED,
-  UPDATE_DATE_COUNTED,
+  FETCH_CYCLE_COUNTS, IMPORT_CYCLE_COUNTS,
+  REMOVE_ROW, SET_UPDATED, UPDATE_COUNTED_BY,
+  UPDATE_DATE_COUNTED, UPDATE_FIELD_VALUE,
 } from 'actions/types';
 import {
   addEmptyRow,
@@ -36,6 +37,28 @@ function entitiesReducer(state = {}, action) {
         ),
       };
     }
+    case IMPORT_CYCLE_COUNTS: {
+      return {
+        ...state,
+        ...action.payload.entities,
+      };
+    }
+    case UPDATE_FIELD_VALUE: {
+      const updatedCycleCountItems = state[action.payload.id].cycleCountItems.map((item) => {
+        if (item.id === action.payload.rowId) {
+          // Updating object through lodash to support nested fields (inventory item properties)
+          return _.set(item, action.payload.field, action.payload.value);
+        }
+        return item;
+      });
+      return {
+        ...state,
+        [action.payload.id]: {
+          ...state[action.payload.id],
+          cycleCountItems: updatedCycleCountItems,
+        },
+      };
+    }
     default:
       return state;
   }
@@ -51,6 +74,12 @@ function dateCountedReducer(state = {}, action) {
         [action.payload.id]: action.payload.dateCounted,
       };
     }
+    case IMPORT_CYCLE_COUNTS: {
+      return {
+        ...state,
+        ...action.payload.dateCounted,
+      };
+    }
     default:
       return state;
   }
@@ -60,6 +89,18 @@ function countedByReducer(state = {}, action) {
   switch (action.type) {
     case FETCH_CYCLE_COUNTS:
       return normalizeCycleCounts(action.payload).countedBy;
+    case UPDATE_COUNTED_BY: {
+      return {
+        state,
+        [action.payload.id]: action.payload.countedBy,
+      };
+    }
+    case IMPORT_CYCLE_COUNTS: {
+      return {
+        ...state,
+        ...action.payload.countedBy,
+      };
+    }
     default:
       return state;
   }

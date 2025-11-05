@@ -12,8 +12,8 @@ import queryString from 'query-string';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import {
-  getCurrentLocale,
   getAllCycleCountProducts,
+  getCurrentLocale,
   getCurrentLocationId,
   getCurrentLocationSupportedActivities,
   getCurrentUserId,
@@ -40,7 +40,7 @@ import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 import apiClient from 'utils/apiClient';
 import confirmationModal from 'utils/confirmationModalUtils';
-import { trimLotNumberSpaces } from 'utils/cycleCountUtils';
+import { importCycleCounts, trimLotNumberSpaces } from 'utils/cycleCountUtils';
 import dateWithoutTimeZone from 'utils/dateUtils';
 import exportFileFromApi from 'utils/file-download-util';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
@@ -53,7 +53,6 @@ const useCountStep = () => {
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
   const [sortByProductName, setSortByProductName] = useState(false);
   const [importErrors, setImportErrors] = useState([]);
-  const assigneeImported = useRef(null);
   const requestIdsWithDiscrepancies = useRef([]);
 
   const dispatch = useDispatch();
@@ -269,7 +268,7 @@ const useCountStep = () => {
         requireRecountOnDiscrepancy: true,
         cycleCountItems: cycleCount.cycleCountItems,
       },
-        currentLocationId,
+      currentLocationId,
       cycleCount?.id),
     ]), []);
   };
@@ -404,7 +403,8 @@ const useCountStep = () => {
           return acc;
         }, []);
       dispatch(eraseDraft(currentLocationId, TO_COUNT_TAB));
-      const requestIdsWithoutDiscrepancies = submittedCounts.length - requestIdsWithDiscrepancies.current.length;
+      const requestIdsWithoutDiscrepancies =
+        submittedCounts.length - requestIdsWithDiscrepancies.current.length;
       if (requestIdsWithDiscrepancies.current.length > 0) {
         openResolveDiscrepanciesModal(
           requestIdsWithDiscrepancies.current,
@@ -420,104 +420,21 @@ const useCountStep = () => {
     }
   };
 
-  // const createCustomItemsFromImport = (items) => (items
-  //   ? items.map((item) => ({
-  //     ...item,
-  //     countIndex: 0,
-  //     id: _.uniqueId('newRow'),
-  //     custom: true,
-  //     inventoryItem: {
-  //       lotNumber: item.lotNumber,
-  //       expirationDate: item.expirationDate,
-  //     },
-  //     product: {
-  //       id: item.product.id,
-  //       productCode: item.product.productCode,
-  //     },
-  //     binLocation: item.binLocation?.id ? {
-  //       id: item.binLocation.id,
-  //       name: item.binLocation.name,
-  //     } : null,
-  //   }))
-  //   : []);
-
-  // const removeItemFromCycleCounts = (cycleCounts, cycleCountId, itemId) => ({
-  //   ...cycleCounts,
-  //   [cycleCountId]: cycleCounts[cycleCountId]
-  //     .filter((item) => item.cycleCountItemId !== itemId),
-  // });
-  //
-  // const mergeImportItems = (originalItem, importedItem) => ({
-  //   ...originalItem,
-  //   quantityCounted: importedItem ? importedItem.quantityCounted : originalItem.quantityCounted,
-  //   comment: importedItem ? importedItem.comment : originalItem.comment,
-  //   updated: true,
-  // });
-
   const importItems = async (importFile) => {
-    // try {
-    //   show();
-    //   const response = await cycleCountApi.importCycleCountItems(
-    //     importFile[0],
-    //     currentLocation?.id,
-    //   );
-    //   setImportErrors(response.data.errors);
-    //   let cycleCounts = _.groupBy(response.data.data, 'cycleCountId');
-    //   const countedByUpdates = {};
-    //   const dateCountedUpdates = {};
-    //
-    //   tableData.current = tableData.current.map((cycleCount) => {
-    //     // After each iteration assign it to false again, so that the flag
-    //     // can be reused for next cycle counts in the loop
-    //     assigneeImported.current = false;
-    //     return {
-    //       ...cycleCount,
-    //       cycleCountItems: [
-    //         ...cycleCount.cycleCountItems
-    //           .map((item) => {
-    //             const correspondingImportItem = cycleCounts[cycleCount.id]?.find(
-    //               (cycleCountItem) => cycleCountItem.cycleCountItemId === item.id,
-    //             );
-    //             // Assign counted by and date counted only once to prevent performance issues
-    //             // At this point, every item after being validated on the backend,
-    //             // should have the same assignee and dateCounted set,
-    //             // so we can make this operation only once
-    //             // this is why we introduce the assigneeImported boolean flag
-    //             if (correspondingImportItem && !assigneeImported.current[cycleCount.id]) {
-    //               countedByUpdates[cycleCount.id] = correspondingImportItem.assignee;
-    //               // Do not allow to clear the date counted dropdown
-    //               // if dateCounted was not set in the sheet
-    //               if (correspondingImportItem.dateCounted) {
-    //                 dateCountedUpdates[cycleCount.id] = correspondingImportItem.dateCounted;
-    //               }
-    //               // Mark the flag as true, so that it's not triggered for each item
-    //               assigneeImported.current = true;
-    //             }
-    //
-    //             if (correspondingImportItem) {
-    //             // Remove items from the import that have a corresponding item
-    //             // in the current cycle count. It allows us to treat items with
-    //             // the wrong ID as new rows that do not already exist.
-    //               cycleCounts = removeItemFromCycleCounts(
-    //                 cycleCounts,
-    //                 cycleCount.id,
-    //                 correspondingImportItem.cycleCountItemId,
-    //               );
-    //             }
-    //
-    //             return mergeImportItems(item, correspondingImportItem);
-    //           }),
-    //         ...createCustomItemsFromImport(cycleCounts[cycleCount.id]),
-    //       ],
-    //     };
-    //   });
-    //   // Batch update refs
-    //   countedBy.current = { ...countedBy.current, ...countedByUpdates };
-    //   defaultCountedBy.current = { ...defaultCountedBy.current, ...countedByUpdates };
-    //   dateCounted.current = { ...dateCounted.current, ...dateCountedUpdates };
-    // } finally {
-    //   hide();
-    // }
+    try {
+      show();
+      const state = store.getState();
+      const currentCycleCountEntities = Object.values(state.countWorkflow.entities);
+      const importAction = await importCycleCounts({
+        importFile: importFile[0],
+        locationId: currentLocationId,
+        currentCycleCountEntities,
+        setImportErrors,
+      });
+      dispatch(importAction);
+    } finally {
+      hide();
+    }
   };
 
   const handleCountStepHeaderSave = async () => {
@@ -526,7 +443,7 @@ const useCountStep = () => {
     // When we click "Save progress", we want to refetch the lot numbers
     // because the user may have created new ones and, without refetching,
     // they won't be available in the dropdown.
-    // dispatch(fetchLotNumbersByProductIds(uniqueProductIds));
+    dispatch(fetchLotNumbersByProductIds(uniqueProductIds));
   };
 
   return {

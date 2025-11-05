@@ -27,6 +27,10 @@ const CountedByHeader = ({ cycleCountId, isStepEditable, isFormDisabled }) => {
     dispatch(updateCountedBy(cycleCountId, countedBy));
   };
 
+  const defaultValue = cycleCountCountedBy
+    ? { ...cycleCountCountedBy, label: cycleCountCountedBy?.name }
+    : undefined;
+
   return (
     isStepEditable ? (
       <HeaderSelect
@@ -34,7 +38,7 @@ const CountedByHeader = ({ cycleCountId, isStepEditable, isFormDisabled }) => {
         className="ml-4"
       >
         <CustomTooltip
-          content={cycleCountCountedBy?.label || translate('react.cycleCount.countedBy.label', 'Counted By')}
+          content={cycleCountCountedBy?.name || translate('react.cycleCount.countedBy.label', 'Counted By')}
         >
           <div className="position-relative">
             <SelectField
@@ -42,7 +46,7 @@ const CountedByHeader = ({ cycleCountId, isStepEditable, isFormDisabled }) => {
               options={users}
               onChange={handleUpdateCountedBy}
               className="min-width-250"
-              defaultValue={cycleCountCountedBy}
+              defaultValue={defaultValue}
               disabled={isFormDisabled}
             />
           </div>
@@ -51,7 +55,7 @@ const CountedByHeader = ({ cycleCountId, isStepEditable, isFormDisabled }) => {
     ) : (
       <HeaderLabel
         label={translate('react.cycleCount.countedBy.label', 'Counted by')}
-        value={cycleCountCountedBy?.label}
+        value={cycleCountCountedBy?.name}
         className="ml-4"
       />
     )
