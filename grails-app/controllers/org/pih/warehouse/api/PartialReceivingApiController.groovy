@@ -108,7 +108,7 @@ class PartialReceivingApiController {
             PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id, "1")
 
             Shipment shipment = partialReceipt?.shipment
-            if (shipment.status.code == ShipmentStatusCode.RECEIVED) {
+            if (shipment?.wasReceived()) {
                 throw new ShipmentException(message: "Shipment has already been received", shipment: shipment)
             }
 
