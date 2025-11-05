@@ -53,6 +53,9 @@ const ExpirationHistoryReport = () => {
     filtersInitialized,
   });
 
+  const shouldDisableExportButton =
+    !filterParams.startDate && !filterParams.endDate && !tableData?.data?.length > 0;
+
   const totalAmount = `${translate('react.report.expirationHistory.totalAmount.label', 'Total amount')}: ${tableData?.totalValueLostToExpiry?.toLocaleString([LocaleConverter[locale] || Locale.EN]) ?? 0} ${currencyCode}`;
 
   return (
@@ -75,6 +78,7 @@ const ExpirationHistoryReport = () => {
             label="react.default.button.export.label"
             variant="secondary"
             EndIcon={<RiDownload2Line />}
+            disabled={shouldDisableExportButton}
           />
         </div>
         <ExpirationHistoryReportTable
