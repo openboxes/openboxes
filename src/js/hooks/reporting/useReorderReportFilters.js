@@ -13,7 +13,7 @@ import ActivityCode from 'consts/activityCode';
 import {
   EXPIRATION_FILTER,
   getExpiredStockOptions,
-  getFilterProductOptions,
+  getFilterProductOptions, INVENTORY_LEVEL_STATUS,
 } from 'consts/filterOptions';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import useSpinner from 'hooks/useSpinner';
@@ -115,11 +115,12 @@ const useReorderReportFilters = () => {
     defaultValues.filterProducts = getSelectedOption(
       selectedFilterProducts,
       getFilterProductOptions(),
+      INVENTORY_LEVEL_STATUS.ALL_PRODUCTS,
     );
     defaultValues.expiredStock = getSelectedOption(
       expiredStock,
       getExpiredStockOptions(),
-      EXPIRATION_FILTER.REMOVE_EXPIRED_STOCK,
+      EXPIRATION_FILTER.SUBTRACT_EXPIRED_STOCK,
     );
     defaultValues.additionalInventoryLocations = setDefaultValue(
       additionalInventoryLocations,

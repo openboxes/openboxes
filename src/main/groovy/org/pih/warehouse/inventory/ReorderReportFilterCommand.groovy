@@ -8,8 +8,8 @@ import org.pih.warehouse.product.Category
 
 class ReorderReportFilterCommand implements Validateable {
     List<Location> additionalLocations
-    InventoryLevelStatus inventoryLevelStatus = InventoryLevelStatus.IN_STOCK
-    ExpirationFilter expiration = ExpirationFilter.REMOVE_EXPIRED_STOCK
+    InventoryLevelStatus inventoryLevelStatus = InventoryLevelStatus.ALL_PRODUCTS
+    ExpirationFilter expiration = ExpirationFilter.SUBTRACT_EXPIRED_STOCK
     List<Category> categories
     List<Tag> tags
 

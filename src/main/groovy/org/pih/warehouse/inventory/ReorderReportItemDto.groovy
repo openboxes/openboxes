@@ -9,7 +9,8 @@ class ReorderReportItemDto {
     Set<Tag> tags
     InventoryLevel inventoryLevel
     Integer monthlyDemand
-    Integer quantityAvailableToPromise
+    Integer finalQuantityAvailableToPromise
+    Integer expiredQuantityAvailableToPromise
     Integer quantityToOrder
     BigDecimal unitCost
     BigDecimal expectedReorderCost
