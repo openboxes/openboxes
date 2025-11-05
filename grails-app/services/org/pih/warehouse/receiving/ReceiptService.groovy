@@ -33,6 +33,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionIdentifierService
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentService
@@ -442,6 +443,14 @@ class ReceiptService {
             Receipt lastReceipt = receivedReceipts.last()
 
             validateReceiptForRollback(lastReceipt)
+
+            def orderItems = OrderItem.findAllByReceipt(lastReceipt)
+            if (orderItems) {
+                orderItems.each { OrderItem item ->
+                    item.receipt = null
+                    item.receiptItem = null
+                }
+            }
 
             Transaction transaction = shipment.incomingTransactions.find {
                 it.receipt?.id == lastReceipt?.id

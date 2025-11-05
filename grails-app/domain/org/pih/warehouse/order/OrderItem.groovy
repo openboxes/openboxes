@@ -26,6 +26,8 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.product.ProductSupplier
+import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
@@ -81,6 +83,9 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     Integer orderIndex = 0
 
     ReasonCode discrepancyReasonCode
+
+    Receipt receipt
+    ReceiptItem receiptItem
 
     // Audit fields
     Date dateCreated
@@ -168,6 +173,8 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         glAccount(nullable: true)
         orderIndex(nullable: true)
         discrepancyReasonCode(nullable: true)
+        receipt(nullable: true)
+        receiptItem(nullable: true)
     }
 
     String getUnitOfMeasure() {
