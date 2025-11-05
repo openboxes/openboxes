@@ -24,7 +24,7 @@ import notification from 'components/Layout/notifications/notification';
 import ActivityCode from 'consts/activityCode';
 import { DASHBOARD_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import NotificationType from 'consts/notificationTypes';
-import RequisitionStatus from 'consts/requisitionStatus';
+import StockMovementStatus from 'consts/stockMovementStatus';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { isRequestFromWard, supports } from 'utils/supportedActivitiesUtils';
@@ -666,7 +666,7 @@ class AddItemsPage extends Component {
     this.updateTotalCount = this.updateTotalCount.bind(this);
     this.updateRow = this.updateRow.bind(this);
     this.updateProductData = this.updateProductData.bind(this);
-    this.submitRequest = this.submitRequest.bind(this);
+    this.nextPage = this.nextPage.bind(this);
     this.calculateQuantityRequested = calculateQuantityRequested.bind(this);
     this.cancelRequest = this.cancelRequest.bind(this);
     this.save = this.save.bind(this);
@@ -723,7 +723,7 @@ class AddItemsPage extends Component {
   getLineItemsToBeSaved(lineItems) {
     // First find items that are new and should be added (don't have status code)
     const lineItemsToBeAdded = _.filter(lineItems, (item) =>
-      !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product);
+      !item.statusCode && item.quantityRequested && item.product);
     // Then get a list of items that already exist in this request (have status code)
     const lineItemsWithStatus = _.filter(lineItems, (item) => item.statusCode);
     const lineItemsToBeUpdated = [];
@@ -1169,6 +1169,9 @@ class AddItemsPage extends Component {
 
   /**
    * Saves current stock movement progress (line items) and goes to the next stock movement step.
+   * Status becomes 'PENDING_APPROVAL' if the origin location requires request approvals,
+   * otherwise status becomes 'REQUESTED'.
+   *
    * @param {object} formValues
    * @param {object} lineItems
    * @public
@@ -1176,10 +1179,10 @@ class AddItemsPage extends Component {
   saveAndTransitionToNextStep(formValues, lineItems) {
     this.props.showSpinner();
 
-    // TODO: This is pre-existing code but why are we using 'VERIFYING' here for non-suppliers?
-    //       It's not a valid StockMovementStatusCode value. Should this be 'VALIDATED'??
-    const status = (formValues.origin.type === 'SUPPLIER' || !formValues.hasManageInventory)
-      ? 'CHECKING' : 'VERIFYING';
+    const status = supports(
+      this.state.values.origin?.supportedActivities,
+      ActivityCode.APPROVE_REQUEST,
+    ) ? StockMovementStatus.PENDING_APPROVAL : StockMovementStatus.REQUESTED;
 
     this.saveRequisitionItems(lineItems)
       .then((resp) => {
@@ -1220,20 +1223,8 @@ class AddItemsPage extends Component {
     return Promise.resolve();
   }
 
-  submitRequest(lineItems) {
-    const nonEmptyLineItems = _.filter(lineItems, (val) => !_.isEmpty(val) && val.product);
-    this.saveRequisitionItems(nonEmptyLineItems)
-      .then(() => {
-        if (supports(this.state.values.origin?.supportedActivities, ActivityCode.APPROVE_REQUEST)) {
-          this.transitionToNextStep(RequisitionStatus.PENDING_APPROVAL);
-        } else {
-          this.transitionToNextStep(RequisitionStatus.REQUESTED);
-        }
-      });
-  }
-
   /**
-   * Saves list of requisition items in current step (without step change). Used to export template.
+   * Saves list of requisition items in current step (without step change).
    * @param {object} itemCandidatesToSave
    * @public
    */
@@ -1267,11 +1258,7 @@ class AddItemsPage extends Component {
    */
   save(formValues) {
     const lineItems = _.filter(formValues.lineItems, (item) => !_.isEmpty(item));
-    if (this.state.isRequestFromWard) {
-      this.confirmSave(() => this.saveItems(lineItems));
-    } else {
-      this.saveItems(lineItems);
-    }
+    this.saveItems(lineItems);
   }
 
   cancelRequest() {
@@ -1335,16 +1322,11 @@ class AddItemsPage extends Component {
           this.props.hideSpinner();
         });
     };
+
     const errors = this.validate(formValues).lineItems;
     if (!errors.length) {
       const lineItems = _.filter(formValues.lineItems, (item) => !_.isEmpty(item));
-      if (this.state.isRequestFromWard) {
-        this.confirmSave(() => {
-          saveAndRedirect(lineItems);
-        });
-      } else {
-        saveAndRedirect(lineItems);
-      }
+      saveAndRedirect(lineItems);
     } else {
       confirmAlert({
         title: this.props.translate('react.stockMovement.confirmExit.label', 'Confirm save'),
@@ -1451,9 +1433,7 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Transition to next stock movement status:
-   * - 'CHECKING' if origin type is supplier.
-   * - 'VERIFYING' if origin type is other than supplier.
+   * Transition to next stock movement status
    * @param {string} status
    * @public
    */
@@ -1461,7 +1441,7 @@ class AddItemsPage extends Component {
     const url = STOCK_MOVEMENT_STATUS(this.state.values.stockMovementId);
     const payload = { status };
     const { movementNumber } = this.state.values;
-    if (this.state.values.statusCode === 'CREATED') {
+    if (this.state.values.statusCode === StockMovementStatus.CREATED) {
       await apiClient.post(url, payload);
     }
     const translatedSubmitMessage = this.props.translate(
@@ -1495,13 +1475,7 @@ class AddItemsPage extends Component {
     };
     if (!invalid) {
       const lineItems = _.filter(values.lineItems, (item) => !_.isEmpty(item));
-      if (this.state.isRequestFromWard) {
-        this.confirmSave(() => {
-          saveAndRedirect(lineItems);
-        });
-      } else {
-        saveAndRedirect(lineItems);
-      }
+      saveAndRedirect(lineItems);
     } else {
       confirmAlert({
         title: this.props.translate('react.stockMovement.confirmPreviousPage.label', 'Validation error'),
@@ -1716,7 +1690,7 @@ class AddItemsPage extends Component {
                   type="submit"
                   onClick={() => this.inactiveProductValidation({
                     lineItems: values.lineItems,
-                    callback: () => this.submitRequest(values.lineItems),
+                    callback: () => this.nextPage(values),
                   })}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={

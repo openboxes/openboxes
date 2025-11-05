@@ -22,6 +22,7 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import ConfirmExpirationDateModal from 'components/modals/ConfirmExpirationDateModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import StockMovementStatus from 'consts/stockMovementStatus';
 import apiClient from 'utils/apiClient';
 import { renderFormField, setColumnValue } from 'utils/form-utils';
 import Select from 'utils/Select';
@@ -272,7 +273,7 @@ class AddItemsPage extends Component {
    */
   getLineItemsToBeSaved(lineItems) {
     const lineItemsToBeAdded = _.filter(lineItems, (item) =>
-      !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product);
+      !item.statusCode && item.quantityRequested && item.product);
     const lineItemsWithStatus = _.filter(lineItems, (item) => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
@@ -880,9 +881,9 @@ class AddItemsPage extends Component {
    */
   transitionToNextStep() {
     const url = STOCK_MOVEMENT_STATUS(this.state.values.stockMovementId);
-    const payload = { status: 'CHECKING' };
+    const payload = { status: StockMovementStatus.CHECKING };
 
-    if (this.state.values.statusCode === 'CREATED') {
+    if (this.state.values.statusCode === StockMovementStatus.CREATED) {
       return apiClient.post(url, payload);
     }
     return Promise.resolve();
