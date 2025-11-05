@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
 import queryString from 'query-string';
 import { useSelector } from 'react-redux';
@@ -8,6 +8,8 @@ import { getCurrentLocation } from 'selectors';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import useSpinner from 'hooks/useSpinner';
 import { transformFilterParams } from 'utils/list-utils';
+
+import useOnLocationChange from '../useOnLocationChange';
 
 const useExpirationHistoryReportFilters = ({ filterFields }) => {
   const [filterParams, setFilterParams] = useState({});
@@ -21,8 +23,6 @@ const useExpirationHistoryReportFilters = ({ filterFields }) => {
   const spinner = useSpinner();
 
   const currentLocation = useSelector(getCurrentLocation);
-
-  const previousLocation = useRef(currentLocation?.id);
 
   const clearFilterValues = () => {
     const { pathname } = history.location;
@@ -80,18 +80,7 @@ const useExpirationHistoryReportFilters = ({ filterFields }) => {
     setFilterParams(values);
   };
 
-  // If the user switches to a different location, reset the filters.
-  // This ensures that filters from a previous location are cleared
-  useEffect(() => {
-    // This if statement ensures that when the page loads for the first time,
-    // we don't trigger an unnecessary reset so this only runs when the location actually changes
-    if (previousLocation.current !== currentLocation?.id) {
-      // Reset filter params to have clear filters for the new location
-      setFilterParams({});
-      // Update the reference to the current location for future checks
-      previousLocation.current = currentLocation?.id;
-    }
-  }, [currentLocation?.id]);
+  useOnLocationChange(() => setFilterParams({}));
 
   return {
     shouldFetch,

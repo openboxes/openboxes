@@ -1,9 +1,4 @@
-import React, {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
@@ -16,6 +11,7 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import { INVENTORY_ITEM_URL, INVENTORY_URL } from 'consts/applicationUrls';
 import expirationHistoryReportColumn from 'consts/expirationHistoryReportColumn';
 import { DateFormatDateFns } from 'consts/timeFormat';
+import useOnLocationChange from 'hooks/useOnLocationChange';
 import useSpinner from 'hooks/useSpinner';
 import useTableDataV2 from 'hooks/useTableDataV2';
 import useTablePagination from 'hooks/useTablePagination';
@@ -39,8 +35,6 @@ const useExpirationHistoryReport = ({
   const [totalCount, setTotalCount] = useState(0);
 
   const currentLocation = useSelector(getCurrentLocation);
-
-  const previousLocation = useRef(currentLocation?.id);
 
   const {
     paginationProps,
@@ -124,23 +118,13 @@ const useExpirationHistoryReport = ({
     setTotalCount(tableData.totalCount);
   }, [tableData]);
 
-  // If the user switches to a different location, reset the table data.
-  // This prevents showing outdated data from the previous location
-  useEffect(() => {
-    // This if statement ensures that when the page loads for the first time,
-    // we don't trigger an unnecessary reset so this only runs when the location actually changes
-    if (previousLocation.current !== currentLocation?.id) {
-    // Reset table data to have clear data for the new location
-      setTableData({
-        data: [],
-        totalCount: 0,
-        totalValueLostToExpiry: 0,
-        totalQuantityLostToExpiry: 0,
-      });
-      // Update the reference to the current location for future checks
-      previousLocation.current = currentLocation?.id;
-    }
-  }, [currentLocation?.id]);
+  useOnLocationChange(() =>
+    setTableData({
+      data: [],
+      totalCount: 0,
+      totalValueLostToExpiry: 0,
+      totalQuantityLostToExpiry: 0,
+    }));
 
   const columns = useMemo(() => [
     columnHelper.accessor(expirationHistoryReportColumn.TRANSACTION_NUMBER, {

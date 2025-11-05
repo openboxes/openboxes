@@ -53,7 +53,7 @@ const ExpirationHistoryReport = () => {
     filtersInitialized,
   });
 
-  const totalAmount = () => `${translate('react.report.expirationHistory.totalAmount.label', 'Total amount')}: ${tableData?.totalValueLostToExpiry?.toLocaleString([LocaleConverter[locale] || Locale.EN]) ?? 0} ${currencyCode}`;
+  const totalAmount = `${translate('react.report.expirationHistory.totalAmount.label', 'Total amount')}: ${tableData?.totalValueLostToExpiry?.toLocaleString([LocaleConverter[locale] || Locale.EN]) ?? 0} ${currencyCode}`;
 
   return (
     <PageWrapper>
@@ -67,7 +67,7 @@ const ExpirationHistoryReport = () => {
         />
         <div className="title-text px-3 py-2 d-flex justify-content-between align-items-center">
           <span>
-            {`${tableData?.totalQuantityLostToExpiry ?? 0} ${translate('react.report.expirationHistory.quantityLostToExpiry.label', 'Quantity Lost to Expiry')} (${totalAmount()})`}
+            {`${tableData?.totalQuantityLostToExpiry ?? 0} ${translate('react.report.expirationHistory.quantityLostToExpiry.label', 'Quantity Lost to Expiry')} (${totalAmount})`}
           </span>
           <Button
             onClick={exportData}
@@ -86,7 +86,7 @@ const ExpirationHistoryReport = () => {
           loading={loading}
           footerComponent={() => (
             <span className="title-text p-1 d-flex flex-1 justify-content-end">
-              {totalAmount()}
+              {totalAmount}
             </span>
           )}
         />
