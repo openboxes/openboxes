@@ -80,10 +80,15 @@ const useExpirationHistoryReportFilters = ({ filterFields }) => {
     setFilterParams(values);
   };
 
-  // Reset filterParams on location change
+  // If the user switches to a different location, reset the filters.
+  // This ensures that filters from a previous location are cleared
   useEffect(() => {
+    // This if statement ensures that when the page loads for the first time,
+    // we don't trigger an unnecessary reset so this only runs when the location actually changes
     if (previousLocation.current !== currentLocation?.id) {
+      // Reset filter params to have clear filters for the new location
       setFilterParams({});
+      // Update the reference to the current location for future checks
       previousLocation.current = currentLocation?.id;
     }
   }, [currentLocation?.id]);

@@ -124,15 +124,20 @@ const useExpirationHistoryReport = ({
     setTotalCount(tableData.totalCount);
   }, [tableData]);
 
-  // if current location changes, reset the table data and rest of the states
+  // If the user switches to a different location, reset the table data.
+  // This prevents showing outdated data from the previous location
   useEffect(() => {
+    // This if statement ensures that when the page loads for the first time,
+    // we don't trigger an unnecessary reset so this only runs when the location actually changes
     if (previousLocation.current !== currentLocation?.id) {
+    // Reset table data to have clear data for the new location
       setTableData({
         data: [],
         totalCount: 0,
         totalValueLostToExpiry: 0,
         totalQuantityLostToExpiry: 0,
       });
+      // Update the reference to the current location for future checks
       previousLocation.current = currentLocation?.id;
     }
   }, [currentLocation?.id]);
@@ -285,6 +290,7 @@ const useExpirationHistoryReport = ({
           {getValue() || '0'}
         </TableCell>
       ),
+      size: 180,
     }), columnHelper.accessor(expirationHistoryReportColumn.UNIT_PRICE, {
       header: () => (
         <TableHeaderCell>

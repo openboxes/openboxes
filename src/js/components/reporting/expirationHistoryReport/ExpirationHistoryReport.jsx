@@ -13,24 +13,21 @@ import ExpirationHistoryReportHeader
   from 'components/reporting/expirationHistoryReport/ExpirationHistoryReportHeader';
 import ExpirationHistoryReportTable
   from 'components/reporting/expirationHistoryReport/ExpirationHistoryReportTable';
+import { Locale, LocaleConverter } from 'consts/locale';
 import useExpirationHistoryReport from 'hooks/reporting/useExpirationHistoryReport';
 import useExpirationHistoryReportFilters from 'hooks/reporting/useExpirationHistoryReportFilters';
 import useTranslate from 'hooks/useTranslate';
 import useTranslation from 'hooks/useTranslation';
-import { Locale, LocaleConverter } from 'utils/locale';
 import PageWrapper from 'wrappers/PageWrapper';
 
 const ExpirationHistoryReport = () => {
   useTranslation('reporting');
 
   const translate = useTranslate();
-  const {
-    locale,
-    currencyCode,
-  } = useSelector((state) => ({
-    locale: getCurrentLocale(state),
-    currencyCode: getCurrencyCode(state),
-  }));
+
+  const locale = useSelector(getCurrentLocale);
+  const currencyCode = useSelector(getCurrencyCode);
+
   const {
     defaultFilterValues,
     filterParams,

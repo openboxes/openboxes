@@ -3507,4 +3507,14 @@ class InventoryService implements ApplicationContextAware {
         }
         return CSVUtils.prependBomToCsvString(csv.writer.toString())
     }
+
+    Map<String, Number> getExpirationHistoryReportTotals(List<ExpirationHistoryReportRow> entries) {
+        Integer totalQuantityLostToExpiry = entries.sum { it?.quantityLostToExpiry ?: 0 } as Integer ?: 0
+        BigDecimal totalValueLostToExpiry = entries.sum { it?.valueLostToExpiry ?: 0 } as BigDecimal ?: 0
+
+        return [
+                totalQuantityLostToExpiry: totalQuantityLostToExpiry,
+                totalValueLostToExpiry   : totalValueLostToExpiry
+        ] as Map<String, Number>
+    }
 }

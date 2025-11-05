@@ -81,11 +81,13 @@ class InventoryApiController {
             }
             "*" {
                 PaginatedList<ExpirationHistoryReportRow> entries = inventoryService.getExpirationHistoryReport(command)
+                Map<String, Number> expirationTotals = inventoryService.getExpirationHistoryReportTotals(entries)
+
                 render([
-                        data: entries,
-                        totalCount: entries.totalCount,
-                        totalQuantityLostToExpiry: entries.sum { it?.quantityLostToExpiry ?: 0 } ?: 0,
-                        totalValueLostToExpiry: entries.sum { it?.valueLostToExpiry ?: 0 } ?: 0
+                        data                     : entries,
+                        totalCount               : entries.totalCount,
+                        totalQuantityLostToExpiry: expirationTotals.totalQuantityLostToExpiry,
+                        totalValueLostToExpiry   : expirationTotals.totalValueLostToExpiry
                 ] as JSON)
             }
         }
