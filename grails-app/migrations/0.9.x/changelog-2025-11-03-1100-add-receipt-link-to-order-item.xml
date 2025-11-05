@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="druchniewicz" id="031120251100-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="order_item" columnName="receipt_id"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="order_item">
+            <column name="receipt_id" type="CHAR(38)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="druchniewicz" id="031120251100-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_order_item_receipt"/>
+            </not>
+        </preConditions>
+
+        <addForeignKeyConstraint
+                baseTableName="order_item"
+                baseColumnNames="receipt_id"
+                referencedTableName="receipt"
+                referencedColumnNames="id"
+                constraintName="fk_order_item_receipt"
+                deferrable="false"
+                initiallyDeferred="false"/>
+    </changeSet>
+
+    <changeSet author="druchniewicz" id="031120251100-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="order_item" columnName="receipt_item_id"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="order_item">
+            <column name="receipt_item_id" type="CHAR(38)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="druchniewicz" id="031120251100-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_order_item_receipt_item"/>
+            </not>
+        </preConditions>
+
+        <addForeignKeyConstraint
+                baseTableName="order_item"
+                baseColumnNames="receipt_item_id"
+                referencedTableName="receipt_item"
+                referencedColumnNames="id"
+                constraintName="fk_order_item_receipt_item"
+                deferrable="false"
+                initiallyDeferred="false"/>
+    </changeSet>
+
+</databaseChangeLog>

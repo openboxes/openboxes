@@ -402,6 +402,8 @@ class PutawayService implements EventPublisher  {
         orderItem.originBinLocation = putawayItem.currentLocation
         orderItem.destinationBinLocation = putawayItem.putawayLocation
         orderItem.containerLocation = putawayItem.containerLocation
+        orderItem.receipt = putawayItem.receipt
+        orderItem.receiptItem = putawayItem.receiptItem
         return orderItem
     }
 
