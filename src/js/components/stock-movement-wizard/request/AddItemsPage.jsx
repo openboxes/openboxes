@@ -14,6 +14,7 @@ import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
+import { STOCK_MOVEMENT_STATUS, STOCK_MOVEMENT_UPDATE_ITEMS } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
@@ -1175,35 +1176,24 @@ class AddItemsPage extends Component {
   saveAndTransitionToNextStep(formValues, lineItems) {
     this.props.showSpinner();
 
-    if (formValues.origin.type === 'SUPPLIER' || !formValues.hasManageInventory) {
-      this.saveRequisitionItems(lineItems)
-        .then((resp) => {
-          let values = formValues;
-          if (resp) {
-            values = { ...formValues, lineItems: resp.data.data.lineItems };
-          }
-          this.transitionToNextStep('CHECKING')
-            .then(() => {
-              this.props.nextPage(values);
-            })
-            .catch(() => this.props.hideSpinner());
-        })
-        .catch(() => this.props.hideSpinner());
-    } else {
-      this.saveRequisitionItems(lineItems)
-        .then((resp) => {
-          let values = formValues;
-          if (resp) {
-            values = { ...formValues, lineItems: resp.data.data.lineItems };
-          }
-          this.transitionToNextStep('VERIFYING')
-            .then(() => {
-              this.props.nextPage(values);
-            })
-            .catch(() => this.props.hideSpinner());
-        })
-        .catch(() => this.props.hideSpinner());
-    }
+    // TODO: This is pre-existing code but why are we using 'VERIFYING' here for non-suppliers?
+    //       It's not a valid StockMovementStatusCode value. Should this be 'VALIDATED'??
+    const status = (formValues.origin.type === 'SUPPLIER' || !formValues.hasManageInventory)
+      ? 'CHECKING' : 'VERIFYING';
+
+    this.saveRequisitionItems(lineItems)
+      .then((resp) => {
+        let values = formValues;
+        if (resp) {
+          values = { ...formValues, lineItems: resp.data.data.lineItems };
+        }
+        this.transitionToNextStep(status)
+          .then(() => {
+            this.props.nextPage(values);
+          })
+          .catch(() => this.props.hideSpinner());
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
@@ -1213,10 +1203,12 @@ class AddItemsPage extends Component {
    */
   saveRequisitionItems(lineItems) {
     const itemsToSave = this.getLineItemsToBeSaved(lineItems);
-    const updateItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
+    const updateItemsUrl = STOCK_MOVEMENT_UPDATE_ITEMS(this.state.values.stockMovementId);
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
+      // We're proceeding to the next step so should not have any zero quantity items at this point.
+      removeEmptyItems: true,
     };
 
     if (payload.lineItems.length) {
@@ -1247,10 +1239,12 @@ class AddItemsPage extends Component {
    */
   saveRequisitionItemsInCurrentStep(itemCandidatesToSave) {
     const itemsToSave = this.getLineItemsToBeSaved(itemCandidatesToSave);
-    const updateItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
+    const updateItemsUrl = STOCK_MOVEMENT_UPDATE_ITEMS(this.state.values.stockMovementId);
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
+      // We're saving without proceeding so it's fine to have items with no quantity at this point.
+      removeEmptyItems: false,
     };
     if (payload.lineItems.length) {
       return apiClient.post(updateItemsUrl, payload)
@@ -1344,8 +1338,7 @@ class AddItemsPage extends Component {
     const errors = this.validate(formValues).lineItems;
     if (!errors.length) {
       const lineItems = _.filter(formValues.lineItems, (item) => !_.isEmpty(item));
-      const zeroedLines = _.some(lineItems, (item) => !item.quantityRequested || item.quantityRequested === '0');
-      if (zeroedLines || this.state.isRequestFromWard) {
+      if (this.state.isRequestFromWard) {
         this.confirmSave(() => {
           saveAndRedirect(lineItems);
         });
@@ -1465,7 +1458,7 @@ class AddItemsPage extends Component {
    * @public
    */
   async transitionToNextStep(status) {
-    const url = `/api/stockMovements/${this.state.values.stockMovementId}/status`;
+    const url = STOCK_MOVEMENT_STATUS(this.state.values.stockMovementId);
     const payload = { status };
     const { movementNumber } = this.state.values;
     if (this.state.values.statusCode === 'CREATED') {

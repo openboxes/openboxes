@@ -2365,9 +2365,9 @@ class StockMovementService {
         }
     }
 
-    StockMovement updateItems(StockMovement stockMovement) {
+    StockMovement updateItems(StockMovement stockMovement, boolean removeEmptyItems=false) {
         if (stockMovement.requisition) {
-            return updateRequisitionBasedStockMovementItems(stockMovement)
+            return updateRequisitionBasedStockMovementItems(stockMovement, removeEmptyItems)
         }
         else {
             return updateShipmentBasedStockMovementItems(stockMovement)
@@ -2458,14 +2458,14 @@ class StockMovementService {
         return shipmentItem
     }
 
-
-    StockMovement updateRequisitionBasedStockMovementItems(StockMovement stockMovement) {
+    private StockMovement updateRequisitionBasedStockMovementItems(StockMovement stockMovement,
+                                                                   boolean removeEmptyItems) {
         Requisition requisition = Requisition.get(stockMovement.id)
 
         if (stockMovement.lineItems) {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
                 RequisitionItem requisitionItem
-                // Try to find a matching stock movement item
+                // Try to find a requisition item matching the stock movement item
                 if (stockMovementItem.id) {
                     requisitionItem = requisition.requisitionItems.find {
                         it.id == stockMovementItem.id
@@ -2481,23 +2481,33 @@ class StockMovementService {
                     requisitionItem.quantityCounted = stockMovementItem.quantityCounted
                     removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
 
-                    if (stockMovementItem.quantityRequested != requisitionItem.quantity) {
+                    // If the item has 0 or null quantity requested, remove it. We add the ability to conditionally not
+                    // remove empty items because often the update is a part of a "save as draft" feature. We only want
+                    // to remove empty rows when we're actually proceeding to the next step of the requisition flow.
+                    if (removeEmptyItems && !stockMovementItem.quantityRequested) {
+                        log.info "Item deleted " + requisitionItem.id
                         requisitionItem.undoChanges()
+                        requisition.removeFromRequisitionItems(requisitionItem)
+                        requisitionItem.delete(flush: true)
+                    } else {
+                        if (stockMovementItem.quantityRequested != requisitionItem.quantity) {
+                            requisitionItem.undoChanges()
+                        }
+
+                        requisitionItem.quantity = stockMovementItem.quantityRequested
+                        requisitionItem.quantityApproved = stockMovementItem.quantityRequested
+
+                        if (stockMovementItem.product) requisitionItem.product = stockMovementItem.product
+                        if (stockMovementItem.inventoryItem) requisitionItem.inventoryItem = stockMovementItem.inventoryItem
+                        if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
+
+                        requisitionItem.recipient = stockMovementItem.recipient
+                        requisitionItem.palletName = stockMovementItem.palletName
+                        requisitionItem.boxName = stockMovementItem.boxName
+                        requisitionItem.lotNumber = stockMovementItem.lotNumber
+                        requisitionItem.expirationDate = stockMovementItem.expirationDate
+                        requisitionItem.comment = stockMovementItem.comments
                     }
-
-                    requisitionItem.quantity = stockMovementItem.quantityRequested
-                    requisitionItem.quantityApproved = stockMovementItem.quantityRequested
-
-                    if (stockMovementItem.product) requisitionItem.product = stockMovementItem.product
-                    if (stockMovementItem.inventoryItem) requisitionItem.inventoryItem = stockMovementItem.inventoryItem
-                    if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
-
-                    requisitionItem.recipient = stockMovementItem.recipient
-                    requisitionItem.palletName = stockMovementItem.palletName
-                    requisitionItem.boxName = stockMovementItem.boxName
-                    requisitionItem.lotNumber = stockMovementItem.lotNumber
-                    requisitionItem.expirationDate = stockMovementItem.expirationDate
-                    requisitionItem.comment = stockMovementItem.comments
                 }
                 // Otherwise we create a new one
                 else {
