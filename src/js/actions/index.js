@@ -62,7 +62,7 @@ import {
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
   UPDATE_COUNTED_BY,
-  UPDATE_DATE_COUNTED,
+  UPDATE_DATE_COUNTED, UPDATE_FIELD_VALUE,
 } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
 import genericApi from 'api/services/GenericApi';
@@ -888,6 +888,20 @@ export const setUpdated = (cycleCountId, updated) => (dispatch) => {
     payload: {
       id: cycleCountId,
       updated,
+    },
+  });
+};
+
+export const updateFieldValue = ({
+  cycleCountId, rowId, field, value,
+}) => (dispatch) => {
+  dispatch({
+    type: UPDATE_FIELD_VALUE,
+    payload: {
+      id: cycleCountId,
+      rowId,
+      field,
+      value,
     },
   });
 };

@@ -15,11 +15,11 @@ import CommentCell from 'components/cycleCount/tableCell/CommentCell';
 import ExpirationDateCell from 'components/cycleCount/tableCell/ExpirationDateCell';
 import LotNumberCell from 'components/cycleCount/tableCell/LotNumberCell';
 import QuantityCell from 'components/cycleCount/tableCell/QuantityCell';
+import HeaderCell from 'components/cycleCount/tableHeader/HeaderCell';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { getBinLocationToDisplay } from 'utils/groupBinLocationsByZone';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
-import HeaderCell from 'components/cycleCount/tableHeader/HeaderCell';
 
 // Managing state for single table, mainly table configuration (from count step)
 const useCountStepTable = ({
@@ -52,11 +52,12 @@ const useCountStepTable = ({
     columnHelper.accessor(
       (row) => getBinLocationToDisplay(row?.binLocation), {
         id: cycleCountColumn.BIN_LOCATION,
-        header: () => <HeaderCell id="react.cycleCount.table.binLocation.label" defaultMessage="Bin Location"/>,
-        cell: ({ getValue, row }) => (
+        header: () => <HeaderCell id="react.cycleCount.table.binLocation.label" defaultMessage="Bin Location" />,
+        cell: ({ getValue, row: { original: { id } } }) => (
           <BinLocationCell
             initialValue={getValue()}
-            row={row}
+            id={id}
+            cycleCountId={cycleCountId}
             showBinLocation={showBinLocation}
           />
         ),
@@ -67,11 +68,12 @@ const useCountStepTable = ({
       },
     ),
     columnHelper.accessor(cycleCountColumn.LOT_NUMBER, {
-      header: () => <HeaderCell id="react.cycleCount.table.lotNumber.label" defaultMessage="Serial / Lot Number"/>,
+      header: () => <HeaderCell id="react.cycleCount.table.lotNumber.label" defaultMessage="Serial / Lot Number" />,
       cell: ({ getValue, row: { original: { id } } }) => (
         <LotNumberCell
           initialValue={getValue()}
           id={id}
+          cycleCountId={cycleCountId}
           setDisabledExpirationDateFields={setDisabledExpirationDateFields}
         />
       ),
@@ -85,6 +87,7 @@ const useCountStepTable = ({
         <ExpirationDateCell
           initialValue={getValue()}
           disabledExpirationDateFields={disabledExpirationDateFields}
+          cycleCountId={cycleCountId}
           id={id}
         />
       ),
@@ -97,17 +100,25 @@ const useCountStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.QUANTITY_COUNTED, {
       header: () => <HeaderCell id="react.cycleCount.table.quantityCounted.label" defaultMessage="Quantity Counted" />,
-      cell: ({ getValue }) => (
-        <QuantityCell initialValue={getValue()} />
+      cell: ({ getValue, row: { original: { id } } }) => (
+        <QuantityCell
+          initialValue={getValue()}
+          id={id}
+          cycleCountId={cycleCountId}
+        />
       ),
       meta: {
         flexWidth: 50,
       },
     }),
     columnHelper.accessor(cycleCountColumn.COMMENT, {
-      header: () => <HeaderCell id="react.cycleCount.table.comment.label" defaultMessage="Comment"/>,
-      cell: ({ getValue }) => (
-        <CommentCell initialValue={getValue()} />
+      header: () => <HeaderCell id="react.cycleCount.table.comment.label" defaultMessage="Comment" />,
+      cell: ({ getValue, row: { original: { id } } }) => (
+        <CommentCell
+          initialValue={getValue()}
+          id={id}
+          cycleCountId={cycleCountId}
+        />
       ),
       meta: {
         flexWidth: 100,

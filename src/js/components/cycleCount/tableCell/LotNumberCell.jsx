@@ -1,16 +1,20 @@
 import React, { useMemo, useState } from 'react';
 
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { makeGetCycleCountProduct, makeGetLotNumbersByProductId } from 'selectors';
 
+import { updateFieldValue } from 'actions';
 import { TableCell } from 'components/DataTable';
 import SelectField from 'components/form-elements/v2/SelectField';
 
 const LotNumberCell = ({
   id,
+  cycleCountId,
   initialValue,
   setDisabledExpirationDateFields,
 }) => {
+  const dispatch = useDispatch();
+
   const getCycleCountProduct = useMemo(makeGetCycleCountProduct, []);
 
   const cycleCountProduct = useSelector(
@@ -23,12 +27,12 @@ const LotNumberCell = ({
     (state) => getLotNumbersByProductId(state, cycleCountProduct?.id),
   );
 
-  const [value, setValue] = useState({
+  const [value, setValue] = useState(initialValue ? {
     label: initialValue,
     value: initialValue,
     id: initialValue,
     name: initialValue,
-  });
+  } : undefined);
 
   const onChange = (selected) => {
     const selectedLot = selected?.value;
@@ -37,8 +41,19 @@ const LotNumberCell = ({
 
     if (lotExists) {
       setDisabledExpirationDateFields((prev) => ({ ...prev, [id]: existingLot?.expirationDate }));
-      setValue(selected);
     }
+    setValue(selected);
+  };
+
+  const onBlur = () => {
+    dispatch(
+      updateFieldValue({
+        cycleCountId,
+        rowId: id,
+        field: 'inventoryItem.lotNumber',
+        value: value?.value,
+      }),
+    );
   };
 
   const selectOptions = useMemo(() => lotNumbersWithExpiration.map((item) => ({
@@ -58,6 +73,7 @@ const LotNumberCell = ({
         options={selectOptions}
         disabled={isDisabled}
         onChange={onChange}
+        onBlur={onBlur}
         creatable
       />
     </TableCell>
