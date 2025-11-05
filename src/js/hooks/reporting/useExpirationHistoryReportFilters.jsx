@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import queryString from 'query-string';
 import { useSelector } from 'react-redux';
@@ -21,6 +21,8 @@ const useExpirationHistoryReportFilters = ({ filterFields }) => {
   const spinner = useSpinner();
 
   const currentLocation = useSelector(getCurrentLocation);
+
+  const previousLocation = useRef(currentLocation?.id);
 
   const clearFilterValues = () => {
     const { pathname } = history.location;
@@ -77,6 +79,14 @@ const useExpirationHistoryReportFilters = ({ filterFields }) => {
     }
     setFilterParams(values);
   };
+
+  // Reset filterParams on location change
+  useEffect(() => {
+    if (previousLocation.current !== currentLocation?.id) {
+      setFilterParams({});
+      previousLocation.current = currentLocation?.id;
+    }
+  }, [currentLocation?.id]);
 
   return {
     shouldFetch,

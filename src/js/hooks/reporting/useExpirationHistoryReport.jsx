@@ -1,4 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
@@ -35,6 +40,8 @@ const useExpirationHistoryReport = ({
 
   const currentLocation = useSelector(getCurrentLocation);
 
+  const previousLocation = useRef(currentLocation?.id);
+
   const {
     paginationProps,
     offset,
@@ -46,7 +53,6 @@ const useExpirationHistoryReport = ({
     totalCount,
     filterParams,
     setShouldFetch,
-    disableAutoUpdateFilterParams: true,
   });
 
   const paginationParams = (paginate) => (paginate ? {
@@ -88,6 +94,7 @@ const useExpirationHistoryReport = ({
   const {
     tableData,
     loading,
+    setTableData,
   } = useTableDataV2({
     url: EXPIRATION_HISTORY_REPORT,
     errorMessageId: 'react.report.expirationHistory.unableToLoadData.label',
@@ -104,11 +111,31 @@ const useExpirationHistoryReport = ({
     serializedParams,
     setShouldFetch,
     filtersInitialized,
+    onFetchedData: (data) => {
+      setTableData((prevState) => ({
+        ...prevState,
+        totalValueLostToExpiry: data.totalValueLostToExpiry,
+        totalQuantityLostToExpiry: data.totalQuantityLostToExpiry,
+      }));
+    },
   });
 
   useEffect(() => {
     setTotalCount(tableData.totalCount);
   }, [tableData]);
+
+  // if current location changes, reset the table data and rest of the states
+  useEffect(() => {
+    if (previousLocation.current !== currentLocation?.id) {
+      setTableData({
+        data: [],
+        totalCount: 0,
+        totalValueLostToExpiry: 0,
+        totalQuantityLostToExpiry: 0,
+      });
+      previousLocation.current = currentLocation?.id;
+    }
+  }, [currentLocation?.id]);
 
   const columns = useMemo(() => [
     columnHelper.accessor(expirationHistoryReportColumn.TRANSACTION_NUMBER, {
@@ -120,6 +147,7 @@ const useExpirationHistoryReport = ({
       cell: ({ getValue, row: { original: { transactionId } } }) => (
         <TableCell
           link={INVENTORY_URL.showTransaction(transactionId)}
+          openLinkInNewTab
           className="rt-td pb-0"
           customTooltip
           tooltipLabel={getValue()}
@@ -160,6 +188,7 @@ const useExpirationHistoryReport = ({
       cell: ({ getValue, row: { original: { productId } } }) => (
         <TableCell
           link={INVENTORY_ITEM_URL.showStockCard(productId)}
+          openLinkInNewTab
           className="rt-td pb-0"
           customTooltip
           tooltipLabel={getValue()}
@@ -182,6 +211,7 @@ const useExpirationHistoryReport = ({
       cell: ({ getValue, row: { original: { productId } } }) => (
         <TableCell
           link={INVENTORY_ITEM_URL.showStockCard(productId)}
+          openLinkInNewTab
           className="rt-td pb-0 multiline-cell"
           customTooltip
           tooltipLabel={getValue()}
