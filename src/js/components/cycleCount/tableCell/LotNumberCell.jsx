@@ -1,7 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { makeGetCycleCountProduct, makeGetLotNumbersByProductId } from 'selectors';
+import {
+  makeGetCycleCountItem,
+  makeGetCycleCountProduct,
+  makeGetLotNumbersByProductId,
+} from 'selectors';
 
 import { updateFieldValue } from 'actions';
 import { TableCell } from 'components/DataTable';
@@ -11,7 +15,6 @@ import useTranslate from 'hooks/useTranslate';
 const LotNumberCell = ({
   id,
   cycleCountId,
-  initialValue,
   setDisabledExpirationDateFields,
   isStepEditable,
 }) => {
@@ -19,14 +22,20 @@ const LotNumberCell = ({
 
   const translate = useTranslate();
 
-  const [value, setValue] = useState(initialValue ? {
+  const getCycleCountItem = useMemo(() => makeGetCycleCountItem(), []);
+  const item = useSelector(
+    (state) => getCycleCountItem(state, cycleCountId, id),
+  );
+  const { inventoryItem: { lotNumber: initialValue } } = item;
+
+  const value = {
     label: initialValue,
     value: initialValue,
     id: initialValue,
     name: initialValue,
-  } : undefined);
+  };
 
-  const tooltipLabel = value
+  const tooltipLabel = value?.label
     || translate('react.cycleCount.table.lotNumber.label', 'Serial / Lot Number');
 
   if (!isStepEditable) {
@@ -61,32 +70,29 @@ const LotNumberCell = ({
     if (lotExists) {
       setDisabledExpirationDateFields((prev) => ({ ...prev, [id]: existingLot?.expirationDate }));
     }
-    setValue(selected);
-  };
 
-  const onBlur = () => {
     dispatch(
       updateFieldValue({
         cycleCountId,
         rowId: id,
         field: 'inventoryItem.lotNumber',
-        value: value?.value,
+        value: selected?.value,
       }),
     );
   };
 
-  const selectOptions = useMemo(() => lotNumbersWithExpiration.map((item) => ({
-    id: item.lotNumber,
-    name: item.lotNumber,
-    label: item.lotNumber,
-    value: item.lotNumber,
+  const selectOptions = useMemo(() => lotNumbersWithExpiration.map((lotWithExp) => ({
+    id: lotWithExp.lotNumber,
+    name: lotWithExp.lotNumber,
+    label: lotWithExp.lotNumber,
+    value: lotWithExp.lotNumber,
   })), []);
 
   const isDisabled = useMemo(() =>
-    !id.includes('newRow'), []);
+    !id?.includes('newRow'), []);
 
   const placeholder = isDisabled
-    && translate('react.cycleCount.emptyLotNumber.label', 'NO LOT')
+    && translate('react.cycleCount.emptyLotNumber.label', 'NO LOT');
 
   return (
     <TableCell
@@ -100,7 +106,6 @@ const LotNumberCell = ({
         options={selectOptions}
         disabled={isDisabled}
         onChange={onChange}
-        onBlur={onBlur}
         placeholder={placeholder}
         className="m-1"
         hideErrorMessageWrapper

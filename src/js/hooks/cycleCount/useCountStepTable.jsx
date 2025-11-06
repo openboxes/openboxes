@@ -4,8 +4,9 @@ import { createColumnHelper } from '@tanstack/react-table';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   getCurrentLocationId,
-  getCurrentLocationSupportedActivities,
-  makeGetCycleCountItems,
+  getCurrentLocationSupportedActivities, makeGetCycleCountItem,
+  makeGetCycleCountItemIds,
+  makeGetCycleCountItemsTotalCount,
 } from 'selectors';
 
 import { removeRow } from 'actions';
@@ -33,11 +34,13 @@ const useCountStepTable = ({
   const currentLocationId = useSelector(getCurrentLocationId);
   const currentLocationSupportedActivities = useSelector(getCurrentLocationSupportedActivities);
 
-  const getCycleCountItems = useMemo(makeGetCycleCountItems, []);
+  const getTotalCount = useMemo(makeGetCycleCountItemsTotalCount, []);
+  const cycleCountItemsTotalCount = useSelector((state) => getTotalCount(state, cycleCountId));
 
-  const cycleCountItems = useSelector(
-    (state) => getCycleCountItems(state, cycleCountId),
-  );
+  // We are returning only IDs to render rows properly. The array doesn't contain full objects to
+  // reduce re-renders of the whole table on every small cell update.
+  const getCycleCountItemIds = useMemo(makeGetCycleCountItemIds, []);
+  const cycleCountItemIds = useSelector((state) => getCycleCountItemIds(state, cycleCountId));
 
   const dispatch = useDispatch();
 
@@ -48,15 +51,14 @@ const useCountStepTable = ({
     dispatch(removeRow(cycleCountId, rowId));
   };
 
-  const columns = [
+  const columns = useMemo(() => [
     columnHelper.accessor(
       (row) => getBinLocationToDisplay(row?.binLocation), {
         id: cycleCountColumn.BIN_LOCATION,
         header: () => <HeaderCell id="react.cycleCount.table.binLocation.label" defaultMessage="Bin Location" />,
-        cell: ({ getValue, row: { original: { id } } }) => (
+        cell: ({ row: { original } }) => (
           <BinLocationCell
-            initialValue={getValue()}
-            id={id}
+            id={original}
             cycleCountId={cycleCountId}
             showBinLocation={showBinLocation}
             isStepEditable={isStepEditable}
@@ -70,10 +72,9 @@ const useCountStepTable = ({
     ),
     columnHelper.accessor(cycleCountColumn.LOT_NUMBER, {
       header: () => <HeaderCell id="react.cycleCount.table.lotNumber.label" defaultMessage="Serial / Lot Number" />,
-      cell: ({ getValue, row: { original: { id } } }) => (
+      cell: ({ row: { original } }) => (
         <LotNumberCell
-          initialValue={getValue()}
-          id={id}
+          id={original}
           cycleCountId={cycleCountId}
           setDisabledExpirationDateFields={setDisabledExpirationDateFields}
           isStepEditable={isStepEditable}
@@ -85,13 +86,12 @@ const useCountStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.EXPIRATION_DATE, {
       header: () => <HeaderCell id="react.cycleCount.table.expirationDate.label" defaultMessage="Expiration Date" />,
-      cell: ({ getValue, row: { original: { id } } }) => (
+      cell: ({ row: { original } }) => (
         <ExpirationDateCell
-          initialValue={getValue()}
           disabledExpirationDateFields={disabledExpirationDateFields}
           cycleCountId={cycleCountId}
           isStepEditable={isStepEditable}
-          id={id}
+          id={original}
         />
       ),
       meta: {
@@ -103,10 +103,9 @@ const useCountStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.QUANTITY_COUNTED, {
       header: () => <HeaderCell id="react.cycleCount.table.quantityCounted.label" defaultMessage="Quantity Counted" />,
-      cell: ({ getValue, row: { original: { id } } }) => (
+      cell: ({ row: { original } }) => (
         <QuantityCell
-          initialValue={getValue()}
-          id={id}
+          id={original}
           cycleCountId={cycleCountId}
           isStepEditable={isStepEditable}
         />
@@ -117,10 +116,9 @@ const useCountStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.COMMENT, {
       header: () => <HeaderCell id="react.cycleCount.table.comment.label" defaultMessage="Comment" />,
-      cell: ({ getValue, row: { original: { id } } }) => (
+      cell: ({ row: { original } }) => (
         <CommentCell
-          initialValue={getValue()}
-          id={id}
+          id={original}
           cycleCountId={cycleCountId}
           isStepEditable={isStepEditable}
         />
@@ -148,11 +146,12 @@ const useCountStepTable = ({
         flexWidth: 25,
       },
     }),
-  ];
+  ], []);
 
   return {
     columns,
-    cycleCountItems,
+    cycleCountItemsTotalCount,
+    cycleCountItemIds,
   };
 };
 
