@@ -810,12 +810,10 @@ class AddItemsPage extends Component {
             manuallyAdded,
           } = val;
 
-          // Determine the quantity requested values for each row. If the request item already has
-          // a quantity value set, use that, otherwise calculate a value to use. We say that if
-          // quantity requested > 0 then it has a value set, but if a row has been manually set by
-          // a user to have quantity 0, then we want to continue using that 0 value. We distinguish
-          // between the cases by checking if the item version is > 0, meaning it has been modified
-          // since creation. Manually added rows should also not have their quantity recalculated.
+          // Determine the quantity requested for each row. If the item already has quantity
+          // requested > 0, or it has been manually set to 0 (an item with version > 0 has been
+          // modified since initial creation) use that value. Otherwise, calculate a new quantity
+          // to use. Manually added rows should not ever have their quantity recalculated.
           // This isn't a perfect solution, but is the least intrusive one for now. Likely a better
           // option would be to move this logic to the stock movement create flow on the backend.
           let qtyRequested;
