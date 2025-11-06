@@ -1120,6 +1120,12 @@ div.search-input:focus-within {
   &:active {
     outline: 1px solid var(--blue-primary);
   }
+
+  &:disabled {
+    background-color: var(--blue-300) !important;
+    color: var(--gray-400) !important;
+    opacity: 0.5;
+  }
 }
 
 .primary-outline-button {

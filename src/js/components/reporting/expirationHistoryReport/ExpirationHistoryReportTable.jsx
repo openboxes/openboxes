@@ -11,6 +11,7 @@ const ExpirationHistoryReportTable = ({
   paginationProps,
   columns,
   emptyTableMessage,
+  footerComponent,
 }) => (
   <div>
     <DataTable
@@ -22,6 +23,7 @@ const ExpirationHistoryReportTable = ({
       filterParams={filterParams}
       paginationProps={paginationProps}
       tableWithPinnedColumns
+      footerComponent={footerComponent}
     />
   </div>
 );
@@ -43,6 +45,8 @@ ExpirationHistoryReportTable.propTypes = {
   tableData: PropTypes.shape({
     data: PropTypes.arrayOf(PropTypes.object).isRequired,
     totalCount: PropTypes.number,
+    totalValueLost: PropTypes.number,
+    totalQuantityLost: PropTypes.number,
   }).isRequired,
   loading: PropTypes.bool.isRequired,
   paginationProps: PropTypes.shape({}).isRequired,
@@ -51,4 +55,9 @@ ExpirationHistoryReportTable.propTypes = {
     id: PropTypes.string.isRequired,
     defaultMessage: PropTypes.string.isRequired,
   }).isRequired,
+  footerComponent: PropTypes.func,
+};
+
+ExpirationHistoryReportTable.defaultProps = {
+  footerComponent: null,
 };

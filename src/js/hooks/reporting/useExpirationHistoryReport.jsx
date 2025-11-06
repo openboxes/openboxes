@@ -11,6 +11,7 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import { INVENTORY_ITEM_URL, INVENTORY_URL } from 'consts/applicationUrls';
 import expirationHistoryReportColumn from 'consts/expirationHistoryReportColumn';
 import { DateFormatDateFns } from 'consts/timeFormat';
+import useOnLocationChange from 'hooks/useOnLocationChange';
 import useSpinner from 'hooks/useSpinner';
 import useTableDataV2 from 'hooks/useTableDataV2';
 import useTablePagination from 'hooks/useTablePagination';
@@ -46,7 +47,6 @@ const useExpirationHistoryReport = ({
     totalCount,
     filterParams,
     setShouldFetch,
-    disableAutoUpdateFilterParams: true,
   });
 
   const paginationParams = (paginate) => (paginate ? {
@@ -88,6 +88,7 @@ const useExpirationHistoryReport = ({
   const {
     tableData,
     loading,
+    setTableData,
   } = useTableDataV2({
     url: EXPIRATION_HISTORY_REPORT,
     errorMessageId: 'react.report.expirationHistory.unableToLoadData.label',
@@ -104,11 +105,26 @@ const useExpirationHistoryReport = ({
     serializedParams,
     setShouldFetch,
     filtersInitialized,
+    onFetchedData: (data) => {
+      setTableData((prevState) => ({
+        ...prevState,
+        totalValueLostToExpiry: data.totalValueLostToExpiry,
+        totalQuantityLostToExpiry: data.totalQuantityLostToExpiry,
+      }));
+    },
   });
 
   useEffect(() => {
     setTotalCount(tableData.totalCount);
   }, [tableData]);
+
+  useOnLocationChange(() =>
+    setTableData({
+      data: [],
+      totalCount: 0,
+      totalValueLostToExpiry: 0,
+      totalQuantityLostToExpiry: 0,
+    }));
 
   const columns = useMemo(() => [
     columnHelper.accessor(expirationHistoryReportColumn.TRANSACTION_NUMBER, {
@@ -120,6 +136,7 @@ const useExpirationHistoryReport = ({
       cell: ({ getValue, row: { original: { transactionId } } }) => (
         <TableCell
           link={INVENTORY_URL.showTransaction(transactionId)}
+          openLinkInNewTab
           className="rt-td pb-0"
           customTooltip
           tooltipLabel={getValue()}
@@ -160,6 +177,7 @@ const useExpirationHistoryReport = ({
       cell: ({ getValue, row: { original: { productId } } }) => (
         <TableCell
           link={INVENTORY_ITEM_URL.showStockCard(productId)}
+          openLinkInNewTab
           className="rt-td pb-0"
           customTooltip
           tooltipLabel={getValue()}
@@ -182,6 +200,7 @@ const useExpirationHistoryReport = ({
       cell: ({ getValue, row: { original: { productId } } }) => (
         <TableCell
           link={INVENTORY_ITEM_URL.showStockCard(productId)}
+          openLinkInNewTab
           className="rt-td pb-0 multiline-cell"
           customTooltip
           tooltipLabel={getValue()}
@@ -255,6 +274,7 @@ const useExpirationHistoryReport = ({
           {getValue() || '0'}
         </TableCell>
       ),
+      size: 180,
     }), columnHelper.accessor(expirationHistoryReportColumn.UNIT_PRICE, {
       header: () => (
         <TableHeaderCell>

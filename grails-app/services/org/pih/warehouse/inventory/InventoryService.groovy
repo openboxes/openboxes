@@ -26,6 +26,7 @@ import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.ImporterUtil
+import org.pih.warehouse.inventory.product.ExpirationHistoryReport
 import org.pih.warehouse.inventory.product.availability.AvailableItemKey
 import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.product.Category
@@ -3455,7 +3456,7 @@ class InventoryService implements ApplicationContextAware {
         }
     }
 
-    PaginatedList<ExpirationHistoryReportRow> getExpirationHistoryReport(ExpirationHistoryReportFilterCommand command) {
+    ExpirationHistoryReport getExpirationHistoryReport(ExpirationHistoryReportFilterCommand command) {
         List<TransactionEntry> entries = TransactionEntry.createCriteria().list(offset: command.paginationParams.offset, max: command.paginationParams.max) {
             createAlias("transaction", "t", JoinType.INNER_JOIN)
             if (command.searchTerm) {
@@ -3473,11 +3474,21 @@ class InventoryService implements ApplicationContextAware {
             between("t.transactionDate", command.startDate, command.endDate)
             order("t.transactionDate", "desc")
         }
-        return new PaginatedList<ExpirationHistoryReportRow>(entries.collect { ExpirationHistoryReportRow.fromTransactionEntry(it) }, entries.totalCount)
+
+        PaginatedList<ExpirationHistoryReportRow> rows = new PaginatedList<ExpirationHistoryReportRow>(entries.collect { ExpirationHistoryReportRow.fromTransactionEntry(it) }, entries.totalCount)
+
+        Integer totalQuantityLostToExpiry = rows.sum { it?.quantityLostToExpiry ?: 0 } as Integer ?: 0
+        BigDecimal totalValueLostToExpiry = rows.sum { it?.valueLostToExpiry ?: 0 } as BigDecimal ?: 0
+
+        return new ExpirationHistoryReport(
+                rows                     : rows,
+                totalQuantityLostToExpiry: totalQuantityLostToExpiry,
+                totalValueLostToExpiry   : totalValueLostToExpiry
+        )
     }
 
     String getExpirationHistoryReportCsv(ExpirationHistoryReportFilterCommand command) {
-        PaginatedList<ExpirationHistoryReportRow> expirationHistoryReport = getExpirationHistoryReport(command)
+        ExpirationHistoryReport expirationHistoryReport = getExpirationHistoryReport(command)
         StringWriter sw = new StringWriter()
         CSVWriter csv = new CSVWriter(sw, {
             "${messageLocalizer.localize("transaction.transactionNumber.label")}" { it?.transactionNumber }
@@ -3491,7 +3502,7 @@ class InventoryService implements ApplicationContextAware {
             "${messageLocalizer.localize("product.unitPrice.label")}" { it?.unitPrice }
             "${messageLocalizer.localize("expirationHistoryReport.valueLostToExpiry.label")}" { it?.valueLostToExpiry }
         })
-        expirationHistoryReport.list.each { ExpirationHistoryReportRow row ->
+        expirationHistoryReport.rows.list.each { ExpirationHistoryReportRow row ->
             csv << [
                     transactionNumber: row.transactionNumber,
                     transactionDate: row.transactionDate,
