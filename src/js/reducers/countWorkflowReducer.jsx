@@ -3,7 +3,7 @@ import { combineReducers } from 'redux';
 
 import {
   ADD_EMPTY_ROW,
-  FETCH_CYCLE_COUNTS, IMPORT_CYCLE_COUNTS,
+  FETCH_CYCLE_COUNTS, IMPORT_CYCLE_COUNTS, MARK_ALL_AS_UPDATED,
   REMOVE_ROW, SET_UPDATED, UPDATE_COUNTED_BY,
   UPDATE_DATE_COUNTED, UPDATE_FIELD_VALUE,
 } from 'actions/types';
@@ -36,6 +36,16 @@ function entitiesReducer(state = {}, action) {
           action.payload.updated,
         ),
       };
+    }
+    case MARK_ALL_AS_UPDATED: {
+      const { cycleCountIds } = action.payload;
+      const nextState = { ...state };
+      cycleCountIds.forEach((id) => {
+        if (state[id]) {
+          nextState[id] = setAllItemsUpdatedState(state[id], action.payload.updated);
+        }
+      });
+      return nextState;
     }
     case IMPORT_CYCLE_COUNTS: {
       return {
@@ -91,7 +101,7 @@ function countedByReducer(state = {}, action) {
       return normalizeCycleCounts(action.payload).countedBy;
     case UPDATE_COUNTED_BY: {
       return {
-        state,
+        ...state,
         [action.payload.id]: action.payload.countedBy,
       };
     }
