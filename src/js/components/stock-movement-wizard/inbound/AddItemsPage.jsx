@@ -13,7 +13,7 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
-import { STOCK_MOVEMENT_STATUS, STOCK_MOVEMENT_UPDATE_ITEMS } from 'api/urls';
+import { STOCK_MOVEMENT_STATUS, STOCK_MOVEMENT_UPDATE_INVENTORY_ITEMS, STOCK_MOVEMENT_UPDATE_ITEMS } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import DateField from 'components/form-elements/DateField';
@@ -695,7 +695,7 @@ class AddItemsPage extends Component {
    */
   updateInventoryItemsAndTransitionToNextStep(formValues, lineItems) {
     const itemsToSave = this.getLineItemsToBeSaved(lineItems);
-    const updateItemsUrl = STOCK_MOVEMENT_UPDATE_ITEMS(this.state.values.stockMovementId);
+    const updateItemsUrl = STOCK_MOVEMENT_UPDATE_INVENTORY_ITEMS(this.state.values.stockMovementId);
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
