@@ -581,6 +581,7 @@ class ProductAvailabilityService {
             locations.addAll(additionalLocations)
         }
         List<ProductAvailability> productsAvailabilityRecords = ProductAvailability.createCriteria().list {
+            setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
             createAlias("inventoryItem", "ii", JoinType.INNER_JOIN)
             createAlias("product", "p", JoinType.INNER_JOIN)
             createAlias("p.synonyms", "syn", JoinType.LEFT_OUTER_JOIN)
@@ -588,8 +589,6 @@ class ProductAvailabilityService {
             createAlias("p.tags", "tags", JoinType.LEFT_OUTER_JOIN)
             inList("location", locations)
 
-            // The additional if check is needed to avoid joining product twice in two separate ifs for categories/tags, as it could throw an error
-            // if both categories and tags were provided. Another possible solution would be to store "usedAliases" and check if categories already joined the product.
             if (categories) {
                 inList("p.category", categories)
             }
