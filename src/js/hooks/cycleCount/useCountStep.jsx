@@ -25,8 +25,8 @@ import {
   fetchBinLocations,
   fetchCycleCounts,
   fetchLotNumbersByProductIds,
-  fetchUsers, markAllItemsAsNotUpdated,
-  markAllItemsAsUpdated,
+  fetchUsers,
+  markAllItemsAsNotUpdated,
   startResolution,
 } from 'actions';
 import { UPDATE_CYCLE_COUNT_IDS } from 'actions/types';

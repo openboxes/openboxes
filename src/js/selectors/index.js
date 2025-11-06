@@ -199,6 +199,13 @@ export const makeGetCycleCountItems = () =>
     (entities, id) => entities?.[id]?.cycleCountItems || [],
   );
 
+export const makeGetCycleCountItem = () =>
+  createSelector(
+    makeGetCycleCountItems(),
+    (_, __, cycleCountItemId) => cycleCountItemId,
+    (items, cycleCountItemId) => items?.find((it) => it.id === cycleCountItemId),
+  );
+
 export const makeGetCycleCountDateCounted = () =>
   createSelector(
     (state) => state.countWorkflow?.dateCounted,
@@ -228,6 +235,18 @@ export const makeGetCycleCountProduct = () =>
   createSelector(
     makeGetCycleCountItems(),
     (items) => items?.[0]?.product,
+  );
+
+export const makeGetCycleCountItemsTotalCount = () =>
+  createSelector(
+    makeGetCycleCountItems(),
+    (items) => (items ? items.length : 0),
+  );
+
+export const makeGetCycleCountItemIds = () =>
+  createSelector(
+    makeGetCycleCountItems(),
+    (items) => (Array.isArray(items) ? items.map((it) => it.id) : []),
   );
 
 /**

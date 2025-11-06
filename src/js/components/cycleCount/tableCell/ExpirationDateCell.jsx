@@ -1,20 +1,25 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
+import { getFormatLocalizedDate, makeGetCycleCountItem } from 'selectors';
 
 import { updateFieldValue } from 'actions';
 import { TableCell } from 'components/DataTable';
 import DatePicker from 'components/form-elements/v2/DateField';
 import { DateFormat } from 'consts/timeFormat';
-import { getFormatLocalizedDate } from 'selectors';
 
 const ExpirationDateCell = ({
   id,
   cycleCountId,
-  initialValue,
   disabledExpirationDateFields,
   isStepEditable,
 }) => {
+  const getCycleCountItem = useMemo(() => makeGetCycleCountItem(), []);
+  const item = useSelector(
+    (state) => getCycleCountItem(state, cycleCountId, id),
+  );
+  const { inventoryItem: { expirationDate: initialValue } } = item;
+
   const [value, setValue] = useState(initialValue || disabledExpirationDateFields?.[id]);
 
   const dispatch = useDispatch();
@@ -32,7 +37,7 @@ const ExpirationDateCell = ({
   }
 
   const isDisabled = disabledExpirationDateFields?.[id]
-    || !id.includes('newRow');
+    || !id?.includes('newRow');
 
   const onChange = (date) => {
     setValue(date);

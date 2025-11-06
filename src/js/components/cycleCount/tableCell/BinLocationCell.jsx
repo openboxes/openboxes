@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { getBinLocations } from 'selectors';
+import { getBinLocations, makeGetCycleCountItem } from 'selectors';
 
 import { updateFieldValue } from 'actions';
 import { TableCell } from 'components/DataTable';
@@ -10,7 +10,6 @@ import useTranslate from 'hooks/useTranslate';
 import { getBinLocationToDisplay, groupBinLocationsByZone } from 'utils/groupBinLocationsByZone';
 
 const BinLocationCell = ({
-  initialValue,
   id,
   cycleCountId,
   showBinLocation,
@@ -22,7 +21,11 @@ const BinLocationCell = ({
 
   const translate = useTranslate();
 
-  const [value, setValue] = useState(initialValue ? { name: initialValue } : undefined);
+  const getCycleCountItem = useMemo(() => makeGetCycleCountItem(), []);
+  const item = useSelector(
+    (state) => getCycleCountItem(state, cycleCountId, id),
+  );
+  const { binLocation: value } = item;
 
   const tooltipLabel = getBinLocationToDisplay(value)
     || translate('react.cycleCount.table.binLocation.label', 'Bin Location');
@@ -44,16 +47,12 @@ const BinLocationCell = ({
   const dispatch = useDispatch();
 
   const onChange = (selected) => {
-    setValue(selected);
-  };
-
-  const onBlur = () => {
     dispatch(
       updateFieldValue({
         cycleCountId,
         rowId: id,
         field: 'binLocation',
-        value: { id: value?.id, name: value?.name },
+        value: { id: selected?.id, name: selected?.name },
       }),
     );
   };
@@ -62,7 +61,7 @@ const BinLocationCell = ({
     groupBinLocationsByZone(binLocations, translate), []);
 
   const isDisabled = useMemo(() =>
-    !id.includes('newRow'), []);
+    !id?.includes('newRow'), []);
 
   const selectedValue = value
     ? { ...value, name: getBinLocationToDisplay(value) }
@@ -80,7 +79,6 @@ const BinLocationCell = ({
         labelKey="name"
         options={selectOptions}
         onChange={onChange}
-        onBlur={onBlur}
         disabled={isDisabled}
         className="m-1"
         hideErrorMessageWrapper

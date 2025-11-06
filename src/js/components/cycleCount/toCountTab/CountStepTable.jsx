@@ -22,7 +22,8 @@ const CountStepTable = ({
 }) => {
   const {
     columns,
-    cycleCountItems,
+    cycleCountItemsTotalCount,
+    cycleCountItemIds,
   } = useCountStepTable({
     cycleCountId: id,
     isStepEditable,
@@ -62,9 +63,8 @@ const CountStepTable = ({
         <div className="mx-4 count-step-table">
           <DataTable
             columns={columns}
-            data={cycleCountItems}
-            totalCount={cycleCountItems.length}
-            filterParams={{}}
+            data={cycleCountItemIds}
+            totalCount={cycleCountItemsTotalCount}
             disablePagination
           />
         </div>
@@ -84,13 +84,6 @@ CountStepTable.propTypes = {
   id: PropTypes.string.isRequired,
   validationErrors: PropTypes.shape({}).isRequired,
   isStepEditable: PropTypes.bool.isRequired,
-  countedBy: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    value: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-  }).isRequired,
-  defaultCountedBy: PropTypes.shape({}).isRequired,
   isFormDisabled: PropTypes.bool.isRequired,
   isAssignCountModalOpen: PropTypes.bool.isRequired,
   closeAssignCountModal: PropTypes.func.isRequired,

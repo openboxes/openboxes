@@ -30,7 +30,7 @@ const ActionsCell = ({
         )}
         disabled={id}
       >
-        {(id.includes('newRow') || custom) && isStepEditable && (
+        {(id?.includes('newRow') || custom) && isStepEditable && (
           <RiDeleteBinLine
             className={isFormDisabled ? 'disabled-icon' : 'cursor-pointer'}
             onClick={() => removeRow(id)}
