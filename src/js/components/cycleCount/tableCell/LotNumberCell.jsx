@@ -6,14 +6,40 @@ import { makeGetCycleCountProduct, makeGetLotNumbersByProductId } from 'selector
 import { updateFieldValue } from 'actions';
 import { TableCell } from 'components/DataTable';
 import SelectField from 'components/form-elements/v2/SelectField';
+import useTranslate from 'hooks/useTranslate';
 
 const LotNumberCell = ({
   id,
   cycleCountId,
   initialValue,
   setDisabledExpirationDateFields,
+  isStepEditable,
 }) => {
   const dispatch = useDispatch();
+
+  const translate = useTranslate();
+
+  const [value, setValue] = useState(initialValue ? {
+    label: initialValue,
+    value: initialValue,
+    id: initialValue,
+    name: initialValue,
+  } : undefined);
+
+  const tooltipLabel = value
+    || translate('react.cycleCount.table.lotNumber.label', 'Serial / Lot Number');
+
+  if (!isStepEditable) {
+    return (
+      <TableCell
+        className="static-cell-count-step d-flex align-items-center"
+        tooltipLabel={tooltipLabel}
+        customTooltip
+      >
+        {value?.label}
+      </TableCell>
+    );
+  }
 
   const getCycleCountProduct = useMemo(makeGetCycleCountProduct, []);
 
@@ -26,13 +52,6 @@ const LotNumberCell = ({
   const lotNumbersWithExpiration = useSelector(
     (state) => getLotNumbersByProductId(state, cycleCountProduct?.id),
   );
-
-  const [value, setValue] = useState(initialValue ? {
-    label: initialValue,
-    value: initialValue,
-    id: initialValue,
-    name: initialValue,
-  } : undefined);
 
   const onChange = (selected) => {
     const selectedLot = selected?.value;
@@ -66,14 +85,25 @@ const LotNumberCell = ({
   const isDisabled = useMemo(() =>
     !id.includes('newRow'), []);
 
+  const placeholder = isDisabled
+    && translate('react.cycleCount.emptyLotNumber.label', 'NO LOT')
+
   return (
-    <TableCell className="rt-td rt-td-count-step pb-0">
+    <TableCell
+      className="rt-td rt-td-count-step pb-0"
+      tooltipClassname="w-75"
+      tooltipLabel={tooltipLabel}
+      customTooltip
+    >
       <SelectField
         value={value}
         options={selectOptions}
         disabled={isDisabled}
         onChange={onChange}
         onBlur={onBlur}
+        placeholder={placeholder}
+        className="m-1"
+        hideErrorMessageWrapper
         creatable
       />
     </TableCell>

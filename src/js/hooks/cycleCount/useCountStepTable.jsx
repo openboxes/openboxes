@@ -59,6 +59,7 @@ const useCountStepTable = ({
             id={id}
             cycleCountId={cycleCountId}
             showBinLocation={showBinLocation}
+            isStepEditable={isStepEditable}
           />
         ),
         meta: {
@@ -75,6 +76,7 @@ const useCountStepTable = ({
           id={id}
           cycleCountId={cycleCountId}
           setDisabledExpirationDateFields={setDisabledExpirationDateFields}
+          isStepEditable={isStepEditable}
         />
       ),
       meta: {
@@ -88,6 +90,7 @@ const useCountStepTable = ({
           initialValue={getValue()}
           disabledExpirationDateFields={disabledExpirationDateFields}
           cycleCountId={cycleCountId}
+          isStepEditable={isStepEditable}
           id={id}
         />
       ),
@@ -105,6 +108,7 @@ const useCountStepTable = ({
           initialValue={getValue()}
           id={id}
           cycleCountId={cycleCountId}
+          isStepEditable={isStepEditable}
         />
       ),
       meta: {
@@ -118,6 +122,7 @@ const useCountStepTable = ({
           initialValue={getValue()}
           id={id}
           cycleCountId={cycleCountId}
+          isStepEditable={isStepEditable}
         />
       ),
       meta: {

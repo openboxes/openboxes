@@ -10,8 +10,19 @@ const QuantityCell = ({
   initialValue,
   id,
   cycleCountId,
+  isStepEditable,
 }) => {
   const [value, setValue] = useState(initialValue ?? '');
+
+  if (!isStepEditable) {
+    return (
+      <TableCell
+        className="static-cell-count-step d-flex align-items-center"
+      >
+        {value?.toString()}
+      </TableCell>
+    );
+  }
 
   const dispatch = useDispatch();
 
@@ -40,6 +51,8 @@ const QuantityCell = ({
         value={value}
         onChange={onChange}
         onBlur={onBlur}
+        className="m-1 w-75"
+        hideErrorMessageWrapper
         min="0"
       />
     </TableCell>
