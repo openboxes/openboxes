@@ -6,10 +6,9 @@ import { useHistory } from 'react-router-dom';
 import { getCurrentLocation } from 'selectors';
 
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
+import useOnLocationChange from 'hooks/useOnLocationChange';
 import useSpinner from 'hooks/useSpinner';
 import { transformFilterParams } from 'utils/list-utils';
-
-import useOnLocationChange from '../useOnLocationChange';
 
 const useExpirationHistoryReportFilters = ({ filterFields }) => {
   const [filterParams, setFilterParams] = useState({});
