@@ -806,10 +806,21 @@ class AddItemsPage extends Component {
             demandPerReplenishmentPeriod,
             quantityOnHand,
             quantityAllowed,
+            version,
           } = val;
 
-          let qtyRequested = 0;
-          if (quantityRequested) qtyRequested = quantityRequested;
+          // Determine the quantity requested values to set for each row. If the request already has
+          // a quantity value set, use that, otherwise calculate a value to use. When creating an
+          // e-request, if QoH for an item > the quantity in the stocklist item, then the quantity
+          // will have been set to 0 initially. For that scenario, we want to try to recompute
+          // quantity here (in the add items step) for pull type replenishments so that the quantity
+          // factors in demand, but we only want to do this if the row hasn't been manually adjusted
+          // to 0 (if a user sets their own quantity requested, that should persist). We distinguish
+          // that case by checking if the item version is 0, meaning it hasn't been modified.
+          // This isn't a perfect solution but is the least intrusive one for now. Probably a better
+          // option would be to move this logic to the stock movement create logic on the backend.
+          let qtyRequested;
+          if (version > 0) qtyRequested = quantityRequested;
           else if (isPullType) qtyRequested = demandPerReplenishmentPeriod - quantityOnHand;
           else qtyRequested = quantityAllowed;
 
@@ -825,9 +836,19 @@ class AddItemsPage extends Component {
       lineItemsData = _.map(
         data,
         (val) => {
-          const { quantityRequested, demandPerReplenishmentPeriod, quantityAvailable } = val;
-          const qtyRequested = quantityRequested
-            || demandPerReplenishmentPeriod - quantityAvailable;
+          const {
+            quantityRequested,
+            demandPerReplenishmentPeriod,
+            quantityAvailable,
+            version,
+          } = val;
+
+          console.log(`PULL: ${version} CASE: ${version > 0} IF TRUE: ${quantityRequested} ELSE: ${demandPerReplenishmentPeriod - quantityAvailable}`);
+
+          // Same comment as the above. If the quantity requested has been manually adjusted to 0,
+          // don't try to recompute it.
+          const qtyRequested = version > 0 ? quantityRequested
+            : (demandPerReplenishmentPeriod - quantityAvailable);
           return {
             ...val,
             disabled: true,

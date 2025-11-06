@@ -71,6 +71,12 @@ class StockMovementItem {
 
     BigDecimal packSize = 1
 
+    /**
+     * Represents the version of the item (ie how many times it has been modified). Typically pulled from
+     * the version field of the domain that was used to initialize the stock movement item (ex: requisition item).
+     */
+    Long version
+
     BigDecimal getQuantityRequired() {
         return quantityRevised ?: quantityRequested
     }
@@ -127,6 +133,7 @@ class StockMovementItem {
     Map toJson() {
         return [
                 id                        : id,
+                version                   : version,
                 productCode               : productCode,
                 product                   : product,
                 lotNumber                 : lotNumber,
@@ -219,6 +226,7 @@ class StockMovementItem {
 
         return new StockMovementItem(
                 id: requisitionItem.id,
+                version: requisitionItem.version,
                 statusCode: requisitionItem.status?.name(),
                 productCode: requisitionItem?.product?.productCode,
                 product: requisitionItem?.product,

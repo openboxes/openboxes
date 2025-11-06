@@ -870,6 +870,7 @@ class StockMovementService {
                 def demand = forecastingService.getDemand(requisition.origin, requisition.destination, stockMovementItem.product)
                 return [
                         id                              : stockMovementItem.id,
+                        version                         : stockMovementItem.version,
                         product                         : stockMovementItem.product,
                         productCode                     : stockMovementItem.productCode,
                         quantityOnHand                  : quantityOnHand ?: 0,
@@ -894,6 +895,7 @@ class StockMovementService {
                 }
                 return [
                         id                              : stockMovementItem.id,
+                        version                         : stockMovementItem.version,
                         product                         : stockMovementItem.product,
                         productCode                     : stockMovementItem.productCode,
                         quantityOnHand                  : quantityOnHand ?: 0,
@@ -910,6 +912,7 @@ class StockMovementService {
             } else {
                 return [
                         id                  : stockMovementItem.id,
+                        version             : stockMovementItem.version,
                         product             : stockMovementItem.product,
                         productCode         : stockMovementItem.productCode,
                         quantityOnHand      : quantityOnHand ?: 0,
