@@ -882,6 +882,7 @@ class StockMovementService {
                         sortOrder                       : stockMovementItem.sortOrder,
                         monthlyDemand                   : demand?.monthlyDemand ?: 0,
                         demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand ?: 0) * (template?.replenishmentPeriod ?: 30)),
+                        manuallyAdded                   : stockMovementItem.manuallyAdded,
                 ]
             } else if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
                 def demand
@@ -908,6 +909,7 @@ class StockMovementService {
                         sortOrder                       : stockMovementItem.sortOrder,
                         monthlyDemand                   : demand?.monthlyDemand ?: 0,
                         demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand ?: 0) * (template?.replenishmentPeriod ?: 30)),
+                        manuallyAdded                   : stockMovementItem.manuallyAdded,
                 ]
             } else {
                 return [
@@ -923,6 +925,7 @@ class StockMovementService {
                         quantityRequested   : stockMovementItem.quantityRequested,
                         statusCode          : stockMovementItem.statusCode,
                         sortOrder           : stockMovementItem.sortOrder,
+                        manuallyAdded       : stockMovementItem.manuallyAdded,
                 ]
             }
         }
