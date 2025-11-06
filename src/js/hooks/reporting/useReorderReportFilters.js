@@ -13,7 +13,8 @@ import ActivityCode from 'consts/activityCode';
 import {
   EXPIRATION_FILTER,
   getExpiredStockOptions,
-  getFilterProductOptions, INVENTORY_LEVEL_STATUS,
+  getFilterProductOptions,
+  INVENTORY_LEVEL_STATUS,
 } from 'consts/filterOptions';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import useSpinner from 'hooks/useSpinner';
