@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { RiDownload2Line } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
@@ -53,10 +53,12 @@ const ExpirationHistoryReport = () => {
     filtersInitialized,
   });
 
-  const shouldDisableExportButton =
+  const isExportDisabled =
     !filterParams.startDate && !filterParams.endDate && !tableData?.data?.length > 0;
 
-  const totalAmount = `${translate('react.report.expirationHistory.totalAmount.label', 'Total amount')}: ${tableData?.totalValueLostToExpiry?.toLocaleString([LocaleConverter[locale] || Locale.EN]) ?? 0} ${currencyCode}`;
+  const totalAmount = useMemo(() =>
+    `${translate('react.report.expirationHistory.totalAmount.label', 'Total amount')}: ${tableData?.totalValueLostToExpiry?.toLocaleString([LocaleConverter[locale] || Locale.EN]) ?? 0} ${currencyCode}`,
+  [tableData?.totalValueLostToExpiry, locale, currencyCode]);
 
   return (
     <PageWrapper>
@@ -78,7 +80,7 @@ const ExpirationHistoryReport = () => {
             label="react.default.button.export.label"
             variant="secondary"
             EndIcon={<RiDownload2Line />}
-            disabled={shouldDisableExportButton}
+            disabled={isExportDisabled}
           />
         </div>
         <ExpirationHistoryReportTable

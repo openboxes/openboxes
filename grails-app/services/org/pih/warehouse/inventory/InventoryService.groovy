@@ -3475,16 +3475,15 @@ class InventoryService implements ApplicationContextAware {
             order("t.transactionDate", "desc")
         }
 
-        List<ExpirationHistoryReportRow> rows = entries.collect { ExpirationHistoryReportRow.fromTransactionEntry(it) }
-        PaginatedList<ExpirationHistoryReportRow> paginatedRows = new PaginatedList<ExpirationHistoryReportRow>(rows, entries.totalCount)
+        PaginatedList<ExpirationHistoryReportRow> rows = new PaginatedList<ExpirationHistoryReportRow>(entries.collect { ExpirationHistoryReportRow.fromTransactionEntry(it) }, entries.totalCount)
 
-        Integer totalQuantity = rows.sum { it?.quantityLostToExpiry ?: 0 } as Integer ?: 0
-        BigDecimal totalValue = rows.sum { it?.valueLostToExpiry ?: 0 } as BigDecimal ?: 0
+        Integer totalQuantityLostToExpiry = rows.sum { it?.quantityLostToExpiry ?: 0 } as Integer ?: 0
+        BigDecimal totalValueLostToExpiry = rows.sum { it?.valueLostToExpiry ?: 0 } as BigDecimal ?: 0
 
         return new ExpirationHistoryReport(
-                rows                     : paginatedRows,
-                totalQuantityLostToExpiry: totalQuantity,
-                totalValueLostToExpiry   : totalValue
+                rows                     : rows,
+                totalQuantityLostToExpiry: totalQuantityLostToExpiry,
+                totalValueLostToExpiry   : totalValueLostToExpiry
         )
     }
 
