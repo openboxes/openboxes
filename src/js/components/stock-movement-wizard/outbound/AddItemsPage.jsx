@@ -408,7 +408,11 @@ class AddItemsPage extends Component {
     this.saveAndTransitionToNextStep = this.saveAndTransitionToNextStep.bind(this);
     this.didUserConfirmAlert = false;
     this.debouncedSave = _.debounce(() => {
-      this.saveRequisitionItemsInCurrentStep(this.state.values.lineItems, false);
+      this.saveRequisitionItemsInCurrentStep({
+        itemCandidatesToSave: this.state.values.lineItems,
+        removeEmptyItems: true,
+        withStateChange: false,
+      });
     }, 1000);
     this.requestsQueue = requestsQueue();
   }
@@ -590,7 +594,11 @@ class AddItemsPage extends Component {
       && _.get(this.state.values.stocklist, 'id')
       && !this.state.isDraftAvailable
     ) {
-      this.saveRequisitionItemsInCurrentStep(data, false, false);
+      this.saveRequisitionItemsInCurrentStep({
+        itemCandidatesToSave: data,
+        removeEmptyItems: false,
+        withStateChange: false,
+      });
     }
     this.setState((prev) => ({
       currentLineItems: startIndex !== null && this.props.isPaginated
@@ -619,7 +627,11 @@ class AddItemsPage extends Component {
       totalCount: this.props.savedStockMovement.lineItems.length,
       isDraftAvailable: false,
     }));
-    this.saveRequisitionItemsInCurrentStep(this.props.savedStockMovement.lineItems, false, true);
+    this.saveRequisitionItemsInCurrentStep({
+      itemCandidatesToSave: this.props.savedStockMovement.lineItems,
+      removeEmptyItems: false,
+      withStateChange: true,
+    });
     this.props.hideSpinner();
   }
 
@@ -892,11 +904,11 @@ class AddItemsPage extends Component {
    * @param {boolean} withStateChange
    * @public
    */
-  async saveRequisitionItemsInCurrentStep(
+  async saveRequisitionItemsInCurrentStep({
     itemCandidatesToSave,
     removeEmptyItems,
     withStateChange = true,
-  ) {
+  }) {
     // We filter out items which were already sent to save
     const filteredCandidates = itemCandidatesToSave
       .filter((item) => item.rowSaveStatus !== RowSaveStatus.SAVING);
@@ -1102,7 +1114,11 @@ class AddItemsPage extends Component {
 
     this.debouncedSave.cancel();
 
-    this.saveRequisitionItemsInCurrentStep(itemsWithStatuses, false, false);
+    this.saveRequisitionItemsInCurrentStep({
+      itemCandidatesToSave: itemsWithStatuses,
+      removeEmptyItems: false,
+      withStateChange: false,
+    });
   };
 
   /**
@@ -1150,7 +1166,10 @@ class AddItemsPage extends Component {
    */
   saveAndExit(formValues) {
     const saveAndRedirect = (removeEmptyItems) =>
-      this.saveRequisitionItemsInCurrentStep(formValues.lineItems, removeEmptyItems)
+      this.saveRequisitionItemsInCurrentStep({
+        itemCandidatesToSave: formValues.lineItems,
+        removeEmptyItems,
+      })
         .then(() => {
           window.location = STOCK_MOVEMENT_URL.show(formValues.stockMovementId);
         });
@@ -1196,7 +1215,10 @@ class AddItemsPage extends Component {
   saveItems(lineItems, removeEmptyItems) {
     this.props.showSpinner();
 
-    this.saveRequisitionItemsInCurrentStep(lineItems, removeEmptyItems)
+    this.saveRequisitionItemsInCurrentStep({
+      itemCandidatesToSave: lineItems,
+      removeEmptyItems,
+    })
       .then(() => {
         this.fetchLineItems();
         this.props.removeStockMovementDraft(this.state.values.stockMovementId);
@@ -1331,7 +1353,10 @@ class AddItemsPage extends Component {
 
     const { movementNumber, stockMovementId } = formValues;
     const url = `/stockMovement/exportCsv/${stockMovementId}`;
-    this.saveRequisitionItemsInCurrentStep(lineItems, false)
+    this.saveRequisitionItemsInCurrentStep({
+      itemCandidatesToSave: lineItems,
+      removeEmptyItems: false,
+    })
       .then(() => {
         apiClient.get(url, { responseType: 'blob' })
           .then((response) => {
@@ -1396,7 +1421,10 @@ class AddItemsPage extends Component {
    */
   previousPage(values, invalid) {
     const saveAndRedirect = (removeEmptyItems) =>
-      this.saveRequisitionItemsInCurrentStep(values.lineItems, removeEmptyItems)
+      this.saveRequisitionItemsInCurrentStep({
+        itemCandidatesToSave: values.lineItems,
+        removeEmptyItems,
+      })
         .then(() => this.props.previousPage(values));
 
     if (!invalid) {
