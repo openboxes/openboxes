@@ -619,10 +619,11 @@ class DashboardService {
 
             // Depending on the provided inventory level status filter value, we have a different condition for filtering out the items
             Map<InventoryLevelStatus, Closure<Boolean>> inventoryLevelStatusFilterCondition = [
-                    (InventoryLevelStatus.IN_STOCK): { item.quantityAvailableToPromise > 0 },
-                    (InventoryLevelStatus.BELOW_MAXIMUM): { inventoryLevel?.maxQuantity && item.quantityAvailableToPromise <= inventoryLevel?.maxQuantity },
-                    (InventoryLevelStatus.BELOW_REORDER): { inventoryLevel?.reorderQuantity && item.quantityAvailableToPromise <= inventoryLevel?.reorderQuantity },
-                    (InventoryLevelStatus.BELOW_MINIMUM): { inventoryLevel?.minQuantity && item.quantityAvailableToPromise <= inventoryLevel?.minQuantity }
+                    // For ALL_PRODUCTS we want to include all products, regardless of their quantity available to promise or inventory level settings
+                    (InventoryLevelStatus.ALL_PRODUCTS): { true },
+                    (InventoryLevelStatus.BELOW_MAXIMUM): { inventoryLevel?.maxQuantity && item.finalQuantityAvailableToPromise <= inventoryLevel?.maxQuantity },
+                    (InventoryLevelStatus.BELOW_REORDER): { inventoryLevel?.reorderQuantity && item.finalQuantityAvailableToPromise <= inventoryLevel?.reorderQuantity },
+                    (InventoryLevelStatus.BELOW_MINIMUM): { inventoryLevel?.minQuantity && item.finalQuantityAvailableToPromise <= inventoryLevel?.minQuantity }
             ]
 
             // If an item satisfies the predicate, call the buildReorderReportItem, otherwise return null so that .findResults filters out the record in the end
@@ -634,7 +635,7 @@ class DashboardService {
 
     private ReorderReportItemDto buildReorderReportItem(InventoryByProduct item, InventoryLevel inventoryLevel) {
         Map<String, Number> monthlyDemand = forecastingService.getDemand(AuthService.currentLocation, null, item.product)
-        Integer quantityToOrder = inventoryLevel?.maxQuantity != null ? inventoryLevel.maxQuantity - item.quantityAvailableToPromise : null
+        Integer quantityToOrder = inventoryLevel?.maxQuantity != null ? inventoryLevel.maxQuantity - item.finalQuantityAvailableToPromise : null
         Boolean hasRoleFinance = userService.hasRoleFinance(AuthService.currentUser)
         BigDecimal unitCost = hasRoleFinance ? item.product.pricePerUnit : null
         BigDecimal expectedReorderCost = hasRoleFinance && quantityToOrder && item.product.pricePerUnit != null
@@ -652,7 +653,8 @@ class DashboardService {
                 tags: item.product.tags,
                 inventoryLevel: inventoryLevel,
                 monthlyDemand: monthlyDemand?.monthlyDemand ?: 0,
-                quantityAvailableToPromise: item.quantityAvailableToPromise,
+                finalQuantityAvailableToPromise: item.finalQuantityAvailableToPromise,
+                expiredQuantityAvailableToPromise: item.expiredQuantityAvailableToPromise,
                 quantityToOrder: quantityToOrder,
                 unitCost: unitCost,
                 expectedReorderCost: expectedReorderCost
@@ -676,6 +678,8 @@ class DashboardService {
             "${messageLocalizer.localize("inventoryLevel.maxQuantity.label", "Max quantity")}" { it?.maxQuantity }
             "${messageLocalizer.localize("report.averageMonthlyDemand.label", "Average Monthly Demand")}" { it?.averageMonthlyDemand }
             "${messageLocalizer.localize("product.quantityAvailableToPromise.label", "Quantity Available")}" { it?.quantityAvailableToPromise }
+            "${messageLocalizer.localize("reorderReport.expiredQuantityAvailableToPromise.label", "Quantity expired")}" { it?.expiredQuantityAvailableToPromise }
+            "${messageLocalizer.localize("reorderReport.finalQuantityAvailableToPromise.label", "Final quantity available")}" { it?.finalQuantityAvailableToPromise }
             "${messageLocalizer.localize("inventory.quantityToOrder.message", "Quantity to Order")}" { it?.quantityToOrder }
 
             if (hasRoleFinance) {
@@ -700,7 +704,9 @@ class DashboardService {
                     reorderQuantity: item.inventoryLevel?.reorderQuantity ?: "",
                     maxQuantity: item.inventoryLevel?.maxQuantity ?: "",
                     averageMonthlyDemand: item.monthlyDemand ?: 0,
-                    quantityAvailableToPromise: item.quantityAvailableToPromise,
+                    finalQuantityAvailableToPromise: item.finalQuantityAvailableToPromise,
+                    expiredQuantityAvailableToPromise: item.expiredQuantityAvailableToPromise,
+                    quantityAvailableToPromise: item.finalQuantityAvailableToPromise + item.expiredQuantityAvailableToPromise,
                     quantityToOrder: getQuantityToOrderDisplayValue(item.inventoryLevel?.maxQuantity, item.quantityToOrder) ?: "",
                     unitCost: item.unitCost ?: "",
                     expectedReorderCost: item.expectedReorderCost ?: "",

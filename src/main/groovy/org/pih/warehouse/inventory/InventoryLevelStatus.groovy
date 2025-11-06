@@ -17,7 +17,8 @@ enum InventoryLevelStatus {
     BELOW_MINIMUM(3),
     BELOW_REORDER(4),
     BELOW_MAXIMUM(5),
-    ABOVE_MAXIMUM(6)
+    ABOVE_MAXIMUM(6),
+    ALL_PRODUCTS(7)
 
     int sortOrder
 

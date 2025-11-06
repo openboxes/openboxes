@@ -4,6 +4,7 @@ import org.pih.warehouse.product.Product
 
 class InventoryByProduct {
     Integer quantityOnHand
-    Integer quantityAvailableToPromise
+    Integer finalQuantityAvailableToPromise
+    Integer expiredQuantityAvailableToPromise
     Product product
 }

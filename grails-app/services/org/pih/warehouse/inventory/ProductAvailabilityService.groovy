@@ -527,6 +527,47 @@ class ProductAvailabilityService {
     }
 
     /**
+     * Calculate quantities based on expiration filter.
+     * @param productAvailabilityRecords
+     * @param expirationFilter
+     * @return
+     * Return map with:
+     * expiredQuantityAvailableToPromise - quantity available to promise that is expired based on expiration filter
+     * finalQuantityAvailableToPromise - quantity available to promise after applying expiration filter
+     * quantityOnHand - total quantity on hand (not affected by expiration filter)
+     * quantityAvailableToPromise - total quantity available to promise (not affected by expiration filter)
+     */
+    private static Map<String, Integer> calculateQuantitiesByExpirationFilter(List<ProductAvailability> productAvailabilityRecords, ExpirationFilter expirationFilter) {
+        boolean removeExpiredStock = expirationFilter == ExpirationFilter.SUBTRACT_EXPIRED_STOCK
+        Date today = new Date()
+        Date maxDate = removeExpiredStock ? today : today + expirationFilter.days
+        // Quantity available to promise before applying expiration filter
+        Integer quantityAvailableToPromise = productAvailabilityRecords.sum { it.quantityAvailableToPromise ?: 0 }
+        // Final quantity available to promise - quantity available to promise subtracted by expired stock based on expiration filter
+        Integer finalQuantityAvailableToPromise = productAvailabilityRecords.sum { ProductAvailability paRecord ->
+            // We can return immedietaly if we do not want to subtract expired stock
+            if (expirationFilter == ExpirationFilter.DO_NOT_SUBTRACT_EXPIRED_STOCK) {
+                return paRecord.quantityAvailableToPromise ?: 0
+            }
+            // We want to include inventory items that either don't have expiration date or have expiration date after maxDate (or >= maxDate if removing expired stock)
+            InventoryItem inventoryItem = paRecord.inventoryItem
+            if (!inventoryItem.expirationDate || (removeExpiredStock ? inventoryItem.expirationDate >= maxDate : inventoryItem.expirationDate > maxDate)) {
+                return paRecord.quantityAvailableToPromise ?: 0
+            }
+            return 0
+        }
+        // Quantity on hand is used only to calculate the inventory level status
+        Integer quantityOnHand = productAvailabilityRecords.sum { it.quantityOnHand ?: 0 }
+
+        return [
+            // Expired quantity is just quantity available to promise subtracted by final quantity available to promise (removed stock based on expiration filter)
+            expiredQuantityAvailableToPromise: quantityAvailableToPromise - finalQuantityAvailableToPromise,
+            finalQuantityAvailableToPromise: finalQuantityAvailableToPromise,
+            quantityOnHand: quantityOnHand,
+        ]
+    }
+
+    /**
      * Find product availability record grouped by product that satisfy the filters which contain primarily:
      * expiration (we can include/exclude inventory items that expire in 30/90/180/365 days),
      * additionalLocations - locations to search (and sum) the stock in (other than current location)
@@ -539,52 +580,34 @@ class ProductAvailabilityService {
         if (additionalLocations) {
             locations.addAll(additionalLocations)
         }
-        return ProductAvailability.createCriteria().list {
-            projections {
-                sum("quantityOnHand")
-                sum("quantityAvailableToPromise")
-                groupProperty("product")
-            }
+        List<ProductAvailability> productsAvailabilityRecords = ProductAvailability.createCriteria().list {
+            setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
+            createAlias("inventoryItem", "ii", JoinType.INNER_JOIN)
+            createAlias("product", "p", JoinType.INNER_JOIN)
+            createAlias("p.synonyms", "syn", JoinType.LEFT_OUTER_JOIN)
+            createAlias("p.category", "category", JoinType.LEFT_OUTER_JOIN)
+            createAlias("p.tags", "tags", JoinType.LEFT_OUTER_JOIN)
             inList("location", locations)
 
-            // The additional if check is needed to avoid joining product twice in two separate ifs for categories/tags, as it could throw an error
-            // if both categories and tags were provided. Another possible solution would be to store "usedAliases" and check if categories already joined the product.
-            if (categories || productTags) {
-                product {
-                    if (categories) {
-                        inList("category", categories)
-                    }
-                    if (productTags) {
-                        tags {
-                            'in'("id", productTags.id)
-                        }
-                    }
-                }
+            if (categories) {
+                inList("p.category", categories)
             }
-
-            if (expiration != ExpirationFilter.INCLUDE_EXPIRED_STOCK) {
-                add(getExpirationCriteria(expiration, delegate))
+            if (productTags) {
+                'in'("tags.id", productTags.id)
             }
-        }.collect { new InventoryByProduct(
-                quantityOnHand: it[0],
-                quantityAvailableToPromise: it[1],
-                product: it[2]
-        )}
-    }
+        }
+        Map<Product, List<ProductAvailability>> productAvailabilityRecordsByProduct =
+                productsAvailabilityRecords.groupBy { it.product }
 
-    private static Criterion getExpirationCriteria(ExpirationFilter expirationFilter, org.grails.datastore.mapping.query.api.Criteria criteria) {
-        criteria.createAlias("inventoryItem", "ii", JoinType.INNER_JOIN)
-        boolean removeExpiredStock = expirationFilter == ExpirationFilter.REMOVE_EXPIRED_STOCK
-        Date today = new Date()
-        Date maxDate = removeExpiredStock ? today : today + expirationFilter.days
-
-        // We want to include inventory items that either don't have expiration date or have expiration date after maxDate
-        Junction expirationDisjunction = Restrictions.disjunction()
-            .add(Restrictions.isNull("ii.expirationDate"))
-            .add(removeExpiredStock ? Restrictions.ge("ii.expirationDate", maxDate) : Restrictions.gt("ii.expirationDate", maxDate))
-        // We have to include the condition for qoh > 0, as we could potentially include items that are out of stock, but have "hidden" associated
-        // inventory item with product availability record that is not visible in the stock history at that time
-        return Restrictions.and(expirationDisjunction, Restrictions.gt("quantityOnHand", 0))
+        return productAvailabilityRecordsByProduct.collect { Product product, List<ProductAvailability> paRecords ->
+            Map<String, Integer> quantities = calculateQuantitiesByExpirationFilter(paRecords, expiration)
+            return new InventoryByProduct(
+                    product: product,
+                    quantityOnHand: quantities.quantityOnHand,
+                    finalQuantityAvailableToPromise: quantities.finalQuantityAvailableToPromise,
+                    expiredQuantityAvailableToPromise: quantities.expiredQuantityAvailableToPromise,
+            )
+        }
     }
 
     Map<Product, Integer> getQuantityOnHandByProduct(Location location) {
