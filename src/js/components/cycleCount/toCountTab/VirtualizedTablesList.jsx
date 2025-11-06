@@ -16,7 +16,7 @@ const VirtualizedTablesList = ({
     count: cycleCountIds.length,
     // table with ~ 5 rows, average size of the count table
     estimateSize: () => 518,
-    overscan: 5,
+    overscan: 2,
   });
 
   return (

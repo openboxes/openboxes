@@ -41,7 +41,7 @@ import {
   FILTER_FORM_PARAMS_BUILT,
   HIDE_INFO_BAR,
   HIDE_INFO_BAR_MODAL,
-  HIDE_SPINNER,
+  HIDE_SPINNER, MARK_ALL_AS_UPDATED,
   REBUILD_FILTER_FORM_PARAMS,
   REMOVE_FROM_INDICATORS,
   REMOVE_ROW,
@@ -843,6 +843,16 @@ export const fetchCycleCounts = (
   dispatch(hideSpinner());
 };
 
+export const setUpdated = (cycleCountId, updated) => (dispatch) => {
+  dispatch({
+    type: SET_UPDATED,
+    payload: {
+      id: cycleCountId,
+      updated,
+    },
+  });
+};
+
 export const updateDateCounted = (cycleCountId, dateCounted) => (dispatch) => {
   dispatch({
     type: UPDATE_DATE_COUNTED,
@@ -851,6 +861,7 @@ export const updateDateCounted = (cycleCountId, dateCounted) => (dispatch) => {
       dateCounted,
     },
   });
+  dispatch(setUpdated(cycleCountId, true));
 };
 
 export const updateCountedBy = (cycleCountId, countedBy) => (dispatch) => {
@@ -861,6 +872,7 @@ export const updateCountedBy = (cycleCountId, countedBy) => (dispatch) => {
       countedBy,
     },
   });
+  dispatch(setUpdated(cycleCountId, true));
 };
 
 export const addEmptyRow = (cycleCountId) => (dispatch) => {
@@ -882,12 +894,22 @@ export const removeRow = (cycleCountId, rowId) => (dispatch) => {
   });
 };
 
-export const setUpdated = (cycleCountId, updated) => (dispatch) => {
+export const markAllItemsAsUpdated = (cycleCountIds) => (dispatch) => {
   dispatch({
-    type: SET_UPDATED,
+    type: MARK_ALL_AS_UPDATED,
     payload: {
-      id: cycleCountId,
-      updated,
+      cycleCountIds,
+      updated: true,
+    },
+  });
+};
+
+export const markAllItemsAsNotUpdated = (cycleCountIds) => (dispatch) => {
+  dispatch({
+    type: MARK_ALL_AS_UPDATED,
+    payload: {
+      cycleCountIds,
+      updated: false,
     },
   });
 };
@@ -904,4 +926,5 @@ export const updateFieldValue = ({
       value,
     },
   });
+  dispatch(setUpdated(cycleCountId, true));
 };

@@ -22,9 +22,11 @@ import {
 
 import {
   eraseDraft,
-  fetchBinLocations, fetchCycleCounts,
+  fetchBinLocations,
+  fetchCycleCounts,
   fetchLotNumbersByProductIds,
-  fetchUsers, setUpdated,
+  fetchUsers, markAllItemsAsNotUpdated,
+  markAllItemsAsUpdated,
   startResolution,
 } from 'actions';
 import { UPDATE_CYCLE_COUNT_IDS } from 'actions/types';
@@ -102,14 +104,6 @@ const useCountStep = () => {
     dispatch(fetchUsers());
   }, []);
 
-  const markAllItemsAsUpdated = () => {
-    cycleCountIds.forEach((cycleCountId) => {
-      dispatch(setUpdated(cycleCountId, true));
-    });
-  };
-
-  const markAllItemsAsNotUpdated = (cycleCountId) => dispatch(setUpdated(cycleCountId, false));
-
   const validateExistenceOfCycleCounts = async (callback) => {
     const { data } = await cycleCountApi.getCycleCounts(
       currentLocationId,
@@ -185,14 +179,15 @@ const useCountStep = () => {
   const save = async (shouldSetDefaultAssignee = false) => {
     try {
       show();
-      markAllItemsAsUpdated();
       const cycleCountItemsToUpdateBatch = [];
       const cycleCountItemsToCreateBatch = [];
+
       const state = store.getState();
       const cycleCounts = Object.values(state.countWorkflow.entities);
+
       for (const cycleCount of cycleCounts) {
         const cycleCountItemsToUpdate = cycleCount.cycleCountItems
-          .filter((item) => ((item.updated || !item.assignee) && !item.id.includes('newRow')))
+          .filter((item) => (item.updated && !item.id.includes('newRow')))
           .map((item) => ({ ...trimLotNumberSpaces(item), cycleCountId: cycleCount.id }));
 
         if (cycleCountItemsToUpdate.length > 0) {
@@ -205,25 +200,33 @@ const useCountStep = () => {
         if (cycleCountItemsToCreate.length > 0) {
           cycleCountItemsToCreateBatch.push(cycleCountItemsToCreate);
         }
-
-        // Now that we've successfully saved all the items, mark them all as not updated so that
-        // we don't try to update them again next time something is changed.
-        markAllItemsAsNotUpdated(cycleCount.id);
       }
+      // Now that we've successfully saved all the items, mark them all as not updated so that
+      // we don't try to update them again next time something is changed.
+      dispatch(markAllItemsAsNotUpdated(cycleCountIds));
+
       const updatePayload = {
         itemsToUpdate: cycleCountItemsToUpdateBatch.flat().map((item) =>
           getPayload(item, shouldSetDefaultAssignee)),
       };
+
       await cycleCountApi
         .updateCycleCountItemsBatch(updatePayload, currentLocationId);
+
       const createPayload = {
         itemsToCreate: cycleCountItemsToCreateBatch.flat().map((item) =>
           getPayload(item, shouldSetDefaultAssignee)),
       };
+
       await cycleCountApi
         .createCycleCountItemsBatch(createPayload, currentLocationId);
     } finally {
       // After the save, refetch cycle counts so that a new row can't be saved multiple times
+      dispatch(fetchCycleCounts(
+        cycleCountIds,
+        currentLocationId,
+        sortByProductName,
+      ));
       hide();
     }
   };
