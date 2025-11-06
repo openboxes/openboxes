@@ -870,6 +870,7 @@ class StockMovementService {
                 def demand = forecastingService.getDemand(requisition.origin, requisition.destination, stockMovementItem.product)
                 return [
                         id                              : stockMovementItem.id,
+                        version                         : stockMovementItem.version,
                         product                         : stockMovementItem.product,
                         productCode                     : stockMovementItem.productCode,
                         quantityOnHand                  : quantityOnHand ?: 0,
@@ -881,6 +882,7 @@ class StockMovementService {
                         sortOrder                       : stockMovementItem.sortOrder,
                         monthlyDemand                   : demand?.monthlyDemand ?: 0,
                         demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand ?: 0) * (template?.replenishmentPeriod ?: 30)),
+                        manuallyAdded                   : stockMovementItem.manuallyAdded,
                 ]
             } else if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
                 def demand
@@ -894,6 +896,7 @@ class StockMovementService {
                 }
                 return [
                         id                              : stockMovementItem.id,
+                        version                         : stockMovementItem.version,
                         product                         : stockMovementItem.product,
                         productCode                     : stockMovementItem.productCode,
                         quantityOnHand                  : quantityOnHand ?: 0,
@@ -906,10 +909,12 @@ class StockMovementService {
                         sortOrder                       : stockMovementItem.sortOrder,
                         monthlyDemand                   : demand?.monthlyDemand ?: 0,
                         demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand ?: 0) * (template?.replenishmentPeriod ?: 30)),
+                        manuallyAdded                   : stockMovementItem.manuallyAdded,
                 ]
             } else {
                 return [
                         id                  : stockMovementItem.id,
+                        version             : stockMovementItem.version,
                         product             : stockMovementItem.product,
                         productCode         : stockMovementItem.productCode,
                         quantityOnHand      : quantityOnHand ?: 0,
@@ -920,6 +925,7 @@ class StockMovementService {
                         quantityRequested   : stockMovementItem.quantityRequested,
                         statusCode          : stockMovementItem.statusCode,
                         sortOrder           : stockMovementItem.sortOrder,
+                        manuallyAdded       : stockMovementItem.manuallyAdded,
                 ]
             }
         }

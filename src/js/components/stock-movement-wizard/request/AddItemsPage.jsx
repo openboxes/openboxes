@@ -806,10 +806,18 @@ class AddItemsPage extends Component {
             demandPerReplenishmentPeriod,
             quantityOnHand,
             quantityAllowed,
+            version,
+            manuallyAdded,
           } = val;
 
-          let qtyRequested = 0;
-          if (quantityRequested) qtyRequested = quantityRequested;
+          // Determine the quantity requested for each row. If the item already has quantity
+          // requested > 0, or it has been manually set to 0 (an item with version > 0 has been
+          // modified since initial creation) use that value. Otherwise, calculate a new quantity
+          // to use. Manually added rows should not ever have their quantity recalculated.
+          // This isn't a perfect solution, but is the least intrusive one for now. Likely a better
+          // option would be to move this logic to the stock movement create flow on the backend.
+          let qtyRequested;
+          if (version > 0 || quantityRequested || manuallyAdded) qtyRequested = quantityRequested;
           else if (isPullType) qtyRequested = demandPerReplenishmentPeriod - quantityOnHand;
           else qtyRequested = quantityAllowed;
 
@@ -825,9 +833,19 @@ class AddItemsPage extends Component {
       lineItemsData = _.map(
         data,
         (val) => {
-          const { quantityRequested, demandPerReplenishmentPeriod, quantityAvailable } = val;
-          const qtyRequested = quantityRequested
-            || demandPerReplenishmentPeriod - quantityAvailable;
+          const {
+            quantityRequested,
+            demandPerReplenishmentPeriod,
+            quantityAvailable,
+            version,
+            manuallyAdded,
+          } = val;
+
+          // Same comment as the above. If the quantity requested has been manually adjusted to 0,
+          // don't try to recompute it.
+          const qtyRequested = (version > 0 || quantityRequested || manuallyAdded)
+            ? quantityRequested
+            : (demandPerReplenishmentPeriod - quantityAvailable);
           return {
             ...val,
             disabled: true,
