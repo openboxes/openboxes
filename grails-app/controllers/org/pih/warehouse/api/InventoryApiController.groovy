@@ -15,6 +15,7 @@ import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.ReorderReportFilterCommand
 import org.pih.warehouse.inventory.ReorderReportItemDto
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.product.ExpirationHistoryReport
 
 class InventoryApiController {
 
@@ -76,18 +77,16 @@ class InventoryApiController {
                 response.contentType = "text/csv"
                 String filename = "Expiration history report - ${AuthService.currentLocation?.name}.csv"
                 response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-                render(contentType: "text/csv", text: csv, encoding: "UTF-8")
+                render(text: csv, encoding: "UTF-8")
                 return
             }
             "*" {
-                PaginatedList<ExpirationHistoryReportRow> entries = inventoryService.getExpirationHistoryReport(command)
-                Map<String, Number> expirationTotals = inventoryService.getExpirationHistoryReportTotals(entries)
-
+                ExpirationHistoryReport report = inventoryService.getExpirationHistoryReport(command)
                 render([
-                        data                     : entries,
-                        totalCount               : entries.totalCount,
-                        totalQuantityLostToExpiry: expirationTotals.totalQuantityLostToExpiry,
-                        totalValueLostToExpiry   : expirationTotals.totalValueLostToExpiry
+                        data                     : report.rows,
+                        totalCount               : report.rows.totalCount,
+                        totalQuantityLostToExpiry: report.totalQuantityLostToExpiry,
+                        totalValueLostToExpiry   : report.totalValueLostToExpiry
                 ] as JSON)
             }
         }
