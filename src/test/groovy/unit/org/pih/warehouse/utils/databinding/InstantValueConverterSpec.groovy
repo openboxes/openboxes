@@ -74,9 +74,9 @@ class InstantValueConverterSpec extends Specification {
         "2000-01-01T00:00Z"             || "2000-01-01T00:00:00Z" | "UTC No seconds"
         "2000-01-01T00:00:00.000-05:00" || "2000-01-01T05:00:00Z" | "-5 Full string in proper ISO format"
         "2000-01-01T00:00:00-05:00"     || "2000-01-01T05:00:00Z" | "-5 No millis"
-        "2000-01-01T00:00-05:00"        || "2000-01-01T05:00:00Z" | "05 No seconds"
+        "2000-01-01T00:00-05:00"        || "2000-01-01T05:00:00Z" | "-5 No seconds"
 
-        // When the string has no time or zone information, default to the one in the user's session
+        // When the string has no time or zone information, default to midnight in the timezone in the user's session
         "2000-01-01"                    || "2000-01-01T03:00:00Z" | "No TZ Full string"
     }
 
@@ -92,10 +92,12 @@ class InstantValueConverterSpec extends Specification {
 
         where:
         givenDate                 || exception              | failureReason
+        // Invalid formats
         "2000-01-32T00:00Z"       || DateTimeParseException | "day out of range"
         "2000-13-01T00:00Z"       || DateTimeParseException | "month out of range"
         "10000-13-01T00:00Z"      || DateTimeParseException | "year out of range"
         "00-01-01T00:00Z"         || DateTimeParseException | "two digit year format not supported"
+        // If we don't have a timezone to fallback to, we always need to be given a full date + time + zone string
         "2000-01-01T00:00:00.000" || DateTimeException      | "full datetime, no timezone"
         "2000-01-01T00:00:00.00"  || DateTimeException      | "Shorter millis, no timezone"
         "2000-01-01T00:00:00.0"   || DateTimeException      | "Ever shorter millis, no timezone"
@@ -120,10 +122,12 @@ class InstantValueConverterSpec extends Specification {
 
         where:
         givenDate                 || exception              | failureReason
+        // Invalid formats
         "2000-01-32T00:00Z"       || DateTimeParseException | "day out of range"
         "2000-13-01T00:00Z"       || DateTimeParseException | "month out of range"
         "10000-13-01T00:00Z"      || DateTimeParseException | "year out of range"
         "00-01-01T00:00Z"         || DateTimeParseException | "two digit year format not supported"
+        // Even if we have a timezone to fallback to, we treat a date + time (with no timezone) string as invalid
         "2000-01-01T00:00:00.000" || DateTimeException      | "full datetime, no timezone"
         "2000-01-01T00:00:00.00"  || DateTimeException      | "Shorter millis, no timezone"
         "2000-01-01T00:00:00.0"   || DateTimeException      | "Ever shorter millis, no timezone"
