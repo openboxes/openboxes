@@ -10,8 +10,19 @@ const CommentCell = ({
   initialValue,
   id,
   cycleCountId,
+  isStepEditable,
 }) => {
   const [value, setValue] = useState(initialValue);
+
+  if (!isStepEditable) {
+    return (
+      <TableCell
+        className="static-cell-count-step d-flex align-items-center"
+      >
+        {value}
+      </TableCell>
+    );
+  }
 
   const dispatch = useDispatch();
 
@@ -36,6 +47,8 @@ const CommentCell = ({
         value={value}
         onChange={onChange}
         onBlur={onBlur}
+        className="m-1 w-75"
+        hideErrorMessageWrapper
       />
     </TableCell>
   );

@@ -14,17 +14,34 @@ const BinLocationCell = ({
   id,
   cycleCountId,
   showBinLocation,
+  isStepEditable,
 }) => {
   if (!showBinLocation) {
     return null;
   }
 
   const translate = useTranslate();
+
+  const [value, setValue] = useState(initialValue ? { name: initialValue } : undefined);
+
+  const tooltipLabel = getBinLocationToDisplay(value)
+    || translate('react.cycleCount.table.binLocation.label', 'Bin Location');
+
+  if (!isStepEditable) {
+    return (
+      <TableCell
+        className="static-cell-count-step d-flex align-items-center"
+        tooltipLabel={tooltipLabel}
+        customTooltip
+      >
+        {getBinLocationToDisplay(value)}
+      </TableCell>
+    );
+  }
+
   const binLocations = useSelector(getBinLocations);
 
   const dispatch = useDispatch();
-
-  const [value, setValue] = useState(initialValue ? { name: initialValue } : undefined);
 
   const onChange = (selected) => {
     setValue(selected);
@@ -52,7 +69,12 @@ const BinLocationCell = ({
     : undefined;
 
   return (
-    <TableCell className="rt-td rt-td-count-step pb-0">
+    <TableCell
+      className="rt-td rt-td-count-step pb-0"
+      tooltipClassname="w-75"
+      tooltipLabel={tooltipLabel}
+      customTooltip
+    >
       <SelectField
         value={selectedValue}
         labelKey="name"
@@ -60,6 +82,8 @@ const BinLocationCell = ({
         onChange={onChange}
         onBlur={onBlur}
         disabled={isDisabled}
+        className="m-1"
+        hideErrorMessageWrapper
       />
     </TableCell>
   );
