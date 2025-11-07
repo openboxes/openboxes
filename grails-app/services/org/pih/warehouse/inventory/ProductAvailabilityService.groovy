@@ -1163,13 +1163,16 @@ class ProductAvailabilityService {
 
     List<ProductAvailability> getStockTransferCandidates(Location location, Boolean showExpiredItemsOnly = false) {
         return ProductAvailability.createCriteria().list {
+            setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+            createAlias("inventoryItem", "ii", JoinType.INNER_JOIN)
+            createAlias("product", "p", JoinType.INNER_JOIN)
+            createAlias("p.synonyms", "syn", JoinType.LEFT_OUTER_JOIN)
+            createAlias("binLocation", "bl", JoinType.LEFT_OUTER_JOIN)
             eq("location", location)
             gt("quantityOnHand", 0)
 
             if (showExpiredItemsOnly) {
-                inventoryItem {
-                    lt('expirationDate', new Date())
-                }
+                lt('ii.expirationDate', new Date())
             }
         }
     }
@@ -1184,6 +1187,11 @@ class ProductAvailabilityService {
         def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
         Date expirationDate = params.expirationDate ? dateFormat.parse(params.expirationDate) : null
         return ProductAvailability.createCriteria().list {
+            setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+            createAlias("inventoryItem", "ii", JoinType.INNER_JOIN)
+            createAlias("product", "p", JoinType.INNER_JOIN)
+            createAlias("p.synonyms", "syn", JoinType.LEFT_OUTER_JOIN)
+            createAlias("binLocation", "bl", JoinType.LEFT_OUTER_JOIN)
             eq("location", location)
             or {
                 if (product) {
@@ -1196,9 +1204,7 @@ class ProductAvailabilityService {
                     ilike("lotNumber", "%${params.lotNumber}%")
                 }
                 if (expirationDate) {
-                    inventoryItem {
-                        eq("expirationDate", expirationDate)
-                    }
+                    eq("ii.expirationDate", expirationDate)
                 }
             }
             gt("quantityOnHand", 0)
