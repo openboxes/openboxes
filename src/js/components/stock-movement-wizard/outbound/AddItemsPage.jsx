@@ -1334,8 +1334,9 @@ class AddItemsPage extends Component {
    */
   exportTemplate(formValues) {
     const lineItems = _.filter(formValues.lineItems, (item) => !_.isEmpty(item));
+    const removeEmptyItems = this.needToRemoveEmptyItemsOnSave(formValues.lineItems);
 
-    this.saveItemsAndExportTemplate(formValues, lineItems);
+    this.saveItemsAndExportTemplate({ formValues, lineItems, removeEmptyItems });
   }
 
   isRowLoaded({ index }) {
@@ -1346,16 +1347,17 @@ class AddItemsPage extends Component {
    * Exports current state of stock movement's to csv file.
    * @param {object} formValues
    * @param {object} lineItems
+   * @param {boolean} removeEmptyItems
    * @public
    */
-  saveItemsAndExportTemplate(formValues, lineItems) {
+  saveItemsAndExportTemplate({ formValues, lineItems, removeEmptyItems }) {
     this.props.showSpinner();
 
     const { movementNumber, stockMovementId } = formValues;
     const url = `/stockMovement/exportCsv/${stockMovementId}`;
     this.saveRequisitionItemsInCurrentStep({
       itemCandidatesToSave: lineItems,
-      removeEmptyItems: false,
+      removeEmptyItems,
     })
       .then(() => {
         apiClient.get(url, { responseType: 'blob' })
