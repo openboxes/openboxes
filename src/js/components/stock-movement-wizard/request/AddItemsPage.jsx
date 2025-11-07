@@ -723,7 +723,7 @@ class AddItemsPage extends Component {
   getLineItemsToBeSaved(lineItems) {
     // First find items that are new and should be added (don't have status code)
     const lineItemsToBeAdded = _.filter(lineItems, (item) =>
-      !item.statusCode && item.quantityRequested && item.product);
+      !item.statusCode && item.product);
     // Then get a list of items that already exist in this request (have status code)
     const lineItemsWithStatus = _.filter(lineItems, (item) => item.statusCode);
     const lineItemsToBeUpdated = [];
@@ -1527,7 +1527,7 @@ class AddItemsPage extends Component {
                     product: { $set: product },
                     quantityOnHand: { $set: '' },
                     monthlyDemand: { $set: monthlyDemand },
-                    quantityRequested: { $set: quantityRequested >= 0 ? quantityRequested : 0 },
+                    quantityRequested: { $set: quantityRequested > 0 ? quantityRequested : '0' },
                   },
                 },
               }),
@@ -1541,7 +1541,7 @@ class AddItemsPage extends Component {
           .then((response) => {
             const { monthlyDemand, quantityAvailable, quantityOnHand } = response.data;
             const quantityRequested = monthlyDemand - quantityAvailable > 0
-              ? monthlyDemand - quantityAvailable : 0;
+              ? monthlyDemand - quantityAvailable : '0';
             this.setState({
               values: update(values, {
                 lineItems: {
