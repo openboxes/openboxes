@@ -700,13 +700,13 @@ class AddItemsPage extends Component {
       || lineItem?.inventoryItem;
     const quantity = (lineItem?.fetchedInventoryItem
       ? lineItem?.fetchedInventoryItem?.quantity : lineItem?.inventoryItem?.quantity) || 0;
-    const expirationDateHasChanged = inventoryItem?.expirationDate
-      && lineItem?.expirationDate
+
+    const expirationDateChanged = lineItem?.expirationDate
       && lineItem?.lotNumber
       && lineItem?.expirationDate !== inventoryItem?.expirationDate
       && quantity > 0;
 
-    if (expirationDateHasChanged) {
+    if (expirationDateChanged) {
       // Despite we have only one item here, we are place it in an array
       // because the ConfirmExpirationDateModal expects an array
       const itemsWithMismatchedExpiry = [{
