@@ -13,7 +13,11 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
-import { STOCK_MOVEMENT_STATUS, STOCK_MOVEMENT_UPDATE_INVENTORY_ITEMS, STOCK_MOVEMENT_UPDATE_ITEMS } from 'api/urls';
+import {
+  STOCK_MOVEMENT_STATUS,
+  STOCK_MOVEMENT_UPDATE_INVENTORY_ITEMS,
+  STOCK_MOVEMENT_UPDATE_ITEMS,
+} from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import DateField from 'components/form-elements/DateField';
@@ -22,6 +26,7 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import ConfirmExpirationDateModal from 'components/modals/ConfirmExpirationDateModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import StockMovementStatus from 'consts/stockMovementStatus';
 import apiClient from 'utils/apiClient';
 import { renderFormField, setColumnValue } from 'utils/form-utils';
 import Select from 'utils/Select';
@@ -272,7 +277,7 @@ class AddItemsPage extends Component {
    */
   getLineItemsToBeSaved(lineItems) {
     const lineItemsToBeAdded = _.filter(lineItems, (item) =>
-      !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product);
+      !item.statusCode && item.quantityRequested && item.product);
     const lineItemsWithStatus = _.filter(lineItems, (item) => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
@@ -635,7 +640,14 @@ class AddItemsPage extends Component {
   saveAndTransitionToNextStep(formValues, lineItems) {
     this.props.showSpinner();
 
-    this.saveRequisitionItemsInCurrentStep(lineItems)
+    this.saveRequisitionItems({
+      itemCandidatesToSave: lineItems,
+      // We're proceeding to the next step so should not have any zero quantity items at this point.
+      // The validation logic prevents you from proceeding to the next step if there are any rows
+      // with non-zero quantities so we should not have any empties to remove at this point,
+      // but we signal the backend to remove them anyway, just in case.
+      removeEmptyItems: true,
+    })
       .then(async (resp) => {
         let values = formValues;
         if (resp) {
@@ -699,8 +711,6 @@ class AddItemsPage extends Component {
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
-      // We're proceeding to the next step so should not have any zero quantity items at this point.
-      removeEmptyItems: true,
     };
 
     this.props.showSpinner();
@@ -711,18 +721,18 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Saves list of requisition items in current step (without step change). Used to export template.
+   * Saves a list of requisition items.
    * @param {object} itemCandidatesToSave
+   * @param {boolean} removeEmptyItems
    * @public
    */
-  saveRequisitionItemsInCurrentStep(itemCandidatesToSave) {
+  saveRequisitionItems({ itemCandidatesToSave, removeEmptyItems }) {
     const itemsToSave = this.getLineItemsToBeSaved(itemCandidatesToSave);
     const updateItemsUrl = STOCK_MOVEMENT_UPDATE_ITEMS(this.state.values.stockMovementId);
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
-      // We're saving without proceeding so it's fine to have items with no quantity at this point.
-      removeEmptyItems: false,
+      removeEmptyItems,
     };
 
     if (payload.lineItems.length) {
@@ -770,7 +780,10 @@ class AddItemsPage extends Component {
   saveAndExit(formValues) {
     const errors = this.validate(formValues).lineItems;
     if (errors.length && errors.every((obj) => typeof obj === 'object' && _.isEmpty(obj))) {
-      this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
+      this.saveRequisitionItems({
+        itemCandidatesToSave: formValues.lineItems,
+        removeEmptyItems: false,
+      })
         .then(() => {
           window.location = STOCK_MOVEMENT_URL.show(formValues.stockMovementId);
         });
@@ -804,7 +817,10 @@ class AddItemsPage extends Component {
   saveItems(lineItems) {
     this.props.showSpinner();
 
-    this.saveRequisitionItemsInCurrentStep(lineItems)
+    this.saveRequisitionItems({
+      itemCandidatesToSave: lineItems,
+      removeEmptyItems: false,
+    })
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
@@ -880,9 +896,9 @@ class AddItemsPage extends Component {
    */
   transitionToNextStep() {
     const url = STOCK_MOVEMENT_STATUS(this.state.values.stockMovementId);
-    const payload = { status: 'CHECKING' };
+    const payload = { status: StockMovementStatus.CHECKING };
 
-    if (this.state.values.statusCode === 'CREATED') {
+    if (this.state.values.statusCode === StockMovementStatus.CREATED) {
       return apiClient.post(url, payload);
     }
     return Promise.resolve();
@@ -927,7 +943,10 @@ class AddItemsPage extends Component {
 
     const { movementNumber, stockMovementId } = formValues;
     const url = `/stockMovement/exportCsv/${stockMovementId}`;
-    this.saveRequisitionItemsInCurrentStep(lineItems)
+    this.saveRequisitionItems({
+      itemCandidatesToSave: lineItems,
+      removeEmptyItems: false,
+    })
       .then(() => {
         apiClient.get(url, { responseType: 'blob' })
           .then((response) => {
@@ -983,7 +1002,10 @@ class AddItemsPage extends Component {
    */
   previousPage(values, invalid) {
     if (!invalid) {
-      this.saveRequisitionItemsInCurrentStep(values.lineItems)
+      this.saveRequisitionItems({
+        itemCandidatesToSave: values.lineItems,
+        removeEmptyItems: false,
+      })
         .then(() => this.props.previousPage(values));
     } else {
       confirmAlert({

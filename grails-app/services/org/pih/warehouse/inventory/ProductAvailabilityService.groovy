@@ -540,7 +540,7 @@ class ProductAvailabilityService {
     private static Map<String, Integer> calculateQuantitiesByExpirationFilter(List<ProductAvailability> productAvailabilityRecords, ExpirationFilter expirationFilter) {
         boolean removeExpiredStock = expirationFilter == ExpirationFilter.SUBTRACT_EXPIRED_STOCK
         Date today = new Date()
-        Date maxDate = removeExpiredStock ? today : today + expirationFilter.days
+        Date maxDate = removeExpiredStock ? today : today + (expirationFilter.days ?: 0)
         // Quantity available to promise before applying expiration filter
         Integer quantityAvailableToPromise = productAvailabilityRecords.sum { it.quantityAvailableToPromise ?: 0 }
         // Final quantity available to promise - quantity available to promise subtracted by expired stock based on expiration filter
