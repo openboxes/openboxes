@@ -2371,7 +2371,7 @@ class StockMovementService {
         }
     }
 
-    StockMovement updateItems(StockMovement stockMovement, boolean removeEmptyItems=false) {
+    StockMovement updateItems(StockMovement stockMovement, boolean removeEmptyItems) {
         if (stockMovement.requisition) {
             return updateRequisitionBasedStockMovementItems(stockMovement, removeEmptyItems)
         }
