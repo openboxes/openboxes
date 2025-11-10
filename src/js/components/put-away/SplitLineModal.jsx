@@ -188,6 +188,7 @@ class SplitLineModal extends Component {
     return (
       <div>
         <button
+          data-testid="open-modal"
           type="button"
           className="btn btn-outline-success btn-xs mr-1 mb-1"
           onClick={() => this.openModal()}
@@ -217,7 +218,7 @@ class SplitLineModal extends Component {
                 {this.props.putawayItem.product.displayNameOrDefaultName}
               </Tooltip>
             </h3>
-            <div className="font-weight-bold">
+            <div className="font-weight-bold" data-testid="expiration-date">
               <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />
               :
               {
@@ -229,12 +230,12 @@ class SplitLineModal extends Component {
                   : this.props.putawayItem.inventoryItem.expirationDate
               }
             </div>
-            <div className="font-weight-bold">
+            <div className="font-weight-bold" data-testid="total-qty">
               <Translate id="react.putAway.totalQty.label" defaultMessage="Total QTY" />
               :
               {this.props.putawayItem.quantity}
             </div>
-            <div className="font-weight-bold">
+            <div className="font-weight-bold" data-testid="putaway-qty">
               <Translate id="react.putAway.putAwayQty.label" defaultMessage="Putaway QTY" />
               :
               {this.calculatePutAwayQty()}
@@ -261,6 +262,7 @@ class SplitLineModal extends Component {
                 >
                   <td className={`py-1 ${!_.get(item, 'putawayLocation.id') ? 'has-error align-middle' : 'align-middle'}`}>
                     <Select
+                      dataTestId="bin-select"
                       options={this.props.bins}
                       valueKey="id"
                       labelKey="name"
@@ -287,6 +289,7 @@ class SplitLineModal extends Component {
                     >
                       <div className={this.isQuantityGreaterThanOriginalPutaway() || item.quantity <= 0 ? 'has-error' : ''}>
                         <Input
+                          dataTestId="quantity-input"
                           type="number"
                           value={item.quantity}
                           onChange={(value) => this.setState((prev) => ({
@@ -300,6 +303,7 @@ class SplitLineModal extends Component {
                   </td>
                   <td width="120px" className="py-1">
                     <button
+                      data-testid="delete-button"
                       type="button"
                       className="btn btn-outline-danger btn-xs"
                       onClick={() => {
@@ -330,6 +334,7 @@ class SplitLineModal extends Component {
             </table>
             <button
               type="button"
+              data-testid="add-line-button"
               className="btn btn-outline-success btn-xs"
               onClick={() => this.setState((prev) => ({
                 splitItems: update(prev.splitItems, {
@@ -357,6 +362,7 @@ class SplitLineModal extends Component {
           <hr />
           <div className="btn-group float-right" role="group">
             <button
+              data-testid="save-button"
               type="button"
               className="btn btn-outline-success btn-sm"
               disabled={!this.isValid() || !this.isBinSelected()}
@@ -365,6 +371,7 @@ class SplitLineModal extends Component {
               <Translate id="react.default.button.save.label" defaultMessage="Save" />
             </button>
             <button
+              data-testid="cancel-button"
               type="button"
               className="btn btn-outline-secondary btn-sm"
               onClick={() => this.closeModal()}

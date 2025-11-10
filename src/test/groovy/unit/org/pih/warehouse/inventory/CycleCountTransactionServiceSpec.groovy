@@ -15,6 +15,7 @@ import org.pih.warehouse.inventory.CycleCountProductInventoryTransactionService
 import org.pih.warehouse.inventory.CycleCountTransactionService
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
@@ -39,6 +40,9 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
 
     @Shared
     TransactionIdentifierService transactionIdentifierServiceStub
+
+    @Shared
+    InventoryService inventoryServiceStub
 
     @Shared
     TransactionType productInventoryTransactionType
@@ -68,6 +72,9 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         transactionIdentifierServiceStub = Stub(TransactionIdentifierService)
         cycleCountTransactionService.transactionIdentifierService = transactionIdentifierServiceStub
 
+        inventoryServiceStub = Stub(InventoryService)
+        cycleCountTransactionService.inventoryService = inventoryServiceStub
+
         // Set up the transaction types
         productInventoryTransactionType = new TransactionType()
         productInventoryTransactionType.id = Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID
@@ -83,6 +90,9 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         Location facility = new Location(inventory: new Inventory())
         Product product = new Product()
         Date date = new Date()
+
+        and: 'no other transactions exist at the time for the product'
+        inventoryServiceStub.hasTransactionEntriesOnDate(facility, _ as Date, [product]) >> false
 
         and: 'a cycle count with no discrepancies'
         CycleCount cycleCount = new CycleCount(
@@ -104,7 +114,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         createExpectedProductInventoryTransaction(facility, product, cycleCount, date)
 
         when:
-        List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, true)
+        List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, [product], true)
 
         then: 'the only transaction should be the product inventory one'
         assert transactions.size() == 1
@@ -119,6 +129,9 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         Product product2 = new Product()
         product2.id = 2
         Date date = new Date()
+
+        and: 'no other transactions exist at the time for the products'
+        inventoryServiceStub.hasTransactionEntriesOnDate(facility, _ as Date, [product1, product2]) >> false
 
         and: 'a cycle count with two products and no discrepancies'
         CycleCount cycleCount = new CycleCount(
@@ -150,7 +163,8 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         createExpectedProductInventoryTransaction(facility, product2, cycleCount, date)
 
         when:
-        List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, true)
+        List<Transaction> transactions = cycleCountTransactionService.createTransactions(
+                cycleCount, [product1, product2], true)
 
         then: 'the only transactions should be the product inventory ones'
         assert transactions.size() == 2
@@ -163,6 +177,9 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         Product product = new Product()
         InventoryItem inventoryItem = new InventoryItem()
         Date date = new Date()
+
+        and: 'no other transactions exist at the time for the product'
+        inventoryServiceStub.hasTransactionEntriesOnDate(facility, _ as Date, [product]) >> false
 
         and: 'a cycle count with discrepancies'
         String binNameNegativeAdjustment = "binNeg"
@@ -207,7 +224,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         createExpectedProductInventoryTransaction(facility, product, cycleCount, date)
 
         when:
-        List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, true)
+        List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, [product], true)
 
         then: 'both a product inventory and adjustment transaction should be created'
         assert transactions.size() == 2
@@ -238,6 +255,45 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         assert positiveTransactionEntry.product == product
         assert negativeTransactionEntry.inventoryItem == inventoryItem
         assert positiveTransactionEntry.quantity == 3
+    }
+
+    void 'OBPIH-7444: createTransactions should fail when a transaction already exists for the product'() {
+        given: 'mocked inputs'
+        Location facility = new Location(inventory: new Inventory())
+        Product product = new Product()
+        InventoryItem inventoryItem = new InventoryItem()
+        Date date = new Date()
+
+        and: 'a transaction already exists at the time for the product'
+        inventoryServiceStub.hasTransactionEntriesOnDate(facility, _ as Date, [product]) >> true
+
+        and: 'a cycle count with discrepancies'
+        CycleCount cycleCount = new CycleCount(
+                facility: facility,
+                cycleCountItems: [
+                        new CycleCountItem(
+                                inventoryItem: inventoryItem,
+                                location: new Location(name: 'bin1'),
+                                product: product,
+                                countIndex: 0,
+                                status: CycleCountItemStatus.COUNTED,
+                                quantityOnHand: 30,
+                                quantityCounted: 33,  // Positive discrepancy (+3)
+                        ),
+                ]
+        )
+
+        and: 'a mocked transaction number'
+        transactionIdentifierServiceStub.generate(_ as Transaction) >> "123ABC"
+
+        and: 'a mocked product inventory transaction'
+        createExpectedProductInventoryTransaction(facility, product, cycleCount, date)
+
+        when:
+        cycleCountTransactionService.createTransactions(cycleCount, [product], true)
+
+        then:
+        thrown(IllegalArgumentException)
     }
 
     private Transaction createExpectedProductInventoryTransaction(

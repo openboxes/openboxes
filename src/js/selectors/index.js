@@ -28,3 +28,8 @@ export const getMinSearchLength = (state) => state.session.searchConfig.minSearc
 export const getCurrentUser = (state) => state.session.user;
 
 export const getCycleCountTranslations = (state) => state.session.fetchedTranslations.cycleCount;
+
+export const getLotNumbersByProductId = (state, productId) =>
+  state.lotNumbers?.lotNumbersWithExpiration?.[productId] || [];
+
+export const getCurrencyCode = (state) => state.session.currencyCode;

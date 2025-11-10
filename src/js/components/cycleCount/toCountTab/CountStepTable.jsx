@@ -13,6 +13,7 @@ import Button from 'components/form-elements/Button';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import { DateFormat } from 'consts/timeFormat';
+import useCountStepHeader from 'hooks/cycleCount/useCountStepHeader';
 import useCountStepTable from 'hooks/cycleCount/useCountStepTable';
 import useTranslate from 'hooks/useTranslate';
 import { formatDate } from 'utils/translation-utils';
@@ -23,27 +24,41 @@ import 'components/cycleCount/cycleCount.scss';
 const CountStepTable = ({
   id,
   product,
-  dateCounted,
   tableData,
   tableMeta,
   addEmptyRow,
   removeRow,
   assignCountedBy,
   validationErrors,
-  setCountedDate,
   isStepEditable,
-  countedBy,
-  defaultCountedBy,
-  refreshFocusCounter,
   triggerValidation,
   isFormDisabled,
   isAssignCountModalOpen,
   closeAssignCountModal,
   assignCountModalData,
+  updateDateCounted,
+  dateCounted: initialDateCounted,
+  countedBy: initialCountedBy,
+  defaultCountedBy: initialDefaultCountedBy,
+  forceRerender,
 }) => {
   const translate = useTranslate();
   const localize = useSelector((state) => state.localize);
   const formatLocalizedDate = formatDate(localize);
+  const {
+    dateCounted,
+    countedByMeta,
+    defaultCountedByMeta,
+    handleDateCountedChange,
+    handleCountedByChange,
+  } = useCountStepHeader({
+    id,
+    initialDateCounted,
+    initialCountedBy,
+    initialDefaultCountedBy,
+    updateDateCounted,
+    assignCountedBy,
+  });
   const {
     columns,
     defaultColumn,
@@ -58,24 +73,9 @@ const CountStepTable = ({
     formatLocalizedDate,
     addEmptyRow,
     triggerValidation,
-    refreshFocusCounter,
     isFormDisabled,
+    forceRerender,
   });
-
-  // Default counted by needs to be stored in order to set the default select value correctly
-  const defaultCountedByMeta = defaultCountedBy ? {
-    id: defaultCountedBy.id,
-    value: defaultCountedBy.id,
-    label: defaultCountedBy.label ?? `${defaultCountedBy.firstName} ${defaultCountedBy.lastName}`,
-    name: `${defaultCountedBy.firstName} ${defaultCountedBy.lastName}`,
-  } : undefined;
-
-  const countedByMeta = countedBy ? {
-    id: countedBy.id,
-    value: countedBy.id,
-    label: countedBy.label ?? `${countedBy.firstName} ${countedBy.lastName}`,
-    name: `${countedBy.firstName} ${countedBy.lastName}`,
-  } : undefined;
 
   return (
     <>
@@ -104,7 +104,7 @@ const CountStepTable = ({
             >
               <DateField
                 className="date-counted-date-picker date-field-input"
-                onChangeRaw={setCountedDate}
+                onChangeRaw={handleDateCountedChange}
                 value={dateCounted}
                 clearable={false}
                 customDateFormat={DateFormat.DD_MMM_YYYY}
@@ -129,7 +129,7 @@ const CountStepTable = ({
                   <SelectField
                     placeholder="Select"
                     options={users}
-                    onChange={assignCountedBy(id)}
+                    onChange={handleCountedByChange}
                     className="min-width-250"
                     defaultValue={defaultCountedByMeta}
                     disabled={isFormDisabled}
@@ -203,7 +203,7 @@ CountStepTable.propTypes = {
   removeRow: PropTypes.func.isRequired,
   assignCountedBy: PropTypes.func.isRequired,
   validationErrors: PropTypes.shape({}).isRequired,
-  setCountedDate: PropTypes.func.isRequired,
+  updateDateCounted: PropTypes.func.isRequired,
   isStepEditable: PropTypes.bool.isRequired,
   countedBy: PropTypes.shape({
     id: PropTypes.string.isRequired,
@@ -212,7 +212,6 @@ CountStepTable.propTypes = {
     name: PropTypes.string.isRequired,
   }).isRequired,
   defaultCountedBy: PropTypes.shape({}).isRequired,
-  refreshFocusCounter: PropTypes.number.isRequired,
   triggerValidation: PropTypes.func.isRequired,
   isFormDisabled: PropTypes.bool.isRequired,
   isAssignCountModalOpen: PropTypes.bool.isRequired,
@@ -220,4 +219,5 @@ CountStepTable.propTypes = {
   assignCountModalData: PropTypes.arrayOf(
     PropTypes.shape({}),
   ).isRequired,
+  forceRerender: PropTypes.func.isRequired,
 };

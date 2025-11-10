@@ -40,6 +40,7 @@ class Constants {
     static final String MONTH_DAY_YEAR_DATE_FORMAT = "MM/dd/yyyy"
     static final String DELIVERY_DATE_FORMAT = "MM/dd/yyyy HH:mm XXX"
     static final String EUROPEAN_DATE_FORMAT = "dd/MM/yyyy"
+    static final String ISO_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     // Display date using day of year format. This is used by the `openboxes.display.date.format` property.
     // It is using `DD` instead `dd` because it is later used on the frontend by the moment, which interprets
     // `dd` and `DD` differently(`DD` is day of month, and `dd` is day of week, see: OBPIH-7149 and OBPIH-5397).
@@ -84,7 +85,7 @@ class Constants {
 
     static final ArrayList COLORS = ['FFFFFF', 'FFDFDF', 'FFBFBF', 'FF9F9F', 'FF7F7F', 'FF5F5F', 'FF3F3F', 'FF1F1F', 'FF0000', 'DF1F00', 'C33B00', 'A75700', '8B7300', '6F8F00', '53AB00', '37C700', '1BE300', '00FF00', '00DF1F', '00C33B', '00A757', '008B73', '006F8F', '0053AB', '0037C7', '001BE3', '0000FF', '0000df', '0000c3', '0000a7', '00008b', '00006f', '000053', '000037', '00001b', '000000']
 
-    static final ArrayList EXPORT_PRODUCT_COLUMNS = ["Id", "ProductCode", "ProductType", "Name", "ProductFamily", "Category", "GLAccount", "Description", "UnitOfMeasure", "Tags", "UnitCost", "LotAndExpiryControl", "ColdChain", "ControlledSubstance", "HazardousMaterial", "Reconditioned", "Manufacturer", "BrandName", "ManufacturerCode", "ManufacturerName", "Vendor", "VendorCode", "VendorName", "UPC", "NDC", "Created", "Updated"]
+    static final ArrayList EXPORT_PRODUCT_COLUMNS = ["Id", "Active", "ProductCode", "ProductType", "Name", "ProductFamily", "Category", "GLAccount", "Description", "UnitOfMeasure", "Tags", "UnitCost", "LotAndExpiryControl", "ColdChain", "ControlledSubstance", "HazardousMaterial", "Reconditioned", "Manufacturer", "BrandName", "ManufacturerCode", "ManufacturerName", "Vendor", "VendorCode", "VendorName", "UPC", "NDC", "Created", "Updated"]
 
     // these are direct references to transaction types by primary key
     static final String CONSUMPTION_TRANSACTION_TYPE_ID = "2"
@@ -189,4 +190,8 @@ class Constants {
     // Cycle count indexes
     static final String COUNT_INDEX = "0"
     static final String RECOUNT_INDEX = "1"
+
+    static final String HS_CODE_PRODUCT_ATTRIBUTE_CODE = "HSCODE"
+    static final String INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT = "Inventory baseline created during old product inventory transactions migration for products that had stock " +
+            "but no inventory baseline transaction as a most recent transaction"
 }

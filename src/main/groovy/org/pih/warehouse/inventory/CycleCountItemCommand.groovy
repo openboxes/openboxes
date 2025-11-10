@@ -54,7 +54,7 @@ class CycleCountItemCommand implements Validateable {
     def beforeValidate() {
         String cycleCountId = RequestContextHolder.getRequestAttributes().params?.cycleCountId
         String facilityId = RequestContextHolder.getRequestAttributes().params?.facility
-        cycleCount = CycleCount.get(cycleCountId)
+        cycleCount = cycleCount ?: CycleCount.get(cycleCountId)
         facility = Location.read(facilityId)
     }
 
@@ -65,7 +65,7 @@ class CycleCountItemCommand implements Validateable {
                 return true
             }
 
-            return ReasonCode.listInventoryAdjustmentReasonCodes().contains(discrepancyReasonCode) ? true : ['invalid']
+            return ReasonCode.listCycleCountReasonCodes().contains(discrepancyReasonCode) ? true : ['invalid']
         })
         comment(nullable: true, blank: true)
         assignee(nullable: true)

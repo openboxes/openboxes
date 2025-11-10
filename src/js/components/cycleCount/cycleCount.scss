@@ -1,14 +1,5 @@
 @import "src/css/colors";
 
-@mixin
-limit-lines($lines-number) {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: $lines-number;
-  line-clamp: $lines-number;
-  -webkit-box-orient: vertical;
-}
-
 .all-products-tab-footer {
 
   p {
@@ -51,11 +42,6 @@ limit-lines($lines-number) {
   font-size: 14px;
 }
 
-@for $i from 1 through 10 {
-  .limit-lines-#{$i} {
-    @include limit-lines($i);
-  }
-}
 
 .resolve-table-limit-lines {
   max-height: calc(1.5em* 3 + 20px);
@@ -171,10 +157,6 @@ limit-lines($lines-number) {
       font-weight: normal;
     }
   }
-}
-
-.bin-location-tooltip {
-  width: 75%;
 }
 
 .zone-label {

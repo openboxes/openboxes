@@ -12,11 +12,17 @@ import _ from 'lodash';
 import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { getCurrentLocation, getCycleCountRequestIds } from 'selectors';
+import {
+  getCurrentLocale,
+  getCurrentLocation,
+  getCurrentUser,
+  getCycleCountRequestIds,
+} from 'selectors';
 
 import {
   eraseDraft,
   fetchBinLocations,
+  fetchLotNumbersByProductIds,
   fetchUsers,
   startResolution,
 } from 'actions';
@@ -47,19 +53,19 @@ const useCountStep = () => {
   // (it removes focus while selecting new fields)
   const tableData = useRef([]);
   // Saving selected "counted by" option
-  const [countedBy, setCountedBy] = useState({});
-  const [defaultCountedBy, setDefaultCountedBy] = useState({});
+  const countedBy = useRef({});
+  const defaultCountedBy = useRef({});
   // Saving selected "date counted" option, initially it's the date fetched from API
-  const [dateCounted, setDateCounted] = useState({});
+  const dateCounted = useRef({});
   const [isStepEditable, setIsStepEditable] = useState(true);
-  // State used to trigger focus reset when changed. When this counter changes,
-  // it will reset the focus by clearing the RowIndex and ColumnId in useEffect.
-  const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
   const [sortByProductName, setSortByProductName] = useState(false);
   const [importErrors, setImportErrors] = useState([]);
   const assigneeImported = useRef(null);
   const requestIdsWithDiscrepancies = useRef([]);
+  // Here we store cycle count IDs that were updated,
+  // and we will mark them as updated before saving.
+  const cycleCountsMarkedToUpdate = useRef([]);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -70,17 +76,30 @@ const useCountStep = () => {
     cycleCountIds,
     currentLocation,
     currentUser,
+    locale,
   } = useSelector((state) => ({
     cycleCountIds: getCycleCountRequestIds(state),
     currentLocation: getCurrentLocation(state),
-    currentUser: state.session.user,
+    currentUser: getCurrentUser(state),
+    locale: getCurrentLocale(state),
   }));
-  const resetFocus = () => {
-    setRefreshFocusCounter((prev) => prev + 1);
-  };
 
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
+
+  // Collect unique product IDs from the tableData to fetch lot numbers for those products
+  const uniqueProductIds = _.uniq(
+    tableData.current.flatMap((c) => c.cycleCountItems)
+      .map((i) => i.product?.id),
+  );
+
+  useEffect(() => {
+    // we want to fetch lot numbers only when the step is editable and there are products
+    // in the table because if the step is not editable, there is no need to fetch lot numbers
+    if (isStepEditable && uniqueProductIds.length > 0) {
+      dispatch(fetchLotNumbersByProductIds(uniqueProductIds));
+    }
+  }, [JSON.stringify(uniqueProductIds), isStepEditable]);
 
   useEffect(() => {
     if (showBinLocation) {
@@ -145,13 +164,13 @@ const useCountStep = () => {
         ...acc,
         [cycleCount?.id]: cycleCount?.cycleCountItems[0]?.dateCounted,
       }), {});
-      setDateCounted(countedDates);
       const countedByMap = data?.data?.reduce((acc, cycleCount) => ({
         ...acc,
         [cycleCount?.id]: cycleCount?.cycleCountItems[0]?.assignee,
       }), {});
-      setCountedBy(countedByMap);
-      setDefaultCountedBy(countedByMap);
+      dateCounted.current = countedDates;
+      countedBy.current = countedByMap;
+      defaultCountedBy.current = countedByMap;
     } finally {
       hide();
     }
@@ -181,7 +200,12 @@ const useCountStep = () => {
     });
   };
 
-  const markAllItemsAsUpdated = (cycleCountId) => setAllItemsUpdatedState(cycleCountId, true);
+  const markAllItemsAsUpdated = () => {
+    cycleCountsMarkedToUpdate.current.forEach((cycleCountId) => {
+      setAllItemsUpdatedState(cycleCountId, true);
+    });
+    cycleCountsMarkedToUpdate.current = [];
+  };
 
   const markAllItemsAsNotUpdated = (cycleCountId) => setAllItemsUpdatedState(cycleCountId, false);
 
@@ -189,16 +213,16 @@ const useCountStep = () => {
     // We need to mark all items as updated if we change the counted by person,
     // because counted by is associated with every cycle count item and needs to be set
     // for every item
-    markAllItemsAsUpdated(cycleCountId);
-    setCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
-    setDefaultCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
-    setDefaultCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
-    resetFocus();
+    if (!cycleCountsMarkedToUpdate.current.includes(cycleCountId)) {
+      cycleCountsMarkedToUpdate.current = [...cycleCountsMarkedToUpdate.current, cycleCountId];
+    }
+    countedBy.current = { ...countedBy.current, [cycleCountId]: person };
+    defaultCountedBy.current = { ...defaultCountedBy.current, [cycleCountId]: person };
   };
 
-  const getCountedBy = (cycleCountId) => countedBy?.[cycleCountId];
+  const getCountedBy = (cycleCountId) => countedBy.current?.[cycleCountId];
 
-  const getDefaultCountedBy = (cycleCountId) => defaultCountedBy?.[cycleCountId];
+  const getDefaultCountedBy = (cycleCountId) => defaultCountedBy.current?.[cycleCountId];
 
   const removeFromState = (cycleCountId, rowId) => {
     const tableIndex = tableData.current.findIndex(
@@ -214,7 +238,6 @@ const useCountStep = () => {
 
       return data;
     });
-    resetFocus();
     triggerValidation();
   };
 
@@ -230,7 +253,7 @@ const useCountStep = () => {
     }
   };
 
-  const addEmptyRow = (productId, id, shouldResetFocus = true) => {
+  const addEmptyRow = (productId, id) => {
     // ID is needed for updating appropriate row
     const emptyRow = {
       id: _.uniqueId('newRow'),
@@ -261,9 +284,6 @@ const useCountStep = () => {
 
       return data;
     });
-    if (shouldResetFocus) {
-      resetFocus();
-    }
     resetValidationState();
     forceRerender();
   };
@@ -308,64 +328,72 @@ const useCountStep = () => {
 
   const back = () => {
     setIsStepEditable(true);
-    resetFocus();
   };
 
-  const getCountedDate = (cycleCountId) => dateCounted[cycleCountId];
+  const getCountedDate = (cycleCountId) => dateCounted.current[cycleCountId];
 
-  const getPayload = (cycleCountItem, cycleCount, shouldSetDefaultAssignee) => ({
+  const getPayload = (cycleCountItem, shouldSetDefaultAssignee) => ({
     ...cycleCountItem,
     recount: false,
     assignee: shouldSetDefaultAssignee
-      ? getCountedBy(cycleCount.id)?.id ?? currentUser.id
-      : getCountedBy(cycleCount.id)?.id,
-    dateCounted: getCountedDate(cycleCount.id),
+      ? getCountedBy(cycleCountItem.cycleCountId)?.id ?? currentUser.id
+      : getCountedBy(cycleCountItem.cycleCountId)?.id,
+    dateCounted: getCountedDate(cycleCountItem.cycleCountId),
     inventoryItem: {
       ...cycleCountItem?.inventoryItem,
       product: cycleCountItem.product?.id,
       expirationDate: dateWithoutTimeZone({
         date: cycleCountItem?.inventoryItem?.expirationDate,
+        currentDateFormat: DateFormat.MMM_DD_YYYY,
         outputDateFormat: DateFormat.MM_DD_YYYY,
+        locale,
       }),
     },
+    cycleCount: cycleCountItem.cycleCountId,
   });
 
   const save = async (shouldSetDefaultAssignee = false) => {
     try {
       show();
+      markAllItemsAsUpdated();
       resetValidationState();
+      const cycleCountItemsToUpdateBatch = [];
+      const cycleCountItemsToCreateBatch = [];
       for (const cycleCount of tableData.current) {
         const cycleCountItemsToUpdate = cycleCount.cycleCountItems
           .filter((item) => ((item.updated || !item.assignee) && !item.id.includes('newRow')))
-          .map(trimLotNumberSpaces);
-        const updatePayload = {
-          itemsToUpdate: cycleCountItemsToUpdate.map((item) =>
-            getPayload(item, cycleCount, shouldSetDefaultAssignee)),
-        };
-        if (updatePayload.itemsToUpdate.length > 0) {
-          await cycleCountApi
-            .updateCycleCountItems(updatePayload, currentLocation?.id, cycleCount.id);
+          .map((item) => ({ ...trimLotNumberSpaces(item), cycleCountId: cycleCount.id }));
+
+        if (cycleCountItemsToUpdate.length > 0) {
+          cycleCountItemsToUpdateBatch.push(cycleCountItemsToUpdate);
         }
         const cycleCountItemsToCreate = cycleCount.cycleCountItems
           .filter((item) => item.id.includes('newRow'))
-          .map(trimLotNumberSpaces);
-        const createPayload = {
-          itemsToCreate: cycleCountItemsToCreate.map((item) =>
-            getPayload(item, cycleCount, shouldSetDefaultAssignee)),
-        };
-        if (createPayload.itemsToCreate.length > 0) {
-          await cycleCountApi
-            .createCycleCountItems(createPayload, currentLocation?.id, cycleCount.id);
+          .map((item) => ({ ...trimLotNumberSpaces(item), cycleCountId: cycleCount.id }));
+
+        if (cycleCountItemsToCreate.length > 0) {
+          cycleCountItemsToCreateBatch.push(cycleCountItemsToCreate);
         }
 
         // Now that we've successfully saved all the items, mark them all as not updated so that
         // we don't try to update them again next time something is changed.
         markAllItemsAsNotUpdated(cycleCount.id);
       }
+      const updatePayload = {
+        itemsToUpdate: cycleCountItemsToUpdateBatch.flat().map((item) =>
+          getPayload(item, shouldSetDefaultAssignee)),
+      };
+      await cycleCountApi
+        .updateCycleCountItemsBatch(updatePayload, currentLocation?.id);
+      const createPayload = {
+        itemsToCreate: cycleCountItemsToCreateBatch.flat().map((item) =>
+          getPayload(item, shouldSetDefaultAssignee)),
+      };
+      await cycleCountApi
+        .createCycleCountItemsBatch(createPayload, currentLocation?.id);
     } finally {
       // After the save, refetch cycle counts so that a new row can't be saved multiple times
       await fetchCycleCounts();
-      resetFocus();
       hide();
     }
   };
@@ -379,7 +407,6 @@ const useCountStep = () => {
       params: { id: cycleCountIds, sortBy: sortByProductName && 'productName' },
       format,
     });
-    resetFocus();
     hide();
   };
 
@@ -387,10 +414,9 @@ const useCountStep = () => {
     const isValid = triggerValidation();
     forceRerender();
     if (isValid) {
-      await save(true);
+      await save({ shouldSetDefaultAssignee: true });
       setIsStepEditable(false);
     }
-    resetFocus();
   };
 
   const modalLabels = (count) => ({
@@ -561,7 +587,6 @@ const useCountStep = () => {
       await redirectToNextTab();
     } finally {
       setIsSaveDisabled(false);
-      resetFocus();
       hide();
     }
   };
@@ -593,13 +618,14 @@ const useCountStep = () => {
     },
   };
 
-  const setCountedDate = (cycleCountId) => (date) => {
-    markAllItemsAsUpdated(cycleCountId);
-    setDateCounted((prevState) => ({
-      ...prevState,
-      [cycleCountId]: date.format(),
-    }));
-    resetFocus();
+  const updateDateCounted = (cycleCountId) => (date) => {
+    if (!cycleCountsMarkedToUpdate.current.includes(cycleCountId)) {
+      cycleCountsMarkedToUpdate.current = [...cycleCountsMarkedToUpdate.current, cycleCountId];
+    }
+    dateCounted.current = {
+      ...dateCounted.current,
+      [cycleCountId]: date ? date.format() : null,
+    };
   };
 
   const createCustomItemsFromImport = (items) => (items
@@ -645,6 +671,9 @@ const useCountStep = () => {
       );
       setImportErrors(response.data.errors);
       let cycleCounts = _.groupBy(response.data.data, 'cycleCountId');
+      const countedByUpdates = {};
+      const dateCountedUpdates = {};
+
       tableData.current = tableData.current.map((cycleCount) => {
         // After each iteration assign it to false again, so that the flag
         // can be reused for next cycle counts in the loop
@@ -663,12 +692,11 @@ const useCountStep = () => {
                 // so we can make this operation only once
                 // this is why we introduce the assigneeImported boolean flag
                 if (correspondingImportItem && !assigneeImported.current[cycleCount.id]) {
-                  assignCountedBy(cycleCount.id)(correspondingImportItem.assignee);
+                  countedByUpdates[cycleCount.id] = correspondingImportItem.assignee;
                   // Do not allow to clear the date counted dropdown
                   // if dateCounted was not set in the sheet
                   if (correspondingImportItem.dateCounted) {
-                    setDateCounted((prevState) =>
-                      ({ ...prevState, [cycleCount.id]: correspondingImportItem.dateCounted }));
+                    dateCountedUpdates[cycleCount.id] = correspondingImportItem.dateCounted;
                   }
                   // Mark the flag as true, so that it's not triggered for each item
                   assigneeImported.current = true;
@@ -691,12 +719,23 @@ const useCountStep = () => {
           ],
         };
       });
+      // Batch update refs
+      countedBy.current = { ...countedBy.current, ...countedByUpdates };
+      defaultCountedBy.current = { ...defaultCountedBy.current, ...countedByUpdates };
+      dateCounted.current = { ...dateCounted.current, ...dateCountedUpdates };
     } finally {
-      // After import we want to trigger the validation on fields,
-      // so that a user knows what fields to correct from the UI
       triggerValidation();
       hide();
     }
+  };
+
+  const handleCountStepHeaderSave = async () => {
+    await validateExistenceOfCycleCounts(save);
+
+    // When we click "Save progress", we want to refetch the lot numbers
+    // because the user may have created new ones and, without refetching,
+    // they won't be available in the dropdown.
+    dispatch(fetchLotNumbersByProductIds(uniqueProductIds));
   };
 
   return {
@@ -710,16 +749,13 @@ const useCountStep = () => {
     assignCountedBy,
     getCountedBy,
     getDefaultCountedBy,
-    countedBy,
     getCountedDate,
-    setCountedDate,
+    updateDateCounted,
     next,
     back,
-    save,
     validateExistenceOfCycleCounts,
     resolveDiscrepancies,
     isStepEditable,
-    refreshFocusCounter,
     isSaveDisabled,
     setIsSaveDisabled,
     importItems,
@@ -729,6 +765,8 @@ const useCountStep = () => {
     isAssignCountModalOpen,
     closeAssignCountModal,
     assignCountModalData,
+    forceRerender,
+    handleCountStepHeaderSave,
   };
 };
 

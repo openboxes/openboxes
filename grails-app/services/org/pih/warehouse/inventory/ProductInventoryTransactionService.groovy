@@ -6,6 +6,8 @@ import grails.validation.ValidationException
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.product.availability.AvailableItemKey
+import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.product.Product
 
 /**
@@ -44,6 +46,7 @@ abstract class ProductInventoryTransactionService<T> {
      * @param transactionDate The datetime that the transaction should be marked with. If left blank will be
      *                        the current time.
      * @param comment An optional comment to associate with the transaction
+     * @param transactionEntriesComments A map of transaction entry comments keyed on AvailableItemKey
      * @param validateTransactionDates An optional param to disable validation of transactions at the same time
      *                                 (Used when for some reason we want to allow multiple transactions at the
      *                                 same time). By default it's true.
@@ -57,17 +60,24 @@ abstract class ProductInventoryTransactionService<T> {
             Collection<Product> products,
             Date transactionDate=null,
             String comment=null,
-            Map<Map<String, Object>, String> transactionEntriesComments = [:],
+            Map<AvailableItemKey, String> transactionEntriesComments = [:],
             Boolean validateTransactionDates = true,
             Boolean disableRefresh = false
     ) {
 
-        List<AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDate(
+        AvailableItemMap availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 facility, products, transactionDate)
 
         createInventoryBaselineTransactionForGivenStock(
-                facility, sourceObject, availableItems, transactionDate, comment, transactionEntriesComments,
-                validateTransactionDates, disableRefresh
+                facility,
+                sourceObject,
+                products,
+                availableItems,
+                transactionDate,
+                comment,
+                transactionEntriesComments,
+                validateTransactionDates,
+                disableRefresh,
         )
     }
 
@@ -86,10 +96,12 @@ abstract class ProductInventoryTransactionService<T> {
      *
      * @param facility The Location to take the baseline snapshot at
      * @param sourceObject The source object that caused the Transaction. Ex: CycleCount, Order, Requisition...
-     * @partam availableItems The stock to take a baseline snapshot against.
+     * @param products The products to take a baseline snapshot for
+     * @param availableItems The stock to take a baseline snapshot against.
      * @param transactionDate The datetime that the transaction should be marked with. If left blank will be
      *                        the current time.
      * @param comment An optional comment to associate with the transaction
+     * @param transactionEntriesComments A map of transaction entry comments keyed on AvailableItemKey
      * @param validateTransactionDates An optional param to disable validation of transactions at the same time
      *                                 (Used when for some reason we want to allow multiple transactions at the
      *                                 same time). By default it's true.
@@ -100,16 +112,16 @@ abstract class ProductInventoryTransactionService<T> {
     Transaction createInventoryBaselineTransactionForGivenStock(
             Location facility,
             T sourceObject,
-            Collection<AvailableItem> availableItems,
+            Collection<Product> products,
+            AvailableItemMap availableItems,
             Date transactionDate=null,
             String comment=null,
-            Map<Map<String, Object>, String> transactionEntriesComments = [:],
-            validateTransactionDates = true,
-            disableRefresh = false
+            Map<AvailableItemKey, String> transactionEntriesComments = [:],
+            boolean validateTransactionDates = true,
+            boolean disableRefresh = false
     ) {
 
-        // If there are no available items, there would be no transaction entries, so skip creating the transaction.
-        if (!availableItems || !baselineTransactionsEnabled()) {
+        if (!baselineTransactionsEnabled()) {
             return null
         }
 
@@ -118,8 +130,8 @@ abstract class ProductInventoryTransactionService<T> {
         // We'd have weird behaviour if we allowed two transactions to exist at the same exact time (precision at the
         // database level is to the second) so fail if there's already a transaction on the items for the given date.
         Date actualTransactionDate = transactionDate ?: new Date()
-        List<InventoryItem> inventoryItems = availableItems.collect{ it.inventoryItem }
-        if (validateTransactionDates && inventoryService.hasTransactionEntriesOnDate(facility, actualTransactionDate, inventoryItems)) {
+        if (validateTransactionDates && inventoryService.hasTransactionEntriesOnDate(
+                facility, actualTransactionDate, products as List<Product>)) {
             throw new IllegalArgumentException("A transaction already exists at time ${actualTransactionDate}")
         }
 
@@ -135,16 +147,36 @@ abstract class ProductInventoryTransactionService<T> {
 
         setSourceObject(transaction, sourceObject)
 
-        for (AvailableItem availableItem : availableItems) {
-            TransactionEntry transactionEntry = new TransactionEntry(
-                    quantity: availableItem.quantityOnHand,
-                    product: availableItem.inventoryItem.product,
-                    binLocation: availableItem.binLocation,
-                    inventoryItem: availableItem.inventoryItem,
-                    transaction: transaction,
-                    comments: transactionEntriesComments?.get([inventoryItem: availableItem.inventoryItem, binLocation: availableItem.binLocation]),
-            )
-            transaction.addToTransactionEntries(transactionEntry)
+        for (Product product in products) {
+            // If the product does not have any stock at the time of the baseline, we still want to take a "snapshot"
+            // of the product so add an entry representing zero stock for the products in the default lot and bin.
+            List<AvailableItem> availableItemsForProduct = availableItems?.getAllByProduct(product)
+            if (!availableItemsForProduct) {
+                InventoryItem defaultInventoryItem = inventoryService.findOrCreateDefaultInventoryItem(product)
+                TransactionEntry transactionEntry = new TransactionEntry(
+                        quantity: 0,
+                        product: product,
+                        binLocation: null,
+                        inventoryItem: defaultInventoryItem,
+                        transaction: transaction,
+                        comments: transactionEntriesComments?.get(new AvailableItemKey(null, defaultInventoryItem)),
+                )
+                transaction.addToTransactionEntries(transactionEntry)
+                continue
+            }
+
+            // Otherwise we do have stock for the product at that time so use it to build the transaction entries.
+            for (AvailableItem availableItem in availableItemsForProduct) {
+                TransactionEntry transactionEntry = new TransactionEntry(
+                        quantity: availableItem.quantityOnHand,
+                        product: availableItem.inventoryItem.product,
+                        binLocation: availableItem.binLocation,
+                        inventoryItem: availableItem.inventoryItem,
+                        transaction: transaction,
+                        comments: transactionEntriesComments?.get(new AvailableItemKey(availableItem)),
+                )
+                transaction.addToTransactionEntries(transactionEntry)
+            }
         }
 
         if (!transaction.save()) {

@@ -62,6 +62,7 @@ export const debounceLocationsFetch = (
   withTypeDescription = true,
   isReturnOrder = false,
   direction,
+  withOrganization = false,
 ) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
@@ -74,6 +75,7 @@ export const debounceLocationsFetch = (
           direction: fetchAll ? undefined : (direction || queryParams?.direction),
           isReturnOrder: isReturnOrder || undefined,
           activityCodes,
+          withOrganization: withOrganization || undefined,
         },
       }).then((result) => callback(_.map(result.data.data, (obj) => {
         const locationTypeData = withTypeDescription ? ` [${obj.locationType.description}]` : '';
@@ -258,6 +260,21 @@ export const fetchBins = async (
   return response.data.data;
 };
 
+export const fetchLocations = async ({ activityCodes }) => {
+  const response = await locationApi.getLocations({
+    paramsSerializer: (parameters) => queryString.stringify(parameters),
+    params: {
+      activityCodes,
+    },
+  });
+
+  return response.data.data.map((location) => ({
+    id: location.id,
+    value: location.id,
+    label: location.name,
+  }));
+};
+
 export const fetchProductsCategories = async () => {
   const response = await apiClient.get('/api/categoryOptions');
   return response.data.data;
@@ -317,13 +334,18 @@ export const fetchIndicatorProductsInventoried = async (params = {}) => {
   return data.data;
 };
 
-export const fetchIndicatorInventoryLoss = async (params = {}) => {
-  const { data } = await indicatorsApi.getInventoryLoss(params);
+export const fetchIndicatorInventoryShrinkage = async (params = {}) => {
+  const { data } = await indicatorsApi.getInventoryShrinkage(params);
   return data.data;
 };
 
-export const fetchInventoryAccuracy = async (params = {}) => {
+export const fetchIndicatorInventoryAccuracy = async (params = {}) => {
   const { data } = await indicatorsApi.getInventoryAccuracy(params);
+  return data.data;
+};
+
+export const getLotNumbersByProductIds = async (productIds) => {
+  const { data } = await productApi.getLotNumbersByProductIds(productIds);
   return data.data;
 };
 

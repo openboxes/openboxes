@@ -60,9 +60,19 @@
             <tr class="prop">
                 <td class="name">Product Inventory transactions that should be replaced by Inventory Baseline and Adjustment pair</td>
                 <td class="value">
-                    ${productInventoryTransactionCount} (total), ${productInventoryTransactionInCurrentLocationCount} (current location)
+                    <h1>${productInventoryTransactionCount} (total), ${productInventoryTransactionInCurrentLocationCount} (current location)</h1>
                     <br>
-                    Products: ${productsWithProductInventoryTransactionInCurrentLocation.join(', ') ?: 'None'}
+                    <h1>Products that have a product inventory transaction overlapping with other type of transaction <b>PLEASE REVIEW THESE BEFORE (OR AFTER MIGRATION)</b>:</h1>
+                    <g:if test="${overlappingTransactions?.size()}">
+                        <g:each var="product" in="${overlappingTransactions}">
+                            <h1>${product}</h1>
+                        </g:each>
+                    </g:if>
+                    <g:else>
+                        <h1>None</h1>
+                    </g:else>
+                    <br>
+                    <h1>Products with old transaction: ${productsWithProductInventoryTransactionInCurrentLocation.join(', ') ?: 'None'}</h1>
                 </td>
                 <td>
                     <div class="button-group">
@@ -79,7 +89,7 @@
                             <b>Migrate</b> Current Location
                         </g:link>
                     </div>
-                    <h1 class=""><b>Warning!</b> Currently it takes about 1-2 minutes to migrate about ~100 transactions. Results will
+                    <h1><b>Warning!</b> Currently it takes about couple of minutes to migrate about ~1000 transactions. Results will
                     be visible in the new tab after everything is processed (for your convenience do not close it).
                     Do not trigger migration for the same location twice (ideally each location should be processed one by one).
                     <br/>

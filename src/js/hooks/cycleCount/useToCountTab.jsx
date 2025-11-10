@@ -76,6 +76,8 @@ const useToCountTab = ({
     catalogs,
     negativeQuantity,
     searchTerm,
+    countAssignees,
+    countDeadline,
   } = filterParams;
 
   const {
@@ -109,6 +111,10 @@ const useToCountTab = ({
     tags: tags?.map?.(({ id }) => id),
     catalogs: catalogs?.map?.(({ id }) => id),
     abcClass: [],
+    countAssignees: countAssignees?.map?.(({ id }) => id),
+    countDeadline: dateWithoutTimeZone({
+      date: countDeadline,
+    }),
     negativeQuantity,
   }, (val) => {
     if (typeof val === 'boolean') {

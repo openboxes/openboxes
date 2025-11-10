@@ -330,6 +330,7 @@ openboxes {
                         [label: "report.showTransactionReport.label", defaultLabel: "Transaction Report", href: "/report/showTransactionReport"],
                         [label: "report.consumption.label", defaultLabel: "Consumption Report", href: "/consumption/show"],
                         [label: "report.requestDetailReport.label", defaultLabel: "Request Detail Report", href: "/report/showRequestDetailReport"],
+                        [label: "report.expirationHistoryReport.label", defaultLabel: "Expiration History Report", href: "/report/expirationHistoryReport"],
                     ]
                 ],
                 [
@@ -1390,3 +1391,9 @@ openboxes {
         }
     }
 }
+
+openboxes.inventoryCount.transactionTypes = [
+        Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
+        Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID,
+        Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID
+]

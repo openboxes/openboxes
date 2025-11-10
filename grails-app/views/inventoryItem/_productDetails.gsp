@@ -350,8 +350,7 @@
                 </td>
                 <td class="value">
                     <span class="fade">
-                        ${g.formatDate(date: productInstance?.dateCreated, format: 'd-MMM-yyyy')}
-                        ${g.formatDate(date: productInstance?.dateCreated, format: 'hh:mma')}
+                        ${g.formatDate(date: productInstance?.dateCreated)}
                     </span>
 
                 </td>
@@ -365,8 +364,7 @@
                 </td>
                 <td class="value">
                     <span class="fade">
-                        ${g.formatDate(date: productInstance?.lastUpdated, format: 'd-MMM-yyyy')}
-                        ${g.formatDate(date: productInstance?.lastUpdated, format: 'hh:mma')}
+                        ${g.formatDate(date: productInstance?.lastUpdated)}
                     </span>
                 </td>
             </tr>

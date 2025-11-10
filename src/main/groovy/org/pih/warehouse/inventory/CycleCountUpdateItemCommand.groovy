@@ -36,9 +36,7 @@ class CycleCountUpdateItemCommand implements Validateable {
                 return true
             }
 
-            return ReasonCode.listInventoryAdjustmentReasonCodes().contains(discrepancyReasonCode) ?
-                    true :
-                    ['cycleCountUpdateItemCommand.discrepancyReasonCode.invalid']
+            return ReasonCode.listCycleCountReasonCodes().contains(discrepancyReasonCode) ? true : ['invalid']
         })
         comment(nullable: true, blank: true)
         assignee(nullable: true)

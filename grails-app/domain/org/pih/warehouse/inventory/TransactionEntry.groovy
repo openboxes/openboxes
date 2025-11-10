@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.util.Holders
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
@@ -58,7 +60,7 @@ class TransactionEntry implements Comparable, Serializable {
             }
             eq 'inventoryItem.product', product
             eq 'transaction.inventory', facility.inventory
-            eq "transactionType.transactionCode", TransactionCode.PRODUCT_INVENTORY
+            inList "transactionType.id", Holders.grailsApplication.config.openboxes.inventoryCount.transactionTypes
         }
 
     }

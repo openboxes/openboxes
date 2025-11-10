@@ -41,6 +41,10 @@ const AssignCycleCountModal = ({
     assignDataDirectly,
   });
 
+  const isAssignButtonDisabled = !selectedCycleCounts.current?.some(
+    (item) => item.assignee || item.deadline,
+  );
+
   return (
     <Modal
       isOpen={isOpen}
@@ -81,6 +85,8 @@ const AssignCycleCountModal = ({
             label="react.cycleCount.assign.label"
             variant="primary"
             onClick={handleAssign}
+            // We want to block the assign button if no assignee is selected in any row
+            disabled={isAssignButtonDisabled}
           />
         </div>
       </div>

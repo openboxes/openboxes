@@ -6,6 +6,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import org.pih.warehouse.core.session.SessionManager
 import org.pih.warehouse.databinding.InstantValueConverter
 
 @Unroll
@@ -14,11 +15,19 @@ class InstantValueConverterSpec extends Specification {
     @Shared
     InstantValueConverter converter
 
-    void setupSpec() {
+    @Shared
+    SessionManager sessionManagerStub
+
+    void setup() {
+        sessionManagerStub = Stub(SessionManager)
         converter = new InstantValueConverter()
+        converter.sessionManager = sessionManagerStub
     }
 
     void 'convertString should successfully parse valid strings for case: #scenario'() {
+        given: 'no default timezone to fallback to'
+        sessionManagerStub.timezone >> null
+
         expect:
         assert converter.convertString(givenDate).toString() == expectedConvertedDate
 
@@ -49,7 +58,32 @@ class InstantValueConverterSpec extends Specification {
         "2000-01-01T00:00:00+05:00" || "1999-12-31T19:00:00Z" | "Timezone conforming to XXX format w/ positive"
     }
 
+    void 'convertString should successfully parse valid strings with a default for case: #scenario'() {
+        given: 'a default timezone to fallback to'
+        sessionManagerStub.timezone >> TimeZone.getTimeZone('America/Montevideo')  // -03:00 (always, no DST)
+
+        expect:
+        assert converter.convertString(givenDate).toString() == expectedConvertedDate
+
+        where:
+        // When the string has a timezone already, use that when converting (though note that the expected
+        // date is still stringified to UTC because Instants have no timezone information)
+        givenDate                       || expectedConvertedDate  | scenario
+        "2000-01-01T00:00:00.000Z"      || "2000-01-01T00:00:00Z" | "UTC Full string in proper ISO format"
+        "2000-01-01T00:00:00Z"          || "2000-01-01T00:00:00Z" | "UTC No millis"
+        "2000-01-01T00:00Z"             || "2000-01-01T00:00:00Z" | "UTC No seconds"
+        "2000-01-01T00:00:00.000-05:00" || "2000-01-01T05:00:00Z" | "-5 Full string in proper ISO format"
+        "2000-01-01T00:00:00-05:00"     || "2000-01-01T05:00:00Z" | "-5 No millis"
+        "2000-01-01T00:00-05:00"        || "2000-01-01T05:00:00Z" | "-5 No seconds"
+
+        // When the string has no time or zone information, default to midnight in the timezone in the user's session
+        "2000-01-01"                    || "2000-01-01T03:00:00Z" | "No TZ Full string"
+    }
+
     void 'convertString should fail to parse invalid strings for case: #failureReason'() {
+        given: 'no default timezone to fallback to'
+        sessionManagerStub.timezone >> null
+
         when:
         converter.convertString(givenDate)
 
@@ -58,10 +92,12 @@ class InstantValueConverterSpec extends Specification {
 
         where:
         givenDate                 || exception              | failureReason
+        // Invalid formats
         "2000-01-32T00:00Z"       || DateTimeParseException | "day out of range"
         "2000-13-01T00:00Z"       || DateTimeParseException | "month out of range"
         "10000-13-01T00:00Z"      || DateTimeParseException | "year out of range"
         "00-01-01T00:00Z"         || DateTimeParseException | "two digit year format not supported"
+        // If we don't have a timezone to fallback to, we always need to be given a full date + time + zone string
         "2000-01-01T00:00:00.000" || DateTimeException      | "full datetime, no timezone"
         "2000-01-01T00:00:00.00"  || DateTimeException      | "Shorter millis, no timezone"
         "2000-01-01T00:00:00.0"   || DateTimeException      | "Ever shorter millis, no timezone"
@@ -72,5 +108,30 @@ class InstantValueConverterSpec extends Specification {
         "2000/01/01"              || DateTimeException      | "Date with slashes, no time"
         "01/01/2000"              || DateTimeException      | "Date with slashes, Excel format, no time"
         "20000101"                || DateTimeException      | "Date with no separator, no time"
+    }
+
+    void 'convertString should fail to parse invalid strings with a default for case: #failureReason'() {
+        given: 'a default timezone to fallback to'
+        sessionManagerStub.timezone >> TimeZone.getTimeZone('America/Montevideo')  // -03:00 (always, no DST)
+
+        when:
+        converter.convertString(givenDate)
+
+        then:
+        thrown(exception)
+
+        where:
+        givenDate                 || exception              | failureReason
+        // Invalid formats
+        "2000-01-32T00:00Z"       || DateTimeParseException | "day out of range"
+        "2000-13-01T00:00Z"       || DateTimeParseException | "month out of range"
+        "10000-13-01T00:00Z"      || DateTimeParseException | "year out of range"
+        "00-01-01T00:00Z"         || DateTimeParseException | "two digit year format not supported"
+        // Even if we have a timezone to fallback to, we treat a date + time (with no timezone) string as invalid
+        "2000-01-01T00:00:00.000" || DateTimeException      | "full datetime, no timezone"
+        "2000-01-01T00:00:00.00"  || DateTimeException      | "Shorter millis, no timezone"
+        "2000-01-01T00:00:00.0"   || DateTimeException      | "Ever shorter millis, no timezone"
+        "2000-01-01T00:00:00"     || DateTimeException      | "No millis, no timezone"
+        "2000-01-01T00:00"        || DateTimeException      | "No seconds, no timezone"
     }
 }

@@ -77,6 +77,8 @@ const useToResolveTab = ({
     catalogs,
     negativeQuantity,
     searchTerm,
+    recountAssignees,
+    recountDeadline,
   } = filterParams;
 
   const getParams = ({
@@ -100,6 +102,10 @@ const useToResolveTab = ({
     tags: tags?.map?.(({ id }) => id),
     catalogs: catalogs?.map?.(({ id }) => id),
     abcClass: [],
+    recountAssignees: recountAssignees?.map?.(({ id }) => id),
+    recountDeadline: dateWithoutTimeZone({
+      date: recountDeadline,
+    }),
     negativeQuantity,
   }, (val) => {
     if (typeof val === 'boolean') {

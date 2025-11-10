@@ -24,7 +24,16 @@ const DateFieldInput = forwardRef(({
 
   const getIcon = () => {
     if (value && clearable) {
-      return <RiCloseLine onClick={onClear} />;
+      return (
+        <button
+          className="border-0 bg-inherit"
+          type="button"
+          aria-label="clear"
+          onClick={onClear}
+        >
+          <RiCloseLine />
+        </button>
+      );
     }
 
     return <RiCalendarLine />;

@@ -134,6 +134,10 @@ class LocationService {
             locations = locations.findAll { location -> user.hasPrimaryRole(location) }
         }
 
+        if (params.withOrganization) {
+            locations = locations.findAll { Location location -> location.organization != null }
+        }
+
         if (params.activityCodes) {
             ActivityCode[] activityCodes = params.list("activityCodes") as ActivityCode[]
             return locations.findAll {

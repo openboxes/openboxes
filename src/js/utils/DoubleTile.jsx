@@ -18,6 +18,7 @@ const DoubleTile = ({
   cardInfo,
   cardInfoDefaultValue,
   currencyCode,
+  showFirstValuePercentSign,
   formatSecondValueAsCurrency,
 }) => {
   const translate = useTranslate();
@@ -34,14 +35,14 @@ const DoubleTile = ({
   };
 
   return (
-    <div className="double-tile">
+    <div className="double-tile" data-testid="double-tile">
       <span className="double-tile__title">
         {translate(cardTitle, cardTitleDefaultValue || cardTitle)}
       </span>
       <div className="d-flex">
         <div className="double-tile__first-value-block">
           <span className="double-tile__value-number">
-            {cardFirstValue}
+            {showFirstValuePercentSign ? `${cardFirstValue}%` : cardFirstValue}
           </span>
           <span className="double-tile__subtitle">
             {translate(cardFirstSubtitle, cardDefaultFirstSubtitle)}
@@ -75,6 +76,7 @@ export default DoubleTile;
 
 DoubleTile.defaultProps = {
   currencyCode: 'USD',
+  showFirstValuePercentSign: false,
   formatSecondValueAsCurrency: false,
 };
 
@@ -90,5 +92,6 @@ DoubleTile.propTypes = {
   cardInfo: PropTypes.string.isRequired,
   cardInfoDefaultValue: PropTypes.string.isRequired,
   currencyCode: PropTypes.string,
+  showFirstValuePercentSign: PropTypes.bool,
   formatSecondValueAsCurrency: PropTypes.bool,
 };

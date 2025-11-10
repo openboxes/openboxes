@@ -27,10 +27,14 @@ const useTableDataV2 = ({
   setShouldFetch,
   disableInitialLoading,
   filtersInitialized = true,
+  onFetchedData,
 }) => {
   const sourceRef = useRef(CancelToken.source());
   const translate = useTranslate();
+  // Loading and pending requests should be defined together, because pending requests
+  // store data between re-renders, but loading refreshes the message displayed in the table
   const [loading, setLoading] = useState(false);
+  const pendingRequests = useRef(0);
   const [tableData, setTableData] = useState({
     data: [],
     totalCount: 0,
@@ -52,6 +56,7 @@ const useTableDataV2 = ({
     const params = getParams({
       sortingParams: { sort, order },
     });
+    pendingRequests.current += 1;
     setLoading(true);
     apiClient.get(url, {
       params,
@@ -63,13 +68,20 @@ const useTableDataV2 = ({
           data: res.data.data,
           totalCount: res.data.totalCount,
         });
+        if (onFetchedData) {
+          onFetchedData(res.data);
+        }
       })
       .catch(() => Promise.reject(new Error(translate(errorMessageId, defaultErrorMessage))))
       .finally(() => {
         if (setShouldFetch) {
           setShouldFetch(false);
         }
-        setLoading(false);
+
+        pendingRequests.current -= 1;
+        if (!pendingRequests.current) {
+          setLoading(false);
+        }
       });
   };
 

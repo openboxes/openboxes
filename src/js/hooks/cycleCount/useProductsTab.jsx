@@ -9,13 +9,14 @@ import { INVENTORY_AUDIT_SUMMARY_REPORT } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import ValueIndicator from 'components/DataTable/v2/ValueIndicator';
+import Spinner from 'components/spinner/Spinner';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import { getCycleCountDifferencesVariant } from 'consts/valueIndicatorVariant';
+import useLastCountedDate from 'hooks/cycleCount/useLastCountedDate';
 import useFormatNumber from 'hooks/useFormatNumber';
 import useTableDataV2 from 'hooks/useTableDataV2';
-import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
 import dateWithoutTimeZone from 'utils/dateUtils';
@@ -47,11 +48,6 @@ const useProductsTab = ({
     currentLocation: state.session.currentLocation,
     formatLocalizedDate: getFormatLocalizedDate(state),
   }));
-  const {
-    sortableProps,
-    sort,
-    order,
-  } = useTableSorting();
   const formatNumber = useFormatNumber();
 
   const getParams = ({
@@ -85,19 +81,24 @@ const useProductsTab = ({
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch products',
     // We should start fetching only after clicking the "Load Table" button
-    shouldFetch,
+    // or after refreshing the page with required filters selected
+    shouldFetch: shouldFetch
+      && (endDate || defaultFilterValues.endDate)
+      && (startDate || defaultFilterValues.startDate),
     setShouldFetch,
     disableInitialLoading: true,
     getParams,
     pageSize,
     offset,
-    sort,
-    order,
     searchTerm: null,
     filterParams,
     serializedParams,
     filtersInitialized,
   });
+
+  const {
+    lastCountedDateMap,
+  } = useLastCountedDate(tableData, loading);
 
   const getStyledCurrency = (value) => {
     const formattedValue = formatCurrency(value);
@@ -132,16 +133,24 @@ const useProductsTab = ({
   const lastCountedColumn = columnHelper.accessor(cycleCountColumn.LAST_COUNTED, {
     header: () => (
       <TableHeaderCell
-        sortable
         columnId={cycleCountColumn.LAST_COUNTED}
-        {...sortableProps}
       >
         {translate('react.cycleCount.table.lastCounted.label', 'Last Counted')}
       </TableHeaderCell>
     ),
-    cell: ({ getValue }) => (
+    cell: ({
+      row: {
+        original: {
+          product: {
+            id,
+          },
+        },
+      },
+    }) => (
       <TableCell className="rt-td">
-        {formatLocalizedDate(getValue(), DateFormat.DD_MMM_YYYY)}
+        {lastCountedDateMap[id]
+          ? formatLocalizedDate(lastCountedDateMap[id], DateFormat.DD_MMM_YYYY)
+          : <Spinner useSpinnerStyling={false} />}
       </TableCell>
     ),
     size: 160,
@@ -150,7 +159,7 @@ const useProductsTab = ({
   const columns = useMemo(() => [
     columnHelper.accessor(cycleCountColumn.PRODUCT, {
       header: () => (
-        <TableHeaderCell sortable columnId={cycleCountColumn.PRODUCT} {...sortableProps}>
+        <TableHeaderCell columnId={cycleCountColumn.PRODUCT}>
           {translate('react.cycleCount.table.product.label', 'Product')}
         </TableHeaderCell>
       ),
@@ -186,9 +195,7 @@ const useProductsTab = ({
     columnHelper.accessor(cycleCountColumn.PRODUCTS_TAB_CATEGORY, {
       header: () => (
         <TableHeaderCell
-          sortable
           columnId={cycleCountColumn.PRODUCTS_TAB_CATEGORY}
-          {...sortableProps}
         >
           {translate('react.cycleCount.table.category.label', 'Category')}
         </TableHeaderCell>
@@ -241,9 +248,7 @@ const useProductsTab = ({
     columnHelper.accessor(cycleCountColumn.PRODUCTS_TAB_ABC_CLASS, {
       header: () => (
         <TableHeaderCell
-          sortable
           columnId={cycleCountColumn.PRODUCTS_TAB_ABC_CLASS}
-          {...sortableProps}
         >
           {translate('react.cycleCount.table.abcClass.label', 'ABC Class')}
         </TableHeaderCell>
@@ -257,7 +262,7 @@ const useProductsTab = ({
     }),
     columnHelper.accessor(cycleCountColumn.NUMBER_OF_COUNTS, {
       header: () => (
-        <TableHeaderCell sortable columnId={cycleCountColumn.NUMBER_OF_COUNTS} {...sortableProps}>
+        <TableHeaderCell columnId={cycleCountColumn.NUMBER_OF_COUNTS}>
           {translate('react.cycleCount.table.numberOfCounts.label', 'Number Of Counts')}
         </TableHeaderCell>
       ),
@@ -270,11 +275,7 @@ const useProductsTab = ({
     }),
     columnHelper.accessor(cycleCountColumn.NUMBER_OF_ADJUSTMENTS, {
       header: () => (
-        <TableHeaderCell
-          sortable
-          columnId={cycleCountColumn.NUMBER_OF_ADJUSTMENTS}
-          {...sortableProps}
-        >
+        <TableHeaderCell columnId={cycleCountColumn.NUMBER_OF_ADJUSTMENTS}>
           {translate('react.cycleCount.table.numberOfAdjustments.label', 'Number Of Adjustments')}
         </TableHeaderCell>
       ),
@@ -287,11 +288,7 @@ const useProductsTab = ({
     }),
     columnHelper.accessor(cycleCountColumn.TOTAL_OF_ADJUSTMENTS, {
       header: () => (
-        <TableHeaderCell
-          sortable
-          columnId={cycleCountColumn.TOTAL_OF_ADJUSTMENTS}
-          {...sortableProps}
-        >
+        <TableHeaderCell columnId={cycleCountColumn.TOTAL_OF_ADJUSTMENTS}>
           {translate('react.cycleCount.table.totalOfAdjustments.label', 'Total Of Adjustments')}
         </TableHeaderCell>
       ),
@@ -316,11 +313,7 @@ const useProductsTab = ({
     }),
     columnHelper.accessor(cycleCountColumn.ADJUSTMENTS_VALUE, {
       header: () => (
-        <TableHeaderCell
-          sortable
-          columnId={cycleCountColumn.ADJUSTMENTS_VALUE}
-          {...sortableProps}
-        >
+        <TableHeaderCell columnId={cycleCountColumn.ADJUSTMENTS_VALUE}>
           {translate('react.cycleCount.table.adjustmentsValue.label', 'Adjustments Value')}
         </TableHeaderCell>
       ),
@@ -336,11 +329,7 @@ const useProductsTab = ({
     }),
     columnHelper.accessor(cycleCountColumn.MONTHS_OF_STOCK_CHANGE, {
       header: () => (
-        <TableHeaderCell
-          sortable
-          columnId={cycleCountColumn.MONTHS_OF_STOCK_CHANGE}
-          {...sortableProps}
-        >
+        <TableHeaderCell columnId={cycleCountColumn.MONTHS_OF_STOCK_CHANGE}>
           {translate('react.cycleCount.table.monthsOfStockChange.label', 'Months Of Stock Change')}
         </TableHeaderCell>
       ),
@@ -357,11 +346,7 @@ const useProductsTab = ({
     }),
     columnHelper.accessor(cycleCountColumn.QUANTITY_ON_HAND, {
       header: () => (
-        <TableHeaderCell
-          sortable
-          columnId={cycleCountColumn.QUANTITY_ON_HAND}
-          {...sortableProps}
-        >
+        <TableHeaderCell columnId={cycleCountColumn.QUANTITY_ON_HAND}>
           {translate('react.cycleCount.table.currentlyInStock.label', 'Currently in Stock')}
         </TableHeaderCell>
       ),
@@ -374,11 +359,7 @@ const useProductsTab = ({
     }),
     columnHelper.accessor(cycleCountColumn.VALUE_ON_HAND, {
       header: () => (
-        <TableHeaderCell
-          sortable
-          columnId={cycleCountColumn.VALUE_ON_HAND}
-          {...sortableProps}
-        >
+        <TableHeaderCell columnId={cycleCountColumn.VALUE_ON_HAND}>
           {translate('react.cycleCount.table.valueInStock.label', 'Value in Stock')}
         </TableHeaderCell>
       ),
@@ -401,10 +382,6 @@ const useProductsTab = ({
       defaultMessage: 'No result found.',
     };
 
-  const exportData = () => {
-    console.log('Button pressed');
-  };
-
   return {
     columns: [
       ...columns.slice(0, 5),
@@ -414,7 +391,6 @@ const useProductsTab = ({
     tableData,
     loading,
     emptyTableMessage,
-    exportData,
   };
 };
 

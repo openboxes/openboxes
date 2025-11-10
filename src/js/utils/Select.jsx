@@ -6,6 +6,7 @@ import { getTranslate } from 'react-localize-redux';
 import { Overlay } from 'react-overlays';
 import { connect } from 'react-redux';
 import ReactSelect, { Async, components } from 'react-select';
+import Creatable from 'react-select/lib/Creatable';
 import { Tooltip } from 'react-tippy';
 
 import { selectNullOption } from 'utils/option-utils';
@@ -155,7 +156,17 @@ class Select extends Component {
         .join(', ');
     }
 
-    return value.label ?? value.name;
+    const label = value.label ?? value.name;
+    if (label instanceof String) {
+      return label;
+    }
+
+    return value?.label?.props?.id
+      ? this.props.translate(
+        value?.label?.props?.id,
+        value?.id,
+        value?.label?.props?.data,
+      ) : null;
   }
 
   getTooltipHtml() {
@@ -262,7 +273,8 @@ class Select extends Component {
       multi = false, delimiter = ';', async = false, showValueTooltip, showLabelTooltip,
       clearable = true, arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress,
       onEnterPress, customSelectComponents, optionRenderer, classNamePrefix,
-      showSelectedOptionColor, scrollableParentContainerClassName, onKeyDown, ...attributes
+      showSelectedOptionColor, scrollableParentContainerClassName, onKeyDown, creatable,
+      ...attributes
     } = this.props;
     const { formatValue, className, showLabel = false } = attributes;
 
@@ -283,8 +295,15 @@ class Select extends Component {
       }
     }
 
-    const SelectType = async ? Async : ReactSelect;
-
+    const SelectType = (() => {
+      if (creatable) {
+        return Creatable;
+      }
+      if (async) {
+        return Async;
+      }
+      return ReactSelect;
+    })();
     const SingleValue = (props) => (
       <components.SingleValue {...props}>
         {this.props.valueRenderer ? (
@@ -503,6 +522,7 @@ Select.propTypes = {
   nullOptionDefaultLabel: PropTypes.string,
   scrollableParentContainerClassName: PropTypes.string,
   onKeyDown: PropTypes.func,
+  creatable: PropTypes.bool,
 };
 
 Select.defaultProps = {
@@ -539,4 +559,5 @@ Select.defaultProps = {
   nullOptionDefaultLabel: 'null',
   scrollableParentContainerClassName: null,
   onKeyDown: null,
+  creatable: false,
 };

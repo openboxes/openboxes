@@ -1,10 +1,8 @@
 import React, { useEffect } from 'react';
 
 import PropTypes from 'prop-types';
-import { RiDownload2Line } from 'react-icons/ri';
 
 import DataTable from 'components/DataTable/v2/DataTable';
-import Button from 'components/form-elements/Button';
 import useProductsTab from 'hooks/cycleCount/useProductsTab';
 
 const ProductsTab = ({
@@ -27,7 +25,6 @@ const ProductsTab = ({
     tableData,
     loading,
     emptyTableMessage,
-    exportData,
   } = useProductsTab({
     paginationProps,
     filterParams,
@@ -46,15 +43,6 @@ const ProductsTab = ({
 
   return (
     <div>
-      <div className="d-flex m-2 justify-content-end">
-        <Button
-          onClick={exportData}
-          defaultLabel="Export"
-          label="react.default.button.export.label"
-          variant="secondary"
-          EndIcon={<RiDownload2Line />}
-        />
-      </div>
       <DataTable
         columns={columns}
         data={tableData.data}
