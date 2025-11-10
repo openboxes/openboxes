@@ -22,7 +22,7 @@ class ProductSpec extends Specification implements DomainUnitTest<Product> {
         Product.metaClass.getApplicationTagLib = { -> gStub }
     }
 
-    void toJson() {
+    void 'toJson works as expected'() {
         given:
         Category category = new Category(name: "categoryName")
         Instant now = Instant.now()
@@ -57,7 +57,7 @@ class ProductSpec extends Specification implements DomainUnitTest<Product> {
         assert map.lotAndExpiryControl == false
     }
 
-    void alternativeProducts_shouldReturnAlternativeProducts() {
+    void 'alternativeProducts returns all expected products'() {
         given:
         ProductAssociationTypeCode substituteCode = ProductAssociationTypeCode.SUBSTITUTE
         Product p1 = new Product(name: "p1").save(validate: false)
