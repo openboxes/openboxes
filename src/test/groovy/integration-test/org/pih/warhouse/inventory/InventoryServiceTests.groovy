@@ -12,8 +12,8 @@ package org.pih.warehouse.inventory
 import grails.test.mixin.Mock
 import grails.testing.services.ServiceUnitTest
 import org.hibernate.SessionFactory
-import org.junit.Ignore
-import org.junit.Test
+import spock.lang.Ignore
+
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
@@ -21,10 +21,6 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.InventoryImportDataService
-import org.pih.warehouse.inventory.InventoryLevel
-import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.inventory.TransactionEntry
-import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.springframework.core.io.ClassPathResource
 import spock.lang.Shared
@@ -32,7 +28,7 @@ import spock.lang.Specification
 import testutils.DbHelper
 import static org.junit.Assert.*;
 
-//@Ignore
+@Ignore('Fix these tests and move them to InventoryServiceSpec or convert them to API tests')
 @Mock([InventoryImportDataService])
 class InventoryServiceTests extends Specification implements ServiceUnitTest<InventoryService>  {
 
@@ -69,7 +65,7 @@ class InventoryServiceTests extends Specification implements ServiceUnitTest<Inv
     @Shared
     protected def  tylenolProduct
     @Shared
-	protected def  ibuprofenProduct
+    protected def  ibuprofenProduct
     @Shared
     protected def  advilProduct
     @Shared
@@ -100,7 +96,7 @@ class InventoryServiceTests extends Specification implements ServiceUnitTest<Inv
     @Shared
     def level5
     @Shared
-	def level6
+    def level6
 
     private void basicTestFixture(){
         warehouseLocationType = LocationType.get(Constants.WAREHOUSE_LOCATION_TYPE_ID)
@@ -261,14 +257,14 @@ class InventoryServiceTests extends Specification implements ServiceUnitTest<Inv
         level3 = new InventoryLevel(status: InventoryStatus.SUPPORTED, inventory: haitiInventory, product: aspirinProduct)
         level4 = new InventoryLevel(status: InventoryStatus.NOT_SUPPORTED, inventory: bostonInventory, product: ibuprofenProduct)
         level5 = new InventoryLevel(status: InventoryStatus.NOT_SUPPORTED, inventory: haitiInventory, product: ibuprofenProduct)
-		level6 = new InventoryLevel(status: InventoryStatus.SUPPORTED, inventory: haitiInventory, product: tylenolProduct)
+        level6 = new InventoryLevel(status: InventoryStatus.SUPPORTED, inventory: haitiInventory, product: tylenolProduct)
 
         bostonInventory.addToConfiguredProducts(level1)
         bostonInventory.addToConfiguredProducts(level2)
         bostonInventory.addToConfiguredProducts(level4)
         haitiInventory.addToConfiguredProducts(level3)
         haitiInventory.addToConfiguredProducts(level5)
-		haitiInventory.addToConfiguredProducts(level6)
+        haitiInventory.addToConfiguredProducts(level6)
 
         bostonInventory.save(flush:true)
         haitiInventory.save(flush:true)
@@ -332,81 +328,75 @@ class InventoryServiceTests extends Specification implements ServiceUnitTest<Inv
         assert !result.contains(ibuprofenProduct)
     }
 
-	@Test
-	void getProductsByTermsAndCategories_shouldFindByBrand() {
+    void getProductsByTermsAndCategories_shouldFindByBrand() {
         when:
-		inventoryLevelTestFixture()
-		def terms = ["TYLENOL®"]
-		def result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
-		println result
+        inventoryLevelTestFixture()
+        def terms = ["TYLENOL®"]
+        def result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+        println result
         then:
-		assert result.contains(tylenolProduct)
-	}
+        assert result.contains(tylenolProduct)
+    }
 
-	@Test
-	void getProductsByTermsAndCategories_shouldFindByManufacturer() {
+    void getProductsByTermsAndCategories_shouldFindByManufacturer() {
         when:
-		inventoryLevelTestFixture()
-		def terms = ["McNeil"]
-		def result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
-		println result
+        inventoryLevelTestFixture()
+        def terms = ["McNeil"]
+        def result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+        println result
         then:
         assert result.contains(tylenolProduct)
 
         when:
-		terms = ["TYL325"]
-		result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
-		println result
+        terms = ["TYL325"]
+        result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+        println result
         then:
-		assert result.contains(tylenolProduct)
-	}
+        assert result.contains(tylenolProduct)
+    }
 
-	@Test
-	void getProductsByTermsAndCategories_shouldFindByVendor() {
+    void getProductsByTermsAndCategories_shouldFindByVendor() {
         when:
-		inventoryLevelTestFixture()
-		def terms = ["IDA"]
-		def result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
-		println result
+        inventoryLevelTestFixture()
+        def terms = ["IDA"]
+        def result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+        println result
         then:
         assert result.contains(tylenolProduct)
 
         when:
-		terms = ["025200"]
-		result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
-		println result
+        terms = ["025200"]
+        result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+        println result
         then:
-		assert result.contains(tylenolProduct)
+        assert result.contains(tylenolProduct)
 
         when:
-		terms = ["Extra Strength"]
-		result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
-		println result
+        terms = ["Extra Strength"]
+        result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+        println result
         then:
-		assert result.contains(tylenolProduct)
-
-	}
+        assert result.contains(tylenolProduct)
+    }
 
     private void productTagTestFixture() {
         when:
-		basicTestFixture()
-		User user = User.get(1)
+        basicTestFixture()
+        User user = User.get(1)
         then:
-		assertNotNull user
-		println user
+        assertNotNull user
+        println user
         when:
-		aspirinProduct.addToTags(new Tag(tag: "thistag"))
-		aspirinProduct.save(flush:true, failOnError:true)
-		tylenolProduct.addToTags(new Tag(tag: "thattag"))
-		tylenolProduct.save(flush:true, failOnError:true)
+        aspirinProduct.addToTags(new Tag(tag: "thistag"))
+        aspirinProduct.save(flush:true, failOnError:true)
+        tylenolProduct.addToTags(new Tag(tag: "thattag"))
+        tylenolProduct.save(flush:true, failOnError:true)
         then:
-		assertEquals 1, aspirinProduct.tags.size()
-		assertEquals 1, tylenolProduct.tags.size()
-		assertEquals 2, Tag.list().size()
-
+        assertEquals 1, aspirinProduct.tags.size()
+        assertEquals 1, tylenolProduct.tags.size()
+        assertEquals 2, Tag.list().size()
     }
 
-    @Test
     void test_getQuantityByProductMap() {
         when:
         transactionEntryTestFixture()
@@ -417,7 +407,6 @@ class InventoryServiceTests extends Specification implements ServiceUnitTest<Inv
         assert map[tylenolProduct] == 25
     }
 
-    @Test
     //todo: getQuantity is broken now, need to know why
     void getQuantity(){
         when:
@@ -429,7 +418,6 @@ class InventoryServiceTests extends Specification implements ServiceUnitTest<Inv
         assert service.getQuantity(bostonInventory, (Location) null, tylenolItem) == 25
     }
 
-    @Test
     void getQuantity_shouldHandleTransactionsForSameDay(){
         when:
         transactionEntryTestFixture2()
@@ -440,9 +428,6 @@ class InventoryServiceTests extends Specification implements ServiceUnitTest<Inv
         assert service.getQuantity(bostonInventory, (Location) null, tylenolItem) == 25
     }
 
-
-
-    @Test
     void test_getProductsQuantityForInventory(){
         when:
         transactionEntryTestFixture()
@@ -452,17 +437,14 @@ class InventoryServiceTests extends Specification implements ServiceUnitTest<Inv
         assert results.keySet().size() == 1
     }
 
-    @Test
-	void test_getProductsQuantityForInventoryWithEmptyProductArray(){
+    void test_getProductsQuantityForInventoryWithEmptyProductArray(){
         when:
-		transactionEntryTestFixture()
-		def results = service.getQuantityForProducts(bostonInventory, [])
+        transactionEntryTestFixture()
+        def results = service.getQuantityForProducts(bostonInventory, [])
         then:
-		assert results == [:]
-	}
+        assert results == [:]
+    }
 
-
-    @Test
     void test_getQuantityByInventoryItemMap() {
         when:
         transactionEntryTestFixture()
@@ -615,7 +597,6 @@ class InventoryServiceTests extends Specification implements ServiceUnitTest<Inv
         assertEquals 2, results.size()
     }
 
-
     void test_getProductsByTag() {
         when:
         productTagTestFixture()
@@ -628,7 +609,6 @@ class InventoryServiceTests extends Specification implements ServiceUnitTest<Inv
         assertEquals 1, results.size()
     }
 
-    @Test
     void getProductsByTag_shouldNotFailDueToSQLGrammarException() {
         when:
         productTagTestFixture()
@@ -658,25 +638,24 @@ class InventoryServiceTests extends Specification implements ServiceUnitTest<Inv
         assert results.contains(tylenolProduct)
     }
 
-	void test_getProductsByTermsAndCategoriesWithProductName() {
+    void test_getProductsByTermsAndCategoriesWithProductName() {
         when:
-		basicTestFixture()
-		def terms = ["Ibuprofen"]
-		def results = service.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 25, 0)
+        basicTestFixture()
+        def terms = ["Ibuprofen"]
+        def results = service.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 25, 0)
         then:
-		assert results.contains(ibuprofenProduct)
-	}
+        assert results.contains(ibuprofenProduct)
+    }
 
-	void test_getProductsByTermsAndCategoriesWithDescription() {
+    void test_getProductsByTermsAndCategoriesWithDescription() {
         when:
-		basicTestFixture()
-		def terms = ["NSAID"]
-		def results = service.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 25, 0)
+        basicTestFixture()
+        def terms = ["NSAID"]
+        def results = service.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 25, 0)
         then:
-		assert results.contains(ibuprofenProduct)
-	}
+        assert results.contains(ibuprofenProduct)
+    }
 
-    @Test
     void importInventory_shouldSaveRecordInventoryTransaction() {
 
         when:

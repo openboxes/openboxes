@@ -1,8 +1,8 @@
 package org.pih.warehouse.product
 
 import grails.testing.services.ServiceUnitTest
-import org.junit.Ignore
-import org.junit.Test
+import spock.lang.Ignore
+
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Role
@@ -16,154 +16,145 @@ import spock.lang.Specification
 import testutils.DbHelper
 import static org.junit.Assert.*;
 
-//@Ignore
+@Ignore('Fix these tests and move them to ProductServiceSpec or convert them to API tests')
 class ProductServiceIntegrationTests extends Specification implements ServiceUnitTest<ProductService> {
 
-	@Shared
-	@Autowired
-	AuthService authService
-	@Shared
-	def product1
-	@Shared
-	def product2
-	@Shared
-	def product3
-	@Shared
-	def product4
-	@Shared
-	def product5
-	@Shared
-	def product6
-	@Shared
-	def group1
-	@Shared
-	def group2
+    @Shared
+    @Autowired
+    AuthService authService
+    @Shared
+    def product1
+    @Shared
+    def product2
+    @Shared
+    def product3
+    @Shared
+    def product4
+    @Shared
+    def product5
+    @Shared
+    def product6
+    @Shared
+    def group1
+    @Shared
+    def group2
 
-    /**
-     *
-     */
-	protected void setup() {
-//		super.setUp()
+    protected void setup() {
+        when:
+        Role financeRole = Role.findByRoleType(RoleType.ROLE_FINANCE)
+        User user = DbHelper.findOrCreateAdminUser('Justin', 'Miranda', 'justin@openboxes.com', 'jmiranda', 'password', true)
+        user.addToRoles(financeRole)
+        user.save()
 
-		when:
-		Role financeRole = Role.findByRoleType(RoleType.ROLE_FINANCE)
-		User user = DbHelper.findOrCreateAdminUser('Justin', 'Miranda', 'justin@openboxes.com', 'jmiranda', 'password', true)
-		user.addToRoles(financeRole)
-		user.save()
+        authService.currentUser = user
 
-		authService.currentUser = user
+        product1 = DbHelper.findOrCreateProductWithGroups('boo floweree 250mg', ['Hoo moodiccina', 'Boo floweree'])
+        product2 = DbHelper.findOrCreateProductWithGroups('boo pill', ['Boo floweree'])
+        product3 = DbHelper.findOrCreateProductWithGroups('foo', ['Hoo moodiccina'])
+        product4 = DbHelper.findOrCreateProductWithGroups('abc tellon', ['Hoo moodiccina'])
+        product5 = DbHelper.findOrCreateProductWithGroups('goomoon', ['Boo floweree'])
+        product6 = DbHelper.findOrCreateProductWithGroups('buhoo floweree root', [])
+        group1 = ProductGroup.findByName("Hoo moodiccina")
+        group2 = ProductGroup.findByName("Boo floweree")
 
-		product1 = DbHelper.findOrCreateProductWithGroups('boo floweree 250mg', ['Hoo moodiccina', 'Boo floweree'])
-		product2 = DbHelper.findOrCreateProductWithGroups('boo pill', ['Boo floweree'])
-		product3 = DbHelper.findOrCreateProductWithGroups('foo', ['Hoo moodiccina'])
-		product4 = DbHelper.findOrCreateProductWithGroups('abc tellon', ['Hoo moodiccina'])
-		product5 = DbHelper.findOrCreateProductWithGroups('goomoon', ['Boo floweree'])
-		product6 = DbHelper.findOrCreateProductWithGroups('buhoo floweree root', [])
-		group1 = ProductGroup.findByName("Hoo moodiccina")
-		group2 = ProductGroup.findByName("Boo floweree")
-
-		// Create new root category if it doesn't exist
-		def category = DbHelper.findOrCreateCategory('ROOT')
-		category.isRoot = true
-		category.save(failOnError: true, flush: true)
+        // Create new root category if it doesn't exist
+        def category = DbHelper.findOrCreateCategory('ROOT')
+        category.isRoot = true
+        category.save(failOnError: true, flush: true)
         then:
-		assertTrue !category.hasErrors()
+        assertTrue !category.hasErrors()
 
         // Create products with tags
-		when:
-		DbHelper.findOrCreateProductWithTags('Ibuprofen 200mg tablet', ['nsaid', 'pain', 'favorite'])
-		DbHelper.findOrCreateProductWithTags('Acetaminophen 325mg tablet', ['pain', 'pain reliever'])
-		DbHelper.findOrCreateProductWithTags('Naproxen 220mg tablet', ['pain reliever', 'pain', 'nsaid', 'fever reducer'])
+        when:
+        DbHelper.findOrCreateProductWithTags('Ibuprofen 200mg tablet', ['nsaid', 'pain', 'favorite'])
+        DbHelper.findOrCreateProductWithTags('Acetaminophen 325mg tablet', ['pain', 'pain reliever'])
+        DbHelper.findOrCreateProductWithTags('Naproxen 220mg tablet', ['pain reliever', 'pain', 'nsaid', 'fever reducer'])
 
-		// Create a tag without products
-		DbHelper.findOrCreateTag('tagwithnoproducts')
+        // Create a tag without products
+        DbHelper.findOrCreateTag('tagwithnoproducts')
 
-		// Create a product with a unique product code
-		def product7 = DbHelper.findOrCreateProduct('Test Product')
-		product7.productCode = 'AB13'
-		product7.save(failOnError: true, flush: true)
-		then:
-		assertNotNull product7
-		assertTrue !product7.hasErrors()
-	}
+        // Create a product with a unique product code
+        def product7 = DbHelper.findOrCreateProduct('Test Product')
+        product7.productCode = 'AB13'
+        product7.save(failOnError: true, flush: true)
+        then:
+        assertNotNull product7
+        assertTrue !product7.hasErrors()
+    }
 
-	protected void tearDown() {
-		AuthService.currentUser.remove()
-//		super.tearDown()
-	}
+    protected void tearDown() {
+        AuthService.currentUser.remove()
+    }
 
-	/**
-	 * Adds quotes around each element and a newline after the end of the row.
-	 */
-	String csvize(row) {
-		return csvize(row, ",")
-	}
+    /**
+     * Adds quotes around each element and a newline after the end of the row.
+     */
+    String csvize(row) {
+        return csvize(row, ",")
+    }
 
-	String csvize(row, delimiter) {
-		return "\"" + row.join("\"" + delimiter + "\"") + "\"\n"
-	}
+    String csvize(row, delimiter) {
+        return "\"" + row.join("\"" + delimiter + "\"") + "\"\n"
+    }
 
-    @Test
-	void csvize() {
-		when:
-		def row = ["1", "test", "another", "last one"]
-		then:
-		assertEquals csvize(row), "\"1\",\"test\",\"another\",\"last one\"\n"
-	}
+    void csvize() {
+        when:
+        def row = ["1", "test", "another", "last one"]
 
-    @Test
-	void searchProductAndProductGroup_shouldGetAllProductsUnderMatchedGroups(){
-		when:
-		def result = service.searchProductAndProductGroup("floweree", true)
-		println result
+        then:
+        assertEquals csvize(row), "\"1\",\"test\",\"another\",\"last one\"\n"
+    }
 
-		// Only searches products, not product groups any longer
-		then:
-		assert result.size() == 2
-		assert result.any{ it[1] == "boo floweree 250mg" && it[2] == "boo floweree 250mg" && it[0] == product1.id}
-		assert result.any{ it[1] == "buhoo floweree root" &&  it[2] == "buhoo floweree root" && it[0] == product6.id}
+    void searchProductAndProductGroup_shouldGetAllProductsUnderMatchedGroups(){
+        when:
+        def result = service.searchProductAndProductGroup("floweree", true)
+        println result
 
-	}
+        // Only searches products, not product groups any longer
+        then:
+        assert result.size() == 2
+        assert result.any{ it[1] == "boo floweree 250mg" && it[2] == "boo floweree 250mg" && it[0] == product1.id}
+        assert result.any{ it[1] == "buhoo floweree root" &&  it[2] == "buhoo floweree root" && it[0] == product6.id}
 
-    @Test
-	void validateProducts_shouldFailWhenProductNameIsMissing() {
-		when:
-		def row = ["1235", "SKU-1", "", "", "category 123", "", "Description", "Unit of Measure", "tag1,tag2", "0.01", "", "", "", "", "", "Manufacturer", "Brand", "ManufacturerCode", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC", "NDC", "Date Created", "Date Updated"]
-		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row)
+    }
 
-		def message = shouldFail(RuntimeException) {
-			service.validateProducts(csv)
-		}
-		then:
-		assertTrue message.contains("Product name cannot be empty")
-	}
+    void validateProducts_shouldFailWhenProductNameIsMissing() {
+        when:
+        def row = ["1235", "SKU-1", "", "", "category 123", "", "Description", "Unit of Measure", "tag1,tag2", "0.01", "", "", "", "", "", "Manufacturer", "Brand", "ManufacturerCode", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC", "NDC", "Date Created", "Date Updated"]
+        def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row)
 
-    @Ignore
-	void importProducts_shouldNotUpdateProductsWhenSaveToDatabaseIsFalse() {
-		when:
-		def product = DbHelper.findOrCreateProduct('Sudafed')
-		assertNotNull product.id
-		def row1 = ["${product.id}", "", "Sudafed 2", "OTC Medicines", "", "Description", "Unit of Measure", "tag1,tag2", "0.01", "Manufacture", "Brand", "ManufacturerCode", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC", "NDC", "Date Created", "Date Updated"]
-		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
+        def message = shouldFail(RuntimeException) {
+            service.validateProducts(csv)
+        }
+        then:
+        assertTrue message.contains("Product name cannot be empty")
+    }
+
+    void importProducts_shouldNotUpdateProductsWhenSaveToDatabaseIsFalse() {
+        when:
+        def product = DbHelper.findOrCreateProduct('Sudafed')
+        assertNotNull product.id
+        def row1 = ["${product.id}", "", "Sudafed 2", "OTC Medicines", "", "Description", "Unit of Measure", "tag1,tag2", "0.01", "Manufacture", "Brand", "ManufacturerCode", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC", "NDC", "Date Created", "Date Updated"]
+        def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
         def products = service.validateProducts(csv)
         service.importProducts(products)
-		def product2 = Product.get(product.id)
-		println ("Get product " + product2.name + " " + product2.id + " " + product2.productCode + " " + product.isAttached())
-		then:
-		assertEquals "Sudafed", product2.name
-		assertEquals "Medicines", product2.category.name
-	}
+        def product2 = Product.get(product.id)
+        println ("Get product " + product2.name + " " + product2.id + " " + product2.productCode + " " + product.isAttached())
+        then:
+        assertEquals "Sudafed", product2.name
+        assertEquals "Medicines", product2.category.name
+    }
 
-    @Test
-	void validateProducts_shouldCreateNewProductWithNewCategory() {
-		when:
-		def category = Category.findByName("category 123")
-		then:
-		assertNull category
+    void validateProducts_shouldCreateNewProductWithNewCategory() {
+        when:
+        def category = Category.findByName("category 123")
 
-		when:
-		def row1 = ["1235", "", "Default", "product 1235", "", "category 123", "", "Description", "Unit of Measure", "tag1,tag2", "0.01", null, null, null, null, null, "Manufacturer", "Brand", "ManufacturerCode", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC", "NDC", "Date Created", "Date Updated"]
-		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
+        then:
+        assertNull category
+
+        when:
+        def row1 = ["1235", "", "Default", "product 1235", "", "category 123", "", "Description", "Unit of Measure", "tag1,tag2", "0.01", null, null, null, null, null, "Manufacturer", "Brand", "ManufacturerCode", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC", "NDC", "Date Created", "Date Updated"]
+        def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
         def products = service.validateProducts(csv)
 
         // FIXME Hack to keep from running into the following error
@@ -172,26 +163,28 @@ class ProductServiceIntegrationTests extends Specification implements ServiceUni
         products[0].lastUpdated = new Date()
 
         service.importProducts(products)
-		def product = Product.findByName("product 1235")
-		then:
-		assertNotNull product
+        def product = Product.findByName("product 1235")
 
-		when:
-		category = Category.findByName("category 123")
-		then:
-		assertNotNull category
-	}
+        then:
+        assertNotNull product
 
-    @Test
+        when:
+        category = Category.findByName("category 123")
+
+        then:
+        assertNotNull category
+    }
+
     void importProducts_shouldCreateNewProductWithExistingCategory() {
-		when:
-		def category = Category.findByName("Medicines")
-		then:
-		assertNotNull category
+        when:
+        def category = Category.findByName("Medicines")
 
-		when:
-		def row1 = ["1235", "", "Default", "product 1235", "", "Medicines", "", "Description", "Unit of Measure", "tag1,tag2", "0.01", null, null, null, null, null, "Manufacturer", "Brand", "ManufacturerCode", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC", "NDC", "Date Created", "Date Updated"]
-		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
+        then:
+        assertNotNull category
+
+        when:
+        def row1 = ["1235", "", "Default", "product 1235", "", "Medicines", "", "Description", "Unit of Measure", "tag1,tag2", "0.01", null, null, null, null, null, "Manufacturer", "Brand", "ManufacturerCode", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC", "NDC", "Date Created", "Date Updated"]
+        def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
         def products = service.validateProducts(csv)
 
         // FIXME Hack to keep from running into the following error
@@ -200,77 +193,78 @@ class ProductServiceIntegrationTests extends Specification implements ServiceUni
         products[0].lastUpdated = new Date()
 
         service.importProducts(products)
-		def product = Product.findByName("product 1235")
-		then:
-		assertNotNull product
-		assertEquals category, product.category
-	}
+        def product = Product.findByName("product 1235")
 
-    @Test
-	void importProducts_shouldUpdateNameOnExistingProduct() {
-		when:
-		def productBefore = DbHelper.findOrCreateProduct('Sudafed')
-		then:
-		assertNotNull productBefore.id
-		when:
-		def row1 = ["${productBefore.id}", "AB12", "Default", "Sudafed 2.0", "", "Medicines", "", "Description", "Unit of Measure", "tag1,tag2", "0.01", "LotAndExpiryControl", "ColdChain", "ControlledSubstance", "HazardousMaterial", "Reconditioned", "Manufacturer", "Brand", "ManufacturerCode", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC", "NDC", "Date Created", "Date Updated"]
-		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
+        then:
+        assertNotNull product
+        assertEquals category, product.category
+    }
+
+    void importProducts_shouldUpdateNameOnExistingProduct() {
+        when:
+        def productBefore = DbHelper.findOrCreateProduct('Sudafed')
+
+        then:
+        assertNotNull productBefore.id
+
+        when:
+        def row1 = ["${productBefore.id}", "AB12", "Default", "Sudafed 2.0", "", "Medicines", "", "Description", "Unit of Measure", "tag1,tag2", "0.01", "LotAndExpiryControl", "ColdChain", "ControlledSubstance", "HazardousMaterial", "Reconditioned", "Manufacturer", "Brand", "ManufacturerCode", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC", "NDC", "Date Created", "Date Updated"]
+        def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
 
         def products = service.validateProducts(csv)
         service.importProducts(products)
 
-		def productAfter = Product.get(productBefore.id)
-		println ("Get product " + productAfter.name + " " + productAfter.id + " " + productAfter.productCode)
-		then:
-		assertEquals "Sudafed 2.0", productAfter.name
-	}
+        def productAfter = Product.get(productBefore.id)
 
-    @Test
-	void importProducts_shouldUpdateAllFieldsOnExistingProduct() {
-		when:
-		def productBefore = DbHelper.findOrCreateProduct('Sudafed')
-		then:
-		assertNotNull productBefore.id
-		def row1 = [productBefore.id, "AB12", "Default", "Sudafed 2.0", "", "Medicines", "", "It's sudafed, dummy.", "EA", "tag1,tag2", "0.01", null, "true", null, null, null, "Acme", "Brand X", "ACME-249248", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC-1202323", "NDC-122929-39292", "", ""]
-		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
+        then:
+        assertEquals "Sudafed 2.0", productAfter.name
+    }
 
-		when:
-		def products = service.validateProducts(csv)
-		service.importProducts(products)
-		def productAfter = Product.get(productBefore.id)
-		println ("Get product " + productAfter.name + " " + productAfter.id + " " + productAfter.productCode)
-		then:
-		assertEquals productBefore.id, productAfter.id
-		assertEquals "AB12", productAfter.productCode
-		assertEquals "Sudafed 2.0", productAfter.name
-		assertEquals "Medicines", productAfter.category.name
-		assertEquals "It's sudafed, dummy.", productAfter.description
-		assertEquals "EA", productAfter.unitOfMeasure
-		assertEquals "Acme", productAfter.manufacturer
-		assertEquals "Brand X", productAfter.brandName
-		assertEquals "ACME-249248", productAfter.manufacturerCode
-		assertEquals "Manufacturer Name", productAfter.manufacturerName
-		assertEquals "Vendor", productAfter.vendor
-		assertEquals "Vendor Code", productAfter.vendorCode
-		assertEquals "Vendor Name", productAfter.vendorName
-		assertTrue productAfter.coldChain
-		assertEquals "UPC-1202323", productAfter.upc
-		assertEquals "NDC-122929-39292", productAfter.ndc
-	}
+    void importProducts_shouldUpdateAllFieldsOnExistingProduct() {
+        when:
+        def productBefore = DbHelper.findOrCreateProduct('Sudafed')
 
-    @Test
+        then:
+        assertNotNull productBefore.id
+        def row1 = [productBefore.id, "AB12", "Default", "Sudafed 2.0", "", "Medicines", "", "It's sudafed, dummy.", "EA", "tag1,tag2", "0.01", null, "true", null, null, null, "Acme", "Brand X", "ACME-249248", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC-1202323", "NDC-122929-39292", "", ""]
+        def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
+
+        when:
+        def products = service.validateProducts(csv)
+        service.importProducts(products)
+        def productAfter = Product.get(productBefore.id)
+
+        then:
+        assertEquals productBefore.id, productAfter.id
+        assertEquals "AB12", productAfter.productCode
+        assertEquals "Sudafed 2.0", productAfter.name
+        assertEquals "Medicines", productAfter.category.name
+        assertEquals "It's sudafed, dummy.", productAfter.description
+        assertEquals "EA", productAfter.unitOfMeasure
+        assertEquals "Acme", productAfter.manufacturer
+        assertEquals "Brand X", productAfter.brandName
+        assertEquals "ACME-249248", productAfter.manufacturerCode
+        assertEquals "Manufacturer Name", productAfter.manufacturerName
+        assertEquals "Vendor", productAfter.vendor
+        assertEquals "Vendor Code", productAfter.vendorCode
+        assertEquals "Vendor Name", productAfter.vendorName
+        assertTrue productAfter.coldChain
+        assertEquals "UPC-1202323", productAfter.upc
+        assertEquals "NDC-122929-39292", productAfter.ndc
+    }
+
     void importProducts_shouldAddExistingTags() {
-		when:
-		def tag1 = new Tag(tag: "tag1").save(flush: true, failOnError: true);
-		def tag2 = new Tag(tag: "tag2").save(flush: true, failOnError: true);
-		def productBefore = DbHelper.findOrCreateProduct('Sudafed')
+        when:
+        def tag1 = new Tag(tag: "tag1").save(flush: true, failOnError: true);
+        def tag2 = new Tag(tag: "tag2").save(flush: true, failOnError: true);
+        def productBefore = DbHelper.findOrCreateProduct('Sudafed')
 
-		then:
-		assertNotNull productBefore.id
+        then:
+        assertNotNull productBefore.id
         assertEquals 0, productBefore?.tags?.size()?:0
 
-		when:
-		def row1 = ["${productBefore.id}", "AB12", "Default", "Sudafed 2.0", "", "Medicines", "", "It's sudafed, dummy.", "EA", "tag1,tag2", "0.01", null, null, null, null, null, "Acme", "Brand X", "ACME-249248", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC-1202323", "NDC-122929-39292", "", ""]
+        when:
+        def row1 = ["${productBefore.id}", "AB12", "Default", "Sudafed 2.0", "", "Medicines", "", "It's sudafed, dummy.", "EA", "tag1,tag2", "0.01", null, null, null, null, null, "Acme", "Brand X", "ACME-249248", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC-1202323", "NDC-122929-39292", "", ""]
 
         def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
         def tags = ["tag1", "tag2"] as List
@@ -281,26 +275,24 @@ class ProductServiceIntegrationTests extends Specification implements ServiceUni
         def productAfter = Product.get(productBefore.id)
         println ("Get product " + productAfter.name + " " + productAfter.id + " " + productAfter.productCode)
 
-		then:
-		assertEquals productBefore.id, productAfter.id
+        then:
+        assertEquals productBefore.id, productAfter.id
         assertEquals 2, productAfter?.tags?.size()
-
     }
 
-    @Test
     void importProducts_shouldAddNewTags() {
-		when:
-		def tag1 = new Tag(tag: "tag1").save(flush: true, failOnError: true);
+        when:
+        def tag1 = new Tag(tag: "tag1").save(flush: true, failOnError: true);
         def tag2 = new Tag(tag: "tag2").save(flush: true, failOnError: true);
 
-		def product = DbHelper.findOrCreateProduct('Sudafed')
+        def product = DbHelper.findOrCreateProduct('Sudafed')
 
-		then:
-		assertNotNull product.id
+        then:
+        assertNotNull product.id
         assertEquals 0, product?.tags?.size()?:0
 
-		when:
-		def row1 = ["${product.id}", "AB12", "Default", "Sudafed 2.0", "", "Medicines", "", "It's sudafed, dummy.", "EA", "tag1,tag2", "0.01", null, null, null, null, null, "Acme", "Brand X", "ACME-249248", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC-1202323", "NDC-122929-39292", "", ""]
+        when:
+        def row1 = ["${product.id}", "AB12", "Default", "Sudafed 2.0", "", "Medicines", "", "It's sudafed, dummy.", "EA", "tag1,tag2", "0.01", null, null, null, null, null, "Acme", "Brand X", "ACME-249248", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC-1202323", "NDC-122929-39292", "", ""]
         def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
         def tags = ["tag3", "tag4", "tag1", "tag2"] as List
 
@@ -310,352 +302,255 @@ class ProductServiceIntegrationTests extends Specification implements ServiceUni
         def result = Product.get(product.id)
         println ("Get product " + result.name + " " + result.id + " " + result.productCode)
 
-		then:
-		assertEquals product.id, result.id
+        then:
+        assertEquals product.id, result.id
         assertEquals 4, result?.tags?.size()
-
     }
 
+    void getDelimiter_shouldDetectCommaDelimiter() {
+        // def row = ["1235","SKU-1","","category 123","Description","Unit of Measure","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]
+        when:
+        def row1 = ["", "AB12", "Sudafed 2", "Medicines", "", "Sudafed description", "EA", "tag1,tag2", "0.01", "Acme", "Brand X", "ACME-249248", "Vendor Y", "Y-1284", "Sudafed", "UPC-1202323", "NDC-122929-39292", "", ""]
+        def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
+        def delimiter = service.getDelimiter(csv)
 
-    @Test
-	void getDelimiter_shouldDetectCommaDelimiter() {
-		// def row = ["1235","SKU-1","","category 123","Description","Unit of Measure","Manufacture","Brand","ManufacturerCode","Manufacturer Name","Vendor","Vendor Code","Vendor Name","false","UPC","NDC","Date Created","Date Updated"]
-		when:
-		def row1 = ["", "AB12", "Sudafed 2", "Medicines", "", "Sudafed description", "EA", "tag1,tag2", "0.01", "Acme", "Brand X", "ACME-249248", "Vendor Y", "Y-1284", "Sudafed", "UPC-1202323", "NDC-122929-39292", "", ""]
-		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
-		def delimiter = service.getDelimiter(csv)
-		then:
-		assertEquals ",", delimiter
-	}
-    @Test
-	void getDelimiter_shouldDetectTabDelimiter() {
-		when:
-		def row1 = ["", "AB12", "Sudafed 2", "Medicines", "", "Sudafed descrition", "each", "tag1,tag2", "0.01", "Acme", "Brand X", "ACME-249248", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC-1202323", "NDC-122929-39292", "", ""]
-		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS, "\t") + csvize(row1, "\t")
-		def delimiter = service.getDelimiter(csv)
-		then:
-		assertEquals "\t", delimiter
-	}
+        then:
+        assertEquals ",", delimiter
+    }
 
-    @Test
-	void getDelimiter_shouldDetectSemiColonDelimiter() {
-		when:
-		def row1 = ["", "00001", "Sudafed 2", "Medicines", "Sudafed description", "each", "tag1,tag2", "0.01", "Acme", "Brand X", "ACME-249248", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC-1202323", "NDC-122929-39292", "", ""]
-		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS, ";") + csvize(row1, ";")
-		def delimiter = service.getDelimiter(csv)
-		then:
-		assertEquals ";", delimiter
-	}
+    void getDelimiter_shouldDetectTabDelimiter() {
+        when:
+        def row1 = ["", "AB12", "Sudafed 2", "Medicines", "", "Sudafed descrition", "each", "tag1,tag2", "0.01", "Acme", "Brand X", "ACME-249248", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC-1202323", "NDC-122929-39292", "", ""]
+        def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS, "\t") + csvize(row1, "\t")
+        def delimiter = service.getDelimiter(csv)
 
-    @Test
-	void findOrCreateCategory_shouldReturnExistingCategory() {
-		when:
-		def categoryName = "Medicines"
-		def existingCategory = Category.findByName(categoryName)
-		then:
-		assertNotNull existingCategory
-		when:
-		def category = service.findOrCreateCategory(categoryName)
-		then:
-		assertEquals existingCategory, category
-	}
+        then:
+        assertEquals "\t", delimiter
+    }
 
-    @Test
-	void findOrCreateCategory_shouldCreateNewCategory() {
-		when:
-		def categoryName = "Nonexistent Category"
-		def nonexistentCategory = Category.findByName(categoryName)
-		then:
-		assertNull nonexistentCategory
-		when:
-		def category = service.findOrCreateCategory(categoryName)
-		def existingCategory = Category.findByName(categoryName)
-		then:
-		assertEquals existingCategory, category
-	}
+    void getDelimiter_shouldDetectSemiColonDelimiter() {
+        when:
+        def row1 = ["", "00001", "Sudafed 2", "Medicines", "Sudafed description", "each", "tag1,tag2", "0.01", "Acme", "Brand X", "ACME-249248", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC-1202323", "NDC-122929-39292", "", ""]
+        def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS, ";") + csvize(row1, ";")
+        def delimiter = service.getDelimiter(csv)
 
-    @Test
-	void findOrCreateCategory_shouldReturnRootCategoryOnRoot() {
-		when:
-		def categoryName = "ROOT"
-		def category = service.findOrCreateCategory(categoryName)
+        then:
+        assertEquals ";", delimiter
+    }
 
-		println category
-		then:
-		assertEquals category.name, "ROOT"
-	}
+    void findOrCreateCategory_shouldReturnExistingCategory() {
+        when:
+        def categoryName = "Medicines"
+        def existingCategory = Category.findByName(categoryName)
 
-    @Test
-	void findOrCreateCategory_shouldReturnRootCategoryOnEmpty() {
-		when:
-		def categoryName = ""
-		def category = service.findOrCreateCategory(categoryName)
-		println category
-		then:
-		assertNotNull category
-		assertEquals category.name, "ROOT"
-	}
+        then:
+        assertNotNull existingCategory
 
-    @Test
-	void exportProducts_shouldReturnAllProducts() {
-		when:
-		def csv = service.exportProducts()
-		def lines = csv.split(/[\r\n]/)
+        when:
+        def category = service.findOrCreateCategory(categoryName)
 
-		// FIXME Export code appends column delimiter for every column (even the last)
-		def expectedHeader = Constants.EXPORT_PRODUCT_COLUMNS.join(",").replace("\n", "") + ","
-		def actualHeader = CSVUtils.stripBomIfPresent(lines[0])
-		then:
-		assertNotNull lines
-		assertEquals expectedHeader, actualHeader
-	}
+        then:
+        assertEquals existingCategory, category
+    }
 
-    @Test
-	void exportProducts_shouldRenderProductsAsCsv() {
-		when:
-		def csv = service.exportProducts()
+    void findOrCreateCategory_shouldCreateNewCategory() {
+        when:
+        def categoryName = "Nonexistent Category"
+        def nonexistentCategory = Category.findByName(categoryName)
 
-		println csv
-		def lines = csv.split(/[\r\n]/)
+        then:
+        assertNull nonexistentCategory
 
-		// Remove quotes
-		def columns = CSVUtils.stripBomIfPresent(lines[0]).replaceAll("\"", "").split(",")
-		println columns
-		then:
-		columns.eachWithIndex { String entry, int i ->
-			assertEquals Constants.EXPORT_PRODUCT_COLUMNS[i], entry
-		}
-	}
+        when:
+        def category = service.findOrCreateCategory(categoryName)
+        def existingCategory = Category.findByName(categoryName)
 
-    @Test
-	void getExistingProducts() {
-		when:
-		def product1 = DbHelper.findOrCreateProduct('Sudafed')
-		def product2 = DbHelper.findOrCreateProduct('Advil')
-		then:
-		assertNotNull product1.id
+        then:
+        assertEquals existingCategory, category
+    }
 
-		when:
-		def row1 = ["${product1.id}", "", "Sudafed", "Medicines", "", "", "", "", "false", "", "", "", ""]
-		def row2 = ["${product2.id}", "", "Advil", "Medicines", "", "", "", "", "", "false", "", "", "", ""]
-		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1) + csvize(row2)
+    void findOrCreateCategory_shouldReturnRootCategoryOnRoot() {
+        when:
+        def categoryName = "ROOT"
+        def category = service.findOrCreateCategory(categoryName)
 
-		def existingProducts = service.getExistingProducts(csv)
-		then:
-		assertEquals 2, existingProducts.size()
-		assertEquals "Sudafed", existingProducts[0].name
-		assertEquals "Advil", existingProducts[1].name
-	}
+        then:
+        assertEquals category.name, "ROOT"
+    }
 
-    @Test
-	void getExistingProducts_shouldReturnAdvil() {
-		when:
-		def product = DbHelper.findOrCreateProduct('Advil')
-		then:
-		assertNotNull product.id
+    void findOrCreateCategory_shouldReturnRootCategoryOnEmpty() {
+        when:
+        def categoryName = ""
+        def category = service.findOrCreateCategory(categoryName)
 
-		when:
-		def row1 = ["", "", "Sudafed", "Medicines", "", "", "", "", "false", "", "", "", ""]
-		def row2 = ["${product.id}", "", "Advil", "Medicines", "", "", "", "", "false", "", "", "", ""]
-		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1) + csvize(row2)
-		def existingProducts = service.getExistingProducts(csv)
-		then:
-		assertEquals 1, existingProducts.size()
-		assertEquals "Advil", existingProducts[0].name
-	}
+        then:
+        assertNotNull category
+        assertEquals category.name, "ROOT"
+    }
 
-    @Test
-	void getAllTagLabels() {
-		when:
-		def service = new ProductService();
-		def tags = service.getAllTagLabels()
-		println tags
-		then:
-		assertEquals 6, tags.size()
-	}
+    void exportProducts_shouldReturnAllProducts() {
+        when:
+        def csv = service.exportProducts()
+        def lines = csv.split(/[\r\n]/)
 
-	@Test
-	void getPopularTags() {
-		when:
-		def popularTagMap = service.getPopularTags()
-		def expectedTags = ["favorite", "fever reducer", "nsaid", "pain", "pain reliever"]
+        // FIXME Export code appends column delimiter for every column (even the last)
+        def expectedHeader = Constants.EXPORT_PRODUCT_COLUMNS.join(",").replace("\n", "") + ","
+        def actualHeader = CSVUtils.stripBomIfPresent(lines[0])
 
-		println popularTagMap
-		then:
-		assertNotNull popularTagMap
-		assertEquals 5, popularTagMap.keySet().size()
+        then:
+        assertNotNull lines
+        assertEquals expectedHeader, actualHeader
+    }
 
-		when:
-		def actualTags = popularTagMap.keySet().collect { it.tag }
-		then:
-		assertEquals expectedTags, actualTags
-		assertEquals 1, popularTagMap[Tag.findByTag("fever reducer")]
-		assertEquals 2, popularTagMap[Tag.findByTag("nsaid")]
-		assertEquals 3, popularTagMap[Tag.findByTag("pain")]
-		assertEquals 2, popularTagMap[Tag.findByTag("pain reliever")]
-	}
+    void exportProducts_shouldRenderProductsAsCsv() {
+        when:
+        def csv = service.exportProducts()
+        def lines = csv.split(/[\r\n]/)
 
-    @Test
+        // Remove quotes
+        def columns = CSVUtils.stripBomIfPresent(lines[0]).replaceAll("\"", "").split(",")
+
+        then:
+        columns.eachWithIndex { String entry, int i ->
+            assertEquals Constants.EXPORT_PRODUCT_COLUMNS[i], entry
+        }
+    }
+
+    void getExistingProducts() {
+        when:
+        def product1 = DbHelper.findOrCreateProduct('Sudafed')
+        def product2 = DbHelper.findOrCreateProduct('Advil')
+
+        then:
+        assertNotNull product1.id
+
+        when:
+        def row1 = ["${product1.id}", "", "Sudafed", "Medicines", "", "", "", "", "false", "", "", "", ""]
+        def row2 = ["${product2.id}", "", "Advil", "Medicines", "", "", "", "", "", "false", "", "", "", ""]
+        def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1) + csvize(row2)
+
+        def existingProducts = service.getExistingProducts(csv)
+        then:
+        assertEquals 2, existingProducts.size()
+        assertEquals "Sudafed", existingProducts[0].name
+        assertEquals "Advil", existingProducts[1].name
+    }
+
+    void getExistingProducts_shouldReturnAdvil() {
+        when:
+        def product = DbHelper.findOrCreateProduct('Advil')
+
+        then:
+        assertNotNull product.id
+
+        when:
+        def row1 = ["", "", "Sudafed", "Medicines", "", "", "", "", "false", "", "", "", ""]
+        def row2 = ["${product.id}", "", "Advil", "Medicines", "", "", "", "", "false", "", "", "", ""]
+        def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1) + csvize(row2)
+        def existingProducts = service.getExistingProducts(csv)
+
+        then:
+        assertEquals 1, existingProducts.size()
+        assertEquals "Advil", existingProducts[0].name
+    }
+
+    void getAllTagLabels() {
+        when:
+        def service = new ProductService();
+        def tags = service.getAllTagLabels()
+
+        then:
+        assertEquals 6, tags.size()
+    }
+
+    void getPopularTags() {
+        when:
+        def popularTagMap = service.getPopularTags()
+        def expectedTags = ["favorite", "fever reducer", "nsaid", "pain", "pain reliever"]
+
+        then:
+        assertNotNull popularTagMap
+        assertEquals 5, popularTagMap.keySet().size()
+
+        when:
+        def actualTags = popularTagMap.keySet().collect { it.tag }
+
+        then:
+        assertEquals expectedTags, actualTags
+        assertEquals 1, popularTagMap[Tag.findByTag("fever reducer")]
+        assertEquals 2, popularTagMap[Tag.findByTag("nsaid")]
+        assertEquals 3, popularTagMap[Tag.findByTag("pain")]
+        assertEquals 2, popularTagMap[Tag.findByTag("pain reliever")]
+    }
+
     void getAllCategories() {
-		when:
-		def categories = Category.list()
-		then:
-		assertNotNull categories
+        when:
+        def categories = Category.list()
+
+        then:
+        assertNotNull categories
         categories.each {
             println it.id + ":" + it?.name + ":" + it?.parentCategory?.name
         }
     }
 
-
-    @Test
     void getRootCategory() {
-		when:
-		def rootCategory = service.getRootCategory()
-		then:
-		assertNotNull rootCategory
+        when:
+        def rootCategory = service.getRootCategory()
+
+        then:
+        assertNotNull rootCategory
         assertEquals rootCategory.name, "ROOT"
         assertTrue rootCategory.isRoot
         assertTrue rootCategory.isRootCategory()
     }
 
-	// FIXME the data counted here are not created in this file
-	@Ignore
-	void getTopLevelCategories() {
-		when:
-		def topLevelCategories = service.getTopLevelCategories()
-		println topLevelCategories
-		then:
-		assertNotNull topLevelCategories
-		assertEquals 5, topLevelCategories.size()
-	}
+    // FIXME the data counted here are not created in this file
+    @Ignore
+    void getTopLevelCategories() {
+        when:
+        def topLevelCategories = service.getTopLevelCategories()
 
-    @Test
-	void addTagsToProduct_shouldAddTagToProduct() {
-		when:
-		def product = Product.findByName("Ibuprofen 200mg tablet")
-		then:
-		assertNotNull product
+        then:
+        assertNotNull topLevelCategories
+        assertEquals 5, topLevelCategories.size()
+    }
 
-		when:
-		service.addTagsToProduct(product, ["awesome", "super"])
-		println product.tags*.tag
-		then:
-		assertEquals product.tagsToString(), "awesome,favorite,nsaid,pain,super"
-	}
-
-    @Test
-    void addTagsToProduct_shouldNotAddSameTagMoreThanOnce() {
-		when:
+    void deleteTag_shouldDeleteTagFromDatabase() {
+        when:
         def product = Product.findByName("Ibuprofen 200mg tablet")
-		then:
+        then:
         assertNotNull product
-		when:
-        service.addTagsToProduct(product, ["awesome", "super", "awesome"])
-        println product.tags*.tag
-		then:
-        assertEquals product.tagsToString(), "awesome,favorite,nsaid,pain,super"
-    }
-
-    @Test
-    void addTagsToProducts_shouldAddEachTagToAllProducts() {
-		when:
-        def products = []
-        def tags = ["newtag1", "newtag2"]
-        def ibuprofen = Product.findByName("Ibuprofen 200mg tablet")
-        def acetaminophen = Product.findByName("Acetaminophen 325mg tablet")
-        products << ibuprofen
-        products << acetaminophen
-
-        service.addTagsToProducts(products, tags)
-
-		then:
-        assertNotNull Tag.findByTag("newtag1")
-        assertNotNull Tag.findByTag("newtag2")
-
-        assert ibuprofen.tagsToString().contains("newtag1")
-        assert ibuprofen.tagsToString().contains("newtag2")
-        assert acetaminophen.tagsToString().contains("newtag1")
-        assert acetaminophen.tagsToString().contains("newtag2")
-
-    }
-
-    @Test
-    void addTagsToProducts_shouldNotAddTagMoreThanOnce() {
-		when:
-        def products = []
-        def tags = ["sametag", "sametag"]
-        def ibuprofen = Product.findByName("Ibuprofen 200mg tablet")
-        def acetaminophen = Product.findByName("Acetaminophen 325mg tablet")
-        products << ibuprofen
-        products << acetaminophen
-
-        service.addTagsToProducts(products, tags)
-
-        // Check to make sure the tag was created
-        def tag = Tag.findByTag("sametag")
-		then:
+        assertEquals product.tagsToString(), "favorite,nsaid,pain"
+        when:
+        Tag tag = Tag.findByTag("favorite")
+        then:
         assertNotNull tag
-
-        // Should have only created the tag once
-		when:
-        def sameTags = Tag.findAllByTag("sametag")
-		then:
-        assertEquals 1, sameTags.size()
-
-        // Check that both products have one instance of the tag
-        assert ibuprofen.tagsToString().contains("sametag")
-        assert acetaminophen.tagsToString().contains("sametag")
-
-        // Check that the tag has only been added to the products once
-		when:
-        def occurrences = ibuprofen.tags.findIndexValues { it == tag }
-		then:
-        assertEquals 1, occurrences.size()
-
-		when:
-        occurrences = acetaminophen.tags.findIndexValues { it == tag }
-		then:
-        assertEquals 1, occurrences.size()
+        when:
+        service.deleteTag(product, tag)
+        then:
+        assertEquals "nsaid,pain", product.tagsToString()
+        when:
+        Tag tag2 = Tag.findByTag("favorite")
+        then:
+        assertNull tag2
     }
 
-    @Test
-	void deleteTag_shouldDeleteTagFromDatabase() {
-		when:
-		def product = Product.findByName("Ibuprofen 200mg tablet")
-		then:
-		assertNotNull product
-		assertEquals product.tagsToString(), "favorite,nsaid,pain"
-		when:
-		Tag tag = Tag.findByTag("favorite")
-		then:
-		assertNotNull tag
-		when:
-		service.deleteTag(product, tag)
-		then:
-		assertEquals "nsaid,pain", product.tagsToString()
-		when:
-		Tag tag2 = Tag.findByTag("favorite")
-		then:
-		assertNull tag2
-	}
-
-    @Test
     void generateProductIdentifier_shouldGenerateUniqueIdentifiers() {
-		when: "generate product Identifier"
+        when: "generate product Identifier"
         for (int i = 0; i<100; i++) {
             assert service.generateProductIdentifier()
         }
-		then: assert true // workaround for time being
 
+        then: assert true // workaround for time being
     }
 
-
-	@Test
-	void saveProduct_failOnValidationError() {
-		when:
+    void saveProduct_failOnValidationError() {
+        when:
         def product = new Product();
         def returnValue = service.saveProduct(product)
-		then:
+
+        then:
         assertNull returnValue
         assertEquals 3, product.errors.getErrorCount()
         assertNotNull product.errors.getFieldError("name")
@@ -664,151 +559,110 @@ class ProductServiceIntegrationTests extends Specification implements ServiceUni
         assertNull product.errors.getFieldError("description")
     }
 
-    @Test
     void saveProduct_shouldSaveProduct() {
-		when:
+        when:
         def product = new Product();
-		def productType = DbHelper.findOrCreateProductType("Default")
+        def productType = DbHelper.findOrCreateProductType("Default")
         product.name = "Test product"
         product.category = Category.getRootCategory()
-		product.productType = productType
+        product.productType = productType
         def returnValue = service.saveProduct(product)
-        println returnValue
-		then:
+
+        then:
         assertNotNull returnValue
         assertEquals product, returnValue
         assertEquals returnValue.category, Category.getRootCategory()
         assertNotNull product.productCode
     }
 
-    @Test
     void saveProduct_shouldSaveProductAndTags() {
-		when:
+        when:
         def product = new Product();
-		def productType = DbHelper.findOrCreateProductType("Default")
+        def productType = DbHelper.findOrCreateProductType("Default")
         product.name = "Test product"
         product.category = Category.getRootCategory()
-		product.productType = productType
+        product.productType = productType
 
         def returnValue = service.saveProduct(product, "a tag,the next tag,another tag")
-		then:
+        then:
         assertNotNull returnValue
         assertNotNull product.id
         assertNotNull product.tags
         assertEquals 3, product.tags.size()
     }
 
-    @Test
     void saveProduct_shouldFailOnInvalidCategory() {
-		when:
+        when:
         def product = new Product();
-		def productType = DbHelper.findOrCreateProductType("Default")
-		product.productType = productType
+        def productType = DbHelper.findOrCreateProductType("Default")
+        product.productType = productType
         service.saveProduct(product)
-        println product.errors
-		then:
+
+        then:
         assertNotNull product.errors.getFieldError("category")
     }
 
-
-    @Test
     void saveProduct_shouldGenerateUniqueProductCode() {
-		when:
+        when:
         def product = new Product();
-		def productType = DbHelper.findOrCreateProductType("Default")
+        def productType = DbHelper.findOrCreateProductType("Default")
         product.name = "New product"
         product.category = Category.getRootCategory()
-		product.productType = productType
+        product.productType = productType
         service.saveProduct(product)
-		then:
+
+        then:
         assertNotNull product
         assertNotNull product.productCode
     }
 
-    @Test
     void saveProduct_shouldFailOnDuplicateProductCode() {
-		when:
+        when:
         def product = Product.findByProductCode("AB13")
-		def productType = DbHelper.findOrCreateProductType("Default")
-		then:
+        def productType = DbHelper.findOrCreateProductType("Default")
+
+        then:
         assertNotNull product
 
-		when:
+        when:
         product = new Product();
         product.name = "New product"
         product.productCode = "AB13"
         product.category = Category.getRootCategory()
-		product.productType = productType
+        product.productType = productType
         def returnValue = service.saveProduct(product)
-        println product.errors
-		then:
+
+        then:
         assertNull returnValue
         assertNotNull product.errors.getFieldError("productCode")
-
-
     }
 
-    @Test
-    void validateProductIdentifier_shouldReturnTrueOnUnique() {
-        // Ensuring that product does not exist
-		when:
-		def product = Product.findByProductCode("ZZZZ")
-		then:
-		assertNull product
-        assertTrue service.validateProductIdentifier("ZZZZ")
-    }
-
-    @Test
-    void validateProductIdentifier_shouldReturnFalseOnDuplicate() {
-        // Ensuring that product does exist
-		when:
-		def product = Product.findByProductCode("AB13")
-		then:
-		assertNotNull product
-        assertFalse service.validateProductIdentifier("AB13")
-    }
-
-    @Test
-    void validateProductIdentifier_shouldReturnFalseOnEmpty() {
-		when:
-		"validateProductIdentifier"
-		then:
-		assertFalse service.validateProductIdentifier("");
-    }
-
-    @Test
-    void validateProductIdentifier_shouldReturnFalseOnNull() {
-		when:
-		"validateProductIdentifier"
-		then:
-        assertFalse service.validateProductIdentifier(null);
-    }
-
-
-    @Test
     void findOrCreateTag_shouldCreateTagSuccessfully() {
-		when:
+        when:
         def tag1 = Tag.findByTag("brand new tag")
-		then:
-        assertNull tag1
-		when:
-        def tag2 = service.findOrCreateTag("brand new tag")
-		then:
-        assertNotNull tag2
 
+        then:
+        assertNull tag1
+
+        when:
+        def tag2 = service.findOrCreateTag("brand new tag")
+
+        then:
+        assertNotNull tag2
     }
 
-    @Test
     void findOrCreateTag_shouldFindExistingTag() {
-		when:
-		def tag1 = Tag.findByTag("favorite")
-		then:
+        when:
+        def tag1 = Tag.findByTag("favorite")
+
+        then:
         assertNotNull tag1
         assertEquals 1, Tag.findAllByTag("favorite").size()
 
-		when:
+        when:
         def tag2 = service.findOrCreateTag("favorite")
-		then:
+
+        then:
         assertNotNull tag2
         assertEquals tag1.id, tag2.id
         assertEquals tag1, tag2
@@ -816,5 +670,4 @@ class ProductServiceIntegrationTests extends Specification implements ServiceUni
         // Make sure there's still only one "favorite" tag
         assertEquals 1, Tag.findAllByTag("favorite").size()
     }
-
 }

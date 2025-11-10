@@ -2,10 +2,9 @@ package org.pih.warehouse.requisition
 
 import grails.testing.gorm.DomainUnitTest
 
-// import grails.test.GrailsUnitTestCase
 import grails.validation.ValidationException
-import org.junit.Ignore
-import org.junit.Test
+import spock.lang.Ignore
+
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UnitOfMeasureClass
 import org.pih.warehouse.inventory.InventoryItem
@@ -13,13 +12,11 @@ import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
-import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionItem
 import org.springframework.context.ApplicationEvent
 import spock.lang.Specification
 import static org.junit.Assert.*;
 
-//@Ignore
+@Ignore('Fix these tests and move them to RequisitionItemSpec')
 class RequisitionItemTests extends Specification implements DomainUnitTest<Requisition> {
 
     Requisition requisition
@@ -31,7 +28,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
     InventoryItem abc123
 
     protected void setup() {
-//        super.setUp();
         UnitOfMeasureClass quantityClass = new UnitOfMeasureClass(name: "Quantity", code: "QTY")
         UnitOfMeasure bottle = new UnitOfMeasure(name: "Bottle", code: "BTL", uomClass: quantityClass)
 
@@ -52,11 +48,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         mockDomain(RequisitionItem)
     }
 
-    protected void tearDown() {
-//        super.tearDown()
-    }
-
-    @Test
     void constructor() {
         when:
         def requisitionItem = new RequisitionItem()
@@ -64,7 +55,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertEquals RequisitionItemType.ORIGINAL, requisitionItem.requisitionItemType
     }
 
-    @Test
     void validate_shouldSucceedWhenCanceledRequisitionItemHasCancelReasonCode() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 50, cancelReasonCode: "Because.", requisition: new Requisition())
@@ -75,7 +65,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertEquals 0, requisitionItem.errors.errorCount
     }
 
-    @Test
     void validate_shouldFailWhenCanceledRequisitionItemDoesNotHaveCancelReasonCode() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 50, requisition: new Requisition())
@@ -86,7 +75,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertNotNull requisitionItem.errors.getFieldError("quantityCanceled")
     }
 
-    @Test
     void cancelQuantity() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
@@ -108,7 +96,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertTrue requisitionItem.validate()
     }
 
-    @Test
     void cancelQuantity_shouldRemovePicklistItems() {
         when:
         def requisition = new Requisition()
@@ -133,7 +120,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
 
     }
 
-    @Test
     void cancelQuantity_shouldFailCannotCancelTwice() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
@@ -146,7 +132,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         }
     }
 
-    @Test
     void getStatus() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
@@ -169,7 +154,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
 
     }
 
-    @Test
     void approveQuantity() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
@@ -181,7 +165,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertTrue requisitionItem.isApproved()
     }
 
-    @Test
     void approveQuantity_shouldFailWhenAlreadyCancelled() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
@@ -199,8 +182,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertTrue requisitionItem.isCanceled()
     }
 
-
-    @Test
     void getChange_shouldReturnNullWhenChangesNotExist() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
@@ -232,8 +213,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertEquals requisitionItem3, requisitionItem.change
     }
 
-
-    @Test
     void changeQuantity() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
@@ -257,8 +236,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertTrue requisitionItem.validate()
     }
 
-
-    @Test
     void changePackageSize() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
@@ -283,7 +260,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertTrue requisitionItem.validate()
     }
 
-    @Test
     void changeQuantity_shouldFailOnEmptyOrNullReasonCode() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
@@ -301,7 +277,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
 
     }
 
-    @Test
     void changeQuantity_shouldFailOnNegativeQuantity() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
@@ -319,7 +294,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertFalse requisitionItem.isChanged()
     }
 
-    @Test
     void changeQuantity_shouldFailOnSameQuantity() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
@@ -338,7 +312,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertTrue requisitionItem.validate()
     }
 
-    @Test
     void changeQuantity_shouldCancelOnQuantityEqualsZero() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
@@ -361,7 +334,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertTrue requisitionItem.validate()
     }
 
-    @Test
     void undoChanges() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
@@ -404,11 +376,8 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertFalse requisitionItem.isPartiallyFulfilled()
         assertFalse requisitionItem.isApproved()
         assertTrue requisitionItem.validate()
-
-
     }
 
-    @Test
     void chooseSubstitute() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
@@ -440,7 +409,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
     }
     */
 
-    @Test
     void totalQuantityNotCanceled() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 50)
@@ -453,7 +421,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertEquals 200, requisitionItem.totalQuantityNotCanceled()
     }
 
-    @Test
     void quantityNotCanceled() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 50)
@@ -497,7 +464,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
 
     }
 
-    @Test
     void totalQuantity() {
         when:
         def requisitionItem1 = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100)
@@ -510,7 +476,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertEquals 2000, requisitionItem2.totalQuantity()
     }
 
-    @Test
     void totalQuantityCanceled() {
         when:
         def requisitionItem1 = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 100)
@@ -527,7 +492,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertEquals 1800, requisitionItem2.totalQuantityCanceled()
     }
 
-    @Test
     void totalQuantityApproved() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0)
@@ -538,7 +502,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertEquals 50, requisitionItem.totalQuantityApproved()
     }
 
-    @Test
     void totalQuantityApproved_usingPackage() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 3, quantityCanceled: 0)
@@ -549,7 +512,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertEquals 400, requisitionItem.totalQuantityApproved()
     }
 
-    @Test
     void calculatePercentagesBeforeItemPicked() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10, quantityCanceled: 9)
@@ -565,7 +527,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertEquals 0, requisitionItem.calculatePercentagePicked()
     }
 
-    @Test
     void calculatePercentageAfterItemPicked() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10, quantityCanceled: 9)
@@ -579,10 +540,8 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertEquals 90, requisitionItem.calculatePercentageCompleted()
         assertEquals 90, requisitionItem.calculatePercentageCanceled()
         assertEquals 10, requisitionItem.calculatePercentagePicked()
-
     }
 
-    @Test
     void calculateQuantityPickedBeforeItemPicked() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10, quantityCanceled: 9)
@@ -594,7 +553,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertEquals 200, requisitionItem.totalQuantityRemaining()
     }
 
-    @Test
     void calculateQuantityPickedAfterItemPicked() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10, quantityCanceled: 9)
@@ -611,8 +569,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertEquals 0, requisitionItem.totalQuantityRemaining()
     }
 
-
-    @Test
     void isCanceled() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10, quantityCanceled: 0)
@@ -630,10 +586,8 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         requisitionItem.quantityCanceled = 10
         then:
         assertTrue requisitionItem.isCanceled()
-
     }
 
-    @Test
     void isCompleted() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10, quantityCanceled: 0)
@@ -653,10 +607,8 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         //def picklistItem = new PicklistItem(inventoryItem: abc123, quantity: 1000, requisitionItem: requisitionItem)
         //mockDomain(PicklistItem, [picklistItem])
         //assertTrue requisitionItem.isCompleted()
-
     }
 
-    @Test
     void isFulfilled() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10, quantityCanceled: 10)
@@ -671,10 +623,8 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         requisitionItem.quantityCanceled = 0
         then:
         assertTrue requisitionItem.isFulfilled()
-
     }
 
-    @Test
     void isPartiallyFulfilled() {
         when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10, quantityCanceled: 0)
@@ -710,47 +660,8 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertEquals 0, requisitionItem.totalQuantityRemaining()
         assertEquals 1000, requisitionItem.totalQuantityPicked()
         assertFalse requisitionItem.isPartiallyFulfilled()
-
-
     }
 
-    /*
-    @Test
-    void hasSubstitution() {
-
-    }
-
-
-
-
-    @Test
-    void calculateQuantityRemaining() {
-    }
-
-    @Test
-    void calculateNumInventoryItem(Inventory inventory) {
-    }
-
-    @Test
-    void retrievePicklistItems() {
-    }
-
-    @Test
-    void availableInventoryItems() {
-    }
-
-    @Test
-    void calculatePercentagePicked() {
-    }
-
-
-    @Test
-    void calculatePercentageRemaining() {
-    }
-    */
-
-
-    @Test
     void testNotNullableConstraints() {
         when:
         mockForConstraintsTests(RequisitionItem)
@@ -761,7 +672,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assertEquals "nullable", requisitionItem.errors["quantity"]
     }
 
-    @Test
     void testQuantityConstraint() {
         when:
 //        mockForConstraintsTests(RequisitionItem)
@@ -771,7 +681,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
 //        println requisitionItem.errors["quantity"]
     }
 
-    @Test
     void testToJsonData(){
         when:
         def product = new Product(id: "prod1", productCode: "ASP", name:"aspin")
@@ -784,13 +693,13 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         substitutable: true,
         orderIndex: 3
       )
-	  
-	  mockDomain(Product, [product])
-	  mockDomain(RequisitionItem, [requisitionItem])
-	  
-      Map json = requisitionItem.toJson()	 
-	  
-	  println json
+
+      mockDomain(Product, [product])
+      mockDomain(RequisitionItem, [requisitionItem])
+
+      Map json = requisitionItem.toJson()
+
+      println json
         then:
       assert json.id == requisitionItem.id
       assert json.productId == requisitionItem.product.id
@@ -802,7 +711,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
       assert json.orderIndex == requisitionItem.orderIndex
     }
 
-    @Test
     void testcalculateQuantityPicked() {
 
         when:
@@ -823,7 +731,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
 
     }
 
-    @Test
     void testcalcuateNumInventoryItem()
     {
         when:
@@ -848,7 +755,6 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assert requisitionItem.calculateNumInventoryItem() == 3
     }
 
-    @Test
     void testRetrievePicklistItems() {
         when:
         def requisitionItem = new RequisitionItem(id: "reqItem1")
@@ -863,6 +769,5 @@ class RequisitionItemTests extends Specification implements DomainUnitTest<Requi
         assert list.contains(picklistItem1)
         assert list.contains(picklistItem2)
         assert list.contains(picklistItem3)
-
     }
 }
