@@ -108,6 +108,9 @@
     <sqlFile path="views/order-item-details.sql"/>
   </changeSet>
   <!-- views required for cycle count last counted -->
+  <changeSet id="1740696149645-0" author="kchelstowski" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/product-inventory-candidate.sql"/>
+  </changeSet>
   <changeSet id="1740696149645-1" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/product-cycle-count-history.sql"/>
   </changeSet>
