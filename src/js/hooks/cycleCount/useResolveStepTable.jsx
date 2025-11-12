@@ -75,9 +75,7 @@ const useResolveStepTable = ({
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!reasonCodes?.length) {
-      dispatch(fetchReasonCodes('CYCLE_COUNT', FETCH_CYCLE_COUNT_REASON_CODES));
-    }
+    dispatch(fetchReasonCodes('CYCLE_COUNT', FETCH_CYCLE_COUNT_REASON_CODES));
   }, []);
 
   // Get appropriate input component based on table column
