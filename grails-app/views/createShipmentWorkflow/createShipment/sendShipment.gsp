@@ -123,7 +123,10 @@
 									</td>
 									<td class="value ${hasErrors(bean: shipmentInstance, field: 'actualShippingDate', 'errors')}">
                                         <g:datePicker name="actualShippingDate"
-                                                      value="${shipmentInstance?.actualShippingDate?:new Date()}" precision="minute" noSelection="['':'']"/>
+                                                      value="${shipmentInstance?.actualShippingDate?:new Date()}"
+                                                      fieldType="${Date}"
+                                                      precision="minute"
+                                                      noSelection="['':'']"/>
 
 									</td>
 								</tr>

@@ -39,7 +39,11 @@
 							<label><warehouse:message code="transaction.transactionDate.label"/></label>
 						</td>
 						<td class="value">
-							<g:datePicker name="transactionDate" value="${commandInstance?.transactionDate}" precision="minute" noSelection="['':'']"/>
+							<g:datePicker name="transactionDate"
+                                          value="${commandInstance?.transactionDate}"
+                                          fieldType="${Date}"
+                                          precision="minute"
+                                          noSelection="['':'']"/>
 						</td>
 					</tr>
 					<tr class="prop">
@@ -126,8 +130,12 @@
 										<g:if test ="${!recordInventoryRow?.oldQuantity}">
 											<g:set var="currentYear" value="${new Date()[Calendar.YEAR]}"/>
 											<g:set var="minimumYear" value="${ConfigHelper.minimumExpirationDate[Calendar.YEAR]}"/>
-											<g:datePicker name="recordInventoryRows[${status}].expirationDate" years="${minimumYear..currentYear + 20}"
-														  noSelection="['': '']" precision="day" value="${recordInventoryRow?.expirationDate}"/>
+											<g:datePicker name="recordInventoryRows[${status}].expirationDate"
+                                                          years="${minimumYear..currentYear + 20}"
+                                                          noSelection="['': '']"
+                                                          precision="day"
+                                                          value="${recordInventoryRow?.expirationDate}"
+                                                          fieldType="${Date}"/>
 										</g:if>
 										<g:else>
 											<g:hiddenField name="recordInventoryRows[${status}].expirationDate"
@@ -465,6 +473,7 @@
 		<g:set var="minimumYear" value="${ConfigHelper.minimumExpirationDate[Calendar.YEAR]}"/>
         <g:datePicker name="recordInventoryRows[{{= getIndex()}}].expirationDate"
                       default="none"
+                      fieldType="${Date}"
 					  noSelection="['': '']"
 					  years="${minimumYear..currentYear + 20}"
                       precision="day"/>
