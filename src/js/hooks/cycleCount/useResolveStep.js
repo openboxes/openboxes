@@ -219,12 +219,14 @@ const useResolveStep = () => {
     return [...originalItems, ...customItemsSortedByCreationDate];
   };
 
-  const refetchData = async (ids = cycleCountIds) => {
+  const refetchData = async ({ ids = cycleCountIds, showSpinner = true } = {}) => {
     if (ids.length === 0) {
       return;
     }
     try {
-      show();
+      if (showSpinner) {
+        show();
+      }
       const { data } = await cycleCountApi.getCycleCounts(
         currentLocation?.id,
         ids,
@@ -259,7 +261,9 @@ const useResolveStep = () => {
       recountedBy.current = recountedByData;
       defaultRecountedBy.current = recountedByData;
     } finally {
-      hide();
+      if (showSpinner) {
+        hide();
+      }
     }
   };
 
@@ -559,9 +563,13 @@ const useResolveStep = () => {
     shouldValidateExistence = true,
     shouldSetDefaultAssignee = false,
     shouldRefetchLotNumbers = false,
+    showSpinner = true,
   }) => {
     try {
-      show();
+      if (showSpinner) {
+        show();
+      }
+
       markAllItemsAsUpdated();
       if (shouldValidateExistence) {
         const isValid = await validateExistenceOfCycleCounts();
@@ -609,7 +617,9 @@ const useResolveStep = () => {
         // they won't be available in the dropdown.
         dispatch(fetchLotNumbersByProductIds(uniqueProductIds));
       }
-      hide();
+      if (showSpinner) {
+        hide();
+      }
     }
   };
 
@@ -650,13 +660,13 @@ const useResolveStep = () => {
       if (!isValid) {
         return;
       }
-      await save({ shouldRefetch: false });
+      await save({ shouldRefetch: false, showSpinner: false });
       for (const cycleCountId of cycleCountIdsForOutdatedProducts) {
         await cycleCountApi.refreshItems(currentLocation?.id, cycleCountId, true, 1);
       }
+      await refetchData({ ids: cycleCountIdsForOutdatedProducts, showSpinner: false });
     } finally {
       hide();
-      await refetchData(cycleCountIdsForOutdatedProducts);
     }
   };
 
