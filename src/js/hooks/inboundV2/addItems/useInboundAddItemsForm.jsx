@@ -22,9 +22,10 @@ import {
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import InboundV2Step from 'consts/InboundStep';
 import RequisitionStatus from 'consts/requisitionStatus';
+import { InboundWorkflowState } from 'consts/StockMovementState';
 import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
-import { InboundWorkflowState } from 'consts/WorkflowState';
 import useInboundAddItemsValidation from 'hooks/inboundV2/addItems/useInboundAddItemsValidation';
+import useHandleModalAction from 'hooks/useHandleModalAction';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
@@ -41,9 +42,12 @@ const useInboundAddItemsForm = ({
   // State used to trigger focus reset when changed. When this counter changes,
   // it will reset the focus by clearing the RowIndex and ColumnId in useEffect.
   const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
-  const [isExpirationModalOpen, setIsExpirationModalOpen] = useState(false);
-  const [itemsWithMismatchedExpiry, setItemsWithMismatchedExpiry] = useState([]);
-  const [resolveExpirationPromise, setResolveExpirationPromise] = useState(null);
+  const {
+    isOpen: isExpirationModalOpen,
+    data: itemsWithMismatchedExpiry,
+    openModal: confirmExpirationDateSave,
+    handleResponse: handleExpirationModalResponse,
+  } = useHandleModalAction();
 
   const history = useHistory();
   const location = useLocation();
@@ -212,33 +216,27 @@ const useInboundAddItemsForm = ({
     setRefreshFocusCounter((prev) => prev + 1);
   };
 
-  const shouldUpdateItem = (item, oldItem) => {
-    const oldQty = Number(oldItem.quantityRequested) || 0;
-    const newQty = Number(item.quantityRequested) || 0;
+  const shouldUpdateItem = (lineItems) =>
+    lineItems.filter(
+      (item) =>
+        item.statusCode
+        && getValues('currentLineItems').some((oldItem) => {
+          if (oldItem.id !== item.id) {
+            return false;
+          }
+          const expirationDateChanged = (item.expirationDate
+              && item.inventoryItem?.expirationDate !== item.expirationDate)
+            || (!item.expirationDate && oldItem.expirationDate);
 
-    const expirationDateChanged = (item.expirationDate
-        && item.inventoryItem?.expirationDate !== item.expirationDate)
-      || (!item.expirationDate && oldItem.expirationDate);
-
-    return (
-      item.palletName !== oldItem.palletName
-      || item.boxName !== oldItem.boxName
-      || item.product?.id !== oldItem.product.id
-      || newQty !== oldQty
-      || item.recipient?.id !== oldItem.recipient?.id
-      || item.lotNumber !== oldItem.lotNumber
-      || expirationDateChanged
+          return !_.isEqual(item, oldItem) || expirationDateChanged;
+        }),
     );
-  };
-
   const getLineItemsToBeSaved = (lineItems) => {
     const lineItemsToBeAdded = lineItems.filter(
       (item) => !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product,
     );
 
-    const lineItemsToBeUpdated = lineItems.filter((item) => item.statusCode
-      && getValues().currentLineItems.some((old) =>
-        old.id === item.id && shouldUpdateItem(item, old)));
+    const lineItemsToBeUpdated = shouldUpdateItem(lineItems);
 
     const formatItem = (item) => ({
       id: item.id,
@@ -353,34 +351,6 @@ const useInboundAddItemsForm = ({
     }
   };
 
-  /**
-   *  Shows Inventory item expiration date update confirmation modal.
-   *  @param {Array} mismatchedItems - Array of elements with mismatched expiration dates.
-   *  @returns {Promise} - Resolves to true if user confirms the update, false if not.
-   * @public
-   */
-  const confirmExpirationDateSave = (mismatchedItems) => new Promise((resolve) => {
-    setItemsWithMismatchedExpiry(mismatchedItems);
-    setResolveExpirationPromise(() => resolve);
-    setIsExpirationModalOpen(true);
-  });
-
-  /**
-   * Handles the response from the expiration date confirmation modal.
-   * @param {boolean} shouldUpdate - True if the user confirmed the update, false if not.
-   * @public
-   */
-  const handleExpirationModalResponse = (shouldUpdate) => {
-    // Resolve the promise returned by confirmExpirationDateSave.
-    if (resolveExpirationPromise) {
-      resolveExpirationPromise(shouldUpdate);
-    }
-    // Close the modal and reset its state.
-    setIsExpirationModalOpen(false);
-    setItemsWithMismatchedExpiry([]);
-    setResolveExpirationPromise(null);
-  };
-
   const handleTransition = async (updatedValues, lineItems) => {
     const updatedLineItems = updatedValues.lineItems || [];
 
@@ -388,39 +358,37 @@ const useInboundAddItemsForm = ({
       (item) => item.inventoryItem && item.expirationDate !== item.inventoryItem.expirationDate,
     );
 
-    if (hasExpiryMismatch) {
-      const hasNonZeroQuantity = updatedLineItems.some(
-        (item) => item.inventoryItem?.quantity && item.inventoryItem.quantity !== '0',
-      );
+    if (!hasExpiryMismatch) {
+      return transitionToNextStep(updatedValues);
+    }
+    const hasNonZeroQuantity = updatedLineItems.some(
+      (item) => item.inventoryItem?.quantity && item.inventoryItem.quantity !== '0',
+    );
 
-      if (hasNonZeroQuantity) {
-        const mismatchedItems = updatedLineItems
-          .filter((item) =>
-            item.inventoryItem &&
-            item.inventoryItem.expirationDate !== item.expirationDate &&
-            item.inventoryItem.quantity &&
-            item.inventoryItem.quantity !== '0')
-          .map((item) => ({
-            code: item.product?.productCode,
-            product: item.product,
-            lotNumber: item.lotNumber,
-            previousExpiry: item.inventoryItem.expirationDate,
-            newExpiry: item.expirationDate,
-          }));
+    if (hasNonZeroQuantity) {
+      const mismatchedItems = updatedLineItems
+        .filter((item) =>
+          item.inventoryItem
+            && item.inventoryItem.expirationDate !== item.expirationDate
+            && item.inventoryItem.quantity
+            && item.inventoryItem.quantity !== '0')
+        .map((item) => ({
+          code: item.product?.productCode,
+          product: item.product,
+          lotNumber: item.lotNumber,
+          previousExpiry: item.inventoryItem.expirationDate,
+          newExpiry: item.expirationDate,
+        }));
 
-        if (mismatchedItems.length > 0) {
-          const shouldUpdate = await confirmExpirationDateSave(mismatchedItems);
-          if (!shouldUpdate) {
-            Promise.reject();
-          }
+      if (mismatchedItems.length > 0) {
+        const shouldUpdate = await confirmExpirationDateSave(mismatchedItems);
+        if (!shouldUpdate) {
+          return Promise.reject();
         }
       }
-
-      updateInventoryItemsAndTransitionToNextStep(updatedValues, lineItems);
-      return;
     }
 
-    transitionToNextStep(updatedValues);
+    return updateInventoryItemsAndTransitionToNextStep(updatedValues, lineItems);
   };
 
   const saveAndTransitionToNextStep = async (values, lineItems) => {

@@ -25,7 +25,7 @@ import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfield
 import EditPickModal from 'components/stock-movement-wizard/modals/EditPickModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
-import { OutboundWorkflowState } from 'consts/WorkflowState';
+import { OutboundWorkflowState } from 'consts/StockMovementState';
 import AlertMessage from 'utils/AlertMessage';
 import {
   apiClientCustomResponseHandler as apiClient,
