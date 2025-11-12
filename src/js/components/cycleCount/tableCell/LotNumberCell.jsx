@@ -89,7 +89,7 @@ const LotNumberCell = ({
   })), []);
 
   const isDisabled = useMemo(() =>
-    !id?.includes('newRow'), []);
+    !id?.includes('newRow'), [id]);
 
   const placeholder = isDisabled
     && translate('react.cycleCount.emptyLotNumber.label', 'NO LOT');

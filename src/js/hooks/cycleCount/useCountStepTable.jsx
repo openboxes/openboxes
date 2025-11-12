@@ -4,7 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   getCurrentLocationId,
-  getCurrentLocationSupportedActivities, makeGetCycleCountItem,
+  getCurrentLocationSupportedActivities,
   makeGetCycleCountItemIds,
   makeGetCycleCountItemsTotalCount,
 } from 'selectors';
@@ -146,7 +146,7 @@ const useCountStepTable = ({
         flexWidth: 25,
       },
     }),
-  ], []);
+  ], [isStepEditable]);
 
   return {
     columns,
