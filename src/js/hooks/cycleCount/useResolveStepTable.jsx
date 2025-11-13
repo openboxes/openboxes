@@ -356,16 +356,12 @@ const useResolveStepTable = ({
           selectedLotNumber,
         );
 
-        const formattedExpirationDate = existingLot
-          ? formatLocalizedDate(existingLot.expirationDate, DateFormat.DD_MMM_YYYY)
-          : null;
-
         // when we change the lot number, we also want to update the expiration date
         table.options.meta?.updateData(
           cycleCountId,
           original.id,
           cycleCountColumn.EXPIRATION_DATE,
-          formattedExpirationDate,
+          existingLot?.expirationDate,
         );
 
         setValue(selectedLotNumber);
