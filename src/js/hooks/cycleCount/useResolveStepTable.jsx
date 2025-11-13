@@ -554,9 +554,7 @@ const useResolveStepTable = ({
       ), []),
       cell: useCallback(({ row: { original: { quantityCounted, commentFromCount } } }) => (
         <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
-          {quantityCounted === null
-            ? <ValueIndicator variant={valueIndicatorVariant.EMPTY} />
-            : quantityCounted}
+          {quantityCounted ?? <ValueIndicator variant={valueIndicatorVariant.EMPTY} />}
           {commentFromCount && (
             <Tooltip
               arrow="true"
