@@ -110,7 +110,10 @@
                     </label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: eventInstance, field: 'eventDate', 'errors')}">
-                    <g:datePicker name="eventDate" value="${eventInstance?.eventDate}" precision="minute"/>
+                    <g:datePicker name="eventDate"
+                                  value="${eventInstance?.eventDate}"
+                                  fieldType="${Date}"
+                                  precision="minute"/>
                 </td>
             </tr>
             %{-- Comment input field --}%

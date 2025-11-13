@@ -100,8 +100,12 @@
 							<td>
 								<g:set var="yearStart" value="${new Date().format('yyyy')as int}"/>
 								<g:set var="yearEnd" value="${2050}"/>
-								<g:datePicker name="expirationDate" precision="day" noSelection="['null':'']" value=""
-									years="${yearStart..yearEnd }"/>
+								<g:datePicker name="expirationDate"
+                                              precision="day"
+                                              noSelection="['null':'']"
+                                              value=""
+                                              fieldType="${Date}"
+                                              years="${yearStart..yearEnd }"/>
 								<button class="button icon add">
 									<warehouse:message code="default.button.save.label"/>
 								</button>

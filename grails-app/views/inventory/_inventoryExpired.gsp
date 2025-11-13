@@ -10,7 +10,11 @@
                     <label><warehouse:message code="transaction.date.label"/></label>
                 </td>
 				<td class="value">
-                    <g:datePicker name="transactionInstance.transactionDate" value="${command?.transactionInstance?.transactionDate}" precision="minute" noSelection="['':'']"/>
+                    <g:datePicker name="transactionInstance.transactionDate"
+                                  value="${command?.transactionInstance?.transactionDate}"
+                                  fieldType="${Date}"
+                                  precision="minute"
+                                  noSelection="['':'']"/>
                 </td>
 			</tr>
 			<tr class="prop">

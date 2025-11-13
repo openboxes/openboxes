@@ -19,7 +19,11 @@
 					<label><warehouse:message code="transaction.date.label"/></label>
 				</td>
 				<td class="value">
-                    <g:datePicker name="transactionInstance.transactionDate" value="${command?.transactionInstance?.transactionDate}" precision="minute" noSelection="['':'']"/>
+                    <g:datePicker name="transactionInstance.transactionDate"
+                                  value="${command?.transactionInstance?.transactionDate}"
+                                  fieldType="${Date}"
+                                  precision="minute"
+                                  noSelection="['':'']"/>
 				</td>
 			</tr>
 			<tr class="prop">
@@ -125,8 +129,12 @@
 													<g:textField class="text" name="transactionEntries[${i }].lotNumber"
 														value="${transactionEntry?.lotNumber }"/>
 
-													<g:datePicker name="transactionEntries[${i }].expirationDate" precision="day" noSelection="['':'']"
-														value="${transactionEntry?.expirationDate }" years="${(1900 + (new Date().year))..(1900+ (new Date() + (20 * 365)).year)}"/>
+													<g:datePicker name="transactionEntries[${i }].expirationDate"
+                                                                  precision="day"
+                                                                  noSelection="['':'']"
+                                                                  value="${transactionEntry?.expirationDate }"
+                                                                  fieldType="${Date}"
+                                                                  years="${(1900 + (new Date().year))..(1900+ (new Date() + (20 * 365)).year)}"/>
 
 													<img class="undo middle" src="${resource(dir:'images/icons/silk',file:'decline.png')}" title="${warehouse.message(code: 'cancel.label') }" alt="${warehouse.message(code: 'cancel.label') }"/>
 												</span>
@@ -218,8 +226,12 @@
 													<g:textField class="text" name="transactionEntries[${i }].lotNumber"
 														value="${command?.transactionEntries[i]?.lotNumber }"/>
 
-													<g:datePicker name="transactionEntries[${i }].expirationDate" precision="day" noSelection="['':'']"
-														value="${command?.transactionEntries[i]?.expirationDate }" years="${(1900 + (new Date().year))..(1900+ (new Date() + (20 * 365)).year)}"/>
+													<g:datePicker name="transactionEntries[${i }].expirationDate"
+                                                                  precision="day"
+                                                                  noSelection="['':'']"
+                                                                  value="${command?.transactionEntries[i]?.expirationDate }"
+                                                                  fieldType="${Date}"
+                                                                  years="${(1900 + (new Date().year))..(1900+ (new Date() + (20 * 365)).year)}"/>
 
 													<img class="undo middle" src="${resource(dir:'images/icons/silk',file:'decline.png')}" alt="${warehouse.message(code: 'cancel.label') }"/>
 												</span>

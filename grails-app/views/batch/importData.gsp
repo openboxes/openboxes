@@ -71,7 +71,10 @@
                                         <label><warehouse:message code="default.date.label"/></label>
                                     </td>
                                     <td class="value">
-                                        <g:datePicker name="date" value="${commandInstance?.date}" precision="minute"/>
+                                        <g:datePicker name="date"
+                                                      value="${commandInstance?.date}"
+                                                      fieldType="${Date}"
+                                                      precision="minute"/>
                                     </td>
                                 </tr>
                             </g:if>

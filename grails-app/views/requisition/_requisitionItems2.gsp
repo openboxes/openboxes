@@ -25,7 +25,10 @@
                         </label>
                     </td>
                     <td class="value">
-                        <g:datePicker name="dateVerified" value="${requisition?.dateVerified}" precision="minute"/>
+                        <g:datePicker name="dateVerified"
+                                      value="${requisition?.dateVerified}"
+                                      fieldType="${Date}"
+                                      precision="minute"/>
 
                         <button class="button icon approve">
                             ${warehouse.message(code:'default.button.save.label')}
