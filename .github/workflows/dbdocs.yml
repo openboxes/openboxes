@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 8
-          distribution: zulu
+          distribution: temurin
           cache: gradle
 
       - name: Install dbdocs

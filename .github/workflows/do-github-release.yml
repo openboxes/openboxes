@@ -35,8 +35,8 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 8
-          distribution: zulu
-          cache: 'gradle'
+          distribution: temurin
+          cache: gradle
 
       - name: Build WAR file
         run: ./grailsw war --info --no-daemon
