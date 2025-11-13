@@ -637,9 +637,11 @@ const useCountStep = () => {
       custom: true,
       inventoryItem: {
         lotNumber: item.lotNumber,
-        expirationDate: moment(item.expirationDate)
-          .locale(locale)
-          .format(DateFormat.MMM_DD_YYYY),
+        expirationDate: item.expirationDate
+          ? moment(item.expirationDate)
+            .locale(locale)
+            .format(DateFormat.MMM_DD_YYYY)
+          : null,
       },
       product: {
         id: item.product.id,
