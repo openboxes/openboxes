@@ -8,7 +8,7 @@ services:
         DATASOURCE_USERNAME: ${DATASOURCE_USERNAME:-openboxes}
         DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD:-openboxes}
         DATASOURCE_URL: ${DATASOURCE_URL:-jdbc:mysql://db/openboxes?useSSL=false}
-        GRAILS_SERVERURL: ${OPENBOXES_SERVER_URL}
+        GRAILS_SERVER_URL: ${GRAILS_SERVER_URL:-http://localhost:8080/openboxes/}
         JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--Xms1024m -Xmx1024m -XX:+UseParallelGC -Djava.awt.headless=true}
       healthcheck:
         test: "curl --fail --silent localhost:8080/openboxes/health | grep UP || exit 1"
