@@ -870,6 +870,7 @@ class StockMovementService {
                 def demand = forecastingService.getDemand(requisition.origin, requisition.destination, stockMovementItem.product)
                 return [
                         id                              : stockMovementItem.id,
+                        version                         : stockMovementItem.version,
                         product                         : stockMovementItem.product,
                         productCode                     : stockMovementItem.productCode,
                         quantityOnHand                  : quantityOnHand ?: 0,
@@ -881,6 +882,7 @@ class StockMovementService {
                         sortOrder                       : stockMovementItem.sortOrder,
                         monthlyDemand                   : demand?.monthlyDemand ?: 0,
                         demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand ?: 0) * (template?.replenishmentPeriod ?: 30)),
+                        manuallyAdded                   : stockMovementItem.manuallyAdded,
                 ]
             } else if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
                 def demand
@@ -894,6 +896,7 @@ class StockMovementService {
                 }
                 return [
                         id                              : stockMovementItem.id,
+                        version                         : stockMovementItem.version,
                         product                         : stockMovementItem.product,
                         productCode                     : stockMovementItem.productCode,
                         quantityOnHand                  : quantityOnHand ?: 0,
@@ -906,10 +909,12 @@ class StockMovementService {
                         sortOrder                       : stockMovementItem.sortOrder,
                         monthlyDemand                   : demand?.monthlyDemand ?: 0,
                         demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand ?: 0) * (template?.replenishmentPeriod ?: 30)),
+                        manuallyAdded                   : stockMovementItem.manuallyAdded,
                 ]
             } else {
                 return [
                         id                  : stockMovementItem.id,
+                        version             : stockMovementItem.version,
                         product             : stockMovementItem.product,
                         productCode         : stockMovementItem.productCode,
                         quantityOnHand      : quantityOnHand ?: 0,
@@ -920,6 +925,7 @@ class StockMovementService {
                         quantityRequested   : stockMovementItem.quantityRequested,
                         statusCode          : stockMovementItem.statusCode,
                         sortOrder           : stockMovementItem.sortOrder,
+                        manuallyAdded       : stockMovementItem.manuallyAdded,
                 ]
             }
         }
@@ -2365,9 +2371,9 @@ class StockMovementService {
         }
     }
 
-    StockMovement updateItems(StockMovement stockMovement) {
+    StockMovement updateItems(StockMovement stockMovement, boolean removeEmptyItems=false) {
         if (stockMovement.requisition) {
-            return updateRequisitionBasedStockMovementItems(stockMovement)
+            return updateRequisitionBasedStockMovementItems(stockMovement, removeEmptyItems)
         }
         else {
             return updateShipmentBasedStockMovementItems(stockMovement)
@@ -2458,14 +2464,14 @@ class StockMovementService {
         return shipmentItem
     }
 
-
-    StockMovement updateRequisitionBasedStockMovementItems(StockMovement stockMovement) {
+    private StockMovement updateRequisitionBasedStockMovementItems(StockMovement stockMovement,
+                                                                   boolean removeEmptyItems) {
         Requisition requisition = Requisition.get(stockMovement.id)
 
         if (stockMovement.lineItems) {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
                 RequisitionItem requisitionItem
-                // Try to find a matching stock movement item
+                // Try to find a requisition item matching the stock movement item
                 if (stockMovementItem.id) {
                     requisitionItem = requisition.requisitionItems.find {
                         it.id == stockMovementItem.id
@@ -2481,7 +2487,10 @@ class StockMovementService {
                     requisitionItem.quantityCounted = stockMovementItem.quantityCounted
                     removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
 
-                    if (!stockMovementItem.quantityRequested) {
+                    // If the item has 0 or null quantity requested, remove it. We add the ability to conditionally not
+                    // remove empty items because often the update is a part of a "save as draft" feature. We only want
+                    // to remove empty rows when we're actually proceeding to the next step of the requisition flow.
+                    if (removeEmptyItems && !stockMovementItem.quantityRequested) {
                         log.info "Item deleted " + requisitionItem.id
                         requisitionItem.undoChanges()
                         requisition.removeFromRequisitionItems(requisitionItem)

@@ -69,6 +69,8 @@ enum ActivityCode {
 
     ALLOW_OVERPICK('ALLOW_OVERPICK'),
 
+    CYCLE_COUNT('CYCLE_COUNT'),
+
     NONE('NONE')
 
     final String id
@@ -105,6 +107,7 @@ enum ActivityCode {
                 DYNAMIC_CREATION,
                 AUTOSAVE,
                 ALLOW_OVERPICK,
+                CYCLE_COUNT,
                 NONE,
         ]
     }

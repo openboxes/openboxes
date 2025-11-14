@@ -105,6 +105,15 @@
 									</label>
 								</p>
 							</div>
+                            <div class="filter-list-item">
+                                <label><g:message code="product.label"/></label>
+                                <p>
+                                    <g:selectProductAjax id="products-select"
+                                                         value="${params?.products}"
+                                                         multiple="true"
+                                    />
+                                </p>
+                            </div>
 							<div class="filter-list-item">
 								<label><warehouse:message code="tag.label"/></label>
 								<p>
@@ -250,6 +259,14 @@
 				data.push({ name: "startDate", value: $("#startDate").val() });
 				data.push({ name: "endDate", value: $("#endDate").val() });
 				data.push({ name: "category", value: $("#category").val() });
+
+                const selectedProducts = $("#products-select").val();
+                if (selectedProducts) {
+                  selectedProducts.forEach(productId => {
+                    data.push({ name: "products", value: productId });
+                  });
+                }
+
 				data.push({ name: "tags", value: $("#tags").val() });
 				data.push({ name: "catalogs", value: $("#catalogs").val() });
 				if($('#includeCategoryChildren').is(':checked')) {
@@ -372,6 +389,7 @@
 				startDate: $("#startDate").val(),
 				endDate: $("#endDate").val(),
 				category: $("#category").val(),
+                products: $("#products-select").val(),
 				tags: $("#tags").val(),
 				catalogs: $("#catalogs").val(),
 				format: "text/csv"

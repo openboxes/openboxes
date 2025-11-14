@@ -3,28 +3,44 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Controller, useWatch } from 'react-hook-form';
 import { useSelector } from 'react-redux';
+import {
+  getFormatLocalizedDate,
+} from 'selectors';
 
-import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import Switch from 'components/form-elements/v2/Switch';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
+import { DateFormat } from 'consts/timeFormat';
 import { debounceOrganizationsFetch, debounceProductsFetch } from 'utils/option-utils';
 import { FormErrorPropType } from 'utils/propTypes';
 
-const BasicDetails = ({ control, errors }) => {
+const BasicDetails = ({ control, errors, getValues }) => {
   const {
     debounceTime,
     minSearchLength,
+    formatLocalizedDate,
   } = useSelector((state) => ({
     debounceTime: state.session.searchConfig.debounceTime,
     minSearchLength: state.session.searchConfig.minSearchLength,
+    formatLocalizedDate: getFormatLocalizedDate(state),
   }));
 
   // Watch product's input changes live, in order to display a "View Product" link
   // with a proper product id
   const product = useWatch({ control, name: 'basicDetails.product' });
+
+  const { basicDetails } = getValues();
+
+  /**
+   * Formats a given user and date into a single string value for display.
+   */
+  const userDateFieldValue = (user, date) => {
+    const formattedDate = formatLocalizedDate(date, DateFormat.MMM_DD_YYYY);
+    const joinerString = formattedDate && user ? ', ' : '';
+    return `${formattedDate ?? ''}${joinerString}${user ? `by ${user}` : ''}`;
+  };
 
   return (
     <Subsection
@@ -151,31 +167,17 @@ const BasicDetails = ({ control, errors }) => {
           />
         </div>
         <div className="col-lg-4 col-md-6 px-2 pt-2">
-          <Controller
-            name="basicDetails.dateCreated"
-            control={control}
-            render={({ field }) => (
-              <DateField
-                title={{ id: 'react.productSupplier.form.dateCreated.title', defaultMessage: 'Source Creation Date' }}
-                errorMessage={errors.dateCreated?.message}
-                {...field}
-                disabled
-              />
-            )}
+          <TextInput
+            title={{ id: 'react.productSupplier.form.created.title', defaultMessage: 'Created' }}
+            value={userDateFieldValue(basicDetails?.createdBy?.name, basicDetails?.dateCreated)}
+            disabled
           />
         </div>
         <div className="col-lg-4 col-md-6 px-2 pt-2">
-          <Controller
-            name="basicDetails.lastUpdated"
-            control={control}
-            render={({ field }) => (
-              <DateField
-                title={{ id: 'react.productSupplier.form.lastUpdated.title', defaultMessage: 'Last Update' }}
-                errorMessage={errors.lastUpdated?.message}
-                {...field}
-                disabled
-              />
-            )}
+          <TextInput
+            title={{ id: 'react.productSupplier.form.updated.title', defaultMessage: 'Updated' }}
+            value={userDateFieldValue(basicDetails?.updatedBy?.name, basicDetails?.lastUpdated)}
+            disabled
           />
         </div>
         <div className="col-lg-4 col-md-6 px-2 pt-2">
@@ -215,13 +217,12 @@ export const basicDetailsFormErrors = PropTypes.shape({
   supplierCode: FormErrorPropType,
   name: FormErrorPropType,
   active: FormErrorPropType,
-  dateCreated: FormErrorPropType,
-  lastUpdated: FormErrorPropType,
 });
 
 BasicDetails.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: basicDetailsFormErrors,
+  getValues: PropTypes.func.isRequired,
 };
 
 BasicDetails.defaultProps = {

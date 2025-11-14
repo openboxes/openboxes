@@ -12,7 +12,12 @@ import _ from 'lodash';
 import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { getCurrentLocation, getCycleCountRequestIds } from 'selectors';
+import {
+  getCurrentLocale,
+  getCurrentLocation,
+  getCurrentUser,
+  getCycleCountRequestIds,
+} from 'selectors';
 
 import {
   eraseDraft,
@@ -71,10 +76,12 @@ const useCountStep = () => {
     cycleCountIds,
     currentLocation,
     currentUser,
+    locale,
   } = useSelector((state) => ({
     cycleCountIds: getCycleCountRequestIds(state),
     currentLocation: getCurrentLocation(state),
-    currentUser: state.session.user,
+    currentUser: getCurrentUser(state),
+    locale: getCurrentLocale(state),
   }));
 
   const showBinLocation = useMemo(() =>
@@ -337,7 +344,9 @@ const useCountStep = () => {
       product: cycleCountItem.product?.id,
       expirationDate: dateWithoutTimeZone({
         date: cycleCountItem?.inventoryItem?.expirationDate,
+        currentDateFormat: DateFormat.MMM_DD_YYYY,
         outputDateFormat: DateFormat.MM_DD_YYYY,
+        locale,
       }),
     },
     cycleCount: cycleCountItem.cycleCountId,

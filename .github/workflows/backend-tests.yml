@@ -5,7 +5,8 @@ on:
   workflow_call:
     secrets:
       CODECOV_TOKEN:
-        required: true
+        # If we're running tests for a PR from a fork, this will not be available.
+        required: false
 
 jobs:
   run-backend-tests:
@@ -23,8 +24,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: ${{vars.JAVA_VERSION}}
-          distribution: zulu
+          java-version: 8
+          distribution: temurin
           cache: gradle
 
       # Run all tests against each of the databases defined in the above matrix. We could split the integration

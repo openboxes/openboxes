@@ -16,13 +16,14 @@ const dateWithoutTimeZone = ({
   date,
   currentDateFormat,
   outputDateFormat = DateFormat.MM_DD_YYYY,
+  locale = 'en',
 }) => {
   if (!date) {
     return null;
   }
 
   const parsedDate = currentDateFormat
-    ? moment(date, currentDateFormat).utcOffset(0, true)
+    ? moment(date, currentDateFormat, locale).utcOffset(0, true)
     : moment(date).utcOffset(0, true);
   return parsedDate.format(outputDateFormat);
 };

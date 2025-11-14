@@ -114,7 +114,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         createExpectedProductInventoryTransaction(facility, product, cycleCount, date)
 
         when:
-        List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, true)
+        List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, [product], true)
 
         then: 'the only transaction should be the product inventory one'
         assert transactions.size() == 1
@@ -163,7 +163,8 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         createExpectedProductInventoryTransaction(facility, product2, cycleCount, date)
 
         when:
-        List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, true)
+        List<Transaction> transactions = cycleCountTransactionService.createTransactions(
+                cycleCount, [product1, product2], true)
 
         then: 'the only transactions should be the product inventory ones'
         assert transactions.size() == 2
@@ -223,7 +224,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         createExpectedProductInventoryTransaction(facility, product, cycleCount, date)
 
         when:
-        List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, true)
+        List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, [product], true)
 
         then: 'both a product inventory and adjustment transaction should be created'
         assert transactions.size() == 2
@@ -289,7 +290,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         createExpectedProductInventoryTransaction(facility, product, cycleCount, date)
 
         when:
-        cycleCountTransactionService.createTransactions(cycleCount, true)
+        cycleCountTransactionService.createTransactions(cycleCount, [product], true)
 
         then:
         thrown(IllegalArgumentException)

@@ -10,18 +10,23 @@
 package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
+import grails.plugins.csv.CSVWriter
 import grails.validation.ValidationException
 import org.hibernate.criterion.CriteriaSpecification
-
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.localization.MessageLocalizer
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.ImporterUtil
+import org.pih.warehouse.inventory.product.ExpirationHistoryReport
 import org.pih.warehouse.inventory.product.availability.AvailableItemKey
 import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.product.Category
@@ -48,6 +53,7 @@ class InventoryService implements ApplicationContextAware {
     RecordStockProductInventoryTransactionService recordStockProductInventoryTransactionService
     ProductAvailabilityService productAvailabilityService
     ConfigService configService
+    MessageLocalizer messageLocalizer
 
     def authService
     def dataService
@@ -3448,5 +3454,68 @@ class InventoryService implements ApplicationContextAware {
                     transactionTypeId: latest[2]
             ]
         }
+    }
+
+    ExpirationHistoryReport getExpirationHistoryReport(ExpirationHistoryReportFilterCommand command) {
+        List<TransactionEntry> entries = TransactionEntry.createCriteria().list(offset: command.paginationParams.offset, max: command.paginationParams.max) {
+            createAlias("transaction", "t", JoinType.INNER_JOIN)
+            if (command.searchTerm) {
+                createAlias("inventoryItem", "ii", JoinType.INNER_JOIN)
+                createAlias("ii.product", "p", JoinType.INNER_JOIN)
+                or {
+                    ilike("t.transactionNumber", "%" + command.searchTerm + "%")
+                    ilike("p.productCode", "%" + command.searchTerm + "%")
+                    ilike("t.id", "%" + command.searchTerm + "%")
+                }
+            }
+            // Expired transaction type is hardcoded with id = "4"
+            eq("t.transactionType", TransactionType.read(Constants.EXPIRATION_TRANSACTION_TYPE_ID))
+            eq("t.inventory", AuthService.currentLocation.inventory)
+            between("t.transactionDate", command.startDate, command.endDate)
+            order("t.transactionDate", "desc")
+        }
+
+        PaginatedList<ExpirationHistoryReportRow> rows = new PaginatedList<ExpirationHistoryReportRow>(entries.collect { ExpirationHistoryReportRow.fromTransactionEntry(it) }, entries.totalCount)
+
+        Integer totalQuantityLostToExpiry = rows.sum { it?.quantityLostToExpiry ?: 0 } as Integer ?: 0
+        BigDecimal totalValueLostToExpiry = rows.sum { it?.valueLostToExpiry ?: 0 } as BigDecimal ?: 0
+
+        return new ExpirationHistoryReport(
+                rows                     : rows,
+                totalQuantityLostToExpiry: totalQuantityLostToExpiry,
+                totalValueLostToExpiry   : totalValueLostToExpiry
+        )
+    }
+
+    String getExpirationHistoryReportCsv(ExpirationHistoryReportFilterCommand command) {
+        ExpirationHistoryReport expirationHistoryReport = getExpirationHistoryReport(command)
+        StringWriter sw = new StringWriter()
+        CSVWriter csv = new CSVWriter(sw, {
+            "${messageLocalizer.localize("transaction.transactionNumber.label")}" { it?.transactionNumber }
+            "${messageLocalizer.localize("transaction.date.label")}" { it?.transactionDate }
+            "${messageLocalizer.localize("product.productCode.label")}" { it?.productCode }
+            "${messageLocalizer.localize("import.productName.label" )}" { it?.productName }
+            "${messageLocalizer.localize("category.label")}" { it?.category }
+            "${messageLocalizer.localize("inventory.lotNumber.label")}" { it?.lotNumber }
+            "${messageLocalizer.localize("inventoryItem.expirationDate.label")}" { it?.expirationDate }
+            "${messageLocalizer.localize("expirationHistoryReport.quantityLostToExpiry.label")}" { it?.quantityLostToExpiry }
+            "${messageLocalizer.localize("product.unitPrice.label")}" { it?.unitPrice }
+            "${messageLocalizer.localize("expirationHistoryReport.valueLostToExpiry.label")}" { it?.valueLostToExpiry }
+        })
+        expirationHistoryReport.rows.list.each { ExpirationHistoryReportRow row ->
+            csv << [
+                    transactionNumber: row.transactionNumber,
+                    transactionDate: row.transactionDate,
+                    productCode: row.productCode,
+                    productName: row.productName,
+                    category: row.category ?: "",
+                    lotNumber: row.lotNumber ?: "",
+                    expirationDate: row.expirationDate ?: "",
+                    quantityLostToExpiry: row.quantityLostToExpiry,
+                    unitPrice: row.unitPrice ?: "",
+                    valueLostToExpiry: row.valueLostToExpiry ?: "",
+            ]
+        }
+        return CSVUtils.prependBomToCsvString(csv.writer.toString())
     }
 }

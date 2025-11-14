@@ -78,9 +78,7 @@ class CycleCountItem implements Comparable {
                 return true
             }
 
-            return ReasonCode.listInventoryAdjustmentReasonCodes().contains(discrepancyReasonCode) ?
-                    true :
-                    ['cycleCountItem.discrepancyReasonCode.invalid']
+            return ReasonCode.listCycleCountReasonCodes().contains(discrepancyReasonCode) ? true : ['invalid']
         })
         location(nullable: true)
     }
