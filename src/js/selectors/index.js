@@ -183,7 +183,10 @@ export const getCycleCountTranslations = createSelector(
  * LOT NUMBERS
  */
 export const getLotNumbersWithExpiration = (state) =>
-  state.lotNumbers?.lotNumbersWithExpiration || [];
+  state.lotNumbers?.lotNumbersWithExpiration || {};
+
+export const getLotNumbersByProductId = (state, productId) =>
+  getLotNumbersWithExpiration(state)?.[productId] || [];
 
 export const makeGetLotNumbersByProductId = () =>
   createSelector(
