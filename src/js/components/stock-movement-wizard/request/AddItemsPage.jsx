@@ -760,7 +760,7 @@ class AddItemsPage extends Component {
 
     const mapPropertiesOfItemsToBeAdded = (item) => {
       // The truthiness check is not enough as 0 is a valid value that we want to save
-      const itemQuantityCounted = (item.quantityOnHand || item?.quantityOnHand === 0)
+      const itemQuantityCounted = (item.quantityOnHand || item.quantityOnHand === 0)
         ? { quantityCounted: parseInt(item.quantityOnHand, 10) } : {};
       return {
         product: { id: item.product.id },
