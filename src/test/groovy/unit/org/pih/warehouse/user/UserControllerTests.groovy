@@ -10,9 +10,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
 
 // import org.springframework.mock.web.MockHttpServletResponse
-import testutils.MockBindDataMixin
 
-//@Mixin(MockBindDataMixin)
 class UserControllerTests implements ControllerUnitTest {
 
     protected void setUp(){

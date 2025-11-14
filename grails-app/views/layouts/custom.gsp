@@ -488,7 +488,11 @@
       });
 
       // Select 2 default configuration
-      $(".select2")
+      // Note that we only apply the default configuration to <select> elements that have the "select2" class because
+      // we only want this default config to be applied to old selectors in the SelectTagLib (users of the taglib set
+      // the "select2", "select2withTag", or "ajaxSelect2" classes to invoke specific defaults).
+      // New flows use the g:selectAjax taglib as defined in SelectTagLib which handles setting its own defaults.
+      $("select.select2")
       .select2({
         placeholder: $(this).data("placeholder") || 'Select an option',
         width: '100%',

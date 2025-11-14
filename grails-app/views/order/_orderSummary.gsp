@@ -58,7 +58,7 @@
             </tr>
             </thead>
 
-            <tbody>
+            <tbody data-testid="order-summary-table">
 
             <g:each var="orderItem" in="${orderItems?.sort { a,b -> a.dateCreated <=> b.dateCreated ?: a.orderIndex <=> b.orderIndex }}" status="i">
                 <g:if test="${!orderItem?.canceled || isPurchaseOrder}">
@@ -70,10 +70,10 @@
                                 </div>
                             </td>
                         </g:if>
-                        <td style="color: ${orderItem?.product?.color}">
+                        <td data-testid="product-code" style="color: ${orderItem?.product?.color}">
                             ${orderItem?.product?.productCode}
                         </td>
-                        <td>
+                        <td data-testid="product-name">
                             <g:link controller="inventoryItem" action="showStockCard"
                                     style="color: ${orderItem?.product?.color}"  params="['product.id':orderItem?.product?.id]">
                                 <format:displayNameWithColor product="${orderItem?.product}" productSupplier="${orderItem?.productSupplier}"  showTooltip="${true}" />
@@ -82,31 +82,31 @@
                         </td>
                         <g:if test="${!orderItem?.canceled}">
                             <g:if test="${hasSupplierCode}">
-                                <td class="center">
+                                <td data-testid="supplier-code" class="center">
                                     ${orderItem?.productSupplier?.supplierCode}
                                 </td>
                             </g:if>
                             <g:if test="${hasManufacturerName}">
-                                <td class="center">
+                                <td data-testid="manufacturer-name" class="center">
                                     ${orderItem?.productSupplier?.manufacturerName}
                                 </td>
                             </g:if>
                             <g:if test="${hasManufacturerCode}">
-                                <td class="center">
+                                <td data-testid="manufacturer-code" class="center">
                                     ${orderItem?.productSupplier?.manufacturerCode}
                                 </td>
                             </g:if>
-                            <td class="center">
-                                ${orderItem?.quantity }
+                            <td data-testid="quantity" class="center">
+                                ${orderItem?.quantity}
                             </td>
-                            <td class="center">
+                            <td data-testid="uom" class="center">
                                 ${orderItem?.unitOfMeasure}
                             </td>
-                            <td class="right">
+                            <td data-testid="unit-price" class="right">
                                 <g:formatNumber number="${orderItem?.unitPrice}" />
                                 ${currencyCode}
                             </td>
-                            <td class="right">
+                            <td data-testid="total-price" class="right">
                                 <g:formatNumber number="${orderItem?.totalPrice()}"/>
                                 ${currencyCode}
                             </td>

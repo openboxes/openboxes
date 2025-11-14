@@ -19,6 +19,7 @@ export const STOCK_MOVEMENT_INCOMING_ITEMS = `${STOCK_MOVEMENT_API}/shippedItems
 export const STOCK_MOVEMENT_UPDATE_STATUS = (id) => `${STOCK_MOVEMENT_API}/${id}/status`;
 export const STOCK_MOVEMENT_ROLLBACK_APPROVAL = (id) => `${STOCK_MOVEMENT_API}/${id}/rollbackApproval`;
 export const STOCK_MOVEMENT_ITEMS = (id) => `${STOCK_MOVEMENT_BY_ID(id)}/stockMovementItems`;
+export const STOCK_MOVEMENT_UPDATE_INVENTORY_ITEMS = (id) => `${STOCK_MOVEMENT_BY_ID(id)}/updateInventoryItems`;
 export const STOCK_MOVEMENT_UPDATE_ITEMS = (id) => `${STOCK_MOVEMENT_BY_ID(id)}/updateItems`;
 export const STOCK_MOVEMENT_REMOVE_ALL_ITEMS = (id) => `${STOCK_MOVEMENT_BY_ID(id)}/removeAllItems`;
 export const STOCK_MOVEMENT_STATUS = (id) => `${STOCK_MOVEMENT_BY_ID(id)}/status`;
@@ -213,3 +214,8 @@ export const INDICATORS_REPORT = `${API}/reports/indicators`;
 export const INDICATORS_PRODUCTS_INVENTORIED = `${INDICATORS_REPORT}/productsInventoried`;
 export const INDICATORS_INVENTORY_SHRINKAGE = `${INDICATORS_REPORT}/inventoryShrinkage`;
 export const INDICATORS_INVENTORY_ACCURACY = `${INDICATORS_REPORT}/inventoryAccuracy`;
+
+// INVENTORY
+export const INVENTORY_API = (id) => `${API}/facilities/${id}/inventories`;
+export const REORDER_REPORT = (id) => `${INVENTORY_API(id)}/reorderReport`;
+export const EXPIRATION_HISTORY_REPORT = `${API}/inventories/expirationHistoryReport`;

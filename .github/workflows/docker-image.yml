@@ -23,8 +23,8 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 8
-          distribution: zulu
-          cache: 'gradle'
+          distribution: temurin
+          cache: gradle
 
       - name: Build dependencies, project and prepare files for Docker build
         run: ./gradlew prepareDocker -Dgrails.env=prod --console=plain
