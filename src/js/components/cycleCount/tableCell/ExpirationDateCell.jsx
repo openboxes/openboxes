@@ -20,7 +20,7 @@ const ExpirationDateCell = ({
   );
   const { inventoryItem: { expirationDate: initialValue } } = item;
 
-  const [value, setValue] = useState(initialValue || disabledExpirationDateFields?.[id]);
+  const [value, setValue] = useState(initialValue);
 
   const dispatch = useDispatch();
 
@@ -59,7 +59,7 @@ const ExpirationDateCell = ({
       className="rt-td rt-td-count-step"
     >
       <DatePicker
-        value={value}
+        value={value || disabledExpirationDateFields?.[id]}
         onChange={onChange}
         onBlur={onBlur}
         disabled={isDisabled}

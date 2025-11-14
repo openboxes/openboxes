@@ -187,7 +187,7 @@ const useCountStep = () => {
 
       for (const cycleCount of cycleCounts) {
         const cycleCountItemsToUpdate = cycleCount.cycleCountItems
-          .filter((item) => (item.updated && !item.id.includes('newRow')))
+          .filter((item) => item.updated && !item.id.includes('newRow'))
           .map((item) => ({ ...trimLotNumberSpaces(item), cycleCountId: cycleCount.id }));
 
         if (cycleCountItemsToUpdate.length > 0) {
@@ -263,7 +263,7 @@ const useCountStep = () => {
   const submitCount = () => {
     const state = store.getState();
     const cycleCounts = Object.values(state.countWorkflow.entities);
-    cycleCounts.reduce((acc, cycleCount) => ([
+    return cycleCounts.reduce((acc, cycleCount) => ([
       ...acc,
       cycleCountApi.submitCount({
         refreshQuantityOnHand: true,
@@ -289,7 +289,9 @@ const useCountStep = () => {
   };
 
   const mapSelectedRowsToModalData = () => {
-    const modalDataWithDisrepancies = [].current.filter(
+    const state = store.getState();
+    const cycleCounts = Object.values(state.countWorkflow.entities);
+    const modalDataWithDisrepancies = cycleCounts.filter(
       (cycleCount) => requestIdsWithDiscrepancies.current.includes(cycleCount?.requestId),
     );
 

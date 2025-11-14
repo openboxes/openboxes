@@ -2,9 +2,9 @@ import React, { useMemo } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  getLotNumbersByProductId,
   makeGetCycleCountItem,
   makeGetCycleCountProduct,
-  makeGetLotNumbersByProductId,
 } from 'selectors';
 
 import { updateFieldValue } from 'actions';
@@ -28,12 +28,14 @@ const LotNumberCell = ({
   );
   const { inventoryItem: { lotNumber: initialValue } } = item;
 
-  const value = {
-    label: initialValue,
-    value: initialValue,
-    id: initialValue,
-    name: initialValue,
-  };
+  const value = initialValue
+    ? {
+      label: initialValue,
+      value: initialValue,
+      id: initialValue,
+      name: initialValue,
+    }
+    : undefined;
 
   const tooltipLabel = value?.label
     || translate('react.cycleCount.table.lotNumber.label', 'Serial / Lot Number');
@@ -53,14 +55,11 @@ const LotNumberCell = ({
   const getCycleCountProduct = useMemo(makeGetCycleCountProduct, []);
 
   const cycleCountProduct = useSelector(
-    (state) => getCycleCountProduct(state, id),
+    (state) => getCycleCountProduct(state, cycleCountId),
   );
 
-  const getLotNumbersByProductId = useMemo(() => makeGetLotNumbersByProductId(), []);
-
-  const lotNumbersWithExpiration = useSelector(
-    (state) => getLotNumbersByProductId(state, cycleCountProduct?.id),
-  );
+  const lotNumbersWithExpiration = useSelector((state) =>
+    getLotNumbersByProductId(state, cycleCountProduct?.id));
 
   const onChange = (selected) => {
     const selectedLot = selected?.value;
@@ -86,7 +85,7 @@ const LotNumberCell = ({
     name: lotWithExp.lotNumber,
     label: lotWithExp.lotNumber,
     value: lotWithExp.lotNumber,
-  })), []);
+  })), [lotNumbersWithExpiration]);
 
   const isDisabled = useMemo(() =>
     !id?.includes('newRow'), [id]);
