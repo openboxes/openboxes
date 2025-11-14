@@ -11,6 +11,17 @@ const reasonCodes = {
   RETURNED: 'Returned',
   SCRAPPED: 'Scrapped',
   STOLEN: 'Stolen',
+  BIN_CORRECTION: 'Bin correction',
+  LOT_CORRECTION: 'Lot correction',
+  INCORRECT_LOT_PICKED: 'Incorrect lot picked',
+  FIX_NEGATIVE_INVENTORY: 'Fix negative inventory',
+  INBOUND_NOT_RECORDED: 'Inbound not recorded',
+  OUTBOUND_NOT_RECORDED: 'Outbound not recorded',
+  RETURN_NOT_RECORDED: 'Return not recorded',
+  ERROR_IN_INBOUND: 'Error in inbound',
+  ERROR_IN_OUTBOUND: 'Error in outbound',
+  BIN_LOCATION_MISSING: 'Bin location missing',
+  MISPLACED: 'Misplaced',
   OTHER: 'Other',
 };
 
