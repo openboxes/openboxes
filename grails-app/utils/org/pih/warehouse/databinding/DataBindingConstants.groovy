@@ -54,7 +54,7 @@ class DataBindingConstants {
      * contain all the information required to build the datetime.
      */
     static final DateTimeFormatter DATE_TIME_ZONE_FORMAT = new DateTimeFormatterBuilder()
-            .appendPattern(DataBindingConstants.FLEXIBLE_DATE_TIME_ZONE_PATTERN)
+            .appendPattern(FLEXIBLE_DATE_TIME_ZONE_PATTERN)
             // Default to HH:mm:00.000 if seconds and milliseconds are excluded in the string because we often don't
             // require that amount of precision.
             .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
@@ -84,7 +84,7 @@ class DataBindingConstants {
      */
     @Deprecated
     static final DateTimeFormatter FLEXIBLE_DATE_TIME_ZONE_FORMAT = new DateTimeFormatterBuilder()
-            .appendPattern(DataBindingConstants.FLEXIBLE_DATE_TIME_ZONE_PATTERN)
+            .appendPattern(FLEXIBLE_DATE_TIME_ZONE_PATTERN)
             // Defaults to 00:00:00.000 (aka midnight) if time is not provided in the String.
             .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
             .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
@@ -92,8 +92,8 @@ class DataBindingConstants {
             .parseDefaulting(ChronoField.MILLI_OF_SECOND, 0)
             // TODO: This is imperfect because if the server is in a timezone that has multiple offsets depending on the
             //       the time of year (due to daylight savings time), this will break. It's unlikely that a server would
-            //       be configured this way, but still worth noting. Once we upgrade to Java 9+, remove this offset
-            //       default and replace it with "withZone" when parsing (see DateUtil.asDate).
+            //       be configured this way, but still worth noting. Once we upgrade to Java 9+, remove this constant
+            //       and replace calls to it in DateUtil.asDate(String) with DATE_TIME_ZONE_FORMAT and "withZone".
             //       https://stackoverflow.com/questions/41999421/how-does-datetimeformatters-override-zone-work-when-parsing
             // Defaults to the current timezone offset of the system if timezone is not provided in the String.
             .parseDefaulting(ChronoField.OFFSET_SECONDS, DateUtil.getSystemZoneOffset().getTotalSeconds())

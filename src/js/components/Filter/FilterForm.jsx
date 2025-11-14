@@ -37,6 +37,7 @@ const FilterForm = ({
   showFilterVisibilityToggler,
   showSearchField,
   disableAutoUpdateFilterParams,
+  onSubmit,
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
   const [filtersHidden, setFiltersHidden] = useState(hidden);
@@ -133,7 +134,10 @@ const FilterForm = ({
   return (
     <div className="filter-form">
       <Form
-        onSubmit={updateFilterParams}
+        onSubmit={(values) => {
+          updateFilterParams(values);
+          onSubmit(values);
+        }}
         initialValues={{ ...defaultValues }}
         render={({ values, handleSubmit, form }) => {
           formRef.current = form;
@@ -230,6 +234,7 @@ FilterForm.propTypes = {
   customSubmitButtonDefaultLabel: PropTypes.string,
   showFilterVisibilityToggler: PropTypes.bool,
   disableAutoUpdateFilterParams: PropTypes.bool,
+  onSubmit: PropTypes.func,
 };
 
 FilterForm.defaultProps = {
@@ -248,4 +253,5 @@ FilterForm.defaultProps = {
   customSubmitButtonDefaultLabel: null,
   showFilterVisibilityToggler: true,
   disableAutoUpdateFilterParams: false,
+  onSubmit: () => {},
 };

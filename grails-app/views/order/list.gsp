@@ -24,12 +24,12 @@
 
 			<div class="buttonBar">
 				<g:supports activityCode="${ActivityCode.PLACE_ORDER}">
-					<g:link controller="order" action="create" class="button">
+					<g:link data-testid="create-shipment-button" controller="order" action="create" class="button">
 						<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
 						<warehouse:message code="default.create.label" args="[g.message(code: 'order.label')]" default="Create purchase order" />
 					</g:link>
 				</g:supports>
-				<g:link controller="stockMovement" action="createCombinedShipments" class="button" params="[direction:'INBOUND']">
+				<g:link data-testid="create-shipment-button" controller="stockMovement" action="createCombinedShipments" class="button" params="[direction:'INBOUND']">
 					<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
 					<warehouse:message code="default.create.label" args="[warehouse.message(code: 'shipmentFromPO.label')]"/>
 				</g:link>
@@ -92,49 +92,49 @@
 
 									<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 										<td class="middle" width="1%">
-											<div class="action-menu">
+											<div data-testid="action-menu-${i}" class="action-menu">
 												<g:render template="/order/actions" model="[orderInstance:orderInstance,hideDelete:true]"/>
 											</div>
 										</td>
 										<td class="middle">
-											<div class="tag">
+											<div data-testid="status-${i}" class="tag">
 												<span class="${orderInstance?.id}">${g.message(code: 'default.loading.label')}</span>
 											</div>
 										</td>
-										<td class="middle">
+										<td data-testid="order-type-${i}" class="middle">
 											<format:metadata obj="${orderInstance?.orderType?.code}"/>
 										</td>
 										<td class="middle">
-											<g:link action="show" id="${orderInstance.id}">
+											<g:link data-testid="order-number-${i}" action="show" id="${orderInstance.id}">
 												${fieldValue(bean: orderInstance, field: "orderNumber")}
 											</g:link>
 										</td>
 										<td class="middle">
-											<g:link action="show" id="${orderInstance.id}">
+											<g:link data-testid="name-${i}" action="show" id="${orderInstance.id}">
 												${fieldValue(bean: orderInstance, field: "name")}
 											</g:link>
 										</td>
                                         <g:if test="${orderType != OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
-                                            <td class="middle">
+                                            <td data-testid="origin-organization-code-${i}" class="middle">
                                                 ${fieldValue(bean: orderInstance, field: "origin.name")}
 												<g:if test="origin.organization.code">
 													 (${fieldValue(bean: orderInstance, field: "origin.organization.code")})
 												</g:if>
                                             </td>
-                                            <td class="middle">
+                                            <td data-testid="destination-organization-code" class="middle">
                                                 ${fieldValue(bean: orderInstance, field: "destination.name")}
 												<g:if test="destination.organization.code">
 													(${fieldValue(bean: orderInstance, field: "destination.organization.code")})
 												</g:if>
                                             </td>
                                         </g:if>
-                                        <td class="middle">
+                                        <td data-testid="ordered-by-${i}" class="middle">
                                             ${orderInstance?.orderedBy?.name}
                                         </td>
-										<td class="middle">
+										<td data-testid="date-ordered-${i}" class="middle">
 											<format:date obj="${orderInstance?.dateOrdered}"/>
 										</td>
-										<td class="center middle">
+										<td data-testid="line-items-${i}" class="center middle">
 											<g:set var="lineItems" value="${orderInstance?.orderItems?.findAll { it.orderItemStatusCode != OrderItemStatusCode.CANCELED }}"/>
 											${lineItems.size()?:0}
 										</td>
@@ -149,11 +149,11 @@
 												${orderInstance?.receivedOrderItems?.size()?:0}
 											</td>
 										</g:if>
-										<td class="center middle">
+										<td data-testid="total-${i}" class="center middle">
 											<g:formatNumber number="${orderInstance.total}"/>
 											${orderInstance.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
 										</td>
-										<td class="center middle">
+										<td data-testid="total-normalized-${i}" class="center middle">
 											<g:formatNumber number="${orderInstance.totalNormalized}"/>
 											${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
 										</td>

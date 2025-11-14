@@ -11,6 +11,7 @@ package org.pih.warehouse.product
 
 import grails.databinding.BindUsing
 import grails.util.Holders
+import java.time.Instant
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
@@ -32,6 +33,7 @@ import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.LocalizationUtil
 
@@ -229,8 +231,8 @@ class Product implements Comparable, Serializable {
     GlAccount glAccount
 
     // Auditing
-    Date dateCreated
-    Date lastUpdated
+    Instant dateCreated
+    Instant lastUpdated
     User createdBy
     User updatedBy
 
@@ -297,7 +299,23 @@ class Product implements Comparable, Serializable {
         unitOfMeasure(nullable: true, maxSize: 255)
         category(nullable: false)
         productType(nullable: false)
-        active(nullable: true)
+        active(nullable: true, validator: { value, obj ->
+            if (value) {
+                return true
+            }
+            // Don't allow a product to be deactivated if it is in an active stocklist.
+            int numActiveStocklistsForProduct = RequisitionItem.createCriteria().count {
+                eq('product', obj)
+                requisition {
+                    eq('isTemplate', true)
+                    eq('isPublished', true)
+                }
+            }
+            if (numActiveStocklistsForProduct > 0) {
+                return ['invalid.inStocklist']
+            }
+            return true
+        })
         coldChain(nullable: true)
         reconditioned(nullable: true)
         controlledSubstance(nullable: true)
@@ -581,7 +599,11 @@ class Product implements Comparable, Serializable {
           where ii.product= :product 
           and t.inventory = :inventory 
           and t.transactionType.id in (:transactionTypeIds)
-          """, [product: this, inventory: inventory, transactionTypeIds: transactionTypeIds]).first()
+          and (t.comment <> :commentToFilter or t.comment IS NULL)
+          """, [product: this,
+                inventory: inventory,
+                transactionTypeIds: transactionTypeIds,
+                commentToFilter: Constants.INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT]).first()
         return date
     }
 
@@ -812,6 +834,64 @@ class Product implements Comparable, Serializable {
                 lastUpdated         : lastUpdated,
                 color               : color,
                 handlingIcons       : handlingIcons,
+                lotAndExpiryControl : lotAndExpiryControl,
+        ]
+    }
+
+    Map toFullJson() {
+        [
+                id                  : id,
+                productCode         : productCode,
+                name                : name,
+                description         : description,
+                productType         : [
+                        id: productType?.id,
+                ],
+                category            : [
+                        id: category?.id,
+                ],
+                defaultUom          : [
+                        id: defaultUom?.id,
+                ],
+                glAccount           : [
+                        id: glAccount?.id,
+                ],
+                productFamily       : [
+                        id: productFamily?.id,
+                ],
+                createdBy           : [
+                        id: createdBy?.id,
+                ],
+                updatedBy           : [
+                        id: updatedBy?.id,
+                ],
+                unitOfMeasure       : unitOfMeasure,
+                abcClass            : abcClass,
+                upc                 : upc,
+                ndc                 : ndc,
+                attributes          : attributes,
+                costPerUnit         : costPerUnit,
+                controlledSubstance : controlledSubstance,
+                hazardousMaterial   : hazardousMaterial,
+                active              : active,
+                coldChain           : coldChain,
+                serialized          : serialized,
+                lotControl          : lotControl,
+                essential           : essential,
+                reconditioned       : reconditioned,
+                manufacturer        : manufacturer,
+                manufacturerCode    : manufacturerCode,
+                manufacturerName    : manufacturerName,
+                brandName           : brandName,
+                modelNumber         : modelNumber,
+                vendor              : vendor,
+                vendorCode          : vendorCode,
+                vendorName          : vendorName,
+                packageSize         : packageSize,
+                pricePerUnit        : pricePerUnit,
+                dateCreated         : dateCreated,
+                lastUpdated         : lastUpdated,
+                color               : color,
                 lotAndExpiryControl : lotAndExpiryControl,
         ]
     }

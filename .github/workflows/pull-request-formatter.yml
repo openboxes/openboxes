@@ -1,7 +1,9 @@
 name: Auto-format Pull Requests
 
 on:
-  pull_request:
+  # Use pull_request_target instead of pull_request because we want this to run on PRs from forks. Simply allowing
+  # actions to run can be insecure, hence why we require approval before running actions in a PR from a fork.
+  pull_request_target:
     types: [opened, synchronize]
 
 jobs:

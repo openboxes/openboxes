@@ -26,6 +26,8 @@ import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.inventory.product.availability.AvailableItemKey
+import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.product.Product
 
 import java.text.ParseException
@@ -140,10 +142,17 @@ class InventoryImportDataService implements ImportDataService {
     void importData(ImportDataCommand command) {
         InventoryImportData inventoryImportData = parseData(command)
 
+        // (OBPIH-7437) If there's nothing in the import, or everything is getting skipped, return early.
+        //  Without this, ALL products at the facility will have their quantities zeroed out! (When the TODO
+        //  in InventoryService.getTransactionEntriesBeforeDate is resolved, this will no longer be true.)
+        if (!inventoryImportData.products) {
+            return
+        }
+
         Date baselineTransactionDate = command.date
 
         // Get the stock for all items in the import at the date that the baseline transaction will be created.
-        Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
+        AvailableItemMap availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 command.location,
                 inventoryImportData.products,
                 baselineTransactionDate)
@@ -153,13 +162,14 @@ class InventoryImportDataService implements ImportDataService {
         // We normally put comments in the adjustment transaction entries, but if we know that there won't be
         // an adjustment transaction entry for an item (because there's no quantity change), we add the comment
         // to the baseline transaction entry instead so that the comment is not lost.
-        Map<Map<String, Object>, String> commentsForBaselineTransactionEntries =
+        Map<AvailableItemKey, String> commentsForBaselineTransactionEntries =
                 getCommentsForBaselineTransactionEntries(inventoryImportData.rows, availableItems)
 
         inventoryImportProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
                 command.location,
                 command,
-                availableItems.values(),
+                inventoryImportData.products,
+                availableItems,
                 baselineTransactionDate,
                 comment,
                 commentsForBaselineTransactionEntries,
@@ -178,14 +188,15 @@ class InventoryImportDataService implements ImportDataService {
     }
 
     /**
-     * Builds a map keyed on inventory item + bin location of all the comments from InventoryImportDataRow objects
+     * Builds a map keyed on AvailableItemKey of all the comments from InventoryImportDataRow objects
      * that have a comment but won't have an adjustment transaction item (because the quantity input is equal to
      * the current quantity on hand for the item).
      */
-    private Map<Map<String, Object>, String> getCommentsForBaselineTransactionEntries(
-            Map<String, List<InventoryImportDataRow>> rowsMap, Map<String, AvailableItem> availableItems) {
+    private Map<AvailableItemKey, String> getCommentsForBaselineTransactionEntries(
+            Map<AvailableItemKey, List<InventoryImportDataRow>> rowsMap,
+            AvailableItemMap availableItems) {
 
-        Map<Map<String, Object>, String> baselineTransactionEntryComments = [:]
+        Map<AvailableItemKey, String> baselineTransactionEntryComments = [:]
         for (rowsEntry in rowsMap.entrySet()) {
             List<InventoryImportDataRow> rowsForKey = rowsEntry.value
 
@@ -198,7 +209,7 @@ class InventoryImportDataService implements ImportDataService {
             int adjustmentQuantity = getAdjustmentQuantity(rowsForKey, availableItem)
             if (adjustmentQuantity == 0) {
                 baselineTransactionEntryComments.put(
-                        [inventoryItem: availableItem.inventoryItem, binLocation: availableItem.binLocation],
+                        new AvailableItemKey(availableItem),
                         comment)
             }
         }
@@ -230,13 +241,13 @@ class InventoryImportDataService implements ImportDataService {
      */
     private Transaction createAdjustmentTransaction(Location facility,
                                                     InventoryImportData inventoryImportData,
-                                                    Map<String, AvailableItem> availableItems,
+                                                    AvailableItemMap availableItems,
                                                     Date transactionDate,
                                                     String comment) {
 
         // We'd have weird behaviour if we allowed two transactions to exist at the same exact time (precision at the
         // database level is to the second) so fail if there's already a transaction on the items for the given date.
-        if (inventoryService.hasTransactionEntriesOnDate(facility, transactionDate, inventoryImportData.inventoryItems)) {
+        if (inventoryService.hasTransactionEntriesOnDate(facility, transactionDate, inventoryImportData.products as List<Product>)) {
             throw new IllegalArgumentException("A transaction already exists at time ${transactionDate}")
         }
 
@@ -271,8 +282,8 @@ class InventoryImportDataService implements ImportDataService {
 
         // For all products in the import, any other bins/lots of those products that exist in the system (ie have
         // a product availability entry) but were not in the import should have their quantity set to zero.
-        Set<String> keysInImport = inventoryImportData.rows.keySet()
-        for (entry in availableItems) {
+        Set<AvailableItemKey> keysInImport = inventoryImportData.rows.keySet()
+        for (entry in availableItems.map) {
             AvailableItem availableItem = entry.value
 
             if (keysInImport.contains(entry.key)) {
@@ -337,25 +348,36 @@ class InventoryImportDataService implements ImportDataService {
     }
 
     private InventoryItem parseInventoryItem(Product product, def lotNumberRaw, def expirationDateRaw) {
+        Date expirationDate = parseExpirationDate(expirationDateRaw)
         String lotNumber = lotNumberRaw instanceof Double ? lotNumberRaw.toInteger() : lotNumberRaw
-
-        Date expirationDate = null
-        if (expirationDateRaw instanceof String) {
-            expirationDate = EXPIRATION_DATE_FORMAT.parse(expirationDateRaw)
-            Calendar calendar = Calendar.getInstance()
-            calendar.setTime(expirationDate)
-            expirationDate = calendar.getTime()
-        } else if (expirationDateRaw instanceof Date) {
-            expirationDate = expirationDateRaw
-        } else if (expirationDateRaw instanceof LocalDate) {
-            expirationDate = expirationDateRaw.toDate()
-        }
-
         return inventoryService.findAndUpdateOrCreateInventoryItem(product, lotNumber, expirationDate)
     }
 
+    private Date parseExpirationDate(Object expirationDateRaw) {
+        if (!expirationDateRaw) {
+            return null
+        }
+
+        if (expirationDateRaw instanceof String) {
+            Date expirationDate = EXPIRATION_DATE_FORMAT.parse(expirationDateRaw)
+            Calendar calendar = Calendar.getInstance()
+            calendar.setTime(expirationDate)
+            return calendar.getTime()
+        }
+
+        if (expirationDateRaw instanceof Date) {
+            return expirationDateRaw
+        }
+
+        if (expirationDateRaw instanceof LocalDate) {
+            return expirationDateRaw.toDate()
+        }
+
+        return null
+    }
+
     private Location parseBinLocation(String binLocationName, Location parentLocation) {
-        if (binLocationName == null) {
+        if (!binLocationName) {
             return null
         }
 
@@ -370,16 +392,16 @@ class InventoryImportDataService implements ImportDataService {
     private class InventoryImportData {
 
         /**
-         * Map the imported rows by [product code + bin location name + lot number]. We store the rows as a list
+         * Map the imported rows by unique key. We store the rows as a list
          * because there can be duplicates. (This is a valid scenario. It's an easy way for users to merge products.)
          */
-        Map<String, List<InventoryImportDataRow>> rows = [:]
+        Map<AvailableItemKey, List<InventoryImportDataRow>> rows = [:]
         Set<Product> products = []
 
         void put(Location binLocation, InventoryItem inventoryItem, def rowRaw) {
             products.add(inventoryItem.product)
 
-            String key = ProductAvailabilityService.constructAvailableItemKey(binLocation, inventoryItem)
+            AvailableItemKey key = new AvailableItemKey(binLocation, inventoryItem)
             rows.computeIfAbsent(key, { k -> [] }).add(new InventoryImportDataRow(
                     binLocation,
                     inventoryItem,
@@ -388,7 +410,7 @@ class InventoryImportDataService implements ImportDataService {
         }
 
         List<InventoryImportDataRow> get(Location binLocation, InventoryItem inventoryItem) {
-            String key = ProductAvailabilityService.constructAvailableItemKey(binLocation, inventoryItem)
+            String key = new AvailableItemKey(binLocation, inventoryItem)
             return rows.get(key)
         }
 

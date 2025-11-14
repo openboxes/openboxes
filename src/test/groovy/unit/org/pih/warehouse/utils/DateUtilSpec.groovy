@@ -250,63 +250,12 @@ class DateUtilSpec extends Specification {
         "2000-01-01T00:00+06:00" | '+05:00'          || "1999-12-31"          | "+06 to +05 (backwards conversion)"
     }
 
-    void 'asDateForDisplay should successfully convert a LocalDate to a String'() {
+    void 'asDateTimeForDisplay should successfully convert a null Date to a String'() {
         given:
-        LocalDate localDate = LocalDate.of(2000, 1, 1)
+        Date date = null
 
         expect:
-        assert DateUtil.asDateForDisplay(localDate) == '01/Jan/2000'
-    }
-
-    void 'asDateTimeForDisplay should successfully convert an Instant to a String'() {
-        given: 'an Instant in the current timezone offset of the system (will internally get converted to UTC)'
-        ZoneOffset offset = DateUtil.getSystemZoneOffset()
-        Instant instant = ZonedDateTime.parse("2000-01-01T00:00:00" + offset).toInstant()
-
-        expect: 'the date time is coverted back to the system timezone for display'
-        assert DateUtil.asDateTimeForDisplay(instant) == "01/Jan/2000 00:00 " + offset
-    }
-
-    void 'asDateTimeForDisplay should successfully convert an Instant with a tz to a String for case: #scenario'() {
-        given:
-        Instant instant = Instant.parse(givenDate)
-        ZoneId zone = ZoneId.of(timezoneToDisplay)
-
-        expect:
-        assert DateUtil.asDateTimeForDisplay(instant, zone) == expectedConvertedDate
-
-        where:
-        givenDate              | timezoneToDisplay || expectedConvertedDate      | scenario
-        "2000-01-01T00:00:00Z" | 'Z'               || "01/Jan/2000 00:00 Z"      | "UTC timezone"
-        "2000-01-01T00:00:00Z" | '+05:00'          || "01/Jan/2000 05:00 +05:00" | "timezone ahead of UTC"
-        "2000-01-01T00:00:00Z" | '-05:00'          || "31/Dec/1999 19:00 -05:00" | "timezone behind UTC"
-    }
-
-    void 'asDateTimeForDisplay should successfully convert a ZonedDateTime to a String'() {
-        given: 'a ZonedDateTime in the current timezone offset of the system'
-        ZoneOffset offset = DateUtil.getSystemZoneOffset()
-        ZonedDateTime zonedDateTime = ZonedDateTime.parse("2000-01-01T00:00:00" + offset)
-
-        expect:
-        assert DateUtil.asDateTimeForDisplay(zonedDateTime) == "01/Jan/2000 00:00 " + offset
-    }
-
-    void 'asDateTimeForDisplay should successfully convert a ZonedDateTime with a tz to a String for case: #scenario'() {
-        given:
-        ZonedDateTime zonedDateTime = ZonedDateTime.parse(givenDate)
-        ZoneId zone = ZoneId.of(timezoneToDisplay)
-
-        expect:
-        assert DateUtil.asDateTimeForDisplay(zonedDateTime, zone) == expectedConvertedDate
-
-        where:
-        givenDate                | timezoneToDisplay || expectedConvertedDate      | scenario
-        "2000-01-01T00:00Z"      | 'Z'               || "01/Jan/2000 00:00 Z"      | "UTC to UTC (no conversion)"
-        "2000-01-01T00:00+05:00" | 'Z'               || "31/Dec/1999 19:00 Z"      | "+05 to UTC (backwards conversion)"
-        "2000-01-01T00:00-05:00" | 'Z'               || "01/Jan/2000 05:00 Z"      | "-05 to UTC (forwards conversion)"
-        "2000-01-01T00:00Z"      | '+05:00'          || "01/Jan/2000 05:00 +05:00" | "UTC to +05 (forwards conversion)"
-        "2000-01-01T00:00+05:00" | '+05:00'          || "01/Jan/2000 00:00 +05:00" | "+05 to +05 (no conversion)"
-        "2000-01-01T00:00+06:00" | '+05:00'          || "31/Dec/1999 23:00 +05:00" | "+06 to +05 (backwards conversion)"
+        assert DateUtil.asDateTimeForDisplay(date) == ''
     }
 
     void 'asDateTimeForDisplay should successfully convert a Date to a String'() {
@@ -315,7 +264,7 @@ class DateUtilSpec extends Specification {
         Date date = newDate("2000-01-01T00:00" + offset)
 
         expect:
-        assert DateUtil.asDateTimeForDisplay(date) == "01/Jan/2000 00:00 " + offset
+        assert DateUtil.asDateTimeForDisplay(date) == "01/Jan/2000 00:00:00 " + offset
     }
 
     void 'asDateTimeForDisplay should successfully convert a Date with a tz to a String for case: #scenario'() {
@@ -327,10 +276,18 @@ class DateUtilSpec extends Specification {
         assert DateUtil.asDateTimeForDisplay(date, zone) == expectedConvertedDate
 
         where:
-        givenDate           | timezoneToDisplay || expectedConvertedDate      | scenario
-        "2000-01-01T00:00Z" | 'Z'               || "01/Jan/2000 00:00 Z"      | "UTC timezone"
-        "2000-01-01T00:00Z" | '+05:00'          || "01/Jan/2000 05:00 +05:00" | "timezone ahead of UTC"
-        "2000-01-01T00:00Z" | '-05:00'          || "31/Dec/1999 19:00 -05:00" | "timezone behind UTC"
+        givenDate           | timezoneToDisplay || expectedConvertedDate         | scenario
+        "2000-01-01T00:00Z" | 'Z'               || "01/Jan/2000 00:00:00 Z"      | "UTC timezone"
+        "2000-01-01T00:00Z" | '+05:00'          || "01/Jan/2000 05:00:00 +05:00" | "timezone ahead of UTC"
+        "2000-01-01T00:00Z" | '-05:00'          || "31/Dec/1999 19:00:00 -05:00" | "timezone behind UTC"
+    }
+
+    void 'asDateForDisplay should successfully convert a null Date to a String'() {
+        given:
+        Date date = null
+
+        expect:
+        assert DateUtil.asDateForDisplay(date) == ''
     }
 
     void 'asDateForDisplay should successfully convert a Date to a String'() {

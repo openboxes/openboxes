@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.data
 
-import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.sql.GroovyRowResult
@@ -32,12 +31,15 @@ import org.pih.warehouse.core.PartyType
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.ProductInventoryTransactionMigrationService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.inventory.product.availability.AvailableItemKey
+import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.receiving.Receipt
@@ -48,6 +50,7 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 @Transactional
 class MigrationService {
 
+    def configService
     def dataService
     def gparsService
     def inventoryService
@@ -55,7 +58,6 @@ class MigrationService {
     ProductInventoryTransactionMigrationService productInventoryTransactionMigrationService
     def persistenceInterceptor
     def dataSource
-    GrailsApplication grailsApplication
 
     def getStockMovementsWithoutShipmentItems() {
         String query = """
@@ -411,9 +413,15 @@ class MigrationService {
 
         // Find all transactions with the old Product Inventory type (by PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
         TransactionType oldProductInventoryType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
+
+        Integer batchSize = configService.getProperty("openboxes.transactions.inventoryBaseline.migration.batchSize", Integer) ?: 5000
+        boolean requiresBatching = Transaction.countByInventoryAndTransactionType(location.inventory, oldProductInventoryType) > batchSize
+
+        log.info("Fetching ${requiresBatching ? batchSize : 'all'} transactions candidates for migration")
         List<Transaction> transactions = Transaction.findAllByInventoryAndTransactionType(
-                location.inventory, oldProductInventoryType
-        )?.sort { [it.transactionDate, it.dateCreated] }?.reverse()
+                location.inventory, oldProductInventoryType,
+                [max: requiresBatching ? batchSize : -1, sort: [transactionDate: "desc", dateCreated: "desc"]]
+        )
 
         if (!transactions) {
             log.info("No transactions found for location ${location.name} with transaction type ${oldProductInventoryType.name}")
@@ -427,6 +435,7 @@ class MigrationService {
             User migratedBy = AuthService.currentUser
             // Split transactions into those with no entries, single product (record stock and single product's inventory import)
             // and those with multiple products (only inventory import)
+            log.info("Grouping transactions into empty, single product and multi-product transactions")
             List<Transaction> transactionsWithNoEntries = transactions.findAll { it.transactionEntries?.isEmpty() }
             List<Transaction> singleProductTransactions = (transactions - transactionsWithNoEntries).findAll {
                 (it.transactionEntries?.inventoryItem?.product?.unique()?.size() ?: 0) == 1
@@ -440,65 +449,88 @@ class MigrationService {
                 [(productId): values*.id]
             }
 
-            List<Product> products = transactions.transactionEntries?.flatten()?.collect { TransactionEntry te -> te.inventoryItem.product }?.unique()
+            log.info("Checking which products need an inventory baseline transaction of current stock")
+            List<Product> allProducts = transactions.transactionEntries?.flatten()?.collect { TransactionEntry te -> te.inventoryItem.product }?.unique()
             // Always create a stock snapshot before modifying any transactions in order to prevent quantity on hand
-            // differences for edge cases that were not addressed
-            log.debug("Creating inventory baseline for current stock for products found in old transactions")
-            Transaction currentInventoryBaseline = productInventoryTransactionMigrationService.createInventoryBaselineTransaction(
+            // differences for edge cases that were not addressed (if a product already has baseline as a most recent
+            // transaction, in this location, we can skip it)
+            // mostRecentTransactionTypeByProduct contains a list of maps like:
+            //   [[product: Product, transactionDate: transaction date, transaction type id]]
+            List mostRecentTransactionTypeByProduct = inventoryService.getMostRecentTransactionTypeForProductsInInventory(location.inventory, allProducts)
+            List<Product> productsToBaseline = mostRecentTransactionTypeByProduct?.findAll { it.transactionTypeId != Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID }?.collect { it.product } ?: []
+            log.info("Creating inventory baseline for current stock for ${productsToBaseline?.size()} products found in old transactions")
+            Transaction currentInventoryBaseline = productsToBaseline ? productInventoryTransactionMigrationService.createInventoryBaselineTransaction(
                     location,
                     null,
-                    products,
+                    productsToBaseline,
                     null,
-                    "Inventory baseline created during old product inventory transactions migration for products that had stock",
+                    Constants.INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT,
                     null,
                     true,
                     true
-            )
+            ) : null
 
-            processProductInventoryTransactions(transactionsWithNoEntries, location, migratedBy, results)
-            gparsService.withPool('migrateProductInventoryTransactionsPool') {
-                transactionIdsGroupedByProduct.values().eachParallel { List<String> transactionIds ->
-                    Transaction.withNewSession {
-                        List<Transaction> transactionList = Transaction.findAllByIdInList(
-                                transactionIds
-                        )?.sort { [it.transactionDate, it.dateCreated] }?.reverse()
-                        log.debug "Migrating transactions for product: " +
-                                "${transactionList?.transactionEntries?.inventoryItem?.product?.productCode?.unique()} " +
-                                "at location ${location.name}"
-                        processProductInventoryTransactions(transactionList, location, migratedBy, results, true)
+            try {
+                log.info("Processing ${transactionsWithNoEntries.size()} transactions with no entries")
+                processProductInventoryTransactions(transactionsWithNoEntries, location, migratedBy, results)
+                log.info("Processing ${singleProductTransactions.size()} single product transactions")
+                gparsService.withPool('migrateProductInventoryTransactionsPool') {
+                    transactionIdsGroupedByProduct.values().eachParallel { List<String> transactionIds ->
+                        Transaction.withNewSession {
+                            List<Transaction> transactionList = Transaction.findAllByIdInList(
+                                    transactionIds
+                            )?.sort { [it.transactionDate, it.dateCreated] }?.reverse()
+                            log.debug "Migrating transactions for product: " +
+                                    "${transactionList?.transactionEntries?.inventoryItem?.product?.productCode?.unique()} " +
+                                    "at location ${location.name}"
+                            processProductInventoryTransactions(transactionList, location, migratedBy, results, true)
+                        }
                     }
                 }
-            }
-            processProductInventoryTransactions(multiProductTransactions, location, migratedBy, results)
+                log.info("Processing ${multiProductTransactions.size()} multi-product transactions")
+                processProductInventoryTransactions(multiProductTransactions, location, migratedBy, results)
 
-            // Zero out stock for products that were migrated but had no stock initially (hence hand no baseline created)
-            def cleanupAdjustmentEnabled = grailsApplication.config.openboxes.transactions.inventoryBaseline.migration.cleanupAdjustment
-            List<Product> shouldBeZeroedOut = products - currentInventoryBaseline?.transactionEntries?.collect { it.inventoryItem.product }?.unique()
-            if (cleanupAdjustmentEnabled && shouldBeZeroedOut) {
-                log.debug("Check if there is need for 'zeroing out' adjustments for products that had no stock before migration")
+                // Zero out stock for products that were migrated but had no stock initially (hence hand no baseline created)
+                Boolean cleanupAdjustmentEnabled = configService.getProperty("openboxes.transactions.inventoryBaseline.migration.cleanupAdjustmentEnabled", Boolean)
+                List<Product> shouldBeZeroedOut = productsToBaseline - currentInventoryBaseline?.transactionEntries?.collect { it.inventoryItem.product }?.unique()
+                if (cleanupAdjustmentEnabled && shouldBeZeroedOut) {
+                    log.info("Check if there is need for 'zeroing out' adjustments for products that had no stock before migration")
 
-                Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
-                        location,
-                        shouldBeZeroedOut
-                )
+                    AvailableItemMap availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
+                            location,
+                            shouldBeZeroedOut
+                    )
 
-                createCleanupAdjustment(
-                        location,
-                        availableItems,
-                        "After migration from single Product Inventory transaction to Baseline + Adjustment pair " +
-                                "this transaction is created to ensure that products that had no stock before, " +
-                                "are currently zeroed out too"
-                )
+                    createCleanupAdjustment(
+                            location,
+                            availableItems,
+                            "After migration from single Product Inventory transaction to Baseline + Adjustment pair " +
+                                    "this transaction is created to ensure that products that had no stock before, " +
+                                    "are currently zeroed out too"
+                    )
+                }
+            } catch (Exception e) {
+                // Catch and exception during migration and log it but do not break the migration process
+                // It will be re-processed later
+                log.error("Error during migration of product inventory transactions at location ${location.name}", e)
             }
 
             // Refresh PA for all products that were migrated
-            productAvailabilityService.triggerRefreshProductAvailability(location.id, products?.id, true)
+            productAvailabilityService.triggerRefreshProductAvailability(location.id, allProducts?.id, true)
 
             createCSVMigrationReportForResults(location, results)
         }
 
+        String batchMessage = "No batching required, all transactions ${performMigration ? 'were' : 'will be'} processed."
+        if (requiresBatching) {
+            batchMessage = "This location has more transactions than specified allowed batch size: ${batchSize}. " +
+                    (performMigration ? "Migration was run only for ${batchSize} most recent transactions." :
+                    "Migration will be run in batches of ${batchSize} most recent transactions.")
+        }
+
         return [
                 "Location"         : location?.name,
+                "Run in batches"   : batchMessage,
                 "Migration Results": results.collectEntries { key, values ->
                     [(key): [] <<
                         ["Status".padRight(10) +
@@ -526,14 +558,14 @@ class MigrationService {
         }
 
         Date previousTransactionDate = null
-        transactions.each { Transaction it ->
+        for (Transaction it in transactions) {
             // For single product transactions, we can keep only the newest transaction with the same transaction date
             if (singleProduct && previousTransactionDate && it.transactionDate == previousTransactionDate) {
                 log.debug "Transaction ${it.transactionNumber} has a transaction date equal to the previously processed " +
                         "transaction. Skipping migrating this one as it won't have effect on the stock."
                 it.disableRefresh = true
                 it.delete(flush: true, failOnError: true)
-                return
+                continue
             }
             previousTransactionDate = it.transactionDate
 
@@ -544,14 +576,14 @@ class MigrationService {
             if (!entries) {
                 it.disableRefresh = true
                 it.delete(flush: true, failOnError: true)
-                return
+                continue
             }
 
             // Find all products in entries (and create inventory baseline for these)
             List<Product> currentTransactionProducts = entries?.collect { TransactionEntry te -> te.inventoryItem.product }?.unique()
 
             // Create inventory baseline for old transaction that is being migrated (if enabled)
-            Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
+            AvailableItemMap availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                     location, currentTransactionProducts, it.transactionDate)
 
             String newComment = "Migrated from single Product Inventory transaction to Baseline + Adjustment pair. " +
@@ -567,7 +599,8 @@ class MigrationService {
             Transaction baselineTransaction = productInventoryTransactionMigrationService.createInventoryBaselineTransactionForGivenStock(
                     location,
                     null,
-                    availableItems.values(),
+                    currentTransactionProducts,
+                    availableItems,
                     it.transactionDate,
                     newComment,
                     null,
@@ -880,24 +913,28 @@ class MigrationService {
      */
     private Transaction createAdjustmentTransaction(Location facility,
                                                     List<TransactionEntry> transactionEntries,
-                                                    Map<String, AvailableItem> availableItems,
+                                                    AvailableItemMap availableItems,
                                                     Date transactionDate,
                                                     String comment) {
         // Don't bother populating the transaction's fields until we know we'll need one.
         Transaction transaction = new Transaction()
 
-        Map<String, Map> groupedEntries = transactionEntries?.groupBy { [it.inventoryItem, it.binLocation] }?.collectEntries { key, entries ->
-            String itemKey = productAvailabilityService.constructAvailableItemKey(key[1], key[0])
-            String comments = entries.comments.findAll { it }.join(', ')
-            [(itemKey): [
-                binLocation: key[1],
-                inventoryItem: key[0],
-                quantity: entries.sum { it.quantity },
-                comments: comments.length() > 255 ? comments.substring(0, 255) : comments
-            ]]
-        }
+        Map<AvailableItemKey, Map> groupedEntries = transactionEntries
+                ?.groupBy { [it.inventoryItem, it.binLocation] }
+                ?.collectEntries { key, entries ->
+                    InventoryItem inventoryItem = key[0] as InventoryItem
+                    Location binLocation = key[1] as Location
+                    AvailableItemKey itemKey = new AvailableItemKey(binLocation, inventoryItem)
+                    String comments = entries.comments.findAll { it }.join(', ')
+                    [(itemKey): [
+                        binLocation: binLocation,
+                        inventoryItem: inventoryItem,
+                        quantity: entries.sum { it.quantity },
+                        comments: comments.length() > 255 ? comments.substring(0, 255) : comments
+                    ]]
+        } as Map<AvailableItemKey, Map>
 
-        groupedEntries?.each { String key, Map value ->
+        groupedEntries?.each { AvailableItemKey key, Map value ->
             // Assuming there is no duplicated product-lot-bin combination in the transaction entries
             // If there are, it need to be done similarly like in the Inventory Import
             int quantityOnHand = availableItems.get(key)?.quantityOnHand ?: 0
@@ -919,12 +956,12 @@ class MigrationService {
 
         // For all products in the transaction, any other bins/lots of those products that exist in the system (ie have
         // a product availability entry) but were not in the migrated transaction should have their quantity set to zero.
-        Set<String> keysInTransaction = groupedEntries.keySet()
-        availableItems.each { entry ->
+        Set<AvailableItemKey> keysInTransaction = groupedEntries.keySet()
+        for (entry in availableItems.entrySet()) {
             AvailableItem availableItem = entry.value
 
             if (keysInTransaction.contains(entry.key)) {
-                return
+                continue
             }
 
             TransactionEntry transactionEntry = new TransactionEntry(
@@ -964,13 +1001,13 @@ class MigrationService {
      * the migration process and somehow it's not empty (it might happen due to the backdated transecations)
      */
     private Transaction createCleanupAdjustment(Location facility,
-                                                Map<String, AvailableItem> availableItems,
+                                                AvailableItemMap availableItems,
                                                 String comment) {
         // Don't bother populating the transaction's fields until we know we'll need one.
         Transaction transaction = new Transaction()
 
         if (availableItems) {
-            availableItems.each { String key, AvailableItem it ->
+            availableItems.values().each {
                 int quantityOnHand = it?.quantityOnHand ?: 0
                 // If there is already a item with qoh zero, we can skip it
                 if (quantityOnHand == 0) {
@@ -1052,6 +1089,10 @@ class MigrationService {
 
     Map<String, List<String>> getOtherOverlappingTransactions(Location location, TransactionType transactionType) {
         Sql sql = new Sql(dataSource)
+        // Find all transactions on the same item at the same time at the same facility.
+        // For each pair of transactions, we need to mark them to be resolved manually if:
+        // - Only one of the transactions is of the given type
+        // - Both transactions are of the given type and at least one of them has multiple products
         List<GroovyRowResult> data = sql.rows("""
             SELECT
                 ii1.product_id AS product_id,
@@ -1061,20 +1102,36 @@ class MigrationService {
             FROM transaction_entry te1
                      JOIN inventory_item ii1 ON te1.inventory_item_id = ii1.id
                      JOIN transaction t1 ON te1.transaction_id = t1.id
-                     JOIN transaction_entry te2 ON te1.inventory_item_id != te2.inventory_item_id
+                     JOIN transaction_entry te2 ON te1.transaction_id != te2.transaction_id
                      JOIN inventory_item ii2 ON te2.inventory_item_id = ii2.id
                      JOIN transaction t2 ON te2.transaction_id = t2.id
             WHERE
               ii1.product_id = ii2.product_id
               AND t1.transaction_date = t2.transaction_date
               AND t1.id < t2.id
-              AND (
-                (t1.transaction_type_id = :transactionTypeId and t2.transaction_type_id != :transactionTypeId) 
-                OR 
-                (t1.transaction_type_id != :transactionTypeId and t2.transaction_type_id = :transactionTypeId)
-              )
               AND t1.inventory_id = :inventoryId
               AND t2.inventory_id = :inventoryId
+              AND (
+                (t1.transaction_type_id = :transactionTypeId AND t2.transaction_type_id != :transactionTypeId)
+                OR (t1.transaction_type_id != :transactionTypeId AND t2.transaction_type_id = :transactionTypeId)
+                OR (
+                  (t1.transaction_type_id = :transactionTypeId AND t2.transaction_type_id = :transactionTypeId)
+                  AND (
+                    (
+                      SELECT COUNT(DISTINCT ii1_inner.product_id) as t1_num_products
+                      FROM transaction_entry te1_inner
+                      JOIN inventory_item ii1_inner ON te1_inner.inventory_item_id = ii1_inner.id
+                      WHERE te1_inner.transaction_id = t1.id
+                    ) > 1
+                    OR (
+                      SELECT COUNT(DISTINCT ii2_inner.product_id) as t2_num_products
+                      FROM transaction_entry te2_inner
+                      JOIN inventory_item ii2_inner ON te2_inner.inventory_item_id = ii2_inner.id
+                      WHERE te2_inner.transaction_id = t2.id
+                    ) > 1
+                  )
+                )
+              )
         """, [inventoryId: location.inventory.id, transactionTypeId: transactionType.id])
         Map groupedData = [:]
         data?.each { it ->
@@ -1123,7 +1180,7 @@ class MigrationService {
         Document migrationReport = new Document()
         migrationReport.documentType = defaultDocumentType
         migrationReport.name = "Product Inventory Migration Report for ${location.name}"
-        migrationReport.filename = "Product Inventory Migration Report for ${location.name}.csv"
+        migrationReport.filename = "Product Inventory Migration Report for ${location.name} ${Constants.DISPLAY_DATE_FORMATTER.format(new Date())}.csv"
         migrationReport.extension = "csv"
         migrationReport.fileContents = csvData
         if (!migrationReport.validate() || !migrationReport.save() ) {

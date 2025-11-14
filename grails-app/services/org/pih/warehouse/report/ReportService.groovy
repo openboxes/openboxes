@@ -18,7 +18,6 @@ import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.DefaultHttpClient
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.PaginatedList
-import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DashboardService
@@ -44,6 +43,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.invoice.InvoiceType
 import org.pih.warehouse.invoice.InvoiceTypeCode
 import org.pih.warehouse.order.OrderAdjustment
@@ -52,6 +52,7 @@ import org.pih.warehouse.order.OrderService
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.reporting.CycleCountProductSummary
 import org.pih.warehouse.reporting.DateDimension
 import org.pih.warehouse.LocalizationUtil
@@ -81,6 +82,7 @@ class ReportService implements ApplicationContextAware {
     LocalizationService localizationService
     ForecastingService forecastingService
     NumberDataService numberDataService
+    ProductService productService
 
     ApplicationContext applicationContext
 
@@ -1144,6 +1146,7 @@ class ReportService implements ApplicationContextAware {
 
     def getInventoryAuditSummary(InventoryAuditCommand command) {
         def inventoryAuditFilters = buildInventoryAuditSummaryFilters(command)
+        long rollupCallTime = System.currentTimeMillis()
         def results = InventoryAuditRollup.createCriteria().list([max: command.max, offset: command.offset]) {
             projections {
                 groupProperty('facility')
@@ -1158,7 +1161,7 @@ class ReportService implements ApplicationContextAware {
             inventoryAuditFilters()
             order('transactionDate', 'desc')
         }
-
+        log.info("Fetch from inventory-audit-rollup took " + (System.currentTimeMillis() - rollupCallTime) + " ms")
 
 
         Integer totalCount = InventoryAuditRollup.createCriteria().get() {
@@ -1170,6 +1173,18 @@ class ReportService implements ApplicationContextAware {
             inventoryAuditFilters()
         }
 
+        long inventoryCountTime = System.currentTimeMillis()
+        List<Object[]> inventoryCountList = results ? InventoryCount.createCriteria().list {
+            projections {
+                rowCount()
+                groupProperty("product")
+            }
+            eq("facility", org.pih.warehouse.auth.AuthService.currentLocation)
+            inList("product", results.collect { it[1] })
+            between("dateRecorded", command.startDate, command.endDate)
+        } : []
+        Map<String, Long> inventoryCountMap = inventoryCountList.collectEntries { [ (it[1]): it[0] ] }
+        log.info("Fetch time for inventory-count call: " + (System.currentTimeMillis() - inventoryCountTime) + " ms")
 
         // Transform the results to a summary object
         def data = results.collect {
@@ -1180,28 +1195,9 @@ class ReportService implements ApplicationContextAware {
             Integer quantityAdjusted = it[3]
             Integer countAdjustments = it[4]
 
-            // Retrieve the number of counts during the given date range
-            Long inventoryCounts = InventoryCount.createCriteria().get {
-                projections {
-                    rowCount()
-                }
-                eq("facility", facility)
-                eq("product", product)
-                between("dateRecorded", command.startDate, command.endDate)
-            }
-
             // FIXME We needed to separate queries since there's not an easy way to get the two values in a single query
             //  at the moment. We created a view for the last counted date for the All Products tab but it's super slow
             //  so it would be best to materialize the last count date at the facility-product level at some point.
-
-            // Get the date of the latest cycle count
-            Date lastCycleCount = CycleCountItem.dateLastCounted(facility, product).get()
-
-            // Get the date of the latest record stock, import inventory, or cycle count transaction
-            Date lastInventoryCount = product.latestInventoryDate(facility.id)
-
-            // Compare the two last count dates
-            Date lastCounted = [lastCycleCount, lastInventoryCount].max()
 
             // Inventory value of adjusted quantity
             BigDecimal amountAdjusted = (quantityAdjusted?:0) * (product?.pricePerUnit?:0)
@@ -1217,8 +1213,8 @@ class ReportService implements ApplicationContextAware {
                     facility: facility,
                     product: product,
                     countAdjustments: countAdjustments,
-                    countCycleCounts: inventoryCounts,
-                    lastCounted: lastCounted,
+                    countCycleCounts: inventoryCountMap[product],
+                    lastCounted: null, // Last counted is sometimes expected to be an expensive call, and is calculated separately
                     quantityAdjusted: quantityAdjusted,
                     amountAdjusted: amountAdjusted,
                     quantityDemanded: quantityDemanded,
@@ -1227,7 +1223,7 @@ class ReportService implements ApplicationContextAware {
                     abcClass: abcClass
             )
         }
-        return new PaginatedList<InventoryAuditSummary>(data, totalCount);
+        return new PaginatedList<InventoryAuditSummary>(data, totalCount)
     }
 
     /**
@@ -1358,7 +1354,7 @@ class ReportService implements ApplicationContextAware {
         return transactionEntry.transaction.transactionType.transactionCode == TransactionCode.CREDIT && transactionEntry.quantity > 0
     }
 
-    List<TransactionEntry> getFilteredTransactionEntries(
+    private List<TransactionEntry> getFilteredTransactionEntries(
             List<TransactionCode> transactionCodes,
             Date startDate,
             Date endDate,
@@ -1366,17 +1362,16 @@ class ReportService implements ApplicationContextAware {
             List<Tag> tagsList,
             List<ProductCatalog> catalogsList,
             Location location,
-            Product productData,
+            List<Product> products,
             String orderBy,
             String sortOrder = "desc"
     ) {
         return TransactionEntry.createCriteria().list {
             inventoryItem {
+                if (products) {
+                    'in'('product', products)
+                }
                 product {
-                    if (productData) {
-                        eq('id', productData.id)
-                    }
-
                     if (categories) {
                         'in'('category', categories)
                     }
@@ -1424,8 +1419,9 @@ class ReportService implements ApplicationContextAware {
         } as List<TransactionEntry>
     }
 
-    List<TransactionEntry> getFilteredTransactionEntries(List<TransactionCode> transactionCodes, Date startDate, Date endDate, Location location, Product product, String orderBy, String sortOrder = "desc") {
-        return getFilteredTransactionEntries(transactionCodes, startDate, endDate, null, null, null, location, product, orderBy, sortOrder)
+    private List<TransactionEntry> getFilteredTransactionEntries(List<TransactionCode> transactionCodes, Date startDate, Date endDate, Location location, Product product, String orderBy, String sortOrder = "desc") {
+        List<Product> products = product ? [product] : null
+        return getFilteredTransactionEntries(transactionCodes, startDate, endDate, null, null, null, location, products, orderBy, sortOrder)
     }
 
     Map<Product, Map<String, Integer>> getDetailedTransactionReportData(Map<Product, List<TransactionEntry>> transactionEntries) {
@@ -1503,7 +1499,15 @@ class ReportService implements ApplicationContextAware {
         ]
     }
 
-    List<Object> getTransactionReport(Location location, List<Category> categories, List<Tag> tagsList, List<ProductCatalog> catalogsList, Date startDate, Date endDate, Boolean includeDetails) {
+    List<Object> getTransactionReport(Location location,
+                                      List<Category> categories,
+                                      List<Tag> tagsList,
+                                      List<ProductCatalog> catalogsList,
+                                      List<Product> productList,
+                                      Date startDate,
+                                      Date endDate,
+                                      Boolean includeDetails) {
+
         List<TransactionCode> adjustmentTransactionCodes = [
                 TransactionCode.CREDIT,
                 TransactionCode.DEBIT
@@ -1519,6 +1523,7 @@ class ReportService implements ApplicationContextAware {
                 tagsList,
                 catalogsList,
                 location,
+                productList,
                 null,
                 null
         )
@@ -1529,14 +1534,14 @@ class ReportService implements ApplicationContextAware {
         }
 
         // Calculate items available at the startDate to get quantity on hand for found products
-        Map<String, AvailableItem> availableItemStartDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+        AvailableItemMap availableItemStartDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 location,
                 productsMap.keySet().toList(),
                 startDate
         )
 
         // Calculate items available at the startDate to get quantity on hand for found products
-        Map<String, AvailableItem> availableItemEndDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+        AvailableItemMap availableItemEndDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 location,
                 productsMap.keySet().toList(),
                 endDate.before(new Date()) ? endDate : new Date()
@@ -1565,12 +1570,8 @@ class ReportService implements ApplicationContextAware {
         // 2. DEBITS = transaction entries in relation with transaction that are DEBIT type
         // and transaction that are CREDIT type, but with quantity lower than 0
         return productsMap.collect { key, value ->
-            Integer openingBalance = availableItemStartDateMap.findAll { entry ->
-                entry.key.startsWith(key.productCode)
-            }.values().quantityOnHand.sum() ?: 0
-            Integer closingBalance = availableItemEndDateMap.findAll { entry ->
-                entry.key.startsWith(key.productCode)
-            }.values().quantityOnHand.sum() ?: 0
+            Integer openingBalance = availableItemStartDateMap.getAllByProduct(key).quantityOnHand.sum() ?: 0
+            Integer closingBalance = availableItemEndDateMap.getAllByProduct(key).quantityOnHand.sum() ?: 0
             Integer credits = getCreditTransactionEntries(value).sum { it.quantity } as Integer ?: 0
             Integer debits = getDebitTransactionEntries(value).sum { Math.abs(it.quantity) } as Integer ?: 0
             // In the new version of the report, it's not based on the inventory snapshot.
@@ -1640,14 +1641,14 @@ class ReportService implements ApplicationContextAware {
         )
 
         // Calculate items available at the startDate to get quantity on hand for found products
-        Map<String, AvailableItem> availableItemStartDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+        AvailableItemMap availableItemStartDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 location,
                 [product],
                 startDate
         )
 
         // Calculate items available at the endDate to get quantity on hand for found products
-        Map<String, AvailableItem> availableItemEndDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+        AvailableItemMap availableItemEndDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 location,
                 [product],
                 // EndDate cannot be a date in the future, because of the validation

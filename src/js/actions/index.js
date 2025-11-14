@@ -19,6 +19,7 @@ import {
   FETCH_INVOICE_STATUSES,
   FETCH_INVOICE_TYPE_CODES,
   FETCH_LOCATION_TYPES,
+  FETCH_LOT_NUMBERS_BY_PRODUCT_IDS,
   FETCH_MENU_CONFIG,
   FETCH_NUMBERS,
   FETCH_PAYMENT_TERMS,
@@ -68,7 +69,7 @@ import { ORGANIZATION_API } from 'api/urls';
 import RoleType from 'consts/roleType';
 import { UnitOfMeasureType } from 'consts/UnitOfMeasureType';
 import apiClient, { parseResponse } from 'utils/apiClient';
-import { fetchBins, mapShipmentTypes } from 'utils/option-utils';
+import { fetchBins, getLotNumbersByProductIds, mapShipmentTypes } from 'utils/option-utils';
 
 export function showSpinner() {
   return {
@@ -808,3 +809,12 @@ export const eraseDraft = (locationId, tab) => ({
   type: ERASE_DRAFT,
   payload: { locationId, tab },
 });
+
+export const fetchLotNumbersByProductIds = (productIds) => async (dispatch) => {
+  const lotNumbersWithExpiration = await getLotNumbersByProductIds(productIds);
+
+  dispatch({
+    type: FETCH_LOT_NUMBERS_BY_PRODUCT_IDS,
+    payload: lotNumbersWithExpiration,
+  });
+};

@@ -114,6 +114,12 @@ input, .date-field-input {
   z-index: 999;
 }
 
+.react-datepicker__navigation {
+  width: 15px;
+  height: 15px;
+  top: 8px;
+}
+
 .react-datepicker__input-container {
   width: 100%;
 
@@ -137,7 +143,6 @@ input, .date-field-input {
       color: var(--gray-600);
     }
 
-
     &.disabled {
       background-color: var(--blue-100);
     }
@@ -153,6 +158,10 @@ input, .date-field-input {
       height: 16px;
       color: var(--gray-600)
     }
+  }
+
+  .react-datepicker__aria-live {
+    display: none !important;
   }
 }
 

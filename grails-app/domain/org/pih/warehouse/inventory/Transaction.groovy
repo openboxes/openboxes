@@ -50,13 +50,20 @@ class Transaction implements Comparable, Serializable {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(this, forceRefresh))
     }
 
+    void publishReportsEvents() {
+        Holders.grailsApplication.mainContext.publishEvent(new RefreshInventoryCountEvent(this))
+        Holders.grailsApplication.mainContext.publishEvent(new RefreshInventoryTransactionsSummaryEvent(this))
+    }
+
     def publishDeleteEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(this, true))
+        Holders.grailsApplication.mainContext.publishEvent(new RefreshInventoryTransactionsSummaryEvent(this, true))
     }
 
     // ID won't be available until after the record is inserted
     def afterInsert() {
         publishSaveEvent()
+        publishReportsEvents()
     }
 
     def afterUpdate() {
@@ -85,6 +92,7 @@ class Transaction implements Comparable, Serializable {
     Receipt receipt
     Order order
     CycleCount cycleCount
+    TransactionSource transactionSource
 
     // Auditing fields
     Boolean confirmed = Boolean.FALSE    // Transactions need to be confirmed by a supervisor
@@ -179,7 +187,7 @@ class Transaction implements Comparable, Serializable {
         comment(nullable: true)
         // transaction date cannot be in the future
         transactionDate(nullable: false,
-                validator: { value -> value <= new Date() })
+            validator: { value -> value <= new Date() })
 
 
         source(nullable: true,
@@ -208,6 +216,7 @@ class Transaction implements Comparable, Serializable {
                     }
                     return true
                 })
+        transactionSource(nullable: true)
     }
 
     LocalTransfer getLocalTransfer() {

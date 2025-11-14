@@ -1,6 +1,7 @@
 package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
+
 import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.importer.ImportDataCommand
 

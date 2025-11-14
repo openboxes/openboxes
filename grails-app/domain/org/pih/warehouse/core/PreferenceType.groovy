@@ -38,7 +38,7 @@ class PreferenceType implements Serializable {
     }
 
     static constraints = {
-        name(nullable: false, unique: true)
+        name(nullable: false, blank: false, unique: true)
         validationCode(nullable: true)
         updatedBy(nullable: true)
         createdBy(nullable: true)

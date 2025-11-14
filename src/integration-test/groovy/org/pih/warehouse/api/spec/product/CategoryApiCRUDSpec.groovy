@@ -1,6 +1,5 @@
 package org.pih.warehouse.api.spec.product
 
-import grails.gorm.transactions.Transactional
 import io.restassured.builder.ResponseSpecBuilder
 import org.apache.http.HttpStatus
 import org.hamcrest.Matchers
@@ -9,8 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Ignore
 import spock.lang.Shared
 
-import org.pih.warehouse.api.client.product.CategoryApi
+import org.pih.warehouse.api.client.product.CategoryApiWrapper
 import org.pih.warehouse.api.spec.base.ApiSpec
+import org.pih.warehouse.common.domain.builder.product.CategoryTestBuilder
 import org.pih.warehouse.product.Category
 
 /**
@@ -19,24 +19,23 @@ import org.pih.warehouse.product.Category
 class CategoryApiCRUDSpec extends ApiSpec {
 
     @Autowired
-    CategoryApi categoryApi
+    CategoryApiWrapper categoryApiWrapper
 
     @Shared
     Category category
 
-    @Transactional
     void setupData() {
-        category = Category.build()
+        category = new CategoryTestBuilder()
+                .build(true)
     }
 
-    @Transactional
     void cleanupData() {
         category.delete()
     }
 
     void 'get category by id should succeed when category exists'() {
         expect:
-        categoryApi.get(category.id, new ResponseSpecBuilder()
+        categoryApiWrapper.api.get(category.id, new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('id', Matchers.equalTo(category.id))
                 .expectBody('name', Matchers.equalTo(category.name))
@@ -46,7 +45,7 @@ class CategoryApiCRUDSpec extends ApiSpec {
 
     void 'get category by id should fail when category does not exist'() {
         expect:
-        categoryApi.get(INVALID_ID, responseSpecUtil.NOT_FOUND_RESPONSE_SPEC)
+        categoryApiWrapper.api.get(INVALID_ID, responseSpecUtil.NOT_FOUND_RESPONSE_SPEC)
     }
 
     void 'create category should succeed when fields are valid'() {
@@ -57,7 +56,7 @@ class CategoryApiCRUDSpec extends ApiSpec {
                 .toString()
 
         expect:
-        categoryApi.create(createBody, new ResponseSpecBuilder()
+        categoryApiWrapper.api.create(createBody, new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('id', Matchers.notNullValue())
                 .build())
@@ -66,17 +65,17 @@ class CategoryApiCRUDSpec extends ApiSpec {
     @Ignore("Delete fails with: Batch update returned unexpected row count from update [0]; actual row count: 0; expected: 1. Fix this then re-enable the test.")
     void 'delete category should succeed when category exists'() {
         expect:
-        categoryApi.delete(category.id, responseSpecUtil.NO_CONTENT_RESPONSE_SPEC)
+        categoryApiWrapper.deleteOK(category.id)
     }
 
     void 'delete category should fail when category does not exist'() {
         expect:
-        categoryApi.delete(INVALID_ID, responseSpecUtil.NOT_FOUND_RESPONSE_SPEC)
+        categoryApiWrapper.api.delete(INVALID_ID, responseSpecUtil.NOT_FOUND_RESPONSE_SPEC)
     }
 
     void 'list categories should successfully return all categories'() {
         expect:
-        categoryApi.list(new ResponseSpecBuilder()
+        categoryApiWrapper.api.list(new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('size()', Matchers.greaterThan(0))
                 .expectBody("data.id", Matchers.hasItem(category.id))

@@ -108,7 +108,7 @@ class UrlMappings {
 
         "/api/products"(parseRequest: true) {
             controller = { "productApi" }
-            action = [GET: "list"]
+            action = [GET: "list", POST: "save"]
         }
 
         "/api/products/search"(parseRequest: true) {
@@ -123,6 +123,21 @@ class UrlMappings {
         "/api/products/$productId/inventoryItems/$lotNumber"(parseRequest: true) {
             controller = { "productApi" }
             action = [GET: "getInventoryItem"]
+        }
+
+        "/api/products/getLatestInventoryCountDate" {
+            controller = { "productApi" }
+            action = [GET: "getLatestInventoryCountDate"]
+        }
+
+        "/api/products/import" {
+            controller = { "productApi" }
+            action = [POST: "importCsv"]
+        }
+
+        "/api/products/inventoryItems/lotNumbersWithExpirationDate" {
+            controller = { "productApi" }
+            action = [GET: "getLotNumbersWithExpirationDate"]
         }
 
         "/api/facilities/$facilityId/products/classifications" {
@@ -797,6 +812,20 @@ class UrlMappings {
         }
 
         /**
+         * Inventory API endpoints
+         */
+
+        "/api/facilities/$facilityId/inventories/import" {
+            controller = { "inventoryApi" }
+            action = "importCsv"
+        }
+
+        "/api/facilities/$facilityId/inventories/reorderReport" {
+            controller = { "inventoryApi" }
+            action = [GET: "getReorderReport"]
+        }
+
+        /**
         * Purchase Orders API endpoints
         */
 
@@ -1056,6 +1085,20 @@ class UrlMappings {
         "/api/reports/indicators/inventoryShrinkage" {
             controller = "indicatorApi"
             action = [GET: "getInventoryShrinkage"]
+        }
+
+        "/api/facilities/$facility/inventory/record-stock/save" {
+            controller = "recordStockApi"
+            action = [POST: "saveRecordStock"]
+        }
+
+        /**
+         * Inventory API endpoints
+         */
+
+        "/api/inventories/expirationHistoryReport" {
+            controller = { "inventoryApi" }
+            action = [GET: "getExpirationHistoryReport"]
         }
 
         // Error handling

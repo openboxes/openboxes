@@ -111,11 +111,13 @@ class PutAwaySecondPage extends Component {
 
   getColumns = () => [
     {
+      name: 'productCode',
       Header: <Translate id="react.putAway.code.label" defaultMessage="Code" />,
       accessor: 'product.productCode',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
+      name: 'productName',
       Header: <Translate id="react.putAway.name.label" defaultMessage="Name" />,
       accessor: 'product',
       Cell: (row) => (
@@ -129,11 +131,13 @@ class PutAwaySecondPage extends Component {
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
+      name: 'lotNumber',
       Header: <Translate id="react.putAway.lotSerialNo.label" defaultMessage="Lot/Serial No." />,
       accessor: 'inventoryItem.lotNumber',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
+      name: 'expirationDate',
       Header: <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />,
       accessor: 'inventoryItem.expirationDate',
       style: { whiteSpace: 'normal' },
@@ -148,11 +152,13 @@ class PutAwaySecondPage extends Component {
       ),
       Filter,
     }, {
+      name: 'recipientName',
       Header: <Translate id="react.putAway.recipient.label" defaultMessage="Recipient" />,
       accessor: 'recipient.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
+      name: 'quantity',
       Header: <Translate id="react.putAway.qty.label" defaultMessage="QTY" />,
       accessor: 'quantity',
       style: { whiteSpace: 'normal' },
@@ -222,6 +228,7 @@ class PutAwaySecondPage extends Component {
       },
       Filter,
     }, {
+      name: 'preferredBin',
       Header: <Translate id="react.putAway.preferredBin.label" defaultMessage="Preferred bin" />,
       accessor: 'preferredBin',
       style: { whiteSpace: 'normal' },
@@ -238,11 +245,13 @@ class PutAwaySecondPage extends Component {
       ),
       Filter,
     }, {
+      name: 'currentBin',
       Header: <Translate id="react.putAway.currentBin.label" defaultMessage="Current bin" />,
       accessor: 'currentBins',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
+      name: 'stockMovementName',
       Header: <Translate id="react.putAway.stockMovement.label" defaultMessage="Stock Movement" />,
       accessor: 'stockMovement.name',
       style: { whiteSpace: 'normal' },
@@ -254,6 +263,7 @@ class PutAwaySecondPage extends Component {
       filterable: true,
       Filter,
     }, {
+      name: 'putawayBin',
       Header: <Translate id="react.putAway.putAwayBin.label" defaultMessage="Putaway Bin" />,
       accessor: 'putawayLocation',
       Cell: (cellInfo) => {
@@ -273,11 +283,13 @@ class PutAwaySecondPage extends Component {
               putawayItems: { [cellInfo.index]: { putawayLocation: { $set: value } } },
             }))}
             className="select-xs"
+            dataTestId="select-bin"
           />
         );
       },
       Filter,
     }, {
+      name: 'splitItems',
       Header: '',
       accessor: 'splitItems',
       Cell: (cellInfo) => (
@@ -294,6 +306,7 @@ class PutAwaySecondPage extends Component {
             type="button"
             className="btn btn-outline-primary btn-xs mr-1 mb-1"
             onClick={() => this.editItem(cellInfo.index)}
+            data-testid="edit-button"
           >
             <Translate id="react.default.button.edit.label" defaultMessage="Edit" />
           </button>
@@ -301,6 +314,7 @@ class PutAwaySecondPage extends Component {
             type="button"
             className="btn btn-outline-danger btn-xs mb-1"
             onClick={() => this.deleteItem(cellInfo.index)}
+            data-testid="delete-button"
           >
             <Translate id="react.default.button.delete.label" defaultMessage="Delete" />
           </button>
@@ -640,6 +654,7 @@ class PutAwaySecondPage extends Component {
           <span className="buttons-container classic-form-buttons">
             <button
               type="button"
+              data-testid="sort-button"
               onClick={() => this.savePutAways(
                 this.state.putAway,
                 () => this.sortPutawayItems(),
@@ -657,6 +672,7 @@ class PutAwaySecondPage extends Component {
             <button
               type="button"
               className="btn btn-outline-secondary btn-xs mr-3"
+              data-testid="export-button"
               onClick={() => this.savePutAways(
                 this.state.putAway,
                 () => this.generatePutAwayList(),
@@ -669,6 +685,7 @@ class PutAwaySecondPage extends Component {
             </button>
             <button
               type="button"
+              data-testid="save-button"
               onClick={() => this.savePutAways(this.state.putAway)}
               className="btn btn-outline-secondary btn-xs"
               disabled={_.some(this.state.putAway.putawayItems, (putawayItem) =>
@@ -703,6 +720,7 @@ class PutAwaySecondPage extends Component {
             type="button"
             onClick={() => this.nextPage()}
             className="btn btn-outline-primary btn-form float-right btn-xs"
+            data-testid="next-button"
           >
             <Translate id="react.default.button.next.label" defaultMessage="Next" />
           </button>

@@ -13,11 +13,20 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.xml.Namespace
+import java.time.Instant
+import java.time.ZoneId
+
+import org.pih.warehouse.DateUtil
+import org.pih.warehouse.core.session.SessionManager
+import org.pih.warehouse.importer.CSVUtils
+import java.sql.Timestamp
 import org.apache.commons.lang.StringUtils
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.criterion.Restrictions
 import org.hibernate.sql.JoinType
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ApiException
+import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
@@ -25,9 +34,12 @@ import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.core.date.DateFormatterManager
 import org.pih.warehouse.LocalizationUtil
+import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.TransactionEntry
 import util.ReportUtil
-import java.text.SimpleDateFormat
+
 /**
  * @author jmiranda*
  */
@@ -41,6 +53,10 @@ class ProductService {
     def userService
     def dataService
     ProductGroupService productGroupService
+    ConfigService configService
+
+    DateFormatterManager dateFormatterManager
+    SessionManager sessionManager
 
     def getNdcResults(operation, q) {
         def hipaaspaceApiKey = grailsApplication.config.hipaaspace.api.key
@@ -307,8 +323,16 @@ class ProductService {
         int offset = params.offset ? params.int("offset") : 0
         String sortColumn = params.sort ?: "name"
         String sortOrder = params.order ?: "asc"
-        Date dateCreatedAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
-        Date dateCreatedBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
+
+        // TODO: The date picker on the React size only sends up date information, but Instants need a time and zone.
+        //       To convert the given date to an Instant we need to manually provide the timezone of the user. We could
+        //       remove this zone-defaulting code if we did one (or both) of the following:
+        //       1) Move these params into a proper command object (the Instant fields would be automatically bound)
+        //       2) Modify the date picker on the react side to send a full date + time + zone string
+        ZoneId zone = sessionManager.timezone?.toZoneId()
+        Instant dateCreatedAfter = params.createdAfter ? DateUtil.asInstant(params.createdAfter, zone) : null
+        Instant dateCreatedBefore = params.createdBefore ? DateUtil.asInstant(params.createdBefore, zone) : null
+
         List<ProductField> handlingRequirements = params.list("handlingRequirementId").collect { ProductField.valueOf(it) }
 
         def query = { isCountQuery ->
@@ -616,7 +640,6 @@ class ProductService {
 
     }
 
-
     /**
      * Import products from csv
      *
@@ -660,35 +683,36 @@ class ProductService {
             rowCount++
             println "Processing line: " + tokens
             def productId = tokens[0]
-            def productCode = tokens[1]
-            def productTypeName = tokens[2]
-            def productName = tokens[3]
-            def productFamilyName = tokens[4]
-            def categoryName = tokens[5]
-            def glAccountCode = tokens[6]
-            def description = tokens[7]
-            def unitOfMeasure = tokens[8]
-            def productTags = tokens[9]?.split(",")
+            def active = CSVUtils.parseCsvBooleanField(tokens[1], rowCount, true)
+            def productCode = tokens[2]
+            def productTypeName = tokens[3]
+            def productName = tokens[4]
+            def productFamilyName = tokens[5]
+            def categoryName = tokens[6]
+            def glAccountCode = tokens[7]
+            def description = tokens[8]
+            def unitOfMeasure = tokens[9]
+            def productTags = tokens[10]?.split(",")
             def pricePerUnit
             try {
-                pricePerUnit = tokens[10] ? Float.valueOf(tokens[10]) : null
+                pricePerUnit = tokens[11] ? Float.valueOf(tokens[11]) : null
             } catch (NumberFormatException e) {
-                throw new RuntimeException("Unit price for product '${productCode}' at row ${rowCount} must be a valid decimal (value = '${tokens[9]}')", e)
+                throw new RuntimeException("Unit price for product '${productCode}' at row ${rowCount} must be a valid decimal (value = '${tokens[10]}')", e)
             }
-            def lotAndExpiryControl = Boolean.valueOf(tokens[11])
-            def coldChain = Boolean.valueOf(tokens[12])
-            def controlledSubstance = Boolean.valueOf(tokens[13])
-            def hazardousMaterial = Boolean.valueOf(tokens[14])
-            def reconditioned = Boolean.valueOf(tokens[15])
-            def manufacturer = tokens[16]
-            def brandName = tokens[17]
-            def manufacturerCode = tokens[18]
-            def manufacturerName = tokens[19]
-            def vendor = tokens[20]
-            def vendorCode = tokens[21]
-            def vendorName = tokens[22]
-            def upc = tokens[23]
-            def ndc = tokens[24]
+            def lotAndExpiryControl = Boolean.valueOf(tokens[12])
+            def coldChain = Boolean.valueOf(tokens[13])
+            def controlledSubstance = Boolean.valueOf(tokens[14])
+            def hazardousMaterial = Boolean.valueOf(tokens[15])
+            def reconditioned = Boolean.valueOf(tokens[16])
+            def manufacturer = tokens[17]
+            def brandName = tokens[18]
+            def manufacturerCode = tokens[19]
+            def manufacturerName = tokens[20]
+            def vendor = tokens[21]
+            def vendorCode = tokens[22]
+            def vendorName = tokens[23]
+            def upc = tokens[24]
+            def ndc = tokens[25]
 
             if (!productName) {
                 throw new RuntimeException("Product name cannot be empty at row " + rowCount)
@@ -723,6 +747,7 @@ class ProductService {
             // If the identifier is incorrect/missing we should display the ID of the product found using the product code instead of the missing/incorrect product identifier
             def productProperties = [
                 id                  : product?.id ?: productId,
+                active              : active,
                 name                : productName,
                 productType         : productType,
                 productFamily       : productFamily,
@@ -774,23 +799,29 @@ class ProductService {
      * @param products The products (as key value maps) to import
      * @param tagNamesForAllProducts A list of tags to assign to all products being imported
      */
-    void importProducts(List<Map<String, Object>> products, List<String> tagNamesForAllProducts) {
+    List<Product> importProducts(List<Map<String, Object>> products, List<String> tagNamesForAllProducts) {
         log.info("Importing products " + products + " tags: " + tagNamesForAllProducts)
 
         // The imported categories and tags are just names at this point. Get or create the actual entities now
         // so that we can assign them to the products in the below loop.
         List<String> allCategoryNames = products.category as List<String>
-        Map<String, Category> categoriesMap = findOrCreateCategoriesAsMap(allCategoryNames)
+        CategoriesByDesensitizedName importedCategories = findOrCreateCategoriesAsMap(allCategoryNames)
 
-        List<String> allTagNames = tagNamesForAllProducts + products.tags.flatten() as List<String>
+        List<String> allTagNames = products.tags.flatten() as List<String>
+        if (tagNamesForAllProducts) {
+            allTagNames.addAll(tagNamesForAllProducts)
+        }
         Map<String, Tag> tagsMap = getOrCreateTagsAsMap(allTagNames)
 
+        List<Product> importedProducts = []
         products.each { productProperties ->
             log.info "Import product code = " + productProperties.productCode + ", name = " + productProperties.name
 
-            // Assign the category to the product. If the product wasn't assigned a category, assign it the root category.
-            String categoryName = (productProperties.category as String)?.trim()
-            productProperties.category = categoryName ? categoriesMap.get(categoryName) : Category.getRootCategory()
+            // The product category is still just a name at this point so assign the product a proper Category instance
+            // now that they've been created. If the product wasn't assigned a category, assign it the root category.
+            productProperties.category = productProperties.category ?
+                    importedCategories.get((productProperties.category as String)) :
+                    Category.getRootCategory()
 
             // Assign both the product-specific tags and the globally defined tags to the product.
             List<String> tagNames = []
@@ -827,7 +858,10 @@ class ProductService {
             if (!product.save(flush: true)) {
                 throw new ValidationException("Could not save product '" + product.name + "'", product.errors)
             }
+            importedProducts.add(product)
         }
+
+        return importedProducts
     }
 
 
@@ -853,7 +887,6 @@ class ProductService {
      */
     String exportProducts(List<Product> products, boolean includeAttributes) {
 
-        def formatDate = new SimpleDateFormat("dd/MMM/yyyy hh:mm:ss")
         def attributes = Attribute.findAllByExportableAndActive(true, true)
         def formatTagLib = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
         boolean hasRoleFinance = userService.hasRoleFinance()
@@ -863,6 +896,10 @@ class ProductService {
             // FIXME make relation to Constants.EXPORT_PRODUCT_COLUMNS explicit
             def row = [
                 Id                  : product?.id,
+                // When product is not active, we want to set it as the string 'false', because without that, when we export the file,
+                // the cell is blank, so if we import this file again, we will set this product as active, because in our import logic
+                // we treat a blank active field as true
+                Active              : product.active ?: 'false',
                 ProductCode         : product.productCode ?: '',
                 ProductType         : product.productType?.name ?: '',
                 Name                : product.name,
@@ -887,8 +924,8 @@ class ProductService {
                 VendorName          : product.vendorName ?: '',
                 UPC                 : product.upc ?: '',
                 NDC                 : product.ndc ?: '',
-                Created             : product.dateCreated ? "${formatDate.format(product.dateCreated)}" : "",
-                Updated             : product.lastUpdated ? "${formatDate.format(product.lastUpdated)}" : "",
+                Created             : dateFormatterManager.formatForExport(product.dateCreated),
+                Updated             : dateFormatterManager.formatForExport(product.lastUpdated),
             ]
 
             if (includeAttributes) {
@@ -904,11 +941,47 @@ class ProductService {
     }
 
     /**
-     * Find or create a list of categories with the given names as a map keyed on category name. Nulls, duplicates,
-     * and whitespace will be ignored.
+     * A map of Category keyed on the "desensitized" (ie trimmed and lower-cased) category name.
+     *
+     * We desensitize the name because we want to treat names like "NAME" and "name  " as equivalent, which is useful
+     * when importing data since user input errors are common. In other scenarios this equivalency might not be useful
+     * (we might want to treat "name" and "NAME" as different), so make sure to be intentional when using this class.
      */
-    private Map<String, Category> findOrCreateCategoriesAsMap(List<String> categoryNames) {
-        return findOrCreateCategories(categoryNames).collectEntries{ [ it.name, it ] }
+    private class CategoriesByDesensitizedName {
+        Map<String, Category> categoryByDesensitizedName = [:]
+
+        CategoriesByDesensitizedName(List<Category> categories) {
+            putAll(categories)
+        }
+
+        List<Category> putAll(List<Category> categories) {
+            categories.each { put(it) }
+        }
+
+        Category put(Category category) {
+            String desensitizedName = desensitizeName(category.name)
+            return categoryByDesensitizedName.put(desensitizedName, category)
+        }
+
+        Category get(String categoryName) {
+            String desensitizedName = desensitizeName(categoryName)
+            return categoryByDesensitizedName.get(desensitizedName)
+        }
+
+        private String desensitizeName(String categoryName) {
+            if (StringUtils.isBlank(categoryName)) {
+                return categoryName
+            }
+            return categoryName.trim().toLowerCase()
+        }
+    }
+
+    /**
+     * Find or create a list of categories with the given names as a map keyed on "desensitized" (ie trimmed
+     * and lower-cased) category name. Nulls, duplicates, and whitespace will be ignored.
+     */
+    private CategoriesByDesensitizedName findOrCreateCategoriesAsMap(List<String> categoryNames) {
+        return new CategoriesByDesensitizedName(findOrCreateCategories(categoryNames))
     }
 
     /**
@@ -1478,5 +1551,68 @@ class ProductService {
             throw new ValidationException("Invalid synonym", synonym.errors)
         }
         return synonym
+    }
+
+    Map<String, Timestamp> latestInventoryDateForProducts(List<String> productIds) {
+        return latestInventoryDateForProducts(AuthService.currentLocation, productIds)
+    }
+
+    Map<String, Timestamp> latestInventoryDateForProducts(Location location, List<String> productIds) {
+        List<String> transactionTypeIds = configService.getProperty('openboxes.inventoryCount.transactionTypes', List) as List<String>
+
+        Inventory inventory = location.inventory
+
+        String hql = """
+            select ii.product.id, max(t.transactionDate)
+            from TransactionEntry te
+            join te.transaction t
+            join te.inventoryItem ii
+            where ii.product.id in (:productIds)
+              and t.inventory = :inventory
+              and t.transactionType.id in (:transactionTypeIds)
+              and (t.comment <> :commentToFilter or t.comment IS NULL)
+            group by ii.product.id
+        """
+
+        List<Object[]> results = TransactionEntry.executeQuery(hql, [
+                productIds: productIds,
+                inventory: inventory,
+                transactionTypeIds: transactionTypeIds,
+                commentToFilter: Constants.INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT
+        ])
+
+        // Convert list to a map for O(1) accessibility further
+        return results.collectEntries { [ (it[0]): it[1] ] }
+    }
+
+    Map<String, List<Map<String, Object>>> getLotNumbersWithExpirationDate(List<String> productIds) {
+        List<Object[]> productLotRows = Product.createCriteria().list {
+            'in'('id', productIds)
+            inventoryItems {
+                isNotNull('lotNumber')
+                ne('lotNumber', '')
+                projections {
+                    property('product.id', 'productId')
+                    property('lotNumber', 'lotNumber')
+                    property('expirationDate', 'expirationDate')
+                }
+            }
+        }
+
+        Map<String, List<Map<String, Object>>> result = productLotRows.groupBy { it[0] as String }
+            .collectEntries {String productId, List<Object[]> lots ->
+                [
+                        productId,
+                        lots.collect { Object[] row ->
+                            [
+                                    lotNumber     : row[1],
+                                    expirationDate: row[2]
+                            ]
+                        }
+                        .unique { it.lotNumber }
+                ]
+            }
+
+        return result
     }
 }

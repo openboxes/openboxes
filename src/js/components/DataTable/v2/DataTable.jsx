@@ -9,6 +9,7 @@ import DataTableHeader from 'components/DataTable/v2/DataTableHeader';
 import useDataTable from 'hooks/useDataTable';
 import useWindowWidthCheck from 'hooks/useWindowWidthCheck';
 
+import 'react-table/react-table.css';
 import 'components/DataTable/DataTable.scss';
 
 // To enable virtualization of the table the "virtualize" object should be passed.
@@ -150,6 +151,6 @@ DataTable.defaultProps = {
     enabled: false,
     customRowsHeight: false,
     estimatedSize: 50,
-    overscan: 5,
+    overscan: 10,
   },
 };

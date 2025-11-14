@@ -13,7 +13,6 @@ import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVMapReader
 import grails.validation.ValidationException
 import org.pih.warehouse.DateUtil
-import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.*
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.LocationImportDataService
@@ -29,6 +28,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionIdentifierService
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductService
@@ -37,8 +37,6 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
 
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.time.Instant
 
 @Transactional
@@ -226,16 +224,15 @@ class LoadDataService {
             Map<String, String> csvReaderRow,
             Product product,
             Location binLocation,
-            Map<String, AvailableItem> availableItems
+            AvailableItemMap availableItems
     ) {
         InventoryItem inventoryItem = inventoryService.findAndUpdateOrCreateInventoryItem(
                 product,
                 csvReaderRow["Lot number"],
                 DateUtil.asDate(csvReaderRow["Expiration date"], Constants.EXPIRATION_DATE_FORMATTER)
         )
-        String key = ProductAvailabilityService.constructAvailableItemKey(binLocation, inventoryItem)
         int newQuantity = csvReaderRow["Physical QOH"] as int
-        int quantityOnHand = availableItems.get(key)?.quantityOnHand ?: 0
+        int quantityOnHand = availableItems.get(binLocation, inventoryItem)?.quantityOnHand ?: 0
         int adjustmentQuantity = newQuantity - quantityOnHand
 
         if (adjustmentQuantity == 0) {
@@ -265,15 +262,16 @@ class LoadDataService {
         Map<String, Product> productMap = Product.findAllByProductCodeInList(productCodes).collectEntries {
             [it.productCode, it]
         }
+        List<Product> products = productMap.values().toList()
 
         // Calculate dates for inventory baseline and adjustment transactions
         Date adjustmentTransactionDate = DateUtil.asDate(Instant.now())
         Date inventoryBaselineTransactionDate = DateUtil.asDate(DateUtil.asInstant(adjustmentTransactionDate).minusSeconds(1))
 
         // 1. Calculate the current available items from product availability - one snapshot transaction for all products
-        Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
+        AvailableItemMap availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 targetWarehouse,
-                productMap.values().toList(),
+                products,
                 inventoryBaselineTransactionDate
         )
 
@@ -291,7 +289,8 @@ class LoadDataService {
             inventoryImportProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
                     targetWarehouse,
                     null,
-                    availableItems.values(),
+                    products,
+                    availableItems,
                     inventoryBaselineTransactionDate
             )
         }

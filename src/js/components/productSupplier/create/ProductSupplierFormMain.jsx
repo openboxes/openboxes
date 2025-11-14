@@ -31,6 +31,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
     triggerValidation,
     setProductPackageQuantity,
     setValue,
+    getValues,
   } = formProps;
 
   return (
@@ -41,6 +42,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
           basicDetails: errors?.basicDetails,
           additionalDetails: errors?.additionalDetails,
         }}
+        getValues={getValues}
       />
       <PreferenceTypeSection
         control={control}
@@ -57,6 +59,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
           packageSpecification: errors?.packageSpecification,
           fixedPrice: errors?.fixedPrice,
         }}
+        triggerValidation={triggerValidation}
         setProductPackageQuantity={setProductPackageQuantity}
       />
       <AttributesSection
@@ -86,5 +89,6 @@ ProductSupplierFormMain.propTypes = {
     triggerValidation: PropTypes.func.isRequired,
     setProductPackageQuantity: PropTypes.func.isRequired,
     setValue: PropTypes.func.isRequired,
+    getValues: PropTypes.func.isRequired,
   }).isRequired,
 };
