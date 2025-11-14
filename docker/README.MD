@@ -12,7 +12,7 @@ We provide the following compose files for running the application under differe
 ## Running OpenBoxes via Docker (compose)
 The following outlines how to run a containerized instance of OpenBoxes.
 
-See the community guide for instructions on creating your own Docker image of the application.
+These compose files support running against officially released OpenBoxes images and locally built ones. See the community guide for [instructions on creating your own Docker image of the application](https://openboxes.gitbook.io/contributor-guide/release-planning/creating-a-new-docker-image).
 
 ### Prerequisites
 1. Install [Docker](https://docs.docker.com/) and [Docker Compose](https://docs.docker.com/compose/)
