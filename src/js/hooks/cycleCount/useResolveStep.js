@@ -255,7 +255,10 @@ const useResolveStep = () => {
       }), {});
       const recountedByData = tableData.current?.reduce((acc, cycleCount) => ({
         ...acc,
-        [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.recountedBy,
+        [cycleCount?.id]:
+          cycleCount?.cycleCountItems?.length > 0
+            ? cycleCount.cycleCountItems[0].recountedBy
+            : cycleCount?.verificationCount?.assignee,
       }), {});
       dateRecounted.current = recountedDates;
       recountedBy.current = recountedByData;
