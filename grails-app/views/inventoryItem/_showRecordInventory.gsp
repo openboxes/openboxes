@@ -1,6 +1,7 @@
 <%@ page import="util.ConfigHelper" %>
 <div id="inventoryForm">
-	<g:form action="saveRecordInventory" autocomplete="off">
+    %{--  OBPIH-7551: Disable the submit button once clicked to avoid multiple submits when multi-clicked  --}%
+	<g:form action="saveRecordInventory" autocomplete="off" onsubmit="saveInventoryItem.disabled = true; return true;">
 
 		<g:hiddenField name="product.id" value="${commandInstance.product?.id}"/>
 		<g:hiddenField name="inventory.id" value="${commandInstance?.inventory?.id}"/>

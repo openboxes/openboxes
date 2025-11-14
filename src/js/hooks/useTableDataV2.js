@@ -27,6 +27,7 @@ const useTableDataV2 = ({
   setShouldFetch,
   disableInitialLoading,
   filtersInitialized = true,
+  onFetchedData,
 }) => {
   const sourceRef = useRef(CancelToken.source());
   const translate = useTranslate();
@@ -67,6 +68,9 @@ const useTableDataV2 = ({
           data: res.data.data,
           totalCount: res.data.totalCount,
         });
+        if (onFetchedData) {
+          onFetchedData(res.data);
+        }
       })
       .catch(() => Promise.reject(new Error(translate(errorMessageId, defaultErrorMessage))))
       .finally(() => {

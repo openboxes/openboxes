@@ -297,9 +297,11 @@ class StockMovementApiController {
      * @deprecated FIXME refactor to avoid using RPC-style endpoints
      */
     def updateItems() {
+        JSONObject requestBody = request.JSON as JSONObject
+
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        bindStockMovement(stockMovement, request.JSON)
-        stockMovement = stockMovementService.updateItems(stockMovement)
+        bindStockMovement(stockMovement, requestBody)
+        stockMovement = stockMovementService.updateItems(stockMovement, requestBody.optBoolean('removeEmptyItems'))
         render([data: stockMovement] as JSON)
     }
 
