@@ -15,6 +15,11 @@ class ProductInventoryTransactionMigrationService extends ProductInventoryTransa
 
     @Override
     void setSourceObject(Transaction transaction, Transaction sourceObject) {
+        // There is no source when we take the pre-migration baseline
+        if (!sourceObject){
+            return
+        }
+
         transaction.cycleCount = sourceObject.cycleCount
     }
 
