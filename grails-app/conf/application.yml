@@ -638,6 +638,8 @@ openboxes:
     stockMovement:
         rollbackAndDelete:
             enabled: true
+        allocate:
+            enabled: true
 
     putaway:
       rollbackAndDelete:
