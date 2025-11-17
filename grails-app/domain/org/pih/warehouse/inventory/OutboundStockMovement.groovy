@@ -231,8 +231,7 @@ class OutboundStockMovement implements Serializable, Validateable {
     }
 
     Boolean shouldGeneratePickList() {
-        return (requisition?.status == RequisitionStatus.CREATED || requisition?.status == RequisitionStatus.VERIFYING) &&
-                lineItems.size() > 0
+        return requisition?.status < RequisitionStatus.PICKING && lineItems.size() > 0
     }
 
     @Deprecated
