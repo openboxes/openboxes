@@ -22,7 +22,6 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAttribute
 import org.pih.warehouse.product.ProductBarcodeUpdatedEvent
 
-@Transactional
 class MobileProductApiController extends BaseDomainApiController {
 
     def zebraService
@@ -158,12 +157,20 @@ class MobileProductApiController extends BaseDomainApiController {
     }
 
     /**
-    * Update a product's barcode (UPC) value.
-    * Endpoint: PUT /mobile/products/{id}/barcode
-    * Request body: { "upc": "123" }
-    */
+     * Update a product identifier (e.g., UPC etc.)
+     * Endpoint: PUT /mobile/products/{id}/identifiers
+     * Request body:
+     * {
+     *   "identifier": {
+     *     "type": "upc",
+     *     "value": "123456789012"
+     *   }
+     * }
+     *
+     * Initially supports only 'upc' type but structured for easy expansion.
+     */
     @Transactional
-    def updateBarcode() {
+    def updateIdentifier() {
         def product = Product.get(params.id)
         if (!product) {
             render(status: 404, text: "Product was not found")
@@ -171,12 +178,13 @@ class MobileProductApiController extends BaseDomainApiController {
         }
 
         try {
-            def requestBody = request.JSON
-            def newUpc = requestBody?.upc?.trim()
-            def oldUpc = product.upc
+            def body = request.JSON
+            def identifier = body?.identifier
+            def type = identifier?.type?.trim()?.toLowerCase()
+            def value = identifier?.value?.trim()
 
-            if (!newUpc) {
-                render(status: 400, text: "Missing 'upc' in request body")
+            if (!type || !value) {
+                render(status: 400, text: "Missing identifier type or value")
                 return
             }
 
@@ -191,27 +199,42 @@ class MobileProductApiController extends BaseDomainApiController {
                 return
             }
 
-            if (oldUpc?.trim() == newUpc) {
-                log.info "UPC for product ${product.id} unchanged; skipping update"
-                render([data: [id: product.id, upc: product.upc, status: 'no_change']] as JSON)
-                return
+            switch (type) {
+                case "upc":
+                    def oldValue = product.upc
+                    def newValue = value
+
+                    if (oldValue?.trim() == newValue) {
+                        log.info "UPC for product ${product.id} unchanged; skipping update"
+                        render([data: [id: product.id, identifier: [type: type, value: oldValue], status: 'no_change']] as JSON)
+                        return
+                    }
+
+                    Product duplicate = Product.findByUpc(newValue)
+                    if (duplicate && duplicate.id != product.id) {
+                        render(
+                                status: 409,
+                                text: "Conflict: '${newValue}' already assigned to another product (Product Code: ${duplicate.productCode})"
+                        )
+                        return
+                    }
+
+                    product.upc = newValue
+                    product.save(flush: true)
+
+                    sendProductBarcodeUpdateNotification(product, oldValue, newValue)
+                    break
+
+                default:
+                    render(status: 400, text: "Unsupported identifier type '${type}'")
+                    return
             }
 
-            Product duplicate = Product.findByUpc(newUpc)
-            if (duplicate && duplicate.id != product.id) {
-                render(status: 409, text: "Conflict: UPC '${newUpc}' already assigned to another product (Product Code: ${duplicate.productCode})")
-                return
-            }
+            render([data: [id: product.id, identifier: [type: type, value: value]]] as JSON)
 
-            product.upc = newUpc
-            product.save(flush: true)
-
-            sendProductBarcodeUpdateNotification(product, oldUpc, newUpc)
-
-            render([data: [id: product.id, upc: product.upc]] as JSON)
         } catch (Exception e) {
-            log.error("Error updating barcode for product ${params.id}: ${e.message}", e)
-            render(status: 500, text: "Server error while updating product barcode")
+            log.error("Error updating identifier for product ${params.id}: ${e.message}", e)
+            render(status: 500, text: "Server error while updating product identifier")
         }
     }
 

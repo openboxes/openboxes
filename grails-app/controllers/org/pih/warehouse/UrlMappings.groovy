@@ -1018,9 +1018,9 @@ class UrlMappings {
             action = [GET: "details"]
         }
 
-        "/api/mobile/products/$id/barcode" {
+        "/api/mobile/products/$id/identifiers" {
             controller = { "mobileProductApi" }
-            action = [PUT: "updateBarcode"]
+            action = [PUT: "updateIdentifier"]
         }
 
         // Standard REST APIs
