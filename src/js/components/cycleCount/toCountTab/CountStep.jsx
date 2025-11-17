@@ -2,6 +2,7 @@ import React, { useMemo, useRef } from 'react';
 
 import _ from 'lodash';
 
+import AssignCycleCountModal from 'components/cycleCount/AssignCycleCountModal';
 import ConfirmStepHeader from 'components/cycleCount/ConfirmStepHeader';
 import CountStepHeader from 'components/cycleCount/toCountTab/CountStepHeader';
 import VirtualizedTablesList from 'components/cycleCount/toCountTab/VirtualizedTablesList';
@@ -39,6 +40,18 @@ const CountStep = () => {
 
   return (
     <PageWrapper>
+      {isAssignCountModalOpen && (
+        <AssignCycleCountModal
+          isOpen={isAssignCountModalOpen}
+          closeModal={closeAssignCountModal}
+          selectedCycleCounts={assignCountModalData}
+          defaultTitleLabel="Assign products to recount"
+          titleLabel="react.cycleCount.modal.assignProductsToRecount.title.label"
+          assignDataDirectly
+          isRecount
+          showSkipButton
+        />
+      )}
       {isStepEditable ? (
         <CountStepHeader
           printCountForm={printCountForm}
