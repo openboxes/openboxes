@@ -690,5 +690,18 @@ class StockMovementController {
 
     }
 
+    def allocate() {
+        try {
+            stockMovementService.createPicklist(params.id)
+            stockMovementService.updateRequisitionStatus(params.id, RequisitionStatus.PICKING)
+
+            flash.message = "Successfully allocated stock movement"
+            redirect(action: "show", id: params.id)
+        } catch (Exception e) {
+            flash.error = "Error while allocating stock movement: ${e.message}"
+            redirect(action: "show", id: params.id)
+        }
+    }
+
 }
 

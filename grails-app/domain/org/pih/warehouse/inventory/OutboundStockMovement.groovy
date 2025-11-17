@@ -230,6 +230,10 @@ class OutboundStockMovement implements Serializable, Validateable {
         return shipment?.currentStatus == ShipmentStatusCode.RECEIVED
     }
 
+    Boolean canGeneratePickList() {
+        return requisition?.status < RequisitionStatus.PICKING && lineItems.size() > 0
+    }
+
     @Deprecated
     Map<String, String> getDisplayStatus() {
         StockMovementStatusContext stockMovementContext = new StockMovementStatusContext(
