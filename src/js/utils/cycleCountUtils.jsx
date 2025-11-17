@@ -1,7 +1,9 @@
 import _ from 'lodash';
+import moment from 'moment';
 
 import { IMPORT_CYCLE_COUNTS } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
+import { DateFormat } from 'consts/timeFormat';
 
 /**
  * Util method to remove lot number spaces from a cycle count item
@@ -106,7 +108,7 @@ const mergeImportItems = (originalItem, importedItem) => ({
   updated: true,
 });
 
-const createCustomItemsFromImport = (items) => (items
+const createCustomItemsFromImport = (items, locale) => (items
   ? items.map((item) => ({
     ...item,
     countIndex: 0,
@@ -114,7 +116,11 @@ const createCustomItemsFromImport = (items) => (items
     custom: true,
     inventoryItem: {
       lotNumber: item.lotNumber,
-      expirationDate: item.expirationDate,
+      expirationDate: item.expirationDate
+        ? moment(item.expirationDate)
+          .locale(locale)
+          .format(DateFormat.MMM_DD_YYYY)
+        : null,
     },
     product: {
       id: item.product.id,
@@ -132,6 +138,7 @@ export const importCycleCounts = async ({
   locationId,
   currentCycleCountEntities,
   setImportErrors,
+  locale,
 }) => {
   const response = await cycleCountApi.importCycleCountItems(
     importFile,
@@ -184,7 +191,7 @@ export const importCycleCounts = async ({
 
             return mergeImportItems(item, correspondingImportItem);
           }),
-        ...createCustomItemsFromImport(cycleCounts[cycleCount.id]),
+        ...createCustomItemsFromImport(cycleCounts[cycleCount.id], locale),
       ],
     };
   });

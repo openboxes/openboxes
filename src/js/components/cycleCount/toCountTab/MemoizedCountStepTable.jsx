@@ -10,9 +10,6 @@ const MemoizedCountStepTable = memo(
     measureElement,
     isStepEditable,
     isFormDisabled,
-    isAssignCountModalOpen,
-    closeAssignCountModal,
-    assignCountModalData,
   }) => (
     <div
       key={id}
@@ -29,9 +26,6 @@ const MemoizedCountStepTable = memo(
         id={id}
         isStepEditable={isStepEditable}
         isFormDisabled={isFormDisabled}
-        isAssignCountModalOpen={isAssignCountModalOpen}
-        closeAssignCountModal={closeAssignCountModal}
-        assignCountModalData={assignCountModalData}
       />
     </div>
   ),
@@ -39,9 +33,7 @@ const MemoizedCountStepTable = memo(
     prev.id === next.id
     && prev.start === next.start
     && prev.isStepEditable === next.isStepEditable
-    && prev.isFormDisabled === next.isFormDisabled
-    && prev.isAssignCountModalOpen === next.isAssignCountModalOpen
-    && prev.assignCountModalData === next.assignCountModalData,
+    && prev.isFormDisabled === next.isFormDisabled,
 );
 
 export default MemoizedCountStepTable;

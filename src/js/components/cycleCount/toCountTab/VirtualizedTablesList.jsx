@@ -8,9 +8,6 @@ const VirtualizedTablesList = ({
   cycleCountIds,
   isStepEditable,
   isFormDisabled,
-  isAssignCountModalOpen,
-  closeAssignCountModal,
-  assignCountModalData,
 }) => {
   const tableVirtualizer = useWindowVirtualizer({
     count: cycleCountIds.length,
@@ -39,9 +36,6 @@ const VirtualizedTablesList = ({
               measureElement={tableVirtualizer.measureElement}
               isStepEditable={isStepEditable}
               isFormDisabled={isFormDisabled}
-              isAssignCountModalOpen={isAssignCountModalOpen}
-              closeAssignCountModal={closeAssignCountModal}
-              assignCountModalData={assignCountModalData}
             />
           );
         })}

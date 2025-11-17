@@ -435,6 +435,7 @@ const useCountStep = () => {
         locationId: currentLocationId,
         currentCycleCountEntities,
         setImportErrors,
+        locale,
       });
       dispatch(importAction);
     } finally {

@@ -2,7 +2,6 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-import AssignCycleCountModal from 'components/cycleCount/AssignCycleCountModal';
 import AddNewRecordFooter from 'components/cycleCount/tableFooter/AddNewRecordFooter';
 import CountedByHeader from 'components/cycleCount/tableHeader/CountedByHeader';
 import DateCountedHeader from 'components/cycleCount/tableHeader/DateCountedHeader';
@@ -16,9 +15,6 @@ const CountStepTable = ({
   id,
   isStepEditable,
   isFormDisabled,
-  isAssignCountModalOpen,
-  closeAssignCountModal,
-  assignCountModalData,
 }) => {
   const {
     columns,
@@ -32,18 +28,6 @@ const CountStepTable = ({
 
   return (
     <>
-      {isAssignCountModalOpen && (
-      <AssignCycleCountModal
-        isOpen={isAssignCountModalOpen}
-        closeModal={closeAssignCountModal}
-        selectedCycleCounts={assignCountModalData}
-        defaultTitleLabel="Assign products to recount"
-        titleLabel="react.cycleCount.modal.assignProductsToRecount.title.label"
-        assignDataDirectly
-        isRecount
-        showSkipButton
-      />
-      )}
       <div className="list-page-list-section">
         <ProductDataHeader
           cycleCountId={id}
