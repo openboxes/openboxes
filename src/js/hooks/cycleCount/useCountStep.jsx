@@ -9,6 +9,7 @@ import {
 } from 'react';
 
 import _ from 'lodash';
+import moment from 'moment';
 import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -636,7 +637,11 @@ const useCountStep = () => {
       custom: true,
       inventoryItem: {
         lotNumber: item.lotNumber,
-        expirationDate: item.expirationDate,
+        expirationDate: item.expirationDate
+          ? moment(item.expirationDate)
+            .locale(locale)
+            .format(DateFormat.MMM_DD_YYYY)
+          : null,
       },
       product: {
         id: item.product.id,
