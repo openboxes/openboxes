@@ -11,6 +11,8 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.shipping.Container
 
 class PutawayItem implements Validateable {
@@ -33,6 +35,8 @@ class PutawayItem implements Validateable {
     // Mobile property
     String scannedPutawayLocation
     Location containerLocation
+    Receipt receipt
+    ReceiptItem receiptItem
 
     Boolean delete = Boolean.FALSE
     List<PutawayItem> splitItems = []
@@ -76,6 +80,8 @@ class PutawayItem implements Validateable {
         putawayItem.putawayLocation = orderItem.destinationBinLocation
         putawayItem.recipient = orderItem.recipient ?: orderItem.order.recipient
         putawayItem.containerLocation = orderItem.containerLocation
+        putawayItem.receipt = orderItem.receipt
+        putawayItem.receiptItem = orderItem.receiptItem
 
         orderItem.orderItems?.each { item ->
             putawayItem.splitItems.add(PutawayItem.createFromOrderItem(item))
@@ -134,7 +140,9 @@ class PutawayItem implements Validateable {
                 quantity                      : quantity,
                 quantityAvailable             : quantityAvailable,
                 splitItems                    : splitItems.collect { it?.toJson() },
-                containerLocation             : containerLocation
+                containerLocation             : containerLocation,
+                "receipt.id"                  : receipt?.id,
+                "receiptItem.id"              : receiptItem?.id,
         ]
     }
 }

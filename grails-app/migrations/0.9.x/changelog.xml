@@ -41,4 +41,5 @@
     <include file="0.9.x/changelog-2025-08-31-1654-add-column-order-item-container-location.xml" />
     <include file="0.9.x/changelog-2025-09-17-1435-add-column-order-item-reason-code.xml" />
     <include file="0.9.x/changelog-2025-09-23-1950-add-column-requisition-fulfillment-properties.xml" />
+    <include file="0.9.x/changelog-2025-11-03-1100-add-receipt-link-to-order-item.xml" />
 </databaseChangeLog>
