@@ -193,7 +193,7 @@
 
                 <g:if test="${grailsApplication.config.openboxes.stockMovement.allocate.enabled}">
                     <g:isUserAdmin>
-                        <g:if test="${stockMovement?.shouldGeneratePickList()}">
+                        <g:if test="${stockMovement?.canGeneratePickList()}">
                             <g:link
                                 controller="stockMovement"
                                 action="allocate"
