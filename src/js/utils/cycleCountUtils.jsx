@@ -143,9 +143,6 @@ export const importCycleCounts = async ({
   const countedByUpdates = {};
   const dateCountedUpdates = {};
 
-  // const state = store.getState();
-  // const tableData = Object.values(state.countWorkflow.entities)
-
   const importedTableData = currentCycleCountEntities.map((cycleCount) => {
     // After each iteration assign it to false again, so that the flag
     // can be reused for next cycle counts in the loop

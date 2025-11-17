@@ -130,13 +130,13 @@ const useCountStepTable = ({
     columnHelper.accessor(null, {
       id: cycleCountColumn.ACTIONS,
       header: () => <TableHeaderCell />,
-      cell: ({ row: { original: { id }, custom } }) => (
+      cell: ({ row: { original, custom } }) => (
         <ActionsCell
           custom={custom}
-          id={id}
+          id={original}
           isStepEditable={isStepEditable}
           isFormDisabled={isFormDisabled}
-          removeRow={() => handleRemoveRow(id)}
+          removeRow={() => handleRemoveRow(original)}
         />
       ),
       meta: {
@@ -146,7 +146,7 @@ const useCountStepTable = ({
         flexWidth: 25,
       },
     }),
-  ], [isStepEditable]);
+  ], [isStepEditable, disabledExpirationDateFields]);
 
   return {
     columns,
