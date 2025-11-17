@@ -191,6 +191,22 @@
                     </g:isUserAdmin>
                 </g:if>
 
+                <g:if test="${grailsApplication.config.openboxes.stockMovement.allocate.enabled}">
+                    <g:isUserAdmin>
+                        <g:if test="${stockMovement?.shouldGeneratePickList()}">
+                            <g:link
+                                controller="stockMovement"
+                                action="allocate"
+                                id="${stockMovement?.requisition?.id}"
+                                class="button"
+                            >
+                                <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                                <warehouse:message code="stockMovement.allocate.label" />
+                            </g:link>
+                        </g:if>
+                    </g:isUserAdmin>
+                </g:if>
+
                 <g:isSuperuser>
                     <a href="javascript:void(0);" class="button btn-show-dialog"
                         data-height="600" data-width="1000"
