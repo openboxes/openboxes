@@ -57,7 +57,7 @@ function entitiesReducer(state = {}, action) {
       const updatedCycleCountItems = state[action.payload.id].cycleCountItems.map((item) => {
         if (item.id === action.payload.rowId) {
           // Updating object through lodash to support nested fields (inventory item properties)
-          return _.set(item, action.payload.field, action.payload.value);
+          return _.set({ ...item }, action.payload.field, action.payload.value);
         }
         return item;
       });
