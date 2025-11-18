@@ -18,7 +18,7 @@ import ModalWrapper from 'components/form-elements/ModalWrapper';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import DateFormat from 'consts/dateFormat';
-import { OutboundWorkflowState } from 'consts/WorkflowState';
+import { OutboundWorkflowState } from 'consts/StockMovementState';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';

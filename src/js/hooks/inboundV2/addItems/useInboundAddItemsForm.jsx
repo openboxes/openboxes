@@ -22,9 +22,10 @@ import {
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import InboundV2Step from 'consts/InboundStep';
 import RequisitionStatus from 'consts/requisitionStatus';
+import { InboundWorkflowState } from 'consts/StockMovementState';
 import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
-import { OutboundWorkflowState } from 'consts/WorkflowState';
 import useInboundAddItemsValidation from 'hooks/inboundV2/addItems/useInboundAddItemsValidation';
+import useHandleModalAction from 'hooks/useHandleModalAction';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
@@ -41,6 +42,13 @@ const useInboundAddItemsForm = ({
   // State used to trigger focus reset when changed. When this counter changes,
   // it will reset the focus by clearing the RowIndex and ColumnId in useEffect.
   const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
+  const {
+    isOpen: isExpirationModalOpen,
+    data: itemsWithMismatchedExpiry,
+    openModal: confirmExpirationDateSave,
+    handleResponse: handleExpirationModalResponse,
+  } = useHandleModalAction();
+
   const history = useHistory();
   const location = useLocation();
 
@@ -86,6 +94,11 @@ const useInboundAddItemsForm = ({
     defaultValues,
     resolver: zodResolver(validationSchema),
   });
+
+  const formatDate = (date) => (formatDateToString({
+    date,
+    dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+  }));
 
   const confirmAction = (onConfirm, messageId, defaultMessage) => {
     const modalLabels = {
@@ -203,14 +216,27 @@ const useInboundAddItemsForm = ({
     setRefreshFocusCounter((prev) => prev + 1);
   };
 
+  const shouldUpdateItem = (lineItems) =>
+    lineItems.filter(
+      (item) =>
+        item.statusCode
+        && getValues('currentLineItems').some((oldItem) => {
+          if (oldItem.id !== item.id) {
+            return false;
+          }
+          const expirationDateChanged = (item.expirationDate
+              && item.inventoryItem?.expirationDate !== item.expirationDate)
+            || (!item.expirationDate && oldItem.expirationDate);
+
+          return !_.isEqual(item, oldItem) || expirationDateChanged;
+        }),
+    );
   const getLineItemsToBeSaved = (lineItems) => {
     const lineItemsToBeAdded = lineItems.filter(
       (item) => !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product,
     );
 
-    const lineItemsToBeUpdated = lineItems.filter((item) =>
-      item.statusCode
-      && getValues('currentLineItems').some((oldItem) => oldItem.id === item.id && !_.isEqual(item, oldItem)));
+    const lineItemsToBeUpdated = shouldUpdateItem(lineItems);
 
     const formatItem = (item) => ({
       id: item.id,
@@ -247,10 +273,13 @@ const useInboundAddItemsForm = ({
         value: item.recipient.value || item.recipient.id,
       }
       : null,
-    expirationDate: formatDateToString({
-      date: item.expirationDate,
-      dateFormat: DateFormatDateFns.DD_MMM_YYYY,
-    }),
+    expirationDate: formatDate(item.expirationDate),
+    inventoryItem: item.inventoryItem
+      ? {
+        ...item.inventoryItem,
+        expirationDate: formatDate(item.inventoryItem.expirationDate),
+      }
+      : null,
   });
 
   const checkInvalidQuantities = (lineItems) =>
@@ -268,25 +297,12 @@ const useInboundAddItemsForm = ({
           : null,
       }));
     if (itemsToSave.length) {
-      const updateInventoryItemsPayload = {
-        id: queryParams.id,
-        lineItems: itemsToSave.map((item) => ({
-          product: item.product,
-          lotNumber: item.lotNumber,
-          expirationDate: item.expirationDate,
-          quantityRequested: item.quantityRequested,
-        })),
-      };
-
       const updateItemsPayload = {
         id: queryParams.id,
         lineItems: itemsToSave,
       };
       try {
         spinner.show();
-        // Update inventory items as part of the save process
-        await apiClient.post(STOCK_MOVEMENT_UPDATE_INVENTORY_ITEMS(queryParams.id),
-          updateInventoryItemsPayload);
         const resp = await apiClient.post(STOCK_MOVEMENT_UPDATE_ITEMS(queryParams.id),
           updateItemsPayload);
         const { data } = resp.data;
@@ -335,34 +351,44 @@ const useInboundAddItemsForm = ({
     }
   };
 
-  const handleExpirationDateMismatch = (updatedValues, lineItems, hasNonZeroQuantity) => {
-    if (hasNonZeroQuantity) {
-      confirmAction(
-        () => updateInventoryItemsAndTransitionToNextStep(updatedValues, lineItems),
-        'react.stockMovement.confirmExpiryDateUpdate.message',
-        'This will update the expiry date across all depots in the system. Are you sure you want to proceed?',
-      );
-    } else {
-      updateInventoryItemsAndTransitionToNextStep(updatedValues, lineItems);
-    }
-  };
+  const handleTransition = async (updatedValues, lineItems) => {
+    const updatedLineItems = updatedValues.lineItems || [];
 
-  const handleTransition = (updatedValues, lineItems) => {
-    const updatedLineItems = updatedValues.lineItems;
-    const hasExpirationDateMismatch = updatedLineItems?.some(
-      (item) => item.inventoryItem && item.expirationDate
-        !== item.inventoryItem.expirationDate,
+    const hasExpiryMismatch = updatedLineItems.some(
+      (item) => item.inventoryItem && item.expirationDate !== item.inventoryItem.expirationDate,
     );
 
-    const hasNonZeroQuantity = updatedLineItems?.some(
+    if (!hasExpiryMismatch) {
+      return transitionToNextStep(updatedValues);
+    }
+    const hasNonZeroQuantity = updatedLineItems.some(
       (item) => item.inventoryItem?.quantity && item.inventoryItem.quantity !== '0',
     );
 
-    if (hasExpirationDateMismatch) {
-      handleExpirationDateMismatch(updatedValues, lineItems, hasNonZeroQuantity);
-    } else {
-      transitionToNextStep(updatedValues);
+    if (hasNonZeroQuantity) {
+      const mismatchedItems = updatedLineItems
+        .filter((item) =>
+          item.inventoryItem
+            && item.inventoryItem.expirationDate !== item.expirationDate
+            && item.inventoryItem.quantity
+            && item.inventoryItem.quantity !== '0')
+        .map((item) => ({
+          code: item.product?.productCode,
+          product: item.product,
+          lotNumber: item.lotNumber,
+          previousExpiry: item.inventoryItem.expirationDate,
+          newExpiry: item.expirationDate,
+        }));
+
+      if (mismatchedItems.length > 0) {
+        const shouldUpdate = await confirmExpirationDateSave(mismatchedItems);
+        if (!shouldUpdate) {
+          return Promise.reject();
+        }
+      }
     }
+
+    return updateInventoryItemsAndTransitionToNextStep(updatedValues, lineItems);
   };
 
   const saveAndTransitionToNextStep = async (values, lineItems) => {
@@ -522,7 +548,7 @@ const useInboundAddItemsForm = ({
   const fetchLineItems = async (showOnlyImportedItems = false) => {
     if (queryParams.id) {
       const response = await stockMovementApi.getStockMovementItems(queryParams.id,
-        { stepNumber: OutboundWorkflowState.ADD_ITEMS });
+        { stepNumber: InboundWorkflowState.ADD_ITEMS });
       setValue('totalCount', response.data.data.length);
       setLineItems(response, null, showOnlyImportedItems);
       await trigger();
@@ -692,6 +718,9 @@ const useInboundAddItemsForm = ({
     refresh,
     exportTemplate,
     importTemplate,
+    isExpirationModalOpen,
+    itemsWithMismatchedExpiry,
+    handleExpirationModalResponse,
   };
 };
 

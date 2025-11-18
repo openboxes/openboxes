@@ -17,8 +17,8 @@ import locationType from 'consts/locationType';
 import NotificationType from 'consts/notificationTypes';
 import requisitionStatus from 'consts/requisitionStatus';
 import RoleType from 'consts/roleType';
+import { InboundWorkflowState } from 'consts/StockMovementState';
 import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
-import { OutboundWorkflowState } from 'consts/WorkflowState';
 import useInboundSendValidation from 'hooks/inboundV2/send/useInboundSendValidation';
 import useFileActions from 'hooks/useFileActions';
 import useQueryParams from 'hooks/useQueryParams';
@@ -136,7 +136,7 @@ const useInboundSendForm = ({ previous }) => {
     try {
       spinner.show();
       const response = await stockMovementApi.getStockMovementById(stockMovementId,
-        { stepNumber: OutboundWorkflowState.SEND_SHIPMENT });
+        { stepNumber: InboundWorkflowState.SEND_SHIPMENT });
 
       const { data } = response.data;
 
