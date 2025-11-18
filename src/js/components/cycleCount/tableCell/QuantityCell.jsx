@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { makeGetCycleCountItem } from 'selectors';
@@ -16,9 +16,14 @@ const QuantityCell = ({
   const item = useSelector(
     (state) => getCycleCountItem(state, cycleCountId, id),
   );
+
   const { quantityCounted: initialValue } = item;
 
-  const [value, setValue] = useState(initialValue ?? '');
+  const [value, setValue] = useState(initialValue);
+
+  useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
 
   if (!isStepEditable) {
     return (
