@@ -614,7 +614,7 @@ const useResolveStep = () => {
       if (shouldRefetch) {
         await refetchData();
       }
-      if (shouldRefetchLotNumbers) {
+      if (shouldRefetchLotNumbers && uniqueProductIds.length > 0) {
         // When we click "Save progress", we want to refetch the lot numbers
         // because the user may have created new ones and, without refetching,
         // they won't be available in the dropdown.
