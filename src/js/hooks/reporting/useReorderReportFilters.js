@@ -109,7 +109,8 @@ const useReorderReportFilters = () => {
     ]);
     setCategories(categoryList);
     setTags(tagList);
-    setLocations(locationList);
+    // Filter out current location from additional inventory locations
+    setLocations(locationList.filter((location) => location.id !== currentLocation?.id));
 
     defaultValues.tags = setDefaultValue(selectedTags, tagList);
     defaultValues.categories = setDefaultValue(selectedCategories, categoryList);

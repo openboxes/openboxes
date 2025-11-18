@@ -635,10 +635,18 @@ class DashboardService {
 
     private ReorderReportItemDto buildReorderReportItem(InventoryByProduct item, InventoryLevel inventoryLevel) {
         Map<String, Number> monthlyDemand = forecastingService.getDemand(AuthService.currentLocation, null, item.product)
-        Integer quantityToOrder = inventoryLevel?.maxQuantity != null ? inventoryLevel.maxQuantity - item.finalQuantityAvailableToPromise : null
+        Closure<Integer> calculateQuantityToOrder = { InventoryLevel invLevel, Integer finalQuantityAvailableToPromise ->
+            if (invLevel?.maxQuantity != null) {
+                return ((invLevel.maxQuantity - finalQuantityAvailableToPromise) > 0
+                        ? invLevel.maxQuantity - finalQuantityAvailableToPromise
+                        : 0)
+            }
+            return null
+        }
+        Integer quantityToOrder = calculateQuantityToOrder(inventoryLevel, item.finalQuantityAvailableToPromise)
         Boolean hasRoleFinance = userService.hasRoleFinance(AuthService.currentUser)
         BigDecimal unitCost = hasRoleFinance ? item.product.pricePerUnit : null
-        BigDecimal expectedReorderCost = hasRoleFinance && quantityToOrder && item.product.pricePerUnit != null
+        BigDecimal expectedReorderCost = hasRoleFinance && (quantityToOrder != null) && item.product.pricePerUnit != null
                 ? quantityToOrder * unitCost
                 : null
         Closure determineInventoryStatus = { InventoryLevel inventoryLevel1, Integer quantityOnHand ->
@@ -707,9 +715,9 @@ class DashboardService {
                     finalQuantityAvailableToPromise: item.finalQuantityAvailableToPromise,
                     expiredQuantityAvailableToPromise: item.expiredQuantityAvailableToPromise,
                     quantityAvailableToPromise: item.finalQuantityAvailableToPromise + item.expiredQuantityAvailableToPromise,
-                    quantityToOrder: getQuantityToOrderDisplayValue(item.inventoryLevel?.maxQuantity, item.quantityToOrder) ?: "",
+                    quantityToOrder: getQuantityToOrderDisplayValue(item.inventoryLevel?.maxQuantity, item.quantityToOrder),
                     unitCost: item.unitCost ?: "",
-                    expectedReorderCost: item.expectedReorderCost ?: "",
+                    expectedReorderCost: item.expectedReorderCost != null ? item.expectedReorderCost : "",
             ]
         }
         return CSVUtils.prependBomToCsvString(csv.writer.toString())
