@@ -7,7 +7,7 @@ import ConfirmStepHeader from 'components/cycleCount/ConfirmStepHeader';
 import CountStepHeader from 'components/cycleCount/toCountTab/CountStepHeader';
 import VirtualizedTablesList from 'components/cycleCount/toCountTab/VirtualizedTablesList';
 import { TO_COUNT_TAB } from 'consts/cycleCount';
-import useCountStep from 'hooks/cycleCount/useCountStep';
+import useCountStep from 'hooks/cycleCount/countStep/useCountStep';
 import PageWrapper from 'wrappers/PageWrapper';
 
 import 'components/cycleCount/cycleCount.scss';
