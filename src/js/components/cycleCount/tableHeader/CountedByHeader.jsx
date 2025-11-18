@@ -28,7 +28,7 @@ const CountedByHeader = ({ cycleCountId, isStepEditable, isFormDisabled }) => {
   };
 
   const defaultValue = cycleCountCountedBy
-    ? { ...cycleCountCountedBy, label: cycleCountCountedBy?.name }
+    ? { ...cycleCountCountedBy, label: cycleCountCountedBy.name }
     : undefined;
 
   return (

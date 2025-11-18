@@ -79,9 +79,6 @@ const CountStep = () => {
         cycleCountIds={cycleCountIds}
         isStepEditable={isStepEditable}
         isFormDisabled={isFormDisabled}
-        isAssignCountModalOpen={isAssignCountModalOpen}
-        closeAssignCountModal={closeAssignCountModal}
-        assignCountModalData={assignCountModalData}
       />
     </PageWrapper>
   );

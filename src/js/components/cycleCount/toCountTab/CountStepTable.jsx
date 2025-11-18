@@ -66,12 +66,6 @@ export default CountStepTable;
 
 CountStepTable.propTypes = {
   id: PropTypes.string.isRequired,
-  validationErrors: PropTypes.shape({}).isRequired,
   isStepEditable: PropTypes.bool.isRequired,
   isFormDisabled: PropTypes.bool.isRequired,
-  isAssignCountModalOpen: PropTypes.bool.isRequired,
-  closeAssignCountModal: PropTypes.func.isRequired,
-  assignCountModalData: PropTypes.arrayOf(
-    PropTypes.shape({}),
-  ).isRequired,
 };
