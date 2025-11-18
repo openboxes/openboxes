@@ -62,7 +62,7 @@ const useCycleCountPersistence = (
       return false;
     }
     return callback();
-  }, [currentLocationId, cycleCountIds, store, locale]);
+  }, [currentLocationId, cycleCountIds, store]);
 
   const getPayload = useCallback((cycleCountItem, shouldSetDefaultAssignee) => {
     const state = store.getState();
@@ -101,7 +101,7 @@ const useCycleCountPersistence = (
         const itemsBase = { cycleCountId: cycleCount.id };
 
         const cycleCountItemsToUpdate = cycleCount.cycleCountItems
-          .filter((item) => item.updated && !item.id.includes('newRow'))
+          .filter((item) => (item.updated || !item.assignee) && !item.id.includes('newRow'))
           .map((item) => ({ ...trimLotNumberSpaces(item), ...itemsBase }));
 
         if (cycleCountItemsToUpdate.length > 0) {
