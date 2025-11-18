@@ -133,7 +133,7 @@ const useResolveDiscrepancies = ({
           openAssignCountModal();
         },
       },
-    ]), [currentLocationId],
+    ]), [currentLocationId, showSuccessNotification],
   );
 
   const openResolveDiscrepanciesModal = useCallback(
@@ -175,7 +175,13 @@ const useResolveDiscrepancies = ({
       setIsSaveDisabled(false);
       hide();
     }
-  }, [currentLocationId]);
+  }, [
+    currentLocationId,
+    submitCount,
+    openResolveDiscrepanciesModal,
+    showSuccessNotification,
+    redirectToNextTab,
+  ]);
 
   return { resolveDiscrepancies, requestIdsWithDiscrepancies };
 };

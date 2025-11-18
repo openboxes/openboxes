@@ -26,7 +26,7 @@ const useCycleCountFetchData = (
 
   const showBinLocation = useMemo(
     () => checkBinLocationSupport(supportedActivities),
-    [JSON.stringify(supportedActivities)],
+    [supportedActivities],
   );
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const useCycleCountFetchData = (
     if (isStepEditable && uniqueProductIds.length > 0) {
       dispatch(fetchLotNumbersByProductIds(uniqueProductIds));
     }
-  }, [JSON.stringify(uniqueProductIds), isStepEditable]);
+  }, [uniqueProductIds, isStepEditable]);
 
   return { uniqueProductIds };
 };

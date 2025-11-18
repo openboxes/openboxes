@@ -132,6 +132,7 @@ const useCountStep = () => {
     resolveDiscrepancies,
     isAssignCountModalOpen,
     closeAssignCountModal,
+    assignCountModalData,
   ]);
 };
 

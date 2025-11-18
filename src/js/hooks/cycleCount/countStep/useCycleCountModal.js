@@ -26,7 +26,7 @@ const useCycleCountModal = (requestIdsWithDiscrepanciesRef) => {
       assignee: cycleCount?.verificationCount?.assignee,
       deadline: cycleCount?.verificationCount?.deadline,
     }));
-  }, [requestIdsWithDiscrepanciesRef.current, store]);
+  }, [store]);
 
   const openAssignCountModal = useCallback(() => {
     mapSelectedRowsToModalData();
