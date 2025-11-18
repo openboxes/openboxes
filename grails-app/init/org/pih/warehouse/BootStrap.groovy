@@ -19,6 +19,7 @@ import org.pih.warehouse.inventory.InventoryAuditDetails
 import org.pih.warehouse.inventory.InventoryAuditSummary
 import org.pih.warehouse.inventory.InventoryTransactionsSummary
 import org.pih.warehouse.inventory.PendingCycleCountRequest
+import org.pih.warehouse.picking.PickTask
 import org.pih.warehouse.putaway.PutawayTask
 import org.pih.warehouse.reporting.CycleCountProductSummary
 
@@ -661,6 +662,10 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(PutawayTask) { PutawayTask putawayTask ->
             return putawayTask.toJson()
+        }
+
+        JSON.registerObjectMarshaller(PickTask) { PickTask pickTask ->
+            return pickTask.toJson()
         }
     }
 
