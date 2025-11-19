@@ -204,12 +204,6 @@ class MobileProductApiController extends BaseDomainApiController {
                     def oldValue = product.upc
                     def newValue = value
 
-                    if (oldValue?.trim() == newValue) {
-                        log.info "UPC for product ${product.id} unchanged; skipping update"
-                        render([data: [id: product.id, identifier: [type: type, value: oldValue], status: 'no_change']] as JSON)
-                        return
-                    }
-
                     Product duplicate = Product.findByUpc(newValue)
                     if (duplicate && duplicate.id != product.id) {
                         render(
