@@ -1,17 +1,25 @@
 package org.pih.warehouse.api.picking
 
 import grails.validation.Validateable
+import org.pih.warehouse.api.PickTaskStatus
+import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 
 class SearchPickTaskCommand implements Validateable {
 
     Location facility
-    String pickType
+    DeliveryTypeCode deliveryTypeCode
     Integer ordersCount
+    String assigneeId
+    PickTaskStatus status
+    Integer priority
 
     static constraints = {
         facility nullable: false
-        pickType nullable: true
-        ordersCount nullable: true, min: 1
+        deliveryTypeCode nullable: true
+        ordersCount nullable: true
+        assigneeId nullable: true
+        status nullable: true
+        priority nullable: true
     }
 }
