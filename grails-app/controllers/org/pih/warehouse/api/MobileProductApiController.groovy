@@ -16,10 +16,12 @@ import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.UserService
+import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAttribute
+import org.pih.warehouse.product.ProductBarcodeUpdatedEvent
 
-@Transactional
 class MobileProductApiController extends BaseDomainApiController {
 
     def zebraService
@@ -27,6 +29,7 @@ class MobileProductApiController extends BaseDomainApiController {
     def documentService
     GrailsApplication grailsApplication
     def productAvailabilityService
+    UserService userService
 
     def read() {
         Product product = productService.getProduct(params.id)
@@ -37,7 +40,9 @@ class MobileProductApiController extends BaseDomainApiController {
         def product = productService.getProduct(params.id)
         def location = Location.get(session.warehouse.id)
         def data = product.toJson()
+
         data.location = location
+        data.upc = product.upc
 
         List availableItems = productAvailabilityService.getAvailableItems(location, [product.id])
         Integer quantityAvailable = availableItems.sum { it.quantityAvailable?:0 }
@@ -149,5 +154,89 @@ class MobileProductApiController extends BaseDomainApiController {
         String [] terms = jsonObject.value?.split(" ")
         List products = productService.searchProducts(terms, [])
         render([data: products?.unique()] as JSON)
+    }
+
+    /**
+     * Update a product identifier (e.g., UPC etc.)
+     * Endpoint: PUT /mobile/products/{id}/identifiers
+     * Request body:
+     * {
+     *   "identifier": {
+     *     "type": "upc",
+     *     "value": "123456789012"
+     *   }
+     * }
+     *
+     * Initially supports only 'upc' type but structured for easy expansion.
+     */
+    @Transactional
+    def updateIdentifier() {
+        def product = Product.get(params.id)
+        if (!product) {
+            render(status: 404, text: "Product was not found")
+            return
+        }
+
+        try {
+            def body = request.JSON
+            def identifier = body?.identifier
+            def type = identifier?.type?.trim()?.toLowerCase()
+            def value = identifier?.value?.trim()
+
+            if (!type || !value) {
+                render(status: 400, text: "Missing identifier type or value")
+                return
+            }
+
+            User user = session?.user
+            if (!user) {
+                render(status: 401, text: "Active user session required")
+                return
+            }
+
+            if (!(userService.hasRoleProductManager(user) || userService.isUserAdmin(user))) {
+                render(status: 403, text: "Insufficient privileges")
+                return
+            }
+
+            switch (type) {
+                case "upc":
+                    def oldValue = product.upc
+                    def newValue = value
+
+                    Product duplicate = Product.findByUpc(newValue)
+                    if (duplicate && duplicate.id != product.id) {
+                        render(
+                                status: 409,
+                                text: "Conflict: '${newValue}' already assigned to another product (Product Code: ${duplicate.productCode})"
+                        )
+                        return
+                    }
+
+                    product.upc = newValue
+                    product.save(flush: true)
+
+                    sendProductBarcodeUpdateNotification(product, oldValue, newValue)
+                    break
+
+                default:
+                    render(status: 400, text: "Unsupported identifier type '${type}'")
+                    return
+            }
+
+            render([data: [id: product.id, identifier: [type: type, value: value]]] as JSON)
+
+        } catch (Exception e) {
+            log.error("Error updating identifier for product ${params.id}: ${e.message}", e)
+            render(status: 500, text: "Server error while updating product identifier")
+        }
+    }
+
+    void sendProductBarcodeUpdateNotification(Product product, String oldUpc, String newUpc) {
+        try {
+            grailsApplication.mainContext.publishEvent(new ProductBarcodeUpdatedEvent(product, oldUpc, newUpc))
+        } catch (Exception e) {
+            log.error("Error while publishing ProductBarcodeUpdatedEvent for product ${product?.id}", e)
+        }
     }
 }

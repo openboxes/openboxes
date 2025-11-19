@@ -356,6 +356,7 @@ class BootStrap {
                 handlingIcons      : product.handlingIcons,
                 lotAndExpiryControl: product.lotAndExpiryControl,
                 active             : product.active,
+                upc                : product.upc,
                 // Introduced new object (decided not to use productNames or synonyms).
                 // that includes the display name for all locales. This gives us a little more
                 // flexibility in case we don't like it or it performs poorly. We can also
