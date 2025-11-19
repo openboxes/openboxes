@@ -633,16 +633,15 @@ class DashboardService {
         return reorderReportItems
     }
 
-    private ReorderReportItemDto buildReorderReportItem(InventoryByProduct item, InventoryLevel inventoryLevel) {
-        Map<String, Number> monthlyDemand = forecastingService.getDemand(AuthService.currentLocation, null, item.product)
-        Closure<Integer> calculateQuantityToOrder = { InventoryLevel invLevel, Integer finalQuantityAvailableToPromise ->
-            if (invLevel?.maxQuantity != null) {
-                return ((invLevel.maxQuantity - finalQuantityAvailableToPromise) > 0
-                        ? invLevel.maxQuantity - finalQuantityAvailableToPromise
-                        : 0)
-            }
+    private static Integer calculateQuantityToOrder(InventoryLevel inventoryLevel, Integer finalQuantityAvailableToPromise) {
+        if (inventoryLevel?.maxQuantity == null) {
             return null
         }
+        return Math.max(inventoryLevel.maxQuantity - finalQuantityAvailableToPromise, 0)
+    }
+
+    private ReorderReportItemDto buildReorderReportItem(InventoryByProduct item, InventoryLevel inventoryLevel) {
+        Map<String, Number> monthlyDemand = forecastingService.getDemand(AuthService.currentLocation, null, item.product)
         Integer quantityToOrder = calculateQuantityToOrder(inventoryLevel, item.finalQuantityAvailableToPromise)
         Boolean hasRoleFinance = userService.hasRoleFinance(AuthService.currentUser)
         BigDecimal unitCost = hasRoleFinance ? item.product.pricePerUnit : null
