@@ -260,6 +260,21 @@ export const fetchBins = async (
   return response.data.data;
 };
 
+export const fetchLocations = async ({ activityCodes }) => {
+  const response = await locationApi.getLocations({
+    paramsSerializer: (parameters) => queryString.stringify(parameters),
+    params: {
+      activityCodes,
+    },
+  });
+
+  return response.data.data.map((location) => ({
+    id: location.id,
+    value: location.id,
+    label: location.name,
+  }));
+};
+
 export const fetchProductsCategories = async () => {
   const response = await apiClient.get('/api/categoryOptions');
   return response.data.data;

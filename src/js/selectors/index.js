@@ -31,3 +31,5 @@ export const getCycleCountTranslations = (state) => state.session.fetchedTransla
 
 export const getLotNumbersByProductId = (state, productId) =>
   state.lotNumbers?.lotNumbersWithExpiration?.[productId] || [];
+
+export const getCurrencyCode = (state) => state.session.currencyCode;

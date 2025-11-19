@@ -1,14 +1,11 @@
-version: "3.8"
+# For running the app against a non-containerized database that is running directly on the host machine
 services:
     app:
       extends: 
         file: docker-compose-base.yml
         service: app
-      image: ghcr.io/openboxes/openboxes:feature-upgrade-to-grails-3.3.10
-      # Use below 'image' property (with proper tag) if you use locally-built image
-      # image: openboxes/openboxes:latest
       environment:
-        DATASOURCE_URL: ${DATASOURCE_URL:-jdbc:mysql://host.docker.internal:3306/openboxes?useSSL=false} 
+        DATASOURCE_URL: ${DATASOURCE_URL:-jdbc:mysql://host.docker.internal:3306/openboxes?serverTimezone=UTC&useSSL=false}
       extra_hosts:
       - "host.docker.internal:host-gateway"
 

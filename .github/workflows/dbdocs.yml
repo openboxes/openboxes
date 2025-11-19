@@ -21,8 +21,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: ${{vars.JAVA_VERSION}}
-          distribution: zulu
+          java-version: 8
+          distribution: temurin
           cache: gradle
 
       - name: Install dbdocs
