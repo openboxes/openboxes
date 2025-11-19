@@ -13,10 +13,13 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.apache.commons.beanutils.BeanUtils
+import org.hibernate.criterion.CriteriaSpecification
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.DocumentGroupCode
 import org.pih.warehouse.api.StockTransfer
 import org.pih.warehouse.api.StockTransferItem
 import org.pih.warehouse.api.StockTransferStatus
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransferStockCommand
@@ -114,12 +117,11 @@ class StockTransferService {
         if (!params) {
             List<StockTransferItem> pendingStockTransferItems = getPendingItems(location)
 
+            Map<List<String>, List<StockTransferItem>> groupedPendingItems = pendingStockTransferItems.groupBy { StockTransferItem item ->
+                [item.location?.id, item.inventoryItem?.id, item.originBinLocation?.id, item.product?.id]
+            }
             stockTransferItems.removeAll { StockTransferItem item ->
-                pendingStockTransferItems.find {
-                    item.location?.id == it.location?.id && item.inventoryItem?.id == it.inventoryItem?.id &&
-                            item.originBinLocation?.id == it.originBinLocation?.id &&
-                            item.product?.id == it.product?.id
-                }
+                groupedPendingItems.containsKey([item.location?.id, item.inventoryItem?.id, item.originBinLocation?.id, item.product?.id])
             }
         }
 
@@ -131,7 +133,19 @@ class StockTransferService {
     }
 
     List<StockTransferItem> getPendingItems(Location location) {
-        List<Order> orders = Order.findAllByOriginAndOrderType(location, OrderType.findByCode(OrderTypeCode.TRANSFER_ORDER.name()))
+        List<Order> orders = Order.createCriteria().list {
+            setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
+            createAlias("orderedBy", "orderedBy", JoinType.INNER_JOIN)
+            createAlias("orderItems", "orderItems", JoinType.LEFT_OUTER_JOIN)
+            createAlias("orderItems.originBinLocation", "originBinLocation", JoinType.LEFT_OUTER_JOIN)
+            createAlias("orderItems.destinationBinLocation", "destinationBinLocation", JoinType.LEFT_OUTER_JOIN)
+            createAlias("orderItems.inventoryItem", "inventoryItem", JoinType.INNER_JOIN)
+            createAlias("inventoryItem.product", "product", JoinType.INNER_JOIN)
+            createAlias("orderItems.picklistItems", "picklistItems", JoinType.LEFT_OUTER_JOIN)
+            createAlias("orderItems.shipmentItems", "shipmentItems", JoinType.LEFT_OUTER_JOIN)
+            eq("origin", location)
+            eq("orderType", OrderType.findByCode(OrderTypeCode.TRANSFER_ORDER.name()))
+        }
         List<StockTransfer> stockTransfers = orders.collect { StockTransfer.createFromOrder(it) }
         List<StockTransferItem> stockTransferItems = []
 

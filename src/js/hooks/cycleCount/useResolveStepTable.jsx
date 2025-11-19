@@ -75,9 +75,7 @@ const useResolveStepTable = ({
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!reasonCodes?.length) {
-      dispatch(fetchReasonCodes('CYCLE_COUNT', FETCH_CYCLE_COUNT_REASON_CODES));
-    }
+    dispatch(fetchReasonCodes('CYCLE_COUNT', FETCH_CYCLE_COUNT_REASON_CODES));
   }, []);
 
   // Get appropriate input component based on table column
@@ -358,16 +356,12 @@ const useResolveStepTable = ({
           selectedLotNumber,
         );
 
-        const formattedExpirationDate = existingLot
-          ? formatLocalizedDate(existingLot.expirationDate, DateFormat.DD_MMM_YYYY)
-          : null;
-
         // when we change the lot number, we also want to update the expiration date
         table.options.meta?.updateData(
           cycleCountId,
           original.id,
           cycleCountColumn.EXPIRATION_DATE,
-          formattedExpirationDate,
+          existingLot?.expirationDate,
         );
 
         setValue(selectedLotNumber);
@@ -554,9 +548,7 @@ const useResolveStepTable = ({
       ), []),
       cell: useCallback(({ row: { original: { quantityCounted, commentFromCount } } }) => (
         <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
-          {quantityCounted === null
-            ? <ValueIndicator variant={valueIndicatorVariant.EMPTY} />
-            : quantityCounted}
+          {quantityCounted ?? <ValueIndicator variant={valueIndicatorVariant.EMPTY} />}
           {commentFromCount && (
             <Tooltip
               arrow="true"

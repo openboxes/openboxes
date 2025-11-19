@@ -46,6 +46,9 @@ class DatePickerTagLib {
      * these params are bound to individual fields.
      *
      * More info: https://docs.grails.org/latest/ref/Tags%20-%20GSP/datePicker.html
+     *
+     * @attr fieldType The class type of the date field that we're picking for. Only used for backwards compatability
+     *                 and so should only need to be set when binding to java.util.Date fields.
      */
     Closure datePicker = { attrs, body ->
         FormTagLib datePickerTagLib = grailsApplication.mainContext.getBean(
@@ -87,15 +90,23 @@ class DatePickerTagLib {
                             "LocalDate fields don't have a time component and so can't have hour or minute precision")
                 }
                 break
+            // attrs.value will often be null when initially populating the picker so this is a common case.
+            case (null):
+                // The default behaviour of Grails' g:datePicker for null Date fields with no attrs.default specified
+                // is to populate the picker with "new Date()", which is the current time in the server timezone.
+                // We preserve this behaviour for backwards compatability, but it is unintuitive for users (who are
+                // expecting to pick dates in their own timezone). As such, fields that we have refactored to use
+                // Instant or LocalDate now default to the current time in the user's timezone.
+                // Unfortunately, when attrs.value is null we are unable to determine the type of the field that we're
+                // picking for (ex: we can't tell if it's an Instant or Date) and so we needed to introduce
+                // attrs.fieldType to help us distinguish between cases. Only Date should default to server time.
+                if (attrs.default == null && attrs.fieldType != Date) {
+                    attrs.value = GregorianCalendar.from(ZonedDateTime.now(zoneId))
+                }
+                break
             // For everything else, (including java.time.Date) we simply pass through to the Grails taglib.
             default:
                 break
-        }
-
-        // If we don't specify a value or a default then the Grails date picker will default to selecting "new Date()",
-        // which uses the server timezone. We want to use the user's timezone instead.
-        if (attrs.value == null && attrs.default == null) {
-            attrs.value = GregorianCalendar.from(ZonedDateTime.now(zoneId))
         }
 
         out << datePickerTagLib.datePicker.call(attrs)

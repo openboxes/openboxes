@@ -157,7 +157,7 @@ class Select extends Component {
     }
 
     const label = value.label ?? value.name;
-    if (label instanceof String) {
+    if (typeof label === 'string') {
       return label;
     }
 

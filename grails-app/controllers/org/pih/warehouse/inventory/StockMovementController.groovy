@@ -546,7 +546,7 @@ class StockMovementController {
                 stockMovement.lineItems.add(stockMovementItem)
                 sortOrder += 100
             }
-            stockMovementService.updateItems(stockMovement)
+            stockMovementService.updateItems(stockMovement, true)
 
         } catch (Exception e) {
             // FIXME The global error handler does not return JSON for multipart uploads

@@ -55,7 +55,9 @@
                                                     </label>
                                                 </td>
                                                 <td class="value">
-                                                    <g:datePicker name="picklist.datePicked" value="${requisition?.picklist?.datePicked}"/>
+                                                    <g:datePicker name="picklist.datePicked"
+                                                                  value="${requisition?.picklist?.datePicked}"
+                                                                  fieldType="${Date}"/>
 
                                                     <button class="button icon approve">
                                                         ${warehouse.message(code:'default.button.save.label')}

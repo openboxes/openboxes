@@ -2371,7 +2371,7 @@ class StockMovementService {
         }
     }
 
-    StockMovement updateItems(StockMovement stockMovement, boolean removeEmptyItems=false) {
+    StockMovement updateItems(StockMovement stockMovement, boolean removeEmptyItems) {
         if (stockMovement.requisition) {
             return updateRequisitionBasedStockMovementItems(stockMovement, removeEmptyItems)
         }
@@ -2534,6 +2534,10 @@ class StockMovementService {
                     requisitionItem.orderIndex = stockMovementItem.sortOrder
                     requisitionItem.comment = stockMovementItem.comments
                     requisitionItem.quantityCounted = stockMovementItem.quantityCounted
+                    // If it's a new item and remove empty items flag is true, we do not want to save it if its quantity is 0
+                    if (removeEmptyItems && !requisitionItem.quantityApproved) {
+                        return
+                    }
                     requisition.addToRequisitionItems(requisitionItem)
                 }
             }

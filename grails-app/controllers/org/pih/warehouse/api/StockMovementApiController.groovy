@@ -432,7 +432,11 @@ class StockMovementApiController {
 
             // Required properties
             stockMovementItem.product = lineItem?.product?.id ? Product.load(lineItem?.product?.id) : null
-            stockMovementItem.quantityRequested = lineItem.quantityRequested ? new BigDecimal(lineItem.quantityRequested) : null
+            // We need to check if quantityRequested is null, because 0 could be evaluated to null if we checked only the truthiness
+            // of lineItem.quantityRequested (as 0 is considered false in Groovy). It worked fine for 0 values, but only if 0 was sent as string
+            // "0", because "0" is true in Groovy. So to avoid such issues we explicitly check for null, and allow both 0 and "0" and let
+            // the removeEmptyItems flag handle removing items with 0 quantity if needed. (OBPIH-7579)
+            stockMovementItem.quantityRequested = lineItem.quantityRequested != null ? new BigDecimal(lineItem.quantityRequested) : null
 
             // Containers (optional)
             stockMovementItem.palletName = !isNull(lineItem["palletName"]) ? lineItem["palletName"] : null

@@ -61,7 +61,10 @@
 										  <label for="dateCreated"><warehouse:message code="localization.dateCreated.label" default="Date Created" /></label>
 										</td>
 										<td valign="top" class="value ${hasErrors(bean: localizationInstance, field: 'dateCreated', 'errors')}">
-											<g:datePicker name="dateCreated" precision="minute" value="${localizationInstance?.dateCreated}"  />
+											<g:datePicker name="dateCreated"
+                                                          precision="minute"
+                                                          value="${localizationInstance?.dateCreated}"
+                                                          fieldType="${Date}"/>
 										</td>
 									</tr>
 
@@ -70,7 +73,10 @@
 										  <label for="lastUpdated"><warehouse:message code="localization.lastUpdated.label" default="Last Updated" /></label>
 										</td>
 										<td valign="top" class="value ${hasErrors(bean: localizationInstance, field: 'lastUpdated', 'errors')}">
-											<g:datePicker name="lastUpdated" precision="minute" value="${localizationInstance?.lastUpdated}"  />
+											<g:datePicker name="lastUpdated"
+                                                          precision="minute"
+                                                          value="${localizationInstance?.lastUpdated}"
+                                                          fieldType="${Date}"/>
 										</td>
 									</tr>
 

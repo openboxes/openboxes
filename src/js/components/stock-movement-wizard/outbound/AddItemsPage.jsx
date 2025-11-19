@@ -410,7 +410,6 @@ class AddItemsPage extends Component {
     this.debouncedSave = _.debounce(() => {
       this.saveRequisitionItemsInCurrentStep({
         itemCandidatesToSave: this.state.values.lineItems,
-        removeEmptyItems: true,
         withStateChange: false,
       });
     }, 1000);
@@ -474,7 +473,7 @@ class AddItemsPage extends Component {
   getLineItemsToBeSaved(lineItems) {
     const lineItemsToBeAdded = _.filter(lineItems, (item) =>
       !item.statusCode
-      && parseInt(item.quantityRequested, 10) >= 0
+      && parseInt(item.quantityRequested, 10) > 0
       && item.product);
     const lineItemsWithStatus = _.filter(lineItems, (item) => item.statusCode);
     const lineItemsToBeUpdated = [];
@@ -596,7 +595,6 @@ class AddItemsPage extends Component {
     ) {
       this.saveRequisitionItemsInCurrentStep({
         itemCandidatesToSave: data,
-        removeEmptyItems: false,
         withStateChange: false,
       });
     }
@@ -629,7 +627,6 @@ class AddItemsPage extends Component {
     }));
     this.saveRequisitionItemsInCurrentStep({
       itemCandidatesToSave: this.props.savedStockMovement.lineItems,
-      removeEmptyItems: false,
       withStateChange: true,
     });
     this.props.hideSpinner();
@@ -900,15 +897,10 @@ class AddItemsPage extends Component {
   /**
    * Saves list of requisition items in current step (without step change).
    * @param {object} itemCandidatesToSave
-   * @param {boolean} removeEmptyItems
    * @param {boolean} withStateChange
    * @public
    */
-  async saveRequisitionItemsInCurrentStep({
-    itemCandidatesToSave,
-    removeEmptyItems,
-    withStateChange = true,
-  }) {
+  async saveRequisitionItemsInCurrentStep({ itemCandidatesToSave, withStateChange = true }) {
     // We filter out items which were already sent to save
     const filteredCandidates = itemCandidatesToSave
       .filter((item) => item.rowSaveStatus !== RowSaveStatus.SAVING);
@@ -917,7 +909,8 @@ class AddItemsPage extends Component {
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
-      removeEmptyItems,
+      // Due to complexities with autosave, outbounds *always* remove zero qty rows.
+      removeEmptyItems: true,
     };
 
     if (payload.lineItems.length) {
@@ -1116,7 +1109,6 @@ class AddItemsPage extends Component {
 
     this.saveRequisitionItemsInCurrentStep({
       itemCandidatesToSave: itemsWithStatuses,
-      removeEmptyItems: false,
       withStateChange: false,
     });
   };
@@ -1129,34 +1121,11 @@ class AddItemsPage extends Component {
   save(formValues) {
     actionInProgress = true;
     const lineItems = _.filter(formValues.lineItems, (item) => !_.isEmpty(item));
-
-    if (this.needToRemoveEmptyItemsOnSave(lineItems)) {
-      this.confirmSave(() => {
-        this.saveItems(lineItems, true);
-      });
-    } else {
-      this.saveItems(lineItems, false);
-    }
+    this.saveItems(lineItems);
   }
 
   static formHasEmptyQuantityRequestedRows(lineItems) {
     return _.some(lineItems, (item) => !item.quantityRequested || item.quantityRequested === '0');
-  }
-
-  /**
-   * True if requisition items with zero or null quantity should be deleted when saving.
-   *
-   * Outbounds allow us to return to the add items step after proceeding past it.
-   * Having zero quantity items in a stock movement results in weird behaviours, so if
-   * the outbound has proceeded past the CREATED status, we can't allow the requisition
-   * to contain blank or zero quantity items.
-   *
-   * @param {object} lineItems
-   * @returns {boolean}
-   */
-  needToRemoveEmptyItemsOnSave(lineItems) {
-    return (this.state.values.statusCode !== StockMovementStatus.CREATED
-      && AddItemsPage.formHasEmptyQuantityRequestedRows(lineItems));
   }
 
   /**
@@ -1165,25 +1134,13 @@ class AddItemsPage extends Component {
    * @public
    */
   saveAndExit(formValues) {
-    const saveAndRedirect = (removeEmptyItems) =>
-      this.saveRequisitionItemsInCurrentStep({
-        itemCandidatesToSave: formValues.lineItems,
-        removeEmptyItems,
-      })
-        .then(() => {
-          window.location = STOCK_MOVEMENT_URL.show(formValues.stockMovementId);
-        });
-
     actionInProgress = true;
     const errors = this.validate(formValues).lineItems;
     if (!errors.length) {
-      if (this.needToRemoveEmptyItemsOnSave(formValues.lineItems)) {
-        this.confirmSave(() => {
-          saveAndRedirect(true);
+      this.saveRequisitionItemsInCurrentStep({ itemCandidatesToSave: formValues.lineItems })
+        .then(() => {
+          window.location = STOCK_MOVEMENT_URL.show(formValues.stockMovementId);
         });
-      } else {
-        saveAndRedirect(false);
-      }
     } else {
       confirmAlert({
         title: this.props.translate('react.stockMovement.confirmExit.label', 'Confirm save'),
@@ -1209,16 +1166,12 @@ class AddItemsPage extends Component {
   /**
    * Saves list of requisition items in current step (without step change).
    * @param {object} lineItems
-   * @param {boolean} removeEmptyItems
    * @public
    */
-  saveItems(lineItems, removeEmptyItems) {
+  saveItems(lineItems) {
     this.props.showSpinner();
 
-    this.saveRequisitionItemsInCurrentStep({
-      itemCandidatesToSave: lineItems,
-      removeEmptyItems,
-    })
+    this.saveRequisitionItemsInCurrentStep({ itemCandidatesToSave: lineItems })
       .then(() => {
         this.fetchLineItems();
         this.props.removeStockMovementDraft(this.state.values.stockMovementId);
@@ -1334,9 +1287,7 @@ class AddItemsPage extends Component {
    */
   exportTemplate(formValues) {
     const lineItems = _.filter(formValues.lineItems, (item) => !_.isEmpty(item));
-    const removeEmptyItems = this.needToRemoveEmptyItemsOnSave(formValues.lineItems);
-
-    this.saveItemsAndExportTemplate({ formValues, lineItems, removeEmptyItems });
+    this.saveItemsAndExportTemplate({ formValues, lineItems });
   }
 
   isRowLoaded({ index }) {
@@ -1347,18 +1298,14 @@ class AddItemsPage extends Component {
    * Exports current state of stock movement's to csv file.
    * @param {object} formValues
    * @param {object} lineItems
-   * @param {boolean} removeEmptyItems
    * @public
    */
-  saveItemsAndExportTemplate({ formValues, lineItems, removeEmptyItems }) {
+  saveItemsAndExportTemplate({ formValues, lineItems }) {
     this.props.showSpinner();
 
     const { movementNumber, stockMovementId } = formValues;
     const url = `/stockMovement/exportCsv/${stockMovementId}`;
-    this.saveRequisitionItemsInCurrentStep({
-      itemCandidatesToSave: lineItems,
-      removeEmptyItems,
-    })
+    this.saveRequisitionItemsInCurrentStep({ itemCandidatesToSave: lineItems })
       .then(() => {
         apiClient.get(url, { responseType: 'blob' })
           .then((response) => {
@@ -1422,21 +1369,9 @@ class AddItemsPage extends Component {
    * @public
    */
   previousPage(values, invalid) {
-    const saveAndRedirect = (removeEmptyItems) =>
-      this.saveRequisitionItemsInCurrentStep({
-        itemCandidatesToSave: values.lineItems,
-        removeEmptyItems,
-      })
-        .then(() => this.props.previousPage(values));
-
     if (!invalid) {
-      if (this.needToRemoveEmptyItemsOnSave(values.lineItems)) {
-        this.confirmSave(() => {
-          saveAndRedirect(true);
-        });
-      } else {
-        saveAndRedirect(false);
-      }
+      this.saveRequisitionItemsInCurrentStep({ itemCandidatesToSave: values.lineItems })
+        .then(() => this.props.previousPage(values));
     } else {
       confirmAlert({
         title: this.props.translate('react.stockMovement.confirmPreviousPage.label', 'Validation error'),

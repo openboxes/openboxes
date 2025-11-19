@@ -55,10 +55,9 @@ class InventoryApiController {
         withFormat {
             "csv" {
                 String csv = dashboardService.getReorderReportCsv(reorderReport)
-                response.contentType = "text/csv"
                 String filename = "Reorder report - ${AuthService.currentLocation?.name}.csv"
                 response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-                render(csv)
+                render(contentType: "text/csv", text: csv, encoding: "UTF-8")
                 return
             }
             "*" {

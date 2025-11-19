@@ -1586,6 +1586,10 @@ class ProductService {
     }
 
     Map<String, List<Map<String, Object>>> getLotNumbersWithExpirationDate(List<String> productIds) {
+        if (!productIds) {
+            return [:]
+        }
+
         List<Object[]> productLotRows = Product.createCriteria().list {
             'in'('id', productIds)
             inventoryItems {
