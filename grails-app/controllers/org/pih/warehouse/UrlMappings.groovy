@@ -1018,6 +1018,11 @@ class UrlMappings {
             action = [GET: "details"]
         }
 
+        "/api/mobile/products/$id/identifiers" {
+            controller = { "mobileProductApi" }
+            action = [PUT: "updateIdentifier"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {

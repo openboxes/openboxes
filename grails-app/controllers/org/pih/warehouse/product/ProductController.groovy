@@ -246,6 +246,20 @@ class ProductController {
                     return
                 }
             }
+            def newUpc = params.upc?.trim()
+            if (newUpc) {
+                Product duplicate = Product.findByUpc(newUpc)
+                if (duplicate && duplicate.id != productInstance.id) {
+                    productInstance.errors.rejectValue(
+                            "upc",
+                            "product.upc.duplicate",
+                            ["UPC '${newUpc}' is already assigned to another product (Product Code: ${duplicate.productCode ?: 'N/A'})"] as Object[],
+                            "UPC '${newUpc}' is already assigned to another product (Product Code: ${duplicate.productCode ?: 'N/A'})"
+                    )
+                    render(view: "edit", model: [productInstance: productInstance])
+                    return
+                }
+            }
             productInstance.properties = params
 
             try {
