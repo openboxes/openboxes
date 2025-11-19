@@ -11,7 +11,7 @@ class SearchPickTaskCommand implements Validateable {
     DeliveryTypeCode deliveryTypeCode
     Integer ordersCount
     String assigneeId
-    PickTaskStatus status
+    List<PickTaskStatus> status
     Integer priority
 
     static constraints = {

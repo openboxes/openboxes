@@ -22,6 +22,11 @@ class PickTaskService {
 
         List<String> requisitionIds = findRequisitionIdsForPicking(command)
 
+        List<PickTaskStatus> statusesToSearch = command.status
+        if (!statusesToSearch) {
+            statusesToSearch = [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
+        }
+
         List<PickTask> tasks = PickTask.createCriteria().list(max: max, offset: offset) {
             eq("facility", command.facility)
 
@@ -37,8 +42,8 @@ class PickTaskService {
                 eq("assignee.id", command.assigneeId)
             }
 
-            if (command.status) {
-                eq("status", command.status)
+            if (statusesToSearch) {
+                'in'("status", statusesToSearch)
             }
 
             if (command.priority) {
