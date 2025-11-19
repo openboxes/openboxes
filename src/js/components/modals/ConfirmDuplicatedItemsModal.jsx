@@ -2,24 +2,23 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-import useConfirmExpirationDateModal from 'hooks/useConfirmExpirationDateModal';
+import ModalWithTable from 'components/modals/ModalWithTable';
+import useConfirmDuplicatedItemsModal from 'hooks/inboundV2/addItems/useShowDuplicatedItems';
 import useTranslate from 'hooks/useTranslate';
 import useTranslation from 'hooks/useTranslation';
 
-import ModalWithTable from './ModalWithTable';
-
-const ConfirmExpirationDateModal = ({
+const ConfirmDuplicatedItemsModal = ({
   isOpen, data, onConfirm, onCancel,
 }) => {
-  useTranslation('confirmExpirationDate');
-  const translate = useTranslate();
-  const { columns } = useConfirmExpirationDateModal();
+  useTranslation('stockMovement');
+  const translate = useTranslate('stockMovement');
+  const { columns } = useConfirmDuplicatedItemsModal();
 
   return (
     <ModalWithTable
       isOpen={isOpen}
-      title={translate('react.confirmExpirationDate.modal.title.label', 'Confirm save')}
-      subtitle={translate('react.confirmExpirationDate.modal.subtitle.label', 'This will update the expiry date across all depots...')}
+      title={translate('react.stockMovement.message.confirmSave.label', 'Confirm save')}
+      subtitle={translate('react.stockMovement.confirmTransition.label', 'You have entered the same code twice. Do you want to continue?')}
       columns={columns}
       data={data}
       confirmLabel={{
@@ -36,23 +35,21 @@ const ConfirmExpirationDateModal = ({
   );
 };
 
-ConfirmExpirationDateModal.propTypes = {
+ConfirmDuplicatedItemsModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   data: PropTypes.arrayOf(
     PropTypes.shape({
       code: PropTypes.string,
       product: PropTypes.shape({}),
-      lotNumber: PropTypes.string,
-      previousExpiry: PropTypes.string,
-      newExpiry: PropTypes.string,
+      quantityRequested: PropTypes.number,
     }),
   ),
   onConfirm: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
 };
 
-ConfirmExpirationDateModal.defaultProps = {
+ConfirmDuplicatedItemsModal.defaultProps = {
   data: [],
 };
 
-export default ConfirmExpirationDateModal;
+export default ConfirmDuplicatedItemsModal;
