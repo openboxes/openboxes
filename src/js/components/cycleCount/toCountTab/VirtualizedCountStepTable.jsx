@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 
 import CountStepTable from 'components/cycleCount/toCountTab/CountStepTable';
 
-const MemoizedCountStepTable = memo(
+const VirtualizedCountStepTable = memo(
   ({
     id,
     start,
@@ -29,11 +29,6 @@ const MemoizedCountStepTable = memo(
       />
     </div>
   ),
-  (prev, next) =>
-    prev.id === next.id
-    && prev.start === next.start
-    && prev.isStepEditable === next.isStepEditable
-    && prev.isFormDisabled === next.isFormDisabled,
 );
 
-export default MemoizedCountStepTable;
+export default VirtualizedCountStepTable;

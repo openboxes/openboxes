@@ -95,7 +95,11 @@ export const setAllItemsUpdatedState = (cycleCount, updated) => ({
   })),
 });
 
-const removeItemFromCycleCounts = (cycleCounts, cycleCountId, itemId) => ({
+const removeItemFromCycleCounts = ({
+  cycleCounts,
+  cycleCountId,
+  itemId,
+}) => ({
   ...cycleCounts,
   [cycleCountId]: cycleCounts[cycleCountId]
     .filter((item) => item.cycleCountItemId !== itemId),
@@ -182,11 +186,11 @@ export const importCycleCounts = async ({
               // Remove items from the import that have a corresponding item
               // in the current cycle count. It allows us to treat items with
               // the wrong ID as new rows that do not already exist.
-              cycleCounts = removeItemFromCycleCounts(
+              cycleCounts = removeItemFromCycleCounts({
                 cycleCounts,
-                cycleCount.id,
-                correspondingImportItem.cycleCountItemId,
-              );
+                cycleCountId: cycleCount.id,
+                itemId: correspondingImportItem.cycleCountItemId,
+              });
             }
 
             return mergeImportItems(item, correspondingImportItem);

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 
-import MemoizedCountStepTable from 'components/cycleCount/toCountTab/MemoizedCountStepTable';
+import VirtualizedCountStepTable from 'components/cycleCount/toCountTab/VirtualizedCountStepTable';
 
 const VirtualizedTablesList = ({
   cycleCountIds,
@@ -28,7 +28,7 @@ const VirtualizedTablesList = ({
           const id = cycleCountIds[virtualRow.index];
 
           return (
-            <MemoizedCountStepTable
+            <VirtualizedCountStepTable
               id={id}
               key={id}
               start={virtualRow.start}
