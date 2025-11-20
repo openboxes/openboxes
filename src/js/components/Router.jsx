@@ -17,6 +17,7 @@ import {
 import CustomAlert from 'components/dashboard/CustomAlert';
 import MainLayoutRoute from 'components/Layout/MainLayoutRoute';
 import Loading from 'components/Loading';
+import ActivityCode from 'consts/activityCode';
 import { DASHBOARD_URL } from 'consts/applicationUrls';
 import useConnectionListener from 'hooks/useConnectionListener';
 import FlashScopeListenerWrapper from 'wrappers/FlashScopeListenerWrapper';
@@ -239,7 +240,8 @@ const Router = () => {
   const notificationAutohideDelay = useSelector(getNotificationAutohideDelay);
 
   const Dashboard = useMemo(
-    () => (!supportedActivities?.includes('MANAGE_INVENTORY') && supportedActivities?.includes('SUBMIT_REQUEST')
+    () => (!supportedActivities?.includes(ActivityCode.MANAGE_INVENTORY)
+    && supportedActivities?.includes(ActivityCode.SUBMIT_REQUEST)
       ? AsyncStockRequestDashboard
       : AsyncDashboard), [supportedActivities],
   );

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { memo, useMemo } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { getUsers, makeGetCycleCountCountedBy } from 'selectors';
@@ -62,4 +62,4 @@ const CountedByHeader = ({ cycleCountId, isStepEditable, isFormDisabled }) => {
   );
 };
 
-export default CountedByHeader;
+export default memo(CountedByHeader);

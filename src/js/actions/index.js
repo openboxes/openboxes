@@ -833,16 +833,19 @@ export const fetchCycleCounts = (
   sortByProductName,
 ) => async (dispatch) => {
   dispatch(showSpinner());
-  const cycleCounts = await cycleCountApi.getCycleCounts(
-    currentLocationId,
-    cycleCountIds,
-    sortByProductName && 'productName',
-  );
-  dispatch({
-    type: FETCH_CYCLE_COUNTS,
-    payload: cycleCounts?.data?.data,
-  });
-  dispatch(hideSpinner());
+  try {
+    const cycleCounts = await cycleCountApi.getCycleCounts(
+      currentLocationId,
+      cycleCountIds,
+      sortByProductName && 'productName',
+    );
+    dispatch({
+      type: FETCH_CYCLE_COUNTS,
+      payload: cycleCounts?.data?.data,
+    });
+  } finally {
+    dispatch(hideSpinner());
+  }
 };
 
 export const setUpdated = (cycleCountId, updated) => (dispatch) => {

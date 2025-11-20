@@ -226,7 +226,10 @@ export const makeGetCycleCountCountedBy = () =>
 export const getAllCycleCountProducts = createSelector(
   [getCountWorkflowEntities],
   (entities) => {
-    if (!entities) return [];
+    if (!entities) {
+      return [];
+    }
+
     return Object.values(entities)
       .flatMap((cc) => cc?.cycleCountItems || [])
       .map((item) => item.product?.id)

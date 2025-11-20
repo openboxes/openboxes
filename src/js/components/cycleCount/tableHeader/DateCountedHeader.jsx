@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { memo, useMemo } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { getFormatLocalizedDate, makeGetCycleCountDateCounted } from 'selectors';
@@ -50,4 +50,4 @@ const DateCountedHeader = ({ cycleCountId, isStepEditable, isFormDisabled }) => 
   );
 };
 
-export default DateCountedHeader;
+export default memo(DateCountedHeader);

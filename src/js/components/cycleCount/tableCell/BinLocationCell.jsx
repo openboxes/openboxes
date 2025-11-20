@@ -60,8 +60,7 @@ const BinLocationCell = ({
   const selectOptions = useMemo(() =>
     groupBinLocationsByZone(binLocations, translate), []);
 
-  const isDisabled = useMemo(() =>
-    !id?.includes('newRow'), [id]);
+  const isDisabled = !id?.includes('newRow');
 
   const selectedValue = value
     ? { ...value, name: getBinLocationToDisplay(value) }
