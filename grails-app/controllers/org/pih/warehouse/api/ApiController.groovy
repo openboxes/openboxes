@@ -62,7 +62,15 @@ class ApiController {
     }
 
     def chooseLocale() {
-        Locale locale = localizationService.setLocale(params.id as String)
+        Locale locale
+        String localeCode = params.id as String
+        try {
+            locale = localizationService.setLocale(localeCode)
+        } catch (IllegalArgumentException ignored) {
+            // Throwing ObjectNotFoundException doesn't make the most sense here since Locale is not a domain model,
+            // but this was the existing behaviour so we preserve it.
+            throw new ObjectNotFoundException(localeCode, Locale.class.toString())
+        }
         render([
             data: [
                 activeLanguage: locale.toString(),

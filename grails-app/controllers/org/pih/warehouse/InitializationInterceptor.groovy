@@ -1,7 +1,10 @@
 package org.pih.warehouse
 
+import org.apache.commons.lang.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.web.servlet.support.RequestContextUtils
 
 /**
  * Copyright (c) 2012 Partners In Health.  All rights reserved.
@@ -30,8 +33,10 @@ class InitializationInterceptor {
     int order = HIGHEST_PRECEDENCE
 
     InitializationInterceptor() {
-        // TODO: This will get triggered for EVERY request. See if we can restrict this at all. Ideally this will only
-        //       be triggered when login is called but we need to double check.
+        // TODO: Break out the setLocale logic into its own LocaleInterceptor. Everything else should only need to
+        //       be triggered once on initial login.
+        // We need this to trigger for every request (not just on login) so that we can check for the presence
+        // of the ?lang query param and wire in our custom locale handling logic.
         matchAll()
     }
 
@@ -66,13 +71,26 @@ class InitializationInterceptor {
     }
 
     void setLocale() {
-        // It might seem weird to get the current locale and then set it immediately after, but getCurrentLocale
-        // returns the user or system default locale when the session locale is not yet initialized (which it won't be
-        // at the time that auth is called). We then set that default into the session so that we don't need to lookup
-        // the defaults again next time we fetch the locale. Subsequent changes to the locale can be made via the ?lang
-        // query param (when making API requests), or via any locale-updating controller actions.
-        Locale locale = localeManager.getCurrentLocale()
+        // Grails has some built in behaviour for setting the locale via the 'lang' query param so we make sure
+        // to account for that case. This avoids desynchronization issues between the expected vs actual locale.
+        String lang = params.lang as String
+
+        Locale locale = StringUtils.isBlank(lang) ?
+                // It might seem weird to get the current locale and then set it immediately after, but getCurrentLocale
+                // returns the user or system default locale in the case when the session locale is not yet initialized.
+                // We can then set that default into the session so that we don't need to lookup the defaults again next
+                // time we fetch the locale. Subsequent changes to the locale can be made via the ?lang query param,
+                // or via any locale-updating controller actions (see UserController and ApiController).
+                localeManager.getCurrentLocale() :
+                LocalizationUtil.getLocale(lang)
+
         localeManager.setCurrentLocale(locale)
+
+        // Grails has some built in behaviour that defaults your locale to your browser's locale when first logging in.
+        // We need to bypass that behaviour and set the locale ourselves to avoid the scenario where the app displays
+        // that we're in one language but text is localized to a different one.
+        // https://pihemr.atlassian.net/browse/OBPIH-3447?focusedCommentId=138878
+        RequestContextUtils.getLocaleResolver(request).setLocale(request, response, locale)
     }
 
     void setCustomProperties() {

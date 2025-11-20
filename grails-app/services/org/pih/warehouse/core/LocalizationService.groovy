@@ -75,7 +75,7 @@ class LocalizationService {
     }
 
     /**
-     * Put the user in localization mode by setting their local to the special Crowdin pseudo-language.
+     * Put the user in localization mode by setting their locale to the special Crowdin pseudo-language.
      */
     void enableLocalizationMode() {
         localeManager.enableLocalizationMode()

@@ -331,8 +331,7 @@ class UserController {
         if (params.locale) {
             try {
                 localizationService.setLocale(params.locale as String)
-            }
-            catch (IllegalArgumentException ignored) {
+            } catch (IllegalArgumentException ignored) {
                 // If the given locale is invalid, do nothing
             }
         }

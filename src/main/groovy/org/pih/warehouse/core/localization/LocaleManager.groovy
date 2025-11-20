@@ -121,7 +121,7 @@ class LocaleManager {
         // If we're disabling localization mode because we're actively switching to a different locale,
         // use that one, else use the locale that the session was using previously.
         Locale locale = StringUtils.isBlank(localeCodeToSwitchTo) ?
-                sessionManager.getPreviousLocale() :
+                (sessionManager.getPreviousLocale() ?: getDefaultLocale()) :
                 asLocale(localeCodeToSwitchTo)
 
         // Set the previous locale to null to guarantee we won't accidentally restore back to it (which can cause us
