@@ -250,7 +250,7 @@ class PutawayTaskService {
         }
 
         if (!container.supports(ActivityCode.PUTAWAY_CART)) {
-            throw new IllegalArgumentException("Container ${container?.name} must support PUTAWAY_CART activity")
+            throw new IllegalArgumentException("Container ${container?.name} does not support PUTAWAY_CART activity")
         }
 
         // validate that the container matches the task putaway container

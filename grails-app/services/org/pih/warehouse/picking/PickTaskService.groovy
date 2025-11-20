@@ -1,17 +1,27 @@
 package org.pih.warehouse.picking
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.api.picking.SearchPickTaskCommand
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.DeliveryTypeCode
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.inventory.InventoryService
+import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.putaway.PutawayTask
+import org.pih.warehouse.putaway.PutawayTaskCompletedEvent
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
 
 @Transactional
 class PickTaskService {
+
+    GrailsApplication grailsApplication
+    InventoryService inventoryService
 
     @Transactional(readOnly = true)
     List<PickTask> search(SearchPickTaskCommand command, Map params = [:]) {
@@ -74,8 +84,18 @@ class PickTaskService {
         }
 
         switch (data?.action) {
+
             case 'start':
                 start(task, data.assigneeId as String)
+                break
+
+            case 'pick':
+                pick(task, data.outboundContainerId as String, data.pickedById as String)
+                break
+
+            case 'short-pick':
+                shortPick(task, data.outboundContainerId as String, data.quantityPicked as Integer,
+                        data.pickedById as String, data.reasonCode as String)
                 break
 
             default:
@@ -90,21 +110,67 @@ class PickTaskService {
     }
 
     void start(PickTask task, String assigneeId) {
-        task.dateStarted = new Date()
-        task.assignee = Person.get(assigneeId)
         executeStateTransition(task, PickTaskStatus.PICKING)
+
+        PicklistItem existingPickItem = PicklistItem.get(task.id)
+        existingPickItem.assignee = Person.get(assigneeId)
+        existingPickItem.dateAssigned = new Date()
+        existingPickItem.dateStarted = new Date()
+
+        save(task)
+    }
+
+    void pick(PickTask task, String outboundContainerId, String pickedById) {
+        Location outboundContainer = Location.findByLocationNumberOrId(outboundContainerId, outboundContainerId)
+        if (!outboundContainer) {
+            throw new IllegalStateException("Outbound container does not exist")
+        }
+
+        if (!outboundContainer.supports(ActivityCode.OUTBOUND_CONTAINER)) {
+            throw new IllegalArgumentException("Container ${outboundContainer.name} does not support OUTBOUND_CONTAINER activity")
+        }
+
+        executeStateTransition(task, PickTaskStatus.PICKED)
+        transferToContainer(task)
+
+        PicklistItem existingPickItem = PicklistItem.get(task.id)
+        existingPickItem.pickedBy = Person.get(pickedById)
+        existingPickItem.datePicked = new Date()
+        existingPickItem.outboundContainer = outboundContainer
+        existingPickItem.quantityPicked = task.quantityRequired.toInteger()
+
+        save(task)
+    }
+
+    void shortPick(PickTask task, String outboundContainerId, Integer quantityPicked, String pickedById, String reasonCode) {
+        Location outboundContainer = Location.findByLocationNumberOrId(outboundContainerId, outboundContainerId)
+        if (!outboundContainer) {
+            throw new IllegalStateException("Outbound container does not exist")
+        }
+
+        if (!outboundContainer.supports(ActivityCode.OUTBOUND_CONTAINER)) {
+            throw new IllegalArgumentException("Container ${outboundContainer.name} does not support OUTBOUND_CONTAINER activity")
+        }
+
+        executeStateTransition(task, PickTaskStatus.PICKED)
+        transferToContainer(task)
+
+        PicklistItem existingPickItem = PicklistItem.get(task.id)
+        existingPickItem.pickedBy = Person.get(pickedById)
+        existingPickItem.datePicked = new Date()
+        existingPickItem.outboundContainer = outboundContainer
+        existingPickItem.quantityPicked = quantityPicked
+        existingPickItem.reasonCode = reasonCode
+
         save(task)
     }
 
     void save(PickTask task) {
         PicklistItem existingPickItem = PicklistItem.get(task.id)
-        existingPickItem.status = task.status.name()
         Requisition requisition = existingPickItem?.requisitionItem?.requisition
-        requisition.approvedBy = task.assignee
-        requisition.dateApproved = task.dateStarted
 
         if (task.status == PickTaskStatus.PICKED) {
-            def allOrderTasks = requisition.picklist.picklistItems
+            def allOrderTasks = requisition?.picklist?.picklistItems
             boolean allTasksPicked = allOrderTasks.every {
                 it.status == PickTaskStatus.PICKED.name()
             }
@@ -124,6 +190,27 @@ class PickTaskService {
             throw new IllegalStateException("Invalid transition ${from} -> ${to}")
         }
         task.status = to
+    }
+
+    void transferToContainer(PickTask task) {
+        TransferStockCommand command = new TransferStockCommand()
+        command.location = task.facility
+        command.binLocation = task.location
+        command.inventoryItem = task.inventoryItem
+        command.quantity = task.quantityPicked.toInteger()
+        command.otherLocation = task.facility
+        command.otherBinLocation = task.outboundContainer
+        command.transferOut = Boolean.TRUE
+        command.disableRefresh = Boolean.TRUE
+        transfer(task, command)
+    }
+
+    void transfer(PickTask task, TransferStockCommand command) {
+        task.discard()
+
+        inventoryService.transferStock(command)
+
+        grailsApplication.mainContext.publishEvent(new PickTaskPickedEvent(task))
     }
 
     private List<String> findRequisitionIdsForPicking(SearchPickTaskCommand command) {

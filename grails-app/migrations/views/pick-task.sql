@@ -19,16 +19,19 @@ SELECT
     r.status AS requisition_status,
     r.origin_id AS facility_id,
     r.type AS requisition_type,
-    r.date_approved as date_started,
-    r.approved_by_id as assignee_id,
 
     ri.id AS requisition_item_id,
     ri.product_id AS product_id,
 
     pli.bin_location_id AS location_id,
+    pli.outbound_container_id AS outbound_container_id,
+    pli.staging_location_id AS staging_location_id,
     pli.inventory_item_id AS inventory_item_id,
     pli.quantity AS quantity_required,
     pli.quantity_picked AS quantity_picked,
+    pli.assignee_id AS assignee_id,
+    pli.date_assigned AS date_assigned,
+    pli.date_started AS date_started,
     pli.picked_by_id AS picked_by_id,
     pli.date_picked AS date_picked,
     pli.reason_code AS reason_code,
@@ -38,6 +41,7 @@ SELECT
         WHEN 'PICKED' THEN 'PICKED'
         ELSE 'PENDING'
     END AS status,
+
     pli.date_created AS date_created,
     pli.last_updated AS last_updated
 FROM picklist_item pli

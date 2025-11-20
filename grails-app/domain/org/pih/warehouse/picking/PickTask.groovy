@@ -25,16 +25,19 @@ class PickTask {
     RequisitionStatus requisitionStatus
     Location facility
     RequisitionType requisitionType
-    Date dateStarted
-    Person assignee
 
     RequisitionItem requisitionItem
     Product product
 
     Location location
+    Location outboundContainer
+    Location stagingLocation
     InventoryItem inventoryItem
     BigDecimal quantityRequired = 0
     BigDecimal quantityPicked = 0
+    Person assignee
+    Date dateAssigned
+    Date dateStarted
     Person pickedBy
     Date datePicked
     String reasonCode
@@ -53,14 +56,17 @@ class PickTask {
         requisitionStatus nullable: true
         facility nullable: true
         requisitionType nullable: true
-        dateStarted nullable: true
-        assignee nullable: true
         requisitionItem nullable: true
         product nullable: false
         location nullable: true
+        outboundContainer nullable: true
+        stagingLocation nullable: true
         inventoryItem nullable: false
         quantityRequired nullable: false
         quantityPicked nullable: true
+        assignee nullable: true
+        dateAssigned nullable: true
+        dateStarted nullable: true
         pickedBy nullable: true
         datePicked nullable: true
         reasonCode nullable: true
@@ -85,13 +91,16 @@ class PickTask {
                 requisitionStatus: requisitionStatus,
                 facility        : facility?.toBaseJson(),
                 requisitionType : requisitionType.name(),
-                dateStarted     : dateStarted,
-                assignee        : assignee,
                 product         : product?.toJson(),
                 location        : location?.toJson(location?.locationType?.locationTypeCode),
+                outboundContainer: outboundContainer?.toJson(location?.locationType?.locationTypeCode),
+                stagingLocation : stagingLocation?.toJson(location?.locationType?.locationTypeCode),
                 inventoryItem   : inventoryItem?.toJson(),
                 quantityRequired: quantityRequired,
                 quantityPicked  : quantityPicked,
+                assignee        : assignee,
+                dateAssigned    : dateAssigned,
+                dateStarted     : dateStarted,
                 pickedBy        : pickedBy?.name,
                 datePicked      : datePicked,
                 reasonCode      : reasonCode,
