@@ -43,9 +43,9 @@ const CycleCountReporting = () => {
   const {
     defaultFilterValues,
     setFilterValues,
+    updateParams,
     isLoading,
     filterParams,
-    resetForm,
     shouldFetch,
     setShouldFetch,
     filtersInitialized,
@@ -64,21 +64,21 @@ const CycleCountReporting = () => {
         id: 'react.cycleCount.products.label',
         defaultMessage: 'Products',
       },
-      onClick: (tab) => switchTab(tab, resetForm),
+      onClick: (tab) => switchTab(tab, updateParams),
     },
     [INVENTORY_TRANSACTIONS_TAB]: {
       label: {
         id: 'react.cycleCount.inventoryTransactions.label',
         defaultMessage: 'Inventory Transactions',
       },
-      onClick: (tab) => switchTab(tab, resetForm),
+      onClick: (tab) => switchTab(tab, updateParams),
     },
     [INDICATORS_TAB]: {
       label: {
         id: 'react.cycleCount.indicators.label',
         defaultMessage: 'Indicators',
       },
-      onClick: (tab) => switchTab(tab, resetForm),
+      onClick: (tab) => switchTab(tab, updateParams),
     },
   };
 
