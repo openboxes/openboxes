@@ -8,7 +8,7 @@ class ProductApiProductAvailabilitySpec extends ApiSpec {
 
     private static final int QUANTITY_ON_HAND = 10
 
-    void 'product availability can successfully be fetched for products with no stock'() {
+    void 'product availability can successfully be fetched for products that have never had stock'() {
         expect: 'product availability to be empty'
         assert productApiWrapper.getProductAvailabilityOK(product).size() == 0
     }

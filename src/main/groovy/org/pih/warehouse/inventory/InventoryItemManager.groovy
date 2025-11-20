@@ -41,9 +41,7 @@ class InventoryItemManager {
             and {
                 eq("product.id", product.id)
                 if (lotNumber) {
-                    or {
-                        eq("lotNumber", lotNumber)
-                    }
+                    eq("lotNumber", lotNumber)
                 } else {
                     or {
                         isNull("lotNumber")
@@ -57,7 +55,7 @@ class InventoryItemManager {
             return inventoryItem
         }
 
-        // Otherwise, sanitize the given lot number and look again (unless the give lot is already sanitized, which
+        // Otherwise, sanitize the given lot number and look again (unless the given lot is already sanitized, which
         // means the item does not exist). We do this in two separate queries because we want an exact matching
         // lot number (the above query) to take priority.
         String sanitizedLotNumber = sanitizeLotNumber(lotNumber)
