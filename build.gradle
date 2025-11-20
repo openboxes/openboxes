@@ -310,6 +310,13 @@ configurations {
     }
 }
 
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+}
+
 configurations.integrationTestImplementation {
     extendsFrom(configurations.implementation)
 }
@@ -775,6 +782,10 @@ dependencies {
     testCompile 'org.springframework:spring-test'
     testCompile 'io.rest-assured:rest-assured:3.2.0'
     testCompile "org.grails.plugins:build-test-data:3.3.1"
+
+    // For development mode
+    developmentOnly "org.testcontainers:mysql:1.17.3"
+
 }
 
 /*
