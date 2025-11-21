@@ -60,6 +60,7 @@ const ExpirationDateCell = ({
     >
       <DatePicker
         value={value || disabledExpirationDateFields?.[id]}
+        customDateFormat={DateFormat.DD_MMM_YYYY}
         onChange={onChange}
         onBlur={onBlur}
         disabled={isDisabled}
