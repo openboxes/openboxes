@@ -130,10 +130,10 @@ const useCountStepTable = ({
     columnHelper.accessor(null, {
       id: cycleCountColumn.ACTIONS,
       header: () => <TableHeaderCell />,
-      cell: ({ row: { original, custom } }) => (
+      cell: ({ row: { original } }) => (
         <ActionsCell
-          custom={custom}
           id={original}
+          cycleCountId={cycleCountId}
           isStepEditable={isStepEditable}
           isFormDisabled={isFormDisabled}
           removeRow={() => handleRemoveRow(original)}
