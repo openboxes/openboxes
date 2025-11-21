@@ -49,7 +49,7 @@ const useIndicatorsTab = ({
       ...dateParams,
     });
     const { pathname } = history.location;
-    history.push({ pathname, search: queryFilterParams });
+    history.replace({ pathname, search: queryFilterParams });
   }, [startDate, endDate]);
 
   const fetchData = async () => {
