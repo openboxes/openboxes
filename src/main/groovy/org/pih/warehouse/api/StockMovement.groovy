@@ -303,6 +303,10 @@ class StockMovement implements Validateable{
         return requisition?.status == RequisitionStatus.PENDING_APPROVAL
     }
 
+    Boolean canGeneratePickList() {
+        return requisition?.status < RequisitionStatus.PICKING && lineItems.size() > 0
+    }
+
     Boolean isDeleteOrRollbackAuthorized(Location currentLocation) {
         Location origin = requisition?.origin?:shipment?.origin
         Location destination = requisition?.destination?:shipment?.destination

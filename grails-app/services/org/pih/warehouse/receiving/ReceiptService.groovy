@@ -33,6 +33,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionIdentifierService
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
@@ -445,11 +446,9 @@ class ReceiptService {
             validateReceiptForRollback(lastReceipt)
 
             def orderItems = OrderItem.findAllByReceipt(lastReceipt)
-            if (orderItems) {
-                orderItems.each { OrderItem item ->
-                    item.receipt = null
-                    item.receiptItem = null
-                }
+            List<Order> orders = orderItems*.order.unique()
+            orders.each { Order order ->
+                order.delete()
             }
 
             Transaction transaction = shipment.incomingTransactions.find {
@@ -507,8 +506,7 @@ class ReceiptService {
     void receiveInboundShipments(Location facility) {
         log.info "Detecting candidates for auto receipt - inbound shipments in-transit to facility ${facility}"
         List<Shipment> shippedShipments = shipmentService.getShippedShipmentsByDestination(facility)
-        shippedShipments.each {Shipment shipment ->
-
+        shippedShipments.each { Shipment shipment ->
             log.info "Creating automated receipt for shipment ${shipment}"
             receiveInboundShipment(shipment)
         }
