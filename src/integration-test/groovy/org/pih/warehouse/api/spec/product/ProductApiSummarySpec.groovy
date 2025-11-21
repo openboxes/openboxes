@@ -4,7 +4,6 @@ import io.restassured.builder.ResponseSpecBuilder
 import org.apache.http.HttpStatus
 import org.hamcrest.Matchers
 import org.springframework.beans.factory.annotation.Autowired
-import spock.lang.Ignore
 
 import org.pih.warehouse.api.client.product.ProductApiWrapper
 import org.pih.warehouse.api.spec.base.ApiSpec
@@ -12,7 +11,6 @@ import org.pih.warehouse.api.spec.base.ApiSpec
 /**
  * Test the product summary endpoints.
  */
-@Ignore("Until we can have our APIs update product availability sequentially these tests are too flaky to be enabled.")
 class ProductApiSummarySpec extends ApiSpec {
 
     private static final int QUANTITY_ON_HAND = 10

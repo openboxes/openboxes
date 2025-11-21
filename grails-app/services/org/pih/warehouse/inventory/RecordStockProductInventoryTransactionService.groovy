@@ -1,6 +1,7 @@
 package org.pih.warehouse.inventory
 
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Constants
 
 import grails.gorm.transactions.Transactional
@@ -11,6 +12,13 @@ import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 @Transactional
 class RecordStockProductInventoryTransactionService extends ProductInventoryTransactionService<RecordInventoryCommand> {
 
+    ConfigService configService
+
+    @Override
+    protected boolean baselineTransactionsEnabled() {
+        return configService.getProperty("openboxes.transactions.inventoryBaseline.recordStock.enabled", Boolean)
+    }
+
     Transaction createAdjustmentTransaction(
             RecordInventoryCommand recordInventoryCommand,
             Date transactionDate
@@ -19,7 +27,9 @@ class RecordStockProductInventoryTransactionService extends ProductInventoryTran
                 transactionType: TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID),
                 inventory: recordInventoryCommand.inventory,
                 comment: recordInventoryCommand.comment,
-                transactionDate: transactionDate
+                transactionDate: transactionDate,
+                // Don't refresh product availability. That will get done manually at the end.
+                disableRefresh: true,
         )
         transaction.transactionNumber = inventoryService.generateTransactionNumber(transaction)
         return transaction

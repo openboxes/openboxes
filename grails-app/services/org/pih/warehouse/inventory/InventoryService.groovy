@@ -53,8 +53,8 @@ class InventoryService implements ApplicationContextAware {
     RecordStockProductInventoryTransactionService recordStockProductInventoryTransactionService
     ProductAvailabilityService productAvailabilityService
     ConfigService configService
+    InventoryItemManager inventoryItemManager
     MessageLocalizer messageLocalizer
-
     def authService
     def dataService
     def gparsService
@@ -1396,14 +1396,17 @@ class InventoryService implements ApplicationContextAware {
                 }
     }
 
-
+    /**
+     * Perform a Record Stock operation on a product, setting a new quantity for all of its items
+     * at a given facility.
+     */
     RecordInventoryCommand saveRecordInventoryCommand(RecordInventoryCommand cmd, Map params) {
         log.debug "Saving record inventory command params: " + params
 
         // First, we need to check if there is no validation error (OBPIH-7438)
         cmd.recordInventoryRows.each { RecordInventoryRowCommand row ->
             if (!row) {
-                return
+                return null
             }
 
             if (row.expirationDate && !row.lotNumber) {
@@ -1423,10 +1426,6 @@ class InventoryService implements ApplicationContextAware {
             return cmd
         }
 
-        Boolean isInventoryBaselineEnabled = configService.getProperty(
-                "openboxes.transactions.inventoryBaseline.recordStock.enabled",
-                Boolean
-        )
         Date adjustmentTransactionDate = new Date(cmd.transactionDate.time + 1000)
 
         try {
@@ -1444,15 +1443,17 @@ class InventoryService implements ApplicationContextAware {
             }
 
             // 1. Create the baseline transaction
-            if (isInventoryBaselineEnabled) {
-                recordStockProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
-                        currentLocation,
-                        null,
-                        [cmd.product],
-                        availableItems,
-                        cmd.transactionDate
-                )
-            }
+            recordStockProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
+                    currentLocation,
+                    null,
+                    [cmd.product],
+                    availableItems,
+                    cmd.transactionDate,
+                    null,
+                    null,
+                    true,
+                    true,  // Don't refresh product availability. That will get done manually at the end.
+            )
 
             // 2. Create a new adjustment transaction
             Transaction adjustmentTransaction = recordStockProductInventoryTransactionService.createAdjustmentTransaction(
@@ -1464,34 +1465,17 @@ class InventoryService implements ApplicationContextAware {
             // 3. Process each row added to the record inventory page
             groupDuplicatedRecordInventoryRows(cmd).each { RecordInventoryRowCommand row ->
                 if (!row) {
-                    return
+                    return null
                 }
 
-                // a) Find an existing inventory item for the given lot number and product and description
-                InventoryItem inventoryItem =
-                        findInventoryItemByProductAndLotNumber(cmd.product, row.lotNumber)
+                InventoryItem inventoryItem = inventoryItemManager.getOrCreateInventoryItem(
+                        cmd.product,
+                        row.lotNumber,
+                        row.expirationDate,
+                        true,  // Don't refresh product availability. That will get done manually at the end.
+                )
 
-                // b) If the inventory item doesn't exist, we create a new one
-                if (!inventoryItem) {
-                    inventoryItem = new InventoryItem(row.properties)
-                    inventoryItem.product = cmd.product
-                    if (inventoryItem.hasErrors() || !inventoryItem.save()) {
-                        inventoryItem.errors.allErrors.each { error ->
-                            cmd.errors.reject("inventoryItem.invalid",
-                                    [
-                                        inventoryItem,
-                                        error.field,
-                                        error.rejectedValue
-                                    ] as Object[],
-                                    "[${error.field} ${error.rejectedValue}] - ${error.defaultMessage} "
-                            )
-                        }
-
-                        return cmd
-                    }
-                }
-
-                // c) Create new transaction entries (but only if the quantity changed)
+                // Create new transaction entries (but only if the quantity changed)
                 TransactionEntry transactionEntry = recordStockProductInventoryTransactionService.createAdjustmentTransactionEntry(
                         row,
                         inventoryItem,
@@ -1524,18 +1508,13 @@ class InventoryService implements ApplicationContextAware {
 
             // 4. Check whether any errors didn't come up
             if (cmd.hasErrors()) {
-                return
+                return null
             }
 
             // 5. Check if there are any changes in quantity recorded. If there aren't, we're done.
             if (!adjustmentTransaction.transactionEntries) {
                 return cmd
             }
-
-            // Quantity available to promise will be manually calculated,
-            // because we want to have the latest value on the Stock Card view
-            // The calculation is done in the controller to avoid circular dependency (adding dependency to productAvailabilityService here)
-            adjustmentTransaction.disableRefresh = Boolean.TRUE
 
             if (adjustmentTransaction.hasErrors() || !adjustmentTransaction.save()) {
                 adjustmentTransaction.errors.allErrors.each { error ->
@@ -1549,7 +1528,7 @@ class InventoryService implements ApplicationContextAware {
                             "Property [${error.field}] of [${adjustmentTransaction.class.name}] with value [${error.rejectedValue}] is invalid"
                     )
                 }
-                return
+                return null
             }
         } catch (Exception e) {
             cmd.errors.reject("Error saving an inventory record to the database: " + e.message)

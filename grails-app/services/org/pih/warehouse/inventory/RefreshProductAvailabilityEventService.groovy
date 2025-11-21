@@ -9,17 +9,23 @@
  **/
 package org.pih.warehouse.inventory
 
-import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationListener
 
 @Transactional
 class RefreshProductAvailabilityEventService implements ApplicationListener<RefreshProductAvailabilityEvent> {
 
-    GrailsApplication grailsApplication
     def productAvailabilityService
 
+    @Value('${openboxes.applicationEvents.refreshProductAvailability.alwaysSynchronous}')
+    Boolean alwaysSynchronous
+
     void onApplicationEvent(RefreshProductAvailabilityEvent event) {
+        if (alwaysSynchronous) {
+            event.synchronousRequired = true
+        }
+
         // Some event publishers might want to trigger the events on their own
         // in order to allow the transaction to be saved to the database (e.g. Partial Receiving)
         if (event?.disableRefresh) {
