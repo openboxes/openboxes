@@ -109,10 +109,21 @@ const formatDateCache = new Map();
 export const getFormatLocalizedDate = createSelector(
   [getLocalize, getLocaleCode],
   (localize, localeCode) => {
-    if (!formatDateCache.has(localeCode)) {
-      formatDateCache.set(localeCode, formatDate(localize));
+    // Cache translation function when it's not available in map object or
+    // when there are new translations keys fetched
+    const translationKeysNumber = Object.keys(localize.translations).length;
+    if (
+      !formatDateCache.has(localeCode)
+      || translationKeysNumber !== formatDateCache.get(localeCode)?.translationsNumber
+    ) {
+      formatDateCache.set(
+        localeCode, {
+          fn: formatDate(localize),
+          translationKeysNumber,
+        },
+      );
     }
-    return formatDateCache.get(localeCode);
+    return formatDateCache.get(localeCode).fn;
   },
 );
 
@@ -122,10 +133,26 @@ const translateCache = new Map();
 export const getAppTranslate = createSelector(
   [getLocalize, getLocaleCode],
   (localize, localeCode) => {
-    if (!translateCache.has(localeCode)) {
-      translateCache.set(localeCode, translateWithDefaultMessage(getTranslate(localize)));
+    if (!localeCode) {
+      return () => {};
     }
-    return translateCache.get(localeCode);
+
+    // Cache translation function when it's not available in map object or
+    // when there are new translations keys fetched
+    const translationKeysNumber = Object.keys(localize.translations).length;
+    if (
+      !translateCache.has(localeCode)
+      || translationKeysNumber !== translateCache.get(localeCode)?.translationKeysNumber
+    ) {
+      translateCache.set(
+        localeCode, {
+          fn: translateWithDefaultMessage(getTranslate(localize)),
+          translationKeysNumber,
+        },
+      );
+    }
+
+    return translateCache.get(localeCode).fn;
   },
 );
 
