@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="druchniewicz" id="211120251300-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="picklist_item" columnName="outbound_container_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="picklist_item">
+            <column name="outbound_container_id" type="CHAR(38)"/>
+            <column name="staging_location_id" type="CHAR(38)"/>
+            <column name="assignee_id" type="CHAR(38)"/>
+            <column name="date_assigned" type="DATETIME"/>
+            <column name="date_started" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="druchniewicz" id="211120251300-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_picklist_item_outbound_container"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseTableName="picklist_item"
+                baseColumnNames="outbound_container_id"
+                referencedTableName="location"
+                referencedColumnNames="id"
+                constraintName="fk_picklist_item_outbound_container"
+                deferrable="false"
+                initiallyDeferred="false"/>
+    </changeSet>
+
+    <changeSet author="druchniewicz" id="211120251300-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_picklist_item_staging_location"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseTableName="picklist_item"
+                baseColumnNames="staging_location_id"
+                referencedTableName="location"
+                referencedColumnNames="id"
+                constraintName="fk_picklist_item_staging_location"
+                deferrable="false"
+                initiallyDeferred="false"/>
+    </changeSet>
+
+    <changeSet author="druchniewicz" id="211120251300-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_picklist_item_assignee"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseTableName="picklist_item"
+                baseColumnNames="assignee_id"
+                referencedTableName="user"
+                referencedColumnNames="id"
+                constraintName="fk_picklist_item_assignee"
+                deferrable="false"
+                initiallyDeferred="false"/>
+    </changeSet>
+
+</databaseChangeLog>

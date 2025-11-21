@@ -9,10 +9,7 @@
  **/
 package org.pih.warehouse.putaway
 
-import grails.events.annotation.Subscriber
 import grails.gorm.transactions.Transactional
-import org.pih.warehouse.api.Putaway
-import org.pih.warehouse.api.PutawayItem
 import org.springframework.context.ApplicationListener
 
 @Transactional
