@@ -39,6 +39,10 @@ class TransactionSource {
     User createdBy
     User updatedBy
 
+    static mapping = {
+        id generator: 'uuid'
+        version false
+    }
 
     static constraints = {
         shipment(nullable: true)

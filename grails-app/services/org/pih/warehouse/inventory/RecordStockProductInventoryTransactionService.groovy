@@ -21,7 +21,8 @@ class RecordStockProductInventoryTransactionService extends ProductInventoryTran
 
     Transaction createAdjustmentTransaction(
             RecordInventoryCommand recordInventoryCommand,
-            Date transactionDate
+            Date transactionDate,
+            TransactionSource transactionSource
     ) {
         Transaction transaction = new Transaction(
                 transactionType: TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID),
@@ -30,6 +31,7 @@ class RecordStockProductInventoryTransactionService extends ProductInventoryTran
                 transactionDate: transactionDate,
                 // Don't refresh product availability. That will get done manually at the end.
                 disableRefresh: true,
+                transactionSource: transactionSource
         )
         transaction.transactionNumber = inventoryService.generateTransactionNumber(transaction)
         return transaction
