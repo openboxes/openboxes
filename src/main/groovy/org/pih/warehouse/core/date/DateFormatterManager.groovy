@@ -7,7 +7,7 @@ import java.time.ZonedDateTime
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
-import org.pih.warehouse.core.localization.LocaleDeterminer
+import org.pih.warehouse.core.localization.LocaleManager
 import org.pih.warehouse.core.session.SessionManager
 
 /**
@@ -22,7 +22,7 @@ class DateFormatterManager {
     SessionManager sessionManager
 
     @Autowired
-    LocaleDeterminer localeDeterminer
+    LocaleManager localeManager
 
     /**
      * Convenience method for converting the given date object to a String for use by file exporters.
@@ -65,7 +65,7 @@ class DateFormatterManager {
 
     private Locale getLocale() {
         // We trust the locale resolver to provide a default locale if there is no valid session.
-        return localeDeterminer.currentLocale
+        return localeManager.getCurrentLocale()
     }
 
     private ZoneId getTimezone(){
