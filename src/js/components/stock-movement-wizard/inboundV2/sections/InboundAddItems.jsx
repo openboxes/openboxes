@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { useFieldArray, useWatch } from 'react-hook-form';
+import { useWatch } from 'react-hook-form';
 import {
   RiAddLine,
   RiCloseCircleLine,
@@ -15,10 +15,11 @@ import {
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
 import Section from 'components/Layout/v2/Section';
+import ConfirmDuplicatedItemsModal from 'components/modals/ConfirmDuplicatedItemsModal';
 import ConfirmExpirationDateModal from 'components/modals/ConfirmExpirationDateModal';
+import modalWithTableType from 'consts/modalWithTableType';
 import useInboundAddItemsColumns from 'hooks/inboundV2/addItems/useInboundAddItemsColumns';
 import useInboundAddItemsForm from 'hooks/inboundV2/addItems/useInboundAddItemsForm';
-import useResetScrollbar from 'hooks/useResetScrollbar';
 
 const InboundAddItems = ({
   next,
@@ -34,33 +35,22 @@ const InboundAddItems = ({
     loading,
     nextPage,
     save,
-    removeItem,
-    updateTotalCount,
-    removeAll,
+    removeAllRows,
     saveAndExit,
     previousPage,
-    refreshFocusCounter,
-    resetFocus,
     refresh,
     importTemplate,
     exportTemplate,
-    isExpirationModalOpen,
-    itemsWithMismatchedExpiry,
-    handleExpirationModalResponse,
+    addNewLine,
+    removeSavedRow,
+    removeRow,
+    lineItemsArrayFields,
+    isModalOpen,
+    modalData,
+    modalType,
+    handleModalResponse,
   } = useInboundAddItemsForm({ next, previous });
   const hasErrors = !!Object.keys(errors).length;
-  const {
-    fields,
-    remove,
-    append,
-  } = useFieldArray({
-    control,
-    name: 'values.lineItems',
-  });
-
-  const { resetScrollbar } = useResetScrollbar({
-    selector: '.rt-table',
-  });
 
   const lineItems = useWatch({
     name: 'values.lineItems',
@@ -70,40 +60,13 @@ const InboundAddItems = ({
   const { columns } = useInboundAddItemsColumns({
     errors,
     control,
-    remove,
+    removeSavedRow,
     trigger,
     getValues,
     setValue,
-    removeItem,
-    updateTotalCount,
-    removeAll,
-    append,
-    refreshFocusCounter,
+    removeRow,
+    addNewLine,
   });
-
-  const defaultTableRow = {
-    palletName: '',
-    boxName: '',
-    product: undefined,
-    lotNumber: '',
-    expirationDate: '',
-    quantityRequested: undefined,
-    recipient: undefined,
-  };
-
-  const getNextSortOrder = () => {
-    const maxSortOrder = Math.max(0, ...fields.map(item => item.sortOrder || 0));
-    return maxSortOrder + 100;
-  };
-  const addNewLine = () => {
-    const newRow = {
-      ...defaultTableRow,
-      sortOrder: getNextSortOrder(),
-    };
-    append(newRow);
-    resetScrollbar();
-    resetFocus();
-  };
 
   return (
     <form onSubmit={handleSubmit(nextPage)}>
@@ -170,7 +133,7 @@ const InboundAddItems = ({
                 disabled={hasErrors}
               />
               <Button
-                onClick={removeAll}
+                onClick={removeAllRows}
                 StartIcon={<RiCloseCircleLine className="icon" />}
                 defaultLabel="Delete All"
                 label="react.default.button.deleteAll.label"
@@ -181,7 +144,7 @@ const InboundAddItems = ({
           </div>
           <DataTable
             columns={columns}
-            data={fields}
+            data={lineItemsArrayFields}
             loading={loading}
             disablePagination
             emptyTableMessage={{
@@ -210,10 +173,17 @@ const InboundAddItems = ({
         />
       </div>
       <ConfirmExpirationDateModal
-        isOpen={isExpirationModalOpen}
-        itemsWithMismatchedExpiry={itemsWithMismatchedExpiry}
-        onConfirm={() => handleExpirationModalResponse(true)}
-        onCancel={() => handleExpirationModalResponse(false)}
+        isOpen={isModalOpen && modalType === modalWithTableType.EXPIRATION}
+        data={modalData || []}
+        onConfirm={() => handleModalResponse(true)}
+        onCancel={() => handleModalResponse(false)}
+      />
+
+      <ConfirmDuplicatedItemsModal
+        isOpen={isModalOpen && modalType === modalWithTableType.DUPLICATES}
+        data={modalData || []}
+        onConfirm={() => handleModalResponse(true)}
+        onCancel={() => handleModalResponse(false)}
       />
     </form>
   );
