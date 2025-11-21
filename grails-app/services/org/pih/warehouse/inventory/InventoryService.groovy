@@ -54,6 +54,7 @@ class InventoryService implements ApplicationContextAware {
     ProductAvailabilityService productAvailabilityService
     ConfigService configService
     MessageLocalizer messageLocalizer
+    TransactionSourceService transactionSourceService
 
     def authService
     def dataService
@@ -1443,21 +1444,27 @@ class InventoryService implements ApplicationContextAware {
                 throw new IllegalArgumentException("A transaction already exists at time ${adjustmentTransactionDate}")
             }
 
+            // Create transaction source
+            TransactionSource transactionSource = transactionSourceService.createRecordStockTransactionSource(currentLocation)
+
             // 1. Create the baseline transaction
             if (isInventoryBaselineEnabled) {
-                recordStockProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
-                        currentLocation,
-                        null,
-                        [cmd.product],
-                        availableItems,
-                        cmd.transactionDate
+                InventoryBaselineTransactionCommand command = new InventoryBaselineTransactionCommand(
+                        facility: currentLocation,
+                        sourceObject: null,
+                        products: [cmd.product],
+                        availableItems: availableItems,
+                        transactionDate: cmd.transactionDate,
+                        transactionSource: transactionSource
                 )
+                recordStockProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(command)
             }
 
             // 2. Create a new adjustment transaction
             Transaction adjustmentTransaction = recordStockProductInventoryTransactionService.createAdjustmentTransaction(
                     cmd,
-                    adjustmentTransactionDate
+                    adjustmentTransactionDate,
+                    transactionSource
             )
 
             List<AvailableItem> currentRecordStockItems = []

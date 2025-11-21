@@ -19,6 +19,7 @@ import org.pih.warehouse.DateUtil
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.InventoryBaselineTransactionCommand
 import org.pih.warehouse.inventory.InventoryImportProductInventoryTransactionService
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
@@ -165,15 +166,16 @@ class InventoryImportDataService implements ImportDataService {
         Map<AvailableItemKey, String> commentsForBaselineTransactionEntries =
                 getCommentsForBaselineTransactionEntries(inventoryImportData.rows, availableItems)
 
-        inventoryImportProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
-                command.location,
-                command,
-                inventoryImportData.products,
-                availableItems,
-                baselineTransactionDate,
-                comment,
-                commentsForBaselineTransactionEntries,
+        InventoryBaselineTransactionCommand<ImportDataCommand> baselineTransactionCommand = new InventoryBaselineTransactionCommand<>(
+                facility: command.location,
+                sourceObject: command,
+                products: inventoryImportData.products,
+                availableItems: availableItems,
+                transactionDate: baselineTransactionDate,
+                comment: comment,
+                transactionEntriesComments: commentsForBaselineTransactionEntries,
         )
+        inventoryImportProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(baselineTransactionCommand)
 
         // Date objects are mutable, so we use Instant to clone the date in the command and avoid directly modifying it.
         Date adjustmentTransactionDate = DateUtil.asDate(DateUtil.asInstant(baselineTransactionDate).plusSeconds(1))
