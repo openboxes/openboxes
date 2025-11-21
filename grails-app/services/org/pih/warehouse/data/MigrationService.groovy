@@ -32,6 +32,7 @@ import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryTransactionMigrationService
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.ProductInventoryTransactionMigrationService
 import org.pih.warehouse.inventory.Transaction
@@ -56,6 +57,7 @@ class MigrationService {
     def inventoryService
     ProductAvailabilityService productAvailabilityService
     ProductInventoryTransactionMigrationService productInventoryTransactionMigrationService
+    InventoryTransactionMigrationService inventoryTransactionMigrationService
     def persistenceInterceptor
     def dataSource
 
@@ -338,7 +340,12 @@ class MigrationService {
         // Always create a stock snapshot before modifying any transactions in order to prevent quantity on hand
         // differences for edge cases that were not addressed
         if (performMigration) {
-            inventoryService.createStockSnapshot(location, product)
+            inventoryTransactionMigrationService.createInventoryBaselineTransaction(
+                    location,
+                    null,
+                    [product],
+                    null,
+                    "Created while migrating Inventory transactions")
         }
 
         def transactionEntries = getTransactionEntries(location, product)

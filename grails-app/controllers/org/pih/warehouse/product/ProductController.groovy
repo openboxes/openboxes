@@ -45,7 +45,6 @@ class ProductController {
     MailService mailService
     def productService
     def documentService
-    def inventoryService
     def barcodeService
     def productMergeService
     UploadService uploadService
@@ -1013,18 +1012,6 @@ class ProductController {
         log.info "productCatalogs: " + productCatalogs
 
         render template: "productCatalogs", model: [productInstance: product]
-    }
-
-    def createProductSnapshot() {
-
-        Product product = Product.get(params.id)
-        Location location = Location.get(session.warehouse.id)
-
-        inventoryService.createStockSnapshot(location, product)
-
-        flash.message = "Successfully created stock snapshot for product ${product.productCode} ${product?.name}"
-
-        redirect(controller: "inventoryItem", action: "showStockCard", id: params.id)
     }
 
     private def updateTags(productInstance, params) {
