@@ -19,6 +19,7 @@ import org.pih.warehouse.importer.LocationImportDataService
 import org.pih.warehouse.importer.ProductCatalogItemImportDataService
 import org.pih.warehouse.importer.ProductSupplierImportDataService
 import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.InventoryBaselineTransactionCommand
 import org.pih.warehouse.inventory.InventoryImportProductInventoryTransactionService
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
@@ -286,13 +287,14 @@ class LoadDataService {
         // 2b. If there are no available items:
         //   - then no snapshot is being saved
         if (availableItems.size() && isInventoryBaselineEnabled) {
-            inventoryImportProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
-                    targetWarehouse,
-                    null,
-                    products,
-                    availableItems,
-                    inventoryBaselineTransactionDate
+            InventoryBaselineTransactionCommand baselineTransactionCommand = new InventoryBaselineTransactionCommand(
+                    facility: targetWarehouse,
+                    sourceObject: null,
+                    products: products,
+                    availableItems: availableItems,
+                    transactionDate: inventoryBaselineTransactionDate
             )
+            inventoryImportProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(baselineTransactionCommand)
         }
 
         // 3. Create an adjustment (credit) transaction and take the data imported
