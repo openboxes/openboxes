@@ -36,4 +36,5 @@
     <include file="0.9.x/changelog-2025-10-08-1700-create-table-transaction-source.xml" />
     <include file="0.9.x/changelog-2025-10-09-1200-add-transaction-source-column-to-transaction.xml" />
     <include file="0.9.x/changelog-2025-10-14-1200-add-user-columns-to-product-supplier.xml" />
+    <include file="0.9.x/changelog-2025-11-20-1300-rename-transaction-source-columns.xml" />
 </databaseChangeLog>
