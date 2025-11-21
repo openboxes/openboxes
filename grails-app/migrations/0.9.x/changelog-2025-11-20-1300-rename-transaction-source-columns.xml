@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="kchelstowski" id="201120251300-1">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="transaction_source"/>
+        </preConditions>
+    </changeSet>
+    <changeSet author="kchelstowski" id="201120251300-2">
+        <renameColumn
+                tableName="transaction_source"
+                oldColumnName="origin"
+                newColumnName="origin_id"
+                columnDataType="CHAR(38)"
+        />
+        <dropForeignKeyConstraint baseTableName="transaction_source" constraintName="fk_transaction_source_origin" />
+        <addForeignKeyConstraint
+                baseColumnNames="origin_id"
+                baseTableName="transaction_source"
+                constraintName="fk_transaction_source_origin"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="location"
+        />
+    </changeSet>
+    <changeSet author="kchelstowski" id="201120251300-3">
+        <renameColumn
+                tableName="transaction_source"
+                oldColumnName="destination"
+                newColumnName="destination_id"
+                columnDataType="CHAR(38)"
+        />
+        <dropForeignKeyConstraint baseTableName="transaction_source" constraintName="fk_transaction_source_destination" />
+        <addForeignKeyConstraint
+                baseColumnNames="destination_id"
+                baseTableName="transaction_source"
+                constraintName="fk_transaction_source_destination"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="location"
+        />
+    </changeSet>
+    <changeSet author="kchelstowski" id="201120251300-4">
+        <renameColumn
+                tableName="transaction_source"
+                oldColumnName="shipment"
+                newColumnName="shipment_id"
+                columnDataType="CHAR(38)"
+        />
+        <dropForeignKeyConstraint baseTableName="transaction_source" constraintName="fk_transaction_source_shipment" />
+        <addForeignKeyConstraint
+                baseColumnNames="shipment_id"
+                baseTableName="transaction_source"
+                constraintName="fk_transaction_source_shipment"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="location"
+        />
+    </changeSet>
+    <changeSet author="kchelstowski" id="201120251300-5">
+        <renameColumn
+                tableName="transaction_source"
+                oldColumnName="requisition"
+                newColumnName="requisition_id"
+                columnDataType="CHAR(38)"
+        />
+        <dropForeignKeyConstraint baseTableName="transaction_source" constraintName="fk_transaction_source_requisition" />
+        <addForeignKeyConstraint
+                baseColumnNames="requisition_id"
+                baseTableName="transaction_source"
+                constraintName="fk_transaction_source_requisition"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="requisition"
+        />
+    </changeSet>
+    <changeSet author="kchelstowski" id="201120251300-6">
+        <renameColumn
+                tableName="transaction_source"
+                oldColumnName="receipt"
+                newColumnName="receipt_id"
+                columnDataType="CHAR(38)"
+        />
+        <dropForeignKeyConstraint baseTableName="transaction_source" constraintName="fk_transaction_source_receipt" />
+        <addForeignKeyConstraint
+                baseColumnNames="receipt_id"
+                baseTableName="transaction_source"
+                constraintName="fk_transaction_source_receipt"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="receipt"
+        />
+    </changeSet>
+    <changeSet author="kchelstowski" id="201120251300-7">
+        <renameColumn
+                tableName="transaction_source"
+                oldColumnName="order"
+                newColumnName="order_id"
+                columnDataType="CHAR(38)"
+        />
+        <dropForeignKeyConstraint baseTableName="transaction_source" constraintName="fk_transaction_source_order" />
+        <addForeignKeyConstraint
+                baseColumnNames="order_id"
+                baseTableName="transaction_source"
+                constraintName="fk_transaction_source_order"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="order"
+        />
+    </changeSet>
+    <changeSet author="kchelstowski" id="201120251300-8">
+        <renameColumn
+                tableName="transaction_source"
+                oldColumnName="cycle_count"
+                newColumnName="cycle_count_id"
+                columnDataType="CHAR(38)"
+        />
+        <dropForeignKeyConstraint baseTableName="transaction_source" constraintName="fk_transaction_source_cycle_count" />
+        <addForeignKeyConstraint
+                baseColumnNames="cycle_count_id"
+                baseTableName="transaction_source"
+                constraintName="fk_transaction_source_cycle_count"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="cycle_count"
+        />
+    </changeSet>
+</databaseChangeLog>
