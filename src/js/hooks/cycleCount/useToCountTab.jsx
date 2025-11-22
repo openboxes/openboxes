@@ -52,19 +52,11 @@ const useToCountTab = ({
   const history = useHistory();
   const { tab } = useQueryParams();
 
-  const {
-    currentLocale,
-    currentLocation,
-    cycleCountMaxSelectedProducts,
-    translationsFetched,
-    formatLocalizedDate,
-  } = useSelector((state) => ({
-    currentLocale: getCurrentLocale(state),
-    currentLocation: getCurrentLocation(state),
-    cycleCountMaxSelectedProducts: getCycleCountMaxSelectedProducts(state),
-    translationsFetched: getCycleCountTranslations(state),
-    formatLocalizedDate: getFormatLocalizedDate(state),
-  }));
+  const currentLocale = useSelector(getCurrentLocale);
+  const currentLocation = useSelector(getCurrentLocation);
+  const cycleCountMaxSelectedProducts = useSelector(getCycleCountMaxSelectedProducts);
+  const translationsFetched = useSelector(getCycleCountTranslations);
+  const formatLocalizedDate = useSelector(getFormatLocalizedDate);
 
   const dispatch = useDispatch();
 

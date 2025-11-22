@@ -88,7 +88,7 @@ const DataTable = ({
             defaultEmptyTableMessage={defaultEmptyTableMessage}
             loading={loading}
             rowModel={table.getRowModel()}
-            dataLength={data?.length}
+            dataLength={totalCount}
             tableWithPinnedColumns={tableWithPinnedColumns}
             isScreenWiderThanTable={isScreenWiderThanTable}
           />

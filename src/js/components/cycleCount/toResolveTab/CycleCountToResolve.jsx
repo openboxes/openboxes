@@ -8,7 +8,7 @@ import {
   RiUserLine,
 } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
-import { getCycleCountsIds } from 'selectors';
+import { getCycleCountIds } from 'selectors';
 
 import AssignCycleCountModal from 'components/cycleCount/AssignCycleCountModal';
 import CycleCountDraftInfoBar from 'components/cycleCount/CycleCountDraftInfoBar';
@@ -53,7 +53,8 @@ const CycleCountToResolve = ({
     pageSize,
     serializedParams,
   });
-  const cycleCountIds = useSelector(getCycleCountsIds);
+
+  const cycleCountIds = useSelector(getCycleCountIds);
 
   useEffect(() => {
     setTotalCount(tableData.totalCount);

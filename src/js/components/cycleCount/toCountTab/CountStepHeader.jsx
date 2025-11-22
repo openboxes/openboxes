@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 import PropTypes from 'prop-types';
 import { RiPrinterLine, RiSave2Line } from 'react-icons/ri';
@@ -92,7 +92,7 @@ const CountStepHeader = ({
   </div>
 );
 
-export default CountStepHeader;
+export default memo(CountStepHeader);
 
 CountStepHeader.propTypes = {
   printCountForm: PropTypes.func.isRequired,
