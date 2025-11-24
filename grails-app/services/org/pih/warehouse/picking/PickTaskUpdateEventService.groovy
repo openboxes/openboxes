@@ -4,14 +4,13 @@ import grails.gorm.transactions.Transactional
 import org.springframework.context.ApplicationListener
 
 @Transactional
-class PickTaskPickedEventService implements ApplicationListener<PickTaskPickedEvent> {
+class PickTaskUpdateEventService implements ApplicationListener<PickTaskUpdateEvent> {
 
     def productAvailabilityService
 
     @Override
-    void onApplicationEvent(PickTaskPickedEvent event) {
+    void onApplicationEvent(PickTaskUpdateEvent event) {
         PickTask task = (PickTask) event.source
-        log.info "Pick task ${task.id}, product: ${task.product}, quantity: ${task.quantityPicked} picked by ${task.pickedBy}"
         productAvailabilityService.triggerRefreshProductAvailability(task?.facility?.id, [task.product.id], event?.forceRefresh)
     }
 }

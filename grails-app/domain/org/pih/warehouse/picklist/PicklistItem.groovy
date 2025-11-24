@@ -63,6 +63,8 @@ class PicklistItem implements Serializable {
     Location stagingLocation
     Person assignee
     Date dateAssigned
+    Person stagedBy
+    Date dateStaged
 
     Integer sortOrder = 0
 
@@ -92,6 +94,8 @@ class PicklistItem implements Serializable {
         assignee(nullable: true)
         dateAssigned(nullable: true)
         dateStarted(nullable: true)
+        stagedBy(nullable: true)
+        dateStaged(nullable: true)
     }
 
     static transients = ['associatedLocation', 'associatedProducts', 'disableRefresh', 'pickable']
@@ -196,6 +200,8 @@ class PicklistItem implements Serializable {
             assignee            : assignee?.id,
             dateAssigned        : dateAssigned,
             dateStarted         : dateStarted,
+            stagedBy            : stagedBy,
+            dateStaged          : dateStaged,
 
             // Used in Bin Replenishment feature
             binLocation                 : binLocation?.toJson(LocationTypeCode.INTERNAL),

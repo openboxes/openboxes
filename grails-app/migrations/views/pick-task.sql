@@ -25,7 +25,22 @@ SELECT
 
     pli.bin_location_id AS location_id,
     pli.outbound_container_id AS outbound_container_id,
-    pli.staging_location_id AS staging_location_id,
+    (SELECT loc.id
+         FROM location loc
+         JOIN location_effective_supported_activities act ON act.location_id = loc.id
+         WHERE loc.parent_location_id = r.origin_id
+           AND loc.active = true
+           AND act.supported_activities_string =
+               CASE r.delivery_type_code
+                   WHEN 'PICK_UP' THEN 'DELIVERY_TYPE_PICKUP'
+                   WHEN 'LOCAL_DELIVERY' THEN 'DELIVERY_TYPE_LOCAL_DELIVERY'
+                   WHEN 'SERVICE' THEN 'DELIVERY_TYPE_SERVICE'
+                   WHEN 'WILL_CALL' THEN 'DELIVERY_TYPE_WILL_CALL'
+                   WHEN 'SHIP_TO' THEN 'DELIVERY_TYPE_SHIPPING'
+                   ELSE NULL
+               END
+         LIMIT 1
+        ) AS staging_location_id,
     pli.inventory_item_id AS inventory_item_id,
     pli.quantity AS quantity_required,
     pli.quantity_picked AS quantity_picked,
@@ -34,11 +49,14 @@ SELECT
     pli.date_started AS date_started,
     pli.picked_by_id AS picked_by_id,
     pli.date_picked AS date_picked,
+    pli.staged_by_id AS staged_by_id,
+    pli.date_staged AS date_staged,
     pli.reason_code AS reason_code,
     CASE `pli`.status
         WHEN 'PENDING' THEN 'PENDING'
         WHEN 'PICKING' THEN 'PICKING'
         WHEN 'PICKED' THEN 'PICKED'
+        WHEN 'STAGED' THEN 'STAGED'
         ELSE 'PENDING'
     END AS status,
 

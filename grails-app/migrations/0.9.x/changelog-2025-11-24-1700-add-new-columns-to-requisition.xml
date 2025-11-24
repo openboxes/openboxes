@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="druchniewicz" id="241120251700-0">
+        <preConditions onFail="MARK_RAN">
+            <not><columnExists tableName="requisition" columnName="picked_by_id"/></not>
+        </preConditions>
+        <addColumn tableName="requisition">
+            <column name="picked_by_id" type="CHAR(38)"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="requisition" baseColumnNames="picked_by_id"
+                                 referencedTableName="user" referencedColumnNames="id"
+                                 constraintName="fk_requisition_picked_by"/>
+    </changeSet>
+
+    <changeSet author="druchniewicz" id="241120251700-1">
+        <preConditions onFail="MARK_RAN">
+            <not><columnExists tableName="requisition" columnName="date_picked"/></not>
+        </preConditions>
+        <addColumn tableName="requisition">
+            <column name="date_picked" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="druchniewicz" id="241120251700-2">
+        <preConditions onFail="MARK_RAN">
+            <not><columnExists tableName="requisition" columnName="staged_by_id"/></not>
+        </preConditions>
+        <addColumn tableName="requisition">
+            <column name="staged_by_id" type="CHAR(38)"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="requisition" baseColumnNames="staged_by_id"
+                                 referencedTableName="user" referencedColumnNames="id"
+                                 constraintName="fk_requisition_staged_by"/>
+    </changeSet>
+
+    <changeSet author="druchniewicz" id="241120251700-3">
+        <preConditions onFail="MARK_RAN">
+            <not><columnExists tableName="requisition" columnName="date_staged"/></not>
+        </preConditions>
+        <addColumn tableName="requisition">
+            <column name="date_staged" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

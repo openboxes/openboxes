@@ -40,6 +40,8 @@ class PickTask {
     Date dateStarted
     Person pickedBy
     Date datePicked
+    Person stagedBy
+    Date dateStaged
     String reasonCode
     PickTaskStatus status = PickTaskStatus.PENDING
 
@@ -69,6 +71,8 @@ class PickTask {
         dateStarted nullable: true
         pickedBy nullable: true
         datePicked nullable: true
+        stagedBy nullable: true
+        dateStaged nullable: true
         reasonCode nullable: true
         status nullable: false
     }
@@ -103,6 +107,8 @@ class PickTask {
                 dateStarted     : dateStarted,
                 pickedBy        : pickedBy?.name,
                 datePicked      : datePicked,
+                stagedBy      :   stagedBy,
+                dateStaged      : dateStaged,
                 reasonCode      : reasonCode,
                 status          : status?.name(),
                 dateCreated     : dateCreated,

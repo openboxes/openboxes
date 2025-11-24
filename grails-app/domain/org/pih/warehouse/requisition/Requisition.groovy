@@ -126,6 +126,12 @@ class Requisition implements Comparable<Requisition>, Serializable {
     Date dateRejected
     Boolean approvalRequired
 
+    Date datePicked
+    Person pickedBy
+
+    Date dateStaged
+    Person stagedBy
+
     // Temporary until we add the original order associated with this request
     OrderTypeCode orderTypeCode
 
@@ -222,6 +228,10 @@ class Requisition implements Comparable<Requisition>, Serializable {
         deliveryTypeCode(nullable: true)
         orderTypeCode(nullable: true)
         priority(nullable: true)
+        datePicked(nullable: true)
+        pickedBy(nullable: true)
+        dateStaged(nullable: true)
+        stagedBy(nullable: true)
     }
 
     Comment getRecentComment() {

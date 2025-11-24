@@ -33,6 +33,7 @@ enum StockMovementStatusCode {
     DISPATCHED(9),
     CANCELED(10),
     REJECTED(10, REJECTED),
+    STAGED
 
     int sortOrder
     StockMovementStatusCode displayStatusCode

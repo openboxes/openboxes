@@ -12,5 +12,10 @@ class PickUrlMappings {
             controller = "pickTaskApi"
             action = [GET: "read", PATCH: "patch"]
         }
+
+        "/api/facilities/$facility/pick-tasks/containers/$outboundContainerId" {
+            controller = "pickTaskApi"
+            action = [PATCH: "drop"]
+        }
     }
 }

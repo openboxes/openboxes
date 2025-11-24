@@ -2,11 +2,11 @@ package org.pih.warehouse.picking
 
 import org.springframework.context.ApplicationEvent
 
-class PickTaskPickedEvent extends ApplicationEvent {
+class PickTaskUpdateEvent extends ApplicationEvent {
 
     Boolean forceRefresh = Boolean.FALSE
 
-    PickTaskPickedEvent(PickTask pickTask) {
+    PickTaskUpdateEvent(PickTask pickTask) {
         super(pickTask)
     }
 }

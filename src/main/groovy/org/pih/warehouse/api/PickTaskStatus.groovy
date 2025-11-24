@@ -3,18 +3,21 @@ package org.pih.warehouse.api
 enum PickTaskStatus {
     PENDING,
     PICKING,
-    PICKED
+    PICKED,
+    STAGED
 
     static final Map<PickTaskStatus, Set<PickTaskStatus>> ALLOWED_STATE_TRANSITIONS = [
             (PENDING): [PICKING, PICKED] as Set,
             (PICKING): [PICKED] as Set,
-            (PICKED): [] as Set
+            (PICKED): [STAGED] as Set,
+            (STAGED): [] as Set
     ]
 
     static final Map<PickTaskStatus, Set<PickTaskStatus>> ROLLBACK_STATE_TRANSITIONS = [
             (PENDING): [] as Set,
             (PICKING): [PENDING] as Set,
-            (PICKED): [PICKING, PENDING] as Set
+            (PICKED): [PICKING, PENDING] as Set,
+            (STAGED): [PICKED, PICKING, PENDING] as Set,
     ]
 
     static Boolean validateTransition(PickTaskStatus from, PickTaskStatus to) {

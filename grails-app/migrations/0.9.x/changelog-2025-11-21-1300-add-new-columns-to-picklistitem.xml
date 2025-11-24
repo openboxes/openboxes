@@ -5,65 +5,77 @@
 
     <changeSet author="druchniewicz" id="211120251300-0">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="picklist_item" columnName="outbound_container_id"/>
-            </not>
+            <not><columnExists tableName="picklist_item" columnName="outbound_container_id"/></not>
         </preConditions>
         <addColumn tableName="picklist_item">
             <column name="outbound_container_id" type="CHAR(38)"/>
-            <column name="staging_location_id" type="CHAR(38)"/>
-            <column name="assignee_id" type="CHAR(38)"/>
-            <column name="date_assigned" type="DATETIME"/>
-            <column name="date_started" type="DATETIME"/>
         </addColumn>
+        <addForeignKeyConstraint baseTableName="picklist_item" baseColumnNames="outbound_container_id"
+                                 referencedTableName="location" referencedColumnNames="id"
+                                 constraintName="fk_picklist_item_outbound_container"/>
     </changeSet>
 
     <changeSet author="druchniewicz" id="211120251300-1">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <foreignKeyConstraintExists foreignKeyName="fk_picklist_item_outbound_container"/>
-            </not>
+            <not><columnExists tableName="picklist_item" columnName="staging_location_id"/></not>
         </preConditions>
-        <addForeignKeyConstraint
-                baseTableName="picklist_item"
-                baseColumnNames="outbound_container_id"
-                referencedTableName="location"
-                referencedColumnNames="id"
-                constraintName="fk_picklist_item_outbound_container"
-                deferrable="false"
-                initiallyDeferred="false"/>
+        <addColumn tableName="picklist_item">
+            <column name="staging_location_id" type="CHAR(38)"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="picklist_item" baseColumnNames="staging_location_id"
+                                 referencedTableName="location" referencedColumnNames="id"
+                                 constraintName="fk_picklist_item_staging_location"/>
     </changeSet>
 
     <changeSet author="druchniewicz" id="211120251300-2">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <foreignKeyConstraintExists foreignKeyName="fk_picklist_item_staging_location"/>
-            </not>
+            <not><columnExists tableName="picklist_item" columnName="assignee_id"/></not>
         </preConditions>
-        <addForeignKeyConstraint
-                baseTableName="picklist_item"
-                baseColumnNames="staging_location_id"
-                referencedTableName="location"
-                referencedColumnNames="id"
-                constraintName="fk_picklist_item_staging_location"
-                deferrable="false"
-                initiallyDeferred="false"/>
+        <addColumn tableName="picklist_item">
+            <column name="assignee_id" type="CHAR(38)"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="picklist_item" baseColumnNames="assignee_id"
+                                 referencedTableName="user" referencedColumnNames="id"
+                                 constraintName="fk_picklist_item_assignee"/>
     </changeSet>
 
     <changeSet author="druchniewicz" id="211120251300-3">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <foreignKeyConstraintExists foreignKeyName="fk_picklist_item_assignee"/>
-            </not>
+            <not><columnExists tableName="picklist_item" columnName="date_assigned"/></not>
         </preConditions>
-        <addForeignKeyConstraint
-                baseTableName="picklist_item"
-                baseColumnNames="assignee_id"
-                referencedTableName="user"
-                referencedColumnNames="id"
-                constraintName="fk_picklist_item_assignee"
-                deferrable="false"
-                initiallyDeferred="false"/>
+        <addColumn tableName="picklist_item">
+            <column name="date_assigned" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="druchniewicz" id="211120251300-4">
+        <preConditions onFail="MARK_RAN">
+            <not><columnExists tableName="picklist_item" columnName="date_started"/></not>
+        </preConditions>
+        <addColumn tableName="picklist_item">
+            <column name="date_started" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="druchniewicz" id="211120251300-5">
+        <preConditions onFail="MARK_RAN">
+            <not><columnExists tableName="picklist_item" columnName="date_staged"/></not>
+        </preConditions>
+        <addColumn tableName="picklist_item">
+            <column name="date_staged" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="druchniewicz" id="211120251300-6">
+        <preConditions onFail="MARK_RAN">
+            <not><columnExists tableName="picklist_item" columnName="staged_by_id"/></not>
+        </preConditions>
+        <addColumn tableName="picklist_item">
+            <column name="staged_by_id" type="CHAR(38)"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="picklist_item" baseColumnNames="staged_by_id"
+                                 referencedTableName="user" referencedColumnNames="id"
+                                 constraintName="fk_picklist_item_staged_by"/>
     </changeSet>
 
 </databaseChangeLog>

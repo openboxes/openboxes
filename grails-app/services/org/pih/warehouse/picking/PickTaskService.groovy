@@ -3,6 +3,7 @@ package org.pih.warehouse.picking
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.api.picking.SearchPickTaskCommand
 import org.pih.warehouse.core.ActivityCode
@@ -10,10 +11,9 @@ import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryService
+import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.picklist.PicklistItem
-import org.pih.warehouse.putaway.PutawayTask
-import org.pih.warehouse.putaway.PutawayTaskCompletedEvent
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
 
@@ -22,6 +22,7 @@ class PickTaskService {
 
     GrailsApplication grailsApplication
     InventoryService inventoryService
+    ProductAvailabilityService productAvailabilityService
 
     @Transactional(readOnly = true)
     List<PickTask> search(SearchPickTaskCommand command, Map params = [:]) {
@@ -129,6 +130,7 @@ class PickTaskService {
         if (!outboundContainer.supports(ActivityCode.OUTBOUND_CONTAINER)) {
             throw new IllegalArgumentException("Container ${outboundContainer.name} does not support OUTBOUND_CONTAINER activity")
         }
+        task.outboundContainer = outboundContainer
 
         executeStateTransition(task, PickTaskStatus.PICKED)
         transferToContainer(task)
@@ -165,18 +167,48 @@ class PickTaskService {
         save(task)
     }
 
-    void save(PickTask task) {
+    def drop(String outboundContainerId, Map data = [:]) {
+        Location outboundContainer = Location.findByLocationNumberOrId(outboundContainerId, outboundContainerId)
+        if (!outboundContainer) {
+            throw new ObjectNotFoundException(outboundContainerId, "Outbound container was not found")
+        }
+
+        switch (data?.action) {
+
+            case 'drop':
+                dropToStaging(outboundContainer, data.stagingLocationId as String, data.stagedById as String)
+                break
+
+            default:
+                throw new UnsupportedOperationException("Unsupported action: ${data?.action}")
+        }
+    }
+
+    void save(PickTask task, Person pickedBy = null, Person stagedBy = null) {
         PicklistItem existingPickItem = PicklistItem.get(task.id)
+        existingPickItem.status = task.status.toString()
         Requisition requisition = existingPickItem?.requisitionItem?.requisition
+        def allOrderTasks = requisition?.picklist?.picklistItems
 
         if (task.status == PickTaskStatus.PICKED) {
-            def allOrderTasks = requisition?.picklist?.picklistItems
             boolean allTasksPicked = allOrderTasks.every {
                 it.status == PickTaskStatus.PICKED.name()
             }
 
             if (allTasksPicked) {
                 requisition.status = RequisitionStatus.PICKED
+                requisition.datePicked = new Date()
+                requisition.pickedBy = pickedBy
+            }
+        } else if (task.status == PickTaskStatus.STAGED) {
+            boolean allTasksStaged = allOrderTasks.every {
+                it.status == PickTaskStatus.STAGED.name()
+            }
+
+            if (allTasksStaged) {
+                requisition.status = RequisitionStatus.STAGED
+                requisition.dateStaged = new Date()
+                requisition.stagedBy = stagedBy
             }
         }
 
@@ -192,14 +224,57 @@ class PickTaskService {
         task.status = to
     }
 
+    void dropToStaging(Location outboundContainer, String stagingLocationId, String stagedById) {
+        Location stagingLocation = Location.findByLocationNumberOrId(stagingLocationId, stagingLocationId)
+        if (!stagingLocation) {
+            throw new ObjectNotFoundException(stagingLocationId, "Staging location was not found")
+        }
+
+        List<AvailableItem> itemsToMove = productAvailabilityService.getAvailableItems(outboundContainer)
+
+        if (!itemsToMove) {
+            throw new IllegalStateException("Outbound container is empty")
+        }
+
+        Person stagedBy = Person.get(stagedById)
+        itemsToMove.each { item ->
+            List<PickTask> tasks = PickTask.findAllByOutboundContainerAndInventoryItemAndStatus(
+                    outboundContainer, item.inventoryItem, PickTaskStatus.PICKED)
+            tasks.each { task ->
+                executeStateTransition(task, PickTaskStatus.STAGED)
+                transferToStaging(task, item, stagingLocation)
+
+                PicklistItem existingPickItem = PicklistItem.get(task.id)
+                existingPickItem.stagingLocation = stagingLocation
+                existingPickItem.dateStaged = new Date()
+                existingPickItem.stagedBy = stagedBy
+
+                save(task, stagedBy)
+            }
+        }
+    }
+
     void transferToContainer(PickTask task) {
         TransferStockCommand command = new TransferStockCommand()
         command.location = task.facility
         command.binLocation = task.location
         command.inventoryItem = task.inventoryItem
-        command.quantity = task.quantityPicked.toInteger()
+        command.quantity = task.quantityRequired.toInteger()
         command.otherLocation = task.facility
         command.otherBinLocation = task.outboundContainer
+        command.transferOut = Boolean.TRUE
+        command.disableRefresh = Boolean.TRUE
+        transfer(task, command)
+    }
+
+    void transferToStaging(PickTask task, AvailableItem item, Location stagingLocation) {
+        TransferStockCommand command = new TransferStockCommand()
+        command.location = item.binLocation?.parentLocation
+        command.binLocation = item.binLocation
+        command.inventoryItem = item.inventoryItem
+        command.quantity = item.quantityOnHand.toInteger()
+        command.otherLocation = item.binLocation?.parentLocation
+        command.otherBinLocation = stagingLocation
         command.transferOut = Boolean.TRUE
         command.disableRefresh = Boolean.TRUE
         transfer(task, command)
@@ -210,7 +285,7 @@ class PickTaskService {
 
         inventoryService.transferStock(command)
 
-        grailsApplication.mainContext.publishEvent(new PickTaskPickedEvent(task))
+        grailsApplication.mainContext.publishEvent(new PickTaskUpdateEvent(task))
     }
 
     private List<String> findRequisitionIdsForPicking(SearchPickTaskCommand command) {
