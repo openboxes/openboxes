@@ -5,6 +5,8 @@ export const getCycleCountRequestIds = (state) =>
 
 export const getCurrentLocation = (state) => state.session.currentLocation;
 
+export const getDefaultTranslationsFetched = (state) => state.session.fetchedTranslations.default;
+
 export const getCycleCountMaxSelectedProducts = (state) =>
   state.session.cycleCountMaxSelectedProducts;
 
@@ -28,6 +30,8 @@ export const getMinSearchLength = (state) => state.session.searchConfig.minSearc
 export const getCurrentUser = (state) => state.session.user;
 
 export const getCycleCountTranslations = (state) => state.session.fetchedTranslations.cycleCount;
+
+export const getCycleCountReasonCodes = (state) => state.cycleCount.reasonCodes;
 
 export const getLotNumbersByProductId = (state, productId) =>
   state.lotNumbers?.lotNumbersWithExpiration?.[productId] || [];

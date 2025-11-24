@@ -3,6 +3,11 @@ import React, { useEffect, useMemo } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
+import {
+  getCurrentLocale,
+  getCurrentLocation, getCycleCountReasonCodes,
+  getDefaultTranslationsFetched,
+} from 'selectors';
 
 import { INVENTORY_TRANSACTIONS_SUMMARY } from 'api/urls';
 import { TableCell } from 'components/DataTable';
@@ -10,7 +15,6 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import ValueIndicator from 'components/DataTable/v2/ValueIndicator';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import inventoryTransactionReportColumn from 'consts/inventoryTransactionReportColumn';
-import reasonCodes from 'consts/reasonCodes';
 import { DateFormat } from 'consts/timeFormat';
 import valueIndicatorVariant, {
   getCycleCountDifferencesVariant,
@@ -32,15 +36,11 @@ const useInventoryTransactionsTab = ({
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
   const { products, endDate, startDate } = filterParams;
-  const {
-    currentLocale,
-    currentLocation,
-    defaultTranslationsFetched,
-  } = useSelector((state) => ({
-    currentLocale: state.session.activeLanguage,
-    currentLocation: state.session.currentLocation,
-    defaultTranslationsFetched: state.session.fetchedTranslations.default,
-  }));
+
+  const currentLocale = useSelector(getCurrentLocale);
+  const currentLocation = useSelector(getCurrentLocation);
+  const defaultTranslationsFetched = useSelector(getDefaultTranslationsFetched);
+  const reasonCodes = useSelector(getCycleCountReasonCodes);
 
   const getParams = ({
     sortingParams,
@@ -279,8 +279,11 @@ const useInventoryTransactionsTab = ({
       },
     }) => {
       const variant = getCycleCountDifferencesVariant({ firstValue: quantityDifference });
-      const percentageValue =
-        calculatePercentage(quantityBefore, quantityAfter, quantityDifference);
+      const percentageValue = calculatePercentage(
+        quantityBefore,
+        quantityAfter,
+        quantityDifference,
+      );
       const className = quantityDifference > 0 ? 'value-indicator--more' : 'value-indicator--less';
 
       return (
@@ -311,7 +314,14 @@ const useInventoryTransactionsTab = ({
     ),
     size: 200,
     cell: ({ getValue }) => {
-      const rootCauses = getValue() ? getValue().map((cause) => reasonCodes[cause]).join(', ') : '';
+      const rootCauses = getValue()
+        ? getValue().map((cause) => {
+          const reasonCode = reasonCodes.find(
+            (fetchedReasonCode) => fetchedReasonCode.id === cause,
+          );
+          return reasonCode.label;
+        }).join(', ')
+        : '';
       return (
         <TableCell
           customTooltip
