@@ -319,7 +319,7 @@ const useInventoryTransactionsTab = ({
           const reasonCode = reasonCodes.find(
             (fetchedReasonCode) => fetchedReasonCode.id === cause,
           );
-          return reasonCode.label;
+          return reasonCode?.label || '';
         }).join(', ')
         : '';
       return (
