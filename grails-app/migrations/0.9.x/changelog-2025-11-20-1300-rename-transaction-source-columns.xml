@@ -59,7 +59,7 @@
                 deferrable="false"
                 initiallyDeferred="false"
                 referencedColumnNames="id"
-                referencedTableName="location"
+                referencedTableName="shipment"
         />
     </changeSet>
     <changeSet author="kchelstowski" id="201120251300-5">
