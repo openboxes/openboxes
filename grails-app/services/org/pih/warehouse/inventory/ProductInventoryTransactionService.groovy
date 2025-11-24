@@ -131,7 +131,6 @@ abstract class ProductInventoryTransactionService<T> {
                 transactionType: transactionType,
                 comment: command.comment,
                 disableRefresh: command.disableRefresh,
-                transactionSource: command.transactionSource,
         )
 
         transaction.transactionNumber = transactionIdentifierService.generate(transaction)

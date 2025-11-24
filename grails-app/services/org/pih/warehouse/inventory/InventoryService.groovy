@@ -55,7 +55,6 @@ class InventoryService implements ApplicationContextAware {
     ConfigService configService
     InventoryItemManager inventoryItemManager
     MessageLocalizer messageLocalizer
-    TransactionSourceService transactionSourceService
 
     def authService
     def dataService
@@ -1444,8 +1443,7 @@ class InventoryService implements ApplicationContextAware {
                 throw new IllegalArgumentException("A transaction already exists at time ${adjustmentTransactionDate}")
             }
 
-            // Create transaction source
-            TransactionSource transactionSource = transactionSourceService.createRecordStockTransactionSource(currentLocation)
+            Transaction baselineTransaction = null
 
             // 1. Create the baseline transaction
             recordStockProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
@@ -1464,7 +1462,7 @@ class InventoryService implements ApplicationContextAware {
             Transaction adjustmentTransaction = recordStockProductInventoryTransactionService.createAdjustmentTransaction(
                     cmd,
                     adjustmentTransactionDate,
-                    transactionSource
+                    baselineTransaction?.transactionSource
             )
 
             List<AvailableItem> currentRecordStockItems = []
