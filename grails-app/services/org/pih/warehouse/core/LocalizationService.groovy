@@ -10,16 +10,28 @@
 package org.pih.warehouse.core
 
 import grails.core.GrailsApplication
+import org.apache.commons.lang.StringUtils
 import org.grails.core.io.ResourceLocator
+import org.springframework.beans.factory.annotation.Value
 
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.localization.LocaleManager
+import org.pih.warehouse.core.localization.LocalizedMessageDto
+import org.pih.warehouse.core.localization.LocalizedMessagesDto
+import org.pih.warehouse.core.localization.MessageLocalizer
 
 class LocalizationService {
 
     GrailsApplication grailsApplication
     ResourceLocator grailsResourceLocator
     LocaleManager localeManager
+    MessageLocalizer messageLocalizer
+
+    @Value('${openboxes.locale.custom.enabled}')
+    boolean localizationDatabaseEnabled
+
+    @Value('${openboxes.locale.supportedLocales}')
+    String[] supportedLocales
 
     String formatMetadata(Object object) {
         def format = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
@@ -46,12 +58,9 @@ class LocalizationService {
 
     /**
      * Get a locale based on the given language code. Returns default if no language code is specified.
-     *
-     * @param languageCode
-     * @return
      */
     Locale getLocale(String languageCode) {
-        return languageCode ? localeManager.asLocale(languageCode) : currentLocale
+        return StringUtils.isBlank(languageCode) ? currentLocale : localeManager.asLocale(languageCode)
     }
 
     /**
@@ -104,5 +113,113 @@ class LocalizationService {
         messagesProperties.load(resource.inputStream)
 
         return messagesProperties
+    }
+
+    /**
+     * Fetch all localized messages for a given locale code and prefix.
+     *
+     * The fallback pattern for locales is region > language > default. For example: es_MX -> es -> default (en)
+     * If a message does not exist in the requested code 'es_MX' but does exist in 'es', we add the message found
+     * in 'es' to the returned results.
+     *
+     * @param localeCode The string representation of a locale. Ex: 'es_MX' or 'es'
+     * @param prefix Filters the messages down to only those that start with the prefix. We prefix all frontend
+     *               messages with 'react.' and so the frontend can filter for only those when querying for messages,
+     *               leading to a smaller API response with backend-only messages being filtered out.
+     */
+    LocalizedMessagesDto list(String localeCode, String prefix) {
+        Locale locale = getLocale(localeCode)
+        List<Locale> fallbackLocales = getFallbackLocalesInPriorityOrder(locale)
+
+        Map<Locale, Properties> localeProperties = getPropertiesForLocales(fallbackLocales + locale)
+
+        // TODO: We should fetch the database overrides for the fallback locales as well so that we can default
+        //       to those if a message is in the database for 'es' but not in the 'es_MX' messages.properties file.
+        Properties messageOverrideProperties = getMessageOverridesAsProperties(locale, prefix)
+
+        // "priority order" meaning highest priority first (with database overrides being top priority).
+        List<Properties> propertiesInPriorityOrder = []
+        if (messageOverrideProperties) {
+            propertiesInPriorityOrder.add(messageOverrideProperties)
+        }
+        propertiesInPriorityOrder.addAll(fallbackLocales.collect { localeProperties.get(it) })
+
+        // Merge all messages from default, language fallback, selected, and custom message properties
+        Properties mergedProperties = new Properties()
+        for (Properties properties in propertiesInPriorityOrder) {
+            properties.each { key, value -> mergedProperties.putIfAbsent(key, value) }
+        }
+
+        // String comparison is slow so we only filter for message prefix once we have the merged list.
+        if (prefix) {
+            mergedProperties = mergedProperties.findAll { (it.key as String).startsWith(prefix) } as Properties
+        }
+
+        return new LocalizedMessagesDto(
+                messages: mergedProperties.sort() as Properties,
+                supportedLocales: supportedLocales,
+                currentLocale: locale,
+        )
+    }
+
+    /**
+     * We allow localization for individual codes to be overridden by data in the Localization database table.
+     * These take priority over the messages in messages.properties files.
+     */
+    private List<Localization> getMessageOverrides(Locale locale, String prefix) {
+        if (!localizationDatabaseEnabled) {
+            return []
+        }
+
+        return prefix ?
+                Localization.findAllByCodeIlikeAndLocale("${prefix}%", locale.toString()) :
+                Localization.findAllByLocale(locale.toString())
+    }
+
+    private Properties getMessageOverridesAsProperties(Locale locale, String prefix) {
+        List<Localization> localizedMessages = getMessageOverrides(locale, prefix)
+
+        Properties customMessageProperties = new Properties()
+        localizedMessages.each { Localization localization ->
+            customMessageProperties.put(localization.code, localization.text)
+        }
+        return customMessageProperties
+    }
+
+    private Map<Locale, Properties> getPropertiesForLocales(List<Locale> locales) {
+        Map<Locale, Properties> localeProperties = [:]
+        for (Locale locale in locales) {
+            localeProperties.put(locale, getMessagesProperties(locale))
+        }
+        return localeProperties
+    }
+
+    private List<Locale> getFallbackLocalesInPriorityOrder(Locale locale) {
+        List<Locale> fallbackLocales = []
+
+        // Region-specific locales fall back to language locales. Ex: 'es_MX' should fall back to 'es'
+        if (locale.country && supportedLocales.contains(locale.language)) {
+            Locale languageLocale = new Locale(locale.language)
+            fallbackLocales.add(languageLocale)
+        }
+
+        fallbackLocales.add(Locale.default)
+
+        return fallbackLocales
+    }
+
+    /**
+     * Localizes a single message.
+     *
+     * Should only be needed for debugging purposes. To localize a message within the app, use MessageLocalizer.
+     */
+    LocalizedMessageDto localize(String messageCode, Object[] messageArgs, String languageCode) {
+        Locale locale = getLocale(languageCode)
+        String message = messageLocalizer.localize(messageCode, messageArgs, locale)
+        return new LocalizedMessageDto(
+                code: messageCode,
+                message: message,
+                currentLocale: locale,
+        )
     }
 }
