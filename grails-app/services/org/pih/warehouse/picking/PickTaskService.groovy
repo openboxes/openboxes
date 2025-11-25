@@ -39,7 +39,9 @@ class PickTaskService {
         }
 
         List<PickTask> tasks = PickTask.createCriteria().list(max: max, offset: offset) {
-            eq("facility", command.facility)
+            if (command.facility) {
+                eq("facility", command.facility)
+            }
 
             if (!requisitionIds.isEmpty()) {
                 'in'("requisition.id", requisitionIds)
@@ -61,6 +63,8 @@ class PickTaskService {
                 eq("priority", command.priority)
             }
 
+            order("priority", "asc")
+            order("dateCreated", "asc")
             createAlias("location", "l")
             order("l.name", "asc")
         }
@@ -184,7 +188,7 @@ class PickTaskService {
         }
     }
 
-    void save(PickTask task, Person pickedBy = null, Person stagedBy = null) {
+    void save(PickTask task) {
         PicklistItem existingPickItem = PicklistItem.get(task.id)
         existingPickItem.status = task.status.toString()
         Requisition requisition = existingPickItem?.requisitionItem?.requisition
@@ -197,8 +201,6 @@ class PickTaskService {
 
             if (allTasksPicked) {
                 requisition.status = RequisitionStatus.PICKED
-                requisition.datePicked = new Date()
-                requisition.pickedBy = pickedBy
             }
         } else if (task.status == PickTaskStatus.STAGED) {
             boolean allTasksStaged = allOrderTasks.every {
@@ -207,8 +209,6 @@ class PickTaskService {
 
             if (allTasksStaged) {
                 requisition.status = RequisitionStatus.STAGED
-                requisition.dateStaged = new Date()
-                requisition.stagedBy = stagedBy
             }
         }
 
@@ -249,7 +249,7 @@ class PickTaskService {
                 existingPickItem.dateStaged = new Date()
                 existingPickItem.stagedBy = stagedBy
 
-                save(task, stagedBy)
+                save(task)
             }
         }
     }

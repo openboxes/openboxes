@@ -26,10 +26,11 @@ enum RequisitionStatus {
     PENDING(9,null, StatusType.PRIMARY),
     CHECKING(10, PENDING, StatusType.WARNING),
     ISSUED(11, null, StatusType.SUCCESS),
-    RECEIVED(12, null, StatusType.SUCCESS),
-    CANCELED(13, null, StatusType.DANGER),
-    DELETED(14, null, StatusType.DANGER),
-    ERROR(15, null, StatusType.DANGER),
+    STAGED(12, null, StatusType.SUCCESS),
+    RECEIVED(13, null, StatusType.SUCCESS),
+    CANCELED(14, null, StatusType.DANGER),
+    DELETED(15, null, StatusType.DANGER),
+    ERROR(16, null, StatusType.DANGER),
     // for Outbound Stock Movement mapping
     DISPATCHED(0, null, StatusType.SUCCESS),
     REQUESTED(0, null, StatusType.PRIMARY),
@@ -37,8 +38,7 @@ enum RequisitionStatus {
     OPEN(0, null, StatusType.SUCCESS),
     FULFILLED(0, null, StatusType.SUCCESS),
     REVIEWING(0, null, StatusType.PRIMARY),
-    CONFIRMING(0, null, StatusType.PRIMARY),
-    STAGED(0, null, StatusType.SUCCESS),
+    CONFIRMING(0, null, StatusType.PRIMARY)
 
     int sortOrder
     RequisitionStatus displayStatusCode
