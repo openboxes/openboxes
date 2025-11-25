@@ -1,5 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
+import { useDispatch } from 'react-redux';
+
+import { fetchReasonCodes } from 'actions';
+import { FETCH_CYCLE_COUNT_REASON_CODES } from 'actions/types';
 import cycleCountReportingFilterFields from 'components/cycleCountReporting/CycleCountReportingFilterFields';
 import CycleCountReportingFilters from 'components/cycleCountReporting/CycleCountReportingFilters';
 import CycleCountReportingHeader from 'components/cycleCountReporting/CycleCountReportingHeader';
@@ -25,6 +29,7 @@ const CycleCountReporting = () => {
   const { switchTab } = useSwitchTabs({ defaultTab: PRODUCTS_TAB });
   useTranslation('cycleCount');
   const { tab: currentTab } = useQueryParams();
+  const dispatch = useDispatch();
 
   // Each tab will have different filters, that's why we will need this function
   const getFilterFields = () => {
@@ -81,6 +86,13 @@ const CycleCountReporting = () => {
       onClick: (tab) => switchTab(tab, resetForm),
     },
   };
+
+  // Fetch reason codes at this level, because we should avoid fetching while switching tabs, and we
+  // should fetch fresh cycle counts reason codes after refreshing the page (due to redux persist
+  // we can't just check the presence in the store),
+  useEffect(() => {
+    dispatch(fetchReasonCodes('CYCLE_COUNT', FETCH_CYCLE_COUNT_REASON_CODES));
+  }, []);
 
   return (
     <PageWrapper>
