@@ -68,17 +68,19 @@ abstract class ProductInventoryTransactionService<T> {
         AvailableItemMap availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 facility, products, transactionDate)
 
-        createInventoryBaselineTransactionForGivenStock(
-                facility,
-                sourceObject,
-                products,
-                availableItems,
-                transactionDate,
-                comment,
-                transactionEntriesComments,
-                validateTransactionDates,
-                disableRefresh,
+        InventoryBaselineTransactionCommand<T> baselineTransactionCommand = new InventoryBaselineTransactionCommand<T>(
+                facility: facility,
+                sourceObject: sourceObject,
+                products: products,
+                availableItems: availableItems,
+                transactionDate: transactionDate,
+                comment: comment,
+                transactionEntriesComments: transactionEntriesComments,
+                validateTransactionDates: validateTransactionDates,
+                disableRefresh: disableRefresh,
         )
+
+        createInventoryBaselineTransactionForGivenStock(baselineTransactionCommand)
     }
 
     /**
