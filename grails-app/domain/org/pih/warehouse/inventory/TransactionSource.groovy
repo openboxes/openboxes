@@ -1,5 +1,6 @@
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
@@ -39,6 +40,19 @@ class TransactionSource {
     User createdBy
     User updatedBy
 
+    def beforeInsert() {
+        createdBy = AuthService.currentUser
+        updatedBy = AuthService.currentUser
+    }
+
+    def beforeUpdate() {
+        updatedBy = AuthService.currentUser
+    }
+
+    static mapping = {
+        id generator: 'uuid'
+        version false
+    }
 
     static constraints = {
         shipment(nullable: true)
@@ -48,6 +62,8 @@ class TransactionSource {
         cycleCount(nullable: true)
         origin(nullable: true)
         destination(nullable: true)
+        createdBy(nullable: true)
+        updatedBy(nullable: true)
     }
 
     List<Transaction> getAssociatedTransactions() {

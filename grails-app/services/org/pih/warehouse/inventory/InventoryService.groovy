@@ -55,6 +55,7 @@ class InventoryService implements ApplicationContextAware {
     ConfigService configService
     InventoryItemManager inventoryItemManager
     MessageLocalizer messageLocalizer
+
     def authService
     def dataService
     def gparsService
@@ -1442,23 +1443,23 @@ class InventoryService implements ApplicationContextAware {
                 throw new IllegalArgumentException("A transaction already exists at time ${adjustmentTransactionDate}")
             }
 
-            // 1. Create the baseline transaction
-            recordStockProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
-                    currentLocation,
-                    null,
-                    [cmd.product],
-                    availableItems,
-                    cmd.transactionDate,
-                    null,
-                    null,
-                    true,
-                    true,  // Don't refresh product availability. That will get done manually at the end.
+            InventoryBaselineTransactionCommand<RecordInventoryCommand> command = new InventoryBaselineTransactionCommand(
+                    facility: currentLocation,
+                    sourceObject: cmd,
+                    products: [cmd.product],
+                    availableItems: availableItems,
+                    transactionDate: cmd.transactionDate,
+                    disableRefresh: true // Don't refresh product availability. That will get done manually at the end.
             )
+            // 1. Create the baseline transaction
+            Transaction baselineTransaction =
+                    recordStockProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(command)
 
             // 2. Create a new adjustment transaction
             Transaction adjustmentTransaction = recordStockProductInventoryTransactionService.createAdjustmentTransaction(
                     cmd,
-                    adjustmentTransactionDate
+                    adjustmentTransactionDate,
+                    baselineTransaction?.transactionSource
             )
 
             List<AvailableItem> currentRecordStockItems = []
