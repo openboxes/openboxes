@@ -1443,20 +1443,17 @@ class InventoryService implements ApplicationContextAware {
                 throw new IllegalArgumentException("A transaction already exists at time ${adjustmentTransactionDate}")
             }
 
-            Transaction baselineTransaction = null
-
-            // 1. Create the baseline transaction
-            recordStockProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
-                    currentLocation,
-                    null,
-                    [cmd.product],
-                    availableItems,
-                    cmd.transactionDate,
-                    null,
-                    null,
-                    true,
-                    true,  // Don't refresh product availability. That will get done manually at the end.
+            InventoryBaselineTransactionCommand<RecordInventoryCommand> command = new InventoryBaselineTransactionCommand(
+                    facility: currentLocation,
+                    sourceObject: cmd,
+                    products: [cmd.product],
+                    availableItems: availableItems,
+                    transactionDate: cmd.transactionDate,
+                    disableRefresh: true // Don't refresh product availability. That will get done manually at the end.
             )
+            // 1. Create the baseline transaction
+            Transaction baselineTransaction =
+                    recordStockProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(command)
 
             // 2. Create a new adjustment transaction
             Transaction adjustmentTransaction = recordStockProductInventoryTransactionService.createAdjustmentTransaction(
