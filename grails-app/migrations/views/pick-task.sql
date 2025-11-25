@@ -66,4 +66,4 @@ FROM picklist_item pli
          JOIN picklist pl ON pl.id = pli.picklist_id
          JOIN requisition r ON r.id = pl.requisition_id
          LEFT JOIN requisition_item ri ON ri.id = pli.requisition_item_id
-WHERE r.status = 'PICKING';
+WHERE r.status IN ('PICKING', 'PICKED', 'STAGED');
