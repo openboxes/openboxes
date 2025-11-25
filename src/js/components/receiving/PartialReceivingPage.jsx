@@ -867,7 +867,7 @@ class PartialReceivingPage extends Component {
    * @public
    */
   saveEditLine(editLines, parentIndex, formValues, rowIndex) {
-    const { containers } = this.state.values;
+    const { containers } = formValues;
     const editLinesGrouped = editLines.reduce((acc, line) => {
       if (line.receiptItemId) {
         return {
@@ -888,17 +888,17 @@ class PartialReceivingPage extends Component {
         rowIndex,
         newItems,
       );
-      this.setState((prevState) =>
-        ({ values: { ...prevState.values, containers: mappedContainers } }));
+      this.setState(() =>
+        ({ values: { ...formValues, containers: mappedContainers } }));
       return;
     }
     this.props.showSpinner();
 
     const editedLinesToSave = {
-      ...this.state.values,
+      ...formValues,
       containers: [
         {
-          ...this.state.values.containers[parentIndex],
+          ...containers[parentIndex],
           shipmentItems: editLinesGrouped.itemsToSave,
         },
       ],
