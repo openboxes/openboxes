@@ -31,7 +31,9 @@ import org.pih.warehouse.core.PartyType
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.InventoryBaselineTransactionCommand
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryTransactionMigrationService
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.ProductInventoryTransactionMigrationService
 import org.pih.warehouse.inventory.Transaction
@@ -56,6 +58,7 @@ class MigrationService {
     def inventoryService
     ProductAvailabilityService productAvailabilityService
     ProductInventoryTransactionMigrationService productInventoryTransactionMigrationService
+    InventoryTransactionMigrationService inventoryTransactionMigrationService
     def persistenceInterceptor
     def dataSource
 
@@ -338,7 +341,12 @@ class MigrationService {
         // Always create a stock snapshot before modifying any transactions in order to prevent quantity on hand
         // differences for edge cases that were not addressed
         if (performMigration) {
-            inventoryService.createStockSnapshot(location, product)
+            inventoryTransactionMigrationService.createInventoryBaselineTransaction(
+                    location,
+                    null,
+                    [product],
+                    null,
+                    "Created while migrating Inventory transactions")
         }
 
         def transactionEntries = getTransactionEntries(location, product)
@@ -595,18 +603,19 @@ class MigrationService {
             if (newComment.length() > 255) {
                 newComment = newComment.substring(0, 255)
             }
-
-            Transaction baselineTransaction = productInventoryTransactionMigrationService.createInventoryBaselineTransactionForGivenStock(
-                    location,
-                    null,
-                    currentTransactionProducts,
-                    availableItems,
-                    it.transactionDate,
-                    newComment,
-                    null,
+            InventoryBaselineTransactionCommand<Transaction> baselineTransactionCommand = new InventoryBaselineTransactionCommand<Transaction>(
+                    facility: location,
+                    sourceObject: it,
+                    products: currentTransactionProducts,
+                    availableItems: availableItems,
+                    transactionDate: it.transactionDate,
+                    comment: newComment,
                     // don't validate transaction date, there is old transaction at the same time, that will be removed
-                    false,
-                    true
+                    validateTransactionDates: false,
+                    disableRefresh: true
+            )
+            Transaction baselineTransaction = productInventoryTransactionMigrationService.createInventoryBaselineTransactionForGivenStock(
+                  baselineTransactionCommand
             )
             if (baselineTransaction) {
                 changeDateCreatedAndCreatedByOnTransaction(baselineTransaction, it.createdBy, it.dateCreated)

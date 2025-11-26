@@ -56,8 +56,8 @@ class TemporalAccessorDateFormatterSpec extends Specification {
         locale         | format                 || expectedResult | scenario
         Locale.ENGLISH | DateDisplayFormat.GSP  || '01/Jan/2000'  | 'GSP format localization in english'
         Locale.ITALIAN | DateDisplayFormat.GSP  || 'gen-01-2000'  | 'GSP format localization in non-english'
-        Locale.ENGLISH | DateDisplayFormat.CSV  || '2000-01-01'   | 'CSV format should use ISO strings (english)'
-        Locale.ITALIAN | DateDisplayFormat.CSV  || '2000-01-01'   | 'CSV format should use ISO strings (non-english)'
+        Locale.ENGLISH | DateDisplayFormat.CSV  || '01/Jan/2000'  | 'CSV format localization in english'
+        Locale.ITALIAN | DateDisplayFormat.CSV  || '01/gen/2000'  | 'CSV format localization in non-english'
         Locale.ENGLISH | DateDisplayFormat.JSON || '2000-01-01'   | 'JSON format should use ISO strings (english)'
         Locale.ITALIAN | DateDisplayFormat.JSON || '2000-01-01'   | 'JSON format should use ISO strings (non-english)'
     }

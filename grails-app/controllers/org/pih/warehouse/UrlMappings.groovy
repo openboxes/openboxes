@@ -820,6 +820,11 @@ class UrlMappings {
             action = "importCsv"
         }
 
+        "/api/facilities/$facilityId/inventories/reorderReport" {
+            controller = { "inventoryApi" }
+            action = [GET: "getReorderReport"]
+        }
+
         /**
         * Purchase Orders API endpoints
         */
@@ -1085,6 +1090,15 @@ class UrlMappings {
         "/api/facilities/$facility/inventory/record-stock/save" {
             controller = "recordStockApi"
             action = [POST: "saveRecordStock"]
+        }
+
+        /**
+         * Inventory API endpoints
+         */
+
+        "/api/inventories/expirationHistoryReport" {
+            controller = { "inventoryApi" }
+            action = [GET: "getExpirationHistoryReport"]
         }
 
         // Error handling

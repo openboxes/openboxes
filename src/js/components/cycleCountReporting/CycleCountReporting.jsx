@@ -1,5 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
+import { useDispatch } from 'react-redux';
+
+import { fetchReasonCodes } from 'actions';
+import { FETCH_CYCLE_COUNT_REASON_CODES } from 'actions/types';
 import cycleCountReportingFilterFields from 'components/cycleCountReporting/CycleCountReportingFilterFields';
 import CycleCountReportingFilters from 'components/cycleCountReporting/CycleCountReportingFilters';
 import CycleCountReportingHeader from 'components/cycleCountReporting/CycleCountReportingHeader';
@@ -25,6 +29,7 @@ const CycleCountReporting = () => {
   const { switchTab } = useSwitchTabs({ defaultTab: PRODUCTS_TAB });
   useTranslation('cycleCount');
   const { tab: currentTab } = useQueryParams();
+  const dispatch = useDispatch();
 
   // Each tab will have different filters, that's why we will need this function
   const getFilterFields = () => {
@@ -43,9 +48,9 @@ const CycleCountReporting = () => {
   const {
     defaultFilterValues,
     setFilterValues,
+    updateParams,
     isLoading,
     filterParams,
-    resetForm,
     shouldFetch,
     setShouldFetch,
     filtersInitialized,
@@ -64,23 +69,30 @@ const CycleCountReporting = () => {
         id: 'react.cycleCount.products.label',
         defaultMessage: 'Products',
       },
-      onClick: (tab) => switchTab(tab, resetForm),
+      onClick: (tab) => switchTab(tab, updateParams),
     },
     [INVENTORY_TRANSACTIONS_TAB]: {
       label: {
         id: 'react.cycleCount.inventoryTransactions.label',
         defaultMessage: 'Inventory Transactions',
       },
-      onClick: (tab) => switchTab(tab, resetForm),
+      onClick: (tab) => switchTab(tab, updateParams),
     },
     [INDICATORS_TAB]: {
       label: {
         id: 'react.cycleCount.indicators.label',
         defaultMessage: 'Indicators',
       },
-      onClick: (tab) => switchTab(tab, resetForm),
+      onClick: (tab) => switchTab(tab, updateParams),
     },
   };
+
+  // Fetch reason codes at this level, because we should avoid fetching while switching tabs, and we
+  // should fetch fresh cycle counts reason codes after refreshing the page (due to redux persist
+  // we can't just check the presence in the store),
+  useEffect(() => {
+    dispatch(fetchReasonCodes('CYCLE_COUNT', FETCH_CYCLE_COUNT_REASON_CODES));
+  }, []);
 
   return (
     <PageWrapper>

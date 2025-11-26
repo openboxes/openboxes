@@ -121,8 +121,14 @@
 																	<g:textField name="orderItems[${i }].lotNumber" value="${orderItem?.lotNumber }" size="20" class="text updateable"/>
 																</td>
 																<td nowrap="true">
-																	<g:datePicker name="orderItems[${i }].expirationDate" precision="day" default="none" class="chzn-select" noSelection="['':'']"
-																		years="${(1900 + (new Date().year))..(1900+ (new Date() + (50 * 365)).year)}" value="${orderItem?.expirationDate }" />
+																	<g:datePicker name="orderItems[${i }].expirationDate"
+                                                                                  precision="day"
+                                                                                  default="none"
+                                                                                  class="chzn-select"
+                                                                                  noSelection="['':'']"
+                                                                                  years="${(1900 + (new Date().year))..(1900+ (new Date() + (50 * 365)).year)}"
+                                                                                  value="${orderItem?.expirationDate }"
+                                                                                  fieldType="${Date}"/>
 																</td>
 																<td>
 																	<span class="buttons" style="padding: 0px;">
@@ -255,8 +261,13 @@
 					<g:textField name="orderItems[{{= Index }}].lotNumber" value="{{= LotNumber}}" size="10" class="updateable text"/>
 				</td>
 				<td nowrap="true">
-					<g:datePicker name="orderItems[{{= Index }}].expirationDate" precision="day" default="none" value="" noSelection="['':'']"
-						years="${(1900 + (new Date().year))..(1900+ (new Date() + (50 * 365)).year)}"/>
+					<g:datePicker name="orderItems[{{= Index }}].expirationDate"
+                                  precision="day"
+                                  default="none"
+                                  value=""
+                                  fieldType="${Date}"
+                                  noSelection="['':'']"
+                                  years="${(1900 + (new Date().year))..(1900+ (new Date() + (50 * 365)).year)}"/>
 				</td>
 				<td>
 					<span class="buttons" style="padding: 0px;">

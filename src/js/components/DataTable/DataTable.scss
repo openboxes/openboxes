@@ -226,7 +226,9 @@
 .table-v2 {
 
   .table-footer {
-    background-color: var(--page-background);
+    display: flex;
+    padding: 0.5rem;
+    background-color: var(--blue-100);
 
     div {
       background-color: var(--blue-100);
@@ -234,7 +236,6 @@
   }
 
   .table-pagination-bottom {
-    background-color: var(--blue-100) !important;
     padding: 0.75rem !important;
   }
 

@@ -253,7 +253,7 @@ const StockMovementOutboundTable = ({
       accessor: 'identifier',
       fixed: 'left',
       headerClassName: 'header justify-content-center',
-      minWidth: 100,
+      minWidth: 130,
       Cell: (row) => {
         const { id, shipmentType } = row.original;
         return (

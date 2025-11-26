@@ -17,7 +17,12 @@
                     <label><warehouse:message code="default.date.label"/></label>
                 </td>
                 <td class="value">
-                    <g:datePicker name="date" value="none" precision="minute" relativeYears="[-20..0]" noSelection="['':'']"/>
+                    <g:datePicker name="date"
+                                  value="none"
+                                  fieldType="${Date}"
+                                  precision="minute"
+                                  relativeYears="[-20..0]"
+                                  noSelection="['':'']"/>
                 </td>
             </tr>
             <tr class="prop">

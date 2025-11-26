@@ -74,7 +74,11 @@
                         <label><g:message code="stockMovement.dateShipped.label"/></label>
                     </td>
                     <td class="value">
-                        <g:datePicker name="dateShipped" value="${stockMovement.dateShipped}" default="none" noSelection="['':'']"/>
+                        <g:datePicker name="dateShipped"
+                                      value="${stockMovement.dateShipped}"
+                                      fieldType="${Date}"
+                                      default="none"
+                                      noSelection="['':'']"/>
                     </td>
                 </tr>
             </table>

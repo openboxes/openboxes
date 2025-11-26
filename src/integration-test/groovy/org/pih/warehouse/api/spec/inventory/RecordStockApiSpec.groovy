@@ -2,7 +2,6 @@ package org.pih.warehouse.api.spec.inventory
 
 import java.time.Instant
 import org.springframework.beans.factory.annotation.Autowired
-import spock.lang.Ignore
 
 import org.pih.warehouse.api.client.inventory.RecordStockApiWrapper
 import org.pih.warehouse.api.spec.base.ApiSpec
@@ -27,7 +26,8 @@ class RecordStockApiSpec extends ApiSpec {
         List<ProductAvailability> availability = getProductAvailability()
 
         then:
-        assert availability.size() == 0
+        assert availability.size() == 1
+        assert availability[0].quantityOnHand == 0
     }
 
     void 'record stock can set the stock for multiple items'() {
@@ -43,8 +43,19 @@ class RecordStockApiSpec extends ApiSpec {
         and:
         List<ProductAvailability> availability = getProductAvailability()
 
+        then: 'expect three records, the two that were added, and the 0 quantity default record that gets created ' +
+              'when we record stock with no previous quantity on the product'
+        assert availability.size() == 3
+
+        when:
+        ProductAvailability defaultLotAvailability = availability.find { it.lotNumber == 'DEFAULT' }
+
         then:
-        assert availability.size() == 2
+        assert defaultLotAvailability != null
+        // the lot number for the default lot is 'DEFAULT' in ProductAvailability but null in InventoryItem.
+        assert defaultLotAvailability.inventoryItem?.lotNumber == null
+        assert defaultLotAvailability.inventoryItem?.expirationDate == null
+        assert defaultLotAvailability.quantityOnHand == 0
 
         when:
         ProductAvailability lot1Availability = availability.find { it.lotNumber == 'TEST-LOT-1' }
@@ -65,7 +76,6 @@ class RecordStockApiSpec extends ApiSpec {
         assert lot2Availability.quantityOnHand == 20
     }
 
-    @Ignore("This doesn't work since product availability is a sum of all of these record stocks instead of only the latest one. Need to figure out what's going on.")
     void 'only the latest record stock applies'() {
         when: 'we set some quantity for the product'
         Instant originalTransactionDate = Instant.now().minusSeconds(100)

@@ -1,2 +1,2 @@
-Id,ProductCode,ProductType,Name,ProductFamily,Category,GLAccount,Description,UnitOfMeasure,Tags,UnitCost,LotAndExpiryControl,ColdChain,ControlledSubstance,HazardousMaterial,Reconditioned,Manufacturer,BrandName,ManufacturerCode,ManufacturerName,Vendor,VendorCode,VendorName,UPC,NDC,Created,Updated
-09f5e11677d27d1d0177d4c45ba50ceb,VM903,Default,Plastic box file,,Office Supplies,5215,,,,0.49,,,true,,,,,,,INDEX ENTERPRISES,,,,,24/Feb/2021 03:59:34,01/Mar/2021 11:24:23
+Id,Active,ProductCode,ProductType,Name,ProductFamily,Category,GLAccount,Description,UnitOfMeasure,Tags,UnitCost,LotAndExpiryControl,ColdChain,ControlledSubstance,HazardousMaterial,Reconditioned,Manufacturer,BrandName,ManufacturerCode,ManufacturerName,Vendor,VendorCode,VendorName,UPC,NDC,Created,Updated
+09f5e11677d27d1d0177d4c45ba50ceb,true,VM903,Default,Plastic box file,,Office Supplies,5215,,,,0.49,,,true,,,,,,,INDEX ENTERPRISES,,,,,24/Feb/2021 03:59:34,01/Mar/2021 11:24:23

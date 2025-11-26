@@ -1,14 +1,9 @@
+# For running the app with a bundled, containerized database
 services:
     app:
       extends: 
         file: docker-compose-base.yml
         service: app
-      image: ghcr.io/openboxes/openboxes:v0.9.3
-      # Use below 'image' property (with proper tag) if you use locally-built image
-      # image: openboxes/openboxes:latest
-      environment:
-        # It's hardcoded - DB connection happens via docker network
-        DATASOURCE_URL: jdbc:mysql://db/openboxes?useSSL=false
       depends_on: 
         db:
           condition: service_healthy

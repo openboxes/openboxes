@@ -1354,7 +1354,7 @@ class ReportService implements ApplicationContextAware {
         return transactionEntry.transaction.transactionType.transactionCode == TransactionCode.CREDIT && transactionEntry.quantity > 0
     }
 
-    List<TransactionEntry> getFilteredTransactionEntries(
+    private List<TransactionEntry> getFilteredTransactionEntries(
             List<TransactionCode> transactionCodes,
             Date startDate,
             Date endDate,
@@ -1362,17 +1362,16 @@ class ReportService implements ApplicationContextAware {
             List<Tag> tagsList,
             List<ProductCatalog> catalogsList,
             Location location,
-            Product productData,
+            List<Product> products,
             String orderBy,
             String sortOrder = "desc"
     ) {
         return TransactionEntry.createCriteria().list {
             inventoryItem {
+                if (products) {
+                    'in'('product', products)
+                }
                 product {
-                    if (productData) {
-                        eq('id', productData.id)
-                    }
-
                     if (categories) {
                         'in'('category', categories)
                     }
@@ -1420,8 +1419,9 @@ class ReportService implements ApplicationContextAware {
         } as List<TransactionEntry>
     }
 
-    List<TransactionEntry> getFilteredTransactionEntries(List<TransactionCode> transactionCodes, Date startDate, Date endDate, Location location, Product product, String orderBy, String sortOrder = "desc") {
-        return getFilteredTransactionEntries(transactionCodes, startDate, endDate, null, null, null, location, product, orderBy, sortOrder)
+    private List<TransactionEntry> getFilteredTransactionEntries(List<TransactionCode> transactionCodes, Date startDate, Date endDate, Location location, Product product, String orderBy, String sortOrder = "desc") {
+        List<Product> products = product ? [product] : null
+        return getFilteredTransactionEntries(transactionCodes, startDate, endDate, null, null, null, location, products, orderBy, sortOrder)
     }
 
     Map<Product, Map<String, Integer>> getDetailedTransactionReportData(Map<Product, List<TransactionEntry>> transactionEntries) {
@@ -1499,7 +1499,15 @@ class ReportService implements ApplicationContextAware {
         ]
     }
 
-    List<Object> getTransactionReport(Location location, List<Category> categories, List<Tag> tagsList, List<ProductCatalog> catalogsList, Date startDate, Date endDate, Boolean includeDetails) {
+    List<Object> getTransactionReport(Location location,
+                                      List<Category> categories,
+                                      List<Tag> tagsList,
+                                      List<ProductCatalog> catalogsList,
+                                      List<Product> productList,
+                                      Date startDate,
+                                      Date endDate,
+                                      Boolean includeDetails) {
+
         List<TransactionCode> adjustmentTransactionCodes = [
                 TransactionCode.CREDIT,
                 TransactionCode.DEBIT
@@ -1515,6 +1523,7 @@ class ReportService implements ApplicationContextAware {
                 tagsList,
                 catalogsList,
                 location,
+                productList,
                 null,
                 null
         )

@@ -111,11 +111,13 @@ class PutAwaySecondPage extends Component {
 
   getColumns = () => [
     {
+      name: 'productCode',
       Header: <Translate id="react.putAway.code.label" defaultMessage="Code" />,
       accessor: 'product.productCode',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
+      name: 'productName',
       Header: <Translate id="react.putAway.name.label" defaultMessage="Name" />,
       accessor: 'product',
       Cell: (row) => (
@@ -129,11 +131,13 @@ class PutAwaySecondPage extends Component {
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
+      name: 'lotNumber',
       Header: <Translate id="react.putAway.lotSerialNo.label" defaultMessage="Lot/Serial No." />,
       accessor: 'inventoryItem.lotNumber',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
+      name: 'expirationDate',
       Header: <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />,
       accessor: 'inventoryItem.expirationDate',
       style: { whiteSpace: 'normal' },
@@ -148,11 +152,13 @@ class PutAwaySecondPage extends Component {
       ),
       Filter,
     }, {
+      name: 'recipientName',
       Header: <Translate id="react.putAway.recipient.label" defaultMessage="Recipient" />,
       accessor: 'recipient.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
+      name: 'quantity',
       Header: <Translate id="react.putAway.qty.label" defaultMessage="QTY" />,
       accessor: 'quantity',
       style: { whiteSpace: 'normal' },
@@ -222,6 +228,7 @@ class PutAwaySecondPage extends Component {
       },
       Filter,
     }, {
+      name: 'preferredBin',
       Header: <Translate id="react.putAway.preferredBin.label" defaultMessage="Preferred bin" />,
       accessor: 'preferredBin',
       style: { whiteSpace: 'normal' },
@@ -238,11 +245,13 @@ class PutAwaySecondPage extends Component {
       ),
       Filter,
     }, {
+      name: 'currentBin',
       Header: <Translate id="react.putAway.currentBin.label" defaultMessage="Current bin" />,
       accessor: 'currentBins',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
+      name: 'stockMovementName',
       Header: <Translate id="react.putAway.stockMovement.label" defaultMessage="Stock Movement" />,
       accessor: 'stockMovement.name',
       style: { whiteSpace: 'normal' },
@@ -254,6 +263,7 @@ class PutAwaySecondPage extends Component {
       filterable: true,
       Filter,
     }, {
+      name: 'putawayBin',
       Header: <Translate id="react.putAway.putAwayBin.label" defaultMessage="Putaway Bin" />,
       accessor: 'putawayLocation',
       Cell: (cellInfo) => {
@@ -279,6 +289,7 @@ class PutAwaySecondPage extends Component {
       },
       Filter,
     }, {
+      name: 'splitItems',
       Header: '',
       accessor: 'splitItems',
       Cell: (cellInfo) => (
@@ -698,9 +709,6 @@ class PutAwaySecondPage extends Component {
                 showPaginationBottom={false}
                 filterable
                 defaultFilterMethod={this.filterMethod}
-                getTdProps={(state, rowInfo) => ({
-                  'data-testid': `row-${rowInfo.level}-${rowInfo.index}`,
-                })}
               />
             )
             : null

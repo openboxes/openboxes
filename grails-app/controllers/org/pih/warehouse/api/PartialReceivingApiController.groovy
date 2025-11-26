@@ -12,6 +12,7 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.product.Product
@@ -197,7 +198,7 @@ class PartialReceivingApiController {
                     partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
                 }
                 bindData(partialReceiptItem, shipmentItemMap)
-
+                partialReceiptItem.binLocation = partialReceiptItem.binLocation ?: Location.findByNameAndParentLocation(shipmentItemMap['binLocation.name'], partialReceipt?.shipment?.destination)
                 partialReceiptItem.shouldSave = newLine || originalLine || partialReceiptItem.quantityReceiving != null || partialReceiptItem.receiptItem
             }
         }

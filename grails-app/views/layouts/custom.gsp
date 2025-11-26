@@ -28,13 +28,7 @@
     <link rel="stylesheet" href="${resource(dir:'css',file:'footable.css')}" type="text/css" media="all" />
     <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
 
-    <g:if test="${session.useDebugLocale}">
-        <script type="text/javascript">
-            var _jipt = [];
-            _jipt.push(['project', 'openboxes']);
-        </script>
-        <script type="text/javascript" src="//cdn.crowdin.com/jipt/jipt.js"></script>
-    </g:if>
+    <g:render template="/localization/crowdin"/>
 
     <!-- Include javascript files -->
     <g:javascript library="application"/>
@@ -494,7 +488,11 @@
       });
 
       // Select 2 default configuration
-      $(".select2")
+      // Note that we only apply the default configuration to <select> elements that have the "select2" class because
+      // we only want this default config to be applied to old selectors in the SelectTagLib (users of the taglib set
+      // the "select2", "select2withTag", or "ajaxSelect2" classes to invoke specific defaults).
+      // New flows use the g:selectAjax taglib as defined in SelectTagLib which handles setting its own defaults.
+      $("select.select2")
       .select2({
         placeholder: $(this).data("placeholder") || 'Select an option',
         width: '100%',

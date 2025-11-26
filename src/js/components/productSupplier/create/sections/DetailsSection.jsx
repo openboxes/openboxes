@@ -8,11 +8,12 @@ import AdditionalDetails, { additionalDetailsFormErrors }
 import BasicDetails, { basicDetailsFormErrors }
   from 'components/productSupplier/create/subsections/BasicDetails';
 
-const DetailsSection = ({ control, errors }) => (
+const DetailsSection = ({ control, errors, getValues }) => (
   <Section title={{ label: 'react.productSupplier.form.section.details', defaultMessage: 'Details' }}>
     <BasicDetails
       control={control}
       errors={errors?.basicDetails}
+      getValues={getValues}
     />
     <AdditionalDetails
       control={control}
@@ -29,4 +30,5 @@ DetailsSection.propTypes = {
     basicDetails: basicDetailsFormErrors,
     additionalDetails: additionalDetailsFormErrors,
   }).isRequired,
+  getValues: PropTypes.func.isRequired,
 };

@@ -1,12 +1,22 @@
 name: Docker
 on:
+  # We want releases to be triggered automatically whenever we push a new tag that starts with "vX.Y.Z"
   push:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+**'
 
+  # And let us trigger this manually if we ever need to.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: The tag associated with the release
+        required: true
+        default: v0.0.0
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  TAG_NAME: ${{ (contains(github.ref, 'tag') && github.ref_name) || github.event.inputs.tag }}
 
 jobs:
   build:
@@ -18,13 +28,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{env.TAG_NAME}}  # Needed for manual runs to ensure we build from the tagged commit
 
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           java-version: 8
-          distribution: zulu
-          cache: 'gradle'
+          distribution: temurin
+          cache: gradle
 
       - name: Build dependencies, project and prepare files for Docker build
         run: ./gradlew prepareDocker -Dgrails.env=prod --console=plain

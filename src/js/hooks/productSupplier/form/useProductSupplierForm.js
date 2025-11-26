@@ -76,6 +76,14 @@ const useProductSupplierForm = () => {
         active: productSupplier?.active,
         dateCreated: productSupplier?.dateCreated ?? undefined,
         lastUpdated: productSupplier?.lastUpdated ?? undefined,
+        createdBy: {
+          id: productSupplier?.createdBy?.id ?? undefined,
+          name: productSupplier?.createdBy?.name ?? undefined,
+        },
+        updatedBy: {
+          id: productSupplier?.updatedBy?.id ?? undefined,
+          name: productSupplier?.updatedBy?.name ?? undefined,
+        },
       },
       additionalDetails: {
         manufacturer: productSupplier?.manufacturer
@@ -183,6 +191,7 @@ const useProductSupplierForm = () => {
     trigger,
     setValue,
     formState: { errors, isValid },
+    getValues,
   } = useForm({
     // We want the validation errors to occur onBlur of any field
     mode: 'onBlur',
@@ -356,6 +365,7 @@ const useProductSupplierForm = () => {
     onSubmit,
     setProductPackageQuantity,
     setValue,
+    getValues,
   };
 };
 

@@ -92,6 +92,7 @@ class Transaction implements Comparable, Serializable {
     Receipt receipt
     Order order
     CycleCount cycleCount
+    TransactionSource transactionSource
 
     // Auditing fields
     Boolean confirmed = Boolean.FALSE    // Transactions need to be confirmed by a supervisor
@@ -215,6 +216,7 @@ class Transaction implements Comparable, Serializable {
                     }
                     return true
                 })
+        transactionSource(nullable: true)
     }
 
     LocalTransfer getLocalTransfer() {

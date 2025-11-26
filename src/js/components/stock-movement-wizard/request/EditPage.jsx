@@ -315,9 +315,10 @@ const AD_HOCK_FIELDS = {
           fieldValue, subfield, reasonCodes, updateRow, values, rowIndex, showOnly,
         }) => {
           const isSubstituted = fieldValue && fieldValue.statusCode === 'SUBSTITUTED';
+          const selectedReasonCode = values?.editPageItems[rowIndex]?.reasonCode;
+
           return {
-            disabled: fieldValue === null
-              || fieldValue === undefined
+            disabled: ((fieldValue === null || fieldValue === undefined) && !selectedReasonCode)
               || subfield
               || isSubstituted
               || showOnly,
@@ -614,9 +615,10 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
           fieldValue, subfield, reasonCodes, updateRow, values, rowIndex, showOnly,
         }) => {
           const isSubstituted = fieldValue && fieldValue.statusCode === 'SUBSTITUTED';
+          const selectedReasonCode = values?.editPageItems[rowIndex]?.reasonCode;
+
           return {
-            disabled: fieldValue === null
-              || fieldValue === undefined
+            disabled: ((fieldValue === null || fieldValue === undefined) && !selectedReasonCode)
               || subfield
               || isSubstituted
               || showOnly,
@@ -913,9 +915,10 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
           fieldValue, subfield, reasonCodes, updateRow, values, rowIndex, showOnly,
         }) => {
           const isSubstituted = fieldValue && fieldValue.statusCode === 'SUBSTITUTED';
+          const selectedReasonCode = values?.editPageItems[rowIndex]?.reasonCode;
+
           return {
-            disabled: fieldValue === null
-              || fieldValue === undefined
+            disabled: ((fieldValue === null || fieldValue === undefined) && !selectedReasonCode)
               || subfield
               || isSubstituted
               || showOnly,

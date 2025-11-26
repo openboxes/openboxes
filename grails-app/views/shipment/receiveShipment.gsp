@@ -81,7 +81,11 @@
                             <td valign="top"
                                 class="value ${hasErrors(bean: receiptInstance, field: 'actualDeliveryDate', 'errors')}"
                                 nowrap="nowrap">
-                                <g:datePicker name="actualDeliveryDate" value="${receiptInstance?.actualDeliveryDate}" precision="minute" noSelection="['':'']"/>
+                                <g:datePicker name="actualDeliveryDate"
+                                              value="${receiptInstance?.actualDeliveryDate}"
+                                              fieldType="${Date}"
+                                              precision="minute"
+                                              noSelection="['':'']"/>
                             </td>
                         </tr>
                         <tr class="prop">

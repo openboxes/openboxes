@@ -72,7 +72,11 @@
                                     <label for="dateCreated"><warehouse:message code="shipmentWorkflow.dateCreated.label" default="Date Created" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: shipmentWorkflowInstance, field: 'dateCreated', 'errors')}">
-                                    <g:datePicker name="dateCreated" precision="minute" value="${shipmentWorkflowInstance?.dateCreated}" noSelection="['': '']" />
+                                    <g:datePicker name="dateCreated"
+                                                  precision="minute"
+                                                  value="${shipmentWorkflowInstance?.dateCreated}"
+                                                  fieldType="${Date}"
+                                                  noSelection="['': '']" />
                                 </td>
                             </tr>
 
@@ -81,7 +85,11 @@
                                     <label for="lastUpdated"><warehouse:message code="shipmentWorkflow.lastUpdated.label" default="Last Updated" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: shipmentWorkflowInstance, field: 'lastUpdated', 'errors')}">
-                                    <g:datePicker name="lastUpdated" precision="minute" value="${shipmentWorkflowInstance?.lastUpdated}" noSelection="['': '']" />
+                                    <g:datePicker name="lastUpdated"
+                                                  precision="minute"
+                                                  value="${shipmentWorkflowInstance?.lastUpdated}"
+                                                  fieldType="${Date}"
+                                                  noSelection="['': '']" />
                                 </td>
                             </tr>
 

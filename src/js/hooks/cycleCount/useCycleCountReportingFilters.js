@@ -140,6 +140,7 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
     defaultFilterValues,
     setFilterValues,
     resetForm,
+    updateParams: initializeDefaultFilterValues,
     filterParams,
     isLoading,
     shouldFetch,

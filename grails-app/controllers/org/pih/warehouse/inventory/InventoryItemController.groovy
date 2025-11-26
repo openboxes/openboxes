@@ -592,10 +592,10 @@ class InventoryItemController {
     }
 
     def saveRecordInventory(RecordInventoryCommand commandInstance) {
-        log.info("Before saving record inventory " + params)
         inventoryService.saveRecordInventoryCommand(commandInstance, params)
         if (!commandInstance.hasErrors()) {
-            // Recalculate product availability after the changes in the inventory
+            // We disabled recalculating product availability during the record stock operation (to avoid
+            // recalculating it multiple times) so now we need to refresh it manually.
             productAvailabilityService.refreshProductsAvailability(commandInstance?.inventory?.warehouse?.id,
                     [commandInstance?.product?.id], false)
 

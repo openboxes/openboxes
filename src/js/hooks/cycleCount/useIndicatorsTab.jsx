@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import moment from 'moment';
+import queryString from 'query-string';
 import { useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { getCurrentLocation } from 'selectors';
 
 import cycleCountReportingIndicators from 'consts/cycleCountReportingIndicators';
+import { DateFormat } from 'consts/timeFormat';
 import dateWithoutTimeZone from 'utils/dateUtils';
 import {
   fetchIndicatorInventoryAccuracy,
@@ -18,6 +22,7 @@ const useIndicatorsTab = ({
   const [loading, setLoading] = useState(false);
   // In tiles, we will store all the filtered data that we will render in IndicatorNumberCards
   const [tiles, setTiles] = useState([]);
+  const history = useHistory();
   const {
     currentLocation,
   } = useSelector((state) => ({
@@ -31,6 +36,22 @@ const useIndicatorsTab = ({
     facility: currentLocation.id,
   }), [startDate, endDate, currentLocation?.id]);
 
+  useEffect(() => {
+    const currentQueryParams = queryString.parse(history.location.search);
+    const dateParams = startDate && endDate
+      ? {
+        startDate: moment(startDate).format(DateFormat.DD_MMM_YYYY),
+        endDate: moment(endDate).format(DateFormat.DD_MMM_YYYY),
+      }
+      : {};
+    const queryFilterParams = queryString.stringify({
+      ...currentQueryParams,
+      ...dateParams,
+    });
+    const { pathname } = history.location;
+    history.replace({ pathname, search: queryFilterParams });
+  }, [startDate, endDate]);
+
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -41,8 +62,8 @@ const useIndicatorsTab = ({
       ]);
 
       const mergedTiles = responses
-        .filter(item => cycleCountReportingIndicators[item.name])
-        .map(item => ({
+        .filter((item) => cycleCountReportingIndicators[item.name])
+        .map((item) => ({
           ...cycleCountReportingIndicators[item.name],
           ...item,
         }));

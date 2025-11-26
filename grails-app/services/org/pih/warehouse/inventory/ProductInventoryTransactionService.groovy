@@ -68,17 +68,19 @@ abstract class ProductInventoryTransactionService<T> {
         AvailableItemMap availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 facility, products, transactionDate)
 
-        createInventoryBaselineTransactionForGivenStock(
-                facility,
-                sourceObject,
-                products,
-                availableItems,
-                transactionDate,
-                comment,
-                transactionEntriesComments,
-                validateTransactionDates,
-                disableRefresh,
+        InventoryBaselineTransactionCommand<T> baselineTransactionCommand = new InventoryBaselineTransactionCommand<T>(
+                facility: facility,
+                sourceObject: sourceObject,
+                products: products,
+                availableItems: availableItems,
+                transactionDate: transactionDate,
+                comment: comment,
+                transactionEntriesComments: transactionEntriesComments,
+                validateTransactionDates: validateTransactionDates,
+                disableRefresh: disableRefresh,
         )
+
+        createInventoryBaselineTransactionForGivenStock(baselineTransactionCommand)
     }
 
     /**
@@ -109,17 +111,7 @@ abstract class ProductInventoryTransactionService<T> {
      *                       the transaction is created. By default it's false.
      * @return The Transaction that was created
      */
-    Transaction createInventoryBaselineTransactionForGivenStock(
-            Location facility,
-            T sourceObject,
-            Collection<Product> products,
-            AvailableItemMap availableItems,
-            Date transactionDate=null,
-            String comment=null,
-            Map<AvailableItemKey, String> transactionEntriesComments = [:],
-            boolean validateTransactionDates = true,
-            boolean disableRefresh = false
-    ) {
+    Transaction createInventoryBaselineTransactionForGivenStock(InventoryBaselineTransactionCommand<T> command) {
 
         if (!baselineTransactionsEnabled()) {
             return null
@@ -129,28 +121,28 @@ abstract class ProductInventoryTransactionService<T> {
 
         // We'd have weird behaviour if we allowed two transactions to exist at the same exact time (precision at the
         // database level is to the second) so fail if there's already a transaction on the items for the given date.
-        Date actualTransactionDate = transactionDate ?: new Date()
-        if (validateTransactionDates && inventoryService.hasTransactionEntriesOnDate(
-                facility, actualTransactionDate, products as List<Product>)) {
+        Date actualTransactionDate = command.transactionDate ?: new Date()
+        if (command.validateTransactionDates && inventoryService.hasTransactionEntriesOnDate(
+                command.facility, actualTransactionDate, command.products as List<Product>)) {
             throw new IllegalArgumentException("A transaction already exists at time ${actualTransactionDate}")
         }
 
         Transaction transaction = new Transaction(
-                inventory: facility.inventory,
+                inventory: command.facility.inventory,
                 transactionDate: actualTransactionDate,
                 transactionType: transactionType,
-                comment: comment,
-                disableRefresh: disableRefresh
+                comment: command.comment,
+                disableRefresh: command.disableRefresh,
         )
 
         transaction.transactionNumber = transactionIdentifierService.generate(transaction)
 
-        setSourceObject(transaction, sourceObject)
+        setSourceObject(transaction, command.sourceObject)
 
-        for (Product product in products) {
+        for (Product product in command.products) {
             // If the product does not have any stock at the time of the baseline, we still want to take a "snapshot"
             // of the product so add an entry representing zero stock for the products in the default lot and bin.
-            List<AvailableItem> availableItemsForProduct = availableItems?.getAllByProduct(product)
+            List<AvailableItem> availableItemsForProduct = command.availableItems?.getAllByProduct(product)
             if (!availableItemsForProduct) {
                 InventoryItem defaultInventoryItem = inventoryService.findOrCreateDefaultInventoryItem(product)
                 TransactionEntry transactionEntry = new TransactionEntry(
@@ -159,7 +151,7 @@ abstract class ProductInventoryTransactionService<T> {
                         binLocation: null,
                         inventoryItem: defaultInventoryItem,
                         transaction: transaction,
-                        comments: transactionEntriesComments?.get(new AvailableItemKey(null, defaultInventoryItem)),
+                        comments: command.transactionEntriesComments?.get(new AvailableItemKey(null, defaultInventoryItem)),
                 )
                 transaction.addToTransactionEntries(transactionEntry)
                 continue
@@ -173,7 +165,7 @@ abstract class ProductInventoryTransactionService<T> {
                         binLocation: availableItem.binLocation,
                         inventoryItem: availableItem.inventoryItem,
                         transaction: transaction,
-                        comments: transactionEntriesComments?.get(new AvailableItemKey(availableItem)),
+                        comments: command.transactionEntriesComments?.get(new AvailableItemKey(availableItem)),
                 )
                 transaction.addToTransactionEntries(transactionEntry)
             }

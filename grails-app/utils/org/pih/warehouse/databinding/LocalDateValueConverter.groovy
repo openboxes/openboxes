@@ -4,6 +4,8 @@ import java.time.LocalDate
 import org.apache.commons.lang.StringUtils
 import org.springframework.stereotype.Component
 
+import org.pih.warehouse.DateUtil
+
 /**
  * As of Java 8, Java.util.Date is functionally replaced with the java.time classes, but Grails 4 and older does not
  * support databinding a datetime String to a LocalDate so we need to add support ourselves.
@@ -22,8 +24,6 @@ class LocalDateValueConverter extends StringValueConverter<LocalDate> {
      */
     @Override
     LocalDate convertString(String value) {
-        return StringUtils.isBlank(value) ?
-                null :
-                LocalDate.parse(value.trim(), DataBindingConstants.DATE_FORMAT)
+        return DateUtil.asLocalDate(value)
     }
 }

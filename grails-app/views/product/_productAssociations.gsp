@@ -43,7 +43,7 @@
 
                         <td>${fieldValue(bean: productAssociation, field: "comments")}</td>
 
-                        <td><format:date obj="${productAssociation.dateCreated}" /></td>
+                        <td><g:formatDate date="${productAssociation.dateCreated}" /></td>
 
                         <td>
 

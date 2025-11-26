@@ -1,6 +1,10 @@
 package org.pih.warehouse
 
+import org.apache.commons.lang.StringUtils
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.web.servlet.support.RequestContextUtils
 
 /**
  * Copyright (c) 2012 Partners In Health.  All rights reserved.
@@ -12,19 +16,16 @@ import org.springframework.beans.factory.annotation.Value
  * You must not remove this notice, or any other, from this software.
  **/
 import org.pih.warehouse.core.User
-import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.web.servlet.support.RequestContextUtils
+
+import org.pih.warehouse.core.localization.LocaleManager
 
 /**
  * Hook-in for initializing a user session.
  */
 class InitializationInterceptor {
 
-    @Value('${openboxes.locale.defaultLocale}')
-    String defaultLocale
-
-    @Value('${openboxes.locale.localizationModeLocale}')
-    String localizationModeLocale
+    @Autowired
+    LocaleManager localeManager
 
     @Value('${server.session.timeout}')
     Integer sessionTimeoutInterval
@@ -32,8 +33,10 @@ class InitializationInterceptor {
     int order = HIGHEST_PRECEDENCE
 
     InitializationInterceptor() {
-        // TODO: This will get triggered for EVERY request. See if we can restrict this at all. Ideally this will only
-        //       be triggered when login is called but we need to double check.
+        // TODO: Break out the setLocale logic into its own LocaleInterceptor. Everything else should only need to
+        //       be triggered once on initial login.
+        // We need this to trigger for every request (not just on login) so that we can check for the presence
+        // of the ?lang query param and wire in our custom locale handling logic.
         matchAll()
     }
 
@@ -68,16 +71,26 @@ class InitializationInterceptor {
     }
 
     void setLocale() {
-        // Figure out if we're in the special "localization mode" used when actively translating the app.
-        Locale locale = session?.locale ?: session.user?.locale ?: new Locale(defaultLocale ?: 'en')
-        session.useDebugLocale = locale == new Locale(localizationModeLocale)
+        // Grails has some built in behaviour for setting the locale via the 'lang' query param so we make sure
+        // to account for that case. This avoids desynchronization issues between the expected vs actual locale.
+        String lang = params.lang as String
 
-        // We want to set the locale for grails (equivalent to passing ?lang as param)
-        // so grails' g:message "understands" current language so that is translatable with the crowdin
+        Locale locale = StringUtils.isBlank(lang) ?
+                // It might seem weird to get the current locale and then set it immediately after, but getCurrentLocale
+                // returns the user or system default locale in the case when the session locale is not yet initialized.
+                // We can then set that default into the session so that we don't need to lookup the defaults again next
+                // time we fetch the locale. Subsequent changes to the locale can be made via the ?lang query param,
+                // or via any locale-updating controller actions (see UserController and ApiController).
+                localeManager.getCurrentLocale() :
+                LocalizationUtil.getLocale(lang)
+
+        localeManager.setCurrentLocale(locale)
+
+        // Grails has some built in behaviour that defaults your locale to your browser's locale when first logging in.
+        // We need to bypass that behaviour and set the locale ourselves to avoid the scenario where the app displays
+        // that we're in one language but text is localized to a different one.
+        // https://pihemr.atlassian.net/browse/OBPIH-3447?focusedCommentId=138878
         RequestContextUtils.getLocaleResolver(request).setLocale(request, response, locale)
-
-        // TODO (OBPIH-5452): If we get rid of our own logic to handle locale, this line or the RCU one might be removed
-        LocaleContextHolder.setLocale(locale)
     }
 
     void setCustomProperties() {

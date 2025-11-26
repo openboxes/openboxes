@@ -1,27 +1,45 @@
 package org.pih.warehouse.inventory
 
+import grails.validation.ValidationException
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.core.ConfigService
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 
 import grails.gorm.transactions.Transactional
-
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.product.availability.AvailableItemKey
 import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 
 @Transactional
 class RecordStockProductInventoryTransactionService extends ProductInventoryTransactionService<RecordInventoryCommand> {
 
+    ConfigService configService
+
+    @Override
+    protected boolean baselineTransactionsEnabled() {
+        return configService.getProperty("openboxes.transactions.inventoryBaseline.recordStock.enabled", Boolean)
+    }
+
     Transaction createAdjustmentTransaction(
             RecordInventoryCommand recordInventoryCommand,
-            Date transactionDate
+            Date transactionDate,
+            TransactionSource transactionSource
     ) {
         Transaction transaction = new Transaction(
                 transactionType: TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID),
                 inventory: recordInventoryCommand.inventory,
                 comment: recordInventoryCommand.comment,
-                transactionDate: transactionDate
+                transactionDate: transactionDate,
+                // Don't refresh product availability. That will get done manually at the end.
+                disableRefresh: true,
+                transactionSource: transactionSource
         )
         transaction.transactionNumber = inventoryService.generateTransactionNumber(transaction)
+        // If baseline was not created just before the adjustment, it means we have not created transaction source instance yet
+        if (!transactionSource) {
+            setSourceObject(transaction, recordInventoryCommand)
+        }
         return transaction
     }
 
@@ -72,9 +90,21 @@ class RecordStockProductInventoryTransactionService extends ProductInventoryTran
                 )}
     }
 
+    TransactionSource createRecordStockTransactionSource(Location location) {
+        TransactionSource transactionSource = new TransactionSource(
+                transactionAction: TransactionAction.RECORD_STOCK,
+                origin: location,
+                destination: location,
+        )
+        if (!transactionSource.validate()) {
+            throw new ValidationException("Invalid transaction source", transactionSource.errors)
+        }
+        return transactionSource.save()
+    }
 
     @Override
-    void setSourceObject(Transaction transaction, RecordInventoryCommand transactionSource) {
-        // Record stock has no source object.
+    void setSourceObject(Transaction transaction, RecordInventoryCommand sourceObject) {
+        TransactionSource transactionSource = createRecordStockTransactionSource(sourceObject.inventory.warehouse)
+        transaction.transactionSource = transactionSource
     }
 }

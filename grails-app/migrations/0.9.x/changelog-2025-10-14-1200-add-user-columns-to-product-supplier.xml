@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="ewaterman" id="141020251200-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="product_supplier" columnName="created_by_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product_supplier">
+            <column name="created_by_id" type="CHAR(38)">
+                <!-- nullable to support pre-existing data -->
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="ewaterman" id="141020251200-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="product_supplier" columnName="updated_by_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product_supplier">
+            <column name="updated_by_id" type="CHAR(38)">
+                <!-- nullable to support pre-existing data -->
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="ewaterman" id="141020251200-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_product_supplier_created_by"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseColumnNames="created_by_id"
+                baseTableName="product_supplier"
+                constraintName="fk_product_supplier_created_by"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="user"
+        />
+    </changeSet>
+
+    <changeSet author="ewaterman" id="141020251200-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_product_supplier_updated_by"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseColumnNames="updated_by_id"
+                baseTableName="product_supplier"
+                constraintName="fk_product_supplier_updated_by"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="user"
+        />
+    </changeSet>
+</databaseChangeLog>

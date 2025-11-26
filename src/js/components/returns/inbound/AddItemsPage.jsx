@@ -19,6 +19,7 @@ import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import notification from 'components/Layout/notifications/notification';
+import ConfirmExpirationDateModal from 'components/modals/ConfirmExpirationDateModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
 import NotificationType from 'consts/notificationTypes';
@@ -161,6 +162,10 @@ class AddItemsPage extends Component {
       inboundReturn: {},
       sortOrder: 0,
       formValues: { returnItems: [] },
+      isExpirationModalOpen: false,
+      // Stores the resolve function for the ConfirmExpirationDateModal promise
+      resolveExpirationModal: null,
+      itemsWithMismatchedExpiry: [],
       // isFirstPageLoaded: false,
     };
 
@@ -300,25 +305,18 @@ class AddItemsPage extends Component {
     });
   }
 
-  confirmExpirationDateSave() {
+  /**
+   * Shows Inventory item expiration date update confirmation modal.
+   * @param {Array} itemsWithMismatchedExpiry - Array of elements with mismatched expiration dates.
+   * @returns {Promise} - Resolves to true if user confirms the update, false if not.
+   * @public
+   */
+  confirmExpirationDateSave(itemsWithMismatchedExpiry) {
     return new Promise((resolve) => {
-      confirmAlert({
-        title: this.props.translate('react.inboundReturns.message.confirmSave.label', 'Confirm save'),
-        message: this.props.translate(
-          'react.stockMovement.confirmExpiryDateUpdate.message',
-          'This will update the expiry date across all depots in the system. Are you sure you want to proceed?',
-        ),
-        willUnmount: () => resolve(false),
-        buttons: [
-          {
-            label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => resolve(true),
-          },
-          {
-            label: this.props.translate('react.default.no.label', 'No'),
-            onClick: () => resolve(false),
-          },
-        ],
+      this.setState({
+        isExpirationModalOpen: true,
+        resolveExpirationModal: resolve,
+        itemsWithMismatchedExpiry,
       });
     });
   }
@@ -396,22 +394,34 @@ class AddItemsPage extends Component {
     const itemsWithLotAndExpirationDate = returnItems.filter(
       (it) => it.expirationDate && it.lotNumber,
     );
-
+    const itemsWithMismatchedExpiry = [];
     // Trying to find at least one instance where the data that we are trying to save
     // does not match the expiration date of the existing inventoryItem in the system
     // eslint-disable-next-line no-restricted-syntax
-    for (const it of itemsWithLotAndExpirationDate) {
-      // eslint-disable-next-line no-await-in-loop
-      const { data } = await ProductApi.getInventoryItem(it.product?.id, it.lotNumber);
-      if (data.inventoryItem && data.inventoryItem.expirationDate !== it.expirationDate) {
-        // After finding at least a single instance where expiration date we are trying to save
-        // does not match the existing inventoryItem expiration date, we want to inform the user
-        // that certain updates to th expiration date in the system will be performed
-        // eslint-disable-next-line no-await-in-loop
-        const shouldUpdateLotExpirationDate = await this.confirmExpirationDateSave();
-        if (!shouldUpdateLotExpirationDate) {
-          return Promise.reject();
+    await Promise.all(
+      itemsWithLotAndExpirationDate.map(async (it) => {
+        const { data } = await ProductApi.getInventoryItem(it.product?.id, it.lotNumber);
+        if (data.inventoryItem && data.inventoryItem.expirationDate !== it.expirationDate) {
+          return itemsWithMismatchedExpiry.push({
+            code: it.product?.productCode,
+            product: it.product,
+            lotNumber: it.lotNumber,
+            previousExpiry: data.inventoryItem.expirationDate,
+            newExpiry: it.expirationDate,
+          });
         }
+        return null;
+      }),
+    );
+
+    if (itemsWithMismatchedExpiry.length > 0) {
+      // After finding at least a single instance where expiration date we are trying to save
+      // does not match the existing inventoryItem expiration date, we want to inform the user
+      // that certain updates to th expiration date in the system will be performed
+      const shouldUpdateExpirationDate =
+        await this.confirmExpirationDateSave(itemsWithMismatchedExpiry);
+      if (!shouldUpdateExpirationDate) {
+        return Promise.reject();
       }
     }
 
@@ -494,6 +504,25 @@ class AddItemsPage extends Component {
     }
     await this.saveStockTransferInCurrentStep(values);
     this.props.previousPage(this.state.inboundReturn);
+  }
+
+  /**
+   * Handles the response from the expiration date confirmation modal.
+   * @param {boolean} shouldUpdate - True if the user confirmed the update, false if not.
+   * @public
+   */
+  handleExpirationModalResponse(shouldUpdate) {
+    // Resolve the promise returned by confirmExpirationDateSave.
+    if (this.state.resolveExpirationModal) {
+      this.state.resolveExpirationModal(shouldUpdate);
+    }
+
+    // Close the modal and reset its state.
+    this.setState({
+      isExpirationModalOpen: false,
+      resolveExpirationModal: null,
+      itemsWithMismatchedExpiry: [],
+    });
   }
 
   render() {
@@ -584,6 +613,12 @@ class AddItemsPage extends Component {
                 </button>
               </div>
             </form>
+            <ConfirmExpirationDateModal
+              isOpen={this.state.isExpirationModalOpen}
+              itemsWithMismatchedExpiry={this.state.itemsWithMismatchedExpiry}
+              onConfirm={() => this.handleExpirationModalResponse(true)}
+              onCancel={() => this.handleExpirationModalResponse(false)}
+            />
           </div>
         )}
       />

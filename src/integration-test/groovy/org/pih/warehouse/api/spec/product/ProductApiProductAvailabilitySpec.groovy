@@ -8,12 +8,37 @@ class ProductApiProductAvailabilitySpec extends ApiSpec {
 
     private static final int QUANTITY_ON_HAND = 10
 
-    void 'product availability can successfully be fetched for products with no stock'() {
+    void 'product availability can successfully be fetched for products that have never had stock'() {
+        expect: 'product availability to be empty'
+        assert productApiWrapper.getProductAvailabilityOK(product).size() == 0
+    }
+
+    void 'product availability can successfully be fetched for products with zero stock'() {
         given: 'a product with no stock'
         setStock(product, null, null, 0)
 
-        expect: 'product availability to be empty'
-        assert productApiWrapper.getProductAvailabilityOK(product).size() == 0
+        when:
+        List<ProductAvailability> availability = productApiWrapper.getProductAvailabilityOK(product)
+
+        then: 'product availability should return only one record'
+        assert availability.size() == 1
+
+        when:
+        ProductAvailability defaultBinAndLotAvailability = availability[0]
+
+        then:
+        assert defaultBinAndLotAvailability.location.id == facility.id
+        assert defaultBinAndLotAvailability.product.id == product.id
+        assert defaultBinAndLotAvailability.productCode == product.productCode
+        assert defaultBinAndLotAvailability.binLocation == null
+        assert defaultBinAndLotAvailability.binLocationName == Constants.DEFAULT
+        assert defaultBinAndLotAvailability.inventoryItem != null
+        assert defaultBinAndLotAvailability.lotNumber == Constants.DEFAULT
+        assert defaultBinAndLotAvailability.quantityOnHand == 0
+        assert defaultBinAndLotAvailability.quantityAllocated == 0
+        assert defaultBinAndLotAvailability.quantityOnHold == 0
+        assert defaultBinAndLotAvailability.quantityAvailableToPromise == 0
+        assert defaultBinAndLotAvailability.quantityNotPicked == 0
     }
 
     void 'product availability can successfully be fetched for products with stock'() {

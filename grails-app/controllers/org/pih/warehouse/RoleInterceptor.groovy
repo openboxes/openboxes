@@ -49,7 +49,7 @@ class RoleInterceptor {
         'location'     : ['edit'],
         'shipper'      : ['create'],
         'locationGroup': ['create'],
-        'locationType' : ['create'],
+        'locationType' : ['list'],
         'productSupplier': ['create', 'delete', 'edit']
     ]
 
@@ -63,6 +63,7 @@ class RoleInterceptor {
         'transactionEntry'          : ['edit', 'delete', 'save', 'update'],
         'user'                      : ['impersonate'],
         'productsConfigurationApi'  : ['downloadCategories', 'importCategories'],
+        'locationType'              : ['create', 'edit', 'delete', 'update', 'save'],
         'quartz'                    : ['*'],
         'jobs'                      : ['*']
     ]

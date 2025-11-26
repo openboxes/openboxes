@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { RiAddCircleLine } from 'react-icons/all';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
+import { getFormatLocalizedDate } from 'selectors';
 
 import AssignCycleCountModal from 'components/cycleCount/AssignCycleCountModal';
 import HeaderLabel from 'components/cycleCount/HeaderLabel';
@@ -16,7 +17,6 @@ import { DateFormat } from 'consts/timeFormat';
 import useCountStepHeader from 'hooks/cycleCount/useCountStepHeader';
 import useCountStepTable from 'hooks/cycleCount/useCountStepTable';
 import useTranslate from 'hooks/useTranslate';
-import { formatDate } from 'utils/translation-utils';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'components/cycleCount/cycleCount.scss';
@@ -43,8 +43,7 @@ const CountStepTable = ({
   forceRerender,
 }) => {
   const translate = useTranslate();
-  const localize = useSelector((state) => state.localize);
-  const formatLocalizedDate = formatDate(localize);
+  const formatLocalizedDate = useSelector(getFormatLocalizedDate);
   const {
     dateCounted,
     countedByMeta,

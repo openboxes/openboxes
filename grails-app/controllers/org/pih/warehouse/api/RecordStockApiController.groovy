@@ -23,11 +23,17 @@ class RecordStockApiController {
 
     def saveRecordStock(RecordInventoryCommand command) {
         inventoryService.saveRecordInventoryCommand(command, params)
+        // TODO: refactor saveRecordInventoryCommand to not catch exceptions. It does so now because it's used
+        //       in a non-API GSP controller which doesn't gracefully handle exceptions. We'll likely need to split it
+        //       into API and non-API service methods. Once we do that, we can remove this if check because exceptions
+        //       will be thrown in the service if the command is invalid.
         if (command.hasErrors()) {
             throw new ValidationException("Invalid record stock", command.errors)
         }
 
-        // Product availability was not refreshed during the record stock so we have to do it manually now.
+        // TODO: Move this refresh into saveRecordInventoryCommand. They don't need to be in separate transactions.
+        // We disabled recalculating product availability during the record stock operation (to avoid
+        // recalculating it multiple times) so now we need to refresh it manually.
         productAvailabilityService.refreshProductsAvailability(
                 command?.inventory?.warehouse?.id,
                 [command?.product?.id],

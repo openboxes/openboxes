@@ -5,7 +5,7 @@ import { Controller } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 
 import { fetchShipmentTypes } from 'actions';
-import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
+import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
@@ -57,14 +57,14 @@ const OutboundImportSendingOptions = ({ control, errors, trigger }) => {
             name="dateShipped"
             control={control}
             render={({ field }) => (
-              <DateFieldDateFns
+              <DateField
                 title={{
                   id: 'react.outboundImport.form.dateShipped.title',
                   defaultMessage: 'Ship date',
                 }}
                 placeholder={{
                   id: 'react.default.dateInput.placeholder.label',
-                  defaultMessage: 'Select a date',
+                  default: 'Select a date',
                 }}
                 errorMessage={errors.dateShipped?.message}
                 required
@@ -83,14 +83,14 @@ const OutboundImportSendingOptions = ({ control, errors, trigger }) => {
             name="expectedDeliveryDate"
             control={control}
             render={({ field }) => (
-              <DateFieldDateFns
+              <DateField
                 title={{
                   id: 'react.outboundImport.form.expectedDeliveryDate.title',
                   defaultMessage: 'Expected delivery date',
                 }}
                 placeholder={{
                   id: 'react.default.dateInput.placeholder.label',
-                  defaultMessage: 'Select a date',
+                  default: 'Select a date',
                 }}
                 errorMessage={errors.expectedDeliveryDate?.message}
                 required

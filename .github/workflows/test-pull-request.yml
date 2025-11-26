@@ -2,9 +2,9 @@ name: Test Pull Request
 
 # Runs all tests whenever a pull request is created or updated.
 on:
-  # Use pull_request_target instead of pull_request because we want this to run on PRs from forks. Simply allowing
-  # actions to run can be insecure, hence why we require approval before running actions in a PR from a fork.
-  pull_request_target:
+  # Use pull_request instead of pull_request_target for security purposes and so that tests run on the source branch
+  # (ie the PR branch), not the target branch.
+  pull_request:
     types: [opened, synchronize]
 
 jobs:

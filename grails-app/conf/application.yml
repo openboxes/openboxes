@@ -314,6 +314,12 @@ environments:
                 databasemigration:
                     changelogFileName: changelog-test.xml
                     changelogLocation: src/integration-test/resources/migrations
+        openboxes:
+            applicationEvents:
+                # Automation tests need product availability to update immediately when stock changes because
+                # they run so quickly. A delayed update would cause inconsistent quantities.
+                refreshProductAvailability:
+                    alwaysSynchronous: true
     production:
         dataSource:
             username: "openboxes"
@@ -632,6 +638,11 @@ openboxes:
                 batchSize: 5000
                 # this one is for testing and should be always set to true on production
                 cleanupAdjustment: true
+
+    # Custom properties relating to Spring's ApplicationEvents
+    applicationEvents:
+        refreshProductAvailability:
+            alwaysSynchronous: false
 
 mail:
     error:

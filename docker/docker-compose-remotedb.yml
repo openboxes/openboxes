@@ -1,4 +1,4 @@
-version: "3.8"
+# For running the app against a database that is externally managed on a separate host
 services:
     app:
       extends: 

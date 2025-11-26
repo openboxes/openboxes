@@ -14,7 +14,9 @@ import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import {
+  getCurrentLocale,
   getCurrentLocation,
+  getCurrentUser,
   getCycleCountsIds,
   getReasonCodes,
   getUsers,
@@ -80,12 +82,14 @@ const useResolveStep = () => {
     reasonCodes,
     users,
     currentUser,
+    locale,
   } = useSelector((state) => ({
     users: getUsers(state),
     cycleCountIds: getCycleCountsIds(state),
     reasonCodes: getReasonCodes(state),
     currentLocation: getCurrentLocation(state),
-    currentUser: state.session.user,
+    currentUser: getCurrentUser(state),
+    locale: getCurrentLocale(state),
   }));
 
   const translate = useTranslate();
@@ -215,12 +219,14 @@ const useResolveStep = () => {
     return [...originalItems, ...customItemsSortedByCreationDate];
   };
 
-  const refetchData = async (ids = cycleCountIds) => {
+  const refetchData = async ({ ids = cycleCountIds, showSpinner = true } = {}) => {
     if (ids.length === 0) {
       return;
     }
     try {
-      show();
+      if (showSpinner) {
+        show();
+      }
       const { data } = await cycleCountApi.getCycleCounts(
         currentLocation?.id,
         ids,
@@ -249,13 +255,18 @@ const useResolveStep = () => {
       }), {});
       const recountedByData = tableData.current?.reduce((acc, cycleCount) => ({
         ...acc,
-        [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.recountedBy,
+        [cycleCount?.id]:
+          cycleCount?.cycleCountItems?.length > 0
+            ? cycleCount.cycleCountItems[0].recountedBy
+            : cycleCount?.verificationCount?.assignee,
       }), {});
       dateRecounted.current = recountedDates;
       recountedBy.current = recountedByData;
       defaultRecountedBy.current = recountedByData;
     } finally {
-      hide();
+      if (showSpinner) {
+        hide();
+      }
     }
   };
 
@@ -535,6 +546,7 @@ const useResolveStep = () => {
         date: cycleCountItem?.inventoryItem?.expirationDate,
         currentDateFormat: DateFormat.MMM_DD_YYYY,
         outputDateFormat: DateFormat.MM_DD_YYYY,
+        locale,
       }),
     },
     binLocation: cycleCountItem?.binLocation,
@@ -554,9 +566,13 @@ const useResolveStep = () => {
     shouldValidateExistence = true,
     shouldSetDefaultAssignee = false,
     shouldRefetchLotNumbers = false,
+    showSpinner = true,
   }) => {
     try {
-      show();
+      if (showSpinner) {
+        show();
+      }
+
       markAllItemsAsUpdated();
       if (shouldValidateExistence) {
         const isValid = await validateExistenceOfCycleCounts();
@@ -598,13 +614,15 @@ const useResolveStep = () => {
       if (shouldRefetch) {
         await refetchData();
       }
-      if (shouldRefetchLotNumbers) {
+      if (shouldRefetchLotNumbers && uniqueProductIds.length > 0) {
         // When we click "Save progress", we want to refetch the lot numbers
         // because the user may have created new ones and, without refetching,
         // they won't be available in the dropdown.
         dispatch(fetchLotNumbersByProductIds(uniqueProductIds));
       }
-      hide();
+      if (showSpinner) {
+        hide();
+      }
     }
   };
 
@@ -645,13 +663,13 @@ const useResolveStep = () => {
       if (!isValid) {
         return;
       }
-      await save({ shouldRefetch: false });
+      await save({ shouldRefetch: false, showSpinner: false });
       for (const cycleCountId of cycleCountIdsForOutdatedProducts) {
         await cycleCountApi.refreshItems(currentLocation?.id, cycleCountId, true, 1);
       }
+      await refetchData({ ids: cycleCountIdsForOutdatedProducts, showSpinner: false });
     } finally {
       hide();
-      await refetchData(cycleCountIdsForOutdatedProducts);
     }
   };
 

@@ -1,8 +1,11 @@
 package org.pih.warehouse.databinding
 
 import java.time.Instant
-import org.apache.commons.lang.StringUtils
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+
+import org.pih.warehouse.DateUtil
+import org.pih.warehouse.core.session.SessionManager
 
 /**
  * As of Java 8, Java.util.Date is functionally replaced with the java.time classes, but Grails 4 and older does not
@@ -12,22 +15,23 @@ import org.springframework.stereotype.Component
 @Component
 class InstantValueConverter extends StringValueConverter<Instant> {
 
+    @Autowired
+    SessionManager sessionManager
+
     /**
      * Binds a given user-input String to an Instant.
      *
      * An Instant is an absolute moment in time, so to construct it we need a full datetime with timezone included.
-     * As such, if the given string doesn't provide time or timezone information, we error.
      *
-     * We could have been more forgiving and allow for time and time zone to be omitted (and default the resulting
-     * Instant to midnight server time), but we've encountered many timezone related issues in the past, so to be safe
-     * we require the client to always provide all the information required to build the Instant.
+     * In order to make refactoring from java.util.Date to java.time.Instant a simpler process, we've opted to
+     * default to midnight in the user's timezone if given a date-only string (such as "2000-01-01" or "01/01/2000").
+     * Because we're not throwing an error if we're not given a timezone, we need to ensure that clients are super
+     * clear on the behaviour. If they're assuming the date will be in server time, then we'll get date mismatch issues.
      *
      * @param value "2000-01-01T00:00Z", or "2000-01-01T00:00+05:00" for example
      */
     @Override
     Instant convertString(String value) {
-        return StringUtils.isBlank(value) ?
-                null :
-                Instant.from(DataBindingConstants.DATE_TIME_ZONE_FORMAT.parse(value.trim()))
+        return DateUtil.asInstant(value, sessionManager.timezone?.toZoneId())
     }
 }

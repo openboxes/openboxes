@@ -17,13 +17,15 @@
   - head-branch: ['^release/', '^develop', '^master']
 
 "domain: l10n":
-  - head-branch: ['l10n']
+  - head-branch: ['^l10n_develop']
   - changed-files:
       - any-glob-to-any-file:
           - 'grails-app/i18n/**/*'
 
+# Hide auto-generated crowdin PRs from release notes. Otherwise
+# it'll flood the release notes with a bunch of identical PRs.
 "flag: ignore in release notes":
-  - head-branch: ['l10n']
+  - head-branch: ['^l10n_develop']
 
 "domain: backend":
   - changed-files:

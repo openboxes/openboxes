@@ -239,6 +239,12 @@ class ConsumptionController {
         if (command.fromLocations) {
             products = command.rows.keySet().asList()
 
+            // Filter products by selected products
+            if (command.selectedProducts) {
+                List<String> selectedIds = command.selectedProducts*.id
+                command.rows.keySet().removeAll { row -> !(row.id in selectedIds) }
+            }
+
             // Filter products by tags
             if (command.selectedTags) {
                 def productsToRemove = products.findAll { product ->
@@ -478,6 +484,7 @@ class ShowConsumptionCommand implements Validateable {
     List<String> selectedDates = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(String.class))
     List<Location> selectedLocations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class))
     List<Category> selectedCategories = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Category.class))
+    List<Product> selectedProducts = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Product.class))
     List<Tag> selectedTags = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Tag.class))
 
     Boolean includeLocationBreakdown = Boolean.TRUE
