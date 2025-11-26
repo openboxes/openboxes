@@ -719,13 +719,16 @@ class ShipmentService {
             Integer quantityAvailableToPromise = productAvailabilityService.getQuantityAvailableToPromise(
                     origin, shipmentItem.binLocation, shipmentItem.inventoryItem)
 
-            // OBS-1866: QATP should always have a value, but in case it doesn't (possibly due to a failed product
-            //           availability refresh), we need to handle that case gracefully.
+            // OBS-1866: QATP should always have a value for a valid item, but in case it doesn't (possibly due to
+            //           a failed product availability refresh), we need to error to prevent negative quantity issues.
             if (quantityAvailableToPromise == null) {
-                // QATP == QoH - quantity allocated via pending outbounds. We assume QoH == 0 when product availability
-                // does not exist for the item, so QATP will simply be a negation of the quantity picked (which will
-                // cause an invalid pick exception if we've picked more than a zero quantity).
-                quantityAvailableToPromise = -shipmentItem.quantityPicked
+                String errorMessage = "The pick for product code(s) ${shipmentItem.product.productCode} is no longer " +
+                        "valid. A product availability refresh is required."
+                shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.productAvailabilityNotFound",
+                        [
+                                shipmentItem?.product?.productCode,
+                        ].toArray(), errorMessage)
+                throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
             }
 
             // Because creating/editing picklist items triggers updates to product availability, the pre-calculated
