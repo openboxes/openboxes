@@ -35,7 +35,7 @@ const ModalWithTable = ({
   }
 
   return (
-    <Modal isOpen={isOpen} className="modal-content min-width-1000">
+    <Modal isOpen={isOpen} className="modal-content min-width-1000" data-testid="modal-with-table">
       <div className="modal-content__header">
         <p className="modal-content__header__title">{title}</p>
         <p className="modal-content__header__subtitile">{subtitle}</p>
