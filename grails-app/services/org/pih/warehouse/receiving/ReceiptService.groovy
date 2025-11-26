@@ -240,6 +240,7 @@ class ReceiptService {
         if (!receipt) {
             receipt = new Receipt()
             receipt.receiptNumber = receiptIdentifierService.generate(receipt)
+            createTemporaryReceivingBin(shipment)
             shipment.addToReceipts(receipt)
         }
 

@@ -1,5 +1,6 @@
 package org.pih.warehouse.common.base
 
+import grails.buildtestdata.TestDataBuilder
 import grails.test.mixin.integration.Integration
 import org.springframework.context.annotation.Import
 import spock.lang.Specification
@@ -9,5 +10,5 @@ import spock.lang.Specification
  */
 @Integration
 @Import(IntegrationSpecConfig.class)
-abstract class IntegrationSpec extends Specification {
+abstract class IntegrationSpec extends Specification implements TestDataBuilder {
 }

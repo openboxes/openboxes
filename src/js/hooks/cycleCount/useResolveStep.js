@@ -13,13 +13,25 @@ import _ from 'lodash';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import {
+  getCurrentLocale,
+  getCurrentLocation,
+  getCurrentUser,
+  getCycleCountsIds,
+  getReasonCodes,
+  getUsers,
+} from 'selectors';
 
-import { fetchBinLocations, fetchUsers } from 'actions';
+import {
+  eraseDraft,
+  fetchBinLocations,
+  fetchLotNumbersByProductIds,
+  fetchUsers,
+} from 'actions';
 import { UPDATE_CYCLE_COUNT_IDS } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT as GET_CYCLE_COUNTS } from 'api/urls';
 import notification from 'components/Layout/notifications/notification';
-import ActivityCode from 'consts/activityCode';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
 import { TO_RESOLVE_TAB } from 'consts/cycleCount';
 import NotificationType from 'consts/notificationTypes';
@@ -39,18 +51,18 @@ const useResolveStep = () => {
   // (it removes focus while selecting new fields)
   const tableData = useRef([]);
   const cycleCountsWithItemsWithoutRecount = useRef([]);
-  // Saving selected "recounted by" option
-  const [recountedBy, setRecountedBy] = useState({});
-  // Saving selected "date recounted" option, initially it's the date fetched from API
-  const [dateRecounted, setDateRecounted] = useState({});
+  // Saving selected "recounted by" and "date recounted" options using useRef
+  const recountedBy = useRef({});
+  const defaultRecountedBy = useRef({});
+  const dateRecounted = useRef({});
   const [isStepEditable, setIsStepEditable] = useState(true);
-  // State used to trigger focus reset when changed. When this counter changes,
-  // it will reset the focus by clearing the RowIndex and ColumnId in useEffect.
-  const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
   const { show, hide } = useSpinner();
   const history = useHistory();
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
-
+  const [sortByProductName, setSortByProductName] = useState(false);
+  // Here we store cycle count IDs that were updated,
+  // and we will mark them as updated before saving.
+  const cycleCountsMarkedToUpdate = useRef([]);
   const {
     validationErrors,
     isRootCauseWarningSkipped,
@@ -59,7 +71,6 @@ const useResolveStep = () => {
     validateRootCauses,
     shouldHaveRootCause,
     showEmptyRootCauseWarning,
-    isFormValid,
     resetValidationState,
   } = useResolveStepValidation({ tableData });
 
@@ -70,27 +81,42 @@ const useResolveStep = () => {
     currentLocation,
     reasonCodes,
     users,
+    currentUser,
+    locale,
   } = useSelector((state) => ({
-    users: state.users.data,
-    cycleCountIds: state.cycleCount.cycleCounts,
-    reasonCodes: state.cycleCount.reasonCodes,
-    currentLocation: state.session.currentLocation,
+    users: getUsers(state),
+    cycleCountIds: getCycleCountsIds(state),
+    reasonCodes: getReasonCodes(state),
+    currentLocation: getCurrentLocation(state),
+    currentUser: getCurrentUser(state),
+    locale: getCurrentLocale(state),
   }));
 
   const translate = useTranslate();
 
-  const resetFocus = () => {
-    setRefreshFocusCounter((prev) => prev + 1);
-  };
-
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
+
+  // Collect unique product IDs from the tableData to fetch lot numbers for those products
+  const uniqueProductIds = _.uniq(
+    tableData.current.flatMap((c) => c.cycleCountItems)
+      .map((i) => i.product?.id),
+  );
+
+  useEffect(() => {
+    // we want to fetch lot numbers only when the step is editable and there are products
+    // in the table because if the step is not editable, there is no need to fetch lot numbers
+    if (isStepEditable && uniqueProductIds.length > 0) {
+      dispatch(fetchLotNumbersByProductIds(uniqueProductIds));
+    }
+  }, [JSON.stringify(uniqueProductIds), isStepEditable]);
 
   useEffect(() => {
     if (showBinLocation) {
       dispatch(fetchBinLocations(
         currentLocation?.id,
-        [ActivityCode.RECEIVE_STOCK],
+        [],
+        'sortOrder,locationType,name',
       ));
     }
   }, [currentLocation?.id]);
@@ -193,50 +219,62 @@ const useResolveStep = () => {
     return [...originalItems, ...customItemsSortedByCreationDate];
   };
 
-  const refetchData = async (ids = cycleCountIds) => {
+  const refetchData = async ({ ids = cycleCountIds, showSpinner = true } = {}) => {
     if (ids.length === 0) {
       return;
     }
-    const { data } = await cycleCountApi.getCycleCounts(
-      currentLocation?.id,
-      ids,
-    );
-    tableData.current = data?.data?.map((cycleCount) => {
-      const mergedItems = mergeCycleCountItems(cycleCount.cycleCountItems);
-      return ({ ...cycleCount, cycleCountItems: moveCustomItemsToTheBottom(mergedItems) || [] });
-    });
-    cycleCountsWithItemsWithoutRecount.current = data?.data?.reduce((acc, cycleCount) => {
-      const cycleCountItems = getItemsWithoutRecountIndexes(cycleCount.cycleCountItems);
-      if (!cycleCountItems.length) {
-        return acc;
+    try {
+      if (showSpinner) {
+        show();
       }
-      return [
+      const { data } = await cycleCountApi.getCycleCounts(
+        currentLocation?.id,
+        ids,
+        sortByProductName && 'productName',
+      );
+      tableData.current = data?.data?.map((cycleCount) => {
+        const mergedItems = mergeCycleCountItems(cycleCount.cycleCountItems);
+        return ({ ...cycleCount, cycleCountItems: moveCustomItemsToTheBottom(mergedItems) || [] });
+      });
+      cycleCountsWithItemsWithoutRecount.current = data?.data?.reduce((acc, cycleCount) => {
+        const cycleCountItems = getItemsWithoutRecountIndexes(cycleCount.cycleCountItems);
+        if (!cycleCountItems.length) {
+          return acc;
+        }
+        return [
+          ...acc,
+          {
+            ...cycleCount,
+            cycleCountItems,
+          },
+        ];
+      }, []);
+      const recountedDates = tableData.current?.reduce((acc, cycleCount) => ({
         ...acc,
-        {
-          ...cycleCount,
-          cycleCountItems,
-        },
-      ];
-    }, []);
-    const recountedDates = tableData.current?.reduce((acc, cycleCount) => ({
-      ...acc,
-      [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.dateRecounted
-      || recountedDates?.[cycleCount?.id],
-    }), {});
-    const recountedByData = tableData.current?.reduce((acc, cycleCount) => ({
-      ...acc,
-      [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.recountedBy
-      || recountedBy?.[cycleCount?.id],
-    }), {});
-    setDateRecounted(recountedDates);
-    setRecountedBy(recountedByData);
+        [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.dateRecounted,
+      }), {});
+      const recountedByData = tableData.current?.reduce((acc, cycleCount) => ({
+        ...acc,
+        [cycleCount?.id]:
+          cycleCount?.cycleCountItems?.length > 0
+            ? cycleCount.cycleCountItems[0].recountedBy
+            : cycleCount?.verificationCount?.assignee,
+      }), {});
+      dateRecounted.current = recountedDates;
+      recountedBy.current = recountedByData;
+      defaultRecountedBy.current = recountedByData;
+    } finally {
+      if (showSpinner) {
+        hide();
+      }
+    }
   };
 
   useEffect(() => {
     (async () => {
       await refetchData();
     })();
-  }, [cycleCountIds]);
+  }, [cycleCountIds, sortByProductName]);
 
   // Fetching data for "recounted by" dropdown
   useEffect(() => {
@@ -249,10 +287,9 @@ const useResolveStep = () => {
     show();
     await exportFileFromApi({
       url: GET_CYCLE_COUNTS(currentLocation?.id),
-      params: { id: cycleCountIds },
+      params: { id: cycleCountIds, sortBy: sortByProductName && 'productName' },
       format,
     });
-    resetFocus();
     hide();
   };
 
@@ -267,7 +304,9 @@ const useResolveStep = () => {
       || _.get(findByField(cycleCountsWithItemsWithoutRecount.current), fieldName);
   }, []);
 
-  const getRecountedBy = (cycleCountId) => recountedBy?.[cycleCountId];
+  const getRecountedBy = (cycleCountId) => recountedBy.current?.[cycleCountId];
+
+  const getDefaultRecountedBy = (cycleCountId) => defaultRecountedBy.current?.[cycleCountId];
 
   const getCountedBy = (cycleCountId) => {
     const countedBy = (data) => data.find(
@@ -302,13 +341,12 @@ const useResolveStep = () => {
       }
       removeRowFromState(cycleCountId, rowId);
     } finally {
-      resetFocus();
       triggerValidation();
       hide();
     }
   };
 
-  const addEmptyRow = (productId, id, shouldResetFocus = true) => {
+  const addEmptyRow = (productId, id) => {
     // ID is needed for updating appropriate row
     const emptyRow = {
       id: _.uniqueId('newRow'),
@@ -341,9 +379,6 @@ const useResolveStep = () => {
 
       return data;
     });
-    if (shouldResetFocus) {
-      resetFocus();
-    }
     resetValidationState();
     forceRerender();
   };
@@ -358,7 +393,10 @@ const useResolveStep = () => {
         .filter((id) => !cycleCountIdsToDelete.includes(id));
       dispatch({
         type: UPDATE_CYCLE_COUNT_IDS,
-        payload: updatedCycleCountsIds,
+        payload: {
+          locationId: currentLocation?.id,
+          cycleCounts: updatedCycleCountsIds,
+        },
       });
       // If we've canceled every product in the batch, there's no reason to stay on this screen.
       if (tableData.current.length === 0) {
@@ -435,7 +473,10 @@ const useResolveStep = () => {
     if (canceledCycleCountsIds.length > 0) {
       dispatch({
         type: UPDATE_CYCLE_COUNT_IDS,
-        payload: existingCycleCountsIds,
+        payload: {
+          locationId: currentLocation?.id,
+          cycleCounts: existingCycleCountsIds,
+        },
       });
       notification(NotificationType.ERROR_FILLED)({
         message: 'Error',
@@ -447,21 +488,152 @@ const useResolveStep = () => {
     return true;
   };
 
+  const back = () => {
+    setIsStepEditable(true);
+  };
+
+  const setAllItemsUpdatedState = (cycleCountId, updated) => {
+    const tableIndex = tableData.current.findIndex(
+      (cycleCount) => cycleCount?.id === cycleCountId,
+    );
+    tableData.current = tableData.current.map((cycleCount, index) => {
+      if (index === tableIndex) {
+        return {
+          ...cycleCount,
+          cycleCountItems: cycleCount.cycleCountItems.map((item) => ({ ...item, updated })),
+        };
+      }
+      return cycleCount;
+    });
+  };
+
+  const markAllItemsAsUpdated = () => {
+    cycleCountsMarkedToUpdate.current.forEach((cycleCountId) => {
+      setAllItemsUpdatedState(cycleCountId, true);
+    });
+    cycleCountsMarkedToUpdate.current = [];
+  };
+
+  const markAllItemsAsNotUpdated = (cycleCountId) => setAllItemsUpdatedState(cycleCountId, false);
+
+  const assignRecountedBy = (cycleCountId) => (person) => {
+    if (!cycleCountsMarkedToUpdate.current.includes(cycleCountId)) {
+      cycleCountsMarkedToUpdate.current = [...cycleCountsMarkedToUpdate.current, cycleCountId];
+    }
+    recountedBy.current = { ...recountedBy.current, [cycleCountId]: person };
+    defaultRecountedBy.current = { ...defaultRecountedBy.current, [cycleCountId]: person };
+  };
+
+  const getRecountedDate = (cycleCountId) => dateRecounted.current[cycleCountId] || moment.now();
+
+  const updateRecountedDate = (cycleCountId) => (date) => {
+    if (!cycleCountsMarkedToUpdate.current.includes(cycleCountId)) {
+      cycleCountsMarkedToUpdate.current = [...cycleCountsMarkedToUpdate.current, cycleCountId];
+    }
+    dateRecounted.current = {
+      ...dateRecounted.current,
+      [cycleCountId]: date ? date.format() : null,
+    };
+  };
+
+  const getPayload = (cycleCountItem, cycleCount, shouldSetDefaultAssignee) => ({
+    quantityCounted: cycleCountItem?.quantityRecounted,
+    countIndex: 1,
+    inventoryItem: {
+      ...cycleCountItem.inventoryItem,
+      product: cycleCountItem?.product?.id,
+      expirationDate: dateWithoutTimeZone({
+        date: cycleCountItem?.inventoryItem?.expirationDate,
+        currentDateFormat: DateFormat.MMM_DD_YYYY,
+        outputDateFormat: DateFormat.MM_DD_YYYY,
+        locale,
+      }),
+    },
+    binLocation: cycleCountItem?.binLocation,
+    comment: cycleCountItem?.comment,
+    dateCounted: getRecountedDate(cycleCount?.id),
+    id: cycleCountItem?.id,
+    facility: cycleCountItem?.facility,
+    discrepancyReasonCode: cycleCountItem?.rootCause?.id,
+    assignee: shouldSetDefaultAssignee
+      ? getRecountedBy(cycleCount.id)?.id ?? currentUser.id
+      : getRecountedBy(cycleCount.id)?.id,
+    recount: true,
+  });
+
+  const save = async ({
+    shouldRefetch = true,
+    shouldValidateExistence = true,
+    shouldSetDefaultAssignee = false,
+    shouldRefetchLotNumbers = false,
+    showSpinner = true,
+  }) => {
+    try {
+      if (showSpinner) {
+        show();
+      }
+
+      markAllItemsAsUpdated();
+      if (shouldValidateExistence) {
+        const isValid = await validateExistenceOfCycleCounts();
+        if (!isValid) {
+          return;
+        }
+      }
+      resetValidationState();
+      for (const cycleCount of tableData.current) {
+        const cycleCountItemsToUpdate = cycleCount.cycleCountItems
+          .filter((item) => ((item.updated || !item.assignee) && !item.id.includes('newRow')))
+          .map(trimLotNumberSpaces);
+        const updatePayload = {
+          itemsToUpdate: cycleCountItemsToUpdate.map((item) =>
+            getPayload(item, cycleCount, shouldSetDefaultAssignee)),
+        };
+        if (updatePayload.itemsToUpdate.length > 0) {
+          await cycleCountApi
+            .updateCycleCountItems(updatePayload, currentLocation?.id, cycleCount.id);
+        }
+        const cycleCountItemsToCreate = cycleCount.cycleCountItems
+          .filter((item) => item.id.includes('newRow'))
+          .map(trimLotNumberSpaces);
+        const createPayload = {
+          itemsToCreate: cycleCountItemsToCreate.map((item) =>
+            getPayload(item, cycleCount, shouldSetDefaultAssignee)),
+        };
+        if (createPayload.itemsToCreate.length > 0) {
+          await cycleCountApi
+            .createCycleCountItems(createPayload, currentLocation?.id, cycleCount.id);
+        }
+
+        // Now that we've successfully saved all the items, mark them all as not updated so that
+        // we don't try to update them again next time something is changed.
+        markAllItemsAsNotUpdated(cycleCount.id);
+      }
+    } finally {
+      // After the save, refetch cycle counts so that a new row can't be saved multiple times
+      if (shouldRefetch) {
+        await refetchData();
+      }
+      if (shouldRefetchLotNumbers && uniqueProductIds.length > 0) {
+        // When we click "Save progress", we want to refetch the lot numbers
+        // because the user may have created new ones and, without refetching,
+        // they won't be available in the dropdown.
+        dispatch(fetchLotNumbersByProductIds(uniqueProductIds));
+      }
+      if (showSpinner) {
+        hide();
+      }
+    }
+  };
+
   const next = async () => {
-    resetFocus();
     const isValid = triggerValidation();
     forceRerender();
     const areCycleCountsUpToDate = await validateExistenceOfCycleCounts();
     if (!areCycleCountsUpToDate) {
       return;
     }
-    const currentCycleCountIds = tableData.current.map((cycleCount) => cycleCount.id);
-    const areRecountedByFilled = _.every(
-      currentCycleCountIds,
-      (id) => getRecountedBy(id)?.id,
-    );
-
-    if (!isValid || !areRecountedByFilled) {
+    if (!isValid) {
       return;
     }
 
@@ -480,110 +652,8 @@ const useResolveStep = () => {
       return;
     }
 
+    await save({ shouldSetDefaultAssignee: true });
     setIsStepEditable(false);
-  };
-
-  const back = () => {
-    setIsStepEditable(true);
-    resetFocus();
-  };
-
-  const setAllItemsUpdatedState = (cycleCountId, updated) => {
-    const tableIndex = tableData.current.findIndex(
-      (cycleCount) => cycleCount?.id === cycleCountId,
-    );
-    tableData.current = tableData.current.map((cycleCount, index) => {
-      if (index === tableIndex) {
-        return {
-          ...cycleCount,
-          cycleCountItems: cycleCount.cycleCountItems.map((item) => ({ ...item, updated })),
-        };
-      }
-      return cycleCount;
-    });
-  };
-
-  const markAllItemsAsUpdated = (cycleCountId) => setAllItemsUpdatedState(cycleCountId, true);
-
-  const markAllItemsAsNotUpdated = (cycleCountId) => setAllItemsUpdatedState(cycleCountId, false);
-
-  const assignRecountedBy = (cycleCountId) => (person) => {
-    markAllItemsAsUpdated(cycleCountId);
-    setRecountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
-    resetFocus();
-  };
-
-  const getRecountedDate = (cycleCountId) => dateRecounted[cycleCountId] || moment.now();
-
-  const setRecountedDate = (cycleCountId) => (date) => {
-    setDateRecounted({
-      ...dateRecounted,
-      [cycleCountId]: date.format(),
-    });
-    markAllItemsAsUpdated(cycleCountId);
-    resetFocus();
-  };
-
-  const getPayload = (cycleCountItem, cycleCount) => ({
-    quantityCounted: cycleCountItem?.quantityRecounted,
-    countIndex: 1,
-    inventoryItem: {
-      ...cycleCountItem.inventoryItem,
-      product: cycleCountItem?.product?.id,
-      expirationDate: dateWithoutTimeZone({
-        date: cycleCountItem?.inventoryItem?.expirationDate,
-        currentDateFormat: DateFormat.MMM_DD_YYYY,
-        outputDateFormat: DateFormat.MM_DD_YYYY,
-      }),
-    },
-    binLocation: cycleCountItem?.binLocation,
-    comment: cycleCountItem?.comment,
-    dateCounted: getRecountedDate(cycleCount?.id),
-    id: cycleCountItem?.id,
-    facility: cycleCountItem?.facility,
-    discrepancyReasonCode: cycleCountItem?.rootCause?.id,
-    assignee: getRecountedBy(cycleCount.id)?.id,
-    recount: true,
-  });
-
-  const save = async (shouldRefetch = true, shouldValidateExistence = true) => {
-    try {
-      show();
-      if (shouldValidateExistence) {
-        const isValid = await validateExistenceOfCycleCounts();
-        if (!isValid) {
-          return;
-        }
-      }
-      resetValidationState();
-      for (const cycleCount of tableData.current) {
-        const cycleCountItemsToUpdate = cycleCount.cycleCountItems
-          .filter((item) => (item.updated && !item.id.includes('newRow')))
-          .map(trimLotNumberSpaces);
-        for (const cycleCountItem of cycleCountItemsToUpdate) {
-          await cycleCountApi.updateCycleCountItem(getPayload(cycleCountItem, cycleCount),
-            currentLocation?.id, cycleCountItem?.id);
-        }
-        const cycleCountItemsToCreate = cycleCount.cycleCountItems
-          .filter((item) => item.id.includes('newRow'))
-          .map(trimLotNumberSpaces);
-        for (const cycleCountItem of cycleCountItemsToCreate) {
-          await cycleCountApi.createCycleCountItem(getPayload(cycleCountItem, cycleCount),
-            currentLocation?.id, cycleCount?.id);
-        }
-
-        // Now that we've successfully saved all the items, mark them all as not updated so that
-        // we don't try to update them again next time something is changed.
-        markAllItemsAsNotUpdated(cycleCount.id);
-      }
-    } finally {
-      // After the save, refetch cycle counts so that a new row can't be saved multiple times
-      if (shouldRefetch) {
-        await refetchData();
-      }
-      hide();
-      resetFocus();
-    }
   };
 
   const refreshCountItems = async (cycleCountIdsForOutdatedProducts = cycleCountIds) => {
@@ -593,14 +663,13 @@ const useResolveStep = () => {
       if (!isValid) {
         return;
       }
-      await save(false);
+      await save({ shouldRefetch: false, showSpinner: false });
       for (const cycleCountId of cycleCountIdsForOutdatedProducts) {
         await cycleCountApi.refreshItems(currentLocation?.id, cycleCountId, true, 1);
       }
+      await refetchData({ ids: cycleCountIdsForOutdatedProducts, showSpinner: false });
     } finally {
-      resetFocus();
       hide();
-      await refetchData(cycleCountIdsForOutdatedProducts);
     }
   };
 
@@ -653,7 +722,7 @@ const useResolveStep = () => {
     confirmationModal({
       buttons: reviewProductsModalButtons(cycleCountIdsForOutdatedProducts),
       ...modalLabels(outdatedProductsCount),
-      hideCloseButton: false,
+      hideCloseButton: true,
       closeOnClickOutside: false,
     });
   };
@@ -667,7 +736,10 @@ const useResolveStep = () => {
       if (!isValid) {
         return;
       }
-      await save(true, false);
+      await save({
+        shouldRefetch: true,
+        shouldValidateExistence: false,
+      });
       for (const cycleCount of tableData.current) {
         try {
           await cycleCountApi.submitRecount({
@@ -688,11 +760,15 @@ const useResolveStep = () => {
       if (outdatedProducts > 0) {
         dispatch({
           type: UPDATE_CYCLE_COUNT_IDS,
-          payload: cycleCountIdsForOutdatedProducts,
+          payload: {
+            locationId: currentLocation?.id,
+            cycleCounts: cycleCountIdsForOutdatedProducts,
+          },
         });
         openReviewProductsModal(outdatedProducts, cycleCountIdsForOutdatedProducts);
         return;
       }
+      dispatch(eraseDraft(currentLocation?.id, TO_RESOLVE_TAB));
       history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));
     } finally {
       hide();
@@ -711,10 +787,13 @@ const useResolveStep = () => {
     // Nested path in colum names contains "_" instead of "."
     const nestedPath = columnId.replaceAll('_', '.');
     // Update data for: cycleCount (table) -> cycleCountItem (row) -> column (nestedPath)
+    const valueChanged = _.get(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].${nestedPath}`) !== value;
     _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].${nestedPath}`, value);
 
     // Mark item as updated, so that the item can be easily distinguished whether it was updated
-    _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].updated`, true);
+    if (valueChanged) {
+      _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].updated`, true);
+    }
   };
 
   const tableMeta = {
@@ -736,8 +815,8 @@ const useResolveStep = () => {
     tableMeta,
     validationErrors,
     isStepEditable,
-    isFormValid,
     getRecountedBy,
+    getDefaultRecountedBy,
     getCountedBy,
     addEmptyRow,
     removeRow,
@@ -745,7 +824,7 @@ const useResolveStep = () => {
     refreshCountItems,
     assignRecountedBy,
     getRecountedDate,
-    setRecountedDate,
+    updateRecountedDate,
     shouldHaveRootCause,
     next,
     save,
@@ -753,11 +832,13 @@ const useResolveStep = () => {
     back,
     getProduct,
     getDateCounted,
-    refreshFocusCounter,
     triggerValidation,
     isSaveDisabled,
     setIsSaveDisabled,
     cycleCountsWithItemsWithoutRecount: cycleCountsWithItemsWithoutRecount.current,
+    sortByProductName,
+    setSortByProductName,
+    forceRerender,
   };
 };
 

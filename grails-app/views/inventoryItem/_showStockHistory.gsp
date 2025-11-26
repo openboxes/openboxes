@@ -298,12 +298,7 @@
                                         <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh_small_blue.png' )}" title="${format.metadata(obj:TransactionScope.INTERNAL)}"/>
                                     </g:if>
                                     <g:elseif test="${stockHistoryEntry?.transaction?.transactionType?.isAdjustment()}">
-                                        <g:if test="${stockHistoryEntry?.isCredit}">
-                                            <img src="${resource(dir: 'images/icons/silk', file: 'arrow_up.png')}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}"/>
-                                        </g:if>
-                                        <g:else>
-                                            <img src="${resource(dir: 'images/icons/silk', file: 'arrow_down_red.png')}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}"/>
-                                        </g:else>
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_up_green_down_red.png')}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}"/>
                                     </g:elseif>
                                     <g:elseif test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== TransactionCode.DEBIT}">
                                         <img src="${resource(dir: 'images/icons/silk', file: 'delete.png' )}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}"/>

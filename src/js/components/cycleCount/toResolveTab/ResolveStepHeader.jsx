@@ -13,7 +13,13 @@ import Translate from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
 const ResolveStepHeader = ({
-  next, save, printRecountForm, refreshCountItems,
+  next,
+  save,
+  printRecountForm,
+  refreshCountItems,
+  isFormDisabled,
+  sortByProductName,
+  setSortByProductName,
 }) => {
   const translate = useTranslate();
 
@@ -33,15 +39,16 @@ const ResolveStepHeader = ({
             label="react.cycleCount.printRecountForm.label"
             variant="primary-outline"
             StartIcon={<RiPrinterLine size={18} />}
+            disabled={isFormDisabled}
           />
           <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">
-            <a href="#" className="dropdown-item" onClick={() => printRecountForm(FileFormat.PDF)} role="button">
+            <a href="#" className="dropdown-item" onClick={() => printRecountForm(FileFormat.PDF)} role="button" aria-disabled={isFormDisabled}>
               <Translate
                 id="react.cycleCount.printRecountFormPdf.label"
                 defaultMessage="Print Recount Form PDF"
               />
             </a>
-            <a href="#" className="dropdown-item" onClick={() => printRecountForm(FileFormat.XLS)} role="button">
+            <a href="#" className="dropdown-item" onClick={() => printRecountForm(FileFormat.XLS)} role="button" aria-disabled={isFormDisabled}>
               <Translate
                 id="react.cycleCount.exportRecountSheet.label"
                 defaultMessage="Export Recount Sheet"
@@ -49,6 +56,13 @@ const ResolveStepHeader = ({
             </a>
           </div>
         </div>
+        <Button
+          onClick={() => setSortByProductName((prev) => !prev)}
+          label="react.cycleCount.sortAlphabetically.label"
+          defaultLabel="Sort alphabetically"
+          variant={sortByProductName ? 'secondary' : 'primary-outline'}
+          disabled={isFormDisabled}
+        />
         <CustomTooltip
           content={translate(
             'react.cycleCount.table.refreshQuantitiesTooltip.label',
@@ -60,6 +74,7 @@ const ResolveStepHeader = ({
             label="react.default.button.refresh.label"
             defaultLabel="Reload"
             variant="primary"
+            disabled={isFormDisabled}
           />
         </CustomTooltip>
         <Button
@@ -68,12 +83,14 @@ const ResolveStepHeader = ({
           defaultLabel="Save progress"
           variant="primary"
           StartIcon={<RiSave2Line size={18} />}
+          disabled={isFormDisabled}
         />
         <Button
           onClick={next}
           label="react.default.button.next.label"
           defaultLabel="Next"
           variant="primary"
+          disabled={isFormDisabled}
         />
       </div>
     </div>
@@ -87,4 +104,7 @@ ResolveStepHeader.propTypes = {
   save: PropTypes.func.isRequired,
   printRecountForm: PropTypes.func.isRequired,
   refreshCountItems: PropTypes.func.isRequired,
+  isFormDisabled: PropTypes.bool.isRequired,
+  sortByProductName: PropTypes.bool.isRequired,
+  setSortByProductName: PropTypes.func.isRequired,
 };

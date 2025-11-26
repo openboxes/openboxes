@@ -3,6 +3,8 @@ import React, { useRef } from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
+import { useSelector } from 'react-redux';
+import { getCurrentLocale } from 'selectors';
 
 import DateFieldInput from 'components/form-elements/v2/DateFieldInput';
 import componentType from 'consts/componentType';
@@ -32,6 +34,7 @@ const DateField = ({
   customDateFormat,
   onChangeRaw,
   clearable,
+  wrapperClassName,
   focusProps = {},
   ...fieldProps
 }) => {
@@ -44,17 +47,28 @@ const DateField = ({
     }
     onChange(date?.format(DateFormat.MMM_DD_YYYY));
   };
+  const locale = useSelector(getCurrentLocale);
 
   const formatDate = (dateToFormat) => {
     if (!dateToFormat) {
       return null;
     }
-    if (showTimeSelect) {
-      return moment(new Date(dateToFormat), DateFormat.MMM_DD_YYYY_HH_MM_SS);
+
+    const format = showTimeSelect
+      ? DateFormat.MMM_DD_YYYY_HH_MM_SS
+      : DateFormat.MMM_DD_YYYY;
+
+    // The locale has to be lower cased, because moment.js accepts arguments like: 'es-mx', not
+    // 'es-MX' we can't just return null if the locale is not already loaded, because the date needs
+    // to have value, so we default to 'en' in that case
+    const language = (locale || 'en').toLowerCase();
+    // If the date is not valid in the given format, we try to parse it without format
+    const date = moment(dateToFormat, format, language, true);
+    if (date.isValid()) {
+      return date;
     }
-    return showTimeSelect
-      ? moment(new Date(dateToFormat), DateFormat.MMM_DD_YYYY_HH_MM_SS)
-      : moment(new Date(dateToFormat), DateFormat.MMM_DD_YYYY);
+    // Fallback to default parsing
+    return moment(dateToFormat);
   };
 
   const selectedDate = formatDate(value);
@@ -83,9 +97,13 @@ const DateField = ({
       errorMessage={errorMessage}
       button={button}
       hideErrorMessageWrapper={hideErrorMessageWrapper}
+      className={wrapperClassName}
     >
       <DatePicker
         {...fieldProps}
+        // Temporary workaround: using 'ar' locale causes the app to crash when selecting a date.
+        // Fallback to 'en' to avoid the crash
+        locale={locale === 'ar' ? 'en' : locale}
         showTimeSelect={showTimeSelect}
         customInput={<DateFieldInput onClear={onClear} clearable={clearable} />}
         className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
@@ -166,6 +184,7 @@ DateField.propTypes = {
   }),
   onChangeRaw: PropTypes.func,
   clearable: PropTypes.bool,
+  wrapperClassName: PropTypes.string,
 };
 
 DateField.defaultProps = {
@@ -177,6 +196,7 @@ DateField.defaultProps = {
   disabled: false,
   placeholder: '',
   className: '',
+  wrapperClassName: '',
   value: null,
   onChange: () => {},
   showTimeSelect: false,

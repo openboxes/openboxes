@@ -94,6 +94,13 @@
   align-items: flex-start;
   gap: 2px;
 
+  &.disabled {
+    .badge {
+      background-color: var(--gray-200);
+      color: var(--gray-350);
+    }
+  }
+
   .badge {
     padding: 4px 10px;
     border-radius: 999px;

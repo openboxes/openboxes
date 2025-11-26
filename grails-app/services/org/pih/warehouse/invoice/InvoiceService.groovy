@@ -220,6 +220,7 @@ class InvoiceService {
             if (invoiceItem) {
                 if (item.quantity > 0) {
                     invoiceItem.quantity = item.quantity
+                    invoiceItem.amount = invoiceItem.unitPrice != null ? item.quantity * invoiceItem.unitPrice : null
                 } else {
                     removeInvoiceItem(invoiceItem.id)
                 }

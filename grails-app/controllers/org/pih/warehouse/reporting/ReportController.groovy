@@ -618,6 +618,10 @@ class ReportController {
         render(view: 'showRequestDetailReport', params: params)
     }
 
+    def expirationHistoryReport() {
+        render(view: "/common/react")
+    }
+
     def showCycleCountReport() {
         Location location = Location.load(session.warehouse.id)
         List binLocations = inventoryService.getQuantityByBinLocation(location)

@@ -213,27 +213,6 @@ class LocationApiController extends BaseDomainApiController {
         return location
     }
 
-    @Transactional
-    def updateForecastingConfiguration() {
-        JSONObject jsonObject = request.JSON
-        Location existingLocation = Location.get(params.id)
-
-        if (!existingLocation) {
-            throw new IllegalArgumentException("No Location found for location ID ${params.id}")
-        }
-
-        def inventoryLevelInstance = InventoryLevel.findByInventoryAndProductIsNull(existingLocation.inventory)
-
-        if (!inventoryLevelInstance) {
-            inventoryLevelInstance = new InventoryLevel(inventory: existingLocation.inventory)
-        }
-        bindData(inventoryLevelInstance, jsonObject)
-
-        inventoryLevelInstance.save()
-
-        render(status: 200)
-    }
-
     def delete() {
         def existingLocation = Location.get(params.id)
         if (!existingLocation) {

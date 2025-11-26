@@ -8,7 +8,7 @@ import Translate from 'utils/Translate';
 const CycleCountStockDiscrepancyInfoBar = ({ outOfStockItems }) => {
   const translate = useTranslate();
   return (
-    <div className="d-flex justify-content-between flex-column draft-modal">
+    <div className="d-flex justify-content-between flex-column draft-modal position-relative t-1">
       {outOfStockItems.map((item) => (
         <div key={item.id}>
           <Translate

@@ -1,6 +1,5 @@
 package org.pih.warehouse.api.spec.auth
 
-import grails.gorm.transactions.Transactional
 import org.apache.http.HttpStatus
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.api.spec.base.ApiSpec
@@ -11,14 +10,9 @@ import spock.lang.Ignore
  */
 class AuthApiSpec extends ApiSpec {
 
-    @Transactional
-    void setupData() {
-        // The base class already creates a test location so nothing to do here.
-    }
-
     void "login should succeed for a valid user"() {
         given:
-        JSONObject body = buildAuthRequestBody(username, password, location.id)
+        JSONObject body = buildAuthRequestBody(username, password, facility.id)
 
         expect:
         authApiWrapper.login(body, HttpStatus.SC_OK)
@@ -26,7 +20,7 @@ class AuthApiSpec extends ApiSpec {
 
     void "login should fail when given an invalid username"() {
         given:
-        JSONObject body = buildAuthRequestBody("invalid", password, location.id)
+        JSONObject body = buildAuthRequestBody("invalid", password, facility.id)
 
         expect:
         authApiWrapper.login(body, HttpStatus.SC_UNAUTHORIZED)
@@ -34,7 +28,7 @@ class AuthApiSpec extends ApiSpec {
 
     void "login should fail when given an invalid password"() {
         given:
-        JSONObject body = buildAuthRequestBody(username, "invalid", location.id)
+        JSONObject body = buildAuthRequestBody(username, "invalid", facility.id)
 
         expect:
         authApiWrapper.login(body, HttpStatus.SC_UNAUTHORIZED)

@@ -5,6 +5,7 @@ import _ from 'lodash';
 import { RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
+import { getLotNumbersByProductId } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
@@ -12,10 +13,11 @@ import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import cycleCountColumn from 'consts/cycleCountColumn';
+import navigationKey from 'consts/navigationKey';
 import { DateFormat } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
-import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
+import { getBinLocationToDisplay, groupBinLocationsByZone } from 'utils/groupBinLocationsByZone';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
@@ -30,31 +32,26 @@ const useCountStepTable = ({
   formatLocalizedDate,
   addEmptyRow,
   triggerValidation,
-  refreshFocusCounter,
+  isFormDisabled,
+  forceRerender,
 }) => {
   const columnHelper = createColumnHelper();
   const [rowIndex, setRowIndex] = useState(null);
   const [columnId, setColumnId] = useState(null);
-  // If prevForceResetFocus is different from refreshFocusCounter,
-  // it triggers a reset of rowIndex and columnId.
-  const [prevForceResetFocus, setPrevForceResetFocus] = useState(0);
-
+  const [disabledExpirationDateFields, setDisabledExpirationDateFields] = useState({});
   const translate = useTranslate();
 
-  const { users, currentLocation, binLocations } = useSelector((state) => ({
+  const {
+    users,
+    currentLocation,
+    binLocations,
+    lotNumbersWithExpiration,
+  } = useSelector((state) => ({
     users: state.users.data,
     binLocations: state.cycleCount.binLocations,
     currentLocation: state.session.currentLocation,
+    lotNumbersWithExpiration: getLotNumbersByProductId(state, productId),
   }));
-
-  useEffect(() => {
-    if (refreshFocusCounter !== prevForceResetFocus) {
-      setRowIndex(null);
-      setColumnId(null);
-      setPrevForceResetFocus(refreshFocusCounter);
-    }
-  }, [refreshFocusCounter]);
-
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
 
@@ -64,7 +61,7 @@ const useCountStepTable = ({
       return DateField;
     }
 
-    if (fieldName === cycleCountColumn.BIN_LOCATION) {
+    if ([cycleCountColumn.BIN_LOCATION, cycleCountColumn.LOT_NUMBER].includes(fieldName)) {
       return SelectField;
     }
 
@@ -82,11 +79,11 @@ const useCountStepTable = ({
   };
 
   // Get field props, for the binLocation dropdown we have to pass options
-  const getFieldProps = (fieldName, value, isFieldDisabled) => {
+  const getFieldProps = (fieldName, isFieldDisabled) => {
     if (fieldName === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return {
         labelKey: 'name',
-        options: groupBinLocationsByZone(binLocations),
+        options: groupBinLocationsByZone(binLocations, translate),
       };
     }
 
@@ -96,17 +93,26 @@ const useCountStepTable = ({
       };
     }
 
-    if (fieldName === cycleCountColumn.LOT_NUMBER && isFieldDisabled) {
+    if (fieldName === cycleCountColumn.LOT_NUMBER) {
       return {
-        placeholder: translate('react.cycleCount.emptyLotNumber.label', 'NO LOT'),
+        placeholder: isFieldDisabled && translate('react.cycleCount.emptyLotNumber.label', 'NO LOT'),
+        options: lotNumbersWithExpiration.map((item) => ({
+          id: item.lotNumber,
+          name: item.lotNumber,
+          label: item.lotNumber,
+          value: item.lotNumber,
+        })),
+        creatable: true,
       };
     }
 
     return {};
   };
 
-  // this function is required because there is a problem with getValue
-  const getValueToDisplay = (columnPath, value) => {
+  /**
+   * Override the behaviour of getValue when displaying fields on the confirmation step.
+   */
+  const getNonEditableValueToDisplay = (columnPath, value) => {
     if (columnPath === cycleCountColumn.EXPIRATION_DATE) {
       return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
     }
@@ -116,9 +122,22 @@ const useCountStepTable = ({
     }
 
     if (columnPath === cycleCountColumn.BIN_LOCATION && showBinLocation) {
-      return value?.name;
+      return getBinLocationToDisplay(value);
     }
 
+    return value;
+  };
+
+  /**
+   Override the behaviour of getValue when displaying fields on the count step.
+   */
+  const getValueToDisplay = (columnPath, value) => {
+    if (columnPath === cycleCountColumn.BIN_LOCATION && showBinLocation) {
+      return { ...value, name: getBinLocationToDisplay(value) };
+    }
+    if (columnPath === cycleCountColumn.LOT_NUMBER && value) {
+      return { label: value, value };
+    }
     return value;
   };
 
@@ -129,17 +148,31 @@ const useCountStepTable = ({
       const columnPath = id.replaceAll('_', '.');
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
       const [value, setValue] = useState(initialValue);
+      const showTooltip = [
+        cycleCountColumn.BIN_LOCATION,
+        cycleCountColumn.LOT_NUMBER,
+      ].includes(columnPath);
 
-      const isFieldDisabled = !original.id.includes('newRow') && ![
-        cycleCountColumn.QUANTITY_COUNTED,
-        cycleCountColumn.COMMENT,
-      ].includes(id);
+      const isFieldDisabled = (
+        !original.id.includes('newRow')
+          && ![cycleCountColumn.QUANTITY_COUNTED, cycleCountColumn.COMMENT].includes(id)
+      )
+        || (columnPath === cycleCountColumn.EXPIRATION_DATE
+          && disabledExpirationDateFields[original.id]);
+
+      const tooltipLabel = columnPath === cycleCountColumn.BIN_LOCATION
+        ? getBinLocationToDisplay(value) || translate('react.cycleCount.table.binLocation.label', 'Bin Location')
+        : value || translate('react.cycleCount.table.lotNumber.label', 'Serial / Lot Number');
 
       // We shouldn't allow users edit fetched data (only quantity counted and comment are editable)
       if (!isStepEditable) {
         return (
-          <TableCell className="static-cell-count-step d-flex align-items-center">
-            {getValueToDisplay(columnPath, value)}
+          <TableCell
+            className="static-cell-count-step d-flex align-items-center"
+            customTooltip={showTooltip}
+            tooltipLabel={tooltipLabel}
+          >
+            {getNonEditableValueToDisplay(columnPath, value)}
           </TableCell>
         );
       }
@@ -175,12 +208,86 @@ const useCountStepTable = ({
         if (rowIndex !== null && columnId && error !== null) {
           setError(null);
         }
+
+        // Thanks to this function, we can reset the focus only after finishing arrow navigation.
+        // Previously, we triggered a focus reset on almost every user interaction,
+        // which caused excessive re-renders in all tables
+        const handleClick = (event) => {
+          if (rowIndex === null && columnId === null) {
+            return;
+          }
+          const { target } = event;
+
+          // Elements that should keep focus (avoid resetting)
+          const isInputElement = target.closest('input, select, textarea, .date-field-input, .react-datepicker, .react-select__control');
+
+          // Specific clickable UI parts that should reset focus
+          // These are elements that close components, e.g. a date picker when clicking a day,
+          // or a select dropdown when selecting an option
+          const isDatePickerDayElement = target.closest('.react-datepicker__day');
+          const isDropdownOptionElement = target.closest('.react-select__option');
+
+          // if this is input element, then we don't want to reset rowIndex and columnId,
+          // and re-render the component again because then all tables will be re-rendered
+          // which will cause performance issues
+          if (!isInputElement && !isDatePickerDayElement && !isDropdownOptionElement) {
+            setRowIndex(null);
+            setColumnId(null);
+            forceRerender();
+          }
+
+          // if this is isDatePickerDayElement or isDropdownOptionElement, then we want to reset
+          // rowIndex and columnId because then we close the date picker or select dropdown
+          if (isDatePickerDayElement || isDropdownOptionElement) {
+            setRowIndex(null);
+            setColumnId(null);
+          }
+        };
+        document.addEventListener('click', handleClick);
+
+        return () => {
+          document.removeEventListener('click', handleClick);
+        };
       }, [rowIndex, columnId]);
+
+      const handleLotNumberChange = (selectedLotNumber) => {
+        const existingLot = lotNumbersWithExpiration.find((lot) =>
+          lot.lotNumber === selectedLotNumber);
+        const lotAlreadyExist = Boolean(existingLot);
+
+        // Disable the expiration date field for this row if the selected lot already exists.
+        // This prevents users from editing the expiration date for a pre-existing lot
+        setDisabledExpirationDateFields((prev) => ({
+          ...prev,
+          [original.id]: lotAlreadyExist,
+        }));
+
+        table.options.meta?.updateData(
+          cycleCountId,
+          original.id,
+          cycleCountColumn.LOT_NUMBER,
+          selectedLotNumber,
+        );
+
+        // when we change the lot number, we also want to update the expiration date
+        table.options.meta?.updateData(
+          cycleCountId,
+          original.id,
+          cycleCountColumn.EXPIRATION_DATE,
+          existingLot?.expirationDate,
+        );
+
+        setValue(selectedLotNumber);
+      };
 
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
-        setValue(e?.target?.value ?? e);
+        if (columnPath === cycleCountColumn.LOT_NUMBER) {
+          return handleLotNumberChange(e?.value);
+        }
+
+        return setValue(e?.target?.value ?? e);
       };
 
       // After pulling the latest changes, table.options.meta?.updateData no longer
@@ -193,16 +300,14 @@ const useCountStepTable = ({
       // select field for bin locations and one date picker for the expiration date.
       const type = getFieldType(columnPath);
       const Component = getFieldComponent(columnPath);
-      const fieldProps = getFieldProps(columnPath, value, isFieldDisabled);
-      const showTooltip = columnPath === cycleCountColumn.BIN_LOCATION;
-
+      const fieldProps = getFieldProps(columnPath, isFieldDisabled);
       // Columns allowed for focus in new rows
       const newRowFocusableCells = [
         cycleCountColumn.LOT_NUMBER,
-        cycleCountColumn.EXPIRATION_DATE,
+        !disabledExpirationDateFields[original.id] ? cycleCountColumn.EXPIRATION_DATE : null,
         cycleCountColumn.QUANTITY_COUNTED,
         cycleCountColumn.COMMENT,
-      ];
+      ].filter(Boolean);
 
       if (showBinLocation) {
         newRowFocusableCells.splice(0, 0, cycleCountColumn.BIN_LOCATION);
@@ -228,24 +333,44 @@ const useCountStepTable = ({
         isNewRow,
         onBlur,
       });
+
+      const handleArrowNavigation = (e) => {
+        // Before calling handleKeyDown, we check two cases where arrow navigation should be blocked
+        // these cases are not handled inside useArrowsNavigation
+        if (
+          e.key === navigationKey.ARROW_UP
+          && columnPath === cycleCountColumn.EXPIRATION_DATE
+          && disabledExpirationDateFields[tableData[index - 1]?.id]
+        ) {
+          return;
+        }
+        if (
+          e.key === navigationKey.ARROW_DOWN
+          && columnPath === cycleCountColumn.EXPIRATION_DATE
+          && disabledExpirationDateFields[tableData[index + 1]?.id]
+        ) {
+          return;
+        }
+        handleKeyDown(e, index, columnPath);
+      };
+
       return (
         <TableCell
           className="rt-td rt-td-count-step pb-0"
-          tooltip={showTooltip}
-          tooltipForm={showTooltip}
-          tooltipClassname={showTooltip && 'bin-location-tooltip'}
-          tooltipLabel={value?.name || translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
+          customTooltip={showTooltip}
+          tooltipClassname="w-75"
+          tooltipLabel={tooltipLabel}
         >
           <Component
-            disabled={isFieldDisabled}
+            disabled={isFieldDisabled || isFormDisabled}
             type={type}
-            value={value}
+            value={getValueToDisplay(columnPath, value)}
             onChange={onChange}
             onBlur={onBlur}
             className={`m-1 hide-arrows ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
             hideErrorMessageWrapper
-            onKeyDown={(e) => handleKeyDown(e, index, columnPath)}
+            onKeyDown={(e) => handleArrowNavigation(e)}
             focusProps={{
               fieldIndex: index,
               fieldId: columnPath,
@@ -269,7 +394,7 @@ const useCountStepTable = ({
 
   const columns = [
     columnHelper.accessor(
-      (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
+      (row) => getBinLocationToDisplay(row?.binLocation), {
         id: cycleCountColumn.BIN_LOCATION,
         header: () => (
           <TableHeaderCell className="rt-th-count-step">
@@ -345,7 +470,7 @@ const useCountStepTable = ({
           >
             {(original.id.includes('newRow') || original.custom) && isStepEditable && (
               <RiDeleteBinLine
-                className="cursor-pointer"
+                className={isFormDisabled ? 'disabled-icon' : 'cursor-pointer'}
                 onClick={() => removeRow(cycleCountId, original.id)}
                 size={22}
               />

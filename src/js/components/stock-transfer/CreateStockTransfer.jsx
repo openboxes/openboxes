@@ -13,7 +13,7 @@ import {
   hideSpinner,
   showSpinner,
 } from 'actions';
-import { STOCK_TRANSFER_CANDIDATES } from 'api/urls';
+import stockTransferApi from 'api/services/StockTransferApi';
 import { TableCell } from 'components/DataTable';
 import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
@@ -55,6 +55,7 @@ class CreateStockTransfer extends Component {
       selection: new Set(),
       selectAll: false,
       selectType: 'checkbox',
+      showExpiredItemsOnly: false,
     };
   }
 
@@ -155,13 +156,23 @@ class CreateStockTransfer extends Component {
 
   dataFetched = false;
 
+  switchExpiredItemsFiltering() {
+    this.props.showSpinner();
+    this.setState((state) => ({
+      ...state,
+      showExpiredItemsOnly: !state.showExpiredItemsOnly,
+    }), async () => {
+      await this.fetchStockTransferCandidates();
+    });
+  }
+
   /**
    * Fetches available items to stock transfer from API.
    * @public
    */
   fetchStockTransferCandidates(locationId) {
     this.props.showSpinner();
-    return apiClient.get(STOCK_TRANSFER_CANDIDATES(locationId))
+    return stockTransferApi.getStockTransferCandidates(locationId, this.state.showExpiredItemsOnly)
       .then((resp) => {
         const stockTransferCandidates = parseResponse(resp.data.data);
         const stockTransferItems = [];
@@ -296,14 +307,25 @@ class CreateStockTransfer extends Component {
             {' '}
             <Translate id="react.stockTransfer.selected.label" defaultMessage="Selected" />
           </div>
-          <button
-            type="button"
-            disabled={this.state.selection.size < 1}
-            onClick={() => this.createStockTransfer()}
-            className="btn btn-outline-primary btn-form float-right btn-xs"
-          >
-            <Translate id="react.stockTransfer.startStockTransfer.label" defaultMessage="Start Stock Transfer" />
-          </button>
+          <div className="align-items-end h-auto">
+            <button
+              type="button"
+              onClick={() => {
+                this.switchExpiredItemsFiltering();
+              }}
+              className={`btn ${this.state.showExpiredItemsOnly ? 'btn-outline-primary' : 'btn-primary'} btn-xs h-100`}
+            >
+              <Translate id="" defaultMessage="Expired Items" />
+            </button>
+            <button
+              type="button"
+              disabled={this.state.selection.size < 1}
+              onClick={() => this.createStockTransfer()}
+              className="btn btn-outline-primary btn-form float-right btn-xs h-100"
+            >
+              <Translate id="react.stockTransfer.startStockTransfer.label" defaultMessage="Start Stock Transfer" />
+            </button>
+          </div>
         </div>
         {
           stockTransferItems
@@ -311,7 +333,9 @@ class CreateStockTransfer extends Component {
               <SelectTreeTable
                 data={stockTransferItems}
                 columns={columns}
-                ref={(r) => { this.selectTable = r; }}
+                ref={(r) => {
+                  this.selectTable = r;
+                }}
                 className="-striped -highlight"
                 {...extraProps}
                 defaultPageSize={Number.MAX_SAFE_INTEGER}
@@ -320,7 +344,10 @@ class CreateStockTransfer extends Component {
                 filterable
                 defaultFilterMethod={this.filterMethod}
                 SelectInputComponent={({
-                  id, checked, onClick, row,
+                  id,
+                  checked,
+                  onClick,
+                  row,
                 }) => (
                   <input
                     type={selectType}

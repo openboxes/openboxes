@@ -15,7 +15,6 @@ import 'react-tippy/dist/tippy.css';
 
 export const renderFormField = (fieldConfig, fieldName, props = {}) => {
   const FieldType = fieldConfig.type;
-
   return (
     <FieldType
       key={fieldName}

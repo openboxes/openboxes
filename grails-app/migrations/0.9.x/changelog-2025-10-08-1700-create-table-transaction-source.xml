@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <!-- Create table transaction_source -->
+    <changeSet author="kchelstowski" id="081020251700-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="transaction_source"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="transaction_source">
+            <column name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="transaction_action" type="VARCHAR(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="shipment" type="CHAR(38)"/>
+            <column name="requisition" type="CHAR(38)"/>
+            <column name="receipt" type="CHAR(38)"/>
+            <column name="order" type="CHAR(38)"/>
+            <column name="cycle_count" type="CHAR(38)"/>
+            <column name="origin" type="CHAR(38)"/>
+            <column name="destination" type="CHAR(38)"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by_id" type="CHAR(38)">
+                <constraints nullable="false" />
+            </column>
+            <column name="updated_by_id" type="CHAR(38)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="kchelstowski" id="081020251700-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_transaction_source_shipment"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseColumnNames="shipment"
+                baseTableName="transaction_source"
+                constraintName="fk_transaction_source_shipment"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="shipment"
+        />
+    </changeSet>
+
+    <changeSet author="kchelstowski" id="081020251700-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_transaction_source_requisition"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseColumnNames="requisition"
+                baseTableName="transaction_source"
+                constraintName="fk_transaction_source_requisition"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="requisition"
+        />
+    </changeSet>
+
+    <changeSet author="kchelstowski" id="081020251700-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_transaction_source_receipt"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseColumnNames="receipt"
+                baseTableName="transaction_source"
+                constraintName="fk_transaction_source_receipt"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="receipt"
+        />
+    </changeSet>
+
+    <changeSet author="kchelstowski" id="081020251700-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_transaction_source_order"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseColumnNames="order"
+                baseTableName="transaction_source"
+                constraintName="fk_transaction_source_order"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="order"
+        />
+    </changeSet>
+
+    <changeSet author="kchelstowski" id="081020251700-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_transaction_source_cycle_count"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseColumnNames="cycle_count"
+                baseTableName="transaction_source"
+                constraintName="fk_transaction_source_cycle_count"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="cycle_count"
+        />
+    </changeSet>
+
+    <changeSet author="kchelstowski" id="081020251700-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_transaction_source_origin"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseColumnNames="origin"
+                baseTableName="transaction_source"
+                constraintName="fk_transaction_source_origin"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="location"
+        />
+    </changeSet>
+
+    <changeSet author="kchelstowski" id="081020251700-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_transaction_source_destination"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseColumnNames="destination"
+                baseTableName="transaction_source"
+                constraintName="fk_transaction_source_destination"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="location"
+        />
+    </changeSet>
+
+    <changeSet author="kchelstowski" id="081020251700-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_transaction_source_created_by"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseColumnNames="created_by_id"
+                baseTableName="transaction_source"
+                constraintName="fk_transaction_source_created_by"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="user"
+        />
+    </changeSet>
+
+    <changeSet author="kchelstowski" id="081020251700-9">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_transaction_source_updated_by"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseColumnNames="updated_by_id"
+                baseTableName="transaction_source"
+                constraintName="fk_transaction_source_updated_by"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="user"
+        />
+    </changeSet>
+</databaseChangeLog>

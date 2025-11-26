@@ -543,7 +543,27 @@ class InventoryItemController {
         if (!commandInstance.inventory) {
             commandInstance.inventory = locationInstance?.inventory
         }
-        inventoryService.populateRecordInventoryCommand(commandInstance, params)
+
+        // We need if/else statement to avoid duplication data (OBPIH-7438)
+        if (flash.recordInventoryRows) {
+            commandInstance.recordInventoryRows = flash.recordInventoryRows.collect { RecordInventoryRowCommand it ->
+                Location binLocation = it?.binLocation ? Location.get(it.binLocation.id) : null
+                [
+                    id: it.id,
+                    lotNumber: it.lotNumber,
+                    binLocation: binLocation,
+                    inventoryItem: it.inventoryItem,
+                    expirationDate: it.expirationDate,
+                    description: it.description,
+                    oldQuantity: it.oldQuantity,
+                    newQuantity: it.newQuantity,
+                    comment: it.comment,
+                    error: it.error,
+                ]
+            }
+        } else {
+            inventoryService.populateRecordInventoryCommand(commandInstance, params)
+        }
 
         Product productInstance = commandInstance.product
         List transactionEntryList = inventoryService.getTransactionEntriesByInventoryAndProduct(commandInstance?.inventory, [productInstance])
@@ -572,10 +592,10 @@ class InventoryItemController {
     }
 
     def saveRecordInventory(RecordInventoryCommand commandInstance) {
-        log.info("Before saving record inventory " + params)
         inventoryService.saveRecordInventoryCommand(commandInstance, params)
         if (!commandInstance.hasErrors()) {
-            // Recalculate product availability after the changes in the inventory
+            // We disabled recalculating product availability during the record stock operation (to avoid
+            // recalculating it multiple times) so now we need to refresh it manually.
             productAvailabilityService.refreshProductsAvailability(commandInstance?.inventory?.warehouse?.id,
                     [commandInstance?.product?.id], false)
 
@@ -583,26 +603,10 @@ class InventoryItemController {
             return
         }
 
-        log.info("User chose to validate or there are errors")
-        def warehouseInstance = Location.get(session?.warehouse?.id)
-
-        commandInstance.inventory = warehouseInstance?.inventory
-        commandInstance.inventoryLevel = InventoryLevel.findByProductAndInventory(commandInstance?.product, commandInstance?.inventory)
-
-        Product productInstance = commandInstance.product
-        List transactionEntryList = inventoryService.getTransactionEntriesByInventoryAndProduct(commandInstance?.inventory, [productInstance])
-
-        // Get the inventory warning level for the given product and inventory
-        commandInstance.inventoryLevel = InventoryLevel.findByProductAndInventory(commandInstance?.product, commandInstance?.inventory)
-
-        commandInstance.totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[productInstance] ?: 0
-
-        log.info "commandInstance.recordInventoryRows: "
-        commandInstance?.recordInventoryRows.each {
-            log.info "it ${it?.id}:${it?.lotNumber}:${it?.oldQuantity}:${it?.newQuantity}"
-        }
-
-        render(view: "showRecordInventory", model: [commandInstance: commandInstance])
+        // We pass the data to flash to preserve data after a redirect, so it can be used in the showRecordInventory method (OBPIH-7438)
+        flash.recordInventoryRows = commandInstance.recordInventoryRows
+        flash.errors = commandInstance.errors
+        redirect(action: "showRecordInventory", params: ['product.id': commandInstance.product.id])
     }
 
     def showTransactions() {

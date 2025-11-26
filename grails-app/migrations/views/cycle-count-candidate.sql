@@ -14,6 +14,9 @@ SELECT *,
            ELSE 3
            END                                           as sort_order
 FROM cycle_count_session
+WHERE
+    -- if a product is inactive, it should not be countable, so filter inactive products out
+    product_active
 ORDER BY sort_order,
          abc_class IS NULL asc,
          abc_class asc,

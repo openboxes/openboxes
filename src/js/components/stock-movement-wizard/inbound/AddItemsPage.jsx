@@ -13,13 +13,20 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
+import {
+  STOCK_MOVEMENT_STATUS,
+  STOCK_MOVEMENT_UPDATE_INVENTORY_ITEMS,
+  STOCK_MOVEMENT_UPDATE_ITEMS,
+} from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import DateField from 'components/form-elements/DateField';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import ConfirmExpirationDateModal from 'components/modals/ConfirmExpirationDateModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import StockMovementStatus from 'consts/stockMovementStatus';
 import apiClient from 'utils/apiClient';
 import { renderFormField, setColumnValue } from 'utils/form-utils';
 import Select from 'utils/Select';
@@ -225,6 +232,10 @@ class AddItemsPage extends Component {
       newItem: false,
       totalCount: 0,
       isFirstPageLoaded: false,
+      isExpirationModalOpen: false,
+      // Stores the resolve function for the ConfirmExpirationDateModal promise
+      resolveExpirationModal: null,
+      itemsWithMismatchedExpiry: [],
     };
 
     this.props.showSpinner();
@@ -266,7 +277,7 @@ class AddItemsPage extends Component {
    */
   getLineItemsToBeSaved(lineItems) {
     const lineItemsToBeAdded = _.filter(lineItems, (item) =>
-      !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product);
+      !item.statusCode && item.quantityRequested && item.product);
     const lineItemsWithStatus = _.filter(lineItems, (item) => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
@@ -484,26 +495,37 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Shows Inventory item expiration date update confirmation dialog.
-   * @param {function} onConfirm
+   * Shows Inventory item expiration date update confirmation modal.
+   * @param {Array} itemsWithMismatchedExpiry - Array of elements with mismatched expiration dates.
+   * @returns {Promise} - Resolves to true if user confirms the update, false if not.
    * @public
    */
-  confirmInventoryItemExpirationDateUpdate(onConfirm) {
-    confirmAlert({
-      title: this.props.translate('react.stockMovement.message.confirmSave.label', 'Confirm save'),
-      message: this.props.translate(
-        'react.stockMovement.confirmExpiryDateUpdate.message',
-        'This will update the expiry date across all depots in the system. Are you sure you want to proceed?',
-      ),
-      buttons: [
-        {
-          label: this.props.translate('react.default.yes.label', 'Yes'),
-          onClick: onConfirm,
-        },
-        {
-          label: this.props.translate('react.default.no.label', 'No'),
-        },
-      ],
+  confirmExpirationDateSave(itemsWithMismatchedExpiry) {
+    return new Promise((resolve) => {
+      this.setState({
+        isExpirationModalOpen: true,
+        resolveExpirationModal: resolve,
+        itemsWithMismatchedExpiry,
+      });
+    });
+  }
+
+  /**
+   * Handles the response from the expiration date confirmation modal.
+   * @param {boolean} shouldUpdate - True if the user confirmed the update, false if not.
+   * @public
+   */
+  handleExpirationModalResponse(shouldUpdate) {
+    // Resolve the promise returned by confirmExpirationDateSave.
+    if (this.state.resolveExpirationModal) {
+      this.state.resolveExpirationModal(shouldUpdate);
+    }
+
+    // Close the modal and reset its state.
+    this.setState({
+      isExpirationModalOpen: false,
+      resolveExpirationModal: null,
+      itemsWithMismatchedExpiry: [],
     });
   }
 
@@ -618,25 +640,61 @@ class AddItemsPage extends Component {
   saveAndTransitionToNextStep(formValues, lineItems) {
     this.props.showSpinner();
 
-    this.saveRequisitionItemsInCurrentStep(lineItems)
-      .then((resp) => {
+    this.saveRequisitionItems({
+      itemCandidatesToSave: lineItems,
+      // We're proceeding to the next step so should not have any zero quantity items at this point.
+      // The validation logic prevents you from proceeding to the next step if there are any rows
+      // with non-zero quantities so we should not have any empties to remove at this point,
+      // but we signal the backend to remove them anyway, just in case.
+      removeEmptyItems: true,
+    })
+      .then(async (resp) => {
         let values = formValues;
         if (resp) {
           values = { ...formValues, lineItems: resp.data.data.lineItems };
         }
 
-        if (_.some(values.lineItems, (item) => item.inventoryItem
-          && item.expirationDate !== item.inventoryItem.expirationDate)) {
-          if (_.some(values.lineItems, (item) => item.inventoryItem.quantity && item.inventoryItem.quantity !== '0')) {
-            this.props.hideSpinner();
-            this.confirmInventoryItemExpirationDateUpdate(() =>
-              this.updateInventoryItemsAndTransitionToNextStep(values, lineItems));
-          } else {
-            this.updateInventoryItemsAndTransitionToNextStep(values, lineItems);
-          }
-        } else {
-          this.transitionToNextStepAndChangePage(formValues);
+        const hasExpiryMismatch = values.lineItems.some(
+          (item) => item.inventoryItem && item.expirationDate !== item.inventoryItem.expirationDate,
+        );
+
+        if (!hasExpiryMismatch) {
+          return this.transitionToNextStepAndChangePage(formValues);
         }
+
+        const hasNonZeroQuantity = values.lineItems.some(
+          (item) => item.inventoryItem?.quantity && item.inventoryItem.quantity !== '0',
+        );
+
+        if (hasNonZeroQuantity) {
+          this.props.hideSpinner();
+
+          const itemsWithMismatchedExpiry = values.lineItems
+            .filter(
+              (item) =>
+                item.inventoryItem
+                  && item.inventoryItem.expirationDate !== item.expirationDate
+                  && item.inventoryItem.quantity
+                  && item.inventoryItem.quantity !== '0',
+            )
+            .map((item) => ({
+              code: item.product?.productCode,
+              product: item.product,
+              lotNumber: item.lotNumber,
+              previousExpiry: item.inventoryItem.expirationDate,
+              newExpiry: item.expirationDate,
+            }));
+
+          if (itemsWithMismatchedExpiry.length > 0) {
+            const shouldUpdateExpirationDate =
+              await this.confirmExpirationDateSave(itemsWithMismatchedExpiry);
+            if (!shouldUpdateExpirationDate) {
+              return Promise.reject();
+            }
+          }
+        }
+
+        return this.updateInventoryItemsAndTransitionToNextStep(values, lineItems);
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -649,7 +707,7 @@ class AddItemsPage extends Component {
    */
   updateInventoryItemsAndTransitionToNextStep(formValues, lineItems) {
     const itemsToSave = this.getLineItemsToBeSaved(lineItems);
-    const updateItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/updateInventoryItems`;
+    const updateItemsUrl = STOCK_MOVEMENT_UPDATE_INVENTORY_ITEMS(this.state.values.stockMovementId);
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
@@ -663,16 +721,18 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Saves list of requisition items in current step (without step change). Used to export template.
+   * Saves a list of requisition items.
    * @param {object} itemCandidatesToSave
+   * @param {boolean} removeEmptyItems
    * @public
    */
-  saveRequisitionItemsInCurrentStep(itemCandidatesToSave) {
+  saveRequisitionItems({ itemCandidatesToSave, removeEmptyItems }) {
     const itemsToSave = this.getLineItemsToBeSaved(itemCandidatesToSave);
-    const updateItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
+    const updateItemsUrl = STOCK_MOVEMENT_UPDATE_ITEMS(this.state.values.stockMovementId);
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
+      removeEmptyItems,
     };
 
     if (payload.lineItems.length) {
@@ -709,12 +769,7 @@ class AddItemsPage extends Component {
    */
   save(formValues) {
     const lineItems = _.filter(formValues.lineItems, (item) => !_.isEmpty(item));
-
-    if (_.some(lineItems, (item) => !item.quantityRequested || item.quantityRequested === '0')) {
-      this.confirmSave(() => this.saveItems(lineItems));
-    } else {
-      this.saveItems(lineItems);
-    }
+    this.saveItems(lineItems);
   }
 
   /**
@@ -725,7 +780,10 @@ class AddItemsPage extends Component {
   saveAndExit(formValues) {
     const errors = this.validate(formValues).lineItems;
     if (errors.length && errors.every((obj) => typeof obj === 'object' && _.isEmpty(obj))) {
-      this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
+      this.saveRequisitionItems({
+        itemCandidatesToSave: formValues.lineItems,
+        removeEmptyItems: false,
+      })
         .then(() => {
           window.location = STOCK_MOVEMENT_URL.show(formValues.stockMovementId);
         });
@@ -759,7 +817,10 @@ class AddItemsPage extends Component {
   saveItems(lineItems) {
     this.props.showSpinner();
 
-    this.saveRequisitionItemsInCurrentStep(lineItems)
+    this.saveRequisitionItems({
+      itemCandidatesToSave: lineItems,
+      removeEmptyItems: false,
+    })
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
@@ -830,16 +891,14 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Transition to next stock movement status:
-   * - 'CHECKING' if origin type is supplier.
-   * - 'VERIFYING' if origin type is other than supplier.
+   * Transition to next stock movement status: CHECKING
    * @public
    */
   transitionToNextStep() {
-    const url = `/api/stockMovements/${this.state.values.stockMovementId}/status`;
-    const payload = { status: 'CHECKING' };
+    const url = STOCK_MOVEMENT_STATUS(this.state.values.stockMovementId);
+    const payload = { status: StockMovementStatus.CHECKING };
 
-    if (this.state.values.statusCode === 'CREATED') {
+    if (this.state.values.statusCode === StockMovementStatus.CREATED) {
       return apiClient.post(url, payload);
     }
     return Promise.resolve();
@@ -884,7 +943,10 @@ class AddItemsPage extends Component {
 
     const { movementNumber, stockMovementId } = formValues;
     const url = `/stockMovement/exportCsv/${stockMovementId}`;
-    this.saveRequisitionItemsInCurrentStep(lineItems)
+    this.saveRequisitionItems({
+      itemCandidatesToSave: lineItems,
+      removeEmptyItems: false,
+    })
       .then(() => {
         apiClient.get(url, { responseType: 'blob' })
           .then((response) => {
@@ -940,7 +1002,10 @@ class AddItemsPage extends Component {
    */
   previousPage(values, invalid) {
     if (!invalid) {
-      this.saveRequisitionItemsInCurrentStep(values.lineItems)
+      this.saveRequisitionItems({
+        itemCandidatesToSave: values.lineItems,
+        removeEmptyItems: false,
+      })
         .then(() => this.props.previousPage(values));
     } else {
       confirmAlert({
@@ -1100,6 +1165,12 @@ class AddItemsPage extends Component {
                   <Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
+              <ConfirmExpirationDateModal
+                isOpen={this.state.isExpirationModalOpen}
+                itemsWithMismatchedExpiry={this.state.itemsWithMismatchedExpiry}
+                onConfirm={() => this.handleExpirationModalResponse(true)}
+                onCancel={() => this.handleExpirationModalResponse(false)}
+              />
             </form>
           </div>
         )}

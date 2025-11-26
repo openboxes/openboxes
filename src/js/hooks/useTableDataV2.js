@@ -19,19 +19,22 @@ const useTableDataV2 = ({
   errorMessageId,
   defaultErrorMessage,
   getParams,
-  offset,
   pageSize,
   sort,
   order,
-  searchTerm,
-  filterParams,
   shouldFetch,
+  serializedParams,
+  setShouldFetch,
+  disableInitialLoading,
+  filtersInitialized = true,
+  onFetchedData,
 }) => {
   const sourceRef = useRef(CancelToken.source());
-
   const translate = useTranslate();
-
+  // Loading and pending requests should be defined together, because pending requests
+  // store data between re-renders, but loading refreshes the message displayed in the table
   const [loading, setLoading] = useState(false);
+  const pendingRequests = useRef(0);
   const [tableData, setTableData] = useState({
     data: [],
     totalCount: 0,
@@ -45,11 +48,15 @@ const useTableDataV2 = ({
   }));
 
   const fetchData = () => {
+    if (sourceRef.current) {
+      sourceRef.current.cancel('Cancelled due to new request');
+    }
     // Each time we fetch, we want to 'reset' the token/signal
     sourceRef.current = CancelToken.source();
     const params = getParams({
       sortingParams: { sort, order },
     });
+    pendingRequests.current += 1;
     setLoading(true);
     apiClient.get(url, {
       params,
@@ -61,29 +68,42 @@ const useTableDataV2 = ({
           data: res.data.data,
           totalCount: res.data.totalCount,
         });
+        if (onFetchedData) {
+          onFetchedData(res.data);
+        }
       })
       .catch(() => Promise.reject(new Error(translate(errorMessageId, defaultErrorMessage))))
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (setShouldFetch) {
+          setShouldFetch(false);
+        }
+
+        pendingRequests.current -= 1;
+        if (!pendingRequests.current) {
+          setLoading(false);
+        }
+      });
   };
 
   // fetching data after changing page size, filters, page number and sorting
   useEffect(() => {
-    if (shouldFetch) {
+    if (shouldFetch && filtersInitialized) {
       fetchData();
     }
   }, [
-    filterParams,
+    serializedParams,
     pageSize,
-    offset,
     sort,
     order,
-    searchTerm,
+    filtersInitialized,
   ]);
 
   // Start displaying the loader in the table when
   // accessing the page first time, before sending a request
   useEffect(() => {
-    setLoading(true);
+    if (!disableInitialLoading) {
+      setLoading(true);
+    }
   }, []);
 
   useEffect(() => () => {
@@ -98,6 +118,7 @@ const useTableDataV2 = ({
     setLoading,
     tableData,
     fetchData,
+    setTableData,
   };
 };
 

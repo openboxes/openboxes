@@ -11,7 +11,15 @@ package org.pih.warehouse
 
 import grails.converters.JSON
 import grails.util.Holders
+import org.pih.warehouse.inventory.CycleCount
+import org.pih.warehouse.inventory.CycleCountDetails
+import org.pih.warehouse.inventory.CycleCountItem
+import org.pih.warehouse.inventory.CycleCountSummary
+import org.pih.warehouse.inventory.InventoryAuditDetails
+import org.pih.warehouse.inventory.InventoryAuditSummary
+import org.pih.warehouse.inventory.InventoryTransactionsSummary
 import org.pih.warehouse.inventory.PendingCycleCountRequest
+import org.pih.warehouse.reporting.CycleCountProductSummary
 
 import java.math.RoundingMode
 import java.time.Instant
@@ -628,16 +636,48 @@ class BootStrap {
             return productPackage.toJson()
         }
 
+        JSON.registerObjectMarshaller(CycleCount) { CycleCount cycleCount ->
+            return cycleCount.toJson()
+        }
+
+        JSON.registerObjectMarshaller(CycleCountItem) { CycleCountItem cycleCountItem ->
+            return cycleCountItem.toJson()
+        }
+
         JSON.registerObjectMarshaller(CycleCountCandidate) { CycleCountCandidate cycleCountCandidate ->
             return cycleCountCandidate.toJson()
+        }
+
+        JSON.registerObjectMarshaller(CycleCountDetails) { CycleCountDetails cycleCountDetails ->
+            return cycleCountDetails.toJson()
         }
 
         JSON.registerObjectMarshaller(CycleCountRequest) { CycleCountRequest cycleCountRequest ->
             return cycleCountRequest.toJson()
         }
 
+        JSON.registerObjectMarshaller(CycleCountSummary) { CycleCountSummary cycleCountSummary ->
+            return cycleCountSummary.toJson()
+        }
+
         JSON.registerObjectMarshaller(PendingCycleCountRequest) { PendingCycleCountRequest pendingCycleCountRequest ->
             return pendingCycleCountRequest.toJson()
+        }
+
+        JSON.registerObjectMarshaller(InventoryAuditDetails) { InventoryAuditDetails inventoryAuditDetails ->
+            return inventoryAuditDetails.toJson()
+        }
+
+        JSON.registerObjectMarshaller(InventoryAuditSummary) { InventoryAuditSummary inventoryAuditSummary ->
+            return inventoryAuditSummary.toJson()
+        }
+
+        JSON.registerObjectMarshaller(CycleCountProductSummary) { CycleCountProductSummary cycleCountProductSummary ->
+            return cycleCountProductSummary.toJson()
+        }
+
+        JSON.registerObjectMarshaller(InventoryTransactionsSummary) { InventoryTransactionsSummary inventoryTransactionsSummary ->
+            return inventoryTransactionsSummary.toJson()
         }
     }
 

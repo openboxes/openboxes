@@ -187,6 +187,7 @@ module.exports = {
       components: path.resolve(SRC, 'components'),
       hooks: path.resolve(SRC, 'hooks'),
       reducers: path.resolve(SRC, 'reducers'),
+      selectors: path.resolve(SRC, 'selectors'),
       actions: path.resolve(SRC, 'actions'),
       consts: path.resolve(SRC, 'consts'),
       tests: path.resolve(SRC, 'tests'),

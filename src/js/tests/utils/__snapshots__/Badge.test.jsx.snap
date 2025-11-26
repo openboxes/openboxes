@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Badge component should match snapshot 1`] = `
+<span
+  className="badge warning"
+  data-testid="badge"
+>
+  Tooltip Badge
+</span>
+`;

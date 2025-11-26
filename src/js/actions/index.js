@@ -19,6 +19,7 @@ import {
   FETCH_INVOICE_STATUSES,
   FETCH_INVOICE_TYPE_CODES,
   FETCH_LOCATION_TYPES,
+  FETCH_LOT_NUMBERS_BY_PRODUCT_IDS,
   FETCH_MENU_CONFIG,
   FETCH_NUMBERS,
   FETCH_PAYMENT_TERMS,
@@ -68,7 +69,7 @@ import { ORGANIZATION_API } from 'api/urls';
 import RoleType from 'consts/roleType';
 import { UnitOfMeasureType } from 'consts/UnitOfMeasureType';
 import apiClient, { parseResponse } from 'utils/apiClient';
-import { fetchBins, mapShipmentTypes } from 'utils/option-utils';
+import { fetchBins, getLotNumbersByProductIds, mapShipmentTypes } from 'utils/option-utils';
 
 export function showSpinner() {
   return {
@@ -567,9 +568,9 @@ export function fetchBuyers(active = false) {
   };
 }
 
-export const fetchBinLocations = (currentLocationId, ignoreActivityCodes = []) =>
+export const fetchBinLocations = (currentLocationId, ignoreActivityCodes = [], sort = null) =>
   async (dispatch) => {
-    const fetchedBins = await fetchBins(currentLocationId, ignoreActivityCodes);
+    const fetchedBins = await fetchBins(currentLocationId, ignoreActivityCodes, sort);
     dispatch({
       type: FETCH_BIN_LOCATIONS,
       payload: fetchedBins,
@@ -776,7 +777,10 @@ export const startCount = (payload, locationId) => async (dispatch) => {
   const cycleCountIds = cycleCounts?.data?.data?.map?.((cycleCount) => cycleCount.id);
   return dispatch({
     type: START_COUNT,
-    payload: cycleCountIds,
+    payload: {
+      locationId,
+      requests: cycleCountIds,
+    },
   });
 };
 
@@ -794,10 +798,23 @@ export const startResolution = (requestIds, locationId) => async (dispatch) => {
   const cycleCountIds = cycleCounts?.data?.data?.map?.((cycleCount) => cycleCount.id);
   return dispatch({
     type: START_RESOLUTION,
-    payload: cycleCountIds,
+    payload: {
+      locationId,
+      cycleCounts: cycleCountIds,
+    },
   });
 };
 
-export const eraseDraft = () => ({
+export const eraseDraft = (locationId, tab) => ({
   type: ERASE_DRAFT,
+  payload: { locationId, tab },
 });
+
+export const fetchLotNumbersByProductIds = (productIds) => async (dispatch) => {
+  const lotNumbersWithExpiration = await getLotNumbersByProductIds(productIds);
+
+  dispatch({
+    type: FETCH_LOT_NUMBERS_BY_PRODUCT_IDS,
+    payload: lotNumbersWithExpiration,
+  });
+};

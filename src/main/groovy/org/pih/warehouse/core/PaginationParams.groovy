@@ -2,7 +2,7 @@ package org.pih.warehouse.core
 
 import grails.validation.Validateable
 
-abstract class PaginationParams implements Validateable {
+class PaginationParams implements Validateable {
 
     Integer max
 

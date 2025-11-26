@@ -59,7 +59,7 @@ class Attribute {
                 ['default.not.unique.message']
             }
         })
-        name(nullable: false, maxSize: 255)
+        name(nullable: false, blank: false, maxSize: 255)
         description(nullable: true)
         defaultValue(nullable: true)
         unitOfMeasureClass(nullable: true)

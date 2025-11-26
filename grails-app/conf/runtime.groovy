@@ -82,6 +82,7 @@ openboxes.client.autosave.enabled = false
 // Backdata configuration (OBPIH-6332)
 openboxes.dashboard.backdatedShipments.daysOffset = 1
 openboxes.dashboard.backdatedShipments.monthsLimit = 6
+openboxes.report.backdatedTransactions.daysOffset = 1
 
 // Merge Products (OBPIH-5453)
 openboxes.products.merge.enabled = false
@@ -187,6 +188,7 @@ openboxes {
                         menuItems: [
                                 [label: "inventory.manageCycleCount.label", defaultLabel: "Manage Cycle Count", href: "/inventory/cycleCount"],
                                 [label: "inventory.performCycleCount.label", defaultLabel: "Perform Cycle Count", href: "/inventory/cycleCount?tab=TO_COUNT"],
+                                [label: "inventory.reporting.label", defaultLabel: "Reporting", href: "/inventory/cycleCount/reporting?tab=PRODUCTS"],
                         ]
                 ]
             ]
@@ -328,6 +330,7 @@ openboxes {
                         [label: "report.showTransactionReport.label", defaultLabel: "Transaction Report", href: "/report/showTransactionReport"],
                         [label: "report.consumption.label", defaultLabel: "Consumption Report", href: "/consumption/show"],
                         [label: "report.requestDetailReport.label", defaultLabel: "Request Detail Report", href: "/report/showRequestDetailReport"],
+                        [label: "report.expirationHistoryReport.label", defaultLabel: "Expiration History Report", href: "/report/expirationHistoryReport"],
                     ]
                 ],
                 [
@@ -1388,3 +1391,9 @@ openboxes {
         }
     }
 }
+
+openboxes.inventoryCount.transactionTypes = [
+        Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
+        Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID,
+        Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID
+]

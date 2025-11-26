@@ -29,8 +29,8 @@ class PaymentTerm implements Serializable {
     }
 
     static constraints = {
-        code(nullable: false)
-        name(nullable: false)
+        code(nullable: false, blank: false)
+        name(nullable: false, blank: false)
         description(nullable: true)
         prepaymentPercent(nullable: true)
         daysToPayment(nullable: true)

@@ -1,8 +1,8 @@
 package unit.org.pih.warehouse.product
 
 import grails.testing.gorm.DataTest
-import grails.testing.services.ServiceUnitTest
 import spock.lang.Ignore
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -12,9 +12,17 @@ import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.product.ProductType
 
 @Unroll
-class ProductServiceSpec extends Specification implements ServiceUnitTest<ProductService>, DataTest {
+class ProductServiceSpec extends Specification implements DataTest {
+
+    @Shared
+    ProductService service
+
     void setupSpec() {
         mockDomain Product
+    }
+
+    void setup() {
+        service = new ProductService()
     }
 
     void 'getProducts returns the requested products'() {

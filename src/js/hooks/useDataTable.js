@@ -1,12 +1,17 @@
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 
-// Hook handling logic for DataTable component.
 const useDataTable = ({
-  columns,
-  data,
-  defaultColumn,
-  meta,
+  columns, data, defaultColumn, meta,
 }) => {
+  const initialColumnPinning = {
+    left: columns
+      .filter((col) => col.meta?.pinned === 'left')
+      .map((col) => (col.accessorKey || col.id).replace(/\./g, '_')),
+    right: columns
+      .filter((col) => col.meta?.pinned === 'right')
+      .map((col) => (col.accessorKey || col.id).replace(/\./g, '_')),
+  };
+
   const table = useReactTable({
     columns,
     data,
@@ -15,6 +20,10 @@ const useDataTable = ({
     manualFiltering: true,
     manualPagination: true,
     manualSorting: true,
+    enableColumnPinning: true,
+    state: {
+      columnPinning: initialColumnPinning,
+    },
     meta,
   });
 

@@ -10,6 +10,7 @@ import infoBarReducer from 'reducers/infoBarReducer';
 import infoBarVisibilityReducer from 'reducers/infoBarVisibilityReducer';
 import invoiceReducer from 'reducers/invoiceReducer';
 import locationReducer from 'reducers/locationReducer';
+import lotNumbersReducer from 'reducers/lotNumbersReducer';
 import organizationsReducer from 'reducers/organizationsReducer';
 import outboundImportReducer from 'reducers/outboundImportReducer';
 import productSupplierReducer from 'reducers/productSupplierReducer';
@@ -50,6 +51,7 @@ const rootReducer = combineReducers({
   unitOfMeasure: unitOfMeasureReducer,
   outboundImport: outboundImportReducer,
   cycleCount: cycleCountReducer,
+  lotNumbers: lotNumbersReducer,
 });
 
 export default rootReducer;

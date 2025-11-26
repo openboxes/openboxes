@@ -9,7 +9,6 @@ import {
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { SortableElement } from 'react-sortable-hoc';
-import { Tooltip } from 'react-tippy';
 
 import DragHandle from 'components/dashboard/DragHandle';
 import LoadingCard from 'components/dashboard/LoadingCard';
@@ -18,6 +17,7 @@ import NumbersRAG from 'components/dashboard/NumbersRAG';
 import NumbersTableCard from 'components/dashboard/NumbersTableCard';
 import TableCard from 'components/dashboard/TableCard';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 // TODO: OBPIH-4384 Refactor FilterComponent to be more generic.
 // It should be built from config instead of being hardcoded (and move it out to separate file)
@@ -286,17 +286,9 @@ const GraphCard = SortableElement(({
           cardInfo
             ? (
               <div className="graph-infos">
-                <Tooltip
-                  html={(
-                    <p>
-                      {translate(cardInfo, cardInfo)}
-                    </p>
-                )}
-                  theme="transparent"
-                  arrow="true"
-                >
+                <CustomTooltip content={translate(cardInfo, cardInfo)}>
                   <i className="fa fa-info-circle" />
-                </Tooltip>
+                </CustomTooltip>
               </div>
             )
             : null

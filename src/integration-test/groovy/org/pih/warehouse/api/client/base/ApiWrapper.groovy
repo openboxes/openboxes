@@ -1,5 +1,6 @@
 package org.pih.warehouse.api.client.base
 
+import org.pih.warehouse.api.util.JsonObjectUtil
 import org.pih.warehouse.api.util.ResponseSpecUtil
 
 /**
@@ -17,9 +18,11 @@ abstract class ApiWrapper<T> {
 
     final T api
     final ResponseSpecUtil responseSpecUtil
+    final JsonObjectUtil jsonObjectUtil
 
-    ApiWrapper(T api, ResponseSpecUtil responseSpecUtil) {
+    ApiWrapper(T api, ResponseSpecUtil responseSpecUtil, JsonObjectUtil jsonObjectUtil) {
         this.api = api
         this.responseSpecUtil = responseSpecUtil
+        this.jsonObjectUtil = jsonObjectUtil
     }
 }

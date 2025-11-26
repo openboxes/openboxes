@@ -248,6 +248,16 @@
                                 ${stockMovement?.displayStatus?.label}
                             </td>
                         </tr>
+                        <g:if test="${stockMovement?.shipment?.isFromPurchaseOrder}">
+                            <tr class="prop">
+                                <td class="name">
+                                    <g:message code="stockMovement.originCode.label"/>
+                                </td>
+                                <td class="value">
+                                    ${stockMovement?.origin?.organization?.code}
+                                </td>
+                            </tr>
+                        </g:if>
                         <tr class="prop">
                             <td class="name">
                                 <warehouse:message code="stockMovement.origin.label"/>

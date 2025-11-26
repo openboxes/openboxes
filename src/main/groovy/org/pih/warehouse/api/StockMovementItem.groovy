@@ -71,6 +71,18 @@ class StockMovementItem {
 
     BigDecimal packSize = 1
 
+    /**
+     * Represents the version of the item (ie how many times it has been modified). Typically pulled from
+     * the version field of the domain that was used to initialize the stock movement item (ex: requisition item).
+     */
+    Long version
+
+    /**
+     * True if the item was manually added by a user (as opposed to being automatically added upon requisition
+     * creation, as stocklist items are, for example).
+     */
+    Boolean manuallyAdded
+
     BigDecimal getQuantityRequired() {
         return quantityRevised ?: quantityRequested
     }
@@ -118,6 +130,8 @@ class StockMovementItem {
         boxName(nullable: true)
         sortOrder(nullable: true)
         substitutionItems(nullable: true)
+        version(nullable: true)
+        manuallyAdded(nullable: true)
     }
 
     String toString() {
@@ -127,6 +141,7 @@ class StockMovementItem {
     Map toJson() {
         return [
                 id                        : id,
+                version                   : version,
                 productCode               : productCode,
                 product                   : product,
                 lotNumber                 : lotNumber,
@@ -164,7 +179,8 @@ class StockMovementItem {
                         lotNumber     : inventoryItem.lotNumber,
                         expirationDate: inventoryItem.expirationDate?.format("MM/dd/yyyy"),
                         quantity      : inventoryItem.quantity
-                ]
+                ],
+                manuallyAdded             : manuallyAdded,
         ]
     }
 
@@ -219,6 +235,7 @@ class StockMovementItem {
 
         return new StockMovementItem(
                 id: requisitionItem.id,
+                version: requisitionItem.version,
                 statusCode: requisitionItem.status?.name(),
                 productCode: requisitionItem?.product?.productCode,
                 product: requisitionItem?.product,
@@ -239,7 +256,13 @@ class StockMovementItem {
                 lotNumber: requisitionItem?.lotNumber ?: "",
                 expirationDate: requisitionItem?.expirationDate,
                 sortOrder: requisitionItem?.orderIndex,
-                requisitionItem: requisitionItem
+                requisitionItem: requisitionItem,
+
+                // We determine whether an item has been manually added by a user (as opposed to being automatically
+                // added upon requisition creation, as stocklist items are, for example) by checking if the item was
+                // created after the requisition itself. A more "proper" solution might be to make "manuallyAdded"
+                // a proper field on requisitionItem, but this works for now.
+                manuallyAdded: requisitionItem.requisition.dateCreated < requisitionItem.dateCreated,
         )
     }
 
@@ -437,6 +460,32 @@ class AvailableItem {
         ]
     }
 
+    @Override
+    boolean equals(Object other) {
+        if (this.is(other)) return true
+        if (!(other instanceof AvailableItem)) return false
+
+        AvailableItem that = (AvailableItem) other
+
+        if (binLocation != that.binLocation) return false
+        if (inventoryItem != that.inventoryItem) return false
+        if (pickedRequisitionNumbers != that.pickedRequisitionNumbers) return false
+        if (quantityAvailable != that.quantityAvailable) return false
+        if (quantityOnHand != that.quantityOnHand) return false
+
+        return true
+    }
+
+    @Override
+    int hashCode() {
+        int result
+        result = (inventoryItem != null ? inventoryItem.hashCode() : 0)
+        result = 31 * result + (binLocation != null ? binLocation.hashCode() : 0)
+        result = 31 * result + (quantityAvailable != null ? quantityAvailable.hashCode() : 0)
+        result = 31 * result + (quantityOnHand != null ? quantityOnHand.hashCode() : 0)
+        result = 31 * result + (pickedRequisitionNumbers != null ? pickedRequisitionNumbers.hashCode() : 0)
+        return result
+    }
 }
 
 enum AvailableItemStatus {

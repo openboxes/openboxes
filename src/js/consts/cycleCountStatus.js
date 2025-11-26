@@ -7,4 +7,5 @@ export default {
   REVIEWED: 'REVIEWED',
   COMPLETED: 'COMPLETED',
   CANCELED: 'CANCELED',
+  CREATED: 'CREATED',
 };

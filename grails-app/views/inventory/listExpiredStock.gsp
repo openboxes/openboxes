@@ -101,11 +101,8 @@
 											   default="Expires after"
 									/>
 								</label>
-								<g:jqueryDatePicker id="startDate"
-													name="startDate"
+								<g:jqueryDatePicker name="startDate"
 													cssClass="filter"
-													format="MM/dd/yyyy"
-													autocomplete="off"
 													value="${command?.startDate}"
 								/>
 							</div>
@@ -115,11 +112,8 @@
 											   default="Expires before"
 									/>
 								</label>
-								<g:jqueryDatePicker id="endDate"
-													name="endDate"
+								<g:jqueryDatePicker name="endDate"
 													cssClass="filter"
-													format="MM/dd/yyyy"
-													autocomplete="off"
 													value="${command.endDate}"
 								/>
 							</div>

@@ -1,0 +1,64 @@
+.dashboard-container {
+  background: white;
+
+  .cards-container {
+    .card-component {
+      .number-card {
+        justify-content: flex-start;
+
+        .number-div {
+          .number-body {
+            .title-card {
+              color: var(--gray-600);
+              font-size: 14px;
+            }
+
+            .result-card {
+              padding-top: 10px;
+              color: var(--blue-700);
+              font-weight: bold;
+              font-size: 32px;
+            }
+
+            .subtitle-card {
+              color: var(--gray-400);
+              font-size: 13px;
+            }
+          }
+
+          .number-infos {
+            right: 15px;
+            color: var(--gray-400);
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 535px) {
+  .double-tile {
+    width: 96%;
+  }
+  .number-card {
+    width: 47%;
+  }
+}
+
+@media (min-width: 868px) {
+  .double-tile {
+    width: 47%;
+  }
+  .number-card {
+    width: 22.5%;
+  }
+}
+
+@media (min-width: 1368px) {
+  .double-tile {
+    width: 29.5%;
+  }
+  .number-card {
+    width: 14.5%;
+  }
+}

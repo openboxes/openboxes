@@ -91,24 +91,6 @@
 							</tr>
 						
 							<tr class="prop">
-								<td valign="top" class="name">
-									<label for="dateCreated"><warehouse:message code="productAssociation.dateCreated.label" default="Date Created" /></label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean: productAssociationInstance, field: 'dateCreated', 'errors')}">
-									<g:datePicker name="dateCreated" precision="minute" value="${productAssociationInstance?.dateCreated}"  />
-								</td>
-							</tr>
-						
-							<tr class="prop">
-								<td valign="top" class="name">
-									<label for="lastUpdated"><warehouse:message code="productAssociation.lastUpdated.label" default="Last Updated" /></label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean: productAssociationInstance, field: 'lastUpdated', 'errors')}">
-									<g:datePicker name="lastUpdated" precision="minute" value="${productAssociationInstance?.lastUpdated}"  />
-								</td>
-							</tr>
-						
-							<tr class="prop">
 								<td valign="top"></td>
 								<td valign="top">
 									<div class="buttons left">

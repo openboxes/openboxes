@@ -362,40 +362,6 @@ class LocationController {
         }
     }
 
-    def showForecastingConfiguration() {
-        def locationInstance = Location.get(params.id)
-        if (!locationInstance) {
-            render "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
-        }
-
-        def inventoryLevelInstance = InventoryLevel.findByInventoryAndProductIsNull(locationInstance.inventory)
-
-        if (!inventoryLevelInstance) {
-            inventoryLevelInstance = new InventoryLevel(inventory: locationInstance.inventory)
-        }
-
-        [inventoryLevelInstance: inventoryLevelInstance]
-    }
-
-    def updateForecastingConfiguration() {
-        def locationInstance = Location.get(params.id)
-        if (!locationInstance) {
-            render "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
-        }
-
-        def inventoryLevelInstance = InventoryLevel.findByInventoryAndProductIsNull(locationInstance.inventory)
-
-        if (!inventoryLevelInstance) {
-            inventoryLevelInstance = new InventoryLevel(inventory: locationInstance.inventory)
-        }
-
-        inventoryLevelInstance.properties = params
-
-        inventoryLevelDataService.save(inventoryLevelInstance)
-
-        redirect(action: "edit", id: locationInstance.id)
-    }
-
     def importBinLocations() {
         try {
             MultipartFile multipartFile = request.getFile('fileContents')

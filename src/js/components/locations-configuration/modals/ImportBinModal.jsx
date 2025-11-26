@@ -8,7 +8,7 @@ import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
-import FileSelect from 'components/form-elements/v2/FileSelect';
+import DropzoneFileSelect from 'components/form-elements/v2/DropzoneFileSelect';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -114,7 +114,7 @@ class ImportBinModal extends Component {
             data={this.state.supportLinks}
             options={{ renderInnerHtml: true }}
           />
-          <FileSelect className="my-3" onChange={this.onDrop} />
+          <DropzoneFileSelect className="my-3" onChange={this.onDrop} />
         </div>
       </ModalWrapper>
     );

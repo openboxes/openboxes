@@ -237,6 +237,9 @@ class PurchaseOrderApiController {
     }
 
     def orderItemsDerivedStatus = {
+        if (!Order.read(params.id)) {
+            throw new IllegalArgumentException("Order with id '$params.id' does not exist")
+        }
         render orderSummaryService.getOrderItemsDerivedStatus(params.id) as JSON
     }
 }

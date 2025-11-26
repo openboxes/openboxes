@@ -1,9 +1,10 @@
 package org.pih.warehouse.api.spec.base
 
-import grails.buildtestdata.TestDataBuilder
 import grails.buildtestdata.TestDataConfigurationHolder
 import io.restassured.RestAssured
 import io.restassured.builder.RequestSpecBuilder
+import io.restassured.config.LogConfig
+import io.restassured.filter.log.LogDetail
 import io.restassured.http.ContentType
 import io.restassured.http.Cookie
 import io.restassured.response.Response
@@ -14,13 +15,25 @@ import spock.lang.Shared
 
 import org.pih.warehouse.api.client.base.AuthenticatedApiContext
 import org.pih.warehouse.api.client.base.UnauthenticatedApiContext
+import org.pih.warehouse.api.client.inventory.RecordStockApiWrapper
+import org.pih.warehouse.api.client.product.CategoryApiWrapper
+import org.pih.warehouse.api.client.product.ProductApiWrapper
+import org.pih.warehouse.api.util.JsonObjectUtil
 import org.pih.warehouse.common.base.IntegrationSpec
-import org.pih.warehouse.common.domains.builders.location.TestLocationBuilder
+import org.pih.warehouse.common.domain.builder.core.LocationTestBuilder
+import org.pih.warehouse.common.domain.builder.inventory.RecordInventoryCommandTestBuilder
+import org.pih.warehouse.common.domain.builder.product.CategoryTestBuilder
+import org.pih.warehouse.common.domain.builder.product.ProductTestBuilder
+import org.pih.warehouse.common.service.TransactionTestService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.api.client.auth.AuthApiWrapper
 import org.pih.warehouse.api.util.JsonPathUtil
 import org.pih.warehouse.common.util.RandomUtil
 import org.pih.warehouse.api.util.ResponseSpecUtil
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.RecordInventoryCommand
+import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.Product
 
 /**
  * Base class for all of our API/component tests.
@@ -40,11 +53,11 @@ import org.pih.warehouse.api.util.ResponseSpecUtil
  * used the annotation, the Domain.save() data would get rolled back successfully, but would be totally inaccessible
  * by the server during the tests.
  *
- * As such, it's important to note that tests do *not* automatically cleanup their data. While we should try to add a
+ * As such, it's important to note that tests do *not* automatically clean up their data. While we should try to add a
  * clean up step to our test suites, it's not enforceable that this actually happens, and so tests should always assume
  * the database is in a dirty state before running.
  */
-abstract class ApiSpec extends IntegrationSpec implements TestDataBuilder {
+abstract class ApiSpec extends IntegrationSpec {
 
     static final String INVALID_ID = "-1"
 
@@ -64,10 +77,25 @@ abstract class ApiSpec extends IntegrationSpec implements TestDataBuilder {
     UnauthenticatedApiContext unauthenticatedApiContext
 
     @Shared
-    Location location
+    Location facility
 
     @Shared
-    Location otherLocation
+    Product product
+
+    @Shared
+    Category rootCategory
+
+    @Autowired
+    TransactionTestService transactionTestService
+
+    @Autowired
+    RecordStockApiWrapper recordStockApiWrapper
+
+    @Autowired
+    ProductApiWrapper productApiWrapper
+
+    @Autowired
+    CategoryApiWrapper categoryApiWrapper
 
     @Autowired
     AuthApiWrapper authApiWrapper
@@ -79,6 +107,9 @@ abstract class ApiSpec extends IntegrationSpec implements TestDataBuilder {
     ResponseSpecUtil responseSpecUtil
 
     @Autowired
+    JsonObjectUtil jsonObjectUtil
+
+    @Autowired
     JsonPathUtil jsonPathUtil
 
     /**
@@ -86,24 +117,14 @@ abstract class ApiSpec extends IntegrationSpec implements TestDataBuilder {
      * for creating Domain objects when you just need some instance of a domain to exist in the db for you to use.
      * All domains that we work with should be defined in TestDataConfig.groovy so that the findOrBuild method knows
      * what to do if a field isn't provided. More info: https://longwa.github.io/build-test-data/index#findorbuild
-     *
-     * Marked with @Transactional since we're working directly with Domain objects, which need a transaction.
-     *
-     * Make sure to annotate child class implementations with @Transactional as well since unfortunately the annotation
-     * doesn't automatically apply to child classes.
      */
-    @Transactional
-    abstract void setupData()
+    void setupData() {
+        // Providing a blank default implementation. Tests will override this to set up the data that they need.
+    }
 
     /**
      * Removes all data created in the setupData step, likely via the Domain.delete() method.
-     *
-     * Marked with @Transactional since we're working directly with Domain objects, which need a transaction.
-     *
-     * Make sure to annotate child class implementations with @Transactional as well since unfortunately the annotation
-     * doesn't automatically apply to child classes.
      */
-    @Transactional
     void cleanupData() {
         // Providing a blank default implementation. Our tests should assume a dirty DB state and so it isn't
         // strictly required for us to do any database cleanup, but tests can override this method if they want to.
@@ -111,6 +132,17 @@ abstract class ApiSpec extends IntegrationSpec implements TestDataBuilder {
         // on foreign key constraints if child objects aren't deleted first.
     }
 
+    void setupSpec() {
+        // Enables logging the request and response content when the asserts on an API call fail.
+        RestAssured.config = RestAssured.config()
+                .logConfig(LogConfig.logConfig()
+                        .enableLoggingOfRequestAndResponseIfValidationFails(LogDetail.ALL)
+                        .enablePrettyPrinting(true))
+    }
+
+    /**
+     * Child classes shouldn't need to override this. Override setupData() instead.
+     */
     @Transactional
     void setup() {
         setupRestAssuredGlobalConfig()
@@ -121,25 +153,33 @@ abstract class ApiSpec extends IntegrationSpec implements TestDataBuilder {
         RequestSpecification baseUnauthenticatedRequestSpec = buildDefaultUnauthenticatedRequestSpec()
         unauthenticatedApiContext.loadContext(baseUnauthenticatedRequestSpec)
 
-        // Create two locations so that we can test cross-facility flows.
-        // Note that we don't attempt to clean up these locations on test teardown because if any test that uses them
-        // fails to clean up their own data, we'll fail to delete the location due to foreign key validation errors.
-        location = new TestLocationBuilder(name: "TEST LOCATION")
-                .facilityLocation()
-                .findOrBuild()
-        otherLocation = new TestLocationBuilder(name: "OTHER TEST LOCATION")
-                .facilityLocation()
-                .findOrBuild()
-
-        cookie = createTestUser(location)
+        // Create the facility if it doesn't exist yet (it should) and log the user into it.
+        facility = createMainFacility()
+        cookie = logInTestUser(facility)
         RequestSpecification baseRequestSpec = buildDefaultRequestSpec(cookie)
         authenticatedApiContext.loadContext(baseRequestSpec)
+
+        // Set up some convenience data for tests. We shouldn't go overboard with setting stuff here. Only set
+        // entities that a majority of tests will need to use. Test-specific setup should go in setupData().
+        rootCategory = createRootCategory()
+        product = createMainProduct()
+
+        // In case the product already existed, wipe out any transactions on it so that we start from a fresh product.
+        transactionTestService.deleteAllTransactions(facility, product)
 
         setupData()
     }
 
+    /**
+     * Child classes shouldn't need to override this. Override cleanupData() instead.
+     */
     @Transactional
     void cleanup() {
+        // Note that we don't attempt to clean up the convenience data that we created during setup because if any
+        // test creates data that references them, such as adding stock to the product, and forgets to clean that up,
+        // deleting the product will fail due to foreign key validation errors. So for simplicity we leave them in
+        // the database.
+
         // Restores the generators in TestDataConfig in case any tests overrode the behaviour. This will also cause any
         // variables in TestDataConfig to be reset to their initial values and any randoms to be regenerated.
         TestDataConfigurationHolder.reset()
@@ -159,7 +199,7 @@ abstract class ApiSpec extends IntegrationSpec implements TestDataBuilder {
     /**
      * Authenticate a user and extract their session id for use by all subsequent requests.
      */
-    private Cookie createTestUser(Location location) {
+    private Cookie logInTestUser(Location location) {
         Response authResponse = authApiWrapper.loginOK(username, password, location.id)
         return authResponse.getDetailedCookie("JSESSIONID")
     }
@@ -187,5 +227,56 @@ abstract class ApiSpec extends IntegrationSpec implements TestDataBuilder {
                 .setAccept(ContentType.JSON)
                 .setContentType(ContentType.JSON)
                 .build()
+    }
+
+    private Location createMainFacility() {
+        return new LocationTestBuilder().findOrBuildMainFacility()
+    }
+
+    private Product createMainProduct() {
+        return productApiWrapper.saveOK(new ProductTestBuilder()
+                .name("Test Product A")
+                .category(rootCategory)
+                .build())
+    }
+
+    private Category createRootCategory() {
+        return categoryApiWrapper.createOK(new CategoryTestBuilder()
+                .name("Test Root Category")
+                .rootCategory()
+                .build())
+    }
+
+    /**
+     * Performs a record stock operation on the default test facility.
+     * RecordInventoryCommandTestBuilder will likely be useful for constructing the command object.
+     */
+    void setStock(RecordInventoryCommand command) {
+        recordStockApiWrapper.saveRecordStockOK(facility, command)
+    }
+
+    /**
+     * Performs a record stock operation on the default test facility where you only need to add stock to a single
+     * lot + bin. If you need to set the stock for multiple bins/lots, use RecordInventoryCommandTestBuilder instead.
+     *
+     * Transaction date will be the current timestamp, and any other transactions existing at the current time
+     * will be deleted.
+     */
+    void setStock(Product product, InventoryItem item, Location binLocation, int quantity) {
+        // We opt to do this via record stock since it sets a baseline and can be done in a single API call.
+        RecordInventoryCommand command = new RecordInventoryCommandTestBuilder()
+                .product(product)
+                .inventory(facility.inventory)
+                .transactionDateNow()
+                .row(item?.lotNumber, item?.expirationDate, binLocation, quantity)
+                .build()
+
+        // We're trying to set the current stock for a product, so we need to delete any pre-existing transactions
+        // that were created this second (which is very likely to happen during tests since they run really fast).
+        // If we don't do this, duplicate transaction exceptions will be thrown or we'll end up with unexpected
+        // QoH due to multiple baselines or adjustments existing at the same exact time.
+        transactionTestService.deleteTransactionsOnOrAfterDate(facility, product, command.transactionDate)
+
+        setStock(command)
     }
 }

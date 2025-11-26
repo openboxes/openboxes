@@ -3,24 +3,44 @@ import React from 'react';
 import { flexRender } from '@tanstack/react-table';
 import PropTypes from 'prop-types';
 
-const DataTableHeader = ({ headerGroups }) => (
-  <div className="rt-thead -header">
+import useTableColumnMeta from 'hooks/useTableColumnMeta';
+import getCommonPinningStyles from 'utils/getCommonPinningStyles';
+
+const DataTableHeader = ({
+  headerGroups,
+  tableWithPinnedColumns,
+  isScreenWiderThanTable,
+}) => (
+  <div
+    className="rt-thead -header"
+    style={{ width: (!isScreenWiderThanTable && tableWithPinnedColumns) ? 'fit-content' : undefined }}
+  >
     <div className="rt-tr">
-      {headerGroups
-        .map((headerGroup) => (
-          headerGroup.headers.map((header) => {
-            if (header.column.columnDef?.meta?.hide) {
-              return null;
-            }
-            const className = header.column.columnDef.meta?.getCellContext?.().className;
-            const flexWidth = header.column.columnDef.meta?.flexWidth || 1;
-            return (
-              <div style={{ flex: flexWidth }} className={`header-cell ${className ?? ''}`} key={header.id}>
-                {flexRender(header.column.columnDef.header, header.getContext())}
-              </div>
-            );
-          })
-        ))}
+      {headerGroups.map((headerGroup) =>
+        headerGroup.headers.map((header) => {
+          const { hide, flexWidth, className } = useTableColumnMeta(header.column);
+          if (hide) {
+            return null;
+          }
+
+          return (
+            <div
+              key={header.id}
+              className={`header-cell ${className}`}
+              style={{
+                ...getCommonPinningStyles(
+                  header.column,
+                  flexWidth,
+                  isScreenWiderThanTable,
+                  true,
+                  false,
+                ),
+              }}
+            >
+              {flexRender(header.column.columnDef.header, header.getContext())}
+            </div>
+          );
+        }))}
     </div>
   </div>
 );
@@ -28,7 +48,11 @@ const DataTableHeader = ({ headerGroups }) => (
 export default DataTableHeader;
 
 DataTableHeader.propTypes = {
-  headerGroups: PropTypes.arrayOf(
-    PropTypes.shape({}),
-  ).isRequired,
+  headerGroups: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  tableWithPinnedColumns: PropTypes.bool,
+  isScreenWiderThanTable: PropTypes.bool.isRequired,
+};
+
+DataTableHeader.defaultProps = {
+  tableWithPinnedColumns: false,
 };

@@ -42,7 +42,7 @@ class Tag implements Serializable {
     static hasMany = [products: Product]
 
     static constraints = {
-        tag(nullable: false, maxSize: 255)
+        tag(nullable: false, blank: false, maxSize: 255)
         isActive(nullable: true)
         updatedBy(nullable: true)
         createdBy(nullable: true)

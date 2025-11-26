@@ -7,7 +7,23 @@
     <!--  First, run the regular migrations  -->
     <include file="changelog.groovy" />
 
-    <!--  Then run the test fixtures to prop the test data  -->
+    <!--
+    Then run test-specific migrations to populate test data (ideally via include statements so this file stays clean).
+
+    All changeSets defined here and in child changeSets should set context='test' to make sure they're only applied
+    when running tests. https://docs.liquibase.com/concepts/changelogs/attributes/contexts.html
+
+    It's safe to edit the data in these test changelogs without bumping the changeSet id. Integration tests use
+    testcontainers, which recreate the database within a new container each time tests are run. This means all
+    changeSets will always be applied when tests are run since they're running from a clean database.
+
+    Test data created via these migrations will be shared amongst ALL integration tests, which can cause data leaks
+    across tests. (Ex: One test deletes a product that was created via the migration, then another test in a different
+    spec tries to use that product and fails.) Until we can wipe and repopulate the DB for each test spec, we'll need
+    to ensure tests don't rely too heavily on the precise format of the data defined here.
+
+    Because of the above, it's generally best for tests to directly create (and clean up) their own test data.
+    -->
 <!--    <include file="xyz.sql" />-->
 
 </databaseChangeLog>

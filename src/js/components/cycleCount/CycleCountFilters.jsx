@@ -2,7 +2,6 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-import cycleCountFilterFields from 'components/cycleCount/CycleCountFilterFields';
 import FilterForm from 'components/Filter/FilterForm';
 import ListFilterFormWrapper from 'wrappers/ListFilterFormWrapper';
 
@@ -11,10 +10,11 @@ const CycleCountFilters = ({
   defaultValues,
   formProps,
   isLoading,
+  filterFields,
 }) => (
   <ListFilterFormWrapper>
     <FilterForm
-      filterFields={cycleCountFilterFields}
+      filterFields={filterFields}
       updateFilterParams={(values) => setFilterParams({ ...values })}
       formProps={formProps}
       defaultValues={defaultValues}
@@ -24,7 +24,8 @@ const CycleCountFilters = ({
       ignoreClearFilters={['tab']}
       hidden={false}
       isLoading={isLoading}
-      isCycleCountTab
+      customSubmitButtonLabel="react.button.filter.label"
+      customSubmitButtonDefaultLabel="Filter"
     />
   </ListFilterFormWrapper>
 );
@@ -36,6 +37,7 @@ CycleCountFilters.propTypes = {
   defaultValues: PropTypes.shape({}).isRequired,
   formProps: PropTypes.shape({}),
   isLoading: PropTypes.bool.isRequired,
+  filterFields: PropTypes.shape({}).isRequired,
 };
 
 CycleCountFilters.defaultProps = {

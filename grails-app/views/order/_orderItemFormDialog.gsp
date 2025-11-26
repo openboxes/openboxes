@@ -133,7 +133,7 @@
             </tr>
             <tr class="prop">
                 <td valign="top" class="name">
-                    <label for="dlgEstimatedReadyDate"><warehouse:message code="orderItem.estimatedReadyDate.label"/></label>
+                    <label for="dlgEstimatedReadyDate"><warehouse:message code="orderItem.quotedShipDate.label"/></label>
                 </td>
                 <td valign="top" class="value">
                     <input class="text large datepicker" id="dlgEstimatedReadyDate" name="estimatedReadyDate"
@@ -156,7 +156,7 @@
             <g:if test="${orderItem?.order?.status >= OrderStatus.PLACED}">
                 <tr class="prop">
                     <td valign="top" class="name">
-                        <label><warehouse:message code="orderItem.actualReadyDate.label"/></label>
+                        <label><warehouse:message code="orderItem.currentExpectedShipDate.label"/></label>
                     </td>
                     <td valign="top" class="value">
                         <input class="text large datepicker" name="actualReadyDate"
@@ -295,7 +295,7 @@
             </tr>
             <tr class="prop">
                 <td valign="top" class="name">
-                    <label for="dlgEstimatedReadyDate"><warehouse:message code="orderItem.estimatedReadyDate.label"/></label>
+                    <label for="dlgEstimatedReadyDate"><warehouse:message code="orderItem.quotedShipDate.label"/></label>
                 </td>
                 <td valign="top" class="value">
                     <input class="text large datepicker" id="dlgEstimatedReadyDate" name="estimatedReadyDate"
@@ -304,7 +304,7 @@
             </tr>
             <tr class="prop">
                 <td valign="top" class="name">
-                    <label for="dlgActualReadyDate"><warehouse:message code="orderItem.actualReadyDate.label"/></label>
+                    <label for="dlgActualReadyDate"><warehouse:message code="orderItem.currentExpectedShipDate.label"/></label>
                 </td>
                 <td valign="top" class="value">
                     <input class="text large datepicker" id="dlgActualReadyDate" name="actualReadyDate" value="${orderItem?.actualReadyDate?.format("MM/dd/yyyy")}" />

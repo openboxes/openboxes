@@ -47,9 +47,9 @@
                             
                                 <td>${fieldValue(bean: partyRoleInstance, field: "roleType")}</td>
                             
-                                <td><format:date obj="${partyRoleInstance.startDate}" /></td>
+                                <td><g:formatDate date="${partyRoleInstance.startDate}" /></td>
                             
-                                <td><format:date obj="${partyRoleInstance.endDate}" /></td>
+                                <td><g:formatDate date="${partyRoleInstance.endDate}" /></td>
                             
                             </tr>
                         </g:each>

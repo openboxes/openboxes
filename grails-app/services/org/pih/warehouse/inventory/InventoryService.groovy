@@ -9,18 +9,26 @@
  **/
 package org.pih.warehouse.inventory
 
-import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.plugins.csv.CSVWriter
 import grails.validation.ValidationException
 import org.hibernate.criterion.CriteriaSpecification
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.localization.MessageLocalizer
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.ImporterUtil
+import org.pih.warehouse.inventory.product.ExpirationHistoryReport
+import org.pih.warehouse.inventory.product.availability.AvailableItemKey
+import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAvailability
@@ -41,8 +49,12 @@ class InventoryService implements ApplicationContextAware {
 
     def sessionFactory
     def persistenceInterceptor
-    GrailsApplication grailsApplication
     TransactionEntryDataService transactionEntryDataService
+    RecordStockProductInventoryTransactionService recordStockProductInventoryTransactionService
+    ProductAvailabilityService productAvailabilityService
+    ConfigService configService
+    InventoryItemManager inventoryItemManager
+    MessageLocalizer messageLocalizer
 
     def authService
     def dataService
@@ -388,7 +400,7 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
-    def getProductsByTagId(List<String> tagIds) {
+    List<Product> getProductsByTagId(List<String> tagIds) {
         def products = Product.withCriteria {
             tags {
                 'in'('id', tagIds)
@@ -893,6 +905,33 @@ class InventoryService implements ApplicationContextAware {
         return getQuantityByBinLocation(entries, false)
     }
 
+    /**
+     * Given a list of transaction entries, compute the total quantity for each bin + inventory item pair, then
+     * convert them to an available item.
+     */
+    List<AvailableItem> getQuantityAsAvailableItems(List<TransactionEntry> entries) {
+
+        // quantityMap is: Map<Product, Map<InventoryItem, Map<Location, Integer>>>
+        Map quantityMap = getQuantityByProductAndInventoryItemMap(entries, true) as Map<Product, Map>
+
+        List<AvailableItem> availableItems = []
+        for (productEntry in quantityMap.entrySet()) {
+
+            for (inventoryItemEntry in productEntry.value.entrySet()) {
+
+                InventoryItem inventoryItem = inventoryItemEntry.key as InventoryItem
+                for (binLocationEntry in (inventoryItemEntry.value as Map<Location, Integer>).entrySet()) {
+                    AvailableItem availableItem = new AvailableItem(
+                            quantityOnHand: binLocationEntry.value,
+                            binLocation: binLocationEntry.key,
+                            inventoryItem: inventoryItem,
+                    )
+                    availableItems.add(availableItem)
+                }
+            }
+        }
+        return availableItems
+    }
 
     def getQuantityByProductGroup(Location location) {
         def quantityMap = getQuantityByProductMap(location.inventory)
@@ -1338,107 +1377,164 @@ class InventoryService implements ApplicationContextAware {
         }
     }
 
+    List<RecordInventoryRowCommand> groupDuplicatedRecordInventoryRows(RecordInventoryCommand cmd) {
+        return cmd.recordInventoryRows
+                .groupBy { row ->
+                    new AvailableItemKey(
+                            cmd?.product?.id,
+                            row?.lotNumber as String,
+                            row?.binLocation?.name as String
+                    )
+                }
+                .collect { key, rows ->
+                    Integer totalNewQty = rows.sum { it.newQuantity ?: 0 }
+                    Integer existingOldQty = rows.find { it.oldQuantity > 0 }?.oldQuantity ?: 0
+
+                    RecordInventoryRowCommand merged = rows[0]
+                    merged.newQuantity = totalNewQty
+                    merged.oldQuantity = existingOldQty
+                    return merged
+                }
+    }
+
     /**
-     * Processes a RecordInventory Command object and perform updates
-     *
-     * @param cmd
-     * @param params
-     * @return
+     * Perform a Record Stock operation on a product, setting a new quantity for all of its items
+     * at a given facility.
      */
     RecordInventoryCommand saveRecordInventoryCommand(RecordInventoryCommand cmd, Map params) {
         log.debug "Saving record inventory command params: " + params
 
-        try {
-            // Create a new transaction
-            Transaction transaction = new Transaction(cmd.properties)
-            transaction.inventory = cmd.inventory
-            transaction.comment = cmd.comment
-            transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
-            transaction.transactionNumber = generateTransactionNumber(transaction)
-
-            // Process each row added to the record inventory page
-            cmd.recordInventoryRows.each { row ->
-
-                if (row) {
-                    if (row.expirationDate && !row.lotNumber) {
-                        cmd.errors.reject("inventoryItem.invalid", "Items with an expiry date must also have a lot number")
-                        row.error = true
-                        return cmd
-                    }
-
-                    if(cmd.product && cmd.product.lotAndExpiryControl && (!row.expirationDate || !row.lotNumber)) {
-                        cmd.errors.reject("inventoryItem.invalid", "Both lot number and expiry date are required for this product.")
-                        row.error = true
-                        return cmd
-                    }
-
-                    // 1. Find an existing inventory item for the given lot number and product and description
-                    InventoryItem inventoryItem =
-                            findInventoryItemByProductAndLotNumber(cmd.product, row.lotNumber)
-
-                    // 2. If the inventory item doesn't exist, we create a new one
-                    if (!inventoryItem) {
-                        inventoryItem = new InventoryItem()
-                        inventoryItem.properties = row.properties
-                        inventoryItem.product = cmd.product
-                        if (!inventoryItem.hasErrors() && inventoryItem.save()) {
-
-                        } else {
-                            // TODO Old error message = "Property [${error.getField()}] of [${inventoryItem.class.name}] with value [${error.getRejectedValue()}] is invalid"
-                            inventoryItem.errors.allErrors.each { error ->
-                                cmd.errors.reject("inventoryItem.invalid",
-                                        [
-                                                inventoryItem,
-                                                error.getField(),
-                                                error.getRejectedValue()] as Object[],
-                                        "[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ")
-
-                            }
-                            // We need to fix these errors before we can move on
-                            return cmd
-                        }
-                    }
-                    // 3. Create a new transaction entry (even if quantity didn't change)
-                    TransactionEntry transactionEntry = new TransactionEntry()
-                    transactionEntry.properties = row.properties
-                    transactionEntry.quantity = row.newQuantity
-                    transactionEntry.product = inventoryItem?.product
-                    transactionEntry.inventoryItem = inventoryItem
-                    transactionEntry.binLocation = row.binLocation
-                    transactionEntry.comments = row.comment
-                    transaction.addToTransactionEntries(transactionEntry)
-                }
+        // First, we need to check if there is no validation error (OBPIH-7438)
+        cmd.recordInventoryRows.each { RecordInventoryRowCommand row ->
+            if (!row) {
+                return null
             }
 
-            // 4. Make sure that the inventory item has been saved before we process the transactions
-            if (!cmd.hasErrors()) {
-                // Check if there are any changes recorded ... no reason to
-                if (!transaction.transactionEntries) {
-                    // We could do this, but it keeps us from changing the lot number and description
-                    cmd.errors.reject("transaction.noChanges", "There are no quantity changes in the current transaction")
-                } else {
-                    // Quantity available to promise will be manually calculated,
-                    // because we want to have the latest value on the Stock Card view
-                    // The calculation is done in the controller to avoid circular dependency (adding dependency to productAvailabilityService here)
-                    transaction.disableRefresh = Boolean.TRUE
-                    if (!transaction.hasErrors() && transaction.save(flush: true)) {
-                        // We saved the transaction successfully
-                    } else {
-                        transaction.errors.allErrors.each { error ->
-                            cmd.errors.reject("transaction.invalid",
-                                    [
-                                            transaction,
-                                            error.getField(),
-                                            error.getRejectedValue()] as Object[],
-                                    "Property [${error.getField()}] of [${transaction.class.name}] with value [${error.getRejectedValue()}] is invalid")
-                        }
-                    }
+            if (row.expirationDate && !row.lotNumber) {
+                cmd.errors.reject("inventoryItem.invalid", "Items with an expiry date must also have a lot number")
+                row.error = true
+                return cmd
+            }
+
+            if (cmd.product && cmd.product.lotAndExpiryControl && (!row.expirationDate || !row.lotNumber)) {
+                cmd.errors.reject("inventoryItem.invalid", "Both lot number and expiry date are required for this product.")
+                row.error = true
+                return cmd
+            }
+        }
+
+        if (cmd.hasErrors()) {
+            return cmd
+        }
+
+        Date adjustmentTransactionDate = new Date(cmd.transactionDate.time + 1000)
+
+        try {
+            // 1. Calculate the current available items for the given product
+            AvailableItemMap availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
+                    currentLocation,
+                    [cmd.product],
+                    new Date(cmd.transactionDate.time + 2000)
+            )
+
+            // We'd have weird behaviour if we allowed two transactions to exist at the same exact time (precision at the
+            // database level is to the second) so fail if there's already a transaction on the items for the given date.
+            if (hasTransactionEntriesOnDate(currentLocation, adjustmentTransactionDate, [cmd.product])) {
+                throw new IllegalArgumentException("A transaction already exists at time ${adjustmentTransactionDate}")
+            }
+
+            InventoryBaselineTransactionCommand<RecordInventoryCommand> command = new InventoryBaselineTransactionCommand(
+                    facility: currentLocation,
+                    sourceObject: cmd,
+                    products: [cmd.product],
+                    availableItems: availableItems,
+                    transactionDate: cmd.transactionDate,
+                    disableRefresh: true // Don't refresh product availability. That will get done manually at the end.
+            )
+            // 1. Create the baseline transaction
+            Transaction baselineTransaction =
+                    recordStockProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(command)
+
+            // 2. Create a new adjustment transaction
+            Transaction adjustmentTransaction = recordStockProductInventoryTransactionService.createAdjustmentTransaction(
+                    cmd,
+                    adjustmentTransactionDate,
+                    baselineTransaction?.transactionSource
+            )
+
+            List<AvailableItem> currentRecordStockItems = []
+            // 3. Process each row added to the record inventory page
+            groupDuplicatedRecordInventoryRows(cmd).each { RecordInventoryRowCommand row ->
+                if (!row) {
+                    return null
                 }
+
+                InventoryItem inventoryItem = inventoryItemManager.getOrCreateInventoryItem(
+                        cmd.product,
+                        row.lotNumber,
+                        row.expirationDate,
+                        true,  // Don't refresh product availability. That will get done manually at the end.
+                )
+
+                // Create new transaction entries (but only if the quantity changed)
+                TransactionEntry transactionEntry = recordStockProductInventoryTransactionService.createAdjustmentTransactionEntry(
+                        row,
+                        inventoryItem,
+                        availableItems,
+                )
+
+                if (transactionEntry) {
+                    adjustmentTransaction.addToTransactionEntries(transactionEntry)
+                }
+
+                currentRecordStockItems.add(
+                        new AvailableItem(
+                                quantityOnHand: row.oldQuantity,
+                                inventoryItem: inventoryItem,
+                                binLocation: row.binLocation,
+                        )
+                )
+            }
+
+            // For those products that exist in the system (ie have a product availability entry) but were not
+            // on the record stock while creating backdated entry, should have their quantity set to zero.
+            List<TransactionEntry> transactionEntries = recordStockProductInventoryTransactionService.createZeroingTransactionEntries(
+                    availableItems,
+                    currentRecordStockItems
+            )
+
+            if (transactionEntries.size() > 0) {
+                transactionEntries.each(adjustmentTransaction.&addToTransactionEntries)
+            }
+
+            // 4. Check whether any errors didn't come up
+            if (cmd.hasErrors()) {
+                return null
+            }
+
+            // 5. Check if there are any changes in quantity recorded. If there aren't, we're done.
+            if (!adjustmentTransaction.transactionEntries) {
+                return cmd
+            }
+
+            if (adjustmentTransaction.hasErrors() || !adjustmentTransaction.save()) {
+                adjustmentTransaction.errors.allErrors.each { error ->
+                    cmd.errors.reject(
+                            "transaction.invalid",
+                            [
+                                    adjustmentTransaction,
+                                    error.field,
+                                    error.rejectedValue
+                            ] as Object[],
+                            "Property [${error.field}] of [${adjustmentTransaction.class.name}] with value [${error.rejectedValue}] is invalid"
+                    )
+                }
+                return null
             }
         } catch (Exception e) {
-            log.error("Error saving an inventory record to the database ", e)
-            throw e
+            cmd.errors.reject("Error saving an inventory record to the database: " + e.message)
         }
+
         return cmd
     }
 
@@ -1612,6 +1708,14 @@ class InventoryService implements ApplicationContextAware {
      */
     InventoryItem findOrCreateInventoryItem(InventoryItem inventoryItem) {
         return findOrCreateInventoryItem(inventoryItem.product, inventoryItem.lotNumber, inventoryItem.expirationDate)
+    }
+
+    /**
+     * Fetches the inventory item associated with the default lot of the given product,
+     * creating it if it does not exist.
+     */
+    InventoryItem findOrCreateDefaultInventoryItem(Product product) {
+        return findOrCreateInventoryItem(product, null, null)
     }
 
     /**
@@ -1802,16 +1906,22 @@ class InventoryService implements ApplicationContextAware {
         def binLocation = command.binLocation
         def availableQuantity = getQuantityFromBinLocation(location, binLocation, inventoryItem)
         def adjustedQuantity = newQuantity - availableQuantity
+        Date transactionDate = new Date()
 
         log.info "Check quantity: ${newQuantity} vs ${availableQuantity}: ${availableQuantity == newQuantity}"
         if (availableQuantity == newQuantity || adjustedQuantity == 0) {
             command.errors.rejectValue("newQuantity", "adjustStock.invalid.quantity.message")
         }
 
+        // Reports and QoH calculations get messed up if two transactions for a product exist at the same exact time.
+        if (hasTransactionEntriesOnDate(location, transactionDate, [inventoryItem.product])) {
+            command.errors.rejectValue("transactionDate", "adjustStock.invalid.transactionDate.duplicate.message")
+        }
+
         if (command.validate() && !command.hasErrors()) {
             // Need to create a transaction if we want the inventory item to show up in the stock card
             def transaction = new Transaction()
-            transaction.transactionDate = new Date()
+            transaction.transactionDate = transactionDate
             transaction.transactionType =
                     TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
             transaction.inventory = inventory
@@ -1832,51 +1942,6 @@ class InventoryService implements ApplicationContextAware {
         }
         return command
     }
-
-
-    def createStockSnapshot(Location location, Product product) {
-        List lineItems = getProductQuantityByBinLocation(location, product)
-
-        // If there's no stock we should record that as well
-        if (!lineItems || lineItems?.empty) {
-            InventoryItem inventoryItem = findOrCreateInventoryItem(product, null, null)
-            lineItems << [binLocation: null, inventoryItem: inventoryItem, quantity: 0]
-        }
-
-
-        recordStock(location, lineItems)
-    }
-
-
-    def recordStock(Location location, List lineItems) {
-
-        if (!location || !location.inventory) {
-            throw new IllegalArgumentException("Record stock transactions require a location")
-        }
-
-        Transaction transaction = new Transaction()
-        transaction.transactionDate = new Date()
-        transaction.inventory = location.inventory
-        transaction.transactionNumber = generateTransactionNumber(transaction)
-        transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
-
-        lineItems.each { lineItem ->
-            // Add transaction entry to transaction
-            TransactionEntry transactionEntry = new TransactionEntry()
-            transactionEntry.binLocation = lineItem.binLocation
-            transactionEntry.inventoryItem = lineItem.inventoryItem
-            transactionEntry.quantity = lineItem.quantity
-            transactionEntry.comments = lineItem.comments
-            transaction.addToTransactionEntries(transactionEntry)
-        }
-
-        if (!transaction.hasErrors() && transaction.save()) {
-            log.info("Transaction saved: " + transaction)
-        }
-
-        return transaction
-    }
-
 
     /**
      * Adjusts the stock level by adding a new transaction entry with a
@@ -2630,31 +2695,75 @@ class InventoryService implements ApplicationContextAware {
     }
 
     def getTransactionEntriesBeforeDate(Location location, Date date, List tagIds) {
+        if (!date) {
+            return []
+        }
 
-        def startTime = System.currentTimeMillis()
-        def transactionEntries = []
-        if (date) {
-            def products = tagIds ? getProductsByTagId(tagIds) : []
-            def criteria = TransactionEntry.createCriteria()
-            transactionEntries = criteria.list {
-                if (products) {
-                    inventoryItem {
-                        'in'("product", products)
-                    }
-                }
-                transaction {
-                    // All transactions before given date
-                    lt("transactionDate", date)
-                    eq("inventory", location?.inventory)
-                    order("transactionDate", "asc")
-                    order("dateCreated", "asc")
+        List<Product> products = tagIds ? getProductsByTagId(tagIds) : []
+        return getTransactionEntriesBeforeDate(location, products, date)
+    }
 
+    /**
+     * @return All transaction entries for the given products at a facility older than the given date. Entries are
+     *         ordered by transaction date to make it easy to iterate through them chronologically.
+     */
+    List<TransactionEntry> getTransactionEntriesBeforeDate(Location facility, Collection<Product> products, Date date) {
+        if (!date) {
+            return []
+        }
+
+        def criteria = TransactionEntry.createCriteria()
+        return criteria.list {
+            // TODO: Consider refactoring this logic to distinguish between products==null and products.?isEmpty().
+            //       The former should give the current behaviour (fetch ALL products) and the latter should return an
+            //       empty list. Existing flows will need to be refactored to default to either passing null or []
+            //       depending on their desired behaviour. See OBPIH-7437.
+            if (products) {
+                inventoryItem {
+                    'in'("product", products)
                 }
             }
+            transaction {
+                lt("transactionDate", date)
+                eq("inventory", facility?.inventory)
+                order("transactionDate", "asc")
+                order("dateCreated", "asc")
+            }
+        } as List<TransactionEntry>
+    }
 
-            log.debug "Get transaction entries before date: " + (System.currentTimeMillis() - startTime) + " ms"
+    /**
+     * @return True if there are any transactions on the given products at a facility at a specific moment
+     *         in time.
+     */
+    boolean hasTransactionEntriesOnDate(Location facility, Date date, List<Product> products) {
+        return getTransactionEntriesOnDate(facility, date, products).size() > 0
+    }
+
+    /**
+     * @return All transaction entries for the given products at a facility at a specific moment in time.
+     */
+    private List<TransactionEntry> getTransactionEntriesOnDate(
+            Location facility, Date date, List<Product> products) {
+        if (!date || !products) {
+            return []
         }
-        return transactionEntries
+
+        def criteria = TransactionEntry.createCriteria()
+        return criteria.list {
+            // TransactionEntry.product is optional, so we need to check the inventory item of the entry as well.
+            or {
+                inList("product", products)
+                inventoryItem {
+                    inList("product", products)
+                }
+            }
+            transaction {
+                eq("transactionDate", date)
+                eq("inventory", facility?.inventory)
+                order("dateCreated", "asc")
+            }
+        } as List<TransactionEntry>
     }
 
     /**
@@ -3250,5 +3359,98 @@ class InventoryService implements ApplicationContextAware {
         // to display the latest value on the Stock Card
         inventoryItem.disableRefresh = Boolean.TRUE
         inventoryItem.save(flush: true)
+    }
+
+    /**
+     * Returns a list of the most recent transaction type ids for each product in the provided list as a
+     * list of maps [[product: <Product>, transactionDate: <transaction date>, transactionTypeId: <transaction type id>]]
+     * */
+    List getMostRecentTransactionTypeForProductsInInventory(Inventory inventory, List<Product> products) {
+        List results = Transaction.executeQuery('''
+            SELECT 
+                ii.product, MAX(t.transactionDate), t.transactionType.id
+            FROM Transaction t
+            LEFT JOIN t.transactionEntries te
+            JOIN te.inventoryItem ii
+            WHERE t.inventory.id = :inventoryId
+             AND ii.product.id in :productIds
+            GROUP BY ii.product.id, t.transactionType
+        ''', [inventoryId: inventory.id, productIds: products.id])
+
+        // Results are returning most recent transactions for product with a transaction type (can be multiple
+        // different types), need to find the most recent transaction with this grouping
+        return results?.groupBy { it[0] }?.collect { product, entries ->
+            List latest = entries.max { a, b ->
+                a[1].toString() <=> b[1].toString()
+            }
+            [
+                    product: latest[0],
+                    transactionDate: latest[1],
+                    transactionTypeId: latest[2]
+            ]
+        }
+    }
+
+    ExpirationHistoryReport getExpirationHistoryReport(ExpirationHistoryReportFilterCommand command) {
+        List<TransactionEntry> entries = TransactionEntry.createCriteria().list(offset: command.paginationParams.offset, max: command.paginationParams.max) {
+            createAlias("transaction", "t", JoinType.INNER_JOIN)
+            if (command.searchTerm) {
+                createAlias("inventoryItem", "ii", JoinType.INNER_JOIN)
+                createAlias("ii.product", "p", JoinType.INNER_JOIN)
+                or {
+                    ilike("t.transactionNumber", "%" + command.searchTerm + "%")
+                    ilike("p.productCode", "%" + command.searchTerm + "%")
+                    ilike("t.id", "%" + command.searchTerm + "%")
+                }
+            }
+            // Expired transaction type is hardcoded with id = "4"
+            eq("t.transactionType", TransactionType.read(Constants.EXPIRATION_TRANSACTION_TYPE_ID))
+            eq("t.inventory", AuthService.currentLocation.inventory)
+            between("t.transactionDate", command.startDate, command.endDate)
+            order("t.transactionDate", "desc")
+        }
+
+        PaginatedList<ExpirationHistoryReportRow> rows = new PaginatedList<ExpirationHistoryReportRow>(entries.collect { ExpirationHistoryReportRow.fromTransactionEntry(it) }, entries.totalCount)
+
+        Integer totalQuantityLostToExpiry = rows.sum { it?.quantityLostToExpiry ?: 0 } as Integer ?: 0
+        BigDecimal totalValueLostToExpiry = rows.sum { it?.valueLostToExpiry ?: 0 } as BigDecimal ?: 0
+
+        return new ExpirationHistoryReport(
+                rows                     : rows,
+                totalQuantityLostToExpiry: totalQuantityLostToExpiry,
+                totalValueLostToExpiry   : totalValueLostToExpiry
+        )
+    }
+
+    String getExpirationHistoryReportCsv(ExpirationHistoryReportFilterCommand command) {
+        ExpirationHistoryReport expirationHistoryReport = getExpirationHistoryReport(command)
+        StringWriter sw = new StringWriter()
+        CSVWriter csv = new CSVWriter(sw, {
+            "${messageLocalizer.localize("transaction.transactionNumber.label")}" { it?.transactionNumber }
+            "${messageLocalizer.localize("transaction.date.label")}" { it?.transactionDate }
+            "${messageLocalizer.localize("product.productCode.label")}" { it?.productCode }
+            "${messageLocalizer.localize("import.productName.label" )}" { it?.productName }
+            "${messageLocalizer.localize("category.label")}" { it?.category }
+            "${messageLocalizer.localize("inventory.lotNumber.label")}" { it?.lotNumber }
+            "${messageLocalizer.localize("inventoryItem.expirationDate.label")}" { it?.expirationDate }
+            "${messageLocalizer.localize("expirationHistoryReport.quantityLostToExpiry.label")}" { it?.quantityLostToExpiry }
+            "${messageLocalizer.localize("product.unitPrice.label")}" { it?.unitPrice }
+            "${messageLocalizer.localize("expirationHistoryReport.valueLostToExpiry.label")}" { it?.valueLostToExpiry }
+        })
+        expirationHistoryReport.rows.list.each { ExpirationHistoryReportRow row ->
+            csv << [
+                    transactionNumber: row.transactionNumber,
+                    transactionDate: row.transactionDate,
+                    productCode: row.productCode,
+                    productName: row.productName,
+                    category: row.category ?: "",
+                    lotNumber: row.lotNumber ?: "",
+                    expirationDate: row.expirationDate ?: "",
+                    quantityLostToExpiry: row.quantityLostToExpiry,
+                    unitPrice: row.unitPrice ?: "",
+                    valueLostToExpiry: row.valueLostToExpiry ?: "",
+            ]
+        }
+        return CSVUtils.prependBomToCsvString(csv.writer.toString())
     }
 }

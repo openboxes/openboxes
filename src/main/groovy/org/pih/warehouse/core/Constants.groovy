@@ -25,11 +25,11 @@ class Constants {
     static final adminControllers = ['createProduct', 'admin']
     static final adminActions = ['product': ['create'], 'person': ['list'], 'user': ['list'], 'location': ['edit'], 'shipper': ['create'], 'locationGroup': ['create'], 'locationType': ['create'], '*': ['delete']]
 
-    // TODO: Don't add more dates here! We should refactor all backend usages (old gsp pages can continue using these)
-    //       of these constants to use the DateUtil.asDate(String) method to parse in Date types and then return Date
-    //       objects unformatted in our responses. The backend should always return dates in the same format so that
-    //       the frontend can easily parse response objects. Let the frontend decide what the display format of each
-    //       individual field should be.
+    // TODO: Don't add more dates here! When reading in date objects from API calls, use DateUtil.asZonedDateTime or
+    //       asInstant (or asDate for old code that still uses the Date type). When returning dates to the client,
+    //       GSPs and file exporters should use DateUtil.toDisplayFormat, and everything else should simply return date
+    //       objects unformatted (which results in them being ISO format) so that the frontend can easily parse
+    //       response objects. The frontend can decide what the display format of each individual field should be.
     static final String DEFAULT_YEAR_FORMAT = "yyyy"
     static final String DEFAULT_DATE_FORMAT = "dd/MMM/yyyy"
     static final String DEFAULT_DATE_TIME_FORMAT = "dd/MMM/yyyy HH:mm:ss"
@@ -40,6 +40,7 @@ class Constants {
     static final String MONTH_DAY_YEAR_DATE_FORMAT = "MM/dd/yyyy"
     static final String DELIVERY_DATE_FORMAT = "MM/dd/yyyy HH:mm XXX"
     static final String EUROPEAN_DATE_FORMAT = "dd/MM/yyyy"
+    static final String ISO_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     // Display date using day of year format. This is used by the `openboxes.display.date.format` property.
     // It is using `DD` instead `dd` because it is later used on the frontend by the moment, which interprets
     // `dd` and `DD` differently(`DD` is day of month, and `dd` is day of week, see: OBPIH-7149 and OBPIH-5397).
@@ -84,18 +85,22 @@ class Constants {
 
     static final ArrayList COLORS = ['FFFFFF', 'FFDFDF', 'FFBFBF', 'FF9F9F', 'FF7F7F', 'FF5F5F', 'FF3F3F', 'FF1F1F', 'FF0000', 'DF1F00', 'C33B00', 'A75700', '8B7300', '6F8F00', '53AB00', '37C700', '1BE300', '00FF00', '00DF1F', '00C33B', '00A757', '008B73', '006F8F', '0053AB', '0037C7', '001BE3', '0000FF', '0000df', '0000c3', '0000a7', '00008b', '00006f', '000053', '000037', '00001b', '000000']
 
-    static final ArrayList EXPORT_PRODUCT_COLUMNS = ["Id", "ProductCode", "ProductType", "Name", "ProductFamily", "Category", "GLAccount", "Description", "UnitOfMeasure", "Tags", "UnitCost", "LotAndExpiryControl", "ColdChain", "ControlledSubstance", "HazardousMaterial", "Reconditioned", "Manufacturer", "BrandName", "ManufacturerCode", "ManufacturerName", "Vendor", "VendorCode", "VendorName", "UPC", "NDC", "Created", "Updated"]
+    static final ArrayList EXPORT_PRODUCT_COLUMNS = ["Id", "Active", "ProductCode", "ProductType", "Name", "ProductFamily", "Category", "GLAccount", "Description", "UnitOfMeasure", "Tags", "UnitCost", "LotAndExpiryControl", "ColdChain", "ControlledSubstance", "HazardousMaterial", "Reconditioned", "Manufacturer", "BrandName", "ManufacturerCode", "ManufacturerName", "Vendor", "VendorCode", "VendorName", "UPC", "NDC", "Created", "Updated"]
 
     // these are direct references to transaction types by primary key
     static final String CONSUMPTION_TRANSACTION_TYPE_ID = "2"
+    // FIXME rename this to ADJUSTMENT_TRANSACTION_TYPE once we migrate old debit adjustments
     static final String ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID = "3"
     static final String EXPIRATION_TRANSACTION_TYPE_ID = "4"
     static final String DAMAGE_TRANSACTION_TYPE_ID = "5"
+    // Deprecated - This transaction type should not be used to create new transactions
     static final String INVENTORY_TRANSACTION_TYPE_ID = "7"
     static final String TRANSFER_IN_TRANSACTION_TYPE_ID = "8"
     static final String TRANSFER_OUT_TRANSACTION_TYPE_ID = "9"
     static final String ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID = "10"
+    // Deprecated - This transaction type should not be used to create new transactions
     static final String PRODUCT_INVENTORY_TRANSACTION_TYPE_ID = "11"
+    static final String INVENTORY_BASELINE_TRANSACTION_TYPE_ID = "12"
 
     // direct references to locations by primary key
     static final String WAREHOUSE_LOCATION_TYPE_ID = "2"
@@ -181,4 +186,12 @@ class Constants {
     static final String FOUR_OR_MORE = "4+"
 
     static final String NONE = 'None'
+
+    // Cycle count indexes
+    static final String COUNT_INDEX = "0"
+    static final String RECOUNT_INDEX = "1"
+
+    static final String HS_CODE_PRODUCT_ATTRIBUTE_CODE = "HSCODE"
+    static final String INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT = "Inventory baseline created during old product inventory transactions migration for products that had stock " +
+            "but no inventory baseline transaction as a most recent transaction"
 }

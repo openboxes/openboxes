@@ -103,20 +103,6 @@
 
 					<g:isSuperuser>
 						<div class="button-group">
-							<g:link controller="product" action="createProductSnapshot" id="${productInstance?.id}" class="button"
-									onclick="return confirm('${warehouse.message(code: 'default.button.confirm.message', default: 'Are you sure?')}');">
-								<img src="${resource(dir: 'images/icons/silk', file: 'camera.png')}"/>&nbsp;
-								<warehouse:message code="default.create.label" default="Create Snapshot" args="[g.message(code: 'snapshot.label', default:' Snapshot')]"/>
-							</g:link>
-							<g:link controller="migration" action="migrateProduct" id="${productInstance?.id}" class="button"
-									onclick="return confirm('${warehouse.message(code: 'default.button.confirm.message', default: 'Are you sure?')}');">
-								<img src="${resource(dir: 'images/icons/silk', file: 'arrow_switch_bluegreen.png')}"/>&nbsp;
-								<warehouse:message code="product.migrateInventoryTransactions.label" default="Migrate Inventory Transactions"/>
-							</g:link>
-							<g:link controller="migration" action="nextInventoryTransaction" params="[max:1]" class="button">
-								<img src="${resource(dir: 'images/icons/silk', file: 'resultset_next.png')}"/>&nbsp;
-								<g:message code="default.button.next.label" default="Next"/>
-							</g:link>
 							<g:if test="${grailsApplication.config.openboxes.products.merge.enabled}">
 								<button class="btn-show-dialog button" data-title="${g.message(code:'product.mergeProducts.label')}"
 								   data-url="${request.contextPath}/product/showMergeProductDialog?primaryProduct=${productInstance?.id}&template=mergeProducts">

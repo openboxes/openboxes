@@ -14,6 +14,7 @@ import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.ObjectNotFoundException
+import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.criterion.Criterion
 import org.hibernate.criterion.DetachedCriteria
 import org.hibernate.criterion.Order
@@ -48,22 +49,43 @@ class ProductSupplierService {
     ProductSupplierIdentifierService productSupplierIdentifierService
     def dataSource
     ProductSupplierDataService productSupplierGormService
+    DataService dataService
 
-
-    List<ProductSupplier> getProductSuppliers(ProductSupplierFilterCommand command) {
+    List<ProductSupplier> getProductSuppliers(ProductSupplierFilterCommand command, boolean forExport = false) {
         if (command.hasErrors()) {
             throw new ValidationException("Invalid params", command.errors)
         }
         // Store added aliases to avoid duplicate alias exceptions for product and supplier
         // This could happen when params.searchTerm and e.g. sort by productCode/productName is applied
         Set<String> usedAliases = new HashSet<>()
-
         return ProductSupplier.createCriteria().list(command.paginationParams) {
-            if (command.searchTerm) {
+            if (forExport) {
+                createAlias("product", "p", JoinType.INNER_JOIN)
+                createAlias("p.synonyms", "ps", JoinType.LEFT_OUTER_JOIN)
+                createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
+                createAlias("manufacturer", "m", JoinType.LEFT_OUTER_JOIN)
+                createAlias("contractPrice", "cp", JoinType.LEFT_OUTER_JOIN)
+                createAlias("defaultProductPackage", "dpp", JoinType.LEFT_OUTER_JOIN)
+                createAlias("defaultProductPackage.uom", "dppu", JoinType.LEFT_OUTER_JOIN)
+                createAlias("defaultProductPackage.productPrice", "dppp", JoinType.LEFT_OUTER_JOIN)
+                createAlias("productSupplierPreferences", "psp", JoinType.LEFT_OUTER_JOIN)
+                createAlias("productPackages", "pp", JoinType.LEFT_OUTER_JOIN)
+                createAlias("productPackages.uom", "ppu", JoinType.LEFT_OUTER_JOIN)
+                createAlias("productPackages.productPrice", "ppp", JoinType.LEFT_OUTER_JOIN)
+                usedAliases.addAll(["product", "supplier", "manufacturer", "contractPrice",
+                                    "defaultProductPackage", "defaultProductPackage.uom",
+                                    "defaultProductPackage.productPrice", "productSupplierPreferences",
+                                    "productPackages", "productPackages.uom", "productPackages.productPrice"])
+            }
+
+            if (command.searchTerm && !forExport) {
                 createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
                 createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
                 createAlias("manufacturer", "m", JoinType.LEFT_OUTER_JOIN)
                 usedAliases.addAll(["product", "supplier", "manufacturer"])
+            }
+
+            if (command.searchTerm) {
                 or {
                     ilike("p.productCode", "%" + command.searchTerm + "%")
                     ilike("code", "%" + command.searchTerm + "%")
@@ -78,13 +100,13 @@ class ProductSupplierService {
                 }
             }
             if (command.product) {
-                eq("product.id", command.product)
+                eq((forExport || command.searchTerm) ? "p.id" : "product.id", command.product)
             }
             if (!command.includeInactive) {
                 eq("active", true)
             }
             if (command.supplier) {
-                eq("supplier.id", command.supplier)
+                eq((forExport || command.searchTerm) ? "s.id" : "supplier.id", command.supplier)
             }
             if (command.defaultPreferenceTypes) {
                 add(getPreferenceTypeCriteria(command.defaultPreferenceTypes))
@@ -99,6 +121,7 @@ class ProductSupplierService {
                 String orderDirection = command.order ?: "asc"
                 getSortOrder(command.sort, orderDirection, delegate, usedAliases)
             }
+            setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
         }
     }
 
@@ -445,5 +468,48 @@ class ProductSupplierService {
                     command?.supplier?.code)
         }
         return productSupplier
+    }
+
+    List<Map> getExportData(ProductSupplierFilterCommand filterParams) {
+        List<ProductSupplier> productSuppliers = getProductSuppliers(filterParams, true)
+
+        productSuppliers = productSuppliers.collect { ProductSupplier p ->
+            ProductPackage productPackage = p.defaultProductPackage ?: p.getDefaultProductPackageDerived()
+            ProductSupplierPreference globalPreference = p.productSupplierPreferences?.find { it.destinationParty == null }
+            [
+                    active                                    : p.active,
+                    id                                        : p.id,
+                    name                                      : p.name,
+                    code                                      : p.code,
+                    productCode                               : p.product?.productCode,
+                    productName                               : p.product?.name,
+                    legacyProductCode                         : p.productCode,
+                    "supplier.name"                           : p.supplier?.name,
+                    supplierCode                              : p.supplierCode,
+                    "manufacturer.name"                       : p.manufacturer?.name,
+                    manufacturerCode                          : p.manufacturerCode,
+                    minOrderQuantity                          : p.minOrderQuantity,
+                    "contractPrice.price"                     : p.contractPrice?.price,
+                    "contractPrice.toDate"                    : p.contractPrice?.toDate,
+                    "defaultProductPackage.uom.code"          : productPackage?.uom?.code,
+                    "defaultProductPackage.quantity"          : productPackage?.quantity,
+                    "defaultProductPackage.productPrice.price": productPackage?.productPrice?.price,
+                    ratingTypeCode                            : p.ratingTypeCode,
+                    dateCreated                               : p.dateCreated,
+                    lastUpdated                               : p.lastUpdated,
+                    "globalProductSupplierPreference"         : globalPreference ? [
+                            "preferenceType"   : globalPreference.preferenceType,
+                            "validityStartDate": globalPreference.validityStartDate,
+                            "validityEndDate"  : globalPreference.validityEndDate,
+                            "comments"         : globalPreference.comments
+                    ] : null,
+                    "product"                                 : [
+                            "productCode": p.product?.productCode,
+                            "name"       : p.product?.displayNameWithLocaleCode ?: p.product?.name
+                    ]
+            ]
+        } as List<Map>
+
+        return productSuppliers ? dataService.transformObjects(productSuppliers, ProductSupplier.PROPERTIES) : [[:]]
     }
 }

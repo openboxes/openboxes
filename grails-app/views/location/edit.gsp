@@ -61,11 +61,6 @@
                         <li role="tab" aria-label="Contents"><a href="${request.contextPath}/location/showContents/${locationInstance?.id}"><warehouse:message
                                 code="binLocation.contents.label" default="Contents"/></a></li>
                     </g:else>
-                    <li role="tab" aria-label="Forecasting"><a href="${request.contextPath}/location/showForecastingConfiguration/${locationInstance?.id}"
-                           id="location-forecastingConfiguration-tab">
-                        <g:message code="forecasting.label"
-                                   default="Forecasting"/></a>
-                    </li>
                 </ul>
 
                 <section id="location-details-tab" aria-label="Location">

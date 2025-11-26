@@ -858,8 +858,8 @@ class OrderController {
                     warehouse.message(code: 'default.cost.label'),
                     warehouse.message(code: 'orderItem.totalCost.label'),
                     warehouse.message(code: 'order.recipient.label'),
-                    "${warehouse.message(code: 'orderItem.estimatedReadyDate.label')} (${dateFormat})",
-                    "${warehouse.message(code: 'orderItem.actualReadyDate.label')} (${dateFormat})",
+                    "${warehouse.message(code: 'orderItem.quotedShipDate.label')} (${dateFormat})",
+                    "${warehouse.message(code: 'orderItem.currentExpectedShipDate.label')} (${dateFormat})",
                     warehouse.message(code: 'orderItem.budgetCode.label')
             )
 

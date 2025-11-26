@@ -71,7 +71,10 @@
 									<label for="dateCreated"><warehouse:message code="productCatalog.dateCreated.label" default="Date Created" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: productCatalogInstance, field: 'dateCreated', 'errors')}">
-									<g:datePicker name="dateCreated" precision="minute" value="${productCatalogInstance?.dateCreated}"  />
+									<g:datePicker name="dateCreated"
+                                                  precision="minute"
+                                                  value="${productCatalogInstance?.dateCreated}"
+                                                  fieldType="${Date}"/>
 								</td>
 							</tr>
 						
@@ -80,7 +83,10 @@
 									<label for="lastUpdated"><warehouse:message code="productCatalog.lastUpdated.label" default="Last Updated" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: productCatalogInstance, field: 'lastUpdated', 'errors')}">
-									<g:datePicker name="lastUpdated" precision="minute" value="${productCatalogInstance?.lastUpdated}"  />
+									<g:datePicker name="lastUpdated"
+                                                  precision="minute"
+                                                  value="${productCatalogInstance?.lastUpdated}"
+                                                  fieldType="${Date}"/>
 								</td>
 							</tr>
 						

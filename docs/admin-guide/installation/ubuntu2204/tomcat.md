@@ -33,28 +33,28 @@ sudo useradd -r -m -U -d /opt/tomcat -s /bin/false tomcat
 Go to the [Tomcat Versions](https://tomcat.apache.org/whichversion.html) page, find the table 
 named Currently Supported Versions and find the Latest Released Version for 9.0.x. 
 
-At the time this document was published, the latest release was 9.0.98, so we'll use `wget` to
+At the time this document was published, the latest release was 9.0.106, so we'll use `wget` to
 download the binary version of the Tomcat server using the following URL.
 ```shell
-wget -c https://downloads.apache.org/tomcat/tomcat-9/v9.0.98/bin/apache-tomcat-9.0.98.tar.gz
+wget -c https://downloads.apache.org/tomcat/tomcat-9/v9.0.106/bin/apache-tomcat-9.0.106.tar.gz
 ```
 
 #### Extract contents
 Once the tar.gz file has been downloaded, we need to extract the contents onto the file system. 
 This can be done using the following command. 
 ```shell
-sudo tar xf apache-tomcat-9.0.98.tar.gz -C /opt
+sudo tar xf apache-tomcat-9.0.106.tar.gz -C /opt
 ```
 In addition, we need to change ownership of the Tomcat directory and make all scripts executable. 
 ```shell
-sudo chmod +x /opt/apache-tomcat-9.0.98/bin/*.sh
+sudo chmod +x /opt/apache-tomcat-9.0.106/bin/*.sh
 ```
 
 #### Create symlink
 In order to update Tomcat more easily in the future we recommend creating a symlink 
 
 ```shell
-sudo ln -s /opt/apache-tomcat-9.0.98/ /opt/tomcat
+sudo ln -s /opt/apache-tomcat-9.0.106/ /opt/tomcat
 ```
 
 ## Configure Tomcat Service

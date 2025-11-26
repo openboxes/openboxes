@@ -8,7 +8,12 @@ import FixedPrice, { fixedPriceFormErrors }
 import PackageSpecification, { packageSpecificationFormErrors }
   from 'components/productSupplier/create/subsections/PackageSpecification';
 
-const PricingSection = ({ control, errors, setProductPackageQuantity }) => (
+const PricingSection = ({
+  control,
+  errors,
+  setProductPackageQuantity,
+  triggerValidation,
+}) => (
   <Section title={{
     label: 'react.productSupplier.form.section.pricing',
     defaultMessage: 'Pricing',
@@ -22,6 +27,7 @@ const PricingSection = ({ control, errors, setProductPackageQuantity }) => (
     <FixedPrice
       control={control}
       errors={errors?.fixedPrice}
+      triggerValidation={triggerValidation}
     />
   </Section>
 );
@@ -35,4 +41,5 @@ PricingSection.propTypes = {
     fixedPrice: fixedPriceFormErrors,
   }).isRequired,
   setProductPackageQuantity: PropTypes.func.isRequired,
+  triggerValidation: PropTypes.func.isRequired,
 };

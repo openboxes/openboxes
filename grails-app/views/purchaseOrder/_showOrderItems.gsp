@@ -106,7 +106,7 @@
                                 <th class="center"><warehouse:message code="default.cost.label"/></th>
                                 <th class="center"><warehouse:message code="orderItem.totalCost.label"/></th>
                                 <th class="center"><warehouse:message code="order.recipient.label"/></th>
-                                <th class="center"><warehouse:message code="orderItem.estimatedReadyDate.label"/></th>
+                                <th class="center"><warehouse:message code="orderItem.quotedShipDate.label"/></th>
                                 <th class="center"><warehouse:message code="orderItem.budgetCode.label"/></th>
                                 <th class="center"><warehouse:message code="default.actions.label"/></th>
                             </tr>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="ewaterman" id="290420250000-0">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="transaction_type" />
+        </preConditions>
+
+        <insert tableName="transaction_type">
+            <column name="id" value="12" />
+            <column name="version" value="0" />
+            <column name="name" value="Inventory Baseline" />
+            <column name="sort_order" value="0" />
+            <column name="date_created" value="2025-04-29T00:00" />
+            <column name="last_updated" value="2025-04-29T00:00" />
+            <column name="transaction_code" value="PRODUCT_INVENTORY" />
+        </insert>
+    </changeSet>
+</databaseChangeLog>

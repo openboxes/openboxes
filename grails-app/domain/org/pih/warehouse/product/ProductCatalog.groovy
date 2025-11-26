@@ -14,8 +14,8 @@ class ProductCatalog implements Comparable, Serializable {
     ]
 
     static constraints = {
-        code(nullable:false, unique: true)
-        name(nullable:false)
+        code(nullable:false, unique: true, blank: false)
+        name(nullable:false, blank: false)
         description(nullable:true)
         active(nullable:true)
         color(nullable: true)

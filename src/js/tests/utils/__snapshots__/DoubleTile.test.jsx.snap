@@ -1,0 +1,76 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DoubleTile component should match snapshot 1`] = `
+<div
+  className="double-tile"
+  data-testid="double-tile"
+>
+  <span
+    className="double-tile__title"
+  >
+    Card Title
+  </span>
+  <div
+    className="d-flex"
+  >
+    <div
+      className="double-tile__first-value-block"
+    >
+      <span
+        className="double-tile__value-number"
+      >
+        75
+      </span>
+      <span
+        className="double-tile__subtitle"
+      >
+        First Subtitle
+      </span>
+    </div>
+    <div
+      className="double-tile__second-value-block"
+    >
+      <span
+        className="double-tile__value-number"
+      >
+        1500
+      </span>
+      <span
+        className="double-tile__subtitle"
+      >
+        Second Subtitle
+      </span>
+    </div>
+  </div>
+  <div
+    className="double-tile__tooltip"
+  >
+    <div>
+      <svg
+        fill="currentColor"
+        height={20}
+        stroke="currentColor"
+        strokeWidth="0"
+        style={
+          {
+            "color": undefined,
+          }
+        }
+        viewBox="0 0 24 24"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <g>
+          <path
+            d="M0 0h24v24H0z"
+            fill="none"
+          />
+          <path
+            d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM11 7h2v2h-2V7zm0 4h2v6h-2v-6z"
+          />
+        </g>
+      </svg>
+    </div>
+  </div>
+</div>
+`;

@@ -9,9 +9,18 @@
  **/
 package org.pih.warehouse
 
+import grails.util.Holders
+import java.time.ZoneId
+import java.time.temporal.TemporalAccessor
 import org.ocpsoft.prettytime.PrettyTime
+import org.grails.plugins.web.taglib.FormatTagLib
 import groovy.time.TimeDuration
+
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.date.DateDisplayFormat
+import org.pih.warehouse.core.date.DateDisplayStyle
+import org.pih.warehouse.core.date.DateFormatterContext
+import org.pih.warehouse.core.date.DateFormatterManager
 
 class DateTagLib {
 
@@ -22,8 +31,45 @@ class DateTagLib {
         out << (new Date().format(org.pih.warehouse.core.Constants.DEFAULT_YEAR_FORMAT))
     }
 
+    /**
+     * Formats a date for display and localizes it to a given locale and timezone.
+     * Overrides the behaviour of Grails' g:formatDate, wrapping it with custom logic.
+     *
+     * @attr date Required. The date object to be formatted.
+     * @attr locale Overrides the locale used for formatting.
+     * @attr format Overrides the pattern that the date will be formatted to. Prefer using displayStyle when possible.
+     * @attr timeZone Overrides the timezone used for formatting.
+     * @attr displayStyle Which of the localizable patterns to use when formatting. Ignored if format is specified.
+     */
     Closure formatDate = { attrs, body ->
-        def formatTagLib = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.FormatTagLib')
+        if (!attrs.containsKey('date')) {
+            throwTagError("Attribute [date] is required.")
+        }
+
+        switch (attrs.date) {
+            // All dates going forward should be java.time classes
+            case TemporalAccessor:
+                out << formatJavaTimeDate(attrs)
+                return
+            // Old dates are java.util.Date instances so we keep this for backwards compatability.
+            case Date:
+                out << formatJavaUtilDate(attrs)
+                return
+            // Make sure to handle optional date fields gracefully.
+            case null:
+                out << ''
+                return
+            default:
+                throwTagError("Attribute [date] does not support type [${attrs.date.class}].")
+        }
+    }
+
+    /**
+     * Formats java.util.Date to a String for display in our GSPs.
+     */
+    private String formatJavaUtilDate(Object attrs) {
+        FormatTagLib formatTagLib = grailsApplication.mainContext.getBean(
+                'org.grails.plugins.web.taglib.FormatTagLib') as FormatTagLib
 
         if (!attrs.format) {
             attrs.format = Constants.DEFAULT_DATE_TIME_FORMAT
@@ -31,9 +77,38 @@ class DateTagLib {
         if (!attrs.timeZone && session.timezone) {
             attrs.timeZone = session.timezone
         }
-        out << formatTagLib.formatDate.call(attrs)
+        // See https://gsp.grails.org/latest/ref/Tags/formatDate.html for more information.
+        return formatTagLib.formatDate.call(attrs)
     }
 
+    /**
+     * Formats java.time classes to a String for display in our GSPs.
+     */
+    private String formatJavaTimeDate(Object attrs) {
+        DateFormatterManager dateFormatterManager =
+                Holders.grailsApplication.mainContext.getBean("dateFormatterManager") as DateFormatterManager
+
+        // We (intentionally) only support a subset of the configuration options that Grails' formatDate uses.
+        // For a list of all options, see: https://gsp.grails.org/latest/ref/Tags/formatDate.html
+        DateFormatterContext context = DateFormatterContext.builder()
+                .withLocaleOverride(attrs.locale as Locale)
+                // in Grails' formatDate, "format" means pattern... kinda confusing terminology.
+                .withPatternOverride(attrs.format as String)
+                .withTimezoneOverride(attrs.timeZone as ZoneId)
+                // Note "displayStyle" differs from "style" from Grails' formatDate, though they function similarly.
+                .withDisplayStyleOverride(attrs.displayStyle as DateDisplayStyle)
+                // If either displayStyle or format are set, don't also set the display format or else it would
+                // trigger errors in the DateFormatterContext.
+                .withDisplayFormat(attrs.displayStyle || attrs.format ? null : DateDisplayFormat.GSP)
+                .build()
+
+        return dateFormatterManager.format(attrs.date, context)
+    }
+
+    /**
+     * Renders expiration dates, displaying the date differently depending on if it's expired or nearing expiry.
+     * Eventually calls back in to g:formatDate so see that method for the list of valid attrs.
+     */
     def expirationDate = { attrs, body ->
         out << g.render(template: '/taglib/expirationDate', model: [attrs: attrs])
     }

@@ -1,6 +1,7 @@
 <%@ page import="util.ConfigHelper" %>
 <div id="inventoryForm">
-	<g:form action="saveRecordInventory" autocomplete="off">
+    %{--  OBPIH-7551: Disable the submit button once clicked to avoid multiple submits when multi-clicked  --}%
+	<g:form action="saveRecordInventory" autocomplete="off" onsubmit="saveInventoryItem.disabled = true; return true;">
 
 		<g:hiddenField name="product.id" value="${commandInstance.product?.id}"/>
 		<g:hiddenField name="inventory.id" value="${commandInstance?.inventory?.id}"/>
@@ -38,7 +39,11 @@
 							<label><warehouse:message code="transaction.transactionDate.label"/></label>
 						</td>
 						<td class="value">
-							<g:datePicker name="transactionDate" value="${commandInstance?.transactionDate}" precision="minute" noSelection="['':'']"/>
+							<g:datePicker name="transactionDate"
+                                          value="${commandInstance?.transactionDate}"
+                                          fieldType="${Date}"
+                                          precision="minute"
+                                          noSelection="['':'']"/>
 						</td>
 					</tr>
 					<tr class="prop">
@@ -125,8 +130,12 @@
 										<g:if test ="${!recordInventoryRow?.oldQuantity}">
 											<g:set var="currentYear" value="${new Date()[Calendar.YEAR]}"/>
 											<g:set var="minimumYear" value="${ConfigHelper.minimumExpirationDate[Calendar.YEAR]}"/>
-											<g:datePicker name="recordInventoryRows[${status}].expirationDate" years="${minimumYear..currentYear + 20}"
-														  noSelection="['': '']" precision="day" value="${recordInventoryRow?.expirationDate}"/>
+											<g:datePicker name="recordInventoryRows[${status}].expirationDate"
+                                                          years="${minimumYear..currentYear + 20}"
+                                                          noSelection="['': '']"
+                                                          precision="day"
+                                                          value="${recordInventoryRow?.expirationDate}"
+                                                          fieldType="${Date}"/>
 										</g:if>
 										<g:else>
 											<g:hiddenField name="recordInventoryRows[${status}].expirationDate"
@@ -464,6 +473,7 @@
 		<g:set var="minimumYear" value="${ConfigHelper.minimumExpirationDate[Calendar.YEAR]}"/>
         <g:datePicker name="recordInventoryRows[{{= getIndex()}}].expirationDate"
                       default="none"
+                      fieldType="${Date}"
 					  noSelection="['': '']"
 					  years="${minimumYear..currentYear + 20}"
                       precision="day"/>

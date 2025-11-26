@@ -420,6 +420,7 @@ class PutAwayPage extends Component {
               className="btn btn-primary ml-2 btn-xs"
               data-toggle="button"
               aria-pressed="false"
+              data-testid="show-by-button"
               onClick={toggleTree}
             >
               {pivotBy && pivotBy.length
@@ -450,6 +451,7 @@ class PutAwayPage extends Component {
             disabled={this.state.selection.size < 1}
             onClick={() => this.createPutAway()}
             className="btn btn-outline-primary btn-form float-right btn-xs"
+            data-testid="start-putaway"
           >
             <Translate id="react.putAway.startPutAway.label" defaultMessage="Start Putaway" />
           </button>
@@ -487,6 +489,7 @@ class PutAwayPage extends Component {
                 )}
                 getTdProps={(state, rowInfo) => ({
                   style: { color: _.get(rowInfo, 'original.putawayStatus') === 'READY' || rowInfo.aggregated ? 'black' : 'gray' },
+                  'data-testid': `row-${rowInfo.level}-${rowInfo.index}`,
                   onClick: (event, handleOriginal) => {
                     const { target } = event;
                     // Fire the original onClick handler, if the other part of row is clicked on
@@ -505,6 +508,7 @@ class PutAwayPage extends Component {
             disabled={this.state.selection.size < 1}
             onClick={() => this.createPutAway()}
             className="btn btn-outline-primary btn-form float-right btn-xs"
+            data-testid="start-putaway"
           >
             <Translate id="react.putAway.startPutAway.label" defaultMessage="Start Putaway" />
           </button>

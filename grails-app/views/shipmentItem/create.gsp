@@ -57,7 +57,11 @@
 	                                    <label for="expirationDate"><warehouse:message code="shipmentItem.expirationDate.label" default="Expiration Date" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: shipmentItemInstance, field: 'expirationDate', 'errors')}">
-	                                    <g:datePicker name="expirationDate" precision="minute" value="${shipmentItemInstance?.expirationDate}" noSelection="['': '']" />
+	                                    <g:datePicker name="expirationDate"
+                                                      precision="minute"
+                                                      value="${shipmentItemInstance?.expirationDate}"
+                                                      fieldType="${Date}"
+                                                      noSelection="['': '']" />
 	                                </td>
 	                            </tr>
 	                        
@@ -102,7 +106,10 @@
 	                                    <label for="dateCreated"><warehouse:message code="shipmentItem.dateCreated.label" default="Date Created" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: shipmentItemInstance, field: 'dateCreated', 'errors')}">
-	                                    <g:datePicker name="dateCreated" precision="minute" value="${shipmentItemInstance?.dateCreated}"  />
+	                                    <g:datePicker name="dateCreated"
+                                                      precision="minute"
+                                                      value="${shipmentItemInstance?.dateCreated}"
+                                                      fieldType="${Date}"/>
 	                                </td>
 	                            </tr>
 	                        
@@ -111,7 +118,10 @@
 	                                    <label for="lastUpdated"><warehouse:message code="shipmentItem.lastUpdated.label" default="Last Updated" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: shipmentItemInstance, field: 'lastUpdated', 'errors')}">
-	                                    <g:datePicker name="lastUpdated" precision="minute" value="${shipmentItemInstance?.lastUpdated}"  />
+	                                    <g:datePicker name="lastUpdated"
+                                                      precision="minute"
+                                                      value="${shipmentItemInstance?.lastUpdated}"
+                                                      fieldType="${Date}"/>
 	                                </td>
 	                            </tr>
 	                        

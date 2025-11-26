@@ -37,7 +37,6 @@ class MigrationController {
 
     def dataService
     def migrationService
-    def inventoryService
     def locationService
     def productAvailabilityService
 
@@ -55,13 +54,23 @@ class MigrationController {
         def organizations = migrationService.getSuppliersForMigration()
         def productSuppliers = migrationService.getProductsForMigration()
         TransactionType inventoryTransactionType = TransactionType.load(Constants.INVENTORY_TRANSACTION_TYPE_ID)
-        def inventoryTransactionCount = Transaction.countByTransactionType(inventoryTransactionType)
+        TransactionType productInventoryTransactionType = TransactionType.load(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
+        Integer inventoryTransactionCount = Transaction.countByTransactionType(inventoryTransactionType)
+        Integer productInventoryTransactionCount = Transaction.countByTransactionType(productInventoryTransactionType)
+        Location currentLocation = Location.get(session.warehouse.id)
+        Integer productInventoryTransactionInCurrentLocationCount = Transaction.countByTransactionTypeAndInventory(productInventoryTransactionType, currentLocation.inventory)
+        List<Product> productsWithProductInventoryTransactionInCurrentLocation = migrationService.getProductsWithTransactions(currentLocation, productInventoryTransactionType)
+        Map<String, List<String>> overlappingTransactions = migrationService.getOtherOverlappingTransactions(currentLocation, productInventoryTransactionType)
+
 
         [
                 organizationCount        : organizations.size(),
                 inventoryTransactionCount: inventoryTransactionCount,
+                productInventoryTransactionCount: productInventoryTransactionCount,
+                productInventoryTransactionInCurrentLocationCount: productInventoryTransactionInCurrentLocationCount,
+                productsWithProductInventoryTransactionInCurrentLocation: productsWithProductInventoryTransactionInCurrentLocation?.productCode,
                 productSupplierCount     : productSuppliers.size(),
-
+                overlappingTransactions  : overlappingTransactions
         ]
     }
 
@@ -296,6 +305,11 @@ class MigrationController {
         render([count: locations.size(), locations: locations] as JSON)
     }
 
+    def locationsWithProductInventoryTransactions() {
+        TransactionType transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
+        def locations = migrationService.getLocationsWithTransaction(transactionType)
+        render([count: locations.size(), locations: locations] as JSON)
+    }
 
     def productsWithInventoryTransactions() {
         def location = Location.get(session.warehouse.id)
@@ -357,6 +371,21 @@ class MigrationController {
 
         render([responseTime: responseTime, count: results.size(), results: results] as JSON)
 
+    }
+
+    def migrateProductInventoryTransactions() {
+        long startTime = System.currentTimeMillis()
+        Location location = Location.get(session.warehouse.id)
+
+        boolean performMigration = params.boolean("performMigration", false)
+        Map results = migrationService.migrateProductInventoryTransactions(location, performMigration)
+
+        long responseTime = System.currentTimeMillis() - startTime
+        String responseTimeMessage = "${performMigration ? 'Migration' : 'Generating preview'} of product inventory " +
+                "transactions at location ${location.name} took ${(responseTime)} ms"
+        log.info "$responseTimeMessage"
+
+        render([responseTime: "$responseTimeMessage", results: results] as JSON)
     }
 
 

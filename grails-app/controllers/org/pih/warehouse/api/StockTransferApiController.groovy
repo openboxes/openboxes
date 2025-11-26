@@ -203,13 +203,14 @@ class StockTransferApiController {
 
     def stockTransferCandidates() {
         String locationId = params?.location?.id ?: session.warehouse.id
+        Boolean showExpiredItemsOnly = params.boolean('showExpiredItemsOnly', false)
         Location location = Location.get(locationId)
 
         if (!location) {
             throw new IllegalArgumentException("Can't find location with given id: ${locationId}")
         }
 
-        List<StockTransferItem> stockTransferCandidates = stockTransferService.getStockTransferCandidates(location, null)
+        List<StockTransferItem> stockTransferCandidates = stockTransferService.getStockTransferCandidates(location, null, showExpiredItemsOnly)
         render([data: stockTransferCandidates?.collect { it.toJson() }] as JSON)
     }
 
