@@ -183,7 +183,7 @@ const useInboundAddItemsForm = ({
       (item) =>
         item.statusCode
         && getValues('currentLineItems').some((oldItem) => {
-          if (oldItem.id !== item.id) {
+          if (item.id && oldItem.id !== item.id) {
             return false;
           }
           const expirationDateChanged = (item.expirationDate
@@ -388,8 +388,8 @@ const useInboundAddItemsForm = ({
   };
 
   const nextPage = async () => {
-    await trigger();
-    if (!isValid) {
+    const isFormValid = await trigger();
+    if (!isFormValid) {
       return;
     }
     const formValues = getValues();
@@ -421,8 +421,8 @@ const useInboundAddItemsForm = ({
   };
 
   const save = async () => {
-    await trigger();
-    if (!isValid) {
+    const isFormValid = await trigger();
+    if (!isFormValid) {
       return;
     }
     const lineItems = getValues('values.lineItems');
@@ -440,14 +440,14 @@ const useInboundAddItemsForm = ({
   };
 
   const saveAndExit = async () => {
-    await trigger();
-    if (!isValid) {
+    const isFormValid = await trigger();
+    if (!isFormValid) {
       confirmAction(
         () => {
           window.location = STOCK_MOVEMENT_URL.show(queryParams.id);
         },
-        'react.stockMovement.confirmExpiryDateUpdate.message',
-        'This will update the expiry date across all depots in the system. Are you sure you want to proceed? ',
+        'react.stockMovement.confirmExit.message',
+        'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
       );
       return;
     }
@@ -505,8 +505,8 @@ const useInboundAddItemsForm = ({
   };
 
   const previousPage = async () => {
-    await trigger();
-    if (!isValid) {
+    const isFormValid = await trigger();
+    if (!isFormValid) {
       confirmValidationError();
       return;
     }

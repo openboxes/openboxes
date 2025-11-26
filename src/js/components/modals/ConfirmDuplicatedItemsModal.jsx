@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import ModalWithTable from 'components/modals/ModalWithTable';
-import useConfirmDuplicatedItemsModal from 'hooks/inboundV2/addItems/useShowDuplicatedItems';
+import useConfirmDuplicatedItemsColumns from 'hooks/inboundV2/addItems/useShowDuplicatedItems';
 import useTranslate from 'hooks/useTranslate';
 import useTranslation from 'hooks/useTranslation';
 
@@ -11,8 +11,8 @@ const ConfirmDuplicatedItemsModal = ({
   isOpen, data, onConfirm, onCancel,
 }) => {
   useTranslation('stockMovement');
-  const translate = useTranslate('stockMovement');
-  const { columns } = useConfirmDuplicatedItemsModal();
+  const translate = useTranslate();
+  const { columns } = useConfirmDuplicatedItemsColumns();
 
   return (
     <ModalWithTable

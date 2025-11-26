@@ -328,8 +328,8 @@ const useInboundSendForm = ({ previous }) => {
 
   // Saves changes made by user in this step and go back to previous page
   const previousPage = async () => {
-    await trigger();
-    if (isValid) {
+    const isFormValid = await trigger();
+    if (isFormValid) {
       await stockMovementApi.updateShipment(stockMovementId, getShipmentPayload());
       return previous();
     }
@@ -361,8 +361,8 @@ const useInboundSendForm = ({ previous }) => {
 
   // Saves changes made by user in this step and redirects to the shipment view page
   const saveAndExit = async () => {
-    await trigger();
-    if (!isValid) {
+    const isFormValid = await trigger();
+    if (!isFormValid) {
       confirmActionModal({
         messageId: 'react.stockMovement.confirmExit.message',
         messageDefault: 'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',

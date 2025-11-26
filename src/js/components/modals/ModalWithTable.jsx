@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import PropTypes from 'prop-types';
 import Modal from 'react-modal';
@@ -17,8 +17,20 @@ const ModalWithTable = ({
   onConfirm,
   onCancel,
 }) => {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflowY = 'hidden';
+    }
+
+    return () => {
+      document.body.style.overflowY = 'auto';
+    };
+  }, [isOpen]);
+
+  // When the modal is not displayed we want to show the scrollbar to users.
+  // The return below is necessary to block executing hooks that are related to
+  // the hidden modal.
   if (!isOpen) {
-    document.body.style.overflowY = 'auto';
     return null;
   }
 

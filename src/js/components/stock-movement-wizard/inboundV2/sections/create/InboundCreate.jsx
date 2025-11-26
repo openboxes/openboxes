@@ -51,7 +51,7 @@ const InboundCreate = ({ next }) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmitStockMovementDetails)}>
-      <Section title="Details">
+      <Section showTitle={false}>
         <div className="row">
           <div className="col-12 px-2 pt-2">
             <Controller

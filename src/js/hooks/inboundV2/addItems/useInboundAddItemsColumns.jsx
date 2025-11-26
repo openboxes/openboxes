@@ -24,6 +24,7 @@ import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import inboundColumns from 'consts/inboundColumns';
+import requisitionStatus from 'consts/requisitionStatus';
 import StockMovementDirection from 'consts/StockMovementDirection';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
@@ -78,7 +79,7 @@ const useInboundAddItemsColumns = ({
   );
 
   const handleDelete = async (row) => {
-    if (getValues('currentLineItems').find((item) => item.id === row?.original?.itemId)) {
+    if (getValues('currentLineItems').find((item) => item.id && item.id === row?.original?.itemId)) {
       await removeSavedRow(row?.original?.itemId);
     }
     removeRow(row.index);
@@ -528,7 +529,7 @@ const useInboundAddItemsColumns = ({
           <div className="bin-container">
             <RiDeleteBinLine
               className="inbound-bin"
-              display={row?.original?.statusCode === 'SUBSTITUTED'}
+              display={row?.original?.statusCode === requisitionStatus.SUBSTITUTED}
               onClick={() => handleDelete(row)}
             />
           </div>

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 
@@ -8,16 +8,9 @@ import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import showDuplicatedItemsColumn from 'consts/showDuplicatedItemsColumn';
 import useTranslate from 'hooks/useTranslate';
 
-const useConfirmDuplicatedItemsModal = () => {
+const useConfirmDuplicatedItemsColumns = () => {
   const translate = useTranslate();
   const columnHelper = createColumnHelper();
-
-  useEffect(() => {
-    document.body.style.overflowY = 'hidden';
-    return () => {
-      document.body.style.overflowY = 'auto';
-    };
-  }, []);
 
   const columns = [
     columnHelper.accessor(showDuplicatedItemsColumn.PRODUCT_PRODUCT_CODE, {
@@ -80,4 +73,4 @@ const useConfirmDuplicatedItemsModal = () => {
   return { columns };
 };
 
-export default useConfirmDuplicatedItemsModal;
+export default useConfirmDuplicatedItemsColumns;

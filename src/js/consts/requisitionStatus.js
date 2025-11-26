@@ -20,6 +20,7 @@ const RequisitionStatus = {
   PENDING_APPROVAL: 'PENDING_APPROVAL',
   APPROVED: 'APPROVED',
   REJECTED: 'REJECTED',
+  SUBSTITUTED: 'SUBSTITUTED',
 };
 
 export default RequisitionStatus;
