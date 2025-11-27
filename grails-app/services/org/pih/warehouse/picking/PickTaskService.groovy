@@ -146,7 +146,7 @@ class PickTaskService {
         task.outboundContainer = outboundContainer
 
         executeStateTransition(task, PickTaskStatus.PICKED)
-        transferToContainer(task)
+        transferToContainer(task, task.quantityRequired.toInteger())
 
         PicklistItem existingPickItem = PicklistItem.get(task.id)
         existingPickItem.pickedBy = Person.get(pickedById)
@@ -167,14 +167,19 @@ class PickTaskService {
             throw new IllegalArgumentException("Container ${outboundContainer.name} does not support OUTBOUND_CONTAINER activity")
         }
 
-        executeStateTransition(task, PickTaskStatus.PICKED)
-        transferToContainer(task)
-
         PicklistItem existingPickItem = PicklistItem.get(task.id)
+        Integer newQuantityPicked = existingPickItem.quantityPicked += quantityPicked
+        if (newQuantityPicked > existingPickItem.quantity) {
+            throw new IllegalArgumentException("Picked quantity cannot be greater than required quantity")
+        }
+
+        executeStateTransition(task, PickTaskStatus.PICKED)
+        transferToContainer(task, quantityPicked)
+
         existingPickItem.pickedBy = Person.get(pickedById)
         existingPickItem.datePicked = new Date()
         existingPickItem.outboundContainer = outboundContainer
-        existingPickItem.quantityPicked = quantityPicked
+        existingPickItem.quantityPicked = newQuantityPicked
         existingPickItem.reasonCode = reasonCode
 
         save(task)
@@ -263,12 +268,12 @@ class PickTaskService {
         }
     }
 
-    void transferToContainer(PickTask task) {
+    void transferToContainer(PickTask task, Integer quantity) {
         TransferStockCommand command = new TransferStockCommand()
         command.location = task.facility
         command.binLocation = task.location
         command.inventoryItem = task.inventoryItem
-        command.quantity = task.quantityRequired.toInteger()
+        command.quantity = quantity
         command.otherLocation = task.facility
         command.otherBinLocation = task.outboundContainer
         command.transferOut = Boolean.TRUE
