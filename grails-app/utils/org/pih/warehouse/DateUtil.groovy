@@ -155,9 +155,9 @@ class DateUtil {
     /**
      * Null-safe conversion of a LocalDate to an Instant.
      *
-     * @param zone "Z", or "UTC" or "+01:00" or "America/Anchorage" for example.
+     * @param zone "Z", or "UTC" or "+01:00" or "America/Anchorage" for example. Defaults to the system timezone.
      */
-    static Instant asInstant(LocalDate localDate, ZoneId zone) {
+    static Instant asInstant(LocalDate localDate, ZoneId zone=null) {
         return localDate ? asInstant(asZonedDateTime(localDate, zone)) : null
     }
 
@@ -185,10 +185,11 @@ class DateUtil {
     /**
      * Null-safe conversion of a LocalDate to a ZonedDateTime.
      *
-     * @param zone "Z", or "UTC" or "+01:00" or "America/Anchorage" for example.
+     * @param zone "Z", or "UTC" or "+01:00" or "America/Anchorage" for example. Defaults to the system timezone.
      */
-    static ZonedDateTime asZonedDateTime(LocalDate localDate, ZoneId zone) {
-        return localDate ? localDate.atStartOfDay(zone) : null
+    static ZonedDateTime asZonedDateTime(LocalDate localDate, ZoneId zone=null) {
+        ZoneId zoneToUse = zone ?: getSystemZoneId()
+        return localDate ? localDate.atStartOfDay(zoneToUse) : null
     }
 
     /**

@@ -1,12 +1,14 @@
 package org.pih.warehouse.reporting
 
+import java.time.Instant
+
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
 class CycleCountProductSummary implements Serializable {
 
     String cycleCountId
-    Date transactionDate
+    Instant transactionDate
     Location facility
     Product product
     Integer quantityVariance

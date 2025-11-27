@@ -1,7 +1,6 @@
 package org.pih.warehouse.inventory
 
 import java.time.Instant
-import java.time.LocalDate
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -16,7 +15,7 @@ class CycleCountSummary implements Serializable {
 
     // Transaction details
     String transactionNumber
-    LocalDate dateRequested
+    Instant dateRequested
     Person requestedBy
     Instant dateInitiated
     Person initiatedBy
@@ -24,7 +23,7 @@ class CycleCountSummary implements Serializable {
     Person recordedBy
 
     // Blind count details
-    LocalDate blindCountDateCounted
+    Instant blindCountDateCounted
     Person blindCountAssignee
     Integer blindCountQuantityOnHand
     Integer blindCountQuantityCounted
@@ -33,7 +32,7 @@ class CycleCountSummary implements Serializable {
     String blindCountVarianceComment
 
     // Verification count details
-    LocalDate verificationCountDateCounted
+    Instant verificationCountDateCounted
     Person verificationCountAssignee
     Integer verificationCountQuantityOnHand
     Integer verificationCountQuantityCounted

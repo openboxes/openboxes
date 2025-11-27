@@ -1,7 +1,6 @@
 package org.pih.warehouse.inventory
 
 import java.time.Instant
-import java.time.LocalDate
 
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
@@ -35,7 +34,7 @@ class CycleCountItemDto {
 
     Boolean custom
 
-    LocalDate dateCounted
+    Instant dateCounted
 
     Instant dateCreated
 

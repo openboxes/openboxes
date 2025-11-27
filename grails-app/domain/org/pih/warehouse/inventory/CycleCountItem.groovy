@@ -1,7 +1,6 @@
 package org.pih.warehouse.inventory
 
 import java.time.Instant
-import java.time.LocalDate
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -40,7 +39,7 @@ class CycleCountItem implements Comparable {
 
     Boolean custom
 
-    LocalDate dateCounted
+    Instant dateCounted
 
     Instant dateCreated
 

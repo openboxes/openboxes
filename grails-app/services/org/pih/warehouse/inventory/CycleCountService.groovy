@@ -3,6 +3,8 @@ package org.pih.warehouse.inventory
 import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import java.time.Instant
+import java.time.LocalDate
 import org.apache.commons.collections4.keyvalue.MultiKey
 import org.apache.commons.collections4.map.MultiKeyMap
 import org.apache.commons.csv.CSVPrinter
@@ -11,7 +13,6 @@ import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
-import org.springframework.beans.factory.annotation.Autowired
 
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
@@ -34,8 +35,6 @@ class CycleCountService {
 
     CycleCountTransactionService cycleCountTransactionService
     CycleCountProductAvailabilityService cycleCountProductAvailabilityService
-
-    @Autowired
     DateFormatterManager dateFormatter
 
     List<CycleCountCandidate> getCandidates(CycleCountCandidateFilterCommand command, String facilityId) {
@@ -562,7 +561,7 @@ class CycleCountService {
                 facility: facility,
                 // Set an initial status here so that validation passes. It gets automatically recomputed on save.
                 status: CycleCountStatus.REQUESTED,
-                dateLastRefreshed: new Date()
+                dateLastRefreshed: Instant.now()
         )
 
         List<AvailableItem> itemsToSave = cycleCountProductAvailabilityService.getAvailableItems(
@@ -693,7 +692,7 @@ class CycleCountService {
                 product: availableItem.inventoryItem.product,
                 createdBy: AuthService.currentUser,
                 updatedBy: AuthService.currentUser,
-                dateCounted: new Date(),
+                dateCounted: Instant.now(),
                 assignee: assignee,
                 custom: false,
         )
@@ -718,7 +717,7 @@ class CycleCountService {
                 product: cycleCountItem.inventoryItem.product,
                 createdBy: AuthService.currentUser,
                 updatedBy: AuthService.currentUser,
-                dateCounted: new Date(),
+                dateCounted: Instant.now(),
 
                 // Note that even though the given item is custom added, the resulting item is treated as not
                 // custom. This is done to preserve count information. Ex: If the item was custom added during the
@@ -819,7 +818,7 @@ class CycleCountService {
         cycleCountItem.status = command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING
         // If the dateCounted field is null, set it to today's date
         if (cycleCountItem.dateCounted == null) {
-            cycleCountItem.dateCounted = new Date()
+            cycleCountItem.dateCounted = Instant.now()
         }
 
         // We've updated the status of a cycle count item so we need to also update the status of the count.
@@ -837,7 +836,6 @@ class CycleCountService {
 
         return createdItems
     }
-
 
     CycleCountItemDto createCycleCountItem(CycleCountItemCommand command) {
         if (!command.inventoryItem?.id) {
@@ -868,7 +866,7 @@ class CycleCountService {
                 product: command.inventoryItem?.product,
                 createdBy: AuthService.currentUser,
                 updatedBy: AuthService.currentUser,
-                dateCounted: command.dateCounted ?: new Date(),
+                dateCounted: command.dateCounted ?: Instant.now(),
                 comment: command.comment,
                 discrepancyReasonCode: command.discrepancyReasonCode,
                 assignee: command.assignee,

@@ -1,7 +1,7 @@
 package org.pih.warehouse.report
 
 import grails.validation.Validateable
-import java.time.LocalDate
+import java.time.Instant
 
 import org.pih.warehouse.api.PaginationCommand
 import org.pih.warehouse.core.Location
@@ -11,8 +11,8 @@ class CycleCountReportCommand extends PaginationCommand implements Validateable 
 
     Location facility
     List<Product> products
-    LocalDate startDate
-    LocalDate endDate
+    Instant startDate
+    Instant endDate
 
     static constraints = {
         facility(nullable: false)
