@@ -1,7 +1,7 @@
 package unit.org.pih.warehouse.inventory
 
 import grails.testing.gorm.DataTest
-import java.time.LocalDate
+import java.time.Instant
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -137,7 +137,7 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
         Product product = new Product()
         InventoryItem existingInventoryItem = new InventoryItem(product: product, lotNumber: 'existingLotNumber')
         Location existingBinLocation = new Location(name: 'existingBinLocation')
-        LocalDate existingDateCounted = LocalDate.now()
+        Instant existingDateCounted = Instant.now()
         User existingAssignee = new User()
         InventoryItem newInventoryItem = new InventoryItem(product: product, lotNumber: 'newLotNumber')
         Location newBinLocation = new Location(name: 'newBinLocation')
