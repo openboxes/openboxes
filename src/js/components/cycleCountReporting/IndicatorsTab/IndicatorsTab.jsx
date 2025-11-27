@@ -11,6 +11,9 @@ import 'components/cycleCountReporting/cycleCountReporting.scss';
 const IndicatorsTab = ({
   filterParams,
   tablePaginationProps,
+  shouldFetch,
+  setShouldFetch,
+  filtersInitialized,
 }) => {
   const { serializedParams } = tablePaginationProps;
   const {
@@ -19,6 +22,9 @@ const IndicatorsTab = ({
   } = useIndicatorsTab({
     filterParams,
     serializedParams,
+    shouldFetch,
+    setShouldFetch,
+    filtersInitialized,
   });
 
   return (
@@ -39,4 +45,7 @@ IndicatorsTab.propTypes = {
     setTotalCount: PropTypes.func.isRequired,
     serializedParams: PropTypes.number.isRequired,
   }).isRequired,
+  shouldFetch: PropTypes.bool.isRequired,
+  setShouldFetch: PropTypes.func.isRequired,
+  filtersInitialized: PropTypes.bool.isRequired,
 };

@@ -6,7 +6,6 @@ const useCycleCountPagination = ({
   filterParams,
   setShouldFetch,
   defaultPageSize = 5,
-  disableAutoUpdateFilterParams = false,
 }) => {
   const [totalCount, setTotalCount] = useState(0);
   const {
@@ -20,7 +19,6 @@ const useCycleCountPagination = ({
     totalCount,
     filterParams,
     setShouldFetch,
-    disableAutoUpdateFilterParams,
   });
 
   return {

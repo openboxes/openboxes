@@ -31,7 +31,6 @@ const useInventoryTransactionsTab = ({
   setShouldFetch,
   serializedParams,
   filtersInitialized,
-  defaultFilterValues,
 }) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
@@ -50,12 +49,12 @@ const useInventoryTransactionsTab = ({
     ...sortingParams,
     ...filterParams,
     endDate: dateWithoutTimeZone({
-      date: endDate || defaultFilterValues.endDate,
+      date: endDate,
     }),
     startDate: dateWithoutTimeZone({
-      date: startDate || defaultFilterValues.startDate,
+      date: startDate,
     }),
-    products: (products || defaultFilterValues.products)?.map?.(({ id }) => id),
+    products: (products)?.map?.(({ id }) => id),
     facility: currentLocation?.id,
   }, (val) => {
     if (typeof val === 'boolean') {
@@ -74,9 +73,7 @@ const useInventoryTransactionsTab = ({
     defaultErrorMessage: 'Unable to fetch products',
     // We should start fetching only after clicking the button
     // or after refreshing the page with filters selected
-    shouldFetch: shouldFetch
-      && (endDate || defaultFilterValues.endDate)
-      && (startDate || defaultFilterValues.startDate),
+    shouldFetch: !!(shouldFetch && endDate && startDate),
     setShouldFetch,
     disableInitialLoading: true,
     getParams,

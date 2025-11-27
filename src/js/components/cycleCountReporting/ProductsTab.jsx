@@ -11,7 +11,6 @@ const ProductsTab = ({
   shouldFetch,
   setShouldFetch,
   filtersInitialized,
-  defaultFilterValues,
 }) => {
   const {
     paginationProps,
@@ -34,7 +33,6 @@ const ProductsTab = ({
     setShouldFetch,
     serializedParams,
     filtersInitialized,
-    defaultFilterValues,
   });
 
   useEffect(() => {
@@ -70,4 +68,5 @@ ProductsTab.propTypes = {
   }).isRequired,
   shouldFetch: PropTypes.bool.isRequired,
   setShouldFetch: PropTypes.func.isRequired,
+  filtersInitialized: PropTypes.bool.isRequired,
 };
