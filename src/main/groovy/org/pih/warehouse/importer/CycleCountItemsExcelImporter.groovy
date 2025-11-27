@@ -46,6 +46,7 @@ class CycleCountItemsExcelImporter extends AbstractExcelImporter implements Data
             "quantityCounted":        ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
             "comment":                ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             "assignee":               ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            // TODO: This is no longer a java.util.Date (it's an Instant) so we need to handle it ourselves(?)
             "dateCounted":            ([expectedType: ExpectedPropertyType.DateJavaType, defaultValue: null]),
     ]
 

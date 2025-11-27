@@ -4,7 +4,6 @@ import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import java.time.Instant
-import java.time.LocalDate
 import org.apache.commons.collections4.keyvalue.MultiKey
 import org.apache.commons.collections4.map.MultiKeyMap
 import org.apache.commons.csv.CSVPrinter
@@ -35,7 +34,7 @@ class CycleCountService {
 
     CycleCountTransactionService cycleCountTransactionService
     CycleCountProductAvailabilityService cycleCountProductAvailabilityService
-    DateFormatterManager dateFormatter
+    DateFormatterManager dateFormatterManager
 
     List<CycleCountCandidate> getCandidates(CycleCountCandidateFilterCommand command, String facilityId) {
         if (command.hasErrors()) {
@@ -393,7 +392,7 @@ class CycleCountService {
                     StringEscapeUtils.escapeCsv(candidate?.abcClass),
                     StringEscapeUtils.escapeCsv(candidate?.internalLocations ?: ""),
                     StringEscapeUtils.escapeCsv(candidate?.product?.tags?.tag?.join(", ")),
-                    dateFormatter.formatForExport(candidate?.dateLastCount),
+                    dateFormatterManager.formatForExport(candidate?.dateLastCount),
                     candidate?.quantityOnHand ?: 0,
             )
         }
@@ -417,7 +416,7 @@ class CycleCountService {
                         "Quantity Counted": item.quantityCounted != null ? item.quantityCounted : "",
                         "Comment": item.comment ?: "",
                         "User Counted": item.assignee?.name ?: "",
-                        "Date Counted": dateFormatter.formatForExport(item.dateCounted),
+                        "Date Counted": dateFormatterManager.formatForExport(item.dateCounted),
                 ]
             }
         }
@@ -491,14 +490,14 @@ class CycleCountService {
                 "Quantity Counted": countItem?.quantityCounted != null ? countItem.quantityCounted : "",
                 "Difference": countItem?.quantityVariance ?: "",
                 "Counted by": countItem?.assignee ?: "",
-                "Date Counted": dateFormatter.formatForExport(countItem?.dateCounted),
+                "Date Counted": dateFormatterManager.formatForExport(countItem?.dateCounted),
 
                 // Recount-specific fields
                 "Quantity Recounted": recountItem.quantityCounted != null ? recountItem.quantityCounted : "",
                 "Root Cause": recountItem.discrepancyReasonCode ?: "",
                 "Comment": recountItem.comment ?: "",
                 "Recounted By": recountItem.assignee ?: "",
-                "Date Recounted": dateFormatter.formatForExport(recountItem.dateCounted),
+                "Date Recounted": dateFormatterManager.formatForExport(recountItem.dateCounted),
         ]
     }
 
