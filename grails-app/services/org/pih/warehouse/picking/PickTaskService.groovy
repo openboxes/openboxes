@@ -34,7 +34,7 @@ class PickTaskService {
         List<String> requisitionIds = findRequisitionIdsForPicking(command)
 
         List<PickTaskStatus> statusesToSearch = command.status
-        if (!statusesToSearch) {
+        if (!statusesToSearch && !command.outboundContainerId) {
             statusesToSearch = [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
         }
 
@@ -61,6 +61,15 @@ class PickTaskService {
 
             if (command.priority) {
                 eq("priority", command.priority)
+            }
+
+            if (command.outboundContainerId) {
+                createAlias("outboundContainer", "oc")
+
+                or {
+                    eq("oc.id", command.outboundContainerId)
+                    eq("oc.locationNumber", command.outboundContainerId)
+                }
             }
 
             order("priority", "asc")
