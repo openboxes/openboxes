@@ -3,6 +3,7 @@ import moment from 'moment';
 
 import { IMPORT_CYCLE_COUNTS } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
+import { NEW_ROW } from 'consts/cycleCount';
 import { DateFormat } from 'consts/timeFormat';
 
 /**
@@ -61,7 +62,7 @@ export const normalizeCycleCounts = (cycleCounts) => {
 };
 
 const emptyRow = (productId) => ({
-  id: _.uniqueId('newRow'),
+  id: _.uniqueId(NEW_ROW),
   product: {
     id: productId,
   },
@@ -116,7 +117,7 @@ const createCustomItemsFromImport = (items, locale) => (items
   ? items.map((item) => ({
     ...item,
     countIndex: 0,
-    id: _.uniqueId('newRow'),
+    id: _.uniqueId(NEW_ROW),
     custom: true,
     inventoryItem: {
       lotNumber: item.lotNumber,

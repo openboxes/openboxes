@@ -19,6 +19,7 @@ import ValueIndicator from 'components/DataTable/v2/ValueIndicator';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
+import { NEW_ROW } from 'consts/cycleCount';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import navigationKey from 'consts/navigationKey';
 import { DateFormat } from 'consts/timeFormat';
@@ -230,7 +231,7 @@ const useResolveStepTable = ({
       const [value, setValue] = useState(initialValue);
 
       const isFieldDisabled = (
-        !original.id.includes('newRow')
+        !original.id.includes(NEW_ROW)
           && ![
             cycleCountColumn.QUANTITY_RECOUNTED,
             cycleCountColumn.ROOT_CAUSE,
@@ -422,7 +423,7 @@ const useResolveStepTable = ({
 
       // Checks if the row is a new one (i.e., added by user and contains 'newRow' in id),
       // and if yes, allow navigation through `newRowFocusableCells`.
-      const isNewRow = (row) => row?.id?.includes('newRow');
+      const isNewRow = (row) => row?.id?.includes(NEW_ROW);
 
       const { handleKeyDown } = useArrowsNavigation({
         newRowFocusableCells,
@@ -676,7 +677,7 @@ const useResolveStepTable = ({
               </span>
             )}
           >
-            {(original.id.includes('newRow') || original.custom) && (
+            {(original.id.includes(NEW_ROW) || original.custom) && (
               <RiDeleteBinLine
                 className={isFormDisabled ? 'disabled-icon' : 'cursor-pointer'}
                 onClick={() => removeRow(cycleCountId, original.id)}
@@ -688,7 +689,7 @@ const useResolveStepTable = ({
       ), [isFormDisabled]),
       meta: {
         flexWidth: 50,
-        hide: !tableData?.some((row) => row.id?.includes('newRow') || row.custom) || !isStepEditable,
+        hide: !tableData?.some((row) => row.id?.includes(NEW_ROW) || row.custom) || !isStepEditable,
       },
     }),
   ];
