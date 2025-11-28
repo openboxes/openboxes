@@ -8,7 +8,7 @@ enum PickTaskStatus {
 
     static final Map<PickTaskStatus, Set<PickTaskStatus>> ALLOWED_STATE_TRANSITIONS = [
             (PENDING): [PICKING, PICKED] as Set,
-            (PICKING): [PICKED] as Set,
+            (PICKING): [PICKING, PICKED] as Set,
             (PICKED): [PICKED, STAGED] as Set, // PICKED -> PICKED allowed because of short-pick, consider adding e.g PARTIAL_PICKED
             (STAGED): [] as Set
     ]
