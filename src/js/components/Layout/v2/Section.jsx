@@ -24,8 +24,8 @@ export default Section;
 Section.propTypes = {
   showTitle: PropTypes.bool,
   title: PropTypes.shape({
-    label: PropTypes.string.isRequired,
-    defaultMessage: PropTypes.string.isRequired,
+    label: PropTypes.string,
+    defaultMessage: PropTypes.string,
   }),
   children: PropTypes.node.isRequired,
   className: PropTypes.string,

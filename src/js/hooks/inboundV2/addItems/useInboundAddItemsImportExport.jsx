@@ -29,7 +29,7 @@ const useInboundAddItemsImportExport = ({
 
       await stockMovementApi.importCsv(stockMovementId, formData, config);
 
-      fetchLineItems(true);
+      await fetchLineItems(true);
       const { lineItems } = getValues('values');
       const lastLineItem = _.last(lineItems);
       const isLastProductNil = _.isNil(lastLineItem?.product);

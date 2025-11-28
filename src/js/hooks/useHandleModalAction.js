@@ -13,8 +13,9 @@ const useHandleModalAction = () => {
 
   /**
    *  Shows the modal with provided data and returns a Promise
-   *  @param {Array} data - Data to be shown in the modal.
-   *  @param {string} type - Type of modal to be displayed.
+   *  @param {Object} params - The parameters object.
+   *  @param {Array} params.data - Data to be shown in the modal.
+   *  @param {string} params.type - Type of modal to be displayed.
    *  @returns {Promise} - Resolves to 'true' if user confirms the update, 'false' if not.
    */
   const openModal = ({ data, type }) =>

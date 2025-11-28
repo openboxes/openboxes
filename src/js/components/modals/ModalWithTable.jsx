@@ -31,7 +31,7 @@ const ModalWithTable = ({
     <Modal isOpen={isOpen} className="modal-content min-width-1000" data-testid="modal-with-table">
       <div className="modal-content__header">
         <p className="modal-content__header__title">{title}</p>
-        <p className="modal-content__header__subtitile">{subtitle}</p>
+        <p className="modal-content__header__subtitle">{subtitle}</p>
       </div>
       <div className="modal-content__main">
         <DataTable data={data} columns={columns} disablePagination />
