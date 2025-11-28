@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import queryString from 'query-string';
 import { useFieldArray, useForm } from 'react-hook-form';
@@ -183,7 +182,7 @@ const useInboundAddItemsForm = ({
       (item) =>
         item.statusCode
         && getValues('currentLineItems').some((oldItem) => {
-          if (item.id && oldItem.id !== item.id) {
+          if (oldItem.id !== item.id) {
             return false;
           }
           const expirationDateChanged = (item.expirationDate
@@ -562,53 +561,12 @@ const useInboundAddItemsForm = ({
     }
   };
 
-  const importTemplate = async (event) => {
-    try {
-      spinner.show();
-      const formData = new FormData();
-      const file = event.target.files[0];
-      const { stockMovementId } = getValues('values');
-
-      formData.append('importFile', file.slice(0, file.size, 'text/csv'));
-      const config = {
-        headers: {
-          'content-type': 'multipart/form-data',
-        },
-      };
-
-      await stockMovementApi.importCsv(stockMovementId, formData, config);
-
-      fetchLineItems(true);
-      const { lineItems } = getValues('values');
-      const lastLineItem = _.last(lineItems);
-      const isLastProductNil = _.isNil(lastLineItem?.product);
-
-      if (isLastProductNil) {
-        setValue('values.lineItems', defaultTableRow);
-      }
-    } finally {
-      spinner.hide();
-    }
-  };
-
   const refresh = async () => {
     confirmAction(
       () => fetchData(),
       'react.stockMovement.confirmRefresh.message',
       'Are you sure you want to refresh? Your progress since last save will be lost.',
     );
-  };
-
-  const exportTemplate = async () => {
-    const { lineItems, identifier, stockMovementId } = getValues('values');
-    try {
-      spinner.show();
-      await saveRequisitionItemsInCurrentStep(lineItems);
-      const response = await stockMovementApi.exportCsv(stockMovementId);
-      fileDownload(response.data, `ItemList${identifier ? `-${identifier}` : ''}.csv`, 'text/csv');
-    } finally {
-      spinner.hide();
-    }
   };
 
   const addNewLine = () => {
@@ -635,8 +593,6 @@ const useInboundAddItemsForm = ({
     saveAndExit,
     previousPage,
     refresh,
-    exportTemplate,
-    importTemplate,
     addNewLine,
     removeRow,
     lineItemsArrayFields,
@@ -644,6 +600,9 @@ const useInboundAddItemsForm = ({
     modalData,
     modalType,
     handleModalResponse,
+    fetchLineItems,
+    saveRequisitionItemsInCurrentStep,
+    defaultTableRow,
   };
 };
 

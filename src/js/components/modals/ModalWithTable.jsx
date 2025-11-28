@@ -18,21 +18,14 @@ const ModalWithTable = ({
   onCancel,
 }) => {
   useEffect(() => {
+    // Disable scroll when modal is open
     if (isOpen) {
       document.body.style.overflowY = 'hidden';
     }
-
     return () => {
       document.body.style.overflowY = 'auto';
     };
   }, [isOpen]);
-
-  // When the modal is not displayed we want to show the scrollbar to users.
-  // The return below is necessary to block executing hooks that are related to
-  // the hidden modal.
-  if (!isOpen) {
-    return null;
-  }
 
   return (
     <Modal isOpen={isOpen} className="modal-content min-width-1000" data-testid="modal-with-table">

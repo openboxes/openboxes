@@ -12,6 +12,7 @@ import InboundAddItemsHeader from 'components/stock-movement-wizard/inboundV2/se
 import modalWithTableType from 'consts/modalWithTableType';
 import useInboundAddItemsColumns from 'hooks/inboundV2/addItems/useInboundAddItemsColumns';
 import useInboundAddItemsForm from 'hooks/inboundV2/addItems/useInboundAddItemsForm';
+import useInboundAddItemsImportExport from 'hooks/inboundV2/addItems/useInboundAddItemsImportExport';
 
 const InboundAddItems = ({
   next,
@@ -31,8 +32,6 @@ const InboundAddItems = ({
     saveAndExit,
     previousPage,
     refresh,
-    importTemplate,
-    exportTemplate,
     addNewLine,
     removeSavedRow,
     removeRow,
@@ -41,7 +40,21 @@ const InboundAddItems = ({
     modalData,
     modalType,
     handleModalResponse,
+    fetchLineItems,
+    saveRequisitionItemsInCurrentStep,
+    defaultTableRow,
   } = useInboundAddItemsForm({ next, previous });
+
+  const {
+    importTemplate,
+    exportTemplate,
+  } = useInboundAddItemsImportExport({
+    getValues,
+    setValue,
+    fetchLineItems,
+    saveRequisitionItemsInCurrentStep,
+    defaultTableRow,
+  });
   const hasErrors = !!Object.keys(errors).length;
 
   const lineItems = useWatch({
@@ -102,7 +115,7 @@ const InboundAddItems = ({
           defaultLabel="Next"
           variant="primary"
           disabled={!lineItems.some(item =>
-            item.product && parseInt(item.quantityRequested, 10))}
+            item.product && item.quantityRequested && parseInt(item.quantityRequested, 10) > 0)}
           type="submit"
         />
       </div>
