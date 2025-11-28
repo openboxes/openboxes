@@ -459,22 +459,11 @@ function validate(values) {
 const rewriteQuantitiesAfterSave = ({
   formValues,
   editLines,
-  fetchedContainers,
   editLinesIndex,
   parentIndex,
 }) => {
-  // Get list of shipment items from all of containers
-  const flattenedShipmentItems = formValues.containers.reduce((acc, container) => [
-    ...acc,
-    ...container.shipmentItems,
-  ], []);
-
-  // Calculate index of line items coming from modal. When there are
-  // more than one container, the index is relative to the container, so as an example:
-  // There are two containers: First has 3 shipment items, second has 2. When we are
-  // adding new lines to the second container at second index, the "editLinesIndex" is 2,
-  // so we have to add sizes of previous containers.
-  const getContainerEditLineIndex = formValues.containers.reduce((acc, container, idx) => {
+  // Calculate index of edited items in flattened shipment items array
+  const containerEditLineIndex = formValues.containers.reduce((acc, container, idx) => {
     if (idx < parentIndex) {
       return acc + container.shipmentItems.length;
     }
@@ -482,53 +471,43 @@ const rewriteQuantitiesAfterSave = ({
     return acc;
   }, 0) + editLinesIndex;
 
-  // Get list of shipment items from all containers. It's fetched data with actual quantities etc.
-  const flattenedFetchedShipmentItems = fetchedContainers.reduce((acc, container) => [
-    ...acc,
-    container.shipmentItems,
-  ], []);
+  // Calculate sizes of containers to be able to regroup items later
+  const containerSizes = formValues.containers.map((container) => container.shipmentItems.length);
+  // Flatten shipment items to be able to easily manipulate them
+  const flattenedFormValues = _.flatten(
+    formValues.containers.map((container) => container.shipmentItems),
+  );
+  const editedLine = editLines[0];
+  const newFormLines = flattenedFormValues.map((item, index) => {
+    // If this is one of the lines added during edit, set quantityReceiving to null, so the field
+    // will be empty
+    const currentLine = index === containerEditLineIndex
+      ? { ...item, quantityReceiving: null }
+      : item;
 
-  // We want to clear quantity receiving after using the edit modal
-  // to force users to enter new quantity to avoid mistakes in
-  // autofilling / copying old values not appropriate for the
-  // current quantity shipped
-  const clearedTableLines = editLines.map((line) => ({
-    ...line,
-    quantityReceiving: null,
-  }));
+    // If this is not the edited line, return it as is
+    if (index !== containerEditLineIndex) {
+      return currentLine;
+    }
 
-  // Concatenated values from first table part (lines after those coming from modal),
-  // with those lines from modal and with values after that lines.
-  const newTableValue = [
-    ..._.take(flattenedShipmentItems, getContainerEditLineIndex),
-    ...clearedTableLines,
-    ..._.takeRight(
-      flattenedShipmentItems,
-      flattenedShipmentItems.length - getContainerEditLineIndex - 1,
-    ),
-  ];
+    // If this is the edited line, replace quantity shipped, so we can avoid manipulating with
+    // fetched data, because the form data is not constantly consistent with the fetched data
+    // due to user changes
+    return {
+      ...currentLine,
+      quantityShipped: editedLine.quantityShipped,
+    };
+  });
+  // Regroup edited flattened items back to containers
+  const groupedItems = _.reduce(containerSizes, (acc, size) => {
+    const start = _.sum(acc.map((x) => x.length));
+    return [...acc, newFormLines.slice(start, start + size)];
+  }, []);
 
-  // Updating line items in the table. All values are taken from fetched
-  // items (updating all quantities) except the quantityReceiving which determines
-  // whether the line should be checked
-  const rewroteTableValue = _.zip(newTableValue, _.flatten(flattenedFetchedShipmentItems))
-    .map(([shipmentItem, fetchedShipmentItem]) => ({
-      ...fetchedShipmentItem,
-      quantityReceiving: shipmentItem?.quantityReceiving,
-    }));
-
-  // Splitting values into containers
-  const { shipmentItems } = fetchedContainers.reduce((acc, container) => ({
-    shipmentItems: [
-      ...acc.shipmentItems,
-      _.slice(rewroteTableValue, acc.startIndex, acc.startIndex + container.shipmentItems.length),
-    ],
-    startIndex: acc.startIndex + container.shipmentItems.length,
-  }), { shipmentItems: [], startIndex: 0 });
-
-  return formValues.containers.map((container, idx) => ({
+  // Return containers with updated shipment items
+  return formValues.containers.map((container, index) => ({
     ...container,
-    shipmentItems: shipmentItems[idx],
+    shipmentItems: groupedItems[index],
   }));
 };
 
@@ -910,7 +889,6 @@ class PartialReceivingPage extends Component {
           formValues,
           editLines,
           parentIndex,
-          fetchedContainers: response.data.data.containers,
           editLinesIndex: rowIndex,
         });
         const mappedContainers = PartialReceivingPage.mapContainers(updatedContainersAfterSave,
