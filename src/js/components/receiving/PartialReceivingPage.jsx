@@ -481,8 +481,7 @@ const rewriteQuantitiesAfterSave = ({
   const newFormLines = flattenedFormValues.map((item, index) => {
     // If this is one of the lines added during edit, set quantityReceiving to null, so the field
     // will be empty
-    const currentLine = item.shipmentItemId === editedLine.shipmentItemId
-    && index === containerEditLineIndex
+    const currentLine = index === containerEditLineIndex
       ? { ...item, quantityReceiving: null }
       : item;
 
@@ -890,7 +889,6 @@ class PartialReceivingPage extends Component {
           formValues,
           editLines,
           parentIndex,
-          fetchedContainers: response.data.data.containers,
           editLinesIndex: rowIndex,
         });
         const mappedContainers = PartialReceivingPage.mapContainers(updatedContainersAfterSave,
