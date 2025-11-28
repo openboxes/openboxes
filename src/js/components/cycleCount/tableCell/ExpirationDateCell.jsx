@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { getFormatLocalizedDate, makeGetCycleCountItem } from 'selectors';
@@ -21,6 +21,10 @@ const ExpirationDateCell = ({
   const { inventoryItem: { expirationDate: initialValue } } = item;
 
   const [value, setValue] = useState(initialValue);
+
+  useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
 
   const dispatch = useDispatch();
 
