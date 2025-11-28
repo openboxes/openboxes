@@ -889,14 +889,24 @@ export const addEmptyRow = (cycleCountId) => (dispatch) => {
   });
 };
 
-export const removeRow = (cycleCountId, rowId) => (dispatch) => {
-  dispatch({
-    type: REMOVE_ROW,
-    payload: {
-      id: cycleCountId,
-      rowId,
-    },
-  });
+export const removeRow = (cycleCountId, rowId, currentLocationId) => async (dispatch) => {
+  try {
+    dispatch(showSpinner());
+    // We need to send request only if the row is already persisted.
+    if (!rowId.includes('newRow')) {
+      await cycleCountApi.deleteCycleCountItem(currentLocationId, rowId);
+    }
+
+    dispatch({
+      type: REMOVE_ROW,
+      payload: {
+        id: cycleCountId,
+        rowId,
+      },
+    });
+  } finally {
+    dispatch(hideSpinner());
+  }
 };
 
 export const markAllItemsAsUpdated = (cycleCountIds) => (dispatch) => {

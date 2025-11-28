@@ -48,7 +48,7 @@ const useCountStepTable = ({
     checkBinLocationSupport(currentLocationSupportedActivities), [currentLocationId]);
 
   const handleRemoveRow = (rowId) => {
-    dispatch(removeRow(cycleCountId, rowId));
+    dispatch(removeRow(cycleCountId, rowId, currentLocationId));
   };
 
   const columns = useMemo(() => [
