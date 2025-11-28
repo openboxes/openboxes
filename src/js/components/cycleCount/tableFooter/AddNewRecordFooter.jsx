@@ -1,5 +1,6 @@
 import React from 'react';
 
+import PropTypes from 'prop-types';
 import { RiAddCircleLine } from 'react-icons/all';
 import { useDispatch } from 'react-redux';
 import { Tooltip } from 'react-tippy';
@@ -45,3 +46,9 @@ const AddNewRecordFooter = ({ cycleCountId, isStepEditable, isFormDisabled }) =>
 };
 
 export default AddNewRecordFooter;
+
+AddNewRecordFooter.propTypes = {
+  cycleCountId: PropTypes.string.isRequired,
+  isStepEditable: PropTypes.bool.isRequired,
+  isFormDisabled: PropTypes.bool.isRequired,
+};

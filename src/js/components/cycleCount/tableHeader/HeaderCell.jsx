@@ -1,5 +1,7 @@
 import React from 'react';
 
+import PropTypes from 'prop-types';
+
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import useTranslate from 'hooks/useTranslate';
 
@@ -14,3 +16,8 @@ const HeaderCell = ({ id, defaultMessage }) => {
 };
 
 export default HeaderCell;
+
+HeaderCell.propTypes = {
+  id: PropTypes.string.isRequired,
+  defaultMessage: PropTypes.string.isRequired,
+};

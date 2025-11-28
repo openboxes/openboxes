@@ -1,11 +1,13 @@
 import React, { useMemo } from 'react';
 
+import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { getBinLocations, makeGetCycleCountItem } from 'selectors';
 
 import { updateFieldValue } from 'actions';
 import { TableCell } from 'components/DataTable';
 import SelectField from 'components/form-elements/v2/SelectField';
+import { NEW_ROW } from 'consts/cycleCount';
 import useTranslate from 'hooks/useTranslate';
 import { getBinLocationToDisplay, groupBinLocationsByZone } from 'utils/groupBinLocationsByZone';
 
@@ -60,7 +62,7 @@ const BinLocationCell = ({
   const selectOptions = useMemo(() =>
     groupBinLocationsByZone(binLocations, translate), []);
 
-  const isDisabled = !id?.includes('newRow');
+  const isDisabled = !id?.includes(NEW_ROW);
 
   const selectedValue = value
     ? { ...value, name: getBinLocationToDisplay(value) }
@@ -87,3 +89,10 @@ const BinLocationCell = ({
 };
 
 export default BinLocationCell;
+
+BinLocationCell.propTypes = {
+  id: PropTypes.string.isRequired,
+  cycleCountId: PropTypes.string.isRequired,
+  showBinLocation: PropTypes.bool.isRequired,
+  isStepEditable: PropTypes.bool.isRequired,
+};

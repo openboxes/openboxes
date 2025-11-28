@@ -1,5 +1,6 @@
 import React, { memo, useMemo } from 'react';
 
+import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { getFormatLocalizedDate, makeGetCycleCountDateCounted } from 'selectors';
 
@@ -51,3 +52,9 @@ const DateCountedHeader = ({ cycleCountId, isStepEditable, isFormDisabled }) => 
 };
 
 export default memo(DateCountedHeader);
+
+DateCountedHeader.propTypes = {
+  cycleCountId: PropTypes.string.isRequired,
+  isStepEditable: PropTypes.bool.isRequired,
+  isFormDisabled: PropTypes.bool.isRequired,
+};

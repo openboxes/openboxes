@@ -1,5 +1,7 @@
 import React, { memo } from 'react';
 
+import PropTypes from 'prop-types';
+
 import CountStepTable from 'components/cycleCount/toCountTab/CountStepTable';
 
 const VirtualizedCountStepTable = memo(
@@ -32,3 +34,12 @@ const VirtualizedCountStepTable = memo(
 );
 
 export default VirtualizedCountStepTable;
+
+VirtualizedCountStepTable.propTypes = {
+  id: PropTypes.string.isRequired,
+  start: PropTypes.number.isRequired,
+  index: PropTypes.number.isRequired,
+  measureElement: PropTypes.func.isRequired,
+  isStepEditable: PropTypes.bool.isRequired,
+  isFormDisabled: PropTypes.bool.isRequired,
+};

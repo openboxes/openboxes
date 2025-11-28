@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
+import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { makeGetCycleCountItem } from 'selectors';
 
@@ -65,3 +66,9 @@ const CommentCell = ({
 };
 
 export default CommentCell;
+
+CommentCell.propTypes = {
+  id: PropTypes.string.isRequired,
+  cycleCountId: PropTypes.string.isRequired,
+  isStepEditable: PropTypes.bool.isRequired,
+};

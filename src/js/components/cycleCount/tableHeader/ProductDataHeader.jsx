@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 
+import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { makeGetCycleCountProduct } from 'selectors';
 
@@ -20,3 +21,7 @@ const ProductDataHeader = ({ cycleCountId }) => {
 };
 
 export default ProductDataHeader;
+
+ProductDataHeader.propTypes = {
+  cycleCountId: PropTypes.string.isRequired,
+};

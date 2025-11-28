@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
+import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { getFormatLocalizedDate, makeGetCycleCountItem } from 'selectors';
 
 import { updateFieldValue } from 'actions';
 import { TableCell } from 'components/DataTable';
 import DatePicker from 'components/form-elements/v2/DateField';
+import { NEW_ROW } from 'consts/cycleCount';
 import { DateFormat } from 'consts/timeFormat';
 
 const ExpirationDateCell = ({
@@ -41,7 +43,7 @@ const ExpirationDateCell = ({
   }
 
   const isDisabled = disabledExpirationDateFields?.[id]
-    || !id?.includes('newRow');
+    || !id?.includes(NEW_ROW);
 
   const onChange = (date) => {
     setValue(date);
@@ -76,3 +78,10 @@ const ExpirationDateCell = ({
 };
 
 export default ExpirationDateCell;
+
+ExpirationDateCell.propTypes = {
+  id: PropTypes.string.isRequired,
+  cycleCountId: PropTypes.string.isRequired,
+  disabledExpirationDateFields: PropTypes.objectOf(PropTypes.string).isRequired,
+  isStepEditable: PropTypes.bool.isRequired,
+};

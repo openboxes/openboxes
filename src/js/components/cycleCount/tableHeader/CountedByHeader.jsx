@@ -1,5 +1,6 @@
 import React, { memo, useMemo } from 'react';
 
+import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUsers, makeGetCycleCountCountedBy } from 'selectors';
 
@@ -63,3 +64,9 @@ const CountedByHeader = ({ cycleCountId, isStepEditable, isFormDisabled }) => {
 };
 
 export default memo(CountedByHeader);
+
+CountedByHeader.propTypes = {
+  cycleCountId: PropTypes.string.isRequired,
+  isStepEditable: PropTypes.bool.isRequired,
+  isFormDisabled: PropTypes.bool.isRequired,
+};

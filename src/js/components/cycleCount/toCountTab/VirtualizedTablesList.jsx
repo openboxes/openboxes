@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
+import PropTypes from 'prop-types';
 
 import VirtualizedCountStepTable from 'components/cycleCount/toCountTab/VirtualizedCountStepTable';
 
@@ -44,3 +45,9 @@ const VirtualizedTablesList = ({
 };
 
 export default VirtualizedTablesList;
+
+VirtualizedTablesList.propTypes = {
+  cycleCountIds: PropTypes.arrayOf(PropTypes.string).isRequired,
+  isStepEditable: PropTypes.bool.isRequired,
+  isFormDisabled: PropTypes.bool.isRequired,
+};

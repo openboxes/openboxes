@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 
+import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   getLotNumbersByProductId,
@@ -10,6 +11,7 @@ import {
 import { updateFieldValue } from 'actions';
 import { TableCell } from 'components/DataTable';
 import SelectField from 'components/form-elements/v2/SelectField';
+import { NEW_ROW } from 'consts/cycleCount';
 import useTranslate from 'hooks/useTranslate';
 
 const LotNumberCell = ({
@@ -87,7 +89,7 @@ const LotNumberCell = ({
     value: lotWithExp.lotNumber,
   })), [lotNumbersWithExpiration]);
 
-  const isDisabled = !id?.includes('newRow');
+  const isDisabled = !id?.includes(NEW_ROW);
 
   const placeholder = isDisabled
     && translate('react.cycleCount.emptyLotNumber.label', 'NO LOT');
@@ -114,3 +116,10 @@ const LotNumberCell = ({
 };
 
 export default LotNumberCell;
+
+LotNumberCell.propTypes = {
+  id: PropTypes.string.isRequired,
+  cycleCountId: PropTypes.string.isRequired,
+  setDisabledExpirationDateFields: PropTypes.func.isRequired,
+  isStepEditable: PropTypes.bool.isRequired,
+};

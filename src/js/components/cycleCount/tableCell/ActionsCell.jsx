@@ -1,11 +1,13 @@
 import React, { useMemo } from 'react';
 
+import PropTypes from 'prop-types';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 import { makeGetCycleCountItem } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
+import { NEW_ROW } from 'consts/cycleCount';
 import useTranslate from 'hooks/useTranslate';
 
 const ActionsCell = ({
@@ -38,7 +40,7 @@ const ActionsCell = ({
         )}
         disabled={id}
       >
-        {(id?.includes('newRow') || custom) && isStepEditable && (
+        {(id?.includes(NEW_ROW) || custom) && isStepEditable && (
           <RiDeleteBinLine
             className={isFormDisabled ? 'disabled-icon' : 'cursor-pointer'}
             onClick={() => removeRow(id)}
@@ -51,3 +53,11 @@ const ActionsCell = ({
 };
 
 export default ActionsCell;
+
+ActionsCell.propTypes = {
+  id: PropTypes.string.isRequired,
+  cycleCountId: PropTypes.string.isRequired,
+  isStepEditable: PropTypes.bool.isRequired,
+  isFormDisabled: PropTypes.bool.isRequired,
+  removeRow: PropTypes.func.isRequired,
+};
