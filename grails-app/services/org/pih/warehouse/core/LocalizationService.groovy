@@ -13,6 +13,7 @@ import grails.core.GrailsApplication
 import org.apache.commons.lang.StringUtils
 import org.grails.core.io.ResourceLocator
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.io.Resource
 
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.localization.LocaleManager
@@ -101,15 +102,19 @@ class LocalizationService {
     }
 
     /**
-     * Get all messages properties.
-     *
-     * @return
+     * Fetch all Properties from the messages.properties file associated with the locale.
      */
-    Properties getMessagesProperties(Locale locale) {
+    private Properties getMessagesProperties(Locale locale) {
         Properties messagesProperties = new Properties()
-        def messagesPropertiesFilename = (locale && locale.language != "en" && locale.language != 'null') ? "messages_${locale.toString()}.properties" : "messages.properties"
 
-        def resource = grailsResourceLocator.findResourceForURI('classpath:' + messagesPropertiesFilename)
+        // File names are structured like: messages_<language-code>_<country-code>.properties
+        // For example: messages.properties, messages_es.properties, messages_es_MX.properties
+        String messagesPropertiesFilename =
+                (locale == null || locale == localeManager.defaultLocale || locale.language == 'null') ?
+                "messages.properties" :
+                "messages_${locale.toString()}.properties"
+
+        Resource resource = grailsResourceLocator.findResourceForURI('classpath:' + messagesPropertiesFilename)
         messagesProperties.load(resource.inputStream)
 
         return messagesProperties
@@ -129,22 +134,10 @@ class LocalizationService {
      */
     LocalizedMessagesDto list(String localeCode, String prefix) {
         Locale locale = getLocale(localeCode)
-        List<Locale> fallbackLocales = getFallbackLocalesInPriorityOrder(locale)
 
-        Map<Locale, Properties> localeProperties = getPropertiesForLocales(fallbackLocales + locale)
-
-        // TODO: We should fetch the database overrides for the fallback locales as well so that we can default
-        //       to those if a message is in the database for 'es' but not in the 'es_MX' messages.properties file.
-        Properties messageOverrideProperties = getMessageOverridesAsProperties(locale, prefix)
-
-        // "priority order" meaning highest priority first (with database overrides being top priority).
-        List<Properties> propertiesInPriorityOrder = []
-        if (messageOverrideProperties) {
-            propertiesInPriorityOrder.add(messageOverrideProperties)
-        }
-        propertiesInPriorityOrder.addAll(fallbackLocales.collect { localeProperties.get(it) })
-
-        // Merge all messages from default, language fallback, selected, and custom message properties
+        // Get all messages for the requested locale along with with any overrides and fallbacks, then merge them all
+        // into a single set of properties. Priority order is: database overrides > the given locale > fallback locales
+        List<Properties> propertiesInPriorityOrder = getPropertiesWithFallbacksInPriorityOrder(locale, prefix)
         Properties mergedProperties = new Properties()
         for (Properties properties in propertiesInPriorityOrder) {
             properties.each { key, value -> mergedProperties.putIfAbsent(key, value) }
@@ -160,6 +153,34 @@ class LocalizationService {
                 supportedLocales: supportedLocales,
                 currentLocale: locale,
         )
+    }
+
+    /**
+     * Fetch a list of localization messages/properties for a given locale, along with any database overrides and
+     * fallback messages. The list is ordered highest to lowest priority. If a message exists in a higher priority
+     * properties file, we expect that to be used first.
+     *
+     * For example, if the locale is 'es_MX', translations in messages_es_MX.properties should take priority over
+     * those in messages_es.properties, which take priority over those in messages.properties.
+     */
+    private List<Properties> getPropertiesWithFallbacksInPriorityOrder(Locale locale, String prefix) {
+        List<Locale> fallbackLocales = getFallbackLocalesInPriorityOrder(locale)
+
+        Map<Locale, Properties> localeProperties = getPropertiesForLocales(fallbackLocales + locale)
+
+        // TODO: We should fetch the database overrides for the fallback locales as well so that we can default
+        //       to those if a message is in the database for 'es' but not in the 'es_MX' messages.properties file.
+        Properties messageOverrideProperties = getMessageOverridesAsProperties(locale, prefix)
+
+        // Priority order is: database overrides > the given locale > fallback locales
+        List<Properties> propertiesInPriorityOrder = []
+        if (messageOverrideProperties) {
+            propertiesInPriorityOrder.add(messageOverrideProperties)
+        }
+        propertiesInPriorityOrder.add(localeProperties.get(locale))
+        propertiesInPriorityOrder.addAll(fallbackLocales.collect { localeProperties.get(it) })
+
+        return propertiesInPriorityOrder
     }
 
     /**
@@ -189,7 +210,10 @@ class LocalizationService {
     private Map<Locale, Properties> getPropertiesForLocales(List<Locale> locales) {
         Map<Locale, Properties> localeProperties = [:]
         for (Locale locale in locales) {
-            localeProperties.put(locale, getMessagesProperties(locale))
+            Properties properties = getMessagesProperties(locale)
+            if (properties) {
+                localeProperties.put(locale, properties)
+            }
         }
         return localeProperties
     }
@@ -203,7 +227,8 @@ class LocalizationService {
             fallbackLocales.add(languageLocale)
         }
 
-        fallbackLocales.add(Locale.default)
+        // The default locale should always be a fallback option. This represents translations in messages.properties.
+        fallbackLocales.add(localeManager.defaultLocale)
 
         return fallbackLocales
     }
