@@ -7,6 +7,7 @@ import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.databinding.InstantValueConverter
 import org.pih.warehouse.inventory.CycleCountImportService
 import org.pih.warehouse.product.Product
 
@@ -14,6 +15,7 @@ class CycleCountItemsExcelImporter extends AbstractExcelImporter implements Data
 
     ExcelImportService excelImportService
     CycleCountImportService cycleCountImportService
+    InstantValueConverter instantValueConverter
 
     static CELL_REPORTER = new DefaultImportCellCollector()
 
@@ -46,8 +48,7 @@ class CycleCountItemsExcelImporter extends AbstractExcelImporter implements Data
             "quantityCounted":        ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
             "comment":                ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             "assignee":               ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            // TODO: This is no longer a java.util.Date (it's an Instant) so we need to handle it ourselves(?)
-            "dateCounted":            ([expectedType: ExpectedPropertyType.DateJavaType, defaultValue: null]),
+            "dateCounted":            ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
     ]
 
     CycleCountItemsExcelImporter(String fileName) {
@@ -55,6 +56,7 @@ class CycleCountItemsExcelImporter extends AbstractExcelImporter implements Data
         read(fileName)
         excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
         cycleCountImportService = Holders.grailsApplication.mainContext.getBean(CycleCountImportService)
+        instantValueConverter = Holders.grailsApplication.mainContext.getBean(InstantValueConverter)
     }
 
     @Override
@@ -98,6 +100,8 @@ class CycleCountItemsExcelImporter extends AbstractExcelImporter implements Data
                     name: personMap[row.assignee]?.name,
                     label: personMap[row.assignee]?.name,
             ] : null
+            // excelimport only supports the Date type so we need to convert to Instant ourselves.
+            row.dateCounted = instantValueConverter.convertString(row.dateCounted as String)
         }
 
         return data
