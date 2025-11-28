@@ -17,7 +17,6 @@ import {
 
 const useIndicatorsTab = ({
   filterParams,
-  serializedParams,
   shouldFetch,
   setShouldFetch,
   filtersInitialized,
@@ -81,7 +80,7 @@ const useIndicatorsTab = ({
     if (shouldFetch && startDate && endDate && filtersInitialized) {
       fetchData();
     }
-  }, [startDate, endDate, serializedParams, shouldFetch, filtersInitialized]);
+  }, [shouldFetch, startDate, endDate, filtersInitialized]);
 
   return {
     loading,
