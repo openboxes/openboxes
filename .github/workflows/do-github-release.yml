@@ -35,7 +35,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 8
-          distribution: temurin
+          distribution: zulu
           cache: gradle
 
       - name: Build WAR file

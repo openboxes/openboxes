@@ -35,12 +35,12 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 8
-          distribution: temurin
+          distribution: zulu
           cache: gradle
 
       - name: Build dependencies, project and prepare files for Docker build
         run: ./gradlew prepareDocker -Dgrails.env=prod --console=plain
-          
+
       - name: Log into registry ${{ env.REGISTRY }}
         if: github.event_name != 'pull_request'
         uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c

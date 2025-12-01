@@ -1,13 +1,13 @@
-# We previously used openjdk 8 (which itself was based on Debian 10 aka "buster") as our base image, but they have
-# since deprecated their images. Following their recommendation, we have switched to Temurin. The Temurin image for
-# Java 8 is based on Ubuntu 22.04 (which has LTS until April 2027).
-FROM eclipse-temurin:8-jre-jammy
+# This image is built on Ubuntu 22.04, which has LTS support until April 2027
+FROM azul/zulu-openjdk:8-jre
 
 LABEL maintainer="support@openboxes.com"
 EXPOSE 8080
 
 # Install curl for healthcheck
-RUN apt-get update && apt-get install curl -y
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends curl \
+  && rm -rf /var/lib/apt/lists/*
 
 # Default flags for the JVM. These can be replaced at the runtime.
 ENV JAVA_TOOL_OPTIONS="-Xms1024m -Xmx1024m -XX:+UseParallelGC -Djava.awt.headless=true"
@@ -20,7 +20,7 @@ WORKDIR /app
 RUN mkdir uploads && chown openboxes:openboxes uploads/
 
 # Copy and chown the WAR file
-COPY --chown=openboxes:openboxes openboxes.war openboxes.war
+COPY --chown=openboxes:openboxes build/libs/openboxes.war openboxes.war
 
 USER openboxes
 
