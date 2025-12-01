@@ -10,51 +10,25 @@ import ConfirmDuplicatedItemsModal from 'components/modals/ConfirmDuplicatedItem
 import ConfirmExpirationDateModal from 'components/modals/ConfirmExpirationDateModal';
 import InboundAddItemsHeader from 'components/stock-movement-wizard/inboundV2/sections/addItems/InboundAddItemsHeader';
 import modalWithTableType from 'consts/modalWithTableType';
-import useInboundAddItemsColumns from 'hooks/inboundV2/addItems/useInboundAddItemsColumns';
 import useInboundAddItemsForm from 'hooks/inboundV2/addItems/useInboundAddItemsForm';
-import useInboundAddItemsImportExport from 'hooks/inboundV2/addItems/useInboundAddItemsImportExport';
 
 const InboundAddItems = ({
   next,
   previous,
 }) => {
   const {
-    control,
-    handleSubmit,
-    errors,
-    trigger,
-    getValues,
-    setValue,
-    loading,
-    nextPage,
-    save,
-    removeAllRows,
-    saveAndExit,
-    previousPage,
-    refresh,
-    addNewLine,
-    removeSavedRow,
-    removeRow,
-    lineItemsArrayFields,
-    isModalOpen,
-    modalData,
-    modalType,
-    handleModalResponse,
-    fetchLineItems,
-    saveRequisitionItemsInCurrentStep,
-    defaultTableRow,
+    form: { control, handleSubmit, errors },
+    table: {
+      lineItemsArrayFields, columns,
+    },
+    actions: {
+      loading, addNewLine, removeAllRows, nextPage, previousPage, save, saveAndExit, refresh,
+    },
+    modal: {
+      isModalOpen, modalData, modalType, handleModalResponse,
+    },
+    importExport: { importTemplate, exportTemplate },
   } = useInboundAddItemsForm({ next, previous });
-
-  const {
-    importTemplate,
-    exportTemplate,
-  } = useInboundAddItemsImportExport({
-    getValues,
-    setValue,
-    fetchLineItems,
-    saveRequisitionItemsInCurrentStep,
-    defaultTableRow,
-  });
   const hasErrors = !!Object.keys(errors).length;
 
   const lineItems = useWatch({
@@ -62,16 +36,8 @@ const InboundAddItems = ({
     control,
   });
 
-  const { columns } = useInboundAddItemsColumns({
-    errors,
-    control,
-    removeSavedRow,
-    trigger,
-    getValues,
-    setValue,
-    removeRow,
-    addNewLine,
-  });
+  const isNextButtonEnabled = lineItems?.some((item) =>
+    item.product && item.quantityRequested && parseInt(item.quantityRequested, 10) > 0) ?? false;
 
   return (
     <form onSubmit={handleSubmit(nextPage)}>
@@ -114,8 +80,7 @@ const InboundAddItems = ({
           label="react.default.button.next.label"
           defaultLabel="Next"
           variant="primary"
-          disabled={!lineItems.some(item =>
-            item.product && item.quantityRequested && parseInt(item.quantityRequested, 10) > 0)}
+          disabled={!isNextButtonEnabled}
           type="submit"
         />
       </div>

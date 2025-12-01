@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import PropTypes from 'prop-types';
 import Modal from 'react-modal';
 
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
+import useHideScroll from 'hooks/useHideScroll';
 
 const ModalWithTable = ({
   isOpen,
@@ -17,15 +18,7 @@ const ModalWithTable = ({
   onConfirm,
   onCancel,
 }) => {
-  useEffect(() => {
-    // Disable scroll when modal is open
-    if (isOpen) {
-      document.body.style.overflowY = 'hidden';
-    }
-    return () => {
-      document.body.style.overflowY = 'auto';
-    };
-  }, [isOpen]);
+  useHideScroll({ hide: isOpen });
 
   return (
     <Modal isOpen={isOpen} className="modal-content min-width-1000" data-testid="modal-with-table">

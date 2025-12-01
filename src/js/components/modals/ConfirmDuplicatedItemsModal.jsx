@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import ModalWithTable from 'components/modals/ModalWithTable';
-import useConfirmDuplicatedItemsColumns from 'hooks/inboundV2/addItems/useShowDuplicatedItemsColumns';
+import useConfirmDuplicatedItemsColumns from 'hooks/inboundV2/addItems/useConfirmDuplicatedItemsColumns';
 import useTranslate from 'hooks/useTranslate';
 import useTranslation from 'hooks/useTranslation';
 

@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 
-import { zodResolver } from '@hookform/resolvers/zod';
 import _ from 'lodash';
 import queryString from 'query-string';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
 
@@ -26,70 +25,31 @@ import NotificationType from 'consts/notificationTypes';
 import RequisitionStatus from 'consts/requisitionStatus';
 import { InboundWorkflowState } from 'consts/StockMovementState';
 import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
-import useInboundAddItemsValidation from 'hooks/inboundV2/addItems/useInboundAddItemsValidation';
-import useHandleModalAction from 'hooks/useHandleModalAction';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
-import useTranslation from 'hooks/useTranslation';
 import apiClient from 'utils/apiClient';
 import confirmationModal from 'utils/confirmationModalUtils';
 import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
 import dateWithoutTimeZone, { formatDateToString } from 'utils/dateUtils';
 
-const useInboundAddItemsForm = ({
+const useInboundAddItemsActions = ({
+  control,
+  getValues,
+  setValue,
+  trigger,
+  defaultTableRow,
   next,
   previous,
+  openModal,
 }) => {
   const [loading, setLoading] = useState(false);
-  const {
-    isOpen: isModalOpen,
-    data: modalData,
-    type: modalType,
-    openModal,
-    handleResponse: handleModalResponse,
-  } = useHandleModalAction();
-
-  const history = useHistory();
-  const location = useLocation();
-
   const spinner = useSpinner();
-  const { validationSchema } = useInboundAddItemsValidation();
-  const queryParams = useQueryParams();
-  useTranslation('stockMovement');
   const translate = useTranslate();
   const dispatch = useDispatch();
-  const defaultTableRow = [{
-    palletName: '',
-    boxName: '',
-    product: undefined,
-    lotNumber: '',
-    expirationDate: '',
-    quantityRequested: undefined,
-    recipient: undefined,
-  }];
-  const defaultValues = {
-    currentLineItems: [],
-    values: {
-      lineItems: defaultTableRow,
-    },
-  };
-
-  const {
-    control,
-    getValues,
-    handleSubmit,
-    formState: {
-      errors,
-      isValid,
-    },
-    trigger,
-    setValue,
-  } = useForm({
-    mode: 'onBlur',
-    defaultValues,
-    resolver: zodResolver(validationSchema),
-  });
+  const history = useHistory();
+  const location = useLocation();
+  const queryParams = useQueryParams();
 
   const {
     fields: lineItemsArrayFields,
@@ -100,121 +60,14 @@ const useInboundAddItemsForm = ({
     name: 'values.lineItems',
   });
 
-  const formatDate = (date) => (formatDateToString({
+  const addNewLine = () => {
+    append(defaultTableRow);
+  };
+
+  const formatDate = (date) => formatDateToString({
     date,
     dateFormat: DateFormatDateFns.DD_MMM_YYYY,
-  }));
-
-  const confirmAction = (onConfirm, messageId, defaultMessage) => {
-    const modalLabels = {
-      title: {
-        label: 'react.stockMovement.message.confirmSave.label',
-        default: 'Confirm save',
-      },
-      content: {
-        label: messageId,
-        default: defaultMessage,
-      },
-    };
-
-    const modalButtons = (onClose) => [
-      {
-        variant: 'transparent',
-        defaultLabel: 'No',
-        label: 'react.default.no.label',
-        onClick: () => onClose(),
-      },
-      {
-        variant: 'primary',
-        defaultLabel: 'Yes',
-        label: 'react.default.yes.label',
-        onClick: () => {
-          onConfirm();
-          onClose();
-        },
-      },
-    ];
-
-    confirmationModal({
-      buttons: modalButtons,
-      ...modalLabels,
-    });
-  };
-
-  const confirmValidationError = () => {
-    const modalLabels = {
-      title: {
-        label: 'react.stockMovement.confirmPreviousPage.label',
-        default: 'Validation error',
-      },
-      content: {
-        label: 'react.stockMovement.confirmPreviousPage.message.label',
-        default: 'Cannot save due to validation error on page',
-      },
-    };
-
-    const modalButtons = (onClose) => [
-      {
-        variant: 'primary',
-        defaultLabel: 'Correct error',
-        label: 'react.stockMovement.confirmPreviousPage.correctError.label',
-        onClick: () => onClose(),
-      },
-      {
-        variant: 'danger',
-        defaultLabel: 'Continue (lose unsaved work)',
-        label: 'react.stockMovement.confirmPreviousPage.continue.label',
-        onClick: () => {
-          previous();
-          onClose();
-        },
-      },
-    ];
-
-    confirmationModal({
-      buttons: modalButtons,
-      ...modalLabels,
-    });
-  };
-
-  const shouldUpdateItem = (lineItems) =>
-    lineItems.filter(
-      (item) =>
-        item.statusCode
-        && getValues('currentLineItems').some((oldItem) => {
-          if (oldItem.id !== item.id) {
-            return false;
-          }
-          const expirationDateChanged = (item.expirationDate
-              && item.inventoryItem?.expirationDate !== item.expirationDate)
-            || (!item.expirationDate && oldItem.expirationDate);
-
-          return !_.isEqual(item, oldItem) || expirationDateChanged;
-        }),
-    );
-  const getLineItemsToBeSaved = (lineItems) => {
-    const lineItemsToBeAdded = lineItems.filter(
-      (item) => !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product,
-    );
-
-    const lineItemsToBeUpdated = shouldUpdateItem(lineItems);
-
-    const formatItem = (item) => ({
-      id: item.id,
-      product: { id: item.product?.id },
-      quantityRequested: item.quantityRequested,
-      palletName: item.palletName,
-      boxName: item.boxName,
-      lotNumber: item.lotNumber,
-      expirationDate: dateWithoutTimeZone({
-        date: item.expirationDate,
-        outputDateFormat: DateFormat.MM_DD_YYYY,
-      }),
-      recipient: { id: item.recipient?.id },
-    });
-
-    return [...lineItemsToBeAdded.map(formatItem), ...lineItemsToBeUpdated.map(formatItem)];
-  };
+  });
 
   const transformLineItem = (item) => ({
     ...item,
@@ -241,6 +94,46 @@ const useInboundAddItemsForm = ({
       }
       : null,
   });
+
+  const shouldUpdateItem = (lineItems) =>
+    lineItems.filter(
+      (item) =>
+        item.statusCode
+        && getValues('currentLineItems').some((oldItem) => {
+          if (oldItem.id !== item.id) {
+            return false;
+          }
+          const expirationDateChanged = (item.expirationDate
+              && item.inventoryItem?.expirationDate !== item.expirationDate)
+            || (!item.expirationDate && oldItem.expirationDate);
+
+          return !_.isEqual(item, oldItem) || expirationDateChanged;
+        }),
+    );
+
+  const getLineItemsToBeSaved = (lineItems) => {
+    const lineItemsToBeAdded = lineItems.filter(
+      (item) => !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product,
+    );
+
+    const lineItemsToBeUpdated = shouldUpdateItem(lineItems);
+
+    const formatItem = (item) => ({
+      id: item.id,
+      product: { id: item.product?.id },
+      quantityRequested: item.quantityRequested,
+      palletName: item.palletName,
+      boxName: item.boxName,
+      lotNumber: item.lotNumber,
+      expirationDate: dateWithoutTimeZone({
+        date: item.expirationDate,
+        outputDateFormat: DateFormat.MM_DD_YYYY,
+      }),
+      recipient: { id: item.recipient?.id },
+    });
+
+    return [...lineItemsToBeAdded.map(formatItem), ...lineItemsToBeUpdated.map(formatItem)];
+  };
 
   const checkInvalidQuantities = (lineItems) =>
     lineItems.some((item) => !item.quantityRequested || item.quantityRequested === '0');
@@ -283,6 +176,125 @@ const useInboundAddItemsForm = ({
     return null;
   };
 
+  const setLineItems = (response, showOnlyImportedItems) => {
+    const { data } = response.data;
+    const existingLineItems = getValues('values.lineItems') || [];
+    const existingCurrentLineItems = getValues('currentLineItems') || [];
+
+    const lineItemsData = !data.length && existingLineItems.length === 0
+      ? defaultTableRow
+      : data.map(transformLineItem);
+
+    setValue('currentLineItems', _.uniqBy([...lineItemsData, ...existingCurrentLineItems], 'id'));
+    setValue(
+      'values.lineItems',
+      showOnlyImportedItems ? lineItemsData : _.uniqBy([...lineItemsData, ...existingLineItems], 'id'),
+    );
+  };
+
+  const fetchLineItems = async (showOnlyImportedItems = false) => {
+    const response = await stockMovementApi.getStockMovementItems(queryParams.id, {
+      stepNumber: InboundWorkflowState.ADD_ITEMS,
+    });
+    setLineItems(response, showOnlyImportedItems);
+  };
+
+  const removeSavedRow = async (itemId) => {
+    try {
+      spinner.show();
+      await apiClient.delete(STOCK_MOVEMENT_ITEM_REMOVE(itemId));
+    } finally {
+      spinner.hide();
+    }
+  };
+
+  const removeAllRows = async () => {
+    try {
+      spinner.show();
+      await apiClient.delete(STOCK_MOVEMENT_REMOVE_ALL_ITEMS(queryParams.id));
+      setValue('currentLineItems', []);
+      setValue('values.lineItems', defaultTableRow);
+      await fetchLineItems();
+    } finally {
+      spinner.hide();
+    }
+  };
+
+  const fetchAddItemsPageData = async () => {
+    const response = await apiClient.get(STOCK_MOVEMENT_BY_ID(queryParams.id));
+    const { data } = response.data;
+    const transformedData = {
+      ...data,
+      identifier: data.identifier,
+      stockMovementId: data.id,
+    };
+    dispatch(updateWorkflowHeader(createInboundWorkflowHeader(data), data.displayStatus.name));
+    setValue('values', transformedData);
+  };
+
+  const confirmAction = (onConfirm, messageId, defaultMessage) => {
+    const modalLabels = {
+      title: {
+        label: 'react.stockMovement.message.confirmSave.label',
+        default: 'Confirm save',
+      },
+      content: { label: messageId, default: defaultMessage },
+    };
+
+    const modalButtons = (onClose) => [
+      {
+        variant: 'transparent',
+        defaultLabel: 'No',
+        label: 'react.default.no.label',
+        onClick: () => onClose(),
+      },
+      {
+        variant: 'primary',
+        defaultLabel: 'Yes',
+        label: 'react.default.yes.label',
+        onClick: () => {
+          onConfirm();
+          onClose();
+        },
+      },
+    ];
+
+    confirmationModal({ buttons: modalButtons, ...modalLabels });
+  };
+
+  const confirmValidationError = () => {
+    const modalLabels = {
+      title: {
+        label: 'react.stockMovement.confirmPreviousPage.label',
+        default: 'Validation error',
+      },
+      content: {
+        label: 'react.stockMovement.confirmPreviousPage.message.label',
+        default: 'Cannot save due to validation error on page',
+      },
+    };
+
+    const modalButtons = (onClose) => [
+      {
+        variant: 'primary',
+        defaultLabel: 'Correct error',
+        label: 'react.stockMovement.confirmPreviousPage.correctError.label',
+        onClick: () => onClose(),
+      },
+      {
+        variant: 'danger',
+        defaultLabel: 'Continue (lose unsaved work)',
+        label: 'react.stockMovement.confirmPreviousPage.continue.label',
+        onClick: () => {
+          previous();
+          onClose();
+        },
+      },
+    ];
+
+    confirmationModal({ buttons: modalButtons, ...modalLabels });
+  };
+
   const transitionToNextStep = async () => {
     const formValues = getValues();
     try {
@@ -305,7 +317,7 @@ const useInboundAddItemsForm = ({
     try {
       spinner.show();
       await apiClient.post(STOCK_MOVEMENT_UPDATE_INVENTORY_ITEMS(queryParams.id), payload);
-      transitionToNextStep();
+      await transitionToNextStep();
     } finally {
       spinner.hide();
     }
@@ -324,13 +336,13 @@ const useInboundAddItemsForm = ({
     );
 
     if (hasNonZeroQuantity) {
-      // Find all items with mismatched items to show in the confirmation modal
+      // Find all items with mismatched expiration dates to show in the confirmation modal
       const mismatchedItems = updatedLineItems
         .filter((item) =>
           item.inventoryItem
-            && item.inventoryItem.expirationDate !== item.expirationDate
-            && item.inventoryItem.quantity
-            && item.inventoryItem.quantity !== '0')
+          && item.inventoryItem.expirationDate !== item.expirationDate
+          && item.inventoryItem.quantity
+          && item.inventoryItem.quantity !== '0')
         .map((item) => ({
           code: item.product?.productCode,
           product: item.product,
@@ -363,21 +375,22 @@ const useInboundAddItemsForm = ({
     }
   };
 
-  const getItemsMapByProductCode = (lineItems) =>
-    _.groupBy(lineItems, (item) => item.product?.productCode);
-
   const checkDuplicatesSaveAndTransitionToNextStep = async (formValues, lineItems) => {
-    const itemsMap = getItemsMapByProductCode(lineItems);
+    const itemsMap = _.groupBy(
+      lineItems.filter(item => item.product?.productCode),
+      (item) => item.product.productCode,
+    );
     const duplicateGroups = Object.values(itemsMap).filter((g) => g.length > 1);
     const hasDuplicates = duplicateGroups.length > 0;
     const skipConfirm =
-      formValues.values.origin.locationType.locationTypeCode === locationType.SUPPLIER
-      || !formValues.values.hasManageInventory;
+      formValues.values.origin.locationType.locationTypeCode === locationType.SUPPLIER ||
+      !formValues.values.hasManageInventory;
 
     if (hasDuplicates && !skipConfirm) {
-      const shouldUpdate = await openModal(
-        { data: duplicateGroups.flat(), type: modalWithTableType.DUPLICATES },
-      );
+      const shouldUpdate = await openModal({
+        data: duplicateGroups.flat(),
+        type: modalWithTableType.DUPLICATES,
+      });
       if (!shouldUpdate) {
         return Promise.reject();
       }
@@ -435,7 +448,7 @@ const useInboundAddItemsForm = ({
       );
       return;
     }
-    saveItems(lineItems);
+    await saveItems(lineItems);
   };
 
   const saveAndExit = async () => {
@@ -460,49 +473,6 @@ const useInboundAddItemsForm = ({
     }
   };
 
-  const removeSavedRow = async (itemId) => {
-    try {
-      spinner.show();
-      await apiClient.delete(STOCK_MOVEMENT_ITEM_REMOVE(itemId));
-    } finally {
-      spinner.hide();
-    }
-  };
-
-  const setLineItems = (response, showOnlyImportedItems) => {
-    const { data } = response.data;
-    const existingLineItems = getValues('values.lineItems') || [];
-    const existingCurrentLineItems = getValues('currentLineItems') || [];
-
-    const lineItemsData = !data.length && existingLineItems.length === 0
-      ? defaultTableRow
-      : data.map(transformLineItem);
-
-    setValue('currentLineItems', _.uniqBy([...lineItemsData, ...existingCurrentLineItems], 'id'));
-    setValue(
-      'values.lineItems',
-      showOnlyImportedItems ? lineItemsData : _.uniqBy([...lineItemsData, ...existingLineItems], 'id'),
-    );
-  };
-
-  const fetchLineItems = async (showOnlyImportedItems = false) => {
-    const response = await stockMovementApi.getStockMovementItems(queryParams.id,
-      { stepNumber: InboundWorkflowState.ADD_ITEMS });
-    setLineItems(response, showOnlyImportedItems);
-  };
-
-  const removeAllRows = async () => {
-    try {
-      spinner.show();
-      await apiClient.delete(STOCK_MOVEMENT_REMOVE_ALL_ITEMS(queryParams.id));
-      setValue('currentLineItems', []);
-      setValue('values.lineItems', defaultTableRow);
-      await fetchLineItems();
-    } finally {
-      spinner.hide();
-    }
-  };
-
   const previousPage = async () => {
     const isFormValid = await trigger();
     if (!isFormValid) {
@@ -516,20 +486,6 @@ const useInboundAddItemsForm = ({
     } finally {
       spinner.hide();
     }
-  };
-
-  const fetchAddItemsPageData = async () => {
-    const response = await apiClient.get(STOCK_MOVEMENT_BY_ID(queryParams.id));
-    const { data } = response.data;
-    const transformedData = {
-      ...data,
-      identifier: data.identifier,
-      stockMovementId: data.id,
-    };
-    dispatch(
-      updateWorkflowHeader(createInboundWorkflowHeader(data), data.displayStatus.name),
-    );
-    setValue('values', transformedData);
   };
 
   const fetchData = async () => {
@@ -569,41 +525,25 @@ const useInboundAddItemsForm = ({
     );
   };
 
-  const addNewLine = () => {
-    append(defaultTableRow);
-  };
-
   useEffect(() => {
     fetchData();
   }, []);
 
   return {
-    control,
-    getValues,
-    setValue,
-    handleSubmit,
-    errors,
-    isValid,
-    trigger,
     loading,
-    nextPage,
-    save,
-    removeSavedRow,
-    removeAllRows,
-    saveAndExit,
-    previousPage,
-    refresh,
+    lineItemsArrayFields,
     addNewLine,
     removeRow,
-    lineItemsArrayFields,
-    isModalOpen,
-    modalData,
-    modalType,
-    handleModalResponse,
-    fetchLineItems,
+    removeAllRows,
     saveRequisitionItemsInCurrentStep,
-    defaultTableRow,
+    fetchLineItems,
+    removeSavedRow,
+    nextPage,
+    previousPage,
+    save,
+    saveAndExit,
+    refresh,
   };
 };
 
-export default useInboundAddItemsForm;
+export default useInboundAddItemsActions;

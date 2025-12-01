@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 import PropTypes from 'prop-types';
 import {
@@ -35,6 +35,7 @@ const InboundAddItemsHeader = ({
       <Button
         onClick={() => {
           const fileInput = document.getElementById('csvInput');
+          // Reset value to null to ensure onChange triggers even if the same file is selected again
           fileInput.value = null;
           fileInput?.click();
         }}
@@ -109,4 +110,4 @@ InboundAddItemsHeader.propTypes = {
   hasErrors: PropTypes.bool.isRequired,
 };
 
-export default InboundAddItemsHeader;
+export default memo(InboundAddItemsHeader);

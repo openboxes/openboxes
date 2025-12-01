@@ -91,7 +91,7 @@ const useInboundAddItemsColumns = ({
   ) => {
     field.onBlur();
 
-    // If some cell is focused, we clear this focus state
+    // If there is a stored focus reference, clear it
     if (rowIndex !== null && columnId !== null) {
       setRowIndex(null);
       setColumnId(null);
@@ -117,11 +117,11 @@ const useInboundAddItemsColumns = ({
     tableData: getValues('values.lineItems') || [],
     setColumnId,
     setRowIndex,
-    addNewRow: () => addNewLine(),
+    addNewRow: addNewLine,
     isNewRow: () => true,
     getValues,
     setValue,
-    onBlur: () => trigger(),
+    onBlur: trigger,
   });
 
   const handleHeaderRecipientChange = (selectedRecipient) => {
