@@ -40,7 +40,7 @@ export const getCurrentLocationId = createSelector(
 
 export const getDefaultTranslationsFetched = createSelector(
   [getSession],
-  (session) => session.fetchedTranslations.default
+  (session) => session.fetchedTranslations.default,
 );
 
 export const getCurrentUser = createSelector(
