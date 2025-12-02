@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 import PropTypes from 'prop-types';
 
@@ -54,7 +54,7 @@ const ConfirmStepHeader = ({
   );
 };
 
-export default ConfirmStepHeader;
+export default memo(ConfirmStepHeader);
 
 ConfirmStepHeader.propTypes = {
   back: PropTypes.func.isRequired,

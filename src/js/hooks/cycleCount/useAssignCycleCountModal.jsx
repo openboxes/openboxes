@@ -8,7 +8,7 @@ import _ from 'lodash';
 import { useSelector } from 'react-redux';
 import {
   getCurrentLocation,
-  getCycleCountsIds,
+  getCycleCountIds,
   getDebounceTime,
   getMinSearchLength,
 } from 'selectors';
@@ -47,7 +47,7 @@ const useAssignCycleCountModal = ({
     debounceTime: getDebounceTime(state),
     minSearchLength: getMinSearchLength(state),
     currentLocation: getCurrentLocation(state),
-    cycleCountIds: getCycleCountsIds(state),
+    cycleCountIds: getCycleCountIds(state),
   }));
   const debouncedPeopleFetch = useCallback(
     debouncePeopleFetch(debounceTime, minSearchLength),
