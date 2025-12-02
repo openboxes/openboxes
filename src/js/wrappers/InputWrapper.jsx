@@ -4,10 +4,11 @@ import PropTypes from 'prop-types';
 import { RiQuestionLine } from 'react-icons/ri';
 import { Tooltip } from 'react-tippy';
 
+import useTranslate from 'hooks/useTranslate';
 import Translate from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
-import './style.scss';
+import 'wrappers/style.scss';
 
 const InputWrapper = ({
   children,
@@ -22,51 +23,58 @@ const InputWrapper = ({
   hideErrorMessageWrapper,
   customTooltip,
   value,
-}) => (
-  <div className={`input-wrapper-container ${className} input-wrapper-label-position-${labelPosition}`}>
-    <div className="input-wrapper-title">
-      <div className="input-wrapper-label">
-        <label htmlFor={inputId} className="m-0">
-          {title && <Translate id={title?.id} defaultMessage={title?.defaultMessage} />}
-        </label>
-        {tooltip && (
-        <Tooltip
-          html={(
-            <span className="p-1">
-              <Translate id={tooltip.id} defaultMessage={tooltip.defaultMessage} />
-            </span>
+}) => {
+  const translate = useTranslate();
+  return (
+    <div
+      data-testid="form-field"
+      className={`input-wrapper-container ${className} input-wrapper-label-position-${labelPosition}`}
+      aria-label={title?.id && title?.defaultMessage && translate(title?.id, title?.defaultMessage)}
+    >
+      <div className="input-wrapper-title">
+        <div className="input-wrapper-label">
+          <label htmlFor={inputId} className="m-0">
+            {title && <Translate id={title?.id} defaultMessage={title?.defaultMessage} />}
+          </label>
+          {tooltip && (
+            <Tooltip
+              html={(
+                <span className="p-1">
+                  <Translate id={tooltip.id} defaultMessage={tooltip.defaultMessage} />
+                </span>
               )}
-        >
-          <span className="input-wrapper-tooltip">
-            <RiQuestionLine className="ml-1" />
-          </span>
-        </Tooltip>
+            >
+              <span className="input-wrapper-tooltip">
+                <RiQuestionLine className="ml-1" />
+              </span>
+            </Tooltip>
+          )}
+          {required && <span className="input-wrapper-asterisk ml-1">&#42;</span>}
+        </div>
+        {button && (
+          <div
+            onClick={button.onClick}
+            role="presentation"
+            className="input-wrapper-button"
+          >
+            <Translate id={button.id} defaultMessage={button.defaultMessage} />
+          </div>
         )}
-        {required && <span className="input-wrapper-asterisk ml-1">&#42;</span>}
       </div>
-      {button && (
-      <div
-        onClick={button.onClick}
-        role="presentation"
-        className="input-wrapper-button"
+      <CustomTooltip
+        show={customTooltip}
+        content={value}
       >
-        <Translate id={button.id} defaultMessage={button.defaultMessage} />
-      </div>
+        {children}
+      </CustomTooltip>
+      {!hideErrorMessageWrapper && (
+        <div className="input-wrapper-error-message" aria-label="subtext">
+          {errorMessage}
+        </div>
       )}
     </div>
-    <CustomTooltip
-      show={customTooltip}
-      content={value}
-    >
-      {children}
-    </CustomTooltip>
-    {!hideErrorMessageWrapper && (
-      <div className="input-wrapper-error-message">
-        {errorMessage}
-      </div>
-    )}
-  </div>
-);
+  );
+};
 
 export default InputWrapper;
 
