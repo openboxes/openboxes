@@ -36,7 +36,7 @@ class PickTaskApiController extends RestfulController<PickTask> {
 
         render ([
                 data: tasks,
-                totalCount: tasks.size() ?: 0,
+                totalCount: tasks.totalCount,
                 max: max,
                 offset: offset
         ] as JSON)

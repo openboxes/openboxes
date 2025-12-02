@@ -751,14 +751,12 @@ class ProductAvailabilityService {
         return data
     }
 
-    List<AvailableItem> getAvailableItems(Location bin, boolean excludeZeroQuantity = true) {
+    List<AvailableItem> getAvailableItems(Location bin) {
         log.info("getItemsInBin: bin=${bin}")
 
         if (!bin) {
             return []
         }
-
-        String quantityCondition = excludeZeroQuantity ? "and pa.quantityOnHand > 0" : ""
 
         def results = ProductAvailability.executeQuery("""
             select 
@@ -770,8 +768,8 @@ class ProductAvailabilityService {
             left outer join pa.inventoryItem ii
             left outer join pa.binLocation bl
             where pa.binLocation = :bin
-            """ +
-                "${quantityCondition}", [bin: bin])
+            and pa.quantityOnHand > 0
+            """, [bin: bin])
 
         List<AvailableItem> data = results.collect {
             InventoryItem inventoryItem = it[0]
