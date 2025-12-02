@@ -4,7 +4,7 @@ import _ from 'lodash';
 import queryString from 'query-string';
 import { useFieldArray } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 
 import { updateWorkflowHeader } from 'actions';
 import stockMovementApi from 'api/services/StockMovementApi';
@@ -50,6 +50,7 @@ const useInboundAddItemsActions = ({
   const history = useHistory();
   const location = useLocation();
   const queryParams = useQueryParams();
+  const { stockMovementId } = useParams();
 
   const {
     fields: lineItemsArrayFields,
@@ -155,7 +156,7 @@ const useInboundAddItemsActions = ({
       };
       try {
         spinner.show();
-        const resp = await apiClient.post(STOCK_MOVEMENT_UPDATE_ITEMS(queryParams.id),
+        const resp = await apiClient.post(STOCK_MOVEMENT_UPDATE_ITEMS(stockMovementId),
           payload);
         const { data } = resp.data;
         const transformedLineItems = data.lineItems.map(transformLineItem);
@@ -193,7 +194,7 @@ const useInboundAddItemsActions = ({
   };
 
   const fetchLineItems = async (showOnlyImportedItems = false) => {
-    const response = await stockMovementApi.getStockMovementItems(queryParams.id, {
+    const response = await stockMovementApi.getStockMovementItems(stockMovementId, {
       stepNumber: InboundWorkflowState.ADD_ITEMS,
     });
     setLineItems(response, showOnlyImportedItems);
@@ -211,7 +212,7 @@ const useInboundAddItemsActions = ({
   const removeAllRows = async () => {
     try {
       spinner.show();
-      await apiClient.delete(STOCK_MOVEMENT_REMOVE_ALL_ITEMS(queryParams.id));
+      await apiClient.delete(STOCK_MOVEMENT_REMOVE_ALL_ITEMS(stockMovementId));
       setValue('currentLineItems', []);
       setValue('values.lineItems', defaultTableRow);
       await fetchLineItems();
@@ -221,7 +222,7 @@ const useInboundAddItemsActions = ({
   };
 
   const fetchAddItemsPageData = async () => {
-    const response = await apiClient.get(STOCK_MOVEMENT_BY_ID(queryParams.id));
+    const response = await apiClient.get(STOCK_MOVEMENT_BY_ID(stockMovementId));
     const { data } = response.data;
     const transformedData = {
       ...data,
@@ -301,7 +302,7 @@ const useInboundAddItemsActions = ({
       spinner.show();
       const payload = { status: RequisitionStatus.CHECKING };
       if (formValues.values.statusCode === RequisitionStatus.CREATED) {
-        await apiClient.post(STOCK_MOVEMENT_UPDATE_STATUS(queryParams.id), payload);
+        await apiClient.post(STOCK_MOVEMENT_UPDATE_STATUS(stockMovementId), payload);
       }
       next();
     } finally {
@@ -316,7 +317,7 @@ const useInboundAddItemsActions = ({
     };
     try {
       spinner.show();
-      await apiClient.post(STOCK_MOVEMENT_UPDATE_INVENTORY_ITEMS(queryParams.id), payload);
+      await apiClient.post(STOCK_MOVEMENT_UPDATE_INVENTORY_ITEMS(stockMovementId), payload);
       await transitionToNextStep();
     } finally {
       spinner.hide();
@@ -456,7 +457,7 @@ const useInboundAddItemsActions = ({
     if (!isFormValid) {
       confirmAction(
         () => {
-          window.location = STOCK_MOVEMENT_URL.show(queryParams.id);
+          window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
         },
         'react.stockMovement.confirmExit.message',
         'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
@@ -467,7 +468,7 @@ const useInboundAddItemsActions = ({
     try {
       spinner.show();
       await saveRequisitionItemsInCurrentStep(getValues('values.lineItems'));
-      window.location = STOCK_MOVEMENT_URL.show(queryParams.id);
+      window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
     } finally {
       spinner.hide();
     }
@@ -489,7 +490,7 @@ const useInboundAddItemsActions = ({
   };
 
   const fetchData = async () => {
-    if (!queryParams.id) {
+    if (!stockMovementId) {
       dispatch(updateWorkflowHeader([], null));
       previous();
       return;

@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import queryString from 'query-string';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { getCurrentLocation } from 'selectors';
 
 import { fetchUsers, updateWorkflowHeader } from 'actions';
@@ -13,7 +13,6 @@ import stockMovementApi from 'api/services/StockMovementApi';
 import { STOCK_MOVEMENT_BY_ID } from 'api/urls';
 import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
 import useInboundCreateValidation from 'hooks/inboundV2/create/useInboundCreateValidation';
-import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import apiClient from 'utils/apiClient';
 import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
@@ -26,10 +25,9 @@ const useInboundCreateForm = ({ next }) => {
   }));
   const spinner = useSpinner();
   const { validationSchema } = useInboundCreateValidation();
-  const queryParams = useQueryParams();
   const dispatch = useDispatch();
   const history = useHistory();
-  const location = useLocation();
+  const { stockMovementId } = useParams();
 
   const defaultValues = useMemo(() => {
     const values = {
@@ -76,11 +74,11 @@ const useInboundCreateForm = ({ next }) => {
       requestedBy: { id: values.requestedBy.id },
     };
     try {
-      const response = queryParams.id
-        ? await stockMovementApi.updateStockMovement(queryParams.id, formattedValues)
+      const response = stockMovementId
+        ? await stockMovementApi.updateStockMovement(stockMovementId, formattedValues)
         : await stockMovementApi.createStockMovement(formattedValues);
 
-      next({ id: response.data.data.id });
+      next({ pathId: response.data.data.id });
     } finally {
       spinner.hide();
     }
@@ -137,13 +135,13 @@ const useInboundCreateForm = ({ next }) => {
   }, [origin?.id, destination?.id]);
 
   const fetchData = async () => {
-    if (!queryParams.id) {
+    if (!stockMovementId) {
       dispatch(updateWorkflowHeader([], null));
       return;
     }
     spinner.show();
     try {
-      const response = await apiClient.get(STOCK_MOVEMENT_BY_ID(queryParams.id));
+      const response = await apiClient.get(STOCK_MOVEMENT_BY_ID(stockMovementId));
 
       const { data } = response.data;
       setValue('description', data.description);
@@ -170,11 +168,8 @@ const useInboundCreateForm = ({ next }) => {
     } catch {
       dispatch(updateWorkflowHeader([], null));
       history.push({
-        pathname: location.pathname,
-        search: queryString.stringify({
-          ...queryParams,
-          id: undefined,
-        }, { skipNull: true }),
+        pathname: '/openboxes/stockMovement/createInbound',
+        search: queryString.stringify({ direction: 'INBOUND' }),
       });
     } finally {
       spinner.hide();

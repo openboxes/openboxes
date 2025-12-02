@@ -3,6 +3,7 @@ import { useEffect, useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import {
   getCurrentLocale,
   getCurrentLocation,
@@ -21,7 +22,6 @@ import { InboundWorkflowState } from 'consts/StockMovementState';
 import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
 import useInboundSendValidation from 'hooks/inboundV2/send/useInboundSendValidation';
 import useFileActions from 'hooks/useFileActions';
-import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 import useUserHasPermissions from 'hooks/useUserHasPermissions';
@@ -44,7 +44,7 @@ const useInboundSendForm = ({ previous }) => {
     minRequiredRole: RoleType.ROLE_ADMIN,
   });
   const translate = useTranslate();
-  const { id: stockMovementId } = useQueryParams();
+  const { stockMovementId } = useParams();
   const dispatch = useDispatch();
   const spinner = useSpinner();
   const { validationSchema } = useInboundSendValidation();
