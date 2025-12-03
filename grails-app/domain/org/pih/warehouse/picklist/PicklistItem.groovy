@@ -57,6 +57,14 @@ class PicklistItem implements Serializable {
     // Audit fields
     Date dateCreated
     Date lastUpdated
+    Date dateStarted
+
+    Location outboundContainer
+    Location stagingLocation
+    Person assignee
+    Date dateAssigned
+    Person stagedBy
+    Date dateStaged
 
     Integer sortOrder = 0
 
@@ -81,6 +89,13 @@ class PicklistItem implements Serializable {
         reasonCode(nullable: true)
         comment(nullable: true)
         sortOrder(nullable: true)
+        outboundContainer(nullable: true)
+        stagingLocation(nullable: true)
+        assignee(nullable: true)
+        dateAssigned(nullable: true)
+        dateStarted(nullable: true)
+        stagedBy(nullable: true)
+        dateStaged(nullable: true)
     }
 
     static transients = ['associatedLocation', 'associatedProducts', 'disableRefresh', 'pickable']
@@ -180,6 +195,13 @@ class PicklistItem implements Serializable {
             reasonCode          : reasonCode,
             reasonCodeMessage   : reasonCodeMessage,
             comment             : comment,
+            outboundContainer   : outboundContainer?.toJson(LocationTypeCode.INTERNAL),
+            stagingLocation     : stagingLocation?.toJson(LocationTypeCode.INTERNAL),
+            assignee            : assignee?.id,
+            dateAssigned        : dateAssigned,
+            dateStarted         : dateStarted,
+            stagedBy            : stagedBy,
+            dateStaged          : dateStaged,
 
             // Used in Bin Replenishment feature
             binLocation                 : binLocation?.toJson(LocationTypeCode.INTERNAL),

@@ -127,6 +127,9 @@ enum ActivityCode {
     // Putaway container codes
     PUTAWAY_CART('PUTAWAY_CART'),
 
+    // Outbound container codes
+    OUTBOUND_CONTAINER('OUTBOUND_CONTAINER'),
+
     NONE('NONE')
 
     final String id
@@ -198,6 +201,9 @@ enum ActivityCode {
                 INBOUND_SORTATION,
                 LOST_AND_FOUND,
                 PUTAWAY_CART,
+
+                // Internal locations used for picking
+                OUTBOUND_CONTAINER,
 
                 // Allows classification of location by delivery type
                 DELIVERY_TYPE_LOCAL_DELIVERY,
