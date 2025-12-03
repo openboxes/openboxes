@@ -11,7 +11,7 @@ const useResolveStepImport = (currentLocationId, locale) => {
   const store = useStore();
   const { show, hide } = useSpinner();
 
-  // This function should be changed in the next ticket OBPIH-7338,
+  //  TODO: This function should be changed in the next ticket OBPIH-7338,
   // because I copied this from count step and this is not working properly
   const importItems = useCallback(async (importFile) => {
     try {
