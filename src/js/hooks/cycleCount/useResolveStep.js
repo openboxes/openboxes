@@ -44,6 +44,7 @@ import { trimLotNumberSpaces } from 'utils/cycleCountUtils';
 import dateWithoutTimeZone from 'utils/dateUtils';
 import exportFileFromApi from 'utils/file-download-util';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
+import useResolveStepImport from './useResolveStepImport';
 
 // Managing state for all tables, operations on shared state (from resolve step)
 const useResolveStep = () => {
@@ -91,6 +92,8 @@ const useResolveStep = () => {
     currentUser: getCurrentUser(state),
     locale: getCurrentLocale(state),
   }));
+
+  const { importErrors, importItems } = useResolveStepImport(currentLocation?.id, locale);
 
   const translate = useTranslate();
 
@@ -839,6 +842,8 @@ const useResolveStep = () => {
     sortByProductName,
     setSortByProductName,
     forceRerender,
+    importErrors,
+    importItems,
   };
 };
 

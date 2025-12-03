@@ -52,6 +52,8 @@ const ResolveStep = () => {
     sortByProductName,
     setSortByProductName,
     forceRerender,
+    importErrors,
+    importItems,
   } = useResolveStep();
   useTranslation('cycleCount');
 
@@ -73,6 +75,8 @@ const ResolveStep = () => {
           isFormDisabled={isFormDisabled}
           sortByProductName={sortByProductName}
           setSortByProductName={setSortByProductName}
+          importItems={importItems}
+          importErrors={importErrors}
         />
       ) : (
         <ConfirmStepHeader
