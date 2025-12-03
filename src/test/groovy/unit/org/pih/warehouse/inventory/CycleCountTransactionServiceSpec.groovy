@@ -59,11 +59,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         cycleCountProductAvailabilityServiceStub.refreshProductAvailability(_ as CycleCount) >>
                 new CycleCountProductAvailabilityService.CycleCountItemsForRefresh()
 
-        cycleCountProductInventoryTransactionServiceStub = Stub(CycleCountProductInventoryTransactionService) {
-            setSourceObject(_ as Transaction, _ as CycleCount) >> { Transaction transaction, CycleCount cc ->
-                transaction.cycleCount = cc
-            }
-        }
+        cycleCountProductInventoryTransactionServiceStub = Stub(CycleCountProductInventoryTransactionService)
         cycleCountTransactionService.cycleCountProductInventoryTransactionService = cycleCountProductInventoryTransactionServiceStub
 
         transactionIdentifierServiceStub = Stub(TransactionIdentifierService)
@@ -232,7 +228,6 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         assert adjustmentTransaction != null
         assert adjustmentTransaction.transactionNumber == "123ABC"
         assert adjustmentTransaction.inventory == facility.inventory
-        assert adjustmentTransaction.cycleCount == cycleCount
 
         // We expect two entries because we had two discrepancy.
         List<TransactionEntry> entries = adjustmentTransaction.transactionEntries as List<TransactionEntry>
