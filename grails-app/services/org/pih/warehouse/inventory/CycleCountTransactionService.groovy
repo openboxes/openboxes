@@ -119,7 +119,6 @@ class CycleCountTransactionService {
                 inventory: cycleCount.facility.inventory,
                 transactionDate: transactionDate,
                 transactionType: transactionType,
-                cycleCount: cycleCount,
         )
         cycleCountProductInventoryTransactionService.setSourceObject(transaction, cycleCount)
         transaction.transactionNumber = transactionIdentifierService.generate(transaction)
