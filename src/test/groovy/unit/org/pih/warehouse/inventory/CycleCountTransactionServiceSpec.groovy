@@ -32,9 +32,6 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
     CycleCountProductAvailabilityService cycleCountProductAvailabilityServiceStub
 
     @Shared
-    CycleCountProductInventoryTransactionService cycleCountProductInventoryTransactionServiceStub
-
-    @Shared
     TransactionIdentifierService transactionIdentifierServiceStub
 
     @Shared
@@ -53,21 +50,6 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
     void setup() {
         cycleCountTransactionService = new CycleCountTransactionService()
 
-        // Set up the stubs
-        cycleCountProductAvailabilityServiceStub = Stub(CycleCountProductAvailabilityService)
-        cycleCountTransactionService.cycleCountProductAvailabilityService = cycleCountProductAvailabilityServiceStub
-        cycleCountProductAvailabilityServiceStub.refreshProductAvailability(_ as CycleCount) >>
-                new CycleCountProductAvailabilityService.CycleCountItemsForRefresh()
-
-        cycleCountProductInventoryTransactionServiceStub = Stub(CycleCountProductInventoryTransactionService)
-        cycleCountTransactionService.cycleCountProductInventoryTransactionService = cycleCountProductInventoryTransactionServiceStub
-
-        transactionIdentifierServiceStub = Stub(TransactionIdentifierService)
-        cycleCountTransactionService.transactionIdentifierService = transactionIdentifierServiceStub
-
-        inventoryServiceStub = Stub(InventoryService)
-        cycleCountTransactionService.inventoryService = inventoryServiceStub
-
         // Set up the transaction types
         baselineTransactionType = new TransactionType()
         baselineTransactionType.id = Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID
@@ -76,13 +58,30 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         adjustmentTransactionType = new TransactionType()
         adjustmentTransactionType.id = Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID
         adjustmentTransactionType.save(validate: false)
+
+        // Set up the stubs
+        cycleCountProductAvailabilityServiceStub = Stub(CycleCountProductAvailabilityService)
+        cycleCountTransactionService.cycleCountProductAvailabilityService = cycleCountProductAvailabilityServiceStub
+        cycleCountProductAvailabilityServiceStub.refreshProductAvailability(_ as CycleCount) >>
+                new CycleCountProductAvailabilityService.CycleCountItemsForRefresh()
+
+        cycleCountTransactionService.cycleCountProductInventoryTransactionService = Stub(CycleCountProductInventoryTransactionService) {
+            // This is stubbed data so we don't care about any of the fields, not even the transaction entries.
+            // The only assertions that we make are on how many of each type of transaction we create.
+            createInventoryBaselineTransaction(*_) >> new Transaction(transactionType: baselineTransactionType)
+        }
+
+        transactionIdentifierServiceStub = Stub(TransactionIdentifierService)
+        cycleCountTransactionService.transactionIdentifierService = transactionIdentifierServiceStub
+
+        inventoryServiceStub = Stub(InventoryService)
+        cycleCountTransactionService.inventoryService = inventoryServiceStub
     }
 
     void 'createTransactions should succeed for a single product count when adjustments are not required'() {
         given: 'mocked inputs'
         Location facility = new Location(inventory: new Inventory())
         Product product = new Product()
-        Date date = new Date()
 
         and: 'no other transactions exist at the time for the product'
         inventoryServiceStub.hasTransactionEntriesOnDate(facility, _ as Date, [product]) >> false
@@ -103,9 +102,6 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
                 ]
         )
 
-        and: 'a stubbed baseline transaction that will be created for the product'
-        stubExpectedBaselineTransaction(product)
-
         when:
         List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, [product], true)
 
@@ -121,7 +117,6 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         product1.id = 1
         Product product2 = new Product()
         product2.id = 2
-        Date date = new Date()
 
         and: 'no other transactions exist at the time for the products'
         inventoryServiceStub.hasTransactionEntriesOnDate(facility, _ as Date, [product1, product2]) >> false
@@ -151,15 +146,11 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
                 ]
         )
 
-        and: 'stubbed baseline transactions that will be created for the products'
-        stubExpectedBaselineTransaction(product1)
-        stubExpectedBaselineTransaction(product2)
-
         when:
         List<Transaction> transactions = cycleCountTransactionService.createTransactions(
                 cycleCount, [product1, product2], true)
 
-        then: 'the only transactions should be the baseline ones'
+        then: 'the only transactions should be the baseline ones (one for each product)'
         assert transactions.size() == 2
         assert transactions.findAll{ it.transactionType == baselineTransactionType }.size() == 2
     }
@@ -169,7 +160,6 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         Location facility = new Location(inventory: new Inventory())
         Product product = new Product()
         InventoryItem inventoryItem = new InventoryItem()
-        Date date = new Date()
 
         and: 'no other transactions exist at the time for the product'
         inventoryServiceStub.hasTransactionEntriesOnDate(facility, _ as Date, [product]) >> false
@@ -213,13 +203,10 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         and: 'a mocked transaction number'
         transactionIdentifierServiceStub.generate(_ as Transaction) >> "123ABC"
 
-        and: 'a stubbed baseline transaction that will be created for the product'
-        stubExpectedBaselineTransaction(product)
-
         when:
         List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, [product], true)
 
-        then: 'both a product inventory and adjustment transaction should be created'
+        then: 'both a baseline and adjustment transaction should be created'
         assert transactions.size() == 2
         assert transactions.findAll{ it.transactionType == baselineTransactionType }.size() == 1
 
@@ -251,7 +238,6 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         Location facility = new Location(inventory: new Inventory())
         Product product = new Product()
         InventoryItem inventoryItem = new InventoryItem()
-        Date date = new Date()
 
         and: 'a transaction already exists at the time for the product'
         inventoryServiceStub.hasTransactionEntriesOnDate(facility, _ as Date, [product]) >> true
@@ -275,27 +261,10 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         and: 'a mocked transaction number'
         transactionIdentifierServiceStub.generate(_ as Transaction) >> "123ABC"
 
-        and: 'a stubbed baseline transaction that will be created for the product'
-        stubExpectedBaselineTransaction(product)
-
         when:
         cycleCountTransactionService.createTransactions(cycleCount, [product], true)
 
         then:
         thrown(IllegalArgumentException)
-    }
-
-    private Transaction stubExpectedBaselineTransaction(Product product) {
-
-        // This is stubbed data so we don't really care about any of the fields, not even the transaction entries.
-        // The only assertions that we make are on how many of each type of transaction we create.
-        Transaction transaction = new Transaction(
-                transactionType: baselineTransactionType,
-        )
-
-        cycleCountProductInventoryTransactionServiceStub.createInventoryBaselineTransaction(
-                _ as Location, _ as CycleCount, [product], *_) >> transaction
-
-        return transaction
     }
 }
