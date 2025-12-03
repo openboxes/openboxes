@@ -7,6 +7,7 @@ import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
 
 import org.pih.warehouse.DateUtil
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 
 /**
@@ -62,6 +63,14 @@ class SessionManager {
 
     void setIsInLocalizationMode(boolean isInLocalizationMode) {
         setAttribute(SessionAttribute.IS_IN_LOCALIZATION_MODE, isInLocalizationMode)
+    }
+
+    Location getCurrentLocation() {
+        return getAttribute(SessionAttribute.WAREHOUSE) as Location
+    }
+
+    void setCurrentLocation(Location currentLocation) {
+        setAttribute(SessionAttribute.WAREHOUSE, currentLocation)
     }
 
     /**
