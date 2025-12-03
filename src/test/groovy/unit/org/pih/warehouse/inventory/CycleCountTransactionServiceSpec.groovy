@@ -51,7 +51,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
     TransactionType adjustmentTransactionType
 
     void setupSpec() {
-        mockDomains(Transaction, TransactionEntry, TransactionType)
+        mockDomains(TransactionEntry, TransactionType)
     }
 
     void setup() {
@@ -65,7 +65,9 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
 
         cycleCountProductInventoryTransactionServiceStub = Stub(CycleCountProductInventoryTransactionService)
         cycleCountTransactionService.cycleCountProductInventoryTransactionService = cycleCountProductInventoryTransactionServiceStub
-
+        cycleCountProductInventoryTransactionServiceStub.setSourceObject(_ as Transaction, _ as CycleCount) >> { Transaction transaction, CycleCount cc ->
+            transaction.cycleCount = cc
+        }
         productAvailabilityServiceStub = Stub(ProductAvailabilityService)
         cycleCountTransactionService.productAvailabilityService = productAvailabilityServiceStub
 
@@ -111,7 +113,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         )
 
         and: 'a mocked product inventory transaction'
-        createExpectedProductInventoryTransaction(facility, product, cycleCount, date)
+        //createExpectedProductInventoryTransaction(facility, product, cycleCount, date)
 
         when:
         List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, [product], true)
@@ -159,8 +161,8 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         )
 
         and: 'mocked product inventory transactions'
-        createExpectedProductInventoryTransaction(facility, product1, cycleCount, date)
-        createExpectedProductInventoryTransaction(facility, product2, cycleCount, date)
+        //createExpectedProductInventoryTransaction(facility, product1, cycleCount, date)
+        //createExpectedProductInventoryTransaction(facility, product2, cycleCount, date)
 
         when:
         List<Transaction> transactions = cycleCountTransactionService.createTransactions(
@@ -221,7 +223,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         transactionIdentifierServiceStub.generate(_ as Transaction) >> "123ABC"
 
         and: 'a mocked product inventory transaction'
-        createExpectedProductInventoryTransaction(facility, product, cycleCount, date)
+        //createExpectedProductInventoryTransaction(facility, product, cycleCount, date)
 
         when:
         List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, [product], true)
@@ -287,7 +289,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         transactionIdentifierServiceStub.generate(_ as Transaction) >> "123ABC"
 
         and: 'a mocked product inventory transaction'
-        createExpectedProductInventoryTransaction(facility, product, cycleCount, date)
+        //createExpectedProductInventoryTransaction(facility, product, cycleCount, date)
 
         when:
         cycleCountTransactionService.createTransactions(cycleCount, [product], true)
