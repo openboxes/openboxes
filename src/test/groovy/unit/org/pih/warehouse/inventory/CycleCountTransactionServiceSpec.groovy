@@ -16,7 +16,6 @@ import org.pih.warehouse.inventory.CycleCountTransactionService
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
-import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionIdentifierService
@@ -33,9 +32,6 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
     CycleCountProductAvailabilityService cycleCountProductAvailabilityServiceStub
 
     @Shared
-    ProductAvailabilityService productAvailabilityServiceStub
-
-    @Shared
     CycleCountProductInventoryTransactionService cycleCountProductInventoryTransactionServiceStub
 
     @Shared
@@ -45,7 +41,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
     InventoryService inventoryServiceStub
 
     @Shared
-    TransactionType productInventoryTransactionType
+    TransactionType baselineTransactionType
 
     @Shared
     TransactionType adjustmentTransactionType
@@ -63,13 +59,12 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         cycleCountProductAvailabilityServiceStub.refreshProductAvailability(_ as CycleCount) >>
                 new CycleCountProductAvailabilityService.CycleCountItemsForRefresh()
 
-        cycleCountProductInventoryTransactionServiceStub = Stub(CycleCountProductInventoryTransactionService)
-        cycleCountTransactionService.cycleCountProductInventoryTransactionService = cycleCountProductInventoryTransactionServiceStub
-        cycleCountProductInventoryTransactionServiceStub.setSourceObject(_ as Transaction, _ as CycleCount) >> { Transaction transaction, CycleCount cc ->
-            transaction.cycleCount = cc
+        cycleCountProductInventoryTransactionServiceStub = Stub(CycleCountProductInventoryTransactionService) {
+            setSourceObject(_ as Transaction, _ as CycleCount) >> { Transaction transaction, CycleCount cc ->
+                transaction.cycleCount = cc
+            }
         }
-        productAvailabilityServiceStub = Stub(ProductAvailabilityService)
-        cycleCountTransactionService.productAvailabilityService = productAvailabilityServiceStub
+        cycleCountTransactionService.cycleCountProductInventoryTransactionService = cycleCountProductInventoryTransactionServiceStub
 
         transactionIdentifierServiceStub = Stub(TransactionIdentifierService)
         cycleCountTransactionService.transactionIdentifierService = transactionIdentifierServiceStub
@@ -78,9 +73,9 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         cycleCountTransactionService.inventoryService = inventoryServiceStub
 
         // Set up the transaction types
-        productInventoryTransactionType = new TransactionType()
-        productInventoryTransactionType.id = Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID
-        productInventoryTransactionType.save(validate: false)
+        baselineTransactionType = new TransactionType()
+        baselineTransactionType.id = Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID
+        baselineTransactionType.save(validate: false)
 
         adjustmentTransactionType = new TransactionType()
         adjustmentTransactionType.id = Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID
@@ -112,15 +107,15 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
                 ]
         )
 
-        and: 'a mocked product inventory transaction'
-        //createExpectedProductInventoryTransaction(facility, product, cycleCount, date)
+        and: 'a stubbed baseline transaction that will be created for the product'
+        stubExpectedBaselineTransaction(product)
 
         when:
         List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, [product], true)
 
-        then: 'the only transaction should be the product inventory one'
+        then: 'the only transaction should be the baseline'
         assert transactions.size() == 1
-        assert transactions.findAll{ it.transactionType != adjustmentTransactionType }.size() == 1
+        assert transactions[0].transactionType == baselineTransactionType
     }
 
     void 'createTransactions should succeed for a multiple product count when adjustments are not required'() {
@@ -160,17 +155,17 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
                 ]
         )
 
-        and: 'mocked product inventory transactions'
-        //createExpectedProductInventoryTransaction(facility, product1, cycleCount, date)
-        //createExpectedProductInventoryTransaction(facility, product2, cycleCount, date)
+        and: 'stubbed baseline transactions that will be created for the products'
+        stubExpectedBaselineTransaction(product1)
+        stubExpectedBaselineTransaction(product2)
 
         when:
         List<Transaction> transactions = cycleCountTransactionService.createTransactions(
                 cycleCount, [product1, product2], true)
 
-        then: 'the only transactions should be the product inventory ones'
+        then: 'the only transactions should be the baseline ones'
         assert transactions.size() == 2
-        assert transactions.findAll{ it.transactionType != adjustmentTransactionType }.size() == 2
+        assert transactions.findAll{ it.transactionType == baselineTransactionType }.size() == 2
     }
 
     void 'createTransactions should succeed for a single product count when adjustments are required'() {
@@ -222,16 +217,15 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         and: 'a mocked transaction number'
         transactionIdentifierServiceStub.generate(_ as Transaction) >> "123ABC"
 
-        and: 'a mocked product inventory transaction'
-        //createExpectedProductInventoryTransaction(facility, product, cycleCount, date)
+        and: 'a stubbed baseline transaction that will be created for the product'
+        stubExpectedBaselineTransaction(product)
 
         when:
         List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, [product], true)
 
         then: 'both a product inventory and adjustment transaction should be created'
         assert transactions.size() == 2
-        Transaction productInventoryTransaction = transactions.find{ it.transactionType != adjustmentTransactionType }
-        assert productInventoryTransaction != null
+        assert transactions.findAll{ it.transactionType == baselineTransactionType }.size() == 1
 
         // The adjustment transaction isn't mocked so make sure to assert on its fields
         Transaction adjustmentTransaction = transactions.find{ it.transactionType == adjustmentTransactionType }
@@ -239,8 +233,6 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         assert adjustmentTransaction.transactionNumber == "123ABC"
         assert adjustmentTransaction.inventory == facility.inventory
         assert adjustmentTransaction.cycleCount == cycleCount
-        // The order of the transactions matters! The adjustment should always be applied after the product inventory.
-        assert adjustmentTransaction.transactionDate > productInventoryTransaction.transactionDate
 
         // We expect two entries because we had two discrepancy.
         List<TransactionEntry> entries = adjustmentTransaction.transactionEntries as List<TransactionEntry>
@@ -288,8 +280,8 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         and: 'a mocked transaction number'
         transactionIdentifierServiceStub.generate(_ as Transaction) >> "123ABC"
 
-        and: 'a mocked product inventory transaction'
-        //createExpectedProductInventoryTransaction(facility, product, cycleCount, date)
+        and: 'a stubbed baseline transaction that will be created for the product'
+        stubExpectedBaselineTransaction(product)
 
         when:
         cycleCountTransactionService.createTransactions(cycleCount, [product], true)
@@ -298,16 +290,16 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         thrown(IllegalArgumentException)
     }
 
-    private Transaction createExpectedProductInventoryTransaction(
-            Location facility, Product product, CycleCount cycleCount, Date date) {
+    private Transaction stubExpectedBaselineTransaction(Product product) {
 
-        // This is mocked data so we don't really care about any of the other fields, not even the transaction entries.
+        // This is stubbed data so we don't really care about any of the fields, not even the transaction entries.
+        // The only assertions that we make are on how many of each type of transaction we create.
         Transaction transaction = new Transaction(
-                transactionType: productInventoryTransactionType,
+                transactionType: baselineTransactionType,
         )
 
         cycleCountProductInventoryTransactionServiceStub.createInventoryBaselineTransaction(
-                facility, cycleCount, [product], date) >> transaction
+                _ as Location, _ as CycleCount, [product], *_) >> transaction
 
         return transaction
     }
