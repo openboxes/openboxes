@@ -1139,11 +1139,6 @@ class UrlMappings {
             action = [POST: "refreshCycleCount"]
         }
 
-        "/api/facilities/$facility/containers/${outboundContainerId}" {
-            controller = "locationApi"
-            action = [PATCH: "patch"]
-        }
-
         "/api/reports/cycle-count-details" {
             controller = "cycleCountApi"
             action = [POST: "getCycleCountDetails", GET: "getCycleCountDetails"]
