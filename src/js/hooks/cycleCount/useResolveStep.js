@@ -44,6 +44,7 @@ import { trimLotNumberSpaces } from 'utils/cycleCountUtils';
 import dateWithoutTimeZone from 'utils/dateUtils';
 import exportFileFromApi from 'utils/file-download-util';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
+
 import useResolveStepImport from './useResolveStepImport';
 
 // Managing state for all tables, operations on shared state (from resolve step)
