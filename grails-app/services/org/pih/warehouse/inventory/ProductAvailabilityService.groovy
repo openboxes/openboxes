@@ -751,6 +751,43 @@ class ProductAvailabilityService {
         return data
     }
 
+    List<AvailableItem> getAvailableItems(Location bin) {
+        log.info("getAvailableItems: bin=${bin}")
+
+        if (!bin) {
+            return []
+        }
+
+        def results = ProductAvailability.executeQuery("""
+            select 
+                ii,
+                pa.binLocation,
+                pa.quantityOnHand,
+                pa.quantityAvailableToPromise
+            from ProductAvailability pa
+            left outer join pa.inventoryItem ii
+            left outer join pa.binLocation bl
+            where pa.binLocation = :bin
+            and pa.quantityOnHand > 0
+            """, [bin: bin])
+
+        List<AvailableItem> data = results.collect {
+            InventoryItem inventoryItem = it[0]
+            Location binLocation = it[1]
+            Integer quantityOnHand = it[2]
+            Integer quantityAvailableToPromise = it[3]
+
+            return new AvailableItem(
+                    inventoryItem               : inventoryItem,
+                    binLocation                 : binLocation,
+                    quantityOnHand              : quantityOnHand,
+                    quantityAvailable           : quantityAvailableToPromise
+            )
+        }
+
+        return data
+    }
+
     List<AvailableItem> getAvailableItems(Location location, InventoryItem inventoryItem) {
         def data = []
         if (location) {

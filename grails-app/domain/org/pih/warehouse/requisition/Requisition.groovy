@@ -125,7 +125,6 @@ class Requisition implements Comparable<Requisition>, Serializable {
     Date dateApproved
     Date dateRejected
     Boolean approvalRequired
-
     // Temporary until we add the original order associated with this request
     OrderTypeCode orderTypeCode
 
