@@ -13,7 +13,8 @@ class PickTaskApiController extends RestfulController<PickTask> {
     static allowedMethods = [
             search: 'GET',
             read: 'GET',
-            patch: 'PATCH'
+            patch: 'PATCH',
+            drop: 'PATCH'
     ]
 
     PickTaskService pickTaskService
@@ -45,7 +46,7 @@ class PickTaskApiController extends RestfulController<PickTask> {
     def read(String id) {
         PickTask task = pickTaskService.get(id)
         if (!task) {
-            render ([errorCode: 404, message: "Pick task not found"] as JSON)
+            render (status: HttpStatus.NOT_FOUND.value(), [errorCode: 404, message: "Pick task not found"] as JSON)
             return
         }
 
@@ -60,7 +61,7 @@ class PickTaskApiController extends RestfulController<PickTask> {
             return render(status: HttpStatus.NOT_FOUND.value())
         }
 
-        render([data: task] as JSON)
+        render([data: task.toJson()] as JSON)
     }
 
     def drop() {

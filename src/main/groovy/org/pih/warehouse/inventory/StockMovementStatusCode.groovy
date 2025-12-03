@@ -26,14 +26,14 @@ enum StockMovementStatusCode {
     APPROVED(3, APPROVED),
     PICKING(3, PENDING),
     PICKED(4, PENDING),
+    STAGED(5, PENDING),
     CHECKING(4, PENDING),
     CHECKED(6, PENDING),
     PACKED(7, PENDING),
     REVIEWING(8, PENDING),
     DISPATCHED(9),
     CANCELED(10),
-    REJECTED(10, REJECTED),
-    STAGED
+    REJECTED(10, REJECTED)
 
     int sortOrder
     StockMovementStatusCode displayStatusCode

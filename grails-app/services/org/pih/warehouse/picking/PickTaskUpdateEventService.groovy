@@ -11,6 +11,6 @@ class PickTaskUpdateEventService implements ApplicationListener<PickTaskUpdateEv
     @Override
     void onApplicationEvent(PickTaskUpdateEvent event) {
         PickTask task = (PickTask) event.source
-        productAvailabilityService.triggerRefreshProductAvailability(task?.facility?.id, [task.product.id], event?.forceRefresh)
+        productAvailabilityService.triggerRefreshProductAvailability(task?.facility?.id, [task?.product?.id], event?.forceRefresh)
     }
 }

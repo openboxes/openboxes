@@ -166,6 +166,7 @@ class PickTaskService {
         if (!outboundContainer.supports(ActivityCode.OUTBOUND_CONTAINER)) {
             throw new IllegalArgumentException("Container ${outboundContainer.name} does not support OUTBOUND_CONTAINER activity")
         }
+        task.outboundContainer = outboundContainer
 
         PicklistItem existingPickItem = PicklistItem.get(task.id)
         Integer newQuantityPicked = existingPickItem.quantityPicked += quantityPicked
@@ -206,7 +207,13 @@ class PickTaskService {
         PicklistItem existingPickItem = PicklistItem.get(task.id)
         existingPickItem.status = task.status.toString()
         Requisition requisition = existingPickItem?.requisitionItem?.requisition
-        def allOrderTasks = requisition?.picklist?.picklistItems
+
+        if (!requisition) {
+            task.discard()
+            return
+        }
+
+        def allOrderTasks = requisition?.picklist?.picklistItems ?: []
 
         if (task.status == PickTaskStatus.PICKED) {
             boolean allTasksPicked = allOrderTasks.every {

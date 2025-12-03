@@ -752,7 +752,7 @@ class ProductAvailabilityService {
     }
 
     List<AvailableItem> getAvailableItems(Location bin) {
-        log.info("getItemsInBin: bin=${bin}")
+        log.info("getAvailableItems: bin=${bin}")
 
         if (!bin) {
             return []
