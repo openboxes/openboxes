@@ -14,6 +14,7 @@ class SearchPickTaskCommand implements Validateable {
     List<PickTaskStatus> status
     Integer priority
     String outboundContainerId
+    String requisitionId
 
     static constraints = {
         facility nullable: false
@@ -23,5 +24,6 @@ class SearchPickTaskCommand implements Validateable {
         status nullable: true
         priority nullable: true
         outboundContainerId nullable: true
+        requisitionId nullable: true
     }
 }
