@@ -142,7 +142,8 @@ class StockMovementController {
                 redirect(action: "createOutbound", params: params)
                 break
             case StockMovementDirection.INBOUND:
-                redirect(action: "createInbound", params: params)
+                // We need to add 'SEND' step to the params to redirect to the correct step
+                redirect(action: "createInbound", params: params + [step: 'SEND'])
                 break
             default:
                 redirect(action: "createOutbound", params: params)

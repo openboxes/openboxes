@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import { locales } from 'moment';
@@ -28,13 +28,6 @@ const useConfirmExpirationDateModal = () => {
       dateFormat: DateFormatDateFns.DD_MMM_YYYY,
       options: { locale: locales[currentLocale] },
     });
-
-  useEffect(() => {
-    document.body.style.overflowY = 'hidden';
-    return () => {
-      document.body.style.overflowY = 'auto';
-    };
-  }, []);
 
   const columns = [
     columnHelper.accessor(confirmExpirationDateColumn.CODE, {

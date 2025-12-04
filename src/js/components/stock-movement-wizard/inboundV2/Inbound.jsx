@@ -3,9 +3,9 @@ import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import InboundHeader from 'components/stock-movement-wizard/inboundV2/InboundHeader';
-import InboundAddItems from 'components/stock-movement-wizard/inboundV2/sections/InboundAddItems';
-import InboundCreate from 'components/stock-movement-wizard/inboundV2/sections/InboundCreate';
-import InboundSend from 'components/stock-movement-wizard/inboundV2/sections/InboundSend';
+import InboundAddItems from 'components/stock-movement-wizard/inboundV2/sections/addItems/InboundAddItems';
+import InboundCreate from 'components/stock-movement-wizard/inboundV2/sections/create/InboundCreate';
+import InboundSend from 'components/stock-movement-wizard/inboundV2/sections/send/InboundSend';
 import WizardStepsV2 from 'components/wizard/v2/WizardStepsV2';
 import inboundV2Step from 'consts/InboundStep';
 import useTranslate from 'hooks/useTranslate';
