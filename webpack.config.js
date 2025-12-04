@@ -17,6 +17,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 const webpack = require('webpack');
 
+const toBoolean = (str) => ['1', 'on', 'true', 'yes'].includes((str?.toString() ?? '').trim().toLowerCase());
+
 module.exports = {
     cache: true,
     entry: {
@@ -34,12 +36,15 @@ module.exports = {
     },
     stats: {
       colors: false,
+      warnings: !toBoolean(process.env.HIDE_WARNING_LOGS_DURING_TESTS),
     },
     /* We generate source maps so Sentry can map errors to lines of code, even when the code is minified */
     devtool: 'source-map',
     plugins: [
       new ESLintPlugin({
         extensions: ['js', 'jsx'],
+        emitWarning: !toBoolean(process.env.HIDE_WARNING_LOGS_DURING_TESTS),
+        failOnWarning: false,
       }),
       new FileManagerPlugin({
         events: {

@@ -927,7 +927,8 @@ tasks.withType(Test) {
         events 'failed', 'passed', 'skipped'
         exceptionFormat 'full'
         showStackTraces = true
-        showStandardStreams = true
+        // suppress standard streams (logs) when HIDE_WARNING_LOGS_DURING_TESTS is set
+        showStandardStreams = !(System.getenv('HIDE_WARNING_LOGS_DURING_TESTS') ?: 'false').toBoolean()
     }
 
     jacoco {
