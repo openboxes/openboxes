@@ -129,7 +129,6 @@ assets {
 
 bootRun {
     addResources = true
-    dependsOn 'npm_run_bundle'
     jvmArgs = [
         '-Dspring.output.ansi.enabled=never',
         '-Xdebug',
@@ -822,6 +821,15 @@ buildProperties.doLast {
     }
 }
 
+task cleanWebpack(type: Delete) {
+    description = "Delete webpack's file cache and output directory"
+    group = 'Build'
+    delete file('node_modules/.cache')
+    delete file('src/main/webapp/webpack')
+}
+
+clean.dependsOn cleanWebpack
+
 /*
  * This lightweight task logs release info for node, npm and friends.
  */
@@ -890,6 +898,9 @@ jacocoTestReport {
 
 // Configuration for both "test" and "integrationTest" tasks.
 tasks.withType(Test) {
+    // never consider test tasks as up-to-date - always run them when requested
+    outputs.upToDateWhen { false }
+
     systemProperty 'geb.build.reportsDir', reporting.file('geb/integrationTest')
     systemProperty 'geb.env', System.getProperty('geb.env')
     systemProperty 'webdriver.chrome.driver', System.getProperty('webdriver.chrome.driver')
