@@ -1,23 +1,20 @@
 import fileDownload from 'js-file-download';
-import _ from 'lodash';
 
 import stockMovementApi from 'api/services/StockMovementApi';
 import useSpinner from 'hooks/useSpinner';
 
 const useInboundAddItemsImportExport = ({
   getValues,
-  setValue,
   fetchLineItems,
   saveRequisitionItemsInCurrentStep,
-  defaultTableRow,
 }) => {
   const spinner = useSpinner();
 
-  const importTemplate = async (event) => {
+  const importTemplate = async (importFile) => {
     try {
       spinner.show();
       const formData = new FormData();
-      const file = event.target.files[0];
+      const file = importFile[0];
       const { stockMovementId } = getValues('values');
 
       formData.append('importFile', file.slice(0, file.size, 'text/csv'));
@@ -28,15 +25,7 @@ const useInboundAddItemsImportExport = ({
       };
 
       await stockMovementApi.importCsv(stockMovementId, formData, config);
-
       await fetchLineItems(true);
-      const { lineItems } = getValues('values');
-      const lastLineItem = _.last(lineItems);
-      const isLastProductNil = _.isNil(lastLineItem?.product);
-
-      if (isLastProductNil) {
-        setValue('values.lineItems', defaultTableRow);
-      }
     } finally {
       spinner.hide();
     }

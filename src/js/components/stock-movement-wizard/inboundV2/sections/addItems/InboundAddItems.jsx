@@ -37,7 +37,7 @@ const InboundAddItems = ({
   });
 
   const isNextButtonEnabled = lineItems?.some((item) =>
-    item.product && item.quantityRequested && parseInt(item.quantityRequested, 10) > 0) ?? false;
+    item.product && item.quantityRequested && parseInt(item.quantityRequested, 10) > 0);
 
   return (
     <form onSubmit={handleSubmit(nextPage)}>

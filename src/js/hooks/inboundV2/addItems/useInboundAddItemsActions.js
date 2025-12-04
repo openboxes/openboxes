@@ -169,9 +169,10 @@ const useInboundAddItemsActions = ({
 
     // If there are no items to save, clear the line items with zero or empty quantity
     if (checkInvalidQuantities(itemCandidatesToSave)) {
-      setValue('values.lineItems', itemCandidatesToSave.filter(
+      const filteredItems = itemCandidatesToSave.filter(
         (item) => item.quantityRequested && item.quantityRequested !== '0',
-      ));
+      );
+      setValue('values.lineItems', filteredItems.length > 0 ? filteredItems : defaultTableRow);
     }
     return null;
   };
@@ -214,7 +215,6 @@ const useInboundAddItemsActions = ({
       await apiClient.delete(STOCK_MOVEMENT_REMOVE_ALL_ITEMS(queryParams.id));
       setValue('currentLineItems', []);
       setValue('values.lineItems', defaultTableRow);
-      await fetchLineItems();
     } finally {
       spinner.hide();
     }
@@ -377,14 +377,14 @@ const useInboundAddItemsActions = ({
 
   const checkDuplicatesSaveAndTransitionToNextStep = async (formValues, lineItems) => {
     const itemsMap = _.groupBy(
-      lineItems.filter(item => item.product?.productCode),
+      lineItems.filter((item) => item.product?.productCode),
       (item) => item.product.productCode,
     );
     const duplicateGroups = Object.values(itemsMap).filter((g) => g.length > 1);
     const hasDuplicates = duplicateGroups.length > 0;
     const skipConfirm =
-      formValues.values.origin.locationType.locationTypeCode === locationType.SUPPLIER ||
-      !formValues.values.hasManageInventory;
+      formValues.values.origin.locationType.locationTypeCode === locationType.SUPPLIER
+      || !formValues.values.hasManageInventory;
 
     if (hasDuplicates && !skipConfirm) {
       const shouldUpdate = await openModal({

@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import {
   RiAddLine,
   RiCloseCircleLine,
-  RiDownload2Line,
   RiPictureInPictureExitLine,
   RiRefreshLine,
   RiSave2Line,
@@ -12,6 +11,8 @@ import {
 } from 'react-icons/ri';
 
 import Button from 'components/form-elements/Button';
+import ButtonFileSelect from 'components/form-elements/v2/ButtonFileSelect';
+import FileFormat from 'consts/fileFormat';
 
 const InboundAddItemsHeader = ({
   addNewLine,
@@ -74,26 +75,13 @@ const InboundAddItemsHeader = ({
       />
 
       <div className="buttons-container">
-        <Button
-          onClick={() => {
-            const fileInput = document.getElementById('csvInput');
-            // Reset value to null to ensure onChange triggers even if the same file
-            // is selected again
-            fileInput.value = null;
-            fileInput?.click();
-          }}
-          StartIcon={<RiDownload2Line className="icon" />}
+        <ButtonFileSelect
+          onFileUpload={importTemplate}
           defaultLabel="Import template"
           label="react.default.button.importTemplate.label"
+          allowedExtensions={[FileFormat.CSV]}
           variant="primary-outline"
-        />
-
-        <input
-          id="csvInput"
-          type="file"
-          className="d-none"
-          onChange={importTemplate}
-          accept=".csv"
+          className="no-transition"
         />
 
         {actionButtons.map((button) => (

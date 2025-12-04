@@ -56,10 +56,8 @@ const useInboundAddItemsForm = ({ next, previous }) => {
     exportTemplate,
   } = useInboundAddItemsImportExport({
     getValues,
-    setValue,
     fetchLineItems,
     saveRequisitionItemsInCurrentStep,
-    defaultTableRow,
   });
 
   const { columns } = useInboundAddItemsColumns({

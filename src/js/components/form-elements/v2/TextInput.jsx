@@ -8,7 +8,7 @@ import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import { decimalParser } from 'utils/form-utils';
 import InputWrapper from 'wrappers/InputWrapper';
 
-import 'components/form-elements/v2/style.scss';
+import './style.scss';
 
 const TextInput = ({
   title,
