@@ -76,7 +76,7 @@ const OutboundImport = () => {
   /** Redirect to first step if there is no cached data */
   useEffect(() => {
     if (_.isEmpty(cachedData) && !is(OutboundImportStep.DETAILS)) {
-      navigateToStep(OutboundImportStep.DETAILS);
+      navigateToStep({ step: OutboundImportStep.DETAILS });
     }
   }, []);
 

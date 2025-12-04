@@ -10,7 +10,7 @@ import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Section from 'components/Layout/v2/Section';
 import InboundSendFormHeader
-  from 'components/stock-movement-wizard/inboundV2/sections/InboundSendFormHeader';
+  from 'components/stock-movement-wizard/inboundV2/sections/send/InboundSendFormHeader';
 import requisitionStatus from 'consts/requisitionStatus';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useInboundSendForm from 'hooks/inboundV2/send/useInboundSendForm';
@@ -69,7 +69,7 @@ const InboundSendForm = ({ previous }) => {
         handleRemoveFile={handleRemoveFile}
       />
       <form onSubmit={handleSubmit(sendShipment)}>
-        <Section title="Send Shipment">
+        <Section showTitle={false}>
           <div className="row">
             <div className="col-lg-3 col-md-6 px-2 pt-2">
               <Controller

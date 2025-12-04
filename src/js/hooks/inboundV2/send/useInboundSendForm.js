@@ -3,6 +3,7 @@ import { useEffect, useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import {
   getCurrentLocale,
   getCurrentLocation,
@@ -21,7 +22,6 @@ import { InboundWorkflowState } from 'consts/StockMovementState';
 import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
 import useInboundSendValidation from 'hooks/inboundV2/send/useInboundSendValidation';
 import useFileActions from 'hooks/useFileActions';
-import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 import useUserHasPermissions from 'hooks/useUserHasPermissions';
@@ -44,7 +44,7 @@ const useInboundSendForm = ({ previous }) => {
     minRequiredRole: RoleType.ROLE_ADMIN,
   });
   const translate = useTranslate();
-  const { id: stockMovementId } = useQueryParams();
+  const { stockMovementId } = useParams();
   const dispatch = useDispatch();
   const spinner = useSpinner();
   const { validationSchema } = useInboundSendValidation();
@@ -328,8 +328,8 @@ const useInboundSendForm = ({ previous }) => {
 
   // Saves changes made by user in this step and go back to previous page
   const previousPage = async () => {
-    await trigger();
-    if (isValid) {
+    const isFormValid = await trigger();
+    if (isFormValid) {
       await stockMovementApi.updateShipment(stockMovementId, getShipmentPayload());
       return previous();
     }
@@ -361,8 +361,8 @@ const useInboundSendForm = ({ previous }) => {
 
   // Saves changes made by user in this step and redirects to the shipment view page
   const saveAndExit = async () => {
-    await trigger();
-    if (!isValid) {
+    const isFormValid = await trigger();
+    if (!isFormValid) {
       confirmActionModal({
         messageId: 'react.stockMovement.confirmExit.message',
         messageDefault: 'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',

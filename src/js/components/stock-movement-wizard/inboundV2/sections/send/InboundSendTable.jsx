@@ -7,13 +7,15 @@ const InboundSendTable = () => {
   const { columns, tableData, loading } = useInboundSendTable();
 
   return (
-    <DataTable
-      columns={columns}
-      data={tableData}
-      loading={loading}
-      disablePagination
-      overflowVisible
-    />
+    <div data-testid="items-table">
+      <DataTable
+        columns={columns}
+        data={tableData}
+        loading={loading}
+        disablePagination
+        overflowVisible
+      />
+    </div>
   );
 };
 
