@@ -176,6 +176,7 @@ configurations {
 
         // log4j-to-slf4j exposes the same API as log4j 2.x
         exclude group: 'org.apache.logging.log4j', module: 'log4j'
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
 
         // presented by spring-boot-starter-jetty and spring-boot-starter-tomcat
         exclude group: 'org.apache.tomcat', module: 'tomcat-juli'
