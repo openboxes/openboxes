@@ -129,7 +129,6 @@ assets {
 
 bootRun {
     addResources = true
-    dependsOn 'npm_run_bundle'
     jvmArgs = [
         '-Dspring.output.ansi.enabled=never',
         '-Xdebug',
@@ -832,6 +831,30 @@ task nodeVersionInfo(type: NpmTask) {
 
 npm_run_bundle.dependsOn nodeVersionInfo
 
+/*
+ * Tell Gradle which files the npm_run_bundle task consumes and produces.
+ * This will allow Gradle to emit `Task :npm_run_bundle UP-TO-DATE`,
+ * instead of building the frontend assets each and every time a task
+ * depends on them. Gradle checks the hash of the input files, not the
+ * timestamps, so merely touching a file will not trigger a rebuild.
+ */
+npm_run_bundle.configure {
+    inputs.files(
+        fileTree('src/js'),
+        'package.json',
+        'package-lock.json'
+    )
+    inputs.files(
+        '.babelrc',
+        '.eslintrc',
+        'webpack.config.js'
+    ).optional(true)
+    // to be extra careful, do a full build whenever node/npm versions change
+    inputs.property('nodeVersion', node.version)
+    inputs.property('npmVersion', node.npmVersion)
+    outputs.dir('src/main/webapp/webpack')
+}
+
 task prepareDocker(type: Copy, dependsOn: assemble) {
     description = 'Copy files from ./docker and openboxes.war to build directory'
     group = 'Docker'
@@ -890,6 +913,9 @@ jacocoTestReport {
 
 // Configuration for both "test" and "integrationTest" tasks.
 tasks.withType(Test) {
+    // never consider test tasks as up-to-date - always run them when requested
+    outputs.upToDateWhen { false }
+
     systemProperty 'geb.build.reportsDir', reporting.file('geb/integrationTest')
     systemProperty 'geb.env', System.getProperty('geb.env')
     systemProperty 'webdriver.chrome.driver', System.getProperty('webdriver.chrome.driver')
