@@ -27,7 +27,7 @@ const InboundHeader = ({ showHeaderStatus }) => {
               <strong>{translate('react.stockMovement.label', 'Stock Movement')}</strong>
               <span>{' | '}</span>
               {headerInfo.map((item) => (
-                <>
+                <React.Fragment key={item.text}>
                   <span style={{ color: item.color }}>
                     {item.isDate
                       ? formatDateToString({
@@ -38,7 +38,7 @@ const InboundHeader = ({ showHeaderStatus }) => {
                       : item.text}
                   </span>
                   {item.delimeter && <span>{item.delimeter}</span>}
-                </>
+                </React.Fragment>
               ))}
             </>
           )}

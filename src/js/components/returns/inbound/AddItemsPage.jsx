@@ -615,7 +615,7 @@ class AddItemsPage extends Component {
             </form>
             <ConfirmExpirationDateModal
               isOpen={this.state.isExpirationModalOpen}
-              itemsWithMismatchedExpiry={this.state.itemsWithMismatchedExpiry}
+              data={this.state.itemsWithMismatchedExpiry}
               onConfirm={() => this.handleExpirationModalResponse(true)}
               onCancel={() => this.handleExpirationModalResponse(false)}
             />

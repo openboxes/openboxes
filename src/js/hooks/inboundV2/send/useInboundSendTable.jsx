@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import * as locales from 'date-fns/locale';
 import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import { getCurrentLocale } from 'selectors';
 
 import stockMovementApi from 'api/services/StockMovementApi';
@@ -11,7 +12,6 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import inboundColumns from 'consts/inboundColumns';
 import { OutboundWorkflowState } from 'consts/StockMovementState';
 import { DateFormatDateFns } from 'consts/timeFormat';
-import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 import { formatDateToString } from 'utils/dateUtils';
@@ -25,7 +25,7 @@ const useInboundSendTable = () => {
     currentLocale: getCurrentLocale(state),
   }));
   const spinner = useSpinner();
-  const queryParams = useQueryParams();
+  const { stockMovementId } = useParams();
   const translate = useTranslate();
   const columnHelper = createColumnHelper();
 
@@ -41,7 +41,7 @@ const useInboundSendTable = () => {
       spinner.show();
       setLoading(true);
 
-      const response = await stockMovementApi.getStockMovementItems(queryParams.id,
+      const response = await stockMovementApi.getStockMovementItems(stockMovementId,
         { stepNumber: OutboundWorkflowState.SEND_SHIPMENT });
 
       const { data } = response.data;

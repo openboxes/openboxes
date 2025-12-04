@@ -1,6 +1,5 @@
 import React, {
   useCallback,
-  useEffect,
   useMemo,
   useState,
 } from 'react';
@@ -25,6 +24,7 @@ import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import inboundColumns from 'consts/inboundColumns';
+import requisitionStatus from 'consts/requisitionStatus';
 import StockMovementDirection from 'consts/StockMovementDirection';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
@@ -35,29 +35,16 @@ import { debouncePeopleFetch, debounceProductsFetch } from 'utils/option-utils';
 const useInboundAddItemsColumns = ({
   errors,
   control,
-  remove,
+  removeRow,
   trigger,
   getValues,
   setValue,
-  removeItem,
-  updateTotalCount,
-  append,
-  refreshFocusCounter,
+  removeSavedRow,
+  addNewLine,
 }) => {
   const [headerRecipient, setHeaderRecipient] = useState(null);
   const [rowIndex, setRowIndex] = useState(null);
   const [columnId, setColumnId] = useState(null);
-  // If prevForceResetFocus is different from refreshFocusCounter,
-  // it triggers a reset of rowIndex and columnId.
-  const [prevForceResetFocus, setPrevForceResetFocus] = useState(0);
-  useEffect(() => {
-    if (refreshFocusCounter !== prevForceResetFocus) {
-      setRowIndex(null);
-      setColumnId(null);
-      setPrevForceResetFocus(refreshFocusCounter);
-    }
-  }, [refreshFocusCounter]);
-
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
 
@@ -93,19 +80,18 @@ const useInboundAddItemsColumns = ({
 
   const handleDelete = async (row) => {
     if (getValues('currentLineItems').find((item) => item.id === row?.original?.itemId)) {
-      await removeItem(row?.original?.itemId);
-      updateTotalCount(-1);
+      await removeSavedRow(row?.original?.itemId);
     }
-    remove(row.index);
+    removeRow(row.index);
   };
 
   const handleBlur = (
     field,
     additionalFieldToOnBlur = null,
-    customLogic = null,
   ) => {
     field.onBlur();
 
+    // If there is a stored focus reference, clear it
     if (rowIndex !== null && columnId !== null) {
       setRowIndex(null);
       setColumnId(null);
@@ -113,10 +99,6 @@ const useInboundAddItemsColumns = ({
 
     if (additionalFieldToOnBlur) {
       additionalFieldToOnBlur.onBlur();
-    }
-
-    if (customLogic) {
-      customLogic();
     }
   };
   const focusableCells = [
@@ -135,11 +117,11 @@ const useInboundAddItemsColumns = ({
     tableData: getValues('values.lineItems') || [],
     setColumnId,
     setRowIndex,
-    addNewRow: () => append({}),
+    addNewRow: addNewLine,
     isNewRow: () => true,
     getValues,
     setValue,
-    onBlur: () => trigger(),
+    onBlur: trigger,
   });
 
   const handleHeaderRecipientChange = (selectedRecipient) => {
@@ -148,6 +130,7 @@ const useInboundAddItemsColumns = ({
       return;
     }
 
+    // we update all the rows with the selected recipient
     _.forEach(lineItems, (item, index) => {
       setValue(`values.lineItems.${index}.recipient`, selectedRecipient);
     });
@@ -546,7 +529,7 @@ const useInboundAddItemsColumns = ({
           <div className="bin-container">
             <RiDeleteBinLine
               className="inbound-bin"
-              display={row?.original?.statusCode === 'SUBSTITUTED'}
+              display={row?.original?.statusCode === requisitionStatus.SUBSTITUTED}
               onClick={() => handleDelete(row)}
             />
           </div>
@@ -577,11 +560,10 @@ export default useInboundAddItemsColumns;
 useInboundAddItemsColumns.propTypes = {
   errors: PropTypes.shape({}).isRequired,
   control: PropTypes.shape({}).isRequired,
-  remove: PropTypes.func.isRequired,
+  removeRow: PropTypes.func.isRequired,
   trigger: PropTypes.func.isRequired,
   getValues: PropTypes.func.isRequired,
   setValue: PropTypes.func.isRequired,
-  removeItem: PropTypes.func.isRequired,
-  updateTotalCount: PropTypes.func.isRequired,
-  append: PropTypes.func.isRequired,
+  removeSavedRow: PropTypes.func.isRequired,
+  addNewLine: PropTypes.func.isRequired,
 };
