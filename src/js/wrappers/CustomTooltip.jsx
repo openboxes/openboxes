@@ -12,7 +12,7 @@ const CustomTooltip = ({
 }) => (
   // This div was added to ensure the tooltip works correctly with absolute positioning
   show ? (
-    <div className={className}>
+    <div className={className} role="tooltip">
       <Tooltip
         delay={150}
         duration={250}

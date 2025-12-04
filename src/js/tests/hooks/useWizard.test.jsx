@@ -80,7 +80,7 @@ describe('Changing steps', () => {
     );
 
     act(() => {
-      result.current[1].navigateToStep(STEP_KEYS.FOURTH);
+      result.current[1].navigateToStep({ step: STEP_KEYS.FOURTH });
     });
 
     expect(result.current[0].key).toEqual(STEP_KEYS.FOURTH);

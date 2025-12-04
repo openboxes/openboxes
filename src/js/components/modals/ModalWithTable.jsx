@@ -27,7 +27,7 @@ const ModalWithTable = ({
       <div data-testid="modal-with-table">
         <div className="modal-content__header">
           {title && <p className="modal-content__header__title">{title}</p>}
-          {subtitle && <p className="modal-content__header__subtitile">{subtitle}</p>}
+          {subtitle && <p className="modal-content__header__subtitle">{subtitle}</p>}
         </div>
         <div className="modal-content__main">
           <DataTable totalCount={data?.length} data={data} columns={columns} disablePagination />
