@@ -132,7 +132,7 @@ const DateFieldDateFns = ({
         ariaLiveMessages={{}}
         locale={dateFnsLocale()}
         showTimeSelect={showTimeSelect}
-        customInput={showCustomInput && <DateFieldInput onClear={onClear} clearable={clearable} />}
+        customInput={showCustomInput ? <DateFieldInput onClear={onClear} clearable={clearable} /> : null}
         className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
         dropdownMode="scroll"
         dateFormat={getDateFormat()}
