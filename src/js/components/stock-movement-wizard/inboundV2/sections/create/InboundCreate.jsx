@@ -168,6 +168,7 @@ const InboundCreate = ({ next }) => {
                     setValue('dateRequested', newDate);
                     await trigger();
                   }}
+                  showCustomInput={false}
                 />
               )}
             />
