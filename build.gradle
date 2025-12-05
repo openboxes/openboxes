@@ -226,6 +226,24 @@ configurations {
                     }
                 }
 
+                /*
+                 * Grails 3.3.16, via directory-watcher 0.5.1, pins JNA 4.2.2,
+                 * which will not work at all on Apple Silicon.
+                 *
+                 * - Apple Silicon support was added in JNA 5.8.0:
+                 *   https://github.com/java-native-access/jna/blob/master/CHANGES.md#release-580
+                 * - But some issues on M4 machines were verified fixed as late as JNA 5.16.0:
+                 *   https://github.com/gmethvin/directory-watcher/issues/101
+                 * - JNA's only breaking changes between 4.2.2 and today involve
+                 *   removing APIs that directory-watcher does not use.
+                 *   https://github.com/java-native-access/jna/blob/master/CHANGES.md#breaking-changes
+                 *   https://github.com/java-native-access/jna/blob/master/CHANGES.md#breaking-changes-1
+                 */
+                if (details.requested.group.startsWith('net.java.dev.jna')) {
+                    details.because "Releases before 5.8.0 won't run on Apple Silicon at all; those before 5.16.0 may not work on M4 processors"
+                    details.useVersion(jnaVersion)
+                }
+
                 if (details.requested.group == 'org.apache.httpcomponents') {
                     details.because 'enforce consistent httpcomponents versioning'
                     if (details.requested.name == 'httpcore') {
