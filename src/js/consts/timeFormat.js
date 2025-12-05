@@ -22,6 +22,7 @@ export const DateFormatDateFns = {
   YYYY_MM_DD: 'yyyy-MM-dd',
   YYYY_MM_DD_HH_MM_Z: "yyyy-MM-dd'T'HH:mmXXX",
   YYYY_MM_DD_HH_MM_SS: "yyyy-MM-dd'T'HH:mm:ss",
+  YYYYMMDD_HHMMSS: 'yyyyMMdd-HHmmss',
 };
 
 // converter values from DateFormat enum to DateFormatDateFns enum

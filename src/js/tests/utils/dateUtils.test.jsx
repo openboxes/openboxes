@@ -6,7 +6,8 @@ import {
   formatDateToDateOnlyString,
   formatDateToDatetimeString,
   formatDateToString,
-  formatDateToZonedDateTimeString, getTimezone, getTimezoneOffset, getUserTimezone,
+  formatDateToZonedDateTimeString,
+  getFilenameDateString,
   parseStringToDate,
 } from 'utils/dateUtils';
 
@@ -271,5 +272,22 @@ describe('formatDateToDateOnlyString()', () => {
       const offset = displayTimezoneOffset(0);
       expect(offset).toBe('Z');
     });
+  });
+});
+
+describe('getFilenameDateString()', () => {
+  it('returns exact formatted string for a fixed date', () => {
+    jest.useFakeTimers('modern');
+    jest.setSystemTime(new Date(2025, 8, 19, 15, 10, 5));
+
+    const filename = getFilenameDateString();
+    expect(filename).toBe('20250919-151005');
+
+    jest.useRealTimers();
+  });
+
+  it('returns a string matching YYYYMMDD_HHMMSS pattern', () => {
+    const filename = getFilenameDateString();
+    expect(filename).toMatch(/^\d{8}-\d{6}$/);
   });
 });

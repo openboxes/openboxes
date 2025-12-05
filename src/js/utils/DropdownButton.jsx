@@ -6,7 +6,7 @@ import { RiDownload2Line } from 'react-icons/ri';
 import Button from 'components/form-elements/Button';
 import Translate from 'utils/Translate';
 
-const ActionButton = ({
+const DropdownButton = ({
   actions,
   disabled,
   buttonLabel,
@@ -27,6 +27,7 @@ const ActionButton = ({
     >
       {actions.map((action) => (
         <a
+          key={action.label}
           href="#"
           className="dropdown-item"
           onClick={action.onClick}
@@ -43,9 +44,9 @@ const ActionButton = ({
   </>
 );
 
-export default ActionButton;
+export default DropdownButton;
 
-ActionButton.propTypes = {
+DropdownButton.propTypes = {
   actions: PropTypes.arrayOf(PropTypes.shape({
     label: PropTypes.string.isRequired,
     defaultLabel: PropTypes.string.isRequired,
@@ -56,7 +57,7 @@ ActionButton.propTypes = {
   disabled: PropTypes.bool,
 };
 
-ActionButton.defaultProps = {
+DropdownButton.defaultProps = {
   actions: [],
   disabled: false,
 };
