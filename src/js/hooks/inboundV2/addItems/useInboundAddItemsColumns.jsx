@@ -387,6 +387,7 @@ const useInboundAddItemsColumns = ({
                   className="input-xs"
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
+                  showCustomInput={false}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
                   onBlur={() => handleBlur(field)}
                   focusProps={{
