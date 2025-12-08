@@ -1062,7 +1062,7 @@ class UrlMappings {
 
         }
 
-        "/api/reports/inventory-audit-summary" {
+        "/api/reports/inventory-audit-summary(.$format)?" {
             controller = "inventoryAuditReport"
             action = [POST: "getInventoryAuditSummary", GET: "getInventoryAuditSummary"]
         }

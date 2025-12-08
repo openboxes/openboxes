@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { useSelector } from 'react-redux';
 import { getCurrentLocationId, getCurrentLocationName } from 'selectors';
 
-import { INVENTORY_AUDIT_SUMMARY_REPORT } from 'api/urls';
+import { INVENTORY_AUDIT_SUMMARY_REPORT_CSV } from 'api/urls';
 import useSpinner from 'hooks/useSpinner';
 import dateWithoutTimeZone, { getFilenameDateString } from 'utils/dateUtils';
 import exportFileFromAPI from 'utils/file-download-util';
@@ -35,7 +35,7 @@ const useProductsTabExport = ({
   const exportProductChangesReport = async (filters) => {
     spinner.show();
     await exportFileFromAPI({
-      url: INVENTORY_AUDIT_SUMMARY_REPORT,
+      url: INVENTORY_AUDIT_SUMMARY_REPORT_CSV,
       params: _.omit({
         endDate: dateWithoutTimeZone({
           date: filters.endDate,
