@@ -123,6 +123,7 @@ const InboundSendForm = ({ previous }) => {
                     required
                     customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
                     customTooltip
+                    showCustomInput={false}
                     onChange={async (newDate) => {
                       setValue('shipDate', newDate);
                       await trigger();
@@ -227,6 +228,7 @@ const InboundSendForm = ({ previous }) => {
                     customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
                     triggerValidation={trigger}
                     customTooltip
+                    showCustomInput={false}
                     onChange={async (newDate) => {
                       setValue('expectedDeliveryDate', newDate);
                       await trigger();

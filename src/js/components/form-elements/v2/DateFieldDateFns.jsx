@@ -39,6 +39,7 @@ const DateFieldDateFns = ({
   wrapperClassName,
   focusProps = {},
   customTooltip,
+  showCustomInput,
   ...fieldProps
 }) => {
   const translate = useTranslate();
@@ -131,7 +132,9 @@ const DateFieldDateFns = ({
         ariaLiveMessages={{}}
         locale={dateFnsLocale()}
         showTimeSelect={showTimeSelect}
-        customInput={<DateFieldInput onClear={onClear} clearable={clearable} />}
+        customInput={showCustomInput
+          ? <DateFieldInput onClear={onClear} clearable={clearable} />
+          : undefined}
         className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
         dropdownMode="scroll"
         dateFormat={getDateFormat()}
@@ -203,6 +206,7 @@ DateFieldDateFns.propTypes = {
   // Optional function to trigger validation for this field
   triggerValidation: PropTypes.func,
   customTooltip: PropTypes.bool,
+  showCustomInput: PropTypes.bool,
 };
 
 DateFieldDateFns.defaultProps = {
@@ -225,4 +229,9 @@ DateFieldDateFns.defaultProps = {
   clearable: true,
   triggerValidation: null,
   customTooltip: false,
+  // If false, the 'x' icon for clearing the date will be hidden,
+  // but the date can still be cleared using Backspace.
+  // Thanks to this, the E2E tests won't fail and we won't need to
+  // write new getters for the datePicker in the E2E tests.
+  showCustomInput: true,
 };
