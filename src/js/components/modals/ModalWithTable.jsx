@@ -21,27 +21,29 @@ const ModalWithTable = ({
   useHideScroll({ hide: isOpen });
 
   return (
-    <Modal isOpen={isOpen} className="modal-content min-width-1000" data-testid="modal-with-table">
-      <div className="modal-content__header">
-        <p className="modal-content__header__title">{title}</p>
-        <p className="modal-content__header__subtitle">{subtitle}</p>
-      </div>
-      <div className="modal-content__main">
-        <DataTable data={data} columns={columns} disablePagination />
-      </div>
-      <div className="modal-content__buttons">
-        <Button
-          defaultLabel={cancelLabel.default}
-          label={cancelLabel.key}
-          variant="secondary"
-          onClick={onCancel}
-        />
-        <Button
-          defaultLabel={confirmLabel.default}
-          label={confirmLabel.key}
-          variant="primary"
-          onClick={onConfirm}
-        />
+    <Modal isOpen={isOpen} className="modal-content min-width-1000">
+      <div data-testid="modal-with-table">
+        <div className="modal-content__header">
+          <p className="modal-content__header__title">{title}</p>
+          <p className="modal-content__header__subtitle">{subtitle}</p>
+        </div>
+        <div className="modal-content__main">
+          <DataTable data={data} columns={columns} disablePagination />
+        </div>
+        <div className="modal-content__buttons">
+          <Button
+            defaultLabel={cancelLabel.default}
+            label={cancelLabel.key}
+            variant="secondary"
+            onClick={onCancel}
+          />
+          <Button
+            defaultLabel={confirmLabel.default}
+            label={confirmLabel.key}
+            variant="primary"
+            onClick={onConfirm}
+          />
+        </div>
       </div>
     </Modal>
   );
