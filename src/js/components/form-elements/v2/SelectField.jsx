@@ -33,6 +33,7 @@ const SelectField = ({
   focusProps = {},
   creatable,
   customTooltip,
+  ariaLabel,
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -70,6 +71,7 @@ const SelectField = ({
       className="select-wrapper-container"
       customTooltip={customTooltip}
       value={fieldProps?.value?.label}
+      ariaLabel={ariaLabel}
     >
       <SelectComponent
         className={`form-element-select ${className} ${errorMessage || hasErrors ? 'has-errors' : ''} ${warning ? 'has-warning' : ''}`}
@@ -143,6 +145,10 @@ SelectField.propTypes = {
   // boolean that enables creating new options in the dropdown
   creatable: PropTypes.bool,
   customTooltip: PropTypes.bool,
+  ariaLabel: PropTypes.shape({
+    id: PropTypes.string,
+    defaultMessage: PropTypes.string,
+  }),
 };
 
 SelectField.defaultProps = {
@@ -168,4 +174,5 @@ SelectField.defaultProps = {
   focusProps: {},
   creatable: false,
   customTooltip: false,
+  ariaLabel: null,
 };
