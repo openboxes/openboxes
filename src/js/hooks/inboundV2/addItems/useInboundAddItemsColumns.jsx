@@ -188,6 +188,10 @@ const useInboundAddItemsColumns = ({
                   onWheel={(event) => event.currentTarget.blur()}
                   autoComplete="off"
                   hasErrors={hasErrors}
+                  ariaLabel={{
+                    id: 'react.stockMovement.packLevel1.label',
+                    defaultMessage: 'Pack Level 1',
+                  }}
                 />
               )}
             />
@@ -237,6 +241,10 @@ const useInboundAddItemsColumns = ({
                   className="input-xs"
                   onChange={(e) => setValue(`values.lineItems.${row.index}.boxName`, e.target.value ?? null)}
                   autoComplete="off"
+                  ariaLabel={{
+                    id: 'react.stockMovement.packLevel2.label',
+                    defaultMessage: 'Pack Level 2',
+                  }}
                 />
               )}
             />
@@ -295,6 +303,10 @@ const useInboundAddItemsColumns = ({
                   // to appear, which we don't want because we're using the new tooltip.
                   // Therefore, we need to explicitly set it to false here.
                   showValueTooltip={false}
+                  ariaLabel={{
+                    id: 'react.stockMovement.product.label',
+                    defaultMessage: 'Product',
+                  }}
                 />
               )}
             />
@@ -344,6 +356,10 @@ const useInboundAddItemsColumns = ({
                     columnId,
                   }}
                   autoComplete="off"
+                  ariaLabel={{
+                    id: 'react.stockMovement.lot.label',
+                    defaultMessage: 'Lot',
+                  }}
                 />
               )}
             />
@@ -401,6 +417,10 @@ const useInboundAddItemsColumns = ({
                     setValue(`values.lineItems.${row.index}.expirationDate`, newDate);
                     await trigger();
                   }}
+                  ariaLabel={{
+                    id: 'react.stockMovement.expiry.label',
+                    defaultMessage: 'Expiry',
+                  }}
                 />
               )}
             />
@@ -451,6 +471,10 @@ const useInboundAddItemsColumns = ({
                     fieldId: column.id,
                     rowIndex,
                     columnId,
+                  }}
+                  ariaLabel={{
+                    id: 'react.stockMovement.quantity.label',
+                    defaultMessage: 'Quantity',
                   }}
                 />
               )}
@@ -504,6 +528,10 @@ const useInboundAddItemsColumns = ({
                     rowIndex,
                     columnId,
                   }}
+                  ariaLabel={{
+                    id: 'react.stockMovement.recipient.label',
+                    defaultMessage: 'Recipient',
+                  }}
                 />
               )}
             />
@@ -527,7 +555,7 @@ const useInboundAddItemsColumns = ({
       ),
       cell: ({ row }) => (
         <TableCell className="rt-td rt-td-xs rt-td-add-items">
-          <div className="bin-container">
+          <div className="bin-container" aria-label={translate('react.default.button.delete.label', 'Delete')}>
             <RiDeleteBinLine
               className="inbound-bin"
               display={row?.original?.statusCode === requisitionStatus.SUBSTITUTED}

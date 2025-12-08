@@ -84,7 +84,10 @@ const useInboundSendTable = () => {
           customTooltip
           tooltipLabel={getValue()}
         >
-          <div className="text-truncate">
+          <div
+            className="text-truncate"
+            aria-label={translate('react.stockMovement.packLevel1.label', 'Pack Level 1')}
+          >
             {getValue()}
           </div>
         </TableCell>
@@ -109,7 +112,10 @@ const useInboundSendTable = () => {
           customTooltip
           tooltipLabel={getValue()}
         >
-          <div className="text-truncate">
+          <div
+            className="text-truncate"
+            aria-label={translate('react.stockMovement.packLevel2.label', 'Pack Level 2')}
+          >
             {getValue()}
           </div>
         </TableCell>
@@ -134,7 +140,10 @@ const useInboundSendTable = () => {
           customTooltip
           tooltipLabel={getValue()}
         >
-          <div className="text-truncate">
+          <div
+            className="text-truncate"
+            aria-label={translate('react.stockMovement.code.label', 'Code')}
+          >
             {getValue()}
           </div>
         </TableCell>
@@ -156,7 +165,10 @@ const useInboundSendTable = () => {
           customTooltip
           tooltipLabel={getValue()}
         >
-          <div className="text-truncate">
+          <div
+            className="text-truncate"
+            aria-label={translate('react.stockMovement.product.label', 'Product')}
+          >
             {getValue()}
           </div>
         </TableCell>
@@ -178,7 +190,10 @@ const useInboundSendTable = () => {
           customTooltip
           tooltipLabel={getValue()}
         >
-          <div className="text-truncate">
+          <div
+            className="text-truncate"
+            aria-label={translate('react.stockMovement.lot.label', 'Lot')}
+          >
             {getValue()}
           </div>
         </TableCell>
@@ -200,7 +215,9 @@ const useInboundSendTable = () => {
           customTooltip
           tooltipLabel={formatDate(getValue())}
         >
-          {formatDate(getValue())}
+          <div aria-label={translate('react.stockMovement.expiry.label', 'Expiry')}>
+            {formatDate(getValue())}
+          </div>
         </TableCell>
       ),
       size: 100,
@@ -220,7 +237,10 @@ const useInboundSendTable = () => {
           customTooltip
           tooltipLabel={getValue()?.toString()}
         >
-          <div className="text-truncate">
+          <div
+            className="text-truncate"
+            aria-label={translate('react.stockMovement.quantityPicked.label', 'Qty Picked')}
+          >
             {getValue()?.toString()}
           </div>
         </TableCell>
@@ -242,7 +262,10 @@ const useInboundSendTable = () => {
           customTooltip
           tooltipLabel={getValue()}
         >
-          <div className="text-truncate">
+          <div
+            className="text-truncate"
+            aria-label={translate('react.stockMovement.recipient.label', 'Recipient')}
+          >
             {getValue()}
           </div>
         </TableCell>
