@@ -30,6 +30,7 @@ const TextInput = ({
   onWheel,
   customTooltip,
   value,
+  ariaLabel,
   ...fieldProps
 }) => {
   const inputRef = useRef(null);
@@ -74,6 +75,7 @@ const TextInput = ({
       hideErrorMessageWrapper={hideErrorMessageWrapper}
       customTooltip={customTooltip}
       value={value}
+      ariaLabel={ariaLabel}
     >
       <input
         ref={inputRef}
@@ -142,6 +144,10 @@ TextInput.propTypes = {
   onWheel: PropTypes.func,
   customTooltip: PropTypes.bool,
   value: PropTypes.string,
+  ariaLabel: PropTypes.shape({
+    id: PropTypes.string,
+    defaultMessage: PropTypes.string,
+  }),
 };
 
 TextInput.defaultProps = {
@@ -164,4 +170,5 @@ TextInput.defaultProps = {
   onWheel: null,
   customTooltip: false,
   value: '',
+  ariaLabel: null,
 };
