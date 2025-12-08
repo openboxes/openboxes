@@ -26,6 +26,7 @@ import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionSource
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.inventory.product.availability.AvailableItemKey
 import org.pih.warehouse.inventory.product.availability.AvailableItemMap
@@ -175,7 +176,8 @@ class InventoryImportDataService implements ImportDataService {
                 comment: comment,
                 transactionEntriesComments: commentsForBaselineTransactionEntries,
         )
-        inventoryImportProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(baselineTransactionCommand)
+        Transaction baselineTransaction =
+                inventoryImportProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(baselineTransactionCommand)
 
         // Date objects are mutable, so we use Instant to clone the date in the command and avoid directly modifying it.
         Date adjustmentTransactionDate = DateUtil.asDate(DateUtil.asInstant(baselineTransactionDate).plusSeconds(1))
@@ -186,7 +188,13 @@ class InventoryImportDataService implements ImportDataService {
         // that time, so we can guarantee that the available items will be the same for both the baseline
         // and adjustment. This avoids needing to fetch available items twice (which is slow).
         createAdjustmentTransaction(
-                command.location, inventoryImportData, availableItems, adjustmentTransactionDate, comment)
+                command.location,
+                inventoryImportData,
+                availableItems,
+                adjustmentTransactionDate,
+                comment,
+                baselineTransaction.transactionSource,
+                command)
     }
 
     /**
@@ -245,7 +253,9 @@ class InventoryImportDataService implements ImportDataService {
                                                     InventoryImportData inventoryImportData,
                                                     AvailableItemMap availableItems,
                                                     Date transactionDate,
-                                                    String comment) {
+                                                    String comment,
+                                                    TransactionSource transactionSource,
+                                                    ImportDataCommand command) {
 
         // We'd have weird behaviour if we allowed two transactions to exist at the same exact time (precision at the
         // database level is to the second) so fail if there's already a transaction on the items for the given date.
@@ -314,7 +324,10 @@ class InventoryImportDataService implements ImportDataService {
         transaction.transactionNumber = inventoryService.generateTransactionNumber(transaction)
         transaction.comment = comment
         transaction.inventory = facility.inventory
-
+        transaction.transactionSource = transactionSource
+        if (!transactionSource) {
+            inventoryImportProductInventoryTransactionService.setSourceObject(transaction, command)
+        }
         if (!transaction.save()) {
             throw new ValidationException("Invalid transaction", transaction.errors)
         }

@@ -1,7 +1,7 @@
 package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
-
+import grails.validation.ValidationException
 import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.importer.ImportDataCommand
 
@@ -13,9 +13,22 @@ class InventoryImportProductInventoryTransactionService extends ProductInventory
 
     ConfigService configService
 
+    TransactionSource createInventoryImportTransactionSource(ImportDataCommand importDataCommand) {
+        TransactionSource transactionSource = new TransactionSource(
+                transactionAction: TransactionAction.INVENTORY_IMPORT,
+                origin: importDataCommand.location,
+                destination: importDataCommand.location,
+        )
+        if (!transactionSource.validate()) {
+            throw new ValidationException("Invalid transaction source", transactionSource.errors)
+        }
+        return transactionSource.save()
+    }
+
     @Override
     void setSourceObject(Transaction transaction, ImportDataCommand sourceObject) {
-        // Inventory Import has no source object.
+        TransactionSource transactionSource = createInventoryImportTransactionSource(sourceObject)
+        transaction.transactionSource = transactionSource
     }
 
     @Override
