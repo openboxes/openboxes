@@ -118,7 +118,6 @@ const InboundCreate = ({ next }) => {
                     id: 'react.stockMovement.destination.label',
                     defaultMessage: 'Destination',
                   }}
-
                 />
               )}
             />
