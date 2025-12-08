@@ -40,6 +40,7 @@ const DateFieldDateFns = ({
   focusProps = {},
   customTooltip,
   showCustomInput,
+  ariaLabel,
   ...fieldProps
 }) => {
   const translate = useTranslate();
@@ -124,6 +125,7 @@ const DateFieldDateFns = ({
         dateFormat: DateFormatDateFns.DD_MMM_YYYY,
         options: { locale: dateFnsLocale() },
       })}
+      ariaLabel={ariaLabel}
     >
       <DatePicker
         {...fieldProps}
@@ -207,6 +209,10 @@ DateFieldDateFns.propTypes = {
   triggerValidation: PropTypes.func,
   customTooltip: PropTypes.bool,
   showCustomInput: PropTypes.bool,
+  ariaLabel: PropTypes.shape({
+    id: PropTypes.string,
+    defaultMessage: PropTypes.string,
+  }),
 };
 
 DateFieldDateFns.defaultProps = {
@@ -234,4 +240,5 @@ DateFieldDateFns.defaultProps = {
   // Thanks to this, the E2E tests won't fail and we won't need to
   // write new getters for the datePicker in the E2E tests.
   showCustomInput: true,
+  ariaLabel: null,
 };
