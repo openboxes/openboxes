@@ -125,7 +125,6 @@ const DateFieldDateFns = ({
         dateFormat: DateFormatDateFns.DD_MMM_YYYY,
         options: { locale: dateFnsLocale() },
       })}
-      ariaLabel={ariaLabel}
     >
       <DatePicker
         {...fieldProps}
