@@ -38,6 +38,11 @@ export const getCurrentLocationId = createSelector(
   (currentLocation) => currentLocation?.id,
 );
 
+export const getCurrentLocationName = createSelector(
+  [getCurrentLocation],
+  (currentLocation) => currentLocation?.name,
+);
+
 export const getDefaultTranslationsFetched = createSelector(
   [getSession],
   (session) => session.fetchedTranslations.default,
