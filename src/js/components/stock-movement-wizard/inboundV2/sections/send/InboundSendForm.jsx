@@ -85,6 +85,10 @@ const InboundSendForm = ({ previous }) => {
                     }}
                     errorMessage={errors.origin?.message}
                     customTooltip
+                    ariaLabel={{
+                      id: 'react.stockMovement.origin.label',
+                      defaultMessage: 'Origin',
+                    }}
                   />
                 )}
               />
@@ -103,6 +107,10 @@ const InboundSendForm = ({ previous }) => {
                     }}
                     errorMessage={errors.destination?.message}
                     customTooltip
+                    ariaLabel={{
+                      id: 'react.stockMovement.destination.label',
+                      defaultMessage: 'Destination',
+                    }}
                   />
                 )}
               />
@@ -127,6 +135,10 @@ const InboundSendForm = ({ previous }) => {
                     onChange={async (newDate) => {
                       setValue('shipDate', newDate);
                       await trigger();
+                    }}
+                    ariaLabel={{
+                      id: 'react.stockMovement.shipDate.label',
+                      defaultMessage: 'Ship date',
                     }}
                   />
                 )}
@@ -153,6 +165,10 @@ const InboundSendForm = ({ previous }) => {
                       value: item.id,
                     }))}
                     customTooltip
+                    ariaLabel={{
+                      id: 'react.stockMovement.shipmentType.label',
+                      defaultMessage: 'ShipmentType',
+                    }}
                   />
                 )}
               />
@@ -171,6 +187,10 @@ const InboundSendForm = ({ previous }) => {
                     }}
                     errorMessage={errors.trackingNumber?.message}
                     customTooltip
+                    ariaLabel={{
+                      id: 'react.stockMovement.trackingNumber.label',
+                      defaultMessage: 'Tracking Number',
+                    }}
                   />
                 )}
               />
@@ -189,6 +209,10 @@ const InboundSendForm = ({ previous }) => {
                     }}
                     errorMessage={errors.driverName?.message}
                     customTooltip
+                    ariaLabel={{
+                      id: 'react.stockMovement.driverName.label',
+                      defaultMessage: 'Driver Name',
+                    }}
                   />
                 )}
               />
@@ -207,6 +231,10 @@ const InboundSendForm = ({ previous }) => {
                     }}
                     errorMessage={errors.comments?.message}
                     customTooltip
+                    ariaLabel={{
+                      id: 'react.stockMovement.comments.label',
+                      defaultMessage: 'Comments',
+                    }}
                   />
                 )}
               />
@@ -232,6 +260,10 @@ const InboundSendForm = ({ previous }) => {
                     onChange={async (newDate) => {
                       setValue('expectedDeliveryDate', newDate);
                       await trigger();
+                    }}
+                    ariaLabel={{
+                      id: 'react.stockMovement.expectedDeliveryDate.label',
+                      defaultMessage: 'Expected Delivery Date',
                     }}
                   />
                 )}

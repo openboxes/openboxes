@@ -67,6 +67,10 @@ const InboundCreate = ({ next }) => {
                   errorMessage={errors.description?.message}
                   required
                   customTooltip
+                  ariaLabel={{
+                    id: 'react.stockMovement.description.label',
+                    defaultMessage: 'Description',
+                  }}
                 />
               )}
             />
@@ -89,6 +93,10 @@ const InboundCreate = ({ next }) => {
                   async
                   loadOptions={debouncedLocationsFetch}
                   customTooltip
+                  ariaLabel={{
+                    id: 'react.stockMovement.origin.label',
+                    defaultMessage: 'Origin',
+                  }}
                 />
               )}
             />
@@ -106,6 +114,11 @@ const InboundCreate = ({ next }) => {
                     defaultMessage: 'Destination',
                   }}
                   customTooltip
+                  ariaLabel={{
+                    id: 'react.stockMovement.destination.label',
+                    defaultMessage: 'Destination',
+                  }}
+
                 />
               )}
             />
@@ -124,6 +137,10 @@ const InboundCreate = ({ next }) => {
                   }}
                   options={stockLists}
                   customTooltip
+                  ariaLabel={{
+                    id: 'react.stockMovement.stocklist.label',
+                    defaultMessage: 'Stocklist',
+                  }}
                 />
               )}
             />
@@ -145,6 +162,10 @@ const InboundCreate = ({ next }) => {
                   async
                   loadOptions={debouncePeopleFetch(debounceTime, minSearchLength)}
                   customTooltip
+                  ariaLabel={{
+                    id: 'react.stockMovement.requestedBy.label',
+                    defaultMessage: 'Requested By',
+                  }}
                 />
               )}
             />
@@ -169,6 +190,10 @@ const InboundCreate = ({ next }) => {
                     await trigger();
                   }}
                   showCustomInput={false}
+                  ariaLabel={{
+                    id: 'react.stockMovement.dateRequested.label',
+                    defaultMessage: 'Date Requested',
+                  }}
                 />
               )}
             />
