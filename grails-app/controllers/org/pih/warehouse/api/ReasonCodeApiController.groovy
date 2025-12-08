@@ -33,6 +33,8 @@ class ReasonCodeApiController {
             reasonCodes.addAll(getReasonCodes(ReasonCode.listInventoryAdjustmentReasonCodes()))
         } else if (ActivityCode.PUTAWAY_DISCREPANCY in activityCodes) {
             reasonCodes.addAll(getReasonCodes(ReasonCode.listPutawayDiscrepancyCodes()))
+        } else if (ActivityCode.PICKING_SHORTAGE in activityCodes) {
+            reasonCodes.addAll(getReasonCodes(ReasonCode.listPickingShortageReasonCodes()))
         } else {
             reasonCodes.addAll(getReasonCodes(ReasonCode.listDefault()))
         }

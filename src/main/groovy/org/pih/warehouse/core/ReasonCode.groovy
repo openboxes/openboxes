@@ -228,4 +228,12 @@ enum ReasonCode {
                 WRONG_ITEM
         ]
     }
+
+    static listPickingShortageReasonCodes() {
+        [
+                INSUFFICIENT_QUANTITY_AVAILABLE,
+                DIFFERENT_LOCATION,
+                DAMAGED
+        ]
+    }
 }

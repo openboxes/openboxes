@@ -128,6 +128,8 @@ enum ActivityCode {
     // Outbound container codes
     OUTBOUND_CONTAINER('OUTBOUND_CONTAINER'),
 
+    PICKING_SHORTAGE('PICKING_SHORTAGE'),
+
     NONE('NONE')
 
     final String id
