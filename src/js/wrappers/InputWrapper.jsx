@@ -30,7 +30,8 @@ const InputWrapper = ({
     <div
       data-testid="form-field"
       className={`input-wrapper-container ${className} input-wrapper-label-position-${labelPosition}`}
-      aria-label={ariaLabel?.id ? translate(ariaLabel.id, ariaLabel.defaultMessage) : undefined}
+      aria-label={ariaLabel?.id && ariaLabel?.defaultMessage
+        ? translate(ariaLabel.id, ariaLabel.defaultMessage) : undefined}
     >
       <div className="input-wrapper-title">
         <div className="input-wrapper-label">

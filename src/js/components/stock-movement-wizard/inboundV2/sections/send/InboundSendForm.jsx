@@ -154,7 +154,7 @@ const InboundSendForm = ({ previous }) => {
                     {...field}
                     title={{
                       id: 'react.stockMovement.shipmentType.label',
-                      defaultMessage: 'ShipmentType',
+                      defaultMessage: 'Shipment type',
                     }}
                     required
                     errorMessage={errors.shipmentType?.message}
@@ -167,7 +167,7 @@ const InboundSendForm = ({ previous }) => {
                     customTooltip
                     ariaLabel={{
                       id: 'react.stockMovement.shipmentType.label',
-                      defaultMessage: 'ShipmentType',
+                      defaultMessage: 'Shipment type',
                     }}
                   />
                 )}
