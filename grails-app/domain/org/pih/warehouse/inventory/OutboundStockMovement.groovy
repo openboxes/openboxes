@@ -234,6 +234,15 @@ class OutboundStockMovement implements Serializable, Validateable {
         return requisition?.status < RequisitionStatus.PICKING && lineItems.size() > 0
     }
 
+    Boolean hasBeenStaged() {
+        return requisition?.status == RequisitionStatus.STAGED
+    }
+
+    Boolean canEditStockMovement() {
+        return requisition.origin.supports(ActivityCode.REQUIRE_MOBILE_PICKING) &&
+                (requisition?.status < RequisitionStatus.PICKING || requisition?.status >= RequisitionStatus.ISSUED)
+    }
+
     @Deprecated
     Map<String, String> getDisplayStatus() {
         StockMovementStatusContext stockMovementContext = new StockMovementStatusContext(

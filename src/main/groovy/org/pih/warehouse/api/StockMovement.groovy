@@ -307,6 +307,15 @@ class StockMovement implements Validateable{
         return requisition?.status < RequisitionStatus.PICKING && lineItems.size() > 0
     }
 
+    Boolean hasBeenStaged() {
+        return requisition?.status == RequisitionStatus.STAGED
+    }
+
+    Boolean canEditStockMovement() {
+        return requisition.origin.supports(ActivityCode.REQUIRE_MOBILE_PICKING) &&
+                (requisition?.status < RequisitionStatus.PICKING || requisition?.status >= RequisitionStatus.ISSUED)
+    }
+
     Boolean isDeleteOrRollbackAuthorized(Location currentLocation) {
         Location origin = requisition?.origin?:shipment?.origin
         Location destination = requisition?.destination?:shipment?.destination

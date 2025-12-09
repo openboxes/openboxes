@@ -110,10 +110,12 @@
                     </g:link>
                 </g:if>
                 <g:else>
-                    <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}" class="button">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
-                        <warehouse:message code="default.button.edit.label" />
-                    </g:link>
+                    <g:if test="${stockMovement?.canEditStockMovement()}">
+                        <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}" class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
+                            <warehouse:message code="default.button.edit.label" />
+                        </g:link>
+                    </g:if>
                 </g:else>
                 <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
                     <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
@@ -124,6 +126,13 @@
                     <g:link controller="partialReceiving" action="autoreceive" id="${stockMovement?.shipment?.id}" class="button">
                         <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
                         <warehouse:message code="default.button.autoreceive.label" />
+                    </g:link>
+                </g:if>
+
+                <g:if test="${stockMovement?.hasBeenStaged()}">
+                    <g:link controller="requisition" action="issue" id="${stockMovement?.requisition?.id}" class="button">
+                        <img src="${resource(dir: 'images/icons', file: 'truck.png')}" />&nbsp;
+                        <warehouse:message code="requisition.wizard.transfer.label" />
                     </g:link>
                 </g:if>
 
