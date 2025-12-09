@@ -136,6 +136,9 @@ bootRun {
         '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005'
     ]
     systemProperties System.properties
+
+    // if using a Gradle daemon, don't use its working directory
+    systemProperty 'user.dir', project.projectDir.absolutePath
 }
 
 configurations {
