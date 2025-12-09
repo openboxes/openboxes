@@ -9,7 +9,7 @@ import org.pih.warehouse.app.ApplicationContextProvider
 /**
  * A formatter that converts TemporalAccessors to strings.
  */
-abstract class TemporalAccessorFormatter<T extends TemporalAccessor> implements DateFormatter<T> {
+abstract class TemporalAccessorFormatter<T extends TemporalAccessor> implements IDateFormatter<T> {
 
     private static final String EMPTY_DISPLAY_DATE = ''
 

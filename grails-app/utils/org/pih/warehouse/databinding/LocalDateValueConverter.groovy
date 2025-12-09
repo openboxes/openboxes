@@ -1,10 +1,10 @@
 package org.pih.warehouse.databinding
 
 import java.time.LocalDate
-import org.apache.commons.lang.StringUtils
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
-import org.pih.warehouse.DateUtil
+import org.pih.warehouse.core.date.LocalDateParser
 
 /**
  * As of Java 8, Java.util.Date is functionally replaced with the java.time classes, but Grails 4 and older does not
@@ -13,6 +13,9 @@ import org.pih.warehouse.DateUtil
  */
 @Component
 class LocalDateValueConverter extends StringValueConverter<LocalDate> {
+
+    @Autowired
+    LocalDateParser localDateParser
 
     /**
      * Parse a given String into a LocalDate of the given format.
@@ -24,6 +27,6 @@ class LocalDateValueConverter extends StringValueConverter<LocalDate> {
      */
     @Override
     LocalDate convertString(String value) {
-        return DateUtil.asLocalDate(value)
+        return localDateParser.parse(value)
     }
 }

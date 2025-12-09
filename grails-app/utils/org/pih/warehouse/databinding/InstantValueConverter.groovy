@@ -4,8 +4,7 @@ import java.time.Instant
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
-import org.pih.warehouse.DateUtil
-import org.pih.warehouse.core.session.SessionManager
+import org.pih.warehouse.core.date.InstantParser
 
 /**
  * As of Java 8, Java.util.Date is functionally replaced with the java.time classes, but Grails 4 and older does not
@@ -16,7 +15,7 @@ import org.pih.warehouse.core.session.SessionManager
 class InstantValueConverter extends StringValueConverter<Instant> {
 
     @Autowired
-    SessionManager sessionManager
+    InstantParser instantParser
 
     /**
      * Binds a given user-input String to an Instant.
@@ -32,6 +31,6 @@ class InstantValueConverter extends StringValueConverter<Instant> {
      */
     @Override
     Instant convertString(String value) {
-        return DateUtil.asInstant(value, sessionManager.timezone?.toZoneId())
+        return instantParser.parse(value)
     }
 }
