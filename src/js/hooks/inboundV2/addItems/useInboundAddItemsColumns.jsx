@@ -89,6 +89,7 @@ const useInboundAddItemsColumns = ({
     field,
     additionalFieldToOnBlur = null,
   ) => {
+    console.log('xdd');
     field.onBlur();
 
     // If there is a stored focus reference, clear it
@@ -453,12 +454,9 @@ const useInboundAddItemsColumns = ({
                   className="hide-arrows input-xs"
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
+                  onChange={(e) => setValue(`values.lineItems.${row.index}.quantityRequested`, e ?? null)}
                   onBlur={() => handleBlur(field)}
                   onFocus={handleFocus}
-                  onChange={async (e) => {
-                    setValue(`values.lineItems.${row.index}.quantityRequested`, e ?? null);
-                    await trigger(`values.lineItems.${row.index}.quantityRequested`);
-                  }}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
                   focusProps={{
                     fieldIndex: row.index,

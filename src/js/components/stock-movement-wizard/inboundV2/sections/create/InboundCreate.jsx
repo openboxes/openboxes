@@ -19,9 +19,11 @@ const InboundCreate = ({ next }) => {
   const {
     errors,
     control,
+    trigger,
     handleSubmit,
     onSubmitStockMovementDetails,
     stockLists,
+    setValue,
   } = useInboundCreateForm({ next });
 
   const origin = useWatch({
@@ -183,6 +185,10 @@ const InboundCreate = ({ next }) => {
                   required
                   customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
                   customTooltip
+                  onChange={async (newDate) => {
+                    setValue('dateRequested', newDate);
+                    await trigger();
+                  }}
                   showCustomInput={false}
                   ariaLabel={{
                     id: 'react.stockMovement.dateRequested.label',
