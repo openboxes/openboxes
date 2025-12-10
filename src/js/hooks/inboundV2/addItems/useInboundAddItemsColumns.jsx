@@ -89,7 +89,6 @@ const useInboundAddItemsColumns = ({
     field,
     additionalFieldToOnBlur = null,
   ) => {
-    console.log('xdd');
     field.onBlur();
 
     // If there is a stored focus reference, clear it
