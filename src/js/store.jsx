@@ -4,6 +4,7 @@ import storage from 'redux-persist/lib/storage';
 import ReduxPromise from 'redux-promise';
 import reduxThunk from 'redux-thunk';
 
+import cycleCount from 'middlewares';
 import rootReducer from 'reducers';
 
 const persistConfig = {
@@ -17,7 +18,11 @@ const persistConfig = {
   blacklist: ['indicators', 'spinner', 'connection', 'infoBarVisibility', 'countWorkflow'],
 };
 
-const createStoreWithMiddleware = applyMiddleware(ReduxPromise, reduxThunk)(createStore);
+const createStoreWithMiddleware = applyMiddleware(
+  ReduxPromise,
+  reduxThunk,
+  cycleCount.validateCycleCount,
+)(createStore);
 const store = createStoreWithMiddleware(persistReducer(persistConfig, rootReducer));
 const persistor = persistStore(store);
 
