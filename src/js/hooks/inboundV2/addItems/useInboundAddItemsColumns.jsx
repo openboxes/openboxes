@@ -455,6 +455,10 @@ const useInboundAddItemsColumns = ({
                   showErrorBorder={hasErrors}
                   onBlur={() => handleBlur(field)}
                   onFocus={handleFocus}
+                  onChange={async (e) => {
+                    setValue(`values.lineItems.${row.index}.quantityRequested`, e ?? null);
+                    await trigger(`values.lineItems.${row.index}.quantityRequested`);
+                  }}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
                   focusProps={{
                     fieldIndex: row.index,

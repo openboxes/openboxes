@@ -6,7 +6,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import {
   getCurrentLocale,
-  getCurrentLocation, getDebounceTime, getMinSearchLength,
+  getCurrentLocation,
+  getDebounceTime,
+  getMinSearchLength,
   getShipmentTypes,
 } from 'selectors';
 
