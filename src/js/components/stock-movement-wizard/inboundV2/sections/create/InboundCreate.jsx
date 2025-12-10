@@ -31,13 +31,8 @@ const InboundCreate = ({ next }) => {
     control,
   });
 
-  const {
-    debounceTime,
-    minSearchLength,
-  } = useSelector((state) => ({
-    debounceTime: getDebounceTime(state),
-    minSearchLength: getMinSearchLength(state),
-  }));
+  const debounceTime = useSelector(getDebounceTime);
+  const minSearchLength = useSelector(getMinSearchLength);
 
   const debouncedLocationsFetch = debounceLocationsFetch(
     debounceTime,
