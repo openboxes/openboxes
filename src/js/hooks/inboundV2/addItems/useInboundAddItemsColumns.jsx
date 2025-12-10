@@ -283,10 +283,6 @@ const useInboundAddItemsColumns = ({
                   {...field}
                   async
                   loadOptions={debouncedProductsFetch}
-                  onChange={(val) => {
-                    field?.onChange(val);
-                    trigger(`values.lineItems.${row.index}.quantityRequested`);
-                  }}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
                   onBlur={() => handleBlur(field)}
                   className="select-xs dark-select-xs"
@@ -346,7 +342,6 @@ const useInboundAddItemsColumns = ({
                   className="input-xs"
                   showErrorBorder={hasErrors}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
-                  onChange={(e) => setValue(`values.lineItems.${row.index}.lotNumber`, e.target.value ?? null)}
                   onBlur={() => handleBlur(field)}
                   onFocus={handleFocus}
                   focusProps={{
@@ -413,10 +408,6 @@ const useInboundAddItemsColumns = ({
                     columnId,
                   }}
                   customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
-                  onChange={async (newDate) => {
-                    setValue(`values.lineItems.${row.index}.expirationDate`, newDate);
-                    await trigger();
-                  }}
                   ariaLabel={{
                     id: 'react.stockMovement.expiry.label',
                     defaultMessage: 'Expiry',
@@ -462,7 +453,6 @@ const useInboundAddItemsColumns = ({
                   className="hide-arrows input-xs"
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
-                  onChange={(e) => setValue(`values.lineItems.${row.index}.quantityRequested`, e ?? null)}
                   onBlur={() => handleBlur(field)}
                   onFocus={handleFocus}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
@@ -555,7 +545,7 @@ const useInboundAddItemsColumns = ({
       ),
       cell: ({ row }) => (
         <TableCell className="rt-td rt-td-xs rt-td-add-items">
-          <div className="bin-container" aria-label={translate('react.default.button.delete.label', 'Delete')}>
+          <div className="bin-container" aria-label={translate('react.default.button.delete.label', 'Delete')} role="button">
             <RiDeleteBinLine
               className="inbound-bin"
               display={row?.original?.statusCode === requisitionStatus.SUBSTITUTED}

@@ -50,11 +50,10 @@ const useInboundCreateForm = ({ next }) => {
     getValues,
     handleSubmit,
     formState: { errors },
-    trigger,
     setValue,
     watch,
   } = useForm({
-    mode: 'onBlur',
+    mode: 'onChange',
     defaultValues,
     resolver: (values, context, options) =>
       zodResolver(validationSchema(values))(values, context, options),
@@ -184,10 +183,8 @@ const useInboundCreateForm = ({ next }) => {
   return {
     control,
     getValues,
-    setValue,
     handleSubmit,
     errors,
-    trigger,
     onSubmitStockMovementDetails,
     stockLists,
   };

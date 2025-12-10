@@ -31,7 +31,7 @@ const useInboundAddItemsFormState = () => {
     trigger,
     setValue,
   } = useForm({
-    mode: 'onBlur',
+    mode: 'onChange',
     defaultValues,
     resolver: zodResolver(validationSchema),
   });

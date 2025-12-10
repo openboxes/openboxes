@@ -87,6 +87,7 @@ const useInboundSendTable = () => {
           <div
             className="text-truncate"
             aria-label={translate('react.stockMovement.packLevel1.label', 'Pack Level 1')}
+            data-testid="label-field"
           >
             {getValue()}
           </div>
@@ -115,6 +116,7 @@ const useInboundSendTable = () => {
           <div
             className="text-truncate"
             aria-label={translate('react.stockMovement.packLevel2.label', 'Pack Level 2')}
+            data-testid="label-field"
           >
             {getValue()}
           </div>
@@ -143,6 +145,7 @@ const useInboundSendTable = () => {
           <div
             className="text-truncate"
             aria-label={translate('react.stockMovement.code.label', 'Code')}
+            data-testid="label-field"
           >
             {getValue()}
           </div>
@@ -168,6 +171,7 @@ const useInboundSendTable = () => {
           <div
             className="text-truncate"
             aria-label={translate('react.stockMovement.product.label', 'Product')}
+            data-testid="label-field"
           >
             {getValue()}
           </div>
@@ -193,6 +197,7 @@ const useInboundSendTable = () => {
           <div
             className="text-truncate"
             aria-label={translate('react.stockMovement.lot.label', 'Lot')}
+            data-testid="label-field"
           >
             {getValue()}
           </div>
@@ -215,7 +220,10 @@ const useInboundSendTable = () => {
           customTooltip
           tooltipLabel={formatDate(getValue())}
         >
-          <div aria-label={translate('react.stockMovement.expiry.label', 'Expiry')}>
+          <div
+            aria-label={translate('react.stockMovement.expiry.label', 'Expiry')}
+            data-testid="label-field"
+          >
             {formatDate(getValue())}
           </div>
         </TableCell>
@@ -240,6 +248,7 @@ const useInboundSendTable = () => {
           <div
             className="text-truncate"
             aria-label={translate('react.stockMovement.quantityPicked.label', 'Qty Picked')}
+            data-testid="label-field"
           >
             {getValue()?.toString()}
           </div>

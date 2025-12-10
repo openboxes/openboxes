@@ -15,8 +15,8 @@ const useInboundAddItemsV2Validation = () => {
     }).optional().nullable(),
     lotNumber: z.string().optional(),
     expirationDate: z.string().optional().nullable(),
-    quantityRequested: z.number()
-      .min(0, translate('react.stockMovement.error.enterQuantity.label', 'Enter proper quantity'))
+    quantityRequested: z.coerce.number()
+      .nonnegative(translate('react.stockMovement.error.enterQuantity.label', 'Enter proper quantity'))
       .optional()
       .nullable(),
     recipient: z.object({
@@ -34,8 +34,10 @@ const useInboundAddItemsV2Validation = () => {
       path: ['lotNumber'],
     })
     .refine((data) => {
-      if (data?.product && data?.product?.id) {
-        return data?.quantityRequested !== undefined && data?.quantityRequested !== null;
+      if (data?.product?.id) {
+        return data?.quantityRequested !== undefined
+          && data?.quantityRequested !== null
+          && data.quantityRequested > 0;
       }
       return true;
     }, {
