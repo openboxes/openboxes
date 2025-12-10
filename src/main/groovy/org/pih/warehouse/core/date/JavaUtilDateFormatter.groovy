@@ -28,7 +28,7 @@ class JavaUtilDateFormatter implements IDateFormatter<Date> {
      * Otherwise we should return the date object as is and let the frontend decide the display format.
      * Useful when working with old code that uses the old Date format.
      *
-     * NOTE: For backwards compatability purposes, the date will always be in the system timezone.
+     * NOTE: For backwards compatibility purposes, the date will always be in the system timezone.
      *
      * @return a formatted date String. Ex: "01/Jan/2025"
      */
@@ -43,7 +43,7 @@ class JavaUtilDateFormatter implements IDateFormatter<Date> {
      * exporters. Otherwise we should return the date object as is and let the frontend decide the display format.
      * Useful when working with old code that uses the old Date format.
      *
-     * NOTE: For backwards compatability purposes, the date will always be in the system timezone.
+     * NOTE: For backwards compatibility purposes, the date will always be in the system timezone.
      *
      * @return a formatted datetime String. Ex: "01/Jan/2025 00:00:00 +05:00"
      */
@@ -58,7 +58,7 @@ class JavaUtilDateFormatter implements IDateFormatter<Date> {
      * exporters. Otherwise we should return the date object as is and let the frontend decide the display format.
      * Useful when working with old code that uses the old Date format.
      *
-     * NOTE: For backwards compatability purposes, the date will always be in the system timezone.
+     * NOTE: For backwards compatibility purposes, the date will always be in the system timezone.
      *
      * @return a formatted time String. Ex: "12:34:56"
      */
@@ -71,6 +71,8 @@ class JavaUtilDateFormatter implements IDateFormatter<Date> {
     /**
      * Null-safe conversion of a (deprecated) java.util.Date to a LocalTime.
      * Useful when working with old code that uses the old format.
+     *
+     * NOTE: For backwards compatibility purposes, the date will always be in the system timezone.
      */
     private static LocalTime asLocalTime(Date date) {
         return date
