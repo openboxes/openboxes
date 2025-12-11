@@ -177,7 +177,6 @@ const useInboundAddItemsColumns = ({
                   {...field}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
                   onBlur={() => handleBlur(field, boxNameField)}
-                  onChange={(e) => setValue(`values.lineItems.${row.index}.palletName`, e.target.value ?? null)}
                   focusProps={{
                     fieldIndex: row.index,
                     fieldId: column.id,
@@ -239,7 +238,6 @@ const useInboundAddItemsColumns = ({
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
                   className="input-xs"
-                  onChange={(e) => setValue(`values.lineItems.${row.index}.boxName`, e.target.value ?? null)}
                   autoComplete="off"
                   ariaLabel={{
                     id: 'react.stockMovement.packLevel2.label',
@@ -408,6 +406,10 @@ const useInboundAddItemsColumns = ({
                     columnId,
                   }}
                   customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
+                  onChange={async (e) => {
+                    field.onChange(e);
+                    await trigger(`values.lineItems.${row.index}.lotNumber`);
+                  }}
                   ariaLabel={{
                     id: 'react.stockMovement.expiry.label',
                     defaultMessage: 'Expiry',

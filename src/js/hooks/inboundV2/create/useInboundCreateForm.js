@@ -52,7 +52,6 @@ const useInboundCreateForm = ({ next }) => {
     formState: { errors },
     setValue,
     watch,
-    trigger,
   } = useForm({
     mode: 'onBlur',
     defaultValues,
@@ -184,10 +183,8 @@ const useInboundCreateForm = ({ next }) => {
   return {
     control,
     getValues,
-    setValue,
     handleSubmit,
     errors,
-    trigger,
     onSubmitStockMovementDetails,
     stockLists,
   };
