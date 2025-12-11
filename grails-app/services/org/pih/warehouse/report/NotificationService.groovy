@@ -230,10 +230,10 @@ class NotificationService {
         }
     }
 
-    def sendProductBarcodeUpdatedNotification(Product product, String oldUpc, String newUpc) {
+    def sendProductBarcodeUpdatedNotification(User user, Product product, String oldUpc, String newUpc) {
         try {
             def emailValidator = EmailValidator.getInstance()
-            def recipients = userService.findUsersByRoleType(RoleType.ROLE_PRODUCT_MANAGER)
+            def recipients = userService.findUsersByRoleType(RoleType.ROLE_PRODUCT_NOTIFICATION)
 
             if (!recipients) {
                 log.info "No Product Managers found; skipping barcode update email for product ${product.id}"
@@ -244,7 +244,7 @@ class NotificationService {
                 if (emailValidator.isValid(it.email)) {
                     def locale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
                     def subject = messageSource.getMessage('email.productBarcodeUpdated.subject', [product.name].toArray(), locale)
-                    def body = renderTemplate("/email/productBarcodeUpdated", [product: product, oldUpc: oldUpc, newUpc: newUpc])
+                    def body = renderTemplate("/email/productBarcodeUpdated", [user: user, product: product, oldUpc: oldUpc, newUpc: newUpc])
                     mailService.sendHtmlMail(subject, body.toString(), it.email)
                 }
             }

@@ -1,4 +1,5 @@
 package org.pih.warehouse.product
+import org.pih.warehouse.core.User
 
 import org.springframework.context.ApplicationEvent
 
@@ -7,11 +8,13 @@ import org.springframework.context.ApplicationEvent
  */
 class ProductBarcodeUpdatedEvent extends ApplicationEvent {
 
+    final User user
     final String oldUpc
     final String newUpc
 
-    ProductBarcodeUpdatedEvent(Product product, String oldUpc, String newUpc) {
+    ProductBarcodeUpdatedEvent(User user, Product product, String oldUpc, String newUpc) {
         super(product)
+        this.user = user
         this.oldUpc = oldUpc
         this.newUpc = newUpc
     }

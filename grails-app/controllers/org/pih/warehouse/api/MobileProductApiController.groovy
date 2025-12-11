@@ -183,19 +183,26 @@ class MobileProductApiController extends BaseDomainApiController {
             def type = identifier?.type?.trim()?.toLowerCase()
             def value = identifier?.value?.trim()
 
-            if (!type || !value) {
-                render(status: 400, text: "Missing identifier type or value")
-                return
-            }
-
             User user = session?.user
             if (!user) {
                 render(status: 401, text: "Active user session required")
                 return
             }
 
-            if (!(userService.hasRoleProductManager(user) || userService.isUserAdmin(user))) {
+            if (!(userService.hasRoleProductManager(user))) {
                 render(status: 403, text: "Insufficient privileges")
+                return
+            }
+
+            if (!type) {
+                render(status: 400, text: "Missing identifier type or value")
+                return
+            }
+
+            if (value == null || value == "") {
+                product.upc = null
+                product.save(flush: true)
+                render([data: [id: product.id, identifier: [type: type, value: null]]] as JSON)
                 return
             }
 
@@ -216,7 +223,7 @@ class MobileProductApiController extends BaseDomainApiController {
                     product.upc = newValue
                     product.save(flush: true)
 
-                    sendProductBarcodeUpdateNotification(product, oldValue, newValue)
+                    sendProductBarcodeUpdateNotification(user, product, oldValue, newValue)
                     break
 
                 default:
@@ -232,9 +239,9 @@ class MobileProductApiController extends BaseDomainApiController {
         }
     }
 
-    void sendProductBarcodeUpdateNotification(Product product, String oldUpc, String newUpc) {
+    void sendProductBarcodeUpdateNotification(User user, Product product, String oldUpc, String newUpc) {
         try {
-            grailsApplication.mainContext.publishEvent(new ProductBarcodeUpdatedEvent(product, oldUpc, newUpc))
+            grailsApplication.mainContext.publishEvent(new ProductBarcodeUpdatedEvent(user, product, oldUpc, newUpc))
         } catch (Exception e) {
             log.error("Error while publishing ProductBarcodeUpdatedEvent for product ${product?.id}", e)
         }
