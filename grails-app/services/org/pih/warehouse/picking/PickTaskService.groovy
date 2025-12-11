@@ -7,6 +7,7 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.api.picking.SearchPickTaskCommand
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -147,13 +148,7 @@ class PickTaskService {
 
     void pick(PickTask task, String outboundContainerId, String pickedById) {
         Location outboundContainer = Location.findByLocationNumberOrId(outboundContainerId, outboundContainerId)
-        if (!outboundContainer) {
-            throw new IllegalStateException("Outbound container does not exist")
-        }
-
-        if (!outboundContainer.supports(ActivityCode.OUTBOUND_CONTAINER)) {
-            throw new IllegalArgumentException("Container ${outboundContainer.name} does not support OUTBOUND_CONTAINER activity")
-        }
+        validateOutboundContainer(outboundContainer, task)
 
         executeStateTransition(task, PickTaskStatus.PICKED)
         transferToContainer(task, outboundContainer, task.quantityRequired.toInteger())
@@ -169,13 +164,7 @@ class PickTaskService {
 
     void shortPick(PickTask task, String outboundContainerId, Integer quantityPicked, String pickedById, String reasonCode) {
         Location outboundContainer = Location.findByLocationNumberOrId(outboundContainerId, outboundContainerId)
-        if (!outboundContainer) {
-            throw new IllegalStateException("Outbound container does not exist")
-        }
-
-        if (!outboundContainer.supports(ActivityCode.OUTBOUND_CONTAINER)) {
-            throw new IllegalArgumentException("Container ${outboundContainer.name} does not support OUTBOUND_CONTAINER activity")
-        }
+        validateOutboundContainer(outboundContainer, task)
 
         PicklistItem existingPickItem = PicklistItem.get(task.id)
         picklistService.updatePicklistItem(existingPickItem.id, task.product?.id, quantityPicked.toBigDecimal(), pickedById, reasonCode)
@@ -192,7 +181,7 @@ class PickTaskService {
     def drop(String outboundContainerId, Map data = [:]) {
         Location outboundContainer = Location.findByLocationNumberOrId(outboundContainerId, outboundContainerId)
         if (!outboundContainer) {
-            throw new ObjectNotFoundException(outboundContainerId, "Outbound container was not found")
+            throw new IllegalArgumentException("Outbound container with identifier ${outboundContainerId} does not exist")
         }
 
         switch (data?.action) {
@@ -250,14 +239,12 @@ class PickTaskService {
 
     void dropToStaging(Location outboundContainer, String stagingLocationId, String stagedById) {
         Location stagingLocation = Location.findByLocationNumberOrId(stagingLocationId, stagingLocationId)
-        if (!stagingLocation) {
-            throw new ObjectNotFoundException(stagingLocationId, "Staging location was not found")
-        }
+        validateStagingLocation(stagingLocation)
 
         List<AvailableItem> itemsToMove = productAvailabilityService.getAvailableItems(outboundContainer)
 
         if (!itemsToMove) {
-            throw new IllegalStateException("Outbound container is empty")
+            throw new IllegalStateException("Outbound container with number ${outboundContainer.locationNumber} is empty")
         }
 
         Person stagedBy = Person.get(stagedById)
@@ -350,5 +337,42 @@ class PickTaskService {
         }
 
         return []
+    }
+
+    private void validateOutboundContainer(Location outboundContainer, PickTask pickTask) {
+        if (!outboundContainer) {
+            throw new IllegalArgumentException("Outbound container does not exist")
+        }
+
+        if (!Constants.OUTBOUND_CONTAINER_LOCATION_TYPE_NAME.equalsIgnoreCase(outboundContainer.getLocationType().getName())) {
+            throw new IllegalArgumentException("Container ${outboundContainer.name} is not of ${Constants.OUTBOUND_CONTAINER_LOCATION_TYPE_NAME} type")
+        }
+
+        if (!outboundContainer.supports(ActivityCode.OUTBOUND_CONTAINER)) {
+            throw new IllegalArgumentException("Container ${outboundContainer.name} does not support ${ActivityCode.OUTBOUND_CONTAINER} activity")
+        }
+
+        if (!outboundContainer.supports(ActivityCode.HOLD_STOCK)) {
+            throw new IllegalArgumentException("Container ${outboundContainer.name} does not support ${ActivityCode.HOLD_STOCK} activity")
+        }
+
+        ActivityCode taskDeliveryTypeActivity = pickTask.getDeliveryTypeCode().getActivityCode()
+        if (!outboundContainer.supports(taskDeliveryTypeActivity)) {
+            throw new IllegalArgumentException("Container ${outboundContainer.name} does not support ${taskDeliveryTypeActivity} activity")
+        }
+    }
+
+    private void validateStagingLocation(Location stagingLocation) {
+        if (!stagingLocation) {
+            throw new IllegalArgumentException("Staging location does not exist")
+        }
+
+        if (!Constants.CROSS_DOCKING_LOCATION_TYPE_NAME.equalsIgnoreCase(stagingLocation.getLocationType().getName())) {
+            throw new IllegalArgumentException("Staging location ${stagingLocation.name} is not of ${Constants.CROSS_DOCKING_LOCATION_TYPE_NAME} type")
+        }
+
+        if (!stagingLocation.supports(ActivityCode.HOLD_STOCK)) {
+            throw new IllegalArgumentException("Staging location ${stagingLocation.name} does not support ${ActivityCode.HOLD_STOCK} activity")
+        }
     }
 }
