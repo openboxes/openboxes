@@ -26,7 +26,6 @@ const useInboundAddItemsFormState = () => {
   const {
     control,
     getValues,
-    handleSubmit,
     formState: { errors },
     trigger,
     setValue,
@@ -39,7 +38,6 @@ const useInboundAddItemsFormState = () => {
   return {
     control,
     getValues,
-    handleSubmit,
     errors,
     trigger,
     setValue,

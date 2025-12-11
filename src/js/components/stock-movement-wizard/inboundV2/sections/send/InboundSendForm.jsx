@@ -37,7 +37,7 @@ const InboundSendForm = ({ previous }) => {
     files,
     handleRemoveFile,
     isValid,
-    setValue,
+    debouncedLocationsFetch,
   } = useInboundSendForm({ previous });
 
   // Rollback button is visible only for admins when shipment has been dispatched
@@ -97,7 +97,6 @@ const InboundSendForm = ({ previous }) => {
               <Controller
                 name="destination"
                 control={control}
-                disabled
                 render={({ field }) => (
                   <SelectField
                     {...field}
@@ -111,6 +110,8 @@ const InboundSendForm = ({ previous }) => {
                       id: 'react.stockMovement.destination.label',
                       defaultMessage: 'Destination',
                     }}
+                    async
+                    loadOptions={debouncedLocationsFetch}
                   />
                 )}
               />
@@ -132,10 +133,6 @@ const InboundSendForm = ({ previous }) => {
                     customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
                     customTooltip
                     showCustomInput={false}
-                    onChange={async (newDate) => {
-                      setValue('shipDate', newDate);
-                      await trigger();
-                    }}
                     ariaLabel={{
                       id: 'react.stockMovement.shipDate.label',
                       defaultMessage: 'Ship date',
@@ -257,10 +254,6 @@ const InboundSendForm = ({ previous }) => {
                     triggerValidation={trigger}
                     customTooltip
                     showCustomInput={false}
-                    onChange={async (newDate) => {
-                      setValue('expectedDeliveryDate', newDate);
-                      await trigger();
-                    }}
                     ariaLabel={{
                       id: 'react.stockMovement.expectedDeliveryDate.label',
                       defaultMessage: 'Expected Delivery Date',

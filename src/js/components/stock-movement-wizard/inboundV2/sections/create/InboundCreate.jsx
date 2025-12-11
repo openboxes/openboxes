@@ -3,6 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Controller, useWatch } from 'react-hook-form';
 import { useSelector } from 'react-redux';
+import { getDebounceTime, getMinSearchLength } from 'selectors';
 
 import Button from 'components/form-elements/Button';
 import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
@@ -18,11 +19,9 @@ const InboundCreate = ({ next }) => {
   const {
     errors,
     control,
-    trigger,
     handleSubmit,
     onSubmitStockMovementDetails,
     stockLists,
-    setValue,
   } = useInboundCreateForm({ next });
 
   const origin = useWatch({
@@ -30,13 +29,8 @@ const InboundCreate = ({ next }) => {
     control,
   });
 
-  const {
-    debounceTime,
-    minSearchLength,
-  } = useSelector((state) => ({
-    debounceTime: state.session.searchConfig.debounceTime,
-    minSearchLength: state.session.searchConfig.minSearchLength,
-  }));
+  const debounceTime = useSelector(getDebounceTime);
+  const minSearchLength = useSelector(getMinSearchLength);
 
   const debouncedLocationsFetch = debounceLocationsFetch(
     debounceTime,
@@ -184,10 +178,6 @@ const InboundCreate = ({ next }) => {
                   required
                   customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
                   customTooltip
-                  onChange={async (newDate) => {
-                    setValue('dateRequested', newDate);
-                    await trigger();
-                  }}
                   showCustomInput={false}
                   ariaLabel={{
                     id: 'react.stockMovement.dateRequested.label',
