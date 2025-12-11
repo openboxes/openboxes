@@ -17,7 +17,7 @@ const InboundAddItems = ({
   previous,
 }) => {
   const {
-    form: { control, handleSubmit, errors },
+    form: { control, errors },
     table: {
       lineItemsArrayFields, columns,
     },
@@ -40,7 +40,7 @@ const InboundAddItems = ({
     item.product && item.quantityRequested && parseInt(item.quantityRequested, 10) > 0);
 
   return (
-    <form onSubmit={handleSubmit(nextPage)}>
+    <form>
       <Section showTitle={false}>
         <div className="inbound-add-items">
           <InboundAddItemsHeader
@@ -81,7 +81,7 @@ const InboundAddItems = ({
           defaultLabel="Next"
           variant="primary"
           disabled={!isNextButtonEnabled}
-          type="submit"
+          onClick={nextPage}
         />
       </div>
       <ConfirmExpirationDateModal
