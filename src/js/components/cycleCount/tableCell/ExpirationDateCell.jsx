@@ -117,7 +117,7 @@ export default ExpirationDateCell;
 
 ExpirationDateCell.propTypes = {
   id: PropTypes.string.isRequired,
-  index: PropTypes.number.isRequired,
+  index: PropTypes.string.isRequired,
   cycleCountId: PropTypes.string.isRequired,
   disabledExpirationDateFields: PropTypes.objectOf(PropTypes.string).isRequired,
   isStepEditable: PropTypes.bool.isRequired,

@@ -143,7 +143,7 @@ export default LotNumberCell;
 
 LotNumberCell.propTypes = {
   id: PropTypes.string.isRequired,
-  index: PropTypes.number.isRequired,
+  index: PropTypes.string.isRequired,
   cycleCountId: PropTypes.string.isRequired,
   setDisabledExpirationDateFields: PropTypes.func.isRequired,
   isStepEditable: PropTypes.bool.isRequired,

@@ -103,7 +103,7 @@ export default QuantityCell;
 
 QuantityCell.propTypes = {
   id: PropTypes.string.isRequired,
-  index: PropTypes.number.isRequired,
+  index: PropTypes.string.isRequired,
   cycleCountId: PropTypes.string.isRequired,
   isStepEditable: PropTypes.bool.isRequired,
 };

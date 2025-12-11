@@ -116,7 +116,7 @@ export default BinLocationCell;
 
 BinLocationCell.propTypes = {
   id: PropTypes.string.isRequired,
-  index: PropTypes.number.isRequired,
+  index: PropTypes.string.isRequired,
   cycleCountId: PropTypes.string.isRequired,
   showBinLocation: PropTypes.bool.isRequired,
   isStepEditable: PropTypes.bool.isRequired,

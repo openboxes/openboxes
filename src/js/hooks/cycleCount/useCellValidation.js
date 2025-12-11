@@ -17,7 +17,12 @@ const useCellValidation = ({
 
   const isFormSubmitted = useSelector(getCountWorkflowIsFormSubmitted);
 
-  const error = useSelector((state) => getErrorForField(state, cycleCountId, index, fieldName));
+  const error = useSelector((state) => getErrorForField(
+    state,
+    cycleCountId,
+    parseInt(index, 10),
+    fieldName,
+  ));
 
   const onChangeValidationHandler = () => {
     wasFieldTouched.current = true;
