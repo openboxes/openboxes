@@ -100,7 +100,7 @@ const useInboundSendForm = ({ previous }) => {
     trigger,
     reset,
   } = useForm({
-    mode: 'onChange',
+    mode: 'onBlur',
     defaultValues,
     resolver: zodResolver(validationSchema()),
   });
