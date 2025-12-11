@@ -19,7 +19,6 @@ const useInboundAddItemsForm = ({ next, previous }) => {
   const {
     control,
     getValues,
-    handleSubmit,
     errors,
     trigger,
     setValue,
@@ -74,7 +73,6 @@ const useInboundAddItemsForm = ({ next, previous }) => {
   return {
     form: {
       control,
-      handleSubmit,
       errors,
     },
     table: {

@@ -50,7 +50,6 @@ const useInboundCreateForm = ({ next }) => {
     getValues,
     handleSubmit,
     formState: { errors },
-    trigger,
     setValue,
     watch,
   } = useForm({
@@ -184,10 +183,8 @@ const useInboundCreateForm = ({ next }) => {
   return {
     control,
     getValues,
-    setValue,
     handleSubmit,
     errors,
-    trigger,
     onSubmitStockMovementDetails,
     stockLists,
   };
