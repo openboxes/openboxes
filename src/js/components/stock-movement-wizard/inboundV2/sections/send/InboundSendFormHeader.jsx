@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { IoMdExit } from 'react-icons/io';
 import {
   RiDeleteBinLine,
-  RiDownload2Line,
   RiPictureInPictureExitLine,
   RiSave2Line,
 } from 'react-icons/ri';
@@ -14,6 +13,7 @@ import Button from 'components/form-elements/Button';
 import DropzoneFileSelect from 'components/form-elements/v2/DropzoneFileSelect';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import requisitionStatus from 'consts/requisitionStatus';
+import DropdownButton from 'utils/DropdownButton';
 import Translate from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
@@ -30,6 +30,16 @@ const InboundSendFormHeader = ({
   handleRemoveFile,
 }) => {
   const history = useHistory();
+  const documentActions = documents.map((document) => (
+    {
+      label: document?.name,
+      defaultLabel: document?.name,
+      onClick: (e) => {
+        e.preventDefault();
+        handleExportFile(document);
+      },
+    }
+  ));
 
   // Upload Documents button is disabled if shipment is already dispatched
   // or selected destination doesn't match current location
@@ -74,35 +84,13 @@ const InboundSendFormHeader = ({
             ))}
           </div>
         </div>
-        <div className="btn-group">
-          <Button
-            isDropdown
-            defaultLabel="Download"
-            label="react.default.button.download.label"
-            variant="primary-outline"
-            StartIcon={<RiDownload2Line />}
-            disabled={!isValid || !matchesDestination}
-          />
-          <div
-            className="dropdown-menu dropdown-menu-right nav-item padding-8"
-            aria-labelledby="dropdownMenuButton"
-          >
-            {documents?.map((document) => (
-              <a
-                key={document?.uri}
-                href="#"
-                className="dropdown-item"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleExportFile(document);
-                }}
-                role="button"
-              >
-                {document?.name}
-              </a>
-            ))}
-          </div>
-        </div>
+        <DropdownButton
+          actions={documentActions}
+          disabled={!isValid || !matchesDestination}
+          buttonDefaultLabel="Download"
+          buttonLabel="react.default.button.download.label"
+          variant="primary-outline"
+        />
         <Button
           onClick={() => saveAndExit()}
           StartIcon={<RiPictureInPictureExitLine className="icon" />}

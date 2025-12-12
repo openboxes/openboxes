@@ -59,6 +59,7 @@ const InboundAddItems = ({
               data={lineItemsArrayFields}
               loading={loading}
               disablePagination
+              totalCount={lineItemsArrayFields.length}
               emptyTableMessage={{
                 id: 'react.stockMovement.emptyTable.label',
                 defaultMessage: 'No items to display',
