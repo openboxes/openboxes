@@ -26,21 +26,28 @@ SELECT
     pli.bin_location_id AS location_id,
     pli.outbound_container_id AS outbound_container_id,
     (SELECT loc.id
-         FROM location loc
-         JOIN location_effective_supported_activities act ON act.location_id = loc.id
-         WHERE loc.parent_location_id = r.origin_id
-           AND loc.active = true
-           AND act.supported_activities_string =
-               CASE r.delivery_type_code
-                   WHEN 'PICK_UP' THEN 'DELIVERY_TYPE_PICKUP'
-                   WHEN 'LOCAL_DELIVERY' THEN 'DELIVERY_TYPE_LOCAL_DELIVERY'
-                   WHEN 'SERVICE' THEN 'DELIVERY_TYPE_SERVICE'
-                   WHEN 'WILL_CALL' THEN 'DELIVERY_TYPE_WILL_CALL'
-                   WHEN 'SHIP_TO' THEN 'DELIVERY_TYPE_SHIPPING'
-                   ELSE NULL
-               END
-         LIMIT 1
-        ) AS staging_location_id,
+     FROM location loc
+     JOIN location_effective_supported_activities lesa ON lesa.location_id = loc.id
+     WHERE loc.parent_location_id = r.origin_id
+       AND loc.active = true
+     GROUP BY loc.id
+     HAVING
+         SUM(CASE WHEN lesa.supported_activities_string = 'STAGING_LOCATION' THEN 1 ELSE 0 END) > 0
+         AND
+         SUM(CASE WHEN lesa.supported_activities_string = 'HOLD_STOCK' THEN 1 ELSE 0 END) > 0
+         AND
+         SUM(CASE WHEN lesa.supported_activities_string =
+                       CASE r.delivery_type_code
+                           WHEN 'PICK_UP' THEN 'DELIVERY_TYPE_PICKUP'
+                           WHEN 'LOCAL_DELIVERY' THEN 'DELIVERY_TYPE_LOCAL_DELIVERY'
+                           WHEN 'SERVICE' THEN 'DELIVERY_TYPE_SERVICE'
+                           WHEN 'WILL_CALL' THEN 'DELIVERY_TYPE_WILL_CALL'
+                           WHEN 'SHIP_TO' THEN 'DELIVERY_TYPE_SHIPPING'
+                           ELSE NULL
+                       END
+            THEN 1 ELSE 0 END) > 0
+     LIMIT 1
+    ) AS staging_location_id,
     pli.inventory_item_id AS inventory_item_id,
     pli.quantity AS quantity_required,
     pli.quantity_picked AS quantity_picked,

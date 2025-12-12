@@ -7,6 +7,7 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.api.picking.SearchPickTaskCommand
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -14,6 +15,7 @@ import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.picklist.PicklistService
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
 
@@ -23,6 +25,7 @@ class PickTaskService {
     GrailsApplication grailsApplication
     InventoryService inventoryService
     ProductAvailabilityService productAvailabilityService
+    PicklistService picklistService
 
     @Transactional(readOnly = true)
     List<PickTask> search(SearchPickTaskCommand command, Map params = [:]) {
@@ -34,7 +37,7 @@ class PickTaskService {
         List<String> requisitionIds = findRequisitionIdsForPicking(command)
 
         List<PickTaskStatus> statusesToSearch = command.status
-        if (!statusesToSearch && !command.outboundContainerId) {
+        if (!statusesToSearch  && !command.outboundContainerId && !command.requisitionId) {
             statusesToSearch = [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
         }
 
@@ -69,6 +72,15 @@ class PickTaskService {
                 or {
                     eq("oc.id", command.outboundContainerId)
                     eq("oc.locationNumber", command.outboundContainerId)
+                }
+            }
+
+            if (command.requisitionId) {
+                createAlias("requisition", "r")
+
+                or {
+                    eq("r.id", command.requisitionId)
+                    eq("r.requestNumber", command.requisitionId)
                 }
             }
 
@@ -136,17 +148,10 @@ class PickTaskService {
 
     void pick(PickTask task, String outboundContainerId, String pickedById) {
         Location outboundContainer = Location.findByLocationNumberOrId(outboundContainerId, outboundContainerId)
-        if (!outboundContainer) {
-            throw new IllegalStateException("Outbound container does not exist")
-        }
-
-        if (!outboundContainer.supports(ActivityCode.OUTBOUND_CONTAINER)) {
-            throw new IllegalArgumentException("Container ${outboundContainer.name} does not support OUTBOUND_CONTAINER activity")
-        }
-        task.outboundContainer = outboundContainer
+        validateOutboundContainer(outboundContainer, task)
 
         executeStateTransition(task, PickTaskStatus.PICKED)
-        transferToContainer(task, task.quantityRequired.toInteger())
+        transferToContainer(task, outboundContainer, task.quantityRequired.toInteger())
 
         PicklistItem existingPickItem = PicklistItem.get(task.id)
         existingPickItem.pickedBy = Person.get(pickedById)
@@ -159,37 +164,24 @@ class PickTaskService {
 
     void shortPick(PickTask task, String outboundContainerId, Integer quantityPicked, String pickedById, String reasonCode) {
         Location outboundContainer = Location.findByLocationNumberOrId(outboundContainerId, outboundContainerId)
-        if (!outboundContainer) {
-            throw new IllegalStateException("Outbound container does not exist")
-        }
-
-        if (!outboundContainer.supports(ActivityCode.OUTBOUND_CONTAINER)) {
-            throw new IllegalArgumentException("Container ${outboundContainer.name} does not support OUTBOUND_CONTAINER activity")
-        }
-        task.outboundContainer = outboundContainer
+        validateOutboundContainer(outboundContainer, task)
 
         PicklistItem existingPickItem = PicklistItem.get(task.id)
-        Integer newQuantityPicked = existingPickItem.quantityPicked += quantityPicked
-        if (newQuantityPicked > existingPickItem.quantity) {
-            throw new IllegalArgumentException("Picked quantity cannot be greater than required quantity")
+        picklistService.updatePicklistItem(existingPickItem.id, task.product?.id, quantityPicked.toBigDecimal(), pickedById, reasonCode)
+
+        if (reasonCode) {
+            executeStateTransition(task, PickTaskStatus.PICKED)
         }
 
-        executeStateTransition(task, PickTaskStatus.PICKED)
-        transferToContainer(task, quantityPicked)
-
-        existingPickItem.pickedBy = Person.get(pickedById)
-        existingPickItem.datePicked = new Date()
+        transferToContainer(task, outboundContainer, quantityPicked)
         existingPickItem.outboundContainer = outboundContainer
-        existingPickItem.quantityPicked = newQuantityPicked
-        existingPickItem.reasonCode = reasonCode
-
         save(task)
     }
 
     def drop(String outboundContainerId, Map data = [:]) {
         Location outboundContainer = Location.findByLocationNumberOrId(outboundContainerId, outboundContainerId)
         if (!outboundContainer) {
-            throw new ObjectNotFoundException(outboundContainerId, "Outbound container was not found")
+            throw new IllegalArgumentException("Outbound container with identifier ${outboundContainerId} does not exist")
         }
 
         switch (data?.action) {
@@ -247,14 +239,12 @@ class PickTaskService {
 
     void dropToStaging(Location outboundContainer, String stagingLocationId, String stagedById) {
         Location stagingLocation = Location.findByLocationNumberOrId(stagingLocationId, stagingLocationId)
-        if (!stagingLocation) {
-            throw new ObjectNotFoundException(stagingLocationId, "Staging location was not found")
-        }
+        validateStagingLocation(stagingLocation)
 
         List<AvailableItem> itemsToMove = productAvailabilityService.getAvailableItems(outboundContainer)
 
         if (!itemsToMove) {
-            throw new IllegalStateException("Outbound container is empty")
+            throw new IllegalStateException("Outbound container with number ${outboundContainer.locationNumber} is empty")
         }
 
         Person stagedBy = Person.get(stagedById)
@@ -275,14 +265,14 @@ class PickTaskService {
         }
     }
 
-    void transferToContainer(PickTask task, Integer quantity) {
+    void transferToContainer(PickTask task, Location container, Integer quantity) {
         TransferStockCommand command = new TransferStockCommand()
         command.location = task.facility
         command.binLocation = task.location
         command.inventoryItem = task.inventoryItem
         command.quantity = quantity
         command.otherLocation = task.facility
-        command.otherBinLocation = task.outboundContainer
+        command.otherBinLocation = container
         command.transferOut = Boolean.TRUE
         command.disableRefresh = Boolean.TRUE
         transfer(task, command)
@@ -347,5 +337,38 @@ class PickTaskService {
         }
 
         return []
+    }
+
+    private void validateOutboundContainer(Location outboundContainer, PickTask pickTask) {
+        if (!outboundContainer) {
+            throw new IllegalArgumentException("Outbound container does not exist")
+        }
+
+        if (!outboundContainer.supports(ActivityCode.OUTBOUND_CONTAINER)) {
+            throw new IllegalArgumentException("Container ${outboundContainer.name} does not support ${ActivityCode.OUTBOUND_CONTAINER} activity")
+        }
+
+        if (!outboundContainer.supports(ActivityCode.HOLD_STOCK)) {
+            throw new IllegalArgumentException("Container ${outboundContainer.name} does not support ${ActivityCode.HOLD_STOCK} activity")
+        }
+
+        ActivityCode taskDeliveryTypeActivity = pickTask.getDeliveryTypeCode().getActivityCode()
+        if (!outboundContainer.supports(taskDeliveryTypeActivity)) {
+            throw new IllegalArgumentException("Container ${outboundContainer.name} does not support ${taskDeliveryTypeActivity} activity")
+        }
+    }
+
+    private void validateStagingLocation(Location stagingLocation) {
+        if (!stagingLocation) {
+            throw new IllegalArgumentException("Staging location does not exist")
+        }
+
+        if (!stagingLocation.supports(ActivityCode.STAGING_LOCATION)) {
+            throw new IllegalArgumentException("Staging location ${stagingLocation.name} does not support ${ActivityCode.STAGING_LOCATION} activity")
+        }
+
+        if (!stagingLocation.supports(ActivityCode.HOLD_STOCK)) {
+            throw new IllegalArgumentException("Staging location ${stagingLocation.name} does not support ${ActivityCode.HOLD_STOCK} activity")
+        }
     }
 }

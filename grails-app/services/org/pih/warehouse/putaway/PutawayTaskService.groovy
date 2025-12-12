@@ -12,6 +12,7 @@ import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.api.putaway.SearchPutawayTaskCommand
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
@@ -250,7 +251,7 @@ class PutawayTaskService {
         }
 
         if (!container.supports(ActivityCode.PUTAWAY_CART)) {
-            throw new IllegalArgumentException("Container ${container?.name} does not support PUTAWAY_CART activity")
+            throw new IllegalArgumentException("Container ${container?.name} does not support ${ActivityCode.PUTAWAY_CART} activity")
         }
 
         // validate that the container matches the task putaway container
