@@ -12,6 +12,6 @@ class ProductBarcodeUpdatedEventService implements ApplicationListener<ProductBa
     void onApplicationEvent(ProductBarcodeUpdatedEvent event) {
         log.info "Application event $event has been published!"
         Product product = (Product) event.source
-        notificationService.sendProductBarcodeUpdatedNotification(product, event.oldUpc, event.newUpc)
+        notificationService.sendProductBarcodeUpdatedNotification(event.user, product, event.oldUpc, event.newUpc)
     }
 }

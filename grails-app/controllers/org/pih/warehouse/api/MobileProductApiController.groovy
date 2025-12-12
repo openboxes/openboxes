@@ -181,12 +181,7 @@ class MobileProductApiController extends BaseDomainApiController {
             def body = request.JSON
             def identifier = body?.identifier
             def type = identifier?.type?.trim()?.toLowerCase()
-            def value = identifier?.value?.trim()
-
-            if (!type || !value) {
-                render(status: 400, text: "Missing identifier type or value")
-                return
-            }
+            def newValue = identifier?.value?.trim()
 
             User user = session?.user
             if (!user) {
@@ -194,15 +189,19 @@ class MobileProductApiController extends BaseDomainApiController {
                 return
             }
 
-            if (!(userService.hasRoleProductManager(user) || userService.isUserAdmin(user))) {
+            if (!(userService.hasRoleProductManager(user))) {
                 render(status: 403, text: "Insufficient privileges")
+                return
+            }
+
+            if (!type) {
+                render(status: 400, text: "Missing identifier type or value")
                 return
             }
 
             switch (type) {
                 case "upc":
                     def oldValue = product.upc
-                    def newValue = value
 
                     Product duplicate = Product.findByUpc(newValue)
                     if (duplicate && duplicate.id != product.id) {
@@ -213,10 +212,17 @@ class MobileProductApiController extends BaseDomainApiController {
                         return
                     }
 
+                    if (newValue == null || newValue == "") {
+                        product.upc = null
+                        product.save(flush: true)
+                        render([data: [id: product.id, identifier: [type: type, value: null]]] as JSON)
+                        return
+                    }
+
                     product.upc = newValue
                     product.save(flush: true)
 
-                    sendProductBarcodeUpdateNotification(product, oldValue, newValue)
+                    sendProductBarcodeUpdateNotification(user, product, oldValue, newValue)
                     break
 
                 default:
@@ -224,7 +230,7 @@ class MobileProductApiController extends BaseDomainApiController {
                     return
             }
 
-            render([data: [id: product.id, identifier: [type: type, value: value]]] as JSON)
+            render([data: [id: product.id, identifier: [type: type, value: newValue]]] as JSON)
 
         } catch (Exception e) {
             log.error("Error updating identifier for product ${params.id}: ${e.message}", e)
@@ -232,9 +238,9 @@ class MobileProductApiController extends BaseDomainApiController {
         }
     }
 
-    void sendProductBarcodeUpdateNotification(Product product, String oldUpc, String newUpc) {
+    void sendProductBarcodeUpdateNotification(User user, Product product, String oldUpc, String newUpc) {
         try {
-            grailsApplication.mainContext.publishEvent(new ProductBarcodeUpdatedEvent(product, oldUpc, newUpc))
+            grailsApplication.mainContext.publishEvent(new ProductBarcodeUpdatedEvent(user, product, oldUpc, newUpc))
         } catch (Exception e) {
             log.error("Error while publishing ProductBarcodeUpdatedEvent for product ${product?.id}", e)
         }
