@@ -45,6 +45,10 @@ class TemporalAccessorDateTimeFormatter<T extends TemporalAccessor> extends Temp
         //return DateTimeFormatter.ISO_OFFSET_DATE_TIME
     }
 
+    DateTimeFormatter getFileNameFormatter() {
+        return DateTimeFormatter.ofPattern('yyyyMMdd-HHmmss')
+    }
+
     @Override
     protected DateTimeFormatter addContextToFormatter(DateTimeFormatter formatter) {
         return super.addContextToFormatter(formatter)

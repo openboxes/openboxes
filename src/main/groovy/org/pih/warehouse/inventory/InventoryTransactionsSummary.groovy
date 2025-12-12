@@ -104,4 +104,21 @@ class InventoryTransactionsSummary {
                 transactionAction: transactionAction.name(),
         ]
     }
+
+    Map toCsv() {
+        [
+                alignment: varianceTypeCode,
+                name: product?.name,
+                productCode: product?.productCode,
+                type: transactionAction,
+                dateRecorded: dateRecorded,
+                recordedBy: recordedBy.name,
+                transactionId: transaction.transactionNumber,
+                quantityBefore: quantityBefore,
+                quantityAfter: quantityAfter,
+                quantityDifference: quantityDifference,
+                rootCauses: rootCauses?.join(', ') ?: '',
+                comments: comments?.join(', ') ?: '',
+        ]
+    }
 }

@@ -26,6 +26,23 @@ class DateFormatter {
     LocaleManager localeManager
 
     /**
+     * Convenience method for converting the current date as a String for use in file names.
+     */
+    String formatCurrentDateForFileName() {
+        return formatForFileName(Instant.now())
+    }
+
+    /**
+     * Convenience method for converting the given date object to a String for use in file names.
+     */
+    String formatForFileName(Object date) {
+        return format(date, DateFormatterContext.builder()
+                .withDisplayFormat(DateDisplayFormat.FILE_NAME)
+                .withDefaultValue('')  // Simply exclude the date in the file name if we aren't given one
+                .build())
+    }
+
+    /**
      * Convenience method for converting the given date object to a String for use by file exporters.
      */
     String formatForExport(Object date) {

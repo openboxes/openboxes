@@ -65,6 +65,11 @@ abstract class TemporalAccessorFormatter<T extends TemporalAccessor> implements 
     abstract DateTimeFormatter getCsvFormatter()
 
     /**
+     * Returns the default DateTimeFormatter to use when formatting for use in file names.
+     */
+    abstract DateTimeFormatter getFileNameFormatter()
+
+    /**
      * Returns the DateTimeFormatter that will be used to format the date to a String.
      */
     DateTimeFormatter getFormatter() {
@@ -89,6 +94,9 @@ abstract class TemporalAccessorFormatter<T extends TemporalAccessor> implements 
                 break
             case DateDisplayFormat.CSV:
                 formatter = getCsvFormatter()
+                break
+            case DateDisplayFormat.FILE_NAME:
+                formatter = getFileNameFormatter()
                 break
             // We opt to not make assumptions about the format, so if no format and no overrides are specified, error.
             case null:
