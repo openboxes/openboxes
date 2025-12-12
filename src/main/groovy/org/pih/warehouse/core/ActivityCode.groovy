@@ -128,6 +128,9 @@ enum ActivityCode {
     // Outbound container codes
     OUTBOUND_CONTAINER('OUTBOUND_CONTAINER'),
 
+    // Staging location codes
+    STAGING_LOCATION('STAGING_LOCATION'),
+
     PICKING_SHORTAGE('PICKING_SHORTAGE'),
 
     NONE('NONE')
@@ -203,6 +206,7 @@ enum ActivityCode {
 
                 // Internal locations used for picking
                 OUTBOUND_CONTAINER,
+                STAGING_LOCATION,
 
                 // Allows classification of location by delivery type
                 DELIVERY_TYPE_LOCAL_DELIVERY,

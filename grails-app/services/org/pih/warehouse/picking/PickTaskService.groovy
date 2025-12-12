@@ -344,10 +344,6 @@ class PickTaskService {
             throw new IllegalArgumentException("Outbound container does not exist")
         }
 
-        if (!Constants.OUTBOUND_CONTAINER_LOCATION_TYPE_NAME.equalsIgnoreCase(outboundContainer.getLocationType().getName())) {
-            throw new IllegalArgumentException("Container ${outboundContainer.name} is not of ${Constants.OUTBOUND_CONTAINER_LOCATION_TYPE_NAME} type")
-        }
-
         if (!outboundContainer.supports(ActivityCode.OUTBOUND_CONTAINER)) {
             throw new IllegalArgumentException("Container ${outboundContainer.name} does not support ${ActivityCode.OUTBOUND_CONTAINER} activity")
         }
@@ -367,8 +363,8 @@ class PickTaskService {
             throw new IllegalArgumentException("Staging location does not exist")
         }
 
-        if (!Constants.CROSS_DOCKING_LOCATION_TYPE_NAME.equalsIgnoreCase(stagingLocation.getLocationType().getName())) {
-            throw new IllegalArgumentException("Staging location ${stagingLocation.name} is not of ${Constants.CROSS_DOCKING_LOCATION_TYPE_NAME} type")
+        if (!stagingLocation.supports(ActivityCode.STAGING_LOCATION)) {
+            throw new IllegalArgumentException("Staging location ${stagingLocation.name} does not support ${ActivityCode.STAGING_LOCATION} activity")
         }
 
         if (!stagingLocation.supports(ActivityCode.HOLD_STOCK)) {

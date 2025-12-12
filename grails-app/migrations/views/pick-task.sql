@@ -27,13 +27,13 @@ SELECT
     pli.outbound_container_id AS outbound_container_id,
     (SELECT loc.id
      FROM location loc
-     JOIN location_type lt ON lt.id = loc.location_type_id
      JOIN location_effective_supported_activities lesa ON lesa.location_id = loc.id
      WHERE loc.parent_location_id = r.origin_id
        AND loc.active = true
-       AND lt.name = 'Cross-docking'
      GROUP BY loc.id
      HAVING
+         SUM(CASE WHEN lesa.supported_activities_string = 'STAGING_LOCATION' THEN 1 ELSE 0 END) > 0
+         AND
          SUM(CASE WHEN lesa.supported_activities_string = 'HOLD_STOCK' THEN 1 ELSE 0 END) > 0
          AND
          SUM(CASE WHEN lesa.supported_activities_string =

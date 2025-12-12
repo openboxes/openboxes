@@ -250,10 +250,6 @@ class PutawayTaskService {
             throw new IllegalStateException("Container does not exist")
         }
 
-        if (!Constants.PUTAWAY_CONTAINER_LOCATION_TYPE_NAME.equalsIgnoreCase(container.getLocationType().getName())) {
-            throw new IllegalArgumentException("Container ${container.name} is not of ${Constants.PUTAWAY_CONTAINER_LOCATION_TYPE_NAME} type")
-        }
-
         if (!container.supports(ActivityCode.PUTAWAY_CART)) {
             throw new IllegalArgumentException("Container ${container?.name} does not support ${ActivityCode.PUTAWAY_CART} activity")
         }
