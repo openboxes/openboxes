@@ -11,6 +11,7 @@ const InboundSendTable = () => {
       <DataTable
         columns={columns}
         data={tableData}
+        totalCount={tableData.length}
         loading={loading}
         disablePagination
         overflowVisible
