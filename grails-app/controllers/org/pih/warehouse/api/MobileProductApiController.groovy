@@ -181,7 +181,7 @@ class MobileProductApiController extends BaseDomainApiController {
             def body = request.JSON
             def identifier = body?.identifier
             def type = identifier?.type?.trim()?.toLowerCase()
-            def value = identifier?.value?.trim()
+            def newValue = identifier?.value?.trim()
 
             User user = session?.user
             if (!user) {
@@ -199,17 +199,9 @@ class MobileProductApiController extends BaseDomainApiController {
                 return
             }
 
-            if (value == null || value == "") {
-                product.upc = null
-                product.save(flush: true)
-                render([data: [id: product.id, identifier: [type: type, value: null]]] as JSON)
-                return
-            }
-
             switch (type) {
                 case "upc":
                     def oldValue = product.upc
-                    def newValue = value
 
                     Product duplicate = Product.findByUpc(newValue)
                     if (duplicate && duplicate.id != product.id) {
@@ -217,6 +209,13 @@ class MobileProductApiController extends BaseDomainApiController {
                                 status: 409,
                                 text: "Conflict: '${newValue}' already assigned to another product (Product Code: ${duplicate.productCode})"
                         )
+                        return
+                    }
+
+                    if (newValue == null || newValue == "") {
+                        product.upc = null
+                        product.save(flush: true)
+                        render([data: [id: product.id, identifier: [type: type, value: null]]] as JSON)
                         return
                     }
 
@@ -231,7 +230,7 @@ class MobileProductApiController extends BaseDomainApiController {
                     return
             }
 
-            render([data: [id: product.id, identifier: [type: type, value: value]]] as JSON)
+            render([data: [id: product.id, identifier: [type: type, value: newValue]]] as JSON)
 
         } catch (Exception e) {
             log.error("Error updating identifier for product ${params.id}: ${e.message}", e)
