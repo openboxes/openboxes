@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 import PropTypes from 'prop-types';
 import { RiDownload2Line } from 'react-icons/ri';
@@ -11,6 +11,7 @@ const DropdownButton = ({
   disabled,
   buttonLabel,
   buttonDefaultLabel,
+  variant,
 }) => (
   <>
     <Button
@@ -18,7 +19,7 @@ const DropdownButton = ({
       disabled={disabled}
       defaultLabel={buttonDefaultLabel}
       label={buttonLabel}
-      variant="secondary"
+      variant={variant}
       EndIcon={<RiDownload2Line />}
     />
     <div
@@ -44,7 +45,7 @@ const DropdownButton = ({
   </>
 );
 
-export default DropdownButton;
+export default memo(DropdownButton);
 
 DropdownButton.propTypes = {
   actions: PropTypes.arrayOf(PropTypes.shape({
@@ -55,9 +56,11 @@ DropdownButton.propTypes = {
   buttonLabel: PropTypes.string.isRequired,
   buttonDefaultLabel: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
+  variant: PropTypes.string,
 };
 
 DropdownButton.defaultProps = {
   actions: [],
   disabled: false,
+  variant: 'secondary',
 };

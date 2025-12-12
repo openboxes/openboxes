@@ -67,10 +67,10 @@ import {
   SUBMIT_FORM,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
-  UPDATE_WORKFLOW_HEADER,
   UPDATE_COUNTED_BY,
   UPDATE_DATE_COUNTED,
   UPDATE_FIELD_VALUE,
+  UPDATE_WORKFLOW_HEADER,
 } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
 import genericApi from 'api/services/GenericApi';
