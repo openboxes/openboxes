@@ -34,6 +34,7 @@ class RequisitionController {
     RequisitionIdentifierService requisitionIdentifierService
     def inventoryService
     def productService
+    def stockMovementService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -453,6 +454,24 @@ class RequisitionController {
         }
         flash.message = "Successfully issued requisition " + requisition?.requestNumber
         redirect(action: "show", id: params.id)
+    }
+
+    def issue() {
+        def requisition = Requisition.get(params.id)
+        try {
+            requisitionService.issueRequisitionFromStagingArea(requisition)
+            stockMovementService.createMissingShipmentItems(requisition, requisition?.shipment)
+            stockMovementService.issueRequisitionBasedStockMovement(params.id)
+        }
+        catch (ValidationException e) {
+            requisition = Requisition.read(params.id)
+            def picklist = Picklist.findByRequisition(requisition)
+            requisition.errors = e.errors
+            render(view: "transfer", model: [requisition: requisition, picklist: picklist])
+            return
+        }
+        flash.message = "Successfully issued requisition " + requisition?.requestNumber
+        redirect(controller: "stockMovement", action: "show", id: params.id)
     }
 
     def cancel() {
