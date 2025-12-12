@@ -64,6 +64,7 @@ const InboundAddItems = ({
                 defaultMessage: 'No items to display',
               }}
               overflowVisible
+              totalCount={lineItemsArrayFields.length}
             />
           </div>
         </div>
