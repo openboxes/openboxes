@@ -9,6 +9,7 @@ import { updateFieldValue } from 'actions';
 import { TableCell } from 'components/DataTable';
 import SelectField from 'components/form-elements/v2/SelectField';
 import { NEW_ROW } from 'consts/cycleCount';
+import cycleCountColumn from 'consts/cycleCountColumn';
 import useCellValidation from 'hooks/cycleCount/useCellValidation';
 import useTranslate from 'hooks/useTranslate';
 import { getBinLocationToDisplay, groupBinLocationsByZone } from 'utils/groupBinLocationsByZone';
@@ -58,7 +59,7 @@ const BinLocationCell = ({
     initialValue: value?.name,
     cycleCountId,
     index,
-    fieldName: 'binLocation',
+    fieldName: cycleCountColumn.BIN_LOCATION,
   });
 
   const dispatch = useDispatch();
@@ -68,7 +69,7 @@ const BinLocationCell = ({
       updateFieldValue({
         cycleCountId,
         rowId: id,
-        field: 'binLocation',
+        field: cycleCountColumn.BIN_LOCATION,
         value: { id: selected?.id, name: selected?.name },
       }),
     );

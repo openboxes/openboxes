@@ -9,6 +9,7 @@ import { updateFieldValue } from 'actions';
 import { TableCell } from 'components/DataTable';
 import DatePicker from 'components/form-elements/v2/DateField';
 import { NEW_ROW } from 'consts/cycleCount';
+import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import useCellValidation from 'hooks/cycleCount/useCellValidation';
 import CustomTooltip from 'wrappers/CustomTooltip';
@@ -36,7 +37,7 @@ const ExpirationDateCell = ({
         updateFieldValue({
           cycleCountId,
           rowId: id,
-          field: 'inventoryItem.expirationDate',
+          field: cycleCountColumn.EXPIRATION_DATE,
           value: disabledExpirationDateFields?.[id],
         }),
       );
@@ -65,7 +66,7 @@ const ExpirationDateCell = ({
     initialValue,
     cycleCountId,
     index,
-    fieldName: 'inventoryItem.expirationDate',
+    fieldName: cycleCountColumn.EXPIRATION_DATE,
   });
 
   const isDisabled = disabledExpirationDateFields?.[id]
@@ -81,7 +82,7 @@ const ExpirationDateCell = ({
       updateFieldValue({
         cycleCountId,
         rowId: id,
-        field: 'inventoryItem.expirationDate',
+        field: cycleCountColumn.EXPIRATION_DATE,
         value,
       }),
     );

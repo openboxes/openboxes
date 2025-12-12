@@ -9,7 +9,7 @@ import { getCountWorkflowIsFormSubmitted, makeGetErrorForField } from 'selectors
 const useCellValidation = ({
   initialValue, cycleCountId, index, fieldName,
 }) => {
-  const [isDirty, setIsDirty] = useState(false);
+  const [hasFocus, setHasFocus] = useState(false);
 
   const wasFieldTouched = useRef(false);
 
@@ -27,13 +27,13 @@ const useCellValidation = ({
   const onChangeValidationHandler = () => {
     wasFieldTouched.current = true;
 
-    if (!isDirty) {
-      setIsDirty(true);
+    if (!hasFocus) {
+      setHasFocus(true);
     }
   };
 
   const onBlurValidationHandler = () => {
-    setIsDirty(false);
+    setHasFocus(false);
   };
 
   /**
@@ -42,7 +42,7 @@ const useCellValidation = ({
    * A validation error is shown only when ALL the following conditions are met:
    *
    * 1. An actual validation error exists "error"
-   * 2. The field is NOT currently being edited "!isDirty"
+   * 2. The field is NOT currently being edited "!hasFocus"
    *    - While the user is typing, errors are temporarily hidden to avoid noise
    *
    * 3. At least one of the following is true:
@@ -64,7 +64,7 @@ const useCellValidation = ({
    */
 
   const shouldShowError = error
-    && !isDirty
+    && !hasFocus
     && (isFormSubmitted || wasFieldTouched.current || initialValue);
 
   return {

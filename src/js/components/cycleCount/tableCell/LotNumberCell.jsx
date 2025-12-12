@@ -13,6 +13,7 @@ import { updateFieldValue } from 'actions';
 import { TableCell } from 'components/DataTable';
 import SelectField from 'components/form-elements/v2/SelectField';
 import { NEW_ROW } from 'consts/cycleCount';
+import cycleCountColumn from 'consts/cycleCountColumn';
 import useCellValidation from 'hooks/cycleCount/useCellValidation';
 import useTranslate from 'hooks/useTranslate';
 import CustomTooltip from 'wrappers/CustomTooltip';
@@ -68,7 +69,7 @@ const LotNumberCell = ({
     initialValue,
     cycleCountId,
     index,
-    fieldName: 'inventoryItem.lotNumber',
+    fieldName: cycleCountColumn.LOT_NUMBER,
   });
 
   const cycleCountProduct = useSelector(
@@ -91,7 +92,7 @@ const LotNumberCell = ({
       updateFieldValue({
         cycleCountId,
         rowId: id,
-        field: 'inventoryItem.lotNumber',
+        field: cycleCountColumn.LOT_NUMBER,
         value: selected?.value,
       }),
     );

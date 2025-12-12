@@ -10,6 +10,7 @@ import {
 import { updateFieldValue } from 'actions';
 import { TableCell } from 'components/DataTable';
 import InputField from 'components/form-elements/v2/TextInput';
+import cycleCountColumn from 'consts/cycleCountColumn';
 import useCellValidation from 'hooks/cycleCount/useCellValidation';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
@@ -51,7 +52,7 @@ const QuantityCell = ({
     initialValue,
     cycleCountId,
     index,
-    fieldName: 'quantityCounted',
+    fieldName: cycleCountColumn.QUANTITY_COUNTED,
   });
 
   const dispatch = useDispatch();
@@ -69,7 +70,7 @@ const QuantityCell = ({
       updateFieldValue({
         cycleCountId,
         rowId: id,
-        field: 'quantityCounted',
+        field: cycleCountColumn.QUANTITY_COUNTED,
         value,
       }),
     );
