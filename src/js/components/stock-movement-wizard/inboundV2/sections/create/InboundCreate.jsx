@@ -65,6 +65,7 @@ const InboundCreate = ({ next }) => {
                     id: 'react.stockMovement.description.label',
                     defaultMessage: 'Description',
                   }}
+                  hasErrors={Boolean(errors.description?.message)}
                 />
               )}
             />
@@ -112,6 +113,7 @@ const InboundCreate = ({ next }) => {
                     id: 'react.stockMovement.destination.label',
                     defaultMessage: 'Destination',
                   }}
+                  hasErrors={Boolean(errors.destination?.message)}
                 />
               )}
             />
@@ -134,6 +136,7 @@ const InboundCreate = ({ next }) => {
                     id: 'react.stockMovement.stocklist.label',
                     defaultMessage: 'Stocklist',
                   }}
+                  hasErrors={Boolean(errors.stocklist?.message)}
                 />
               )}
             />
@@ -183,6 +186,7 @@ const InboundCreate = ({ next }) => {
                     id: 'react.stockMovement.dateRequested.label',
                     defaultMessage: 'Date Requested',
                   }}
+                  hasErrors={Boolean(errors.dateRequested?.message)}
                 />
               )}
             />

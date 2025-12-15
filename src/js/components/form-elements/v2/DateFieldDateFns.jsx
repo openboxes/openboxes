@@ -127,7 +127,7 @@ const DateFieldDateFns = ({
         options: { locale: dateFnsLocale() },
       })}
       ariaLabel={ariaLabel}
-      hasError={!!(errorMessage || hasErrors)}
+      hasErrors={!!(errorMessage || hasErrors)}
     >
       <DatePicker
         {...fieldProps}

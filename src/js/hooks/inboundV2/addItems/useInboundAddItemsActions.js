@@ -182,7 +182,6 @@ const useInboundAddItemsActions = ({
       const filteredItems = itemCandidatesToSave.filter(
         (item) => item.quantityRequested && item.quantityRequested !== '0',
       );
-      console.log('xd', filteredItems);
       setValue('values.lineItems', filteredItems.length > 0 ? filteredItems : defaultTableRow);
     }
     return null;
