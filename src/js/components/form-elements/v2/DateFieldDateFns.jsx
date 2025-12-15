@@ -162,6 +162,7 @@ const DateFieldDateFns = ({
         ref={(el) => {
           datePickerRef.current = el;
         }}
+        autoComplete="off"
       />
     </InputWrapper>
   );
