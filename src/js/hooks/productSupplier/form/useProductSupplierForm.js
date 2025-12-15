@@ -25,7 +25,7 @@ import useCalculateEachPrice from 'hooks/productSupplier/form/useCalculateEachPr
 import useProductSupplierAttributes from 'hooks/productSupplier/form/useProductSupplierAttributes';
 import useProductSupplierValidation from 'hooks/productSupplier/form/useProductSupplierValidation';
 import useQueryParams from 'hooks/useQueryParams';
-import useTranslate from 'hooks/useTranslate';
+import useTranslateWithRedirect from 'hooks/useTranslateWithRedirect';
 import { omitEmptyValues } from 'utils/form-values-utils';
 import { splitPreferenceTypes } from 'utils/list-utils';
 
@@ -37,7 +37,7 @@ const useProductSupplierForm = () => {
   const queryParams = useQueryParams();
 
   const history = useHistory();
-  const translate = useTranslate();
+  const translateWithRedirect = useTranslateWithRedirect();
   const dispatch = useDispatch();
 
   useOptionsFetch(
@@ -312,6 +312,7 @@ const useProductSupplierForm = () => {
 
       // Id of created/updated product supplier
       const productSupplier = detailsResponse.data?.data?.id;
+      const productSupplierCode = detailsResponse.data?.data?.code;
 
       // Build package and pricing payload and send a request
       const packagePayload = buildPackagePayload({
@@ -337,9 +338,16 @@ const useProductSupplierForm = () => {
       await productSupplierAttributeApi.updateAttributes(attributesPayload);
 
       // Show a success message and redirect to the list page
-      const successMessage = productSupplierId
-        ? translate('react.productSupplier.form.success.update', 'Product source has been updated successfully')
-        : translate('react.productSupplier.form.success.create', 'Product source has been created successfully');
+      const successMessage = translateWithRedirect({
+        label: `react.productSupplier.form.success.${productSupplierId ? 'update' : 'create'}`,
+        defaultLabel: `Product ${productSupplierCode} has been ${productSupplierId ? 'updated' : 'created'} successfully`,
+        options: { code: productSupplierCode },
+        redirects: [{
+          phrase: productSupplierCode,
+          redirectTo: PRODUCT_SUPPLIER_URL.edit(productSupplier),
+        }],
+      });
+
       notification(NotificationType.SUCCESS)({ message: successMessage });
       history.push(PRODUCT_SUPPLIER_URL.list());
     } finally {
