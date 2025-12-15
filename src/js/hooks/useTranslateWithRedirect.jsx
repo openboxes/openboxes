@@ -46,7 +46,7 @@ const useTranslateWithRedirect = () => {
     });
 
     const stringifiedHTML = redirects.reduce((acc, { phrase, redirectTo }) => {
-      const anchorTag = `<a href="${redirectTo}" target="_blank">${phrase}</a>`;
+      const anchorTag = `<a href="${redirectTo}" target="_blank" rel="noopener noreferre">${phrase}</a>`;
       return acc.replace(phrase, anchorTag);
     }, content);
 
