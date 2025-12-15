@@ -13,7 +13,8 @@ class CycleCountProductInventoryTransactionService extends ProductInventoryTrans
         TransactionSource transactionSource = new TransactionSource(
                 transactionAction: TransactionAction.CYCLE_COUNT,
                 cycleCount: cycleCount,
-                origin: cycleCount.facility
+                origin: cycleCount.facility,
+                migrated: false,
         )
         if (!transactionSource.validate()) {
             throw new ValidationException("Invalid transaction source", transactionSource.errors)

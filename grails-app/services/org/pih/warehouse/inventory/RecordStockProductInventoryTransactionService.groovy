@@ -95,6 +95,7 @@ class RecordStockProductInventoryTransactionService extends ProductInventoryTran
                 transactionAction: TransactionAction.RECORD_STOCK,
                 origin: location,
                 destination: location,
+                migrated: false,
         )
         if (!transactionSource.validate()) {
             throw new ValidationException("Invalid transaction source", transactionSource.errors)
