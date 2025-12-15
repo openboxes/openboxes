@@ -29,7 +29,7 @@ const InputWrapper = ({
   const translate = useTranslate();
   return (
     <div
-      data-testid={`form-field ${hasErrors ? 'has-errors' : ''}`}
+      data-testid={hasErrors ? 'form-field has-errors' : 'form-field'}
       className={`input-wrapper-container ${className} input-wrapper-label-position-${labelPosition}`}
       aria-label={ariaLabel?.id && ariaLabel?.defaultMessage
         ? translate(ariaLabel.id, ariaLabel.defaultMessage) : undefined}
