@@ -59,9 +59,6 @@ const CycleCountReporting = () => {
     filterParams,
     setShouldFetch,
     defaultPageSize: currentTab === PRODUCTS_TAB ? 10 : 25,
-    // In the INDICATORS_TAB we immediately load indicators,
-    // so we set disableAutoUpdateFilterParams to true to prevent duplicated fetching
-    disableAutoUpdateFilterParams: currentTab === INDICATORS_TAB,
   });
   const tabs = {
     [PRODUCTS_TAB]: {
@@ -69,21 +66,21 @@ const CycleCountReporting = () => {
         id: 'react.cycleCount.products.label',
         defaultMessage: 'Products',
       },
-      onClick: (tab) => switchTab(tab, updateParams),
+      onClick: (tab) => switchTab(tab, () => updateParams({ isTabSwitch: true })),
     },
     [INVENTORY_TRANSACTIONS_TAB]: {
       label: {
         id: 'react.cycleCount.inventoryTransactions.label',
         defaultMessage: 'Inventory Transactions',
       },
-      onClick: (tab) => switchTab(tab, updateParams),
+      onClick: (tab) => switchTab(tab, () => updateParams({ isTabSwitch: true })),
     },
     [INDICATORS_TAB]: {
       label: {
         id: 'react.cycleCount.indicators.label',
         defaultMessage: 'Indicators',
       },
-      onClick: (tab) => switchTab(tab, updateParams),
+      onClick: (tab) => switchTab(tab, () => updateParams({ isTabSwitch: true })),
     },
   };
 
@@ -114,7 +111,6 @@ const CycleCountReporting = () => {
             shouldFetch={shouldFetch}
             setShouldFetch={setShouldFetch}
             filtersInitialized={filtersInitialized}
-            defaultFilterValues={defaultFilterValues}
           />
         )}
         {currentTab === INVENTORY_TRANSACTIONS_TAB && (
@@ -124,13 +120,14 @@ const CycleCountReporting = () => {
             shouldFetch={shouldFetch}
             setShouldFetch={setShouldFetch}
             filtersInitialized={filtersInitialized}
-            defaultFilterValues={defaultFilterValues}
           />
         )}
         {currentTab === INDICATORS_TAB && (
           <IndicatorsTab
-            tablePaginationProps={tablePaginationProps}
             filterParams={filterParams}
+            shouldFetch={shouldFetch}
+            setShouldFetch={setShouldFetch}
+            filtersInitialized={filtersInitialized}
           />
         )}
       </div>

@@ -3,6 +3,7 @@ import { combineReducers } from 'redux';
 
 import approversReducer from 'reducers/approversReducer';
 import connectionReducer from 'reducers/connectionReducer';
+import countWorkflowReducer from 'reducers/countWorkflowReducer';
 import cycleCountReducer from 'reducers/cycleCountReducer';
 import filterFormReducer from 'reducers/filterFormReducer';
 import indicatorsReducer from 'reducers/indicatorsReducer';
@@ -51,6 +52,7 @@ const rootReducer = combineReducers({
   unitOfMeasure: unitOfMeasureReducer,
   outboundImport: outboundImportReducer,
   cycleCount: cycleCountReducer,
+  countWorkflow: countWorkflowReducer,
   lotNumbers: lotNumbersReducer,
 });
 

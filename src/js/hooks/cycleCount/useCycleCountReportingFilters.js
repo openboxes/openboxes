@@ -10,7 +10,6 @@ import { getCurrentLocation } from 'selectors';
 import { setShouldRebuildFilterParams } from 'actions';
 import { INDICATORS_TAB } from 'consts/cycleCount';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
-import useQueryParams from 'hooks/useQueryParams';
 import { transformFilterParams } from 'utils/list-utils';
 import { fetchProduct } from 'utils/option-utils';
 
@@ -22,7 +21,6 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
   const [shouldFetch, setShouldFetch] = useState(false);
   const dispatch = useDispatch();
   const history = useHistory();
-  const { tab } = useQueryParams();
   const {
     currentLocation,
   } = useSelector((state) => ({
@@ -52,7 +50,11 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
     dispatch(setShouldRebuildFilterParams(true));
   };
 
-  const initializeDefaultFilterValues = async () => {
+  /**
+   * @param {boolean} isTabSwitch - Indicates whether this function is triggered by a tab switch.
+   * When true, forces default date values for INDICATORS_TAB even if filtersInitialized is true.
+   */
+  const initializeDefaultFilterValues = async ({ isTabSwitch = false } = {}) => {
     setIsLoading(true);
     try {
       const queryProps = queryString.parse(history.location.search);
@@ -61,14 +63,16 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
         { tab: queryProps.tab },
       );
 
-      if (queryProps.startDate || (tab === INDICATORS_TAB && !filtersInitialized)) {
-        // If tab === INDICATORS_TAB and queryProps.startDate is not provided,
+      if (queryProps.startDate
+        || (queryProps.tab === INDICATORS_TAB && (!filtersInitialized || isTabSwitch))) {
+        // If queryProps.tab === INDICATORS_TAB and queryProps.startDate is not provided,
         // we want to use data from the last 3 months as the default.
         defaultValues.startDate = queryProps.startDate || moment()
           .subtract(3, 'months');
       }
-      if (queryProps.endDate || (tab === INDICATORS_TAB && !filtersInitialized)) {
-        // If tab === INDICATORS_TAB and queryProps.endDate is not provided,
+      if (queryProps.endDate
+        || (queryProps.tab === INDICATORS_TAB && (!filtersInitialized || isTabSwitch))) {
+        // If queryProps.tab === INDICATORS_TAB and queryProps.endDate is not provided,
         // we want to use the current day as the default.
         defaultValues.endDate = queryProps.endDate
           || moment();
@@ -89,9 +93,7 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
           value: product.id,
         }));
       }
-      if (tab === INDICATORS_TAB) {
-        setFilterParams(defaultValues);
-      }
+      setFilterParams(defaultValues);
       setDefaultFilterValues(defaultValues);
       setFiltersInitialized(true);
     } finally {
@@ -140,12 +142,13 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
     defaultFilterValues,
     setFilterValues,
     resetForm,
-    updateParams: initializeDefaultFilterValues,
+    updateParams: (options) => initializeDefaultFilterValues(options),
     filterParams,
     isLoading,
     shouldFetch,
     setShouldFetch,
     filtersInitialized,
+    setFiltersInitialized,
   };
 };
 

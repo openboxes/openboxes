@@ -19,6 +19,7 @@ import org.grails.plugins.web.taglib.FormTagLib
 
 import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.date.ZonedDateTimeParser
 import org.pih.warehouse.core.session.SessionManager
 
 class DatePickerTagLib {
@@ -73,7 +74,7 @@ class DatePickerTagLib {
         // BindingEditor classes need to manually set the user's zone again when marshalling fields.
         switch (attrs.value) {
             case (Instant):
-                ZonedDateTime zonedDateTime = DateUtil.asZonedDateTime(attrs.value as Instant, zoneId)
+                ZonedDateTime zonedDateTime = ZonedDateTimeParser.asZonedDateTime(attrs.value as Instant, zoneId)
                 attrs.value = GregorianCalendar.from(zonedDateTime)
                 break
             case (ZonedDateTime):

@@ -2,8 +2,8 @@ package org.pih.warehouse.common.domain.builder.inventory
 
 import java.time.Instant
 
-import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.RecordInventoryCommand
 import org.pih.warehouse.inventory.RecordInventoryRowCommand
@@ -41,7 +41,7 @@ class RecordInventoryCommandTestBuilder {
     }
 
     RecordInventoryCommandTestBuilder transactionDate(Instant transactionDate) {
-        cmd.transactionDate = DateUtil.asDate(transactionDate)
+        cmd.transactionDate = JavaUtilDateParser.asDate(transactionDate)
         return this
     }
 

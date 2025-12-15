@@ -17,7 +17,9 @@ import {
 
 const useIndicatorsTab = ({
   filterParams,
-  serializedParams,
+  shouldFetch,
+  setShouldFetch,
+  filtersInitialized,
 }) => {
   const [loading, setLoading] = useState(false);
   // In tiles, we will store all the filtered data that we will render in IndicatorNumberCards
@@ -69,15 +71,16 @@ const useIndicatorsTab = ({
         }));
       setTiles(mergedTiles);
     } finally {
+      setShouldFetch(false);
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (startDate && endDate) {
+    if (shouldFetch && startDate && endDate && filtersInitialized) {
       fetchData();
     }
-  }, [startDate, endDate, serializedParams]);
+  }, [shouldFetch, startDate, endDate, filtersInitialized]);
 
   return {
     loading,

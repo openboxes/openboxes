@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 
 import DataTable from 'components/DataTable/v2/DataTable';
 import useProductsTab from 'hooks/cycleCount/useProductsTab';
+import useProductsTabExport from 'hooks/cycleCount/useProductsTabExport';
+import DropdownButton from 'utils/DropdownButton';
 
 const ProductsTab = ({
   filterParams,
@@ -11,7 +13,6 @@ const ProductsTab = ({
   shouldFetch,
   setShouldFetch,
   filtersInitialized,
-  defaultFilterValues,
 }) => {
   const {
     paginationProps,
@@ -34,8 +35,9 @@ const ProductsTab = ({
     setShouldFetch,
     serializedParams,
     filtersInitialized,
-    defaultFilterValues,
   });
+
+  const { actions } = useProductsTabExport(filterParams);
 
   useEffect(() => {
     setTotalCount(tableData.totalCount);
@@ -43,6 +45,14 @@ const ProductsTab = ({
 
   return (
     <div>
+      <div className="w-100 d-flex justify-content-end pr-3 pb-3">
+        <DropdownButton
+          disabled={!filterParams.startDate || !filterParams.endDate}
+          buttonLabel="react.default.button.export.label"
+          buttonDefaultLabel="Export"
+          actions={actions}
+        />
+      </div>
       <DataTable
         columns={columns}
         data={tableData.data}
@@ -70,4 +80,5 @@ ProductsTab.propTypes = {
   }).isRequired,
   shouldFetch: PropTypes.bool.isRequired,
   setShouldFetch: PropTypes.func.isRequired,
+  filtersInitialized: PropTypes.bool.isRequired,
 };

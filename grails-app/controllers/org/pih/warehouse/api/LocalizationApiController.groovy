@@ -10,67 +10,31 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import org.pih.warehouse.LocalizationUtil
-import org.pih.warehouse.core.Localization
-import grails.core.GrailsApplication
+
+import org.pih.warehouse.core.LocalizationService
+import org.pih.warehouse.core.localization.LocalizedMessageDto
+import org.pih.warehouse.core.localization.LocalizedMessagesDto
 
 class LocalizationApiController {
 
-    def messageSource
-    def localizationService
-    GrailsApplication grailsApplication
+    LocalizationService localizationService
 
     def list() {
         String languageCode = params.languageCode
         String prefix = params.prefix
 
-        String[] supportedLocales = grailsApplication.config.openboxes.locale.supportedLocales
+        LocalizedMessagesDto response = localizationService.list(languageCode, prefix)
 
-        Locale defaultLocale = Locale.default
-        Locale currentLocale = localizationService.getCurrentLocale()
-        Locale selectedLocale = languageCode ? LocalizationUtil.getLocale(languageCode) : currentLocale
-
-        // Get the system default message properties
-        Properties defaultMessageProperties = localizationService.getMessagesProperties(defaultLocale)
-
-        // Get the country fallback language default message properties if it is country specific language
-        // (Example: if we have es_MX we want to have messages fallback in this precedence es_MX -> es -> en)
-        Properties fallbackMessageProperties = null
-        if (selectedLocale.country && supportedLocales.contains(selectedLocale.language)) {
-            Locale fallbackLocale = new Locale(selectedLocale.language)
-            fallbackMessageProperties = localizationService.getMessagesProperties(fallbackLocale)
-        }
-        // Get the message properties for the selected locale
-        Properties selectedMessageProperties = localizationService.getMessagesProperties(selectedLocale)
-
-        // Get all translations for the given prefix and locale from the database
-        List<Localization> localizedMessages = prefix ? Localization.findAllByCodeIlikeAndLocale("${prefix}%", selectedLocale.toString()) :
-                Localization.findAllByLocale(selectedLocale.toString())
-        Properties customMessageProperties = new Properties()
-        localizedMessages.each { Localization localization ->
-            customMessageProperties.put(localization.code, localization.text)
-        }
-
-        // Merge all messages from default, language fallback, selected, and custom message properties
-        Properties mergedMessageProperties = new Properties()
-        mergedMessageProperties.putAll(defaultMessageProperties)
-        if (fallbackMessageProperties) {
-            mergedMessageProperties.putAll(fallbackMessageProperties)
-        }
-        mergedMessageProperties.putAll(selectedMessageProperties)
-        mergedMessageProperties.putAll(customMessageProperties)
-
-        Properties messageProperties = prefix ? mergedMessageProperties.findAll {
-            it.key.startsWith(prefix)
-        } : mergedMessageProperties
-
-        render([messages: messageProperties?.sort(), supportedLocales: supportedLocales, currentLocale: selectedLocale] as JSON)
+        render(response.toJson() as JSON)
     }
 
     def read() {
+        String messageCode = params.id
+        Object[] messageArgs = params.list("args").toArray()
         String languageCode = params.lang
-        Locale locale = localizationService.getLocale(languageCode)
-        String message = messageSource.getMessage(params.id, params.list("args").toArray(), locale)
-        render([code: params.id, message: message, currentLocale: locale] as JSON)
+
+        LocalizedMessageDto response = localizationService.localize(messageCode, messageArgs, languageCode)
+
+        render(response.toJson() as JSON)
     }
 }

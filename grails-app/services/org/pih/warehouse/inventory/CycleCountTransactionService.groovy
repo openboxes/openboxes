@@ -4,8 +4,8 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import java.time.Instant
 
-import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.inventory.product.availability.AvailableItemKey
 import org.pih.warehouse.product.Product
 
@@ -39,8 +39,8 @@ class CycleCountTransactionService {
         // transaction date offset is necessary to guarantee that the transactions are applied in the correct order.
         Instant now = Instant.now()
         // -1 (instead of +1 to the adjustment transaction date) because transaction date can't be in the future.
-        Date productInventoryTransactionDate = DateUtil.asDate(now.minusSeconds(1))
-        Date adjustmentTransactionDate = DateUtil.asDate(now)
+        Date productInventoryTransactionDate = JavaUtilDateParser.asDate(now.minusSeconds(1))
+        Date adjustmentTransactionDate = JavaUtilDateParser.asDate(now)
 
         List<Transaction> productInventoryTransactions = createProductInventoryTransactions(
                 cycleCount, countedProducts, productInventoryTransactionDate)
@@ -119,8 +119,8 @@ class CycleCountTransactionService {
                 inventory: cycleCount.facility.inventory,
                 transactionDate: transactionDate,
                 transactionType: transactionType,
-                cycleCount: cycleCount,
         )
+        cycleCountProductInventoryTransactionService.setSourceObject(transaction, cycleCount)
         transaction.transactionNumber = transactionIdentifierService.generate(transaction)
 
         for (TransactionEntry transactionEntry : entries) {

@@ -177,4 +177,10 @@ export const displayTimezoneOffset = (timezoneOffset = new Date().getTimezoneOff
   return `${sign}${paddedHours}:${paddedMinutes}`;
 };
 
+/**
+ * Get current date string for filename usage
+ * @returns {string}
+ */
+export const getFilenameDateString = () => format(new Date(), DateFormatDateFns.YYYYMMDD_HHMMSS);
+
 export default dateWithoutTimeZone;

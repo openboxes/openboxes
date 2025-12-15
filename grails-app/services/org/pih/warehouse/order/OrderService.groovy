@@ -33,6 +33,7 @@ import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UpdateUnitPriceMethodCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
+import org.pih.warehouse.core.session.SessionManager
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.data.PersonService
 import org.pih.warehouse.data.ProductSupplierService
@@ -65,6 +66,7 @@ class OrderService {
     ProductSupplierService productSupplierService
     PersonService personService
     GrailsApplication grailsApplication
+    SessionManager sessionManager
 
     def getApplicationTagLib() {
         return Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
@@ -372,6 +374,11 @@ class OrderService {
     }
 
     Order saveOrder(Order order) {
+        if (order.destinationParty?.id != sessionManager.getCurrentLocation().organizationId) {
+            order.errors.rejectValue("destinationParty", "order.destinationParty.invalid.differentOrganization")
+            throw new ValidationException("Unable to save order due to errors", order.errors)
+        }
+
         // update the status of the order before saving
         order.updateStatus()
 

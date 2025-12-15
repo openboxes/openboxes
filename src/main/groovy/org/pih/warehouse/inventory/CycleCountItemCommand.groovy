@@ -4,10 +4,10 @@ import grails.databinding.BindUsing
 import grails.validation.Validateable
 import java.time.Instant
 
-import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
+import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.product.Product
 import org.springframework.web.context.request.RequestContextHolder
 
@@ -32,7 +32,7 @@ class CycleCountItemCommand implements Validateable {
         return inventoryItem ?: new InventoryItem(
                 product: product,
                 lotNumber: source['inventoryItem']['lotNumber'],
-                expirationDate: source['inventoryItem']['expirationDate'] ? DateUtil.asDate(source['inventoryItem']['expirationDate'].toString()) : null
+                expirationDate: source['inventoryItem']['expirationDate'] ? JavaUtilDateParser.asDate(source['inventoryItem']['expirationDate'].toString()) : null
         )
     })
     InventoryItem inventoryItem

@@ -20,7 +20,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.date.DateDisplayFormat
 import org.pih.warehouse.core.date.DateDisplayStyle
 import org.pih.warehouse.core.date.DateFormatterContext
-import org.pih.warehouse.core.date.DateFormatterManager
+import org.pih.warehouse.core.date.DateFormatter
 
 class DateTagLib {
 
@@ -85,8 +85,7 @@ class DateTagLib {
      * Formats java.time classes to a String for display in our GSPs.
      */
     private String formatJavaTimeDate(Object attrs) {
-        DateFormatterManager dateFormatterManager =
-                Holders.grailsApplication.mainContext.getBean("dateFormatterManager") as DateFormatterManager
+        DateFormatter dateFormatter = Holders.grailsApplication.mainContext.getBean("dateFormatter") as DateFormatter
 
         // We (intentionally) only support a subset of the configuration options that Grails' formatDate uses.
         // For a list of all options, see: https://gsp.grails.org/latest/ref/Tags/formatDate.html
@@ -102,7 +101,7 @@ class DateTagLib {
                 .withDisplayFormat(attrs.displayStyle || attrs.format ? null : DateDisplayFormat.GSP)
                 .build()
 
-        return dateFormatterManager.format(attrs.date, context)
+        return dateFormatter.format(attrs.date, context)
     }
 
     /**
