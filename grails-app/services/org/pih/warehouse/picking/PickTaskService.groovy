@@ -2,6 +2,7 @@ package org.pih.warehouse.picking
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.PickTaskStatus
@@ -13,6 +14,9 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.ProductAvailabilityService
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionAction
+import org.pih.warehouse.inventory.TransactionSource
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.picklist.PicklistService
@@ -294,9 +298,62 @@ class PickTaskService {
     void transfer(PickTask task, TransferStockCommand command) {
         task.discard()
 
-        inventoryService.transferStock(command)
+        Transaction transaction = inventoryService.transferStock(command)
+        transaction.transactionSource = createPickTaskTransactionSource(task)
 
         grailsApplication.mainContext.publishEvent(new PickTaskUpdateEvent(task))
+    }
+
+
+    TransactionSource createPickTaskTransactionSource(PickTask pickTask) {
+        // FIXME: Check if micro transactions are enabled
+
+        TransactionSource transactionSource = new TransactionSource(
+                transactionAction: TransactionAction.PICK_TASK,
+                picklist: PicklistItem.get(pickTask.id).picklist,
+                origin: pickTask.facility
+        )
+
+        if (!transactionSource.validate()) {
+            throw new ValidationException("Invalid transaction source", transactionSource.errors)
+        }
+
+        return transactionSource.save()
+    }
+
+    /**
+     * Rollback the pick task from any state before ISSUED to pending state.
+     *
+     * @param Requisition requisition
+     * @return boolean
+     */
+    boolean rollbackPickTasks(Requisition requisition) {
+        // FIXME: Check if micro transactions are enabled
+
+        if (requisition.status >= RequisitionStatus.ISSUED) {
+            throw new IllegalStateException("Cannot rollback pick tasks for requisition with status: ${requisition.status}")
+        }
+
+        if (requisition.picklist) {
+            // First delete local transfers and transaction sources
+            List<TransactionSource> transactionSources = TransactionSource.findAllByPicklist(requisition.picklist)
+            List<Transaction> transactions =  transactionSources?.associatedTransactions?.flatten()
+            transactions?.each {
+                inventoryService.deleteLocalTransfer(it)
+            }
+            transactionSources?.each {
+                it.delete()
+            }
+
+            // Once we are done with deleting transactions, we can clear the picklist (delete picklist items)
+            picklistService.clearPicklist(requisition.picklist.id)
+        }
+
+        // Finally set requisition status to VERIFYING
+        requisition.status = RequisitionStatus.VERIFYING
+        requisition.save()
+
+        return true
     }
 
     private List<String> findRequisitionIdsForPicking(SearchPickTaskCommand command) {

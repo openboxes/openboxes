@@ -4,7 +4,8 @@ enum TransactionAction {
     CYCLE_COUNT,
     RECORD_STOCK,
     INVENTORY_IMPORT,
-    INVENTORY_ADJUSTMENT
+    INVENTORY_ADJUSTMENT,
+    PICK_TASK
 
     @Override
     String toString() {
