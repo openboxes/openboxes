@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 
 import { useSelector } from 'react-redux';
+import { getActiveLanguage } from 'selectors';
 
 import InboundHeader from 'components/stock-movement-wizard/inboundV2/InboundHeader';
 import InboundAddItems from 'components/stock-movement-wizard/inboundV2/sections/addItems/InboundAddItems';
@@ -20,7 +21,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 const Inbound = () => {
   useTranslation('stockMovement');
   const translate = useTranslate();
-  const { locale } = useSelector((state) => state.session.activeLanguage);
+  const locale = useSelector(getActiveLanguage);
 
   const steps = useMemo(() => [
     {

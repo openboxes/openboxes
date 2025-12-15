@@ -7,8 +7,6 @@ import { useParams } from 'react-router-dom';
 import {
   getCurrentLocale,
   getCurrentLocation,
-  getDebounceTime,
-  getMinSearchLength,
   getShipmentTypes,
 } from 'selectors';
 
@@ -20,7 +18,6 @@ import locationType from 'consts/locationType';
 import NotificationType from 'consts/notificationTypes';
 import requisitionStatus from 'consts/requisitionStatus';
 import RoleType from 'consts/roleType';
-import StockMovementDirection from 'consts/StockMovementDirection';
 import { InboundWorkflowState } from 'consts/StockMovementState';
 import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
 import useInboundSendValidation from 'hooks/inboundV2/send/useInboundSendValidation';
@@ -31,23 +28,13 @@ import useUserHasPermissions from 'hooks/useUserHasPermissions';
 import confirmationModal from 'utils/confirmationModalUtils';
 import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
 import dateWithoutTimeZone, { formatDateToString } from 'utils/dateUtils';
-import { debounceLocationsFetch } from 'utils/option-utils';
 import filterDocumentsByStepNumber from 'utils/stockMovementUtils';
 
 const useInboundSendForm = ({ previous }) => {
-  const {
-    currentLocation,
-    currentLocale,
-    shipmentTypes,
-    debounceTime,
-    minSearchLength,
-  } = useSelector((state) => ({
-    currentLocation: getCurrentLocation(state),
-    currentLocale: getCurrentLocale(state),
-    shipmentTypes: getShipmentTypes(state),
-    debounceTime: getDebounceTime(state),
-    minSearchLength: getMinSearchLength(state),
-  }));
+  const currentLocation = useSelector(getCurrentLocation);
+  const currentLocale = useSelector(getCurrentLocale);
+  const shipmentTypes = useSelector(getShipmentTypes);
+
   const hasRoleAdmin = useUserHasPermissions({
     minRequiredRole: RoleType.ROLE_ADMIN,
   });
@@ -56,16 +43,6 @@ const useInboundSendForm = ({ previous }) => {
   const dispatch = useDispatch();
   const spinner = useSpinner();
   const { validationSchema } = useInboundSendValidation();
-  const debouncedLocationsFetch = debounceLocationsFetch(
-    debounceTime,
-    minSearchLength,
-    null,
-    false,
-    false,
-    true,
-    false,
-    StockMovementDirection.INBOUND,
-  );
 
   // We don't want to allow users to select "Default" shipment type, so we filter it out
   const shipmentTypesWithoutDefaultValue = useMemo(
@@ -429,7 +406,6 @@ const useInboundSendForm = ({ previous }) => {
     files,
     handleRemoveFile,
     isValid,
-    debouncedLocationsFetch,
   };
 };
 

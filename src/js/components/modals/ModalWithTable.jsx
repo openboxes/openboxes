@@ -28,7 +28,7 @@ const ModalWithTable = ({
           <p className="modal-content__header__subtitle">{subtitle}</p>
         </div>
         <div className="modal-content__main">
-          <DataTable data={data} columns={columns} disablePagination />
+          <DataTable data={data} columns={columns} disablePagination totalCount={data?.length} />
         </div>
         <div className="modal-content__buttons">
           <Button

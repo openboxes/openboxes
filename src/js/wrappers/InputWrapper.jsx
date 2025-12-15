@@ -24,11 +24,12 @@ const InputWrapper = ({
   customTooltip,
   value,
   ariaLabel,
+  hasErrors,
 }) => {
   const translate = useTranslate();
   return (
     <div
-      data-testid="form-field"
+      data-testid={hasErrors ? 'form-field has-errors' : 'form-field'}
       className={`input-wrapper-container ${className} input-wrapper-label-position-${labelPosition}`}
       aria-label={ariaLabel?.id && ariaLabel?.defaultMessage
         ? translate(ariaLabel.id, ariaLabel.defaultMessage) : undefined}
@@ -117,6 +118,7 @@ InputWrapper.propTypes = {
     id: PropTypes.string,
     defaultMessage: PropTypes.string,
   }),
+  hasErrors: PropTypes.bool,
 };
 
 InputWrapper.defaultProps = {
@@ -132,4 +134,5 @@ InputWrapper.defaultProps = {
   customTooltip: false,
   value: '',
   ariaLabel: null,
+  hasErrors: false,
 };
