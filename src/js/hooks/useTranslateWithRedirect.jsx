@@ -32,7 +32,7 @@ const useTranslateWithRedirect = () => {
    * become a link
    * @param {string} params.redirects[].redirectTo - Target URL for the generated anchor tag
    *
-   * @returns {string | React.ReactNode} - Translated text with the phrase replaced by a hyperlink
+   * @returns {React.ReactNode} - Translated text with the phrase replaced by a hyperlink
    */
   return ({
     label, defaultLabel, options = {}, redirects = [],
