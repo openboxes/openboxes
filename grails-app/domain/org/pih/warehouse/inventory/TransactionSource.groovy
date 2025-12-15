@@ -40,6 +40,13 @@ class TransactionSource {
     User createdBy
     User updatedBy
 
+    /**
+     A flag to indicate whether a transaction source was created during migration of existing transactions
+     The flag is to indicate whether the transaction source is "accurate" and is supposed to be showing truth for 100%
+     If migrated = true, it means there is a small risk of the source being not accurate
+    */
+    Boolean migrated
+
     def beforeInsert() {
         createdBy = AuthService.currentUser
         updatedBy = AuthService.currentUser

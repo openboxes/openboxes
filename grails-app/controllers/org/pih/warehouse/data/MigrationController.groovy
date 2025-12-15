@@ -17,6 +17,7 @@ import grails.validation.ValidationException
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.plugins.web.taglib.ValidationTagLib
 import org.hibernate.criterion.CriteriaSpecification
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Transaction
@@ -61,7 +62,7 @@ class MigrationController {
         Integer productInventoryTransactionInCurrentLocationCount = Transaction.countByTransactionTypeAndInventory(productInventoryTransactionType, currentLocation.inventory)
         List<Product> productsWithProductInventoryTransactionInCurrentLocation = migrationService.getProductsWithTransactions(currentLocation, productInventoryTransactionType)
         Map<String, List<String>> overlappingTransactions = migrationService.getOtherOverlappingTransactions(currentLocation, productInventoryTransactionType)
-
+        Integer missingInventoryImportTransactionSources = migrationService.getAmountOfMissingInventoryImportTransactionSources()
 
         [
                 organizationCount        : organizations.size(),
@@ -70,7 +71,8 @@ class MigrationController {
                 productInventoryTransactionInCurrentLocationCount: productInventoryTransactionInCurrentLocationCount,
                 productsWithProductInventoryTransactionInCurrentLocation: productsWithProductInventoryTransactionInCurrentLocation?.productCode,
                 productSupplierCount     : productSuppliers.size(),
-                overlappingTransactions  : overlappingTransactions
+                overlappingTransactions  : overlappingTransactions,
+                missingInventoryImportTransactionSources: missingInventoryImportTransactionSources
         ]
     }
 
@@ -386,6 +388,15 @@ class MigrationController {
         log.info "$responseTimeMessage"
 
         render([responseTime: "$responseTimeMessage", results: results] as JSON)
+    }
+
+    def createMissingInventoryImportTransactionSourcesForCurrentLocation() {
+        long responseTime = System.currentTimeMillis()
+        Map<String, Integer> response = migrationService.createMissingInventoryImportTransactionSources(AuthService.currentLocation)
+        responseTime = System.currentTimeMillis() - responseTime
+        log.info("Created missing transaction sources in ${responseTime} ms")
+
+        render([responseTime: responseTime, inventoryCounts: response.inventoryCounts, transactionSourcesCreated: response.transactionSourcesCreated] as JSON)
     }
 
 
