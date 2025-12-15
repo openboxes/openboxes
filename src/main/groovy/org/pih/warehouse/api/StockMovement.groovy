@@ -6,6 +6,7 @@ import grails.util.Holders
 import grails.validation.Validateable
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Person
@@ -82,6 +83,7 @@ class StockMovement implements Validateable{
     Requisition requisition
     RequisitionType requestType
     RequisitionSourceType sourceType // temporary sourceType field for ELECTRONIC and PAPER types
+    DeliveryTypeCode deliveryTypeCode
     Order order
     Shipment shipment
     List documents
@@ -131,6 +133,7 @@ class StockMovement implements Validateable{
         lastUpdated(nullable: true)
         requestType(nullable: true)
         sourceType(nullable: true)
+        deliveryTypeCode(nullable: true)
 
         packingLocation(nullable: true)
         receivingLocation(nullable: true)

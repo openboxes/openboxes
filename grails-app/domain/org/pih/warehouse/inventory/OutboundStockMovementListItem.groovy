@@ -3,6 +3,7 @@ package org.pih.warehouse.inventory
 import grails.validation.Validateable
 import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Person
@@ -45,6 +46,7 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
     Requisition stocklist
     RequisitionType requestType
     RequisitionSourceType sourceType // temporary sourceType field for ELECTRONIC and PAPER types
+    DeliveryTypeCode deliveryTypeCode
 
     StockMovementType stockMovementType
 
@@ -79,6 +81,7 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
         table "stock_movement_list_item"
 
         statusSortOrder formula: RequisitionStatus.getStatusSortOrderFormula()
+        deliveryTypeCode enumType: "string"
     }
 
     static constraints = {
@@ -99,6 +102,7 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
         lastUpdated(nullable: true)
         requestType(nullable: true)
         sourceType(nullable: true)
+        deliveryTypeCode(nullable: true)
 
         stockMovementType(nullable: true)
         statusCode(nullable: true)
@@ -175,6 +179,8 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
                 isApprovalRequired  : requisition?.approvalRequired,
                 shipmentType        : shipment?.shipmentType,
                 approvers           : requisition?.approvers?.toList(),
+                deliveryTypeCode    : deliveryTypeCode,
+                requisitionItems    : requisition?.requisitionItems,
 
                 // Required by mobile app
                 expectedShippingDate : shipment?.expectedShippingDate?.format("MM/dd/yyyy HH:mm XXX"),

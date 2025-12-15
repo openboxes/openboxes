@@ -28,6 +28,7 @@ CREATE OR REPLACE VIEW stock_movement_list_item AS
         ifnull(r.type, 'DEFAULT') AS request_type,
         r.source_type AS source_type,
         r.requisition_template_id AS stocklist_id,
+        r.delivery_type_code AS delivery_type_code,
         NULL AS order_id,
         'STOCK_MOVEMENT' AS stock_movement_type
     FROM
@@ -86,6 +87,7 @@ CREATE OR REPLACE VIEW stock_movement_list_item AS
         NULL AS request_type,
         NULL AS source_type,
         NULL AS stocklist_id,
+        NULL AS delivery_type_code,
         o.id AS order_id,
         'RETURN_ORDER' AS stock_movement_type
     FROM
