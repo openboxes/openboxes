@@ -17,6 +17,7 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.hibernate.HibernateException
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
@@ -459,11 +460,10 @@ class RequisitionController {
     def issue() {
         def requisition = Requisition.get(params.id)
         try {
-            requisitionService.issueRequisitionFromStagingArea(requisition)
+            requisitionService.issueRequisition(requisition, AuthService.currentUser, AuthService.currentUser, null)
             stockMovementService.createMissingShipmentItems(requisition, requisition?.shipment)
             stockMovementService.issueRequisitionBasedStockMovement(params.id)
-        }
-        catch (ValidationException e) {
+        } catch (ValidationException e) {
             requisition = Requisition.read(params.id)
             def picklist = Picklist.findByRequisition(requisition)
             requisition.errors = e.errors
