@@ -16,7 +16,6 @@ import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.DefaultHttpClient
-import org.pih.warehouse.DateUtil
 import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
@@ -26,6 +25,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.VarianceTypeCode
+import org.pih.warehouse.core.date.JavaUtilDateFormatter
 import org.pih.warehouse.dashboard.NumberData
 import org.pih.warehouse.dashboard.NumberDataService
 import org.pih.warehouse.forecasting.ForecastingService
@@ -1664,8 +1664,8 @@ class ReportService implements ApplicationContextAware {
         // Create a list with only opening balance
         List<Object> entries = [
             [
-                transactionDate     : DateUtil.asDateForDisplay(startDate),
-                transactionTime     : DateUtil.asTimeForDisplay(startDate),
+                transactionDate     : JavaUtilDateFormatter.formatAsDate(startDate),
+                transactionTime     : JavaUtilDateFormatter.formatAsTime(startDate),
                 transactionCode     : "BALANCE_OPENING",
                 transactionTypeName : "Opening Balance",
                 quantity            : null,
@@ -1682,8 +1682,8 @@ class ReportService implements ApplicationContextAware {
             }
 
             entries.add([
-                    transactionDate: DateUtil.asDateForDisplay(it.transaction.transactionDate),
-                    transactionTime: DateUtil.asTimeForDisplay(it.transaction.transactionDate),
+                    transactionDate: JavaUtilDateFormatter.formatAsDate(it.transaction.transactionDate),
+                    transactionTime: JavaUtilDateFormatter.formatAsTime(it.transaction.transactionDate),
                     transactionCode: it.transaction.transactionType.transactionCode.name(),
                     transactionTypeName: LocalizationUtil.getLocalizedString(
                             it.transaction.transactionType.name,
@@ -1696,8 +1696,8 @@ class ReportService implements ApplicationContextAware {
 
         // Add closing balance as a last element
         entries.add([
-            transactionDate     : DateUtil.asDateForDisplay(endDate - 1),
-            transactionTime     : DateUtil.asTimeForDisplay(endDate),
+            transactionDate     : JavaUtilDateFormatter.formatAsDate(endDate - 1),
+            transactionTime     : JavaUtilDateFormatter.formatAsTime(endDate),
             transactionCode     : "BALANCE_CLOSING",
             transactionTypeName : "Closing Balance",
             quantity            : null,

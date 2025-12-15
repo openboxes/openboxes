@@ -15,10 +15,11 @@ import grails.validation.ValidationException
 import org.apache.commons.lang.StringUtils
 import org.joda.time.LocalDate
 
-import org.pih.warehouse.DateUtil
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.date.InstantParser
+import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.inventory.InventoryBaselineTransactionCommand
 import org.pih.warehouse.inventory.InventoryImportProductInventoryTransactionService
 import org.pih.warehouse.inventory.InventoryItem
@@ -180,7 +181,7 @@ class InventoryImportDataService implements ImportDataService {
                 inventoryImportProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(baselineTransactionCommand)
 
         // Date objects are mutable, so we use Instant to clone the date in the command and avoid directly modifying it.
-        Date adjustmentTransactionDate = DateUtil.asDate(DateUtil.asInstant(baselineTransactionDate).plusSeconds(1))
+        Date adjustmentTransactionDate = JavaUtilDateParser.asDate(InstantParser.asInstant(baselineTransactionDate).plusSeconds(1))
 
         // We let the adjustment transaction be built from the same available items that we built the baseline
         // transaction with. The adjustment transaction is dated one second after the baseline transaction so it

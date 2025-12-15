@@ -11,12 +11,10 @@ package org.pih.warehouse.core
 
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
-import grails.util.Holders
-import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.hibernate.sql.JoinType
 
-import org.pih.warehouse.DateUtil
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.importer.CSVUtils
@@ -178,11 +176,11 @@ class DashboardService {
             }
 
             if (command.startDate) {
-                ge("expirationDate", DateUtil.asDate(command.startDate.plusDays(1)))
+                ge("expirationDate", JavaUtilDateParser.asDate(command.startDate.plusDays(1)))
             }
 
             if (command.endDate) {
-                le("expirationDate", DateUtil.asDate(command.endDate))
+                le("expirationDate", JavaUtilDateParser.asDate(command.endDate))
             }
 
             order("expirationDate", "desc")
@@ -221,11 +219,11 @@ class DashboardService {
             }
 
             if (command.startDate) {
-                ge("expirationDate", DateUtil.asDate(command.startDate.plusDays(1)))
+                ge("expirationDate", JavaUtilDateParser.asDate(command.startDate.plusDays(1)))
             }
 
             if (command.endDate) {
-                le("expirationDate", DateUtil.asDate(command.endDate))
+                le("expirationDate", JavaUtilDateParser.asDate(command.endDate))
             }
 
             order("expirationDate", "asc")
