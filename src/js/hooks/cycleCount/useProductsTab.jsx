@@ -3,7 +3,7 @@ import React, { useEffect, useMemo } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
-import { getFormatLocalizedDate } from 'selectors';
+import { getCurrentLocationId, getFormatLocalizedDate } from 'selectors';
 
 import { INVENTORY_AUDIT_SUMMARY_REPORT } from 'api/urls';
 import { TableCell } from 'components/DataTable';
@@ -33,21 +33,16 @@ const useProductsTab = ({
 }) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
+  const formatNumber = useFormatNumber();
+
+  const currentLocationId = useSelector(getCurrentLocationId);
+  const formatLocalizedDate = useSelector(getFormatLocalizedDate);
+
   const {
     products,
     endDate,
     startDate,
   } = filterParams;
-  const {
-    currentLocale,
-    currentLocation,
-    formatLocalizedDate,
-  } = useSelector((state) => ({
-    currentLocale: state.session.activeLanguage,
-    currentLocation: state.session.currentLocation,
-    formatLocalizedDate: getFormatLocalizedDate(state),
-  }));
-  const formatNumber = useFormatNumber();
 
   const getParams = ({
     sortingParams,
@@ -63,7 +58,7 @@ const useProductsTab = ({
       date: startDate,
     }),
     products: (products)?.map?.(({ id }) => id),
-    facility: currentLocation?.id,
+    facility: currentLocationId,
   }, (val) => {
     if (typeof val === 'boolean') {
       return !val;
@@ -125,7 +120,7 @@ const useProductsTab = ({
       data: [],
       totalCount: 0,
     });
-  }, [currentLocation?.id]);
+  }, [currentLocationId]);
 
   const lastCountedColumn = columnHelper.accessor(cycleCountColumn.LAST_COUNTED, {
     header: () => (
@@ -367,7 +362,7 @@ const useProductsTab = ({
       ),
       size: 130,
     }),
-  ], [currentLocale]);
+  ], [translate]);
 
   const emptyTableMessage = !filterParams.startDate && !filterParams.endDate
     ? {
