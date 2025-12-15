@@ -19,11 +19,7 @@ import { formatDateToString } from 'utils/dateUtils';
 const useInboundSendTable = () => {
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const {
-    currentLocale,
-  } = useSelector((state) => ({
-    currentLocale: getCurrentLocale(state),
-  }));
+  const currentLocale = useSelector(getCurrentLocale);
   const spinner = useSpinner();
   const { stockMovementId } = useParams();
   const translate = useTranslate();
@@ -274,6 +270,7 @@ const useInboundSendTable = () => {
           <div
             className="text-truncate"
             aria-label={translate('react.stockMovement.recipient.label', 'Recipient')}
+            data-testid="label-field"
           >
             {getValue()}
           </div>

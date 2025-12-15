@@ -14,6 +14,7 @@ const useInboundAddItemsFormState = () => {
     expirationDate: '',
     quantityRequested: undefined,
     recipient: undefined,
+    sortOrder: 100,
   }];
 
   const defaultValues = {

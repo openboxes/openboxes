@@ -37,7 +37,6 @@ const InboundSendForm = ({ previous }) => {
     files,
     handleRemoveFile,
     isValid,
-    debouncedLocationsFetch,
   } = useInboundSendForm({ previous });
 
   // Rollback button is visible only for admins when shipment has been dispatched
@@ -110,8 +109,7 @@ const InboundSendForm = ({ previous }) => {
                       id: 'react.stockMovement.destination.label',
                       defaultMessage: 'Destination',
                     }}
-                    async
-                    loadOptions={debouncedLocationsFetch}
+                    disabled
                   />
                 )}
               />

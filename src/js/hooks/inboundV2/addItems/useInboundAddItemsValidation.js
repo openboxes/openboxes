@@ -41,6 +41,16 @@ const useInboundAddItemsV2Validation = () => {
     }, {
       message: translate('react.stockMovement.error.enterQuantity.label', 'Enter proper quantity'),
       path: ['quantityRequested'],
+    })
+    .refine((data) => {
+      if (!data.expirationDate) {
+        return true;
+      }
+      const date = new Date(data.expirationDate);
+      return date.getFullYear() >= 2000;
+    }, {
+      message: translate('react.stockMovement.error.invalidDate.label', 'This date is invalid. Please enter a date after 2000.'),
+      path: ['expirationDate'],
     });
 
   const validationSchema = z.object({

@@ -31,6 +31,7 @@ const TextInput = ({
   customTooltip,
   value,
   ariaLabel,
+  hasErrors,
   ...fieldProps
 }) => {
   const inputRef = useRef(null);
@@ -76,6 +77,7 @@ const TextInput = ({
       customTooltip={customTooltip}
       value={value}
       ariaLabel={ariaLabel}
+      hasErrors={!!(errorMessage || hasErrors)}
     >
       <input
         ref={inputRef}
@@ -148,6 +150,7 @@ TextInput.propTypes = {
     id: PropTypes.string,
     defaultMessage: PropTypes.string,
   }),
+  hasErrors: PropTypes.bool,
 };
 
 TextInput.defaultProps = {
@@ -171,4 +174,5 @@ TextInput.defaultProps = {
   customTooltip: false,
   value: '',
   ariaLabel: null,
+  hasErrors: false,
 };

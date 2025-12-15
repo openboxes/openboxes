@@ -142,8 +142,8 @@ class StockMovementController {
                 redirect(action: "createOutbound", params: params)
                 break
             case StockMovementDirection.INBOUND:
-                // We need to add 'SEND' step to the params to redirect to the correct step
-                redirect(action: "createInbound", params: params + [step: 'SEND'])
+                String step = (stockMovement.statusCode in ['CREATED', 'REQUESTING']) ? 'ADD_ITEMS' : 'SEND'
+                redirect(action: "createInbound", params: params + [step: step])
                 break
             default:
                 redirect(action: "createOutbound", params: params)
