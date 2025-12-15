@@ -20,9 +20,7 @@ import dateWithoutTimeZone, { formatDateToString } from 'utils/dateUtils';
 
 const useInboundCreateForm = ({ next }) => {
   const [stockLists, setStockLists] = useState([]);
-  const { currentLocation } = useSelector((state) => ({
-    currentLocation: getCurrentLocation(state),
-  }));
+  const currentLocation = useSelector(getCurrentLocation);
   const spinner = useSpinner();
   const { validationSchema } = useInboundCreateValidation();
   const dispatch = useDispatch();

@@ -61,8 +61,16 @@ const useInboundAddItemsActions = ({
     name: 'values.lineItems',
   });
 
+  const getNextSortOrder = () => {
+    const maxSortOrder = Math.max(0, ...getValues('values.lineItems').map(item => item.sortOrder || 0));
+    return maxSortOrder + 100;
+  };
+
   const addNewLine = () => {
-    append(defaultTableRow);
+    append([{
+      ...defaultTableRow[0],
+      sortOrder: getNextSortOrder(),
+    }]);
   };
 
   const formatDate = (date) => formatDateToString({
@@ -131,6 +139,7 @@ const useInboundAddItemsActions = ({
         outputDateFormat: DateFormat.MM_DD_YYYY,
       }),
       recipient: { id: item.recipient?.id },
+      sortOrder: item.sortOrder,
     });
 
     return [...lineItemsToBeAdded.map(formatItem), ...lineItemsToBeUpdated.map(formatItem)];
@@ -173,6 +182,7 @@ const useInboundAddItemsActions = ({
       const filteredItems = itemCandidatesToSave.filter(
         (item) => item.quantityRequested && item.quantityRequested !== '0',
       );
+      console.log('xd', filteredItems);
       setValue('values.lineItems', filteredItems.length > 0 ? filteredItems : defaultTableRow);
     }
     return null;

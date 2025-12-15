@@ -41,6 +41,7 @@ const DateFieldDateFns = ({
   customTooltip,
   showCustomInput,
   ariaLabel,
+  hasErrors,
   ...fieldProps
 }) => {
   const translate = useTranslate();
@@ -126,6 +127,7 @@ const DateFieldDateFns = ({
         options: { locale: dateFnsLocale() },
       })}
       ariaLabel={ariaLabel}
+      hasError={!!(errorMessage || hasErrors)}
     >
       <DatePicker
         {...fieldProps}
@@ -137,7 +139,7 @@ const DateFieldDateFns = ({
         customInput={showCustomInput
           ? <DateFieldInput onClear={onClear} clearable={clearable} />
           : undefined}
-        className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
+        className={`form-element-input ${(errorMessage || hasErrors) ? 'has-errors' : ''} ${className}`}
         dropdownMode="scroll"
         dateFormat={getDateFormat()}
         timeFormat={TimeFormat.HH_MM}
@@ -151,6 +153,7 @@ const DateFieldDateFns = ({
         popperContainer={RootPortalWrapper}
         popperPlacement="bottom-start"
         selected={selectedDate}
+        maxDate={new Date(9999, 11, 31)}
         highlightDates={highlightedDates}
         onChange={onChangeRaw || onChangeHandler}
         onSelect={() => {
@@ -213,6 +216,7 @@ DateFieldDateFns.propTypes = {
     id: PropTypes.string,
     defaultMessage: PropTypes.string,
   }),
+  hasErrors: PropTypes.bool,
 };
 
 DateFieldDateFns.defaultProps = {
@@ -241,4 +245,5 @@ DateFieldDateFns.defaultProps = {
   // write new getters for the datePicker in the E2E tests.
   showCustomInput: true,
   ariaLabel: null,
+  hasErrors: false,
 };

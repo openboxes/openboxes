@@ -48,17 +48,11 @@ const useInboundAddItemsColumns = ({
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
 
-  const {
-    debounceTime,
-    minSearchLength,
-    users,
-    currentLocale,
-  } = useSelector((state) => ({
-    debounceTime: getDebounceTime(state),
-    minSearchLength: getMinSearchLength(state),
-    users: getUsers(state),
-    currentLocale: getCurrentLocale(state),
-  }));
+  const debounceTime = useSelector(getDebounceTime);
+  const minSearchLength = useSelector(getMinSearchLength);
+  const users = useSelector(getUsers);
+  const currentLocale = useSelector(getCurrentLocale);
+
   const debouncedProductsFetch = useCallback(
     debounceProductsFetch(
       debounceTime,
@@ -77,7 +71,6 @@ const useInboundAddItemsColumns = ({
     debouncePeopleFetch(debounceTime, minSearchLength),
     [debounceTime, minSearchLength],
   );
-
   const handleDelete = async (row) => {
     if (getValues('currentLineItems').find((item) => item.id === row?.original?.itemId)) {
       await removeSavedRow(row?.original?.itemId);
@@ -395,7 +388,6 @@ const useInboundAddItemsColumns = ({
                   {...field}
                   className="input-xs"
                   hasErrors={hasErrors}
-                  showErrorBorder={hasErrors}
                   showCustomInput={false}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
                   onBlur={() => handleBlur(field)}
@@ -406,10 +398,6 @@ const useInboundAddItemsColumns = ({
                     columnId,
                   }}
                   customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
-                  onChange={async (e) => {
-                    field.onChange(e);
-                    await trigger(`values.lineItems.${row.index}.lotNumber`);
-                  }}
                   ariaLabel={{
                     id: 'react.stockMovement.expiry.label',
                     defaultMessage: 'Expiry',
