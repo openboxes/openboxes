@@ -221,7 +221,7 @@
                                     class="button"
                             >
                                 <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
-                                <warehouse:message code="stockMovement.clearPicklsit.label" default="Clear Picklist"/>
+                                <warehouse:message code="stockMovement.clearPicklist.label" default="Clear Picklist"/>
                             </g:link>
                             <g:link
                                     controller="stockMovement"

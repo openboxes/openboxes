@@ -708,6 +708,11 @@ class StockMovementController {
     def clearPicklist() {
         try {
             Requisition requisition = Requisition.get(params.id)
+            if (!requisition) {
+                flash.error = "Requisition not found for id: ${params.id}"
+                redirect(action: "show", id: params.id)
+                return
+            }
             pickTaskService.rollbackPickTasks(requisition)
 
             flash.message = "Successfully cleared picklist for stock movement"
@@ -721,6 +726,11 @@ class StockMovementController {
     def redoAutopick() {
         try {
             Requisition requisition = Requisition.get(params.id)
+            if (!requisition) {
+                flash.error = "Requisition not found for id: ${params.id}"
+                redirect(action: "show", id: params.id)
+                return
+            }
             pickTaskService.rollbackPickTasks(requisition)
 
             redirect(action: "allocate", id: params.id)
