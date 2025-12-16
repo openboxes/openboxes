@@ -1,5 +1,7 @@
 package org.pih.warehouse.inventory
 
+import java.time.Instant
+
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
@@ -13,7 +15,7 @@ class InventoryCount implements Serializable {
 
     Location facility
 
-    Date dateRecorded
+    Instant dateRecorded
 
     InventoryCountTypeCode inventoryCountTypeCode
 
