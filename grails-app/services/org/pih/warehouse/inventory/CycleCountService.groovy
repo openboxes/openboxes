@@ -18,7 +18,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.core.date.DateFormatterManager
+import org.pih.warehouse.core.date.DateFormatter
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
 import org.hibernate.criterion.CriteriaSpecification
@@ -34,7 +34,7 @@ class CycleCountService {
 
     CycleCountTransactionService cycleCountTransactionService
     CycleCountProductAvailabilityService cycleCountProductAvailabilityService
-    DateFormatterManager dateFormatterManager
+    DateFormatter dateFormatter
 
     List<CycleCountCandidate> getCandidates(CycleCountCandidateFilterCommand command, String facilityId) {
         if (command.hasErrors()) {
@@ -392,7 +392,7 @@ class CycleCountService {
                     StringEscapeUtils.escapeCsv(candidate?.abcClass),
                     StringEscapeUtils.escapeCsv(candidate?.internalLocations ?: ""),
                     StringEscapeUtils.escapeCsv(candidate?.product?.tags?.tag?.join(", ")),
-                    dateFormatterManager.formatForExport(candidate?.dateLastCount),
+                    dateFormatter.formatForExport(candidate?.dateLastCount),
                     candidate?.quantityOnHand ?: 0,
             )
         }
@@ -416,7 +416,7 @@ class CycleCountService {
                         "Quantity Counted": item.quantityCounted != null ? item.quantityCounted : "",
                         "Comment": item.comment ?: "",
                         "User Counted": item.assignee?.name ?: "",
-                        "Date Counted": dateFormatterManager.formatForExport(item.dateCounted),
+                        "Date Counted": dateFormatter.formatForExport(item.dateCounted),
                 ]
             }
         }
@@ -490,14 +490,14 @@ class CycleCountService {
                 "Quantity Counted": countItem?.quantityCounted != null ? countItem.quantityCounted : "",
                 "Difference": countItem?.quantityVariance ?: "",
                 "Counted by": countItem?.assignee ?: "",
-                "Date Counted": dateFormatterManager.formatForExport(countItem?.dateCounted),
+                "Date Counted": dateFormatter.formatForExport(countItem?.dateCounted),
 
                 // Recount-specific fields
                 "Quantity Recounted": recountItem.quantityCounted != null ? recountItem.quantityCounted : "",
                 "Root Cause": recountItem.discrepancyReasonCode ?: "",
                 "Comment": recountItem.comment ?: "",
                 "Recounted By": recountItem.assignee ?: "",
-                "Date Recounted": dateFormatterManager.formatForExport(recountItem.dateCounted),
+                "Date Recounted": dateFormatter.formatForExport(recountItem.dateCounted),
         ]
     }
 

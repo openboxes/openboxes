@@ -63,7 +63,7 @@ class DateFormatterSpec extends Specification {
 
     void 'format returns null when given a null date'() {
         expect:
-        dateFormatterManager.format(null) == null
+        dateFormatter.format(null) == null
     }
 
     void 'format returns #expectedValue when given a null date and a default value of #defaultValue'() {
@@ -73,7 +73,7 @@ class DateFormatterSpec extends Specification {
                 .build()
 
         expect:
-        dateFormatterManager.format(null, context) == expectedValue
+        dateFormatter.format(null, context) == expectedValue
 
         where:
         defaultValue | expectedValue
