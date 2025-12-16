@@ -8,7 +8,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import * as locales from 'date-fns/locale';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { Controller, useController } from 'react-hook-form';
+import { Controller, useController, useWatch } from 'react-hook-form';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import {
@@ -53,18 +53,22 @@ const useInboundAddItemsColumns = ({
   const users = useSelector(getUsers);
   const currentLocale = useSelector(getCurrentLocale);
 
+  const originId = useWatch({
+    control,
+    name: 'values.origin.id',
+  });
   const debouncedProductsFetch = useCallback(
     debounceProductsFetch(
       debounceTime,
       minSearchLength,
-      null,
+      originId,
       false,
       false,
       true,
       false,
       StockMovementDirection.INBOUND,
     ),
-    [debounceTime, minSearchLength],
+    [debounceTime, minSearchLength, originId],
   );
   const lineItems = getValues('values.lineItems');
   const debouncedPeopleFetch = useCallback(
@@ -290,6 +294,7 @@ const useInboundAddItemsColumns = ({
                   // to appear, which we don't want because we're using the new tooltip.
                   // Therefore, we need to explicitly set it to false here.
                   showValueTooltip={false}
+                  showSelectedOptionColor
                   ariaLabel={{
                     id: 'react.stockMovement.product.label',
                     defaultMessage: 'Product',
