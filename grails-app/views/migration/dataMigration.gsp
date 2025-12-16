@@ -100,7 +100,7 @@
             <tr class="prop">
                 <td class="name">Missing transaction sources for inventory import based transactions</td>
                 <td>
-                    Maximum amount of inventory import transactions without transaction source: <b>${missingInventoryImportTransactionSources}</b>
+                    Maximum amount of inventory import transactions without transaction source: <b>${amountOfMissingInventoryImportTransactionSources}</b>
                 </td>
                 <td>
                     <div class="button-group">

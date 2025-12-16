@@ -6,12 +6,12 @@
     <changeSet author="kchelstowski" id="101220251400-0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="transaction_source" columnName="migrated"/>
+                <columnExists tableName="transaction_source" columnName="accurate"/>
             </not>
         </preConditions>
 
         <addColumn tableName="transaction_source">
-            <column name="migrated" type="BIT" defaultValueBoolean="false" />
+            <column name="accurate" type="BIT" defaultValueBoolean="true" />
         </addColumn>
     </changeSet>
 </databaseChangeLog>

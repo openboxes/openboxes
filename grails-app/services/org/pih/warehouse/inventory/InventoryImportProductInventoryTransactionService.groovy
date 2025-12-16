@@ -19,7 +19,7 @@ class InventoryImportProductInventoryTransactionService extends ProductInventory
                 transactionAction: TransactionAction.INVENTORY_IMPORT,
                 origin: location,
                 destination: location,
-                migrated: true
+                accurate: false
         )
         if (!transactionSource.validate()) {
             throw new ValidationException("Invalid transaction source", transactionSource.errors)
@@ -32,7 +32,6 @@ class InventoryImportProductInventoryTransactionService extends ProductInventory
                 transactionAction: TransactionAction.INVENTORY_IMPORT,
                 origin: importDataCommand.location,
                 destination: importDataCommand.location,
-                migrated: false,
         )
         if (!transactionSource.validate()) {
             throw new ValidationException("Invalid transaction source", transactionSource.errors)

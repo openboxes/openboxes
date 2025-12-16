@@ -40,6 +40,7 @@ class MigrationController {
     def migrationService
     def locationService
     def productAvailabilityService
+    TransactionSourceMigrationService transactionSourceMigrationService
 
     def index() {
 
@@ -62,7 +63,7 @@ class MigrationController {
         Integer productInventoryTransactionInCurrentLocationCount = Transaction.countByTransactionTypeAndInventory(productInventoryTransactionType, currentLocation.inventory)
         List<Product> productsWithProductInventoryTransactionInCurrentLocation = migrationService.getProductsWithTransactions(currentLocation, productInventoryTransactionType)
         Map<String, List<String>> overlappingTransactions = migrationService.getOtherOverlappingTransactions(currentLocation, productInventoryTransactionType)
-        Integer missingInventoryImportTransactionSources = migrationService.getAmountOfMissingInventoryImportTransactionSources()
+        Integer amountOfMissingInventoryImportTransactionSources = transactionSourceMigrationService.getAmountOfMissingInventoryImportTransactionSources()
 
         [
                 organizationCount        : organizations.size(),
@@ -72,7 +73,7 @@ class MigrationController {
                 productsWithProductInventoryTransactionInCurrentLocation: productsWithProductInventoryTransactionInCurrentLocation?.productCode,
                 productSupplierCount     : productSuppliers.size(),
                 overlappingTransactions  : overlappingTransactions,
-                missingInventoryImportTransactionSources: missingInventoryImportTransactionSources
+                amountOfMissingInventoryImportTransactionSources: amountOfMissingInventoryImportTransactionSources
         ]
     }
 
@@ -392,7 +393,7 @@ class MigrationController {
 
     def createMissingInventoryImportTransactionSourcesForCurrentLocation() {
         long responseTime = System.currentTimeMillis()
-        Map<String, Integer> response = migrationService.createMissingInventoryImportTransactionSources(AuthService.currentLocation)
+        Map<String, Integer> response = transactionSourceMigrationService.createMissingInventoryImportTransactionSources(AuthService.currentLocation)
         responseTime = System.currentTimeMillis() - responseTime
         log.info("Created missing transaction sources in ${responseTime} ms")
 
