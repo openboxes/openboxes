@@ -43,7 +43,7 @@ const useProductsTabExport = ({
         startDate: dateWithoutTimeZone({
           date: filters.startDate,
         }),
-        products: filters.products?.map((product) => product.id),
+        products: filters.products ? filters.products?.map((product) => product.id) : undefined,
         facility: currentLocationId,
       }, (val) => {
         if (typeof val === 'boolean') {
