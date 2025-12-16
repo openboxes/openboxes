@@ -64,7 +64,7 @@ const LotNumberCell = ({
   const {
     onBlurValidationHandler,
     error,
-    shouldShowError,
+    showError,
   } = useCellValidation({
     initialValue,
     cycleCountId,
@@ -120,16 +120,16 @@ const LotNumberCell = ({
     >
       <SelectField
         value={value}
-        hasErrors={shouldShowError}
+        hasErrors={showError}
         options={selectOptions}
         disabled={isDisabled}
         onChange={onChange}
         placeholder={placeholder}
-        className={`m-1 ${shouldShowError ? 'input-has-error' : ''}`}
+        className={`m-1 ${showError ? 'input-has-error' : ''}`}
         hideErrorMessageWrapper
         creatable
       />
-      {shouldShowError && (
+      {showError && (
         <CustomTooltip
           content={error}
           className="tooltip-icon tooltip-icon--error"

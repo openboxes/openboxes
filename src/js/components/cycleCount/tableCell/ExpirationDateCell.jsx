@@ -61,7 +61,7 @@ const ExpirationDateCell = ({
     onBlurValidationHandler,
     onChangeValidationHandler,
     error,
-    shouldShowError,
+    showError,
   } = useCellValidation({
     initialValue,
     cycleCountId,
@@ -96,14 +96,14 @@ const ExpirationDateCell = ({
       <DatePicker
         value={value}
         customDateFormat={DateFormat.DD_MMM_YYYY}
-        hasErrors={shouldShowError}
+        hasErrors={showError}
         onChange={onChange}
         onBlur={onBlur}
         disabled={isDisabled}
-        className={`m-1 w-75 ${shouldShowError ? 'input-has-error' : ''}`}
+        className={`m-1 w-75 ${showError ? 'input-has-error' : ''}`}
         hideErrorMessageWrapper
       />
-      {shouldShowError && (
+      {showError && (
         <CustomTooltip
           content={error}
           className="tooltip-icon tooltip-icon--error"

@@ -54,7 +54,7 @@ const BinLocationCell = ({
   const {
     onBlurValidationHandler,
     error,
-    shouldShowError,
+    showError,
   } = useCellValidation({
     initialValue: value?.name,
     cycleCountId,
@@ -94,15 +94,15 @@ const BinLocationCell = ({
     >
       <SelectField
         value={selectedValue}
-        hasErrors={shouldShowError}
+        hasErrors={showError}
         labelKey="name"
         options={selectOptions}
         onChange={onChange}
         disabled={isDisabled}
-        className={`m-1 ${shouldShowError ? 'input-has-error' : ''}`}
+        className={`m-1 ${showError ? 'input-has-error' : ''}`}
         hideErrorMessageWrapper
       />
-      {shouldShowError && (
+      {showError && (
         <CustomTooltip
           content={error}
           className="tooltip-icon tooltip-icon--error"

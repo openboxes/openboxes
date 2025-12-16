@@ -63,12 +63,12 @@ const useCellValidation = ({
    * - Errors are hidden while the user is actively editing a field
    */
 
-  const shouldShowError = error
+  const showError = error
     && !hasFocus
     && (isFormSubmitted || wasFieldTouched.current || initialValue);
 
   return {
-    shouldShowError,
+    showError,
     error,
     onChangeValidationHandler,
     onBlurValidationHandler,

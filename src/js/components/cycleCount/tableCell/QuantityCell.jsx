@@ -47,7 +47,7 @@ const QuantityCell = ({
     onChangeValidationHandler,
     onBlurValidationHandler,
     error,
-    shouldShowError,
+    showError,
   } = useCellValidation({
     initialValue,
     cycleCountId,
@@ -82,14 +82,14 @@ const QuantityCell = ({
       <InputField
         type="number"
         value={value}
-        showErrorBorder={shouldShowError}
+        showErrorBorder={showError}
         onChange={onChange}
         onBlur={onBlur}
         className="m-1 w-75"
         hideErrorMessageWrapper
         min="0"
       />
-      {shouldShowError && (
+      {showError && (
         <CustomTooltip
           content={error}
           className="tooltip-icon tooltip-icon--error"
