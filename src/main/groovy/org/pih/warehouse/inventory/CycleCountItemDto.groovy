@@ -1,5 +1,7 @@
 package org.pih.warehouse.inventory
 
+import java.time.Instant
+
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.product.Product
@@ -32,9 +34,9 @@ class CycleCountItemDto {
 
     Boolean custom
 
-    Date dateCounted
+    Instant dateCounted
 
-    Date dateCreated
+    Instant dateCreated
 
     Person assignee
 }

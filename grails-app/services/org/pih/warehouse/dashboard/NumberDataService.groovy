@@ -2,8 +2,8 @@ package org.pih.warehouse.dashboard
 
 import grails.core.GrailsApplication
 import grails.plugin.cache.Cacheable
+import java.time.Instant
 import org.grails.plugins.web.taglib.ApplicationTagLib
-import org.joda.time.LocalDate
 
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.api.StockMovementDirection
@@ -11,7 +11,8 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
-import org.pih.warehouse.inventory.TransactionCode
+import org.pih.warehouse.core.date.DateGenerator
+import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderStatus
@@ -28,6 +29,7 @@ class NumberDataService {
 
     def dataService
     GrailsApplication grailsApplication
+    DateGenerator dateGenerator
 
     @Cacheable(value = "dashboardCache", key = { "getInventoryByLotAndBin-${location?.id}"})
     NumberData getInventoryByLotAndBin(Location location) {
@@ -102,9 +104,12 @@ class NumberDataService {
         return new NumberData(receivingBin[0], "${urlContextPath}/report/showBinLocationReport?status=inStock")
     }
 
+    /**
+     * Fetch the number of items inventoried since the start of the calendar month.
+     */
     @Cacheable(value = "dashboardCache", key = { "getItemsInventoried-${location?.id}" })
     NumberData getItemsInventoried(Location location) {
-        Date firstOfMonth = LocalDate.now().withDayOfMonth(1).toDate()
+        Instant firstOfMonth = dateGenerator.firstDayOfMonthAsInstant()
         return getItemsInventoriedInRange(location, firstOfMonth)
     }
 
@@ -116,7 +121,7 @@ class NumberDataService {
      * @param startDate The datetime in the past to start the check at. If null, will use the start of time.
      * @param endDate The datetime in the past to check up until. If null, will use the current time.
      */
-    NumberData getItemsInventoriedInRange(Location location, Date startDate=null, Date endDate=null) {
+    NumberData getItemsInventoriedInRange(Location location, Instant startDate=null, Instant endDate=null) {
         /**
         * After migrating from single product inventory transaction to baseline + adjustment transactions
         * there is a case when we might have only an adjustment if it's first inventory record
@@ -140,8 +145,8 @@ class NumberDataService {
                 [
                         inventory          : location?.inventory,
                         transactionTypeIds : transactionTypeIds,
-                        startDate          : startDate ?: DateUtil.EPOCH_DATE,
-                        endDate            : endDate ?: new Date(),
+                        startDate          : startDate ? JavaUtilDateParser.asDate(startDate) : DateUtil.EPOCH_DATE,
+                        endDate            : endDate ? JavaUtilDateParser.asDate(endDate) : new Date(),
                         commentToFilter    : Constants.INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT
                 ])
 
@@ -203,7 +208,7 @@ class NumberDataService {
 
     @Cacheable(value = "dashboardCache", key = { "getExpiredProductsInStock-${location?.id}" })
     NumberData getExpiredProductsInStock(Location location) {
-        Date today = LocalDate.now().toDate()
+        Date today = JavaUtilDateParser.asDate(dateGenerator.today())
         def expiredProductsInStock = ProductAvailability.executeQuery("""
             SELECT COUNT(distinct pa.inventoryItem) FROM ProductAvailability pa
             WHERE pa.location = :location

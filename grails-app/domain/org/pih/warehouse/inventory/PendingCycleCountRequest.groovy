@@ -1,10 +1,11 @@
 package org.pih.warehouse.inventory
 
+import java.time.Instant
+
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
-
 
 class PendingCycleCountRequest {
 
@@ -24,9 +25,9 @@ class PendingCycleCountRequest {
 
     Boolean blindCount
 
-    Date dateCreated
+    Instant dateCreated
 
-    Date lastUpdated
+    Instant lastUpdated
 
     User createdBy
 

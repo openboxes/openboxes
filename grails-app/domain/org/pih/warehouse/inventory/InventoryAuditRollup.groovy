@@ -1,5 +1,7 @@
 package org.pih.warehouse.inventory
 
+import java.time.Instant
+
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.VarianceTypeCode
 import org.pih.warehouse.product.Product
@@ -10,7 +12,7 @@ class InventoryAuditRollup implements Serializable {
     Location facility
     Transaction transaction
     String transactionNumber
-    Date transactionDate
+    Instant transactionDate
     String facilityName
     String productCode
     BigDecimal quantityAdjusted

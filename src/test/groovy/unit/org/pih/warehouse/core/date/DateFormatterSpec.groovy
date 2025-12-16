@@ -61,6 +61,27 @@ class DateFormatterSpec extends Specification {
         dateFormatter.localeManager = localeManagerStub
     }
 
+    void 'format returns null when given a null date'() {
+        expect:
+        dateFormatter.format(null) == null
+    }
+
+    void 'format returns #expectedValue when given a null date and a default value of #defaultValue'() {
+        given:
+        DateFormatterContext context = DateFormatterContext.builder()
+                .withDefaultValue(defaultValue)
+                .build()
+
+        expect:
+        dateFormatter.format(null, context) == expectedValue
+
+        where:
+        defaultValue | expectedValue
+        null         | null
+        ''           | ''
+        'DEFAULT'    | 'DEFAULT'
+    }
+
     void 'format does not error when given an Instant and no override'() {
         given:
         sessionManagerStub.timezone >> TimeZone.getTimeZone('UTC')

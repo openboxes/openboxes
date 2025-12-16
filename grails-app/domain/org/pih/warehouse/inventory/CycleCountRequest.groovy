@@ -1,6 +1,8 @@
 package org.pih.warehouse.inventory
 
 import grails.util.Holders
+import java.time.Instant
+
 import org.pih.warehouse.api.AvailableItem
 
 import java.time.LocalDate
@@ -49,9 +51,9 @@ class CycleCountRequest {
      */
     LocalDate recountDeadline
 
-    Date dateCreated
+    Instant dateCreated
 
-    Date lastUpdated
+    Instant lastUpdated
 
     User createdBy
 

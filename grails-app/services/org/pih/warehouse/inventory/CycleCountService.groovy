@@ -1,9 +1,9 @@
 package org.pih.warehouse.inventory
 
-import grails.converters.JSON
 import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import java.time.Instant
 import org.apache.commons.collections4.keyvalue.MultiKey
 import org.apache.commons.collections4.map.MultiKeyMap
 import org.apache.commons.csv.CSVPrinter
@@ -12,18 +12,17 @@ import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
-import org.pih.warehouse.DateUtil
+
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.date.DateFormatter
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.report.CycleCountReportCommand
-
-import java.time.LocalDate
 
 @Transactional
 class CycleCountService {
@@ -35,6 +34,7 @@ class CycleCountService {
 
     CycleCountTransactionService cycleCountTransactionService
     CycleCountProductAvailabilityService cycleCountProductAvailabilityService
+    DateFormatter dateFormatter
 
     List<CycleCountCandidate> getCandidates(CycleCountCandidateFilterCommand command, String facilityId) {
         if (command.hasErrors()) {
@@ -392,7 +392,7 @@ class CycleCountService {
                     StringEscapeUtils.escapeCsv(candidate?.abcClass),
                     StringEscapeUtils.escapeCsv(candidate?.internalLocations ?: ""),
                     StringEscapeUtils.escapeCsv(candidate?.product?.tags?.tag?.join(", ")),
-                    candidate?.dateLastCount?.format(Constants.EUROPEAN_DATE_FORMAT) ?: "",
+                    dateFormatter.formatForExport(candidate?.dateLastCount),
                     candidate?.quantityOnHand ?: 0,
             )
         }
@@ -416,8 +416,7 @@ class CycleCountService {
                         "Quantity Counted": item.quantityCounted != null ? item.quantityCounted : "",
                         "Comment": item.comment ?: "",
                         "User Counted": item.assignee?.name ?: "",
-                        "Date Counted": item.dateCounted
-                                ? Constants.MONTH_DAY_YEAR_DATE_FORMATTER.format(item.dateCounted) : "",
+                        "Date Counted": dateFormatter.formatForExport(item.dateCounted),
                 ]
             }
         }
@@ -491,16 +490,14 @@ class CycleCountService {
                 "Quantity Counted": countItem?.quantityCounted != null ? countItem.quantityCounted : "",
                 "Difference": countItem?.quantityVariance ?: "",
                 "Counted by": countItem?.assignee ?: "",
-                "Date Counted": countItem?.dateCounted
-                        ? Constants.MONTH_DAY_YEAR_DATE_FORMATTER.format(countItem.dateCounted) : "",
+                "Date Counted": dateFormatter.formatForExport(countItem?.dateCounted),
 
                 // Recount-specific fields
                 "Quantity Recounted": recountItem.quantityCounted != null ? recountItem.quantityCounted : "",
                 "Root Cause": recountItem.discrepancyReasonCode ?: "",
                 "Comment": recountItem.comment ?: "",
                 "Recounted By": recountItem.assignee ?: "",
-                "Date Recounted": recountItem.dateCounted
-                        ? Constants.MONTH_DAY_YEAR_DATE_FORMATTER.format(recountItem.dateCounted) : "",
+                "Date Recounted": dateFormatter.formatForExport(recountItem.dateCounted),
         ]
     }
 
@@ -563,7 +560,7 @@ class CycleCountService {
                 facility: facility,
                 // Set an initial status here so that validation passes. It gets automatically recomputed on save.
                 status: CycleCountStatus.REQUESTED,
-                dateLastRefreshed: new Date()
+                dateLastRefreshed: Instant.now()
         )
 
         List<AvailableItem> itemsToSave = cycleCountProductAvailabilityService.getAvailableItems(
@@ -694,7 +691,7 @@ class CycleCountService {
                 product: availableItem.inventoryItem.product,
                 createdBy: AuthService.currentUser,
                 updatedBy: AuthService.currentUser,
-                dateCounted: new Date(),
+                dateCounted: Instant.now(),
                 assignee: assignee,
                 custom: false,
         )
@@ -719,7 +716,7 @@ class CycleCountService {
                 product: cycleCountItem.inventoryItem.product,
                 createdBy: AuthService.currentUser,
                 updatedBy: AuthService.currentUser,
-                dateCounted: new Date(),
+                dateCounted: Instant.now(),
 
                 // Note that even though the given item is custom added, the resulting item is treated as not
                 // custom. This is done to preserve count information. Ex: If the item was custom added during the
@@ -820,7 +817,7 @@ class CycleCountService {
         cycleCountItem.status = command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING
         // If the dateCounted field is null, set it to today's date
         if (cycleCountItem.dateCounted == null) {
-            cycleCountItem.dateCounted = new Date()
+            cycleCountItem.dateCounted = Instant.now()
         }
 
         // We've updated the status of a cycle count item so we need to also update the status of the count.
@@ -838,7 +835,6 @@ class CycleCountService {
 
         return createdItems
     }
-
 
     CycleCountItemDto createCycleCountItem(CycleCountItemCommand command) {
         if (!command.inventoryItem?.id) {
@@ -869,7 +865,7 @@ class CycleCountService {
                 product: command.inventoryItem?.product,
                 createdBy: AuthService.currentUser,
                 updatedBy: AuthService.currentUser,
-                dateCounted: command.dateCounted ?: new Date(),
+                dateCounted: command.dateCounted ?: Instant.now(),
                 comment: command.comment,
                 discrepancyReasonCode: command.discrepancyReasonCode,
                 assignee: command.assignee,

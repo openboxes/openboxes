@@ -1,6 +1,8 @@
 package org.pih.warehouse.reporting
 
 import grails.converters.JSON
+import java.time.Instant
+
 import org.pih.warehouse.api.PaginationCommand
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.data.DataService
@@ -53,8 +55,8 @@ class InventoryAuditReportController {
 class InventoryAuditCommand extends PaginationCommand {
     Location facility
     List<Product> products
-    Date startDate
-    Date endDate
+    Instant startDate
+    Instant endDate
 
     static constraints = {
         facility(nullable: false)

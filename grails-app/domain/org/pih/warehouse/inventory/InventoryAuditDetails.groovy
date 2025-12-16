@@ -1,5 +1,7 @@
 package org.pih.warehouse.inventory
 
+import java.time.Instant
+
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
@@ -14,7 +16,7 @@ class InventoryAuditDetails implements Serializable {
 
     // Transaction dimensions
     CycleCount cycleCount
-    Date transactionDate
+    Instant transactionDate
     TransactionType transactionType
     String transactionNumber
 

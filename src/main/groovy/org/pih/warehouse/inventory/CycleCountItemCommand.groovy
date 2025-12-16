@@ -2,6 +2,8 @@ package org.pih.warehouse.inventory
 
 import grails.databinding.BindUsing
 import grails.validation.Validateable
+import java.time.Instant
+
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
@@ -49,7 +51,7 @@ class CycleCountItemCommand implements Validateable {
 
     Person assignee
 
-    Date dateCounted
+    Instant dateCounted
 
     def beforeValidate() {
         String cycleCountId = RequestContextHolder.getRequestAttributes().params?.cycleCountId

@@ -46,8 +46,8 @@ class DateFormatterContext {
 
     DateFormatterContext validate() {
         int numFormatOverrides = (patternOverride != null ? 1 : 0) +
-                (displayFormat != null ? 1 : 0) +
-                (displayStyleOverride != null ? 1 : 0)
+                                 (displayFormat != null ? 1 : 0) +
+                                 (displayStyleOverride != null ? 1 : 0)
         if (numFormatOverrides > 1) {
             throw new IllegalArgumentException(
                     'One (and only one) of the following fields must be set when formatting a date: patternOverride, ' +
