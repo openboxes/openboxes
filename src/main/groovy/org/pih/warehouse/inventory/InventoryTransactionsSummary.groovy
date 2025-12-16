@@ -1,6 +1,7 @@
 package org.pih.warehouse.inventory
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.VarianceTypeCode
 import org.pih.warehouse.product.Product
@@ -28,7 +29,7 @@ class InventoryTransactionsSummary {
     /**
      * Root causes are only captured for the cycle count
      */
-    Set<String> getRootCauses() {
+    Set<ReasonCode> getRootCauses() {
         if (transaction.cycleCount) {
             return transaction
                     .cycleCount
@@ -36,8 +37,6 @@ class InventoryTransactionsSummary {
                     .discrepancyReasonCode
                     // filter out null/empty
                     .findAll { it }
-                    .collect { it.name() }
-                    .toSet()
         }
         return null
     }
@@ -98,27 +97,10 @@ class InventoryTransactionsSummary {
                 recordedBy: [
                     name: recordedBy.name,
                 ],
-                rootCauses: rootCauses,
+                rootCauses: rootCauses?.collect { it.name() },
                 comments: comments,
                 varianceTypeCode: varianceTypeCode?.name(),
                 transactionAction: transactionAction.name(),
-        ]
-    }
-
-    Map toCsv() {
-        [
-                alignment: varianceTypeCode,
-                name: product?.name,
-                productCode: product?.productCode,
-                type: transactionAction,
-                dateRecorded: dateRecorded,
-                recordedBy: recordedBy.name,
-                transactionId: transaction.transactionNumber,
-                quantityBefore: quantityBefore,
-                quantityAfter: quantityAfter,
-                quantityDifference: quantityDifference,
-                rootCauses: rootCauses?.join(', ') ?: '',
-                comments: comments?.join(', ') ?: '',
         ]
     }
 }

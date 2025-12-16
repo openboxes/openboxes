@@ -35,7 +35,7 @@ const useInventoryTransactionsTabExport = ({
         startDate: dateWithoutTimeZone({
           date: filters.startDate,
         }),
-        products: filters.products ? filters.products?.map((product) => product.id) : undefined,
+        products: filters.products?.map?.((product) => product.id),
         facility: currentLocationId,
       }, (val) => {
         if (typeof val === 'boolean') {
@@ -49,12 +49,12 @@ const useInventoryTransactionsTabExport = ({
 
   const actions = [
     {
-      label: 'react.cycleCount.reporting.exportReport.label',
-      defaultLabel: 'Export report',
+      label: 'react.cycleCount.reporting.exportFullReport.label',
+      defaultLabel: 'Export Full Report',
       onClick: () => exportInventoryTransactionsReport({ startDate, endDate }),
     }, {
-      label: 'react.cycleCount.reporting.exportResults.label',
-      defaultLabel: 'Export results',
+      label: 'react.cycleCount.reporting.exportFilteredReport.label',
+      defaultLabel: 'Export Filtered Report',
       onClick: () => exportInventoryTransactionsReport({ startDate, endDate, products }),
     },
   ];
