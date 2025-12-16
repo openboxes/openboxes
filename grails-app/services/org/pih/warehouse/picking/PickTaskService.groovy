@@ -266,8 +266,8 @@ class PickTaskService {
     }
 
     void transferToContainer(PickTask task, Location container, Integer quantity) {
-        if (!task.facility.supports(ActivityCode.TRACK_INTERNAL_LOCATIONS)) {
-            throw new IllegalArgumentException("Facility does not support ${ActivityCode.TRACK_INTERNAL_LOCATIONS} activity")
+        if (!task.facility.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS)) {
+            throw new IllegalArgumentException("Facility does not support ${ActivityCode.TRACK_INTERNAL_TRANSACTIONS} activity")
         }
 
         Integer quantityAvailable = productAvailabilityService.getQuantityAvailableToPromiseForProductInBin(task.facility, task.location, task.inventoryItem)
@@ -288,8 +288,8 @@ class PickTaskService {
     }
 
     void transferToStaging(PickTask task, AvailableItem item, Location stagingLocation) {
-        if (!task.facility.supports(ActivityCode.TRACK_INTERNAL_LOCATIONS)) {
-            throw new IllegalArgumentException("Facility does not support ${ActivityCode.TRACK_INTERNAL_LOCATIONS} activity")
+        if (!task.facility.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS)) {
+            throw new IllegalArgumentException("Facility does not support ${ActivityCode.TRACK_INTERNAL_TRANSACTIONS} activity")
         }
 
         TransferStockCommand command = new TransferStockCommand()

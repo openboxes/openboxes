@@ -136,7 +136,7 @@ enum ActivityCode {
     PICKING_SHORTAGE('PICKING_SHORTAGE'),
 
     // Track internal locations
-    TRACK_INTERNAL_LOCATIONS('TRACK_INTERNAL_LOCATIONS'),
+    TRACK_INTERNAL_TRANSACTIONS('TRACK_INTERNAL_TRANSACTIONS'),
 
     NONE('NONE')
 
@@ -221,7 +221,7 @@ enum ActivityCode {
                 DELIVERY_TYPE_SHIPPING,
                 DELIVERY_TYPE_WILL_CALL,
 
-                TRACK_INTERNAL_LOCATIONS
+                TRACK_INTERNAL_TRANSACTIONS
         ]
     }
 
