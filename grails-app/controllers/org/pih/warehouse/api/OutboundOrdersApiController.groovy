@@ -12,7 +12,7 @@ class OutboundOrdersApiController {
     def read() {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         if (!stockMovement) {
-            throw new IllegalArgumentException("No stock movement found for requisition id ${params.id}")
+            throw new IllegalArgumentException("No outbound order found for id ${params.id}")
         }
 
         render([data: stockMovement] as JSON)
@@ -21,7 +21,7 @@ class OutboundOrdersApiController {
     def items() {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         if (!stockMovement) {
-            throw new IllegalArgumentException("No stock movement found for requisition id ${params.id}")
+            throw new IllegalArgumentException("No outbound order found for id ${params.id}")
         }
 
         render([data: stockMovement.lineItems] as JSON)
