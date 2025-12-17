@@ -306,8 +306,6 @@ class PickTaskService {
 
 
     TransactionSource createPickTaskTransactionSource(PickTask pickTask) {
-        // FIXME: Check if micro transactions are enabled
-
         PicklistItem picklistItem = PicklistItem.get(pickTask.id)
         if (!picklistItem) {
             throw new ValidationException("PicklistItem not found for PickTask id: ${pickTask.id}", null)
@@ -333,8 +331,6 @@ class PickTaskService {
      * @return boolean
      */
     boolean rollbackPickTasks(Requisition requisition) {
-        // FIXME: Check if micro transactions are enabled
-
         if (requisition.status >= RequisitionStatus.ISSUED) {
             throw new IllegalStateException("Cannot rollback pick tasks for requisition with status: ${requisition.status}")
         }
