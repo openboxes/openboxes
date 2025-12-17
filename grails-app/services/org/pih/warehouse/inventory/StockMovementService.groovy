@@ -1847,6 +1847,10 @@ class StockMovementService {
             List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
             log.info "Suggested items " + suggestedItems
 
+            if (!suggestedItems) {
+                return
+            }
+
             // The only time we don't want to clear the picklist is if we're generating new picklist items due to a shortage
             if (shouldClearPicklist) {
                 clearPicklist(requisitionItem)
