@@ -93,7 +93,7 @@ const useResolveStep = () => {
     currentUser: getCurrentUser(state),
     locale: getCurrentLocale(state),
   }));
-  console.log(tableData.current);
+
   const { importErrors, importItems } = useResolveStepImport({
     currentLocationId: currentLocation?.id,
     locale,

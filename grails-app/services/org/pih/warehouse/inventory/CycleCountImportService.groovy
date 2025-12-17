@@ -129,14 +129,14 @@ class CycleCountImportService {
                 command.data
                 // Firstly group by cycle count to separate them
                         .groupBy { it.cycleCountId }
-                // Then build a map, where cycle count id is a key, and value is also a map with assignee as a key
-                // and value is a list with rows with a particular assignee.
-                // For a valid cycle count, the list should contain only one element (one assignee used for all rows for a cycle count)
+                // Then build a map, where cycle count id is a key, and value is also a map with recount assignee as a key
+                // and value is a list with rows with a particular recount assignee.
+                // For a valid cycle count, the list should contain only one element (one recount assignee used for all rows for a cycle count)
                         .collectEntries { [it.key, it.value.groupBy { val -> val.recountAssignee }]}
                         .findAll { it.value.size() > 1 }
 
         cycleCountsWithInvalidRecountAssignee.each {
-            // If at least one row is invalid, we want to clear the assignee for all rows
+            // If at least one row is invalid, we want to clear the recount assignee for all rows
             command.data.each { row ->
                 if (row.cycleCountId == it.key) {
                     row.recountAssignee = null
