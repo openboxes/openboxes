@@ -1209,6 +1209,18 @@ class UrlMappings {
             action = [GET: "getExpirationHistoryReport"]
         }
 
+        // Outbound orders API endpoints
+
+        "/api/outbound-orders/$id"(parseRequest: true) {
+            controller = "outboundOrdersApi"
+            action = [GET: "read"]
+        }
+
+        "/api/outbound-orders/$id/items"(parseRequest: true) {
+            controller = "outboundOrdersApi"
+            action = [GET: "items"]
+        }
+
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")
