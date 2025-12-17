@@ -251,6 +251,7 @@ export const importCycleCountsRecount = async ({
   setImportErrors,
   locale,
   recountedBy,
+  defaultRecountedBy,
   dateRecounted,
 }) => {
   const response = await cycleCountApi.importCycleCountItemsRecount(
@@ -312,6 +313,7 @@ export const importCycleCountsRecount = async ({
   // eslint-disable-next-line no-param-reassign
   recountedBy.current = { ...recountedBy.current, ...recountedByUpdates };
   // eslint-disable-next-line no-param-reassign
+  defaultRecountedBy.current = { ...defaultRecountedBy.current, ...recountedByUpdates };
+  // eslint-disable-next-line no-param-reassign
   dateRecounted.current = { ...dateRecounted.current, ...dateRecountedUpdates };
-  console.log(recountedBy.current);
 };

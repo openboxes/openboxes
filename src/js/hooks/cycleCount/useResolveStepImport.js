@@ -8,6 +8,7 @@ const useResolveStepImport = ({
   locale,
   tableData,
   recountedBy,
+  defaultRecountedBy,
   dateRecounted,
 }) => {
   const [importErrors, setImportErrors] = useState([]);
@@ -22,6 +23,7 @@ const useResolveStepImport = ({
         tableData,
         recountedBy,
         dateRecounted,
+        defaultRecountedBy,
         setImportErrors,
         locale,
       });

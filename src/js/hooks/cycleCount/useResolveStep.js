@@ -99,6 +99,7 @@ const useResolveStep = () => {
     locale,
     tableData,
     recountedBy,
+    defaultRecountedBy,
     dateRecounted,
   });
   const translate = useTranslate();

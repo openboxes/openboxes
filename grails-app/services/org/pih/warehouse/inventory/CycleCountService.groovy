@@ -481,7 +481,7 @@ class CycleCountService {
     private Map mergeCountAndRecountItemAsXlsMap(CycleCountItemDto countItem, CycleCountItemDto recountItem, String cycleCountId) {
         return [
                 "Product cycle count id": cycleCountId,
-                "Cycle count item id"   : recountItem?.id ?: countItem?.id ?: "",
+                "Cycle count item id"   : recountItem?.id,
                 "Product Code": recountItem.product.productCode,
                 "Product Name": recountItem.product.name,
                 "Lot Number": recountItem.inventoryItem.lotNumber,
