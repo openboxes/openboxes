@@ -51,7 +51,6 @@ const ProductSupplierFormHeader = ({ isValid, isFormDirty }) => {
             label="react.productSupplier.redirectToList.label"
             defaultMessage="Back to Product Source List"
             handleOnClick={handleBackButtonClick}
-            beforeRedirect={openUnsavedChangesConfirmationModal}
           />
           <HeaderButtonsWrapper>
             {productSupplier && (

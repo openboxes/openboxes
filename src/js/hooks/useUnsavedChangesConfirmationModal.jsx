@@ -37,7 +37,7 @@ const useUnsavedChangesConfirmationModal = ({ onConfirm }) => {
         onClose?.();
       },
     },
-  ]), []);
+  ]), [onConfirm]);
 
   return useCallback(
     () => {
