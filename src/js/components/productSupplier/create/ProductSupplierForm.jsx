@@ -17,6 +17,7 @@ const ProductSupplierForm = () => {
     errors,
     triggerValidation,
     dirtyFields,
+    isFormDirty,
     onSubmit,
     setProductPackageQuantity,
     setValue,
@@ -28,6 +29,7 @@ const ProductSupplierForm = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <ProductSupplierFormHeader
           isValid={isValid}
+          isFormDirty={isFormDirty}
         />
         <ProductSupplierFormMain
           formProps={{

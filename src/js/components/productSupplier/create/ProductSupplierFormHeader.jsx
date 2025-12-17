@@ -8,11 +8,18 @@ import ProductSupplierFormTitle from 'components/productSupplier/create/ProductS
 import { PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
 import useProductSupplierActions from 'hooks/list-pages/productSupplier/useProductSupplierActions';
 import useProductSupplierData from 'hooks/list-pages/productSupplier/useProductSupplierData';
+import useUnsavedChangesConfirmationModal from 'hooks/useUnsavedChangesConfirmationModal';
 import RedirectButton from 'utils/RedirectButton';
 import HeaderButtonsWrapper from 'wrappers/HeaderButtonsWrapper';
 import HeaderWrapper from 'wrappers/HeaderWrapper';
 
-const ProductSupplierFormHeader = ({ isValid }) => {
+/**
+ * Product Supplier Form Header component
+ * @param isValid - indicates if the form is valid
+ * @param isFormDirty - indicates if the form has unsaved changes
+ * @returns {JSX.Element} - The ProductSupplierFormHeader component
+ */
+const ProductSupplierFormHeader = ({ isValid, isFormDirty }) => {
   const history = useHistory();
   const { productSupplier } = useProductSupplierData();
 
@@ -24,6 +31,18 @@ const ProductSupplierFormHeader = ({ isValid }) => {
     fireFetchData: redirectToListPage,
   });
 
+  const openUnsavedChangesConfirmationModal = useUnsavedChangesConfirmationModal({
+    onConfirm: redirectToListPage,
+  });
+
+  const handleBackButtonClick = () => {
+    if (isFormDirty) {
+      openUnsavedChangesConfirmationModal();
+      return;
+    }
+    redirectToListPage();
+  };
+
   return (
     <HeaderWrapper className="h-auto">
       <div className="w-100 d-flex justify-content-around flex-column">
@@ -31,7 +50,8 @@ const ProductSupplierFormHeader = ({ isValid }) => {
           <RedirectButton
             label="react.productSupplier.redirectToList.label"
             defaultMessage="Back to Product Source List"
-            redirectTo={PRODUCT_SUPPLIER_URL.list()}
+            handleOnClick={handleBackButtonClick}
+            beforeRedirect={openUnsavedChangesConfirmationModal}
           />
           <HeaderButtonsWrapper>
             {productSupplier && (
@@ -68,4 +88,5 @@ export default ProductSupplierFormHeader;
 
 ProductSupplierFormHeader.propTypes = {
   isValid: PropTypes.bool.isRequired,
+  isFormDirty: PropTypes.bool.isRequired,
 };
