@@ -1212,12 +1212,12 @@ class UrlMappings {
         // Outbound orders API endpoints
 
         "/api/outbound-orders/$id"(parseRequest: true) {
-            controller = "outboundOrdersApi"
+            controller = "outboundOrderApi"
             action = [GET: "read"]
         }
 
         "/api/outbound-orders/$id/items"(parseRequest: true) {
-            controller = "outboundOrdersApi"
+            controller = "outboundOrderApi"
             action = [GET: "items"]
         }
 
