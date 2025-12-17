@@ -7,10 +7,7 @@ import {
   IMPORT_CYCLE_COUNTS,
   MARK_ALL_AS_UPDATED,
   REMOVE_ROW,
-  SET_ERRORS,
-  SET_ERRORS_BY_ID,
   SET_UPDATED,
-  SUBMIT_FORM,
   UPDATE_COUNTED_BY,
   UPDATE_DATE_COUNTED,
   UPDATE_FIELD_VALUE,
@@ -124,37 +121,8 @@ function countedByReducer(state = {}, action) {
   }
 }
 
-function errorsReducer(state = {
-  isFormSubmitted: false,
-  errors: {},
-}, action) {
-  switch (action.type) {
-    case SET_ERRORS:
-      return {
-        ...state,
-        errors: action.payload,
-      };
-    case SET_ERRORS_BY_ID:
-      return {
-        ...state,
-        errors: {
-          ...state.errors,
-          [action.payload.id]: action.payload.errors,
-        },
-      };
-    case SUBMIT_FORM:
-      return {
-        ...state,
-        isFormSubmitted: true,
-      };
-    default:
-      return state;
-  }
-}
-
 export default combineReducers({
   entities: entitiesReducer,
   dateCounted: dateCountedReducer,
   countedBy: countedByReducer,
-  errors: errorsReducer,
 });

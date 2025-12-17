@@ -4,7 +4,7 @@ import {
 } from 'react';
 
 import { useSelector } from 'react-redux';
-import { getCountWorkflowIsFormSubmitted, makeGetErrorForField } from 'selectors';
+import { getIsFormSubmitted, makeGetErrorForField } from 'selectors';
 
 const useCellValidation = ({
   initialValue, cycleCountId, index, fieldName,
@@ -15,7 +15,7 @@ const useCellValidation = ({
 
   const getErrorForField = useMemo(() => makeGetErrorForField(), []);
 
-  const isFormSubmitted = useSelector(getCountWorkflowIsFormSubmitted);
+  const isFormSubmitted = useSelector(getIsFormSubmitted);
 
   const error = useSelector((state) => getErrorForField(
     state,

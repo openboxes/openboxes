@@ -297,19 +297,19 @@ export const makeGetCycleCountItemIds = () =>
     (items) => (Array.isArray(items) ? items.map((it) => it.id) : []),
   );
 
-export const getCountWorkflowErrors = createSelector(
-  [getCountWorkflow],
-  (wf) => wf?.errors?.errors,
-);
+/**
+  FORM ERRORS
+ */
+export const getErrors = (state) => state.errors.errors;
 
-export const getCountWorkflowIsFormSubmitted = createSelector(
-  [getCountWorkflow],
-  (wf) => wf?.errors?.isFormSubmitted,
-);
+export const getIsFormSubmitted = (state) => state.errors.isFormSubmitted;
 
+/**
+ * CYCLE COUNT ERRORS
+ */
 export const makeGetErrorsForCycleCount = () =>
   createSelector(
-    [getCountWorkflowErrors, (_, cycleCountId) => cycleCountId],
+    [getErrors, (_, cycleCountId) => cycleCountId],
     (errors, cycleCountId) => errors?.[cycleCountId] || {},
   );
 

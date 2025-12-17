@@ -21,7 +21,7 @@ const persistConfig = {
 const createStoreWithMiddleware = applyMiddleware(
   ReduxPromise,
   reduxThunk,
-  cycleCount.validateCycleCount,
+  cycleCount.validateCycleCountHandler,
 )(createStore);
 const store = createStoreWithMiddleware(persistReducer(persistConfig, rootReducer));
 const persistor = persistStore(store);

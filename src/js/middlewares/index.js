@@ -6,7 +6,7 @@ import { UPDATE_FIELD_VALUE } from 'actions/types';
 import cycleCountSchemes from 'schemes/cycleCountSchemes';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
-const validate = (store, cycleCountId) => {
+const validateCycleCount = (store, cycleCountId) => {
   const { dispatch, getState } = store;
   const state = getState();
   const translate = translateWithDefaultMessage(getTranslate(state.localize));
@@ -25,14 +25,14 @@ const validate = (store, cycleCountId) => {
  * we can't validate only one field / row, due to the fact that error can be displayed based
  * on multiple fields (e.g. unique bin locations across all items).
 */
-const validateCycleCount = (store) => (next) => (action) => {
+const validateCycleCountHandler = (store) => (next) => (action) => {
   const result = next(action);
 
   if (action.type === UPDATE_FIELD_VALUE) {
-    validate(store, action.payload.id);
+    validateCycleCount(store, action.payload.id);
   }
 
   return result;
 };
 
-export default { validateCycleCount };
+export default { validateCycleCountHandler };
