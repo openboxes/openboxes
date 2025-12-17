@@ -226,6 +226,11 @@ configurations {
                     }
                 }
 
+                if (details.requested.group.startsWith('net.java.dev.jna')) {
+                    details.because 'support testcontainers and Mac-based development'
+                    details.useVersion(jnaVersion)
+                }
+
                 if (details.requested.group == 'org.apache.httpcomponents') {
                     details.because 'enforce consistent httpcomponents versioning'
                     if (details.requested.name == 'httpcore') {
