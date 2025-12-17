@@ -1951,7 +1951,7 @@ class InventoryService implements ApplicationContextAware {
      * @param inventoryItem
      * @param params
      */
-    def transferStock(TransferStockCommand command) {
+    Transaction transferStock(TransferStockCommand command) {
 
         Integer quantity = command.quantity
         Location location = command.location

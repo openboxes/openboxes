@@ -210,7 +210,27 @@
                                 class="button"
                             >
                                 <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
-                                <warehouse:message code="stockMovement.allocate.label" />
+                                <warehouse:message code="stockMovement.allocate.label" default="Allocate"/>
+                            </g:link>
+                        </g:if>
+                        <g:if test="${stockMovement?.requisition?.picklist?.picklistItems}">
+                            <g:link
+                                    controller="stockMovement"
+                                    action="clearPicklist"
+                                    id="${stockMovement?.requisition?.id}"
+                                    class="button"
+                            >
+                                <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                                <warehouse:message code="stockMovement.clearPicklist.label" default="Clear Picklist"/>
+                            </g:link>
+                            <g:link
+                                    controller="stockMovement"
+                                    action="redoAutopick"
+                                    id="${stockMovement?.requisition?.id}"
+                                    class="button"
+                            >
+                                <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                                <warehouse:message code="stockMovement.redoAutopick.label" default="Redo Autopick"/>
                             </g:link>
                         </g:if>
                     </g:isUserAdmin>

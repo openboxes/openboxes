@@ -4,6 +4,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
@@ -28,6 +29,7 @@ class TransactionSource {
 
     Shipment shipment
     Requisition requisition
+    Picklist picklist
     Receipt receipt
     Order order
     CycleCount cycleCount
@@ -58,6 +60,7 @@ class TransactionSource {
         shipment(nullable: true)
         requisition(nullable: true)
         receipt(nullable: true)
+        picklist(nullable: true)
         order(nullable: true)
         cycleCount(nullable: true)
         origin(nullable: true)

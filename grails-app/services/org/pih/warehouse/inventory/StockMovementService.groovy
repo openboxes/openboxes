@@ -63,7 +63,6 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.putaway.PutawayService
-import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptService
 import org.pih.warehouse.requisition.ReplenishmentTypeCode
