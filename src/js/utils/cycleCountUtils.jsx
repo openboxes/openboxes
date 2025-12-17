@@ -240,11 +240,11 @@ const createCustomItemsRecountFromImport = (items, locale, reasonCodes) => (item
       id: item.binLocation.id,
       name: item.binLocation.name,
     } : null,
-    rootCause: {
-      id: item.rootCause?.name,
-      label: reasonCodes?.find?.((reasonCode) => reasonCode?.id === item.rootCause?.name)?.label,
-      value: item.rootCause?.name,
-    },
+    rootCause: item.rootCause ? {
+      id: item.rootCause,
+      label: reasonCodes?.find?.((reasonCode) => reasonCode?.id === item.rootCause)?.label,
+      value: item.rootCause,
+    } : null,
   }))
   : []);
 
