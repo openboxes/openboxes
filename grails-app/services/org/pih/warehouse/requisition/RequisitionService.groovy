@@ -18,6 +18,7 @@ import org.joda.time.LocalDate
 import org.pih.warehouse.DateUtil
 import javassist.NotFoundException
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Event
@@ -421,7 +422,7 @@ class RequisitionService {
         if (picklist) {
             picklist.picklistItems.each { picklistItem ->
                 def transactionEntry = new TransactionEntry()
-                transactionEntry.binLocation = picklistItem.binLocation
+                transactionEntry.binLocation = picklistItem.stagingLocation ?: picklistItem.binLocation
                 transactionEntry.inventoryItem = picklistItem.inventoryItem
                 transactionEntry.quantity = picklistItem.quantity
                 outboundTransaction.addToTransactionEntries(transactionEntry)
@@ -439,52 +440,6 @@ class RequisitionService {
                 requisition.save(flush: true)
             }
 
-        } else {
-            requisition.errors.reject("requisition.picklist.mustHavePicklist")
-            throw new ValidationException("Could not find a picklist associated with this requisition", requisition.errors)
-        }
-
-        return outboundTransaction
-    }
-
-    def issueRequisitionFromStagingArea(Requisition requisition) {
-        def outboundTransaction = Transaction.findByRequisition(requisition)
-        if (outboundTransaction) {
-            outboundTransaction.errors.reject("Cannot create multiple outbound transaction for the same requisition")
-            throw new ValidationException("Cannot complete inventory transfer", outboundTransaction.errors)
-        }
-
-        if (!outboundTransaction) {
-            outboundTransaction = new Transaction()
-            outboundTransaction.transactionNumber = inventoryService.generateTransactionNumber(outboundTransaction)
-            outboundTransaction.transactionDate = new Date()
-            outboundTransaction.requisition = requisition
-            outboundTransaction.destination = requisition.destination
-            outboundTransaction.inventory = requisition?.origin?.inventory
-            outboundTransaction.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
-        }
-
-        def picklist = Picklist.findByRequisition(requisition)
-        if (picklist) {
-            picklist.picklistItems.each { picklistItem ->
-                def transactionEntry = new TransactionEntry()
-                transactionEntry.binLocation = picklistItem.stagingLocation
-                transactionEntry.inventoryItem = picklistItem.inventoryItem
-                transactionEntry.quantity = picklistItem.quantity
-                outboundTransaction.addToTransactionEntries(transactionEntry)
-            }
-
-            if (!inventoryService.saveLocalTransfer(outboundTransaction)) {
-                throw new ValidationException("Unable to save local transfer", outboundTransaction.errors)
-            } else {
-                Date now = new Date()
-                requisition.status = RequisitionStatus.ISSUED
-                requisition.dateIssued = now
-                requisition.issuedBy = AuthService.currentUser
-                requisition.dateDelivered = now
-                requisition.deliveredBy = AuthService.currentUser
-                requisition.save(flush: true)
-            }
         } else {
             requisition.errors.reject("requisition.picklist.mustHavePicklist")
             throw new ValidationException("Could not find a picklist associated with this requisition", requisition.errors)
