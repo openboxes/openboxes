@@ -210,3 +210,108 @@ export const importCycleCounts = async ({
     },
   };
 };
+
+const mergeImportItemsRecount = (originalItem, importedItem) => ({
+  ...originalItem,
+  quantityRecounted: importedItem ? importedItem.quantityRecounted : originalItem.quantityRecounted,
+  rootCause: importedItem ? importedItem.rootCause : originalItem.rootCause,
+  comment: importedItem ? importedItem.comment : originalItem.comment,
+  updated: true,
+});
+
+const createCustomItemsRecountFromImport = (items, locale) => (items
+  ? items.map((item) => ({
+    ...item,
+    countIndex: 1,
+    id: _.uniqueId(NEW_ROW),
+    custom: true,
+    inventoryItem: {
+      lotNumber: item.lotNumber,
+      expirationDate: item.expirationDate
+        ? moment(item.expirationDate)
+          .locale(locale)
+          .format(DateFormat.MMM_DD_YYYY)
+        : null,
+    },
+    product: {
+      id: item.product.id,
+      productCode: item.product.productCode,
+    },
+    binLocation: item.binLocation?.id ? {
+      id: item.binLocation.id,
+      name: item.binLocation.name,
+    } : null,
+  }))
+  : []);
+
+export const importCycleCountsRecount = async ({
+  importFile,
+  locationId,
+  tableData,
+  setImportErrors,
+  locale,
+  recountedBy,
+  dateRecounted,
+}) => {
+  const response = await cycleCountApi.importCycleCountItemsRecount(
+    importFile,
+    locationId,
+  );
+  setImportErrors(response.data.errors);
+  let cycleCounts = _.groupBy(response.data.data, 'cycleCountId');
+  const assigneeImported = {};
+  const recountedByUpdates = {};
+  const dateRecountedUpdates = {};
+
+  // eslint-disable-next-line no-param-reassign
+  tableData.current = tableData.current.map((cycleCount) => {
+    // After each iteration assign it to false again, so that the flag
+    // can be reused for next cycle counts in the loop
+    assigneeImported[cycleCount.id] = false;
+    return {
+      ...cycleCount,
+      cycleCountItems: [
+        ...cycleCount.cycleCountItems
+          .map((item) => {
+            const correspondingImportItem = cycleCounts[cycleCount.id]?.find(
+              (cycleCountItem) => cycleCountItem.cycleCountItemId === item.id,
+            );
+            // Assign counted by and date counted only once to prevent performance issues
+            // At this point, every item after being validated on the backend,
+            // should have the same assignee and dateCounted set,
+            // so we can make this operation only once
+            // this is why we introduce the assigneeImported boolean flag
+            if (correspondingImportItem && !assigneeImported[cycleCount.id]) {
+              recountedByUpdates[cycleCount.id] = correspondingImportItem.recountAssignee;
+              // Do not allow to clear the date counted dropdown
+              // if dateCounted was not set in the sheet
+              if (correspondingImportItem.dateRecounted) {
+                dateRecountedUpdates[cycleCount.id] = correspondingImportItem.dateRecounted;
+              }
+              // Mark the flag as true, so that it's not triggered for each item
+              assigneeImported[cycleCount.id] = true;
+            }
+
+            if (correspondingImportItem) {
+              // Remove items from the import that have a corresponding item
+              // in the current cycle count. It allows us to treat items with
+              // the wrong ID as new rows that do not already exist.
+              cycleCounts = removeItemFromCycleCounts({
+                cycleCounts,
+                cycleCountId: cycleCount.id,
+                itemId: correspondingImportItem.cycleCountItemId,
+              });
+            }
+
+            return mergeImportItemsRecount(item, correspondingImportItem);
+          }),
+        ...createCustomItemsRecountFromImport(cycleCounts[cycleCount.id], locale),
+      ],
+    };
+  });
+  // eslint-disable-next-line no-param-reassign
+  recountedBy.current = { ...recountedBy.current, ...recountedByUpdates };
+  // eslint-disable-next-line no-param-reassign
+  dateRecounted.current = { ...dateRecounted.current, ...dateRecountedUpdates };
+  console.log(recountedBy.current);
+};

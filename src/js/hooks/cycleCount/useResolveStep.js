@@ -94,8 +94,13 @@ const useResolveStep = () => {
     locale: getCurrentLocale(state),
   }));
 
-  const { importErrors, importItems } = useResolveStepImport(currentLocation?.id, locale);
-
+  const { importErrors, importItems } = useResolveStepImport({
+    currentLocationId: currentLocation?.id,
+    locale,
+    tableData,
+    recountedBy,
+    dateRecounted,
+  });
   const translate = useTranslate();
 
   const showBinLocation = useMemo(() =>
