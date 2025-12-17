@@ -180,7 +180,6 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
                 shipmentType        : shipment?.shipmentType,
                 approvers           : requisition?.approvers?.toList(),
                 deliveryTypeCode    : deliveryTypeCode,
-                requisitionItems    : requisition?.requisitionItems,
 
                 // Required by mobile app
                 expectedShippingDate : shipment?.expectedShippingDate?.format("MM/dd/yyyy HH:mm XXX"),
