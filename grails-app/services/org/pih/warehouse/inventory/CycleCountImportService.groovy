@@ -149,9 +149,9 @@ class CycleCountImportService {
                 command.data
                 // Firstly group by cycle count to separate them
                         .groupBy { it.cycleCountId }
-                // Then build a map, where cycle count id is a key, and value is also a map with date counted as a key
+                // Then build a map, where cycle count id is a key, and value is also a map with date recounted as a key
                 // and value is a list with rows with a particular date recounted.
-                // For a valid cycle count, the list should contain only one element (one date counted used for all rows for a cycle count)
+                // For a valid cycle count, the list should contain only one element (one date recounted used for all rows for a cycle count)
                         .collectEntries { [it.key, it.value.groupBy { val -> val.dateRecounted }]}
                         .findAll { it.value.size() > 1 }
 
@@ -195,9 +195,9 @@ class CycleCountImportService {
             if (row.binLocation != null && !row.binLocation.id) {
                 command.errors.reject("Row ${index + 1}: Provided bin location does not exist in the system")
             }
-            if (row.assignee != null && !row.assignee.id) {
-                command.errors.reject("Row ${index + 1}: Provided assignee (user counted column) does not exist in the system")
-                row.assignee = null
+            if (row.recountAssignee != null && !row.recountAssignee.id) {
+                command.errors.reject("Row ${index + 1}: Provided recount assignee (user recounted column) does not exist in the system")
+                row.recountAssignee = null
             }
             // Validation cases for an existing item (update)
             // We mustn't update bin location, lot number and expiration date via import for an existing item

@@ -214,12 +214,11 @@ export const importCycleCounts = async ({
 const mergeImportItemsRecount = (originalItem, importedItem) => ({
   ...originalItem,
   quantityRecounted: importedItem ? importedItem.quantityRecounted : originalItem.quantityRecounted,
-  rootCause: importedItem ? importedItem.rootCause : originalItem.rootCause,
   comment: importedItem ? importedItem.comment : originalItem.comment,
   updated: true,
 });
 
-const createCustomItemsRecountFromImport = (items, locale) => (items
+const createCustomItemsRecountFromImport = (items, locale, reasonCodes) => (items
   ? items.map((item) => ({
     ...item,
     countIndex: 1,
@@ -241,6 +240,11 @@ const createCustomItemsRecountFromImport = (items, locale) => (items
       id: item.binLocation.id,
       name: item.binLocation.name,
     } : null,
+    rootCause: {
+      id: item.rootCause?.name,
+      label: reasonCodes?.find?.((reasonCode) => reasonCode?.id === item.rootCause?.name)?.label,
+      value: item.rootCause?.name,
+    },
   }))
   : []);
 
@@ -253,6 +257,7 @@ export const importCycleCountsRecount = async ({
   recountedBy,
   defaultRecountedBy,
   dateRecounted,
+  reasonCodes,
 }) => {
   const response = await cycleCountApi.importCycleCountItemsRecount(
     importFile,
@@ -306,7 +311,7 @@ export const importCycleCountsRecount = async ({
 
             return mergeImportItemsRecount(item, correspondingImportItem);
           }),
-        ...createCustomItemsRecountFromImport(cycleCounts[cycleCount.id], locale),
+        ...createCustomItemsRecountFromImport(cycleCounts[cycleCount.id], locale, reasonCodes),
       ],
     };
   });

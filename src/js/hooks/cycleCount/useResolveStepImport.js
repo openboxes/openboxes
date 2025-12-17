@@ -10,6 +10,7 @@ const useResolveStepImport = ({
   recountedBy,
   defaultRecountedBy,
   dateRecounted,
+  reasonCodes,
 }) => {
   const [importErrors, setImportErrors] = useState([]);
   const { show, hide } = useSpinner();
@@ -26,11 +27,20 @@ const useResolveStepImport = ({
         defaultRecountedBy,
         setImportErrors,
         locale,
+        reasonCodes,
       });
     } finally {
       hide();
     }
-  }, [currentLocationId, locale]);
+  }, [
+    currentLocationId,
+    locale,
+    tableData,
+    recountedBy,
+    defaultRecountedBy,
+    dateRecounted,
+    reasonCodes,
+  ]);
 
   return {
     importErrors,

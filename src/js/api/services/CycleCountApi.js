@@ -4,7 +4,8 @@ import {
   CYCLE_COUNT, CYCLE_COUNT_ITEM,
   CYCLE_COUNT_ITEMS_BATCH,
   CYCLE_COUNT_ITEMS_BATCH_ROOT,
-  CYCLE_COUNT_ITEMS_IMPORT, CYCLE_COUNT_ITEMS_RECOUNT_IMPORT,
+  CYCLE_COUNT_ITEMS_IMPORT,
+  CYCLE_COUNT_ITEMS_IMPORT_RECOUNT,
   CYCLE_COUNT_PENDING_REQUESTS,
   CYCLE_COUNT_RECOUNT_START,
   CYCLE_COUNT_REFRESH_ITEMS,
@@ -79,7 +80,7 @@ export default {
         'content-type': 'multipart/form-data',
       },
     };
-    return apiClient.post(CYCLE_COUNT_ITEMS_RECOUNT_IMPORT(locationId), formData, config);
+    return apiClient.post(CYCLE_COUNT_ITEMS_IMPORT_RECOUNT(locationId), formData, config);
   },
   updateCycleCountRequests(locationId, payload) {
     return apiClient.patch(CYCLE_COUNT_REQUESTS_BATCH(locationId), payload);
