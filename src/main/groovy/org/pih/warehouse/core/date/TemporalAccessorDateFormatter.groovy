@@ -36,4 +36,8 @@ class TemporalAccessorDateFormatter<T extends TemporalAccessor> extends Temporal
         // we stick with ISO pattern because it's a universally accepted date format and is guaranteed to work.
         //return DateTimeFormatter.ISO_DATE
     }
+
+    DateTimeFormatter getFileNameFormatter() {
+        return DateTimeFormatter.ofPattern('yyyyMMdd')
+    }
 }

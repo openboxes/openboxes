@@ -60,6 +60,26 @@ class MessageLocalizer {
     }
 
     /**
+     * Convenience method for localizing Enum values.
+     */
+    public <T extends Enum<T>> String localizeEnumValue(T enumValue, Locale localeOverride=null) {
+        // Our localization message keys for Enums are standardized to "enum.<enum_class>.<enum_key>"
+        // For example: "enum.ActivityCode.ADJUST_INVENTORY"
+        return localize("enum.${enumValue.class.simpleName}.${enumValue.name()}", localeOverride)
+    }
+
+    /**
+     * Convenience method for localizing a collection of Enum values.
+     */
+    public <T extends Enum<T>> List<String> localizeEnumValues(Collection<T> enumValues, Locale localeOverride=null) {
+        if (!enumValues) {
+            return []
+        }
+
+        return enumValues.collect { localizeEnumValue(it, localeOverride) }
+    }
+
+    /**
      * Returns a custom message override if one exists in the Localization database.
      *
      * We allow localization for individual codes to be overridden by data in the Localization database table.
