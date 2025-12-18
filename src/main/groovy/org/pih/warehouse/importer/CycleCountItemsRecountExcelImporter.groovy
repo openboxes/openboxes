@@ -74,7 +74,7 @@ class CycleCountItemsRecountExcelImporter extends AbstractExcelImporter implemen
         // 1. Collect all uniques bin location names and product codes
         List<String> locationNames = data*.binLocation.unique()
         List<String> productCodes  = data*.productCode.unique()
-        List<String> personNames = (data*.recountAssignee + data*.assignee).unique().findAll { it }
+        List<String> personNames = data*.recountAssignee.unique()
 
         // 2. Fetch all of the necessary data in single database call
         Map<String, Location> locationMap = Location.findAllByNameInList(locationNames).collectEntries {

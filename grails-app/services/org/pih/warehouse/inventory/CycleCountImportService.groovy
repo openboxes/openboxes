@@ -137,10 +137,8 @@ class CycleCountImportService {
 
         cycleCountsWithInvalidRecountAssignee.each {
             // If at least one row is invalid, we want to clear the recount assignee for all rows
-            command.data.each { row ->
-                if (row.cycleCountId == it.key) {
-                    row.recountAssignee = null
-                }
+            it.value.values().flatten().each { row ->
+                row.recountAssignee = null
             }
             command.errors.reject("Product cycle count with id ${it.key} must have the same recount assignee set up for all rows")
         }
@@ -157,10 +155,8 @@ class CycleCountImportService {
 
         cycleCountsWithInvalidDateRecounted.each {
             // If at least one row is invalid, we want to clear the dateRecounted for all rows
-            command.data.each { row ->
-                if (row.cycleCountId == it.key) {
-                    row.dateRecounted = null
-                }
+            it.value.values().flatten().each { row ->
+                row.dateRecounted = null
             }
             command.errors.reject("Product cycle count with id ${it.key} must have the same date recounted set up for all rows and it must not be empty")
         }
@@ -185,7 +181,7 @@ class CycleCountImportService {
                 command.errors.reject("Row ${index + 1}: This row was ignored in the import because product code was blank - you must use a product associated with this cycle count")
                 itemsToRemove.add(row)
             }
-            // Ignore the row is product code is different than the product code that cycle count is associated with
+            // Ignore the row if product code is different than the product code that cycle count is associated with
             if (row.productCode != cycleCountRequest.product.productCode) {
                 command.errors.reject("Row ${index + 1}: This row is skipped, because you used an invalid product - you must use a product associated with this cycle count")
                 itemsToRemove.add(row)
@@ -208,7 +204,7 @@ class CycleCountImportService {
                 if (normalizeLotNumber(row.lotNumber) != normalizeLotNumber(cycleCountItem.inventoryItem?.lotNumber)) {
                     command.errors.reject("Row ${index + 1}: You cannot update lot number for an existing item")
                 }
-                if (row.expirationDate != cycleCountItem.inventoryItem.expirationDate) {
+                if (row.expirationDate != cycleCountItem.inventoryItem?.expirationDate) {
                     command.errors.reject("Row ${index + 1}: You cannot update expiration date for an existing item")
                 }
             }
