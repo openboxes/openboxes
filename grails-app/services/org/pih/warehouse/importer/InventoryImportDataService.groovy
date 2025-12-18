@@ -90,7 +90,9 @@ class InventoryImportDataService implements ImportDataService {
 
                 // OBPIH 5102: If the product requires a lot and expiry, error unless we're zeroing out the quantity.
                 // This is useful for data cleanup and for the initial import of products that don't have a lot yet.
-                if (product.lotAndExpiryControl && (row.quantity && (row.quantity as int) < 0) && (!row.expirationDate || !row.lotNumber)) {
+                if (product.lotAndExpiryControl
+                        && (row.quantity?.isInteger() && row.quantity as int != 0)
+                        && (!row.expirationDate || !row.lotNumber)) {
                     command.errors.reject(
                             "error.lotAndExpiryControl.required",
                             "Row ${rowIndex}: Both lot number and expiry date are required for the '${product.productCode} ${product.name}' product."
