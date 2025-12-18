@@ -1216,6 +1216,11 @@ class UrlMappings {
             action = [GET: "read"]
         }
 
+        "/api/outbound-orders/$id/items/$itemId/allocations"(parseRequest: true) {
+            controller = "outboundOrderApi"
+            action = [POST: "allocate"]
+        }
+
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")
