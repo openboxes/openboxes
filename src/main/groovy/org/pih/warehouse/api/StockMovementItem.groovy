@@ -71,6 +71,8 @@ class StockMovementItem {
 
     BigDecimal packSize = 1
 
+    List<AvailableItem> availableItems // required for outbound orders
+
     /**
      * Represents the version of the item (ie how many times it has been modified). Typically pulled from
      * the version field of the domain that was used to initialize the stock movement item (ex: requisition item).
@@ -132,6 +134,7 @@ class StockMovementItem {
         substitutionItems(nullable: true)
         version(nullable: true)
         manuallyAdded(nullable: true)
+        availableItems(nullable: true)
     }
 
     String toString() {
@@ -180,7 +183,8 @@ class StockMovementItem {
                         expirationDate: inventoryItem.expirationDate?.format("MM/dd/yyyy"),
                         quantity      : inventoryItem.quantity
                 ],
-                manuallyAdded             : manuallyAdded,
+                manuallyAdded          : manuallyAdded,
+                availableItems         : availableItems
         ]
     }
 

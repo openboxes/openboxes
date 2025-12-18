@@ -14,6 +14,7 @@ import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.ShipmentType
@@ -102,6 +103,9 @@ class OutboundStockMovementService {
             }
             if (stockMovement.requestType) {
                 eq("requestType", stockMovement.requestType)
+            }
+            if (stockMovement.deliveryTypeCode) {
+                eq("deliveryTypeCode", stockMovement.deliveryTypeCode)
             }
             if (stockMovement.sourceType) {
                 eq ('sourceType', stockMovement.sourceType)

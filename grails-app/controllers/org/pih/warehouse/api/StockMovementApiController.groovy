@@ -14,6 +14,7 @@ import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
@@ -72,6 +73,7 @@ class StockMovementApiController {
         stockMovement.requestType = params.requestType ? params.requestType as RequisitionType : null
         stockMovement.sourceType = params.sourceType ? params.sourceType as RequisitionSourceType : null
         stockMovement.approvers = params.approver ? User.getAll(params.list("approver"))?.findAll{ it } : null
+        stockMovement.deliveryTypeCode = params.deliveryTypeCode ? DeliveryTypeCode.valueOf(params.deliveryTypeCode) : null
 
         if (params.q) {
             stockMovement.identifier = "%" + params.q + "%"
