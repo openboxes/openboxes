@@ -190,7 +190,7 @@ const useProductSupplierForm = () => {
     handleSubmit,
     trigger,
     setValue,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isDirty },
     getValues,
   } = useForm({
     // We want the validation errors to occur onBlur of any field
@@ -369,6 +369,7 @@ const useProductSupplierForm = () => {
     handleSubmit,
     errors,
     isValid,
+    isFormDirty: isDirty,
     triggerValidation: trigger,
     onSubmit,
     setProductPackageQuantity,
