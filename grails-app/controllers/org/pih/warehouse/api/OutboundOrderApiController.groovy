@@ -23,13 +23,4 @@ class OutboundOrderApiController {
 
         render([data: stockMovement] as JSON)
     }
-
-    def items() {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        if (!stockMovement) {
-            throw new IllegalArgumentException("No outbound order found for id ${params.id}")
-        }
-
-        render([data: stockMovement.lineItems] as JSON)
-    }
 }
