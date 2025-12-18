@@ -121,7 +121,7 @@ class CycleCountImportService {
 
     void validateRecountImport(ImportDataCommand command) {
         // Firstly clear the command's errors, as it might contain some additional errors related to the file itself
-        // that we do not care about while validating the data, and we don't them to be visible for a user
+        // that we do not care about while validating the data, and we don't want them to be visible for a user
         command.clearErrors()
         // Store items that should be ignored for an import - for some cases we want not only to display an error, but also to ignore such row
         List<Map> itemsToRemove = []
