@@ -1825,11 +1825,11 @@ class StockMovementService {
         }
     }
 
-    void createPicklistAfterShortage(PicklistItem picklistItem, Boolean validateQuantityAvailable) {
-        createPicklist(picklistItem.requisitionItem, picklistItem?.quantityCanceled, Boolean.FALSE, validateQuantityAvailable, picklistItem)
+    void createPicklistAfterShortage(PicklistItem picklistItem, Boolean validateSuggestionItemsAvailability) {
+        createPicklist(picklistItem.requisitionItem, picklistItem?.quantityCanceled, Boolean.FALSE, validateSuggestionItemsAvailability, picklistItem)
     }
 
-    void createPicklist(RequisitionItem requisitionItem, Integer quantityRequired, Boolean shouldClearPicklist = Boolean.TRUE, Boolean validateQuantityAvailable = Boolean.FALSE, PicklistItem excludedPicklistItem = null) {
+    void createPicklist(RequisitionItem requisitionItem, Integer quantityRequired, Boolean shouldClearPicklist = Boolean.TRUE, Boolean validateSuggestionItemsAvailability = Boolean.FALSE, PicklistItem excludedPicklistItem = null) {
         Location location = requisitionItem?.requisition?.origin
 
         log.info "QUANTITY REQUIRED: ${quantityRequired}"
@@ -1867,7 +1867,7 @@ class StockMovementService {
                             suggestedItem.quantityPicked.intValueExact(),)
                 }
             }
-            if (validateQuantityAvailable && !suggestedItems) {
+            if (validateSuggestionItemsAvailability && !suggestedItems) {
                 String errorMessage = "Product " + requisitionItem.product.productCode + " has no available inventory. Please go back to edit page and revise quantity"
                 requisitionItem.errors.rejectValue("picklistItems", errorMessage, [
                         requisitionItem?.product?.productCode,

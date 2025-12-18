@@ -171,14 +171,16 @@ class PickTaskService {
         validateOutboundContainer(outboundContainer, task)
 
         PicklistItem existingPickItem = PicklistItem.get(task.id)
-        picklistService.updatePicklistItem(existingPickItem.id, task.product?.id, quantityPicked.toBigDecimal(), pickedById, reasonCode)
+        if (quantityPicked > 0) {
+            picklistService.updatePicklistItem(existingPickItem.id, task.product?.id, quantityPicked.toBigDecimal(), pickedById, reasonCode)
+            transferToContainer(task, outboundContainer, quantityPicked)
+            existingPickItem.outboundContainer = outboundContainer
+        }
 
         if (reasonCode) {
             executeStateTransition(task, PickTaskStatus.PICKED)
         }
 
-        transferToContainer(task, outboundContainer, quantityPicked)
-        existingPickItem.outboundContainer = outboundContainer
         save(task)
     }
 
