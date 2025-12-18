@@ -211,14 +211,19 @@ export const importCycleCounts = async ({
   };
 };
 
-const mergeImportItemsRecount = (originalItem, importedItem) => ({
+const mergeImportItemsRecount = (originalItem, importedItem, reasonCodes) => ({
   ...originalItem,
   quantityRecounted: importedItem ? importedItem.quantityRecounted : originalItem.quantityRecounted,
   comment: importedItem ? importedItem.comment : originalItem.comment,
+  rootCause: (importedItem.rootCause && {
+    id: importedItem.rootCause,
+    label: reasonCodes?.find?.((reasonCode) => reasonCode?.id === importedItem.rootCause)?.label,
+    value: importedItem.rootCause,
+  }) || (importedItem ? null : originalItem.rootCause),
   updated: true,
 });
 
-const createCustomItemsRecountFromImport = (items, locale, reasonCodes) => (items
+const createCustomItemsRecountFromImport = (items, locale) => (items
   ? items.map((item) => ({
     ...item,
     countIndex: 1,
@@ -240,11 +245,6 @@ const createCustomItemsRecountFromImport = (items, locale, reasonCodes) => (item
       id: item.binLocation.id,
       name: item.binLocation.name,
     } : null,
-    rootCause: item.rootCause ? {
-      id: item.rootCause,
-      label: reasonCodes?.find?.((reasonCode) => reasonCode?.id === item.rootCause)?.label,
-      value: item.rootCause,
-    } : null,
   }))
   : []);
 
@@ -265,7 +265,7 @@ export const importCycleCountsRecount = async ({
   );
   setImportErrors(response.data.errors);
   let cycleCounts = _.groupBy(response.data.data, 'cycleCountId');
-  const assigneeImported = {};
+  const recountAssigneeImported = {};
   const recountedByUpdates = {};
   const dateRecountedUpdates = {};
 
@@ -273,7 +273,7 @@ export const importCycleCountsRecount = async ({
   tableData.current = tableData.current.map((cycleCount) => {
     // After each iteration assign it to false again, so that the flag
     // can be reused for next cycle counts in the loop
-    assigneeImported[cycleCount.id] = false;
+    recountAssigneeImported[cycleCount.id] = false;
     return {
       ...cycleCount,
       cycleCountItems: [
@@ -286,8 +286,8 @@ export const importCycleCountsRecount = async ({
             // At this point, every item after being validated on the backend,
             // should have the same assignee and dateCounted set,
             // so we can make this operation only once
-            // this is why we introduce the assigneeImported boolean flag
-            if (correspondingImportItem && !assigneeImported[cycleCount.id]) {
+            // this is why we introduce the recountAssigneeImported boolean flag
+            if (correspondingImportItem && !recountAssigneeImported[cycleCount.id]) {
               recountedByUpdates[cycleCount.id] = correspondingImportItem.recountAssignee;
               // Do not allow to clear the date counted dropdown
               // if dateCounted was not set in the sheet
@@ -295,7 +295,7 @@ export const importCycleCountsRecount = async ({
                 dateRecountedUpdates[cycleCount.id] = correspondingImportItem.dateRecounted;
               }
               // Mark the flag as true, so that it's not triggered for each item
-              assigneeImported[cycleCount.id] = true;
+              recountAssigneeImported[cycleCount.id] = true;
             }
 
             if (correspondingImportItem) {
@@ -309,9 +309,9 @@ export const importCycleCountsRecount = async ({
               });
             }
 
-            return mergeImportItemsRecount(item, correspondingImportItem);
+            return mergeImportItemsRecount(item, correspondingImportItem, reasonCodes);
           }),
-        ...createCustomItemsRecountFromImport(cycleCounts[cycleCount.id], locale, reasonCodes),
+        ...createCustomItemsRecountFromImport(cycleCounts[cycleCount.id], locale),
       ],
     };
   });
