@@ -2,6 +2,7 @@ package org.pih.warehouse.core.date
 
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import org.springframework.stereotype.Component
 
 import org.pih.warehouse.DateUtil
 
@@ -9,7 +10,19 @@ import org.pih.warehouse.DateUtil
  * A formatter that converts Date objects to Strings.
  *
  * Designed to be temporary. We aim to eventually fully switch to java.time classes, which would deprecate this class.
+ *
+ * We don't bother extending AbstractDateFormatter because Date functions differently. It represents both date-only
+ * and datetime fields, so the getXFormatter methods aren't useful (we still wouldn't know which pattern to use).
+ * Instead we opt to provide formatAsX convenience methods so that the caller can choose the pattern they want.
+ *
+ * As such, there are two ways to use this formatter:
+ * 1) JavaUtilDateFormatter.formatAsX(date)
+ * 2) dateFormatter.format(date, DateFormatterContext.builder().withDisplayStyleOverride(DateDisplayStyle.X).build())
+ *
+ * Option 1 is easier since it's a static call, but option 2 uses the actual method we'll call after the date refactor
+ * (after the refactor the DateFormatterContext wont be needed so it'll just be dateFormatter.format(date)).
  */
+@Component
 class JavaUtilDateFormatter implements IDateFormatter<Date> {
 
     private static final String EMPTY_DISPLAY_DATE = ''
@@ -18,9 +31,17 @@ class JavaUtilDateFormatter implements IDateFormatter<Date> {
     private static final DateTimeFormatter DEFAULT_DISPLAY_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MMM/yyyy HH:mm:ss XXX")
     private static final DateTimeFormatter DEFAULT_DISPLAY_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss")
 
-    @Override
-    String format(Date date) {
-        return formatAsDateTime(date)
+    String format(Date date, DateFormatterContext context=null) {
+        switch (context?.displayStyleOverride) {
+            case DateDisplayStyle.DATE_TIME:
+            case DateDisplayStyle.DATE_TIME_ZONE:
+            case null:
+                return formatAsDateTime(date)
+            case DateDisplayStyle.DATE:
+                return formatAsDate(date)
+            case DateDisplayStyle.TIME:
+                return formatAsTime(date)
+        }
     }
 
     /**
