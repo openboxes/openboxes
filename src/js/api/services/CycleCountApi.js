@@ -72,7 +72,7 @@ export default {
     };
     return apiClient.post(CYCLE_COUNT_ITEMS_IMPORT(locationId), formData, config);
   },
-  importCycleCountItemsRecount: (file, locationId) => {
+  importCycleCountRecountItems: (file, locationId) => {
     const formData = new FormData();
     formData.append('importFile', file);
     const config = {

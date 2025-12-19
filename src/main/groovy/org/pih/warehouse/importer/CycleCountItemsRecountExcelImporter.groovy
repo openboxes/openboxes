@@ -10,7 +10,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.CycleCountImportService
 import org.pih.warehouse.product.Product
 
-class CycleCountItemsRecountExcelImporter extends AbstractExcelImporter implements DataImporter {
+class CycleCountRecountItemsExcelImporter extends AbstractExcelImporter implements DataImporter {
 
     ExcelImportService excelImportService
     CycleCountImportService cycleCountImportService
@@ -55,7 +55,7 @@ class CycleCountItemsRecountExcelImporter extends AbstractExcelImporter implemen
             dateRecounted:     ([expectedType: ExpectedPropertyType.DateJavaType, defaultValue: null]),
     ]
 
-    CycleCountItemsRecountExcelImporter(String fileName) {
+    CycleCountRecountItemsExcelImporter(String fileName) {
         super()
         read(fileName)
         excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")

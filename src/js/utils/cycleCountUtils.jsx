@@ -264,21 +264,21 @@ export const importCycleCountsRecount = async ({
   dateRecounted,
   reasonCodes,
 }) => {
-  const response = await cycleCountApi.importCycleCountItemsRecount(
+  const response = await cycleCountApi.importCycleCountRecountItems(
     importFile,
     locationId,
   );
   setImportErrors(response.data.errors);
   let cycleCounts = _.groupBy(response.data.data, 'cycleCountId');
-  const recountAssigneeImported = {};
-  const recountedByUpdates = {};
-  const dateRecountedUpdates = {};
+  const assigneeAlreadyProcessed = {};
+  const importedRecountAssignees = {};
+  const importedDateRecounted = {};
 
   // eslint-disable-next-line no-param-reassign
   tableData.current = tableData.current.map((cycleCount) => {
     // After each iteration assign it to false again, so that the flag
     // can be reused for next cycle counts in the loop
-    recountAssigneeImported[cycleCount.id] = false;
+    assigneeAlreadyProcessed[cycleCount.id] = false;
     return {
       ...cycleCount,
       cycleCountItems: [
@@ -291,16 +291,16 @@ export const importCycleCountsRecount = async ({
             // At this point, every item after being validated on the backend,
             // should have the same recountAssignee and dateRecounted set,
             // so we can make this operation only once
-            // this is why we introduce the recountAssigneeImported boolean flag
-            if (correspondingImportItem && !recountAssigneeImported[cycleCount.id]) {
-              recountedByUpdates[cycleCount.id] = correspondingImportItem.recountAssignee;
+            // this is why we introduce the assigneeAlreadyProcessed boolean flag
+            if (correspondingImportItem && !assigneeAlreadyProcessed[cycleCount.id]) {
+              importedRecountAssignees[cycleCount.id] = correspondingImportItem.recountAssignee;
               // Do not allow to clear the date recounted dropdown
               // if dateRecounted was not set in the sheet
               if (correspondingImportItem.dateRecounted) {
-                dateRecountedUpdates[cycleCount.id] = correspondingImportItem.dateRecounted;
+                importedDateRecounted[cycleCount.id] = correspondingImportItem.dateRecounted;
               }
               // Mark the flag as true, so that it's not triggered for each item
-              recountAssigneeImported[cycleCount.id] = true;
+              assigneeAlreadyProcessed[cycleCount.id] = true;
             }
 
             if (correspondingImportItem) {
@@ -319,10 +319,16 @@ export const importCycleCountsRecount = async ({
       ],
     };
   });
+
+  // Merge imported recount assignees with existing ones, preserving
+  // any cycle counts not included in this import
   // eslint-disable-next-line no-param-reassign
-  recountedBy.current = { ...recountedBy.current, ...recountedByUpdates };
+  recountedBy.current = { ...recountedBy.current, ...importedRecountAssignees };
   // eslint-disable-next-line no-param-reassign
-  defaultRecountedBy.current = { ...defaultRecountedBy.current, ...recountedByUpdates };
+  defaultRecountedBy.current = { ...defaultRecountedBy.current, ...importedRecountAssignees };
+
+  // Merge imported date recounted with existing ones, preserving
+  // any cycle counts not included in this import
   // eslint-disable-next-line no-param-reassign
-  dateRecounted.current = { ...dateRecounted.current, ...dateRecountedUpdates };
+  dateRecounted.current = { ...dateRecounted.current, ...importedDateRecounted };
 };

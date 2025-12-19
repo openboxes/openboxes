@@ -10,7 +10,7 @@ import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.core.dtos.BatchCommandUtils
 import org.pih.warehouse.importer.CycleCountItemsExcelImporter
-import org.pih.warehouse.importer.CycleCountItemsRecountExcelImporter
+import org.pih.warehouse.importer.CycleCountRecountItemsExcelImporter
 import org.pih.warehouse.importer.DataImporter
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.PackingListExcelImporter
@@ -251,10 +251,10 @@ class CycleCountApiController {
         MultipartFile importFile = command.importFile
         File localFile = uploadService.createLocalFile(importFile.originalFilename)
         importFile.transferTo(localFile)
-        DataImporter cycleCountItemsRecountExcelImporter = new CycleCountItemsRecountExcelImporter(localFile.absolutePath)
+        DataImporter cycleCountRecountItemsExcelImporter = new CycleCountRecountItemsExcelImporter(localFile.absolutePath)
         // After importer takes care of parsing the data, assign it to the import data command that is further validated
-        command.data = cycleCountItemsRecountExcelImporter.data
-        cycleCountItemsRecountExcelImporter.validateData(command)
+        command.data = cycleCountRecountItemsExcelImporter.data
+        cycleCountRecountItemsExcelImporter.validateData(command)
         // Collect the errors after validating the data to readable state
         List<String> errors = cycleCountImportService.buildErrors(command)
         render([data: command.data, errors: errors] as JSON)

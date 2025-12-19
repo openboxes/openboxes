@@ -26,45 +26,9 @@ class CycleCountImportService {
         command.clearErrors()
         // Store items that should be ignored for an import - for some cases we want not only to display an error, but also to ignore such row
         List<Map> itemsToRemove = []
-        Map<String, Map<String, List<Map<String, Object>>>> cycleCountsWithInvalidAssignee =
-                command.data
-                        // Firstly group by cycle count to separate them
-                        .groupBy { it.cycleCountId }
-                        // Then build a map, where cycle count id is a key, and value is also a map with assignee as a key
-                        // and value is a list with rows with a particular assignee.
-                        // For a valid cycle count, the list should contain only one element (one assignee used for all rows for a cycle count)
-                        .collectEntries { [it.key, it.value.groupBy { val -> val.assignee }]}
-                        .findAll { it.value.size() > 1 }
 
-        cycleCountsWithInvalidAssignee.each {
-            // If at least one row is invalid, we want to clear the assignee for all rows
-            command.data.each { row ->
-                if (row.cycleCountId == it.key) {
-                    row.assignee = null
-                }
-            }
-            command.errors.reject("Product cycle count with id ${it.key} must have the same assignee set up for all rows")
-        }
-
-        Map<String, Map<String, List<Map<String, Object>>>> cycleCountsWithInvalidDateCounted =
-                command.data
-                // Firstly group by cycle count to separate them
-                        .groupBy { it.cycleCountId }
-                // Then build a map, where cycle count id is a key, and value is also a map with date counted as a key
-                // and value is a list with rows with a particular date counted.
-                // For a valid cycle count, the list should contain only one element (one date counted used for all rows for a cycle count)
-                        .collectEntries { [it.key, it.value.groupBy { val -> val.dateCounted }]}
-                        .findAll { it.value.size() > 1 }
-
-        cycleCountsWithInvalidDateCounted.each {
-            // If at least one row is invalid, we want to clear the dateCounted for all rows
-            command.data.each { row ->
-                if (row.cycleCountId == it.key) {
-                    row.dateCounted = null
-                }
-            }
-            command.errors.reject("Product cycle count with id ${it.key} must have the same date counted set up for all rows and it must not be empty")
-        }
+        validateConsistentFieldAcrossCycleCount(command, 'assignee', "must have the same assignee set up for all rows")
+        validateConsistentFieldAcrossCycleCount(command, 'dateCounted', "must have the same date counted set up for all rows and it must not be empty")
 
         command.data.eachWithIndex { row, index ->
             CycleCountRequest cycleCountRequest = CycleCount.read(row.cycleCountId)?.cycleCountRequest
@@ -125,41 +89,9 @@ class CycleCountImportService {
         command.clearErrors()
         // Store items that should be ignored for an import - for some cases we want not only to display an error, but also to ignore such row
         List<Map> itemsToRemove = []
-        Map<String, Map<String, List<Map<String, Object>>>> cycleCountsWithInvalidRecountAssignee =
-                command.data
-                // Firstly group by cycle count to separate them
-                        .groupBy { it.cycleCountId }
-                // Then build a map, where cycle count id is a key, and value is also a map with recount assignee as a key
-                // and value is a list with rows with a particular recount assignee.
-                // For a valid cycle count, the list should contain only one element (one recount assignee used for all rows for a cycle count)
-                        .collectEntries { [it.key, it.value.groupBy { val -> val.recountAssignee }]}
-                        .findAll { it.value.size() > 1 }
 
-        cycleCountsWithInvalidRecountAssignee.each {
-            // If at least one row is invalid, we want to clear the recount assignee for all rows
-            it.value.values().flatten().each { row ->
-                row.recountAssignee = null
-            }
-            command.errors.reject("Product cycle count with id ${it.key} must have the same recount assignee set up for all rows")
-        }
-
-        Map<String, Map<String, List<Map<String, Object>>>> cycleCountsWithInvalidDateRecounted =
-                command.data
-                // Firstly group by cycle count to separate them
-                        .groupBy { it.cycleCountId }
-                // Then build a map, where cycle count id is a key, and value is also a map with date recounted as a key
-                // and value is a list with rows with a particular date recounted.
-                // For a valid cycle count, the list should contain only one element (one date recounted used for all rows for a cycle count)
-                        .collectEntries { [it.key, it.value.groupBy { val -> val.dateRecounted }]}
-                        .findAll { it.value.size() > 1 }
-
-        cycleCountsWithInvalidDateRecounted.each {
-            // If at least one row is invalid, we want to clear the dateRecounted for all rows
-            it.value.values().flatten().each { row ->
-                row.dateRecounted = null
-            }
-            command.errors.reject("Product cycle count with id ${it.key} must have the same date recounted set up for all rows and it must not be empty")
-        }
+        validateConsistentFieldAcrossCycleCount(command, 'recountAssignee', "must have the same recount assignee set up for all rows")
+        validateConsistentFieldAcrossCycleCount(command, 'dateRecounted', "must have the same date recounted set up for all rows and it must not be empty")
 
         command.data.eachWithIndex { row, index ->
             CycleCountRequest cycleCountRequest = CycleCount.read(row.cycleCountId)?.cycleCountRequest
@@ -212,6 +144,26 @@ class CycleCountImportService {
         }
         // In the end remove from the list all rows that are supposed to be ignored
         command.data.removeAll(itemsToRemove)
+    }
+
+    private static void validateConsistentFieldAcrossCycleCount(ImportDataCommand command, String fieldName, String errorMessage) {
+        Map<String, Map<String, List<Map<String, Object>>>> cycleCountsWithInvalidField =
+                command.data
+                // Firstly group by cycle count to separate them
+                        .groupBy { it.cycleCountId }
+                // Then build a map, where cycle count id is a key, and value is also a map with field name as a key
+                // and value is a list with rows with a particular field value.
+                // For a valid cycle count, the list should contain only one element (one field value used for all rows for a cycle count)
+                        .collectEntries { [it.key, it.value.groupBy { val -> val[fieldName] }] }
+                        .findAll { it.value.size() > 1 }
+
+        cycleCountsWithInvalidField.each {
+            // If at least one row is invalid, we want to clear the field for all rows
+            it.value.values().flatten().each { row ->
+                row[fieldName] = null
+            }
+            command.errors.reject("Product cycle count with id ${it.key} ${errorMessage}")
+        }
     }
 
     List<String> buildErrors(ImportDataCommand command) {
