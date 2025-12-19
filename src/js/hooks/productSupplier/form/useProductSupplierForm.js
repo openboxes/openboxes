@@ -340,7 +340,7 @@ const useProductSupplierForm = () => {
       // Show a success message and redirect to the list page
       const successMessage = translateWithRedirect({
         label: `react.productSupplier.form.success.${productSupplierId ? 'update' : 'create'}`,
-        defaultLabel: `Product ${productSupplierCode} has been ${productSupplierId ? 'updated' : 'created'} successfully`,
+        defaultLabel: `Product source ${productSupplierCode} has been ${productSupplierId ? 'updated' : 'created'} successfully`,
         options: { code: productSupplierCode },
         redirects: [{
           phrase: productSupplierCode,
