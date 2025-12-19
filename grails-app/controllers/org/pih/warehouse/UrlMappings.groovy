@@ -1028,7 +1028,7 @@ class UrlMappings {
 
         "/api/facilities/$facility/cycle-counts/items/upload/recount" {
             controller = "cycleCountApi"
-            action = [POST: "uploadCycleCountItemsRecount"]
+            action = [POST: "uploadCycleCountRecountItems"]
         }
 
         "/api/facilities/$facility/cycle-counts/$cycleCountId/items" {

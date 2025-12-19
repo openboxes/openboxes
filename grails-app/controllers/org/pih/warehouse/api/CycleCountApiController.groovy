@@ -247,7 +247,7 @@ class CycleCountApiController {
         render([data: command.data, errors: errors] as JSON)
     }
 
-    def uploadCycleCountItemsRecount(ImportDataCommand command) {
+    def uploadCycleCountRecountItems(ImportDataCommand command) {
         MultipartFile importFile = command.importFile
         File localFile = uploadService.createLocalFile(importFile.originalFilename)
         importFile.transferTo(localFile)
