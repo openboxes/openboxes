@@ -81,4 +81,4 @@
       - 'grails-app/migrations/**/*'
 
 "stakeholder: vvg":
-  - head-branch: ['^feature/obaf-integration']
+  - base-branch: ['^feature/obaf-integration']
