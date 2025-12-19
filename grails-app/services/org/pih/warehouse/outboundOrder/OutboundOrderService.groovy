@@ -58,8 +58,8 @@ class OutboundOrderService {
 }
 
 class ItemToAllocate {
-    InventoryItem inventoryItemId
-    Location binLocationId
+    String inventoryItemId
+    String binLocationId
     Integer quantity
 }
 
