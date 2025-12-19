@@ -3136,7 +3136,7 @@ class StockMovementService {
                 shipmentItem.recipient = picklistItem?.requisitionItem?.recipient ?:
                         picklistItem?.requisitionItem?.parentRequisitionItem?.recipient
                 shipmentItem.inventoryItem = picklistItem?.inventoryItem
-                shipmentItem.binLocation = picklistItem?.binLocation
+                shipmentItem.binLocation = picklistItem?.stagingLocation ?: picklistItem?.binLocation
                 shipmentItem.sortOrder = shipmentItems.size()
 
                 shipmentItems.add(shipmentItem)

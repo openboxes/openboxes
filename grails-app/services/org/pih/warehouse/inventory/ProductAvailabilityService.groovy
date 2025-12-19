@@ -31,6 +31,7 @@ import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.api.AllocatedItem
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -231,16 +232,17 @@ class ProductAvailabilityService {
      *     (IMPORTANT: Outbound returns can have picked items with RECALLED lots and bins with HOLD_STOCK activity)
      * */
     List<AllocatedItem> getQuantityPickedByProductAndLocation(Location location, Product product) {
+        boolean internalTransactionsEnabled = location.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS)
         def query = """
             SELECT 
                 bin_location_id as bin_location_id, 
                 inventory_item_id as inventory_item_id, 
-                SUM(quantity_picked) as quantity_allocated
+                SUM(quantity_allocated) as quantity_allocated
             FROM (
                 SELECT
                     pli.bin_location_id as bin_location_id,
                     pli.inventory_item_id as inventory_item_id,
-                    sum(pli.quantity) as quantity_picked
+                    sum(pli.quantity) as quantity_allocated
                 FROM picklist_item pli
                     INNER JOIN picklist p ON pli.picklist_id = p.id
                     LEFT JOIN requisition_item ri ON pli.requisition_item_id = ri.id
@@ -259,6 +261,7 @@ class ProductAvailabilityService {
                   AND (ri.id IS NOT NULL AND (ii.lot_status IS NULL OR ii.lot_status != 'RECALLED') 
                   AND (lsa.activities IS NULL OR lsa.activities NOT LIKE '%HOLD_STOCK%'))
                   AND (:productId = '' OR ri.product_id = :productId)
+                  ${internalTransactionsEnabled ? 'AND pli.outbound_container_id IS NULL AND pli.staging_location_id IS NULL' : ''}
                 GROUP BY pli.bin_location_id, pli.inventory_item_id
                 UNION
                 SELECT
