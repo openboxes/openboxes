@@ -12,6 +12,9 @@ import moment from 'moment';
 
 import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
 
+/**
+ * @deprecated This method uses moment.js which is deprecated in favor of date-fns.
+ */
 const dateWithoutTimeZone = ({
   date,
   currentDateFormat,

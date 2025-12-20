@@ -79,3 +79,6 @@
   - changed-files:
     - any-glob-to-any-file:
       - 'grails-app/migrations/**/*'
+
+"stakeholder: vvg":
+  - base-branch: ['^feature/obaf-integration']

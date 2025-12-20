@@ -1,29 +1,14 @@
 package org.pih.warehouse.core.date
 
-import java.time.ZoneId
+import java.time.Instant
 import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalAccessor
+import org.springframework.stereotype.Component
 
 /**
- * A formatter that converts TemporalAccessor objects that have a date + time component to Strings.
+ * A formatter that converts Instants to Strings.
  */
-class TemporalAccessorDateTimeFormatter<T extends TemporalAccessor> extends TemporalAccessorFormatter<T> {
-
-    /**
-     * Required. The timezone that we should convert the datetime to be in.
-     */
-    ZoneId timezone
-
-    TemporalAccessorDateTimeFormatter(
-            final Locale locale,
-            final DateDisplayFormat displayFormat,
-            final String patternOverride,
-            final DateDisplayStyle displayStyleOverride,
-            final ZoneId timezone) {
-
-        super(locale, displayFormat, patternOverride, displayStyleOverride)
-        this.timezone = timezone
-    }
+@Component
+class InstantFormatter extends AbstractDateFormatter<Instant> {
 
     DateTimeFormatter getJsonFormatter() {
         return DateTimeFormatter.ISO_OFFSET_DATE_TIME
@@ -51,9 +36,13 @@ class TemporalAccessorDateTimeFormatter<T extends TemporalAccessor> extends Temp
         return DateTimeFormatter.ISO_LOCAL_DATE
     }
 
+    DateTimeFormatter getFileNameFormatter() {
+        return DateTimeFormatter.ofPattern('yyyyMMdd-HHmmss')
+    }
+
     @Override
-    protected DateTimeFormatter addContextToFormatter(DateTimeFormatter formatter) {
-        return super.addContextToFormatter(formatter)
-                .withZone(timezone)
+    protected DateTimeFormatter addContextToFormatter(DateTimeFormatter formatter, DateFormatterContext context) {
+        return super.addContextToFormatter(formatter, context)
+                .withZone(context?.timezoneOverride ?: getTimezone())
     }
 }

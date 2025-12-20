@@ -24,6 +24,7 @@ const DateField = ({
   tooltip,
   disabled,
   errorMessage,
+  hasErrors,
   placeholder,
   button,
   className,
@@ -106,7 +107,7 @@ const DateField = ({
         locale={locale === 'ar' ? 'en' : locale}
         showTimeSelect={showTimeSelect}
         customInput={<DateFieldInput onClear={onClear} clearable={clearable} />}
-        className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
+        className={`form-element-input ${(hasErrors || errorMessage) ? 'has-errors' : ''} ${className}`}
         dropdownMode="scroll"
         dateFormat={getDateFormat()}
         timeFormat={TimeFormat.HH_MM}
@@ -162,6 +163,8 @@ DateField.propTypes = {
   // If the errorMessage is not empty then the field is bordered
   // and the message is displayed under the input
   errorMessage: PropTypes.string,
+  // If true, the field is bordered to indicate there are errors
+  hasErrors: PropTypes.bool,
   // Text displayed within input field
   placeholder: PropTypes.oneOfType([
     PropTypes.string,
@@ -205,4 +208,5 @@ DateField.defaultProps = {
   focusProps: {},
   onChangeRaw: null,
   clearable: true,
+  hasErrors: false,
 };

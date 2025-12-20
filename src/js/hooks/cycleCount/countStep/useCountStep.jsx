@@ -8,7 +8,8 @@ import {
   getCycleCountRequestIds,
 } from 'selectors';
 
-import { fetchLotNumbersByProductIds } from 'actions';
+import { fetchLotNumbersByProductIds, submitForm } from 'actions';
+import useCountStepValidation from 'hooks/cycleCount/countStep/useCountStepValidation';
 import useCycleCountFetchData from 'hooks/cycleCount/countStep/useCycleCountFetchData';
 import useCycleCountImport from 'hooks/cycleCount/countStep/useCycleCountImport';
 import useCycleCountModal from 'hooks/cycleCount/countStep/useCycleCountModal';
@@ -76,11 +77,18 @@ const useCountStep = () => {
     requestIdsWithDiscrepanciesRef: requestIdsWithDiscrepancies,
   });
 
-  // 5. Navigation & Header Actions
+  // 5. Validation
+  const { validateCountStep } = useCountStepValidation();
+
+  // 6. Navigation & Header Actions
   const next = useCallback(async () => {
-    await save(true);
-    setIsStepEditable(false);
-  }, [save]);
+    const validationPassed = validateCountStep();
+    dispatch(submitForm);
+    if (validationPassed) {
+      await save(true);
+      setIsStepEditable(false);
+    }
+  }, [save, validateCountStep]);
 
   const back = useCallback(() => {
     setIsStepEditable(true);

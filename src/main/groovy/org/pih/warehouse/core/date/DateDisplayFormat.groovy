@@ -22,4 +22,9 @@ enum DateDisplayFormat {
      * As used by file exporters.
      */
     CSV,
+
+    /**
+     * As used in file names. For example, when we include the current date in the file name.
+     */
+    FILE_NAME,
 }

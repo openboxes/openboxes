@@ -18,7 +18,26 @@ const FileManagerPlugin = require('filemanager-webpack-plugin');
 const webpack = require('webpack');
 
 module.exports = {
-    cache: true,
+    cache: {
+      type: 'filesystem',
+      buildDependencies: {
+        config: [
+          __filename,
+          path.resolve(__dirname, 'package.json'),
+          path.resolve(__dirname, 'package-lock.json'),
+          path.resolve(__dirname, '.babelrc'),
+          path.resolve(__dirname, '.eslintrc'),
+        ],
+      },
+    },
+    // ignore test files in watch mode to avoid unnecessary rebuilds
+    watchOptions: {
+      ignored: [
+        '**/src/js/tests/**',
+        '**/*.test.js',
+        '**/*.test.jsx'
+      ],
+    },
     entry: {
       app: `${SRC}/index.jsx`,
     },
@@ -113,7 +132,7 @@ module.exports = {
             presets: [
               '@babel/preset-env',
               '@babel/react',
-            ]
+            ],
           },
         },
         include: SRC,
@@ -188,6 +207,8 @@ module.exports = {
       hooks: path.resolve(SRC, 'hooks'),
       reducers: path.resolve(SRC, 'reducers'),
       selectors: path.resolve(SRC, 'selectors'),
+      schemes: path.resolve(SRC, 'schemes'),
+      middlewares: path.resolve(SRC, 'middlewares'),
       actions: path.resolve(SRC, 'actions'),
       consts: path.resolve(SRC, 'consts'),
       tests: path.resolve(SRC, 'tests'),

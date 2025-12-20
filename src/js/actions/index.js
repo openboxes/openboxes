@@ -50,6 +50,8 @@ import {
   REORDER_INDICATORS,
   RESET_INDICATORS,
   SET_ACTIVE_CONFIG,
+  SET_ERRORS,
+  SET_ERRORS_BY_ID,
   SET_OFFLINE,
   SET_ONLINE,
   SET_SCROLL_TO_BOTTOM,
@@ -60,6 +62,7 @@ import {
   START_COUNT,
   START_FETCHING_TRANSLATIONS,
   START_RESOLUTION,
+  SUBMIT_FORM,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
   UPDATE_COUNTED_BY,
@@ -942,4 +945,24 @@ export const updateFieldValue = ({
     },
   });
   dispatch(setUpdated(cycleCountId, true));
+};
+
+export const setErrors = (errors) => (dispatch) => {
+  dispatch({
+    type: SET_ERRORS,
+    payload: errors,
+  });
+};
+
+export const setErrorsById = (id, errors) => (dispatch) => {
+  dispatch({
+    type: SET_ERRORS_BY_ID,
+    payload: { errors, id },
+  });
+};
+
+export const submitForm = (dispatch) => {
+  dispatch({
+    type: SUBMIT_FORM,
+  });
 };

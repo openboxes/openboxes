@@ -7,7 +7,7 @@ import CountedByHeader from 'components/cycleCount/tableHeader/CountedByHeader';
 import DateCountedHeader from 'components/cycleCount/tableHeader/DateCountedHeader';
 import ProductDataHeader from 'components/cycleCount/tableHeader/ProductDataHeader';
 import DataTable from 'components/DataTable/v2/DataTable';
-import useCountStepTable from 'hooks/cycleCount/useCountStepTable';
+import useCountStepTable from 'hooks/cycleCount/countStep/useCountStepTable';
 
 import 'components/cycleCount/cycleCount.scss';
 

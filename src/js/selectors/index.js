@@ -237,11 +237,16 @@ export const getCountWorkflowEntities = createSelector(
   (wf) => wf?.entities,
 );
 
+export const getCountWorkflowEntityById = createSelector(
+  getCountWorkflowEntities,
+  (_, cycleCountId) => cycleCountId,
+  (entities, id) => entities?.[id],
+);
+
 export const makeGetCycleCountItems = () =>
   createSelector(
-    getCountWorkflowEntities,
-    (_, cycleCountId) => cycleCountId,
-    (entities, id) => entities?.[id]?.cycleCountItems || [],
+    getCountWorkflowEntityById,
+    (entity) => entity?.cycleCountItems || [],
   );
 
 export const makeGetCycleCountItem = () =>
@@ -295,6 +300,36 @@ export const makeGetCycleCountItemIds = () =>
   createSelector(
     makeGetCycleCountItems(),
     (items) => (Array.isArray(items) ? items.map((it) => it.id) : []),
+  );
+
+/**
+  FORM ERRORS
+ */
+export const getErrors = (state) => state.errors.errors;
+
+export const getIsFormSubmitted = (state) => state.errors.isFormSubmitted;
+
+/**
+ * CYCLE COUNT ERRORS
+ */
+export const makeGetErrorsForCycleCount = () =>
+  createSelector(
+    [getErrors, (_, cycleCountId) => cycleCountId],
+    (errors, cycleCountId) => errors?.[cycleCountId] || {},
+  );
+
+export const makeGetErrorsForCycleCountItem = () =>
+  createSelector(
+    makeGetErrorsForCycleCount(),
+    (_, __, itemIdx) => itemIdx,
+    (ccErrors, itemIdx) => ccErrors?.cycleCountItems?.[itemIdx] || {},
+  );
+
+export const makeGetErrorForField = () =>
+  createSelector(
+    makeGetErrorsForCycleCountItem(),
+    (_, __, ___, fieldName) => fieldName,
+    (itemErrors, fieldName) => itemErrors?.[fieldName]?._errors[0] || null,
   );
 
 /**

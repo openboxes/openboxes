@@ -56,8 +56,9 @@ const useCountStepTable = ({
       (row) => getBinLocationToDisplay(row?.binLocation), {
         id: cycleCountColumn.BIN_LOCATION,
         header: () => <HeaderCell id="react.cycleCount.table.binLocation.label" defaultMessage="Bin Location" />,
-        cell: ({ row: { original } }) => (
+        cell: ({ row: { original, id } }) => (
           <BinLocationCell
+            index={id}
             id={original}
             cycleCountId={cycleCountId}
             showBinLocation={showBinLocation}
@@ -72,8 +73,9 @@ const useCountStepTable = ({
     ),
     columnHelper.accessor(cycleCountColumn.LOT_NUMBER, {
       header: () => <HeaderCell id="react.cycleCount.table.lotNumber.label" defaultMessage="Serial / Lot Number" />,
-      cell: ({ row: { original } }) => (
+      cell: ({ row: { original, id } }) => (
         <LotNumberCell
+          index={id}
           id={original}
           cycleCountId={cycleCountId}
           setDisabledExpirationDateFields={setDisabledExpirationDateFields}
@@ -86,8 +88,9 @@ const useCountStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.EXPIRATION_DATE, {
       header: () => <HeaderCell id="react.cycleCount.table.expirationDate.label" defaultMessage="Expiration Date" />,
-      cell: ({ row: { original } }) => (
+      cell: ({ row: { original, id } }) => (
         <ExpirationDateCell
+          index={id}
           disabledExpirationDateFields={disabledExpirationDateFields}
           cycleCountId={cycleCountId}
           isStepEditable={isStepEditable}
@@ -103,8 +106,9 @@ const useCountStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.QUANTITY_COUNTED, {
       header: () => <HeaderCell id="react.cycleCount.table.quantityCounted.label" defaultMessage="Quantity Counted" />,
-      cell: ({ row: { original } }) => (
+      cell: ({ row: { original, id } }) => (
         <QuantityCell
+          index={id}
           id={original}
           cycleCountId={cycleCountId}
           isStepEditable={isStepEditable}
