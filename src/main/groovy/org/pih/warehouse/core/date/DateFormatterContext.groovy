@@ -10,12 +10,14 @@ class DateFormatterContext {
 
     /**
      * Overrides the locale to use when formatting the date.
+     * Needed for day (ex: eeee -> Monday) and month (ex: MMM -> Jan) fields.
      */
     Locale localeOverride
 
     /**
      * Overrides the pattern to use when formatting the date.
      * Unlike displayStyleOverride, the pattern itself is not localized.
+     * Will take priority over displayStyleOverride.
      */
     String patternOverride
 
@@ -32,6 +34,7 @@ class DateFormatterContext {
 
     /**
      * Overrides the localized pattern (whereas patternOverride is not locale-specific) to format the date to.
+     * If patternOverride is also set, it will take priority over this field.
      */
     DateDisplayStyle displayStyleOverride
 
