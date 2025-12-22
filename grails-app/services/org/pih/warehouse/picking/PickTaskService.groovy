@@ -167,8 +167,11 @@ class PickTaskService {
     }
 
     void shortPick(PickTask task, String outboundContainerId, Integer quantityPicked, String pickedById, String reasonCode) {
-        Location outboundContainer = Location.findByLocationNumberOrId(outboundContainerId, outboundContainerId)
-        validateOutboundContainer(outboundContainer, task)
+        Location outboundContainer = null
+        if (outboundContainerId != null) {
+            outboundContainer = Location.findByLocationNumberOrId(outboundContainerId, outboundContainerId)
+            validateOutboundContainer(outboundContainer, task)
+        }
 
         PicklistItem existingPickItem = PicklistItem.get(task.id)
         if (quantityPicked > 0) {
