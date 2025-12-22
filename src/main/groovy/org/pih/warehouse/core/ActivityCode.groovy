@@ -138,6 +138,8 @@ enum ActivityCode {
     // Track internal locations
     TRACK_INTERNAL_TRANSACTIONS('TRACK_INTERNAL_TRANSACTIONS'),
 
+    DISPLAY_STOCK('DISPLAY_STOCK'),
+
     NONE('NONE')
 
     final String id
@@ -221,7 +223,8 @@ enum ActivityCode {
                 DELIVERY_TYPE_SHIPPING,
                 DELIVERY_TYPE_WILL_CALL,
 
-                TRACK_INTERNAL_TRANSACTIONS
+                TRACK_INTERNAL_TRANSACTIONS,
+                DISPLAY_STOCK
         ]
     }
 
