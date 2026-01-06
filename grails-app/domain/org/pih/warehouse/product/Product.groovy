@@ -18,10 +18,12 @@ import org.apache.commons.lang.NotImplementedException
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.EmptyStringsToNullBinder
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
@@ -36,6 +38,7 @@ import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.LocalizationUtil
+import org.pih.warehouse.shipping.ShipmentStatusCode
 
 /**
  * An product is an instance of a generic.  For instance,
@@ -303,6 +306,40 @@ class Product implements Comparable, Serializable {
             if (value) {
                 return true
             }
+
+            // Don't allow a product to be deactivated if there are ANY locations with ANY stock.
+            List<Location> locationsWithProductInStock = ProductAvailability.createCriteria().list {
+                projections {
+                    groupProperty("location")
+                }
+                eq("product", obj)
+                gt("quantityOnHand", 0)
+            } as List<Location>
+            if(locationsWithProductInStock) {
+                return ["invalid.inStock", locationsWithProductInStock]
+            }
+
+            // Don't allow a product to be deactivated if it is in a non-fully received shipment to a managed location.
+            List<Location> managedInventoryDepotLocations = Location.createCriteria().list {
+                locationType {
+                    eq("locationTypeCode", LocationTypeCode.DEPOT)
+                }
+            } as List<Location>
+            managedInventoryDepotLocations = managedInventoryDepotLocations.findAll { it.supports(ActivityCode.MANAGE_INVENTORY) }
+
+            List<Location> locationsWithShipment = ShipmentItem.createCriteria().list {
+                createAlias("shipment", "shipmentAlias")
+                projections {
+                    groupProperty("shipmentAlias.destination")
+                }
+                eq("product", obj)
+                inList("shipmentAlias.currentStatus", [ShipmentStatusCode.SHIPPED, ShipmentStatusCode.PARTIALLY_RECEIVED])
+                inList("shipmentAlias.destination", managedInventoryDepotLocations)
+            } as List<Location>
+            if(locationsWithShipment) {
+                return ["invalid.inShipment", locationsWithShipment]
+            }
+
             // Don't allow a product to be deactivated if it is in an active stocklist.
             int numActiveStocklistsForProduct = RequisitionItem.createCriteria().count {
                 eq('product', obj)
