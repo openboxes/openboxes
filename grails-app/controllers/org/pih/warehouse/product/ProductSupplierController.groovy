@@ -283,7 +283,7 @@ class ProductSupplierController {
 
         def productSuppliers = []
 
-        String productId = params.containsKey("productId") ? params.productId : null
+        String productId = params.productId
 
         productSuppliers = ProductSupplier.createCriteria().list {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
