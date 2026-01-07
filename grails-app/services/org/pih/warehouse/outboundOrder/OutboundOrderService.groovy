@@ -23,6 +23,8 @@ class OutboundOrderService {
 
         outboundOrder.lineItems.each { StockMovementItem item ->
             item.availableItems = stockMovementService.getAvailableItems(outboundOrder.origin, RequisitionItem.get(item.id), false)
+            item.allocationStatus = RequisitionItem.get(item.id).getAllocationStatus()
+            item.quantityAllocated = RequisitionItem.get(item.id).calculateQuantityAllocated()
         }
 
         return outboundOrder

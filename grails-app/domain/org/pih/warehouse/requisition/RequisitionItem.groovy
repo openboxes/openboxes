@@ -635,6 +635,30 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return numInventoryItem
     }
 
+    def calculateQuantityAllocated() {
+        return PicklistItem.findAllByRequisitionItem(this).sum { it.quantity }
+    }
+
+    Boolean isAllocated() {
+        def quantityRequired = calculateQuantityRequired()
+        if (quantityRequired == 0) return false
+
+        return calculateQuantityAllocated() >= quantityRequired
+    }
+
+    Boolean isPartiallyAllocated() {
+        def quantityAllocated = calculateQuantityAllocated() ?: 0
+        def quantityRequired = calculateQuantityRequired() ?: 0
+
+        return quantityAllocated > 0 && quantityAllocated < quantityRequired
+    }
+
+    String getAllocationStatus() {
+        if (isAllocated()) return "ALLOCATED"
+        if (isPartiallyAllocated()) return "PARTIALLY_ALLOCATED"
+        return "UNALLOCATED"
+    }
+
     def retrievePicklistItems() {
         def picklistItems = PicklistItem.findAllByRequisitionItem(this)
         return picklistItems

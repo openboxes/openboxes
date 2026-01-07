@@ -34,6 +34,7 @@ class StockMovementItem {
     BigDecimal quantityCanceled
     BigDecimal quantityPicked
     BigDecimal quantityShipped
+    BigDecimal quantityAllocated
 
     String unitOfMeasure
 
@@ -72,6 +73,8 @@ class StockMovementItem {
     BigDecimal packSize = 1
 
     List<AvailableItem> availableItems // required for outbound orders
+
+    String allocationStatus
 
     /**
      * Represents the version of the item (ie how many times it has been modified). Typically pulled from
@@ -118,6 +121,7 @@ class StockMovementItem {
         quantityCanceled(nullable: true)
         quantityPicked(nullable: true)
         quantityCounted(nullable: true)
+        quantityAllocated(nullable: true)
         statusCode(nullable: true)
         reasonCode(nullable: true)
         comments(nullable: true)
@@ -135,6 +139,7 @@ class StockMovementItem {
         version(nullable: true)
         manuallyAdded(nullable: true)
         availableItems(nullable: true)
+        allocationStatus(nullable: true)
     }
 
     String toString() {
@@ -184,7 +189,9 @@ class StockMovementItem {
                         quantity      : inventoryItem.quantity
                 ],
                 manuallyAdded          : manuallyAdded,
-                availableItems         : availableItems
+                availableItems         : availableItems,
+                quantityAllocated      : quantityAllocated,
+                allocationStatus       : allocationStatus
         ]
     }
 
