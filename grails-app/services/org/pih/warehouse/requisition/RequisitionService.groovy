@@ -1122,5 +1122,18 @@ class RequisitionService {
         return CSVUtils.prependBomToCsvString(sw.toString())
     }
 
+    /**
+     * @return True if the given product is in any active stock lists, false otherwise.
+     */
+    boolean isProductInStockList(Product product) {
+        int numActiveStocklistItemsForProduct = RequisitionItem.createCriteria().count {
+            eq("product", product)
+            requisition {
+                eq("isTemplate", true)
+                eq("isPublished", true)
+            }
+        }
 
+        return numActiveStocklistItemsForProduct > 0
+    }
 }

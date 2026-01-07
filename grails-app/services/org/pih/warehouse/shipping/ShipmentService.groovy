@@ -43,6 +43,7 @@ import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
@@ -2359,5 +2360,28 @@ class ShipmentService {
         comment.save()
         shipmentInstance.addToComments(comment)
         return comment
+    }
+
+    /**
+     * Fetch the list of locations that support the given activity code and have a product that is in
+     * a shipment with one of the given statuses.
+     */
+    List<Location> getDestinationsWithActivityCodeAndProductInShipmentWithStatus(
+            Product product, ActivityCode activityCode, List<ShipmentStatusCode> statusCodes) {
+
+        List<Location> activeLocationsSupportingActivity = Location.createCriteria().list {
+            eq("active", true)
+        } as List<Location>
+        activeLocationsSupportingActivity = activeLocationsSupportingActivity.findAll { it.supports(activityCode) }
+
+        return ShipmentItem.createCriteria().list {
+            createAlias("shipment", "shipmentAlias")
+            projections {
+                groupProperty("shipmentAlias.destination")
+            }
+            eq("product", product)
+            inList("shipmentAlias.currentStatus", statusCodes)
+            inList("shipmentAlias.destination", activeLocationsSupportingActivity)
+        } as List<Location>
     }
 }

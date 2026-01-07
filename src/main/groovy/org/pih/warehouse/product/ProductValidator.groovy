@@ -1,29 +1,39 @@
 package org.pih.warehouse.product
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.validation.GormEntityValidator
-import org.pih.warehouse.requisition.RequisitionItem
-import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.inventory.ProductAvailabilityService
+import org.pih.warehouse.requisition.RequisitionService
+import org.pih.warehouse.shipping.ShipmentService
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
 @Component
 class ProductValidator implements GormEntityValidator {
+
+    @Autowired
+    ProductAvailabilityService productAvailabilityService
+
+    @Autowired
+    RequisitionService requisitionService
+
+    @Autowired
+    ShipmentService shipmentService
 
     def validateActive(Product product) {
         if (product.active) {
             return true
         }
 
-        def validationResult = validateCannotDeactivateProductWhenAnyLocationHasAnyStock(product)
+        def validationResult = validateCannotDeactivateProductWhenManagedLocationHasItInStock(product)
         if (!isValidationResultValid(validationResult)) {
             return validationResult
         }
 
-        validationResult = validateCannotDeactivateProductWhenInPendingDepotShipment(product)
+        validationResult = validateCannotDeactivateProductWhenInPendingShipmentToManagedLocation(product)
         if (!isValidationResultValid(validationResult)) {
             return validationResult
         }
@@ -34,51 +44,26 @@ class ProductValidator implements GormEntityValidator {
         }
     }
 
-    private def validateCannotDeactivateProductWhenAnyLocationHasAnyStock(Product product) {
-        // TODO: move to some service/repository
-        List<Location> locationsWithProductInStock = ProductAvailability.createCriteria().list {
-            projections {
-                groupProperty("location")
-            }
-            eq("product", product)
-            gt("quantityOnHand", 0)
-        } as List<Location>
+    private def validateCannotDeactivateProductWhenManagedLocationHasItInStock(Product product) {
+        List<Location> locations = productAvailabilityService.getActiveLocationsWithProductInStockAndActivityCode(
+                product, ActivityCode.MANAGE_INVENTORY)
 
-        return locationsWithProductInStock ? ["invalid.inStock", locationsWithProductInStock] : true
+        return locations ? ["invalid.inStock", locations] : true
     }
 
-    private def validateCannotDeactivateProductWhenInPendingDepotShipment(Product product) {
-        // TODO: move to some service/repository
-        List<Location> managedInventoryDepotLocations = Location.createCriteria().list {
-            locationType {
-                eq("locationTypeCode", LocationTypeCode.DEPOT)
-            }
-        } as List<Location>
-        managedInventoryDepotLocations = managedInventoryDepotLocations.findAll { it.supports(ActivityCode.MANAGE_INVENTORY) }
+    private def validateCannotDeactivateProductWhenInPendingShipmentToManagedLocation(Product product) {
+        List<Location> locations =  shipmentService.getDestinationsWithActivityCodeAndProductInShipmentWithStatus(
+                product,
+                ActivityCode.MANAGE_INVENTORY,
+                [ShipmentStatusCode.SHIPPED, ShipmentStatusCode.PARTIALLY_RECEIVED])
 
-        List<Location> locationsWithShipment = ShipmentItem.createCriteria().list {
-            createAlias("shipment", "shipmentAlias")
-            projections {
-                groupProperty("shipmentAlias.destination")
-            }
-            eq("product", product)
-            inList("shipmentAlias.currentStatus", [ShipmentStatusCode.SHIPPED, ShipmentStatusCode.PARTIALLY_RECEIVED])
-            inList("shipmentAlias.destination", managedInventoryDepotLocations)
-        } as List<Location>
 
-        return locationsWithShipment ? ["invalid.inShipment", locationsWithShipment] : true
+        return locations ? ["invalid.inShipment", locations] : true
     }
 
     private def validateCannotDeactivateProductWhenInActiveStocklist(Product product) {
-        // TODO: move to some service/repository
-        int numActiveStocklistsForProduct = RequisitionItem.createCriteria().count {
-            eq("product", product)
-            requisition {
-                eq("isTemplate", true)
-                eq("isPublished", true)
-            }
-        }
+        boolean productInStockList = requisitionService.isProductInStockList(product)
 
-        return numActiveStocklistsForProduct > 0 ? ["invalid.inStocklist"] : true
+        return productInStockList ? ["invalid.inStocklist"] : true
     }
 }
