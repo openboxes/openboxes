@@ -30,7 +30,7 @@ class InventoryAuditSummaryFormatter {
                 'number of adjustments': object.countAdjustments,
                 'total of adjustments': object.quantityAdjusted,
                 'adjustments value': object.amountAdjusted,
-                'moths of stock change': object.monthsOfStockChange,
+                'months of stock change': object.monthsOfStockChange,
                 'currently in stock': object.quantityOnHand,
                 'value in stock': object.amountOnHand,
         ]
