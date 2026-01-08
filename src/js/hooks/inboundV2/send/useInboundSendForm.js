@@ -6,7 +6,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import {
   getCurrentLocale,
-  getCurrentLocation, getDebounceTime, getMinSearchLength,
+  getCurrentLocation,
+  getDebounceTime,
+  getMinSearchLength,
   getShipmentTypes,
 } from 'selectors';
 
@@ -39,7 +41,7 @@ const useInboundSendForm = ({ previous }) => {
   const debounceTime = useSelector(getDebounceTime);
   const minSearchLength = useSelector(getMinSearchLength);
 
-  const debouncedDestinationFetch = useMemo(
+  const debouncedDestinationLocationsFetch = useMemo(
     () => debounceLocationsFetch(
       debounceTime,
       minSearchLength,
@@ -412,7 +414,7 @@ const useInboundSendForm = ({ previous }) => {
       shipped,
       documents,
       shipmentTypesWithoutDefaultValue,
-      debouncedDestinationFetch,
+      debouncedDestinationLocationsFetch,
     },
     actions: {
       onSave,

@@ -29,7 +29,7 @@ const InboundSendForm = ({ previous }) => {
       shipped,
       documents,
       shipmentTypesWithoutDefaultValue,
-      debouncedDestinationFetch,
+      debouncedDestinationLocationsFetch,
     },
     actions: {
       sendShipment,
@@ -113,7 +113,7 @@ const InboundSendForm = ({ previous }) => {
                       defaultMessage: 'Destination',
                     }}
                     async
-                    loadOptions={debouncedDestinationFetch}
+                    loadOptions={debouncedDestinationLocationsFetch}
                   />
                 )}
               />

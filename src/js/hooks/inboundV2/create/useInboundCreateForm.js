@@ -31,7 +31,7 @@ const useInboundCreateForm = ({ next }) => {
   const history = useHistory();
   const { stockMovementId } = useParams();
 
-  const debouncedOriginFetch = useMemo(
+  const debouncedOriginLocationsFetch = useMemo(
     () => debounceLocationsFetch(
       debounceTime,
       minSearchLength,
@@ -229,7 +229,7 @@ const useInboundCreateForm = ({ next }) => {
     data: {
       stockLists,
       origin,
-      debouncedOriginFetch,
+      debouncedOriginLocationsFetch,
       debouncedPeopleFetch,
     },
     actions: {

@@ -17,7 +17,7 @@ const InboundCreate = ({ next }) => {
     data: {
       stockLists,
       origin,
-      debouncedOriginFetch,
+      debouncedOriginLocationsFetch,
       debouncedPeopleFetch,
     },
     actions: { onSubmitStockMovementDetails },
@@ -66,7 +66,7 @@ const InboundCreate = ({ next }) => {
                   hasErrors={Boolean(errors.origin?.message)}
                   errorMessage={errors.origin?.message}
                   async
-                  loadOptions={debouncedOriginFetch}
+                  loadOptions={debouncedOriginLocationsFetch}
                   customTooltip
                   ariaLabel={{
                     id: 'react.stockMovement.origin.label',
