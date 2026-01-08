@@ -29,6 +29,7 @@ import org.pih.warehouse.importer.ImporterUtil
 import org.pih.warehouse.inventory.product.ExpirationHistoryReport
 import org.pih.warehouse.inventory.product.availability.AvailableItemKey
 import org.pih.warehouse.inventory.product.availability.AvailableItemMap
+import org.pih.warehouse.product.lot.ProductLot
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAvailability
@@ -1462,19 +1463,25 @@ class InventoryService implements ApplicationContextAware {
                     baselineTransaction?.transactionSource
             )
 
-            List<AvailableItem> currentRecordStockItems = []
+            List<RecordInventoryRowCommand> groupedRows = groupDuplicatedRecordInventoryRows(cmd)
+
+            // Collect all unique product lots (ie inventory items) across all rows...
+            List<ProductLot> itemsToGetOrCreate = groupedRows.collect {
+                new ProductLot(product: cmd.product, lotNumber: it.lotNumber, expirationDate: it.expirationDate)
+            }
+            // ...Then get/create them all in bulk. Don't refresh product availability for any newly created items.
+            // We will manually perform a product availability refresh at the end.
+            InventoryItemByProductLot inventoryItemMap = inventoryItemManager.getOrCreateInventoryItems(
+                    itemsToGetOrCreate, true)
+
             // 3. Process each row added to the record inventory page
-            groupDuplicatedRecordInventoryRows(cmd).each { RecordInventoryRowCommand row ->
+            List<AvailableItem> currentRecordStockItems = []
+            for (RecordInventoryRowCommand row in groupedRows) {
                 if (!row) {
                     return null
                 }
 
-                InventoryItem inventoryItem = inventoryItemManager.getOrCreateInventoryItem(
-                        cmd.product,
-                        row.lotNumber,
-                        row.expirationDate,
-                        true,  // Don't refresh product availability. That will get done manually at the end.
-                )
+                InventoryItem inventoryItem = inventoryItemMap.get(cmd.product, row.lotNumber)
 
                 // Create new transaction entries (but only if the quantity changed)
                 TransactionEntry transactionEntry = recordStockProductInventoryTransactionService.createAdjustmentTransactionEntry(
