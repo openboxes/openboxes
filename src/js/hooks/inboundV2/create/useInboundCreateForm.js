@@ -82,8 +82,8 @@ const useInboundCreateForm = ({ next }) => {
       zodResolver(validationSchema(values))(values, context, options),
   });
 
-  const origin = watch('origin');
   const destination = watch('destination');
+  const origin = watch('origin');
 
   const onSubmitStockMovementDetails = async (values) => {
     spinner.show();
@@ -117,7 +117,7 @@ const useInboundCreateForm = ({ next }) => {
         label: `${currentLocation?.name} [${currentLocation?.locationType?.description}]`,
       });
     }
-  }, [currentLocation?.id]);
+  }, [currentLocation?.id, destination]);
 
   const fetchStockLists = async () => {
     spinner.show();
