@@ -283,48 +283,48 @@ class ProductSupplierController {
 
         def productSuppliers = []
 
-        if (params.hasProperty("productSupplier.id")) {
-            productSuppliers = ProductSupplier.findAllByIdInList(params.list("productSupplier.id"))
-        }
-        else {
-            productSuppliers = ProductSupplier.createCriteria().list {
-                resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
-                projections {
-                    property("active", "active")
-                    property("id", "id")
-                    property("name", "name")
-                    property("code", "code")
-                    product {
-                        property("productCode", "productCode")
-                        property("name", "productName")
-                    }
-                    property("productCode", "legacyProductCode")
-                    supplier(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                        property("name", "supplier.name")
-                    }
-                    property("supplierCode", "supplierCode")
-                    manufacturer(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                        property("name", "manufacturer.name")
-                    }
-                    property("manufacturerCode", "manufacturerCode")
-                    property("minOrderQuantity", "minOrderQuantity")
-                    contractPrice(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                        property("price", "contractPrice.price")
-                        property("toDate", "contractPrice.toDate")
-                    }
-                    defaultProductPackage(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                        uom(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                            property("code", "defaultProductPackage.uom.code")
-                        }
-                        property("quantity", "defaultProductPackage.quantity")
-                        productPrice(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                            property("price", "defaultProductPackage.productPrice.price")
-                        }
-                    }
-                    property("ratingTypeCode", "ratingTypeCode")
-                    property("dateCreated", "dateCreated")
-                    property("lastUpdated", "lastUpdated")
+        String productId = params.productId
+
+        productSuppliers = ProductSupplier.createCriteria().list {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            projections {
+                property("active", "active")
+                property("id", "id")
+                property("name", "name")
+                property("code", "code")
+                product {
+                    property("productCode", "productCode")
+                    property("name", "productName")
                 }
+                property("productCode", "legacyProductCode")
+                supplier(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                    property("name", "supplier.name")
+                }
+                property("supplierCode", "supplierCode")
+                manufacturer(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                    property("name", "manufacturer.name")
+                }
+                property("manufacturerCode", "manufacturerCode")
+                property("minOrderQuantity", "minOrderQuantity")
+                contractPrice(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                    property("price", "contractPrice.price")
+                    property("toDate", "contractPrice.toDate")
+                }
+                defaultProductPackage(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                    uom(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        property("code", "defaultProductPackage.uom.code")
+                    }
+                    property("quantity", "defaultProductPackage.quantity")
+                    productPrice(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        property("price", "defaultProductPackage.productPrice.price")
+                    }
+                }
+                property("ratingTypeCode", "ratingTypeCode")
+                property("dateCreated", "dateCreated")
+                property("lastUpdated", "lastUpdated")
+            }
+            if (productId) {
+                eq("product.id", productId)
             }
         }
 

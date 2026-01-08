@@ -152,7 +152,7 @@
                             <img src="${resource(dir:'images/icons/silk', file:'add.png')}" />
                             ${g.message(code: 'default.create.label', default: 'Create', args: [g.message(code:'productSupplier.label')])}
                         </g:link>
-                        <g:link class="button" controller="productSupplier" action="export" params="['productSupplier.id':productInstance?.productSuppliers*.id, format: 'xls']">
+                        <g:link class="button" controller="productSupplier" action="export" params="[format: 'xls', 'productId': productInstance?.id]">
                             <img src="${resource(dir:'images/icons/silk', file:'page_excel.png')}" />
                             ${g.message(code: 'default.export.label', default: 'Export', args: [g.message(code:'productSuppliers.label')])}
                         </g:link>
