@@ -27,8 +27,8 @@ class CycleCountImportService {
         // Store items that should be ignored for an import - for some cases we want not only to display an error, but also to ignore such row
         List<Map> itemsToRemove = []
 
-        validateConsistentFieldAcrossCycleCount(command, 'assignee', "must have the same assignee set up for all rows")
-        validateConsistentFieldAcrossCycleCount(command, 'dateCounted', "must have the same date counted set up for all rows and it must not be empty")
+        validateConsistentFieldAcrossCycleCount(command, "assignee", "must have the same assignee set up for all rows")
+        validateConsistentFieldAcrossCycleCount(command, "dateCounted", "must have the same date counted set up for all rows and it must not be empty")
 
         command.data.eachWithIndex { row, index ->
             CycleCountRequest cycleCountRequest = CycleCount.read(row.cycleCountId)?.cycleCountRequest
@@ -90,8 +90,8 @@ class CycleCountImportService {
         // Store items that should be ignored for an import - for some cases we want not only to display an error, but also to ignore such row
         List<Map> itemsToRemove = []
 
-        validateConsistentFieldAcrossCycleCount(command, 'recountAssignee', "must have the same recount assignee set up for all rows")
-        validateConsistentFieldAcrossCycleCount(command, 'dateRecounted', "must have the same date recounted set up for all rows and it must not be empty")
+        validateConsistentFieldAcrossCycleCount(command, "recountAssignee", "must have the same recount assignee set up for all rows")
+        validateConsistentFieldAcrossCycleCount(command, "dateRecounted", "must have the same date recounted set up for all rows and it must not be empty")
 
         command.data.eachWithIndex { row, index ->
             CycleCountRequest cycleCountRequest = CycleCount.read(row.cycleCountId)?.cycleCountRequest
