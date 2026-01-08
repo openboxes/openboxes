@@ -654,9 +654,9 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     String getAllocationStatus() {
-        if (isAllocated()) return "ALLOCATED"
-        if (isPartiallyAllocated()) return "PARTIALLY_ALLOCATED"
-        return "UNALLOCATED"
+        if (isAllocated()) return AllocationStatus.ALLOCATED
+        if (isPartiallyAllocated()) return AllocationStatus.PARTIALLY_ALLOCATED
+        return AllocationStatus.UNALLOCATED
     }
 
     def retrievePicklistItems() {

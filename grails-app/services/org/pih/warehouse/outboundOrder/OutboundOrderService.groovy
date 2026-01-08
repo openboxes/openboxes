@@ -31,26 +31,26 @@ class OutboundOrderService {
     }
 
     void allocate(StockMovementItem orderItem, Map data = [:]) {
-        String mode = data.mode as AllocationType
+        AllocationType mode = data.mode as AllocationType
         if (!mode) {
             throw new IllegalStateException("mode parameter not provided")
         }
 
-        if (mode.equalsIgnoreCase(AllocationType.AUTO.name())) {
+        if (mode == AllocationType.AUTO) {
             stockMovementService.createPicklist(orderItem, false)
-        } else if (mode.equalsIgnoreCase(AllocationType.MANUAL.name())) {
-            List<ItemToAllocate> allocations = data.allocations as List<ItemToAllocate>
-            allocations.each { itemToAllocate ->
+        } else if (mode == AllocationType.MANUAL) {
+            List<Allocation> allocations = data.allocations as List<Allocation>
+            allocations.each { allocation ->
                 stockMovementService.createOrUpdatePicklistItem(
                         orderItem.requisitionItem,
                         null,
-                        InventoryItem.get(itemToAllocate.inventoryItemId),
-                        Location.get(itemToAllocate.binLocationId),
+                        InventoryItem.load(allocation.inventoryItemId),
+                        Location.load(allocation.binLocationId),
                         0,
                         null,
                         null,
                         true,
-                        itemToAllocate.quantity
+                        allocation.quantity
                 )
             }
         } else {
@@ -59,7 +59,7 @@ class OutboundOrderService {
     }
 }
 
-class ItemToAllocate {
+class Allocation {
     String inventoryItemId
     String binLocationId
     Integer quantity

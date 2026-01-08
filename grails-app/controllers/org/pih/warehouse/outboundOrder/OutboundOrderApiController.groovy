@@ -4,13 +4,11 @@ import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
-import org.pih.warehouse.inventory.StockMovementService
 import org.springframework.http.HttpStatus
 
 @Transactional
 class OutboundOrderApiController {
 
-    StockMovementService stockMovementService
     OutboundOrderService outboundOrderService
 
     def read() {
