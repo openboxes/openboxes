@@ -210,3 +210,125 @@ export const importCycleCounts = async ({
     },
   };
 };
+
+const mergeImportItemsRecount = (originalItem, importedItem, reasonCodes) => ({
+  ...originalItem,
+  quantityRecounted: importedItem ? importedItem.quantityRecounted : originalItem.quantityRecounted,
+  comment: importedItem ? importedItem.comment : originalItem.comment,
+  rootCause: (importedItem && importedItem.rootCause && {
+    id: importedItem.rootCause,
+    label: reasonCodes?.find?.((reasonCode) => reasonCode?.id === importedItem.rootCause)?.label,
+    value: importedItem.rootCause,
+  }) || (importedItem ? null : originalItem.rootCause),
+  updated: true,
+});
+
+const createCustomItemsRecountFromImport = (items, locale, reasonCodes) => (items
+  ? items.map((item) => ({
+    ...item,
+    countIndex: 1,
+    id: _.uniqueId(NEW_ROW),
+    custom: true,
+    inventoryItem: {
+      lotNumber: item.lotNumber,
+      expirationDate: item.expirationDate
+        ? moment(item.expirationDate)
+          .locale(locale)
+          .format(DateFormat.MMM_DD_YYYY)
+        : null,
+    },
+    product: {
+      id: item.product.id,
+      productCode: item.product.productCode,
+    },
+    binLocation: item.binLocation?.id ? {
+      id: item.binLocation.id,
+      name: item.binLocation.name,
+    } : null,
+    rootCause: item?.rootCause ? {
+      id: item.rootCause,
+      label: reasonCodes?.find?.((reasonCode) => reasonCode?.id === item.rootCause)?.label,
+      value: item.rootCause,
+    } : null,
+  }))
+  : []);
+
+export const importCycleCountsRecount = async ({
+  importFile,
+  locationId,
+  tableData,
+  setImportErrors,
+  locale,
+  recountedBy,
+  defaultRecountedBy,
+  dateRecounted,
+  reasonCodes,
+}) => {
+  const response = await cycleCountApi.importCycleCountRecountItems(
+    importFile,
+    locationId,
+  );
+  setImportErrors(response.data.errors);
+  let cycleCounts = _.groupBy(response.data.data, 'cycleCountId');
+  const assigneeAlreadyProcessed = {};
+  const importedRecountAssignees = {};
+  const importedDateRecounted = {};
+
+  // eslint-disable-next-line no-param-reassign
+  tableData.current = tableData.current.map((cycleCount) => {
+    // After each iteration assign it to false again, so that the flag
+    // can be reused for next cycle counts in the loop
+    assigneeAlreadyProcessed[cycleCount.id] = false;
+    return {
+      ...cycleCount,
+      cycleCountItems: [
+        ...cycleCount.cycleCountItems
+          .map((item) => {
+            const correspondingImportItem = cycleCounts[cycleCount.id]?.find(
+              (cycleCountItem) => cycleCountItem.cycleCountItemId === item.id,
+            );
+            // Assign recounted by and date recounted only once to prevent performance issues
+            // At this point, every item after being validated on the backend,
+            // should have the same recountAssignee and dateRecounted set,
+            // so we can make this operation only once
+            // this is why we introduce the assigneeAlreadyProcessed boolean flag
+            if (correspondingImportItem && !assigneeAlreadyProcessed[cycleCount.id]) {
+              importedRecountAssignees[cycleCount.id] = correspondingImportItem.recountAssignee;
+              // Do not allow to clear the date recounted dropdown
+              // if dateRecounted was not set in the sheet
+              if (correspondingImportItem.dateRecounted) {
+                importedDateRecounted[cycleCount.id] = correspondingImportItem.dateRecounted;
+              }
+              // Mark the flag as true, so that it's not triggered for each item
+              assigneeAlreadyProcessed[cycleCount.id] = true;
+            }
+
+            if (correspondingImportItem) {
+              // Remove items from the import that have a corresponding item
+              // in the current cycle count. It allows us to treat items with
+              // the wrong ID as new rows that do not already exist.
+              cycleCounts = removeItemFromCycleCounts({
+                cycleCounts,
+                cycleCountId: cycleCount.id,
+                itemId: correspondingImportItem.cycleCountItemId,
+              });
+            }
+            return mergeImportItemsRecount(item, correspondingImportItem, reasonCodes);
+          }),
+        ...createCustomItemsRecountFromImport(cycleCounts[cycleCount.id], locale, reasonCodes),
+      ],
+    };
+  });
+
+  // Merge imported recount assignees with existing ones, preserving
+  // any cycle counts not included in this import
+  // eslint-disable-next-line no-param-reassign
+  recountedBy.current = { ...recountedBy.current, ...importedRecountAssignees };
+  // eslint-disable-next-line no-param-reassign
+  defaultRecountedBy.current = { ...defaultRecountedBy.current, ...importedRecountAssignees };
+
+  // Merge imported date recounted with existing ones, preserving
+  // any cycle counts not included in this import
+  // eslint-disable-next-line no-param-reassign
+  dateRecounted.current = { ...dateRecounted.current, ...importedDateRecounted };
+};
