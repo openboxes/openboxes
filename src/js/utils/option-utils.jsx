@@ -63,6 +63,7 @@ export const debounceLocationsFetch = (
   isReturnOrder = false,
   direction,
   withOrganization = false,
+  locationTypeCode = null,
 ) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
@@ -76,6 +77,7 @@ export const debounceLocationsFetch = (
           isReturnOrder: isReturnOrder || undefined,
           activityCodes: activityCodes || undefined,
           withOrganization: withOrganization || undefined,
+          locationTypeCode: locationTypeCode || undefined,
         },
       }).then((result) => callback(_.map(result.data.data, (obj) => {
         const locationTypeData = withTypeDescription ? ` [${obj.locationType.description}]` : '';

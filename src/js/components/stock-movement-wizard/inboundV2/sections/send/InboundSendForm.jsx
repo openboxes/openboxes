@@ -29,7 +29,7 @@ const InboundSendForm = ({ previous }) => {
       shipped,
       documents,
       shipmentTypesWithoutDefaultValue,
-      debouncedLocationsFetch,
+      debouncedDestinationFetch,
     },
     actions: {
       sendShipment,
@@ -113,7 +113,7 @@ const InboundSendForm = ({ previous }) => {
                       defaultMessage: 'Destination',
                     }}
                     async
-                    loadOptions={debouncedLocationsFetch}
+                    loadOptions={debouncedDestinationFetch}
                   />
                 )}
               />
@@ -129,7 +129,6 @@ const InboundSendForm = ({ previous }) => {
                       id: 'react.stockMovement.shipDate.label',
                       defaultMessage: 'Ship date',
                     }}
-                    disabled={isDispatched}
                     errorMessage={errors.shipDate?.message}
                     required
                     customDateFormat={DateFormatDateFns.DD_MMM_YYYY}

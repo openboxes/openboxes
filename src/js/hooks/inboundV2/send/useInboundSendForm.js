@@ -39,7 +39,7 @@ const useInboundSendForm = ({ previous }) => {
   const debounceTime = useSelector(getDebounceTime);
   const minSearchLength = useSelector(getMinSearchLength);
 
-  const debouncedLocationsFetch = useMemo(
+  const debouncedDestinationFetch = useMemo(
     () => debounceLocationsFetch(
       debounceTime,
       minSearchLength,
@@ -49,6 +49,8 @@ const useInboundSendForm = ({ previous }) => {
       true,
       false,
       StockMovementDirection.INBOUND,
+      false,
+      locationType.DEPOT,
     ),
     [debounceTime, minSearchLength],
   );
@@ -410,7 +412,7 @@ const useInboundSendForm = ({ previous }) => {
       shipped,
       documents,
       shipmentTypesWithoutDefaultValue,
-      debouncedLocationsFetch,
+      debouncedDestinationFetch,
     },
     actions: {
       onSave,

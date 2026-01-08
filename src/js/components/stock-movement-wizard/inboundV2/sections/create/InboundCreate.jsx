@@ -17,8 +17,7 @@ const InboundCreate = ({ next }) => {
     data: {
       stockLists,
       origin,
-      destination,
-      debouncedLocationsFetch,
+      debouncedOriginFetch,
       debouncedPeopleFetch,
     },
     actions: { onSubmitStockMovementDetails },
@@ -67,7 +66,7 @@ const InboundCreate = ({ next }) => {
                   hasErrors={Boolean(errors.origin?.message)}
                   errorMessage={errors.origin?.message}
                   async
-                  loadOptions={debouncedLocationsFetch}
+                  loadOptions={debouncedOriginFetch}
                   customTooltip
                   ariaLabel={{
                     id: 'react.stockMovement.origin.label',
@@ -81,6 +80,7 @@ const InboundCreate = ({ next }) => {
             <Controller
               name="destination"
               control={control}
+              disabled
               render={({ field }) => (
                 <SelectField
                   {...field}
@@ -93,11 +93,6 @@ const InboundCreate = ({ next }) => {
                     id: 'react.stockMovement.destination.label',
                     defaultMessage: 'Destination',
                   }}
-                  hasErrors={Boolean(errors.destination?.message)}
-                  errorMessage={errors.destination?.message}
-                  required
-                  async
-                  loadOptions={debouncedLocationsFetch}
                 />
               )}
             />
@@ -105,7 +100,7 @@ const InboundCreate = ({ next }) => {
           <div className="col-lg-6 col-md-12 px-2 pt-2">
             <Controller
               name="stockList"
-              disabled={!origin || !destination}
+              disabled={!origin}
               control={control}
               render={({ field }) => (
                 <SelectField

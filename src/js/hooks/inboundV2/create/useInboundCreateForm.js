@@ -31,7 +31,7 @@ const useInboundCreateForm = ({ next }) => {
   const history = useHistory();
   const { stockMovementId } = useParams();
 
-  const debouncedLocationsFetch = useMemo(
+  const debouncedOriginFetch = useMemo(
     () => debounceLocationsFetch(
       debounceTime,
       minSearchLength,
@@ -82,6 +82,9 @@ const useInboundCreateForm = ({ next }) => {
       zodResolver(validationSchema(values))(values, context, options),
   });
 
+  const origin = watch('origin');
+  const destination = watch('destination');
+
   const onSubmitStockMovementDetails = async (values) => {
     spinner.show();
     const formattedValues = {
@@ -105,6 +108,16 @@ const useInboundCreateForm = ({ next }) => {
       spinner.hide();
     }
   };
+
+  useEffect(() => {
+    if (currentLocation && !destination?.id) {
+      setValue('destination', {
+        id: currentLocation?.id,
+        name: currentLocation?.name,
+        label: `${currentLocation?.name} [${currentLocation?.locationType?.description}]`,
+      });
+    }
+  }, [currentLocation?.id]);
 
   const fetchStockLists = async () => {
     spinner.show();
@@ -136,9 +149,6 @@ const useInboundCreateForm = ({ next }) => {
       spinner.hide();
     }
   };
-
-  const origin = watch('origin');
-  const destination = watch('destination');
 
   useEffect(() => {
     if (origin?.id && destination?.id) {
@@ -219,8 +229,7 @@ const useInboundCreateForm = ({ next }) => {
     data: {
       stockLists,
       origin,
-      destination,
-      debouncedLocationsFetch,
+      debouncedOriginFetch,
       debouncedPeopleFetch,
     },
     actions: {
