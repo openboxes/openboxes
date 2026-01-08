@@ -1,47 +1,28 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { Controller, useWatch } from 'react-hook-form';
-import { useSelector } from 'react-redux';
-import { getDebounceTime, getMinSearchLength } from 'selectors';
+import { Controller } from 'react-hook-form';
 
 import Button from 'components/form-elements/Button';
 import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Section from 'components/Layout/v2/Section';
-import StockMovementDirection from 'consts/StockMovementDirection';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useInboundCreateForm from 'hooks/inboundV2/create/useInboundCreateForm';
-import { debounceLocationsFetch, debouncePeopleFetch } from 'utils/option-utils';
 
 const InboundCreate = ({ next }) => {
   const {
-    errors,
-    control,
-    handleSubmit,
-    onSubmitStockMovementDetails,
-    stockLists,
+    form: { control, errors, handleSubmit },
+    data: {
+      stockLists,
+      origin,
+      destination,
+      debouncedLocationsFetch,
+      debouncedPeopleFetch,
+    },
+    actions: { onSubmitStockMovementDetails },
   } = useInboundCreateForm({ next });
-
-  const origin = useWatch({
-    name: 'origin',
-    control,
-  });
-
-  const debounceTime = useSelector(getDebounceTime);
-  const minSearchLength = useSelector(getMinSearchLength);
-
-  const debouncedLocationsFetch = debounceLocationsFetch(
-    debounceTime,
-    minSearchLength,
-    null,
-    false,
-    false,
-    true,
-    false,
-    StockMovementDirection.INBOUND,
-  );
 
   return (
     <form onSubmit={handleSubmit(onSubmitStockMovementDetails)}>
@@ -100,7 +81,6 @@ const InboundCreate = ({ next }) => {
             <Controller
               name="destination"
               control={control}
-              disabled
               render={({ field }) => (
                 <SelectField
                   {...field}
@@ -114,6 +94,10 @@ const InboundCreate = ({ next }) => {
                     defaultMessage: 'Destination',
                   }}
                   hasErrors={Boolean(errors.destination?.message)}
+                  errorMessage={errors.destination?.message}
+                  required
+                  async
+                  loadOptions={debouncedLocationsFetch}
                 />
               )}
             />
@@ -121,7 +105,7 @@ const InboundCreate = ({ next }) => {
           <div className="col-lg-6 col-md-12 px-2 pt-2">
             <Controller
               name="stockList"
-              disabled={!origin}
+              disabled={!origin || !destination}
               control={control}
               render={({ field }) => (
                 <SelectField
@@ -156,7 +140,7 @@ const InboundCreate = ({ next }) => {
                   hasErrors={Boolean(errors.requestedBy?.message)}
                   errorMessage={errors.requestedBy?.message}
                   async
-                  loadOptions={debouncePeopleFetch(debounceTime, minSearchLength)}
+                  loadOptions={debouncedPeopleFetch}
                   customTooltip
                   ariaLabel={{
                     id: 'react.stockMovement.requestedBy.label',

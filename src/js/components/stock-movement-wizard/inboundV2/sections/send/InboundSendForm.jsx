@@ -17,41 +17,44 @@ import useInboundSendForm from 'hooks/inboundV2/send/useInboundSendForm';
 
 const InboundSendForm = ({ previous }) => {
   const {
-    handleSubmit,
-    control,
-    errors,
-    trigger,
-    sendShipment,
-    shipmentTypesWithoutDefaultValue,
-    rollbackStockMovement,
-    onSave,
-    previousPage,
-    saveAndExit,
-    statusCode,
-    hasRoleAdmin,
-    shipped,
-    matchesDestination,
-    documents,
-    handleExportFile,
-    handleDownloadFiles,
-    files,
-    handleRemoveFile,
-    isValid,
+    form: {
+      control,
+      errors,
+      isValid,
+      handleSubmit,
+      trigger,
+    },
+    data: {
+      statusCode,
+      shipped,
+      documents,
+      shipmentTypesWithoutDefaultValue,
+      debouncedLocationsFetch,
+    },
+    actions: {
+      sendShipment,
+      rollbackStockMovement,
+      onSave,
+      previousPage,
+      saveAndExit,
+    },
+    files: {
+      files,
+      handleExportFile,
+      handleDownloadFiles,
+      handleRemoveFile,
+    },
+    permissions: { hasRoleAdmin },
   } = useInboundSendForm({ previous });
+
+  // Check if shipment is dispatched (used for disabling buttons and enabling rollback)
+  const isDispatched = statusCode === requisitionStatus.DISPATCHED;
 
   // Rollback button is visible only for admins when shipment has been dispatched
   const rollbackButtonVisible = hasRoleAdmin && shipped;
 
-  // Rollback is enabled only when form is valid, status is dispatched,
-  // and destination matches the current location
-  const isRollbackEnabled = isValid
-    && statusCode === requisitionStatus.DISPATCHED
-    && matchesDestination;
-
-  // Disable navigation buttons if shipment is already dispatched
-  // or selected destination doesn't match current location
-  const navigationButtonDisabled = statusCode === requisitionStatus.DISPATCHED
-    || !matchesDestination;
+  // Rollback is enabled only when form is valid and status is dispatched
+  const isRollbackEnabled = isValid && isDispatched;
 
   return (
     <>
@@ -60,12 +63,12 @@ const InboundSendForm = ({ previous }) => {
         onSave={onSave}
         statusCode={statusCode}
         isValid={isValid}
-        matchesDestination={matchesDestination}
         documents={documents}
         handleExportFile={handleExportFile}
         handleDownloadFiles={handleDownloadFiles}
         files={files}
         handleRemoveFile={handleRemoveFile}
+        isDispatched={isDispatched}
       />
       <form onSubmit={handleSubmit(sendShipment)}>
         <Section showTitle={false}>
@@ -109,7 +112,8 @@ const InboundSendForm = ({ previous }) => {
                       id: 'react.stockMovement.destination.label',
                       defaultMessage: 'Destination',
                     }}
-                    disabled
+                    async
+                    loadOptions={debouncedLocationsFetch}
                   />
                 )}
               />
@@ -118,7 +122,6 @@ const InboundSendForm = ({ previous }) => {
               <Controller
                 name="shipDate"
                 control={control}
-                disabled={!matchesDestination}
                 render={({ field }) => (
                   <DateFieldDateFns
                     {...field}
@@ -126,6 +129,7 @@ const InboundSendForm = ({ previous }) => {
                       id: 'react.stockMovement.shipDate.label',
                       defaultMessage: 'Ship date',
                     }}
+                    disabled={isDispatched}
                     errorMessage={errors.shipDate?.message}
                     required
                     customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
@@ -143,7 +147,6 @@ const InboundSendForm = ({ previous }) => {
               <Controller
                 name="shipmentType"
                 control={control}
-                disabled={!matchesDestination}
                 render={({ field }) => (
                   <SelectField
                     {...field}
@@ -172,7 +175,6 @@ const InboundSendForm = ({ previous }) => {
               <Controller
                 name="trackingNumber"
                 control={control}
-                disabled={!matchesDestination}
                 render={({ field }) => (
                   <TextInput
                     {...field}
@@ -194,7 +196,6 @@ const InboundSendForm = ({ previous }) => {
               <Controller
                 name="driverName"
                 control={control}
-                disabled={!matchesDestination}
                 render={({ field }) => (
                   <TextInput
                     {...field}
@@ -216,7 +217,6 @@ const InboundSendForm = ({ previous }) => {
               <Controller
                 name="comments"
                 control={control}
-                disabled={!matchesDestination}
                 render={({ field }) => (
                   <TextInput
                     {...field}
@@ -238,7 +238,6 @@ const InboundSendForm = ({ previous }) => {
               <Controller
                 name="expectedDeliveryDate"
                 control={control}
-                disabled={!matchesDestination}
                 render={({ field }) => (
                   <DateFieldDateFns
                     {...field}
@@ -268,7 +267,7 @@ const InboundSendForm = ({ previous }) => {
             defaultLabel="Previous"
             variant="primary"
             onClick={() => previousPage()}
-            disabled={navigationButtonDisabled}
+            disabled={isDispatched}
           />
           <div className="buttons-container">
             {rollbackButtonVisible && (
@@ -286,7 +285,7 @@ const InboundSendForm = ({ previous }) => {
               defaultLabel="Send shipment"
               variant="primary"
               type="submit"
-              disabled={navigationButtonDisabled}
+              disabled={isDispatched}
             />
           </div>
         </div>

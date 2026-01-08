@@ -5,27 +5,50 @@ import queryString from 'query-string';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
-import { getCurrentLocation } from 'selectors';
+import { getCurrentLocation, getDebounceTime, getMinSearchLength } from 'selectors';
 
 import { fetchUsers, updateWorkflowHeader } from 'actions';
 import stockListApi from 'api/services/StockListApi';
 import stockMovementApi from 'api/services/StockMovementApi';
 import { STOCK_MOVEMENT_BY_ID } from 'api/urls';
+import StockMovementDirection from 'consts/StockMovementDirection';
 import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
 import useInboundCreateValidation from 'hooks/inboundV2/create/useInboundCreateValidation';
 import useSpinner from 'hooks/useSpinner';
 import apiClient from 'utils/apiClient';
 import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
 import dateWithoutTimeZone, { formatDateToString } from 'utils/dateUtils';
+import { debounceLocationsFetch, debouncePeopleFetch } from 'utils/option-utils';
 
 const useInboundCreateForm = ({ next }) => {
   const [stockLists, setStockLists] = useState([]);
   const currentLocation = useSelector(getCurrentLocation);
+  const debounceTime = useSelector(getDebounceTime);
+  const minSearchLength = useSelector(getMinSearchLength);
   const spinner = useSpinner();
   const { validationSchema } = useInboundCreateValidation();
   const dispatch = useDispatch();
   const history = useHistory();
   const { stockMovementId } = useParams();
+
+  const debouncedLocationsFetch = useMemo(
+    () => debounceLocationsFetch(
+      debounceTime,
+      minSearchLength,
+      null,
+      false,
+      false,
+      true,
+      false,
+      StockMovementDirection.INBOUND,
+    ),
+    [debounceTime, minSearchLength],
+  );
+
+  const debouncedPeopleFetch = useMemo(
+    () => debouncePeopleFetch(debounceTime, minSearchLength),
+    [debounceTime, minSearchLength],
+  );
 
   const defaultValues = useMemo(() => {
     const values = {
@@ -34,6 +57,7 @@ const useInboundCreateForm = ({ next }) => {
       destination: {
         id: currentLocation?.id,
         label: `${currentLocation?.name} [${currentLocation?.locationType?.description}]`,
+        name: currentLocation?.name,
       },
       stocklist: undefined,
       requestedBy: undefined,
@@ -50,6 +74,7 @@ const useInboundCreateForm = ({ next }) => {
     formState: { errors },
     setValue,
     watch,
+    reset,
   } = useForm({
     mode: 'onBlur',
     defaultValues,
@@ -67,7 +92,7 @@ const useInboundCreateForm = ({ next }) => {
         outputDateFormat: DateFormat.MM_DD_YYYY,
       }),
       origin: { id: values.origin.id },
-      destination: { id: currentLocation.id },
+      destination: { id: values.destination.id },
       requestedBy: { id: values.requestedBy.id },
     };
     try {
@@ -80,16 +105,6 @@ const useInboundCreateForm = ({ next }) => {
       spinner.hide();
     }
   };
-
-  useEffect(() => {
-    if (currentLocation) {
-      setValue('destination', {
-        id: currentLocation?.id,
-        name: currentLocation?.name,
-        label: `${currentLocation?.name} [${currentLocation?.locationType?.description}]`,
-      });
-    }
-  }, [currentLocation?.id]);
 
   const fetchStockLists = async () => {
     spinner.show();
@@ -139,23 +154,39 @@ const useInboundCreateForm = ({ next }) => {
     spinner.show();
     try {
       const response = await apiClient.get(STOCK_MOVEMENT_BY_ID(stockMovementId));
-
       const { data } = response.data;
-      setValue('description', data.description);
-      setValue('origin', {
-        id: data.origin.id,
-        name: data.origin.name,
-        label: `${data.origin.name} [${data.origin.locationType.description}]`,
+
+      reset({
+        description: data.description,
+        origin: data.origin
+          ? {
+            id: data.origin.id,
+            name: data.origin.name,
+            label: `${data.origin.name} [${data.origin.locationType?.description ?? ''}]`,
+          }
+          : null,
+        destination: data.destination
+          ? {
+            id: data.destination.id,
+            name: data.destination.name,
+            label: `${data.destination.name} [${data.destination.locationType?.description ?? ''}]`,
+          }
+          : null,
+        requestedBy: data.requestedBy ? {
+          id: data.requestedBy.id,
+          name: data.requestedBy.name,
+          label: data.requestedBy.name,
+        } : null,
+        dateRequested: formatDateToString({
+          date: data.dateRequested,
+          dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+        }),
+        stocklist: data.stocklist ? {
+          id: data.stocklist.id,
+          name: data.stocklist.name,
+          label: data.stocklist.name,
+        } : null,
       });
-      setValue('requestedBy', {
-        id: data.requestedBy.id,
-        name: data.requestedBy.name,
-        label: data.requestedBy.name,
-      });
-      setValue('dateRequested', formatDateToString({
-        date: data.dateRequested,
-        dateFormat: DateFormatDateFns.DD_MMM_YYYY,
-      }));
 
       // We set {} for headerStatus in the create step because we only want to display it on the
       // last step
@@ -178,13 +209,23 @@ const useInboundCreateForm = ({ next }) => {
     dispatch(fetchUsers());
     fetchData();
   }, []);
+
   return {
-    control,
-    getValues,
-    handleSubmit,
-    errors,
-    onSubmitStockMovementDetails,
-    stockLists,
+    form: {
+      control,
+      errors,
+      handleSubmit,
+    },
+    data: {
+      stockLists,
+      origin,
+      destination,
+      debouncedLocationsFetch,
+      debouncedPeopleFetch,
+    },
+    actions: {
+      onSubmitStockMovementDetails,
+    },
   };
 };
 
