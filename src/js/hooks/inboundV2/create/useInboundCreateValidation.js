@@ -48,7 +48,8 @@ const useInboundCreateValidation = () => {
       .string({
         invalid_type_error: requiredFieldMessage,
         required_error: requiredFieldMessage,
-      }),
+      })
+      .min(1, requiredFieldMessage),
     origin: originSchema,
     destination: destinationSchema,
     stocklist: stocklistSchema,
