@@ -6,13 +6,18 @@ import { validateFutureDate } from 'utils/form-utils';
 const useInboundCreateValidation = () => {
   const translate = useTranslate();
 
+  const requiredFieldMessage = translate(
+    'react.default.error.requiredField.label',
+    'This field is required',
+  );
+
   const requestedBySchema = z.object({
     id: z.string(),
     label: z.string(),
     name: z.string(),
   }, {
-    invalid_type_error: translate('react.default.error.requiredField.label', 'Requested by is required'),
-    required_error: translate('react.default.error.requiredField.label', 'Requested by is required'),
+    invalid_type_error: requiredFieldMessage,
+    required_error: requiredFieldMessage,
   }).required();
 
   const originSchema = z.object({
@@ -20,8 +25,8 @@ const useInboundCreateValidation = () => {
     name: z.string(),
     label: z.string(),
   }, {
-    invalid_type_error: translate('react.default.error.requiredField.label', 'Origin is required'),
-    required_error: translate('react.default.error.requiredField.label', 'Origin is required'),
+    invalid_type_error: requiredFieldMessage,
+    required_error: requiredFieldMessage,
   }).required();
 
   const destinationSchema = z.object({
@@ -29,8 +34,8 @@ const useInboundCreateValidation = () => {
     name: z.string(),
     label: z.string(),
   }, {
-    invalid_type_error: translate('react.default.error.requiredField.label', 'Destination is required'),
-    required_error: translate('react.default.error.requiredField.label', 'Destination is required'),
+    invalid_type_error: requiredFieldMessage,
+    required_error: requiredFieldMessage,
   }).optional().nullable();
 
   const stocklistSchema = z.object({
@@ -41,17 +46,17 @@ const useInboundCreateValidation = () => {
   const validationSchema = () => z.object({
     description: z
       .string({
-        required_error: translate('react.default.error.requiredField.label', 'Description is required'),
-      })
-      .min(1, translate('react.default.error.requiredField.label', 'Description is required')),
+        invalid_type_error: requiredFieldMessage,
+        required_error: requiredFieldMessage,
+      }),
     origin: originSchema,
     destination: destinationSchema,
     stocklist: stocklistSchema,
     requestedBy: requestedBySchema,
     dateRequested: z
       .string({
-        required_error: translate('react.default.error.requiredField.label', 'Date requested is required'),
-        invalid_type_error: translate('react.default.error.requiredField.label', 'Date requested is required'),
+        invalid_type_error: requiredFieldMessage,
+        required_error: requiredFieldMessage,
       })
       .refine((pickedDate) => validateFutureDate(pickedDate), {
         message: translate('react.default.error.futureDate.label', 'The date cannot be in the future'),

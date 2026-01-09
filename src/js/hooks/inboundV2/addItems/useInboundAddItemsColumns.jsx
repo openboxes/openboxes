@@ -87,7 +87,6 @@ const useInboundAddItemsColumns = ({
     additionalFieldToOnBlur = null,
   ) => {
     field.onBlur();
-
     // If there is a stored focus reference, clear it
     if (rowIndex !== null && columnId !== null) {
       setRowIndex(null);
@@ -373,6 +372,10 @@ const useInboundAddItemsColumns = ({
       ),
       cell: ({ row, column }) => {
         const hasErrors = !!errors?.values?.lineItems?.[row.index]?.expirationDate?.message;
+        const { field: lotNumberField } = useController({
+          name: `values.lineItems.${row.index}.lotNumber`,
+          control,
+        });
         const value = getValues(`values.lineItems.${row.index}.expirationDate`);
         return (
           <TableCell
@@ -395,7 +398,7 @@ const useInboundAddItemsColumns = ({
                   hasErrors={hasErrors}
                   showCustomInput={false}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
-                  onBlur={() => handleBlur(field)}
+                  onBlur={() => handleBlur(field, lotNumberField)}
                   focusProps={{
                     fieldIndex: row.index,
                     fieldId: column.id,
