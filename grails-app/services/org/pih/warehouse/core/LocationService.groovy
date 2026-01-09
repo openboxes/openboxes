@@ -151,6 +151,13 @@ class LocationService {
             }
         }
 
+        if (direction == StockMovementDirection.INBOUND.name()) {
+            LocationTypeCode code = (params.locationTypeCode as LocationTypeCode) ?: LocationTypeCode.SUPPLIER
+            return locations.findAll {
+                it.locationType.locationTypeCode == code
+            }
+        }
+
         if (direction == StockMovementDirection.OUTBOUND.name()) {
             return locations.findAll {
                 (it.locationGroup == currentLocation.locationGroup) ||
@@ -161,12 +168,6 @@ class LocationService {
         if (params.locationTypeCode) {
             LocationTypeCode locationTypeCode = params.locationTypeCode as LocationTypeCode
             return locations.findAll { it.locationType.locationTypeCode == locationTypeCode }
-        }
-
-        if (direction == StockMovementDirection.INBOUND.name()) {
-            return locations.findAll {
-                it.locationType.locationTypeCode == LocationTypeCode.SUPPLIER
-            }
         }
 
         return locations

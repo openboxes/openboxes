@@ -114,6 +114,7 @@ const InboundSendForm = ({ previous }) => {
                     }}
                     async
                     loadOptions={debouncedDestinationLocationsFetch}
+                    required
                   />
                 )}
               />
