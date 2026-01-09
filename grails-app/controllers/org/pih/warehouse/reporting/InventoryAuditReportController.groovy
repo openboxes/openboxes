@@ -4,6 +4,7 @@ import grails.converters.JSON
 import org.pih.warehouse.api.PaginationCommand
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.data.DataService
+import org.pih.warehouse.inventory.InventoryAuditSummaryFormatter
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.report.ReportService
 
@@ -11,6 +12,7 @@ class InventoryAuditReportController {
 
     DataService dataService
     ReportService reportService
+    InventoryAuditSummaryFormatter inventoryAuditSummaryFormatter
 
     def getInventoryAuditDetails(InventoryAuditCommand command) {
         def data = reportService.getInventoryAuditDetails(command)
@@ -33,7 +35,7 @@ class InventoryAuditReportController {
 
         def data = reportService.getInventoryAuditSummary(command)
         if (params.format == "csv") {
-            def text = dataService.generateCsv(data*.toCsv())
+            String text = dataService.generateCsv(inventoryAuditSummaryFormatter.toCsv(data))
             response.setHeader("Content-disposition", "attachment; filename=\"inventory-audit-summary.csv\"")
             render(contentType: "text/csv", text: text)
             return

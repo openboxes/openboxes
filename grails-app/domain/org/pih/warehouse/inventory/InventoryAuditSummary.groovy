@@ -58,26 +58,4 @@ class InventoryAuditSummary implements Serializable {
                 valueOnHand       : amountOnHand
         ]
     }
-
-    Map toCsv() {
-        return [
-                facility           : facility?.name,
-                name               : product?.name,
-                productCode        : product?.productCode,
-                category           : product?.category?.name,
-                abcClass           : abcClass,
-                tags               : product.tags.collect { it.tag }?.join(","),
-                catalogs           : product?.productCatalogs?.collect { it.name }?.join(","),
-                lastCounted        : lastCounted,
-                pricePerUnit       : product?.pricePerUnit,
-                numberOfCounts     : countCycleCounts,
-                numberOfAdjustments: countAdjustments,
-                quantityAdjusted   : quantityAdjusted,
-                valueAdjusted      : amountAdjusted,
-                quantityDemanded   : quantityDemanded,
-                monthsOfStockChange: monthsOfStockChange,
-                quantityOnHand     : quantityOnHand,
-                valueOnHand        : amountOnHand
-        ]
-    }
 }
