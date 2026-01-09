@@ -87,6 +87,7 @@ const useInboundAddItemsColumns = ({
     additionalFieldToOnBlur = null,
   ) => {
     field.onBlur();
+
     // If there is a stored focus reference, clear it
     if (rowIndex !== null && columnId !== null) {
       setRowIndex(null);

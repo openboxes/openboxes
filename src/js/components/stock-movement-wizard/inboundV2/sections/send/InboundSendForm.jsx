@@ -53,11 +53,6 @@ const InboundSendForm = ({ previous }) => {
   const navigationButtonDisabled = statusCode === requisitionStatus.DISPATCHED
     || !matchesDestination;
 
-  const handleDateChange = (onChange) => async (value) => {
-    onChange(value);
-    await trigger(['shipDate', 'expectedDeliveryDate']);
-  };
-
   return (
     <>
       <InboundSendFormHeader
@@ -140,7 +135,10 @@ const InboundSendForm = ({ previous }) => {
                       id: 'react.stockMovement.shipDate.label',
                       defaultMessage: 'Ship date',
                     }}
-                    onChange={handleDateChange(field.onChange)}
+                    onChange={async (value) => {
+                      field.onChange(value);
+                      await trigger(['shipDate', 'expectedDeliveryDate']);
+                    }}
                   />
                 )}
               />
@@ -261,7 +259,10 @@ const InboundSendForm = ({ previous }) => {
                       id: 'react.stockMovement.expectedDeliveryDate.label',
                       defaultMessage: 'Expected Delivery Date',
                     }}
-                    onChange={handleDateChange(field.onChange)}
+                    onChange={async (value) => {
+                      field.onChange(value);
+                      await trigger(['shipDate', 'expectedDeliveryDate']);
+                    }}
                   />
                 )}
               />
