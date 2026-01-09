@@ -14,6 +14,7 @@ import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.outboundOrder.AllocationStatus
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductGroup
@@ -653,7 +654,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return quantityAllocated > 0 && quantityAllocated < quantityRequired
     }
 
-    String getAllocationStatus() {
+    AllocationStatus getAllocationStatus() {
         if (isAllocated()) return AllocationStatus.ALLOCATED
         if (isPartiallyAllocated()) return AllocationStatus.PARTIALLY_ALLOCATED
         return AllocationStatus.UNALLOCATED

@@ -8,6 +8,9 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.outboundOrder.AllocationDto
+import org.pih.warehouse.outboundOrder.AllocationStatus
+import org.pih.warehouse.outboundOrder.AllocationType
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
@@ -73,8 +76,9 @@ class StockMovementItem {
     BigDecimal packSize = 1
 
     List<AvailableItem> availableItems // required for outbound orders
+    List<AllocationDto> allocations // required for outbound orders
 
-    String allocationStatus
+    AllocationStatus allocationStatus
 
     /**
      * Represents the version of the item (ie how many times it has been modified). Typically pulled from
@@ -139,6 +143,7 @@ class StockMovementItem {
         version(nullable: true)
         manuallyAdded(nullable: true)
         availableItems(nullable: true)
+        allocations(nullable: true)
         allocationStatus(nullable: true)
     }
 
@@ -190,6 +195,7 @@ class StockMovementItem {
                 ],
                 manuallyAdded          : manuallyAdded,
                 availableItems         : availableItems,
+                allocations            : allocations,
                 quantityAllocated      : quantityAllocated,
                 allocationStatus       : allocationStatus
         ]
