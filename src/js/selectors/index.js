@@ -43,6 +43,11 @@ export const getCurrentLocationName = createSelector(
   (currentLocation) => currentLocation?.name,
 );
 
+export const getHasBinLocationSupport = createSelector(
+  [getCurrentLocation],
+  (location) => location?.hasBinLocationSupport,
+);
+
 export const getDefaultTranslationsFetched = createSelector(
   [getSession],
   (session) => session.fetchedTranslations.default,
