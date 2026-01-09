@@ -264,6 +264,10 @@ const useInboundAddItemsColumns = ({
       cell: ({ row, column }) => {
         const hasErrors = !!errors?.values?.lineItems?.[row.index]?.product?.message;
         const value = getValues(`values.lineItems.${row.index}.product`);
+        const { field: quantityField } = useController({
+          name: `values.lineItems.${row.index}.quantityRequested`,
+          control,
+        });
         return (
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
@@ -279,7 +283,7 @@ const useInboundAddItemsColumns = ({
                   async
                   loadOptions={debouncedProductsFetch}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
-                  onBlur={() => handleBlur(field)}
+                  onBlur={() => handleBlur(field, quantityField)}
                   className="select-xs dark-select-xs"
                   focusProps={{
                     fieldIndex: row.index,
