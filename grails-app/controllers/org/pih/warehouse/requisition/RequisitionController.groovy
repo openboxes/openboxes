@@ -460,9 +460,13 @@ class RequisitionController {
     def issue() {
         def requisition = Requisition.get(params.id)
         try {
-            requisitionService.issueRequisition(requisition, AuthService.currentUser, AuthService.currentUser, null)
             stockMovementService.createMissingShipmentItems(requisition, requisition?.shipment)
             stockMovementService.issueRequisitionBasedStockMovement(params.id)
+            requisitionService.triggerRequisitionStatusTransition(
+                requisition,
+                AuthService.currentUser,
+                RequisitionStatus.ISSUED
+            )
         } catch (ValidationException e) {
             requisition = Requisition.read(params.id)
             def picklist = Picklist.findByRequisition(requisition)
