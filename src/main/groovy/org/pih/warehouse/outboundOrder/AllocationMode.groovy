@@ -1,5 +1,5 @@
 package org.pih.warehouse.outboundOrder
 
-enum AllocationType {
+enum AllocationMode {
     AUTO, MANUAL
 }

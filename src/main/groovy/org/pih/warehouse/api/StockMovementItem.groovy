@@ -10,7 +10,6 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.outboundOrder.AllocationDto
 import org.pih.warehouse.outboundOrder.AllocationStatus
-import org.pih.warehouse.outboundOrder.AllocationType
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier

@@ -22,12 +22,24 @@ class OutboundOrderApiController {
 
     def allocate() {
         def jsonBody = request.JSON ?: [:]
+        AllocationMode mode = jsonBody.mode as AllocationMode
+        List<AllocationDto> allocations = jsonBody.allocations as List<AllocationDto>
         try {
-            def result = allocationService.allocate(
-                    params.itemId, jsonBody.mode as AllocationType, jsonBody.allocations as List<AllocationDto>)
+            List<AllocationStrategy> strategies = []
+            if (jsonBody.strategies) {
+                strategies = jsonBody.strategies.collect { String strategy ->
+                    try {
+                        return AllocationStrategy.valueOf(strategy)
+                    } catch (IllegalArgumentException e) {
+                        return null
+                    }
+                }.findAll { it != null }
+            }
+
+            def result = allocationService.allocate(params.itemId, mode, allocations, strategies)
             render(result as JSON)
         } catch (Exception e) {
-            render(status: 500, [errorCode: 500, message: e.message] as JSON)
+            render(status: 500, [errorCode: 500, errorMessage: e.message] as JSON)
         }
     }
 }

@@ -1,8 +1,10 @@
 package org.pih.warehouse.outboundOrder
 
 import grails.gorm.transactions.Transactional
+import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.StockMovementService
@@ -43,16 +45,15 @@ class AllocationService {
         return outboundOrder
     }
 
-    AllocationDetailsDto allocate(String requisitionItemId, AllocationType mode, List<AllocationDto> allocations) {
+    AllocationDetailsDto allocate(String requisitionItemId, AllocationMode mode, List<AllocationDto> allocations, List<AllocationStrategy> strategies = []) {
         RequisitionItem requisitionItem = RequisitionItem.get(requisitionItemId)
         if (!requisitionItem) {
             throw new IllegalArgumentException("Requisition item not found")
         }
 
-        if (mode == AllocationType.AUTO) {
-            StockMovementItem smItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
-            stockMovementService.createPicklist(smItem, false)
-        } else if (mode == AllocationType.MANUAL) {
+        if (mode == AllocationMode.AUTO) {
+            autoAllocate(requisitionItem, strategies)
+        } else if (mode == AllocationMode.MANUAL) {
             List<PicklistItem> existingPickListItems = PicklistItem.findAllByRequisitionItem(requisitionItem)
             Set<String> processedPickIds = []
             allocations.each { allocation ->
@@ -103,6 +104,45 @@ class AllocationService {
         }
 
         return buildAllocationDetailsDto(requisitionItem)
+    }
+
+    private void autoAllocate(RequisitionItem requisitionItem, List<AllocationStrategy> strategies) {
+        Location location = requisitionItem.requisition.origin
+        List<AvailableItem> allAvailableItems = stockMovementService.getAvailableItems(location, requisitionItem, false)
+        List<AvailableItem> filteredItems = applyStrategies(allAvailableItems, strategies)
+
+        Integer quantityRequired = requisitionItem.calculateQuantityRequired()
+        Integer quantityAvailable = filteredItems.sum { it.quantityAvailable } ?: 0
+        if (quantityAvailable < quantityRequired) {
+            throw new IllegalArgumentException("Insufficient stock. Required: ${quantityRequired}, Available: ${quantityAvailable}")
+        }
+
+        List<SuggestedItem> suggestedItems = stockMovementService.getSuggestedItems(filteredItems, quantityRequired)
+
+        stockMovementService.clearPicklist(requisitionItem)
+        stockMovementService.allocateSuggestedItems(requisitionItem, suggestedItems, true)
+    }
+
+    private List<AvailableItem> applyStrategies(List<AvailableItem> items, List<AllocationStrategy> strategies) {
+        if (!strategies || strategies.isEmpty()) {
+            return items
+        }
+
+        List<AvailableItem> result = new ArrayList<>(items)
+
+        strategies.each { strategy ->
+            switch (strategy) {
+                case AllocationStrategy.DISPLAY_FIRST:
+                    result = result.findAll { it.binLocation?.isDisplay() }
+                    break
+
+                case AllocationStrategy.WAREHOUSE_FIRST:
+                    result = result.findAll { !it.binLocation?.isDisplay() }
+                    break
+            }
+        }
+
+        return result
     }
 
     private AllocationDetailsDto buildAllocationDetailsDto(RequisitionItem requisitionItem) {
