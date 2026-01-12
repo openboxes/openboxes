@@ -451,7 +451,7 @@ class RequisitionService {
     void rollbackRequisition(Requisition requisition) {
         try {
             if (requisition.status == RequisitionStatus.ISSUED) {
-                requisition.status = RequisitionStatus.CHECKING
+                requisition.status = RequisitionStatus.STAGED
                 requisition.issuedBy = null
                 requisition.dateIssued = null
                 requisition.transactions.each { transaction ->

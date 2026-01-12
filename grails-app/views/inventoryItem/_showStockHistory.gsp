@@ -321,7 +321,7 @@
                             </td>
                             <td class="middle">
                                 <g:if test="${stockHistoryEntry?.showDetails}">
-                                    <format:date obj="${stockHistoryEntry?.transaction?.transactionDate}" format="hh:mma"/>
+                                    <format:date obj="${stockHistoryEntry?.transaction?.lastUpdated}" format="hh:mma"/>
                                 </g:if>
                             </td>
                             <td class="middle">

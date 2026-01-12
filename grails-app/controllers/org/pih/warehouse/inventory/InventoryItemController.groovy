@@ -286,6 +286,18 @@ class InventoryItemController {
             totalCount = count.values().sum()
         }
 
+        stockHistoryList.sort { a, b ->
+            def t1 = a.transaction
+            def t2 = b.transaction
+
+            int result = t1.lastUpdated <=> t2.lastUpdated
+
+            if (result == 0) {
+                result = t1.dateCreated <=> t2.dateCreated
+            }
+
+            return result
+        }
 
         log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
 
