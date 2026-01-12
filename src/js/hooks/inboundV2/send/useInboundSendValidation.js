@@ -20,7 +20,7 @@ const useInboundSendValidation = () => {
   }, {
     invalid_type_error: requiredFieldMessage,
     required_error: requiredFieldMessage,
-  }).nullable().refine((val) => !!val, { message: requiredFieldMessage });
+  }).nullable().refine((val) => !!val?.id, { message: requiredFieldMessage });
 
   const shipDateSchema = z
     .string({
