@@ -220,7 +220,8 @@ class BootStrap {
                 product       : [
                     id         : inventoryItem?.product?.id,
                     name       : inventoryItem?.product?.name,
-                    productCode: inventoryItem?.product?.productCode
+                    productCode: inventoryItem?.product?.productCode,
+                    upc        : inventoryItem?.product?.upc,
                 ],
                 lotNumber     : inventoryItem.lotNumber ?: null,
                 expirationDate: inventoryItem.expirationDate?.format("MM/dd/yyyy")
