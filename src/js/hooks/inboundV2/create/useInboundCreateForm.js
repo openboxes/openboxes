@@ -117,7 +117,7 @@ const useInboundCreateForm = ({ next }) => {
         label: `${currentLocation?.name} [${currentLocation?.locationType?.description}]`,
       });
     }
-  }, [currentLocation?.id, destination]);
+  }, [currentLocation?.id, destination?.id]);
 
   const fetchStockLists = async () => {
     spinner.show();
