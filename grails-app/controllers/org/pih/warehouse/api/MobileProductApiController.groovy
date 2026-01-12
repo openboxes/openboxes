@@ -203,19 +203,30 @@ class MobileProductApiController extends BaseDomainApiController {
                 case "upc":
                     def oldValue = product.upc
 
-                    Product duplicate = Product.findByUpc(newValue)
-                    if (duplicate && duplicate.id != product.id) {
+                    if (!newValue) {
+                        product.upc = null
+                        product.save(flush: true)
+                        render([data: [id: product.id, identifier: [type: type, value: null]]] as JSON)
+                        return
+                    }
+
+                    Product upcDuplicate = Product.findByUpc(newValue)
+                    if (upcDuplicate && upcDuplicate.id != product.id) {
                         render(
                                 status: 409,
-                                text: "Conflict: '${newValue}' already assigned to another product (Product Code: ${duplicate.productCode})"
+                                text: "Conflict: The UPC '${newValue}' is already assigned to product " +
+                                        "${upcDuplicate.productCode} – ${upcDuplicate.name}."
                         )
                         return
                     }
 
-                    if (newValue == null || newValue == "") {
-                        product.upc = null
-                        product.save(flush: true)
-                        render([data: [id: product.id, identifier: [type: type, value: null]]] as JSON)
+                    Product productCodeDuplicate = Product.findByProductCode(newValue)
+                    if (productCodeDuplicate && productCodeDuplicate.id != product.id) {
+                        render(
+                                status: 409,
+                                text: "Conflict: The UPC '${newValue}' is already used as a product code " +
+                                        "by product ${productCodeDuplicate.productCode} – ${productCodeDuplicate.name}."
+                        )
                         return
                     }
 
