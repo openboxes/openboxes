@@ -125,7 +125,7 @@ class RequisitionServiceSpec extends Specification implements ServiceUnitTest<Re
         where:
         currentStatus              || requisitionStatus          | issuedBy     | dateIssued
         RequisitionStatus.CHECKING || RequisitionStatus.CHECKING | null         | null
-        RequisitionStatus.ISSUED   || RequisitionStatus.CHECKING | Mock(Person) | new Date()
+        RequisitionStatus.ISSUED   || RequisitionStatus.STAGED | Mock(Person) | new Date()
     }
 
     void 'cloneRequisition should return copy of the passed requisition'() {
