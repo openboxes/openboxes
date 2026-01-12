@@ -835,6 +835,7 @@ class Product implements Comparable, Serializable {
                 color               : color,
                 handlingIcons       : handlingIcons,
                 lotAndExpiryControl : lotAndExpiryControl,
+                upc                 : upc,
         ]
     }
 
