@@ -7,6 +7,7 @@ import { getCurrentLocationId } from 'selectors';
 import productApi from 'api/services/ProductApi';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
+import outboundImportColumn from 'consts/outboundImportColumn';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 
@@ -35,10 +36,10 @@ const useItemInStockModal = ({ productId }) => {
 
   useEffect(() => {
     fetchData();
-  }, [productId]);
+  }, [productId, currentLocationId]);
 
   const columns = useMemo(() => [
-    columnHelper.accessor('binLocation.name', {
+    columnHelper.accessor(outboundImportColumn.BIN_LOCATION, {
       header: () => (
         <TableHeaderCell>
           {translate('react.outboundImport.table.column.binLocation.label', 'Bin Location')}
@@ -50,7 +51,7 @@ const useItemInStockModal = ({ productId }) => {
         </TableCell>
       ),
     }),
-    columnHelper.accessor('lotNumber', {
+    columnHelper.accessor(outboundImportColumn.LOT_NUMBER, {
       header: () => (
         <TableHeaderCell>
           {translate('react.outboundImport.table.column.lotNumber.label', 'Lot')}
@@ -62,7 +63,7 @@ const useItemInStockModal = ({ productId }) => {
         </TableCell>
       ),
     }),
-    columnHelper.accessor('expirationDate', {
+    columnHelper.accessor(outboundImportColumn.EXPIRATION_DATE, {
       header: () => (
         <TableHeaderCell>
           {translate('react.outboundImport.table.column.expires.label', 'Expires')}
@@ -74,7 +75,7 @@ const useItemInStockModal = ({ productId }) => {
         </TableCell>
       ),
     }),
-    columnHelper.accessor('quantityOnHand', {
+    columnHelper.accessor(outboundImportColumn.QUANTITY_ON_HAND, {
       header: () => (
         <TableHeaderCell>
           {translate('react.outboundImport.table.column.onHand.label', 'On Hand')}
@@ -86,7 +87,7 @@ const useItemInStockModal = ({ productId }) => {
         </TableCell>
       ),
     }),
-    columnHelper.accessor('quantityAvailable', {
+    columnHelper.accessor(outboundImportColumn.QUANTITY_AVAILABLE, {
       header: () => (
         <TableHeaderCell>
           {translate('react.outboundImport.table.column.available.label', 'Available')}
