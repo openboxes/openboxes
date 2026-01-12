@@ -1,4 +1,4 @@
-package org.pih.warehouse.outboundOrder
+package org.pih.warehouse.allocation
 
 enum AllocationStatus {
     ALLOCATED, PARTIALLY_ALLOCATED, UNALLOCATED

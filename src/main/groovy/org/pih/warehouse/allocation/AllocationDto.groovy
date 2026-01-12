@@ -1,4 +1,4 @@
-package org.pih.warehouse.outboundOrder
+package org.pih.warehouse.allocation
 
 class AllocationDto {
     String id

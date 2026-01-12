@@ -14,7 +14,7 @@ import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Inventory
-import org.pih.warehouse.outboundOrder.AllocationStatus
+import org.pih.warehouse.allocation.AllocationStatus
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductGroup
@@ -637,7 +637,16 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     def calculateQuantityAllocated() {
-        return PicklistItem.findAllByRequisitionItem(this).sum { it.quantity }
+        def quantityAllocated = 0
+        if (substitutionItems) {
+            substitutionItems.each { substitutionItem ->
+                quantityAllocated += PicklistItem.findAllByRequisitionItem(substitutionItem).sum { it.quantity }
+            }
+        } else {
+            quantityAllocated = PicklistItem.findAllByRequisitionItem(this).sum { it.quantity }
+        }
+
+        return quantityAllocated ?: 0
     }
 
     Boolean isAllocated() {

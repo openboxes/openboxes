@@ -1,4 +1,4 @@
-package org.pih.warehouse.outboundOrder
+package org.pih.warehouse.allocation
 
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.api.AvailableItem
