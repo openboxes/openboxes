@@ -1057,7 +1057,7 @@ class MigrationService {
         return transaction
     }
 
-    private static void recordMigrationResult(Map migrationResults, List<Transaction> transactions, Boolean before = false) {
+    private void recordMigrationResult(Map migrationResults, List<Transaction> transactions, Boolean before = false) {
         transactions.each { Transaction t ->
             t.transactionEntries.each { TransactionEntry te ->
                 if (!migrationResults.containsKey(te.inventoryItem.product.productCode)) {
