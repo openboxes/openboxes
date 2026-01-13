@@ -8,6 +8,8 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.allocation.AllocationDto
+import org.pih.warehouse.allocation.AllocationStatus
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
@@ -34,6 +36,7 @@ class StockMovementItem {
     BigDecimal quantityCanceled
     BigDecimal quantityPicked
     BigDecimal quantityShipped
+    BigDecimal quantityAllocated
 
     String unitOfMeasure
 
@@ -72,6 +75,9 @@ class StockMovementItem {
     BigDecimal packSize = 1
 
     List<AvailableItem> availableItems // required for outbound orders
+    List<AllocationDto> allocations // required for outbound orders
+
+    AllocationStatus allocationStatus
 
     /**
      * Represents the version of the item (ie how many times it has been modified). Typically pulled from
@@ -118,6 +124,7 @@ class StockMovementItem {
         quantityCanceled(nullable: true)
         quantityPicked(nullable: true)
         quantityCounted(nullable: true)
+        quantityAllocated(nullable: true)
         statusCode(nullable: true)
         reasonCode(nullable: true)
         comments(nullable: true)
@@ -135,6 +142,8 @@ class StockMovementItem {
         version(nullable: true)
         manuallyAdded(nullable: true)
         availableItems(nullable: true)
+        allocations(nullable: true)
+        allocationStatus(nullable: true)
     }
 
     String toString() {
@@ -184,7 +193,10 @@ class StockMovementItem {
                         quantity      : inventoryItem.quantity
                 ],
                 manuallyAdded          : manuallyAdded,
-                availableItems         : availableItems
+                availableItems         : availableItems,
+                allocations            : allocations,
+                quantityAllocated      : quantityAllocated,
+                allocationStatus       : allocationStatus
         ]
     }
 

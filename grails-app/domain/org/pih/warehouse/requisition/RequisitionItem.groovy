@@ -14,6 +14,7 @@ import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.allocation.AllocationStatus
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductGroup
@@ -633,6 +634,39 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     def calculateNumInventoryItem(Inventory inventory) {
         def numInventoryItem = InventoryItem.findAllByProduct(product).size()
         return numInventoryItem
+    }
+
+    def calculateQuantityAllocated() {
+        def quantityAllocated = 0
+        if (substitutionItems) {
+            substitutionItems.each { substitutionItem ->
+                quantityAllocated += PicklistItem.findAllByRequisitionItem(substitutionItem).sum { it.quantity }
+            }
+        } else {
+            quantityAllocated = PicklistItem.findAllByRequisitionItem(this).sum { it.quantity }
+        }
+
+        return quantityAllocated ?: 0
+    }
+
+    Boolean isAllocated() {
+        def quantityRequired = calculateQuantityRequired()
+        if (quantityRequired == 0) return false
+
+        return calculateQuantityAllocated() >= quantityRequired
+    }
+
+    Boolean isPartiallyAllocated() {
+        def quantityAllocated = calculateQuantityAllocated() ?: 0
+        def quantityRequired = calculateQuantityRequired() ?: 0
+
+        return quantityAllocated > 0 && quantityAllocated < quantityRequired
+    }
+
+    AllocationStatus getAllocationStatus() {
+        if (isAllocated()) return AllocationStatus.ALLOCATED
+        if (isPartiallyAllocated()) return AllocationStatus.PARTIALLY_ALLOCATED
+        return AllocationStatus.UNALLOCATED
     }
 
     def retrievePicklistItems() {

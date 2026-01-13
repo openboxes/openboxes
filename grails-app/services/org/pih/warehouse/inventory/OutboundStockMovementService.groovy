@@ -10,11 +10,9 @@
 package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
-import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.StockMovement
-import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.ShipmentType

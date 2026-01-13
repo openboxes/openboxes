@@ -369,6 +369,14 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return supports(ActivityCode.REQUIRE_MOBILE_PICKING)
     }
 
+    Boolean isAllocable() {
+        return supports(ActivityCode.PICK_STOCK)
+    }
+
+    Boolean isDisplay() {
+        return supports(ActivityCode.DISPLAY_STOCK)
+    }
+
     static List<Location> listNonInternalLocations() {
         return createCriteria().list {
             createAlias("locationType", "locationType", JoinType.LEFT_OUTER_JOIN)
@@ -416,6 +424,8 @@ class Location implements Comparable<Location>, java.io.Serializable {
                 manager                    : manager,
                 address                    : address,
                 supportedActivities        : supportedActivities ?: locationType?.supportedActivities,
+                isAllocable                : isAllocable(),
+                isDisplay                  : isDisplay()
         ]
     }
 
