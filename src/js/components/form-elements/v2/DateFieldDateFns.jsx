@@ -209,8 +209,6 @@ DateFieldDateFns.propTypes = {
   onChangeRaw: PropTypes.func,
   clearable: PropTypes.bool,
   wrapperClassName: PropTypes.string,
-  // Optional function to trigger validation for this field
-  triggerValidation: PropTypes.func,
   customTooltip: PropTypes.bool,
   showCustomInput: PropTypes.bool,
   ariaLabel: PropTypes.shape({
@@ -238,7 +236,6 @@ DateFieldDateFns.defaultProps = {
   focusProps: {},
   onChangeRaw: null,
   clearable: true,
-  triggerValidation: null,
   customTooltip: false,
   // If false, the 'x' icon for clearing the date will be hidden,
   // but the date can still be cleared using Backspace.
