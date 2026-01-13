@@ -2,6 +2,7 @@ import axios from 'axios';
 import queryString from 'query-string';
 
 import {
+  AVAILABLE_ITEMS,
   GENERIC_API,
   INVENTORY_ITEM,
   LOT_NUMBERS_WITH_EXPIRATION_DATE,
@@ -25,4 +26,12 @@ export default {
       params: { productIds },
       paramsSerializer: (parameters) => queryString.stringify(parameters),
     }),
+  availableItems: ({ locationId, productIds }) => apiClient.get(AVAILABLE_ITEMS, {
+    params: {
+      'product.id': productIds,
+      'location.id': locationId,
+    },
+    paramsSerializer: (parameters) => queryString.stringify(parameters),
+
+  }),
 };
