@@ -41,7 +41,8 @@ const useInboundCreateValidation = () => {
   const stocklistSchema = z.object({
     id: z.string(),
     name: z.string(),
-  }).optional();
+    label: z.string(),
+  }).optional().nullable();
 
   const validationSchema = () => z.object({
     description: z

@@ -99,7 +99,7 @@ const InboundCreate = ({ next }) => {
           </div>
           <div className="col-lg-6 col-md-12 px-2 pt-2">
             <Controller
-              name="stockList"
+              name="stocklist"
               disabled={!origin}
               control={control}
               render={({ field }) => (
