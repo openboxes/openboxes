@@ -1,9 +1,12 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, {
+  useEffect, useMemo, useRef, useState,
+} from 'react';
 
 import { RiSearchLine } from 'react-icons/ri';
-import { useSelector } from 'react-redux';
-import { getHasBinLocationSupport } from 'selectors';
+import { useDispatch, useSelector } from 'react-redux';
+import { getHasBinLocationSupport, getLotNumbersWithExpiration } from 'selectors';
 
+import { fetchLotNumbersByProductIds } from 'actions';
 import { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
 import useOutboundImportFiltering from 'hooks/outboundImport/useOutboundImportFiltering';
@@ -24,6 +27,21 @@ const useOutboundImportItems = ({ itemsInOrder }) => {
     !itemsInOrder?.some((it) => it.boxName), [itemsInOrder?.length]);
 
   const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
+
+  const lotNumbersWithExpirationDates = useSelector(getLotNumbersWithExpiration);
+
+  const dispatch = useDispatch();
+
+  const productIds = useMemo(
+    () => itemsInOrder?.map((item) => item.product?.id) || [],
+    [itemsInOrder],
+  );
+
+  useEffect(() => {
+    if (productIds.length > 0) {
+      dispatch(fetchLotNumbersByProductIds(productIds));
+    }
+  }, [JSON.stringify(productIds)]);
 
   const {
     setIsFiltered,
@@ -87,7 +105,13 @@ const useOutboundImportItems = ({ itemsInOrder }) => {
       Header: translate('react.outboundImport.table.column.expirationDate.label', 'Expiry'),
       accessor: 'expirationDate',
       width: 120,
-      Cell: (row) => <DateCell {...row} defaultValue="" />,
+      Cell: (row) => {
+        const expirationDate = lotNumbersWithExpirationDates?.[row.original.product?.id]
+          ?.find((lotWithExp) => lotWithExp.lotNumber === row.original.lotNumber)?.expirationDate;
+        return (
+          <DateCell {...row} value={expirationDate} defaultValue="" />
+        );
+      },
     },
     {
       Header: translate('react.outboundImport.table.column.quantityPicked.label', 'Qty Picked'),
