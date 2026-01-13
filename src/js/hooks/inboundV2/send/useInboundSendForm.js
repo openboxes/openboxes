@@ -7,6 +7,8 @@ import { useParams } from 'react-router-dom';
 import {
   getCurrentLocale,
   getCurrentLocation,
+  getDebounceTime,
+  getMinSearchLength,
   getShipmentTypes,
 } from 'selectors';
 
@@ -18,6 +20,7 @@ import locationType from 'consts/locationType';
 import NotificationType from 'consts/notificationTypes';
 import requisitionStatus from 'consts/requisitionStatus';
 import RoleType from 'consts/roleType';
+import StockMovementDirection from 'consts/StockMovementDirection';
 import { InboundWorkflowState } from 'consts/StockMovementState';
 import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
 import useInboundSendValidation from 'hooks/inboundV2/send/useInboundSendValidation';
@@ -28,12 +31,31 @@ import useUserHasPermissions from 'hooks/useUserHasPermissions';
 import confirmationModal from 'utils/confirmationModalUtils';
 import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
 import dateWithoutTimeZone, { formatDateToString } from 'utils/dateUtils';
+import { debounceLocationsFetch } from 'utils/option-utils';
 import filterDocumentsByStepNumber from 'utils/stockMovementUtils';
 
 const useInboundSendForm = ({ previous }) => {
   const currentLocation = useSelector(getCurrentLocation);
   const currentLocale = useSelector(getCurrentLocale);
   const shipmentTypes = useSelector(getShipmentTypes);
+  const debounceTime = useSelector(getDebounceTime);
+  const minSearchLength = useSelector(getMinSearchLength);
+
+  const debouncedDestinationLocationsFetch = useMemo(
+    () => debounceLocationsFetch(
+      debounceTime,
+      minSearchLength,
+      null,
+      false,
+      false,
+      true,
+      false,
+      StockMovementDirection.INBOUND,
+      false,
+      locationType.DEPOT,
+    ),
+    [debounceTime, minSearchLength],
+  );
 
   const hasRoleAdmin = useUserHasPermissions({
     minRequiredRole: RoleType.ROLE_ADMIN,
@@ -84,19 +106,12 @@ const useInboundSendForm = ({ previous }) => {
   const {
     statusCode,
     shipped,
-    destination,
     documents,
   } = getValues();
 
-  // True when destination matches current location (valid case)
-  // or when destination is not yet loaded from backend (to avoid showing incorrect UI state
-  // during initial loading)
-  const matchesDestination = currentLocation?.id && destination?.id
-    ? currentLocation.id === destination.id
-    : true;
-
   const getShipmentPayload = () => {
     const {
+      destination,
       shipDate,
       shipmentType,
       trackingNumber,
@@ -106,6 +121,7 @@ const useInboundSendForm = ({ previous }) => {
     } = getValues();
 
     return {
+      destination: { id: destination.id },
       dateShipped: dateWithoutTimeZone({
         date: shipDate,
         outputDateFormat: DateFormat.MM_DD_YYYY,
@@ -254,8 +270,9 @@ const useInboundSendForm = ({ previous }) => {
   const rollbackStockMovement = async () => {
     try {
       spinner.show();
-      const { origin, hasManageInventory } = getValues();
+      const { destination, origin, hasManageInventory } = getValues();
       const matchesOrigin = currentLocation?.id === origin?.id;
+      const matchesDestination = currentLocation?.id === destination?.id;
 
       const canRollback = (hasManageInventory && matchesOrigin)
         || (!hasManageInventory && matchesDestination);
@@ -385,27 +402,36 @@ const useInboundSendForm = ({ previous }) => {
   }, [stockMovementId]);
 
   return {
-    control,
-    getValues,
-    handleSubmit,
-    errors,
-    trigger,
-    sendShipment,
-    shipmentTypesWithoutDefaultValue,
-    rollbackStockMovement,
-    onSave,
-    previousPage,
-    saveAndExit,
-    statusCode,
-    hasRoleAdmin,
-    shipped,
-    matchesDestination,
-    documents,
-    handleExportFile,
-    handleDownloadFiles,
-    files,
-    handleRemoveFile,
-    isValid,
+    form: {
+      control,
+      errors,
+      isValid,
+      trigger,
+      handleSubmit,
+    },
+    data: {
+      statusCode,
+      shipped,
+      documents,
+      shipmentTypesWithoutDefaultValue,
+      debouncedDestinationLocationsFetch,
+    },
+    actions: {
+      onSave,
+      sendShipment,
+      rollbackStockMovement,
+      previousPage,
+      saveAndExit,
+    },
+    files: {
+      files,
+      handleExportFile,
+      handleDownloadFiles,
+      handleRemoveFile,
+    },
+    permissions: {
+      hasRoleAdmin,
+    },
   };
 };
 

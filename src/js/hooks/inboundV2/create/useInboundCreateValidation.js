@@ -34,9 +34,9 @@ const useInboundCreateValidation = () => {
     name: z.string(),
     label: z.string(),
   }, {
-    invalid_type_error: requiredFieldMessage,
-    required_error: requiredFieldMessage,
-  }).optional().nullable();
+    invalid_type_error: translate('react.default.error.requiredField.label', 'Destination is required'),
+    required_error: translate('react.default.error.requiredField.label', 'Destination is required'),
+  }).required();
 
   const stocklistSchema = z.object({
     id: z.string(),

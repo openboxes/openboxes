@@ -1,18 +1,14 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { IoMdExit } from 'react-icons/io';
 import {
   RiDeleteBinLine,
   RiPictureInPictureExitLine,
   RiSave2Line,
 } from 'react-icons/ri';
-import { useHistory } from 'react-router-dom';
 
 import Button from 'components/form-elements/Button';
 import DropzoneFileSelect from 'components/form-elements/v2/DropzoneFileSelect';
-import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
-import requisitionStatus from 'consts/requisitionStatus';
 import DropdownButton from 'utils/DropdownButton';
 import Translate from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
@@ -20,16 +16,14 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 const InboundSendFormHeader = ({
   saveAndExit,
   onSave,
-  statusCode,
   isValid,
-  matchesDestination,
   documents,
   handleExportFile,
   handleDownloadFiles,
   files,
   handleRemoveFile,
+  isDispatched,
 }) => {
-  const history = useHistory();
   const documentActions = documents.map((document) => (
     {
       label: document?.name,
@@ -41,10 +35,6 @@ const InboundSendFormHeader = ({
     }
   ));
 
-  // Upload Documents button is disabled if shipment is already dispatched
-  // or selected destination doesn't match current location
-  const uploadDocumentsButtonDisabled =
-    statusCode === requisitionStatus.DISPATCHED || !matchesDestination;
   return (
     <div className="d-flex justify-content-between mb-3">
       <div className="font-size-md font-weight-normal">
@@ -59,7 +49,7 @@ const InboundSendFormHeader = ({
           <DropzoneFileSelect
             onChange={handleDownloadFiles}
             multiple
-            isFormDisabled={uploadDocumentsButtonDisabled}
+            isFormDisabled={isDispatched}
             showButtonOnly
             buttonLabel={{
               id: 'react.stockMovement.uploadDocuments.label',
@@ -75,7 +65,7 @@ const InboundSendFormHeader = ({
                     {file.name}
                   </span>
                   <RiDeleteBinLine
-                    className={uploadDocumentsButtonDisabled ? 'disabled-icon' : 'cursor-pointer text-danger'}
+                    className={isDispatched ? 'disabled-icon' : 'cursor-pointer text-danger'}
                     onClick={() => handleRemoveFile(file)}
                     size={16}
                   />
@@ -86,7 +76,7 @@ const InboundSendFormHeader = ({
         </div>
         <DropdownButton
           actions={documentActions}
-          disabled={!isValid || !matchesDestination}
+          disabled={!isValid}
           buttonDefaultLabel="Download"
           buttonLabel="react.default.button.download.label"
           variant="primary-outline"
@@ -97,7 +87,6 @@ const InboundSendFormHeader = ({
           defaultLabel="Save and exit"
           label="react.default.button.saveAndExit.label"
           variant="primary-outline"
-          disabled={!matchesDestination}
         />
         <Button
           onClick={() => onSave({ showNotification: true })}
@@ -105,17 +94,8 @@ const InboundSendFormHeader = ({
           defaultLabel="Save"
           label="react.default.button.save.label"
           variant="primary-outline"
-          disabled={!isValid || !matchesDestination}
+          disabled={!isValid}
         />
-        {!matchesDestination && (
-          <Button
-            onClick={() => history.push(STOCK_MOVEMENT_URL.listInbound())}
-            StartIcon={<IoMdExit className="icon" />}
-            defaultLabel="Exit"
-            label="react.default.button.exit.label"
-            variant="danger-outline"
-          />
-        )}
       </div>
     </div>
   );
@@ -126,18 +106,16 @@ export default InboundSendFormHeader;
 InboundSendFormHeader.propTypes = {
   saveAndExit: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
-  statusCode: PropTypes.string,
   isValid: PropTypes.bool.isRequired,
-  matchesDestination: PropTypes.bool.isRequired,
   documents: PropTypes.arrayOf(PropTypes.shape({})),
   handleExportFile: PropTypes.func.isRequired,
   handleDownloadFiles: PropTypes.func.isRequired,
   files: PropTypes.arrayOf(PropTypes.shape({})),
   handleRemoveFile: PropTypes.func.isRequired,
+  isDispatched: PropTypes.bool.isRequired,
 };
 
 InboundSendFormHeader.defaultProps = {
-  statusCode: '',
   documents: [],
   files: [],
 };
