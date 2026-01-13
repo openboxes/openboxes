@@ -117,8 +117,8 @@ const useInboundCreateForm = ({ next }) => {
         default: 'Confirm change',
       },
       content: {
-        label: 'react.stockMovement.confirmChange.message',
-        default: 'Do you want to change stock movement data? Changing origin, destination or stock list can cause loss of your current work',
+        label: 'react.stockMovement.confirmUpdateInboundChange.message',
+        default: 'Do you want to change stock movement data? Changing origin or stock list can cause loss of your current work',
       },
     };
 
