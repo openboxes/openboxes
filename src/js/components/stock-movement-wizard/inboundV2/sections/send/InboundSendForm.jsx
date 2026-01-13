@@ -139,6 +139,10 @@ const InboundSendForm = ({ previous }) => {
                       id: 'react.stockMovement.shipDate.label',
                       defaultMessage: 'Ship date',
                     }}
+                    onChange={async (value) => {
+                      field.onChange(value);
+                      await trigger(['shipDate', 'expectedDeliveryDate']);
+                    }}
                   />
                 )}
               />
@@ -248,12 +252,15 @@ const InboundSendForm = ({ previous }) => {
                     errorMessage={errors.expectedDeliveryDate?.message}
                     required
                     customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
-                    triggerValidation={trigger}
                     customTooltip
                     showCustomInput={false}
                     ariaLabel={{
                       id: 'react.stockMovement.expectedDeliveryDate.label',
                       defaultMessage: 'Expected Delivery Date',
+                    }}
+                    onChange={async (value) => {
+                      field.onChange(value);
+                      await trigger(['shipDate', 'expectedDeliveryDate']);
                     }}
                   />
                 )}
