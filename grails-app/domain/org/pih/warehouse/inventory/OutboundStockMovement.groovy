@@ -239,7 +239,7 @@ class OutboundStockMovement implements Serializable, Validateable {
     }
 
     Boolean canEditStockMovement() {
-        return requisition.origin.supports(ActivityCode.REQUIRE_MOBILE_PICKING) &&
+        return requisition?.origin?.supports(ActivityCode.REQUIRE_MOBILE_PICKING) &&
                 (requisition?.status < RequisitionStatus.PICKING || requisition?.status >= RequisitionStatus.ISSUED)
     }
 
