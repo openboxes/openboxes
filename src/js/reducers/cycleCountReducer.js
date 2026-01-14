@@ -1,6 +1,7 @@
 import _ from 'lodash';
 
 import {
+  CLEAR_CYCLE_COUNT_DATA,
   ERASE_DRAFT,
   FETCH_BIN_LOCATIONS,
   FETCH_CYCLE_COUNT_REASON_CODES,
@@ -64,6 +65,11 @@ export default function cycleCountReducer(state = initialState, action) {
           ...state.cycleCounts,
           [action.payload.locationId]: action.payload.cycleCounts,
         },
+      };
+    case CLEAR_CYCLE_COUNT_DATA:
+      return {
+        ...state,
+        cycleCounts: {},
       };
     default:
       return state;
