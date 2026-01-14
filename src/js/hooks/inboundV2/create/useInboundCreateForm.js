@@ -84,7 +84,7 @@ const useInboundCreateForm = ({ next }) => {
     control,
     getValues,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, dirtyFields },
     setValue,
     watch,
     reset,
@@ -98,16 +98,13 @@ const useInboundCreateForm = ({ next }) => {
   const destination = watch('destination');
   const origin = watch('origin');
 
-  const checkStockMovementChange = (newValues) => {
+  const checkStockMovementChange = () => {
     // If no stock movement id, it's a new stock movement, so no need to check for changes
     if (!stockMovementId) {
       return false;
     }
 
-    const originChanged = newValues.origin?.id !== initialValues.origin?.id;
-    const stocklistChanged = newValues.stocklist?.id !== initialValues.stocklist?.id;
-
-    return originChanged || stocklistChanged;
+    return dirtyFields.origin || dirtyFields.stocklist;
   };
 
   const confirmStockMovementChange = (onConfirm) => {
@@ -207,7 +204,7 @@ const useInboundCreateForm = ({ next }) => {
       const stocklistChanged = !newStockLists.find((item) => item.id === currentStocklistId);
 
       if (stocklistChanged) {
-        setValue('stocklist', undefined);
+        setValue('stocklist', null);
       }
 
       setStockLists(newStockLists);

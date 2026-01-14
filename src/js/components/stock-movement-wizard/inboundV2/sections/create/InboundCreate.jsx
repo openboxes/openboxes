@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { capitalize } from 'lodash/string';
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
 
@@ -10,6 +11,7 @@ import TextInput from 'components/form-elements/v2/TextInput';
 import Section from 'components/Layout/v2/Section';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useInboundCreateForm from 'hooks/inboundV2/create/useInboundCreateForm';
+import mapToFormSelectOption from 'utils/mapToFormSelectOption';
 
 const InboundCreate = ({ next }) => {
   const {
@@ -67,6 +69,12 @@ const InboundCreate = ({ next }) => {
                   errorMessage={errors.origin?.message}
                   async
                   loadOptions={debouncedOriginLocationsFetch}
+                  onChange={(option) =>
+                    field.onChange(
+                      mapToFormSelectOption(option, {
+                        customLabel: option ? `${option.name} [${capitalize(option.type)}]` : undefined,
+                      }),
+                    )}
                   customTooltip
                   ariaLabel={{
                     id: 'react.stockMovement.origin.label',
@@ -111,6 +119,7 @@ const InboundCreate = ({ next }) => {
                   }}
                   options={stockLists}
                   customTooltip
+                  onChange={(option) => field.onChange(mapToFormSelectOption(option))}
                   ariaLabel={{
                     id: 'react.stockMovement.stocklist.label',
                     defaultMessage: 'Stocklist',
