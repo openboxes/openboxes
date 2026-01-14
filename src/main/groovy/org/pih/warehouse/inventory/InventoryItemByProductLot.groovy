@@ -1,6 +1,5 @@
 package org.pih.warehouse.inventory
 
-
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.lot.ProductLot
 
@@ -14,7 +13,6 @@ class InventoryItemByProductLot extends HashMap<ProductLot, InventoryItem> {
      * so we don't need to bother passing any other fields (such as expirationDate).
      */
     InventoryItem get(Product product, String lotNumber) {
-        //InventoryItem x = get(new ProductLot(product: product, lotNumber: lotNumber))
         return get(new ProductLot(product: product, lotNumber: lotNumber))
     }
 }

@@ -1726,13 +1726,9 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
-     * TODO Need to finish this method.
-     *
-     * @param product
-     * @param lotNumber
-     * @param expirationDate
-     * @return
+     * @deprecated use {@link InventoryItemManager} instead.
      */
+    @Deprecated
     InventoryItem findOrCreateInventoryItem(Product product, String lotNumber, Date expirationDate) {
         def inventoryItem =
                 findInventoryItemByProductAndLotNumber(product, lotNumber)
