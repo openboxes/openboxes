@@ -2375,13 +2375,13 @@ class ShipmentService {
         activeLocationsSupportingActivity = activeLocationsSupportingActivity.findAll { it.supports(activityCode) }
 
         return ShipmentItem.createCriteria().list {
-            createAlias("shipment", "shipmentAlias")
+            createAlias("shipment", "s")
             projections {
-                groupProperty("shipmentAlias.destination")
+                groupProperty("s.destination")
             }
             eq("product", product)
-            inList("shipmentAlias.currentStatus", statusCodes)
-            inList("shipmentAlias.destination", activeLocationsSupportingActivity)
+            inList("s.currentStatus", statusCodes)
+            inList("s.destination", activeLocationsSupportingActivity)
         } as List<Location>
     }
 }

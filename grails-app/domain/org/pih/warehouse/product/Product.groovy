@@ -18,7 +18,6 @@ import org.apache.commons.lang.NotImplementedException
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.EmptyStringsToNullBinder
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.AppUtil
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.GlAccount
@@ -28,6 +27,7 @@ import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.validation.Validatable
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
@@ -50,7 +50,7 @@ import org.pih.warehouse.LocalizationUtil
  * 20 mg tablets vs a 50 count bottle of 20 mg tablets will both be stored
  * as 20 mg tablets).
  */
-class Product implements Comparable, Serializable {
+class Product implements Comparable, Serializable, Validatable<ProductValidator> {
 
     def beforeInsert() {
         createdBy = AuthService.currentUser
@@ -299,11 +299,7 @@ class Product implements Comparable, Serializable {
         unitOfMeasure(nullable: true, maxSize: 255)
         category(nullable: false)
         productType(nullable: false)
-        active(nullable: true, validator: { value, obj ->
-            // OBPIH-773: We have a dedicated validator since we need to do somewhat complex validation here. This
-            // isn't a perfect solution, but it saves us from needing to put all the logic into this constraints block.
-            return AppUtil.getBean(ProductValidator).validateActive(obj)
-        })
+        active(nullable: true)
         coldChain(nullable: true)
         reconditioned(nullable: true)
         controlledSubstance(nullable: true)
