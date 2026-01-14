@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { capitalize } from 'lodash/string';
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
 
@@ -72,7 +72,7 @@ const InboundCreate = ({ next }) => {
                   onChange={(option) =>
                     field.onChange(
                       mapToFormSelectOption(option, {
-                        customLabel: option ? `${option.name} [${capitalize(option.type)}]` : undefined,
+                        customLabel: option ? `${option.name} [${_.capitalize(option.type)}]` : undefined,
                       }),
                     )}
                   customTooltip

@@ -1,4 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import queryString from 'query-string';
@@ -27,7 +32,7 @@ const useInboundCreateForm = ({ next }) => {
   // Store initial form values from backend to detect changes in origin or stocklist
   // before proceeding to the next step. If changes are detected, a confirmation
   // modal 'Confirm change' is shown. If user declines, form is reset to these initial values
-  const [initialValues, setInitialValues] = useState({
+  const initialValuesRef = useRef({
     description: '',
     origin: undefined,
     destination: undefined,
@@ -125,7 +130,7 @@ const useInboundCreateForm = ({ next }) => {
         defaultLabel: 'No',
         label: 'react.default.no.label',
         onClick: () => {
-          reset(initialValues);
+          reset(initialValuesRef.current);
           onClose();
         },
       },
@@ -245,7 +250,7 @@ const useInboundCreateForm = ({ next }) => {
         }),
       };
 
-      setInitialValues(formValues);
+      initialValuesRef.current = formValues;
       reset(formValues);
 
       // We set {} for headerStatus in the create step because we only want to display it on the
