@@ -61,10 +61,11 @@ export const normalizeCycleCounts = (cycleCounts) => {
   return { entities, dateCounted, countedBy };
 };
 
-const emptyRow = (productId) => ({
+const emptyRow = (productId, lotAndExpiryControl = false) => ({
   id: _.uniqueId(NEW_ROW),
   product: {
     id: productId,
+    lotAndExpiryControl,
   },
   inventoryItem: {
     lotNumber: null,
@@ -79,7 +80,10 @@ export const addEmptyRow = (cycleCount) => ({
   ...cycleCount,
   cycleCountItems: [
     ...cycleCount.cycleCountItems,
-    emptyRow(cycleCount.cycleCountItems[0]?.product?.id),
+    emptyRow(
+      cycleCount.cycleCountItems[0]?.product?.id,
+      cycleCount.cycleCountItems[0]?.product?.lotAndExpiryControl,
+    ),
   ],
 });
 
@@ -332,3 +336,13 @@ export const importCycleCountsRecount = async ({
   // eslint-disable-next-line no-param-reassign
   dateRecounted.current = { ...dateRecounted.current, ...importedDateRecounted };
 };
+
+// Remove bin location data from cycle count items. It's a workaround needed for validation
+// because when a user assigns a bin location and then removes it, the field remains in the database
+export const removeBinLocationData = (cycleCounts) => cycleCounts.map((cycleCount) => ({
+  ...cycleCount,
+  cycleCountItems: cycleCount.cycleCountItems.map((item) => ({
+    ...item,
+    binLocation: null,
+  })),
+}));
