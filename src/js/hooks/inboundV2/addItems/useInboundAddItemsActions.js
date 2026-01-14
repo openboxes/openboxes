@@ -32,6 +32,7 @@ import apiClient from 'utils/apiClient';
 import confirmationModal from 'utils/confirmationModalUtils';
 import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
 import dateWithoutTimeZone, { formatDateToString } from 'utils/dateUtils';
+import forceUIUpdate from 'utils/forceUIUpdate';
 
 const useInboundAddItemsActions = ({
   control,
@@ -410,24 +411,18 @@ const useInboundAddItemsActions = ({
   };
 
   const nextPage = async () => {
+    spinner.show();
+    await forceUIUpdate();
     const isFormValid = await trigger();
     if (!isFormValid) {
       return;
     }
+
     const formValues = getValues();
     const lineItems = formValues.values.lineItems.filter((item) => item?.product);
 
-    const hasInvalidQuantity = checkInvalidQuantities(lineItems);
-
-    if (hasInvalidQuantity) {
-      confirmAction(
-        () => checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems),
-        'react.stockMovement.confirmSave.message',
-        'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
-      );
-      return;
-    }
     await checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems);
+    spinner.hide();
   };
 
   const saveItems = async (lineItems) => {
@@ -443,6 +438,8 @@ const useInboundAddItemsActions = ({
   };
 
   const save = async () => {
+    spinner.show();
+    await forceUIUpdate();
     const isFormValid = await trigger();
     if (!isFormValid) {
       return;
@@ -462,6 +459,8 @@ const useInboundAddItemsActions = ({
   };
 
   const saveAndExit = async () => {
+    spinner.show();
+    await forceUIUpdate();
     const isFormValid = await trigger();
     if (!isFormValid) {
       confirmAction(
@@ -474,28 +473,22 @@ const useInboundAddItemsActions = ({
       return;
     }
 
-    try {
-      spinner.show();
-      await saveRequisitionItemsInCurrentStep(getValues('values.lineItems'));
-      window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
-    } finally {
-      spinner.hide();
-    }
+    await saveRequisitionItemsInCurrentStep(getValues('values.lineItems'));
+    window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
+    spinner.hide();
   };
 
   const previousPage = async () => {
+    spinner.show();
+    await forceUIUpdate();
     const isFormValid = await trigger();
     if (!isFormValid) {
       confirmValidationError();
       return;
     }
-    try {
-      spinner.show();
-      await saveRequisitionItemsInCurrentStep(getValues('values.lineItems'));
-      previous();
-    } finally {
-      spinner.hide();
-    }
+    await saveRequisitionItemsInCurrentStep(getValues('values.lineItems'));
+    previous();
+    spinner.hide();
   };
 
   const fetchData = async () => {
