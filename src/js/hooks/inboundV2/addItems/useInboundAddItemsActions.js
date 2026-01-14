@@ -438,57 +438,67 @@ const useInboundAddItemsActions = ({
   };
 
   const save = async () => {
-    spinner.show();
-    await forceUIUpdate();
-    const isFormValid = await trigger();
-    if (!isFormValid) {
-      return;
-    }
-    const lineItems = getValues('values.lineItems');
-    const hasInvalidQuantity = checkInvalidQuantities(lineItems);
+    try {
+      spinner.show();
+      await forceUIUpdate();
+      const isFormValid = await trigger();
+      if (!isFormValid) {
+        return;
+      }
+      const lineItems = getValues('values.lineItems');
+      const hasInvalidQuantity = checkInvalidQuantities(lineItems);
 
-    if (hasInvalidQuantity) {
-      confirmAction(
-        () => saveItems(lineItems),
-        'react.stockMovement.confirmSave.message',
-        'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
-      );
-      return;
+      if (hasInvalidQuantity) {
+        confirmAction(
+          () => saveItems(lineItems),
+          'react.stockMovement.confirmSave.message',
+          'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
+        );
+        return;
+      }
+      await saveItems(lineItems);
+    } finally {
+      spinner.hide();
     }
-    await saveItems(lineItems);
   };
 
   const saveAndExit = async () => {
-    spinner.show();
-    await forceUIUpdate();
-    const isFormValid = await trigger();
-    if (!isFormValid) {
-      confirmAction(
-        () => {
-          window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
-        },
-        'react.stockMovement.confirmExit.message',
-        'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
-      );
-      return;
-    }
+    try {
+      spinner.show();
+      await forceUIUpdate();
+      const isFormValid = await trigger();
+      if (!isFormValid) {
+        confirmAction(
+          () => {
+            window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
+          },
+          'react.stockMovement.confirmExit.message',
+          'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
+        );
+        return;
+      }
 
-    await saveRequisitionItemsInCurrentStep(getValues('values.lineItems'));
-    window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
-    spinner.hide();
+      await saveRequisitionItemsInCurrentStep(getValues('values.lineItems'));
+      window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
+    } finally {
+      spinner.hide();
+    }
   };
 
   const previousPage = async () => {
-    spinner.show();
-    await forceUIUpdate();
-    const isFormValid = await trigger();
-    if (!isFormValid) {
-      confirmValidationError();
-      return;
+    try {
+      spinner.show();
+      await forceUIUpdate();
+      const isFormValid = await trigger();
+      if (!isFormValid) {
+        confirmValidationError();
+        return;
+      }
+      await saveRequisitionItemsInCurrentStep(getValues('values.lineItems'));
+      previous();
+    } finally {
+      spinner.hide();
     }
-    await saveRequisitionItemsInCurrentStep(getValues('values.lineItems'));
-    previous();
-    spinner.hide();
   };
 
   const fetchData = async () => {
