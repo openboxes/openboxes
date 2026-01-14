@@ -411,18 +411,22 @@ const useInboundAddItemsActions = ({
   };
 
   const nextPage = async () => {
-    spinner.show();
-    await forceUIUpdate();
-    const isFormValid = await trigger();
-    if (!isFormValid) {
-      return;
+    try {
+      spinner.show();
+      await forceUIUpdate();
+
+      const isFormValid = await trigger();
+      if (!isFormValid) {
+        return;
+      }
+
+      const formValues = getValues();
+      const lineItems = formValues.values.lineItems.filter((item) => item?.product);
+
+      await checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems);
+    } finally {
+      spinner.hide();
     }
-
-    const formValues = getValues();
-    const lineItems = formValues.values.lineItems.filter((item) => item?.product);
-
-    await checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems);
-    spinner.hide();
   };
 
   const saveItems = async (lineItems) => {
