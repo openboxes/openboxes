@@ -2,7 +2,7 @@ import { getTranslate } from 'react-localize-redux';
 import { getCountWorkflowEntityById } from 'selectors';
 
 import { setErrorsById } from 'actions';
-import { UPDATE_FIELD_VALUE } from 'actions/types';
+import { ADD_EMPTY_ROW, REMOVE_ROW, UPDATE_FIELD_VALUE } from 'actions/types';
 import cycleCountSchemes from 'schemes/cycleCountSchemes';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -28,7 +28,7 @@ const validateCycleCount = (store, cycleCountId) => {
 const validateCycleCountHandler = (store) => (next) => (action) => {
   const result = next(action);
 
-  if (action.type === UPDATE_FIELD_VALUE) {
+  if ([UPDATE_FIELD_VALUE, ADD_EMPTY_ROW, REMOVE_ROW].includes(action.type)) {
     validateCycleCount(store, action.payload.id);
   }
 
