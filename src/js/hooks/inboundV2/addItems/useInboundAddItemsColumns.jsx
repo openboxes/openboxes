@@ -291,6 +291,14 @@ const useInboundAddItemsColumns = ({
                     rowIndex,
                     columnId,
                   }}
+                  onChange={(val) => {
+                    field.onChange(val);
+                    // After selecting a product, we want to remove focus
+                    // unless the product was selected using arrow navigation.
+                    if (document.activeElement && !rowIndex && !columnId) {
+                      document.activeElement.blur();
+                    }
+                  }}
                   hasErrors={hasErrors}
                   productSelect
                   // When using ProductSelect instead of Select, ProductSelect sets
