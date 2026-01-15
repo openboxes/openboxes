@@ -119,10 +119,10 @@ const checkLotNumberRequireness = (items, ctx) => {
       return;
     }
 
-    const isLotNumberEmpty = row?.inventoryItem?.lotNumber?.trim()
-      || !row?.inventoryItem?.expirationDate;
+    const expirationWithoutLot = !row?.inventoryItem?.lotNumber?.trim()
+      && row?.inventoryItem?.expirationDate;
 
-    if (!isLotNumberEmpty) {
+    if (expirationWithoutLot) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Lot number is required.',
