@@ -1,4 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import queryString from 'query-string';
@@ -16,15 +21,30 @@ import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
 import useInboundCreateValidation from 'hooks/inboundV2/create/useInboundCreateValidation';
 import useSpinner from 'hooks/useSpinner';
 import apiClient from 'utils/apiClient';
+import confirmationModal from 'utils/confirmationModalUtils';
 import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
 import dateWithoutTimeZone, { formatDateToString } from 'utils/dateUtils';
+import mapToFormSelectOption from 'utils/mapToFormSelectOption';
 import { debounceLocationsFetch, debouncePeopleFetch } from 'utils/option-utils';
 
 const useInboundCreateForm = ({ next }) => {
   const [stockLists, setStockLists] = useState([]);
+  // Store initial form values from backend to detect changes in origin or stocklist
+  // before proceeding to the next step. If changes are detected, a confirmation
+  // modal 'Confirm change' is shown. If user declines, form is reset to these initial values
+  const initialValuesRef = useRef({
+    description: '',
+    origin: undefined,
+    destination: undefined,
+    requestedBy: undefined,
+    dateRequested: undefined,
+    stocklist: undefined,
+  });
+
   const currentLocation = useSelector(getCurrentLocation);
   const debounceTime = useSelector(getDebounceTime);
   const minSearchLength = useSelector(getMinSearchLength);
+
   const spinner = useSpinner();
   const { validationSchema } = useInboundCreateValidation();
   const dispatch = useDispatch();
@@ -54,11 +74,9 @@ const useInboundCreateForm = ({ next }) => {
     const values = {
       description: '',
       origin: undefined,
-      destination: {
-        id: currentLocation?.id,
-        label: `${currentLocation?.name} [${currentLocation?.locationType?.description}]`,
-        name: currentLocation?.name,
-      },
+      destination: mapToFormSelectOption(currentLocation, {
+        customLabel: `${currentLocation?.name} [${currentLocation?.locationType?.description}]`,
+      }),
       stocklist: undefined,
       requestedBy: undefined,
       dateRequested: undefined,
@@ -71,7 +89,7 @@ const useInboundCreateForm = ({ next }) => {
     control,
     getValues,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, dirtyFields },
     setValue,
     watch,
     reset,
@@ -85,7 +103,52 @@ const useInboundCreateForm = ({ next }) => {
   const destination = watch('destination');
   const origin = watch('origin');
 
-  const onSubmitStockMovementDetails = async (values) => {
+  const checkStockMovementChange = () => {
+    // If no stock movement id, it's a new stock movement, so no need to check for changes
+    if (!stockMovementId) {
+      return false;
+    }
+
+    return dirtyFields.origin || dirtyFields.stocklist;
+  };
+
+  const confirmStockMovementChange = (onConfirm) => {
+    const modalLabels = {
+      title: {
+        label: 'react.stockMovement.message.confirmChange.label',
+        default: 'Confirm change',
+      },
+      content: {
+        label: 'react.stockMovement.confirmUpdateInboundChange.message',
+        default: 'Do you want to change stock movement data? Changing origin or stock list can cause loss of your current work',
+      },
+    };
+
+    const modalButtons = (onClose) => [
+      {
+        variant: 'transparent',
+        defaultLabel: 'No',
+        label: 'react.default.no.label',
+        onClick: () => {
+          reset(initialValuesRef.current);
+          onClose();
+        },
+      },
+      {
+        variant: 'primary',
+        defaultLabel: 'Yes',
+        label: 'react.default.yes.label',
+        onClick: () => {
+          onConfirm();
+          onClose();
+        },
+      },
+    ];
+
+    confirmationModal({ buttons: modalButtons, ...modalLabels });
+  };
+
+  const saveStockMovement = async (values) => {
     spinner.show();
     const formattedValues = {
       ...values,
@@ -97,6 +160,7 @@ const useInboundCreateForm = ({ next }) => {
       origin: { id: values.origin.id },
       destination: { id: values.destination.id },
       requestedBy: { id: values.requestedBy.id },
+      stocklist: values.stocklist?.id ? { id: values.stocklist.id } : null,
     };
     try {
       const response = stockMovementId
@@ -109,39 +173,43 @@ const useInboundCreateForm = ({ next }) => {
     }
   };
 
+  const onSubmitStockMovementDetails = async (values) => {
+    const showModal = checkStockMovementChange(values);
+
+    if (!showModal) {
+      await saveStockMovement(values);
+      return;
+    }
+
+    confirmStockMovementChange(() => saveStockMovement(values));
+  };
+
   useEffect(() => {
     if (currentLocation && !destination?.id) {
-      setValue('destination', {
-        id: currentLocation?.id,
-        name: currentLocation?.name,
-        label: `${currentLocation?.name} [${currentLocation?.locationType?.description}]`,
-      });
+      setValue('destination', mapToFormSelectOption(currentLocation, {
+        customLabel: `${currentLocation?.name} [${currentLocation?.locationType?.description}]`,
+      }));
     }
-  }, [currentLocation?.id, destination?.id]);
+  }, [currentLocation?.id, destination]);
 
   const fetchStockLists = async () => {
     spinner.show();
     const config = {
       params: {
-        origin: getValues().origin.id,
-        destination: getValues().destination.id,
+        origin: origin.id,
+        destination: destination.id,
       },
     };
     try {
       const response = await stockListApi.getStockLists(config);
 
-      const newStockLists = response.data.data.map((stocklist) => ({
-        id: stocklist.id,
-        name: stocklist.name,
-        value: stocklist.id,
-        label: stocklist.name,
-      }));
+      const newStockLists = response.data.data.map((stocklist) => mapToFormSelectOption(stocklist));
 
       const currentStocklistId = getValues()?.stocklist?.id;
       const stocklistChanged = !newStockLists.find((item) => item.id === currentStocklistId);
 
       if (stocklistChanged) {
-        setValue('stocklist', undefined);
+        setValue('stocklist', null);
       }
 
       setStockLists(newStockLists);
@@ -166,37 +234,24 @@ const useInboundCreateForm = ({ next }) => {
       const response = await apiClient.get(STOCK_MOVEMENT_BY_ID(stockMovementId));
       const { data } = response.data;
 
-      reset({
+      const formValues = {
         description: data.description,
-        origin: data.origin
-          ? {
-            id: data.origin.id,
-            name: data.origin.name,
-            label: `${data.origin.name} [${data.origin.locationType?.description ?? ''}]`,
-          }
-          : null,
-        destination: data.destination
-          ? {
-            id: data.destination.id,
-            name: data.destination.name,
-            label: `${data.destination.name} [${data.destination.locationType?.description ?? ''}]`,
-          }
-          : null,
-        requestedBy: data.requestedBy ? {
-          id: data.requestedBy.id,
-          name: data.requestedBy.name,
-          label: data.requestedBy.name,
-        } : null,
+        origin: mapToFormSelectOption(data.origin, {
+          customLabel: `${data.origin.name} [${data.origin.locationType?.description ?? ''}]`,
+        }),
+        destination: mapToFormSelectOption(data.destination, {
+          customLabel: `${data.destination.name} [${data.destination.locationType?.description ?? ''}]`,
+        }),
+        requestedBy: mapToFormSelectOption(data.requestedBy),
+        stocklist: mapToFormSelectOption(data.stocklist),
         dateRequested: formatDateToString({
           date: data.dateRequested,
           dateFormat: DateFormatDateFns.DD_MMM_YYYY,
         }),
-        stocklist: data.stocklist ? {
-          id: data.stocklist.id,
-          name: data.stocklist.name,
-          label: data.stocklist.name,
-        } : null,
-      });
+      };
+
+      initialValuesRef.current = formValues;
+      reset(formValues);
 
       // We set {} for headerStatus in the create step because we only want to display it on the
       // last step
