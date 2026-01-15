@@ -3250,23 +3250,34 @@ class InventoryService implements ApplicationContextAware {
         return getAvailableBinLocations(location, [product], excludeOutOfStock)
     }
 
-    List<AvailableItem> getAvailableBinLocations(Location location, List products, boolean excludeOutOfStock = false) {
-        def availableBinLocations = getProductQuantityByBinLocation(location, products)
+    List<AvailableItem> getAvailableBinLocations(Location location, List<Product> products, boolean excludeOutOfStock = false) {
+        List<AvailableItem> availableItems = productAvailabilityService.getAvailableItems(location, products.id)
+                .findAll { it.quantityOnHand > 0 || it.quantityAvailable > 0 }
+        Map<Tuple2<InventoryItem, Location>, List<AvailableItem>> groupedAvailableItems = availableItems.groupBy {new Tuple2(it.inventoryItem, it.binLocation) }
+        Map<Tuple2<InventoryItem, Location>, AvailableItem> data =
+                groupedAvailableItems.collectEntries {Tuple2<InventoryItem, Location> key, List<AvailableItem> items ->
+                    Integer quantityAvailableSum =
+                            items.collect { it.quantityAvailable ?: 0 }.sum() ?: 0
+                    Integer quantityOnHandSum =
+                            items.collect { it.quantityOnHand ?: 0 }.sum() ?: 0
 
-        List<AvailableItem> availableItems = availableBinLocations.collect {
-            return new AvailableItem(
-                    inventoryItem: it?.inventoryItem,
-                    binLocation: it?.binLocation,
-                    quantityAvailable: it.quantity
-            )
-        }
+                    return [
+                            (key): new AvailableItem(
+                                    inventoryItem: key.first,
+                                    binLocation: key.second,
+                                    quantityAvailable: quantityAvailableSum,
+                                    quantityOnHand: quantityOnHandSum
+                            )
+                    ]
+                }
 
-        availableItems = sortAvailableItems(availableItems)
-        return availableItems
+        return sortAvailableItems(data.values() as List<AvailableItem>, false)
     }
 
-    List<AvailableItem> sortAvailableItems(List<AvailableItem> availableItems) {
-        availableItems = availableItems.findAll { it.quantityAvailable > 0 }
+    List<AvailableItem> sortAvailableItems(List<AvailableItem> availableItems, boolean removeWithEmptyQuantity = true) {
+        availableItems = removeWithEmptyQuantity
+                ? availableItems.findAll { it.quantityAvailable > 0 }
+                : availableItems
 
         // Sort bins  by available quantity
         availableItems = availableItems.sort { a, b ->
