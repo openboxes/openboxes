@@ -135,6 +135,11 @@ class UrlMappings {
             action = [POST: "importCsv"]
         }
 
+        "/api/products/availableItems" {
+            controller = { "productApi" }
+            action = [GET: "availableItems"]
+        }
+
         "/api/products/inventoryItems/lotNumbersWithExpirationDate" {
             controller = { "productApi" }
             action = [GET: "getLotNumbersWithExpirationDate"]
@@ -1026,6 +1031,11 @@ class UrlMappings {
             action = [POST: "uploadCycleCountItems"]
         }
 
+        "/api/facilities/$facility/cycle-counts/items/upload/recount" {
+            controller = "cycleCountApi"
+            action = [POST: "uploadCycleCountRecountItems"]
+        }
+
         "/api/facilities/$facility/cycle-counts/$cycleCountId/items" {
             controller = "cycleCountApi"
             action = [POST: "createCycleCountItem"]
@@ -1067,7 +1077,7 @@ class UrlMappings {
             action = [POST: "getInventoryAuditSummary", GET: "getInventoryAuditSummary"]
         }
 
-        "/api/reports/inventory-transactions-summary" {
+        "/api/reports/inventory-transactions-summary(.$format)?" {
             controller = "inventoryTransactionSummaryApi"
             action = [GET: "getInventoryTransactionsSummary"]
         }

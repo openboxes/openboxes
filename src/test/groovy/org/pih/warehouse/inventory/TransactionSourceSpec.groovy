@@ -42,7 +42,7 @@ class TransactionSourceSpec extends Specification implements DomainUnitTest<Tran
                 id: 2,
                 transactionAction: TransactionAction.RECORD_STOCK,
                 createdBy: user,
-                updatedBy: user
+                updatedBy: user,
         )
 
         expect:

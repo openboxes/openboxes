@@ -5,52 +5,61 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import org.pih.warehouse.core.date.DateDisplayFormat
-import org.pih.warehouse.core.date.DateDisplayStyle
-import org.pih.warehouse.core.date.DatePatternLocalizer
-import org.pih.warehouse.core.date.TemporalAccessorDateFormatter
+import org.pih.warehouse.core.localization.LocaleManager
 
 @Unroll
-class TemporalAccessorDateFormatterSpec extends Specification {
+class LocalDateFormatterSpec extends Specification {
 
     static final LocalDate JAN_1ST_2000 = LocalDate.of(2000, 1, 1)
 
     @Shared
     DatePatternLocalizer datePatternLocalizerStub
 
+    @Shared
+    LocaleManager localeManagerStub
+
+    @Shared
+    LocalDateFormatter localDateFormatter
+
     void setup() {
+        localDateFormatter = new LocalDateFormatter()
         datePatternLocalizerStub = Stub(DatePatternLocalizer)
+        localDateFormatter.datePatternLocalizer = datePatternLocalizerStub
+        localeManagerStub = Stub(LocaleManager)
+        localDateFormatter.localeManager = localeManagerStub
     }
 
     void 'format can handle null inputs gracefully'() {
-        given:
-        TemporalAccessorDateFormatter formatter = initFormatter(Locale.ENGLISH, null, null, null)
-
         expect:
-        formatter.format(null) == ''
+        localDateFormatter.format(null) == null
     }
 
-    void 'format errors when given no format options'() {
+    void 'format succeeds when given no format options'() {
         given:
-        TemporalAccessorDateFormatter formatter = initFormatter(Locale.ENGLISH, null, null, null)
+        localeManagerStub.getCurrentLocale() >> Locale.ENGLISH
 
-        when:
-        formatter.format(JAN_1ST_2000)
+        and:
+        datePatternLocalizerStub.localizePattern(DateDisplayStyle.DATE, Locale.ENGLISH) >> 'dd/MMM/yyyy'
 
-        then:
-        thrown(IllegalArgumentException)
+        expect:
+        localDateFormatter.format(JAN_1ST_2000) == '01/Jan/2000'
     }
 
     void 'format succeeds when given a display format for scenario: #scenario'() {
         given:
-        TemporalAccessorDateFormatter formatter = initFormatter(locale, format, null, null)
+        DateFormatterContext context = DateFormatterContext.builder()
+                .withDisplayFormat(format)
+                .build()
+
+        and:
+        localeManagerStub.getCurrentLocale() >> locale
 
         and:
         datePatternLocalizerStub.localizePattern(DateDisplayStyle.DATE, Locale.ENGLISH) >> 'dd/MMM/yyyy'
         datePatternLocalizerStub.localizePattern(DateDisplayStyle.DATE, Locale.ITALIAN) >> 'MMM-dd-yyyy'
 
         expect:
-        formatter.format(JAN_1ST_2000) == expectedResult
+        localDateFormatter.format(JAN_1ST_2000, context) == expectedResult
 
         where:
         locale         | format                 || expectedResult | scenario
@@ -64,10 +73,15 @@ class TemporalAccessorDateFormatterSpec extends Specification {
 
     void 'format succeeds when given a pattern override for scenario: #scenario'() {
         given:
-        TemporalAccessorDateFormatter formatter = initFormatter(locale, null, 'yyyy.MMM.dd', null)
+        DateFormatterContext context = DateFormatterContext.builder()
+                .withPatternOverride('yyyy.MMM.dd')
+                .build()
+
+        and:
+        localeManagerStub.getCurrentLocale() >> locale
 
         expect:
-        formatter.format(JAN_1ST_2000) == expectedResult
+        localDateFormatter.format(JAN_1ST_2000, context) == expectedResult
 
         where:
         locale         || expectedResult | scenario
@@ -77,32 +91,23 @@ class TemporalAccessorDateFormatterSpec extends Specification {
 
     void 'format succeeds when given a display style for scenario: #scenario'() {
         given:
-        TemporalAccessorDateFormatter formatter = initFormatter(locale, null, null, DateDisplayStyle.DATE)
+        DateFormatterContext context = DateFormatterContext.builder()
+                .withDisplayStyleOverride(DateDisplayStyle.DATE)
+                .build()
+
+        and:
+        localeManagerStub.getCurrentLocale() >> locale
 
         and:
         datePatternLocalizerStub.localizePattern(DateDisplayStyle.DATE, Locale.ENGLISH) >> 'dd/MMM/yyyy'
         datePatternLocalizerStub.localizePattern(DateDisplayStyle.DATE, Locale.ITALIAN) >> 'MMM-dd-yyyy'
 
         expect:
-        formatter.format(JAN_1ST_2000) == expectedResult
+        localDateFormatter.format(JAN_1ST_2000, context) == expectedResult
 
         where:
         locale         || expectedResult | scenario
         Locale.ENGLISH || '01/Jan/2000'  | 'DATE style localization in english'
         Locale.ITALIAN || 'gen-01-2000'  | 'DATE style localization in non-english'
-    }
-
-    private TemporalAccessorDateFormatter<LocalDate> initFormatter(
-            Locale locale,
-            DateDisplayFormat displayFormat,
-            String patternOverride,
-            DateDisplayStyle displayStyleOverride) {
-
-        TemporalAccessorDateFormatter<LocalDate> formatter = Spy(new TemporalAccessorDateFormatter(
-                locale, displayFormat, patternOverride, displayStyleOverride))
-
-        formatter.getLocalizer() >> datePatternLocalizerStub
-
-        return formatter
     }
 }

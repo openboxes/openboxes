@@ -12,7 +12,6 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import org.pih.warehouse.DateUtil
-import org.pih.warehouse.core.date.JavaUtilDateParser
 
 @Unroll
 class JavaUtilDateParserSpec extends Specification {

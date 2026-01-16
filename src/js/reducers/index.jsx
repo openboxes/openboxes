@@ -5,6 +5,7 @@ import approversReducer from 'reducers/approversReducer';
 import connectionReducer from 'reducers/connectionReducer';
 import countWorkflowReducer from 'reducers/countWorkflowReducer';
 import cycleCountReducer from 'reducers/cycleCountReducer';
+import errorsReducer from 'reducers/errorsReducer';
 import filterFormReducer from 'reducers/filterFormReducer';
 import indicatorsReducer from 'reducers/indicatorsReducer';
 import infoBarReducer from 'reducers/infoBarReducer';
@@ -53,6 +54,7 @@ const rootReducer = combineReducers({
   outboundImport: outboundImportReducer,
   cycleCount: cycleCountReducer,
   countWorkflow: countWorkflowReducer,
+  errors: errorsReducer,
   lotNumbers: lotNumbersReducer,
 });
 

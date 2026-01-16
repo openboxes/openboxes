@@ -1,21 +1,14 @@
 package org.pih.warehouse.core.date
 
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalAccessor
+import org.springframework.stereotype.Component
 
 /**
- * A formatter that converts TemporalAccessor objects that have a date component to Strings.
+ * A formatter that converts LocalDates to Strings.
  */
-class TemporalAccessorDateFormatter<T extends TemporalAccessor> extends TemporalAccessorFormatter<T> {
-
-    TemporalAccessorDateFormatter(
-            final Locale locale,
-            final DateDisplayFormat displayFormat,
-            final String patternOverride,
-            final DateDisplayStyle displayStyleOverride) {
-
-        super(locale, displayFormat, patternOverride, displayStyleOverride)
-    }
+@Component
+class LocalDateFormatter extends AbstractDateFormatter<LocalDate> {
 
     DateTimeFormatter getJsonFormatter() {
         return DateTimeFormatter.ISO_DATE
@@ -35,5 +28,9 @@ class TemporalAccessorDateFormatter<T extends TemporalAccessor> extends Temporal
         // pattern but we'd need to verify that each of those patterns can be handled by our data binders. For now,
         // we stick with ISO pattern because it's a universally accepted date format and is guaranteed to work.
         //return DateTimeFormatter.ISO_DATE
+    }
+
+    DateTimeFormatter getFileNameFormatter() {
+        return DateTimeFormatter.ofPattern('yyyyMMdd')
     }
 }

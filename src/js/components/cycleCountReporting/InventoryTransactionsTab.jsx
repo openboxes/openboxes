@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 
 import DataTable from 'components/DataTable/v2/DataTable';
 import useInventoryTransactionsTab from 'hooks/cycleCount/useInventoryTransactionsTab';
+import useInventoryTransactionsTabExport from 'hooks/cycleCount/useInventoryTransactionsTabExport';
+import DropdownButton from 'utils/DropdownButton';
 
 const InventoryTransactionsTab = ({
   filterParams,
@@ -35,12 +37,22 @@ const InventoryTransactionsTab = ({
     filtersInitialized,
   });
 
+  const { actions } = useInventoryTransactionsTabExport(filterParams);
+
   useEffect(() => {
     setTotalCount(tableData.totalCount);
   }, [tableData.totalCount]);
 
   return (
     <div>
+      <div className="w-100 d-flex justify-content-end pr-3 pb-3">
+        <DropdownButton
+          disabled={!filterParams.startDate || !filterParams.endDate}
+          buttonLabel="react.default.button.export.label"
+          buttonDefaultLabel="Export"
+          actions={actions}
+        />
+      </div>
       <DataTable
         columns={columns}
         data={tableData.data}
@@ -58,7 +70,10 @@ const InventoryTransactionsTab = ({
 export default InventoryTransactionsTab;
 
 InventoryTransactionsTab.propTypes = {
-  filterParams: PropTypes.shape({}).isRequired,
+  filterParams: PropTypes.shape({
+    startDate: PropTypes.string.isRequired,
+    endDate: PropTypes.string.isRequired,
+  }).isRequired,
   tablePaginationProps: PropTypes.shape({
     paginationProps: PropTypes.shape({}).isRequired,
     offset: PropTypes.number.isRequired,

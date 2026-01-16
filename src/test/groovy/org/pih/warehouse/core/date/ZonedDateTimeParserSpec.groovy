@@ -10,7 +10,6 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import org.pih.warehouse.core.date.ZonedDateTimeParser
 import org.pih.warehouse.core.session.SessionManager
 
 @Unroll

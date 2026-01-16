@@ -129,13 +129,15 @@ assets {
 
 bootRun {
     addResources = true
-    dependsOn 'npm_run_bundle'
     jvmArgs = [
         '-Dspring.output.ansi.enabled=never',
         '-Xdebug',
         '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005'
     ]
     systemProperties System.properties
+
+    // if using a Gradle daemon, don't use its working directory
+    systemProperty 'user.dir', project.projectDir.absolutePath
 }
 
 configurations {
@@ -224,6 +226,11 @@ configurations {
                     } else {
                         details.useVersion(jacksonVersion)
                     }
+                }
+
+                if (details.requested.group.startsWith('net.java.dev.jna')) {
+                    details.because 'support testcontainers and Mac-based development'
+                    details.useVersion(jnaVersion)
                 }
 
                 if (details.requested.group == 'org.apache.httpcomponents') {
@@ -769,9 +776,9 @@ dependencies {
 
     // For integration tests
     testCompile 'org.apache.commons:commons-compress:1.21'  // Needed to avoid a dependency conflict
-    testCompile "org.testcontainers:mysql:1.17.3"
-    testCompile "org.testcontainers:mariadb:1.17.3"
-    testCompile "org.testcontainers:spock:1.17.3"
+    testCompile "org.testcontainers:mysql:${testContainersVersion}"
+    testCompile "org.testcontainers:mariadb:${testContainersVersion}"
+    testCompile "org.testcontainers:spock:${testContainersVersion}"
     testCompile 'org.springframework:spring-test'
     testCompile 'io.rest-assured:rest-assured:3.2.0'
     testCompile "org.grails.plugins:build-test-data:3.3.1"
@@ -821,6 +828,15 @@ buildProperties.doLast {
         properties.store(it, null)
     }
 }
+
+task cleanWebpack(type: Delete) {
+    description = "Delete webpack's file cache and output directory"
+    group = 'Build'
+    delete file('node_modules/.cache')
+    delete file('src/main/webapp/webpack')
+}
+
+clean.dependsOn cleanWebpack
 
 /*
  * This lightweight task logs release info for node, npm and friends.
@@ -890,6 +906,12 @@ jacocoTestReport {
 
 // Configuration for both "test" and "integrationTest" tasks.
 tasks.withType(Test) {
+    // never consider test tasks as up-to-date - always run them when requested
+    outputs.upToDateWhen { false }
+    
+    // https://github.com/testcontainers/testcontainers-java/pull/11216
+    systemProperty 'api.version', dockerApiVersion
+
     systemProperty 'geb.build.reportsDir', reporting.file('geb/integrationTest')
     systemProperty 'geb.env', System.getProperty('geb.env')
     systemProperty 'webdriver.chrome.driver', System.getProperty('webdriver.chrome.driver')

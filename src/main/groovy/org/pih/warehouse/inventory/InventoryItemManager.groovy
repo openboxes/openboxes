@@ -4,6 +4,7 @@ import grails.validation.ValidationException
 import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 
+import org.pih.warehouse.product.lot.ProductLot
 import org.pih.warehouse.product.Product
 
 @Component
@@ -29,6 +30,37 @@ class InventoryItemManager {
         }
 
         return createInventoryItem(product, lotNumber, expirationDate, disableRefresh)
+    }
+
+    /**
+     * Finds the inventory item for the given product lot, creating it if it doesn't exist.
+     *
+     * @param productLot The product + lot of the item to get or create.
+     * @param disableRefresh True if the creation of a new InventoryItem should NOT trigger an asynchronous
+     *                       product availability refresh. Typically this is only true when callers want to
+     *                       trigger the refresh themselves, manually.
+     */
+    InventoryItem getOrCreateInventoryItem(ProductLot productLot, boolean disableRefresh = false) {
+        return getOrCreateInventoryItem(
+                productLot.product, productLot.lotNumber, productLot.expirationDate, disableRefresh)
+    }
+
+    /**
+     * Bulk method for finding the inventory items for the given product lots, creating them if they don't exist.
+     */
+    InventoryItemByProductLot getOrCreateInventoryItems(Collection<ProductLot> productLots,
+                                                        boolean disableRefresh = false) {
+        InventoryItemByProductLot inventoryItemMap = new InventoryItemByProductLot()
+        for (ProductLot productLot in productLots) {
+            if (inventoryItemMap.containsKey(productLot)) {
+                // We could consider adding some validation here, such as checking that the expiration dates match,
+                // but for now we simply continue if we've already fetched or created this inventory item.
+                continue
+            }
+            InventoryItem inventoryItem = getOrCreateInventoryItem(productLot, disableRefresh)
+            inventoryItemMap.put(productLot, inventoryItem)
+        }
+        return inventoryItemMap
     }
 
     /**
