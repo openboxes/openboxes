@@ -776,9 +776,9 @@ dependencies {
 
     // For integration tests
     testCompile 'org.apache.commons:commons-compress:1.21'  // Needed to avoid a dependency conflict
-    testCompile "org.testcontainers:mysql:1.17.3"
-    testCompile "org.testcontainers:mariadb:1.17.3"
-    testCompile "org.testcontainers:spock:1.17.3"
+    testCompile "org.testcontainers:mysql:${testContainersVersion}"
+    testCompile "org.testcontainers:mariadb:${testContainersVersion}"
+    testCompile "org.testcontainers:spock:${testContainersVersion}"
     testCompile 'org.springframework:spring-test'
     testCompile 'io.rest-assured:rest-assured:3.2.0'
     testCompile "org.grails.plugins:build-test-data:3.3.1"
@@ -908,6 +908,9 @@ jacocoTestReport {
 tasks.withType(Test) {
     // never consider test tasks as up-to-date - always run them when requested
     outputs.upToDateWhen { false }
+    
+    // https://github.com/testcontainers/testcontainers-java/pull/11216
+    systemProperty 'api.version', dockerApiVersion
 
     systemProperty 'geb.build.reportsDir', reporting.file('geb/integrationTest')
     systemProperty 'geb.env', System.getProperty('geb.env')
