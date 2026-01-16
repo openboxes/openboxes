@@ -83,7 +83,7 @@ const useItemInStockModal = ({ productId }) => {
       ),
       cell: ({ getValue }) => (
         <TableCell className="rt-td">
-          {(getValue() ?? 0).toString()}
+          {getValue()?.toString() ?? '0'}
         </TableCell>
       ),
     }),
@@ -95,7 +95,7 @@ const useItemInStockModal = ({ productId }) => {
       ),
       cell: ({ getValue }) => (
         <TableCell className="rt-td">
-          {(getValue() ?? 0).toString()}
+          {getValue()?.toString() ?? '0'}
         </TableCell>
       ),
     }),

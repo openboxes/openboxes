@@ -12,6 +12,7 @@ package org.pih.warehouse.inventory
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
 import grails.validation.ValidationException
+import org.apache.commons.collections.map.MultiKeyMap
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.PaginatedList
@@ -3243,35 +3244,31 @@ class InventoryService implements ApplicationContextAware {
     }
 
     List<AvailableItem> getAvailableBinLocations(Location location, Product product) {
-        return getAvailableBinLocations(location, product, false)
+        return getAvailableBinLocations(location, [product])
     }
 
-    List<AvailableItem> getAvailableBinLocations(Location location, Product product, boolean excludeOutOfStock) {
-        return getAvailableBinLocations(location, [product], excludeOutOfStock)
-    }
+    List<AvailableItem> getAvailableBinLocations(Location location, List<Product> products) {
+        List<AvailableItem> availableItems = productAvailabilityService.getAvailableItems(location, products.id, true, true)
+        MultiKeyMap<Object, AvailableItem> map = new MultiKeyMap()
+        for (AvailableItem availableItem in availableItems) {
+            InventoryItem inventoryItem = availableItem.inventoryItem
+            Location binLocation = availableItem.binLocation
 
-    List<AvailableItem> getAvailableBinLocations(Location location, List<Product> products, boolean excludeOutOfStock = false) {
-        List<AvailableItem> availableItems = productAvailabilityService.getAvailableItems(location, products.id)
-                .findAll { it.quantityOnHand > 0 || it.quantityAvailable > 0 }
-        Map<Tuple2<InventoryItem, Location>, List<AvailableItem>> groupedAvailableItems = availableItems.groupBy {new Tuple2(it.inventoryItem, it.binLocation) }
-        Map<Tuple2<InventoryItem, Location>, AvailableItem> data =
-                groupedAvailableItems.collectEntries {Tuple2<InventoryItem, Location> key, List<AvailableItem> items ->
-                    Integer quantityAvailableSum =
-                            items.collect { it.quantityAvailable ?: 0 }.sum() ?: 0
-                    Integer quantityOnHandSum =
-                            items.collect { it.quantityOnHand ?: 0 }.sum() ?: 0
+            AvailableItem collectedItem = map.get(inventoryItem, binLocation)
+            if (collectedItem) {
+                collectedItem.quantityAvailable += availableItem.quantityAvailable
+                collectedItem.quantityOnHand += availableItem.quantityOnHand
+                continue
+            }
 
-                    return [
-                            (key): new AvailableItem(
-                                    inventoryItem: key.first,
-                                    binLocation: key.second,
-                                    quantityAvailable: quantityAvailableSum,
-                                    quantityOnHand: quantityOnHandSum
-                            )
-                    ]
-                }
+            map.put(inventoryItem, binLocation, new AvailableItem(
+                    inventoryItem: inventoryItem,
+                    binLocation: binLocation,
+                    quantityAvailable: availableItem.quantityAvailable,
+                    quantityOnHand: availableItem.quantityOnHand))
+        }
 
-        return sortAvailableItems(data.values() as List<AvailableItem>, false)
+        return sortAvailableItems(map.values().toList(), false)
     }
 
     List<AvailableItem> sortAvailableItems(List<AvailableItem> availableItems, boolean removeWithEmptyQuantity = true) {
