@@ -75,6 +75,7 @@ export const PREPAYMENT_INVOICE_ITEM_BY_ID = (id) => `${PREPAYMENT_INVOICE_ITEM_
 export const PRODUCT_API = `${API}/products`;
 export const INVENTORY_ITEM = (productCode, lotNumber) => `${CONTEXT_PATH}/${PRODUCT_API}/${productCode}/inventoryItems/${lotNumber}`;
 export const LOT_NUMBERS_WITH_EXPIRATION_DATE = `${PRODUCT_API}/inventoryItems/lotNumbersWithExpirationDate`;
+export const AVAILABLE_ITEMS = `${PRODUCT_API}/availableItems`;
 
 // STOCK LIST
 export const STOCKLIST_API = `${API}/stocklists`;
@@ -200,6 +201,7 @@ export const CYCLE_COUNT_SUBMIT_COUNT = (locationId, cycleCountId) => `${CYCLE_C
 export const CYCLE_COUNT_SUBMIT_RECOUNT = (locationId, cycleCountId) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/recount`;
 export const CYCLE_COUNT_REFRESH_ITEMS = (locationId, cycleCountId, removeOutOfStockItemsImplicitly) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/refresh${removeOutOfStockItemsImplicitly ? '?removeOutOfStockItemsImplicitly=true' : ''}`;
 export const CYCLE_COUNT_ITEMS_IMPORT = (locationId) => `${CYCLE_COUNT(locationId)}/items/upload/count`;
+export const CYCLE_COUNT_ITEMS_IMPORT_RECOUNT = (locationId) => `${CYCLE_COUNT(locationId)}/items/upload/recount`;
 export const CYCLE_COUNT_REQUESTS_BATCH = (locationId) => `${CYCLE_COUNT(locationId)}/requests/batch`;
 
 // REPORTING
