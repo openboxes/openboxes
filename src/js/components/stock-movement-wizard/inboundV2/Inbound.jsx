@@ -1,8 +1,5 @@
 import React, { useMemo } from 'react';
 
-import { useSelector } from 'react-redux';
-import { getActiveLanguage } from 'selectors';
-
 import InboundHeader from 'components/stock-movement-wizard/inboundV2/InboundHeader';
 import InboundAddItems from 'components/stock-movement-wizard/inboundV2/sections/addItems/InboundAddItems';
 import InboundCreate from 'components/stock-movement-wizard/inboundV2/sections/create/InboundCreate';
@@ -21,25 +18,24 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 const Inbound = () => {
   useTranslation('stockMovement');
   const translate = useTranslate();
-  const locale = useSelector(getActiveLanguage);
 
   const steps = useMemo(() => [
     {
       key: inboundV2Step.CREATE,
       title: translate('react.stockMovement.create.label', 'Create'),
-      Component: (props) => (<InboundCreate {...props} />),
+      Component: InboundCreate,
     },
     {
       key: inboundV2Step.ADD_ITEMS,
       title: translate('react.stockMovement.addItems.label', 'Add Items'),
-      Component: (props) => (<InboundAddItems {...props} />),
+      Component: InboundAddItems,
     },
     {
       key: inboundV2Step.SEND,
       title: translate('react.stockMovement.send.label', 'Send'),
-      Component: (props) => (<InboundSend {...props} />),
+      Component: InboundSend,
     },
-  ], [locale]);
+  ], [translate]);
 
   const stepsTitles = steps.map((step) => ({
     title: step.title,
