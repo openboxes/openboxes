@@ -740,9 +740,6 @@ class OrderService {
                             if (productSource.product != orderItem.product) {
                                 throw new ProductException("Wrong product source for given product")
                             }
-                            if (!productSource.active) {
-                                throw new ProductException("Product source ${sourceCode} for product ${productCode} is inactive")
-                            }
                             orderItem.productSupplier = productSource
                         }
                     } else {
