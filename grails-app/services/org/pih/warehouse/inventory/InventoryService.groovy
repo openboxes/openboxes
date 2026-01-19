@@ -12,6 +12,7 @@ package org.pih.warehouse.inventory
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
 import grails.validation.ValidationException
+import org.apache.commons.collections.map.MultiKeyMap
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.PaginatedList
@@ -3246,30 +3247,37 @@ class InventoryService implements ApplicationContextAware {
     }
 
     List<AvailableItem> getAvailableBinLocations(Location location, Product product) {
-        return getAvailableBinLocations(location, product, false)
+        return getAvailableBinLocations(location, [product])
     }
 
-    List<AvailableItem> getAvailableBinLocations(Location location, Product product, boolean excludeOutOfStock) {
-        return getAvailableBinLocations(location, [product], excludeOutOfStock)
-    }
+    List<AvailableItem> getAvailableBinLocations(Location location, List<Product> products) {
+        List<AvailableItem> availableItems = productAvailabilityService.getAvailableItems(location, products.id, true, true)
+        MultiKeyMap<Object, AvailableItem> map = new MultiKeyMap()
+        for (AvailableItem availableItem in availableItems) {
+            InventoryItem inventoryItem = availableItem.inventoryItem
+            Location binLocation = availableItem.binLocation
 
-    List<AvailableItem> getAvailableBinLocations(Location location, List products, boolean excludeOutOfStock = false) {
-        def availableBinLocations = getProductQuantityByBinLocation(location, products)
+            AvailableItem collectedItem = map.get(inventoryItem, binLocation)
+            if (collectedItem) {
+                collectedItem.quantityAvailable += availableItem.quantityAvailable
+                collectedItem.quantityOnHand += availableItem.quantityOnHand
+                continue
+            }
 
-        List<AvailableItem> availableItems = availableBinLocations.collect {
-            return new AvailableItem(
-                    inventoryItem: it?.inventoryItem,
-                    binLocation: it?.binLocation,
-                    quantityAvailable: it.quantity
-            )
+            map.put(inventoryItem, binLocation, new AvailableItem(
+                    inventoryItem: inventoryItem,
+                    binLocation: binLocation,
+                    quantityAvailable: availableItem.quantityAvailable,
+                    quantityOnHand: availableItem.quantityOnHand))
         }
 
-        availableItems = sortAvailableItems(availableItems)
-        return availableItems
+        return sortAvailableItems(map.values().toList(), false)
     }
 
-    List<AvailableItem> sortAvailableItems(List<AvailableItem> availableItems) {
-        availableItems = availableItems.findAll { it.quantityAvailable > 0 }
+    List<AvailableItem> sortAvailableItems(List<AvailableItem> availableItems, boolean removeWithEmptyQuantity = true) {
+        availableItems = removeWithEmptyQuantity
+                ? availableItems.findAll { it.quantityAvailable > 0 }
+                : availableItems
 
         // Sort bins  by available quantity
         availableItems = availableItems.sort { a, b ->
