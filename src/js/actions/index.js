@@ -8,6 +8,7 @@ import {
   ADD_STOCK_MOVEMENT_DRAFT,
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
+  CLEAR_CYCLE_COUNT_DATA,
   CLOSE_INFO_BAR,
   ERASE_DRAFT,
   FETCH_APPROVERS,
@@ -80,6 +81,7 @@ import { ORGANIZATION_API } from 'api/urls';
 import RoleType from 'consts/roleType';
 import { UnitOfMeasureType } from 'consts/UnitOfMeasureType';
 import apiClient, { parseResponse } from 'utils/apiClient';
+import { removeBinLocationData } from 'utils/cycleCountUtils';
 import { fetchBins, getLotNumbersByProductIds, mapShipmentTypes } from 'utils/option-utils';
 
 export function showSpinner() {
@@ -834,17 +836,19 @@ export const fetchCycleCounts = (
   cycleCountIds,
   currentLocationId,
   sortByProductName,
+  showBinLocation = true,
 ) => async (dispatch) => {
   dispatch(showSpinner());
   try {
-    const cycleCounts = await cycleCountApi.getCycleCounts(
+    const { data } = await cycleCountApi.getCycleCounts(
       currentLocationId,
       cycleCountIds,
       sortByProductName && 'productName',
     );
+    const cycleCounts = data?.data;
     dispatch({
       type: FETCH_CYCLE_COUNTS,
-      payload: cycleCounts?.data?.data,
+      payload: showBinLocation ? cycleCounts : removeBinLocationData(cycleCounts),
     });
   } finally {
     dispatch(hideSpinner());
@@ -964,5 +968,11 @@ export const setErrorsById = (id, errors) => (dispatch) => {
 export const submitForm = (dispatch) => {
   dispatch({
     type: SUBMIT_FORM,
+  });
+};
+
+export const clearCycleCountData = (dispatch) => {
+  dispatch({
+    type: CLEAR_CYCLE_COUNT_DATA,
   });
 };

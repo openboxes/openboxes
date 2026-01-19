@@ -7,6 +7,7 @@ import {
 } from 'selectors';
 
 import {
+  clearCycleCountData,
   fetchBinLocations,
   fetchCycleCounts,
   fetchLotNumbersByProductIds,
@@ -40,8 +41,14 @@ const useCycleCountFetchData = (
   }, [currentLocationId, showBinLocation]);
 
   useEffect(() => {
-    dispatch(fetchCycleCounts(cycleCountIds, currentLocationId, sortByProductName));
-  }, [cycleCountIds, currentLocationId, sortByProductName]);
+    dispatch(
+      fetchCycleCounts(cycleCountIds, currentLocationId, sortByProductName, showBinLocation),
+    );
+
+    return () => {
+      dispatch(clearCycleCountData);
+    };
+  }, [cycleCountIds, currentLocationId, sortByProductName, showBinLocation]);
 
   useEffect(() => {
     if (isStepEditable && uniqueProductIds.length > 0) {

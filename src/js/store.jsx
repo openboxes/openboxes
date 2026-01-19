@@ -15,7 +15,7 @@ const persistConfig = {
   // (see reference in the comments section in the: OBPIH-4735),
   // hence there is need to temporarily disable the indicator reducer
   // from the persisted reducers.
-  blacklist: ['indicators', 'spinner', 'connection', 'infoBarVisibility', 'countWorkflow'],
+  blacklist: ['indicators', 'spinner', 'connection', 'infoBarVisibility', 'countWorkflow', 'errors'],
 };
 
 const createStoreWithMiddleware = applyMiddleware(

@@ -112,9 +112,39 @@ const checkProductsWithLotAndExpiryControl = (items, ctx) => {
   });
 };
 
+// 5. Lot number is required if expiration date is provided
+const checkLotNumberRequireness = (items, ctx) => {
+  items.forEach((row, index) => {
+    if (!row?.id.includes(NEW_ROW)) {
+      return;
+    }
+
+    const expirationWithoutLot = !row?.inventoryItem?.lotNumber?.trim()
+      && row?.inventoryItem?.expirationDate;
+
+    if (expirationWithoutLot) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Lot number is required.',
+        path: ['cycleCountItems', index, 'inventoryItem.lotNumber'],
+      });
+    }
+  });
+};
+
 const getRowValidationSchema = (translate) => z.object({
   id: z
     .string(),
+  product: z.object({
+    id: z
+      .string()
+      .optional()
+      .nullable(),
+    lotAndExpiryControl: z
+      .boolean()
+      .optional()
+      .nullable(),
+  }),
   quantityCounted: z
     .number({
       required_error: translate('react.cycleCount.requiredQuantityCounted', 'Quantity counted is required'),
@@ -148,6 +178,7 @@ const getCountEntitySchema = (translate) => z.object({
   checkDuplicatedLotNumber(cycleCountItems, ctx);
   checkDifferentExpirationDatesForTheSameLot(cycleCountItems, ctx);
   checkProductsWithLotAndExpiryControl(cycleCountItems, ctx);
+  checkLotNumberRequireness(cycleCountItems, ctx);
 });
 
 const getCountStepValidationSchema = (translate) => z.record(getCountEntitySchema(translate));
