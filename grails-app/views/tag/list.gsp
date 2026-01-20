@@ -17,56 +17,77 @@
             <div class="list">
 
                 <g:render template="summary"/>
-                <div class="box">
-                    <h2>${g.message(code: 'tags.label')}</h2>
-                    <table>
-                        <thead>
-                            <tr>
 
-                                <g:sortableColumn property="id" title="${warehouse.message(code: 'tag.id.label', default: 'Id')}" />
+                <div class="yui-gf">
+                    <div class="yui-u first">
+                        <div class="box">
+                            <h2><warehouse:message code="filters.label" default="Filters"/></h2>
+                            <g:form action="list" method="get">
+                                <div class="filters">
+                                    <div class="filter-list-item">
+                                        <label>${g.message(code:'product.label')}</label>
+                                        <g:textField name="tag" value="${params.tag}" class="large text"/>
+                                    </div>
+                                </div>
+                                <div class="buttons">
+                                    <button class="button">
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}" />&nbsp;
+                                        ${g.message(code: 'default.button.search.label')}
+                                    </button>
+                                </div>
+                            </g:form>
+                        </div>
+                    </div>
 
-                                <g:sortableColumn property="tag" title="${warehouse.message(code: 'tag.tag.label', default: 'Tag')}" />
+                    <div class="yui-u">
+                        <div class="box">
+                            <h2>${g.message(code: 'tags.label')}</h2>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <g:sortableColumn property="id" title="${warehouse.message(code: 'tag.id.label', default: 'Id')}" />
 
-                                <th><warehouse:message code="tag.products.label" default="Products"/></th>
+                                        <g:sortableColumn property="tag" title="${warehouse.message(code: 'tag.tag.label', default: 'Tag')}" />
 
-                                <th><warehouse:message code="tag.isActive.label" default="Is active?"/></th>
+                                        <th><warehouse:message code="tag.products.label" default="Products"/></th>
 
-                                <th><warehouse:message code="tag.updatedBy.label" default="Updated By" /></th>
+                                        <th><warehouse:message code="tag.isActive.label" default="Is active?"/></th>
 
-                                <th><warehouse:message code="tag.createdBy.label" default="Created By" /></th>
+                                        <th><warehouse:message code="tag.updatedBy.label" default="Updated By" /></th>
 
-                                <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'tag.dateCreated.label', default: 'Date Created')}" />
+                                        <th><warehouse:message code="tag.createdBy.label" default="Created By" /></th>
 
-                                <g:sortableColumn property="lastUpdated" title="${warehouse.message(code: 'tag.lastUpdated.label', default: 'Last Updated')}" />
+                                        <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'tag.dateCreated.label', default: 'Date Created')}" />
 
-                            </tr>
-                        </thead>
-                        <tbody>
-                        <g:each in="${tagInstanceList}" status="i" var="tagInstance">
-                            <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+                                        <g:sortableColumn property="lastUpdated" title="${warehouse.message(code: 'tag.lastUpdated.label', default: 'Last Updated')}" />
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <g:each in="${tagInstanceList}" status="i" var="tagInstance">
+                                    <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+                                        <td><g:link action="edit" id="${tagInstance.id}">${fieldValue(bean: tagInstance, field: "id")}</g:link></td>
 
-                                <td><g:link action="edit" id="${tagInstance.id}">${fieldValue(bean: tagInstance, field: "id")}</g:link></td>
+                                        <td><g:link action="edit" id="${tagInstance.id}">${fieldValue(bean: tagInstance, field: "tag")}</g:link></td>
 
-                                <td><g:link action="edit" id="${tagInstance.id}">${fieldValue(bean: tagInstance, field: "tag")}</g:link></td>
+                                        <td>${tagInstance?.products?.size()} </td>
 
-                                <td>${tagInstance?.products?.size()} </td>
+                                        <td>${fieldValue(bean: tagInstance, field: "isActive")}</td>
 
-                                <td>${fieldValue(bean: tagInstance, field: "isActive")}</td>
+                                        <td>${fieldValue(bean: tagInstance, field: "updatedBy")}</td>
 
-                                <td>${fieldValue(bean: tagInstance, field: "updatedBy")}</td>
+                                        <td>${fieldValue(bean: tagInstance, field: "createdBy")}</td>
 
-                                <td>${fieldValue(bean: tagInstance, field: "createdBy")}</td>
+                                        <td><format:date obj="${tagInstance.dateCreated}" /></td>
 
-                                <td><format:date obj="${tagInstance.dateCreated}" /></td>
-
-                                <td><format:date obj="${tagInstance.lastUpdated}" /></td>
-
-                            </tr>
-                        </g:each>
-                        </tbody>
-                    </table>
-                    <div class="paginateButtons">
-                        <g:paginate total="${tagInstanceTotal}" />
+                                        <td><format:date obj="${tagInstance.lastUpdated}" /></td>
+                                    </tr>
+                                </g:each>
+                                </tbody>
+                            </table>
+                            <div class="paginateButtons">
+                                <g:paginate total="${tagInstanceTotal}" params="${params}" />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
