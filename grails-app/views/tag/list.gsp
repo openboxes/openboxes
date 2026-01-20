@@ -25,7 +25,7 @@
                             <g:form action="list" method="get">
                                 <div class="filters">
                                     <div class="filter-list-item">
-                                        <label>${g.message(code:'product.label')}</label>
+                                        <label>${g.message(code:'tag.label')}</label>
                                         <g:textField name="tag" value="${params.tag}" class="large text"/>
                                     </div>
                                 </div>
