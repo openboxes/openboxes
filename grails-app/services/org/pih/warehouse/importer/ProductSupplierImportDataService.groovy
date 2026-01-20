@@ -20,8 +20,6 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 import util.ConfigHelper
 
-import java.text.SimpleDateFormat
-
 @Transactional
 class ProductSupplierImportDataService implements ImportDataService {
     ProductSupplierService productSupplierService
@@ -114,41 +112,19 @@ class ProductSupplierImportDataService implements ImportDataService {
             }
 
             Date minDate = ConfigHelper.getMinimumExpirationDate()
-            def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
-            if (params.globalPreferenceTypeValidityStartDate) {
-                try {
-                    def startDate = dateFormat.parse(params.globalPreferenceTypeValidityStartDate)
-
-                    if (minDate > startDate) {
-                        command.errors.reject("Row ${index + 1}: Validity start date ${params.globalPreferenceTypeValidityStartDate} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
-                    }
-                } catch (Exception e) {
-                    command.errors.reject("Row ${index + 1}: Validity start date ${params.globalPreferenceTypeValidityStartDate} is invalid. "+ e.message)
-                }
+            Date preferenceTypeValidityStartDate = params.globalPreferenceTypeValidityStartDate
+            if (preferenceTypeValidityStartDate && minDate > preferenceTypeValidityStartDate) {
+                command.errors.reject("Row ${index + 1}: Validity start date ${preferenceTypeValidityStartDate} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
             }
 
-            if (params.globalPreferenceTypeValidityEndDate) {
-                try {
-                    def endDate = dateFormat.parse(params.globalPreferenceTypeValidityEndDate)
-
-                    if (minDate > endDate) {
-                        command.errors.reject("Row ${index + 1}: Validity start date ${params.globalPreferenceTypeValidityEndDate} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
-                    }
-                } catch (Exception e) {
-                    command.errors.reject("Row ${index + 1}: Validity end date ${params.globalPreferenceTypeValidityEndDate} is invalid. " + e.message)
-                }
+            Date preferenceTypeValidityEndDate = params.globalPreferenceTypeValidityEndDate
+            if (preferenceTypeValidityEndDate && minDate > preferenceTypeValidityEndDate) {
+                command.errors.reject("Row ${index + 1}: Validity end date ${preferenceTypeValidityEndDate} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
             }
 
-            if (params.contractPriceValidUntil) {
-                try {
-                    def validUntilDate = dateFormat.parse(params.contractPriceValidUntil)
-
-                    if (minDate > validUntilDate) {
-                        command.errors.reject("Row ${index + 1}: Contract Price Valid Until date ${params.contractPriceValidUntil} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
-                    }
-                } catch (Exception e) {
-                    command.errors.reject("Row ${index + 1}: Contract Price Valid Until date ${params.contractPriceValidUntil} is invalid. " + e.message)
-                }
+            Date contractPriceValidUntil = params.contractPriceValidUntil
+            if (contractPriceValidUntil && minDate > contractPriceValidUntil) {
+                command.errors.reject("Row ${index + 1}: Contract Price Valid Until date ${contractPriceValidUntil} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
             }
         }
     }
