@@ -180,7 +180,8 @@ class PickTaskService {
             existingPickItem.outboundContainer = outboundContainer
         }
 
-        if (reasonCode) {
+        def isFullyPicked = task.quantityRequired.toInteger() == existingPickItem.quantityPicked
+        if (reasonCode || isFullyPicked) {
             executeStateTransition(task, PickTaskStatus.PICKED)
         }
 
