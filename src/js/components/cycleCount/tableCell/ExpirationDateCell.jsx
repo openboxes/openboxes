@@ -48,14 +48,16 @@ const ExpirationDateCell = ({
 
   useEffect(() => {
     setValue(disabledExpirationDateFields?.[id]);
-    dispatch(
-      updateFieldValue({
-        cycleCountId,
-        rowId: id,
-        field: cycleCountColumn.EXPIRATION_DATE,
-        value: undefined,
-      }),
-    );
+    if (!disabledExpirationDateFields?.[id]) {
+      dispatch(
+        updateFieldValue({
+          cycleCountId,
+          rowId: id,
+          field: cycleCountColumn.EXPIRATION_DATE,
+          value: undefined,
+        }),
+      );
+    }
   }, [disabledExpirationDateFields?.[id]]);
 
   if (!isStepEditable) {
