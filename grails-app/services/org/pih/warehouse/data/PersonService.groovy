@@ -146,4 +146,34 @@ class PersonService {
         }
         return names
     }
+
+    /**
+     * Find an active person by recipient string which can be either an email address or a full name.
+     * Supports RFC 822 format for email addresses (e.g., "Justin Miranda <justin@openboxes.com>").
+     *
+     * @param recipient Either a RFC 822 internet/email address (ex: "Justin Miranda <justin@openboxes.com>"),
+     * a plain email address (ex: "justin@openboxes.com"), or simply the recipient's name (ex: "Justin Miranda").
+     * @return An active Person matching the recipient, or null if not found or recipient is blank.
+     */
+    Person findActiveRecipient(String recipient) {
+        if (StringUtils.isBlank(recipient)) {
+            return null
+        }
+
+        recipient = recipient.trim()
+
+        try {
+            InternetAddress internetAddress = new InternetAddress(recipient, false)
+            internetAddress.validate()
+            return getActivePersonByEmail(internetAddress.address)
+
+        } catch (AddressException ignored) {
+            // If recipient isn't a valid internet address, it must be a regular name.
+            // Check if name has at least two words
+            if (recipient.split(" ").length < 2) {
+                return null
+            }
+            return getActivePersonByName(recipient)
+        }
+    }
 }

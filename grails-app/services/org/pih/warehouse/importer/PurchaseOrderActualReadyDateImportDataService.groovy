@@ -9,20 +9,19 @@
  **/
 package org.pih.warehouse.importer
 
-import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.data.PersonService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderService
 import org.pih.warehouse.product.Product
 
-import java.text.ParseException
-
 @Transactional
 class PurchaseOrderActualReadyDateImportDataService implements ImportDataService {
-    GrailsApplication grailsApplication
     OrderService orderService
+    PersonService personService
 
     @Override
     void validateData(ImportDataCommand command) {
@@ -101,7 +100,12 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
                     command.errors.reject("Row ${index + 1}: Could not parse date ${params['actualReadyDate']} on 'Actual Ready Date'. Expected date format: ${Constants.EXPIRATION_DATE_FORMAT}")
                 }
             }
-
+            if (params["recipient"]) {
+                Person recipient = personService.findActiveRecipient(params["recipient"])
+                if (!recipient) {
+                    command.errors.reject("Row ${index + 1}: [${params["recipient"]}] does not exist in OpenBoxes. Please check your data")
+                }
+            }
         }
     }
 
@@ -122,6 +126,14 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
             }
 
             orderItem.actualReadyDate = Date.parse(Constants.EXPIRATION_DATE_FORMAT, params["actualReadyDate"])
+
+            if (params["recipient"]) {
+                Person recipient = personService.findActiveRecipient(params["recipient"])
+                if (recipient) {
+                    orderItem.recipient = recipient
+                }
+            }
+
             orderItem.save(failOnError: true)
         }
     }
