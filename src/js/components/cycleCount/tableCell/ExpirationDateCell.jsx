@@ -58,8 +58,6 @@ const ExpirationDateCell = ({
     );
   }, [disabledExpirationDateFields?.[id]]);
 
-  console.log(value)
-
   if (!isStepEditable) {
     const formatLocalizedDate = useSelector(getFormatLocalizedDate);
 
