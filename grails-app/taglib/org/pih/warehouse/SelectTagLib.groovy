@@ -10,6 +10,7 @@
 package org.pih.warehouse
 
 import org.grails.core.artefact.DomainClassArtefactHandler
+import org.pih.warehouse.product.CategoryService
 import org.springframework.beans.factory.annotation.Value
 
 import org.pih.warehouse.core.ActivityCode
@@ -56,6 +57,7 @@ class SelectTagLib {
     def shipmentService
     def requisitionService
     def organizationService
+    CategoryService categoryService
 
     /**
      * The minimum number of characters input into the search field before a request will be sent.
@@ -191,11 +193,18 @@ class SelectTagLib {
 
     //@Cacheable("selectCategoryCache")
     def selectCategory = { attrs, body ->
-        attrs.from = Category.list().sort() // { it.name }
-        attrs.optionKey = "id"
-        attrs.optionValue = {
-            it.getHierarchyAsString(" > ")
+        // If a product category is specified, include it in the list of options,
+        // even if it would not be supposed to be included in the results
+        Category productCategory = attrs.value ? Category.read(attrs.value) : null
+        boolean includeParentCategories = attrs.includeParentCategories != null ? attrs.includeParentCategories : true
+        List<Map<String, String>> categoriesOptions = categoryService.getCategoriesOptions(includeParentCategories)
+        // Ensure that the product category is not already in the list, as we would get duplicates otherwise
+        if (productCategory && !categoriesOptions.find { it.id == productCategory.id }) {
+            categoriesOptions.add([id: productCategory.id, label: productCategory.getHierarchyAsString(" > ")])
         }
+        attrs.from = categoriesOptions
+        attrs.optionKey = "id"
+        attrs.optionValue = { it.label }
         out << g.select(attrs)
     }
 

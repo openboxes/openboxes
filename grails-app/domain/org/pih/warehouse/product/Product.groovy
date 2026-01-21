@@ -297,7 +297,12 @@ class Product implements Comparable, Serializable {
         description(nullable: true)
         productCode(nullable: true, maxSize: 255, unique: true)
         unitOfMeasure(nullable: true, maxSize: 255)
-        category(nullable: false)
+        category(nullable: false, validator: { Category category, Product product ->
+            if (!category.assigningParentToProductEnabled && product.categories.empty) {
+                // TODO: Decide whether to throw validation error or let the existing data live like it is
+                //return false
+            }
+        })
         productType(nullable: false)
         active(nullable: true, validator: { value, obj ->
             if (value) {
