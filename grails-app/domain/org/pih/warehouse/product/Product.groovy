@@ -495,19 +495,21 @@ class Product implements Comparable, Serializable {
         }
 
         // Find an inventory that matches the provided lot number
-        return InventoryItem.createCriteria().get {
-            and {
-                eq("product", this)
-                if (lotNumber) {
-                    eq("lotNumber", lotNumber)
-                } else {
-                    or {
-                        isNull("lotNumber")
-                        eq("lotNumber", "")
-                    }
-                }
-            }
-        } as InventoryItem
+        if (lotNumber) {
+            return InventoryItem.findByProductAndLotNumber(this, lotNumber)
+        }
+
+        // Because of data inconsistency default inventory item may have either null or empty string as lot number.
+        // To avoid using random inventory item when we have null and empty string lot numbers,
+        // we first try to find inventory item with null lot number.
+        // TODO: After cleaning up the data we can remove this logic and always use the lot number that
+        // TODO: we decided for default inventory items.
+        InventoryItem inventoryItemWithNullLot = InventoryItem.findByProductAndLotNumberIsNull(this)
+        if (inventoryItemWithNullLot) {
+            return inventoryItemWithNullLot
+        }
+
+        return InventoryItem.findByProductAndLotNumber(this, "")
     }
 
 
