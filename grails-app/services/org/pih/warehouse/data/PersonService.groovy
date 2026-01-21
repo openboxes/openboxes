@@ -149,9 +149,9 @@ class PersonService {
 
     /**
      * Find an active person by recipient string which can be either an email address or a full name.
-     * Supports RFC 822 format for email addresses (e.g., "Justin Miranda <justin@openboxes.com>").
+     * Supports RFC822 format for email addresses (e.g., "Justin Miranda <justin@openboxes.com>").
      *
-     * @param recipient Either a RFC 822 internet/email address (ex: "Justin Miranda <justin@openboxes.com>"),
+     * @param recipient Either a RFC822 internet/email address (ex: "Justin Miranda <justin@openboxes.com>"),
      * a plain email address (ex: "justin@openboxes.com"), or simply the recipient's name (ex: "Justin Miranda").
      * @return An active Person matching the recipient, or null if not found or recipient is blank.
      */
