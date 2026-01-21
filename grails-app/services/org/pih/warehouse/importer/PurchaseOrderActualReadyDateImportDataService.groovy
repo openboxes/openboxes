@@ -17,6 +17,8 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderService
 import org.pih.warehouse.product.Product
+import org.apache.commons.lang.StringUtils
+
 
 @Transactional
 class PurchaseOrderActualReadyDateImportDataService implements ImportDataService {
@@ -100,8 +102,8 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
                     command.errors.reject("Row ${index + 1}: Could not parse date ${params['actualReadyDate']} on 'Actual Ready Date'. Expected date format: ${Constants.EXPIRATION_DATE_FORMAT}")
                 }
             }
-            if (params["recipient"] && params["recipient"].trim()) {
-                Person recipient = personService.findActiveRecipient(params["recipient"])
+            if (!StringUtils.isBlank(params["recipient"])) {
+                Person recipient = personService.getActivePerson(params["recipient"])
                 if (!recipient) {
                     command.errors.reject("Row ${index + 1}: Recipient ${params["recipient"]} does not exist in OpenBoxes. Please check your data")
                 }
@@ -127,8 +129,8 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
 
             orderItem.actualReadyDate = Date.parse(Constants.EXPIRATION_DATE_FORMAT, params["actualReadyDate"])
 
-            if (params["recipient"] && params["recipient"].trim()) {
-                Person recipient = personService.findActiveRecipient(params["recipient"])
+            if (!StringUtils.isBlank(params["recipient"])) {
+                Person recipient = personService.getActivePerson(params["recipient"])
                 if (recipient) {
                     orderItem.recipient = recipient
                 }

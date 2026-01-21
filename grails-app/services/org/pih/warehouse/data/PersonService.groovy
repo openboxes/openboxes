@@ -155,7 +155,7 @@ class PersonService {
      * a plain email address (ex: "justin@openboxes.com"), or simply the recipient's name (ex: "Justin Miranda").
      * @return An active Person matching the recipient, or null if not found or recipient is blank.
      */
-    Person findActiveRecipient(String recipient) {
+    Person getActivePerson(String recipient) {
         recipient = recipient?.trim()
         if (StringUtils.isBlank(recipient)) {
             return null
