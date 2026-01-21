@@ -156,11 +156,10 @@ class PersonService {
      * @return An active Person matching the recipient, or null if not found or recipient is blank.
      */
     Person findActiveRecipient(String recipient) {
+        recipient = recipient?.trim()
         if (StringUtils.isBlank(recipient)) {
             return null
         }
-
-        recipient = recipient.trim()
 
         try {
             InternetAddress internetAddress = new InternetAddress(recipient, false)
