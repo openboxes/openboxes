@@ -1,7 +1,6 @@
 package org.pih.warehouse.product
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
 import org.springframework.validation.ObjectError
 
 import org.pih.warehouse.core.ActivityCode
@@ -13,7 +12,6 @@ import org.pih.warehouse.requisition.RequisitionService
 import org.pih.warehouse.shipping.ShipmentService
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
-@Component
 class ProductValidator implements DomainValidator<Product> {
 
     private static String ACTIVE_FIELD_NAME = "active"
