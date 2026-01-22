@@ -2,7 +2,6 @@ package org.pih.warehouse.api.spec.product
 
 import org.apache.http.HttpStatus
 import org.springframework.beans.factory.annotation.Autowired
-import spock.lang.Ignore
 
 import org.pih.warehouse.api.client.product.ProductClassificationApiWrapper
 import org.pih.warehouse.api.spec.base.ApiSpec

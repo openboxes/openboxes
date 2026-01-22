@@ -12,6 +12,10 @@ import org.pih.warehouse.requisition.RequisitionService
 import org.pih.warehouse.shipping.ShipmentService
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
+// We don't add the @Component annotation here because it causes a null pointer on TransactionEntryDataService down the
+// chain (when product availability is refreshed). Unfortunately Spring components can't detect Grails' *DataService
+// classes (possibly because they're statically compiled). Defining the ProductValidator bean in resources.groovy fixes
+// the issue because it makes it aware of the Grails context.
 class ProductValidator implements DomainValidator<Product> {
 
     private static String ACTIVE_FIELD_NAME = "active"
