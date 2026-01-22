@@ -740,6 +740,10 @@ class OrderService {
                             if (productSource.product != orderItem.product) {
                                 throw new ProductException("Wrong product source for given product")
                             }
+                            // Prevent creating order items with inactive product sources, but allow to modify existing order items
+                            if (!productSource.active && orderItemId == "") {
+                                throw new ProductException("Product source ${sourceCode} for product ${productCode} is inactive")
+                            }
                             orderItem.productSupplier = productSource
                         }
                     } else {
