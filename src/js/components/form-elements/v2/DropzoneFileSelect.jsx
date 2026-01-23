@@ -10,6 +10,7 @@ import Button from 'components/form-elements/Button';
 import notification from 'components/Layout/notifications/notification';
 import NotificationType from 'consts/notificationTypes';
 import useTranslate from 'hooks/useTranslate';
+import { bytesToMB } from 'utils/number-utils';
 
 import './style.scss';
 
@@ -59,12 +60,13 @@ const DropzoneFileSelect = ({
       return null;
     }
 
+    const MaxFileSizeInMB = bytesToMB(maxFileSize);
     return {
       code: 'file-too-large',
       message: translate(
         'react.default.error.fileTooLarge.label',
-        `File is larger than ${maxFileSize} bytes`,
-        [maxFileSize],
+        `File exceeds max file size of ${MaxFileSizeInMB} MB`,
+        [MaxFileSizeInMB],
       ),
     };
   };
