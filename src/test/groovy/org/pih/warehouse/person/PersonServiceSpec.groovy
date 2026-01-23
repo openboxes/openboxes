@@ -72,13 +72,17 @@ class PersonServiceSpec extends Specification implements ServiceUnitTest<PersonS
         service.getPerson(recipient)?.id == expectedId
 
         where:
-        recipient                               || expectedId
-        'Justin Miranda'                        || '1'
-        'justin@openboxes.com'                  || '1'
-        'oneword'                               || null
-        'Justin Miranda <justin@openboxes.com>' || '1'
-        'Justin Inactive'                       || '2'
-        null                                    || null
+        recipient                                || expectedId
+        'Justin'                                 || null
+        'Justin Miranda'                         || '1'
+        'Justin Justy Miranda'                   || null
+        'justin@openboxes.com'                   || '1'
+        'unknown@openboxes.com'                  || null
+        'Justin Miranda <justin@openboxes.com>'  || '1'
+        'Justin Miranda <unknown@openboxes.com>' || null
+        'Unknown Name <justin@openboxes.com>'    || '1'
+        'Justin Inactive'                        || '2'
+        null                                     || null
     }
 
     void 'getActivePerson returns person only if they are active'() {
@@ -90,9 +94,16 @@ class PersonServiceSpec extends Specification implements ServiceUnitTest<PersonS
         service.getActivePerson(recipient)?.id == expectedId
 
         where:
-        recipient                              || expectedId
-        'Justin Miranda'                       || '1'
-        'Unknown Name <justin@openboxes.com>'  || '1'
-        'Justin Inactive'                      || null
+        recipient                                || expectedId
+        'Justin'                                 || null
+        'Justin Miranda'                         || '1'
+        'Justin Justy Miranda'                   || null
+        'justin@openboxes.com'                   || '1'
+        'unknown@openboxes.com'                  || null
+        'Justin Miranda <justin@openboxes.com>'  || '1'
+        'Justin Miranda <unknown@openboxes.com>' || null
+        'Unknown Name <justin@openboxes.com>'    || '1'
+        'Justin Inactive'                        || null
+        null                                     || null
     }
 }
