@@ -44,7 +44,7 @@ class PersonServiceSpec extends Specification implements ServiceUnitTest<PersonS
         where:
         recipient       || expectedFirstName | expectedLastName | expectedEmail
         'a b'           || 'a'               | 'b'              | null
-        'a b <1@1.com>' || 'a'               | 'b'              | '18@1.com'
+        'a b <1@1.com>' || 'a'               | 'b'              | '1@1.com'
     }
 
     void 'getOrCreatePersonByRecipient fails when given only a single word'() {
