@@ -42,7 +42,7 @@ class ProductSupplierExcelImporter extends AbstractExcelImporter implements Data
                     'L': 'minOrderQuantity',
                     'M': 'contractPricePrice',
                     'N': 'contractPriceValidUntil',
-                    'O': 'ratingTypeCode',
+                    'O': 'ratingType',
                     'P': 'globalPreferenceTypeName',
                     'Q': 'globalPreferenceTypeValidityStartDate',
                     'R': 'globalPreferenceTypeValidityEndDate',
@@ -66,7 +66,7 @@ class ProductSupplierExcelImporter extends AbstractExcelImporter implements Data
             manufacturerName                      : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             manufacturerCode                      : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             minOrderQuantity                      : ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
-            contractPricePrice                    : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            contractPricePrice                    : ([expectedType: ExpectedPropertyType.DoubleType, defaultValue: null]),
             contractPriceValidUntil               : ([expectedType: ExpectedPropertyType.DateJavaType, defaultValue: null]),
             ratingType                            : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             globalPreferenceTypeName              : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
@@ -75,7 +75,7 @@ class ProductSupplierExcelImporter extends AbstractExcelImporter implements Data
             globalPreferenceTypeComments          : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             defaultProductPackageUomCode          : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             defaultProductPackageQuantity         : ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
-            defaultProductPackagePrice            : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null])
+            defaultProductPackagePrice            : ([expectedType: ExpectedPropertyType.DoubleType, defaultValue: null])
     ]
 
 
