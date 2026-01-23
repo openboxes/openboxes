@@ -102,10 +102,12 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
                     command.errors.reject("Row ${index + 1}: Could not parse date ${params['actualReadyDate']} on 'Actual Ready Date'. Expected date format: ${Constants.EXPIRATION_DATE_FORMAT}")
                 }
             }
-            if (!StringUtils.isBlank(params["recipient"])) {
-                Person recipient = personService.getActivePerson(params["recipient"])
+
+            String recipientValue = params["recipient"]
+            if (!StringUtils.isBlank(recipientValue)) {
+                Person recipient = personService.getActivePerson(recipientValue)
                 if (!recipient) {
-                    command.errors.reject("Row ${index + 1}: Recipient ${params["recipient"]} does not exist in OpenBoxes. Please check your data")
+                    command.errors.reject("Row ${index + 1}: Recipient ${recipientValue} does not exist in OpenBoxes. Please check your data")
                 }
             }
         }
@@ -128,9 +130,9 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
             }
 
             orderItem.actualReadyDate = Date.parse(Constants.EXPIRATION_DATE_FORMAT, params["actualReadyDate"])
-
-            if (!StringUtils.isBlank(params["recipient"])) {
-                Person recipient = personService.getActivePerson(params["recipient"])
+            String recipientValue = params["recipient"]
+            if (!StringUtils.isBlank(recipientValue)) {
+                Person recipient = personService.getActivePerson(recipientValue)
                 if (recipient) {
                     orderItem.recipient = recipient
                 }
