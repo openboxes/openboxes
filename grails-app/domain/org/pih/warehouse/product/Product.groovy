@@ -300,7 +300,7 @@ class Product implements Comparable, Serializable {
         category(nullable: false, validator: { Category category, Product product ->
             // If assigning a parent category to product is enabled, and the category is the parent (it has children), throw an error
             if (!category?.assigningParentToProductEnabled && !category?.categories?.empty) {
-                return ['cannotAssignParentCategoryToProduct.message']
+                return ["invalid.cannotAssignParentCategoryToProduct"]
             }
         })
         productType(nullable: false)
