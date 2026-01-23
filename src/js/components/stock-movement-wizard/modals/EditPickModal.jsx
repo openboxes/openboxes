@@ -294,6 +294,7 @@ class EditPickModal extends Component {
           availableItems,
           reasonCode: '',
           quantityRequired: pickPageItem.quantityRequired,
+          quantityAllocated: pickPageItem.quantityAllocated,
           productCode: pickPageItem.productCode,
           productName: pickPageItem.product.name,
           displayName: pickPageItem.product?.displayNames?.default,
@@ -351,6 +352,11 @@ class EditPickModal extends Component {
             <Translate id="react.stockMovement.quantityRequired.label" defaultMessage="Qty Required" />
             :
             {this.state.formValues.quantityRequired}
+          </div>
+          <div className="font-weight-bold">
+            <Translate id="react.stockMovement.quantityAllocated.label" defaultMessage="Qty Allocated" />
+            :
+            {this.state.formValues.quantityAllocated}
           </div>
         </div>
       </ModalWrapper>

@@ -716,6 +716,7 @@ class PickPageItem {
                 autoAllocated       : requisitionItem?.autoAllocated,
                 comments            : requisitionItem?.cancelComments,
                 quantityRequested   : requisitionItem.quantity,
+                quantityAllocated   : requisitionItem.calculateQuantityAllocated(),
                 quantityRequired    : quantityRequired,
                 quantityPicked      : quantityPicked,
                 quantityAvailable   : quantityAvailable,

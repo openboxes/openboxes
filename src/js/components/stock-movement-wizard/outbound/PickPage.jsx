@@ -137,6 +137,15 @@ const FIELDS = {
           formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
         },
       },
+      quantityAllocated: {
+        type: LabelField,
+        label: 'react.stockMovement.quantityAllocated.label',
+        defaultMessage: 'Qty Allocated',
+        flexWidth: '0.8',
+        attributes: {
+          formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
+        },
+      },
       quantityPicked: {
         type: LabelField,
         label: 'react.stockMovement.quantityPicked.label',
