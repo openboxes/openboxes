@@ -298,9 +298,9 @@ class Product implements Comparable, Serializable {
         productCode(nullable: true, maxSize: 255, unique: true)
         unitOfMeasure(nullable: true, maxSize: 255)
         category(nullable: false, validator: { Category category, Product product ->
-            if (!category.assigningParentToProductEnabled && product.categories.empty) {
-                // TODO: Decide whether to throw validation error or let the existing data live like it is
-                //return false
+            // If assigning a parent category to product is enabled, and the category is the parent (it has children), throw an error
+            if (!category?.assigningParentToProductEnabled && !category?.categories?.empty) {
+                return ['cannotAssignParentCategoryToProduct.message']
             }
         })
         productType(nullable: false)
