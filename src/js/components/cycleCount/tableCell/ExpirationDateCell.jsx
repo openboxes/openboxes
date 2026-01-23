@@ -42,8 +42,23 @@ const ExpirationDateCell = ({
         }),
       );
     }
+
     setValue(initialValue || disabledExpirationDateFields?.[id]);
   }, [initialValue]);
+
+  useEffect(() => {
+    setValue(disabledExpirationDateFields?.[id]);
+    if (!disabledExpirationDateFields?.[id]) {
+      dispatch(
+        updateFieldValue({
+          cycleCountId,
+          rowId: id,
+          field: cycleCountColumn.EXPIRATION_DATE,
+          value: undefined,
+        }),
+      );
+    }
+  }, [disabledExpirationDateFields?.[id]]);
 
   if (!isStepEditable) {
     const formatLocalizedDate = useSelector(getFormatLocalizedDate);

@@ -82,11 +82,11 @@ const LotNumberCell = ({
   const onChange = (selected) => {
     const selectedLot = selected?.value;
     const existingLot = lotNumbersWithExpiration.find((l) => l.lotNumber === selectedLot);
-    const lotExists = Boolean(existingLot);
 
-    if (lotExists) {
-      setDisabledExpirationDateFields((prev) => ({ ...prev, [id]: existingLot?.expirationDate }));
-    }
+    setDisabledExpirationDateFields((prev) => ({
+      ...prev,
+      [id]: existingLot?.expirationDate || undefined,
+    }));
 
     dispatch(
       updateFieldValue({

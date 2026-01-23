@@ -167,12 +167,14 @@ const ProductSupplierListTable = ({ filterParams }) => {
       Header: <Translate id="react.productSupplier.column.createdBy.label" defaultMessage="Created by" />,
       accessor: 'createdBy.name',
       minWidth: 150,
+      sortable: false,
       Cell: (row) => (<TableCell {...row} tooltip />),
     },
     {
       Header: <Translate id="react.productSupplier.column.updatedBy.label" defaultMessage="Updated by" />,
       accessor: 'updatedBy.name',
       minWidth: 150,
+      sortable: false,
       Cell: (row) => (<TableCell {...row} tooltip />),
     },
     {

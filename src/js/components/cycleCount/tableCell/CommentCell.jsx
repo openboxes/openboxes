@@ -23,7 +23,7 @@ const CommentCell = ({
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
-    setValue(initialValue);
+    setValue(initialValue || '');
   }, [initialValue]);
 
   if (!isStepEditable) {
