@@ -14,6 +14,11 @@ export const getNotificationAutohideDelay = createSelector(
   (session) => session.notificationAutohideDelay,
 );
 
+export const getMaxUploadFileSize = createSelector(
+  [getSession],
+  (session) => session.maxUploadFileSize,
+);
+
 // Cache for locations
 const locationCache = new Map();
 
