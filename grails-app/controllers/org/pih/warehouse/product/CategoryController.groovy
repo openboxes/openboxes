@@ -38,7 +38,6 @@ class CategoryController {
     }
 
     def updateAssigningParentToProduct() {
-        params.boolean('assigningParentToProductEnabled')
         categoryService.updateAssigningParentToProduct(params.boolean("assigningParentToProductEnabled"))
         redirect(action: "tree")
     }
