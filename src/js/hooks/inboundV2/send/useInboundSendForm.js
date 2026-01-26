@@ -31,6 +31,7 @@ import useUserHasPermissions from 'hooks/useUserHasPermissions';
 import confirmationModal from 'utils/confirmationModalUtils';
 import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
 import dateWithoutTimeZone, { formatDateToString } from 'utils/dateUtils';
+import { parse } from 'date-fns';
 import { debounceLocationsFetch } from 'utils/option-utils';
 import filterDocumentsByStepNumber from 'utils/stockMovementUtils';
 
@@ -120,11 +121,17 @@ const useInboundSendForm = ({ previous }) => {
       expectedDeliveryDate,
     } = getValues();
 
+    const parsedDateShipped = parse(
+      shipDate,
+      DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS,
+      new Date(),
+    );
+
     return {
       destination: { id: destination.id },
-      dateShipped: dateWithoutTimeZone({
-        date: shipDate,
-        outputDateFormat: DateFormat.MM_DD_YYYY,
+      dateShipped: formatDateToString({
+        date: parsedDateShipped,
+        dateFormat: DateFormatDateFns.MM_DD_YYYY_HH_MM_Z,
       }),
       shipmentType: shipmentType.id,
       trackingNumber: trackingNumber ?? '',
@@ -140,6 +147,11 @@ const useInboundSendForm = ({ previous }) => {
   const formatDate = (date) => (formatDateToString({
     date,
     dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+  }));
+
+  const formatDateWithTime = (date) => (formatDateToString({
+    date,
+    dateFormat: DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS,
   }));
 
   const fetchStockMovementData = async () => {
@@ -165,7 +177,7 @@ const useInboundSendForm = ({ previous }) => {
             label: `${data.destination.name} [${data.destination.locationType?.description ?? ''}]`,
           }
           : null,
-        shipDate: formatDate(data.dateShipped),
+        shipDate: formatDateWithTime(data.dateShipped),
         shipmentType: data.shipmentType && data.shipmentType.name !== 'Default'
           ? {
             id: data.shipmentType.id,

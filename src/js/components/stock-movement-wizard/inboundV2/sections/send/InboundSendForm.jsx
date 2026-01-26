@@ -131,6 +131,7 @@ const InboundSendForm = ({ previous }) => {
                       defaultMessage: 'Ship date',
                     }}
                     errorMessage={errors.shipDate?.message}
+                    showTimeSelect
                     required
                     customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
                     customTooltip
