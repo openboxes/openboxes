@@ -13,6 +13,7 @@ import { RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import {
   getCurrentLocale,
+  getCurrentLocationId,
   getDebounceTime,
   getMinSearchLength,
   getUsers,
@@ -51,6 +52,7 @@ const useInboundAddItemsColumns = ({
   const minSearchLength = useSelector(getMinSearchLength);
   const users = useSelector(getUsers);
   const currentLocale = useSelector(getCurrentLocale);
+  const locationId = useSelector(getCurrentLocationId);
 
   const lineItems = getValues('values.lineItems');
   const debouncedPeopleFetch = useCallback(
@@ -291,6 +293,7 @@ const useInboundAddItemsColumns = ({
                     id: 'react.stockMovement.product.label',
                     defaultMessage: 'Product',
                   }}
+                  locationId={locationId}
                   onExactProductSelected={({ product }) => {
                     if (product?.id) {
                       setColumnId('quantityRequested');
