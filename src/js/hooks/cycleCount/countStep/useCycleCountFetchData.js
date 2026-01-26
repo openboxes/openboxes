@@ -7,7 +7,8 @@ import {
 } from 'selectors';
 
 import {
-  clearCycleCountData, clearErrorsData,
+  clearCycleCountData,
+  clearErrorsData,
   fetchBinLocations,
   fetchCycleCounts,
   fetchLotNumbersByProductIds,
