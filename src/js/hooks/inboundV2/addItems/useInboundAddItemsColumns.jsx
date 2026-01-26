@@ -8,7 +8,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import * as locales from 'date-fns/locale';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { Controller, useController, useWatch } from 'react-hook-form';
+import { Controller, useController } from 'react-hook-form';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import {
@@ -25,12 +25,11 @@ import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import inboundColumns from 'consts/inboundColumns';
 import requisitionStatus from 'consts/requisitionStatus';
-import StockMovementDirection from 'consts/StockMovementDirection';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
 import { formatDateToString } from 'utils/dateUtils';
-import { debouncePeopleFetch, debounceProductsFetch } from 'utils/option-utils';
+import { debouncePeopleFetch } from 'utils/option-utils';
 
 const useInboundAddItemsColumns = ({
   errors,
@@ -53,23 +52,6 @@ const useInboundAddItemsColumns = ({
   const users = useSelector(getUsers);
   const currentLocale = useSelector(getCurrentLocale);
 
-  const originId = useWatch({
-    control,
-    name: 'values.origin.id',
-  });
-  const debouncedProductsFetch = useCallback(
-    debounceProductsFetch(
-      debounceTime,
-      minSearchLength,
-      originId,
-      false,
-      false,
-      true,
-      false,
-      StockMovementDirection.INBOUND,
-    ),
-    [debounceTime, minSearchLength, originId],
-  );
   const lineItems = getValues('values.lineItems');
   const debouncedPeopleFetch = useCallback(
     debouncePeopleFetch(debounceTime, minSearchLength),
@@ -280,8 +262,6 @@ const useInboundAddItemsColumns = ({
               render={({ field }) => (
                 <SelectField
                   {...field}
-                  async
-                  loadOptions={debouncedProductsFetch}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
                   onBlur={() => handleBlur(field, quantityField)}
                   className="select-xs dark-select-xs"
@@ -310,6 +290,12 @@ const useInboundAddItemsColumns = ({
                   ariaLabel={{
                     id: 'react.stockMovement.product.label',
                     defaultMessage: 'Product',
+                  }}
+                  onExactProductSelected={({ product }) => {
+                    if (product?.id) {
+                      setColumnId('quantityRequested');
+                      setRowIndex(row.index);
+                    }
                   }}
                 />
               )}

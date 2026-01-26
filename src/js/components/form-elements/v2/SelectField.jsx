@@ -34,6 +34,7 @@ const SelectField = ({
   creatable,
   customTooltip,
   ariaLabel,
+  onExactProductSelected,
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -84,6 +85,7 @@ const SelectField = ({
         onKeyDown={onKeyDown}
         creatable={creatable}
         fieldRef={fieldRef}
+        onExactProductSelected={onExactProductSelected}
         {...asyncProps}
         {...fieldProps}
       />
@@ -150,6 +152,7 @@ SelectField.propTypes = {
     id: PropTypes.string,
     defaultMessage: PropTypes.string,
   }),
+  onExactProductSelected: PropTypes.func,
 };
 
 SelectField.defaultProps = {
@@ -176,4 +179,5 @@ SelectField.defaultProps = {
   creatable: false,
   customTooltip: false,
   ariaLabel: null,
+  onExactProductSelected: () => {},
 };
