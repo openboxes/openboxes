@@ -51,6 +51,7 @@ const InboundSendFormHeader = ({
             multiple
             isFormDisabled={isDispatched}
             showButtonOnly
+            throwErrorOnInvalidFiles
             buttonLabel={{
               id: 'react.stockMovement.uploadDocuments.label',
               defaultMessage: 'Upload documents',
