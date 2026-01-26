@@ -10,6 +10,7 @@ class CategoryTestBuilder extends TestBuilder<Category> {
         return [
                 name: "Test Category",
                 description: "A category to be used by tests. Can be deleted safely.",
+                assigningParentToProductEnabled: true,
         ] as Map<String, Object>
     }
 

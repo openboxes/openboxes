@@ -106,5 +106,16 @@
                 </div>
             </div>
         </div>
+        <div class="p-4">
+            <p>
+                <g:isSuperuser>
+                    <g:link class="button" controller="category" action="updateAssigningParentToProduct" params="[assigningParentToProductEnabled: !assigningParentToProductEnabled]">
+                        ${assigningParentToProductEnabled
+                                ? g.message(code: "category.disableAssigningParentCategoryToProduct.label", default: "Disable assigning parent category to product")
+                                : g.message(code: "category.enableAssigningParentCategoryToProduct.label", default: "Enable assigning parent category to product")}
+                    </g:link>
+                </g:isSuperuser>
+            </p>
+        </div>
     </body>
 </html>

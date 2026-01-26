@@ -22,6 +22,7 @@ class Category implements Comparable, Serializable {
     Date lastUpdated
     Boolean deleted = false
     Boolean isRoot = false
+    Boolean assigningParentToProductEnabled = false
 
     GlAccount glAccount
 

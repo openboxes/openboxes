@@ -38,4 +38,5 @@
     <include file="0.9.x/changelog-2025-10-14-1200-add-user-columns-to-product-supplier.xml" />
     <include file="0.9.x/changelog-2025-11-20-1300-rename-transaction-source-columns.xml" />
     <include file="0.9.x/changelog-2025-12-10-1400-add-accurate-column-to-transaction-source.xml" />
+    <include file="0.9.x/changelog-2026-01-19-1500-add-assigning-parent-to-product-column-to-category.xml" />
 </databaseChangeLog>
