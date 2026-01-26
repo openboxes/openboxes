@@ -1,13 +1,16 @@
 import {
+  CLEAR_ERRORS_DATA,
   SET_ERRORS,
   SET_ERRORS_BY_ID,
   SUBMIT_FORM,
 } from 'actions/types';
 
-export default function errorsReducer(state = {
+const defaultState = {
   isFormSubmitted: false,
   errors: {},
-}, action) {
+};
+
+export default function errorsReducer(state = defaultState, action) {
   switch (action.type) {
     case SET_ERRORS:
       return {
@@ -27,6 +30,8 @@ export default function errorsReducer(state = {
         ...state,
         isFormSubmitted: true,
       };
+    case CLEAR_ERRORS_DATA:
+      return defaultState;
     default:
       return state;
   }
