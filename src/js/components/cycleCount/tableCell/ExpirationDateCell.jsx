@@ -31,7 +31,16 @@ const ExpirationDateCell = ({
 
   const dispatch = useDispatch();
 
+  const isNewRow = id?.includes(NEW_ROW);
+
+  const isDisabled = disabledExpirationDateFields?.[id]
+    || !isNewRow;
+
   useEffect(() => {
+    if (!isNewRow) {
+      return;
+    }
+
     if (!initialValue && disabledExpirationDateFields?.[id]) {
       dispatch(
         updateFieldValue({
@@ -47,6 +56,10 @@ const ExpirationDateCell = ({
   }, [initialValue]);
 
   useEffect(() => {
+    if (!isNewRow) {
+      return;
+    }
+
     setValue(disabledExpirationDateFields?.[id]);
     if (!disabledExpirationDateFields?.[id]) {
       dispatch(
@@ -83,9 +96,6 @@ const ExpirationDateCell = ({
     index,
     fieldName: cycleCountColumn.EXPIRATION_DATE,
   });
-
-  const isDisabled = disabledExpirationDateFields?.[id]
-    || !id?.includes(NEW_ROW);
 
   const onChange = (date) => {
     setValue(date);
