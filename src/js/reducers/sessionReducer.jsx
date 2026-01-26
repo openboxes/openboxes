@@ -84,6 +84,7 @@ const initialState = {
   browserConnectionTimeout: 0,
   isAutosaveEnabled: false,
   cycleCountMaxSelectedProducts: 50,
+  maxUploadFileSize: 2097152,
 };
 
 export default function (state = initialState, action) {
@@ -132,6 +133,7 @@ export default function (state = initialState, action) {
         browserConnectionTimeout: _.get(action, 'payload.data.data.browserConnectionTimeout', 0),
         isAutosaveEnabled: _.get(action, 'payload.data.data.isAutosaveEnabled', false),
         cycleCountMaxSelectedProducts: _.get(action, 'payload.data.data.cycleCountMaxSelectedProducts', 50),
+        maxUploadFileSize: _.get(action, 'payload.data.data.maxUploadFileSize', 2097152),
       };
     case FETCH_MENU_CONFIG:
       return {
