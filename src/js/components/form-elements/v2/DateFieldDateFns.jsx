@@ -47,9 +47,7 @@ const DateFieldDateFns = ({
   const translate = useTranslate();
   const onClear = () => onChange(null);
 
-  const { locale: currentLocale } = useSelector((state) => ({
-    locale: getCurrentLocale(state),
-  }));
+  const currentLocale = useSelector(getCurrentLocale);
 
   const getDateFormat = () => {
     if (showTimeSelect) {
