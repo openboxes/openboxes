@@ -12,7 +12,6 @@ import DateField from 'components/form-elements/DateField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import TextField from 'components/form-elements/TextField';
-import ConfirmExpirationDateModal from 'components/modals/ConfirmExpirationDateModal';
 import DateFormat from 'consts/dateFormat';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -119,10 +118,6 @@ class EditLineModal extends Component {
       // This is the original quantity shipped of a shipmentItem. This indicates the maximum.
       shipmentItemQuantityShippedSum: shipmentItemsQuantityMap[attr.fieldValue?.shipmentItemId],
       showMismatchQuantityShippedInfo: false,
-      isExpirationModalOpen: false,
-      // Stores the resolve function for the ConfirmExpirationDateModal promise
-      resolveExpirationModal: null,
-      itemsWithMismatchedExpiry: [],
     };
 
     this.onOpen = this.onOpen.bind(this);
@@ -211,7 +206,7 @@ class EditLineModal extends Component {
 
     if (itemsWithMismatchedExpiry.length > 0) {
       const shouldUpdateExpirationDate =
-        await this.confirmExpirationDateSave(itemsWithMismatchedExpiry);
+        await this.props.confirmExpirationDateSave(itemsWithMismatchedExpiry);
       if (!shouldUpdateExpirationDate) {
         return Promise.reject();
       }
@@ -227,22 +222,6 @@ class EditLineModal extends Component {
       this.props.values,
       this.props.rowIndex,
     );
-  }
-
-  /**
-   * Shows Inventory item expiration date update confirmation modal.
-   * @param {Array} itemsWithMismatchedExpiry - Array of elements with mismatched expiration dates.
-   * @returns {Promise} - Resolves to true if user confirms the update, false if not.
-   * @public
-   */
-  confirmExpirationDateSave(itemsWithMismatchedExpiry) {
-    return new Promise((resolve) => {
-      this.setState({
-        isExpirationModalOpen: true,
-        resolveExpirationModal: resolve,
-        itemsWithMismatchedExpiry,
-      });
-    });
   }
 
   calculateQuantityShippedSum(values) {
@@ -334,49 +313,29 @@ class EditLineModal extends Component {
     return errors;
   }
 
-  /**
-   * Handles the response from the expiration date confirmation modal.
-   * @param {boolean} shouldUpdate - True if the user confirmed the update, false if not.
-   * @public
-   */
-  handleExpirationModalResponse(shouldUpdate) {
-    // Resolve the promise returned by confirmExpirationDateSave.
-    if (this.state.resolveExpirationModal) {
-      this.state.resolveExpirationModal(shouldUpdate);
-    }
-
-    // Close the modal and reset its state.
-    this.setState({
-      isExpirationModalOpen: false,
-      resolveExpirationModal: null,
-      itemsWithMismatchedExpiry: [],
-    });
-  }
-
   render() {
     return (
-      <>
-        <ModalWrapper
-          {...this.state.attr}
-          onOpen={this.onOpen}
-          onSave={this.onSave}
-          validate={this.validate}
-          initialValues={this.state.formValues}
-          fields={FIELDS}
-          wrapperClassName={this.props.wrapperClassName}
-          formProps={{
-            shipmentItemId: this.state.attr.fieldValue.shipmentItemId,
-            binLocation: this.state.attr.fieldValue.binLocation,
-            product: this.state.attr.fieldValue.product,
-          }}
-        >
-          <div>
-            <div className="font-weight-bold mb-3">
-              <Translate id="react.partialReceiving.originalQtyShipped.label" defaultMessage="Original quantity shipped" />
-              :
-              {this.state.attr.fieldValue.quantityShipped}
-            </div>
-            {this.state.showMismatchQuantityShippedInfo
+      <ModalWrapper
+        {...this.state.attr}
+        onOpen={this.onOpen}
+        onSave={this.onSave}
+        validate={this.validate}
+        initialValues={this.state.formValues}
+        fields={FIELDS}
+        wrapperClassName={this.props.wrapperClassName}
+        formProps={{
+          shipmentItemId: this.state.attr.fieldValue.shipmentItemId,
+          binLocation: this.state.attr.fieldValue.binLocation,
+          product: this.state.attr.fieldValue.product,
+        }}
+      >
+        <div>
+          <div className="font-weight-bold mb-3">
+            <Translate id="react.partialReceiving.originalQtyShipped.label" defaultMessage="Original quantity shipped" />
+            :
+            {this.state.attr.fieldValue.quantityShipped}
+          </div>
+          {this.state.showMismatchQuantityShippedInfo
             && (
               <div className="font-weight-bold font-red-ob">
                 <Translate
@@ -385,15 +344,8 @@ class EditLineModal extends Component {
                 />
               </div>
             )}
-          </div>
-        </ModalWrapper>
-        <ConfirmExpirationDateModal
-          isOpen={this.state.isExpirationModalOpen}
-          itemsWithMismatchedExpiry={this.state.itemsWithMismatchedExpiry}
-          onConfirm={() => this.handleExpirationModalResponse(true)}
-          onCancel={() => this.handleExpirationModalResponse(false)}
-        />
-      </>
+        </div>
+      </ModalWrapper>
     );
   }
 }
@@ -429,6 +381,7 @@ EditLineModal.propTypes = {
   initialReceiptCandidates: PropTypes.shape({
     containers: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   }).isRequired,
+  confirmExpirationDateSave: PropTypes.func.isRequired,
 };
 
 EditLineModal.defaultProps = {

@@ -16,6 +16,7 @@ import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import TextField from 'components/form-elements/TextField';
+import ConfirmExpirationDateModal from 'components/modals/ConfirmExpirationDateModal';
 import EditLineModal from 'components/receiving/modals/EditLineModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
@@ -391,13 +392,19 @@ const TABLE_FIELDS = {
           defaultTitleMessage: 'Edit',
         },
         getDynamicAttr: ({
-          fieldValue, saveEditLine, parentIndex, rowIndex, shipmentReceived,
+          fieldValue,
+          saveEditLine,
+          parentIndex,
+          rowIndex,
+          shipmentReceived,
+          confirmExpirationDateSave,
         }) => ({
           fieldValue,
           saveEditLine,
           parentIndex,
           rowIndex,
           btnOpenDisabled: shipmentReceived || isReceived(true, fieldValue),
+          confirmExpirationDateSave,
         }),
       },
       comment: {
@@ -542,6 +549,9 @@ class PartialReceivingPage extends Component {
     this.state = {
       values: {},
       isFirstPageLoaded: false,
+      isExpirationModalOpen: false,
+      resolveExpirationModal: null,
+      itemsWithMismatchedExpiry: [],
     };
     this.autofillLines = this.autofillLines.bind(this);
     this.setLocation = this.setLocation.bind(this);
@@ -552,10 +562,47 @@ class PartialReceivingPage extends Component {
     this.exportTemplate = this.exportTemplate.bind(this);
     this.importTemplate = this.importTemplate.bind(this);
     this.isRowLoaded = this.isRowLoaded.bind(this);
+    this.confirmExpirationDateSave = this.confirmExpirationDateSave.bind(this);
+    this.handleExpirationModalResponse = this.handleExpirationModalResponse.bind(this);
   }
 
   componentDidMount() {
     this.fetchPartialReceiptCandidates();
+  }
+
+  /**
+   * Shows Inventory item expiration date update confirmation modal.
+   * @param {Array} itemsWithMismatchedExpiry - Array of elements with mismatched expiration dates.
+   * @returns {Promise} - Resolves to true if user confirms the update, false if not.
+   * @public
+   */
+  confirmExpirationDateSave(itemsWithMismatchedExpiry) {
+    return new Promise((resolve) => {
+      this.setState({
+        isExpirationModalOpen: true,
+        resolveExpirationModal: resolve,
+        itemsWithMismatchedExpiry,
+      });
+    });
+  }
+
+  /**
+   * Handles the response from the expiration date confirmation modal.
+   * @param {boolean} shouldUpdate - True if the user confirmed the update, false if not.
+   * @public
+   */
+  handleExpirationModalResponse(shouldUpdate) {
+    // Resolve the promise returned by confirmExpirationDateSave.
+    if (this.state.resolveExpirationModal) {
+      this.state.resolveExpirationModal(shouldUpdate);
+    }
+
+    // Close the modal and reset its state.
+    this.setState({
+      isExpirationModalOpen: false,
+      resolveExpirationModal: null,
+      itemsWithMismatchedExpiry: [],
+    });
   }
 
   confirmReceive(formValues, emptyLinesCount) {
@@ -1098,6 +1145,7 @@ class PartialReceivingPage extends Component {
                         translate: this.props.translate,
                         formatLocalizedDate: this.props.formatLocalizedDate,
                         initialReceiptCandidates: this.state.initialReceiptCandidates,
+                        confirmExpirationDateSave: this.confirmExpirationDateSave,
                       }))}
                   </div>
                   <div className="submit-buttons">
@@ -1109,6 +1157,12 @@ class PartialReceivingPage extends Component {
               </form>
             );
           }}
+        />
+        <ConfirmExpirationDateModal
+          isOpen={this.state.isExpirationModalOpen}
+          itemsWithMismatchedExpiry={this.state.itemsWithMismatchedExpiry}
+          onConfirm={() => this.handleExpirationModalResponse(true)}
+          onCancel={() => this.handleExpirationModalResponse(false)}
         />
       </div>
     );
