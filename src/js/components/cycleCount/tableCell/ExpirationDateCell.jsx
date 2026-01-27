@@ -44,23 +44,37 @@ const ExpirationDateCell = ({
   const lastAutoValue = useRef(null);
 
   useEffect(() => {
-    if (!isNewRow) return;
+    if (!isNewRow) {
+      return;
+    }
 
+    // Keep local state in sync with redux,
+    // but do not clear the input when redux temporarily has no value
     if (initialValue !== undefined) {
       setValue(initialValue);
     }
   }, [initialValue, isNewRow]);
 
   useEffect(() => {
+    // Backend response can return rows in different order.
+    // When the row id changes, this component may now represent
+    // a different inventory item.
+    // Reset local state so the expiration date matches the new row.
+    setValue(initialValue);
+  }, [id]);
+
+  useEffect(() => {
     if (!isNewRow) {
       return;
     }
 
+    // Check if there is an option for auto value for expiration date
     const autoValue = disabledExpirationDateFields?.[id];
     if (!autoValue) {
       return;
     }
 
+    // Update only if the previous auto value is different from the current value
     if (lastAutoValue.current !== autoValue) {
       lastAutoValue.current = autoValue;
       setValue(autoValue);
