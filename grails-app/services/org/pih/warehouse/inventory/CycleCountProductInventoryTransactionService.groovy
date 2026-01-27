@@ -9,6 +9,19 @@ import grails.validation.ValidationException
 @Transactional
 class CycleCountProductInventoryTransactionService extends ProductInventoryTransactionService<CycleCount> {
 
+    TransactionSource createMissingCycleCountTransactionSource(CycleCount cycleCount) {
+        TransactionSource transactionSource = new TransactionSource(
+                transactionAction: TransactionAction.CYCLE_COUNT,
+                origin: cycleCount.facility,
+                cycleCount: cycleCount,
+                accurate: false
+        )
+        if (!transactionSource.validate()) {
+            throw new ValidationException("Invalid transaction source", transactionSource.errors)
+        }
+        return transactionSource.save()
+    }
+
     TransactionSource createCycleCountTransactionSource(CycleCount cycleCount) {
         TransactionSource transactionSource = new TransactionSource(
                 transactionAction: TransactionAction.CYCLE_COUNT,
