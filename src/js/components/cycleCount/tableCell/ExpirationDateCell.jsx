@@ -1,4 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import PropTypes from 'prop-types';
 import { RiErrorWarningLine } from 'react-icons/ri';
@@ -36,42 +41,43 @@ const ExpirationDateCell = ({
   const isDisabled = disabledExpirationDateFields?.[id]
     || !isNewRow;
 
+  const lastAutoValue = useRef(null);
+
   useEffect(() => {
-    if (!isNewRow) {
-      return;
-    }
+    if (!isNewRow) return;
 
-    if (!initialValue && disabledExpirationDateFields?.[id]) {
-      dispatch(
-        updateFieldValue({
-          cycleCountId,
-          rowId: id,
-          field: cycleCountColumn.EXPIRATION_DATE,
-          value: disabledExpirationDateFields?.[id],
-        }),
-      );
+    if (initialValue !== undefined) {
+      setValue(initialValue);
     }
-
-    setValue(initialValue || disabledExpirationDateFields?.[id]);
-  }, [initialValue]);
+  }, [initialValue, isNewRow]);
 
   useEffect(() => {
     if (!isNewRow) {
       return;
     }
 
-    setValue(disabledExpirationDateFields?.[id]);
-    if (!disabledExpirationDateFields?.[id]) {
+    const autoValue = disabledExpirationDateFields?.[id];
+    if (!autoValue) {
+      return;
+    }
+
+    if (lastAutoValue.current !== autoValue) {
+      lastAutoValue.current = autoValue;
+      setValue(autoValue);
       dispatch(
         updateFieldValue({
           cycleCountId,
           rowId: id,
           field: cycleCountColumn.EXPIRATION_DATE,
-          value: undefined,
+          value: autoValue,
         }),
       );
     }
-  }, [disabledExpirationDateFields?.[id]]);
+  }, [
+    disabledExpirationDateFields?.[id],
+    isNewRow,
+    value,
+  ]);
 
   if (!isStepEditable) {
     const formatLocalizedDate = useSelector(getFormatLocalizedDate);
@@ -99,19 +105,15 @@ const ExpirationDateCell = ({
 
   const onChange = (date) => {
     setValue(date);
-    onChangeValidationHandler();
-  };
-
-  const onBlur = () => {
     dispatch(
       updateFieldValue({
         cycleCountId,
         rowId: id,
         field: cycleCountColumn.EXPIRATION_DATE,
-        value,
+        value: date,
       }),
     );
-    onBlurValidationHandler();
+    onChangeValidationHandler();
   };
 
   return (
@@ -123,7 +125,7 @@ const ExpirationDateCell = ({
         customDateFormat={DateFormat.DD_MMM_YYYY}
         hasErrors={showError}
         onChange={onChange}
-        onBlur={onBlur}
+        onBlur={onBlurValidationHandler}
         disabled={isDisabled}
         className={`m-1 w-75 ${showError ? 'input-has-error' : ''}`}
         hideErrorMessageWrapper
