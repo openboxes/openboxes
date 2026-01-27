@@ -8,6 +8,7 @@ import {
 
 import {
   clearCycleCountData,
+  clearErrorsData,
   fetchBinLocations,
   fetchCycleCounts,
   fetchLotNumbersByProductIds,
@@ -47,6 +48,7 @@ const useCycleCountFetchData = (
 
     return () => {
       dispatch(clearCycleCountData);
+      dispatch(clearErrorsData);
     };
   }, [cycleCountIds, currentLocationId, sortByProductName, showBinLocation]);
 

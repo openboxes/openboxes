@@ -1,4 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import PropTypes from 'prop-types';
 import { RiErrorWarningLine } from 'react-icons/ri';
@@ -31,34 +36,62 @@ const ExpirationDateCell = ({
 
   const dispatch = useDispatch();
 
+  const isNewRow = id?.includes(NEW_ROW);
+
+  const isDisabled = disabledExpirationDateFields?.[id]
+    || !isNewRow;
+
+  const lastAutoValue = useRef(null);
+
   useEffect(() => {
-    if (!initialValue && disabledExpirationDateFields?.[id]) {
+    if (!isNewRow) {
+      return;
+    }
+
+    // Keep local state in sync with redux,
+    // but do not clear the input when redux temporarily has no value
+    if (initialValue !== undefined) {
+      setValue(initialValue);
+    }
+  }, [initialValue, isNewRow]);
+
+  useEffect(() => {
+    // Backend response can return rows in different order.
+    // When the row id changes, this component may now represent
+    // a different inventory item.
+    // Reset local state so the expiration date matches the new row.
+    setValue(initialValue);
+  }, [id]);
+
+  useEffect(() => {
+    if (!isNewRow) {
+      return;
+    }
+
+    // Check if there is an option for auto value for expiration date
+    const autoValue = disabledExpirationDateFields?.[id];
+    if (!autoValue) {
+      return;
+    }
+
+    // Update only if the previous auto value is different from the current value
+    if (lastAutoValue.current !== autoValue) {
+      lastAutoValue.current = autoValue;
+      setValue(autoValue);
       dispatch(
         updateFieldValue({
           cycleCountId,
           rowId: id,
           field: cycleCountColumn.EXPIRATION_DATE,
-          value: disabledExpirationDateFields?.[id],
+          value: autoValue,
         }),
       );
     }
-
-    setValue(initialValue || disabledExpirationDateFields?.[id]);
-  }, [initialValue]);
-
-  useEffect(() => {
-    setValue(disabledExpirationDateFields?.[id]);
-    if (!disabledExpirationDateFields?.[id]) {
-      dispatch(
-        updateFieldValue({
-          cycleCountId,
-          rowId: id,
-          field: cycleCountColumn.EXPIRATION_DATE,
-          value: undefined,
-        }),
-      );
-    }
-  }, [disabledExpirationDateFields?.[id]]);
+  }, [
+    disabledExpirationDateFields?.[id],
+    isNewRow,
+    value,
+  ]);
 
   if (!isStepEditable) {
     const formatLocalizedDate = useSelector(getFormatLocalizedDate);
@@ -84,24 +117,17 @@ const ExpirationDateCell = ({
     fieldName: cycleCountColumn.EXPIRATION_DATE,
   });
 
-  const isDisabled = disabledExpirationDateFields?.[id]
-    || !id?.includes(NEW_ROW);
-
   const onChange = (date) => {
     setValue(date);
-    onChangeValidationHandler();
-  };
-
-  const onBlur = () => {
     dispatch(
       updateFieldValue({
         cycleCountId,
         rowId: id,
         field: cycleCountColumn.EXPIRATION_DATE,
-        value,
+        value: date,
       }),
     );
-    onBlurValidationHandler();
+    onChangeValidationHandler();
   };
 
   return (
@@ -113,7 +139,7 @@ const ExpirationDateCell = ({
         customDateFormat={DateFormat.DD_MMM_YYYY}
         hasErrors={showError}
         onChange={onChange}
-        onBlur={onBlur}
+        onBlur={onBlurValidationHandler}
         disabled={isDisabled}
         className={`m-1 w-75 ${showError ? 'input-has-error' : ''}`}
         hideErrorMessageWrapper
