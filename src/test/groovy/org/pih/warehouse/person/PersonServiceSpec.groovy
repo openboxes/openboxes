@@ -14,45 +14,6 @@ class PersonServiceSpec extends Specification implements ServiceUnitTest<PersonS
         mockDomain Person
     }
 
-    void 'getActivePersonByEmail expect person #expectedPerson to be returned when given email #email'() {
-        given:
-        new Person(id: '1', email: '1@1.com', active: false).save(validate: false)
-        new Person(id: '2', email: '1@1.com', active: true).save(validate: false)
-
-        expect:
-        service.getActivePersonByEmail(email)?.id == expectedPerson
-
-        where:
-        email     || expectedPerson
-        null      || null
-        '1@1.com' || '2'
-        '2@2.com' || null
-    }
-
-    void 'getActivePersonByName expect person #expectedPerson to be returned when given name #name'() {
-        given:
-        new Person(id: '1', firstName: 'a', lastName: 'b', active: false).save(validate: false)
-        new Person(id: '2', firstName: 'a', lastName: 'b', active: true).save(validate: false)
-
-        expect:
-        service.getActivePersonByName(name)?.id == expectedPerson
-
-        where:
-        name    || expectedPerson
-        null    || null
-        ''      || null
-        'a b'   || '2'
-        'a b c' || null
-    }
-
-    void 'getActivePersonByName fails when given only a single word'() {
-        when:
-        service.getActivePersonByName('oneword')
-
-        then:
-        thrown(RuntimeException)
-    }
-
     void 'getOrCreatePersonByRecipient expect person #expectedPerson to be returned when given recipient #recipient'() {
         given:
         new Person(id: '1', firstName: 'a', lastName: 'b', email: '1@1.com', active: false).save(validate: false)
@@ -100,5 +61,49 @@ class PersonServiceSpec extends Specification implements ServiceUnitTest<PersonS
 
         then:
         thrown(RuntimeException)
+    }
+
+    void 'getPerson returns person or null without throwing exceptions'() {
+        given:
+        new Person(id: '1', firstName: 'Justin', lastName: 'Miranda', email: 'justin@openboxes.com', active: true).save(validate: false)
+        new Person(id: '2', firstName: 'Justin', lastName: 'Inactive', email: 'justin@openboxes.com', active: false).save(validate: false)
+
+        expect:
+        service.getPerson(recipient)?.id == expectedId
+
+        where:
+        recipient                                || expectedId
+        'Justin'                                 || null
+        'Justin Miranda'                         || '1'
+        'Justin Justy Miranda'                   || null
+        'justin@openboxes.com'                   || '1'
+        'unknown@openboxes.com'                  || null
+        'Justin Miranda <justin@openboxes.com>'  || '1'
+        'Justin Miranda <unknown@openboxes.com>' || null
+        'Unknown Name <justin@openboxes.com>'    || '1'
+        'Justin Inactive'                        || '2'
+        null                                     || null
+    }
+
+    void 'getActivePerson returns person only if they are active'() {
+        given:
+        new Person(id: '1', firstName: 'Justin', lastName: 'Miranda', email: 'justin@openboxes.com', active: true).save(validate: false)
+        new Person(id: '2', firstName: 'Justin', lastName: 'Inactive', email: 'justin@openboxes.com', active: false).save(validate: false)
+
+        expect:
+        service.getActivePerson(recipient)?.id == expectedId
+
+        where:
+        recipient                                || expectedId
+        'Justin'                                 || null
+        'Justin Miranda'                         || '1'
+        'Justin Justy Miranda'                   || null
+        'justin@openboxes.com'                   || '1'
+        'unknown@openboxes.com'                  || null
+        'Justin Miranda <justin@openboxes.com>'  || '1'
+        'Justin Miranda <unknown@openboxes.com>' || null
+        'Unknown Name <justin@openboxes.com>'    || '1'
+        'Justin Inactive'                        || null
+        null                                     || null
     }
 }

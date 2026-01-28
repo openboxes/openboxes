@@ -293,11 +293,11 @@
                             <td>
                                 <label>
                                     <g:radio name="importType" value="purchaseOrderActualReadyDate" checked="${params.importType=='purchaseOrderActualReadyDate'}"/>
-                                    <warehouse:message code="import.purchaseOrderActualReadyDate.label" default="PO Actual Ready Date"/>
+                                    <warehouse:message code="import.purchaseOrderActualReadyDateAndRecipient.label" default="PO Actual Ready Date and Recipient"/>
                                 </label>
                             </td>
                             <td>
-                                <g:link controller="batch" action="downloadTemplate" params="[template:'purchaseOrderActualReadyDate.xls']">
+                                <g:link controller="batch" action="downloadTemplate" params="[template:'purchaseOrderActualReadyDateAndRecipient.xls']">
                                     <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
                                 </g:link>
                             </td>

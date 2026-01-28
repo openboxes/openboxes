@@ -9,20 +9,21 @@
  **/
 package org.pih.warehouse.importer
 
-import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.data.PersonService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderService
 import org.pih.warehouse.product.Product
+import org.apache.commons.lang.StringUtils
 
-import java.text.ParseException
 
 @Transactional
 class PurchaseOrderActualReadyDateImportDataService implements ImportDataService {
-    GrailsApplication grailsApplication
     OrderService orderService
+    PersonService personService
 
     @Override
     void validateData(ImportDataCommand command) {
@@ -102,6 +103,13 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
                 }
             }
 
+            String recipientValue = params["recipient"]
+            if (!StringUtils.isBlank(recipientValue)) {
+                Person recipient = personService.getActivePerson(recipientValue)
+                if (!recipient) {
+                    command.errors.reject("Row ${index + 1}: Recipient ${recipientValue} does not exist in OpenBoxes. Please check your data")
+                }
+            }
         }
     }
 
@@ -122,6 +130,14 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
             }
 
             orderItem.actualReadyDate = Date.parse(Constants.EXPIRATION_DATE_FORMAT, params["actualReadyDate"])
+            String recipientValue = params["recipient"]
+            if (!StringUtils.isBlank(recipientValue)) {
+                Person recipient = personService.getActivePerson(recipientValue)
+                if (recipient) {
+                    orderItem.recipient = recipient
+                }
+            }
+
             orderItem.save(failOnError: true)
         }
     }

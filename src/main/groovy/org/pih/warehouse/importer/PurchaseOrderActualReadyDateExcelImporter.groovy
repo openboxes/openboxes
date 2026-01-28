@@ -33,6 +33,7 @@ class PurchaseOrderActualReadyDateExcelImporter extends AbstractExcelImporter im
                     'C': 'productCode',
                     'D': 'productName',
                     'E': 'actualReadyDate',
+                    'F': 'recipient',
             ]
     ]
 
@@ -42,6 +43,7 @@ class PurchaseOrderActualReadyDateExcelImporter extends AbstractExcelImporter im
             "productCode"           : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             "productName"           : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             "actualReadyDate"       : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            "recipient"             : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
     ]
 
 
