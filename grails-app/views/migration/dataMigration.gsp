@@ -109,6 +109,25 @@
                     <h1><span class="font-weight-bold">Important:</span> trigger the product inventory transactions migration first, before proceeding with creating the missing transaction sources.</h1>
                 </td>
             </tr>
+            <tr class="prop">
+                <td class="name">Missing transaction sources for cycle count based transactions</td>
+                <td>
+                    Maximum amount of cycle count transactions without transaction source: <b>${amountOfMissingCycleCountTransactionSources}</b>
+                </td>
+                <td>
+                    <div class="button-group">
+                        <g:link
+                                controller="migration"
+                                action="createMissingCycleCountTransactionSourcesForCurrentLocation"
+                                class="button"
+                                target="_blank"
+                        >
+                            Migrate cycle count transactions for current location
+                        </g:link>
+                    </div>
+                    <h1><span class="font-weight-bold">Important:</span> trigger the product inventory transactions migration first, before proceeding with creating the missing transaction sources.</h1>
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
