@@ -2168,7 +2168,8 @@ class StockMovementService {
                     suggestedItem.quantityPicked?.intValueExact(),
                     null,
                     null,
-                    isAutoAllocated
+                    isAutoAllocated,
+                    suggestedItem.quantityRequested.toInteger()
             )
         }
     }

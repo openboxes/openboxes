@@ -277,7 +277,8 @@ class PickTaskService {
 
     void transferToContainer(PickTask task, Location container, Integer quantity) {
         if (!task.facility.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS)) {
-            throw new IllegalArgumentException("Facility does not support ${ActivityCode.TRACK_INTERNAL_TRANSACTIONS} activity")
+            log.warn("Skipping transfer to container: Facility does not support TRACK_INTERNAL_TRANSACTIONS activity")
+            return
         }
 
         TransferStockCommand command = new TransferStockCommand()
@@ -294,7 +295,8 @@ class PickTaskService {
 
     void transferToStaging(PickTask task, AvailableItem item, Location stagingLocation) {
         if (!task.facility.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS)) {
-            throw new IllegalArgumentException("Facility does not support ${ActivityCode.TRACK_INTERNAL_TRANSACTIONS} activity")
+            log.warn("Skipping transfer to staging: Facility does not support TRACK_INTERNAL_TRANSACTIONS activity")
+            return
         }
 
         TransferStockCommand command = new TransferStockCommand()

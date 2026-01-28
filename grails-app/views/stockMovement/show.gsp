@@ -110,7 +110,7 @@
                     </g:link>
                 </g:if>
                 <g:else>
-                    <g:if test="${stockMovement?.canEditStockMovement()}">
+                    <g:if test="${isSameDestination || stockMovement?.canEditStockMovement()}">
                         <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}" class="button">
                             <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
                             <warehouse:message code="default.button.edit.label" />

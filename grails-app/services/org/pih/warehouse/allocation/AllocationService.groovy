@@ -118,6 +118,7 @@ class AllocationService {
         }
 
         List<SuggestedItem> suggestedItems = stockMovementService.getSuggestedItems(filteredItems, quantityRequired)
+        suggestedItems.each { it.quantityPicked = 0 }
 
         stockMovementService.clearPicklist(requisitionItem)
         stockMovementService.allocateSuggestedItems(requisitionItem, suggestedItems, true)
