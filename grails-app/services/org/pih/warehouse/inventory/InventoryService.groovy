@@ -3251,6 +3251,9 @@ class InventoryService implements ApplicationContextAware {
     }
 
     List<AvailableItem> getAvailableBinLocations(Location location, List<Product> products) {
+        if (products.empty) {
+            return []
+        }
         List<AvailableItem> availableItems = productAvailabilityService.getAvailableItems(location, products.id, true, true)
         MultiKeyMap<Object, AvailableItem> map = new MultiKeyMap()
         for (AvailableItem availableItem in availableItems) {
