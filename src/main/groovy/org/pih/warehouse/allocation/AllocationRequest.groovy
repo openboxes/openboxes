@@ -9,12 +9,4 @@ class AllocationRequest {
     AllocationMode allocationMode
     List<AvailableItem> availableItems
     List<AllocationStrategy> allocationStrategies
-
-    static constraints = {
-        quantityRequired(nullable: false)
-        requisitionItem(nullable: false)
-        allocationMode(nullable: false)
-        availableItems(nullable: true)
-        allocationStrategies(nullable: true)
-    }
 }

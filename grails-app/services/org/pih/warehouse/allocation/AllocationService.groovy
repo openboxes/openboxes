@@ -9,6 +9,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 
 @Transactional
@@ -113,17 +114,16 @@ class AllocationService {
     AllocationResult allocate(AllocationRequest request, boolean saveAllocation = true) {
         AllocationMode mode = request.allocationMode
         RequisitionItem requisitionItem = request.requisitionItem
-        Integer quantityRequired = requisitionItem.calculateQuantityRequired()
+        Integer quantityRequired = request.quantityRequired ?: requisitionItem.calculateQuantityRequired()
         List<SuggestedItem> suggestedItems
         if (mode == AllocationMode.AUTO) {
             suggestedItems = getAutoSuggestedItems(requisitionItem, quantityRequired, request.allocationStrategies)
-
         } else if (mode == AllocationMode.MANUAL) {
             List<AvailableItem> manualItems = request.availableItems?.findAll { it.inventoryItem.product?.id == requisitionItem.product?.id }
             suggestedItems = stockMovementService.getSuggestedItems(manualItems, quantityRequired)
             Integer quantitySuggested = suggestedItems.sum { it.quantityAvailable } ?: 0
             if (quantitySuggested < quantityRequired) {
-                List<SuggestedItem> remainingItems = getAutoSuggestedItems(requisitionItem, quantityRequired - quantitySuggested, null, quantitySuggested)
+                List<SuggestedItem> remainingItems = getAutoSuggestedItems(requisitionItem, quantityRequired - quantitySuggested, null, suggestedItems)
                 suggestedItems.addAll(remainingItems)
             }
         } else {
@@ -131,9 +131,18 @@ class AllocationService {
         }
 
         if (saveAllocation) {
+            stockMovementService.clearPicklist(requisitionItem)
             stockMovementService.allocateSuggestedItems(requisitionItem, suggestedItems, mode == AllocationMode.AUTO)
         }
         return new AllocationResult(allocationRequest: request, suggestedItems: suggestedItems)
+    }
+
+    Boolean deallocate(Requisition requisition) {
+        boolean result = true
+        requisition.requisitionItems.each { requisitionItem ->
+            result &= deallocate(requisitionItem)
+        }
+        return result
     }
 
     Boolean deallocate(RequisitionItem requisitionItem) {
@@ -153,6 +162,12 @@ class AllocationService {
             throw new UnsupportedOperationException("Unsupported mode: $allocationMode")
         }
         return allocate(request)
+    }
+
+    void allocate(Requisition requisition) {
+        requisition.requisitionItems.each { requisitionItem ->
+
+        }
     }
 
     private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationStrategy> strategies, List<AvailableItem> excludeList = []) {

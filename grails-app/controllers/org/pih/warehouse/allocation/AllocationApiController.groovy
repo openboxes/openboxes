@@ -1,18 +1,18 @@
 package org.pih.warehouse.allocation
 
-import grails.converters.JSON
+import org.pih.warehouse.requisition.RequisitionItem
 
 class AllocationApiController {
     AllocationService allocationService
 
     def allocate() {
-        def jsonBody = request.JSON ?: [:]
-        AllocationRequest allocationRequest = jsonBody.allocationRequest as AllocationRequest
         try {
-            def result = allocationService.allocate(allocationRequest)
-            render(result as JSON)
+            RequisitionItem requisitionItem = RequisitionItem.get(params.id)
+            List<AllocationStrategy> strategyList = [AllocationStrategy.WAREHOUSE_FIRST]
+             AllocationRequest allocationRequest = new AllocationRequest(requisitionItem: requisitionItem, allocationMode: AllocationMode.AUTO, allocationStrategies: strategyList)
+             def result = allocationService.allocate(allocationRequest)
         } catch (Exception e) {
-            render(status: 500, [errorCode: 500, errorMessage: e.message] as JSON)
+            response.status = 404
         }
     }
 }
