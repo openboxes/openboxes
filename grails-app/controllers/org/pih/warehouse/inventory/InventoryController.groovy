@@ -1086,8 +1086,10 @@ class InventoryController {
                 if (!transactionInstance.hasErrors() && transactionInstance.validate()) {
                     transactionInstance.save(failOnError: true)
                     flash.message = "Successfully saved transaction"
-                    //redirect(controller: "inventory", action: "browse")
-                    redirect(controller: "inventory", action: "browse")
+
+                    // We assume that a transfer-in only operates on a single product so redirect to its stock card.
+                    String productId = transactionInstance.transactionEntries.first().inventoryItem.product.id
+                    redirect(controller: "inventoryItem", action: "showStockCard", id: productId)
                 }
             } catch (ValidationException e) {
                 log.debug("caught validation exception " + e)
