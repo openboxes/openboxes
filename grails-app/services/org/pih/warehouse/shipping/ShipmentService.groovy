@@ -12,6 +12,8 @@ package org.pih.warehouse.shipping
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import grails.validation.ValidationException
+import java.time.Duration
+import java.time.Instant
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
@@ -28,6 +30,7 @@ import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.ListCommand
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
@@ -43,6 +46,7 @@ import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
@@ -2359,5 +2363,39 @@ class ShipmentService {
         comment.save()
         shipmentInstance.addToComments(comment)
         return comment
+    }
+
+    /**
+     * Fetch the list of locations that support the given activity code and have a product that is in
+     * a shipment with one of the given statuses.
+     */
+    List<Location> getDestinationsWithActivityCodeAndProductInShipmentWithStatus(
+            Product product, ActivityCode activityCode, List<ShipmentStatusCode> statusCodes) {
+
+        // The piece of this query that filters on supportedActivities is equivalent to calling
+        // Location.supports(ActivityCode) on each location. Doing it directly via query is much faster
+        // because it doesn't require n+1 queries (one per location).
+        List<String> activeLocationsSupportingActivity = Location.executeQuery(
+                """
+                SELECT l.id
+                FROM Location l
+                JOIN l.locationType lt
+                WHERE
+                    l.active = TRUE
+                    AND (
+                        (size(l.supportedActivities) <> 0 AND :activityCode IN elements(lt.supportedActivities))
+                        OR (:activityCode IN elements(l.supportedActivities))
+                    )
+                """, [activityCode: activityCode.toString()])
+
+        return ShipmentItem.createCriteria().list {
+            createAlias("shipment", "s")
+            projections {
+                groupProperty("s.destination")
+            }
+            eq("product", product)
+            inList("s.currentStatus", statusCodes)
+            inList("s.destination.id", activeLocationsSupportingActivity)
+        } as List<Location>
     }
 }

@@ -27,13 +27,13 @@ import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.validation.Validatable
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
-import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.LocalizationUtil
 
@@ -50,7 +50,7 @@ import org.pih.warehouse.LocalizationUtil
  * 20 mg tablets vs a 50 count bottle of 20 mg tablets will both be stored
  * as 20 mg tablets).
  */
-class Product implements Comparable, Serializable {
+class Product implements Comparable, Serializable, Validatable<ProductValidator> {
 
     def beforeInsert() {
         createdBy = AuthService.currentUser
@@ -304,23 +304,7 @@ class Product implements Comparable, Serializable {
             }
         })
         productType(nullable: false)
-        active(nullable: true, validator: { value, obj ->
-            if (value) {
-                return true
-            }
-            // Don't allow a product to be deactivated if it is in an active stocklist.
-            int numActiveStocklistsForProduct = RequisitionItem.createCriteria().count {
-                eq('product', obj)
-                requisition {
-                    eq('isTemplate', true)
-                    eq('isPublished', true)
-                }
-            }
-            if (numActiveStocklistsForProduct > 0) {
-                return ['invalid.inStocklist']
-            }
-            return true
-        })
+        active(nullable: true)
         coldChain(nullable: true)
         reconditioned(nullable: true)
         controlledSubstance(nullable: true)

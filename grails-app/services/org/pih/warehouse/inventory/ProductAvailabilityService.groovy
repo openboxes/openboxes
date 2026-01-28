@@ -31,6 +31,7 @@ import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.api.AllocatedItem
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -1363,5 +1364,23 @@ class ProductAvailabilityService {
             }
             remainingProductAvailability.save(flush: true)
         }
+    }
+
+    /**
+     * Fetch the list of locations that have some quantity on hand for the given product and that
+     * support the given activity code.
+     */
+    List<Location> getActiveLocationsWithProductInStockAndActivityCode(Product product, ActivityCode activityCode) {
+        List<Location> activeLocationsWithProductInStock = ProductAvailability.createCriteria().list {
+            projections {
+                groupProperty("location")
+            }
+            eq("product", product)
+            gt("quantityOnHand", 0)  // Negative QoH doesn't count as having stock
+            location {
+                eq("active", true)
+            }
+        } as List<Location>
+        return activeLocationsWithProductInStock.findAll { it.supports(activityCode) }
     }
 }
