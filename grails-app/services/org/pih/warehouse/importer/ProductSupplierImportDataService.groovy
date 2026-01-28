@@ -10,6 +10,10 @@
 package org.pih.warehouse.importer
 
 import grails.gorm.transactions.Transactional
+import org.apache.commons.lang.StringUtils
+import org.pih.warehouse.core.parser.BooleanParser
+import org.pih.warehouse.core.parser.EnumParser
+
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.RatingTypeCode
@@ -19,6 +23,8 @@ import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 import util.ConfigHelper
+
+import org.pih.warehouse.product.ProductSupplierImportCommand
 
 @Transactional
 class ProductSupplierImportDataService implements ImportDataService {
@@ -134,8 +140,39 @@ class ProductSupplierImportDataService implements ImportDataService {
         log.info "Process data " + command.filename
 
         command.data.each { params ->
-            ProductSupplier productSupplier = productSupplierService.createOrUpdate(params)
+            // Sanitize the raw import data into a strongly-typed command object
+            ProductSupplierImportCommand productSupplierImportCommand = new ProductSupplierImportCommand(
+                    active: BooleanParser.parse(params.active as String, false),
+                    id: sanitizeStringInput(params.id),
+                    code: sanitizeStringInput(params.code),
+                    name: sanitizeStringInput(params.name),
+                    productCode: sanitizeStringInput(params.productCode),
+                    productName: sanitizeStringInput(params.productName),
+                    legacyProductCode: sanitizeStringInput(params.legacyProductCode),
+                    supplierName: sanitizeStringInput(params.supplierName),
+                    supplierCode: sanitizeStringInput(params.supplierCode),
+                    manufacturerName: sanitizeStringInput(params.manufacturerName),
+                    manufacturerCode: sanitizeStringInput(params.manufacturerCode),
+                    minOrderQuantity: params.minOrderQuantity,
+                    contractPricePrice: params.contractPricePrice ? BigDecimal.valueOf(params.contractPricePrice as double) : null,
+                    contractPriceValidUntil: params.contractPriceValidUntil,
+                    ratingType: EnumParser.parse(params.ratingType as String, RatingTypeCode),
+                    globalPreferenceTypeName: sanitizeStringInput(params.globalPreferenceTypeName),
+                    globalPreferenceTypeValidityStartDate: params.globalPreferenceTypeValidityStartDate,
+                    globalPreferenceTypeValidityEndDate: params.globalPreferenceTypeValidityEndDate,
+                    globalPreferenceTypeComments: sanitizeStringInput(params.globalPreferenceTypeComments),
+                    defaultProductPackageUomCode: sanitizeStringInput(params.defaultProductPackageUomCode),
+                    defaultProductPackageQuantity: params.defaultProductPackageQuantity,
+                    defaultProductPackagePrice: params.defaultProductPackagePrice ? BigDecimal.valueOf(params.defaultProductPackagePrice as double) : null,
+            )
+
+            ProductSupplier productSupplier = productSupplierService.createOrUpdate(productSupplierImportCommand)
             productSupplier.save(failOnError: true)
         }
+    }
+
+    private String sanitizeStringInput(Object field) {
+        String fieldString = field as String
+        return StringUtils.isBlank(fieldString) ? null : fieldString.trim()
     }
 }

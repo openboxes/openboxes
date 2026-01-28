@@ -22,6 +22,7 @@ import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 import org.hibernate.criterion.Subqueries
 import org.hibernate.sql.JoinType
+
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.ProductPrice
@@ -34,6 +35,7 @@ import org.pih.warehouse.product.ProductSupplierDataService
 
 import org.pih.warehouse.product.ProductSupplierFilterCommand
 import org.pih.warehouse.product.ProductSupplierDetailsCommand
+import org.pih.warehouse.product.ProductSupplierImportCommand
 import org.pih.warehouse.product.ProductSupplierPreference
 
 @Transactional
@@ -208,116 +210,144 @@ class ProductSupplierService {
                                 Restrictions.eqProperty("pp.productSupplier.id", "this.id")))))
     }
 
-    ProductSupplier createOrUpdate(Map params) {
-        log.info("params: ${params}")
+    /**
+     * Create or update a single product supplier that has just been imported.
+     */
+    ProductSupplier createOrUpdate(ProductSupplierImportCommand command) {
+        ProductSupplier productSupplier = ProductSupplier.findByIdOrCode(command.id, command.code) ?: new ProductSupplier()
 
-        def productCode = params.productCode
-        def supplierName = params.supplierName
-        def manufacturerName = params.manufacturerName
-        def ratingTypeCode = params?.ratingTypeCode ? params?.ratingTypeCode?.toUpperCase() as RatingTypeCode : null
-        def supplierCode = params.supplierCode
-        def manufacturerCode = params.manufacturerCode
+        productSupplier.active = command.active
+        productSupplier.name = command.name
+        productSupplier.minOrderQuantity = command.minOrderQuantity
+        productSupplier.productCode = command.legacyProductCode  // Confusingly, "produceCode" is the legacy field.
+        productSupplier.product = command.productCode ? Product.findByProductCode(command.productCode) : null
+        productSupplier.supplier = command.supplierName ? Organization.findByName(command.supplierName) : null
+        productSupplier.supplierName = command.supplierName
+        productSupplier.supplierCode = command.supplierCode
 
-        Product product = productCode ? Product.findByProductCode(productCode) : null
-        UnitOfMeasure unitOfMeasure = params.defaultProductPackageUomCode ?
-                UnitOfMeasure.findByCode(params.defaultProductPackageUomCode) : null
-        BigDecimal price = params.defaultProductPackagePrice ?
-                new BigDecimal(params.defaultProductPackagePrice) : null
-        Integer quantity = params.defaultProductPackageQuantity as Integer
-
-        ProductSupplier productSupplier = ProductSupplier.findByIdOrCode(params["id"], params["code"])
-        if (!productSupplier) {
-            productSupplier = new ProductSupplier(params)
-        } else {
-            String sourceCode = productSupplier.code
-            productSupplier.properties = params
-            // Do not allow to bind an empty source code, which caused the code to be re-generated for an existing product supplier (OBPIH-6288)
-            // The code could be overwritten by the binding, hence we'd like to bring back the existing code, if the one in params is null/empty
-            if (!params.code) {
-                productSupplier.code = sourceCode
-            }
+        // (OBPIH-6288) Code cannot be manually set to null for existing suppliers. We don't want to generate new
+        // codes for suppliers that already exist. We only generate a code if the supplier is new and a code wasn't
+        // manually specified.
+        if (command.code) {
+            productSupplier.code = command.code
+        }
+        else if (!productSupplier.code && !productSupplier.id) {
+            assignSourceCode(productSupplier, productSupplier.supplier)
         }
 
-        productSupplier.ratingTypeCode = ratingTypeCode
-        productSupplier.productCode = params["legacyProductCode"]
-        productSupplier.product = product
-        Organization supplier = supplierName ? Organization.findByName(supplierName) : null
-        productSupplier.supplier = supplier
-        productSupplier.manufacturer = manufacturerName ? Organization.findByName(manufacturerName) : null
-        productSupplier.supplierCode = supplierCode ? supplierCode : null
-        productSupplier.manufacturerCode = manufacturerCode ? manufacturerCode : null
-        if (!productSupplier.code && !productSupplier.id) {
-            assignSourceCode(productSupplier, supplier)
-        }
+        assignManufacturer(productSupplier, command.manufacturerName, command.manufacturerCode, command.ratingType)
 
-        if (unitOfMeasure && quantity) {
-            ProductPackage defaultProductPackage =
-                    productSupplier.productPackages.find { it.uom == unitOfMeasure && it.quantity == quantity }
+        assignDefaultProductPackage(productSupplier,
+                command.defaultProductPackageUomCode,
+                command.defaultProductPackageQuantity,
+                command.defaultProductPackagePrice)
 
-            if (!defaultProductPackage) {
-                defaultProductPackage = new ProductPackage()
-                defaultProductPackage.name = "${unitOfMeasure.code}/${quantity}"
-                defaultProductPackage.description = "${unitOfMeasure.name} of ${quantity}"
-                defaultProductPackage.product = productSupplier.product
-                defaultProductPackage.uom = unitOfMeasure
-                defaultProductPackage.quantity = quantity
-                /**
-                    Product supplier needs to be saved here to receive an ID in order to be able to assign it to the product package
-                    otherwise the transient property value exception would be thrown
-                 */
-                productSupplier.save()
-                defaultProductPackage.productSupplier = productSupplier
-                /**
-                    The flush is needed because of the order Hibernate uses to save the entities in this operation -
-                    for productSupplier.defaultProductPackage to be stored properly and not be cleared after transaction commit, the flush is needed
-                    Check OBPIH-6757 for more details (#4904 PR)
-                 */
-                defaultProductPackage.save(flush: true)
-                productSupplier.defaultProductPackage = defaultProductPackage
-                productSupplier.addToProductPackages(defaultProductPackage)
-
-                if (price != null) {
-                    ProductPrice productPrice = new ProductPrice()
-                    productPrice.price = price
-                    defaultProductPackage.productPrice = productPrice
-                }
-            } else if (price != null && !defaultProductPackage.productPrice) {
-                ProductPrice productPrice = new ProductPrice()
-                productPrice.price = price
-                defaultProductPackage.productPrice = productPrice
-            } else if (price != null && defaultProductPackage.productPrice) {
-                defaultProductPackage.productPrice.price = price
-                defaultProductPackage.lastUpdated = new Date()
-            }
-        }
-
-        BigDecimal contractPricePrice = params.contractPricePrice ? new BigDecimal(params.contractPricePrice) : null
-
-        if (contractPricePrice) {
-            if (!productSupplier.contractPrice) {
-                productSupplier.contractPrice = new ProductPrice()
-            }
-
-            productSupplier.contractPrice.price = contractPricePrice
-            productSupplier.contractPrice.toDate = params.contractPriceValidUntil as Date
-        }
-
-        PreferenceType preferenceType = params.globalPreferenceTypeName ? PreferenceType.findByName(params.globalPreferenceTypeName) : null
+        assignContractPrice(productSupplier, command.contractPricePrice, command.contractPriceValidUntil)
 
         assignDefaultPreferenceType(productSupplier,
-                preferenceType,
-                params.globalPreferenceTypeComments as String,
-                params.globalPreferenceTypeValidityStartDate as Date,
-                params.globalPreferenceTypeValidityEndDate as Date)
+                command.globalPreferenceTypeName,
+                command.globalPreferenceTypeComments,
+                command.globalPreferenceTypeValidityStartDate,
+                command.globalPreferenceTypeValidityEndDate)
 
         return productSupplier
     }
 
+    private void assignDefaultProductPackage(ProductSupplier productSupplier,
+                                             String defaultProductPackageUomCode,
+                                             Integer defaultProductPackageQuantity,
+                                             BigDecimal price) {
+
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.findByCode(defaultProductPackageUomCode)
+
+        if (!unitOfMeasure || !defaultProductPackageQuantity) {
+            // Without UOM and quantity we can't uniquely identify the product package so simply do nothing.
+            return
+        }
+
+        ProductPackage defaultProductPackage = productSupplier.productPackages.find {
+            it.uom == unitOfMeasure && it.quantity == defaultProductPackageQuantity
+        }
+
+        // If the product package already exists for the supplier, simply update the price (if it has changed)
+        if (defaultProductPackage) {
+            if (price == null) {
+                defaultProductPackage.productPrice?.delete()
+                defaultProductPackage.productPrice = null
+                return
+            }
+            if (!defaultProductPackage.productPrice) {
+                defaultProductPackage.productPrice = new ProductPrice()
+            }
+            defaultProductPackage.productPrice.price = price
+            return
+        }
+
+        // Otherwise initialize a new product package for the supplier
+        defaultProductPackage = new ProductPackage()
+        defaultProductPackage.name = "${unitOfMeasure.code}/${defaultProductPackageQuantity}"
+        defaultProductPackage.description = "${unitOfMeasure.name} of ${defaultProductPackageQuantity}"
+        defaultProductPackage.product = productSupplier.product
+        defaultProductPackage.uom = unitOfMeasure
+        defaultProductPackage.quantity = defaultProductPackageQuantity
+
+        // Save the supplier so that the package can reference it, else transient property value exceptions are thrown.
+        productSupplier.save()
+        defaultProductPackage.productSupplier = productSupplier
+
+        // OBPIH-6757 (#4904 PR) The flush is needed because of Hibernate's order of operations when saving entities.
+        // Without this, productSupplier.defaultProductPackage is cleared after transaction commit
+        defaultProductPackage.save(flush: true)
+        productSupplier.defaultProductPackage = defaultProductPackage
+        productSupplier.addToProductPackages(defaultProductPackage)
+
+        if (price != null) {
+            defaultProductPackage.productPrice = new ProductPrice(price: price)
+        }
+    }
+
+    private void assignContractPrice(ProductSupplier productSupplier,
+                                     BigDecimal contractPrice,
+                                     Date toDate) {
+        if (contractPrice == null) {
+            productSupplier.contractPrice?.delete()
+            productSupplier.contractPrice = null
+            productSupplier.tieredPricing = false  // tieredPricing cannot be set via this logic, only unset.
+            return
+        }
+
+        if (!productSupplier.contractPrice) {
+            productSupplier.contractPrice = new ProductPrice()
+        }
+        productSupplier.contractPrice.price = contractPrice
+        productSupplier.contractPrice.toDate = toDate
+    }
+
+    private void assignManufacturer(ProductSupplier productSupplier,
+                                    String manufacturerName,
+                                    String manufacturerCode,
+                                    RatingTypeCode ratingTypeCode) {
+        if (!manufacturerName) {
+            productSupplier.manufacturerName = null
+            productSupplier.manufacturer = null
+            productSupplier.manufacturerCode = null
+            productSupplier.brandName = null  // brand cannot be set via this logic, only unset.
+            productSupplier.ratingTypeCode = null
+            return
+        }
+
+        productSupplier.manufacturerName = manufacturerName
+        productSupplier.manufacturer = Organization.findByName(manufacturerName)
+        productSupplier.manufacturerCode = manufacturerCode
+        productSupplier.ratingTypeCode = ratingTypeCode
+    }
+
     private void assignDefaultPreferenceType(ProductSupplier productSupplier,
-                 PreferenceType preferenceType,
+                 String globalPreferenceTypeName,
                  String comments,
                  Date validityStartDate,
                  Date validityEndDate) {
+        PreferenceType preferenceType = globalPreferenceTypeName ? PreferenceType.findByName(globalPreferenceTypeName) : null
         ProductSupplierPreference productSupplierPreference = productSupplier.getGlobalProductSupplierPreference()
         if (!preferenceType && productSupplierPreference) {
             // If preference type is not provided, delete it
