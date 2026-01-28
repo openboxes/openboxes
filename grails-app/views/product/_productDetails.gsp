@@ -58,7 +58,7 @@
                     </td>
                     <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
                         <g:selectCategory name="category.id" class="chzn-select-deselect" noSelection="['null':'']"
-                                             value="${productInstance?.category?.id}" includeParentCategories="${false}"/>
+                                             value="${productInstance?.category?.id}" includeParentCategories="${assigningParentCategoryToProductEnabled}"/>
                    </td>
                 </tr>
                 <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.PRODUCT_FAMILY)}">

@@ -50,6 +50,7 @@ class ProductController {
     UploadService uploadService
     def localizationService
     ProductDataService productDataService
+    CategoryService categoryService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -225,7 +226,8 @@ class ProductController {
             if (!params.templateName) {
                 throw new IllegalArgumentException("Must provide templateName parameter")
             }
-            render(template: params.templateName, model: [productInstance: productInstance])
+            boolean assigningParentCategoryToProductEnabled = categoryService.isAssigningParentToProductEnabled()
+            render(template: params.templateName, model: [productInstance: productInstance, assigningParentCategoryToProductEnabled: assigningParentCategoryToProductEnabled])
         }
     }
 
