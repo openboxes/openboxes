@@ -56,8 +56,7 @@ class CycleCountService {
                 }
             }
             if (command.categories) {
-                usedAliases.add("product")
-                createAlias("product", "product", JoinType.INNER_JOIN)
+                createProductAlias(delegate, usedAliases)
                 "in"("product.category", command.categories)
             }
             if (command.internalLocations) {
@@ -182,8 +181,7 @@ class CycleCountService {
                 }
             }
             if (command.categories) {
-                usedAliases.add("product")
-                createAlias("product", "product", JoinType.INNER_JOIN)
+                createProductAlias(delegate, usedAliases)
                 "in"("product.category", command.categories)
             }
             if (command.internalLocations) {
