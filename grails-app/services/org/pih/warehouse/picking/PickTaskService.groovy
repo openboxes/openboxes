@@ -181,7 +181,11 @@ class PickTaskService {
         }
 
         def isFullyPicked = task.quantityRequired.toInteger() == existingPickItem.quantityPicked
-        if (reasonCode || isFullyPicked) {
+
+        if (quantityPicked == 0 && reasonCode) { // 0-quantity short pick, we skip transfer to container
+            existingPickItem.reasonCode = reasonCode
+            executeStateTransition(task, PickTaskStatus.STAGED) // dummy transition
+        } else if (reasonCode || isFullyPicked) {
             executeStateTransition(task, PickTaskStatus.PICKED)
         }
 
