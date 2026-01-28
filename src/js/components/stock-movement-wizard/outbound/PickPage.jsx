@@ -369,7 +369,15 @@ class PickPage extends Component {
         }
       });
 
-      return { ...pickPageItem, picklistItems: _.concat(initialPicks, _.sortBy(pickPageItem.picklistItems, ['binLocation.name', 'initial'])) };
+      const updatedPicklistItems = _.map(pickPageItem.picklistItems, (item) => ({
+        ...item,
+        quantityAllocated: item.quantity,
+      }));
+
+      return {
+        ...pickPageItem,
+        picklistItems: _.concat(initialPicks, _.sortBy(updatedPicklistItems, ['binLocation.name', 'initial'])),
+      };
     }
 
     return pickPageItem;
