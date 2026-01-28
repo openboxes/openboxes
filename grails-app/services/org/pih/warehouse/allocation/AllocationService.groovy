@@ -11,6 +11,7 @@ import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionStatus
 
 @Transactional
 class AllocationService {
@@ -142,6 +143,11 @@ class AllocationService {
         requisition.requisitionItems.each { requisitionItem ->
             result &= deallocate(requisitionItem)
         }
+        if (result) {
+            // Set requisition status back to VERIFYING
+            requisition.status = RequisitionStatus.VERIFYING
+            requisition.save()
+        }
         return result
     }
 
@@ -164,9 +170,10 @@ class AllocationService {
         return allocate(request)
     }
 
-    void allocate(Requisition requisition) {
-        requisition.requisitionItems.each { requisitionItem ->
-
+    void allocate(Requisition requisition, AllocationMode allocationMode, List<AllocationStrategy> allocationStrategyList) {
+        requisition?.requisitionItems?.each { requisitionItem ->
+            AllocationRequest allocationRequest = new AllocationRequest(requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationStrategyList)
+            allocate(allocationRequest)
         }
     }
 

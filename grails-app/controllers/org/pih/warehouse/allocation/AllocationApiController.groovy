@@ -1,16 +1,15 @@
 package org.pih.warehouse.allocation
 
-import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.Requisition
 
 class AllocationApiController {
     AllocationService allocationService
 
     def allocate() {
         try {
-            RequisitionItem requisitionItem = RequisitionItem.get(params.id)
+            Requisition requisition = Requisition.get(params.id)
             List<AllocationStrategy> strategyList = [AllocationStrategy.WAREHOUSE_FIRST]
-             AllocationRequest allocationRequest = new AllocationRequest(requisitionItem: requisitionItem, allocationMode: AllocationMode.AUTO, allocationStrategies: strategyList)
-             def result = allocationService.allocate(allocationRequest)
+            allocationService.allocate(requisition, AllocationMode.AUTO, strategyList)
         } catch (Exception e) {
             response.status = 404
         }
