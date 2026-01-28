@@ -7,6 +7,7 @@ import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.requisition.Requisition
@@ -17,6 +18,7 @@ import org.pih.warehouse.requisition.RequisitionStatus
 class AllocationService {
 
     StockMovementService stockMovementService
+    ProductAvailabilityService productAvailabilityService
 
     @Transactional(readOnly = true)
     StockMovement getOutboundOrder(String id) {
@@ -206,6 +208,10 @@ class AllocationService {
 
                 case AllocationStrategy.WAREHOUSE_FIRST:
                     result = result.findAll { !it.binLocation?.isDisplay() }
+                    break
+
+                case AllocationStrategy.FEFO:
+                    result = productAvailabilityService.sortAvailableItems(result)
                     break
             }
         }
