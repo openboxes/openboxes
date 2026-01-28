@@ -381,7 +381,7 @@ class FulfillmentService {
     }
 
     String bindOrInferLotNumber(ImportPackingListItem obj, Map source) {
-        String lotNumber = source['lotNumber']
+        String lotNumber = source['lotNumber']?.trim() ?: null
         String productCode = source['product']
         String binLocationName = source['binLocation']
 
