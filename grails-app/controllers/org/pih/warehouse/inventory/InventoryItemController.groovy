@@ -376,6 +376,7 @@ class InventoryItemController {
                     picklistItemsByLot: k?.picklist?.getPicklistItemsByLot(product),
                     quantityRequested: v.quantity.sum(),
                     quantityRequired: v.sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityRequired() },
+                    quantityAllocated: v.sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityAllocated() },
                     quantityPicked: v.sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityPicked() },
             ]
             )

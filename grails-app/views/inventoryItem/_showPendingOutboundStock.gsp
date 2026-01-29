@@ -29,6 +29,9 @@
                     ${warehouse.message(code: 'requisition.quantityRequired.label')}
                 </th>
                 <th>
+                    ${warehouse.message(code: 'requisition.quantityAllocated.label')}
+                </th>
+                <th>
                     ${warehouse.message(code: 'requisition.quantityPicked.label')}
                 </th>
                 <th>
@@ -72,6 +75,9 @@
                     <td>
                         ${entry.value["quantityRequired"]} ${product?.unitOfMeasure}
                     </td>
+                    <td>
+                      ${entry.value["quantityAllocated"] ?: 0} ${product?.unitOfMeasure}
+                    </td>
                     <g:each var="piEntry" in="${entry.value.picklistItemsByLot}" status="index">
                         <g:if test="${index != 0}">
                             <tr>
@@ -114,6 +120,9 @@
                 </td>
                 <td>
                     ${itemsMap.values()["quantityRequired"].sum()} ${product?.unitOfMeasure}
+                </td>
+                <td>
+                    ${itemsMap.values()["quantityAllocated"].sum() ?: 0} ${product?.unitOfMeasure}
                 </td>
                 <td>
                     ${itemsMap.values()["picklistItemsByLot"]*.values()["quantity"]?.flatten()?.sum() ?: 0} ${product?.unitOfMeasure}
