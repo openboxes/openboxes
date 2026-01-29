@@ -116,6 +116,15 @@ const FIELDS = {
           formatValue: (value) => (value || value === 0 ? value.toLocaleString('en-US') : null),
         },
       },
+      quantityAllocated: {
+        type: LabelField,
+        label: 'react.stockMovement.allocated.label',
+        defaultMessage: 'Allocated',
+        fixedWidth: '150px',
+        attributes: {
+          formatValue: (value) => (value || value === 0 ? value.toLocaleString('en-US') : null),
+        },
+      },
       quantityPicked: {
         type: TextField,
         fieldKey: '',
@@ -271,6 +280,7 @@ class EditPickModal extends Component {
             id: picklistItem.id,
             quantityPicked: picklistItem.quantityPicked > 0
               ? picklistItem.quantityPicked : picklistItem.quantityToPick,
+            quantityAllocated: picklistItem.quantity,
             binLocation: {
               id: picklistItem['binLocation.id'],
               name: picklistItem['binLocation.name'],
@@ -294,6 +304,7 @@ class EditPickModal extends Component {
           availableItems,
           reasonCode: '',
           quantityRequired: pickPageItem.quantityRequired,
+          quantityAllocated: pickPageItem.quantityAllocated,
           productCode: pickPageItem.productCode,
           productName: pickPageItem.product.name,
           displayName: pickPageItem.product?.displayNames?.default,
@@ -351,6 +362,11 @@ class EditPickModal extends Component {
             <Translate id="react.stockMovement.quantityRequired.label" defaultMessage="Qty Required" />
             :
             {this.state.formValues.quantityRequired}
+          </div>
+          <div className="font-weight-bold">
+            <Translate id="react.stockMovement.quantityAllocated.label" defaultMessage="Qty Allocated" />
+            :
+            {this.state.formValues.quantityAllocated}
           </div>
         </div>
       </ModalWrapper>

@@ -137,6 +137,15 @@ const FIELDS = {
           formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
         },
       },
+      quantityAllocated: {
+        type: LabelField,
+        label: 'react.stockMovement.quantityAllocated.label',
+        defaultMessage: 'Qty Allocated',
+        flexWidth: '0.8',
+        attributes: {
+          formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
+        },
+      },
       quantityPicked: {
         type: LabelField,
         label: 'react.stockMovement.quantityPicked.label',
@@ -360,7 +369,15 @@ class PickPage extends Component {
         }
       });
 
-      return { ...pickPageItem, picklistItems: _.concat(initialPicks, _.sortBy(pickPageItem.picklistItems, ['binLocation.name', 'initial'])) };
+      const updatedPicklistItems = _.map(pickPageItem.picklistItems, (item) => ({
+        ...item,
+        quantityAllocated: item.quantity,
+      }));
+
+      return {
+        ...pickPageItem,
+        picklistItems: _.concat(initialPicks, _.sortBy(updatedPicklistItems, ['binLocation.name', 'initial'])),
+      };
     }
 
     return pickPageItem;

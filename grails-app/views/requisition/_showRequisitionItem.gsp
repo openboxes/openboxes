@@ -178,6 +178,11 @@
 
     </td>
     <td class="middle center">
+        <div class="${requisitionItem?.isCanceled() ? 'canceled' : ''}">
+            ${requisitionItem?.calculateQuantityAllocated() ?: 0}
+        </div>
+    </td>
+    <td class="middle center">
         <g:if test="${requisitionItem?.isSubstituted()}">
             <div>
                 ${requisitionItem?.calculateQuantityPicked()?:0}
