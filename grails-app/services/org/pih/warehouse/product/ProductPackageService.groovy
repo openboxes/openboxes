@@ -6,6 +6,8 @@ import org.pih.warehouse.core.ProductPrice
 @Transactional
 class ProductPackageService {
 
+    ProductPackageDataService productPackageGormService
+
     ProductSupplier save(ProductPackageCommand command) {
         setPackageData(command)
         setContractPriceData(command.productSupplier, command.contractPricePrice, command.contractPriceValidUntil)
@@ -73,5 +75,10 @@ class ProductPackageService {
         // 4. Set passed data
         contractPrice.price = contractPricePrice
         contractPrice.toDate = validUntil
+    }
+
+    void delete(Set<ProductPackage> productPackages) {
+        List<String> productPackageIds = productPackages*.id
+        productPackageIds.each(productPackageGormService.&delete)
     }
 }

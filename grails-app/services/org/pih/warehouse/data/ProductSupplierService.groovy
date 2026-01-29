@@ -30,6 +30,8 @@ import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
+import org.pih.warehouse.product.ProductPackageDataService
+import org.pih.warehouse.product.ProductPackageService
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.product.ProductSupplierDataService
 
@@ -48,6 +50,7 @@ class ProductSupplierService {
     ProductSupplierIdentifierService productSupplierIdentifierService
     def dataSource
     ProductSupplierDataService productSupplierGormService
+    ProductPackageService productPackageService
     DataService dataService
 
     List<ProductSupplier> getProductSuppliers(ProductSupplierFilterCommand command, boolean forExport = false) {
@@ -452,6 +455,9 @@ class ProductSupplierService {
     }
 
     void delete(String productSupplierId) {
+        ProductSupplier productSupplier = productSupplierGormService.get(productSupplierId)
+        productSupplier.defaultProductPackage = null
+        productPackageService.delete(productSupplier.productPackages)
         productSupplierGormService.delete(productSupplierId)
     }
 
