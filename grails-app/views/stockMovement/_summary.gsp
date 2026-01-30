@@ -158,8 +158,25 @@
                 </g:if>
             </td>
             <td class="center" width="1%">
-                <div class="tag tag-alert" data-testid="status-tag">
-                    ${stockMovement?.displayStatus?.label}
+                <div style="display: flex; flex-direction: row; align-items: flex-end; gap: 4px;">
+                    <g:if test="${stockMovement?.fulfillmentSummaryStatus}">
+                        <div>
+                            <div class="tag tag-info" style="margin: 0; background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb;">
+                                ${stockMovement?.fulfillmentSummaryStatus?.label}
+                            </div>
+                            <div style="font-size: 0.8em; color: #666; text-align: right; padding-right: 4px;">
+                                <warehouse:message code="stockMovement.fulfillmentSummaryStatus.fulfillment" default="Fulfillment"/>
+                            </div>
+                        </div>
+                    </g:if>
+                    <div>
+                        <div class="tag tag-alert" data-testid="status-tag" style="margin: 0;">
+                            ${stockMovement?.displayStatus?.label}
+                        </div>
+                        <div style="font-size: 0.8em; color: #666; text-align: right; padding-right: 4px;">
+                            <warehouse:message code="stockMovement.status.label" default="Status"/>
+                        </div>
+                    </div>
                 </div>
             </td>
         </tr>

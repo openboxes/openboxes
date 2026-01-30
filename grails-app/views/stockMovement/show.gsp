@@ -318,6 +318,16 @@
                                 ${stockMovement?.displayStatus?.label}
                             </td>
                         </tr>
+                        <g:if test="${stockMovement?.fulfillmentSummaryStatus}">
+                            <tr class="prop">
+                                <td class="name">
+                                    <warehouse:message code="stockMovement.fulfillmentSummaryStatus.label" default="Fulfillment Status"/>
+                                </td>
+                            <td class="value">
+                                ${stockMovement?.fulfillmentSummaryStatus?.label}
+                            </td>
+                            </tr>
+                        </g:if>
                         <g:if test="${stockMovement?.shipment?.isFromPurchaseOrder}">
                             <tr class="prop">
                                 <td class="name">

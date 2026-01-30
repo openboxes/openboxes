@@ -167,6 +167,7 @@ class StockMovement implements Validateable{
             description         : description,
             statusCode          : statusCode,
             displayStatus       : displayStatus,
+            fulfillmentSummaryStatus : fulfillmentSummaryStatus,
             identifier          : identifier,
             origin              : [
                 id                  : origin?.id,
@@ -538,6 +539,11 @@ class StockMovement implements Validateable{
                 destination: destination
         )
         Enum status = StockMovementStatusResolver.getListStatus(stockMovementContext)
+        return StockMovementStatusResolver.getStatusMetaData(status)
+    }
+
+    Map<String, String> getFulfillmentSummaryStatus() {
+        FulfillmentSummaryStatus status = FulfillmentSummaryStatus.fromLineItems(lineItems)
         return StockMovementStatusResolver.getStatusMetaData(status)
     }
 
