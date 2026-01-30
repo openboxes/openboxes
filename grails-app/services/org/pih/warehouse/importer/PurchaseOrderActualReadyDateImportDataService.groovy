@@ -10,6 +10,7 @@
 package org.pih.warehouse.importer
 
 import grails.gorm.transactions.Transactional
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.data.PersonService
 import org.pih.warehouse.order.Order
@@ -92,7 +93,7 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
 
             // Actual Ready Date validation
             if (!params["actualReadyDate"]) {
-                command.errors.reject("Row ${index + 1}: 'Actual Ready Date' is required")
+                command.errors.reject("Row ${index + 1}: 'Actual Ready Date' is required. Expected date format: ${Constants.EXPIRATION_DATE_FORMAT}")
             }
 
             String recipientValue = params["recipient"]
