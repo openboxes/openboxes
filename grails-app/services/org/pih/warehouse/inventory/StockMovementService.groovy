@@ -3207,8 +3207,7 @@ class StockMovementService {
         shipmentService.sendShipment(shipment, "Sent on ${new Date()}", user, shipment.origin, stockMovement.dateShipped ?: new Date())
     }
 
-    void issueRequisitionBasedStockMovement(String id) {
-
+    void issueRequisitionBasedStockMovement(String id, boolean synchronizeDateShipped = false) {
         User user = authService.currentUser
         StockMovement stockMovement = getStockMovement(id)
         Requisition requisition = stockMovement.requisition
@@ -3220,7 +3219,10 @@ class StockMovementService {
             throw new IllegalStateException("There are no shipments associated with stock movement ${requisition.requestNumber}")
         }
 
-        shipmentService.sendShipment(shipment, null, user, requisition.origin, stockMovement.dateShipped ?: new Date())
+        // If synchronizeDateShipped is true, use the current date instead of the dateShipped from stockMovement,
+        // which is expectedShippingDate from the past. Useful for setting the actual (current) issue date.
+        Date dateShipped = stockMovement.dateShipped && !synchronizeDateShipped ? stockMovement.dateShipped : new Date()
+        shipmentService.sendShipment(shipment, null, user, requisition.origin, dateShipped)
     }
 
     void validateRequisition(Requisition requisition) {

@@ -242,7 +242,10 @@ class ProductAvailabilityService {
                 SELECT
                     pli.bin_location_id as bin_location_id,
                     pli.inventory_item_id as inventory_item_id,
-                    sum(pli.quantity) as quantity_allocated
+                    CASE
+                        WHEN pli.reason_code IS NULL THEN sum(pli.quantity)
+                        ELSE SUM(pli.quantity_picked)
+                    END as quantity_allocated
                 FROM picklist_item pli
                     INNER JOIN picklist p ON pli.picklist_id = p.id
                     LEFT JOIN requisition_item ri ON pli.requisition_item_id = ri.id
@@ -262,7 +265,7 @@ class ProductAvailabilityService {
                   AND (lsa.activities IS NULL OR lsa.activities NOT LIKE '%HOLD_STOCK%'))
                   AND (:productId = '' OR ri.product_id = :productId)
                   ${internalTransactionsEnabled ? 'AND pli.outbound_container_id IS NULL AND pli.staging_location_id IS NULL' : ''}
-                GROUP BY pli.bin_location_id, pli.inventory_item_id
+                GROUP BY pli.bin_location_id, pli.inventory_item_id, pli.reason_code
                 UNION
                 SELECT
                     pli.bin_location_id as bin_location_id,

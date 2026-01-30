@@ -461,7 +461,7 @@ class RequisitionController {
         def requisition = Requisition.get(params.id)
         try {
             stockMovementService.createMissingShipmentItems(requisition, requisition?.shipment)
-            stockMovementService.issueRequisitionBasedStockMovement(params.id)
+            stockMovementService.issueRequisitionBasedStockMovement(params.id, true)
             requisitionService.triggerRequisitionStatusTransition(
                 requisition,
                 AuthService.currentUser,
