@@ -218,6 +218,7 @@ class StockMovementService {
                     case StockMovementStatusCode.PACKED:
                     case StockMovementStatusCode.CHECKING:
                     case StockMovementStatusCode.CHECKED:
+                    case StockMovementStatusCode.STAGED:
                         def shipment = createShipment(stockMovement)
                         if (stockMovement?.requisition?.picklist) {
                             shipmentService.validateShipment(shipment)
@@ -286,7 +287,7 @@ class StockMovementService {
 
         log.info "Update status ${id} " + status
         Requisition requisition = requisitionDataService.getRequisitionWithEvents(id)
-        if (status == RequisitionStatus.CHECKING) {
+        if (status == RequisitionStatus.CHECKING || status == RequisitionStatus.STAGED) {
             Shipment shipment = requisition.shipment
             shipment?.expectedShippingDate = new Date()
         }

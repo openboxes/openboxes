@@ -17,6 +17,7 @@ import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.joda.time.LocalDate
 import org.pih.warehouse.DateUtil
 import javassist.NotFoundException
+import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
@@ -451,7 +452,12 @@ class RequisitionService {
     void rollbackRequisition(Requisition requisition) {
         try {
             if (requisition.status == RequisitionStatus.ISSUED) {
-                requisition.status = RequisitionStatus.STAGED
+                if (allPickItemsStaged(requisition)) {
+                    requisition.status = RequisitionStatus.STAGED
+                } else {
+                    requisition.status = RequisitionStatus.CHECKING
+                }
+
                 requisition.issuedBy = null
                 requisition.dateIssued = null
                 requisition.transactions.each { transaction ->
@@ -472,6 +478,9 @@ class RequisitionService {
         }
     }
 
+    boolean allPickItemsStaged(Requisition requisition) {
+        requisition.picklist?.picklistItems?.every { it.status == PickTaskStatus.STAGED.name() }
+    }
 
     Requisition saveRequisition(Map data, Location userLocation) {
 
