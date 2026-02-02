@@ -65,6 +65,8 @@ class MigrationController {
         Map<String, List<String>> overlappingTransactions = migrationService.getOtherOverlappingTransactions(currentLocation, productInventoryTransactionType)
         Integer amountOfMissingInventoryImportTransactionSources = transactionSourceMigrationService.getAmountOfMissingInventoryImportTransactionSources()
         Integer amountOfMissingCycleCountTransactionSources = transactionSourceMigrationService.getAmountOfMissingCycleCountTransactionSources()
+        // The amount of missing record stock transaction sources can only be determined if previous migrations
+        // were completed (inventory import, cycle count related)
         Integer amountOfMissingRecordStockTransactionSources =
                 ((amountOfMissingInventoryImportTransactionSources + amountOfMissingCycleCountTransactionSources) == 0)
                         ? transactionSourceMigrationService.getAmountOfMissingRecordStockTransactionSources()

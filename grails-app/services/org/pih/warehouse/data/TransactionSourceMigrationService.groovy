@@ -206,6 +206,8 @@ class TransactionSourceMigrationService {
         List<InventoryCount> inventoryCounts = InventoryCount.createCriteria().list {
             transaction {
                 isNull("transactionSource")
+                // It's not accurate in every case to check the comment,
+                // but is the closest we can get to identify adjust stock transactions
                 isNotNull("comment")
             }
             and {
@@ -221,6 +223,7 @@ class TransactionSourceMigrationService {
         }
         List<InventoryCount> recordStockCounts = InventoryCount.createCriteria().list {
             not {
+                // Exclude adjustment transactions that have just been processed
                 inList("id", inventoryCounts.id)
             }
             transaction {
@@ -228,6 +231,7 @@ class TransactionSourceMigrationService {
             }
             eq("facility", location)
         } as List<InventoryCount>
+        // Loop through record stock inventory count records and create missing transaction sources
         recordStockCounts.each { InventoryCount inventoryCount ->
             Transaction recordStockAdjustmentTransaction = inventoryCount.transaction
             Transaction recordStockBaselineTransaction = inventoryCount.associatedTransaction
@@ -238,9 +242,16 @@ class TransactionSourceMigrationService {
                 recordStockBaselineTransaction.transactionSource = transactionSource
             }
         }
-        return [inventoryCounts: inventoryCounts.size() + recordStockCounts.size(), transactionSourcesCreated: inventoryCounts.size() + recordStockCounts.size()]
+        int transactionSourcesCreated = inventoryCounts.size() + recordStockCounts.size()
+        return [inventoryCounts: transactionSourcesCreated, transactionSourcesCreated: transactionSourcesCreated]
     }
 
+    /**
+     * Method to determine the amount of missing record stock transaction sources.
+     * We can just look at inventory counts of type adjustment and record stock that have no transaction source associated,
+     * because the amount would only be displayed to the user if all previous migrations (inventory import, cycle count) have been completed.
+     * @return amount of missing record stock transaction sources
+     */
     Integer getAmountOfMissingRecordStockTransactionSources() {
         return InventoryCount.createCriteria().get {
             projections {
