@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import useTranslate from 'hooks/useTranslate';
-import { validateFutureDate } from 'utils/form-utils';
+import { validateFutureDateFns } from 'utils/dateUtils';
 
 const useInboundCreateValidation = () => {
   const translate = useTranslate();
@@ -60,7 +60,7 @@ const useInboundCreateValidation = () => {
         invalid_type_error: requiredFieldMessage,
         required_error: requiredFieldMessage,
       })
-      .refine((pickedDate) => validateFutureDate(pickedDate), {
+      .refine((pickedDate) => validateFutureDateFns(pickedDate), {
         message: translate('react.default.error.futureDate.label', 'The date cannot be in the future'),
       }),
   });

@@ -2,7 +2,7 @@ import moment from 'moment';
 import { z } from 'zod';
 
 import useTranslate from 'hooks/useTranslate';
-import { validateFutureDate } from 'utils/form-utils';
+import { validateFutureDateFns } from 'utils/dateUtils';
 
 const useInboundSendValidation = () => {
   const translate = useTranslate();
@@ -27,7 +27,7 @@ const useInboundSendValidation = () => {
       required_error: requiredFieldMessage,
       invalid_type_error: requiredFieldMessage,
     })
-    .refine((pickedDate) => validateFutureDate(pickedDate), {
+    .refine((pickedDate) => validateFutureDateFns(pickedDate), {
       message: translate('react.default.error.futureDate.label', 'The date cannot be in the future'),
     });
 
