@@ -1087,8 +1087,8 @@ class InventoryController {
                     transactionInstance.save(failOnError: true)
                     flash.message = "Successfully saved transaction"
 
-                    // We assume that a transfer-in only operates on a single product so redirect to its stock card.
-                    String productId = transactionInstance.transactionEntries.first().inventoryItem.product.id
+                    // A transfer-in only operates on a single product so redirect to its stock card.
+                    String productId = transactionInstance.getAssociatedProducts().first()
                     redirect(controller: "inventoryItem", action: "showStockCard", id: productId)
                 }
             } catch (ValidationException e) {
