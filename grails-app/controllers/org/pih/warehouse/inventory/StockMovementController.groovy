@@ -537,10 +537,24 @@ class StockMovementController {
             String csv = new String(importFile.bytes)
             char separatorChar = CSVUtils.getSeparator(csv, StockMovement.buildCsvRow()?.keySet()?.size())
             def settings = [separatorChar: separatorChar, skipLines: 1]
-            Integer sortOrder = 0
+
+            Map<String, StockMovementItem> existingItemsMap = stockMovement.lineItems.collectEntries { [it.id, it] }
+            Integer sortOrder = (stockMovement.lineItems*.sortOrder.findAll { it != null }.max() ?: 0) + 100
+
             csv.toCsvReader(settings).eachLine { tokens ->
                 Boolean validateLotAndExpiry = stockMovement.getStockMovementDirection(currentLocation) != StockMovementDirection.OUTBOUND && !stockMovement.electronicType
                 StockMovementItem stockMovementItem = StockMovementItem.createFromTokens(tokens, validateLotAndExpiry)
+                StockMovementItem existingItem = existingItemsMap.get(stockMovementItem.id)
+                if (existingItem) {
+                    existingItem.product = stockMovementItem.product
+                    existingItem.quantityRequested = stockMovementItem.quantityRequested
+                    existingItem.palletName = stockMovementItem.palletName
+                    existingItem.boxName = stockMovementItem.boxName
+                    existingItem.lotNumber = stockMovementItem.lotNumber
+                    existingItem.expirationDate = stockMovementItem.expirationDate
+                    existingItem.recipient = stockMovementItem.recipient
+                    return
+                }
                 stockMovementItem.stockMovement = stockMovement
                 stockMovementItem.sortOrder = sortOrder
                 stockMovement.lineItems.add(stockMovementItem)
