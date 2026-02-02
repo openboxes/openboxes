@@ -65,6 +65,10 @@ class MigrationController {
         Map<String, List<String>> overlappingTransactions = migrationService.getOtherOverlappingTransactions(currentLocation, productInventoryTransactionType)
         Integer amountOfMissingInventoryImportTransactionSources = transactionSourceMigrationService.getAmountOfMissingInventoryImportTransactionSources()
         Integer amountOfMissingCycleCountTransactionSources = transactionSourceMigrationService.getAmountOfMissingCycleCountTransactionSources()
+        Integer amountOfMissingRecordStockTransactionSources =
+                ((amountOfMissingInventoryImportTransactionSources + amountOfMissingCycleCountTransactionSources) == 0)
+                        ? transactionSourceMigrationService.getAmountOfMissingRecordStockTransactionSources()
+                        : null
 
         [
                 organizationCount        : organizations.size(),
@@ -76,6 +80,7 @@ class MigrationController {
                 overlappingTransactions  : overlappingTransactions,
                 amountOfMissingInventoryImportTransactionSources: amountOfMissingInventoryImportTransactionSources,
                 amountOfMissingCycleCountTransactionSources: amountOfMissingCycleCountTransactionSources,
+                amountOfMissingRecordStockTransactionSources: amountOfMissingRecordStockTransactionSources
         ]
     }
 
@@ -405,6 +410,15 @@ class MigrationController {
     def createMissingCycleCountTransactionSourcesForCurrentLocation() {
         long responseTime = System.currentTimeMillis()
         Map<String, Integer> response = transactionSourceMigrationService.createMissingCycleCountTransactionSources(AuthService.currentLocation)
+        responseTime = System.currentTimeMillis() - responseTime
+        log.info("Created missing transaction sources in ${responseTime} ms")
+
+        render([responseTime: responseTime, inventoryCounts: response.inventoryCounts, transactionSourcesCreated: response.transactionSourcesCreated] as JSON)
+    }
+
+    def createMissingRecordStockTransactionSourcesForCurrentLocation() {
+        long responseTime = System.currentTimeMillis()
+        Map<String, Integer> response = transactionSourceMigrationService.createMissingRecordStockTransactionSources(AuthService.currentLocation)
         responseTime = System.currentTimeMillis() - responseTime
         log.info("Created missing transaction sources in ${responseTime} ms")
 

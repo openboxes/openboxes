@@ -3,10 +3,13 @@ package org.pih.warehouse.data
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.AdjustInventoryService
 import org.pih.warehouse.inventory.CycleCount
 import org.pih.warehouse.inventory.CycleCountProductInventoryTransactionService
 import org.pih.warehouse.inventory.InventoryCount
+import org.pih.warehouse.inventory.InventoryCountTypeCode
 import org.pih.warehouse.inventory.InventoryImportProductInventoryTransactionService
+import org.pih.warehouse.inventory.RecordStockProductInventoryTransactionService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionSource
 
@@ -16,6 +19,8 @@ class TransactionSourceMigrationService {
     InventoryImportProductInventoryTransactionService inventoryImportProductInventoryTransactionService
     CycleCountProductInventoryTransactionService cycleCountProductInventoryTransactionService
     HibernateSessionService hibernateSessionService
+    AdjustInventoryService adjustInventoryService
+    RecordStockProductInventoryTransactionService recordStockProductInventoryTransactionService
 
     List<InventoryCount> getInventoryImportTransactionsWithMissingTransactionSource(Location location) {
         List<InventoryCount> inventoryCounts = InventoryCount.createCriteria().list {
@@ -194,5 +199,57 @@ class TransactionSourceMigrationService {
             transactionSourcesCreated++
         }
         return [inventoryCounts: inventoryCounts.size(), transactionSourcesCreated: transactionSourcesCreated]
+    }
+
+    Map<String, Integer> createMissingRecordStockTransactionSources(Location location) {
+        // Inventory adjustment transactions
+        List<InventoryCount> inventoryCounts = InventoryCount.createCriteria().list {
+            transaction {
+                isNull("transactionSource")
+                isNotNull("comment")
+            }
+            and {
+                eq("facility", location)
+                eq("inventoryCountTypeCode", InventoryCountTypeCode.ADJUSTMENT)
+            }
+        } as List<InventoryCount>
+
+        inventoryCounts.each { InventoryCount inventoryCount ->
+            Transaction adjustmentTransaction = inventoryCount.transaction
+            TransactionSource transactionSource = adjustInventoryService.createMissingAdjustInventoryTransactionSource(location)
+            adjustmentTransaction.transactionSource = transactionSource
+        }
+        List<InventoryCount> recordStockCounts = InventoryCount.createCriteria().list {
+            not {
+                inList("id", inventoryCounts.id)
+            }
+            transaction {
+                isNull("transactionSource")
+            }
+            eq("facility", location)
+        } as List<InventoryCount>
+        recordStockCounts.each { InventoryCount inventoryCount ->
+            Transaction recordStockAdjustmentTransaction = inventoryCount.transaction
+            Transaction recordStockBaselineTransaction = inventoryCount.associatedTransaction
+            TransactionSource transactionSource =
+                    recordStockProductInventoryTransactionService.createMissingRecordStockTransactionSource(location)
+            recordStockAdjustmentTransaction.transactionSource = transactionSource
+            if (recordStockBaselineTransaction) {
+                recordStockBaselineTransaction.transactionSource = transactionSource
+            }
+        }
+        return [inventoryCounts: inventoryCounts.size() + recordStockCounts.size(), transactionSourcesCreated: inventoryCounts.size() + recordStockCounts.size()]
+    }
+
+    Integer getAmountOfMissingRecordStockTransactionSources() {
+        return InventoryCount.createCriteria().get {
+            projections {
+                rowCount()
+            }
+            transaction {
+                isNull("transactionSource")
+            }
+            eq("facility", AuthService.currentLocation)
+        }
     }
 }
