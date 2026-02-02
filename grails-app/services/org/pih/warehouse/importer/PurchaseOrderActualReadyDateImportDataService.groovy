@@ -93,14 +93,7 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
 
             // Actual Ready Date validation
             if (!params["actualReadyDate"]) {
-                command.errors.reject("Row ${index + 1}: 'Actual Ready Date' is required")
-            }
-            if (params["actualReadyDate"]) {
-                try {
-                    Date.parse(Constants.EXPIRATION_DATE_FORMAT, params["actualReadyDate"])
-                } catch(ParseException) {
-                    command.errors.reject("Row ${index + 1}: Could not parse date ${params['actualReadyDate']} on 'Actual Ready Date'. Expected date format: ${Constants.EXPIRATION_DATE_FORMAT}")
-                }
+                command.errors.reject("Row ${index + 1}: 'Actual Ready Date' is required. Expected date format: ${Constants.EXPIRATION_DATE_FORMAT}")
             }
 
             String recipientValue = params["recipient"]
@@ -129,7 +122,7 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
                 throw new IllegalArgumentException("Order Item is not found")
             }
 
-            orderItem.actualReadyDate = Date.parse(Constants.EXPIRATION_DATE_FORMAT, params["actualReadyDate"])
+            orderItem.actualReadyDate = params["actualReadyDate"] as Date
             String recipientValue = params["recipient"]
             if (!StringUtils.isBlank(recipientValue)) {
                 Person recipient = personService.getActivePerson(recipientValue)
