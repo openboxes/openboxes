@@ -77,8 +77,11 @@ class ProductPackageService {
         contractPrice.toDate = validUntil
     }
 
+    void delete(ProductPackage productPackage) {
+        productPackageGormService.delete(productPackage.id)
+    }
+
     void delete(Set<ProductPackage> productPackages) {
-        List<String> productPackageIds = productPackages*.id
-        productPackageIds.each(productPackageGormService.&delete)
+        productPackages.each { delete(it) }
     }
 }
