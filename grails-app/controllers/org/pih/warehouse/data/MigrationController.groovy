@@ -406,7 +406,9 @@ class MigrationController {
         responseTime = System.currentTimeMillis() - responseTime
         log.info("Created missing transaction sources in ${responseTime} ms")
 
-        render([responseTime: responseTime, inventoryCounts: response.inventoryCounts, transactionSourcesCreated: response.transactionSourcesCreated] as JSON)
+        render([responseTime: responseTime,
+                inventoryCounts: response.inventoryCounts,
+                transactionSourcesCreated: response.transactionSourcesCreated] as JSON)
     }
 
     def createMissingCycleCountTransactionSourcesForCurrentLocation() {
@@ -415,7 +417,9 @@ class MigrationController {
         responseTime = System.currentTimeMillis() - responseTime
         log.info("Created missing transaction sources in ${responseTime} ms")
 
-        render([responseTime: responseTime, inventoryCounts: response.inventoryCounts, transactionSourcesCreated: response.transactionSourcesCreated] as JSON)
+        render([responseTime: responseTime,
+                inventoryCounts: response.inventoryCounts,
+                transactionSourcesCreated: response.transactionSourcesCreated] as JSON)
     }
 
     def createMissingRecordStockTransactionSourcesForCurrentLocation() {
@@ -424,7 +428,9 @@ class MigrationController {
         responseTime = System.currentTimeMillis() - responseTime
         log.info("Created missing transaction sources in ${responseTime} ms")
 
-        render([responseTime: responseTime, inventoryCounts: response.inventoryCounts, transactionSourcesCreated: response.transactionSourcesCreated] as JSON)
+        render([responseTime: responseTime,
+                inventoryCounts: response.inventoryCounts,
+                transactionSourcesCreated: response.transactionSourcesCreated] as JSON)
     }
 
     def migrateProductSuppliers(MigrationCommand command) {

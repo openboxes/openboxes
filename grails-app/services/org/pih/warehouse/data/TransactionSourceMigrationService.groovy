@@ -203,7 +203,7 @@ class TransactionSourceMigrationService {
 
     Map<String, Integer> createMissingRecordStockTransactionSources(Location location) {
         // Inventory adjustment transactions
-        List<InventoryCount> inventoryCounts = InventoryCount.createCriteria().list {
+        List<InventoryCount> adjustStockCounts = InventoryCount.createCriteria().list {
             transaction {
                 isNull("transactionSource")
                 // It's not accurate in every case to check the comment,
@@ -216,7 +216,7 @@ class TransactionSourceMigrationService {
             }
         } as List<InventoryCount>
 
-        inventoryCounts.each { InventoryCount inventoryCount ->
+        adjustStockCounts.each { InventoryCount inventoryCount ->
             Transaction adjustmentTransaction = inventoryCount.transaction
             TransactionSource transactionSource = adjustInventoryService.createMissingAdjustInventoryTransactionSource(location)
             adjustmentTransaction.transactionSource = transactionSource
@@ -224,7 +224,7 @@ class TransactionSourceMigrationService {
         List<InventoryCount> recordStockCounts = InventoryCount.createCriteria().list {
             not {
                 // Exclude adjustment transactions that have just been processed
-                inList("id", inventoryCounts.id)
+                inList("id", adjustStockCounts.id)
             }
             transaction {
                 isNull("transactionSource")
@@ -233,16 +233,16 @@ class TransactionSourceMigrationService {
         } as List<InventoryCount>
         // Loop through record stock inventory count records and create missing transaction sources
         recordStockCounts.each { InventoryCount inventoryCount ->
-            Transaction recordStockAdjustmentTransaction = inventoryCount.transaction
-            Transaction recordStockBaselineTransaction = inventoryCount.associatedTransaction
+            Transaction transaction = inventoryCount.transaction
+            Transaction associatedTransaction = inventoryCount.associatedTransaction
             TransactionSource transactionSource =
                     recordStockProductInventoryTransactionService.createMissingRecordStockTransactionSource(location)
-            recordStockAdjustmentTransaction.transactionSource = transactionSource
-            if (recordStockBaselineTransaction) {
-                recordStockBaselineTransaction.transactionSource = transactionSource
+            transaction.transactionSource = transactionSource
+            if (associatedTransaction) {
+                associatedTransaction.transactionSource = transactionSource
             }
         }
-        int transactionSourcesCreated = inventoryCounts.size() + recordStockCounts.size()
+        int transactionSourcesCreated = adjustStockCounts.size() + recordStockCounts.size()
         return [inventoryCounts: transactionSourcesCreated, transactionSourcesCreated: transactionSourcesCreated]
     }
 
