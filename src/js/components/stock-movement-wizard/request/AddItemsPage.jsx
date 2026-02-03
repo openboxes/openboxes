@@ -211,7 +211,7 @@ const LINE_ITEMS_ATTR = {
   loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
   isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
   addButton,
-  showProductFilter: true,
+  showItemFilter: true,
   getDynamicRowAttr: ({ rowValues, itemFilter }) => {
     const hideRow = itemFilter && !matchesProductCodeOrName({
       product: rowValues?.product,

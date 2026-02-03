@@ -55,7 +55,7 @@ class FieldArrayComponent extends Component {
     } = this.props;
     const AddButton = fieldsConfig.addButton;
     const {
-      maxTableHeight, virtualized, overflowStyle = 'scroll', showRowSaveIndicator, showProductFilter,
+      maxTableHeight, virtualized, overflowStyle = 'scroll', showRowSaveIndicator, showItemFilter,
     } = fieldsConfig;
     const addRow = (row = {}, index = null, shouldScroll = true) => {
       if (index === null) {
@@ -178,7 +178,8 @@ class FieldArrayComponent extends Component {
             }}
           />
         </div>
-        { AddButton
+        <div className="table-toolbar">
+          { AddButton
           && (
           <div className="text-center add-button">
             {
@@ -193,17 +194,18 @@ class FieldArrayComponent extends Component {
                 )
                 : <AddButton {...properties} addRow={addRow} />
             }
-            {showProductFilter && (
-              <>
-                <FilterInput
-                  itemFilter={properties.itemFilter}
-                  onChange={(e) => properties.updateFilter(e.target.value)}
-                  onClear={() => properties.updateFilter('')}
-                />
-              </>
-            )}
           </div>
           )}
+          {showItemFilter && (
+          <>
+            <FilterInput
+              itemFilter={properties.itemFilter}
+              onChange={(e) => properties.updateFilter(e.target.value)}
+              onClear={() => properties.updateFilter('')}
+            />
+          </>
+          )}
+        </div>
       </div>
     );
   }
