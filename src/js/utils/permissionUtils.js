@@ -3,6 +3,24 @@ import StockMovementStatus from 'consts/stockMovementStatus';
 import { supports } from 'utils/supportedActivitiesUtils';
 
 const canEditRequest = (currentUser, request, location) => {
+  const hasMobilePicking = supports(
+    request?.origin?.supportedActivities,
+    ActivityCode.REQUIRE_MOBILE_PICKING,
+  );
+
+  if (hasMobilePicking) {
+    const blockEditingStatuses = [
+      StockMovementStatus.PICKING,
+      StockMovementStatus.PICKED,
+      StockMovementStatus.CHECKING,
+      StockMovementStatus.STAGED,
+    ];
+
+    if (blockEditingStatuses.includes(request.statusCode)) {
+      return false;
+    }
+  }
+
   const isUserRequestor = currentUser?.id === request?.requestedBy?.id;
   const isLocationOrigin = location.id === request?.origin?.id;
   const isLocationDestination = location.id === request?.destination?.id;

@@ -286,7 +286,6 @@ class InventoryItemController {
             totalCount = count.values().sum()
         }
 
-
         log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
 
         if (params.print) {
