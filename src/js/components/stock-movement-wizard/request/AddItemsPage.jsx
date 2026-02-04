@@ -682,6 +682,7 @@ class AddItemsPage extends Component {
     this.cancelRequest = this.cancelRequest.bind(this);
     this.save = this.save.bind(this);
     this.saveAndExit = this.saveAndExit.bind(this);
+    this.updateFilter = this.updateFilter.bind(this);
   }
 
   componentDidMount() {
@@ -1587,6 +1588,19 @@ class AddItemsPage extends Component {
     }
   }
 
+  /**
+   * Updates the item filter and resets the newItem flag to prevent
+   * unexpected focus jumps during search.
+   * @param {string} itemFilter
+   * @public
+   */
+  updateFilter(itemFilter) {
+    this.setState({
+      itemFilter,
+      newItem: false,
+    });
+  }
+
   render() {
     const { origin } = this.state.values;
     return (
@@ -1706,12 +1720,7 @@ class AddItemsPage extends Component {
                     updateProductData: this.updateProductData,
                     calculateQtyRequested: this.calculateQuantityRequested,
                     itemFilter: this.state.itemFilter,
-                    updateFilter: (value) => {
-                      this.setState({
-                        itemFilter: value,
-                        newItem: false,
-                      });
-                    },
+                    updateFilter: this.updateFilter,
                   }))}
               </div>
               <div className="submit-buttons">
