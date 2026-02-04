@@ -90,16 +90,21 @@ class RecordStockProductInventoryTransactionService extends ProductInventoryTran
                 )}
     }
 
-    TransactionSource createRecordStockTransactionSource(Location location) {
+    TransactionSource createRecordStockTransactionSource(Location location, boolean accurate = true) {
         TransactionSource transactionSource = new TransactionSource(
                 transactionAction: TransactionAction.RECORD_STOCK,
                 origin: location,
                 destination: location,
+                accurate: accurate,
         )
         if (!transactionSource.validate()) {
             throw new ValidationException("Invalid transaction source", transactionSource.errors)
         }
         return transactionSource.save()
+    }
+
+    TransactionSource createMissingRecordStockTransactionSource(Location location) {
+        return createRecordStockTransactionSource(location, false)
     }
 
     @Override

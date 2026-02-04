@@ -65,6 +65,12 @@ class MigrationController {
         Map<String, List<String>> overlappingTransactions = migrationService.getOtherOverlappingTransactions(currentLocation, productInventoryTransactionType)
         Integer amountOfMissingInventoryImportTransactionSources = transactionSourceMigrationService.getAmountOfMissingInventoryImportTransactionSources()
         Integer amountOfMissingCycleCountTransactionSources = transactionSourceMigrationService.getAmountOfMissingCycleCountTransactionSources()
+        // The amount of missing record stock transaction sources can only be determined if previous migrations
+        // were completed (inventory import, cycle count related)
+        Integer amountOfMissingRecordStockTransactionSources =
+                ((amountOfMissingInventoryImportTransactionSources + amountOfMissingCycleCountTransactionSources) == 0)
+                        ? transactionSourceMigrationService.getAmountOfMissingRecordStockTransactionSources()
+                        : null
 
         [
                 organizationCount        : organizations.size(),
@@ -76,6 +82,7 @@ class MigrationController {
                 overlappingTransactions  : overlappingTransactions,
                 amountOfMissingInventoryImportTransactionSources: amountOfMissingInventoryImportTransactionSources,
                 amountOfMissingCycleCountTransactionSources: amountOfMissingCycleCountTransactionSources,
+                amountOfMissingRecordStockTransactionSources: amountOfMissingRecordStockTransactionSources
         ]
     }
 
@@ -399,7 +406,9 @@ class MigrationController {
         responseTime = System.currentTimeMillis() - responseTime
         log.info("Created missing transaction sources in ${responseTime} ms")
 
-        render([responseTime: responseTime, inventoryCounts: response.inventoryCounts, transactionSourcesCreated: response.transactionSourcesCreated] as JSON)
+        render([responseTime: responseTime,
+                inventoryCounts: response.inventoryCounts,
+                transactionSourcesCreated: response.transactionSourcesCreated] as JSON)
     }
 
     def createMissingCycleCountTransactionSourcesForCurrentLocation() {
@@ -408,7 +417,20 @@ class MigrationController {
         responseTime = System.currentTimeMillis() - responseTime
         log.info("Created missing transaction sources in ${responseTime} ms")
 
-        render([responseTime: responseTime, inventoryCounts: response.inventoryCounts, transactionSourcesCreated: response.transactionSourcesCreated] as JSON)
+        render([responseTime: responseTime,
+                inventoryCounts: response.inventoryCounts,
+                transactionSourcesCreated: response.transactionSourcesCreated] as JSON)
+    }
+
+    def createMissingRecordStockTransactionSourcesForCurrentLocation() {
+        long responseTime = System.currentTimeMillis()
+        Map<String, Integer> response = transactionSourceMigrationService.createMissingRecordStockTransactionSources(AuthService.currentLocation)
+        responseTime = System.currentTimeMillis() - responseTime
+        log.info("Created missing transaction sources in ${responseTime} ms")
+
+        render([responseTime: responseTime,
+                inventoryCounts: response.inventoryCounts,
+                transactionSourcesCreated: response.transactionSourcesCreated] as JSON)
     }
 
     def migrateProductSuppliers(MigrationCommand command) {

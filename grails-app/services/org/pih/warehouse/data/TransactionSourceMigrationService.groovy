@@ -3,10 +3,13 @@ package org.pih.warehouse.data
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.AdjustInventoryService
 import org.pih.warehouse.inventory.CycleCount
 import org.pih.warehouse.inventory.CycleCountProductInventoryTransactionService
 import org.pih.warehouse.inventory.InventoryCount
+import org.pih.warehouse.inventory.InventoryCountTypeCode
 import org.pih.warehouse.inventory.InventoryImportProductInventoryTransactionService
+import org.pih.warehouse.inventory.RecordStockProductInventoryTransactionService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionSource
 
@@ -16,6 +19,8 @@ class TransactionSourceMigrationService {
     InventoryImportProductInventoryTransactionService inventoryImportProductInventoryTransactionService
     CycleCountProductInventoryTransactionService cycleCountProductInventoryTransactionService
     HibernateSessionService hibernateSessionService
+    AdjustInventoryService adjustInventoryService
+    RecordStockProductInventoryTransactionService recordStockProductInventoryTransactionService
 
     List<InventoryCount> getInventoryImportTransactionsWithMissingTransactionSource(Location location) {
         List<InventoryCount> inventoryCounts = InventoryCount.createCriteria().list {
@@ -194,5 +199,68 @@ class TransactionSourceMigrationService {
             transactionSourcesCreated++
         }
         return [inventoryCounts: inventoryCounts.size(), transactionSourcesCreated: transactionSourcesCreated]
+    }
+
+    Map<String, Integer> createMissingRecordStockTransactionSources(Location location) {
+        // Inventory adjustment transactions
+        List<InventoryCount> adjustStockCounts = InventoryCount.createCriteria().list {
+            transaction {
+                isNull("transactionSource")
+                // It's not accurate in every case to check the comment,
+                // but is the closest we can get to identify adjust stock transactions
+                isNotNull("comment")
+            }
+            and {
+                eq("facility", location)
+                eq("inventoryCountTypeCode", InventoryCountTypeCode.ADJUSTMENT)
+            }
+        } as List<InventoryCount>
+
+        adjustStockCounts.each { InventoryCount inventoryCount ->
+            Transaction adjustmentTransaction = inventoryCount.transaction
+            TransactionSource transactionSource = adjustInventoryService.createMissingAdjustInventoryTransactionSource(location)
+            adjustmentTransaction.transactionSource = transactionSource
+        }
+        List<InventoryCount> recordStockCounts = InventoryCount.createCriteria().list {
+            not {
+                // Exclude adjustment transactions that have just been processed
+                inList("id", adjustStockCounts.id)
+            }
+            transaction {
+                isNull("transactionSource")
+            }
+            eq("facility", location)
+        } as List<InventoryCount>
+        // Loop through record stock inventory count records and create missing transaction sources
+        recordStockCounts.each { InventoryCount inventoryCount ->
+            Transaction transaction = inventoryCount.transaction
+            Transaction associatedTransaction = inventoryCount.associatedTransaction
+            TransactionSource transactionSource =
+                    recordStockProductInventoryTransactionService.createMissingRecordStockTransactionSource(location)
+            transaction.transactionSource = transactionSource
+            if (associatedTransaction) {
+                associatedTransaction.transactionSource = transactionSource
+            }
+        }
+        int transactionSourcesCreated = adjustStockCounts.size() + recordStockCounts.size()
+        return [inventoryCounts: transactionSourcesCreated, transactionSourcesCreated: transactionSourcesCreated]
+    }
+
+    /**
+     * Method to determine the amount of missing record stock transaction sources.
+     * We can just look at inventory counts of type adjustment and record stock that have no transaction source associated,
+     * because the amount would only be displayed to the user if all previous migrations (inventory import, cycle count) have been completed.
+     * @return amount of missing record stock transaction sources
+     */
+    Integer getAmountOfMissingRecordStockTransactionSources() {
+        return InventoryCount.createCriteria().get {
+            projections {
+                rowCount()
+            }
+            transaction {
+                isNull("transactionSource")
+            }
+            eq("facility", AuthService.currentLocation)
+        }
     }
 }
