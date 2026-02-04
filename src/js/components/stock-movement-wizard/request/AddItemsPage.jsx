@@ -27,6 +27,7 @@ import NotificationType from 'consts/notificationTypes';
 import StockMovementStatus from 'consts/stockMovementStatus';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
+import { matchesProductCodeOrName } from 'utils/form-values-utils';
 import { isRequestFromWard, supports } from 'utils/supportedActivitiesUtils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -210,6 +211,15 @@ const LINE_ITEMS_ATTR = {
   loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
   isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
   addButton,
+  showItemFilter: true,
+  getDynamicRowAttr: ({ rowValues, itemFilter }) => {
+    const hideRow = itemFilter && !matchesProductCodeOrName({
+      product: rowValues?.product,
+      filterValue: itemFilter,
+    });
+
+    return { hideRow };
+  },
 };
 
 const NO_STOCKLIST_FIELDS = {
@@ -221,10 +231,10 @@ const NO_STOCKLIST_FIELDS = {
         fieldKey: '',
         flexWidth: '9.5',
         getDynamicAttr: ({
-          rowIndex, rowCount, updateProductData, values, originId, focusField,
+          rowIndex, rowCount, updateProductData, values, originId, focusField, newItem,
         }) => ({
           onChange: (value) => updateProductData(value, values, rowIndex),
-          autoFocus: rowIndex === rowCount - 1,
+          autoFocus: newItem && rowIndex === rowCount - 1,
           locationId: originId,
           onExactProductSelected: ({ product }) => {
             if (focusField && product) {
@@ -651,6 +661,7 @@ class AddItemsPage extends Component {
       totalCount: 0,
       isFirstPageLoaded: false,
       isRequestFromWard: false,
+      itemFilter: '',
     };
 
     this.props.showSpinner();
@@ -671,6 +682,7 @@ class AddItemsPage extends Component {
     this.cancelRequest = this.cancelRequest.bind(this);
     this.save = this.save.bind(this);
     this.saveAndExit = this.saveAndExit.bind(this);
+    this.updateFilter = this.updateFilter.bind(this);
   }
 
   componentDidMount() {
@@ -1576,6 +1588,19 @@ class AddItemsPage extends Component {
     }
   }
 
+  /**
+   * Updates the item filter and resets the newItem flag to prevent
+   * unexpected focus jumps during search.
+   * @param {string} itemFilter
+   * @public
+   */
+  updateFilter(itemFilter) {
+    this.setState({
+      itemFilter,
+      newItem: false,
+    });
+  }
+
   render() {
     const { origin } = this.state.values;
     return (
@@ -1694,6 +1719,8 @@ class AddItemsPage extends Component {
                     isFirstPageLoaded: this.state.isFirstPageLoaded,
                     updateProductData: this.updateProductData,
                     calculateQtyRequested: this.calculateQuantityRequested,
+                    itemFilter: this.state.itemFilter,
+                    updateFilter: this.updateFilter,
                   }))}
               </div>
               <div className="submit-buttons">

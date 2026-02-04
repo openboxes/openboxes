@@ -6,6 +6,7 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
+import FilterInput from 'components/form-elements/FilterInput';
 import TableBody from 'components/form-elements/TableBody';
 import TableBodyVirtualized from 'components/form-elements/TableBodyVirtualized';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -54,7 +55,7 @@ class FieldArrayComponent extends Component {
     } = this.props;
     const AddButton = fieldsConfig.addButton;
     const {
-      maxTableHeight, virtualized, overflowStyle = 'scroll', showRowSaveIndicator,
+      maxTableHeight, virtualized, overflowStyle = 'scroll', showRowSaveIndicator, showItemFilter,
     } = fieldsConfig;
     const addRow = (row = {}, index = null, shouldScroll = true) => {
       if (index === null) {
@@ -177,7 +178,8 @@ class FieldArrayComponent extends Component {
             }}
           />
         </div>
-        { AddButton
+        <div className="table-toolbar">
+          { AddButton
           && (
           <div className="text-center add-button">
             {
@@ -194,6 +196,16 @@ class FieldArrayComponent extends Component {
             }
           </div>
           )}
+          {showItemFilter && (
+          <>
+            <FilterInput
+              itemFilter={properties.itemFilter}
+              onChange={(e) => properties.updateFilter(e.target.value)}
+              onClear={() => properties.updateFilter('')}
+            />
+          </>
+          )}
+        </div>
       </div>
     );
   }
