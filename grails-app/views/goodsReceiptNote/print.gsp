@@ -51,7 +51,7 @@
     </thead>
     <tbody>
     <tr><td>
-        <g:render template="body" model="[pageBreakAter:false]"/>
+        <g:render template="body" model="[pageBreakAfter: false]"/>
     </td></tr>
     </tbody>
     <div class="signature-page">
