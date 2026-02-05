@@ -8,7 +8,7 @@ class AllocationApiController {
     def allocate() {
         try {
             Requisition requisition = Requisition.get(params.id)
-            List<AllocationStrategy> strategyList = grailsApplication.config.openboxes.order.allocation.strategies
+            List<AllocationStrategy> strategyList = [AllocationStrategy.WAREHOUSE_FIRST]
             allocationService.allocate(requisition, AllocationMode.AUTO, strategyList)
         } catch (Exception e) {
             response.status = 404
