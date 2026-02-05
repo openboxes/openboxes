@@ -18,13 +18,8 @@ const useInboundAddItemsImportExport = ({
       const { stockMovementId } = getValues('values');
 
       formData.append('importFile', file.slice(0, file.size, 'text/csv'));
-      const config = {
-        headers: {
-          'content-type': 'multipart/form-data',
-        },
-      };
 
-      await stockMovementApi.importCsv(stockMovementId, formData, config);
+      await stockMovementApi.importCsv(stockMovementId, formData);
       await fetchLineItems(true);
     } finally {
       spinner.hide();

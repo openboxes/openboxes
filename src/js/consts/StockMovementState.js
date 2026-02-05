@@ -4,7 +4,7 @@
  * steps that are included in URL parameters sent to the backend.
  */
 
-const OutboundWorkflowState = {
+export const OutboundWorkflowState = {
   CREATE_HEADER: 1,
   ADD_ITEMS: 2,
   REVISE_ITEMS: 3,
@@ -13,11 +13,13 @@ const OutboundWorkflowState = {
   SEND_SHIPMENT: 6,
 };
 
-const InboundWorkflowState = {
+export const InboundWorkflowState = {
   CREATE_HEADER: 1,
   ADD_ITEMS: 2,
   SEND_SHIPMENT: 6,
 };
 
-// eslint-disable-next-line import/prefer-default-export
-export { InboundWorkflowState, OutboundWorkflowState };
+export default {
+  InboundWorkflowState,
+  OutboundWorkflowState,
+};

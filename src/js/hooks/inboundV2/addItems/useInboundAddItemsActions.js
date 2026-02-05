@@ -511,15 +511,12 @@ const useInboundAddItemsActions = ({
       await fetchAddItemsPageData();
       await fetchLineItems();
     } catch {
+      // Any error during fetching means we cannot continue the edit flow.
+      // In that case, redirect the user to the create inbound flow.
       dispatch(updateWorkflowHeader([], null));
-      // In case of an error, redirect to the "create" step without the id parameter
       history.push({
-        pathname: location.pathname,
-        search: queryString.stringify({
-          ...queryParams,
-          id: undefined,
-          step: InboundV2Step.CREATE,
-        }, { skipNull: true }),
+        pathname: '/openboxes/stockMovement/createInbound',
+        search: queryString.stringify({ direction: 'INBOUND' }),
       });
     } finally {
       setLoading(false);

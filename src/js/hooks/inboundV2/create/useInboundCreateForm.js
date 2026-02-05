@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -51,8 +52,8 @@ const useInboundCreateForm = ({ next }) => {
   const history = useHistory();
   const { stockMovementId } = useParams();
 
-  const debouncedOriginLocationsFetch = useMemo(
-    () => debounceLocationsFetch(
+  const debouncedOriginLocationsFetch = useCallback(
+    debounceLocationsFetch(
       debounceTime,
       minSearchLength,
       null,
@@ -65,10 +66,8 @@ const useInboundCreateForm = ({ next }) => {
     [debounceTime, minSearchLength],
   );
 
-  const debouncedPeopleFetch = useMemo(
-    () => debouncePeopleFetch(debounceTime, minSearchLength),
-    [debounceTime, minSearchLength],
-  );
+  const debouncedPeopleFetch = useCallback(debouncePeopleFetch(debounceTime, minSearchLength),
+    [debounceTime, minSearchLength]);
 
   const defaultValues = useMemo(() => {
     const values = {
@@ -103,7 +102,10 @@ const useInboundCreateForm = ({ next }) => {
   const destination = watch('destination');
   const origin = watch('origin');
 
-  const checkStockMovementChange = () => {
+  // isStockMovementDirty checks only origin and stocklist. Changing these fields
+  // can cause loss of work, which is why only they trigger the confirmation modal.
+  // Other fields (e.g., description) can be changed freely without warning.
+  const isStockMovementDirty = () => {
     // If no stock movement id, it's a new stock movement, so no need to check for changes
     if (!stockMovementId) {
       return false;
@@ -150,17 +152,22 @@ const useInboundCreateForm = ({ next }) => {
 
   const saveStockMovement = async (values) => {
     spinner.show();
+    const {
+      dateRequested,
+      requestedBy,
+      stocklist,
+    } = values;
     const formattedValues = {
       ...values,
       name: '',
       dateRequested: dateWithoutTimeZone({
-        date: values.dateRequested,
+        date: dateRequested,
         outputDateFormat: DateFormat.MM_DD_YYYY,
       }),
-      origin: { id: values.origin.id },
-      destination: { id: values.destination.id },
-      requestedBy: { id: values.requestedBy.id },
-      stocklist: values.stocklist?.id ? { id: values.stocklist.id } : null,
+      origin: { id: origin.id },
+      destination: { id: destination.id },
+      requestedBy: { id: requestedBy.id },
+      stocklist: stocklist?.id ? { id: stocklist.id } : null,
     };
     try {
       const response = stockMovementId
@@ -174,7 +181,7 @@ const useInboundCreateForm = ({ next }) => {
   };
 
   const onSubmitStockMovementDetails = async (values) => {
-    const showModal = checkStockMovementChange(values);
+    const showModal = isStockMovementDirty(values);
 
     if (!showModal) {
       await saveStockMovement(values);
@@ -259,6 +266,8 @@ const useInboundCreateForm = ({ next }) => {
         updateWorkflowHeader(createInboundWorkflowHeader(data), data.displayStatus?.name),
       );
     } catch {
+      // Any error during fetching means we cannot continue the edit flow.
+      // In that case, redirect the user to the create inbound flow.
       dispatch(updateWorkflowHeader([], null));
       history.push({
         pathname: '/openboxes/stockMovement/createInbound',

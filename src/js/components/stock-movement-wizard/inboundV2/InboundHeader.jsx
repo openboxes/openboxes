@@ -11,11 +11,9 @@ import { formatDateToString } from 'utils/dateUtils';
 import HeaderWrapper from 'wrappers/HeaderWrapper';
 
 const InboundHeader = ({ showHeaderStatus }) => {
-  const { headerInfo, headerStatus, currentLocale } = useSelector((state) => ({
-    headerInfo: getInboundHeaderInfo(state),
-    headerStatus: getInboundHeaderStatus(state),
-    currentLocale: getCurrentLocale(state),
-  }));
+  const headerInfo = useSelector(getInboundHeaderInfo);
+  const headerStatus = useSelector(getInboundHeaderStatus);
+  const currentLocale = useSelector(getCurrentLocale);
   const translate = useTranslate();
 
   return (

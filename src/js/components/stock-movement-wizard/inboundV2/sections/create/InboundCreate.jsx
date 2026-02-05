@@ -15,14 +15,20 @@ import mapToFormSelectOption from 'utils/mapToFormSelectOption';
 
 const InboundCreate = ({ next }) => {
   const {
-    form: { control, errors, handleSubmit },
+    form: {
+      control,
+      errors,
+      handleSubmit,
+    },
     data: {
       stockLists,
       origin,
       debouncedOriginLocationsFetch,
       debouncedPeopleFetch,
     },
-    actions: { onSubmitStockMovementDetails },
+    actions: {
+      onSubmitStockMovementDetails,
+    },
   } = useInboundCreateForm({ next });
 
   return (
@@ -63,7 +69,6 @@ const InboundCreate = ({ next }) => {
                     id: 'react.stockMovement.origin.label',
                     defaultMessage: 'Origin',
                   }}
-                  placeholder="Select Origin"
                   required
                   hasErrors={Boolean(errors.origin?.message)}
                   errorMessage={errors.origin?.message}
@@ -187,7 +192,7 @@ const InboundCreate = ({ next }) => {
           defaultLabel="Next"
           variant="primary"
           type="submit"
-          disabled={!!Object.keys(errors).length}
+          disabled={Boolean(Object.keys(errors).length)}
         />
       </div>
     </form>

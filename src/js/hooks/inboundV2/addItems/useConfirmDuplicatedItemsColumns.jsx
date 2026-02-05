@@ -5,7 +5,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
-import showDuplicatedItemsColumn from 'consts/showDuplicatedItemsColumn';
+import showDuplicatedItemsColumn from 'consts/duplicatedItemsModalColumns';
 import useTranslate from 'hooks/useTranslate';
 
 const useConfirmDuplicatedItemsColumns = () => {

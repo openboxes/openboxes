@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 import DataTable from 'components/DataTable/v2/DataTable';
 import useInboundSendTable from 'hooks/inboundV2/send/useInboundSendTable';
 
-const InboundSendTable = () => {
+const InboundSendTable = memo(() => {
   const { columns, tableData, loading } = useInboundSendTable();
 
   return (
@@ -18,6 +18,6 @@ const InboundSendTable = () => {
       />
     </div>
   );
-};
+});
 
 export default InboundSendTable;

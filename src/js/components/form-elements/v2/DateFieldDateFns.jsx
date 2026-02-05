@@ -49,6 +49,10 @@ const DateFieldDateFns = ({
 
   const currentLocale = useSelector(getCurrentLocale);
 
+  // The datePicker throws errors when we set a date later than this one.
+  // We use 31st December 9999 as the upper bound for date selection.
+  const MAX_DATE_PICKER_DATE = new Date(9999, 11, 31);
+
   const getDateFormat = () => {
     if (showTimeSelect) {
       return customDateFormat
@@ -125,7 +129,7 @@ const DateFieldDateFns = ({
         options: { locale: dateFnsLocale() },
       })}
       ariaLabel={ariaLabel}
-      hasErrors={!!(errorMessage || hasErrors)}
+      hasErrors={Boolean(errorMessage || hasErrors)}
     >
       <DatePicker
         {...fieldProps}
@@ -151,7 +155,7 @@ const DateFieldDateFns = ({
         popperContainer={RootPortalWrapper}
         popperPlacement="bottom-start"
         selected={selectedDate}
-        maxDate={new Date(9999, 11, 31)}
+        maxDate={MAX_DATE_PICKER_DATE}
         highlightDates={highlightedDates}
         onChange={onChangeRaw || onChangeHandler}
         onSelect={() => {

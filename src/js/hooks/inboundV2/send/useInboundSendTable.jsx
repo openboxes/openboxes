@@ -278,7 +278,7 @@ const useInboundSendTable = () => {
       ),
       size: 100,
     }),
-  ], [currentLocale, loading]);
+  ], [translate, loading]);
 
   return {
     columns,

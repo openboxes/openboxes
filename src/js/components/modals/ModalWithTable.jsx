@@ -35,16 +35,16 @@ const ModalWithTable = ({
         <div className="modal-content__buttons">
           {onCancel && (
           <Button
-            defaultLabel={cancelLabel.default}
-            label={cancelLabel.key}
+            defaultLabel={cancelLabel.defaultMessage}
+            label={cancelLabel.id}
             variant="secondary"
             onClick={onCancel}
           />
           )}
           {onConfirm && (
           <Button
-            defaultLabel={confirmLabel.default}
-            label={confirmLabel.key}
+            defaultLabel={confirmLabel.defaultMessage}
+            label={confirmLabel.id}
             variant="primary"
             onClick={onConfirm}
           />
@@ -62,12 +62,12 @@ ModalWithTable.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.object).isRequired,
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
   confirmLabel: PropTypes.shape({
-    key: PropTypes.string.isRequired,
-    default: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    defaultMessage: PropTypes.string.isRequired,
   }),
   cancelLabel: PropTypes.shape({
-    key: PropTypes.string.isRequired,
-    default: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    defaultMessage: PropTypes.string.isRequired,
   }),
   onConfirm: PropTypes.func,
   onCancel: PropTypes.func,
@@ -77,12 +77,12 @@ ModalWithTable.defaultProps = {
   title: null,
   subtitle: null,
   confirmLabel: {
-    key: 'react.default.yes.label',
-    default: 'Yes',
+    id: 'react.default.yes.label',
+    defaultMessage: 'Yes',
   },
   cancelLabel: {
-    key: 'react.default.no.label',
-    default: 'No',
+    id: 'react.default.no.label',
+    defaultMessage: 'No',
   },
   onConfirm: null,
   onCancel: null,

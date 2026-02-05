@@ -5,7 +5,7 @@ import InboundAddItems from 'components/stock-movement-wizard/inboundV2/sections
 import InboundCreate from 'components/stock-movement-wizard/inboundV2/sections/create/InboundCreate';
 import InboundSend from 'components/stock-movement-wizard/inboundV2/sections/send/InboundSend';
 import WizardStepsV2 from 'components/wizard/v2/WizardStepsV2';
-import inboundV2Step from 'consts/InboundStep';
+import inboundStep from 'consts/InboundStep';
 import useTranslate from 'hooks/useTranslate';
 import useTranslation from 'hooks/useTranslation';
 import useWizard from 'hooks/useWizard';
@@ -21,26 +21,26 @@ const Inbound = () => {
 
   const steps = useMemo(() => [
     {
-      key: inboundV2Step.CREATE,
+      key: inboundStep.CREATE,
       title: translate('react.stockMovement.create.label', 'Create'),
       Component: InboundCreate,
     },
     {
-      key: inboundV2Step.ADD_ITEMS,
+      key: inboundStep.ADD_ITEMS,
       title: translate('react.stockMovement.addItems.label', 'Add Items'),
       Component: InboundAddItems,
     },
     {
-      key: inboundV2Step.SEND,
+      key: inboundStep.SEND_SHIPMENT,
       title: translate('react.stockMovement.send.label', 'Send'),
       Component: InboundSend,
     },
   ], [translate]);
 
-  const stepsTitles = steps.map((step) => ({
-    title: step.title,
-    key: step.key,
-  }));
+  const stepsTitles = useMemo(
+    () => steps.map((step) => ({ title: step.title, key: step.key })),
+    [steps],
+  );
 
   const [
     Step,
@@ -50,19 +50,17 @@ const Inbound = () => {
       is,
     },
   ] = useWizard({
-    initialKey: inboundV2Step.CREATE,
+    initialKey: inboundStep.CREATE,
     steps,
   });
 
   return (
     <PageWrapper>
       <WizardStepsV2 steps={stepsTitles} currentStepKey={Step.key} />
-      <InboundHeader showHeaderStatus={is(inboundV2Step.SEND)} />
-      {is(inboundV2Step.CREATE) && (<Step.Component next={next} />)}
-
-      {is(inboundV2Step.ADD_ITEMS) && (<Step.Component previous={previous} next={next} />)}
-
-      {is(inboundV2Step.SEND) && (<Step.Component previous={previous} />)}
+      <InboundHeader showHeaderStatus={is(inboundStep.SEND_SHIPMENT)} />
+      {is(inboundStep.CREATE) && (<Step.Component next={next} />)}
+      {is(inboundStep.ADD_ITEMS) && (<Step.Component previous={previous} next={next} />)}
+      {is(inboundStep.SEND_SHIPMENT) && (<Step.Component previous={previous} />)}
     </PageWrapper>
   );
 };

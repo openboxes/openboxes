@@ -74,7 +74,7 @@ const SelectField = ({
       customTooltip={customTooltip}
       value={fieldProps?.value?.label}
       ariaLabel={ariaLabel}
-      hasErrors={!!(errorMessage || hasErrors)}
+      hasErrors={Boolean(errorMessage || hasErrors)}
     >
       <SelectComponent
         className={`form-element-select ${className} ${errorMessage || hasErrors ? 'has-errors' : ''} ${warning ? 'has-warning' : ''}`}
