@@ -18,7 +18,7 @@ import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.sql.JoinType
-import org.pih.warehouse.allocation.AllocationRequest
+import org.pih.warehouse.allocation.AllocationItemRequest
 import org.pih.warehouse.api.OutboundWorkflowState
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.AvailableItemStatus
@@ -1344,7 +1344,7 @@ class StockMovementService {
                                 pickPageItem.getAvailableItems(inventoryItem)
 
                         // Create an allocation request and validate that it
-                        AllocationRequest allocationRequest = new AllocationRequest(
+                        AllocationItemRequest allocationRequest = new AllocationItemRequest(
                                 product: inventoryItem?.product,
                                 inventoryItem: inventoryItem,
                                 picklistItemCommand: data,
@@ -1400,7 +1400,7 @@ class StockMovementService {
         return availableItems?.any { it.quantityAvailable >= quantityRequired }
     }
 
-    void validateAllocationRequest(AllocationRequest allocationRequest) {
+    void validateAllocationRequest(AllocationItemRequest allocationRequest) {
 
         Product product = allocationRequest.product
         InventoryItem inventoryItem = allocationRequest.inventoryItem

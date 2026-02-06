@@ -7,7 +7,7 @@ import org.pih.warehouse.picklist.PicklistItemCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionItem
 
-class AllocationRequest implements Validateable {
+class AllocationItemRequest implements Validateable {
 
     Product product
     Integer quantityRequired

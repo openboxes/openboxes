@@ -7,14 +7,18 @@ import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionStatus
 
 @Transactional
 class AllocationService {
 
     StockMovementService stockMovementService
+    ProductAvailabilityService productAvailabilityService
 
     @Transactional(readOnly = true)
     StockMovement getOutboundOrder(String id) {
@@ -31,10 +35,10 @@ class AllocationService {
             def picklistItems = PicklistItem.findAllByRequisitionItem(requisitionItem)
             item.allocations = picklistItems.collect { pickListItem ->
                 [
-                        id: pickListItem.id,
+                        id             : pickListItem.id,
                         inventoryItemId: pickListItem.inventoryItem?.id,
-                        binLocationId: pickListItem.binLocation?.id,
-                        quantity: pickListItem.quantity
+                        binLocationId  : pickListItem.binLocation?.id,
+                        quantity       : pickListItem.quantity
                 ]
             }
 
@@ -52,7 +56,11 @@ class AllocationService {
         }
 
         if (mode == AllocationMode.AUTO) {
-            autoAllocate(requisitionItem, strategies)
+            Integer quantityRequired = requisitionItem.calculateQuantityRequired()
+            List<SuggestedItem> suggestedItems = getAutoSuggestedItems(requisitionItem, quantityRequired, strategies)
+
+            stockMovementService.clearPicklist(requisitionItem)
+            stockMovementService.allocateSuggestedItems(requisitionItem, suggestedItems, true)
         } else if (mode == AllocationMode.MANUAL) {
             List<PicklistItem> existingPickListItems = PicklistItem.findAllByRequisitionItem(requisitionItem)
             Set<String> processedPickIds = []
@@ -64,13 +72,13 @@ class AllocationService {
 
                 PicklistItem picklistItem = null
                 if (pickListItemId) {
-                    picklistItem = existingPickListItems.find { it.id == pickListItemId}
+                    picklistItem = existingPickListItems.find { it.id == pickListItemId }
                 }
 
                 if (!picklistItem) {
                     picklistItem = existingPickListItems.find {
                         it.inventoryItem.id == inventoryItemId &&
-                        it.binLocation?.id == binLocationId
+                                it.binLocation?.id == binLocationId
                     }
                 }
 
@@ -106,22 +114,83 @@ class AllocationService {
         return buildAllocationDetailsDto(requisitionItem)
     }
 
-    private void autoAllocate(RequisitionItem requisitionItem, List<AllocationStrategy> strategies) {
+    AllocationResult allocate(AllocationRequest request, boolean saveAllocation = true) {
+        AllocationMode mode = request.allocationMode
+        RequisitionItem requisitionItem = request.requisitionItem
+        Integer quantityRequired = request.quantityRequired ?: requisitionItem.calculateQuantityRequired()
+        List<SuggestedItem> suggestedItems
+        if (mode == AllocationMode.AUTO) {
+            suggestedItems = getAutoSuggestedItems(requisitionItem, quantityRequired, request.allocationStrategies)
+        } else if (mode == AllocationMode.MANUAL) {
+            List<AvailableItem> manualItems = request.availableItems?.findAll { it.inventoryItem.product?.id == requisitionItem.product?.id }
+            suggestedItems = stockMovementService.getSuggestedItems(manualItems, quantityRequired)
+            Integer quantitySuggested = suggestedItems.sum { it.quantityAvailable } ?: 0
+            if (quantitySuggested < quantityRequired) {
+                List<SuggestedItem> remainingItems = getAutoSuggestedItems(requisitionItem, quantityRequired - quantitySuggested, null, suggestedItems)
+                suggestedItems.addAll(remainingItems)
+            }
+        } else {
+            throw new UnsupportedOperationException("Unsupported mode: $mode")
+        }
+
+        if (saveAllocation) {
+            stockMovementService.clearPicklist(requisitionItem)
+            stockMovementService.allocateSuggestedItems(requisitionItem, suggestedItems, mode == AllocationMode.AUTO)
+        }
+        return new AllocationResult(allocationRequest: request, suggestedItems: suggestedItems)
+    }
+
+    Boolean deallocate(Requisition requisition) {
+        boolean result = true
+        requisition.requisitionItems.each { requisitionItem ->
+            result &= deallocate(requisitionItem)
+        }
+        if (result) {
+            // Set requisition status back to VERIFYING
+            requisition.status = RequisitionStatus.VERIFYING
+            requisition.save()
+        }
+        return result
+    }
+
+    Boolean deallocate(RequisitionItem requisitionItem) {
+        stockMovementService.clearPicklist(requisitionItem)
+        return true
+    }
+
+    AllocationResult allocate(RequisitionItem requisitionItem, Integer quantityRequired, AllocationMode allocationMode, List list) {
+        AllocationRequest request
+        if (allocationMode == AllocationMode.AUTO) {
+            List<AllocationStrategy> allocationStrategyList = list
+            request = new AllocationRequest(quantityRequired: quantityRequired, requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationStrategyList)
+        } else if (allocationMode == AllocationMode.MANUAL) {
+            List<AvailableItem> allocationItemList = list
+            request = new AllocationRequest(quantityRequired: quantityRequired, requisitionItem: requisitionItem, allocationMode: allocationMode, availableItems: allocationItemList)
+        } else {
+            throw new UnsupportedOperationException("Unsupported mode: $allocationMode")
+        }
+        return allocate(request)
+    }
+
+    void allocate(Requisition requisition, AllocationMode allocationMode, List<AllocationStrategy> allocationStrategyList) {
+        requisition?.requisitionItems?.each { requisitionItem ->
+            AllocationRequest allocationRequest = new AllocationRequest(requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationStrategyList)
+            allocate(allocationRequest)
+        }
+    }
+
+    private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationStrategy> strategies, List<AvailableItem> excludeList = []) {
         Location location = requisitionItem.requisition.origin
         List<AvailableItem> allAvailableItems = stockMovementService.getAvailableItems(location, requisitionItem, false)
         List<AvailableItem> filteredItems = applyStrategies(allAvailableItems, strategies)
+        List<AvailableItem> includedItems = filteredItems.findAll { !excludeList.contains(it) }
 
-        Integer quantityRequired = requisitionItem.calculateQuantityRequired()
-        Integer quantityAvailable = filteredItems.sum { it.quantityAvailable } ?: 0
+        Integer quantityAvailable = includedItems.sum { it.quantityAvailable } ?: 0
         if (quantityAvailable < quantityRequired) {
             throw new IllegalArgumentException("Insufficient stock. Required: ${quantityRequired}, Available: ${quantityAvailable}")
         }
 
-        List<SuggestedItem> suggestedItems = stockMovementService.getSuggestedItems(filteredItems, quantityRequired)
-        suggestedItems.each { it.quantityPicked = 0 }
-
-        stockMovementService.clearPicklist(requisitionItem)
-        stockMovementService.allocateSuggestedItems(requisitionItem, suggestedItems, true)
+        return stockMovementService.getSuggestedItems(includedItems, quantityRequired)
     }
 
     private List<AvailableItem> applyStrategies(List<AvailableItem> items, List<AllocationStrategy> strategies) {
@@ -139,6 +208,10 @@ class AllocationService {
 
                 case AllocationStrategy.WAREHOUSE_FIRST:
                     result = result.findAll { !it.binLocation?.isDisplay() }
+                    break
+
+                case AllocationStrategy.FEFO:
+                    result = productAvailabilityService.sortAvailableItems(result)
                     break
             }
         }
