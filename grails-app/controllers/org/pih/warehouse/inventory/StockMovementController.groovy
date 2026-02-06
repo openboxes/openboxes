@@ -706,7 +706,7 @@ class StockMovementController {
                 redirect(action: "show", id: params.id)
                 return
             }
-            allocationService.deallocate(requisition)
+            pickTaskService.rollbackPickTasks(requisition)
 
             flash.message = "Successfully cleared picklist for stock movement"
             redirect(action: "show", id: params.id)
