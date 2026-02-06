@@ -224,14 +224,39 @@ class ShipmentItem implements Comparable, Serializable {
         return orderItem ? orderItem.quantityPerUom : 1
     }
 
+    /**
+     * Get full picked quantity for related requisition item's picklist items that share the same lot and bin as this shipment item
+     */
     Integer getQuantityPicked() {
         Integer quantityPicked
-        if (binLocation) {
-            quantityPicked = requisitionItem?.picklistItems?.findAll { it.inventoryItem == inventoryItem && it.binLocation == binLocation }?.sum { it.quantityPicked }
-        } else {
+        if (!binLocation) {
             quantityPicked = requisitionItem?.picklistItems?.findAll { it.inventoryItem == inventoryItem }?.sum { it.quantityPicked }
+            return quantityPicked?:quantity
         }
-        return quantityPicked?:quantity
+
+        boolean internalTransactionsEnabled = shipment.origin.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS)
+        if (!internalTransactionsEnabled) {
+            quantityPicked = requisitionItem?.picklistItems?.findAll {
+                it.inventoryItem == inventoryItem && it.binLocation == binLocation
+            }?.sum { it.quantityPicked }
+            return quantityPicked?:quantity
+        }
+
+        if (binLocation.supports(ActivityCode.STAGING_LOCATION)) {
+            quantityPicked = requisitionItem?.picklistItems?.findAll {
+                it.inventoryItem == inventoryItem && it.stagingLocation == binLocation
+            }?.sum { it.quantityPicked }
+            return quantityPicked?:quantity
+        }
+
+        if (binLocation.supports(ActivityCode.OUTBOUND_CONTAINER)) {
+            quantityPicked = requisitionItem?.picklistItems?.findAll {
+                it.inventoryItem == inventoryItem && it.outboundContainer == binLocation
+            }?.sum { it.quantityPicked }
+            return quantityPicked?:quantity
+        }
+
+        return quantity
     }
 
     // For requisition based shipments, to avoid qualifying recalled or on hold items into quantity picked validation
