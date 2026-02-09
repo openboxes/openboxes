@@ -3,7 +3,6 @@ package org.pih.warehouse.order
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import grails.validation.ValidationException
-import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
@@ -20,6 +19,18 @@ import org.pih.warehouse.product.ProductSupplier
 import spock.lang.Specification
 
 class OrderServiceSpec extends Specification implements DataTest, ServiceUnitTest<OrderService> {
+
+    void setup() {
+        GroovyMock(CSVUtils, global: true)
+
+        CSVUtils.parseNumber(_, _) >> { String s, String field ->
+            return s ? new BigDecimal(s.trim()) : null
+        }
+
+        CSVUtils.parseInteger(_, _) >> { String s, String field ->
+            return s ? Integer.parseInt(s.trim()) : 0
+        }
+    }
 
     void setupSpec() {
         mockDomains(Order, OrderItem, Product, ProductSupplier, Organization, Location, User, UnitOfMeasure, BudgetCode, Person)
@@ -284,7 +295,7 @@ class OrderServiceSpec extends Specification implements DataTest, ServiceUnitTes
         ).save(validate: false)
 
         and: 'mock the quantityInShipments property to simulate items being shipped'
-        item.metaClass.getQuantityInShipments = { -> return 50 }
+        OrderItem.metaClass.getQuantityInShipments = { -> return 50 }
 
         and: 'import data trying to reduce quantity to 40 (less than 50 shipped)'
         new UnitOfMeasure(code: "EA", name: "Each").save(validate: false)
