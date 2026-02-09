@@ -1,5 +1,6 @@
 package org.pih.warehouse.allocation
 
+import grails.converters.JSON
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -10,15 +11,26 @@ class AllocationApiController {
 
     def allocate() {
         try {
+            def jsonBody = request.JSON ?: [:]
+            AllocationMode mode = jsonBody.mode as AllocationMode
             Requisition requisition = Requisition.get(params.id)
-            List<AllocationStrategy> strategyList = [AllocationStrategy.WAREHOUSE_FIRST]
-            def result = allocationService.allocate(requisition, AllocationMode.AUTO, strategyList)
+            List<AllocationStrategy> strategies = []
+            if (jsonBody.strategies) {
+                strategies = jsonBody.strategies.collect { String strategy ->
+                    try {
+                        return AllocationStrategy.valueOf(strategy)
+                    } catch (IllegalArgumentException e) {
+                        return null
+                    }
+                }.findAll { it != null }
+            }
+            def result = allocationService.allocate(requisition, mode ?: AllocationMode.AUTO, strategies)
             if (result && !result.empty) {
                 stockMovementService.updateRequisitionStatus(params.id, RequisitionStatus.PICKING)
             }
             redirect(controller: "stockMovement", action: "show", id: params.id)
         } catch (Exception e) {
-            response.status = 404
+            render(status: 500, [errorCode: 500, errorMessage: e.message] as JSON)
         }
     }
 
