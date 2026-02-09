@@ -48,7 +48,7 @@ const useInboundSendValidation = () => {
       comments: z.string().optional(),
       expectedDeliveryDate: expectedDeliveryDateSchema,
     }).superRefine((data, ctx) => {
-      if (!moment(data.expectedDeliveryDate).isSameOrAfter(moment(data.shipDate), 'day')) {
+      if (moment(data.expectedDeliveryDate).isBefore(moment(data.shipDate), 'day')) {
         const errorMessage = translate(
           'react.stockMovement.error.deliveryDateBeforeShipDate.label',
           'Please verify timeline. Delivery date cannot be before Ship date.',

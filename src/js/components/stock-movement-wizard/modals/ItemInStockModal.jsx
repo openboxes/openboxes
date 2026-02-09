@@ -26,8 +26,8 @@ const ItemInStockModal = ({
       columns={columns}
       data={data}
       cancelLabel={{
-        key: 'react.default.close.label',
-        default: 'Close',
+        id: 'react.default.close.label',
+        defaultMessage: 'Close',
       }}
       onCancel={onCancel}
     />

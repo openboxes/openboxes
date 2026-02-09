@@ -3,22 +3,22 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Route } from 'react-router-dom';
 
-import MainLayoutV2 from 'components/Layout/v2/MainLayoutV2';
+import MainLayout from 'components/Layout/v2/MainLayout';
 
-const MainLayoutRouteV2 = ({ path, component: Component }) => (
+const MainLayoutRoute = ({ path, component: Component }) => (
   <Route
     path={path}
     render={(matchProps) => (
-      <MainLayoutV2>
+      <MainLayout>
         <Component {...matchProps} />
-      </MainLayoutV2>
+      </MainLayout>
     )}
   />
 );
 
-export default MainLayoutRouteV2;
+export default MainLayoutRoute;
 
-MainLayoutRouteV2.propTypes = {
+MainLayoutRoute.propTypes = {
   component: PropTypes.oneOfType([PropTypes.string, PropTypes.func]).isRequired,
   path: PropTypes.string.isRequired,
 };

@@ -22,12 +22,12 @@ const ConfirmDuplicatedItemsModal = ({
       columns={columns}
       data={data}
       confirmLabel={{
-        key: 'react.default.yes.label',
-        default: 'Yes',
+        id: 'react.default.yes.label',
+        defaultMessage: 'Yes',
       }}
       cancelLabel={{
-        key: 'react.default.no.label',
-        default: 'No',
+        id: 'react.default.no.label',
+        defaultMessage: 'No',
       }}
       onConfirm={onConfirm}
       onCancel={onCancel}

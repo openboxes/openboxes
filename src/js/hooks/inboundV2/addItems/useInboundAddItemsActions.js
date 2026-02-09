@@ -4,7 +4,7 @@ import _ from 'lodash';
 import queryString from 'query-string';
 import { useFieldArray } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 
 import { updateWorkflowHeader } from 'actions';
 import stockMovementApi from 'api/services/StockMovementApi';
@@ -18,14 +18,12 @@ import {
 } from 'api/urls';
 import notification from 'components/Layout/notifications/notification';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
-import InboundV2Step from 'consts/InboundStep';
 import locationType from 'consts/locationType';
 import modalWithTableType from 'consts/modalWithTableType';
 import NotificationType from 'consts/notificationTypes';
 import RequisitionStatus from 'consts/requisitionStatus';
 import { InboundWorkflowState } from 'consts/StockMovementState';
 import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
-import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 import apiClient from 'utils/apiClient';
@@ -48,8 +46,6 @@ const useInboundAddItemsActions = ({
   const translate = useTranslate();
   const dispatch = useDispatch();
   const history = useHistory();
-  const location = useLocation();
-  const queryParams = useQueryParams();
   const { stockMovementId } = useParams();
 
   const {
@@ -511,15 +507,12 @@ const useInboundAddItemsActions = ({
       await fetchAddItemsPageData();
       await fetchLineItems();
     } catch {
+      // Any error during fetching means we cannot continue the edit flow.
+      // In that case, redirect the user to the create inbound flow.
       dispatch(updateWorkflowHeader([], null));
-      // In case of an error, redirect to the "create" step without the id parameter
       history.push({
-        pathname: location.pathname,
-        search: queryString.stringify({
-          ...queryParams,
-          id: undefined,
-          step: InboundV2Step.CREATE,
-        }, { skipNull: true }),
+        pathname: '/openboxes/stockMovement/createInbound',
+        search: queryString.stringify({ direction: 'INBOUND' }),
       });
     } finally {
       setLoading(false);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 import PropTypes from 'prop-types';
 import {
@@ -13,7 +13,7 @@ import DropdownButton from 'utils/DropdownButton';
 import Translate from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
-const InboundSendFormHeader = ({
+const InboundSendFormHeader = memo(({
   saveAndExit,
   onSave,
   isValid,
@@ -100,7 +100,7 @@ const InboundSendFormHeader = ({
       </div>
     </div>
   );
-};
+});
 
 export default InboundSendFormHeader;
 

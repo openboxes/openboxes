@@ -1,7 +1,7 @@
 const InboundStep = {
   CREATE: 'CREATE',
   ADD_ITEMS: 'ADD_ITEMS',
-  SEND: 'SEND',
+  SEND_SHIPMENT: 'SEND_SHIPMENT',
 };
 
 export default InboundStep;

@@ -4,11 +4,12 @@ import PropTypes from 'prop-types';
 import { useWatch } from 'react-hook-form';
 
 import DataTable from 'components/DataTable/v2/DataTable';
-import Button from 'components/form-elements/Button';
 import Section from 'components/Layout/v2/Section';
 import ConfirmDuplicatedItemsModal from 'components/modals/ConfirmDuplicatedItemsModal';
 import ConfirmExpirationDateModal from 'components/modals/ConfirmExpirationDateModal';
 import InboundAddItemsHeader from 'components/stock-movement-wizard/inboundV2/sections/addItems/InboundAddItemsHeader';
+import InboundAddItemsNavigationButtons
+  from 'components/stock-movement-wizard/inboundV2/sections/addItems/InboundAddItemsNavigationButtons';
 import modalWithTableType from 'consts/modalWithTableType';
 import useInboundAddItemsForm from 'hooks/inboundV2/addItems/useInboundAddItemsForm';
 
@@ -17,7 +18,9 @@ const InboundAddItems = ({
   previous,
 }) => {
   const {
-    form: { control, errors },
+    form: {
+      control, errors,
+    },
     table: {
       lineItemsArrayFields, columns,
     },
@@ -27,9 +30,11 @@ const InboundAddItems = ({
     modal: {
       isModalOpen, modalData, modalType, handleModalResponse,
     },
-    importExport: { importTemplate, exportTemplate },
+    importExport: {
+      importTemplate, exportTemplate,
+    },
   } = useInboundAddItemsForm({ next, previous });
-  const hasErrors = !!Object.keys(errors).length;
+  const hasErrors = Boolean(Object.keys(errors).length);
 
   const lineItems = useWatch({
     name: 'values.lineItems',
@@ -69,31 +74,21 @@ const InboundAddItems = ({
           </div>
         </div>
       </Section>
-      <div className="submit-buttons">
-        <Button
-          label="react.default.button.previous.label"
-          defaultLabel="Previous"
-          variant="primary"
-          onClick={previousPage}
-          disabled={hasErrors}
-        />
-        <Button
-          label="react.default.button.next.label"
-          defaultLabel="Next"
-          variant="primary"
-          disabled={!isNextButtonEnabled}
-          onClick={nextPage}
-        />
-      </div>
+      <InboundAddItemsNavigationButtons
+        onPrevious={previousPage}
+        onNext={nextPage}
+        isPreviousDisabled={hasErrors}
+        isNextDisabled={!isNextButtonEnabled}
+      />
       <ConfirmExpirationDateModal
         isOpen={isModalOpen && modalType === modalWithTableType.EXPIRATION}
-        data={modalData || []}
+        data={modalData}
         onConfirm={() => handleModalResponse(true)}
         onCancel={() => handleModalResponse(false)}
       />
       <ConfirmDuplicatedItemsModal
         isOpen={isModalOpen && modalType === modalWithTableType.DUPLICATES}
-        data={modalData || []}
+        data={modalData}
         onConfirm={() => handleModalResponse(true)}
         onCancel={() => handleModalResponse(false)}
       />

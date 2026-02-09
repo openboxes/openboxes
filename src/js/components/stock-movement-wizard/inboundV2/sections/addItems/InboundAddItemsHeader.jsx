@@ -14,7 +14,7 @@ import Button from 'components/form-elements/Button';
 import ButtonFileSelect from 'components/form-elements/v2/ButtonFileSelect';
 import FileFormat from 'consts/fileFormat';
 
-const InboundAddItemsHeader = ({
+const InboundAddItemsHeader = memo(({
   addNewLine,
   importTemplate,
   exportTemplate,
@@ -98,7 +98,7 @@ const InboundAddItemsHeader = ({
       </div>
     </div>
   );
-};
+});
 
 InboundAddItemsHeader.propTypes = {
   addNewLine: PropTypes.func.isRequired,

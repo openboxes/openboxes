@@ -104,10 +104,12 @@ const ProductSelect = ({
     });
 
   /**
-   * Handles the reference to the Async Select component.
-   * Stores the component instance internally and updates any external ref provided.
+   * Manages component refs for both internal and external use.
    *
-   * @param el - The Async Select component instance.
+   * selectRef: Internal ref for exact product match logic
+   * fieldRef: External ref from parent (SelectField) for focus management and arrow navigation
+   *
+   * @param el - The Async Select component instance
    */
   const handleFieldRef = (el) => {
     // Store the internal reference to the Async Select component instance

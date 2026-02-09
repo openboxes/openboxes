@@ -32,8 +32,10 @@ export default {
       comment,
     }),
   rollbackApproval: (id) => apiClient.put(STOCK_MOVEMENT_ROLLBACK_APPROVAL(id)),
-  importCsv: (stockMovementId, formData, config) =>
-    apiClient.post(STOCK_MOVEMENT_URL.importCsv(stockMovementId), formData, config),
+  importCsv: (stockMovementId, formData) =>
+    apiClient.post(STOCK_MOVEMENT_URL.importCsv(stockMovementId), formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
   exportCsv: (stockMovementId) =>
     apiClient.get(STOCK_MOVEMENT_URL.exportCsv(stockMovementId), { responseType: 'blob' }),
   getStockMovementById: (id, params) =>

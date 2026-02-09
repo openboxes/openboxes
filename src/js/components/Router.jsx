@@ -15,14 +15,12 @@ import {
 } from 'selectors';
 
 import CustomAlert from 'components/dashboard/CustomAlert';
-import MainLayoutRoute from 'components/Layout/MainLayoutRoute';
+import MainLayoutRoute from 'components/Layout/v2/MainLayoutRoute';
 import Loading from 'components/Loading';
 import ActivityCode from 'consts/activityCode';
 import { DASHBOARD_URL } from 'consts/applicationUrls';
 import useConnectionListener from 'hooks/useConnectionListener';
 import FlashScopeListenerWrapper from 'wrappers/FlashScopeListenerWrapper';
-
-import MainLayoutRouteV2 from './Layout/v2/MainLayoutRouteV2';
 
 import 'react-s-alert/dist/s-alert-default.css';
 import 'react-s-alert/dist/s-alert-css-effects/bouncyflip.css';
@@ -263,7 +261,7 @@ const Router = () => {
             <MainLayoutRoute path="**/inventory/cycleCount/resolve" component={AsyncCycleCountResolveStep} />
             <MainLayoutRoute path="**/inventory/cycleCount/reporting" component={AsyncCycleCountReporting} />
             <MainLayoutRoute path="**/inventory/cycleCount" component={AsyncCycleCount} />
-            <MainLayoutRouteV2 path="**/stockMovement/createInbound/:stockMovementId?" component={AsyncStockMovementInbound} />
+            <MainLayoutRoute path="**/stockMovement/createInbound/:stockMovementId?" component={AsyncStockMovementInbound} />
             <MainLayoutRoute path="**/stockMovement/createCombinedShipments/:stockMovementId?" component={AsyncStockMovementCombinedShipments} />
             <MainLayoutRoute path="**/stockMovement/createRequest/:stockMovementId?" component={AsyncStockMovementRequest} />
             <MainLayoutRoute path="**/stockMovement/verifyRequest/:stockMovementId?" component={AsyncStockMovementVerifyRequest} />

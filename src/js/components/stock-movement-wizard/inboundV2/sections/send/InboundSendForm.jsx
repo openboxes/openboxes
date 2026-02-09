@@ -2,15 +2,13 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
-import { RiArrowGoBackFill } from 'react-icons/ri';
 
-import Button from 'components/form-elements/Button';
 import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Section from 'components/Layout/v2/Section';
-import InboundSendFormHeader
-  from 'components/stock-movement-wizard/inboundV2/sections/send/InboundSendFormHeader';
+import InboundSendFormHeader from 'components/stock-movement-wizard/inboundV2/sections/send/InboundSendFormHeader';
+import InboundSendFormNavigation from 'components/stock-movement-wizard/inboundV2/sections/send/InboundSendNavigationButtons';
 import requisitionStatus from 'consts/requisitionStatus';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useInboundSendForm from 'hooks/inboundV2/send/useInboundSendForm';
@@ -269,34 +267,13 @@ const InboundSendForm = ({ previous }) => {
             </div>
           </div>
         </Section>
-        <div className="submit-buttons">
-          <Button
-            label="react.default.button.previous.label"
-            defaultLabel="Previous"
-            variant="primary"
-            onClick={() => previousPage()}
-            disabled={isDispatched}
-          />
-          <div className="buttons-container">
-            {rollbackButtonVisible && (
-              <Button
-                label="react.default.button.rollback.label"
-                defaultLabel="Rollback"
-                variant="primary-outline"
-                onClick={() => rollbackStockMovement()}
-                StartIcon={<RiArrowGoBackFill className="icon" />}
-                disabled={!isRollbackEnabled}
-              />
-            )}
-            <Button
-              label="react.shipping.sendShipment.label"
-              defaultLabel="Send shipment"
-              variant="primary"
-              type="submit"
-              disabled={isDispatched}
-            />
-          </div>
-        </div>
+        <InboundSendFormNavigation
+          onPrevious={() => previousPage()}
+          onRollback={() => rollbackStockMovement()}
+          isDispatched={isDispatched}
+          isRollbackEnabled={isRollbackEnabled}
+          rollbackButtonVisible={rollbackButtonVisible}
+        />
       </form>
     </>
   );

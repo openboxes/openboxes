@@ -71,7 +71,7 @@ const DropzoneFileSelect = ({
     };
   };
 
-  const validate = (file) => validateFileType(file) || validateFileSize(file);
+  const hasFileErrors = (file) => validateFileType(file) || validateFileSize(file);
 
   const {
     getRootProps, getInputProps, open, acceptedFiles, fileRejections,
@@ -79,7 +79,7 @@ const DropzoneFileSelect = ({
     onDrop,
     noClick: true,
     noKeyboard: true,
-    validator: validate,
+    validator: hasFileErrors,
     multiple,
     maxFiles,
     disabled: isFormDisabled,

@@ -9,6 +9,7 @@ import { getCurrentLocale } from 'selectors';
 
 import DateFieldInput from 'components/form-elements/v2/DateFieldInput';
 import componentType from 'consts/componentType';
+import MAX_DATE_PICKER_DATE from 'consts/datePickerLimits';
 import { DateFormatDateFns, TimeFormat } from 'consts/timeFormat';
 import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import useTranslate from 'hooks/useTranslate';
@@ -125,7 +126,7 @@ const DateFieldDateFns = ({
         options: { locale: dateFnsLocale() },
       })}
       ariaLabel={ariaLabel}
-      hasErrors={!!(errorMessage || hasErrors)}
+      hasErrors={Boolean(errorMessage || hasErrors)}
     >
       <DatePicker
         {...fieldProps}
@@ -151,7 +152,7 @@ const DateFieldDateFns = ({
         popperContainer={RootPortalWrapper}
         popperPlacement="bottom-start"
         selected={selectedDate}
-        maxDate={new Date(9999, 11, 31)}
+        maxDate={MAX_DATE_PICKER_DATE}
         highlightDates={highlightedDates}
         onChange={onChangeRaw || onChangeHandler}
         onSelect={() => {
