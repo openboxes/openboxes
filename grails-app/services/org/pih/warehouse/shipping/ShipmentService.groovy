@@ -12,8 +12,6 @@ package org.pih.warehouse.shipping
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import grails.validation.ValidationException
-import java.time.Duration
-import java.time.Instant
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
@@ -21,7 +19,6 @@ import org.apache.poi.ss.usermodel.Row
 import org.hibernate.FetchMode
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.StockTransfer
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
@@ -30,8 +27,6 @@ import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.ListCommand
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationTypeCode
-import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
@@ -46,7 +41,6 @@ import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
@@ -58,9 +52,7 @@ import java.math.RoundingMode
 @Transactional
 class ShipmentService {
 
-    MailService mailService
-    def sessionFactory
-    def productService
+    ShipmentEventService shipmentEventService
     def inventoryService
     TransactionIdentifierService transactionIdentifierService
     ShipmentIdentifierService shipmentIdentifierService
@@ -433,8 +425,7 @@ class ShipmentService {
             def shipments = Shipment.findAllByCurrentStatusIsNullAndEventsIsNotNull([max: 1000])
             if (shipments) {
                 shipments.each {
-                    it.currentStatus = it.status.code
-                    it.currentEvent = it.mostRecentSystemEvent
+                    it.resynchronizeEventAndStatus()
                     if (it.save(flush: true)) {
                         count++
                     }
@@ -1173,40 +1164,10 @@ class ShipmentService {
 
 
     /**
-     *
-     * @param shipmentInstance
-     * @param eventDate
-     * @param eventCode
-     * @param location
+     * Adds a new shipment event for the given code and logs a new shipment event.
      */
     void createShipmentEvent(Shipment shipmentInstance, Date eventDate, EventCode eventCode, Location location) {
-        log.info "Creating shipment event ${eventDate} ${eventCode}"
-
-        // Get the appropriate event type for the given event code
-        EventType eventType = EventType.findByEventCode(eventCode)
-        if (!eventType) {
-            throw new RuntimeException("Unable to find event type for event code '" + eventCode + "'")
-        }
-
-        // Prevent duplicate events
-        Event eventAlreadyExists = shipmentInstance?.events?.find {
-            it.eventType?.eventCode == eventType?.eventCode
-        }
-        if (eventAlreadyExists) {
-            shipmentInstance.errors.reject("shipment.eventAlreadyExists.message", "Event ${eventCode} already exists")
-            throw new ValidationException("Unable to create shipment event", shipmentInstance.errors)
-        }
-
-        // Attempt to add the event to the shipment
-        User currentUser = AuthService.currentUser
-        Event eventInstance = new Event(eventDate: eventDate, eventType: eventType, eventLocation: location, createdBy: currentUser)
-        if (!eventInstance.hasErrors()) {
-            shipmentInstance.addToEvents(eventInstance)
-            shipmentInstance.save()
-        } else {
-            throw new ValidationException("Unable to create shipment event", eventInstance.errors)
-        }
-
+        shipmentEventService.createShipmentEvent(shipmentInstance, eventDate, eventCode, location)
     }
 
     void receiveShipments(List shipmentIds, String comment, String userId, String locationId, Boolean creditStockOnReceipt) {
@@ -1800,14 +1761,7 @@ class ShipmentService {
 
 
     void deleteEvent(Shipment shipmentInstance, Event eventInstance) {
-        shipmentInstance.removeFromEvents(eventInstance)
-        eventInstance.delete()
-        shipmentInstance.currentEvent = null
-        shipmentInstance.currentStatus = null
-        if (shipmentInstance.isFromPurchaseOrder) {
-            // Set disable refresh to false to refresh order summary
-            shipmentInstance.disableRefresh = false
-        }
+        shipmentEventService.rollbackShipmentEvent(shipmentInstance, eventInstance)
         shipmentInstance.save()
     }
 
@@ -1832,14 +1786,11 @@ class ShipmentService {
             if (eventInstance?.eventType?.eventCode in [EventCode.RECEIVED, EventCode.PARTIALLY_RECEIVED]) {
                 deleteReceipts(shipmentInstance)
                 deleteInboundTransactions(shipmentInstance)
-                deleteEvent(shipmentInstance, eventInstance)
             } else if (eventInstance?.eventType?.eventCode == EventCode.SHIPPED) {
                 deleteReceipts(shipmentInstance)
                 deleteOutboundTransactions(shipmentInstance)
-                deleteEvent(shipmentInstance, eventInstance)
-            } else {
-                deleteEvent(shipmentInstance, eventInstance)
             }
+            deleteEvent(shipmentInstance, eventInstance)
 
         } catch (Exception e) {
             log.error("Error rolling back most recent event", e)

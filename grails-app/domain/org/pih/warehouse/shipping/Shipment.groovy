@@ -32,14 +32,10 @@ class Shipment implements Comparable, Serializable, Historizable {
     def beforeInsert() {
         createdBy = AuthService.currentUser
         updatedBy = AuthService.currentUser
-        currentEvent = mostRecentSystemEvent
-        currentStatus = status.code
     }
 
     def beforeUpdate() {
         updatedBy = AuthService.currentUser
-        currentEvent = mostRecentSystemEvent
-        currentStatus = status.code
     }
 
     def afterInsert() {
@@ -80,7 +76,8 @@ class Shipment implements Comparable, Serializable, Historizable {
     String driverName                // added for stock movements (should use carrier)
 
     // One-to-many associations
-    SortedSet events
+    SortedSet<Event> events
+    SortedSet<EventLog> eventLogs
 
     Requisition requisition
 
@@ -128,6 +125,7 @@ class Shipment implements Comparable, Serializable, Historizable {
     // Core association mappings
     static hasMany = [
             events              : Event,
+            eventLogs           : EventLog,
             comments            : Comment,
             containers          : Container,
             documents           : Document,
@@ -151,6 +149,7 @@ class Shipment implements Comparable, Serializable, Historizable {
         cache true
         additionalInformation type: "text"
         events cascade: "all-delete-orphan"
+        eventLogs joinTable: [name: 'shipment_event_log', key: 'shipment_id', column: 'event_log_id']
         comments cascade: "all-delete-orphan"
         documents cascade: "all-delete-orphan"
         shipmentItemCount(formula: '(select count(shipment_item.id) from shipment_item where (shipment_item.shipment_id = id))')
@@ -194,7 +193,7 @@ class Shipment implements Comparable, Serializable, Historizable {
         // a shipment can't have two system events with the same event code
         events(validator: { events ->
             Set<Event> systemEvents = events.findAll {
-                it?.eventType?.eventCode in EventCode.listSystemEventTypeCodes()
+                it?.eventType?.eventCode?.isSystemEvent
             }
             return systemEvents.unique().size() == systemEvents.size()
         })
@@ -216,6 +215,26 @@ class Shipment implements Comparable, Serializable, Historizable {
     // TODO: is this in descending order for a good reason?
     int compareTo(obj) {
         obj.name <=> name
+    }
+
+    /**
+     * Overrides GORM's built in method for adding an event to the shipment.
+     * We do this to ensure that whenever an event is added, we recompute the current shipment status.
+     */
+    Shipment addToEvents(Event event) {
+        events.add(event)
+        resynchronizeEventAndStatus()
+        return this
+    }
+
+    /**
+     * Overrides GORM's built in method for removing an event from the shipment.
+     * We do this to ensure that whenever an event is removed, we recompute the current shipment status.
+     */
+    Shipment removeFromEvents(Event event) {
+        events.remove(event)
+        resynchronizeEventAndStatus()
+        return this
     }
 
     /**
@@ -328,15 +347,15 @@ class Shipment implements Comparable, Serializable, Historizable {
     }
 
     Boolean hasShipped() {
-        return events.any { it.eventType?.eventCode == EventCode.SHIPPED }
+        return getEventByCode(EventCode.SHIPPED) != null
     }
 
     Boolean wasReceived() {
-        return events.any { it.eventType?.eventCode == EventCode.RECEIVED }
+        return getEventByCode(EventCode.RECEIVED) != null
     }
 
     Boolean wasPartiallyReceived() {
-        return events.any { it.eventType?.eventCode == EventCode.PARTIALLY_RECEIVED }
+        return getEventByCode(EventCode.PARTIALLY_RECEIVED) != null
     }
 
     Boolean getIsFromPurchaseOrder() {
@@ -388,27 +407,18 @@ class Shipment implements Comparable, Serializable, Historizable {
         return null
     }
 
-
     Date getActualShippingDate() {
-        for (event in events) {
-            if (event?.eventType?.eventCode == EventCode.SHIPPED) {
-                return event?.eventDate
-            }
-        }
-        return null
+        Event event = getEventByCode(EventCode.SHIPPED)
+        return event?.eventDate
     }
 
     Date getActualDeliveryDate() {
-        for (event in events) {
-            if (event?.eventType?.eventCode == EventCode.RECEIVED) {
-                return event?.eventDate
-            }
-        }
-        return null
+        Event event = getEventByCode(EventCode.RECEIVED)
+        return event?.eventDate
     }
 
     User getShippedBy() {
-        Event shippedEvent = events?.find { it.eventType?.eventCode == EventCode.SHIPPED }
+        Event shippedEvent = getEventByCode(EventCode.SHIPPED)
         if (shippedEvent) {
             // For the e-requests we want to have the fallback to the user, who last updated the shipment
             if (requisition?.electronicType) {
@@ -421,7 +431,6 @@ class Shipment implements Comparable, Serializable, Historizable {
         return null
     }
 
-
     Event getMostRecentEvent() {
         if (events && events.size() > 0) {
             return events.iterator().next()
@@ -430,30 +439,45 @@ class Shipment implements Comparable, Serializable, Historizable {
     }
 
     Event getMostRecentSystemEvent() {
-        Set<Event> systemEvents = events.findAll { EventCode.listSystemEventTypeCodes().contains(it.eventType?.eventCode) }.sort()
+        Set<Event> systemEvents = events.findAll { it.eventType?.eventCode?.isSystemEvent }.sort()
         if (systemEvents?.size()) {
             return systemEvents.first()
         }
         return null
     }
 
+    /**
+     * @deprecated use {@link #getCurrentStatus()} instead. This method is slow because it recomputes status each time.
+     */
+    @Deprecated
     ShipmentStatus getStatus() {
-        if (this.wasReceived()) {
-            return new ShipmentStatus([code    : ShipmentStatusCode.RECEIVED,
-                                       date    : this.getActualDeliveryDate(),
-                                       location: this.destination])
-        } else if (wasPartiallyReceived()) {
-            return new ShipmentStatus([code    : ShipmentStatusCode.PARTIALLY_RECEIVED,
-                                       date    : this.getActualDeliveryDate(),
-                                       location: this.destination])
-        } else if (this.hasShipped()) {
-            return new ShipmentStatus([code    : ShipmentStatusCode.SHIPPED,
-                                       date    : this.getActualShippingDate(),
-                                       location: this.origin])
-        } else {
-            return new ShipmentStatus([code    : ShipmentStatusCode.PENDING,
-                                       date    : null,
-                                       location: null])
+        return recomputeShipmentStatus()
+    }
+
+    /**
+     * Dynamically recomputes the current status of the shipment based on the shipment events that have occurred.
+     *
+     * Note that if you simply need to access the current status of the shipment, use {@link #getCurrentStatus()}.
+     */
+    ShipmentStatus recomputeShipmentStatus() {
+        Event event = getMostRecentSystemEvent()
+        switch(event?.eventType?.eventCode) {
+            case EventCode.SHIPPED:
+                return new ShipmentStatus(code    : ShipmentStatusCode.SHIPPED,
+                                            date    : event.eventDate,
+                                            location: this.origin)
+            case EventCode.PARTIALLY_RECEIVED:
+                return new ShipmentStatus(code    : ShipmentStatusCode.PARTIALLY_RECEIVED,
+                                            date    : event.eventDate,
+                                            location: this.destination)
+            case EventCode.RECEIVED:
+                return new ShipmentStatus(code    : ShipmentStatusCode.RECEIVED,
+                                            date    : event.eventDate,
+                                            location: this.destination)
+            default:
+                return new ShipmentStatus(code    : ShipmentStatusCode.PENDING,
+                                            date    : null,
+                                            location: null)
         }
     }
 
@@ -665,27 +689,30 @@ class Shipment implements Comparable, Serializable, Historizable {
     }
 
     Date dateScheduled() {
-        Event event = events.find { Event event -> event?.eventType?.eventCode == EventCode.SCHEDULED }
+        Event event = getEventByCode(EventCode.SCHEDULED)
         return event?.eventDate ?: dateCreated
     }
 
     Date dateShipped() {
-        Event event = events.find { Event event -> event?.eventType?.eventCode == EventCode.SHIPPED }
+        Event event = getEventByCode(EventCode.SHIPPED)
         return event?.eventDate ?: actualShippingDate
     }
 
     Date dateDelivered() {
-        Event event = events.find { Event event -> event?.eventType?.eventCode == EventCode.RECEIVED || event?.eventType?.eventCode == EventCode.DELIVERED }
+        Event event = getEventByCode(EventCode.RECEIVED)
+        if (!event) {
+            event = getEventByCode(EventCode.DELIVERED)
+        }
         return event?.eventDate ?: actualDeliveryDate
     }
 
     Date dateCustomsEntry() {
-        Event event = events.find { Event event -> event?.eventType?.eventCode == EventCode.CUSTOMS_ENTRY }
+        Event event = getEventByCode(EventCode.CUSTOMS_ENTRY)
         return event?.eventDate
     }
 
     Date dateCustomsRelease() {
-        Event event = events.find { Event event -> event?.eventType?.eventCode == EventCode.CUSTOMS_RELEASE }
+        Event event = getEventByCode(EventCode.CUSTOMS_RELEASE)
         return event?.eventDate
     }
 
@@ -702,7 +729,7 @@ class Shipment implements Comparable, Serializable, Historizable {
     }
 
     Set<Event> getCustomEvents() {
-        return events.findAll { EventCode.listCustomEventTypeCodes().contains(it.eventType?.eventCode) }
+        return events.findAll { it.eventType?.eventCode?.isCustomEvent() }
     }
 
     @Override
@@ -719,6 +746,24 @@ class Shipment implements Comparable, Serializable, Historizable {
 
     @Override
     List<HistoryItem> getHistory() {
+        // Gracefully handle fetching history for shipments from before we introduced event logs.
+        if (!eventLogs) {
+            return getHistoryPreEventLog()
+        }
+
+        List<HistoryItem> histories = []
+        ReferenceDocument referenceDocument = getReferenceDocument()
+        for (EventLog eventLog in eventLogs) {
+            List<HistoryItem> historyItems = eventLog.getHistory()
+            historyItems.each { it.referenceDocument = referenceDocument }
+            histories.addAll(historyItems)
+        }
+
+        // TODO: Order the history chronologically
+        return histories
+    }
+
+    private List<HistoryItem> getHistoryPreEventLog() {
         List<HistoryItem> histories = []
         // First collect history of CREATED event
         histories.add(new HistoryItem<Shipment>(
@@ -773,5 +818,20 @@ class Shipment implements Comparable, Serializable, Historizable {
         histories.addAll(customEventsHistory)
         return histories
     }
-}
 
+    Event getEventByCode(EventCode code) {
+        // Shipments only allow one type per code, so simply find the first event that matches the code.
+        return events?.find { it.eventType?.eventCode == code }
+    }
+
+    /**
+     * Recompute the values of currentStatus and currentEvent.
+     *
+     * Only to be called when the shipment events are modified, which happens automatically due to this method
+     * being called in addToEvents and removeFromEvents. We do this so that getters on the fields are quick.
+     */
+    void resynchronizeEventAndStatus() {
+        currentStatus = recomputeShipmentStatus().code
+        currentEvent = getMostRecentSystemEvent()
+    }
+}
