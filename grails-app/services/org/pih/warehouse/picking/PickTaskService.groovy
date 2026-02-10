@@ -22,6 +22,9 @@ import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.picklist.PicklistService
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentService
 
 @Transactional
 class PickTaskService {
@@ -30,6 +33,7 @@ class PickTaskService {
     InventoryService inventoryService
     ProductAvailabilityService productAvailabilityService
     PicklistService picklistService
+    ShipmentService shipmentService
 
     @Transactional(readOnly = true)
     List<PickTask> search(SearchPickTaskCommand command, Map params = [:]) {
@@ -366,7 +370,15 @@ class PickTaskService {
                 it.delete()
             }
 
-            // Once we are done with deleting transactions, we can clear the picklist (delete picklist items)
+            // Then delete shipment items associated with the requisition (if any)
+            requisition.shipments?.each { Shipment shipment ->
+                shipment.shipmentItems?.each { ShipmentItem shipmentItem ->
+                    shipmentService.deleteShipmentItem(shipmentItem)
+                }
+            }
+
+            // Once we are done with deleting transactions and shipment items, we can clear the picklist
+            // (delete picklist items)
             picklistService.clearPicklist(requisition.picklist.id)
         }
 
