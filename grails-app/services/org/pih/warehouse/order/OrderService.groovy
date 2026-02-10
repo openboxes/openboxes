@@ -729,6 +729,9 @@ class OrderService {
                         if (currentLocation.isAccountingRequired() && !product.glAccount) {
                             throw new ProductException("Product ${productCode}: Cannot add order item without a valid general ledger code")
                         }
+                        if (orderItemId && orderItem.product.productCode != productCode) {
+                            throw new ProductException("Cannot change the product for an existing order item via import")
+                        }
                         orderItem.product = product
                     } else {
                         throw new ProductException("No product code specified")
@@ -795,6 +798,10 @@ class OrderService {
                     Integer parsedQty = CSVUtils.parseInteger(quantity, "quantity")
                     if (parsedQty <= 0) {
                         throw new IllegalArgumentException("Wrong quantity value: ${parsedQty}.")
+                    }
+
+                    if (order.status >= OrderStatus.PLACED && orderItem.quantityInShipments > parsedQty) {
+                        throw new IllegalArgumentException("Must enter a quantity greater than or equal to the quantity in shipments (${orderItem.quantityInShipments})")
                     }
 
                     BigDecimal parsedUnitPrice = CSVUtils.parseNumber(unitPrice, "unitPrice")
