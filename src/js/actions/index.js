@@ -70,6 +70,7 @@ import {
   UPDATE_COUNTED_BY,
   UPDATE_DATE_COUNTED,
   UPDATE_FIELD_VALUE,
+  UPDATE_WORKFLOW_HEADER,
 } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
 import genericApi from 'api/services/GenericApi';
@@ -822,6 +823,14 @@ export const startResolution = (requestIds, locationId) => async (dispatch) => {
 export const eraseDraft = (locationId, tab) => ({
   type: ERASE_DRAFT,
   payload: { locationId, tab },
+});
+
+export const updateWorkflowHeader = (headerInfo, headerStatus) => ({
+  type: UPDATE_WORKFLOW_HEADER,
+  payload: {
+    headerInfo,
+    headerStatus,
+  },
 });
 
 export const fetchLotNumbersByProductIds = (productIds) => async (dispatch) => {

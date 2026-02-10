@@ -53,8 +53,8 @@ const TableCell = ({
           duration="250"
           hideDelay="50"
           className="text-overflow-ellipsis"
-          html={tooltipLabel || value}
           style={tooltipForm && { width: '100%' }}
+          html={tooltipLabel || value}
         >
           {cellValue}
         </Tooltip>
@@ -113,6 +113,7 @@ TableCell.defaultProps = {
   openLinkInNewTab: false,
   showError: false,
   tdProps: {},
+  tooltipLabel: '',
 };
 
 TableCell.propTypes = {

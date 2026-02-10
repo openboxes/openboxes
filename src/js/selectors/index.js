@@ -14,6 +14,11 @@ export const getNotificationAutohideDelay = createSelector(
   (session) => session.notificationAutohideDelay,
 );
 
+export const getMaxUploadFileSize = createSelector(
+  [getSession],
+  (session) => session.maxUploadFileSize,
+);
+
 // Cache for locations
 const locationCache = new Map();
 
@@ -222,6 +227,8 @@ export const getCycleCountTranslations = createSelector(
 export const getLotNumbersWithExpiration = (state) =>
   state.lotNumbers?.lotNumbersWithExpiration || {};
 
+export const getShipmentTypes = (state) => state.stockMovementCommon.shipmentTypes;
+
 export const getLotNumbersByProductId = (state, productId) =>
   getLotNumbersWithExpiration(state)?.[productId] || [];
 
@@ -352,3 +359,10 @@ export const getSpinner = (state) => state.spinner.show;
  * CURRENCY
  */
 export const getCurrencyCode = (state) => state.session.currencyCode;
+
+/**
+ * INBOUND
+ */
+export const getInboundHeaderInfo = (state) => state.inbound.headerInfo || [];
+
+export const getInboundHeaderStatus = (state) => state.inbound.headerStatus;

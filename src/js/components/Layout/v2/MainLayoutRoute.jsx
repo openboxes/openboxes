@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Route } from 'react-router-dom';
 
-import MainLayout from 'components/Layout/MainLayout';
+import MainLayout from 'components/Layout/v2/MainLayout';
 
 const MainLayoutRoute = ({ path, component: Component }) => (
   <Route

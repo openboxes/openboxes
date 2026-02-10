@@ -32,6 +32,10 @@ const SelectField = ({
   onKeyDown,
   focusProps = {},
   creatable,
+  customTooltip,
+  ariaLabel,
+  locationId,
+  onExactProductSelected,
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -56,8 +60,6 @@ const SelectField = ({
 
   const fieldRef = useRef(null);
 
-  const refProps = productSelect ? {} : { fieldRef };
-
   useFocusOnMatch({ ...focusProps, ref: fieldRef, type: componentType.SELECT_FIELD });
 
   return (
@@ -69,6 +71,10 @@ const SelectField = ({
       required={required}
       hideErrorMessageWrapper={hideErrorMessageWrapper}
       className="select-wrapper-container"
+      customTooltip={customTooltip}
+      value={fieldProps?.value?.label}
+      ariaLabel={ariaLabel}
+      hasErrors={Boolean(errorMessage || hasErrors)}
     >
       <SelectComponent
         className={`form-element-select ${className} ${errorMessage || hasErrors ? 'has-errors' : ''} ${warning ? 'has-warning' : ''}`}
@@ -79,7 +85,9 @@ const SelectField = ({
         multi={multiple}
         onKeyDown={onKeyDown}
         creatable={creatable}
-        {...refProps}
+        fieldRef={fieldRef}
+        locationId={locationId}
+        onExactProductSelected={onExactProductSelected}
         {...asyncProps}
         {...fieldProps}
       />
@@ -141,6 +149,13 @@ SelectField.propTypes = {
   }),
   // boolean that enables creating new options in the dropdown
   creatable: PropTypes.bool,
+  customTooltip: PropTypes.bool,
+  ariaLabel: PropTypes.shape({
+    id: PropTypes.string,
+    defaultMessage: PropTypes.string,
+  }),
+  locationId: PropTypes.string,
+  onExactProductSelected: PropTypes.func,
 };
 
 SelectField.defaultProps = {
@@ -165,4 +180,8 @@ SelectField.defaultProps = {
   onKeyDown: null,
   focusProps: {},
   creatable: false,
+  customTooltip: false,
+  ariaLabel: null,
+  locationId: null,
+  onExactProductSelected: () => {},
 };

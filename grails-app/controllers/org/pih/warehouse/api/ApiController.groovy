@@ -195,6 +195,7 @@ class ApiController {
         String localizedHelpScoutKey = helpScoutService.localizedHelpScoutKey
         boolean isHelpScoutEnabled = grailsApplication.config.openboxes.helpscout.widget.enabled
         boolean localizationModeEnabled = session.useDebugLocale ?: false
+        int maxUploadFileSize = grailsApplication.config.grails.controllers.upload.maxFileSize
 
         render([
             data: [
@@ -238,6 +239,7 @@ class ApiController {
                 browserConnectionTimeout      : browserConnectionTimeout,
                 isAutosaveEnabled             : isAutosaveEnabled,
                 cycleCountMaxSelectedProducts : cycleCountMaxSelectedProducts,
+                maxUploadFileSize             : maxUploadFileSize,
             ],
         ] as JSON)
     }

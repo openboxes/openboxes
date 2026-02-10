@@ -150,11 +150,14 @@ class LocationService {
                 !it.supports(ActivityCode.MANAGE_INVENTORY) && it.locationType.locationTypeCode != LocationTypeCode.SUPPLIER
             }
         }
+
         if (direction == StockMovementDirection.INBOUND.name()) {
+            LocationTypeCode code = (params.locationTypeCode as LocationTypeCode) ?: LocationTypeCode.SUPPLIER
             return locations.findAll {
-                it.locationType.locationTypeCode == LocationTypeCode.SUPPLIER
+                it.locationType.locationTypeCode == code
             }
         }
+
         if (direction == StockMovementDirection.OUTBOUND.name()) {
             return locations.findAll {
                 (it.locationGroup == currentLocation.locationGroup) ||

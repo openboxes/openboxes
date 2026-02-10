@@ -14,6 +14,7 @@ import grails.converters.JSON
 import grails.core.GrailsApplication
 import grails.plugins.csv.CSVWriter
 import org.grails.web.json.JSONObject
+import org.pih.warehouse.api.InboundWorkflowState
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementItem
@@ -142,7 +143,8 @@ class StockMovementController {
                 redirect(action: "createOutbound", params: params)
                 break
             case StockMovementDirection.INBOUND:
-                redirect(action: "createInbound", params: params)
+                String step = (stockMovement.statusCode in [StockMovementStatusCode.CREATED.name(), StockMovementStatusCode.REQUESTING.name()]) ?  InboundWorkflowState.ADD_ITEMS : InboundWorkflowState.SEND_SHIPMENT
+                redirect(action: "createInbound", params: params + [step: step])
                 break
             default:
                 redirect(action: "createOutbound", params: params)

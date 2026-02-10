@@ -9,7 +9,7 @@ import useTranslation from 'hooks/useTranslation';
 import ModalWithTable from './ModalWithTable';
 
 const ConfirmExpirationDateModal = ({
-  isOpen, itemsWithMismatchedExpiry, onConfirm, onCancel,
+  isOpen, data, onConfirm, onCancel,
 }) => {
   useTranslation('confirmExpirationDate');
   const translate = useTranslate();
@@ -21,14 +21,14 @@ const ConfirmExpirationDateModal = ({
       title={translate('react.confirmExpirationDate.modal.title.label', 'Confirm save')}
       subtitle={translate('react.confirmExpirationDate.modal.subtitle.label', 'This will update the expiry date across all depots...')}
       columns={columns}
-      data={itemsWithMismatchedExpiry}
+      data={data}
       confirmLabel={{
-        key: 'react.default.yes.label',
-        default: 'Yes',
+        id: 'react.default.yes.label',
+        defaultMessage: 'Yes',
       }}
       cancelLabel={{
-        key: 'react.default.no.label',
-        default: 'No',
+        id: 'react.default.no.label',
+        defaultMessage: 'No',
       }}
       onConfirm={onConfirm}
       onCancel={onCancel}
@@ -38,7 +38,7 @@ const ConfirmExpirationDateModal = ({
 
 ConfirmExpirationDateModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
-  itemsWithMismatchedExpiry: PropTypes.arrayOf(
+  data: PropTypes.arrayOf(
     PropTypes.shape({
       code: PropTypes.string,
       product: PropTypes.shape({}),
@@ -52,7 +52,7 @@ ConfirmExpirationDateModal.propTypes = {
 };
 
 ConfirmExpirationDateModal.defaultProps = {
-  itemsWithMismatchedExpiry: [],
+  data: [],
 };
 
 export default ConfirmExpirationDateModal;

@@ -16,6 +16,7 @@ export const DateFormat = {
 export const DateFormatDateFns = {
   MM_DD_YYYY: 'MM/dd/yyyy',
   DD_MMM_YYYY: 'dd/MMM/yyyy',
+  DD_MMM_YYYY_HH_MM_SS: 'dd/MMM/yyyy HH:mm:ss',
   MMM_DD_YYYY: 'MMM dd, yyyy',
   MMM_DD_YYYY_HH_MM_SS: 'MMM dd, yyyy HH:mm:ss',
   MM_DD_YYYY_HH_MM_Z: 'MM/dd/yyyy HH:mm XXX',

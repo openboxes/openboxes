@@ -6,9 +6,9 @@ import Footer from 'components/Layout/Footer';
 import Header from 'components/Layout/Header';
 
 const MainLayout = ({ children }) => (
-  <div className="page page-dashboard">
+  <div className="page-layout">
     <Header />
-    <div className="main">{children}</div>
+    <main className="page-layout__main">{children}</main>
     <Footer />
   </div>
 );

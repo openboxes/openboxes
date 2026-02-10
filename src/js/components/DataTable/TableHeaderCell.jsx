@@ -3,6 +3,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { RiArrowDownSFill, RiArrowUpSFill } from 'react-icons/ri';
 
+import CustomTooltip from 'wrappers/CustomTooltip';
+
 const TableHeaderCell = ({
   children,
   className,
@@ -11,6 +13,9 @@ const TableHeaderCell = ({
   sortable,
   columnId,
   dynamicClassName,
+  required,
+  tooltip,
+  tooltipLabel,
 }) => {
   const sortableProps = {
     tabIndex: '0',
@@ -20,19 +25,22 @@ const TableHeaderCell = ({
   };
 
   return (
-    <div
-      {...(sortable ? sortableProps : {})}
-      style={style}
-      className={`rt-th ${className} ${dynamicClassName?.(columnId)}`}
-    >
-      {children}
-      {sortable && (
-      <div className="sorting-arrows">
-        <RiArrowUpSFill className="arrow-up" />
-        <RiArrowDownSFill className="arrow-down" />
+    <CustomTooltip content={tooltipLabel} show={tooltip}>
+      <div
+        {...(sortable ? sortableProps : {})}
+        style={style}
+        className={`rt-th ${className} ${dynamicClassName?.(columnId)}`}
+      >
+        {children}
+        {required && <span className="ml-1 required">&#42;</span>}
+        {sortable && (
+        <div className="sorting-arrows">
+          <RiArrowUpSFill className="arrow-up" />
+          <RiArrowDownSFill className="arrow-down" />
+        </div>
+        )}
       </div>
-      )}
-    </div>
+    </CustomTooltip>
   );
 };
 
@@ -42,9 +50,12 @@ TableHeaderCell.defaultProps = {
   style: undefined,
   className: undefined,
   sortable: false,
+  required: false,
   columnId: null,
   dynamicClassName: () => {},
   toggleSort: () => {},
+  tooltip: false,
+  tooltipLabel: undefined,
 };
 
 TableHeaderCell.propTypes = {
@@ -54,10 +65,13 @@ TableHeaderCell.propTypes = {
   ]).isRequired,
   className: PropTypes.string,
   sortable: PropTypes.bool,
+  required: PropTypes.bool,
   style: PropTypes.shape({}),
   toggleSort: PropTypes.func,
   // When passing columnId, it is expected that toggleSort will take this as an argument.
   // It's needed for differentiate columns while sorting.
   columnId: PropTypes.string,
   dynamicClassName: PropTypes.func,
+  tooltip: PropTypes.bool,
+  tooltipLabel: PropTypes.string,
 };
