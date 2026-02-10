@@ -70,6 +70,11 @@ const InboundAddItems = ({
                 defaultMessage: 'No items to display',
               }}
               overflowVisible
+              virtualize={{
+                enabled: lineItemsArrayFields.length > 20,
+                estimateSize: 36,
+                overscan: 5,
+              }}
             />
           </div>
         </div>
