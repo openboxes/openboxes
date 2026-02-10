@@ -2159,18 +2159,20 @@ class StockMovementService {
 
 
     void allocateSuggestedItems(RequisitionItem requisitionItem, List<SuggestedItem> suggestedItems, Boolean isAutoAllocated = true) {
-
+        Boolean overwriteQuantityPicked = requisitionItem?.requisition?.origin?.requiresMobilePicking()
         for (SuggestedItem suggestedItem : suggestedItems) {
+            Integer quantityPicked = overwriteQuantityPicked ? 0 : suggestedItem.quantityPicked?.intValueExact()
+            Integer quantityToPick = suggestedItem.quantityPicked.toInteger()
             createOrUpdatePicklistItem(
                     requisitionItem,
                     null,
                     suggestedItem.inventoryItem,
                     suggestedItem.binLocation,
-                    suggestedItem.quantityPicked?.intValueExact(),
+                    quantityPicked,
                     null,
                     null,
                     isAutoAllocated,
-                    suggestedItem.quantityRequested.toInteger()
+                    quantityToPick
             )
         }
     }
