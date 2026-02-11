@@ -22,6 +22,9 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 //                       Increasing this number will increase the amount of time it takes
 //                       to render the virtualizer, but might decrease the likelihood of seeing
 //                       slow-rendering blank items
+//    customRowsHeight: true/false - if true, the height of rows will be recalculated
+//                      while scrolling, it has worse performance than hardcoded
+//                      row height
 // }
 const DataTableBody = ({
   emptyTableMessage,
@@ -37,7 +40,12 @@ const DataTableBody = ({
 }) => {
   const translate = useTranslate();
   const parentRef = useRef(null);
-  const { enabled: isVirtualizationEnabled, estimateSize, overscan } = virtualize;
+  const {
+    enabled: isVirtualizationEnabled,
+    estimateSize,
+    overscan,
+    customRowsHeight: isCustomRowsHeightEnabled,
+  } = virtualize;
 
   const rowVirtualizer = useVirtualizer({
     count: rowModel?.rows?.length,
@@ -82,6 +90,9 @@ const DataTableBody = ({
             const rowProps = isVirtualizationEnabled
               ? {
                 'data-index': row.index,
+                ref: isCustomRowsHeightEnabled
+                  ? rowVirtualizer.measureElement
+                  : null,
                 style: {
                   position: 'absolute',
                   top: 0,
@@ -177,6 +188,7 @@ DataTableBody.propTypes = {
     enabled: PropTypes.bool,
     estimateSize: PropTypes.number,
     overscan: PropTypes.number,
+    customRowsHeight: PropTypes.bool,
   }),
 };
 
@@ -189,5 +201,6 @@ DataTableBody.defaultProps = {
     enabled: false,
     estimateSize: 50,
     overscan: 10,
+    customRowsHeight: false,
   },
 };

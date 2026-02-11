@@ -11,6 +11,21 @@ import useWindowWidthCheck from 'hooks/useWindowWidthCheck';
 import 'react-table/react-table.css';
 import 'components/DataTable/DataTable.scss';
 
+// To enable row virtualization pass the `virtualize` config object:
+// virtualize: {
+//    enabled: true/false - ability to dynamically turn on/off virtualization
+//    estimateSize: number - this value is required even if the customRowsHeight is
+//                   set to true. The value should be set to the average height of the
+//                   row to ensure that any issues won't be seen before attaching the
+//                   ResizeObserver to the browser.
+//    overscan: number - the number of items to render above and below the visible area.
+//                       Increasing this number will increase the amount of time it takes
+//                       to render the virtualizer, but might decrease the likelihood of seeing
+//                       slow-rendering blank items
+//    customRowsHeight: true/false - if true, the height of rows will be recalculated
+//                      while scrolling, it has worse performance than hardcoded
+//                      row height
+// }
 const DataTable = ({
   columns,
   data,
@@ -109,6 +124,7 @@ DataTable.propTypes = {
     enabled: PropTypes.bool,
     estimateSize: PropTypes.number,
     overscan: PropTypes.number,
+    customRowsHeight: PropTypes.bool,
   }),
   overflowVisible: PropTypes.bool,
 };
@@ -127,6 +143,7 @@ DataTable.defaultProps = {
     enabled: false,
     estimateSize: 50,
     overscan: 10,
+    customRowsHeight: false,
   },
   // it allows tooltips to overflow outside the table
   overflowVisible: false,
