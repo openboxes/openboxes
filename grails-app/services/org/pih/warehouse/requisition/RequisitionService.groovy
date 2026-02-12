@@ -119,6 +119,10 @@ class RequisitionService {
         return statistics
     }
 
+    Requisition getById(String id) {
+        return Requisition.get(id)
+    }
+
     /**
      * Get recent requisitions
      */
