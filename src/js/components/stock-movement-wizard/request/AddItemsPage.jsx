@@ -1184,7 +1184,7 @@ class AddItemsPage extends Component {
     const hasDuplicates = _.some(itemsMap, (item) => item.length > 1);
 
     // First check for duplicates, if there are any, display the alert to combine them into one line
-    if (hasDuplicates && !(isSupplier || !values.hasManageInventory)) {
+    if (hasDuplicates && (!isSupplier && values.hasManageInventory)) {
       this.confirmTransition(itemsWithSameCode);
       return;
     }
