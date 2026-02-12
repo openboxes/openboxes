@@ -117,16 +117,18 @@
                         </g:link>
                     </g:if>
                 </g:else>
-                <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
-                    <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
-                    <warehouse:message code="default.button.receive.label" />
-                </g:link>
 
-                <g:if test="${grailsApplication.config.openboxes.receiving.manualAutoReceiving.enabled}">
-                    <g:link controller="partialReceiving" action="autoreceive" id="${stockMovement?.shipment?.id}" class="button">
+                <g:if test="${stockMovement?.hasBeenIssued() && (stockMovement?.hasBeenShipped() || stockMovement?.hasBeenPartiallyReceived())}">
+                    <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
                         <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
-                        <warehouse:message code="default.button.autoreceive.label" />
+                        <warehouse:message code="default.button.receive.label" />
                     </g:link>
+                    <g:if test="${grailsApplication.config.openboxes.receiving.manualAutoReceiving.enabled}">
+                        <g:link controller="partialReceiving" action="autoreceive" id="${stockMovement?.shipment?.id}" class="button">
+                            <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                            <warehouse:message code="default.button.autoreceive.label" />
+                        </g:link>
+                    </g:if>
                 </g:if>
 
                 <g:if test="${stockMovement?.hasBeenStaged()}">
