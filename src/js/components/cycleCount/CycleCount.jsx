@@ -15,7 +15,7 @@ import {
 import useCycleCountFilters from 'hooks/cycleCount/useCycleCountFilters';
 import useCycleCountPagination from 'hooks/useCycleCountPagination';
 import useQueryParams from 'hooks/useQueryParams';
-import useResetScrollbar from 'hooks/useResetScrollbar';
+import useScrollbar from 'hooks/useScrollbar';
 import useSwitchTabs from 'hooks/useSwitchTabs';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTranslation from 'hooks/useTranslation';
@@ -95,12 +95,12 @@ const CycleCount = () => {
     },
   };
 
-  const { resetScrollbar } = useResetScrollbar({
+  const { scrollToTop } = useScrollbar({
     selector: 'body',
   });
 
   useLayoutEffect(() => {
-    resetScrollbar();
+    scrollToTop();
   }, [currentTab, pageSize, offset]);
 
   return (
