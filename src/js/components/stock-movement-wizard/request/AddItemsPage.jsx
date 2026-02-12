@@ -23,6 +23,7 @@ import TextField from 'components/form-elements/TextField';
 import notification from 'components/Layout/notifications/notification';
 import ActivityCode from 'consts/activityCode';
 import { DASHBOARD_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import locationType from 'consts/locationType';
 import NotificationType from 'consts/notificationTypes';
 import StockMovementStatus from 'consts/stockMovementStatus';
 import apiClient from 'utils/apiClient';
@@ -1178,11 +1179,12 @@ class AddItemsPage extends Component {
     });
     const itemsWithSameCode = _.filter(itemsMap, (item) => item.length > 1);
 
-    const hasDuplicates =
-      _.some(itemsMap, (item) => item.length > 1) && !(this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory)
+    const { values } = this.state;
+    const isSupplier = values.origin.type === locationType.SUPPLIER;
+    const hasDuplicates = _.some(itemsMap, (item) => item.length > 1);
 
     // First check for duplicates, if there are any, display the alert to combine them into one line
-    if (hasDuplicates) {
+    if (hasDuplicates && !(isSupplier || !values.hasManageInventory)) {
       this.confirmTransition(itemsWithSameCode);
       return;
     }
