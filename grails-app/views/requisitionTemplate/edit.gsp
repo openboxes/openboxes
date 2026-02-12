@@ -311,7 +311,6 @@
               // Displaying error for duplicated products that are currently in the table.
               // This can happen when user saved invalid line before that validation existed
               if (isDuplicate) {
-                console.log(nRow)
                 $(nRow).addClass('line-error');
               } else {
                 $(nRow).removeClass('line-error');
