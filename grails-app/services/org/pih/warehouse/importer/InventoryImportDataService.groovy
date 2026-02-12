@@ -406,6 +406,26 @@ class InventoryImportDataService implements ImportDataService {
         return binLocation
     }
 
+    void calculateAndApplyInventoryDifferences(ImportDataCommand command) {
+        command.data = command.data.findResults { entry ->
+            Product product = Product.findByProductCode(entry['productCode'])
+            InventoryItem inventoryItem =
+                    inventoryService.findInventoryItemByProductAndLotNumber(product, entry['lotNumber'])
+
+            Integer currentQuantity =
+                    productAvailabilityService.getQuantityOnHand(inventoryItem)
+
+            Integer quantityToImport = entry['quantity'] as Integer
+            Integer quantity = quantityToImport - currentQuantity
+
+            if (quantity > 0) {
+                return entry
+            }
+            // Remove rows that have quantity 0, so that they won't be imported
+            return null
+        }
+    }
+
     /**
      * Convenience POJO for holding the results of the inventory import.
      */
