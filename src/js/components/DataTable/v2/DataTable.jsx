@@ -14,6 +14,8 @@ import 'components/DataTable/DataTable.scss';
 // To enable row virtualization pass the `virtualize` config object:
 // virtualize: {
 //    enabled: true/false - ability to dynamically turn on/off virtualization
+//    minSize: number - minimum number of rows required to enable virtualization.
+//              Virtualization will be enabled only when enabled === true and dataLength >= minSize.
 //    estimateSize: number - this value is required even if the customRowsHeight is
 //                   set to true. The value should be set to the average height of the
 //                   row to ensure that any issues won't be seen before attaching the
@@ -122,6 +124,7 @@ DataTable.propTypes = {
   tableWithPinnedColumns: PropTypes.bool,
   virtualize: PropTypes.shape({
     enabled: PropTypes.bool,
+    minSize: PropTypes.number,
     estimateSize: PropTypes.number,
     overscan: PropTypes.number,
     customRowsHeight: PropTypes.bool,
@@ -141,6 +144,7 @@ DataTable.defaultProps = {
   tableWithPinnedColumns: false,
   virtualize: {
     enabled: false,
+    minSize: 20,
     estimateSize: 50,
     overscan: 10,
     customRowsHeight: false,

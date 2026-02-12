@@ -71,7 +71,8 @@ const InboundAddItems = ({
               }}
               overflowVisible
               virtualize={{
-                enabled: lineItemsArrayFields.length > 20,
+                enabled: true,
+                minSize: 20,
                 estimateSize: 36,
                 overscan: 10,
                 customRowsHeight: false,
