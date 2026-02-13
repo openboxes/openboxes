@@ -55,6 +55,7 @@ class ShipmentEventService {
         shipmentEventLogService.logShipmentEventRollback(shipment, event)
 
         shipment.removeFromEvents(event)
+        shipment.currentEvent = null  // TODO: do this better?????????
         event.delete()
 
         // Ensure the order summary gets refreshed

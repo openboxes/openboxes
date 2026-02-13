@@ -20,6 +20,12 @@
             <column name="event_id" type="CHAR(38)">
                 <constraints nullable="true" />
             </column>
+            <column name="event_code" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="event_date" type="DATETIME">
+                <constraints nullable="false" />
+            </column>
             <column name="event_log_code" type="VARCHAR(50)">
                 <constraints nullable="false" />
             </column>

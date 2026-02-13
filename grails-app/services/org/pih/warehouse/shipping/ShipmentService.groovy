@@ -1783,7 +1783,7 @@ class ShipmentService {
 
         try {
 
-            if (eventInstance?.eventType?.eventCode in [EventCode.RECEIVED, EventCode.PARTIALLY_RECEIVED]) {
+            if (eventInstance?.eventType?.eventCode?.isReceiptEvent()) {
                 deleteReceipts(shipmentInstance)
                 deleteInboundTransactions(shipmentInstance)
             } else if (eventInstance?.eventType?.eventCode == EventCode.SHIPPED) {

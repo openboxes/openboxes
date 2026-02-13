@@ -58,4 +58,15 @@ enum EventCode {
     static List<EventCode> listCustomEventTypeCodes() {
         return values().findAll { it.isCustomEvent() }
     }
+
+    static List<EventCode> listReceiptEventTypeCodes() {
+        return [
+                PARTIALLY_RECEIVED,
+                RECEIVED,
+        ]
+    }
+
+    boolean isReceiptEvent() {
+        return listReceiptEventTypeCodes().contains(this)
+    }
 }

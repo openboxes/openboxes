@@ -2,10 +2,13 @@ package org.pih.warehouse.shipping
 
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import java.time.Instant
 
 import org.pih.warehouse.core.Event
-import org.pih.warehouse.core.EventLog
-import org.pih.warehouse.core.EventLogCode
+import org.pih.warehouse.core.date.InstantParser
+import org.pih.warehouse.core.date.JavaUtilDateFormatter
+import org.pih.warehouse.core.history.EventLog
+import org.pih.warehouse.core.history.EventLogCode
 
 @Transactional
 class ShipmentEventLogService {
@@ -29,9 +32,11 @@ class ShipmentEventLogService {
 
         EventLog eventLog = new EventLog(
                 event: event,
+                eventCode: event.eventType?.eventCode,
+                eventDate: event.eventDate ? InstantParser.asInstant(event.eventDate) : Instant.now(),
                 eventLogCode: EventLogCode.EVENT_OCCURRED,
                 message: event.comment?.comment ?: event.eventType?.description,
-                eventLocation: event.eventLocation)
+                location: event.eventLocation)
 
         return createShipmentEventLog(shipment, eventLog)
     }
@@ -40,19 +45,19 @@ class ShipmentEventLogService {
      * Log the occurrence of a shipment {@link Event} being rolled back / reverted.
      */
     EventLog logShipmentEventRollback(Shipment shipment, Event event) {
-        EventLog eventLog = new EventLog(
-                event: null,  // We can't reference the event in the log because it is going to be deleted
+        EventLog rollbackEventLog = new EventLog(
+                // We can't reference the event in the log because it is going to be deleted by the rollback
+                event: null,
+                eventCode: event.eventType?.eventCode,
+                eventDate: Instant.now(),
                 eventLogCode: EventLogCode.ROLLBACK_EVENT_OCCURRED,
                 message: "Rolling back event: ${event.eventType?.eventCode}",
-                eventLocation: event.eventLocation)
+                location: event.eventLocation)
 
-        // Find all other event logs referencing that Event and null the reference so that we don't get
+        // Find all other event logs that reference the Event and remove the reference so that we don't get
         // "deleted object would be re-saved by cascade" exceptions.
-        List<EventLog> eventLogsToClean = EventLog.findAllByEvent(event)
-        for (EventLog eventLogToClean in eventLogsToClean) {
-            eventLogToClean.event = null
-        }
+        shipment.eventLogs.findAll { it.event == event }.each { it.event = null }
 
-        return createShipmentEventLog(shipment, eventLog)
+        return createShipmentEventLog(shipment, rollbackEventLog)
     }
 }

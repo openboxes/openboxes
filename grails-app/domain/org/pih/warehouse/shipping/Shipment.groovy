@@ -14,6 +14,8 @@ import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import org.pih.warehouse.core.*
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.history.EventLog
+import org.pih.warehouse.core.history.Historizable
 import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
@@ -21,9 +23,8 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
-import util.StringUtil
 
-class Shipment implements Comparable, Serializable, Historizable {
+class Shipment implements Comparable, Serializable, Historizable<ShipmentHistoryBuilder> {
 
     def publishRefreshEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this))
@@ -32,10 +33,14 @@ class Shipment implements Comparable, Serializable, Historizable {
     def beforeInsert() {
         createdBy = AuthService.currentUser
         updatedBy = AuthService.currentUser
+        currentEvent = mostRecentSystemEvent
+        currentStatus = status.code
     }
 
     def beforeUpdate() {
         updatedBy = AuthService.currentUser
+        currentEvent = mostRecentSystemEvent
+        currentStatus = status.code
     }
 
     def afterInsert() {
@@ -76,7 +81,7 @@ class Shipment implements Comparable, Serializable, Historizable {
     String driverName                // added for stock movements (should use carrier)
 
     // One-to-many associations
-    SortedSet<Event> events
+    SortedSet events
     SortedSet<EventLog> eventLogs
 
     Requisition requisition
@@ -215,26 +220,6 @@ class Shipment implements Comparable, Serializable, Historizable {
     // TODO: is this in descending order for a good reason?
     int compareTo(obj) {
         obj.name <=> name
-    }
-
-    /**
-     * Overrides GORM's built in method for adding an event to the shipment.
-     * We do this to ensure that whenever an event is added, we recompute the current shipment status.
-     */
-    Shipment addToEvents(Event event) {
-        events.add(event)
-        resynchronizeEventAndStatus()
-        return this
-    }
-
-    /**
-     * Overrides GORM's built in method for removing an event from the shipment.
-     * We do this to ensure that whenever an event is removed, we recompute the current shipment status.
-     */
-    Shipment removeFromEvents(Event event) {
-        events.remove(event)
-        resynchronizeEventAndStatus()
-        return this
     }
 
     /**
@@ -447,35 +432,25 @@ class Shipment implements Comparable, Serializable, Historizable {
     }
 
     /**
-     * @deprecated use {@link #getCurrentStatus()} instead. This method is slow because it recomputes status each time.
-     */
-    @Deprecated
-    ShipmentStatus getStatus() {
-        return recomputeShipmentStatus()
-    }
-
-    /**
      * Dynamically recomputes the current status of the shipment based on the shipment events that have occurred.
-     *
-     * Note that if you simply need to access the current status of the shipment, use {@link #getCurrentStatus()}.
      */
-    ShipmentStatus recomputeShipmentStatus() {
+    ShipmentStatus getStatus() {
         Event event = getMostRecentSystemEvent()
         switch(event?.eventType?.eventCode) {
             case EventCode.SHIPPED:
-                return new ShipmentStatus(code    : ShipmentStatusCode.SHIPPED,
+                return new ShipmentStatus(code      : ShipmentStatusCode.SHIPPED,
                                             date    : event.eventDate,
                                             location: this.origin)
             case EventCode.PARTIALLY_RECEIVED:
-                return new ShipmentStatus(code    : ShipmentStatusCode.PARTIALLY_RECEIVED,
+                return new ShipmentStatus(code      : ShipmentStatusCode.PARTIALLY_RECEIVED,
                                             date    : event.eventDate,
                                             location: this.destination)
             case EventCode.RECEIVED:
-                return new ShipmentStatus(code    : ShipmentStatusCode.RECEIVED,
+                return new ShipmentStatus(code      : ShipmentStatusCode.RECEIVED,
                                             date    : event.eventDate,
                                             location: this.destination)
             default:
-                return new ShipmentStatus(code    : ShipmentStatusCode.PENDING,
+                return new ShipmentStatus(code      : ShipmentStatusCode.PENDING,
                                             date    : null,
                                             location: null)
         }
@@ -728,97 +703,6 @@ class Shipment implements Comparable, Serializable, Historizable {
         shipmentItems?.any { it?.container }
     }
 
-    Set<Event> getCustomEvents() {
-        return events.findAll { it.eventType?.eventCode?.isCustomEvent() }
-    }
-
-    @Override
-    ReferenceDocument getReferenceDocument() {
-        return new ReferenceDocument(
-                label: shipmentNumber,
-                url: "/stockMovement/show/${requisition?.id ?: id}",
-                id: id,
-                identifier: shipmentNumber,
-                description: description,
-                name: name,
-        )
-    }
-
-    @Override
-    List<HistoryItem> getHistory() {
-        // Gracefully handle fetching history for shipments from before we introduced event logs.
-        if (!eventLogs) {
-            return getHistoryPreEventLog()
-        }
-
-        List<HistoryItem> histories = []
-        ReferenceDocument referenceDocument = getReferenceDocument()
-        for (EventLog eventLog in eventLogs) {
-            List<HistoryItem> historyItems = eventLog.getHistory()
-            historyItems.each { it.referenceDocument = referenceDocument }
-            histories.addAll(historyItems)
-        }
-
-        // TODO: Order the history chronologically
-        return histories
-    }
-
-    private List<HistoryItem> getHistoryPreEventLog() {
-        List<HistoryItem> histories = []
-        // First collect history of CREATED event
-        histories.add(new HistoryItem<Shipment>(
-                date: dateCreated,
-                location: origin,
-                eventType: new EventTypeDto(
-                        name: StringUtil.format(EventCode.CREATED.name()),
-                        eventCode: EventCode.CREATED,
-                ),
-                referenceDocument: referenceDocument,
-                createdBy: createdBy,
-        ))
-        // Then collect history of a shipped event if any
-        if (hasShipped()) {
-            histories.add(new HistoryItem<Shipment>(
-                    date: dateShipped(),
-                    location: origin,
-                    eventType: new EventTypeDto(
-                            name: StringUtil.format(EventCode.SHIPPED.name()),
-                            eventCode: EventCode.SHIPPED,
-                    ),
-                    referenceDocument: referenceDocument,
-                    createdBy: shippedBy,
-            ))
-        }
-        // Then collect history of a partially_received events if any
-        if (wasPartiallyReceived()) {
-            // If there is a received event, exclude it from the set
-            Set<Receipt> partialReceipts = wasReceived() ? (receipts - receipts.last()) : receipts
-            List<HistoryItem<Receipt>> partiallyReceivedHistoryItem = partialReceipts.collect { it.getHistory() }.flatten()
-            partiallyReceivedHistoryItem.each {
-                it.eventType = new EventTypeDto(
-                        name: StringUtil.format(EventCode.PARTIALLY_RECEIVED.name()),
-                        eventCode: EventCode.PARTIALLY_RECEIVED,
-                )
-            }
-            histories.addAll(partiallyReceivedHistoryItem)
-        }
-        // Then collect history of a received event if any
-        if (wasReceived()) {
-            List<HistoryItem<Receipt>> receivedHistoryItem = receipts.last().getHistory()
-            receivedHistoryItem.each {
-                it.eventType = new EventTypeDto(
-                        name: StringUtil.format(EventCode.RECEIVED.name()),
-                        eventCode: EventCode.RECEIVED,
-                )
-            }
-            histories.addAll(receivedHistoryItem)
-        }
-        // At the end collect history of custom events
-        List<HistoryItem<Event>> customEventsHistory = getCustomEvents().collect { it.getHistory() }.flatten()
-        histories.addAll(customEventsHistory)
-        return histories
-    }
-
     Event getEventByCode(EventCode code) {
         // Shipments only allow one type per code, so simply find the first event that matches the code.
         return events?.find { it.eventType?.eventCode == code }
@@ -831,7 +715,7 @@ class Shipment implements Comparable, Serializable, Historizable {
      * being called in addToEvents and removeFromEvents. We do this so that getters on the fields are quick.
      */
     void resynchronizeEventAndStatus() {
-        currentStatus = recomputeShipmentStatus().code
+        currentStatus = getStatus().code
         currentEvent = getMostRecentSystemEvent()
     }
 }
