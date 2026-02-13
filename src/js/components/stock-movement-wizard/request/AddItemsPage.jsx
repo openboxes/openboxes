@@ -1067,7 +1067,7 @@ class AddItemsPage extends Component {
    */
   confirmTransition(items) {
     confirmAlert({
-      title: this.props.translate('react.stockMovement.confirmTransition.label', 'You have entered the same code twice. Please combine them into one line before continuing.'),
+      title: this.props.translate('react.stockMovement.confirmRequestTransition.label', 'You have entered the same code twice. Please combine them into one line before continuing.'),
       message: _.map(items.flat(), (item) => (
         <p key={item.sortOrder}>
           {`${item.product.productCode} ${item.product.displayNames?.default || item.product.name} ${item.quantityRequested}`}
