@@ -15,7 +15,12 @@
             <thead>
             <tr class="odd">
                 <th><warehouse:message code="inventoryLevel.status.label"/></th>
-                <th><warehouse:message code="location.label"/></th>
+                <th><warehouse:message code="inventoryLevel.inventoryLevelScope.label"/></th>
+                <th>
+                    <warehouse:message code="inventoryLevel.facility.label"/> &rsaquo;
+                    <warehouse:message code="inventoryLevel.location.label"/>
+                </th>
+                <th class="center"><warehouse:message code="location.locationPurpose.label" default="Purpose"/></th>
                 <th class="center"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Class"/></th>
                 <th class="center"><warehouse:message code="inventoryLevel.preferredBinLocation.label" default="Putaway Location"/></th>
                 <th class="center border-right"><warehouse:message code="inventoryLevel.replenishmentLocation.label" default="Replenishment Location"/></th>
@@ -31,7 +36,7 @@
             </thead>
             <tbody>
 
-            <g:each var="inventoryLevelInstance" in="${productInstance?.inventoryLevels.sort { it?.inventory?.warehouse?.name }}" status="i">
+            <g:each var="inventoryLevelInstance" in="${productInstance?.inventoryLevels.sort()}" status="i">
 
                 <tr class="prop ${i%2?'even':'odd'}">
                     <td class="center middle">
@@ -46,9 +51,19 @@
                         </g:else>
                     </td>
                     <td class="middle">
+                        ${inventoryLevelInstance?.inventoryLevelScope}
+                    </td>
+                    <td class="middle">
                         ${inventoryLevelInstance?.inventory?.warehouse?.name }
-                        <g:if test="${inventoryLevelInstance?.internalLocation}">/
+                        <g:if test="${inventoryLevelInstance?.internalLocation}"> &rsaquo;
                             ${inventoryLevelInstance?.internalLocation?.name }
+                            ${inventoryLevelInstance?.internalLocation?.locationType?.name }
+                        </g:if>
+                    </td>
+                    <td class="center middle">
+                        <g:set var="purpose" value="${inventoryLevelInstance?.internalLocation?.locationPurpose ?: inventoryLevelInstance?.inventory?.warehouse?.locationPurpose}"/>
+                        <g:if test="${purpose}">
+                            <warehouse:message code="enum.LocationPurpose.${purpose}" default="${purpose}"/>
                         </g:if>
                     </td>
                     <td class="center middle">
@@ -97,7 +112,7 @@
             </g:each>
             <g:unless test="${productInstance?.inventoryLevels}">
                 <tr>
-                    <td colspan="12" class="center">
+                    <td colspan="15" class="center">
                         <div class="empty center">
                             <warehouse:message code="product.hasNoInventoryLevels.label" default="There are no stock levels"/>
                         </div>
@@ -107,7 +122,7 @@
             </tbody>
             <tfoot>
             <tr class="prop">
-                <td colspan="14" class="center">
+                <td colspan="15" class="center">
 
                     <a href="javascript:void(0);" class="button btn-show-dialog"
                        data-title="${warehouse.message(code:'inventoryLevel.create.label', default: 'Create stock level')}" data-width="900" data-height="500"

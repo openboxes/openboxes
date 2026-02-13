@@ -16,15 +16,21 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import util.InventoryUtil
 
-class InventoryLevel {
+class InventoryLevel implements Comparable<InventoryLevel> {
 
     String id
+
+    // Unique identifier (optional) for facility-level inventory level rules (used for integration with external systems)
+    String identifier
 
     // Product assigned to inventory level rule
     Product product
 
     // Internal location assigned to inventory level rule (optional)
     Location internalLocation
+
+    // Sort order for location-level rules (lower = primary storage location)
+    Integer sortOrder = 0
 
     // Inventory status of rule (whether it's enabled / disabled)
     InventoryStatus status = InventoryStatus.SUPPORTED
@@ -75,6 +81,11 @@ class InventoryLevel {
     // Additional comments about
     String comments
 
+    // Cycle count fields
+    Integer cycleCountFrequencyDays
+    Date dateLastCycleCount
+    Date dateNextCycleCount
+
     // Auditing
     Date dateCreated
     Date lastUpdated
@@ -95,10 +106,13 @@ class InventoryLevel {
             "monthlyForecastQuantity",
             "assignedLocations",
             "putawayLocations",
-            "defaultPutawayLocation"
+            "defaultPutawayLocation",
+            "inventoryLevelScope"
     ]
 
     static constraints = {
+        identifier(nullable: true, maxSize: 255)
+        sortOrder(nullable: true)
         status(nullable: true)
         inventory(nullable: false)
         product(nullable: false)
@@ -115,6 +129,9 @@ class InventoryLevel {
         abcClass(nullable: true, blank: false)
         preferred(nullable: true)
         comments(nullable: true)
+        cycleCountFrequencyDays(nullable: true)
+        dateLastCycleCount(nullable: true)
+        dateNextCycleCount(nullable: true)
         replenishmentPeriodDays(nullable: true)
         demandTimePeriodDays(nullable: true)
     }
@@ -141,6 +158,23 @@ class InventoryLevel {
         }.projections {
             property "preferredBinLocation"
         }.get() as Location
+    }
+
+    InventoryLevelScope getInventoryLevelScope() {
+        return internalLocation ? InventoryLevelScope.LOCATION : InventoryLevelScope.FACILITY
+    }
+
+    int compareTo(InventoryLevel other) {
+        // Facility-level first (no internalLocation), then location-level
+        int scopeCompare = (internalLocation ? 1 : 0) <=> (other?.internalLocation ? 1 : 0)
+        if (scopeCompare != 0) return scopeCompare
+
+        // Then by sort order
+        int sortCompare = (sortOrder ?: 0) <=> (other?.sortOrder ?: 0)
+        if (sortCompare != 0) return sortCompare
+
+        // Then alphabetical by internal location name
+        return (internalLocation?.name ?: "") <=> (other?.internalLocation?.name ?: "")
     }
 
     Location getFacilityLocation() {

@@ -46,4 +46,5 @@
     <include file="0.9.x/changelog-2025-11-21-1300-add-new-columns-to-picklistitem.xml" />
     <include file="0.9.x/changelog-2025-12-04-1200-add-picklist-column-to-transaction-source.xml" />
     <include file="0.9.x/changelog-2026-02-04-1200-add-requisition-columns-to-control-allocation.xml" />
+    <include file="0.9.x/changelog-2026-02-12-0000-alter-table-inventory-level-add-identifier.xml" />
 </databaseChangeLog>
