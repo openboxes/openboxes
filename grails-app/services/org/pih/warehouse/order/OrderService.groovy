@@ -804,6 +804,11 @@ class OrderService {
                         throw new IllegalArgumentException("Must enter a quantity greater than or equal to the quantity in shipments (${orderItem.quantityInShipments})")
                     }
 
+                    if (orderItem.hasInvoices && parsedQty < orderItem.quantityInvoiced) {
+                        String invoiceNumbers = orderItem.invoices?.collect { it.invoiceNumber }?.join(", ")
+                        throw new IllegalArgumentException("Must enter a quantity greater than or equal to the quantity invoiced (${orderItem.quantityInvoiced}). Pending invoices: ${invoiceNumbers}")
+                    }
+
                     BigDecimal parsedUnitPrice = CSVUtils.parseNumber(unitPrice, "unitPrice")
                     if (orderItem.id && orderItem.hasRegularInvoice && orderItem.unitPrice != parsedUnitPrice) {
                         throw new IllegalArgumentException("Cannot update the unit price on a line that is already invoiced.")
