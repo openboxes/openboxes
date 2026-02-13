@@ -4,7 +4,6 @@ import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
 import {
-  getCurrentLocale,
   getCurrentLocation,
   getCycleCountMaxSelectedProducts,
   getFormatLocalizedDate,
@@ -48,12 +47,10 @@ const useAllProductsTab = ({
   const { tab } = useQueryParams();
 
   const {
-    currentLocale,
     currentLocation,
     cycleCountMaxSelectedProducts,
     formatLocalizedDate,
   } = useSelector((state) => ({
-    currentLocale: getCurrentLocale(state),
     currentLocation: getCurrentLocation(state),
     cycleCountMaxSelectedProducts: getCycleCountMaxSelectedProducts(state),
     formatLocalizedDate: getFormatLocalizedDate(state),
@@ -365,7 +362,7 @@ const useAllProductsTab = ({
         flexWidth: 150,
       },
     }),
-  ], [currentLocale, sort, order]);
+  ], [translate, sort, order]);
 
   const emptyTableMessage = {
     id: 'react.cycleCount.table.emptyTable.label',

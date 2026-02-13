@@ -5,7 +5,7 @@ import queryString from 'query-string';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import useQueryParams from 'hooks/useQueryParams';
-import useResetScrollbar from 'hooks/useResetScrollbar';
+import useScrollbar from 'hooks/useScrollbar';
 
 const useWizard = ({ initialKey, steps }) => {
   const parsedQueryParams = useQueryParams();
@@ -54,12 +54,12 @@ const useWizard = ({ initialKey, steps }) => {
     parsedQueryParams.step || initialKey || steps[0]?.key,
   [parsedQueryParams.step, steps, initialKey]);
 
-  const { resetScrollbar } = useResetScrollbar({
+  const { scrollToTop } = useScrollbar({
     selector: 'body',
   });
 
   useLayoutEffect(() => {
-    resetScrollbar();
+    scrollToTop();
   }, [currentStepKey]);
 
   const stepProperties = useMemo(() => {

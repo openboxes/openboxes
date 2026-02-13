@@ -15,6 +15,7 @@ import { DateFormatDateFns } from 'consts/timeFormat';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 import { formatDateToString } from 'utils/dateUtils';
+import { formatProductDisplayName } from 'utils/form-values-utils';
 
 const useInboundSendTable = () => {
   const [tableData, setTableData] = useState([]);
@@ -158,19 +159,13 @@ const useInboundSendTable = () => {
           {translate('react.stockMovement.product.label', 'Product')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
+      cell: ({ getValue, row }) => (
         <TableCell
           className="rt-td-send-step"
           customTooltip
           tooltipLabel={getValue()}
         >
-          <div
-            className="text-truncate"
-            aria-label={translate('react.stockMovement.product.label', 'Product')}
-            data-testid="label-field"
-          >
-            {getValue()}
-          </div>
+          {formatProductDisplayName(row.original.product)}
         </TableCell>
       ),
       size: 300,

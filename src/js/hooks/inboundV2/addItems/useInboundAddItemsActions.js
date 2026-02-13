@@ -24,6 +24,7 @@ import NotificationType from 'consts/notificationTypes';
 import RequisitionStatus from 'consts/requisitionStatus';
 import { InboundWorkflowState } from 'consts/StockMovementState';
 import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
+import useScrollbar from 'hooks/useScrollbar';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 import apiClient from 'utils/apiClient';
@@ -47,7 +48,7 @@ const useInboundAddItemsActions = ({
   const dispatch = useDispatch();
   const history = useHistory();
   const { stockMovementId } = useParams();
-
+  const { scrollToBottom } = useScrollbar({ selector: '.rt-tbody-v2' });
   const {
     fields: lineItemsArrayFields,
     remove: removeRow,
@@ -67,6 +68,12 @@ const useInboundAddItemsActions = ({
       ...defaultTableRow[0],
       sortOrder: getNextSortOrder(),
     }]);
+
+    // We use setTimeout to ensure the scroll happens after React
+    // finishes rendering the new row and updates the scrollHeight
+    setTimeout(() => {
+      scrollToBottom();
+    }, 0);
   };
 
   const formatDate = (date) => formatDateToString({
