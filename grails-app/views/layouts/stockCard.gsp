@@ -31,11 +31,41 @@
 		}
 
 		.recalled {
-			background-color: #ffcccb !important;
 		}
 
 		.restricted {
-			background-color: #fca714 !important;
+		}
+
+		.status-badge {
+			display: inline-block;
+			padding: 2px 8px;
+			border-radius: 3px;
+			font-size: 0.85em;
+			font-weight: 500;
+		}
+		.status-available {
+			color: #155724;
+			background-color: #d4edda;
+		}
+		.status-picked {
+			color: #004085;
+			background-color: #cce5ff;
+		}
+		.status-allocated {
+			color: #3d3d8f;
+			background-color: #e0e0f8;
+		}
+		.status-hold {
+			color: #856404;
+			background-color: #fff3cd;
+		}
+		.status-recalled {
+			color: #721c24;
+			background-color: #f8d7da;
+		}
+		.status-not-available {
+			color: #383d41;
+			background-color: #e2e3e5;
 		}
 	</style>
 </head>

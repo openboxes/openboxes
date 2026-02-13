@@ -129,7 +129,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
         cache true
     }
 
-    static transients = ["managedLocally", "status", "approvalRequired"]
+    static transients = ["managedLocally", "status", "approvalRequired", "locationPurpose"]
 
     String toString() { return this.name }
 
@@ -375,6 +375,19 @@ class Location implements Comparable<Location>, java.io.Serializable {
 
     Boolean isDisplay() {
         return supports(ActivityCode.DISPLAY_STOCK)
+    }
+
+    LocationPurpose getLocationPurpose() {
+        if (supports(ActivityCode.DISPLAY_STOCK)) {
+            return LocationPurpose.DISPLAY
+        }
+        if (supports(ActivityCode.RECEIVE_STOCK)) {
+            return LocationPurpose.RECEIVING
+        }
+        if (supports(ActivityCode.STAGE_STOCK) || supports(ActivityCode.STAGING_LOCATION)) {
+            return LocationPurpose.STAGING
+        }
+        return LocationPurpose.STORAGE
     }
 
     static List<Location> listNonInternalLocations() {

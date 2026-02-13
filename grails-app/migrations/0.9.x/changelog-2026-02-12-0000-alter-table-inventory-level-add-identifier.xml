@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda" id="120220260000-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="inventory_level" columnName="identifier"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="inventory_level">
+            <column name="identifier" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="120220260000-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="inventory_level" columnName="sort_order"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="inventory_level">
+            <column name="sort_order" type="INT" defaultValueNumeric="0">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="120220260000-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="inventory_level" columnName="cycle_count_frequency_days"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="inventory_level">
+            <column name="cycle_count_frequency_days" type="INT">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="120220260000-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="inventory_level" columnName="date_last_cycle_count"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="inventory_level">
+            <column name="date_last_cycle_count" type="DATETIME">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="120220260000-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="inventory_level" columnName="date_next_cycle_count"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="inventory_level">
+            <column name="date_next_cycle_count" type="DATETIME">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>
