@@ -20,6 +20,7 @@ class Person implements Comparable, Serializable {
     String lastName
     String email
     String phoneNumber
+    String identifier
     Date dateCreated
     Date lastUpdated
     Boolean active = true
@@ -37,6 +38,7 @@ class Person implements Comparable, Serializable {
         lastName(blank: false, maxSize: 255)
         phoneNumber(nullable: true, maxSize: 255)
         email(nullable: true, email: true, maxSize: 255)
+        identifier(nullable: true, maxSize: 255)
         active(nullable: true)
     }
 
