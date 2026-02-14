@@ -51,7 +51,8 @@
                                 </g:if>
                                 <span class="line-extension" title="${entry?.binLocation?.name}">
                                     <g:link controller="location" action="edit" id="${entry.binLocation?.id}">${entry?.binLocation?.name}</g:link>
-                                </span>
+                                </span>&nbsp;
+                                <span class="fade"><warehouse:message code="enum.LocationPurpose.${entry.binLocation?.locationPurpose}" default="${entry.binLocation?.locationPurpose}"/></span>
                             </g:if>
                             <g:else>
                                 <warehouse:message code="default.label" default="Default"/>

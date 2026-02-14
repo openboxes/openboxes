@@ -4,6 +4,14 @@
     width: 100%;
     overflow: hidden;
 }
+ul.assigned-locations {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+ul.assigned-locations li {
+    padding: 2px 0;
+}
 </style>
 
 <div id="product-details">
@@ -171,7 +179,16 @@
                         </td>
                         <td class="value">
                             <g:if test="${inventoryLevel.assignedLocations}">
-                                ${inventoryLevel?.assignedLocations.join(" : ")}
+                                <ul class="assigned-locations">
+                                    <g:each var="assignedLocation" in="${inventoryLevel.assignedLocations}">
+                                        <li>
+                                            <g:link controller="location" action="edit" id="${assignedLocation?.id}">
+                                                ${assignedLocation?.name}
+                                            </g:link>
+                                            <span class="fade"><warehouse:message code="enum.LocationPurpose.${assignedLocation?.locationPurpose}" default="${assignedLocation?.locationPurpose}"/></span>
+                                        </li>
+                                    </g:each>
+                                </ul>
                             </g:if>
                             <g:else>
                                 ${warehouse.message(code:'default.none.label')}
