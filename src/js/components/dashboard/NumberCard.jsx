@@ -111,6 +111,7 @@ const NumberCard = SortableElement(({
   showPercentSign,
   infoIcon,
   disableSubtitleEllipsis,
+  linkTarget,
 }) => {
   let isSparkline = false;
   if (sparklineData != null) {
@@ -181,7 +182,7 @@ const NumberCard = SortableElement(({
     );
 
   return (
-    cardLink ? <a target="_blank" rel="noopener noreferrer" href={cardLink} className="number-card">{card}</a> : <div className="number-card">{card}</div>
+    cardLink ? <a href={cardLink} className="number-card" target={linkTarget} rel={linkTarget === '_blank' ? 'noopener noreferrer' : undefined}>{card}</a> : <div className="number-card">{card}</div>
   );
 });
 

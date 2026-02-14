@@ -346,6 +346,7 @@ function fetchGraphIndicator(
           disableTruncation: indicatorConfig.disableTruncation,
         },
         size: indicatorConfig.size,
+        linkTarget: indicatorConfig.linkTarget,
       },
     });
   }, () => {
@@ -386,6 +387,7 @@ function fetchNumberIndicator(
         info: indicatorConfig.info,
         subtitle: indicatorConfig.subtitle,
         numberType: indicatorConfig.numberType,
+        linkTarget: indicatorConfig.linkTarget,
       },
     });
   });

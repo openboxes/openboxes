@@ -32,7 +32,7 @@ defaults.scale.ticks.beginAtZero = true;
 // TODO: OBPIH-4385 Refactor/Split this file into separate components
 
 const SortableCards = SortableContainer(({
-  data, loadIndicator, allLocations, personalDashboardActive,
+  data, loadIndicator, allLocations, personalDashboardActive, linkTarget,
 }) => (
   <div className="card-component">
     {data.map((value, index) =>
@@ -58,13 +58,14 @@ const SortableCards = SortableContainer(({
           size={value.size}
           disabled={!personalDashboardActive}
           hideDraghandle={!personalDashboardActive}
+          linkTarget={value.linkTarget || linkTarget}
         />
         )
       ))}
   </div>
 ));
 
-const SortableNumberCards = SortableContainer(({ data, personalDashboardActive }) => (
+const SortableNumberCards = SortableContainer(({ data, personalDashboardActive, linkTarget }) => (
   <div className="card-component">
     {data.map((value, index) => (
       (value
@@ -83,6 +84,7 @@ const SortableNumberCards = SortableContainer(({ data, personalDashboardActive }
           sparklineData={value.data}
           disabled={!personalDashboardActive}
           hideDraghandle={!personalDashboardActive}
+          linkTarget={value.linkTarget || linkTarget}
         />
         )
       )
@@ -153,6 +155,7 @@ const ConfigurationsList = ({
 };
 
 const MAIN_DASHBOARD_CONFIG = 'mainDashboard';
+const DEFAULT_LINK_TARGET = '_self';
 
 class Dashboard extends Component {
   constructor(props) {
@@ -398,6 +401,7 @@ class Dashboard extends Component {
           axis="xy"
           useDragHandle
           personalDashboardActive={isPersonalDashboardActive}
+          linkTarget={this.props.dashboardConfig.linkTarget || DEFAULT_LINK_TARGET}
         />
       );
     } else {
@@ -441,6 +445,7 @@ class Dashboard extends Component {
               axis="xy"
               useDragHandle
               personalDashboardActive={isPersonalDashboardActive}
+              linkTarget={this.props.dashboardConfig.linkTarget || DEFAULT_LINK_TARGET}
             />
             <ArchiveIndicator hideArchive={!this.state.isDragging} />
             {isPersonalDashboardActive
