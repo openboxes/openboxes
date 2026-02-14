@@ -236,7 +236,7 @@
                   $(nRow).removeClass().css('backgroundColor', '#ffcccb').attr("title", "This lot has been recalled");
                 }
                 if (aData["isOnHold"]) {
-                  $(nRow).removeClass().css('backgroundColor', '#fca714').attr("title", "This bin has been restricted");
+                  $(nRow).removeClass().css('backgroundColor', '#fff3cd').attr("title", "This bin has been restricted");
                 }
             }
 

@@ -20,7 +20,6 @@
                     <warehouse:message code="inventoryLevel.facility.label"/> &rsaquo;
                     <warehouse:message code="inventoryLevel.location.label"/>
                 </th>
-                <th class="center"><warehouse:message code="location.locationPurpose.label" default="Purpose"/></th>
                 <th class="center"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Class"/></th>
                 <th class="center"><warehouse:message code="inventoryLevel.preferredBinLocation.label" default="Putaway Location"/></th>
                 <th class="center border-right"><warehouse:message code="inventoryLevel.replenishmentLocation.label" default="Replenishment Location"/></th>
@@ -57,13 +56,13 @@
                         ${inventoryLevelInstance?.inventory?.warehouse?.name }
                         <g:if test="${inventoryLevelInstance?.internalLocation}"> &rsaquo;
                             ${inventoryLevelInstance?.internalLocation?.name }
-                            ${inventoryLevelInstance?.internalLocation?.locationType?.name }
-                        </g:if>
-                    </td>
-                    <td class="center middle">
-                        <g:set var="purpose" value="${inventoryLevelInstance?.internalLocation?.locationPurpose ?: inventoryLevelInstance?.inventory?.warehouse?.locationPurpose}"/>
-                        <g:if test="${purpose}">
-                            <warehouse:message code="enum.LocationPurpose.${purpose}" default="${purpose}"/>
+                            <span class="fade">
+                                <g:set var="purpose" value="${inventoryLevelInstance?.internalLocation?.locationPurpose}"/>
+                                <g:if test="${purpose}">
+                                    <warehouse:message code="enum.LocationPurpose.${purpose}" default="${purpose}"/>
+                                </g:if>
+                            </span>
+
                         </g:if>
                     </td>
                     <td class="center middle">
