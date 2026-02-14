@@ -585,6 +585,7 @@ openboxes {
 
 openboxes {
     dashboardConfig {
+        linkTarget = "_self"
         mainDashboardId = "mainDashboard"
         dashboards {
             mainDashboard {
