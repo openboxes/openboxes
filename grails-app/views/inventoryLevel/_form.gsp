@@ -236,7 +236,8 @@
                             <label for="dateLastCycleCount"><warehouse:message code="inventoryLevel.dateLastCycleCount.label" default="Date Last Count" /></label>
                         </td>
                         <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'dateLastCycleCount', 'errors')}">
-                            <g:datePicker name="dateLastCycleCount" value="${inventoryLevelInstance?.dateLastCycleCount}" precision="day" noSelection="['':'']"/>
+                            <input type="text" name="dateLastCycleCount" class="text datepicker"
+                                   value="${inventoryLevelInstance?.dateLastCycleCount?.format('MM/dd/yyyy')}" />
                         </td>
                     </tr>
                     <tr class="prop">
@@ -244,7 +245,8 @@
                             <label for="dateNextCycleCount"><warehouse:message code="inventoryLevel.dateNextCycleCount.label" default="Date Next Count" /></label>
                         </td>
                         <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'dateNextCycleCount', 'errors')}">
-                            <g:datePicker name="dateNextCycleCount" value="${inventoryLevelInstance?.dateNextCycleCount}" precision="day" noSelection="['':'']"/>
+                            <input type="text" name="dateNextCycleCount" class="text datepicker"
+                                   value="${inventoryLevelInstance?.dateNextCycleCount?.format('MM/dd/yyyy')}" />
                         </td>
                     </tr>
                 </tbody>
