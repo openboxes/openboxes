@@ -509,7 +509,8 @@ class UserService {
         def mainDashboardId = Holders.config.openboxes.dashboardConfig.mainDashboardId
         def resultConfig = [
                 dashboard: fullConfig.dashboards[id ?: mainDashboardId],
-                dashboardWidgets: fullConfig.dashboardWidgets
+                dashboardWidgets: fullConfig.dashboardWidgets,
+                linkTarget: fullConfig.linkTarget,
         ]
         def userConfig = user.deserializeDashboardConfig()
 

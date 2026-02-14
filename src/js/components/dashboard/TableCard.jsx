@@ -9,6 +9,7 @@ const TableCard = (props) => {
     truncationLength,
     disableTruncation,
     data,
+    linkTarget,
   } = props;
 
   const displayItemData = ({
@@ -21,7 +22,7 @@ const TableCard = (props) => {
       href={link}
       className={link ? 'indicator-item-href' : 'disabled-indicator-item-href'}
       rel="noreferrer"
-      target="_blank"
+      target={linkTarget}
     >
       {!truncate ? item : _.truncate(item, {
         length: truncationLength ?? defaultTruncationLength,
@@ -35,7 +36,7 @@ const TableCard = (props) => {
         href={links[index]}
         className="indicator-item-href"
         rel="noreferrer"
-        target="_blank"
+        target={linkTarget}
       >
         {item}
         {' '}
@@ -64,7 +65,11 @@ const TableCard = (props) => {
             <tr
               onClick={() => {
                 if (item.link) {
-                  window.open(item.link, '_blank');
+                  if (linkTarget === '_blank') {
+                    window.open(item.link, '_blank');
+                  } else {
+                    window.location = item.link;
+                  }
                 }
               }}
               key={`item-${item.number}`}
@@ -132,6 +137,7 @@ TableCard.propTypes = {
     number: PropTypes.bool,
     value: PropTypes.bool,
   }),
+  linkTarget: PropTypes.string,
 };
 
 TableCard.defaultProps = {
@@ -150,6 +156,7 @@ TableCard.defaultProps = {
     number: undefined,
     value: undefined,
   },
+  linkTarget: undefined,
 };
 
 export default TableCard;
