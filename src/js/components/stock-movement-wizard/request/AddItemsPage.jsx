@@ -23,6 +23,7 @@ import TextField from 'components/form-elements/TextField';
 import notification from 'components/Layout/notifications/notification';
 import ActivityCode from 'consts/activityCode';
 import { DASHBOARD_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import locationType from 'consts/locationType';
 import NotificationType from 'consts/notificationTypes';
 import StockMovementStatus from 'consts/stockMovementStatus';
 import apiClient from 'utils/apiClient';
@@ -1064,21 +1065,17 @@ class AddItemsPage extends Component {
    * @param {object} items
    * @public
    */
-  confirmTransition(onConfirm, items) {
+  confirmTransition(items) {
     confirmAlert({
-      title: this.props.translate('react.stockMovement.confirmTransition.label', 'You have entered the same code twice. Do you want to continue?'),
-      message: _.map(items, (item) => (
+      title: this.props.translate('react.stockMovement.confirmRequestTransition.label', 'You have entered the same code twice. Please combine them into one line before continuing.'),
+      message: _.map(items.flat(), (item) => (
         <p key={item.sortOrder}>
           {`${item.product.productCode} ${item.product.displayNames?.default || item.product.name} ${item.quantityRequested}`}
         </p>
       )),
       buttons: [
         {
-          label: this.props.translate('react.default.yes.label', 'Yes'),
-          onClick: onConfirm,
-        },
-        {
-          label: this.props.translate('react.default.no.label', 'No'),
+          label: this.props.translate('react.default.continue.label', 'Continue'),
         },
       ],
     });
@@ -1168,13 +1165,7 @@ class AddItemsPage extends Component {
    */
   nextPage(formValues) {
     const lineItems = _.filter(formValues.lineItems, (val) => !_.isEmpty(val) && val.product);
-
-    if (_.some(lineItems, (item) => !item.quantityRequested || item.quantityRequested === '0')) {
-      this.confirmSave(() =>
-        this.checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems));
-    } else {
-      this.checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems);
-    }
+    this.checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems);
   }
 
   checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems) {
@@ -1188,14 +1179,28 @@ class AddItemsPage extends Component {
     });
     const itemsWithSameCode = _.filter(itemsMap, (item) => item.length > 1);
 
-    if (_.some(itemsMap, (item) => item.length > 1) && !(this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory)) {
-      this.confirmTransition(
-        () => this.saveAndTransitionToNextStep(formValues, lineItems),
-        _.reduce(itemsWithSameCode, (a, b) => a.concat(b), []),
-      );
-    } else {
-      this.saveAndTransitionToNextStep(formValues, lineItems);
+    const { values } = this.state;
+    const isSupplier = values.origin.type === locationType.SUPPLIER;
+    const hasDuplicates = _.some(itemsMap, (item) => item.length > 1);
+
+    // First check for duplicates, if there are any, display the alert to combine them into one line
+    if (hasDuplicates && (!isSupplier && values.hasManageInventory)) {
+      this.confirmTransition(itemsWithSameCode);
+      return;
     }
+    // Only if there are no duplicates left,
+    // check for the zero lines quantity and eventually transition to the next step
+    this.checkZeroQuantityLinesAndTransitionToNextStep(formValues, lineItems);
+  }
+
+  checkZeroQuantityLinesAndTransitionToNextStep(formValues, lineItems) {
+    const hasZeroQuantityLines = _.some(lineItems, (item) => !item.quantityRequested || item.quantityRequested === '0');
+    if (hasZeroQuantityLines) {
+      this.confirmSave(() =>
+        this.saveAndTransitionToNextStep(formValues, lineItems));
+      return;
+    }
+    this.saveAndTransitionToNextStep(formValues, lineItems);
   }
 
   /**
