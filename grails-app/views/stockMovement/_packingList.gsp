@@ -43,6 +43,7 @@
             <th><warehouse:message code="shipping.recipient.label"/></th>
             <th class="left"><warehouse:message code="default.comment.label"/></th>
             <th><warehouse:message code="shipmentItem.isFullyReceived.label" default="Received?"/></th>
+            <th><warehouse:message code="shipmentItem.backorderReference.label" default="Backorder Reference"/></th>
         </tr>
         <g:if test="${shipmentInstance?.shipmentItems}">
             <g:set var="count" value="${0 }"/>
@@ -202,13 +203,21 @@
                     <td aria-label="Is Fully Received" data-testid="is-fully-received">
                         <g:message code="default.boolean.${shipmentItem?.isFullyReceived()}"/>
                     </td>
+                    <td aria-label="Backorder Reference" data-testid="backorder-reference">
+                        <g:if test="${shipmentItem?.backorderReference || shipmentItem?.backorderItem}">
+                            ${shipmentItem?.backorderReference?:shipmentItem?.backorderItem?.requisition?.requestNumber}
+                        </g:if>
+                        <g:else>
+                            <div class="fade"><warehouse:message code="default.empty.label"/></div>
+                        </g:else>
+                    </td>
                 </tr>
                 <g:set var="previousContainer" value="${shipmentItem.container }"/>
             </g:each>
         </g:if>
         <g:else>
             <tr>
-                <td colspan="11" class="middle center fade empty">
+                <td colspan="13" class="middle center fade empty">
                     <warehouse:message code="shipment.noShipmentItems.message"/>
                 </td>
             </tr>

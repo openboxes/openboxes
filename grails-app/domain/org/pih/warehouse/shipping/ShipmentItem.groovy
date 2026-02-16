@@ -49,6 +49,9 @@ class ShipmentItem implements Comparable, Serializable {
 
     Integer sortOrder
 
+    String backorderReference
+    RequisitionItem backorderItem
+
     static belongsTo = [Shipment, OrderItem]
 
     static hasMany = [orderItems: OrderItem, receiptItems: ReceiptItem, invoiceItems: InvoiceItem]
@@ -98,6 +101,8 @@ class ShipmentItem implements Comparable, Serializable {
         requisitionItem(nullable: true)
         shipment(nullable: true)
         sortOrder(nullable: true)
+        backorderReference(nullable: true)
+        backorderItem(nullable: true)
     }
 
     Boolean isFullyReceived() {

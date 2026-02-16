@@ -517,7 +517,9 @@ class BootStrap {
                 quantity     : shipmentItem.quantity,
                 recipient    : shipmentItem.recipient,
                 shipment     : [id: shipmentItem?.shipment?.id, name: shipmentItem?.shipment?.name, shipmentNumber: shipmentItem?.shipment?.shipmentNumber],
-                container    : container
+                container    : container,
+                backorderReference: shipmentItem.backorderReference,
+                backorderItem: ["id": shipmentItem.backorderItem?.id],
             ]
         }
 

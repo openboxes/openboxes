@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="abalcerzak" id="120220261600-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="shipment_item" columnName="backorder_reference"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="shipment_item">
+            <column name="backorder_reference" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="abalcerzak" id="120220261600-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="shipment_item" columnName="backorder_item_id"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="shipment_item">
+            <column name="backorder_item_id" type="CHAR(38)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="abalcerzak" id="120220261600-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_shipment_item_backorder_item"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseColumnNames="backorder_item_id"
+                baseTableName="shipment_item"
+                constraintName="fk_shipment_item_backorder_item"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="requisition_item"
+        />
+    </changeSet>
+
+</databaseChangeLog>
