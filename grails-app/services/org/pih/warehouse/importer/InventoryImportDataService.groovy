@@ -416,9 +416,8 @@ class InventoryImportDataService implements ImportDataService {
                     productAvailabilityService.getQuantityOnHand(inventoryItem)
 
             Integer quantityToImport = entry['quantity'] as Integer
-            Integer quantity = quantityToImport - currentQuantity
 
-            if (quantity > 0) {
+            if (quantityToImport > currentQuantity) {
                 return entry
             }
             // Remove rows that have quantity 0, so that they won't be imported
