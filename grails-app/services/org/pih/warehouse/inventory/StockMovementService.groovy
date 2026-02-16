@@ -219,6 +219,15 @@ class StockMovementService {
                     case StockMovementStatusCode.CHECKING:
                     case StockMovementStatusCode.CHECKED:
                     case StockMovementStatusCode.STAGED:
+                        if (stockMovement.origin.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS)) {
+                            /**
+                             * If origin tracks internal transactions, then skip shipment creation for now.
+                             * It will be created when the requisition is issued. Plus on top of that it will
+                             * be improved/refactored in https://openboxes.atlassian.net/browse/OBLS-376.
+                             * */
+                            break
+                        }
+
                         def shipment = createShipment(stockMovement)
                         if (stockMovement?.requisition?.picklist) {
                             shipmentService.validateShipment(shipment)

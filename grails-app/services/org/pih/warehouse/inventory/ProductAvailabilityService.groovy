@@ -232,7 +232,39 @@ class ProductAvailabilityService {
      *     (IMPORTANT: Outbound returns can have picked items with RECALLED lots and bins with HOLD_STOCK activity)
      * */
     List<AllocatedItem> getQuantityPickedByProductAndLocation(Location location, Product product) {
+        // TODO: This will be reworked once we track internal transactions on requisition (OBLS-396)
         boolean internalTransactionsEnabled = location.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS)
+        // When external transactions are tracked:
+        //  1. exclude picks entirely moved to the staging location or outbound container
+        //  2. include partial picks moved to the staging location or outbound container, but were not shorted yet
+        //     (quantity picked less than quantity allocated and reason code not set indicates it is partial pick)
+        def internalTransactionsWhereClause = internalTransactionsEnabled ? """
+            AND (
+                (pli.outbound_container_id IS NULL AND pli.staging_location_id IS NULL)
+                OR
+                (pli.quantity_picked < pli.quantity AND pli.reason_code IS NULL)
+            )
+        """ : ''
+
+        def quantityAllocatedCalculation = internalTransactionsEnabled ?
+        // If we track internal transaction (ie we move picked inventory to staging location or outbound container),
+        // we should only consider as quantity allocated only the part not moved to staging location or
+        // outbound container (as these locations should be unallocable)
+        """
+            CASE
+                WHEN pli.reason_code IS NULL THEN sum(pli.quantity) - sum(pli.quantity_picked)
+                ELSE SUM(pli.quantity_picked)
+            END as quantity_allocated
+        """ :
+        // If we don't track internal transaction, we should consider the entire quantity as allocated
+        // until it is issued
+        """
+            CASE
+                WHEN pli.reason_code IS NULL THEN sum(pli.quantity)
+                ELSE SUM(pli.quantity_picked)
+            END as quantity_allocated
+        """
+
         def query = """
             SELECT 
                 bin_location_id as bin_location_id, 
@@ -242,10 +274,7 @@ class ProductAvailabilityService {
                 SELECT
                     pli.bin_location_id as bin_location_id,
                     pli.inventory_item_id as inventory_item_id,
-                    CASE
-                        WHEN pli.reason_code IS NULL THEN sum(pli.quantity)
-                        ELSE SUM(pli.quantity_picked)
-                    END as quantity_allocated
+                    ${quantityAllocatedCalculation}
                 FROM picklist_item pli
                     INNER JOIN picklist p ON pli.picklist_id = p.id
                     LEFT JOIN requisition_item ri ON pli.requisition_item_id = ri.id
@@ -264,7 +293,7 @@ class ProductAvailabilityService {
                   AND (ri.id IS NOT NULL AND (ii.lot_status IS NULL OR ii.lot_status != 'RECALLED') 
                   AND (lsa.activities IS NULL OR lsa.activities NOT LIKE '%HOLD_STOCK%'))
                   AND (:productId = '' OR ri.product_id = :productId)
-                  ${internalTransactionsEnabled ? 'AND pli.outbound_container_id IS NULL AND pli.staging_location_id IS NULL' : ''}
+                  ${internalTransactionsWhereClause}
                 GROUP BY pli.bin_location_id, pli.inventory_item_id, pli.reason_code
                 UNION
                 SELECT
