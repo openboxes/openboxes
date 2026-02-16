@@ -1,6 +1,7 @@
 package org.pih.warehouse.allocation
 
 import grails.gorm.transactions.Transactional
+import grails.validation.ValidationException
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
@@ -141,6 +142,8 @@ class AllocationService {
     }
 
     Boolean deallocate(Requisition requisition) {
+        validateNothingPicked(requisition)
+
         boolean result = true
         requisition.requisitionItems.each { requisitionItem ->
             result &= deallocate(requisitionItem)
@@ -154,8 +157,21 @@ class AllocationService {
     }
 
     Boolean deallocate(RequisitionItem requisitionItem) {
+        validateNothingPicked(requisitionItem)
         stockMovementService.clearPicklist(requisitionItem)
         return true
+    }
+
+    void validateNothingPicked(Requisition requisition) {
+        if (requisition?.picklist?.picklistItems?.any {it.status == "PICKED" || it.status == "STAGED"} ) {
+            throw new ValidationException("Requisition has picked items")
+        }
+    }
+
+    void validateNothingPicked(RequisitionItem requisitionItem) {
+        if (requisitionItem?.picklistItems?.any {it.status == "PICKED" || it.status == "STAGED"} ) {
+            throw new ValidationException("Requisition has picked items")
+        }
     }
 
     AllocationResult allocate(RequisitionItem requisitionItem, Integer quantityRequired, AllocationMode allocationMode, List list) {
@@ -172,11 +188,14 @@ class AllocationService {
         return allocate(request)
     }
 
-    void allocate(Requisition requisition, AllocationMode allocationMode, List<AllocationStrategy> allocationStrategyList) {
+    List<AllocationResult> allocate(Requisition requisition, AllocationMode allocationMode, List<AllocationStrategy> allocationStrategyList) {
+        List<AllocationResult> results = []
         requisition?.requisitionItems?.each { requisitionItem ->
             AllocationRequest allocationRequest = new AllocationRequest(requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationStrategyList)
-            allocate(allocationRequest)
+            AllocationResult singleResult = allocate(allocationRequest)
+            results.add(singleResult)
         }
+        return results
     }
 
     private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationStrategy> strategies, List<AvailableItem> excludeList = []) {
