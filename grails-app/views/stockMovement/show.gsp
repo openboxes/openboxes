@@ -221,7 +221,7 @@
                                         id="${stockMovement?.requisition?.id}"
                                         class="button"
                                 >
-                                    <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                                   <img src="${resource(dir: 'images/icons/silk/', file: 'bin.png')}" />&nbsp;
                                     <warehouse:message code="stockMovement.rollbackPicklist.label" default="Rollback picklist"/>
                                 </g:link>
                                 <g:link
@@ -230,7 +230,7 @@
                                         id="${stockMovement?.requisition?.id}"
                                         class="button"
                                 >
-                                    <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                                    <img src="${resource(dir: 'images/icons/silk/', file: 'arrow_redo.png')}" />&nbsp;
                                     <warehouse:message code="stockMovement.redoAllocation.label" default="Redo Allocation"/>
                                 </g:link>
                             </g:if>
@@ -241,7 +241,7 @@
                                         id="${stockMovement?.requisition?.id}"
                                         class="button"
                                 >
-                                    <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                                    <img src="${resource(dir: 'images/icons/silk/', file: 'bin.png')}" />&nbsp;
                                     <warehouse:message code="stockMovement.clearAllocation.label" default="Clear Allocation"/>
                                 </g:link>
                                 <g:link
@@ -250,7 +250,7 @@
                                         id="${stockMovement?.requisition?.id}"
                                         class="button"
                                 >
-                                    <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                                    <img src="${resource(dir: 'images/icons/silk/', file: 'arrow_redo.png')}" />&nbsp;
                                     <warehouse:message code="stockMovement.redoAllocation.label" default="Redo Allocation"/>
                                 </g:link>
                             </g:else>
