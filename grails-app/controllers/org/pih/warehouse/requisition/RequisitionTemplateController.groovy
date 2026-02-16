@@ -354,7 +354,7 @@ class RequisitionTemplateController {
         InputStream file = params?.csv
                 ? new ByteArrayInputStream(params?.csv.getBytes("UTF-8"))
                 :  request.getFile('file').inputStream
-        Requisition requisition = requisitionService.getById(params.id as String)
+        Requisition requisition = Requisition.get(params.id)
 
         List<Object> data = requisitionTemplateService.parseImportFile(file, requisition, delimiter, skipLines)
         List<String> errors = requisitionTemplateService.validateImportData(data)

@@ -228,6 +228,10 @@
 
         previouslySelectedProductId = selectedProductId;
 
+        linesToClear.forEach((index) => {
+          $(table.fnGetNodes()[index]).removeClass('new-line-error');
+        })
+
         if (duplicates.length > 0) {
           $("#new-row").addClass("new-line-error");
           addButton.prop("disabled", true);
@@ -239,9 +243,6 @@
           $("#new-row").removeClass("new-line-error");
             addButton.prop("disabled", false);
             addButton.prop("title", "");
-          linesToClear.forEach((index) => {
-            $(table.fnGetNodes()[index]).removeClass('new-line-error');
-          })
         }
       });
 

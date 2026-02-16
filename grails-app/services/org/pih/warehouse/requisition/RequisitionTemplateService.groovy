@@ -1,15 +1,12 @@
 package org.pih.warehouse.requisition
 
 import grails.gorm.transactions.Transactional
-import grails.util.Holders
-import org.grails.plugins.web.taglib.ApplicationTagLib
+import org.pih.warehouse.core.localization.MessageLocalizer
 
 @Transactional
 class RequisitionTemplateService {
 
-    ApplicationTagLib getApplicationTagLib() {
-        return Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
-    }
+    MessageLocalizer messageLocalizer
 
     List<Object> parseImportFile(InputStream inputStream, Requisition requisition, String delimiter, Integer skipLines) {
         List<Object> data = []
@@ -33,14 +30,19 @@ class RequisitionTemplateService {
     }
 
     List<String> validateImportData(List<Object> data) {
-        ApplicationTagLib g = getApplicationTagLib()
         List<String> errors = []
 
-        List<String> duplicationErrors = data.withIndex(1)
+        // Imported data is in format: [Product code, Product name, Quantity, UoM]
+        List<String> duplicationErrors = data
+                // adding line numbers to the data so that we can report which lines have duplicates
+                .withIndex(1)
+                // grouping by product code, which is the first column in the data
                 .groupBy { it[0][0] }
+                // filtering out groups that only have one entry, since those are not duplicates
                 .findAll { k, v -> v.size() > 1 }
+                // creating error messages for each group of duplicates
                 .collect { k, v ->
-                    "${g.message(code: "requisitionTemplate.importDuplicatedLine.error.label", default: "Duplicated product in the stocklist (${k}) in lines: ${v*.second.join(', ')}", args: [k, v*.second.join(', ')])}"
+                    "${messageLocalizer.localize("requisitionTemplate.importDuplicatedLine.error.label", k, v*.second.join(', '))}"
                 }
 
         if (duplicationErrors.size() > 0) {
