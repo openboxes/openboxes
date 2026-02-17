@@ -6,7 +6,6 @@ import java.time.Instant
 
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.date.InstantParser
-import org.pih.warehouse.core.date.JavaUtilDateFormatter
 import org.pih.warehouse.core.history.EventLog
 import org.pih.warehouse.core.history.EventLogCode
 
@@ -46,8 +45,7 @@ class ShipmentEventLogService {
      */
     EventLog logShipmentEventRollback(Shipment shipment, Event event) {
         EventLog rollbackEventLog = new EventLog(
-                // We can't reference the event in the log because it is going to be deleted by the rollback
-                event: null,
+                event: null,  // We can't reference the event because it is going to be deleted by the rollback
                 eventCode: event.eventType?.eventCode,
                 eventDate: Instant.now(),
                 eventLogCode: EventLogCode.ROLLBACK_EVENT_OCCURRED,

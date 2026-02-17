@@ -52,7 +52,7 @@ class ShipmentHistoryBuilder extends EventLogHistoryBuilder<Shipment> {
                 (it as Receipt).actualDeliveryDate == eventLog?.event?.eventDate
             }
             if (receipt) {
-                return receipt.getReferenceDocument()
+                return receiptHistoryBuilder.getReferenceDocument(receipt)
             }
         }
 
@@ -66,11 +66,9 @@ class ShipmentHistoryBuilder extends EventLogHistoryBuilder<Shipment> {
     ReferenceDocument getReferenceDocument(Shipment source, Event event) {
         // If this is a receiving event, find the matching Receipt and use that as the reference
         if (event?.eventType?.eventCode?.isReceiptEvent()) {
-            Receipt receipt = source.receipts.find {
-                (it as Receipt).actualDeliveryDate == event?.eventDate
-            }
+            Receipt receipt = source.receipts.find { (it as Receipt).actualDeliveryDate == event?.eventDate }
             if (receipt) {
-                return receipt.getReferenceDocument()
+                return receiptHistoryBuilder.getReferenceDocument(receipt)
             }
         }
 
@@ -125,7 +123,7 @@ class ShipmentHistoryBuilder extends EventLogHistoryBuilder<Shipment> {
         histories.add(getCreatedHistoryItem(source))
 
         // Then we can simply collect history of each of the Events
-        for (Event event in (source.events as List<Event>)) {
+        for (Event event in (source.events as SortedSet<Event>)) {
             HistoryItem historyItem = getHistoryItemFromEvent(source, event)
 
             // Unfortunately, because both Shipment and Receipt event are referenced together (in Shipment.events),
@@ -134,7 +132,7 @@ class ShipmentHistoryBuilder extends EventLogHistoryBuilder<Shipment> {
 
             histories.add(historyItem)
         }
-        return histories
+        return histories.sort()
     }
 
     /**
@@ -152,7 +150,7 @@ class ShipmentHistoryBuilder extends EventLogHistoryBuilder<Shipment> {
                         name: messageLocalizer.localizeEnumValue(EventCode.CREATED),
                         eventCode: EventCode.CREATED,
                 ),
-                referenceDocument: source.getReferenceDocument(),
+                referenceDocument: getReferenceDocument(source),
                 createdBy: source.createdBy,
         )
     }

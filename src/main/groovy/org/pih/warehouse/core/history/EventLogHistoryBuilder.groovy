@@ -34,7 +34,6 @@ abstract class EventLogHistoryBuilder<T extends Referenceable> implements Histor
         return history.sort()
     }
 
-
     /**
      * Creates a HistoryItem from a given Event and source object.
      */
@@ -53,7 +52,7 @@ abstract class EventLogHistoryBuilder<T extends Referenceable> implements Histor
                 ),
                 comment: event.comment,
                 createdBy: event.createdBy,
-                referenceDocument: source.getReferenceDocument(),
+                referenceDocument: getReferenceDocument(source),
         )
         return historyItem
     }
