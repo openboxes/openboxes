@@ -76,34 +76,43 @@
                         ${entry.value["quantityRequired"]} ${product?.unitOfMeasure}
                     </td>
                     <td>
-                      ${entry.value["quantityAllocated"] ?: 0} ${product?.unitOfMeasure}
+                        ${entry.value["quantityAllocated"] ?: 0} ${product?.unitOfMeasure}
                     </td>
-                    <g:each var="piEntry" in="${entry.value.picklistItemsByLot}" status="index">
-                        <g:if test="${index != 0}">
-                            <tr>
-                            <td colspan="8"></td>
-                        </g:if>
+                    <g:if test="${entry.value.picklistItemsByLot}">
+                        <g:set var="lotEntries" value="${entry.value.picklistItemsByLot.entrySet().toList()}"/>
+                        <g:set var="firstLot" value="${lotEntries[0]}"/>
+                        <td>
+                            ${firstLot.value.quantity.sum()} ${product?.unitOfMeasure}
+                        </td>
+                        <td>
+                            ${firstLot.key}
+                        </td>
+                    </g:if>
+                    <g:else>
+                        <td>
+                            0 ${product?.unitOfMeasure}
+                        </td>
+                        <td></td>
+                    </g:else>
+                </tr>
+                <g:if test="${entry.value.picklistItemsByLot && entry.value.picklistItemsByLot.size() > 1}">
+                    <g:set var="lotEntries" value="${entry.value.picklistItemsByLot.entrySet().toList()}"/>
+                    <g:each var="piEntry" in="${lotEntries[1..-1]}" status="index">
+                        <tr class="${(status%2==0)?'even':'odd' } prop">
+                            <td colspan="9"></td>
                             <td>
                                 ${piEntry.value.quantity.sum()} ${product?.unitOfMeasure}
                             </td>
                             <td>
                                 ${piEntry.key}
                             </td>
-                        <g:if test="${index != 0}">
-                            </tr>
-                        </g:if>
+                        </tr>
                     </g:each>
-                    <g:if test="${!entry.value.picklistItemsByLot}">
-                        <td>
-                            0 ${product?.unitOfMeasure}
-                        </td>
-                        <td></td>
-                    </g:if>
-                </tr>
+                </g:if>
             </g:each>
             <g:if test="${!itemsMap}">
                 <tr>
-                    <g:set var="colspan" value="9"/>
+                    <g:set var="colspan" value="11"/>
                     <td colspan="${colspan}" class="even center">
                         <div class="fade empty">
                             <warehouse:message code="stockMovements.empty.label" default="No pending stock movements"/>
