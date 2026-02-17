@@ -191,6 +191,15 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
         return 0.0
     }
 
+    BigDecimal getEachPrice() {
+        Integer defaultPackageQuantity = defaultProductPackage?.quantity ?: defaultProductPackageDerived?.quantity
+        if (!packagePrice || !defaultPackageQuantity) {
+            return 0.0
+        }
+
+        return packagePrice / defaultPackageQuantity
+    }
+
     static PROPERTIES = [
             "active"                              : "active",
             "ID"                                  : "id",
