@@ -54,8 +54,6 @@ class FulfillmentService {
     RequisitionIdentifierService requisitionIdentifierService
     ProductAvailabilityService productAvailabilityService
 
-    private static final String RECEIVING_BIN_PREFIX = "R-"
-
     /**
      * Adds a fulfillment item to a fulfillment object and saves the parent.
      * @param fulfillment
@@ -421,8 +419,8 @@ class FulfillmentService {
                     .getAvailableBinLocationByName(obj.origin, productCode, binLocationName)
 
             // If no binLocation is found, try guessing with the "R-" prefix (Receiving Bin)
-            if (!binLocation && !binLocationName.startsWith(RECEIVING_BIN_PREFIX)) {
-                String receivingBinLocationName = RECEIVING_BIN_PREFIX + binLocationName
+            if (!binLocation && !binLocationName.startsWith(Constants.DEFAULT_RECEIVING_LOCATION_PREFIX)) {
+                String receivingBinLocationName = Constants.DEFAULT_RECEIVING_LOCATION_PREFIX + binLocationName
                 binLocation = productAvailabilityService
                         .getAvailableBinLocationByName(obj.origin, productCode, receivingBinLocationName)
             }

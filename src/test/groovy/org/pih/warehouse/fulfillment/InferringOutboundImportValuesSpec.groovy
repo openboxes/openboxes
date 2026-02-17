@@ -480,16 +480,14 @@ class InferringOutboundImportValuesSpec extends Specification implements Service
         Location location = new Location(id: "fake-location")
         importedFile.origin = location
 
-        ProductAvailabilityService productAvailabilityServiceSpy = Spy(service.productAvailabilityService)
-
-        productAvailabilityServiceSpy.getAvailableBinLocations(_, _) >> [
-                new AvailableItem(
-                        inventoryItem: new InventoryItem(lotNumber: 'fake-lot-number-1'),
-                        binLocation:  new Location(name:'R-fake-bin'),
-                )
-        ]
-
-        service.productAvailabilityService = productAvailabilityServiceSpy
+        service.productAvailabilityService = Spy(ProductAvailabilityService) {
+            getAvailableBinLocations(_, _) >> [
+                    new AvailableItem(
+                            inventoryItem: new InventoryItem(lotNumber: 'fake-lot-number-1'),
+                            binLocation: new Location(name: 'R-fake-bin'),
+                    )
+            ]
+        }
 
         when:
         Location inferredBinLocation = service.bindOrInferBinLocation(importedFile, data)
@@ -503,27 +501,23 @@ class InferringOutboundImportValuesSpec extends Specification implements Service
         given:
         Map data = [
                 product: "product-code-123",
-                lotNumber: null,
                 binLocation: "fake-bin"
         ]
         ImportPackingListItem importedFile = new ImportPackingListItem()
         Location location = new Location(id: "fake-location")
         importedFile.origin = location
-
-        ProductAvailabilityService productAvailabilityServiceSpy = Spy(service.productAvailabilityService)
-
-        productAvailabilityServiceSpy.getAvailableBinLocations(_, _) >> [
-                new AvailableItem(
-                        inventoryItem: new InventoryItem(lotNumber: null),
-                        binLocation:  new Location(name: "R-fake-bin"),
-                ),
-                new AvailableItem(
-                        inventoryItem: new InventoryItem(lotNumber: null),
-                        binLocation:  new Location(name: "fake-bin"),
-                )
-        ]
-
-        service.productAvailabilityService = productAvailabilityServiceSpy
+        service.productAvailabilityService = Spy(ProductAvailabilityService) {
+            getAvailableBinLocations(_, _) >> [
+                    new AvailableItem(
+                            inventoryItem: new InventoryItem(lotNumber: null),
+                            binLocation: new Location(name: "R-fake-bin"),
+                    ),
+                    new AvailableItem(
+                            inventoryItem: new InventoryItem(lotNumber: null),
+                            binLocation: new Location(name: "fake-bin"),
+                    )
+            ]
+        }
 
         when:
         Location inferredBinLocation = service.bindOrInferBinLocation(importedFile, data)
@@ -537,18 +531,15 @@ class InferringOutboundImportValuesSpec extends Specification implements Service
         given:
         Map data = [
                 product: "product-code-123",
-                lotNumber: null,
                 binLocation: "R-fake-bin"
         ]
         ImportPackingListItem importedFile = new ImportPackingListItem()
         Location location = new Location(id: "fake-location")
         importedFile.origin = location
 
-        ProductAvailabilityService productAvailabilityServiceSpy = Spy(service.productAvailabilityService)
-
-        productAvailabilityServiceSpy.getAvailableBinLocations(_, _) >> []
-
-        service.productAvailabilityService = productAvailabilityServiceSpy
+        service.productAvailabilityService = Spy(ProductAvailabilityService) {
+            getAvailableBinLocations(_, _) >> []
+        }
 
         when:
         Location inferredBinLocation = service.bindOrInferBinLocation(importedFile, data)
