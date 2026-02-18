@@ -144,6 +144,7 @@ class ShipmentHistoryBuilder extends EventLogHistoryBuilder<Shipment> {
      */
     private HistoryItem getCreatedHistoryItem(Shipment source) {
         return new HistoryItem(
+                dateLogged: source.dateCreated,
                 date: source.dateCreated,
                 location: source.origin,
                 eventType: new EventTypeDto(

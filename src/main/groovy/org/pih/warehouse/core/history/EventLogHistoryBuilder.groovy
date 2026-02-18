@@ -43,7 +43,8 @@ abstract class EventLogHistoryBuilder<T extends Referenceable> implements Histor
         }
 
         EventType eventType = event.eventType
-        HistoryItem historyItem = new HistoryItem(
+        return new HistoryItem(
+                dateLogged: event.dateCreated,
                 date: event.eventDate,
                 location: event.eventLocation,
                 eventType: new EventTypeDto(
@@ -54,7 +55,6 @@ abstract class EventLogHistoryBuilder<T extends Referenceable> implements Histor
                 createdBy: event.createdBy,
                 referenceDocument: getReferenceDocument(source),
         )
-        return historyItem
     }
 
     private HistoryItem getHistoryItem(T source, EventLog eventLog) {
@@ -74,6 +74,7 @@ abstract class EventLogHistoryBuilder<T extends Referenceable> implements Histor
         String eventNameString = "${isRollback ? "[ROLLBACK] " : ""}${messageLocalizer.localizeEnumValue(eventName)}"
 
         return new HistoryItem(
+                dateLogged: JavaUtilDateParser.asDate(eventLog.dateCreated),
                 date: JavaUtilDateParser.asDate(eventLog.dateCreated),
                 location: eventLog.location,
                 eventType: new EventTypeDto(

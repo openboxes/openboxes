@@ -1,6 +1,24 @@
 package org.pih.warehouse.core
 
-class HistoryItem<T> implements Comparable<HistoryItem> {
+/**
+ * Represents a standardized format to represent the history items of some historizable object.
+ *
+ * HistoryItem is generic, so it is up to the feature-specific usages of this object to determine what being
+ * historizable means. Most commonly, this will be defined via a {@link org.pih.warehouse.core.history.HistoryBuilder}
+ * and/or the {@link org.pih.warehouse.core.history.Historizable} trait on an entity.
+ */
+class HistoryItem implements Comparable<HistoryItem> {
+
+    /**
+     * The system datetime that the history item was logged at.
+     * This is typically mapped to the "dateCreated" audit field of the entity being historized.
+     */
+    Date dateLogged
+
+    /**
+     * The real world datetime that the action being historized occurred at.
+     * This can differ from dateLogged in cases where we're backdating or logging upcoming events.
+     */
     Date date
 
     Location location
@@ -15,20 +33,11 @@ class HistoryItem<T> implements Comparable<HistoryItem> {
 
     @Override
     int compareTo(HistoryItem historyItem) {
-        // Events with event code created should be placed
-        // at the top of the lists as a first created event
-        if (historyItem?.eventType?.eventCode == EventCode.CREATED) {
-            return 1
-        }
-
-        if (eventType?.eventCode == EventCode.CREATED) {
-            return -1
-        }
-
-        // falling back to the reference document id, to avoid disappearing items
-        // in case of the same dates and event codes
-        return date <=> historyItem?.date ?:
+        return dateLogged <=> historyItem?.dateLogged ?:
+               date <=> historyItem?.date ?:
                eventType?.name <=> historyItem?.eventType?.name ?:
+               // falling back to the reference document id, to avoid disappearing items
+               // in case of the same dates and event codes
                referenceDocument?.id <=> historyItem?.referenceDocument?.id
     }
 }

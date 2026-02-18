@@ -28,6 +28,7 @@ class ReceiptHistoryBuilder implements HistoryBuilder<Receipt> {
     @Override
     List<HistoryItem> getHistory(Receipt source) {
         return [new HistoryItem(
+                dateLogged: source.dateCreated,
                 date: source.actualDeliveryDate,
                 location: source.shipment.destination,
                 referenceDocument: getReferenceDocument(source),

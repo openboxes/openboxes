@@ -67,38 +67,43 @@ class ShipmentHistoryBuilderSpec extends Specification {
         shipment.receipts = new TreeSet<Receipt>([partialReceipt, finalReceipt])
 
         and: "Events for the Shipment"
-        shipment.events = new TreeSet<Event>([
-                new Event(
-                        eventType: new EventType(
-                                name: EventCode.SHIPPED.name(),
-                                eventCode: EventCode.SHIPPED,
-                        ),
-                        eventDate: shipmentCreationDate,
-                        eventLocation: origin,
-                        comment: new Comment(comment: "Sending shipment"),
-                        createdBy: shipmentCreator,
+        Event shippedEvent = new Event(
+                eventType: new EventType(
+                        name: EventCode.SHIPPED.name(),
+                        eventCode: EventCode.SHIPPED,
                 ),
-                new Event(
-                        eventType: new EventType(
-                                name: EventCode.PARTIALLY_RECEIVED.name(),
-                                eventCode: EventCode.PARTIALLY_RECEIVED,
-                        ),
-                        eventDate: partialReceiptDate,
-                        eventLocation: origin,
-                        comment: new Comment(comment: "Partial receiving shipment"),
-                        createdBy: shipmentCreator,
+                eventDate: shipmentCreationDate,
+                eventLocation: origin,
+                comment: new Comment(comment: "Sending shipment"),
+                createdBy: shipmentCreator,
+        )
+        shippedEvent.dateCreated = shipmentCreationDate
+
+        Event partialReceivedEvent = new Event(
+                eventType: new EventType(
+                        name: EventCode.PARTIALLY_RECEIVED.name(),
+                        eventCode: EventCode.PARTIALLY_RECEIVED,
                 ),
-                new Event(
-                        eventType: new EventType(
-                                name: EventCode.RECEIVED.name(),
-                                eventCode: EventCode.RECEIVED,
-                        ),
-                        eventDate: finalReceiptDate,
-                        eventLocation: origin,
-                        comment: new Comment(comment: "Final receiving shipment"),
-                        createdBy: shipmentCreator,
+                eventDate: partialReceiptDate,
+                eventLocation: origin,
+                comment: new Comment(comment: "Partial receiving shipment"),
+                createdBy: shipmentCreator,
+        )
+        partialReceivedEvent.dateCreated = partialReceiptDate
+
+        Event receivedEvent = new Event(
+                eventType: new EventType(
+                        name: EventCode.RECEIVED.name(),
+                        eventCode: EventCode.RECEIVED,
                 ),
-        ])
+                eventDate: finalReceiptDate,
+                eventLocation: origin,
+                comment: new Comment(comment: "Final receiving shipment"),
+                createdBy: shipmentCreator,
+        )
+        receivedEvent.dateCreated = finalReceiptDate
+
+        shipment.events = new TreeSet<Event>([shippedEvent, partialReceivedEvent, receivedEvent])
 
         when:
         List<HistoryItem> historyItems = shipmentHistoryBuilder.getHistory(shipment)
