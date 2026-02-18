@@ -8,12 +8,6 @@ import org.pih.warehouse.api.PickTaskStatus
  */
 class FulfillmentStatusResolver {
 
-    /**
-     * Determines the fulfillment summary status based on the state of line items.
-     *
-     * @param items List of stock movement items to evaluate
-     * @return The calculated FulfillmentSummaryStatus
-     */
     static FulfillmentSummaryStatus resolve(List<StockMovementItem> items) {
         if (!items) {
             return FulfillmentSummaryStatus.CREATED
@@ -32,11 +26,8 @@ class FulfillmentStatusResolver {
         // 3. BACK_ORDER - Some items shipped but others are unallocated
         boolean anyShipped = items.any { hasAnyShipped(it) }
         boolean anyUnallocatedActive = items.any {
-            !isFullyCanceled(it) &&
-                    !isFullyIssued(it) &&
-                    !hasAllocation(it)
+            !isFullyCanceled(it) && !isFullyIssued(it) && !hasAllocation(it)
         }
-
         if (anyShipped && anyUnallocatedActive) {
             return FulfillmentSummaryStatus.BACK_ORDER
         }
@@ -60,8 +51,6 @@ class FulfillmentStatusResolver {
         return FulfillmentSummaryStatus.CREATED
     }
 
-    // Helper methods for status calculation
-
     private static BigDecimal netRequired(StockMovementItem item) {
         return item.getQuantityRequired()
     }
@@ -71,8 +60,18 @@ class FulfillmentStatusResolver {
     }
 
     private static boolean isFullyIssued(StockMovementItem item) {
-        return !isFullyCanceled(item) &&
-                (item.quantityShipped ?: BigDecimal.ZERO) >= netRequired(item)
+        BigDecimal shipped = item.quantityShipped ?: calculateQuantityShipped(item)
+        return !isFullyCanceled(item) && shipped >= netRequired(item)
+    }
+
+    private static BigDecimal calculateQuantityShipped(StockMovementItem item) {
+        def requisitionItem = item.requisitionItem
+        def shipment = requisitionItem?.requisition?.shipment
+        if (!shipment) {
+            return BigDecimal.ZERO
+        }
+        def shipmentItems = shipment.shipmentItems?.findAll { it.requisitionItem?.id == requisitionItem?.id }
+        return shipmentItems?.sum { it.quantity } ?: BigDecimal.ZERO
     }
 
     private static boolean isFullyPicked(StockMovementItem item) {
@@ -81,30 +80,33 @@ class FulfillmentStatusResolver {
     }
 
     private static boolean isPicked(StockMovementItem item) {
-        return !isFullyCanceled(item) &&
-                (item.quantityPicked ?: BigDecimal.ZERO) <= netRequired(item)
+        BigDecimal picked = item.quantityPicked ?: BigDecimal.ZERO
+        return !isFullyCanceled(item) && picked > BigDecimal.ZERO && picked <= netRequired(item)
     }
 
     private static boolean isStaged(StockMovementItem item) {
         if (isFullyCanceled(item)) {
             return false
         }
-
         def picklistItems = item.requisitionItem?.retrievePicklistItems()
-
         if (!picklistItems) {
             return false
         }
-
         return picklistItems.every { it?.status == PickTaskStatus.STAGED.name() }
     }
 
     private static boolean hasAllocation(StockMovementItem item) {
-        return !isFullyCanceled(item) &&
-                ((item.quantityAllocated ?: BigDecimal.ZERO) > BigDecimal.ZERO || isPicked(item))
+        if (isFullyCanceled(item)) {
+            return false
+        }
+        BigDecimal allocated = item.quantityAllocated
+                ?: item.requisitionItem?.calculateQuantityAllocated()
+                ?: BigDecimal.ZERO
+        return allocated > BigDecimal.ZERO || isPicked(item)
     }
 
     private static boolean hasAnyShipped(StockMovementItem item) {
-        return (item.quantityShipped ?: BigDecimal.ZERO) > BigDecimal.ZERO
+        BigDecimal shipped = item.quantityShipped ?: calculateQuantityShipped(item)
+        return shipped > BigDecimal.ZERO
     }
 }
