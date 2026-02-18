@@ -545,8 +545,20 @@ class StockMovement implements Validateable{
         return StockMovementStatusResolver.getStatusMetaData(status)
     }
 
+    /**
+     * Returns the fulfillment summary status for tracking order lifecycle.
+     * This is only applicable to outbound stock movements.
+     *
+     * @return Map containing status metadata, or null if not an outbound movement
+     */
     Map<String, String> getFulfillmentSummaryStatus() {
-        FulfillmentSummaryStatus status = FulfillmentSummaryStatus.fromLineItems(lineItems)
+        // Fulfillment summary status is only applicable to outbound movements.
+        Location currentLocation = AuthService.currentLocation
+        if (getStockMovementDirection(currentLocation) != StockMovementDirection.OUTBOUND) {
+            return null
+        }
+
+        FulfillmentSummaryStatus status = FulfillmentStatusResolver.resolve(lineItems)
         return StockMovementStatusResolver.getStatusMetaData(status)
     }
 
