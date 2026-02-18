@@ -468,4 +468,84 @@ class InferringOutboundImportValuesSpec extends Specification implements Service
         then:
         inferredBinLocation == null
     }
+
+    void 'bindOrInferBinLocation should return receiving bin location (R-prefix) if exact match is not found'() {
+        given:
+        Map data = [
+                product: "product-code-123",
+                lotNumber: 'fake-lot-number-1',
+                binLocation: 'fake-bin'
+        ]
+        ImportPackingListItem importedFile = new ImportPackingListItem()
+        Location location = new Location(id: "fake-location")
+        importedFile.origin = location
+
+        service.productAvailabilityService = Spy(ProductAvailabilityService) {
+            getAvailableBinLocations(_, _) >> [
+                    new AvailableItem(
+                            inventoryItem: new InventoryItem(lotNumber: 'fake-lot-number-1'),
+                            binLocation: new Location(name: 'R-fake-bin'),
+                    )
+            ]
+        }
+
+        when:
+        Location inferredBinLocation = service.bindOrInferBinLocation(importedFile, data)
+
+        then:
+        inferredBinLocation.name == 'R-fake-bin'
+        importedFile.binLocationFound == true
+    }
+
+    void 'bindOrInferBinLocation should prioritize exact match over receiving bin location (R-prefix) when both exist'() {
+        given:
+        Map data = [
+                product: "product-code-123",
+                binLocation: "fake-bin"
+        ]
+        ImportPackingListItem importedFile = new ImportPackingListItem()
+        Location location = new Location(id: "fake-location")
+        importedFile.origin = location
+        service.productAvailabilityService = Spy(ProductAvailabilityService) {
+            getAvailableBinLocations(_, _) >> [
+                    new AvailableItem(
+                            inventoryItem: new InventoryItem(lotNumber: null),
+                            binLocation: new Location(name: "R-fake-bin"),
+                    ),
+                    new AvailableItem(
+                            inventoryItem: new InventoryItem(lotNumber: null),
+                            binLocation: new Location(name: "fake-bin"),
+                    )
+            ]
+        }
+
+        when:
+        Location inferredBinLocation = service.bindOrInferBinLocation(importedFile, data)
+
+        then:
+        inferredBinLocation.name == "fake-bin"
+        importedFile.binLocationFound == true
+    }
+
+    void 'bindOrInferBinLocation should not add double R-prefix if bin name already starts with R- and is not found'() {
+        given:
+        Map data = [
+                product: "product-code-123",
+                binLocation: "R-fake-bin"
+        ]
+        ImportPackingListItem importedFile = new ImportPackingListItem()
+        Location location = new Location(id: "fake-location")
+        importedFile.origin = location
+
+        service.productAvailabilityService = Spy(ProductAvailabilityService) {
+            getAvailableBinLocations(_, _) >> []
+        }
+
+        when:
+        Location inferredBinLocation = service.bindOrInferBinLocation(importedFile, data)
+
+        then:
+        inferredBinLocation.name == "R-fake-bin"
+        importedFile.binLocationFound == false
+    }
 }

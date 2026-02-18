@@ -418,6 +418,13 @@ class FulfillmentService {
             Location binLocation = productAvailabilityService
                     .getAvailableBinLocationByName(obj.origin, productCode, binLocationName)
 
+            // If no binLocation is found, try guessing with the "R-" prefix (Receiving Bin)
+            if (!binLocation && !binLocationName.startsWith(Constants.DEFAULT_RECEIVING_LOCATION_PREFIX)) {
+                String receivingBinLocationName = Constants.DEFAULT_RECEIVING_LOCATION_PREFIX + binLocationName
+                binLocation = productAvailabilityService
+                        .getAvailableBinLocationByName(obj.origin, productCode, receivingBinLocationName)
+            }
+
             if (binLocation) {
                 return binLocation
             }
