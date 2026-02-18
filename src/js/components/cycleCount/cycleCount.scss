@@ -233,7 +233,7 @@ input.hide-arrows[type=number] {
   .assign-count-modal-container {
     padding: 0 4px 0 4px;
     overflow-y: auto;
-    max-height: 400px;
+    max-height: 40vh;
 
     &::-webkit-scrollbar {
       width: 0.5em;
@@ -248,6 +248,12 @@ input.hide-arrows[type=number] {
       background-color: var(--blue-301);
       border-radius: 4px;
     }
+  }
+}
+
+@media (max-width: 1366px) {
+  .modal-content {
+    min-width: 90vw;
   }
 }
 
