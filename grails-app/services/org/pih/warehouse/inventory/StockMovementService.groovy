@@ -18,7 +18,7 @@ import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.sql.JoinType
-import org.pih.warehouse.allocation.AllocationRequest
+import org.pih.warehouse.allocation.AllocationItemRequest
 import org.pih.warehouse.api.OutboundWorkflowState
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.AvailableItemStatus
@@ -218,6 +218,16 @@ class StockMovementService {
                     case StockMovementStatusCode.PACKED:
                     case StockMovementStatusCode.CHECKING:
                     case StockMovementStatusCode.CHECKED:
+                    case StockMovementStatusCode.STAGED:
+                        if (stockMovement.origin.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS)) {
+                            /**
+                             * If origin tracks internal transactions, then skip shipment creation for now.
+                             * It will be created when the requisition is issued. Plus on top of that it will
+                             * be improved/refactored in https://openboxes.atlassian.net/browse/OBLS-376.
+                             * */
+                            break
+                        }
+
                         def shipment = createShipment(stockMovement)
                         if (stockMovement?.requisition?.picklist) {
                             shipmentService.validateShipment(shipment)
@@ -286,7 +296,7 @@ class StockMovementService {
 
         log.info "Update status ${id} " + status
         Requisition requisition = requisitionDataService.getRequisitionWithEvents(id)
-        if (status == RequisitionStatus.CHECKING) {
+        if (status == RequisitionStatus.CHECKING || status == RequisitionStatus.STAGED) {
             Shipment shipment = requisition.shipment
             shipment?.expectedShippingDate = new Date()
         }
@@ -1343,7 +1353,7 @@ class StockMovementService {
                                 pickPageItem.getAvailableItems(inventoryItem)
 
                         // Create an allocation request and validate that it
-                        AllocationRequest allocationRequest = new AllocationRequest(
+                        AllocationItemRequest allocationRequest = new AllocationItemRequest(
                                 product: inventoryItem?.product,
                                 inventoryItem: inventoryItem,
                                 picklistItemCommand: data,
@@ -1399,7 +1409,7 @@ class StockMovementService {
         return availableItems?.any { it.quantityAvailable >= quantityRequired }
     }
 
-    void validateAllocationRequest(AllocationRequest allocationRequest) {
+    void validateAllocationRequest(AllocationItemRequest allocationRequest) {
 
         Product product = allocationRequest.product
         InventoryItem inventoryItem = allocationRequest.inventoryItem
@@ -2158,18 +2168,21 @@ class StockMovementService {
 
 
     void allocateSuggestedItems(RequisitionItem requisitionItem, List<SuggestedItem> suggestedItems, Boolean isAutoAllocated = true) {
-
+        // If origin requires mobile picking we are only allocating = setting quantity picked to 0
+        Boolean allocateOnly = requisitionItem?.requisition?.origin?.requiresMobilePicking()
         for (SuggestedItem suggestedItem : suggestedItems) {
+            Integer quantityPicked = allocateOnly ? 0 : suggestedItem.quantityPicked?.intValueExact()
+            Integer quantityToPick = suggestedItem.quantityPicked.toInteger()
             createOrUpdatePicklistItem(
                     requisitionItem,
                     null,
                     suggestedItem.inventoryItem,
                     suggestedItem.binLocation,
-                    suggestedItem.quantityPicked?.intValueExact(),
+                    quantityPicked,
                     null,
                     null,
                     isAutoAllocated,
-                    suggestedItem.quantityRequested.toInteger()
+                    quantityToPick
             )
         }
     }
@@ -3207,8 +3220,7 @@ class StockMovementService {
         shipmentService.sendShipment(shipment, "Sent on ${new Date()}", user, shipment.origin, stockMovement.dateShipped ?: new Date())
     }
 
-    void issueRequisitionBasedStockMovement(String id) {
-
+    void issueRequisitionBasedStockMovement(String id, boolean synchronizeDateShipped = false) {
         User user = authService.currentUser
         StockMovement stockMovement = getStockMovement(id)
         Requisition requisition = stockMovement.requisition
@@ -3220,7 +3232,10 @@ class StockMovementService {
             throw new IllegalStateException("There are no shipments associated with stock movement ${requisition.requestNumber}")
         }
 
-        shipmentService.sendShipment(shipment, null, user, requisition.origin, stockMovement.dateShipped ?: new Date())
+        // If synchronizeDateShipped is true, use the current date instead of the dateShipped from stockMovement,
+        // which is expectedShippingDate from the past. Useful for setting the actual (current) issue date.
+        Date dateShipped = stockMovement.dateShipped && !synchronizeDateShipped ? stockMovement.dateShipped : new Date()
+        shipmentService.sendShipment(shipment, null, user, requisition.origin, dateShipped)
     }
 
     void validateRequisition(Requisition requisition) {

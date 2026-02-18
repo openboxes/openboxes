@@ -218,12 +218,12 @@ class StockMovement implements Validateable{
             lineItems           : lineItems,
             lineItemCount       : lineItemCount,
             associations        : [
-                requisition: [id: requisition?.id, requestNumber: requisition?.requestNumber, status: requisition?.status?.name()],
-                shipment   : [id: shipment?.id, shipmentNumber: shipment?.shipmentNumber, status: shipment?.currentStatus?.name()],
-                shipments  : requisition?.shipments?.collect {
-                    [id: it?.id, shipmentNumber: it?.shipmentNumber, status: it?.currentStatus?.name()]
-                },
-                documents  : documents
+                    requisition: [id: requisition?.id, requestNumber: requisition?.requestNumber, status: requisition?.status?.name()],
+                    shipment   : [id: shipment?.id, shipmentNumber: shipment?.shipmentNumber, status: shipment?.currentStatus?.name()],
+                    shipments  : requisition?.shipments?.collect {
+                        [id: it?.id, shipmentNumber: it?.shipmentNumber, status: it?.currentStatus?.name()]
+                    },
+                    documents  : documents
             ],
             approvers           : approvers,
             isFromOrder         : isFromOrder,
@@ -243,6 +243,9 @@ class StockMovement implements Validateable{
             receivingLocation: receivingLocation?.toJson(LocationTypeCode.INTERNAL),
             packingLocation  : packingLocation?.toJson(LocationTypeCode.INTERNAL),
             loadingLocation  : loadingLocation?.toJson(LocationTypeCode.INTERNAL),
+            autoAllocationEnabled   : requisition?.autoAllocationEnabled,
+            partialAllocationAllowed: requisition?.partialAllocationAllowed,
+            partialIssuanceAllowed  : requisition?.partialIssuanceAllowed,
         ]
     }
 

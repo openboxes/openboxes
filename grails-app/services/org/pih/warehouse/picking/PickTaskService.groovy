@@ -8,12 +8,12 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.api.picking.SearchPickTaskCommand
 import org.pih.warehouse.core.ActivityCode
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.ProductAvailabilityService
+import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionAction
 import org.pih.warehouse.inventory.TransactionSource
@@ -21,6 +21,7 @@ import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.picklist.PicklistService
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
 
 @Transactional
@@ -30,6 +31,7 @@ class PickTaskService {
     InventoryService inventoryService
     ProductAvailabilityService productAvailabilityService
     PicklistService picklistService
+    StockMovementService stockMovementService
 
     @Transactional(readOnly = true)
     List<PickTask> search(SearchPickTaskCommand command, Map params = [:]) {
@@ -366,7 +368,13 @@ class PickTaskService {
                 it.delete()
             }
 
-            // Once we are done with deleting transactions, we can clear the picklist (delete picklist items)
+            // Then delete shipment items associated with the requisition (if any)
+            requisition.requisitionItems?.each { RequisitionItem requisitionItem ->
+                stockMovementService.removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
+            }
+
+            // Once we are done with deleting transactions and shipment items, we can clear the picklist
+            // (delete picklist items)
             picklistService.clearPicklist(requisition.picklist.id)
         }
 

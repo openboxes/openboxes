@@ -132,6 +132,11 @@ class Requisition implements Comparable<Requisition>, Serializable {
     Integer priority = 0
     DeliveryTypeCode deliveryTypeCode = DeliveryTypeCode.DEFAULT
 
+    // for controlling partial allocation and issuance
+    Boolean autoAllocationEnabled
+    Boolean partialAllocationAllowed
+    Boolean partialIssuanceAllowed
+
     // Removed comments, documents, events for the time being.
     static transients = [
             "sortedStocklistItems",
@@ -221,12 +226,15 @@ class Requisition implements Comparable<Requisition>, Serializable {
         deliveryTypeCode(nullable: true)
         orderTypeCode(nullable: true)
         priority(nullable: true)
+        autoAllocationEnabled(nullable: true)
+        partialAllocationAllowed(nullable: true)
+        partialIssuanceAllowed(nullable: true)
     }
 
     Comment getRecentComment() {
         return comments?.sort({ a, b ->
             b.dateCreated <=> a.dateCreated
-        })?.find{true}
+        })?.find { true }
     }
 
     def getRequisitionItemCount() {
@@ -462,7 +470,10 @@ class Requisition implements Comparable<Requisition>, Serializable {
                 destinationName      : destination?.name,
                 recipientProgram     : recipientProgram,
                 requisitionTemplate  : requisitionTemplate?.toJson(),
-                requisitionItems     : requisitionItems?.sort()?.collect { it?.toJson() }
+                requisitionItems     : requisitionItems?.sort()?.collect { it?.toJson() },
+                autoAllocationEnabled   : autoAllocationEnabled,
+                partialAllocationAllowed: partialAllocationAllowed,
+                partialIssuanceAllowed  : partialIssuanceAllowed,
         ]
     }
 
@@ -482,6 +493,9 @@ class Requisition implements Comparable<Requisition>, Serializable {
             dateCreated: dateCreated?.format("MMM dd, yyyy"),
             lastUpdated: lastUpdated?.format("MMM dd, yyyy"),
             isPublished: isPublished,
+            autoAllocationEnabled: autoAllocationEnabled,
+            partialAllocationAllowed: partialAllocationAllowed,
+            partialIssuanceAllowed: partialIssuanceAllowed,
         ]
     }
 }

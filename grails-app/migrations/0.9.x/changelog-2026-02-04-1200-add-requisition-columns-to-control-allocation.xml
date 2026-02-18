@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="abalcerzak" id="040220261200-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="requisition" columnName="auto_allocation_enabled"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="requisition">
+            <column name="auto_allocation_enabled" type="BIT(1)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="abalcerzak" id="040220261200-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="requisition" columnName="partial_allocation_allowed"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="requisition">
+            <column name="partial_allocation_allowed" type="BIT(1)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="abalcerzak" id="040220261200-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="requisition" columnName="partial_issuance_allowed"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="requisition">
+            <column name="partial_issuance_allowed" type="BIT(1)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
