@@ -105,6 +105,16 @@ class ShipmentHistoryBuilderSpec extends Specification {
 
         shipment.events = new TreeSet<Event>([shippedEvent, partialReceivedEvent, receivedEvent])
 
+        and: "An expected reference document representing the shipment"
+        ReferenceDocument expectedReferenceDocument = new ReferenceDocument(
+                label: "ABC123",
+                url: "/stockMovement/show/0",
+                id: 0,
+                identifier: "ABC123",
+                description: "Description",
+                name: "Name",
+        )
+
         when:
         List<HistoryItem> historyItems = shipmentHistoryBuilder.getHistory(shipment)
 
@@ -117,14 +127,7 @@ class ShipmentHistoryBuilderSpec extends Specification {
                 null,
                 shipmentCreator,
                 EventCode.CREATED,
-                new ReferenceDocument(
-                        label: "ABC123",
-                        url: "/stockMovement/show/0",
-                        id: 0,
-                        identifier: "ABC123",
-                        description: "Description",
-                        name: "Name",
-                ))
+                expectedReferenceDocument)
 
         assertHistoryItem(historyItems[1],  // The shipped event - based on Shipment
                 shipmentCreationDate,
@@ -132,14 +135,7 @@ class ShipmentHistoryBuilderSpec extends Specification {
                 "Sending shipment",
                 shipmentCreator,
                 EventCode.SHIPPED,
-                new ReferenceDocument(
-                        label: "ABC123",
-                        url: "/stockMovement/show/0",
-                        id: 0,
-                        identifier: "ABC123",
-                        description: "Description",
-                        name: "Name",
-                ))
+                expectedReferenceDocument)
 
         assertHistoryItem(historyItems[2],  // The partial receipt - based on Receipt
                 partialReceiptDate,
@@ -147,7 +143,7 @@ class ShipmentHistoryBuilderSpec extends Specification {
                 "Partial receiving shipment",
                 shipmentCreator,
                 EventCode.PARTIALLY_RECEIVED,
-                new ReferenceDocument(identifier: "R0"))  // This is a stub for receipts. No other fields are set.
+                expectedReferenceDocument)
 
         assertHistoryItem(historyItems[3],  // The final receipt - based on Receipt
                 finalReceiptDate,
@@ -155,7 +151,7 @@ class ShipmentHistoryBuilderSpec extends Specification {
                 "Final receiving shipment",
                 shipmentCreator,
                 EventCode.RECEIVED,
-                new ReferenceDocument(identifier: "R1"))  // This is a stub for receipts. No other fields are set.
+                expectedReferenceDocument)
     }
 
     private void assertHistoryItem(HistoryItem historyItem,

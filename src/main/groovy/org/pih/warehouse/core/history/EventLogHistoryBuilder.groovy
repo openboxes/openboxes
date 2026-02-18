@@ -35,6 +35,18 @@ abstract class EventLogHistoryBuilder<T extends Referenceable> implements Histor
     }
 
     /**
+     * Creates a List of HistoryItem from a given Event collection and source object.
+     */
+    protected List<HistoryItem> getHistoryItemsFromEvents(T source, Collection<Event> events) {
+        List<HistoryItem> historyItems = []
+        for (Event event in (events)) {
+            HistoryItem historyItem = getHistoryItemFromEvent(source, event)
+            historyItems.add(historyItem)
+        }
+        return historyItems.findAll()
+    }
+
+    /**
      * Creates a HistoryItem from a given Event and source object.
      */
     protected HistoryItem getHistoryItemFromEvent(T source, Event event) {
