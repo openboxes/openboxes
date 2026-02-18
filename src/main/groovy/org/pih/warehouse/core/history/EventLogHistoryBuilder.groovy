@@ -71,7 +71,7 @@ abstract class EventLogHistoryBuilder<T extends Referenceable> implements Histor
         // For non-event-based logs and Event rollbacks, we build the history item ourselves.
         Enum eventName = eventLog.eventCode ?: eventLog.eventLogCode
         boolean isRollback = eventLog.eventLogCode == EventLogCode.ROLLBACK_EVENT_OCCURRED
-        String eventNameString = "${isRollback ? "[ROLLBACK] " : ""}${messageLocalizer.localizeEnumValue(eventName)}"
+        String eventNameString = "${messageLocalizer.localizeEnumValue(eventName)}${isRollback ? " - Rollback" : ""}"
 
         return new HistoryItem(
                 dateLogged: JavaUtilDateParser.asDate(eventLog.dateCreated),
@@ -81,7 +81,7 @@ abstract class EventLogHistoryBuilder<T extends Referenceable> implements Histor
                         name: eventNameString,
                         eventCode: eventLog.eventCode,
                 ),
-                comment: new Comment(comment: eventLog.message),
+                comment: StringUtils.isBlank(eventLog.message) ? null : new Comment(comment: eventLog.message),
                 createdBy: eventLog.createdBy,
                 referenceDocument: getReferenceDocument(source),
         )

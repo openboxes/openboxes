@@ -34,7 +34,7 @@ class ShipmentEventLogService {
                 eventCode: event.eventType?.eventCode,
                 eventDate: event.eventDate ? InstantParser.asInstant(event.eventDate) : Instant.now(),
                 eventLogCode: EventLogCode.EVENT_OCCURRED,
-                message: event.comment?.comment ?: event.eventType?.description,
+                message: event.comment?.comment,
                 location: event.eventLocation)
 
         return createShipmentEventLog(shipment, eventLog)
@@ -49,7 +49,6 @@ class ShipmentEventLogService {
                 eventCode: event.eventType?.eventCode,
                 eventDate: Instant.now(),
                 eventLogCode: EventLogCode.ROLLBACK_EVENT_OCCURRED,
-                message: "Rolling back event: ${event.eventType?.eventCode}",
                 location: event.eventLocation)
 
         // Find all other event logs that reference the Event and remove the reference so that we don't get

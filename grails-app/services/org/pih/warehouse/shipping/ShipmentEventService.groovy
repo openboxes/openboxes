@@ -54,8 +54,14 @@ class ShipmentEventService {
         // the Event, but create a new EventLog.
         shipmentEventLogService.logShipmentEventRollback(shipment, event)
 
+        // Remove all associations to the Event before deleting it. (The associations in EventLog are handled within
+        // ShipmentEventLogService.)
         shipment.removeFromEvents(event)
-        shipment.currentEvent = null  // TODO: do this better?????????
+        // We should technically call shipment.resynchronizeEventAndStatus() here since removing the Event will modify
+        // the values of status and currentEvent, but because those values are refreshed when the shipment is persisted,
+        // and since we don't rely on those values during rollback, for performance reasons we simply null the current
+        // event and let the fields be refreshed when save() is called on the shipment later.
+        shipment.currentEvent = null
         event.delete()
 
         // Ensure the order summary gets refreshed
