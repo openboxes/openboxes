@@ -209,41 +209,49 @@
     }, [])
   }
 
+  function validate(table) {
+    const selectedProductId = $("#product-id").val();
+    const addButton = $("#add-requisition-item");
+
+    $(table.fnGetNodes()).removeClass('new-line-error');
+
+    if (!selectedProductId) {
+      $("#new-row").removeClass("new-line-error");
+      addButton.prop("disabled", false);
+      addButton.prop("title", "");
+      return;
+    }
+
+    const duplicates = getDuplicateProductIndexes(table, selectedProductId);
+
+    if (duplicates.length > 0) {
+      $("#new-row").addClass("new-line-error");
+      addButton.prop("disabled", true);
+      addButton.prop(
+        "title",
+        "${g.message(code: 'requisitionTemplate.duplicatedLine.error.label', default: 'Item already exists in the stocklist')}"
+      );
+
+      duplicates.forEach(index => {
+        $(table.fnGetNodes()[index]).addClass('new-line-error');
+      });
+    } else {
+      $("#new-row").removeClass("new-line-error");
+      addButton.prop("disabled", false);
+      addButton.prop("title", "");
+    }
+  }
+
     $(document).ready(function() {
         var columns = [];
         const replenishmentType = $("#replenishmentTypeCode").val();
         const pullType = $("#pullType").val();
-        let previouslySelectedProductId = null;
 
       // When user selects product in the dropdown, we want to check if this product already exists in the table.
       // If it does, we will display error message and highlight all lines with duplicated product.
       // When user changes selection, we want to remove error message and highlights from previously duplicated lines.
       $("#product-id").on("change", function () {
-        const selectedProductId = $(this).val();
-        const addButton = $("#add-requisition-item");
-        const duplicates = getDuplicateProductIndexes(table, selectedProductId);
-        const linesToClear = previouslySelectedProductId
-          ? getDuplicateProductIndexes(table, previouslySelectedProductId)
-          : [];
-
-        previouslySelectedProductId = selectedProductId;
-
-        linesToClear.forEach((index) => {
-          $(table.fnGetNodes()[index]).removeClass('new-line-error');
-        })
-
-        if (duplicates.length > 0) {
-          $("#new-row").addClass("new-line-error");
-          addButton.prop("disabled", true);
-          addButton.prop("title", "${g.message(code: 'requisitionTemplate.duplicatedLine.error.label', default: 'Item already exists in the stocklist')}");
-          duplicates.forEach((index) => {
-            $(table.fnGetNodes()[index]).addClass('new-line-error');
-          })
-        } else {
-          $("#new-row").removeClass("new-line-error");
-            addButton.prop("disabled", false);
-            addButton.prop("title", "");
-        }
+        validate(table);
       });
 
         if (replenishmentType == pullType) {
@@ -350,6 +358,7 @@
                             dataType: "json",
                             success: function() {
                                 table.fnDeleteRow(nRow);
+                                validate(table);
                             },
                             error: handleAjaxError
                         });
