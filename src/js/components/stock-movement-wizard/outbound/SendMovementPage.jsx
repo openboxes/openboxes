@@ -20,8 +20,10 @@ import DateField from 'components/form-elements/DateField';
 import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import ConfirmRadioOptionModal from 'components/modals/ConfirmRadioOptionModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
+import { DateFormat as DateFormatMoment } from 'consts/timeFormat';
 import AlertMessage from 'utils/AlertMessage';
 import {
   apiClientCustomResponseHandler as apiClient,
@@ -625,26 +627,62 @@ class SendMovementPage extends Component {
       ));
       this.props.hideSpinner();
     } else if (moment().startOf('day').diff(values.dateShipped) > 0) {
+      const { dateShipped } = values;
+      const daysAgo = moment().startOf('day').diff(moment(dateShipped).startOf('day'), 'days');
+      const todayDate = moment().format(DateFormatMoment.MM_DD_YYYY_HH_MM_Z);
+
+      const formatedTodayDate = moment(todayDate).format(DateFormatMoment.DD_MMM_YYYY);
+      const formattedDateShipped = moment(dateShipped).format(DateFormatMoment.DD_MMM_YYYY);
+
       confirmAlert({
-        title: this.props.translate('react.stockMovement.message.confirmSend.label', 'Confirm send'),
-        message: this.props.translate(
-          'react.stockMovement.alert.sendWithPastDate.message.label',
-          'You are sending a shipment with a ship date in the past. Would you like to update the ship date to today?',
+        customUI: ({ onClose }) => (
+          <ConfirmRadioOptionModal
+            labels={{
+              title: { label: 'react.stockMovement.message.confirmSend.label', defaultMessage: 'Confirm send' },
+              content: {
+                label: 'react.stockMovement.alert.sendWithPastDate.message.label',
+                defaultMessage: `You are recording that this shipment was shipped on ${formattedDateShipped}, which is ${daysAgo} days ago. How do you want to proceed?`,
+                data: { formattedDateShipped, daysAgo },
+              },
+            }}
+            initialValue={dateShipped}
+            options={[
+              {
+                label: {
+                  id: 'react.stockMovement.confirmSend.keepDate.label',
+                  defaultMessage: `Ship on the date I entered (${formattedDateShipped})`,
+                  data: { formattedDateShipped },
+                },
+                value: dateShipped,
+              },
+              {
+                label: {
+                  id: 'react.stockMovement.confirmSend.updateToToday.label',
+                  defaultMessage: `Update the ship date to today (${formatedTodayDate})`,
+                  data: { formatedTodayDate },
+                },
+                value: todayDate,
+              },
+            ]}
+            buttons={(selectedDate) => [
+              {
+                label: 'react.default.button.next.label',
+                defaultLabel: 'Next',
+                variant: 'primary',
+                onClick: () => {
+                  payload.dateShipped = selectedDate;
+
+                  // Ensure delivery date is not before ship date to avoid backend validation error
+                  if (selectedDate === todayDate) {
+                    payload.expectedDeliveryDate = selectedDate;
+                  }
+                  this.saveAndTransitionToIssued(payload);
+                  onClose();
+                },
+              },
+            ]}
+          />
         ),
-        buttons: [
-          {
-            label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => {
-              payload.dateShipped = moment(new Date()).format('MM/DD/YYYY HH:mm Z');
-              this.saveAndTransitionToIssued(payload);
-            },
-          },
-          {
-            label: this.props.translate('react.default.no.label', 'No'),
-            onClick: () => this.saveAndTransitionToIssued(payload),
-          },
-        ],
-        closeOnEscape: false,
         closeOnClickOutside: false,
       });
     } else {
