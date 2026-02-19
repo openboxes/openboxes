@@ -638,12 +638,22 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
     def calculateQuantityAllocated() {
         def quantityAllocated = 0
+        // Handle revised/modified items - get allocation from the modification item
+        if (modificationItem) {
+            return modificationItem.calculateQuantityAllocated()
+        }
         if (substitutionItems) {
             substitutionItems.each { substitutionItem ->
-                quantityAllocated += PicklistItem.findAllByRequisitionItem(substitutionItem).sum { it.quantity }
+                quantityAllocated += PicklistItem.findAllByRequisitionItem(substitutionItem).sum { picklistItem ->
+                    // When a shortage occurred (reasonCode is set), use quantityPicked instead of quantity
+                    // to avoid counting canceled/unpicked quantities
+                    picklistItem.reasonCode ? (picklistItem.quantityPicked ?: 0) : picklistItem.quantity
+                }
             }
         } else {
-            quantityAllocated = PicklistItem.findAllByRequisitionItem(this).sum { it.quantity }
+            quantityAllocated = PicklistItem.findAllByRequisitionItem(this).sum { picklistItem ->
+                picklistItem.reasonCode ? (picklistItem.quantityPicked ?: 0) : picklistItem.quantity
+            }
         }
 
         return quantityAllocated ?: 0

@@ -371,7 +371,7 @@ class PickPage extends Component {
 
       const updatedPicklistItems = _.map(pickPageItem.picklistItems, (item) => ({
         ...item,
-        quantityAllocated: item.quantity,
+        quantityAllocated: item.reasonCode ? (item.quantityPicked || 0) : item.quantity,
       }));
 
       return {
