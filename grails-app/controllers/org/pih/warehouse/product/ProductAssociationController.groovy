@@ -91,6 +91,7 @@ class ProductAssociationController {
 
             mutualAssociationInstance.mutualAssociation = productAssociationInstance
             productAssociationInstance.mutualAssociation = mutualAssociationInstance
+            mutualAssociationInstance.save()
         }
         productAssociationInstance.validate()
         if (!productAssociationInstance.hasErrors() && productAssociationInstance.save(flush: true)) {

@@ -23,7 +23,7 @@ class ProductAssociationValidator implements DomainValidator<ProductAssociation>
     }
 
     private ObjectError validateDuplicateAssociation(ProductAssociation productAssociation) {
-        List<ProductAssociation> foundProductAssociations = ProductAssociation.createCriteria().list {
+        int amountOfExistingAssociations = ProductAssociation.createCriteria().count {
             and {
                 eq("product", productAssociation.product)
                 eq("associatedProduct", productAssociation.associatedProduct)
@@ -35,14 +35,17 @@ class ProductAssociationValidator implements DomainValidator<ProductAssociation>
                 }
             }
         }
-        if (foundProductAssociations && foundProductAssociations.size() > 0) {
+        if (amountOfExistingAssociations > 0) {
             return rejectField("associatedProduct", productAssociation.associatedProduct, "productAssociation.associatedProduct.invalid.duplicateAssociation")
         }
         return null
     }
 
     private ObjectError validateDuplicateMutualAssociation(ProductAssociation productAssociation) {
-        List<ProductAssociation> existingAssociations = ProductAssociation.createCriteria().list {
+        if (!productAssociation.mutualAssociation) {
+            return null
+        }
+        int amountOfExistingAssociations = ProductAssociation.createCriteria().count {
             or {
                 and {
                     eq("product", productAssociation.product)
@@ -66,7 +69,7 @@ class ProductAssociationValidator implements DomainValidator<ProductAssociation>
                 }
             }
         }
-        if (existingAssociations.size() > 0 && productAssociation.mutualAssociation) {
+        if (amountOfExistingAssociations > 0) {
             return rejectField("associatedProduct", productAssociation.associatedProduct, "productAssociation.associatedProduct.invalid.duplicateMutualAssociation")
         }
         return null
