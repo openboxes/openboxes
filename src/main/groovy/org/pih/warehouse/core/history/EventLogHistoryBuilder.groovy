@@ -30,8 +30,12 @@ abstract class EventLogHistoryBuilder<T extends Referenceable> implements Histor
     List<HistoryItem> getHistory(T source) {
         // The default behaviour assumes the event logs contain all the information that we need to build the history.
         Collection<EventLog> eventLogs = getEventLogs(source)
-        List<HistoryItem> history = eventLogs.collect { getHistoryItem(source, it) }
-        return history.sort()
+        List<HistoryItem> historyItems = []
+        for (EventLog eventLog in eventLogs) {
+            HistoryItem historyItem = getHistoryItem(source, eventLog)
+            historyItems.add(historyItem)
+        }
+        return historyItems.sort()
     }
 
     /**
@@ -39,7 +43,7 @@ abstract class EventLogHistoryBuilder<T extends Referenceable> implements Histor
      */
     protected List<HistoryItem> getHistoryItemsFromEvents(T source, Collection<Event> events) {
         List<HistoryItem> historyItems = []
-        for (Event event in (events)) {
+        for (Event event in events) {
             HistoryItem historyItem = getHistoryItemFromEvent(source, event)
             historyItems.add(historyItem)
         }
