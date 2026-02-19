@@ -405,6 +405,13 @@ class FulfillmentService {
         AvailableItem availableItem = productAvailabilityService
                 .getAvailableItemByBinLocation(obj.origin, productCode, binLocationName)
 
+        // If no availableItem is found for the exact bin location name, try guessing with the "R-" prefix (Receiving Bin)
+        if (!availableItem && binLocationName && !binLocationName.startsWith(Constants.DEFAULT_RECEIVING_LOCATION_PREFIX)) {
+            String receivingBinLocationName = Constants.DEFAULT_RECEIVING_LOCATION_PREFIX + binLocationName
+            availableItem = productAvailabilityService
+                    .getAvailableItemByBinLocation(obj.origin, productCode, receivingBinLocationName)
+        }
+
         return availableItem?.inventoryItem?.lotNumber
     }
 
@@ -419,7 +426,7 @@ class FulfillmentService {
                     .getAvailableBinLocationByName(obj.origin, productCode, binLocationName)
 
             // If no binLocation is found, try guessing with the "R-" prefix (Receiving Bin)
-            if (!binLocation && !binLocationName.startsWith(Constants.DEFAULT_RECEIVING_LOCATION_PREFIX)) {
+            if (!binLocation && binLocationName && !binLocationName.startsWith(Constants.DEFAULT_RECEIVING_LOCATION_PREFIX)) {
                 String receivingBinLocationName = Constants.DEFAULT_RECEIVING_LOCATION_PREFIX + binLocationName
                 binLocation = productAvailabilityService
                         .getAvailableBinLocationByName(obj.origin, productCode, receivingBinLocationName)
