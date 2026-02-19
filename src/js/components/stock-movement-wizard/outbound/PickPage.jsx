@@ -23,6 +23,7 @@ import FilterInput from 'components/form-elements/FilterInput';
 import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import EditPickModal from 'components/stock-movement-wizard/modals/EditPickModal';
+import ActivityCode from 'consts/activityCode';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
 import { OutboundWorkflowState } from 'consts/WorkflowState';
@@ -35,6 +36,7 @@ import {
 } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
+import { supports } from 'utils/supportedActivitiesUtils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
 
@@ -353,6 +355,10 @@ class PickPage extends Component {
   checkForInitialPicksChanges(pickPageItem) {
     if (pickPageItem.picklistItems.length && pickPageItem.autoAllocated) {
       const initialPicks = [];
+      const hasMobilePicking = supports(
+        this.state.values.origin?.supportedActivities,
+        ActivityCode.REQUIRE_MOBILE_PICKING,
+      );
       _.forEach(pickPageItem.suggestedItems, (suggestion) => {
         // search if suggested picks are inside picklist
         // if no -> add suggested pick as initial pick (to be crossed out)
@@ -361,7 +367,12 @@ class PickPage extends Component {
           pickPageItem.picklistItems,
           (item) => _.get(suggestion, 'inventoryItem.id') === _.get(item, 'inventoryItem.id') && _.get(item, 'binLocation.id') === _.get(suggestion, 'binLocation.id'),
         );
-        if (_.isEmpty(pick) || (pick.quantityPicked !== suggestion.quantityPicked)) {
+        // When mobile picking is enabled, quantityPicked is always 0 (allocation-only mode)
+        // So we compare planned quantities (pick.quantity) instead
+        const hasChanges = hasMobilePicking
+          ? Number(pick?.quantity) !== Number(suggestion.quantityPicked)
+          : pick?.quantityPicked !== suggestion.quantityPicked;
+        if (_.isEmpty(pick) || hasChanges) {
           initialPicks.push({
             ...suggestion,
             initial: true,
@@ -393,7 +404,7 @@ class PickPage extends Component {
     })
       .then((resp) => {
         const { totalCount } = resp.data;
-        const { associations, picklist } = resp.data.data;
+        const { associations, picklist, origin } = resp.data.data;
         const printPicks = _.find(
           associations.documents,
           (doc) => doc.documentType === 'PICKLIST' && doc.uri.includes('print'),
@@ -405,6 +416,7 @@ class PickPage extends Component {
           values: {
             ...prev.values,
             picklist,
+            origin,
           },
         }), () => this.props.hideSpinner());
       })
