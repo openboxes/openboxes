@@ -82,6 +82,14 @@
                             </tr>
 
                              <tr class="prop">
+                                    <td valign="top" class="name">
+                                      <label for="identifier"><warehouse:message code="person.identifier.label" default="Identifier" /></label>
+                                    </td>
+                                    <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'identifier', 'errors')}">
+                                        <g:textField name="identifier" value="${userInstance?.identifier}" class="text" />
+                                    </td>
+                                </tr>
+                             <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="locale"><warehouse:message code="default.locale.label"/></label>
 	                                </td>
