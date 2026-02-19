@@ -63,6 +63,7 @@
                                     <g:sortableColumn property="lastName" title="${warehouse.message(code: 'default.name.label')}" />
                                     <g:sortableColumn property="email" title="${warehouse.message(code: 'user.email.label')}" />
                                     <g:sortableColumn property="locale" title="${warehouse.message(code: 'default.locale.label')}" />
+                                    <g:sortableColumn property="identifier" title="${warehouse.message(code: 'person.identifier.label', default: 'Identifier')}" />
                                     <g:sortableColumn property="role" title="${warehouse.message(code: 'user.roles.label')}" />
                                     <g:sortableColumn property="lastLoginDate" title="${warehouse.message(code: 'user.lastLoginDate.label')}" />
                                 </tr>
@@ -71,9 +72,12 @@
                             <g:each in="${userInstanceList}" status="i" var="userInstance">
                                 <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                                     <td>
-                                        <g:if test="${userInstance?.active }">
-                                            <span class="active"><warehouse:message code="default.yes.label"/></span></g:if>
-                                        <g:else><span class="inactive"><warehouse:message code="default.no.label"/></span></g:else>
+                                        <g:if test="${userInstance?.active}">
+                                            <span class="tag tag-success"><warehouse:message code="default.active.label" default="Active"/></span>
+                                        </g:if>
+                                        <g:else>
+                                            <span class="tag tag-danger"><warehouse:message code="default.inactive.label" default="Inactive"/></span>
+                                        </g:else>
                                     </td>
                                     <td>
                                         <g:link action="edit" id="${userInstance.id}">
@@ -95,6 +99,7 @@
                                         </g:else>
                                     </td>
                                     <td>${fieldValue(bean: userInstance, field: "locale.displayName")}</td>
+                                    <td>${fieldValue(bean: userInstance, field: "identifier")}</td>
                                     <td>${fieldValue(bean: userInstance, field: "roles")}</td>
                                     <td>
                                         <g:formatDate date="${userInstance.lastLoginDate}"/>
@@ -103,7 +108,7 @@
                             </g:each>
                             <g:unless test="${userInstanceList}">
                                 <tr>
-                                    <td colspan="7">
+                                    <td colspan="8">
                                         <p class="empty center">
                                             <warehouse:message code="users.empty.label" default="No users returned"/>
                                         </p>
