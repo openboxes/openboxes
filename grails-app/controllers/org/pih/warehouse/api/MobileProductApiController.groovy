@@ -151,7 +151,8 @@ class MobileProductApiController extends BaseDomainApiController {
 
     def search() {
         JSONObject jsonObject = request.JSON
-        String [] terms = jsonObject.value?.split(" ")
+        // Don't split scanned value - treat as single term for barcode/product code matching
+        String[] terms = jsonObject.value ? [jsonObject.value] as String[] : null
         List products = productService.searchProducts(terms, [])
         render([data: products?.unique()] as JSON)
     }
