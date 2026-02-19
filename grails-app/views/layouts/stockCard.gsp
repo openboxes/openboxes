@@ -35,7 +35,7 @@
 		}
 
 		.restricted {
-			background-color: #fca714 !important;
+			background-color: #fff3cd !important;
 		}
 	</style>
 </head>

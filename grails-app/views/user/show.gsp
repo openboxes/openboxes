@@ -27,6 +27,18 @@
 					<tbody>
 						<tr class="prop">
 							<td valign="top" class="name"><label><warehouse:message
+									code="user.active.label" /></label></td>
+							<td valign="top" class="value">
+								<g:if test="${userInstance?.active}">
+									<span class="tag tag-success"><warehouse:message code="default.active.label" default="Active"/></span>
+								</g:if>
+								<g:else>
+									<span class="tag tag-danger"><warehouse:message code="default.inactive.label" default="Inactive"/></span>
+								</g:else>
+							</td>
+						</tr>
+						<tr class="prop">
+							<td valign="top" class="name"><label><warehouse:message
 									code="user.username.label" /></label></td>
 							<td valign="top" class="value">
 								${fieldValue(bean: userInstance, field: "username")}
@@ -46,6 +58,13 @@
 									code="user.email.label" /></label></td>
 							<td valign="top" class="value">
 								${fieldValue(bean: userInstance, field: "email")}
+							</td>
+						</tr>
+						<tr class="prop">
+							<td valign="top" class="name"><label><warehouse:message
+									code="person.identifier.label" default="Identifier" /></label></td>
+							<td valign="top" class="value">
+								${fieldValue(bean: userInstance, field: "identifier")}
 							</td>
 						</tr>
 						<tr class="prop">

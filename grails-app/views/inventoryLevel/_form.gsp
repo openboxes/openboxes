@@ -17,6 +17,7 @@
             <li><a href="#tabs-2"><g:message code="default.replenishment.label" default="Replenishment"/></a></li>
             <li><a href="#tabs-3"><g:message code="default.receiving.label" default="Receiving"/></a></li>
             <li><a href="#tabs-4"><g:message code="default.forecasting.label" default="Forecasting"/></a></li>
+            <li><a href="#tabs-5"><g:message code="default.cycleCount.label" default="Cycle Count"/></a></li>
         </ul>
         <div id="tabs-1">
             <table>
@@ -69,6 +70,22 @@
                         <g:selectBinLocationByLocation name="internalLocation" id="${locationInstance?.id}"
                                                        value="${inventoryLevelInstance?.internalLocation?.id}"
                                                        noSelection="['':'Optional']" class="chzn-select-deselect"/>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td valign="top" class="name">
+                        <label for="identifier"><warehouse:message code="inventoryLevel.identifier.label" default="Identifier" /></label>
+                    </td>
+                    <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'identifier', 'errors')}">
+                        <g:textField name="identifier" value="${inventoryLevelInstance?.identifier}" class="text large"/>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td valign="top" class="name">
+                        <label for="sortOrder"><warehouse:message code="inventoryLevel.sortOrder.label" default="Sort Order" /></label>
+                    </td>
+                    <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'sortOrder', 'errors')}">
+                        <g:textField name="sortOrder" value="${inventoryLevelInstance?.sortOrder}" class="text large"/>
                     </td>
                 </tr>
                 <tr class="prop">
@@ -197,6 +214,39 @@
                         <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'forecastPeriodDays', 'errors')}">
                             <g:textField name="forecastPeriodDays" value="${inventoryLevelInstance?.forecastPeriodDays }" size="10" class="text"/>
                             ${warehouse.message(code:'default.days.label')}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="tabs-5">
+            <table>
+                <tbody>
+                    <tr class="prop">
+                        <td valign="top" class="name">
+                            <label for="cycleCountFrequencyDays"><warehouse:message code="inventoryLevel.cycleCountFrequencyDays.label" default="Count Frequency (Days)" /></label>
+                        </td>
+                        <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'cycleCountFrequencyDays', 'errors')}">
+                            <g:textField name="cycleCountFrequencyDays" value="${inventoryLevelInstance?.cycleCountFrequencyDays}" size="10" class="text"/>
+                            ${warehouse.message(code:'default.days.label')}
+                        </td>
+                    </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name">
+                            <label for="dateLastCycleCount"><warehouse:message code="inventoryLevel.dateLastCycleCount.label" default="Date Last Count" /></label>
+                        </td>
+                        <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'dateLastCycleCount', 'errors')}">
+                            <input type="text" name="dateLastCycleCount" class="text datepicker"
+                                   value="${inventoryLevelInstance?.dateLastCycleCount?.format('MM/dd/yyyy')}" />
+                        </td>
+                    </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name">
+                            <label for="dateNextCycleCount"><warehouse:message code="inventoryLevel.dateNextCycleCount.label" default="Date Next Count" /></label>
+                        </td>
+                        <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'dateNextCycleCount', 'errors')}">
+                            <input type="text" name="dateNextCycleCount" class="text datepicker"
+                                   value="${inventoryLevelInstance?.dateNextCycleCount?.format('MM/dd/yyyy')}" />
                         </td>
                     </tr>
                 </tbody>

@@ -1,5 +1,6 @@
 package org.pih.warehouse.allocation
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.api.AvailableItem
@@ -20,6 +21,7 @@ class AllocationService {
 
     StockMovementService stockMovementService
     ProductAvailabilityService productAvailabilityService
+    GrailsApplication grailsApplication
 
     @Transactional(readOnly = true)
     StockMovement getOutboundOrder(String id) {
@@ -213,6 +215,9 @@ class AllocationService {
     }
 
     private List<AvailableItem> applyStrategies(List<AvailableItem> items, List<AllocationStrategy> strategies) {
+        if (!strategies || strategies.isEmpty()) {
+            strategies = grailsApplication.config.openboxes.order.allocation.strategies
+        }
         if (!strategies || strategies.isEmpty()) {
             return items
         }

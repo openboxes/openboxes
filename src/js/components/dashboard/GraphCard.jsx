@@ -210,6 +210,7 @@ const GraphCard = SortableElement(({
   size = null,
   translate,
   hideDraghandle,
+  linkTarget,
 }) => {
   let graph;
   // eslint-disable-next-line no-template-curly-in-string
@@ -254,7 +255,7 @@ const GraphCard = SortableElement(({
   } else if (cardType === 'numbersCustomColors') {
     graph = <NumbersRAG data={data} />;
   } else if (cardType === 'table') {
-    graph = <TableCard data={data} />;
+    graph = <TableCard data={data} linkTarget={linkTarget} />;
   } else if (cardType === 'numberTable') {
     graph = <NumbersTableCard data={data} options={options} />;
   } else if (cardType === 'loading') {
@@ -271,7 +272,7 @@ const GraphCard = SortableElement(({
     <div className={`graph-card ${size === 'big' ? 'big-size' : ''} ${cardType === 'error' ? 'error-card' : ''}`}>
       <div className="header-card">
         {cardLink ? (
-          <a target="_blank" rel="noopener noreferrer" href={cardLink} className="title-link">
+          <a href={cardLink} className="title-link" target={linkTarget} rel={linkTarget === '_blank' ? 'noopener noreferrer' : undefined}>
             <span className="title-link">
               {translate(cardTitle, cardTitle)}
             </span>
