@@ -17,6 +17,7 @@ import org.grails.plugins.web.taglib.RenderTagLib
 import grails.web.context.ServletContextHolder
 import org.grails.web.errors.GrailsWrappedRuntimeException
 import org.pih.warehouse.api.PartialReceipt
+import org.pih.warehouse.api.PartialReceiptItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Person
@@ -163,16 +164,18 @@ class NotificationService {
         }
     }
 
-    def sendReceiptNotifications(PartialReceipt partialReceipt) {
+    void sendReceiptNotifications(PartialReceipt partialReceipt) {
         Shipment shipment = partialReceipt?.shipment
-        def emailValidator = EmailValidator.getInstance()
-        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
-        def recipientItems = partialReceipt.partialReceiptItems.groupBy {it.recipient }
+        EmailValidator emailValidator = EmailValidator.getInstance()
+        Map<Person, List<PartialReceiptItem>> recipientItems = partialReceipt.partialReceiptItems.groupBy {it.recipient }
         recipientItems.each { Person recipient, items ->
             if (emailValidator.isValid(recipient?.email)) {
-                def subject = g.message(code: "email.yourItemReceived.message", args: [shipment.destination.name, shipment.shipmentNumber])
-                def body = "${g.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items, recipient: recipient, receivedBy: partialReceipt.recipient])}"
-                mailService.sendHtmlMail(subject, body.toString(), recipient.email)
+                mailService.sendHtmlMailWithGoodsDeliveryNoteAttached(
+                        shipment,
+                        items,
+                        recipient,
+                        partialReceipt.recipient
+                )
             }
         }
     }
