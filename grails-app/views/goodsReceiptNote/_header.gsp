@@ -11,7 +11,7 @@
                     <g:message code="enum.ShipmentStatusCode.${shipment?.status?.code?.name}" default="${shipment?.status?.code?.name}" />
                 </div>
                 <h1>${title}</h1>
-                <h3>${shipment?.shipmentNumber} - ${shipment?.name }
+                <h3>${shipment?.shipmentNumber} - ${shipment?.name }</h3>
                 <g:if test="${shipment.shipmentNumber}">
                     <div class="barcode">
                         <img src="${createLink(controller: 'product', action: 'barcode', params: [data: shipment?.shipmentNumber, width: 100, height: 30, format: 'CODE_128'])}"/>
