@@ -366,9 +366,8 @@ class OutboundStockMovement implements Serializable, Validateable {
     }
 
     Map<String, String> getFulfillmentSummaryStatus() {
-        // Fulfillment summary status is only applicable when viewing from the origin (outbound perspective)
-        Location currentLocation = AuthService.currentLocation
-        if (currentLocation?.id != origin?.id) {
+        // Fulfillment summary status is only applicable to requisition-based movements
+        if (!requisition) {
             return null
         }
 
