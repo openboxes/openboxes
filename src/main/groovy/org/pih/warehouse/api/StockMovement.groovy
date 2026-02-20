@@ -167,6 +167,7 @@ class StockMovement implements Validateable{
             description         : description,
             statusCode          : statusCode,
             displayStatus       : displayStatus,
+            fulfillmentSummaryStatus : fulfillmentSummaryStatus,
             identifier          : identifier,
             origin              : [
                 id                  : origin?.id,
@@ -541,6 +542,22 @@ class StockMovement implements Validateable{
                 destination: destination
         )
         Enum status = StockMovementStatusResolver.getListStatus(stockMovementContext)
+        return StockMovementStatusResolver.getStatusMetaData(status)
+    }
+
+    /**
+     * Returns the fulfillment summary status for tracking order lifecycle.
+     * This is only applicable to requisition-based outbound stock movements.
+     *
+     * @return Map containing status metadata, or null if not applicable
+     */
+    Map<String, String> getFulfillmentSummaryStatus() {
+        // Fulfillment summary status is only applicable to requisition-based movements
+        if (!requisition) {
+            return null
+        }
+
+        FulfillmentSummaryStatus status = FulfillmentStatusResolver.resolve(lineItems)
         return StockMovementStatusResolver.getStatusMetaData(status)
     }
 

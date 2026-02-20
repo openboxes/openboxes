@@ -1,7 +1,11 @@
 package org.pih.warehouse.inventory
 
 import grails.validation.Validateable
+import org.pih.warehouse.api.FulfillmentStatusResolver
+import org.pih.warehouse.api.FulfillmentSummaryStatus
+import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
@@ -359,5 +363,15 @@ class OutboundStockMovement implements Serializable, Validateable {
     // This has to be named with the get prefix to align with the StockMovement DTO
     boolean getIsReturn() {
         return shipment?.isFromReturnOrder
+    }
+
+    Map<String, String> getFulfillmentSummaryStatus() {
+        // Fulfillment summary status is only applicable to requisition-based movements
+        if (!requisition) {
+            return null
+        }
+
+        FulfillmentSummaryStatus status = FulfillmentStatusResolver.resolve(getLineItems())
+        return StockMovementStatusResolver.getStatusMetaData(status)
     }
 }
