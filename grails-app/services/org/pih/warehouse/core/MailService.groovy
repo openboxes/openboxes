@@ -9,20 +9,29 @@
  **/
 package org.pih.warehouse.core
 
-import grails.core.GrailsApplication
+import grails.config.Config
 import org.apache.commons.mail.Email
 import org.apache.commons.mail.EmailAttachment
 import org.apache.commons.mail.HtmlEmail
 import org.apache.commons.mail.SimpleEmail
 import grails.util.Holders
+import org.grails.plugins.web.taglib.ApplicationTagLib
+import org.pih.warehouse.api.PartialReceiptItem
+import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.data.FileGenerationService
+import org.pih.warehouse.shipping.Shipment
+import org.springframework.http.MediaType
 
 import javax.mail.util.ByteArrayDataSource
 
 class MailService {
 
-    def userService
-    GrailsApplication grailsApplication
-    def config = Holders.getConfig()
+    FileGenerationService fileGenerationService
+    Config config = Holders.getConfig()
+
+    ApplicationTagLib getApplicationTagLib() {
+        return Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
+    }
 
     String getDefaultFrom() {
         return config.getProperty("grails.mail.from")
@@ -53,11 +62,11 @@ class MailService {
     }
 
     Boolean getStartTlsEnabled() {
-        return grailsApplication.config.grails.mail.props["mail.smtp.starttls.enable"]
+        return config.getProperty("grails.mail.props.mail.smtp.starttls.enable").toBoolean()
     }
 
     Boolean getIsMailEnabled() {
-        return grailsApplication.config.grails.mail.enabled.toBoolean()
+        return config.getProperty("grails.mail.enabled").toBoolean()
     }
 
     Boolean sendMail(String subject, String msg, String to) {
@@ -93,7 +102,7 @@ class MailService {
     }
 
     Boolean sendHtmlMailWithAttachment(String to, String subject, String body, byte[] bytes, String name, String mimeType) {
-        return doSendMail(subject, body, null, null, Collections.singleton(to), ccList, Collections.singleton(new Attachment(name: name, mimeType: mimeType, bytes: bytes)), null, true, false)
+        return doSendMail(subject, body, null, null, Collections.singleton(to), null, Collections.singleton(new Attachment(name: name, mimeType: mimeType, bytes: bytes)), null, true, false)
     }
 
     /**
@@ -121,6 +130,30 @@ class MailService {
 
     Boolean sendHtmlMailWithAttachment(User fromUser, Collection toList, Collection ccList, String subject, String body, List<Attachment> attachments, Integer port) {
         return doSendMail(subject, body, fromUser?.email, fromUser?.name, toList, ccList, attachments, port, true, false)
+    }
+
+    void sendHtmlMailWithGoodsDeliveryNoteAttached(Shipment shipment, List<PartialReceiptItem> items, Person recipient, Person receivedBy) {
+        String subject = applicationTagLib.message(code: "email.yourItemReceived.message", args: [shipment.destination.name, shipment.shipmentNumber])
+        GString body = "${applicationTagLib.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items, recipient: recipient, receivedBy: receivedBy])}"
+
+        String barcodeFileUri = fileGenerationService.generateBarcodeFileUri(shipment.shipmentNumber)
+
+        String fileName = "GoodsReceiptNote-${shipment.shipmentNumber}.pdf"
+
+        byte[] goodsDeliveryNotePdf = fileGenerationService.generatePdfFromTemplate("/email/goodsDeliveryNote", [
+                shipment: shipment,
+                currentLocation: AuthService.currentLocation,
+                barcodeFileUri: barcodeFileUri
+        ])
+
+        sendHtmlMailWithAttachment(
+                recipient.email,
+                subject,
+                body.toString(),
+                goodsDeliveryNotePdf,
+                fileName,
+                MediaType.APPLICATION_PDF_VALUE
+        )
     }
 
     /**
