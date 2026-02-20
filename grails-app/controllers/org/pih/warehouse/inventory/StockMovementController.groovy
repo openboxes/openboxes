@@ -17,6 +17,7 @@ import org.grails.web.json.JSONObject
 import org.pih.warehouse.allocation.AllocationMode
 import org.pih.warehouse.allocation.AllocationService
 import org.pih.warehouse.allocation.AllocationStrategy
+import org.pih.warehouse.api.InboundWorkflowState
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementItem
@@ -137,7 +138,8 @@ class StockMovementController {
                 redirect(action: "createOutbound", params: params)
                 break
             case StockMovementDirection.INBOUND:
-                redirect(action: "createInbound", params: params)
+                String step = (stockMovement.statusCode in [StockMovementStatusCode.CREATED.name(), StockMovementStatusCode.REQUESTING.name()]) ?  InboundWorkflowState.ADD_ITEMS : InboundWorkflowState.SEND_SHIPMENT
+                redirect(action: "createInbound", params: params + [step: step])
                 break
             default:
                 redirect(action: "createOutbound", params: params)
@@ -561,10 +563,24 @@ class StockMovementController {
             String csv = new String(importFile.bytes)
             char separatorChar = CSVUtils.getSeparator(csv, StockMovement.buildCsvRow()?.keySet()?.size())
             def settings = [separatorChar: separatorChar, skipLines: 1]
-            Integer sortOrder = 0
+
+            Map<String, StockMovementItem> existingItemsMap = stockMovement.lineItems.collectEntries { [it.id, it] }
+            Integer sortOrder = (stockMovement.lineItems*.sortOrder.findAll { it != null }.max() ?: 0) + 100
+
             csv.toCsvReader(settings).eachLine { tokens ->
                 Boolean validateLotAndExpiry = stockMovement.getStockMovementDirection(currentLocation) != StockMovementDirection.OUTBOUND && !stockMovement.electronicType
                 StockMovementItem stockMovementItem = StockMovementItem.createFromTokens(tokens, validateLotAndExpiry)
+                StockMovementItem existingItem = existingItemsMap.get(stockMovementItem.id)
+                if (existingItem) {
+                    existingItem.product = stockMovementItem.product
+                    existingItem.quantityRequested = stockMovementItem.quantityRequested
+                    existingItem.palletName = stockMovementItem.palletName
+                    existingItem.boxName = stockMovementItem.boxName
+                    existingItem.lotNumber = stockMovementItem.lotNumber
+                    existingItem.expirationDate = stockMovementItem.expirationDate
+                    existingItem.recipient = stockMovementItem.recipient
+                    return
+                }
                 stockMovementItem.stockMovement = stockMovement
                 stockMovementItem.sortOrder = sortOrder
                 stockMovement.lineItems.add(stockMovementItem)

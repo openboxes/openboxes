@@ -16,6 +16,7 @@ class CategoryController {
 
     def productService
     CategoryDataService categoryGormService
+    CategoryService categoryService
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index() {
@@ -28,11 +29,17 @@ class CategoryController {
 
         println "Category tree: " + (System.currentTimeMillis() - startTime) + " ms"
         List<Category> categoriesWithoutParent = productService.getCategoriesWithoutParent()
-
+        boolean assigningParentToProductEnabled = categoryService.isAssigningParentToProductEnabled()
         [
             selectedCategory:           selectedCategory,
             categoriesWithoutParent:    categoriesWithoutParent,
+            assigningParentToProductEnabled: assigningParentToProductEnabled,
         ]
+    }
+
+    def updateAssigningParentToProduct() {
+        categoryService.updateAssigningParentToProduct(params.boolean("assigningParentToProductEnabled"))
+        redirect(action: "tree")
     }
 
     def move() {

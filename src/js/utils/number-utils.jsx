@@ -11,3 +11,6 @@ export default function accountingFormat(value) {
 
   return number;
 }
+
+// 1 MB = 1024 * 1024 = 1,048,576 bytes
+export const bytesToMB = (bytes) => (bytes / (1024 * 1024)).toFixed(2);

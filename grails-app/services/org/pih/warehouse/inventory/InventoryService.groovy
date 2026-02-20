@@ -12,6 +12,7 @@ package org.pih.warehouse.inventory
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
 import grails.validation.ValidationException
+import org.apache.commons.collections.map.MultiKeyMap
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.PaginatedList
@@ -29,6 +30,7 @@ import org.pih.warehouse.importer.ImporterUtil
 import org.pih.warehouse.inventory.product.ExpirationHistoryReport
 import org.pih.warehouse.inventory.product.availability.AvailableItemKey
 import org.pih.warehouse.inventory.product.availability.AvailableItemMap
+import org.pih.warehouse.product.lot.ProductLot
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAvailability
@@ -1462,19 +1464,25 @@ class InventoryService implements ApplicationContextAware {
                     baselineTransaction?.transactionSource
             )
 
-            List<AvailableItem> currentRecordStockItems = []
+            List<RecordInventoryRowCommand> groupedRows = groupDuplicatedRecordInventoryRows(cmd)
+
+            // Collect all unique product lots (ie inventory items) across all rows...
+            List<ProductLot> itemsToGetOrCreate = groupedRows.collect {
+                new ProductLot(product: cmd.product, lotNumber: it.lotNumber, expirationDate: it.expirationDate)
+            }
+            // ...Then get/create them all in bulk. Don't refresh product availability for any newly created items.
+            // We will manually perform a product availability refresh at the end.
+            InventoryItemByProductLot inventoryItemMap = inventoryItemManager.getOrCreateInventoryItems(
+                    itemsToGetOrCreate, true)
+
             // 3. Process each row added to the record inventory page
-            groupDuplicatedRecordInventoryRows(cmd).each { RecordInventoryRowCommand row ->
+            List<AvailableItem> currentRecordStockItems = []
+            for (RecordInventoryRowCommand row in groupedRows) {
                 if (!row) {
                     return null
                 }
 
-                InventoryItem inventoryItem = inventoryItemManager.getOrCreateInventoryItem(
-                        cmd.product,
-                        row.lotNumber,
-                        row.expirationDate,
-                        true,  // Don't refresh product availability. That will get done manually at the end.
-                )
+                InventoryItem inventoryItem = inventoryItemMap.get(cmd.product, row.lotNumber)
 
                 // Create new transaction entries (but only if the quantity changed)
                 TransactionEntry transactionEntry = recordStockProductInventoryTransactionService.createAdjustmentTransactionEntry(
@@ -1719,13 +1727,9 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
-     * TODO Need to finish this method.
-     *
-     * @param product
-     * @param lotNumber
-     * @param expirationDate
-     * @return
+     * @deprecated use {@link InventoryItemManager} instead.
      */
+    @Deprecated
     InventoryItem findOrCreateInventoryItem(Product product, String lotNumber, Date expirationDate) {
         def inventoryItem =
                 findInventoryItemByProductAndLotNumber(product, lotNumber)
@@ -3243,30 +3247,40 @@ class InventoryService implements ApplicationContextAware {
     }
 
     List<AvailableItem> getAvailableBinLocations(Location location, Product product) {
-        return getAvailableBinLocations(location, product, false)
+        return getAvailableBinLocations(location, [product])
     }
 
-    List<AvailableItem> getAvailableBinLocations(Location location, Product product, boolean excludeOutOfStock) {
-        return getAvailableBinLocations(location, [product], excludeOutOfStock)
-    }
+    List<AvailableItem> getAvailableBinLocations(Location location, List<Product> products) {
+        if (products.empty) {
+            return []
+        }
+        List<AvailableItem> availableItems = productAvailabilityService.getAvailableItems(location, products.id, true, true)
+        MultiKeyMap<Object, AvailableItem> map = new MultiKeyMap()
+        for (AvailableItem availableItem in availableItems) {
+            InventoryItem inventoryItem = availableItem.inventoryItem
+            Location binLocation = availableItem.binLocation
 
-    List<AvailableItem> getAvailableBinLocations(Location location, List products, boolean excludeOutOfStock = false) {
-        def availableBinLocations = getProductQuantityByBinLocation(location, products)
+            AvailableItem collectedItem = map.get(inventoryItem, binLocation)
+            if (collectedItem) {
+                collectedItem.quantityAvailable += availableItem.quantityAvailable
+                collectedItem.quantityOnHand += availableItem.quantityOnHand
+                continue
+            }
 
-        List<AvailableItem> availableItems = availableBinLocations.collect {
-            return new AvailableItem(
-                    inventoryItem: it?.inventoryItem,
-                    binLocation: it?.binLocation,
-                    quantityAvailable: it.quantity
-            )
+            map.put(inventoryItem, binLocation, new AvailableItem(
+                    inventoryItem: inventoryItem,
+                    binLocation: binLocation,
+                    quantityAvailable: availableItem.quantityAvailable,
+                    quantityOnHand: availableItem.quantityOnHand))
         }
 
-        availableItems = sortAvailableItems(availableItems)
-        return availableItems
+        return sortAvailableItems(map.values().toList(), false)
     }
 
-    List<AvailableItem> sortAvailableItems(List<AvailableItem> availableItems) {
-        availableItems = availableItems.findAll { it.quantityAvailable > 0 }
+    List<AvailableItem> sortAvailableItems(List<AvailableItem> availableItems, boolean removeWithEmptyQuantity = true) {
+        availableItems = removeWithEmptyQuantity
+                ? availableItems.findAll { it.quantityAvailable > 0 }
+                : availableItems
 
         // Sort bins  by available quantity
         availableItems = availableItems.sort { a, b ->

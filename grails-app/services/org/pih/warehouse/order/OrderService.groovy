@@ -762,6 +762,9 @@ class OrderService {
                         if (currentLocation.isAccountingRequired() && !product.glAccount) {
                             throw new ProductException("Product ${productCode}: Cannot add order item without a valid general ledger code")
                         }
+                        if (orderItemId && orderItem.product.productCode != productCode) {
+                            throw new ProductException("Cannot change the product for an existing order item via import")
+                        }
                         orderItem.product = product
                     } else {
                         throw new ProductException("No product code specified")
@@ -773,7 +776,8 @@ class OrderService {
                             if (productSource.product != orderItem.product) {
                                 throw new ProductException("Wrong product source for given product")
                             }
-                            if (!productSource.active) {
+                            // Prevent creating order items with inactive product sources, but allow to modify existing order items
+                            if (!productSource.active && orderItemId == "") {
                                 throw new ProductException("Product source ${sourceCode} for product ${productCode} is inactive")
                             }
                             orderItem.productSupplier = productSource
@@ -829,6 +833,15 @@ class OrderService {
                         throw new IllegalArgumentException("Wrong quantity value: ${parsedQty}.")
                     }
 
+                    if (order.status >= OrderStatus.PLACED && orderItem.quantityInShipments > parsedQty) {
+                        throw new IllegalArgumentException("Must enter a quantity greater than or equal to the quantity in shipments (${orderItem.quantityInShipments})")
+                    }
+
+                    if (orderItem.hasInvoices && parsedQty < orderItem.quantityInvoiced) {
+                        String invoiceNumbers = orderItem.invoices?.collect { it.invoiceNumber }?.join(", ")
+                        throw new IllegalArgumentException("Must enter a quantity greater than or equal to the quantity invoiced (${orderItem.quantityInvoiced}). Pending invoices: ${invoiceNumbers}")
+                    }
+
                     BigDecimal parsedUnitPrice = CSVUtils.parseNumber(unitPrice, "unitPrice")
                     if (orderItem.id && orderItem.hasRegularInvoice && orderItem.unitPrice != parsedUnitPrice) {
                         throw new IllegalArgumentException("Cannot update the unit price on a line that is already invoiced.")
@@ -841,7 +854,7 @@ class OrderService {
                     orderItem.unitPrice = parsedUnitPrice
 
                     if (recipient) {
-                        Person person = personService.getActivePersonByName(recipient)
+                        Person person = personService.getActivePerson(recipient)
                         if (!person) {
                             throw new IllegalArgumentException("Cannot set a recipient who is non-existant or inactive: ${recipient}")
                         }

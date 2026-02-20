@@ -768,6 +768,9 @@ class OrderController {
         }
         if (!orderItem) {
             orderItem = new OrderItem(params)
+            if (order.status >= OrderStatus.PLACED && orderItem.estimatedReadyDate) {
+                orderItem.actualReadyDate = orderItem.estimatedReadyDate
+            }
             order.addToOrderItems(orderItem)
         }
         else {

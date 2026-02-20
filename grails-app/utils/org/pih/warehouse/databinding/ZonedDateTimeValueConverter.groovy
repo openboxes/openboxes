@@ -2,7 +2,10 @@ package org.pih.warehouse.databinding
 
 import java.time.ZonedDateTime
 import org.apache.commons.lang.StringUtils
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+
+import org.pih.warehouse.core.date.ZonedDateTimeParser
 
 /**
  * As of Java 8, Java.util.Date is functionally replaced with the java.time classes, but Grails 4 and older does not
@@ -11,6 +14,9 @@ import org.springframework.stereotype.Component
  */
 @Component
 class ZonedDateTimeValueConverter extends StringValueConverter<ZonedDateTime> {
+
+    @Autowired
+    ZonedDateTimeParser zonedDateTimeParser
 
     /**
      * Binds a given user-input String to a ZonedDateTime.
@@ -26,8 +32,6 @@ class ZonedDateTimeValueConverter extends StringValueConverter<ZonedDateTime> {
      */
     @Override
     ZonedDateTime convertString(String value) {
-        return StringUtils.isBlank(value) ?
-                null :
-                ZonedDateTime.from(DataBindingConstants.DATE_TIME_ZONE_FORMAT.parse(value.trim()))
+        return zonedDateTimeParser.parse(value)
     }
 }

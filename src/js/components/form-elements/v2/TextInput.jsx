@@ -28,6 +28,10 @@ const TextInput = ({
   onKeyDown,
   focusProps = {},
   onWheel,
+  customTooltip,
+  value,
+  ariaLabel,
+  hasErrors,
   ...fieldProps
 }) => {
   const inputRef = useRef(null);
@@ -70,6 +74,10 @@ const TextInput = ({
       inputId={id || name}
       errorMessage={errorMessage}
       hideErrorMessageWrapper={hideErrorMessageWrapper}
+      customTooltip={customTooltip}
+      value={value}
+      ariaLabel={ariaLabel}
+      hasErrors={!!(errorMessage || hasErrors)}
     >
       <input
         ref={inputRef}
@@ -80,6 +88,7 @@ const TextInput = ({
         placeholder={placeholder}
         type={type}
         step={numberIncrementValue}
+        value={value}
         {...fieldProps}
         onChange={onChangeHandler}
         onBlur={onBlurHandler}
@@ -135,6 +144,13 @@ TextInput.propTypes = {
     columnId: PropTypes.string,
   }),
   onWheel: PropTypes.func,
+  customTooltip: PropTypes.bool,
+  value: PropTypes.string,
+  ariaLabel: PropTypes.shape({
+    id: PropTypes.string,
+    defaultMessage: PropTypes.string,
+  }),
+  hasErrors: PropTypes.bool,
 };
 
 TextInput.defaultProps = {
@@ -155,4 +171,8 @@ TextInput.defaultProps = {
   onKeyDown: null,
   focusProps: {},
   onWheel: null,
+  customTooltip: false,
+  value: '',
+  ariaLabel: null,
+  hasErrors: false,
 };

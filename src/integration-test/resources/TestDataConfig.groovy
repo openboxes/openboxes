@@ -30,6 +30,7 @@ testDataConfig {
         'org.pih.warehouse.product.Category' {
             name = "Test Category"
             description = "A category to be used by tests. Can be deleted safely."
+            assigningParentToProductEnabled = true
         }
 
         'org.pih.warehouse.product.ProductType' {

@@ -34,13 +34,6 @@ class PersonService {
     }
 
     /**
-     * @return The first person we can find who is active and has the given email
-     */
-    Person getActivePersonByEmail(String email) {
-        return Person.findByActiveAndEmail(true, email)
-    }
-
-    /**
      * Fetch a user via their full name. We require the combined name to be provided (instead of first name
      * and last name individually) because while internally we split the name so that it conforms to the firstName and
      * lastName fields in the Person table, we want to eventually move away from forcing that name structure upon users.
@@ -56,23 +49,6 @@ class PersonService {
 
         // We give preference to active people, so if there is one found, return it, otherwise return anyone.
         return people.find{ it.active } ?: people.first()
-    }
-
-    /**
-     * Fetch an active user via their full name. We require the combined name to be provided (instead of first name
-     * and last name individually) because while internally we split the name so that it conforms to the firstName and
-     * lastName fields in the Person table, we want to eventually move away from forcing that name structure upon users.
-     *
-     * @param combinedNames The person's full name (first name + last name) combined into a single String.
-     * @return A Person who is active and has a firstName and lastName matching the combinedNames
-     */
-    Person getActivePersonByName(String combinedNames) {
-        if (StringUtils.isBlank(combinedNames)) {
-            return null
-        }
-
-        String[] names = extractNames(combinedNames)
-        return Person.findByActiveAndFirstNameAndLastName(true, names[0], names[1])
     }
 
     /**
@@ -145,5 +121,43 @@ class PersonService {
             throw new RuntimeException("Recipient ${combinedNames} must have at least two names (i.e. first name and last name)")
         }
         return names
+    }
+
+    /**
+     * Find a person by identifier string which can be either an email address or a full name.
+     * Supports RFC822 format for email addresses (e.g., "Justin Miranda <justin@openboxes.com>").
+     *
+     * @param identifier Either a RFC822 internet/email address (ex: "Justin Miranda <justin@openboxes.com>"),
+     * a plain email address (ex: "justin@openboxes.com"), or simply the identifier's name (ex: "Justin Miranda").
+     * @return A Person matching the identifier (preferring active people), or null if not found.
+     */
+    Person getPerson(String identifier) {
+        identifier = identifier?.trim()
+        if (StringUtils.isBlank(identifier)) {
+            return null
+        }
+
+        try {
+            InternetAddress internetAddress = new InternetAddress(identifier, false)
+            internetAddress.validate()
+            return getPersonByEmail(internetAddress.address)
+        } catch (AddressException ignored) {}
+        // If identifier isn't a valid internet address, it must be a regular name.
+        // Check if name has at least two words
+        if (identifier.split(" ").length < 2) {
+            return null
+        }
+        return getPersonByName(identifier)
+    }
+
+    /**
+     * Find an active person by identifier string which can be either an email address or a full name.
+     *
+     * @param identifier Either a RFC822 internet/email address, a plain email address, or a full name.
+     * @return An active Person matching the identifier, or null if not found or person is inactive.
+     */
+    Person getActivePerson(String identifier) {
+        Person person = getPerson(identifier)
+        return person?.active ? person : null
     }
 }

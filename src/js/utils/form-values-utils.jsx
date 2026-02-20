@@ -62,6 +62,9 @@ export const getReceivingPayloadContainers = (formValues) =>
 export const matchesProductCodeOrName = ({
   product, filterValue,
 }) => {
+  if (!product?.id) {
+    return false;
+  }
   const { productCode, name, displayNames } = product;
   const value = filterValue?.toLowerCase();
   return (productCode?.toLowerCase()?.includes(value)

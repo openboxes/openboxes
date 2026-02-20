@@ -1,15 +1,22 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import PropTypes from 'prop-types';
+import { RiErrorWarningLine } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
-import { makeGetCycleCountItem } from 'selectors';
+import {
+  makeGetCycleCountItem,
+} from 'selectors';
 
 import { updateFieldValue } from 'actions';
 import { TableCell } from 'components/DataTable';
 import InputField from 'components/form-elements/v2/TextInput';
+import cycleCountColumn from 'consts/cycleCountColumn';
+import useCellValidation from 'hooks/cycleCount/useCellValidation';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const QuantityCell = ({
   id,
+  index,
   cycleCountId,
   isStepEditable,
 }) => {
@@ -23,7 +30,7 @@ const QuantityCell = ({
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
-    setValue(initialValue);
+    setValue(initialValue || '');
   }, [initialValue]);
 
   if (!isStepEditable) {
@@ -36,6 +43,18 @@ const QuantityCell = ({
     );
   }
 
+  const {
+    onChangeValidationHandler,
+    onBlurValidationHandler,
+    error,
+    showError,
+  } = useCellValidation({
+    initialValue,
+    cycleCountId,
+    index,
+    fieldName: cycleCountColumn.QUANTITY_COUNTED,
+  });
+
   const dispatch = useDispatch();
 
   const onChange = (enteredValue) => {
@@ -43,6 +62,7 @@ const QuantityCell = ({
       ? (parseInt(enteredValue, 10) || 0)
       : enteredValue;
     setValue(parsedValue);
+    onChangeValidationHandler();
   };
 
   const onBlur = () => {
@@ -50,10 +70,11 @@ const QuantityCell = ({
       updateFieldValue({
         cycleCountId,
         rowId: id,
-        field: 'quantityCounted',
+        field: cycleCountColumn.QUANTITY_COUNTED,
         value,
       }),
     );
+    onBlurValidationHandler();
   };
 
   return (
@@ -61,12 +82,20 @@ const QuantityCell = ({
       <InputField
         type="number"
         value={value}
+        showErrorBorder={showError}
         onChange={onChange}
         onBlur={onBlur}
         className="m-1 w-75"
         hideErrorMessageWrapper
         min="0"
       />
+      {showError && (
+        <CustomTooltip
+          content={error}
+          className="tooltip-icon tooltip-icon--error"
+          icon={RiErrorWarningLine}
+        />
+      )}
     </TableCell>
   );
 };
@@ -75,6 +104,7 @@ export default QuantityCell;
 
 QuantityCell.propTypes = {
   id: PropTypes.string.isRequired,
+  index: PropTypes.string.isRequired,
   cycleCountId: PropTypes.string.isRequired,
   isStepEditable: PropTypes.bool.isRequired,
 };

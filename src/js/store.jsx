@@ -4,6 +4,7 @@ import storage from 'redux-persist/lib/storage';
 import ReduxPromise from 'redux-promise';
 import reduxThunk from 'redux-thunk';
 
+import cycleCount from 'middlewares';
 import rootReducer from 'reducers';
 
 const persistConfig = {
@@ -14,10 +15,14 @@ const persistConfig = {
   // (see reference in the comments section in the: OBPIH-4735),
   // hence there is need to temporarily disable the indicator reducer
   // from the persisted reducers.
-  blacklist: ['indicators', 'spinner', 'connection', 'infoBarVisibility', 'countWorkflow'],
+  blacklist: ['indicators', 'spinner', 'connection', 'infoBarVisibility', 'countWorkflow', 'errors'],
 };
 
-const createStoreWithMiddleware = applyMiddleware(ReduxPromise, reduxThunk)(createStore);
+const createStoreWithMiddleware = applyMiddleware(
+  ReduxPromise,
+  reduxThunk,
+  cycleCount.validateCycleCountHandler,
+)(createStore);
 const store = createStoreWithMiddleware(persistReducer(persistConfig, rootReducer));
 const persistor = persistStore(store);
 

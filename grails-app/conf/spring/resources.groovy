@@ -4,6 +4,7 @@ import org.pih.warehouse.inboundSortation.strategy.CrossDockingStrategy
 import org.pih.warehouse.inboundSortation.strategy.DefaultSlottingStrategy
 import org.pih.warehouse.inboundSortation.strategy.RandomSlottingStrategy
 import org.pih.warehouse.inboundSortation.SlottingService
+import org.pih.warehouse.product.ProductValidator
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.core.Ordered
 
@@ -36,4 +37,5 @@ beans = {
         urlPatterns = ['/*']
         order = Ordered.HIGHEST_PRECEDENCE + 1
     }
+    productValidator(ProductValidator)
 }

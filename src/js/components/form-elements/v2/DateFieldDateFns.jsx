@@ -9,9 +9,11 @@ import { getCurrentLocale } from 'selectors';
 
 import DateFieldInput from 'components/form-elements/v2/DateFieldInput';
 import componentType from 'consts/componentType';
+import MAX_DATE_PICKER_DATE from 'consts/datePickerLimits';
 import { DateFormatDateFns, TimeFormat } from 'consts/timeFormat';
 import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import useTranslate from 'hooks/useTranslate';
+import { formatDateToString } from 'utils/dateUtils';
 import InputWrapper from 'wrappers/InputWrapper';
 import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 
@@ -37,14 +39,16 @@ const DateFieldDateFns = ({
   clearable,
   wrapperClassName,
   focusProps = {},
+  customTooltip,
+  showCustomInput,
+  ariaLabel,
+  hasErrors,
   ...fieldProps
 }) => {
   const translate = useTranslate();
   const onClear = () => onChange(null);
 
-  const { locale: currentLocale } = useSelector((state) => ({
-    locale: getCurrentLocale(state),
-  }));
+  const currentLocale = useSelector(getCurrentLocale);
 
   const getDateFormat = () => {
     if (showTimeSelect) {
@@ -115,6 +119,14 @@ const DateFieldDateFns = ({
       button={button}
       hideErrorMessageWrapper={hideErrorMessageWrapper}
       className={wrapperClassName}
+      customTooltip={customTooltip}
+      value={formatDateToString({
+        date: value,
+        dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+        options: { locale: dateFnsLocale() },
+      })}
+      ariaLabel={ariaLabel}
+      hasErrors={Boolean(errorMessage || hasErrors)}
     >
       <DatePicker
         {...fieldProps}
@@ -123,8 +135,10 @@ const DateFieldDateFns = ({
         ariaLiveMessages={{}}
         locale={dateFnsLocale()}
         showTimeSelect={showTimeSelect}
-        customInput={<DateFieldInput onClear={onClear} clearable={clearable} />}
-        className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
+        customInput={showCustomInput
+          ? <DateFieldInput onClear={onClear} clearable={clearable} />
+          : undefined}
+        className={`form-element-input ${(errorMessage || hasErrors) ? 'has-errors' : ''} ${className}`}
         dropdownMode="scroll"
         dateFormat={getDateFormat()}
         timeFormat={TimeFormat.HH_MM}
@@ -138,6 +152,7 @@ const DateFieldDateFns = ({
         popperContainer={RootPortalWrapper}
         popperPlacement="bottom-start"
         selected={selectedDate}
+        maxDate={MAX_DATE_PICKER_DATE}
         highlightDates={highlightedDates}
         onChange={onChangeRaw || onChangeHandler}
         onSelect={() => {
@@ -146,6 +161,7 @@ const DateFieldDateFns = ({
         ref={(el) => {
           datePickerRef.current = el;
         }}
+        autoComplete="off"
       />
     </InputWrapper>
   );
@@ -192,6 +208,13 @@ DateFieldDateFns.propTypes = {
   onChangeRaw: PropTypes.func,
   clearable: PropTypes.bool,
   wrapperClassName: PropTypes.string,
+  customTooltip: PropTypes.bool,
+  showCustomInput: PropTypes.bool,
+  ariaLabel: PropTypes.shape({
+    id: PropTypes.string,
+    defaultMessage: PropTypes.string,
+  }),
+  hasErrors: PropTypes.bool,
 };
 
 DateFieldDateFns.defaultProps = {
@@ -212,4 +235,12 @@ DateFieldDateFns.defaultProps = {
   focusProps: {},
   onChangeRaw: null,
   clearable: true,
+  customTooltip: false,
+  // If false, the 'x' icon for clearing the date will be hidden,
+  // but the date can still be cleared using Backspace.
+  // Thanks to this, the E2E tests won't fail and we won't need to
+  // write new getters for the datePicker in the E2E tests.
+  showCustomInput: true,
+  ariaLabel: null,
+  hasErrors: false,
 };

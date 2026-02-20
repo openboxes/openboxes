@@ -15,10 +15,11 @@ import grails.validation.ValidationException
 import org.apache.commons.lang.StringUtils
 import org.joda.time.LocalDate
 
-import org.pih.warehouse.DateUtil
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.date.InstantParser
+import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.inventory.InventoryBaselineTransactionCommand
 import org.pih.warehouse.inventory.InventoryImportProductInventoryTransactionService
 import org.pih.warehouse.inventory.InventoryItem
@@ -87,7 +88,11 @@ class InventoryImportDataService implements ImportDataService {
                     command.errors.reject("error.lotNumber.notExists", "Row ${rowIndex}: Items with an expiry date must also have a lot number")
                 }
 
-                if (product.lotAndExpiryControl && (!row.expirationDate || !row.lotNumber)) {
+                // OBPIH 5102: If the product requires a lot and expiry, error unless we're zeroing out the quantity.
+                // This is useful for data cleanup and for the initial import of products that don't have a lot yet.
+                if (product.lotAndExpiryControl
+                        && (row.quantity?.isInteger() && row.quantity as int != 0)
+                        && (!row.expirationDate || !row.lotNumber)) {
                     command.errors.reject(
                             "error.lotAndExpiryControl.required",
                             "Row ${rowIndex}: Both lot number and expiry date are required for the '${product.productCode} ${product.name}' product."
@@ -180,7 +185,7 @@ class InventoryImportDataService implements ImportDataService {
                 inventoryImportProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(baselineTransactionCommand)
 
         // Date objects are mutable, so we use Instant to clone the date in the command and avoid directly modifying it.
-        Date adjustmentTransactionDate = DateUtil.asDate(DateUtil.asInstant(baselineTransactionDate).plusSeconds(1))
+        Date adjustmentTransactionDate = JavaUtilDateParser.asDate(InstantParser.asInstant(baselineTransactionDate).plusSeconds(1))
 
         // We let the adjustment transaction be built from the same available items that we built the baseline
         // transaction with. The adjustment transaction is dated one second after the baseline transaction so it
@@ -399,6 +404,25 @@ class InventoryImportDataService implements ImportDataService {
         Location binLocation = Location.findByNameAndParentLocation(binLocationName, parentLocation)
         assert binLocation != null
         return binLocation
+    }
+
+    void calculateAndApplyInventoryDifferences(ImportDataCommand command) {
+        command.data = command.data.findResults { entry ->
+            Product product = Product.findByProductCode(entry['productCode'])
+            InventoryItem inventoryItem =
+                    inventoryService.findInventoryItemByProductAndLotNumber(product, entry['lotNumber'])
+
+            Integer currentQuantity =
+                    productAvailabilityService.getQuantityOnHand(inventoryItem)
+
+            Integer quantityToImport = entry['quantity'] as Integer
+
+            if (quantityToImport > currentQuantity) {
+                return entry
+            }
+            // Remove rows that have quantity 0, so that they won't be imported
+            return null
+        }
     }
 
     /**

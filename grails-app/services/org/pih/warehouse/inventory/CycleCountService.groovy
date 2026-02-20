@@ -56,8 +56,7 @@ class CycleCountService {
                 }
             }
             if (command.categories) {
-                usedAliases.add("product")
-                createAlias("product", "product", JoinType.INNER_JOIN)
+                createProductAlias(delegate, usedAliases)
                 "in"("product.category", command.categories)
             }
             if (command.internalLocations) {
@@ -182,8 +181,7 @@ class CycleCountService {
                 }
             }
             if (command.categories) {
-                usedAliases.add("product")
-                createAlias("product", "product", JoinType.INNER_JOIN)
+                createProductAlias(delegate, usedAliases)
                 "in"("product.category", command.categories)
             }
             if (command.internalLocations) {
@@ -464,11 +462,11 @@ class CycleCountService {
         for (itemsEntry in countItemsMap.entrySet()) {
             CycleCountItemDto countItem = itemsEntry.value.get(INITIAL_COUNT_INDEX)
             CycleCountItemDto recountItem = itemsEntry.value.get(currentCountIndex)
-            data << mergeCountAndRecountItemAsXlsMap(countItem, recountItem)
+            data << mergeCountAndRecountItemAsXlsMap(countItem, recountItem, cycleCount.id)
         }
 
         for (CycleCountItemDto customItem in customRecountItems) {
-            data << mergeCountAndRecountItemAsXlsMap(null, customItem)
+            data << mergeCountAndRecountItemAsXlsMap(null, customItem, cycleCount.id)
         }
         return data
     }
@@ -478,8 +476,10 @@ class CycleCountService {
      * @param countItem Represents the item in the original count
      * @param recountItem Represents the item in the current recount
      */
-    private Map mergeCountAndRecountItemAsXlsMap(CycleCountItemDto countItem, CycleCountItemDto recountItem) {
+    private Map mergeCountAndRecountItemAsXlsMap(CycleCountItemDto countItem, CycleCountItemDto recountItem, String cycleCountId) {
         return [
+                "Product cycle count id": cycleCountId,
+                "Cycle count item id"   : recountItem?.id,
                 "Product Code": recountItem.product.productCode,
                 "Product Name": recountItem.product.name,
                 "Lot Number": recountItem.inventoryItem.lotNumber,

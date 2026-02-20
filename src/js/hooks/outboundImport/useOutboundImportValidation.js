@@ -1,10 +1,15 @@
+import moment from 'moment/moment';
+import { useSelector } from 'react-redux';
+import { getCurrentLocale } from 'selectors';
 import { z } from 'zod';
 
+import { DateFormat } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
 import { validateDateIsSameOrAfter, validateFutureDate } from 'utils/form-utils';
 
 const useOutboundImportValidation = () => {
   const translate = useTranslate();
+  const locale = useSelector(getCurrentLocale);
   const requestedBySchema = z.object({
     id: z.string(),
     label: z.string(),
@@ -42,22 +47,29 @@ const useOutboundImportValidation = () => {
     dateRequested: z.string({
       required_error: translate('react.outboundImport.validation.dateRequested.required.label', 'Date requested is required'),
       invalid_type_error: translate('react.outboundImport.validation.dateRequested.required.label', 'Date requested is required'),
-    }).refine((pickedDate) =>
-      validateFutureDate(pickedDate), {
+    }).refine((pickedDate) => {
+      const pickedDateMoment = moment(pickedDate, DateFormat.MMM_DD_YYYY, locale);
+      return validateFutureDate(pickedDateMoment);
+    }, {
       message: translate('react.outboundImport.validation.dateRequested.futureDate.label', 'The date cannot be in the future'),
     }),
     dateShipped: z.string({
       required_error: translate('react.outboundImport.validation.dateShipped.required.label', 'Date shipped is required'),
       invalid_type_error: translate('react.outboundImport.validation.dateShipped.required.label', 'Date shipped is required'),
     }).superRefine((pickedDate, ctx) => {
-      if (!validateFutureDate(pickedDate)) {
+      const pickedDateMoment = moment(pickedDate, DateFormat.MMM_DD_YYYY_HH_MM_SS, locale);
+      if (!validateFutureDate(pickedDateMoment)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: translate('react.outboundImport.validation.dateRequested.futureDate.label', 'The date cannot be in the future'),
         });
       }
       const { expectedDeliveryDate, dateShipped } = data;
-      if (!validateDateIsSameOrAfter(expectedDeliveryDate, dateShipped)) {
+      const expectedDeliveryDateMoment = moment(
+        expectedDeliveryDate, DateFormat.MMM_DD_YYYY, locale,
+      );
+      const dateShippedMoment = moment(dateShipped, DateFormat.MMM_DD_YYYY_HH_MM_SS, locale);
+      if (!validateDateIsSameOrAfter(expectedDeliveryDateMoment, dateShippedMoment)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: translate('react.outboundImport.validation.expectedDeliveryDate.afterDateShipped.label',
@@ -82,7 +94,9 @@ const useOutboundImportValidation = () => {
       invalid_type_error: translate('react.outboundImport.validation.expectedDeliveryDate.required.label', 'Expected delivery date is required'),
     }).refine(() => {
       const { expectedDeliveryDate, dateShipped } = data;
-      return validateDateIsSameOrAfter(expectedDeliveryDate, dateShipped);
+      const deliveryDateMoment = moment(expectedDeliveryDate, DateFormat.MMM_DD_YYYY, locale);
+      const dateShippedMoment = moment(dateShipped, DateFormat.MMM_DD_YYYY_HH_MM_SS, locale);
+      return validateDateIsSameOrAfter(deliveryDateMoment, dateShippedMoment);
     }, {
       message: translate('react.outboundImport.validation.expectedDeliveryDate.afterDateShipped.label',
         'Please verify timeline. Delivery date cannot be before Ship date.'),

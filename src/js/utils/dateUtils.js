@@ -3,15 +3,20 @@ import {
   getDate,
   getMonth,
   getYear,
+  isAfter,
   isValid,
   parse,
   parseISO,
+  startOfDay,
 } from 'date-fns';
 import * as locales from 'date-fns/locale';
 import moment from 'moment';
 
 import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
 
+/**
+ * @deprecated This method uses moment.js which is deprecated in favor of date-fns.
+ */
 const dateWithoutTimeZone = ({
   date,
   currentDateFormat,
@@ -184,3 +189,8 @@ export const displayTimezoneOffset = (timezoneOffset = new Date().getTimezoneOff
 export const getFilenameDateString = () => format(new Date(), DateFormatDateFns.YYYYMMDD_HHMMSS);
 
 export default dateWithoutTimeZone;
+
+export const validateFutureDateFns = (date) => {
+  const today = startOfDay(new Date());
+  return !isAfter(startOfDay(date), today);
+};

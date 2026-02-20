@@ -12,8 +12,10 @@ package org.pih.warehouse.data
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVMapReader
 import grails.validation.ValidationException
-import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.*
+import org.pih.warehouse.core.date.DateParser
+import org.pih.warehouse.core.date.InstantParser
+import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.LocationImportDataService
 import org.pih.warehouse.importer.ProductCatalogItemImportDataService
@@ -53,6 +55,7 @@ class LoadDataService {
     ProductAvailabilityService productAvailabilityService
     ConfigService configService
     TransactionIdentifierService transactionIdentifierService
+    DateParser dateParser
 
     def importLocations(URL csvURL) {
         CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
@@ -230,7 +233,7 @@ class LoadDataService {
         InventoryItem inventoryItem = inventoryService.findAndUpdateOrCreateInventoryItem(
                 product,
                 csvReaderRow["Lot number"],
-                DateUtil.asDate(csvReaderRow["Expiration date"], Constants.EXPIRATION_DATE_FORMATTER)
+                dateParser.parseToDate(csvReaderRow["Expiration date"])
         )
         int newQuantity = csvReaderRow["Physical QOH"] as int
         int quantityOnHand = availableItems.get(binLocation, inventoryItem)?.quantityOnHand ?: 0
@@ -266,8 +269,8 @@ class LoadDataService {
         List<Product> products = productMap.values().toList()
 
         // Calculate dates for inventory baseline and adjustment transactions
-        Date adjustmentTransactionDate = DateUtil.asDate(Instant.now())
-        Date inventoryBaselineTransactionDate = DateUtil.asDate(DateUtil.asInstant(adjustmentTransactionDate).minusSeconds(1))
+        Date adjustmentTransactionDate = JavaUtilDateParser.asDate(Instant.now())
+        Date inventoryBaselineTransactionDate = JavaUtilDateParser.asDate(InstantParser.asInstant(adjustmentTransactionDate).minusSeconds(1))
 
         // 1. Calculate the current available items from product availability - one snapshot transaction for all products
         AvailableItemMap availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(

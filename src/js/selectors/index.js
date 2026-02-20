@@ -14,6 +14,11 @@ export const getNotificationAutohideDelay = createSelector(
   (session) => session.notificationAutohideDelay,
 );
 
+export const getMaxUploadFileSize = createSelector(
+  [getSession],
+  (session) => session.maxUploadFileSize,
+);
+
 // Cache for locations
 const locationCache = new Map();
 
@@ -41,6 +46,11 @@ export const getCurrentLocationId = createSelector(
 export const getCurrentLocationName = createSelector(
   [getCurrentLocation],
   (currentLocation) => currentLocation?.name,
+);
+
+export const getHasBinLocationSupport = createSelector(
+  [getCurrentLocation],
+  (location) => location?.hasBinLocationSupport,
 );
 
 export const getDefaultTranslationsFetched = createSelector(
@@ -217,6 +227,8 @@ export const getCycleCountTranslations = createSelector(
 export const getLotNumbersWithExpiration = (state) =>
   state.lotNumbers?.lotNumbersWithExpiration || {};
 
+export const getShipmentTypes = (state) => state.stockMovementCommon.shipmentTypes;
+
 export const getLotNumbersByProductId = (state, productId) =>
   getLotNumbersWithExpiration(state)?.[productId] || [];
 
@@ -237,11 +249,16 @@ export const getCountWorkflowEntities = createSelector(
   (wf) => wf?.entities,
 );
 
+export const getCountWorkflowEntityById = createSelector(
+  getCountWorkflowEntities,
+  (_, cycleCountId) => cycleCountId,
+  (entities, id) => entities?.[id],
+);
+
 export const makeGetCycleCountItems = () =>
   createSelector(
-    getCountWorkflowEntities,
-    (_, cycleCountId) => cycleCountId,
-    (entities, id) => entities?.[id]?.cycleCountItems || [],
+    getCountWorkflowEntityById,
+    (entity) => entity?.cycleCountItems || [],
   );
 
 export const makeGetCycleCountItem = () =>
@@ -298,6 +315,36 @@ export const makeGetCycleCountItemIds = () =>
   );
 
 /**
+  FORM ERRORS
+ */
+export const getErrors = (state) => state.errors.errors;
+
+export const getIsFormSubmitted = (state) => state.errors.isFormSubmitted;
+
+/**
+ * CYCLE COUNT ERRORS
+ */
+export const makeGetErrorsForCycleCount = () =>
+  createSelector(
+    [getErrors, (_, cycleCountId) => cycleCountId],
+    (errors, cycleCountId) => errors?.[cycleCountId] || {},
+  );
+
+export const makeGetErrorsForCycleCountItem = () =>
+  createSelector(
+    makeGetErrorsForCycleCount(),
+    (_, __, itemIdx) => itemIdx,
+    (ccErrors, itemIdx) => ccErrors?.cycleCountItems?.[itemIdx] || {},
+  );
+
+export const makeGetErrorForField = () =>
+  createSelector(
+    makeGetErrorsForCycleCountItem(),
+    (_, __, ___, fieldName) => fieldName,
+    (itemErrors, fieldName) => itemErrors?.[fieldName]?._errors[0] || null,
+  );
+
+/**
  * CONNECTION
  */
 export const getOnline = (state) => state.connection.online;
@@ -312,3 +359,10 @@ export const getSpinner = (state) => state.spinner.show;
  * CURRENCY
  */
 export const getCurrencyCode = (state) => state.session.currencyCode;
+
+/**
+ * INBOUND
+ */
+export const getInboundHeaderInfo = (state) => state.inbound.headerInfo || [];
+
+export const getInboundHeaderStatus = (state) => state.inbound.headerStatus;

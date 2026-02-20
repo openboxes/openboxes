@@ -8,6 +8,8 @@ import {
   ADD_STOCK_MOVEMENT_DRAFT,
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
+  CLEAR_CYCLE_COUNT_DATA,
+  CLEAR_ERRORS_DATA,
   CLOSE_INFO_BAR,
   ERASE_DRAFT,
   FETCH_APPROVERS,
@@ -50,6 +52,8 @@ import {
   REORDER_INDICATORS,
   RESET_INDICATORS,
   SET_ACTIVE_CONFIG,
+  SET_ERRORS,
+  SET_ERRORS_BY_ID,
   SET_OFFLINE,
   SET_ONLINE,
   SET_SCROLL_TO_BOTTOM,
@@ -60,11 +64,13 @@ import {
   START_COUNT,
   START_FETCHING_TRANSLATIONS,
   START_RESOLUTION,
+  SUBMIT_FORM,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
   UPDATE_COUNTED_BY,
   UPDATE_DATE_COUNTED,
   UPDATE_FIELD_VALUE,
+  UPDATE_WORKFLOW_HEADER,
 } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
 import genericApi from 'api/services/GenericApi';
@@ -77,6 +83,7 @@ import { ORGANIZATION_API } from 'api/urls';
 import RoleType from 'consts/roleType';
 import { UnitOfMeasureType } from 'consts/UnitOfMeasureType';
 import apiClient, { parseResponse } from 'utils/apiClient';
+import { removeBinLocationData } from 'utils/cycleCountUtils';
 import { fetchBins, getLotNumbersByProductIds, mapShipmentTypes } from 'utils/option-utils';
 
 export function showSpinner() {
@@ -820,6 +827,14 @@ export const eraseDraft = (locationId, tab) => ({
   payload: { locationId, tab },
 });
 
+export const updateWorkflowHeader = (headerInfo, headerStatus) => ({
+  type: UPDATE_WORKFLOW_HEADER,
+  payload: {
+    headerInfo,
+    headerStatus,
+  },
+});
+
 export const fetchLotNumbersByProductIds = (productIds) => async (dispatch) => {
   const lotNumbersWithExpiration = await getLotNumbersByProductIds(productIds);
 
@@ -833,17 +848,19 @@ export const fetchCycleCounts = (
   cycleCountIds,
   currentLocationId,
   sortByProductName,
+  showBinLocation = true,
 ) => async (dispatch) => {
   dispatch(showSpinner());
   try {
-    const cycleCounts = await cycleCountApi.getCycleCounts(
+    const { data } = await cycleCountApi.getCycleCounts(
       currentLocationId,
       cycleCountIds,
       sortByProductName && 'productName',
     );
+    const cycleCounts = data?.data;
     dispatch({
       type: FETCH_CYCLE_COUNTS,
-      payload: cycleCounts?.data?.data,
+      payload: showBinLocation ? cycleCounts : removeBinLocationData(cycleCounts),
     });
   } finally {
     dispatch(hideSpinner());
@@ -944,4 +961,36 @@ export const updateFieldValue = ({
     },
   });
   dispatch(setUpdated(cycleCountId, true));
+};
+
+export const setErrors = (errors) => (dispatch) => {
+  dispatch({
+    type: SET_ERRORS,
+    payload: errors,
+  });
+};
+
+export const setErrorsById = (id, errors) => (dispatch) => {
+  dispatch({
+    type: SET_ERRORS_BY_ID,
+    payload: { errors, id },
+  });
+};
+
+export const submitForm = (dispatch) => {
+  dispatch({
+    type: SUBMIT_FORM,
+  });
+};
+
+export const clearCycleCountData = (dispatch) => {
+  dispatch({
+    type: CLEAR_CYCLE_COUNT_DATA,
+  });
+};
+
+export const clearErrorsData = (dispatch) => {
+  dispatch({
+    type: CLEAR_ERRORS_DATA,
+  });
 };

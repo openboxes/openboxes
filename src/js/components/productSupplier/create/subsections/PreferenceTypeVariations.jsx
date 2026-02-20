@@ -12,7 +12,7 @@ import usePreferenceTypeVariationsColumns
   from 'hooks/productSupplier/form/usePreferenceTypeVariationsColumns';
 import usePreferenceTypeVariationsFiltering
   from 'hooks/productSupplier/form/usePreferenceTypeVariationsFiltering';
-import useResetScrollbar from 'hooks/useResetScrollbar';
+import useScrollbar from 'hooks/useScrollbar';
 import useTranslate from 'hooks/useTranslate';
 import { FormErrorPropType } from 'utils/propTypes';
 
@@ -31,7 +31,7 @@ const PreferenceTypeVariations = ({
     control,
   });
 
-  const { resetScrollbar } = useResetScrollbar({
+  const { scrollToTop } = useScrollbar({
     selector: '.rt-table',
   });
 
@@ -65,7 +65,7 @@ const PreferenceTypeVariations = ({
   const addNewLine = () => {
     prepend(defaultTableRow);
     triggerValidation('productSupplierPreferences');
-    resetScrollbar();
+    scrollToTop();
   };
 
   return (
@@ -89,7 +89,7 @@ const PreferenceTypeVariations = ({
               triggerValidation('productSupplierPreferences');
               if (invalidRowCount) {
                 setIsFiltered((value) => !value);
-                resetScrollbar();
+                scrollToTop();
               }
             }}
           />

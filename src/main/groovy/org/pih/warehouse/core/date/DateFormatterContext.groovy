@@ -10,12 +10,14 @@ class DateFormatterContext {
 
     /**
      * Overrides the locale to use when formatting the date.
+     * Needed for day (ex: eeee -> Monday) and month (ex: MMM -> Jan) fields.
      */
     Locale localeOverride
 
     /**
      * Overrides the pattern to use when formatting the date.
      * Unlike displayStyleOverride, the pattern itself is not localized.
+     * Will take priority over displayStyleOverride.
      */
     String patternOverride
 
@@ -32,15 +34,24 @@ class DateFormatterContext {
 
     /**
      * Overrides the localized pattern (whereas patternOverride is not locale-specific) to format the date to.
+     * If patternOverride is also set, it will take priority over this field.
      */
     DateDisplayStyle displayStyleOverride
+
+    /**
+     * The default value to return if the given date object is null.
+     */
+    String defaultValue
 
     static DateFormatterContextBuilder builder() {
         return new DateFormatterContextBuilder()
     }
 
     DateFormatterContext validate() {
-        if (!(patternOverride != null ^ displayFormat != null ^ displayStyleOverride != null)) {
+        int numFormatOverrides = (patternOverride != null ? 1 : 0) +
+                (displayFormat != null ? 1 : 0) +
+                (displayStyleOverride != null ? 1 : 0)
+        if (numFormatOverrides > 1) {
             throw new IllegalArgumentException(
                     'One (and only one) of the following fields must be set when formatting a date: patternOverride, ' +
                             'displayFormat, displayStyleOverride')
@@ -78,6 +89,11 @@ class DateFormatterContext {
 
         DateFormatterContextBuilder withDisplayStyleOverride(DateDisplayStyle displayStyleOverride) {
             context.displayStyleOverride = displayStyleOverride
+            return this
+        }
+
+        DateFormatterContextBuilder withDefaultValue(String defaultValue) {
+            context.defaultValue = defaultValue
             return this
         }
     }

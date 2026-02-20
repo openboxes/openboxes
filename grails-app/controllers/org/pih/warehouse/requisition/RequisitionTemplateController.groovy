@@ -13,16 +13,17 @@ import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.StringEscapeUtils
 import grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.auth.AuthService
 
 @Transactional
 class RequisitionTemplateController {
 
-    def requisitionService
-    def inventoryService
-    def productService
-    def userService
+    RequisitionService requisitionService
+    UserService userService
+    RequisitionTemplateService requisitionTemplateService
+
     static allowedMethods = [save: "POST", update: "POST"]
 
     def index() {
@@ -347,61 +348,19 @@ class RequisitionTemplateController {
         [requisition: requisition]
     }
 
+    def importData() {
+        Integer skipLines = params.int('skipLines') ?: 0
+        String delimiter = params.delimiter ?: ","
+        InputStream file = params?.csv
+                ? new ByteArrayInputStream(params?.csv.getBytes("UTF-8"))
+                :  request.getFile('file').inputStream
+        Requisition requisition = Requisition.get(params.id)
 
-    def importAsString() {
-        def lines = []
-        def data = []
+        List<Object> data = requisitionTemplateService.parseImportFile(file, requisition, delimiter, skipLines)
+        List<String> errors = requisitionTemplateService.validateImportData(data)
 
-        def requisition = Requisition.get(params.id)
-        if (requisition) {
-            def delimiter = params.delimiter
-            if (delimiter) {
-                if (params.csv) {
-
-                    println "CSV " + params.csv
-                    params?.csv?.toCsvReader('separatorChar': delimiter, 'skipLines': params.skipLines ?: 0).eachLine { tokens ->
-                        println "line: " + tokens + " delimiter=" + delimiter
-                        println "ROW " + tokens
-                        if (tokens) {
-                            data << tokens
-                        }
-                    }
-                }
-            } else {
-                flash.message = "Please choose a delimiter"
-            }
-        }
         session.data = data
-        render(view: "batch", model: [requisition: requisition, data: data])
-    }
-
-    def importAsFile() {
-
-        def skipLines = params.skipLines ?: 0
-        def delimiter = params.delimiter ?: ","
-        def requisition = Requisition.get(params.id)
-        def data = []
-        if (requisition) {
-            def file = request.getFile('file')
-
-            if (!file) {
-                throw new IllegalArgumentException("Must specify a file")
-            }
-
-            file.inputStream.toCsvReader('separatorChar': delimiter, 'skipLines': skipLines).eachLine { tokens ->
-                println "line: " + tokens + " delimiter=" + delimiter
-                println "ROW " + tokens
-                if (tokens) {
-                    data << tokens[0..3]
-                }
-            }
-
-            log.info "Data: " + data
-
-        }
-        session.data = data
-        render(view: "batch", model: [requisition: requisition, data: data])
-
+        render(view: "batch", model: [requisition: requisition, data: data, errors: errors])
     }
 
     def doImport() {

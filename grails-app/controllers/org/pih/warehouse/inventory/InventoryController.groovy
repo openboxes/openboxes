@@ -50,6 +50,7 @@ class InventoryController {
     def documentService
     TransactionIdentifierService transactionIdentifierService
     def forecastingService
+    AdjustInventoryService adjustInventoryService
 
     static allowedMethods = [show: "GET", search: "POST", download: "GET"]
 
@@ -900,6 +901,9 @@ class InventoryController {
                         transaction.addToTransactionEntries(transactionEntry)
                     }
                 }
+                TransactionSource transactionSource =
+                        adjustInventoryService.createAdjustInventoryTransactionSource(warehouseInstance)
+                transaction.transactionSource = transactionSource
 
                 // Validate the transaction object
                 if (!transaction.hasErrors() && transaction.validate()) {
@@ -1086,8 +1090,10 @@ class InventoryController {
                 if (!transactionInstance.hasErrors() && transactionInstance.validate()) {
                     transactionInstance.save(failOnError: true)
                     flash.message = "Successfully saved transaction"
-                    //redirect(controller: "inventory", action: "browse")
-                    redirect(controller: "inventory", action: "browse")
+
+                    // A transfer-in only operates on a single product so redirect to its stock card.
+                    String productId = transactionInstance.getAssociatedProducts().first()
+                    redirect(controller: "inventoryItem", action: "showStockCard", id: productId)
                 }
             } catch (ValidationException e) {
                 log.debug("caught validation exception " + e)

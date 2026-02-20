@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.core
 
+import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.product.Product
 // TODO: Fix CacheFlush
@@ -25,7 +26,14 @@ class TagController {
 
     def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [tagInstanceList: Tag.list(params), tagInstanceTotal: Tag.count()]
+
+        PagedResultList tags = Tag.createCriteria().list(params) {
+            if (params.tag) {
+                ilike("tag", "%${params.tag}%")
+            }
+        } as PagedResultList
+
+        [tagInstanceList: tags, tagInstanceTotal: tags.totalCount]
     }
 
     def create() {

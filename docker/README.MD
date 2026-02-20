@@ -15,7 +15,7 @@ The following outlines how to run a containerized instance of OpenBoxes.
 These compose files support running against officially released OpenBoxes images and locally built ones. See the community guide for [instructions on creating your own Docker image of the application](https://openboxes.gitbook.io/contributor-guide/release-planning/creating-a-new-docker-image).
 
 ### Prerequisites
-1. Install [Docker](https://docs.docker.com/) and [Docker Compose](https://docs.docker.com/compose/)
+1. Install [Docker](https://docs.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) (we support Docker Engine v24 or later)
 2. [An openboxes database with a valid db user](https://openboxes.gitbook.io/contributor-guide/software-development/onboarding/running-openboxes-locally#id-2.-configure-the-database-instance)
 
 ### Steps
@@ -23,3 +23,4 @@ These compose files support running against officially released OpenBoxes images
 2. Navigate to the `/docker` directory
 3. Optionally create a `.env` file containing any environment variable overrides that you need. See `.env.example` for a reference. If you do not provide an override for a variable, the default will be used. For example, given a line like `{DATASOURCE_USERNAME:-openboxes}` in the compose file, if `DATASOURCE_USERNAME` is not defined in your .env file, or it is blank, a value of `openboxes` will be used.
 4. Run `docker compose up` to start your containers. You can select the compose file to use by specifying the `-f <config file>` argument. For example: `docker compose -f docker-compose-hostdb.yml up`
+5. Look in `docker-compose`'s logs for `Grails application running at http:/localhost:8080/openboxes in environment: production` and connect to that URL

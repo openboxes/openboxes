@@ -43,7 +43,7 @@ const useProductsTabExport = ({
         startDate: dateWithoutTimeZone({
           date: filters.startDate,
         }),
-        products: filters.products?.map((product) => product.id),
+        products: filters.products ? filters.products?.map((product) => product.id) : undefined,
         facility: currentLocationId,
       }, (val) => {
         if (typeof val === 'boolean') {
@@ -56,19 +56,14 @@ const useProductsTabExport = ({
     });
   };
 
-  // Export report: exports the same table as the Product Changes table in the UI,
-  // for the time range selected, all records (without filters).
-  // Export results: exports the same table as the Product Changes table in the UI,
-  // for the time range selected, only the results currently visible in the
-  // table (filters applied)
   const actions = [
     {
-      label: 'react.cycleCount.reporting.exportReport.label',
-      defaultLabel: 'Export report',
+      label: 'react.cycleCount.reporting.exportFullReport.label',
+      defaultLabel: 'Export Full Report',
       onClick: () => exportProductChangesReport({ startDate, endDate }),
     }, {
-      label: 'react.cycleCount.reporting.exportResults.label',
-      defaultLabel: 'Export results',
+      label: 'react.cycleCount.reporting.exportFilteredReport.label',
+      defaultLabel: 'Export Filtered Report',
       onClick: () => exportProductChangesReport({ startDate, endDate, products }),
     },
   ];

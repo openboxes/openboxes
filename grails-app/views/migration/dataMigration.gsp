@@ -1,3 +1,7 @@
+<g:set
+        var="recordStockTransactionSourcesMigrationEnabled"
+        value="${(amountOfMissingInventoryImportTransactionSources + amountOfMissingCycleCountTransactionSources) == 0}"
+/>
 <div id="tabs-2">
     <div class="box">
         <h2><g:message code="data.migration.label" default="Data Migration"/></h2>
@@ -95,6 +99,82 @@
                     <br/>
                     Preview displays all transaction entries within this location grouped by product.
                     </h1>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="name">Missing transaction sources for inventory import based transactions</td>
+                <td>
+                    Maximum amount of inventory import transactions without transaction source: <b>${amountOfMissingInventoryImportTransactionSources}</b>
+                </td>
+                <td>
+                    <g:if test="${productInventoryTransactionInCurrentLocationCount}">
+                        <h1>
+                            <span class="font-weight-bold">Important:</span> trigger the product inventory transactions migration first, before proceeding with creating the missing transaction sources.
+                        </h1>
+
+                    </g:if>
+                    <g:elseif test="${amountOfMissingInventoryImportTransactionSources}">
+                        <div class="button-group">
+                            <g:link controller="migration" action="createMissingInventoryImportTransactionSourcesForCurrentLocation" class="button" target="_blank">Migrate inventory import transactions for current location</g:link>
+                        </div>
+                    </g:elseif>
+                    <g:else>
+                        <h1>All missing inventory import transaction sources have been created.</h1>
+                    </g:else>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="name">Missing transaction sources for cycle count based transactions</td>
+                <td>
+                    Maximum amount of cycle count transactions without transaction source: <b>${amountOfMissingCycleCountTransactionSources}</b>
+                </td>
+                <td>
+                    <g:if test="${productInventoryTransactionInCurrentLocationCount}">
+                        <h1>
+                            <span class="font-weight-bold">Important:</span> trigger the product inventory transactions migration first, before proceeding with creating the missing transaction sources.
+                        </h1>
+                    </g:if>
+                    <g:elseif test="${amountOfMissingCycleCountTransactionSources}">
+                        <div class="button-group">
+                            <g:link
+                                    controller="migration"
+                                    action="createMissingCycleCountTransactionSourcesForCurrentLocation"
+                                    class="button"
+                                    target="_blank"
+                            >
+                                Migrate cycle count transactions for current location
+                            </g:link>
+                        </div>
+                    </g:elseif>
+                    <g:else>
+                        <h1>All missing cycle count transaction sources have been created.</h1>
+                    </g:else>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="name">Missing transaction sources for record stock and adjust inventory based transactions</td>
+                <td>
+                    The amount of missing transaction sources for record stock and adjust inventory based transactions: <b>${amountOfMissingRecordStockTransactionSources}</b>
+                </td>
+                <td>
+                    <div class="button-group">
+                        <g:if test="${!recordStockTransactionSourcesMigrationEnabled}">
+                            <h1>Please migrate all missing inventory import and cycle count transaction sources first.</h1>
+                        </g:if>
+                        <g:elseif test="${amountOfMissingRecordStockTransactionSources}">
+                            <g:link
+                                    controller="migration"
+                                    action="createMissingRecordStockTransactionSourcesForCurrentLocation"
+                                    class="button"
+                                    target="_blank"
+                            >
+                                Migrate record stock and adjust inventory transactions for current location
+                            </g:link>
+                        </g:elseif>
+                        <g:else>
+                            <h1>All missing record stock and adjust inventory transaction sources have been created.</h1>
+                        </g:else>
+                    </div>
                 </td>
             </tr>
             </tbody>

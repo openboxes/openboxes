@@ -9,20 +9,21 @@
  **/
 package org.pih.warehouse.importer
 
-import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.data.PersonService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderService
 import org.pih.warehouse.product.Product
+import org.apache.commons.lang.StringUtils
 
-import java.text.ParseException
 
 @Transactional
 class PurchaseOrderActualReadyDateImportDataService implements ImportDataService {
-    GrailsApplication grailsApplication
     OrderService orderService
+    PersonService personService
 
     @Override
     void validateData(ImportDataCommand command) {
@@ -92,16 +93,16 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
 
             // Actual Ready Date validation
             if (!params["actualReadyDate"]) {
-                command.errors.reject("Row ${index + 1}: 'Actual Ready Date' is required")
-            }
-            if (params["actualReadyDate"]) {
-                try {
-                    Date.parse(Constants.EXPIRATION_DATE_FORMAT, params["actualReadyDate"])
-                } catch(ParseException) {
-                    command.errors.reject("Row ${index + 1}: Could not parse date ${params['actualReadyDate']} on 'Actual Ready Date'. Expected date format: ${Constants.EXPIRATION_DATE_FORMAT}")
-                }
+                command.errors.reject("Row ${index + 1}: 'Actual Ready Date' is required. Expected date format: ${Constants.EXPIRATION_DATE_FORMAT}")
             }
 
+            String recipientValue = params["recipient"]
+            if (!StringUtils.isBlank(recipientValue)) {
+                Person recipient = personService.getActivePerson(recipientValue)
+                if (!recipient) {
+                    command.errors.reject("Row ${index + 1}: Recipient ${recipientValue} does not exist in OpenBoxes. Please check your data")
+                }
+            }
         }
     }
 
@@ -121,7 +122,15 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
                 throw new IllegalArgumentException("Order Item is not found")
             }
 
-            orderItem.actualReadyDate = Date.parse(Constants.EXPIRATION_DATE_FORMAT, params["actualReadyDate"])
+            orderItem.actualReadyDate = params["actualReadyDate"] as Date
+            String recipientValue = params["recipient"]
+            if (!StringUtils.isBlank(recipientValue)) {
+                Person recipient = personService.getActivePerson(recipientValue)
+                if (recipient) {
+                    orderItem.recipient = recipient
+                }
+            }
+
             orderItem.save(failOnError: true)
         }
     }

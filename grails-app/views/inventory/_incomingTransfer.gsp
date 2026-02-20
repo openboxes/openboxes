@@ -2,7 +2,6 @@
     <h2><warehouse:message code="inventory.incomingTransfer.label"/></h2>
 
 	<g:form action="saveCreditTransaction">
-		<g:hiddenField name="transactionInstance.id" value="${command?.transactionInstance?.id}"/>
 		<g:hiddenField name="transactionInstance.inventory.id" value="${command?.warehouseInstance?.inventory?.id}"/>
 		<g:hiddenField name="transactionInstance.transactionType.id" value="${command?.transactionInstance?.transactionType?.id }"/>
 		<table>

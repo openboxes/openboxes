@@ -155,25 +155,21 @@ export const decimalParser = (value, precision) => {
 /**
  * Method to check if picked date is from the future
  * @return true if the date is not from the future; false if the date is from the future
- * @param pickedDate
+ * @param {Moment} pickedDate
  */
 export const validateFutureDate = (pickedDate) => {
-  const date = moment(pickedDate);
   const today = moment(new Date());
-  return date.startOf('day').isSameOrBefore(today.startOf('day'));
+  return pickedDate.startOf('day').isSameOrBefore(today.startOf('day'));
 };
 
 /**
  * Method to check if first date is later or same as the second date
  * @return true if the first date is later or same as the second date
- * @param laterDate
- * @param earlierDate
+ * @param {Moment} laterDate
+ * @param {Moment} earlierDate
  */
-export const validateDateIsSameOrAfter = (laterDate, earlierDate) => {
-  const laterDateParsed = moment(laterDate);
-  const earlierDateParsed = moment(earlierDate);
-  return laterDateParsed.startOf('day').isSameOrAfter(earlierDateParsed.startOf('day'));
-};
+export const validateDateIsSameOrAfter = (laterDate, earlierDate) =>
+  laterDate.startOf('day').isSameOrAfter(earlierDate.startOf('day'));
 
 /**
  * * Mutator function to set all values in a specified column for each entry in an array field.

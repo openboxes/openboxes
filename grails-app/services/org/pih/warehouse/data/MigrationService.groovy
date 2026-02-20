@@ -16,7 +16,6 @@ import groovy.sql.Sql
 import org.hibernate.Criteria
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
-import org.pih.warehouse.DateUtil
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
@@ -31,6 +30,9 @@ import org.pih.warehouse.core.PartyType
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.date.DateFormatter
+import org.pih.warehouse.core.date.InstantParser
+import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.inventory.InventoryBaselineTransactionCommand
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryTransactionMigrationService
@@ -61,6 +63,7 @@ class MigrationService {
     InventoryTransactionMigrationService inventoryTransactionMigrationService
     def persistenceInterceptor
     def dataSource
+    DateFormatter dateFormatter
 
     def getStockMovementsWithoutShipmentItems() {
         String query = """
@@ -625,7 +628,7 @@ class MigrationService {
             // Create adjustment transactions for the old transaction that is being migrated
             // Date objects are mutable, so we use Instant to clone the date in the command and avoid directly modifying it.
             // FIXME (OBPIH-7422) Standardize the +1 second for adjustment transaction's transaction date, should be configurable
-            Date adjustmentTransactionDate = DateUtil.asDate(DateUtil.asInstant(it.transactionDate).plusSeconds(1))
+            Date adjustmentTransactionDate = JavaUtilDateParser.asDate(InstantParser.asInstant(it.transactionDate).plusSeconds(1))
             Transaction adjustmentTransaction = createAdjustmentTransaction(
                     location,
                     it.transactionEntries,
@@ -634,7 +637,7 @@ class MigrationService {
                     newComment
             )
             if (adjustmentTransaction) {
-                Date adjustmentDateCreated = DateUtil.asDate(DateUtil.asInstant(it.dateCreated).plusSeconds(1))
+                Date adjustmentDateCreated = JavaUtilDateParser.asDate(InstantParser.asInstant(it.dateCreated).plusSeconds(1))
                 changeDateCreatedAndCreatedByOnTransaction(adjustmentTransaction, it.createdBy, adjustmentDateCreated)
                 recordMigrationResult(results, [adjustmentTransaction])
             }
@@ -1054,7 +1057,7 @@ class MigrationService {
         return transaction
     }
 
-    private static void recordMigrationResult(Map migrationResults, List<Transaction> transactions, Boolean before = false) {
+    private void recordMigrationResult(Map migrationResults, List<Transaction> transactions, Boolean before = false) {
         transactions.each { Transaction t ->
             t.transactionEntries.each { TransactionEntry te ->
                 if (!migrationResults.containsKey(te.inventoryItem.product.productCode)) {
@@ -1065,8 +1068,8 @@ class MigrationService {
                         // name split by "|", because the old inline translation
                         transactionTypeName: t.transactionType.name.split("\\|")[0],
                         transactionNumber: t.transactionNumber,
-                        transactionDate: DateUtil.asDateTimeForDisplay(t.transactionDate),
-                        dateCreated: DateUtil.asDateTimeForDisplay(t.dateCreated),
+                        transactionDate: dateFormatter.format(t.transactionDate),
+                        dateCreated: dateFormatter.format(t.dateCreated),
                         quantity: te.quantity,
                         product: te.inventoryItem.product.productCode,
                         lotNumber: te.inventoryItem?.lotNumber,

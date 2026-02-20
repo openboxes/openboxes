@@ -143,7 +143,6 @@ body {
   vertical-align: middle;
   border-top: 1px solid #aaa;
   width: 100%;
-  height: 3.5vh;
   text-align: center;
   font-size: 12px;
   background-color: white;
@@ -288,14 +287,30 @@ body {
 .font-size-label {
   font-size: .8rem;
 }
-
 .font-size-xs {
-  font-size: .875rem;
+  font-size: 0.875rem;
+}
+.font-size-sm {
+  font-size: 1rem;
+}
+.font-size-md {
+  font-size: 1.25rem;
+}
+.font-size-lg {
+  font-size: 1.5rem;
+}
+.font-size-xl {
+  font-size: 2rem;
+}
 
-  &.required::after {
-    content: "*";
-    color: red;
-  }
+.font-size-xs.required::after,
+.font-size-sm.required::after,
+.font-size-md.required::after,
+.font-size-lg.required::after,
+.font-size-xl.required::after {
+  content: "*";
+  color: red;
+  margin-left: 2px;
 }
 
 .btn-link {
@@ -382,6 +397,15 @@ body {
   .react-select__menu {
     background-color: white;
     z-index: 9999;
+  }
+}
+
+.dark-select-xs {
+  .react-select__control {
+    &.react-select__control--is-focused {
+      border: 1px solid var(--blue-primary) !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(104, 113, 130, 0.16), 0 0 0 4px rgba(34, 100, 229, 0.15) !important;
+    }
   }
 }
 
@@ -1864,5 +1888,18 @@ div.search-input:focus-within {
     top: 15px;
     right: 15px;
     color: var(--gray-400) ;
+  }
+}
+
+.page-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--page-background);
+
+  &__main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
 }

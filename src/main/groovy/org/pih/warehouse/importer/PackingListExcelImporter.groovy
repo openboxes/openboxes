@@ -21,10 +21,9 @@ class PackingListExcelImporter extends AbstractExcelImporter implements DataImpo
                     C: "productCode",
                     D: "product.name",
                     E: "lotNumber",
-                    F: "expirationDate",
-                    G: "binLocation",
-                    H: "quantityPicked",
-                    I: "recipient"
+                    F: "binLocation",
+                    G: "quantityPicked",
+                    H: "recipient"
             ]
     ]
 
@@ -34,7 +33,6 @@ class PackingListExcelImporter extends AbstractExcelImporter implements DataImpo
             "productCode":          ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             "product.name":         ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             "lotNumber":            ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            "expirationDate":       ([expectedType: ExpectedPropertyType.DateJavaType, defaultValue: null]),
             "binLocation":          ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             "quantityPicked":       ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
             "recipient":            ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),

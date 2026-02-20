@@ -27,13 +27,13 @@ import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.validation.Validatable
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
-import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.LocalizationUtil
 
@@ -50,7 +50,7 @@ import org.pih.warehouse.LocalizationUtil
  * 20 mg tablets vs a 50 count bottle of 20 mg tablets will both be stored
  * as 20 mg tablets).
  */
-class Product implements Comparable, Serializable {
+class Product implements Comparable, Serializable, Validatable<ProductValidator> {
 
     def beforeInsert() {
         createdBy = AuthService.currentUser
@@ -297,25 +297,14 @@ class Product implements Comparable, Serializable {
         description(nullable: true)
         productCode(nullable: true, maxSize: 255, unique: true)
         unitOfMeasure(nullable: true, maxSize: 255)
-        category(nullable: false)
-        productType(nullable: false)
-        active(nullable: true, validator: { value, obj ->
-            if (value) {
-                return true
+        category(nullable: false, validator: { Category category, Product product ->
+            // If assigning a parent category to product is enabled, and the category is the parent (it has children), throw an error
+            if (!category?.assigningParentToProductEnabled && !category?.categories?.empty) {
+                return ["invalid.cannotAssignParentCategoryToProduct"]
             }
-            // Don't allow a product to be deactivated if it is in an active stocklist.
-            int numActiveStocklistsForProduct = RequisitionItem.createCriteria().count {
-                eq('product', obj)
-                requisition {
-                    eq('isTemplate', true)
-                    eq('isPublished', true)
-                }
-            }
-            if (numActiveStocklistsForProduct > 0) {
-                return ['invalid.inStocklist']
-            }
-            return true
         })
+        productType(nullable: false)
+        active(nullable: true)
         coldChain(nullable: true)
         reconditioned(nullable: true)
         controlledSubstance(nullable: true)
@@ -495,19 +484,21 @@ class Product implements Comparable, Serializable {
         }
 
         // Find an inventory that matches the provided lot number
-        return InventoryItem.createCriteria().get {
-            and {
-                eq("product", this)
-                if (lotNumber) {
-                    eq("lotNumber", lotNumber)
-                } else {
-                    or {
-                        isNull("lotNumber")
-                        eq("lotNumber", "")
-                    }
-                }
-            }
-        } as InventoryItem
+        if (lotNumber) {
+            return InventoryItem.findByProductAndLotNumber(this, lotNumber)
+        }
+
+        // Because of data inconsistency default inventory item may have either null or empty string as lot number.
+        // To avoid using random inventory item when we have null and empty string lot numbers,
+        // we first try to find inventory item with null lot number.
+        // TODO: After cleaning up the data we can remove this logic and always use the lot number that
+        // TODO: we decided for default inventory items.
+        InventoryItem inventoryItemWithNullLot = InventoryItem.findByProductAndLotNumberIsNull(this)
+        if (inventoryItemWithNullLot) {
+            return inventoryItemWithNullLot
+        }
+
+        return InventoryItem.findByProductAndLotNumber(this, "")
     }
 
 

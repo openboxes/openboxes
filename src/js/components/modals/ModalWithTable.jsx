@@ -26,25 +26,29 @@ const ModalWithTable = ({
     <Modal isOpen={isOpen} className="modal-content min-width-1000">
       <div data-testid="modal-with-table">
         <div className="modal-content__header">
-          <p className="modal-content__header__title">{title}</p>
-          <p className="modal-content__header__subtitile">{subtitle}</p>
+          {title && <p className="modal-content__header__title">{title}</p>}
+          {subtitle && <p className="modal-content__header__subtitle">{subtitle}</p>}
         </div>
         <div className="modal-content__main">
-          <DataTable data={data} columns={columns} disablePagination />
+          <DataTable totalCount={data?.length} data={data} columns={columns} disablePagination />
         </div>
         <div className="modal-content__buttons">
+          {onCancel && (
           <Button
-            defaultLabel={cancelLabel.default}
-            label={cancelLabel.key}
+            defaultLabel={cancelLabel.defaultMessage}
+            label={cancelLabel.id}
             variant="secondary"
             onClick={onCancel}
           />
+          )}
+          {onConfirm && (
           <Button
-            defaultLabel={confirmLabel.default}
-            label={confirmLabel.key}
+            defaultLabel={confirmLabel.defaultMessage}
+            label={confirmLabel.id}
             variant="primary"
             onClick={onConfirm}
           />
+          )}
         </div>
       </div>
     </Modal>
@@ -53,20 +57,35 @@ const ModalWithTable = ({
 
 ModalWithTable.propTypes = {
   isOpen: PropTypes.bool.isRequired,
-  title: PropTypes.string.isRequired,
-  subtitle: PropTypes.string.isRequired,
+  title: PropTypes.string,
+  subtitle: PropTypes.string,
   columns: PropTypes.arrayOf(PropTypes.object).isRequired,
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
   confirmLabel: PropTypes.shape({
-    key: PropTypes.string.isRequired,
-    default: PropTypes.string.isRequired,
-  }).isRequired,
+    id: PropTypes.string.isRequired,
+    defaultMessage: PropTypes.string.isRequired,
+  }),
   cancelLabel: PropTypes.shape({
-    key: PropTypes.string.isRequired,
-    default: PropTypes.string.isRequired,
-  }).isRequired,
-  onConfirm: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
+    id: PropTypes.string.isRequired,
+    defaultMessage: PropTypes.string.isRequired,
+  }),
+  onConfirm: PropTypes.func,
+  onCancel: PropTypes.func,
+};
+
+ModalWithTable.defaultProps = {
+  title: null,
+  subtitle: null,
+  confirmLabel: {
+    id: 'react.default.yes.label',
+    defaultMessage: 'Yes',
+  },
+  cancelLabel: {
+    id: 'react.default.no.label',
+    defaultMessage: 'No',
+  },
+  onConfirm: null,
+  onCancel: null,
 };
 
 export default ModalWithTable;

@@ -7,6 +7,7 @@ import { makeGetCycleCountItem } from 'selectors';
 import { updateFieldValue } from 'actions';
 import { TableCell } from 'components/DataTable';
 import InputField from 'components/form-elements/v2/TextInput';
+import cycleCountColumn from 'consts/cycleCountColumn';
 
 const CommentCell = ({
   id,
@@ -22,7 +23,7 @@ const CommentCell = ({
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
-    setValue(initialValue);
+    setValue(initialValue || '');
   }, [initialValue]);
 
   if (!isStepEditable) {
@@ -46,7 +47,7 @@ const CommentCell = ({
       updateFieldValue({
         cycleCountId,
         rowId: id,
-        field: 'comment',
+        field: cycleCountColumn.COMMENT,
         value,
       }),
     );

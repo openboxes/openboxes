@@ -15,7 +15,7 @@ import {
 } from 'selectors';
 
 import CustomAlert from 'components/dashboard/CustomAlert';
-import MainLayoutRoute from 'components/Layout/MainLayoutRoute';
+import MainLayoutRoute from 'components/Layout/v2/MainLayoutRoute';
 import Loading from 'components/Loading';
 import ActivityCode from 'consts/activityCode';
 import { DASHBOARD_URL } from 'consts/applicationUrls';
@@ -33,7 +33,7 @@ const AsyncStockMovement = Loadable({
 });
 
 const AsyncStockMovementInbound = Loadable({
-  loader: () => import('components/stock-movement-wizard/StockMovementInbound'),
+  loader: () => import('components/stock-movement-wizard/inboundV2/Inbound'),
   loading: Loading,
 });
 

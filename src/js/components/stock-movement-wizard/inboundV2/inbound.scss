@@ -1,0 +1,128 @@
+@mixin set-size($width, $height) {
+  width: $width;
+  height: $height;
+}
+
+
+.inbound-add-items {
+
+  .rt-th-add-items {
+    padding: 19px 0 !important;
+  }
+
+  .rt-td-add-items {
+    padding: 0 4px 4px 4px !important;
+  }
+
+  .input-wrapper-error-message {
+    min-height: unset;
+  }
+
+  .custom-select-error-placeholder {
+
+    svg {
+      color: var(--color-red);
+      margin-right: 5px;
+      @include set-size(16px, 16px);
+    }
+
+    span {
+      font-size: 14px;
+      color: var(--gray-350);
+      font-weight: 400;
+    }
+  }
+
+  .bin-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+
+    .inbound-bin {
+      @include set-size(18px, 18px);
+      color: var(--color-red);
+      cursor: pointer;
+
+      &.disabled {
+        color: var(--color-red);
+        cursor: auto;
+      }
+    }
+  }
+}
+
+.inbound-send-shipment {
+  
+  .rt-td-send-step {
+    padding: 4px 12px;
+  }
+
+  .uploaded-file {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10px;
+    font-weight: bold;
+    max-width: 180px;
+    margin-top: 4px;
+    padding: 8px;
+    background-color: white;
+
+    span {
+      max-width: 145px;
+    }
+  }
+}
+
+.submit-buttons {
+  margin-top: 18px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input.hide-arrows::-webkit-outer-spin-button,
+input.hide-arrows::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input.hide-arrows[type=number] {
+  -moz-appearance: textfield;
+}
+
+.buttons-container {
+  display: flex;
+  gap: 4px;
+  .icon {
+    @include set-size(16px, 16px);
+  }
+}
+
+.rt-tbody-v2 {
+  max-height: 500px;
+  overflow: auto;
+
+  .input-xs {
+    height: 26px;
+    padding: 4px 8px;
+    font-size: 14px;
+  }
+
+  &::-webkit-scrollbar {
+    width: 0.5em;
+    height: 0.5em;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--blue-200);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--blue-301);
+    border-radius: 4px;
+  }
+}

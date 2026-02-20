@@ -12,13 +12,13 @@ const CustomTooltip = ({
 }) => (
   // This div was added to ensure the tooltip works correctly with absolute positioning
   show ? (
-    <div className={className}>
+    <div className={className} role="tooltip">
       <Tooltip
         delay={150}
         duration={250}
         hideDelay={50}
         className="w-100"
-        html={<div className="p-2 tooltip-dark-blue">{content}</div>}
+        html={<div className={`p-2 tooltip-dark-blue ${!content && 'd-none'}`}>{content}</div>}
       >
         <div className="flex items-center">
           {Icon && <Icon className="mr-2" />}

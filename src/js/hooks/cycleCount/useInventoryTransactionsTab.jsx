@@ -5,7 +5,8 @@ import _ from 'lodash';
 import { useSelector } from 'react-redux';
 import {
   getCurrentLocale,
-  getCurrentLocation, getCycleCountReasonCodes,
+  getCurrentLocationId,
+  getCycleCountReasonCodes,
   getDefaultTranslationsFetched,
 } from 'selectors';
 
@@ -37,7 +38,7 @@ const useInventoryTransactionsTab = ({
   const { products, endDate, startDate } = filterParams;
 
   const currentLocale = useSelector(getCurrentLocale);
-  const currentLocation = useSelector(getCurrentLocation);
+  const currentLocationId = useSelector(getCurrentLocationId);
   const defaultTranslationsFetched = useSelector(getDefaultTranslationsFetched);
   const reasonCodes = useSelector(getCycleCountReasonCodes);
 
@@ -55,7 +56,7 @@ const useInventoryTransactionsTab = ({
       date: startDate,
     }),
     products: (products)?.map?.(({ id }) => id),
-    facility: currentLocation?.id,
+    facility: currentLocationId,
   }, (val) => {
     if (typeof val === 'boolean') {
       return !val;
@@ -87,7 +88,7 @@ const useInventoryTransactionsTab = ({
 
   useEffect(() => {
     setTableData({ data: [], totalCount: 0 });
-  }, [currentLocation?.id]);
+  }, [currentLocationId]);
 
   const calculatePercentage = (quantityOnHand, quantityCounted, quantityVariance) => {
     // If quantityOnHand is less than or equal to 0 and quantityCounted is 0,
