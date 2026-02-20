@@ -649,7 +649,7 @@ class SendMovementPage extends Component {
             options={[
               {
                 label: {
-                  id: 'react.stockMovement.confirmSend.keepDate.label',
+                  id: 'react.stockMovement.alert.keepDate.label',
                   defaultMessage: `Ship on the date I entered (${formattedDateShipped})`,
                   data: { formattedDateShipped },
                 },
@@ -657,7 +657,7 @@ class SendMovementPage extends Component {
               },
               {
                 label: {
-                  id: 'react.stockMovement.confirmSend.updateToToday.label',
+                  id: 'react.stockMovement.alert.updateToToday.label',
                   defaultMessage: `Update the ship date to today (${formatedTodayDate})`,
                   data: { formatedTodayDate },
                 },
