@@ -9,14 +9,18 @@ class FileGenerationService {
     PdfRenderingService pdfRenderingService
     BarcodeService barcodeService
 
-    String generateBarcodeFileUri(String shipmentNumber) {
+    File generateBarcodeFile(String shipmentNumber) {
         File tempBarcodeFile = File.createTempFile("barcode-${shipmentNumber}", ".png")
 
         tempBarcodeFile.withOutputStream { os ->
             barcodeService.renderImage(os, shipmentNumber, 100, 30, BarcodeFormat.CODE_128)
         }
 
-        return "file://" + tempBarcodeFile.absolutePath
+        return tempBarcodeFile
+    }
+
+    String getFileUri(File file) {
+        return "file://" + file.absolutePath
     }
 
     byte[] generatePdfFromTemplate(String templateName, Map model) {

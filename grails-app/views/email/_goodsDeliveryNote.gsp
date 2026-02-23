@@ -1,10 +1,10 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="org.pih.warehouse.core.Constants" contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
     <style>
     body {
-        font-family: "DejaVu Sans", sans-serif;
         font-size: 10px;
+        font-family: 'Inter', sans-serif;
     }
 
     table {
@@ -37,7 +37,7 @@
 
     .signature-table td {
         border: none;
-        border-bottom: 1px solid #000;
+        border-top: 1px solid #ccc;
         height: 40px;
     }
 
@@ -103,9 +103,9 @@
                 <tr><td class="right"><strong><g:message code="shipping.destination.label"/>:</strong>
                 </td><td>${shipment?.destination?.name}</td></tr>
                 <tr><td class="right"><strong><g:message code="shipping.dateShipped.label"/>:</strong>
-                </td><td><g:formatDate date="${shipment?.actualShippingDate}" format="dd/MMM/yyyy"/></td></tr>
+                </td><td><g:formatDate date="${shipment?.actualShippingDate}" format="${Constants.DEFAULT_DATE_FORMAT}"/></td></tr>
                 <tr><td class="right"><strong><g:message code="default.datePrinted.label"/>:</strong>
-                </td><td><g:formatDate date="${new Date()}" format="dd/MMM/yyyy HH:mm"/></td></tr>
+                </td><td><g:formatDate date="${new Date()}" format="${Constants.DEFAULT_DATE_TIME_FORMAT}"/></td></tr>
             </table>
         </td>
     </tr>
@@ -142,7 +142,7 @@
                 <td class="canceled">${shipmentItem?.product?.displayNameOrDefaultName}</td>
                 <td class="canceled">${shipmentItem?.inventoryItem?.lotNumber}</td>
                 <td class="canceled"><g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate}"
-                                                   format="dd/MMM/yyyy"/></td>
+                                                   format="${Constants.DEFAULT_DATE_FORMAT}"/></td>
                 <td class="canceled">${shipmentItem?.inventoryItem?.product?.unitOfMeasure ?: 'EA'}</td>
                 <td class="canceled">${shipmentItem?.quantity}</td>
                 <g:each in="${shipment.receipts}" var="receipt"><td></td></g:each>
@@ -156,7 +156,7 @@
                 <td>${receiptItem?.product?.productCode}</td>
                 <td>${receiptItem?.product?.displayNameOrDefaultName}</td>
                 <td>${receiptItem?.inventoryItem?.lotNumber}</td>
-                <td><g:formatDate date="${receiptItem?.inventoryItem?.expirationDate}" format="dd/MMM/yyyy"/></td>
+                <td><g:formatDate date="${receiptItem?.inventoryItem?.expirationDate}" format="${Constants.DEFAULT_DATE_FORMAT}"/></td>
                 <td>${j == 0 ? (shipmentItem?.inventoryItem?.product?.unitOfMeasure ?: 'EA') : ''}</td>
                 <td>${receiptItem?.quantityShipped}</td>
                 <g:each in="${shipment.receipts}" var="receipt">

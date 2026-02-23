@@ -15,23 +15,12 @@ import org.apache.commons.mail.EmailAttachment
 import org.apache.commons.mail.HtmlEmail
 import org.apache.commons.mail.SimpleEmail
 import grails.util.Holders
-import org.grails.plugins.web.taglib.ApplicationTagLib
-import org.pih.warehouse.api.PartialReceiptItem
-import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.data.FileGenerationService
-import org.pih.warehouse.shipping.Shipment
-import org.springframework.http.MediaType
 
 import javax.mail.util.ByteArrayDataSource
 
 class MailService {
 
-    FileGenerationService fileGenerationService
     Config config = Holders.getConfig()
-
-    ApplicationTagLib getApplicationTagLib() {
-        return Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
-    }
 
     String getDefaultFrom() {
         return config.getProperty("grails.mail.from")
@@ -130,30 +119,6 @@ class MailService {
 
     Boolean sendHtmlMailWithAttachment(User fromUser, Collection toList, Collection ccList, String subject, String body, List<Attachment> attachments, Integer port) {
         return doSendMail(subject, body, fromUser?.email, fromUser?.name, toList, ccList, attachments, port, true, false)
-    }
-
-    void sendHtmlMailWithGoodsDeliveryNoteAttached(Shipment shipment, List<PartialReceiptItem> items, Person recipient, Person receivedBy) {
-        String subject = applicationTagLib.message(code: "email.yourItemReceived.message", args: [shipment.destination.name, shipment.shipmentNumber])
-        GString body = "${applicationTagLib.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items, recipient: recipient, receivedBy: receivedBy])}"
-
-        String barcodeFileUri = fileGenerationService.generateBarcodeFileUri(shipment.shipmentNumber)
-
-        String fileName = "GoodsReceiptNote-${shipment.shipmentNumber}.pdf"
-
-        byte[] goodsDeliveryNotePdf = fileGenerationService.generatePdfFromTemplate("/email/goodsDeliveryNote", [
-                shipment: shipment,
-                currentLocation: AuthService.currentLocation,
-                barcodeFileUri: barcodeFileUri
-        ])
-
-        sendHtmlMailWithAttachment(
-                recipient.email,
-                subject,
-                body.toString(),
-                goodsDeliveryNotePdf,
-                fileName,
-                MediaType.APPLICATION_PDF_VALUE
-        )
     }
 
     /**
