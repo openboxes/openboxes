@@ -13,6 +13,8 @@
     .sortable tr { margin: 0 5px 5px 5px; padding: 5px; font-size: 1.2em; height: 1.5em; }
     html>body .sortable li { height: 1.5em; line-height: 1.2em; }
     .ui-state-highlight { height: 1.5em; line-height: 1.2em; }
+    .submit-import-button:disabled { cursor: not-allowed;}
+    .line-error { background-color: rgba(255, 0, 0, 0.31); }
     </style>
 </head>
 <body>
@@ -20,10 +22,13 @@
 <g:if test="${flash.message}">
     <div class="message">${flash.message}</div>
 </g:if>
-<g:if test="${flash.errors}">
+<g:if test="${flash.errors || errors}">
     <div class="errors">
         <ul>
             <g:each var="error" in="${flash.errors}">
+                <li>${error}</li>
+            </g:each>
+            <g:each var="error" in="${errors}">
                 <li>${error}</li>
             </g:each>
         </ul>
@@ -74,7 +79,7 @@
 
                 <div class="box">
                     <h2>${warehouse.message(code:'requisitionTemplate.addRequisitionItems.label', default: "Upload CSV/TSV")}</h2>
-                    <g:uploadForm controller="requisitionTemplate" action="importAsFile">
+                    <g:uploadForm controller="requisitionTemplate" action="importData">
                         <g:hiddenField name="id" value="${requisition?.id}" />
                         <g:hiddenField name="version" value="${requisition?.version}" />
                         <table>
@@ -126,7 +131,7 @@
                 <div class="box">
 
                     <h2>${warehouse.message(code:'requisitionTemplate.addRequisitionItems.label', default: "Copy-and-paste CSV/TSV")}</h2>
-                    <g:form method="post" controller="requisitionTemplate" action="importAsString">
+                    <g:form method="post" controller="requisitionTemplate" action="importData">
                         <g:hiddenField name="id" value="${requisition?.id}" />
                         <g:hiddenField name="version" value="${requisition?.version}" />
                         <table>
@@ -212,8 +217,10 @@
                             </tr>
                         </thead>
                         <tbody>
+                        <g:set var="productCountMap" value="${data.countBy { it[0] }}" />
                         <g:each var="row" in="${data}" status="count">
-                            <tr class="${count%2?'even':'odd'}">
+                            <g:set var="isDuplicate" value="${productCountMap[row[0]] > 1}" />
+                            <tr class="${count % 2 ? 'even' : 'odd'} ${isDuplicate ? "line-error" : ""}">
                                 <td>${count+1}</td>
                                 <g:each var="column" in="${row}">
                                     <td>${column}</td>
@@ -224,7 +231,8 @@
                         <tfoot>
                             <tr>
                                 <td class="center" colspan="5">
-                                    <button class="button icon approve">
+                                    <g:set var="hasDuplicates" value="${productCountMap.any { k, v -> v > 1 }}" />
+                                    <button class="button icon approve submit-import-button" ${hasDuplicates ? 'disabled' : ''}>
                                         ${warehouse.message(code:'requisitionTemplate.save.label', default: 'Save')}
                                     </button>
                                 </td>

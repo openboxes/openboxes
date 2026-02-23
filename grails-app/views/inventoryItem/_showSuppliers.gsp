@@ -39,7 +39,7 @@
             <thead>
             <g:sortableColumn property="code" title="${warehouse.message(code: 'productSupplier.code.label', default: 'Code')}" />
 
-            <th><g:message code="default.name.label" default="Name" /></th>
+            <th><g:message code="productSupplier.sourceName.label" default="Source Name" /></th>
 
             <th><g:message code="productSupplier.supplier.label" default="Supplier" /></th>
 
@@ -53,14 +53,11 @@
 
             <th><g:message code="productSupplier.minOrderQuantity.label" default="Minimum Order Quantity" /></th>
 
-            <th><g:message code="package.packSize.label" default="Pack Size" /></th>
+            <th><g:message code="package.defaultSourcePackage.label" default="Default Source Package" /></th>
 
-            <th><g:message code="package.lastPrice.label" default="Last Price" /></th>
+            <th><g:message code="package.packagePrice.label" default="Package Price" /></th>
 
-            <th><g:message code="productSupplier.contractPrice.label" default="Contract price (each) " /></th>
-
-            <th><g:message code="productSupplier.contractValidUntil.label" default="Contract Valid Until" /></th>
-
+            <th><g:message code="package.eachPrice.label" default="Each Price" /></th>
             </thead>
             <tbody>
             <g:if test="${productInstance?.productSuppliers}">
@@ -100,30 +97,23 @@
 
                         <td>
                             <g:if test="${defaultProductPackage}">
-                                ${fieldValue(bean: defaultProductPackage?.uom, field: "code")}/${fieldValue(bean: defaultProductPackage, field: "quantity")}
+                                ${productSupplier.packageSize}
                             </g:if>
                         </td>
 
                         <td>
                             <g:if test="${defaultProductPackage?.productPrice != null}">
                                 <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'default.none.label')])}">
-                                    <g:formatNumber number="${defaultProductPackage?.productPrice?.price}" />
+                                    <g:formatNumber number="${productSupplier.packagePrice}" />
                                     ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                 </g:hasRoleFinance>
                             </g:if>
                         </td>
 
                         <td>
-                            <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'default.none.label')])}">
-                                <g:formatNumber number="${productSupplier?.contractPrice?.price}"/>
-                                ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                            </g:hasRoleFinance>
+                            <g:formatNumber number="${productSupplier.eachPrice}" minFractionDigits="4" maxFractionDigits="4"/>
+                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                         </td>
-
-                        <td>
-                            <g:prettyDateFormat date="${productSupplier?.contractPrice?.toDate}"/>
-                        </td>
-
                     </tr>
                 </g:each>
             </g:if>

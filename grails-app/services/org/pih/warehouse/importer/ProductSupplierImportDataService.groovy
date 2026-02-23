@@ -80,16 +80,9 @@ class ProductSupplierImportDataService implements ImportDataService {
                 }
             }
 
-            try {
-                def ratingTypeCode = params?.ratingTypeCode ? params?.ratingTypeCode?.toUpperCase() as RatingTypeCode : null
-                if (ratingTypeCode && !RatingTypeCode.inList(ratingTypeCode)) {
-                    command.errors.reject("Row ${index + 1}: Rating Type with value '${params.ratingTypeCode}' exists but is not valid.")
-                }
+            if (params.ratingType && !EnumParser.parse(params.ratingType as String, RatingTypeCode)) {
+                command.errors.reject("Row ${index + 1}: Rating Type with value '${params.ratingType}' does not exist")
             }
-            catch(IllegalArgumentException e) {
-                command.errors.reject("Row ${index + 1}: Rating Type with value '${params.ratingTypeCode}' does not exist. " + e.message)
-            }
-
 
             if (params.globalPreferenceTypeName && !PreferenceType.findByName(params.globalPreferenceTypeName)) {
                 command.errors.reject("Row ${index + 1}: Preference Type with name '${params.globalPreferenceTypeName}' does not exist")
@@ -142,7 +135,7 @@ class ProductSupplierImportDataService implements ImportDataService {
         command.data.each { params ->
             // Sanitize the raw import data into a strongly-typed command object
             ProductSupplierImportCommand productSupplierImportCommand = new ProductSupplierImportCommand(
-                    active: BooleanParser.parse(params.active as String, false),
+                    active: BooleanParser.parse(params.active as String, true),  // Default to active if left blank
                     id: sanitizeStringInput(params.id),
                     code: sanitizeStringInput(params.code),
                     name: sanitizeStringInput(params.name),

@@ -40,6 +40,7 @@ class InventoryApiController {
                 location: Location.get(params.facilityId)
         )
 
+        inventoryImportDataService.calculateAndApplyInventoryDifferences(command)
         inventoryImportDataService.validateData(command)
         inventoryImportDataService.importData(command)
 
