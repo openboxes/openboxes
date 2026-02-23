@@ -135,7 +135,7 @@ class ProductSupplierImportDataService implements ImportDataService {
         command.data.each { params ->
             // Sanitize the raw import data into a strongly-typed command object
             ProductSupplierImportCommand productSupplierImportCommand = new ProductSupplierImportCommand(
-                    active: BooleanParser.parse(params.active as String, false),
+                    active: BooleanParser.parse(params.active as String, true),  // Default to active if left blank
                     id: sanitizeStringInput(params.id),
                     code: sanitizeStringInput(params.code),
                     name: sanitizeStringInput(params.name),
