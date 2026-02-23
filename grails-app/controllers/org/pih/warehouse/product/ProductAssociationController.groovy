@@ -90,8 +90,10 @@ class ProductAssociationController {
             bindMutualAssociationData(mutualAssociationInstance, params)
 
             mutualAssociationInstance.mutualAssociation = productAssociationInstance
+            // Save the assocation before assigning it to the main instance, otherwise given the transaction commit that is proceeded in the controller
+            // the mutual association instance might not be assigned to the productAssociationInstance after rendering the view
+            mutualAssociationInstance.save(flush: true)
             productAssociationInstance.mutualAssociation = mutualAssociationInstance
-            mutualAssociationInstance.save()
         }
         productAssociationInstance.validate()
         if (!productAssociationInstance.hasErrors() && productAssociationInstance.save(flush: true)) {
@@ -156,6 +158,12 @@ class ProductAssociationController {
                     mutualAssociationInstance.errors.allErrors.each { error ->
                         productAssociationInstance.errors.addError(error)
                     }
+                    // Re-read product association to reset any changes made to it before rendering the view
+                    // TODO: This all logic should be moved to a transactional service, as having it in the controller which is transactional
+                    // causes the bug that even though we wouldn't update a productAssociationInstance, the rollback takes place after rendering the view
+                    // Ideally the rollback should happen in the service so that when the instance comes back to the controller, all the dirty fields
+                    // are reset to the original values and we don't have to manually refresh the instance here
+                    productAssociationInstance.refresh()
                     render(view: "edit", model: [productAssociationInstance: productAssociationInstance])
                     return
                 }
