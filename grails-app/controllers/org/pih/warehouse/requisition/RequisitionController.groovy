@@ -21,6 +21,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
+import org.pih.warehouse.integration.WebhookEventService
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
@@ -36,6 +37,7 @@ class RequisitionController {
     def inventoryService
     def productService
     def stockMovementService
+    WebhookEventService webhookEventService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -467,6 +469,15 @@ class RequisitionController {
                 AuthService.currentUser,
                 RequisitionStatus.ISSUED
             )
+            // TODO: 1. Move out to the event listener service ShipmentStatusTransitionEventService (same place where
+            //  moriana webhook is triggered)
+            // TODO: 2. Set proper webhook event type and eventId
+            webhookEventService.triggerOrderConfirmationWebhookEvent(null, null, [
+                    requisition: requisition,
+                    facility: requisition.origin,
+                    triggeredBy: AuthService.currentUser,
+                    dateTriggered: new Date()
+            ])
         } catch (ValidationException e) {
             requisition = Requisition.read(params.id)
             def picklist = Picklist.findByRequisition(requisition)

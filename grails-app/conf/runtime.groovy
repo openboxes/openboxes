@@ -1455,6 +1455,15 @@ openboxes {
         }
     }
 }
+openboxes {
+    n8n {
+        enabled = true
+        endpoint {
+            url = ''
+            apiKey = ''
+        }
+    }
+}
 
 openboxes.inventoryCount.transactionTypes = [
         Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
