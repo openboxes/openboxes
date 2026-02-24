@@ -1,11 +1,16 @@
-package org.pih.warehouse.core
+package org.pih.warehouse.core.history
+
+import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.EventTypeDto
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.ReferenceDocument
+import org.pih.warehouse.core.User
 
 /**
  * Represents a standardized format to represent the history items of some historizable object.
  *
  * HistoryItem is generic, so it is up to the feature-specific usages of this object to determine what being
- * historizable means. Most commonly, this will be defined via a {@link org.pih.warehouse.core.history.HistoryBuilder}
- * and/or the {@link org.pih.warehouse.core.history.Historizable} trait on an entity.
+ * historizable means. Most commonly, this will be defined via a {@link HistoryProvider}.
  */
 class HistoryItem implements Comparable<HistoryItem> {
 

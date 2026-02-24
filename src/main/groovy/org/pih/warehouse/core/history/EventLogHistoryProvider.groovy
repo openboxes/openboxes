@@ -7,16 +7,15 @@ import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.EventTypeDto
-import org.pih.warehouse.core.HistoryItem
 import org.pih.warehouse.core.Referenceable
 import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.core.localization.MessageLocalizer
 
 /**
- * A convenience base class for any history builders that operate on entities whose history is based off
+ * A convenience base class for any HistoryProvider that operates on entities whose history is based off
  * of a collection of {@link EventLog}.
  */
-abstract class EventLogHistoryBuilder<T extends Referenceable> implements HistoryBuilder<T> {
+abstract class EventLogHistoryProvider<T extends Referenceable> implements HistoryProvider<T> {
 
     @Autowired
     MessageLocalizer messageLocalizer
@@ -86,7 +85,7 @@ abstract class EventLogHistoryBuilder<T extends Referenceable> implements Histor
 
         // For non-event-based logs and Event rollbacks, we build the history item ourselves.
         Enum eventName = eventLog.eventCode ?: eventLog.eventLogCode
-        boolean isRollback = eventLog.eventLogCode == EventLogCode.ROLLBACK_EVENT_OCCURRED
+        boolean isRollback = eventLog.eventLogCode == EventLogCode.EVENT_ROLLBACK_OCCURRED
         String eventNameString = "${messageLocalizer.localizeEnumValue(eventName)}${isRollback ? " - Rollback" : ""}"
 
         return new HistoryItem(

@@ -18,7 +18,7 @@ import org.pih.warehouse.core.User
  * as a part of any internal logic. If you need the ability to track state changes within some system, use
  * {@link Event}.
  *
- * A typical usage of EventLog is in conjunction with a {@link HistoryBuilder}, using the EventLog to construct
+ * A typical usage of EventLog is in conjunction with a {@link HistoryProvider}, using the EventLog to construct
  * the results of the getHistory() method. This standardizes process of operating on and rendering audit logs in
  * the system.
  */
@@ -100,7 +100,7 @@ class EventLog implements Comparable<EventLog>, Serializable {
     Map toJson() {
         return [
                 id: id,
-                event: event.toJson(),
+                event: event?.toJson(),
                 eventLogCode: eventLogCode,
                 message: message,
                 location: locationId,

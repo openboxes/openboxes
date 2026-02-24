@@ -52,7 +52,7 @@ import java.math.RoundingMode
 @Transactional
 class ShipmentService {
 
-    ShipmentEventService shipmentEventService
+    ShipmentEventManager shipmentEventManager
     def inventoryService
     TransactionIdentifierService transactionIdentifierService
     ShipmentIdentifierService shipmentIdentifierService
@@ -1167,7 +1167,7 @@ class ShipmentService {
      * Adds a new shipment event for the given code and logs a new shipment event.
      */
     void createShipmentEvent(Shipment shipmentInstance, Date eventDate, EventCode eventCode, Location location) {
-        shipmentEventService.createShipmentEvent(shipmentInstance, eventDate, eventCode, location)
+        shipmentEventManager.createEvent(shipmentInstance, eventDate, eventCode, location)
     }
 
     void receiveShipments(List shipmentIds, String comment, String userId, String locationId, Boolean creditStockOnReceipt) {
@@ -1761,7 +1761,7 @@ class ShipmentService {
 
 
     void deleteEvent(Shipment shipmentInstance, Event eventInstance) {
-        shipmentEventService.rollbackShipmentEvent(shipmentInstance, eventInstance)
+        shipmentEventManager.rollbackEvent(shipmentInstance, eventInstance)
         shipmentInstance.save()
     }
 

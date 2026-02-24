@@ -24,7 +24,7 @@ import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 
-class Shipment implements Comparable, Serializable, Historizable<ShipmentHistoryBuilder> {
+class Shipment implements Comparable, Serializable, Historizable<ShipmentHistoryProvider> {
 
     def publishRefreshEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this))
@@ -154,7 +154,8 @@ class Shipment implements Comparable, Serializable, Historizable<ShipmentHistory
         cache true
         additionalInformation type: "text"
         events cascade: "all-delete-orphan"
-        eventLogs joinTable: [name: 'shipment_event_log', key: 'shipment_id', column: 'event_log_id']
+        eventLogs(joinTable: [name: 'shipment_event_log', key: 'shipment_id', column: 'event_log_id'],
+                  cascade: "all-delete-orphan")
         comments cascade: "all-delete-orphan"
         documents cascade: "all-delete-orphan"
         shipmentItemCount(formula: '(select count(shipment_item.id) from shipment_item where (shipment_item.shipment_id = id))')

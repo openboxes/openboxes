@@ -11,13 +11,12 @@ package org.pih.warehouse.receiving
 
 import grails.util.Holders
 
-import org.pih.warehouse.core.history.Historizable
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.shipping.Shipment
 
-class Receipt implements Serializable, Comparable<Receipt>, Historizable<ReceiptHistoryBuilder> {
+class Receipt implements Serializable, Comparable<Receipt> {
 
     def publishRefreshEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this))

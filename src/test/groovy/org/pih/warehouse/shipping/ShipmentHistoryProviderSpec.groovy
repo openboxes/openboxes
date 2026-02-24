@@ -8,7 +8,7 @@ import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventType
-import org.pih.warehouse.core.HistoryItem
+import org.pih.warehouse.core.history.HistoryItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.ReferenceDocument
 import org.pih.warehouse.core.User
@@ -17,21 +17,16 @@ import org.pih.warehouse.core.history.EventLog
 import org.pih.warehouse.core.history.EventLogCode
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.receiving.Receipt
-import org.pih.warehouse.receiving.ReceiptHistoryBuilder
 
-class ShipmentHistoryBuilderSpec extends Specification {
+class ShipmentHistoryProviderSpec extends Specification {
 
     @Shared
-    ShipmentHistoryBuilder shipmentHistoryBuilder
+    ShipmentHistoryProvider shipmentHistoryProvider
 
     void setup() {
-        shipmentHistoryBuilder = new ShipmentHistoryBuilder()
+        shipmentHistoryProvider = new ShipmentHistoryProvider()
 
-        shipmentHistoryBuilder.receiptHistoryBuilder = Stub(ReceiptHistoryBuilder) {
-            getReferenceDocument(_ as Receipt) >> { Receipt r -> new ReferenceDocument(identifier: r.receiptNumber) }
-        }
-
-        shipmentHistoryBuilder.messageLocalizer = Stub(MessageLocalizer) {
+        shipmentHistoryProvider.messageLocalizer = Stub(MessageLocalizer) {
             // Stub all localization of enums to simply return the enum name
             localizeEnumValue(_ as Enum) >> { Enum enumVal -> return enumVal.name() }
         }
@@ -160,7 +155,7 @@ class ShipmentHistoryBuilderSpec extends Specification {
         shipment.eventLogs = new TreeSet<EventLog>([shippedEventLog, partialReceivedEventLog, receivedEventLog])
 
         when:
-        List<HistoryItem> historyItems = shipmentHistoryBuilder.getHistory(shipment)
+        List<HistoryItem> historyItems = shipmentHistoryProvider.getHistory(shipment)
 
         then:
         assert historyItems.size() == 4
@@ -272,7 +267,7 @@ class ShipmentHistoryBuilderSpec extends Specification {
                 event: null,  // rolled back so no longer exists
                 eventCode: EventCode.RECEIVED,
                 eventDate: finalReceiptRollbackLogDate,
-                eventLogCode: EventLogCode.ROLLBACK_EVENT_OCCURRED,
+                eventLogCode: EventLogCode.EVENT_ROLLBACK_OCCURRED,
                 message: "Event Log - Rollback - Final receiving shipment",
                 location: origin,
                 createdBy: shipmentCreator,
@@ -285,7 +280,7 @@ class ShipmentHistoryBuilderSpec extends Specification {
                 event: null,  // rolled back so no longer exists
                 eventCode: EventCode.PARTIALLY_RECEIVED,
                 eventDate: partialReceiptRollbackLogDate,
-                eventLogCode: EventLogCode.ROLLBACK_EVENT_OCCURRED,
+                eventLogCode: EventLogCode.EVENT_ROLLBACK_OCCURRED,
                 message: "Event Log - Rollback - Partial receiving shipment",
                 location: origin,
                 createdBy: shipmentCreator,
@@ -298,7 +293,7 @@ class ShipmentHistoryBuilderSpec extends Specification {
                 event: null,  // rolled back so no longer exists
                 eventCode: EventCode.SHIPPED,
                 eventDate: shipmentCreationRollbackLogDate,
-                eventLogCode: EventLogCode.ROLLBACK_EVENT_OCCURRED,
+                eventLogCode: EventLogCode.EVENT_ROLLBACK_OCCURRED,
                 message: "Event Log - Rollback - Sending shipment",
                 location: origin,
                 createdBy: shipmentCreator,
@@ -315,7 +310,7 @@ class ShipmentHistoryBuilderSpec extends Specification {
         ])
 
         when:
-        List<HistoryItem> historyItems = shipmentHistoryBuilder.getHistory(shipment)
+        List<HistoryItem> historyItems = shipmentHistoryProvider.getHistory(shipment)
 
         then:
         assert historyItems.size() == 7
@@ -468,7 +463,7 @@ class ShipmentHistoryBuilderSpec extends Specification {
         )
 
         when:
-        List<HistoryItem> historyItems = shipmentHistoryBuilder.getHistory(shipment)
+        List<HistoryItem> historyItems = shipmentHistoryProvider.getHistory(shipment)
 
         then:
         assert historyItems.size() == 4

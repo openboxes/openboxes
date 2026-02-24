@@ -41,7 +41,7 @@ import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentEventService
+import org.pih.warehouse.shipping.ShipmentEventManager
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
@@ -52,7 +52,7 @@ class FulfillmentService {
     TransactionIdentifierService transactionIdentifierService
     RequisitionIdentifierService requisitionIdentifierService
     ProductAvailabilityService productAvailabilityService
-    ShipmentEventService shipmentEventService
+    ShipmentEventManager shipmentEventManager
 
     /**
      * Adds a fulfillment item to a fulfillment object and saves the parent.
@@ -329,7 +329,7 @@ class FulfillmentService {
     void sendShipment(Shipment shipment) {
         shipment.requisition.status = RequisitionStatus.ISSUED
 
-        shipmentEventService.createShipmentEvent(
+        shipmentEventManager.createEvent(
                 shipment, shipment.expectedShippingDate, EventCode.SHIPPED, AuthService.currentLocation)
 
         Holders.grailsApplication.mainContext.publishEvent(new ShipmentStatusTransitionEvent(shipment, ShipmentStatusCode.SHIPPED))

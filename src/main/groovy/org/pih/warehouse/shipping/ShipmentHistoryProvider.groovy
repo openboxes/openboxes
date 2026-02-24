@@ -1,21 +1,16 @@
 package org.pih.warehouse.shipping
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventTypeDto
-import org.pih.warehouse.core.HistoryItem
+import org.pih.warehouse.core.history.HistoryItem
 import org.pih.warehouse.core.ReferenceDocument
 import org.pih.warehouse.core.history.EventLog
-import org.pih.warehouse.core.history.EventLogHistoryBuilder
-import org.pih.warehouse.receiving.ReceiptHistoryBuilder
+import org.pih.warehouse.core.history.EventLogHistoryProvider
 
 @Component
-class ShipmentHistoryBuilder extends EventLogHistoryBuilder<Shipment> {
-
-    @Autowired
-    ReceiptHistoryBuilder receiptHistoryBuilder
+class ShipmentHistoryProvider extends EventLogHistoryProvider<Shipment> {
 
     @Override
     ReferenceDocument getReferenceDocument(Shipment source) {
@@ -36,11 +31,15 @@ class ShipmentHistoryBuilder extends EventLogHistoryBuilder<Shipment> {
 
     @Override
     List<HistoryItem> getHistory(Shipment source) {
-        if (source.eventLogs) {
+        // A (temporary) backwards compatibility check. We don't want to generate a partial history for shipments that
+        // were in progress when event logs were first introduced so we only rely on event logs if all of the shipment
+        // events have been logged. We know that the SHIPPED event is the first logged event, so if the shipment has it,
+        // it's safe to rely on event logs.
+        if (source.eventLogs?.any { it.eventCode == EventCode.SHIPPED }) {
             return getHistoryFromEventLogs(source)
         }
         // Gracefully handle fetching history for shipments from before we introduced event logs.
-        return getHistoryPreEventLog(source)
+        return getHistoryFromEvents(source)
     }
 
     /**
@@ -59,9 +58,10 @@ class ShipmentHistoryBuilder extends EventLogHistoryBuilder<Shipment> {
     }
 
     /**
-     * Build the history for shipments that were started before we introduced event logs.
+     * Build the history for Shipments using only the shipment's Events.
+     * For use on shipments that were started before we introduced event logs.
      */
-    private List<HistoryItem> getHistoryPreEventLog(Shipment source) {
+    private List<HistoryItem> getHistoryFromEvents(Shipment source) {
         List<HistoryItem> histories = []
 
         // The entry for the initial CREATED event must be added manually. See the docstring for details.
