@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.core
 
-import grails.core.GrailsApplication
+import grails.config.Config
 import org.apache.commons.mail.Email
 import org.apache.commons.mail.EmailAttachment
 import org.apache.commons.mail.HtmlEmail
@@ -20,9 +20,7 @@ import javax.mail.util.ByteArrayDataSource
 
 class MailService {
 
-    def userService
-    GrailsApplication grailsApplication
-    def config = Holders.getConfig()
+    Config config = Holders.getConfig()
 
     String getDefaultFrom() {
         return config.getProperty("grails.mail.from")
@@ -53,11 +51,11 @@ class MailService {
     }
 
     Boolean getStartTlsEnabled() {
-        return grailsApplication.config.grails.mail.props["mail.smtp.starttls.enable"]
+        return config.getProperty("grails.mail.props.mail.smtp.starttls.enable").toBoolean()
     }
 
     Boolean getIsMailEnabled() {
-        return grailsApplication.config.grails.mail.enabled.toBoolean()
+        return config.getProperty("grails.mail.enabled").toBoolean()
     }
 
     Boolean sendMail(String subject, String msg, String to) {
@@ -93,7 +91,7 @@ class MailService {
     }
 
     Boolean sendHtmlMailWithAttachment(String to, String subject, String body, byte[] bytes, String name, String mimeType) {
-        return doSendMail(subject, body, null, null, Collections.singleton(to), ccList, Collections.singleton(new Attachment(name: name, mimeType: mimeType, bytes: bytes)), null, true, false)
+        return doSendMail(subject, body, null, null, Collections.singleton(to), null, Collections.singleton(new Attachment(name: name, mimeType: mimeType, bytes: bytes)), null, true, false)
     }
 
     /**

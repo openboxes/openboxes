@@ -11,21 +11,28 @@ package org.pih.warehouse.report
 
 import grails.core.GrailsApplication
 import grails.util.GrailsWebMockUtil
+import grails.util.Holders
 import org.apache.commons.mail.EmailException
 import org.apache.commons.validator.EmailValidator
+import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.plugins.web.taglib.RenderTagLib
 import grails.web.context.ServletContextHolder
 import org.grails.web.errors.GrailsWrappedRuntimeException
 import org.pih.warehouse.api.PartialReceipt
+import org.pih.warehouse.api.PartialReceiptItem
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.localization.MessageLocalizer
+import org.pih.warehouse.data.FileGenerationService
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
+import org.springframework.http.MediaType
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
 
@@ -35,7 +42,13 @@ class NotificationService {
     def userService
     MailService mailService
     GrailsApplication grailsApplication
+    FileGenerationService fileGenerationService
+    MessageLocalizer messageLocalizer
     def messageSource
+
+    ApplicationTagLib getApplicationTagLib() {
+        return Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
+    }
 
     def renderTemplate(String template, Map model) {
         def webRequest = RequestContextHolder.getRequestAttributes()
@@ -163,16 +176,34 @@ class NotificationService {
         }
     }
 
-    def sendReceiptNotifications(PartialReceipt partialReceipt) {
+    void sendReceiptNotifications(PartialReceipt partialReceipt) {
         Shipment shipment = partialReceipt?.shipment
-        def emailValidator = EmailValidator.getInstance()
-        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
-        def recipientItems = partialReceipt.partialReceiptItems.groupBy {it.recipient }
+        EmailValidator emailValidator = EmailValidator.getInstance()
+        Map<Person, List<PartialReceiptItem>> recipientItems = partialReceipt.partialReceiptItems.groupBy {it.recipient }
         recipientItems.each { Person recipient, items ->
             if (emailValidator.isValid(recipient?.email)) {
-                def subject = g.message(code: "email.yourItemReceived.message", args: [shipment.destination.name, shipment.shipmentNumber])
-                def body = "${g.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items, recipient: recipient, receivedBy: partialReceipt.recipient])}"
-                mailService.sendHtmlMail(subject, body.toString(), recipient.email)
+                String subject = messageLocalizer.localize("email.yourItemReceived.message", shipment.destination.name, shipment.shipmentNumber)
+                GString body = "${applicationTagLib.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items, recipient: recipient, receivedBy: partialReceipt.recipient])}"
+
+                File barcodeFile = fileGenerationService.generateBarcodeFile(shipment.shipmentNumber)
+                String barcodeFileUri = fileGenerationService.getFileUri(barcodeFile)
+                String fileName = "GoodsReceiptNote-${shipment.shipmentNumber}.pdf"
+
+                byte[] goodsDeliveryNotePdf = fileGenerationService.generatePdfFromTemplate("/email/goodsDeliveryNote", [
+                        shipment: shipment,
+                        currentLocation: AuthService.currentLocation,
+                        barcodeFileUri: barcodeFileUri
+                ])
+
+                barcodeFile.delete()
+                mailService.sendHtmlMailWithAttachment(
+                        recipient.email,
+                        subject,
+                        body.toString(),
+                        goodsDeliveryNotePdf,
+                        fileName,
+                        MediaType.APPLICATION_PDF_VALUE
+                )
             }
         }
     }
