@@ -684,6 +684,7 @@ class SendMovementPage extends Component {
           />
         ),
         closeOnClickOutside: false,
+        closeOnEscape: false,
       });
     } else {
       this.saveAndTransitionToIssued(payload);
