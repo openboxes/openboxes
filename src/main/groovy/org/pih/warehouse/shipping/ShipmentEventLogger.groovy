@@ -14,8 +14,7 @@ import org.pih.warehouse.core.history.EventLog
 import org.pih.warehouse.core.history.EventLogCode
 
 /**
- * Manages the lifecycle (creating and rolling back) of Shipment related {@link Event}s as
- * well as the logging of those events via {@link EventLog}s.
+ * Uses {@link EventLog} to log the occurrence of Shipment related {@Event}s and other actions.
  */
 @Component
 class ShipmentEventLogger {
@@ -33,7 +32,7 @@ class ShipmentEventLogger {
     }
 
     /**
-     * Log the occurrence of a shipment Event.
+     * Log the occurrence of a shipment {@link Event}.
      */
     EventLog logEvent(Shipment shipment, Event event) {
 
@@ -49,7 +48,7 @@ class ShipmentEventLogger {
     }
 
     /**
-     * Log the occurrence of a shipment Event being rolled back / reverted.
+     * Log the occurrence of a shipment {@link Event} being rolled back / reverted.
      */
     EventLog logEventRollback(Shipment shipment, Event event) {
         EventLog rollbackEventLog = new EventLog(
