@@ -14,7 +14,7 @@ import org.pih.warehouse.core.history.EventLog
 import org.pih.warehouse.core.history.EventLogCode
 
 /**
- * Uses {@link EventLog} to log the occurrence of Shipment related {@Event}s and other actions.
+ * Uses {@link EventLog} to log the occurrence of Shipment related {@link Event}s and other actions.
  */
 @Component
 class ShipmentEventLogger {
