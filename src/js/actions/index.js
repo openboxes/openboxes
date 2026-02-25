@@ -8,7 +8,6 @@ import {
   ADD_STOCK_MOVEMENT_DRAFT,
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
-  CLEAR_CYCLE_COUNT_DATA,
   CLEAR_ERRORS_DATA,
   CLOSE_INFO_BAR,
   ERASE_DRAFT,
@@ -978,12 +977,6 @@ export const setErrorsById = (id, errors) => (dispatch) => {
 export const submitForm = (dispatch) => {
   dispatch({
     type: SUBMIT_FORM,
-  });
-};
-
-export const clearCycleCountData = (dispatch) => {
-  dispatch({
-    type: CLEAR_CYCLE_COUNT_DATA,
   });
 };
 
