@@ -51,11 +51,11 @@ class MailService {
     }
 
     Boolean getStartTlsEnabled() {
-        return config.getProperty("grails.mail.props.mail.smtp.starttls.enable").toBoolean()
+        return config.getProperty("grails.mail.props.mail.smtp.starttls.enable", Boolean, false)
     }
 
     Boolean getIsMailEnabled() {
-        return config.getProperty("grails.mail.enabled").toBoolean()
+        return config.getProperty("grails.mail.enabled", Boolean, false)
     }
 
     Boolean sendMail(String subject, String msg, String to) {
