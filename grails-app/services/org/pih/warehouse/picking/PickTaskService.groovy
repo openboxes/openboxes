@@ -186,7 +186,13 @@ class PickTaskService {
 
         if (quantityPicked == 0 && reasonCode) { // 0-quantity short pick, we skip transfer to container
             existingPickItem.reasonCode = reasonCode
-            executeStateTransition(task, PickTaskStatus.STAGED) // dummy transition
+            // Only use STAGED if nothing was ever picked (pure cancellation)
+            if (!existingPickItem.quantityPicked || existingPickItem.quantityPicked == 0) {
+                // STAGED is used as a terminal status for items that were never picked - there's nothing to physically stage
+                executeStateTransition(task, PickTaskStatus.STAGED)
+            } else {
+                executeStateTransition(task, PickTaskStatus.PICKED)
+            }
         } else if (reasonCode || isFullyPicked) {
             executeStateTransition(task, PickTaskStatus.PICKED)
         }
