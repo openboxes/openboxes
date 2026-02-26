@@ -14,7 +14,7 @@ class SlottingService {
 
         for (PutawayStrategy strategy in strategies) {
             if (quantityRemaining <= 0) break
-            def tasks = strategy.execute(context, locations, quantityRemaining)
+            def tasks = strategy.execute(context, locations, quantityRemaining, results)
 
             if (tasks) {
                 results.addAll(tasks)

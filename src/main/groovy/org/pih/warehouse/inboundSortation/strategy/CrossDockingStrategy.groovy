@@ -12,7 +12,7 @@ class CrossDockingStrategy implements PutawayStrategy {
     def demandService
 
     @Override
-    List<PutawayResult> execute(PutawayContext context, List<Location> locations, Integer quantityRemaining) {
+    List<PutawayResult> execute(PutawayContext context, List<Location> locations, Integer quantityRemaining, List<PutawayResult> putawayResults) {
 
         List<PutawayResult> putawayTasks = []
 
@@ -61,20 +61,30 @@ class CrossDockingStrategy implements PutawayStrategy {
 
                 Integer quantityDemanded = unmetDemandsByDeliveryType.get(deliveryTypeCode)
                 int quantityForDemand = Math.min(quantityDemanded, availableQuantity)
-                putawayTasks << new PutawayResult(
-                        facility: context.facility,
-                        product: context.product,
-                        inventoryItem: context.inventoryItem,
-                        location: context.currentBinLocation,
-                        destination: destination,
-                        quantity: quantityForDemand,
-                        container: putawayContainer
-                )
 
-                availableQuantity -= quantityForDemand
+                PutawayResult existingResult = putawayResults.find {
+                    it.facility == context.facility &&
+                    it.product == context.product &&
+                    it.inventoryItem == context.inventoryItem &&
+                    it.location == context.currentBinLocation &&
+                    it.quantity == quantityForDemand
+                }
 
-                if (availableQuantity <= 0) {
-                    break
+                if (!existingResult) {
+                    putawayTasks << new PutawayResult(
+                            facility: context.facility,
+                            product: context.product,
+                            inventoryItem: context.inventoryItem,
+                            location: context.currentBinLocation,
+                            destination: destination,
+                            quantity: quantityForDemand,
+                            container: putawayContainer
+                    )
+                    availableQuantity -= quantityForDemand
+
+                    if (availableQuantity <= 0) {
+                        break
+                    }
                 }
             }
         }

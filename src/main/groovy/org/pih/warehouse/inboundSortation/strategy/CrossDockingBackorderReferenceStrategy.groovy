@@ -13,7 +13,7 @@ import javax.xml.bind.ValidationException
 class CrossDockingBackorderReferenceStrategy implements PutawayStrategy {
 
     @Override
-    List<PutawayResult> execute(PutawayContext context, List<Location> locations, Integer quantityRemaining) {
+    List<PutawayResult> execute(PutawayContext context, List<Location> locations, Integer quantityRemaining, List<PutawayResult> putawayResults) {
 
         List<PutawayResult> putawayTasks = []
 
@@ -22,11 +22,11 @@ class CrossDockingBackorderReferenceStrategy implements PutawayStrategy {
             throw new ValidationException("No backorder found for '${context.backorderReference}' backorderReference")
         }
 
-        RequisitionItem requisitionItem = context.backorderItem
+        def requisitionItem = context.backorderItem
         if (!requisitionItem) {
             requisitionItem = backorder.requisitionItems.find {
-                it.product == context.product && it.quantity == context.quantity && !it.isAllocated()
-            }
+                it.product == context.product && it.quantity <= context.quantity && !it.isAllocated()
+            } as RequisitionItem
         }
         if (!requisitionItem) {
             throw new ValidationException("No match for product '${context.product}' and quantity '${context.quantity}'")
@@ -41,7 +41,7 @@ class CrossDockingBackorderReferenceStrategy implements PutawayStrategy {
                     inventoryItem: context.inventoryItem,
                     location: context.currentBinLocation,
                     destination: putawayLocation,
-                    quantity: context.quantity,
+                    quantity: requisitionItem.quantity,
             )
         }
         return putawayTasks
