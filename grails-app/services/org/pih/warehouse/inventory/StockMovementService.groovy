@@ -1079,6 +1079,7 @@ class StockMovementService {
                 quantityDemandFulfilling    : quantityDemandFulfilling ? quantityDemandFulfilling.monthlyDemand : 0,
                 quantityOnHand              : (quantityOnHand && quantityOnHand > 0 ? quantityOnHand : 0),
                 quantityAvailable           : (quantityAvailable && quantityAvailable > 0 ? quantityAvailable : 0),
+                quantityBackordered         : it.quantity_backordered,
                 quantityCounted             : it.quantity_counted,
                 substitutionStatus          : it.substitution_status,
                 sortOrder                   : it.sort_order,

@@ -13,6 +13,7 @@ package org.pih.warehouse.inventory
 import grails.converters.JSON
 import grails.core.GrailsApplication
 import grails.plugins.csv.CSVWriter
+import grails.validation.ValidationException
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.allocation.AllocationMode
 import org.pih.warehouse.allocation.AllocationService
@@ -705,6 +706,11 @@ class StockMovementController {
     def allocate() {
         try {
             Requisition requisition = Requisition.get(params.id)
+
+            if (false) {
+                throw new ValidationException("Hold Until Complete (Allocation) for ${requisition?.requestNumber}")
+            }
+
             List<AllocationStrategy> strategyList = [AllocationStrategy.WAREHOUSE_FIRST]
             allocationService.allocate(requisition, AllocationMode.AUTO, strategyList)
             stockMovementService.updateRequisitionStatus(params.id, RequisitionStatus.PICKING)

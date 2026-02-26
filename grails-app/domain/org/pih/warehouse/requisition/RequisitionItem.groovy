@@ -52,6 +52,9 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     // saved QOH in ward request
     Integer quantityCounted
 
+    Integer quantityBackordered
+    String backorderedReasonCode
+
     // Status is handled dynamically at the moment, but we might want to save it at some point
     //RequisitionItemStatus requisitionItemStatus
 
@@ -133,6 +136,16 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         requestedBy(nullable: true)
         quantity(nullable: false, min: 0)
         quantityApproved(nullable: true)
+        quantityBackordered(nullable: true,
+                validator: { value, obj ->
+                    // Must have a backordered reason code
+                    if (value > 0 && "BACKORDER" != obj.backorderedReasonCode) {
+                        return false
+                    } else {
+                        return true
+                    }
+                })
+        backorderedReasonCode(nullable: true)
         quantityCanceled(nullable: true,
                 validator: { value, obj ->
                     // Must have a cancel reason code
@@ -301,7 +314,12 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         log.info "Change quantity: ${newQuantity} ${reasonCode} ${comments}"
         // And then create a new requisition item for the remaining quantity (if not 0)
         if (newQuantity == 0) {
-            cancelQuantity(reasonCode, comments)
+            if ("BACKORDER" == reasonCode) {
+                quantityBackordered = quantity
+                backorderedReasonCode = reasonCode
+            } else {
+                cancelQuantity(reasonCode, comments)
+            }
         } else {
 
             if (newProductPackage == productPackage && newQuantity == quantity) {
@@ -337,6 +355,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             modificationItem.save(flush: true, failOnError: true)
         }
     }
+
     def chooseSubstitute(Product newProduct, ProductPackage newProductPackage, Integer newQuantity, String reasonCode, String comments) {
         chooseSubstitute(newProduct, newProductPackage, newQuantity, reasonCode, comments, null)
     }
@@ -441,6 +460,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return (productPackage?.quantity ?: 1) * (quantityCanceled ?: 0)
     }
 
+    def totalQuantityBackordered() {
+        return (productPackage?.quantity ?: 1) * (quantityBackordered ?: 0)
+    }
+
     def totalQuantityApproved() {
         return (productPackage?.quantity ?: 1) * (quantityApproved ?: 0)
     }
@@ -463,6 +486,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      */
     def isCanceled() {
         return totalQuantityCanceled() == totalQuantity() && !modificationItem && !substitutionItem && !requisitionItems
+    }
+
+    def isBackordered() {
+        return totalQuantityBackordered() == totalQuantity() && !isChanged() && !isCanceled()
     }
 
     def isCanceledDuringPick() {
@@ -819,6 +846,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                 isCompleted           : isCompleted(),
                 isApproved            : isApproved(),
                 isCanceled            : isCanceled(),
+                isBackordered         : isBacxkordered(),
                 orderIndex            : orderIndex
         ]
     }

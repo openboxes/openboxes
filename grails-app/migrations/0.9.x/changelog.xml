@@ -51,4 +51,5 @@
     <include file="0.9.x/changelog-2026-02-12-0000-alter-table-inventory-level-add-identifier.xml" />
     <include file="0.9.x/changelog-2026-02-13-0001-alter-table-person-add-identifier.xml" />
     <include file="0.9.x/changelog-2026-02-12-1600-add-shipmentItem-columns-to-store-outbound-sales-link.xml" />
+    <include file="0.9.x/changelog-2026-02-25-1200-add-requisitionItem-column-quantity-backordered.xml" />
 </databaseChangeLog>
