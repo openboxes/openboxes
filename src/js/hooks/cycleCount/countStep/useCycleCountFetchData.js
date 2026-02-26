@@ -7,7 +7,6 @@ import {
 } from 'selectors';
 
 import {
-  clearCycleCountData,
   clearErrorsData,
   fetchBinLocations,
   fetchCycleCounts,
@@ -47,7 +46,6 @@ const useCycleCountFetchData = (
     );
 
     return () => {
-      dispatch(clearCycleCountData);
       dispatch(clearErrorsData);
     };
   }, [cycleCountIds, currentLocationId, sortByProductName, showBinLocation]);
