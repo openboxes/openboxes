@@ -66,15 +66,6 @@ class Event implements Comparable, Serializable {
         return diff
     }
 
-    @Override
-    boolean equals(Object obj) {
-        if (!(obj instanceof Event)) {
-            return false
-        }
-
-        return this.id == obj.id
-    }
-
     Map toJson() {
         return [
                 id: id,
