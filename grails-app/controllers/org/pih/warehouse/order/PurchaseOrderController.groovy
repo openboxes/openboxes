@@ -59,6 +59,13 @@ class PurchaseOrderController {
         def order
         if (params.order?.id) {
             order = Order.get(params.order.id)
+        } else if (!params.order) {
+            // An edge case where the user has tried to submit the order once, failed validation, then switches
+            // locations. The chooseLocation flow redirects back to this controller but loses all the params.
+            // Since we don't have any of the original data (including if we were on the create or edit flow)
+            // we simply redirect out of the save flow.
+            redirect(action: "list")
+            return
         } else {
             order = new Order()
         }
