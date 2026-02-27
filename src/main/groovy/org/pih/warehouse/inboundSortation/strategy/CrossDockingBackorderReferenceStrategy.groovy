@@ -17,15 +17,15 @@ class CrossDockingBackorderReferenceStrategy implements PutawayStrategy {
 
         List<PutawayResult> putawayTasks = []
         if (!context.backorderReference && !context.backorderItem) {
-            return putawayTasks  
-        }
-        Requisition backorder = Requisition.findByRequestNumber(context.backorderReference)
-        if (!backorder) {
-            throw new ValidationException("No backorder found for '${context.backorderReference}' backorderReference")
+            return putawayTasks
         }
 
         def requisitionItem = context.backorderItem
         if (!requisitionItem) {
+            Requisition backorder = Requisition.findByRequestNumber(context.backorderReference)
+            if (!backorder) {
+                throw new ValidationException("No backorder found for '${context.backorderReference}' backorderReference")
+            }
             requisitionItem = backorder.requisitionItems.find {
                 it.product == context.product && it.quantity <= context.quantity && !it.isAllocated()
             } as RequisitionItem
@@ -34,7 +34,7 @@ class CrossDockingBackorderReferenceStrategy implements PutawayStrategy {
             throw new ValidationException("No match for product '${context.product}' and quantity '${context.quantity}'")
         }
 
-        ActivityCode deliveryTypeCode = backorder.deliveryTypeCode.activityCode
+        ActivityCode deliveryTypeCode = requisitionItem.requisition.deliveryTypeCode.activityCode
         Location putawayLocation = locations.find { (deliveryTypeCode && it.supports(deliveryTypeCode)) && it.supports(ActivityCode.STAGING_LOCATION) }
         if (putawayLocation) {
             putawayTasks << new PutawayResult(
