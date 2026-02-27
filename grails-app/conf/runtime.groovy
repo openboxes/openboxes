@@ -1455,12 +1455,14 @@ openboxes {
         }
     }
 }
+
+// Default n8n webhook configuration (OBLS-610), will be improved in BLS-592
 openboxes {
     n8n {
-        enabled = true
+        enabled = false
         endpoint {
             url = ''
-            apiKey = ''
+            headers = [:]
         }
     }
 }

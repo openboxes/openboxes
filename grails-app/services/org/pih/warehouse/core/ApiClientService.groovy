@@ -9,6 +9,7 @@
 **/
 package org.pih.warehouse.core
 
+import groovy.json.JsonSlurper
 import org.apache.commons.io.IOUtils
 import org.apache.http.HttpResponse
 import org.apache.http.client.HttpClient
@@ -71,12 +72,18 @@ class ApiClientService {
         // Process response
         InputStream is = response.entity.content
         String data = IOUtils.toString(is, "UTF-8")
-        // TODO: Try using JsonSlurper here. For now this is a workaround for a case where the response is a JSON
-        //  array instead of an object (n8n returns array of objects, currently only one object, but should handle more)
-        if (data.startsWith("[") && data.endsWith("]")) {
-            data = data.substring(1, data.length() - 1)
+        if (data.isEmpty()) {
+            return null
         }
-        return !data.isEmpty() ? new JSONObject(data) : null
+
+        // Use JsonSlurper in case in the response is array of objects instead of single object
+        JsonSlurper slurper = new JsonSlurper()
+        def result = slurper.parseText(data)
+        if (result instanceof List) {
+            return [results: result] as JSONObject
+        }
+
+        return result as JSONObject
     }
 
     static private getRequestConfig() {
