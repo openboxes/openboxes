@@ -119,7 +119,7 @@
     "zod": "3.22.4"
   },
   "devDependencies": {
-    "@babel/core": "7.21.8",
+    "@babel/core": "^7.29.0",
     "@babel/eslint-parser": "7.21.8",
     "@babel/preset-env": "7.24.4",
     "@babel/preset-react": "7.18.6",
