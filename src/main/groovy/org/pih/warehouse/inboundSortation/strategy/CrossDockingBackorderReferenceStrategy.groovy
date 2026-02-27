@@ -16,7 +16,9 @@ class CrossDockingBackorderReferenceStrategy implements PutawayStrategy {
     List<PutawayResult> execute(PutawayContext context, List<Location> locations, Integer quantityRemaining, List<PutawayResult> putawayResults) {
 
         List<PutawayResult> putawayTasks = []
-
+        if (!context.backorderReference && !context.backorderItem) {
+            return putawayTasks  
+        }
         Requisition backorder = Requisition.findByRequestNumber(context.backorderReference)
         if (!backorder) {
             throw new ValidationException("No backorder found for '${context.backorderReference}' backorderReference")
