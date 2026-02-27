@@ -11,23 +11,43 @@ package util
 
 import grails.util.Holders
 import groovy.sql.GroovyRowResult
+import groovy.util.logging.Slf4j
 import liquibase.Contexts
 import liquibase.LabelExpression
 import liquibase.Liquibase
 import liquibase.database.Database
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
+import liquibase.integration.spring.SpringLiquibase
 import liquibase.lockservice.LockService
 import liquibase.lockservice.LockServiceFactory
 import liquibase.resource.ClassLoaderResourceAccessor
 import org.apache.commons.lang.StringUtils
-
+import org.springframework.core.io.Resource
+import org.springframework.core.io.DefaultResourceLoader
+import java.nio.file.Paths
+import liquibase.resource.ClassLoaderResourceAccessor
+import liquibase.resource.CompositeResourceAccessor
+import liquibase.resource.DirectoryResourceAccessor
+import liquibase.resource.ResourceAccessor
+import java.io.File
+import liquibase.Contexts
+import liquibase.LabelExpression
+import liquibase.Liquibase
+import liquibase.database.Database
+import liquibase.database.DatabaseFactory
+import liquibase.database.jvm.JdbcConnection
 import org.pih.warehouse.data.DataService
+
+import javax.sql.DataSource
 
 /**
  * Utility methods for running Liquibase database migrations.
  */
+@Slf4j
 class LiquibaseUtil {
+
+    //DataSource dataSource
 
     /**
      * Because we skip changelogs under the release folders (Ex: '0.9.x') when doing clean installs, we don't get tagged
@@ -80,12 +100,50 @@ class LiquibaseUtil {
      * the migration plugin: https://grails.github.io/grails-database-migration/latest/index.html
      */
     static void executeMigrations() {
-        String changeLogFile = Holders.grailsApplication.config.getProperty('grails.plugin.databasemigration.changelogFileName')
-        if (StringUtils.isBlank(changeLogFile)) {
-            throw new RuntimeException('Cannot determine base changelog file when running Liquibase migrations. Check your configuration.')
+        log.info("Dropping all views. They will be rebuilt after migrations complete...")
+        runLiquibaseFile('views/drop-all-views.xml')
+
+        TaggedMigrationVersion currentVersion = getCurrentVersion()
+
+        if (currentVersion == null) {
+            log.info("Executing migrations on new installation. Running consolidated migrations...")
+            runLiquibaseFile('install/changelog.xml')
+            currentVersion = getNextVersion(CLEAN_INSTALL_VERSION)
+        } else {
+            log.info("Current migration version is ${currentVersion}. Skipping older migrations.")
         }
 
-        Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database)
+        List<TaggedMigrationVersion> currentAndNewerReleases = getCurrentAndNewerVersions(currentVersion)
+        for (TaggedMigrationVersion release : currentAndNewerReleases) {
+            log.info("Executing migrations for release version: ${release}")
+            runLiquibaseFile(release.toString() + "/changelog.xml")
+        }
+
+        log.info("Rebuilding all views")
+        runLiquibaseFile('views/changelog.xml')
+    }
+
+
+    private static void runLiquibaseFile(String filePath) {
+        log.info("Running Liquibase using Composite Accessor: ${filePath}")
+
+        def ds = Holders.grailsApplication.mainContext.getBean("dataSource")
+        JdbcConnection connection = new JdbcConnection(ds.connection)
+        Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
+        database.setDefaultSchemaName(connection.catalog)
+
+        // 1. Search the physical file system (fixes the ./gradlew bootRun issue)
+        File devDir = new File("grails-app/migrations")
+        ResourceAccessor fsAccessor = new DirectoryResourceAccessor(devDir)
+
+        // 2. Search the classpath (fixes the production issue within WAR/JAR files)
+        ResourceAccessor clAccessor = new ClassLoaderResourceAccessor(Thread.currentThread().getContextClassLoader())
+
+        // 3. Combine both accessors into one
+        ResourceAccessor compositeAccessor = new CompositeResourceAccessor(fsAccessor, clAccessor)
+
+        // Liquibase receives the direct path (e.g., 'views/drop-all-views.xml') and searches for it in both locations
+        Liquibase liquibase = new Liquibase(filePath, compositeAccessor, database)
         liquibase.update(null as Contexts, new LabelExpression())
     }
 

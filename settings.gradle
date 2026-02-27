@@ -4,8 +4,8 @@
  * they say on the tin. Here, we put the cache in the project root.
  */
 buildCache {
-    local(DirectoryBuildCache) {
-        directory = new File(rootDir, '.gradle/caches/build')
+    local {
+        directory = new File(settingsDir, '.gradle/caches/build')
         removeUnusedEntriesAfterDays = 30
     }
 }

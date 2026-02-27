@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.shipping
 
-import au.com.bytecode.opencsv.CSVWriter
+import com.opencsv.CSVWriter
 import com.google.zxing.BarcodeFormat
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException

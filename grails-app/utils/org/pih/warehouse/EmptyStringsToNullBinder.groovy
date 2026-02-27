@@ -5,7 +5,7 @@ import grails.databinding.DataBindingSource
 
 class EmptyStringsToNullBinder<T> implements BindingHelper<T> {
 
-    static final T bindEmptyStringToNull(Object source, String fieldName) {
+    static final <T> T bindEmptyStringToNull(Object source, String fieldName) {
         return source[fieldName] == "" ? null : source[fieldName]
     }
 

@@ -35,8 +35,8 @@
     <logger name="grails.util" level="info" /><!-- use 'debug' to see CacheEntry logs -->
     <logger name="grails.web" level="info" /><!-- use 'debug' to see redirects -->
     <logger name="liquibase.changelog" level="info" />
-    <logger name="liquibase.database" level="info" /><!-- use 'debug' to see migration SQL -->
-    <logger name="liquibase.executor" level="warn" /><!-- use 'info' to see migration SQL -->
+    <logger name="liquibase.database" level="debug" /><!-- use 'debug' to see migration SQL -->
+    <logger name="liquibase.executor" level="trace" /><!-- use 'info' to see migration SQL -->
     <logger name="liquibase.license" level="info" />
     <logger name="liquibase.lockservice" level="warn" /><!-- use 'info' to see change log locks -->
     <logger name="liquibase.parser" level="info" />

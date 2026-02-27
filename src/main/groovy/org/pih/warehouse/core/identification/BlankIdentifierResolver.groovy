@@ -13,7 +13,7 @@ import org.grails.datastore.gorm.GormEntity
  * not called by the AssignIdentifierJob.
  */
 @Slf4j
-trait BlankIdentifierResolver<T extends GormEntity> {
+trait BlankIdentifierResolver<T> {
 
     /**
      * @return the domain-specific name/keyword that is used in identifier properties.

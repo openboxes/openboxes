@@ -14,7 +14,7 @@ import org.pih.warehouse.data.DataService
  * Handles generating custom identifiers that conform to a certain format.
  */
 @Transactional
-abstract class IdentifierService<T extends GormEntity> {
+abstract class IdentifierService<T> {
 
     RandomIdentifierGenerator randomIdentifierGenerator
     DataService dataService

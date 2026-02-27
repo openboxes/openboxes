@@ -164,9 +164,9 @@ class ApiController {
         boolean isUserManager = userService.getEffectiveRoles(user).any { managerRoles.contains(it.roleType) }
         def supportedActivities = location.supportedActivities ?: location.locationType.supportedActivities
         boolean isImpersonated = session.impersonateUserId ? true : false
-        def buildNumber = gitProperties.shortCommitId
+        //def buildNumber = gitProperties.shortCommitId
         def buildDate = grailsApplication.metadata.getProperty('build.time') ?: messageSource.getMessage('application.realTimeBuild.label', null, currentLocale)
-        def branchName = ConfigHelper.getBranchName(gitProperties)
+        //def branchName = ConfigHelper.getBranchName(gitProperties)
         def grailsVersion = grailsApplication.metadata.getProperty('info.app.grailsVersion')
         def appVersion = grailsApplication.metadata.getProperty('info.app.version')
         def environment = Environment.current
@@ -211,8 +211,8 @@ class ApiController {
                 isImpersonated                : isImpersonated,
                 grailsVersion                 : grailsVersion,
                 appVersion                    : appVersion,
-                branchName                    : branchName,
-                buildNumber                   : buildNumber,
+                //branchName                    : branchName,
+                buildNumber                   : null,
                 environment                   : environment.name,
                 buildDate                     : buildDate,
                 ipAddress                     : ipAddress,
