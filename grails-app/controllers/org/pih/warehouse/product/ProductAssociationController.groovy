@@ -104,7 +104,7 @@ class ProductAssociationController {
             }
             redirect(controller: "product", action: "edit", id: productAssociationInstance?.product?.id)
         } else {
-            render(view: "create", model: [productAssociationInstance: productAssociationInstance])
+            chain(controller: "product", action: "edit", id: productAssociationInstance?.product?.id, model: [productAssociationInstance: productAssociationInstance])
         }
     }
 
@@ -164,7 +164,7 @@ class ProductAssociationController {
                     // Ideally the rollback should happen in the service so that when the instance comes back to the controller, all the dirty fields
                     // are reset to the original values and we don't have to manually refresh the instance here
                     productAssociationInstance.refresh()
-                    render(view: "edit", model: [productAssociationInstance: productAssociationInstance])
+                    chain(controller: "product", action: "edit", id: productAssociationInstance?.product?.id, model: [productAssociationInstance: productAssociationInstance])
                     return
                 }
                 mutualAssociationInstance.save(flush: true, failOnError: true)
@@ -180,7 +180,7 @@ class ProductAssociationController {
                 redirect(controller: "product", action: "edit", id: productAssociationInstance?.product?.id)
 
             } else {
-                render(view: "edit", model: [productAssociationInstance: productAssociationInstance])
+                chain(controller: "product", action: "edit", id: productAssociationInstance?.product?.id, model: [productAssociationInstance: productAssociationInstance])
             }
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), params.id])}"
