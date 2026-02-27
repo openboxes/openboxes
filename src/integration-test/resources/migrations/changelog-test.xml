@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
     <!--  First, run the regular migrations  -->
-    <include file="changelog.groovy" />
+    <include file="/changelog_old_backup.txt" />
 
     <!--
     Then run test-specific migrations to populate test data (ideally via include statements so this file stays clean).

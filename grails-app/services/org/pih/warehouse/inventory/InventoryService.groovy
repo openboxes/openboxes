@@ -12,7 +12,7 @@ package org.pih.warehouse.inventory
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
 import grails.validation.ValidationException
-import org.apache.commons.collections.map.MultiKeyMap
+import org.apache.commons.collections4.map.MultiKeyMap
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.PaginatedList
