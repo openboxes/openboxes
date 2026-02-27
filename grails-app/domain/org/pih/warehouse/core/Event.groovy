@@ -56,6 +56,8 @@ class Event implements Comparable, Serializable {
     String toString() { return "$eventType $eventLocation on $eventDate" }
 
     int compareTo(obj) {
+        // Note the order of the operands here! The the object being compared to is on the left side of the operator,
+        // resulting in Events being sorted descending (ie largest to smallest, ie newest first)
         def diff = obj?.eventDate <=> eventDate
         if (diff == 0) {
             diff = obj?.eventType <=> eventType
@@ -64,15 +66,6 @@ class Event implements Comparable, Serializable {
             diff = obj?.dateCreated <=> dateCreated
         }
         return diff
-    }
-
-    @Override
-    boolean equals(Object obj) {
-        if (!(obj instanceof Event)) {
-            return false
-        }
-
-        return this.id == obj.id
     }
 
     Map toJson() {
