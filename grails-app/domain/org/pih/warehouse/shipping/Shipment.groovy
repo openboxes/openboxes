@@ -436,9 +436,9 @@ class Shipment implements Comparable, Serializable, Historizable<ShipmentHistory
      * Dynamically recomputes the current status of the shipment based on the shipment events that have occurred.
      */
     ShipmentStatus getStatus() {
-        // TODO: we should call getMostRecentSystemEvent() here and set the status based on that, but the Events
-        //       seem to be sorted incorrectly. Ex: PARTIALLY_RECEIVED can be before RECEIVED if they share the same
-        //       eventDate. Look into the Event.compareTo(obj) method to see if something unexpected is going on.
+        // TODO: we should set the status based on getMostRecentSystemEvent(), but there is a bug in the compareTo()
+        //       check in EventType that causes PARTIALLY_RECEIVED events to be before RECEIVED ones if they share the
+        //       same eventDate. Once that is fixed then we can refactor this method to use getMostRecentSystemEvent()
         if (this.wasReceived()) {
             return new ShipmentStatus([code    : ShipmentStatusCode.RECEIVED,
                                        date    : this.getActualDeliveryDate(),
