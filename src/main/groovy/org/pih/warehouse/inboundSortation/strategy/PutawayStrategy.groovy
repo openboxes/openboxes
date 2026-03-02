@@ -5,5 +5,5 @@ import org.pih.warehouse.inboundSortation.PutawayContext
 import org.pih.warehouse.inboundSortation.PutawayResult
 
 interface PutawayStrategy {
-    List<PutawayResult> execute(PutawayContext context, List<Location> locations, Integer quantityRemaining)
+    List<PutawayResult> execute(PutawayContext context, List<Location> locations, Integer quantityRemaining, List<PutawayResult> putawayResults)
 }
