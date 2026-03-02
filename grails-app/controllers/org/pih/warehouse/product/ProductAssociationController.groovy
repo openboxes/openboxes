@@ -104,7 +104,11 @@ class ProductAssociationController {
             }
             redirect(controller: "product", action: "edit", id: productAssociationInstance?.product?.id)
         } else {
-            chain(controller: "product", action: "edit", id: productAssociationInstance?.product?.id, model: [productAssociationInstance: productAssociationInstance])
+            if (params.isFromProductEditPage) {
+                chain(controller: "product", action: "edit", id: productAssociationInstance?.product?.id, model: [productAssociationInstance: productAssociationInstance])
+                return
+            }
+            render(view: "create", model: [productAssociationInstance: productAssociationInstance])
         }
     }
 
@@ -124,7 +128,7 @@ class ProductAssociationController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), params.id])}"
             redirect(action: "list")
         } else {
-            return [productAssociationInstance: productAssociationInstance]
+            return [productAssociationInstance: productAssociationInstance, isFromProductEditPage: params.isFromProductEditPage]
         }
     }
 
@@ -164,7 +168,11 @@ class ProductAssociationController {
                     // Ideally the rollback should happen in the service so that when the instance comes back to the controller, all the dirty fields
                     // are reset to the original values and we don't have to manually refresh the instance here
                     productAssociationInstance.refresh()
-                    chain(controller: "product", action: "edit", id: productAssociationInstance?.product?.id, model: [productAssociationInstance: productAssociationInstance])
+                    if (params.isFromProductEditPage) {
+                        chain(controller: "product", action: "edit", id: productAssociationInstance?.product?.id, model: [productAssociationInstance: productAssociationInstance])
+                        return
+                    }
+                    render(view: "create", model: [productAssociationInstance: productAssociationInstance])
                     return
                 }
                 mutualAssociationInstance.save(flush: true, failOnError: true)
@@ -180,7 +188,11 @@ class ProductAssociationController {
                 redirect(controller: "product", action: "edit", id: productAssociationInstance?.product?.id)
 
             } else {
-                chain(controller: "product", action: "edit", id: productAssociationInstance?.product?.id, model: [productAssociationInstance: productAssociationInstance])
+                if (params.isFromProductEditPage) {
+                    chain(controller: "product", action: "edit", id: productAssociationInstance?.product?.id, model: [productAssociationInstance: productAssociationInstance])
+                    return
+                }
+                render(view: "create", model: [productAssociationInstance: productAssociationInstance])
             }
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), params.id])}"
@@ -228,7 +240,7 @@ class ProductAssociationController {
             productAssociation.code = ProductAssociationTypeCode.SUBSTITUTE
             productAssociation.product = product
         }
-        render(template: "dialog", model: [productAssociation: productAssociation])
+        render(template: "dialog", model: [productAssociation: productAssociation, isFromProductEditPage: true])
     }
 
 
