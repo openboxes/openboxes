@@ -26,6 +26,7 @@ import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.api.FulfillmentStatusCode
 import util.ConfigHelper
 import util.StockMovementStatusResolver
 
@@ -551,13 +552,13 @@ class StockMovement implements Validateable{
      *
      * @return Map containing status metadata, or null if not applicable
      */
-    Map<String, String> getFulfillmentSummaryStatus() {
-        // Fulfillment summary status is only applicable to requisition-based movements
+    Map<String, String> getFulfillmentStatus() {
+        // Fulfillment status is only applicable to requisition-based movements
         if (!requisition) {
             return null
         }
 
-        FulfillmentSummaryStatus status = FulfillmentStatusResolver.resolve(lineItems)
+        FulfillmentStatusCode status = FulfillmentStatusResolver.resolve(lineItems)
         return StockMovementStatusResolver.getStatusMetaData(status)
     }
 

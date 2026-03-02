@@ -3,14 +3,14 @@ package org.pih.warehouse.api
 import org.pih.warehouse.api.PickTaskStatus
 
 /**
- * Resolves the FulfillmentSummaryStatus based on stock movement line items.
+ * Resolves the FulfillmentStatusCode based on stock movement line items.
  * This logic is specific to Outbound Stock Movements to track the order lifecycle.
  */
 class FulfillmentStatusResolver {
 
-    static FulfillmentSummaryStatus resolve(List<StockMovementItem> items) {
+    static FulfillmentStatusCode resolve(List<StockMovementItem> items) {
         if (!items) {
-            return FulfillmentSummaryStatus.CREATED
+            return FulfillmentStatusCode.CREATED
         }
 
         // Pre-calculate shipped quantities for efficiency
@@ -18,57 +18,62 @@ class FulfillmentStatusResolver {
 
         // 1. CANCELLED - All items are fully canceled
         if (items.every { isCanceled(it) }) {
-            return FulfillmentSummaryStatus.CANCELLED
+            return FulfillmentStatusCode.CANCELLED
         }
 
         // 2. ISSUED - All items are either fully canceled or fully issued
         if (items.every { isCanceled(it) || isFullyIssued(it, shippedQuantities[it.id]) }) {
-            return FulfillmentSummaryStatus.ISSUED
+            return FulfillmentStatusCode.ISSUED
         }
 
         // 3. PARTIALLY_ISSUED - Some items are issued but not all
         if (items.any { isPartiallyIssued(it, shippedQuantities[it.id]) }) {
-            return FulfillmentSummaryStatus.PARTIALLY_ISSUED
+            return FulfillmentStatusCode.PARTIALLY_ISSUED
         }
 
-        // 4. BACK_ORDER - Some items shipped but others are unallocated
+        // 4. BACKORDERED - Some items shipped but others are unallocated
         boolean anyShipped = items.any { shippedQuantities[it.id] > 0 }
         boolean anyUnallocatedActive = items.any {
             !isCanceled(it) && !isFullyIssued(it, shippedQuantities[it.id]) && !hasAllocation(it)
         }
         if (anyShipped && anyUnallocatedActive) {
-            return FulfillmentSummaryStatus.BACK_ORDER
+            return FulfillmentStatusCode.BACKORDERED
         }
 
         // 5. STAGED - All items are either fully canceled or staged
         if (items.every { isCanceled(it) || isStaged(it) }) {
-            return FulfillmentSummaryStatus.STAGED
+            return FulfillmentStatusCode.STAGED
         }
 
         // 6. PARTIALLY_STAGED - Some items are staged but not all
         if (items.any { isPartiallyStaged(it) }) {
-            return FulfillmentSummaryStatus.PARTIALLY_STAGED
+            return FulfillmentStatusCode.PARTIALLY_STAGED
         }
 
         // 7. PICKED - All items are either fully canceled or fully picked
         if (items.every { isCanceled(it) || isFullyPicked(it) }) {
-            return FulfillmentSummaryStatus.PICKED
+            return FulfillmentStatusCode.PICKED
         }
 
-        // 8. PICKING - Any item is picked OR all items have allocation
+        // 8. PICKING - Any item is currently being picked
         boolean anyPicked = items.any { !isCanceled(it) && isPicked(it) }
+        if (anyPicked) {
+            return FulfillmentStatusCode.PICKING
+        }
+
+        // 9. ALLOCATED - All items have allocation but picking hasn't started
         boolean allHaveAllocation = items.every { isCanceled(it) || hasAllocation(it) }
-        if (anyPicked || allHaveAllocation) {
-            return FulfillmentSummaryStatus.PICKING
+        if (allHaveAllocation) {
+            return FulfillmentStatusCode.ALLOCATED
         }
 
-        // 9. PARTIALLY_ALLOCATED - Some items have allocation but not all
+        // 10. PARTIALLY_ALLOCATED - Some items have allocation but not all
         if (items.any { hasAllocation(it) }) {
-            return FulfillmentSummaryStatus.PARTIALLY_ALLOCATED
+            return FulfillmentStatusCode.PARTIALLY_ALLOCATED
         }
 
-        // 10. CREATED - Default state
-        return FulfillmentSummaryStatus.CREATED
+        // 11. CREATED - Default state
+        return FulfillmentStatusCode.CREATED
     }
 
     // Helpers

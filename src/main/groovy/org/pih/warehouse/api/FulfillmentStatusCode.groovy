@@ -1,11 +1,13 @@
 package org.pih.warehouse.api
 
-enum FulfillmentSummaryStatus {
+enum FulfillmentStatusCode {
     // Received, but not yet allocated
     CREATED,
     // Some items have allocation but not all
     PARTIALLY_ALLOCATED,
-    // Allocation complete, picking in progress
+    // Allocation complete, waiting for picking to start
+    ALLOCATED,
+    // Picking in progress
     PICKING,
     // Picking is complete for all items
     PICKED,
@@ -20,5 +22,5 @@ enum FulfillmentSummaryStatus {
     // All items in the movement were cancelled
     CANCELLED,
     // Partial fulfillment occurred, remaining quantity is unavailable
-    BACK_ORDER
+    BACKORDERED
 }
