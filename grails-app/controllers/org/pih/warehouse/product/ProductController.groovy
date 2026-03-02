@@ -212,7 +212,12 @@ class ProductController {
             if (!inventoryLevelInstance) {
                 inventoryLevelInstance = new InventoryLevel()
             }
-			[productInstance: productInstance, locationInstance: location, inventoryInstance: location.inventory, inventoryLevelInstance:inventoryLevelInstance]
+			[productInstance: productInstance,
+             locationInstance: location,
+             inventoryInstance: location.inventory,
+             inventoryLevelInstance:inventoryLevelInstance,
+             productAssociationInstance: chainModel?.productAssociationInstance
+            ]
         }
     }
 
