@@ -172,7 +172,7 @@ class ProductAssociationController {
                         chain(controller: "product", action: "edit", id: productAssociationInstance?.product?.id, model: [productAssociationInstance: productAssociationInstance])
                         return
                     }
-                    render(view: "create", model: [productAssociationInstance: productAssociationInstance])
+                    render(view: "edit", model: [productAssociationInstance: productAssociationInstance])
                     return
                 }
                 mutualAssociationInstance.save(flush: true, failOnError: true)
@@ -192,7 +192,7 @@ class ProductAssociationController {
                     chain(controller: "product", action: "edit", id: productAssociationInstance?.product?.id, model: [productAssociationInstance: productAssociationInstance])
                     return
                 }
-                render(view: "create", model: [productAssociationInstance: productAssociationInstance])
+                render(view: "edit", model: [productAssociationInstance: productAssociationInstance])
             }
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), params.id])}"
