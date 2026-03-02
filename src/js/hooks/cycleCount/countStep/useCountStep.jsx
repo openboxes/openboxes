@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import {
   getCurrentLocale,
   getCurrentLocationId,
@@ -8,7 +9,9 @@ import {
   getCycleCountRequestIds,
 } from 'selectors';
 
-import { fetchLotNumbersByProductIds, submitForm } from 'actions';
+import { clearCountWorkflow, fetchLotNumbersByProductIds, submitForm } from 'actions';
+import { CYCLE_COUNT } from 'consts/applicationUrls';
+import { TO_COUNT_TAB } from 'consts/cycleCount';
 import useCountStepValidation from 'hooks/cycleCount/countStep/useCountStepValidation';
 import useCycleCountFetchData from 'hooks/cycleCount/countStep/useCycleCountFetchData';
 import useCycleCountImport from 'hooks/cycleCount/countStep/useCycleCountImport';
@@ -21,6 +24,7 @@ const useCountStep = () => {
   const [isStepEditable, setIsStepEditable] = useState(true);
 
   const dispatch = useDispatch();
+  const history = useHistory();
   const currentLocationId = useSelector(getCurrentLocationId);
   const currentUserId = useSelector(getCurrentUserId);
   const cycleCountIds = useSelector(getCycleCountRequestIds);
@@ -99,6 +103,11 @@ const useCountStep = () => {
     dispatch(fetchLotNumbersByProductIds(uniqueProductIds));
   }, [validateExistenceOfCycleCounts, save, dispatch, uniqueProductIds]);
 
+  const handleBackToList = useCallback(() => {
+    dispatch(clearCountWorkflow);
+    history.push(CYCLE_COUNT.list(TO_COUNT_TAB));
+  }, [dispatch, history]);
+
   return useMemo(() => ({
     cycleCountIds,
     currentLocationId,
@@ -119,6 +128,7 @@ const useCountStep = () => {
     back,
     handleCountStepHeaderSave,
     resolveDiscrepancies,
+    handleBackToList,
 
     // Modal
     isAssignCountModalOpen,
@@ -138,6 +148,7 @@ const useCountStep = () => {
     back,
     handleCountStepHeaderSave,
     resolveDiscrepancies,
+    handleBackToList,
     isAssignCountModalOpen,
     closeAssignCountModal,
     assignCountModalData,

@@ -1,3 +1,4 @@
+import { isEqual, uniq } from 'lodash';
 import { getTranslate } from 'react-localize-redux';
 import { createSelector } from 'reselect';
 
@@ -285,14 +286,18 @@ export const makeGetCycleCountCountedBy = () =>
 export const getAllCycleCountProducts = createSelector(
   [getCountWorkflowEntities],
   (entities) => {
-    if (!entities) {
-      return [];
-    }
-
-    return Object.values(entities)
-      .flatMap((cc) => cc?.cycleCountItems || [])
-      .map((item) => item.product?.id)
-      .filter(Boolean);
+    if (!entities) return [];
+    return uniq(
+      Object.values(entities)
+        .flatMap((cc) => cc?.cycleCountItems || [])
+        .map((item) => item.product?.id)
+        .filter(Boolean),
+    );
+  },
+  {
+    memoizeOptions: {
+      resultEqualityCheck: isEqual,
+    },
   },
 );
 
