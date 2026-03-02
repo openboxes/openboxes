@@ -53,8 +53,6 @@ export default (Component) => {
 
     TdComponent = (props) => {
       const {
-        name,
-        rowIndex,
         className,
         style,
         onClick,
@@ -63,13 +61,11 @@ export default (Component) => {
         onKeyDown,
       } = props;
 
-      const testId = `cell-${rowIndex}-${name}`;
-
       return (
         <div
           role="button"
           tabIndex={0}
-          data-testid={testId}
+          data-testid="table-cell"
           className={`rt-td ${className}`}
           style={style}
           onClick={onClick}
