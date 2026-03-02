@@ -201,183 +201,215 @@ class SplitLineModal extends Component {
           className="modal-content-custom"
           shouldCloseOnOverlayClick={false}
         >
-          <div>
-            <h3 className="font-weight-bold">
-              <span>{this.props.putawayItem.product.productCode}</span>
-              <Tooltip
-                arrow="true"
-                delay="150"
-                duration="250"
-                hideDelay="50"
-                className="text-overflow-ellipsis"
-                disabled={this.props.putawayItem.product?.name
-                  === this.props.putawayItem.product?.displayNameOrDefaultName}
-                html={this.props.putawayItem.product?.name}
-              >
-                {' '}
-                {this.props.putawayItem.product.displayNameOrDefaultName}
-              </Tooltip>
-            </h3>
-            <div className="font-weight-bold" data-testid="expiration-date">
-              <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />
-              :
-              {
-                this.props.putawayItem.inventoryItem.expirationDate
-                  ? this.props.formatLocalizedDate(
-                    this.props.putawayItem.inventoryItem.expirationDate,
-                    DateFormat.COMMON,
-                  )
-                  : this.props.putawayItem.inventoryItem.expirationDate
-              }
-            </div>
-            <div className="font-weight-bold" data-testid="total-qty">
-              <Translate id="react.putAway.totalQty.label" defaultMessage="Total QTY" />
-              :
-              {this.props.putawayItem.quantity}
-            </div>
-            <div className="font-weight-bold" data-testid="putaway-qty">
-              <Translate id="react.putAway.putAwayQty.label" defaultMessage="Putaway QTY" />
-              :
-              {this.calculatePutAwayQty()}
-            </div>
-          </div>
-          <hr />
-
-          <div className="text-center">
-            <table className="table table-striped text-center border">
-              <thead>
-                <tr>
-                  <th aria-label="Putaway Bin" className="py-1"><Translate id="react.putAway.putAwayBin.label" defaultMessage="Putaway Bin" /></th>
-                  <th aria-label="Quantity" className="py-1"><Translate id="react.putAway.quantity.label" defaultMessage="Quantity" /></th>
-                  <th aria-label="Delete" className="py-1"><Translate id="react.default.button.delete.label" defaultMessage="Delete" /></th>
-                </tr>
-              </thead>
-              <tbody>
-                { _.map(this.state.splitItems, (item, index) => (
-                  !item.delete
-                && (
-                <tr
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={index}
+          <div
+            data-testid="split-line-modal"
+          >
+            <div>
+              <h3 className="font-weight-bold">
+                <span>{this.props.putawayItem.product.productCode}</span>
+                <Tooltip
+                  arrow="true"
+                  delay="150"
+                  duration="250"
+                  hideDelay="50"
+                  className="text-overflow-ellipsis"
+                  disabled={this.props.putawayItem.product?.name
+                    === this.props.putawayItem.product?.displayNameOrDefaultName}
+                  html={this.props.putawayItem.product?.name}
                 >
-                  <td className={`py-1 ${!_.get(item, 'putawayLocation.id') ? 'has-error align-middle' : 'align-middle'}`}>
-                    <Select
-                      dataTestId="bin-select"
-                      options={this.props.bins}
-                      valueKey="id"
-                      labelKey="name"
-                      value={item.putawayLocation}
-                      onChange={(value) => this.setState((prev) => ({
-                        splitItems: update(prev.splitItems, {
-                          [index]: {
-                            putawayLocation: { $set: value },
-                          },
-                        }),
-                      }))}
-                      className="select-xs"
-                    />
-                  </td>
-                  <td className="py-1 align-middle">
-                    <Tooltip
-                      html={this.getErrorMessage()}
-                      disabled={!this.isQuantityGreaterThanOriginalPutaway() && item.quantity > 0}
-                      theme="transparent"
-                      arrow="true"
-                      delay="150"
-                      duration="250"
-                      hideDelay="50"
+                  {' '}
+                  {this.props.putawayItem.product.displayNameOrDefaultName}
+                </Tooltip>
+              </h3>
+              <div className="font-weight-bold" data-testid="expiration-date">
+                <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />
+                :
+                {
+                  this.props.putawayItem.inventoryItem.expirationDate
+                    ? this.props.formatLocalizedDate(
+                      this.props.putawayItem.inventoryItem.expirationDate,
+                      DateFormat.COMMON,
+                    )
+                    : this.props.putawayItem.inventoryItem.expirationDate
+                }
+              </div>
+              <div className="font-weight-bold" data-testid="total-qty">
+                <Translate id="react.putAway.totalQty.label" defaultMessage="Total QTY" />
+                :
+                {this.props.putawayItem.quantity}
+              </div>
+              <div className="font-weight-bold" data-testid="putaway-qty">
+                <Translate id="react.putAway.putAwayQty.label" defaultMessage="Putaway QTY" />
+                :
+                {this.calculatePutAwayQty()}
+              </div>
+            </div>
+            <hr />
+
+            <div className="text-center">
+              <table className="table table-striped text-center border">
+                <thead>
+                  <tr>
+                    <th aria-label="Putaway Bin" className="py-1">
+                      <Translate
+                        id="react.putAway.putAwayBin.label"
+                        defaultMessage="Putaway Bin"
+                      />
+                    </th>
+                    <th aria-label="Quantity" className="py-1">
+                      <Translate
+                        id="react.putAway.quantity.label"
+                        defaultMessage="Quantity"
+                      />
+                    </th>
+                    <th aria-label="Delete" className="py-1">
+                      <Translate
+                        id="react.default.button.delete.label"
+                        defaultMessage="Delete"
+                      />
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {_.map(this.state.splitItems, (item, index) => (
+                    !item.delete
+                  && (
+                    <tr
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={index}
                     >
-                      <div className={this.isQuantityGreaterThanOriginalPutaway() || item.quantity <= 0 ? 'has-error' : ''}>
-                        <Input
-                          dataTestId="quantity-input"
-                          type="number"
-                          value={item.quantity}
+                      <td
+                        className={`py-1 ${!_.get(item, 'putawayLocation.id') ? 'has-error align-middle' : 'align-middle'}`}
+                      >
+                        <Select
+                          dataTestId="bin-select"
+                          options={this.props.bins}
+                          valueKey="id"
+                          labelKey="name"
+                          value={item.putawayLocation}
                           onChange={(value) => this.setState((prev) => ({
                             splitItems: update(prev.splitItems, {
-                              [index]: { quantity: { $set: value } },
+                              [index]: {
+                                putawayLocation: { $set: value },
+                              },
                             }),
                           }))}
+                          className="select-xs"
                         />
-                      </div>
-                    </Tooltip>
-                  </td>
-                  <td width="120px" className="py-1">
-                    <button
-                      data-testid="delete-button"
-                      type="button"
-                      className="btn btn-outline-danger btn-xs"
-                      onClick={() => {
-                        if (this.state.splitItems[index].id) {
-                          this.setState((prev) => ({
-                            splitItems: update(prev.splitItems, {
-                              [index]: { delete: { $set: true } },
-                            }),
-                          }));
-                        } else {
-                          this.setState((prev) => ({
-                            splitItems: update(prev.splitItems, {
-                              $splice: [
-                                [index, 1],
-                              ],
-                            }),
-                          }));
-                        }
-                      }}
-                    >
-                      <Translate id="react.default.button.delete.label" defaultMessage="Delete" />
-                    </button>
-                  </td>
-                </tr>
-                )
-                ))}
-              </tbody>
-            </table>
-            <button
-              type="button"
-              data-testid="add-line-button"
-              className="btn btn-outline-success btn-xs"
-              onClick={() => this.setState((prev) => ({
-                splitItems: update(prev.splitItems, {
-                  $push: [{
-                    quantity: '',
-                    putawayFacility: {
-                      id: this.props.putawayItem.putawayFacility
-                        ? this.props.putawayItem.putawayFacility.id : null,
-                    },
-                    putawayLocation: { id: null },
-                    product: { id: this.props.putawayItem.product.id },
-                    inventoryItem: { id: this.props.putawayItem.inventoryItem.id },
-                    currentLocation: {
-                      id: this.props.putawayItem.currentLocation
-                        ? this.props.putawayItem.currentLocation.id : null,
-                    },
-                  }],
-                }),
-              }))}
-            >
-              <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
-            </button>
-          </div>
+                      </td>
+                      <td className="py-1 align-middle">
+                        <Tooltip
+                          html={this.getErrorMessage()}
+                          disabled={
+                            !this.isQuantityGreaterThanOriginalPutaway() && item.quantity > 0
+                          }
+                          theme="transparent"
+                          arrow="true"
+                          delay="150"
+                          duration="250"
+                          hideDelay="50"
+                        >
+                          <div
+                            className={
+                              this.isQuantityGreaterThanOriginalPutaway() || item.quantity <= 0
+                                ? 'has-error'
+                                : ''
+                            }
+                          >
+                            <Input
+                              dataTestId="quantity-input"
+                              type="number"
+                              value={item.quantity}
+                              onChange={(value) => this.setState((prev) => ({
+                                splitItems: update(prev.splitItems, {
+                                  [index]: { quantity: { $set: value } },
+                                }),
+                              }))}
+                            />
+                          </div>
+                        </Tooltip>
+                      </td>
+                      <td width="120px" className="py-1">
+                        <button
+                          data-testid="delete-button"
+                          type="button"
+                          className="btn btn-outline-danger btn-xs"
+                          onClick={() => {
+                            if (this.state.splitItems[index].id) {
+                              this.setState((prev) => ({
+                                splitItems: update(prev.splitItems, {
+                                  [index]: { delete: { $set: true } },
+                                }),
+                              }));
+                            } else {
+                              this.setState((prev) => ({
+                                splitItems: update(prev.splitItems, {
+                                  $splice: [
+                                    [index, 1],
+                                  ],
+                                }),
+                              }));
+                            }
+                          }}
+                        >
+                          <Translate
+                            id="react.default.button.delete.label"
+                            defaultMessage="Delete"
+                          />
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                  ))}
+                </tbody>
+              </table>
+              <button
+                type="button"
+                data-testid="add-line-button"
+                className="btn btn-outline-success btn-xs"
+                onClick={() => this.setState((prev) => ({
+                  splitItems: update(prev.splitItems, {
+                    $push: [{
+                      quantity: '',
+                      putawayFacility: {
+                        id: this.props.putawayItem.putawayFacility
+                          ? this.props.putawayItem.putawayFacility.id : null,
+                      },
+                      putawayLocation: { id: null },
+                      product: { id: this.props.putawayItem.product.id },
+                      inventoryItem: { id: this.props.putawayItem.inventoryItem.id },
+                      currentLocation: {
+                        id: this.props.putawayItem.currentLocation
+                          ? this.props.putawayItem.currentLocation.id : null,
+                      },
+                    }],
+                  }),
+                }))}
+              >
+                <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
+              </button>
+            </div>
 
-          <hr />
-          <div className="btn-group float-right" role="group">
-            <button
-              data-testid="save-button"
-              type="button"
-              className="btn btn-outline-success btn-sm"
-              disabled={!this.isValid() || !this.isBinSelected()}
-              onClick={() => this.onSave()}
-            >
-              <Translate id="react.default.button.save.label" defaultMessage="Save" />
-            </button>
-            <button
-              data-testid="cancel-button"
-              type="button"
-              className="btn btn-outline-secondary btn-sm"
-              onClick={() => this.closeModal()}
-            >
-              <Translate id="react.default.button.cancel.label" defaultMessage="Cancel" />
-            </button>
+            <hr />
+            <div className="btn-group float-right" role="group">
+              <button
+                data-testid="save-button"
+                type="button"
+                className="btn btn-outline-success btn-sm"
+                disabled={!this.isValid() || !this.isBinSelected()}
+                onClick={() => this.onSave()}
+              >
+                <Translate id="react.default.button.save.label" defaultMessage="Save" />
+              </button>
+              <button
+                data-testid="cancel-button"
+                type="button"
+                className="btn btn-outline-secondary btn-sm"
+                onClick={() => this.closeModal()}
+              >
+                <Translate id="react.default.button.cancel.label" defaultMessage="Cancel" />
+              </button>
+            </div>
           </div>
         </Modal>
       </div>
