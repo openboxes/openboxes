@@ -33,20 +33,20 @@
 				<hr/>
 			</div>
 
-			<div class="action-menu-item">
+			<div class="action-menu-item" data-testid="view-details-item">
 				<g:link controller="order" action="show" id="${orderInstance?.id}">
 					<img src="${resource(dir:'images/icons/silk',file:'zoom.png')}" alt="Edit" style="vertical-align: middle" />
 					&nbsp;${warehouse.message(code: 'order.viewDetails.label')}
 				</g:link>
 			</div>
 			<g:if test="${orderInstance?.orderType != PURCHASE_ORDER || Location.load(session?.warehouse?.id).supports(ActivityCode.PLACE_ORDER)}">
-				<div class="action-menu-item">
+				<div class="action-menu-item" data-testid="add-comment-item">
 					<g:link controller="order" action="addComment" id="${orderInstance?.id}">
 						<img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />
 						&nbsp;${warehouse.message(code: 'order.addComment.label')}
 					</g:link>
 				</div>
-				<div class="action-menu-item">
+				<div class="action-menu-item" data-testid="add-document-item">
 					<g:link controller="order" action="addDocument" id="${orderInstance?.id}">
 						<img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />
 						&nbsp;${warehouse.message(code: 'order.addDocument.label')}
@@ -56,26 +56,26 @@
 			<g:if test="${orderInstance?.orderType == PURCHASE_ORDER}">
 				<g:supports activityCode="${ActivityCode.PLACE_ORDER}">
 					<g:if test="${orderInstance?.isPending()}">
-						<div class="action-menu-item">
+						<div class="action-menu-item" data-testid="edit-details-item">
 							<g:link controller="purchaseOrder" action="edit" id="${orderInstance?.id}" params="[id:orderInstance?.id]">
 								<img src="${resource(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" style="vertical-align: middle" />
 								&nbsp;${warehouse.message(code: 'order.editDetails.label')}
 							</g:link>
 						</div>
-						<div class="action-menu-item">
+						<div class="action-menu-item" data-testid="add-items-item">
 							<g:link controller="purchaseOrder" action="addItems" id="${orderInstance?.id}">
 								<img src="${resource(dir:'images/icons/silk',file:'add.png')}" alt="Add" style="vertical-align: middle" />
 								&nbsp;${warehouse.message(code: 'order.editItems.label')}
 							</g:link>
 						</div>
-						<div class="action-menu-item">
+						<div class="action-menu-item" data-testid="place-order-item">
 							<g:link controller="order" action="placeOrder" id="${orderInstance?.id}">
 								<img src="${resource(dir: 'images/icons/silk', file: 'cart.png')}" />
 								&nbsp;${warehouse.message(code: 'order.placeOrder.label')}
 							</g:link>
 						</div>
 					</g:if>
-					<div class="action-menu-item">
+					<div class="action-menu-item" data-testid="print-item">
 						<g:link target="_blank" controller="order" action="print" id="${orderInstance?.id}"
 								disabled="${orderInstance?.status < OrderStatus.PLACED}"
 								disabledMessage="Order must be placed in order to print.">
@@ -84,7 +84,7 @@
 						</g:link>
 					</div>
 					<g:if test="${orderInstance?.isPlaced()}">
-						<div class="action-menu-item">
+						<div class="action-menu-item" data-testid="withdraw-item">
 							<g:link controller="order" action="withdraw" id="${orderInstance?.id}" onclick="alert('${warehouse.message(code: 'default.button.notSupported.message', default: 'This feature is not currently supported.')}'); return false;">
 								<img src="${resource(dir: 'images/icons/silk', file: 'cart_delete.png')}" />
 								&nbsp;${warehouse.message(code: 'order.cancelOrder.label')}
@@ -94,7 +94,7 @@
 				</g:supports>
 			</g:if>
 			<g:elseif test="${orderInstance?.orderType == PUTAWAY_ORDER}">
-				<div class="action-menu-item">
+				<div class="action-menu-item" data-testid="generate-pdf-item">
 					<g:link controller="putAway" action="generatePdf" id="${orderInstance?.id}" target="_blank">
 						<img src="${resource(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>
 						<warehouse:message code="putaway.generatePutawayList.label" default="Generate Putaway List"/>
@@ -143,7 +143,7 @@
 			</g:if>
 			<g:elseif test="${orderInstance?.orderType == PUTAWAY_ORDER && orderInstance?.status != OrderStatus.COMPLETED}">
 				<g:isUserInRole roles="[RoleType.ROLE_ASSISTANT]">
-					<div class="action-menu-item">
+					<div class="action-menu-item" data-testid="delete-order-item">
 						<g:link controller="order" action="remove" id="${orderInstance?.id}"
 								disabled="${orderInstance?.status != OrderStatus.PENDING}"
 								disabledMessage="${g.message(code: 'order.errors.delete.message')}"

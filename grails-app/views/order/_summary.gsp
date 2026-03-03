@@ -26,7 +26,7 @@
 						</div>
                     </td>
                     <td class="top right" width="1%">
-                        <div class="tag tag-alert">
+                        <div class="tag tag-alert" data-testid="status">
                             <span class="${orderInstance?.id}">${g.message(code: 'default.loading.label')}</span>
                         </div>
                     </td>
