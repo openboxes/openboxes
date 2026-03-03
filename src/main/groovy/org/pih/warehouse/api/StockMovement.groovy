@@ -168,7 +168,7 @@ class StockMovement implements Validateable{
             description         : description,
             statusCode          : statusCode,
             displayStatus       : displayStatus,
-            fulfillmentSummaryStatus : fulfillmentSummaryStatus,
+            fulfillmentStatus : fulfillmentStatus,
             identifier          : identifier,
             origin              : [
                 id                  : origin?.id,

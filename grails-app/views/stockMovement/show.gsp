@@ -342,13 +342,13 @@
                                 ${stockMovement?.displayStatus?.label}
                             </td>
                         </tr>
-                        <g:if test="${stockMovement?.fulfillmentSummaryStatus}">
+                        <g:if test="${stockMovement?.fulfillmentStatus}">
                             <tr class="prop">
                                 <td class="name">
-                                    <warehouse:message code="stockMovement.fulfillmentSummaryStatus.label" default="Fulfillment Status"/>
+                                    <warehouse:message code="stockMovement.fulfillmentStatus.label" default="Fulfillment Status"/>
                                 </td>
                             <td class="value">
-                                ${stockMovement?.fulfillmentSummaryStatus?.label}
+                                ${stockMovement?.fulfillmentStatus?.label}
                             </td>
                             </tr>
                         </g:if>
