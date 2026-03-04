@@ -44,7 +44,6 @@ class ShipmentController {
     def barcodeService
     def sessionFactory
     DocumentService documentService
-    ShipmentEventManager shipmentEventManager
 
     def redirect() {
         redirect(controller: "shipment", action: "showDetails", id: params.id)
@@ -121,8 +120,7 @@ class ShipmentController {
             def eventType = EventType.get(params.eventType.id)
             if (eventType) {
                 def shipmentEvent = new Event(eventType: eventType, eventLocation: session.warehouse, eventDate: new Date())
-                shipmentEventManager.createEvent(shipmentInstance, shipmentEvent)
-                shipmentInstance.save(flush: true)
+                shipmentInstance.addToEvents(shipmentEvent).save(flush: true)
             }
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
             redirect(action: "showDetails", id: shipmentInstance.id)
@@ -942,7 +940,8 @@ class ShipmentController {
         def event = Event.get(params.id)
         def shipment = Shipment.get(params.shipmentId)
         if (shipment && event) {   // not allowed to delete a "created" event
-            shipmentEventManager.rollbackEvent(shipment, event)
+            shipment.removeFromEvents(event)
+            event.delete()
             shipment.save()
             flash.message = "${warehouse.message(code: 'shipping.deletedEventFromShipment.message', args: [params.id])}"
         } else {
@@ -1038,8 +1037,7 @@ class ShipmentController {
         if (params.eventId) {
             eventInstance.save(flush: true)
         } else {
-            shipmentEventManager.createEvent(shipmentInstance, eventInstance)
-            shipmentInstance.save(flush: true)
+            shipmentInstance.addToEvents(eventInstance).save(flush: true)
         }
 
         // Redirect to the page from where the request came

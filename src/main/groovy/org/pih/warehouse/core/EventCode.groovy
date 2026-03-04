@@ -9,64 +9,72 @@
  **/
 package org.pih.warehouse.core
 
-/**
- * Represents a particular category of {@link Event} that can occur during the course of a state-changing operation.
- *
- * EventCodes should be broad, categorical, and general purpose. Custom, feature-specific types of events should be
- * created as an {@Link EventType} so that the system remains flexible to a dynamic range of use cases.
- */
 enum EventCode {
 
-    CREATED(true),
-    SCHEDULED(false),
-    PICKED(false),
-    PACKED(false),
-    STAGING(false),
-    LOADING(false),
-    SHIPPED(true),
-    IN_TRANSIT(false),
-    CUSTOMS_ENTRY(false),
-    CUSTOMS_HOLD(false),
-    CUSTOMS_RELEASE(false),
-    DELIVERED(false),
-    RECEIVED(true),
-    PARTIALLY_RECEIVED(true),
-    CANCELLED(false),
-    PENDING_APPROVAL(true),
-    APPROVED(true),
-    REJECTED(true),
-    SUBMITTED(true),
+    CREATED,
+    SCHEDULED,
+    PICKED,
+    PACKED,
+    STAGING,
+    LOADING,
+    SHIPPED,
+    IN_TRANSIT,
+    CUSTOMS_ENTRY,
+    CUSTOMS_HOLD,
+    CUSTOMS_RELEASE,
+    DELIVERED,
+    RECEIVED,
+    PARTIALLY_RECEIVED,
+    CANCELLED,
+    PENDING_APPROVAL,
+    APPROVED,
+    REJECTED,
+    SUBMITTED
 
-    /**
-     * Returns true if the event code represents a system event, meaning there is internal functionality built
-     * into the app relating to it. As such, triggering this event likely changes state in the app.
-     */
-    boolean isSystemEvent
 
-    EventCode(boolean isSystemEvent) {
-        this.isSystemEvent = isSystemEvent
-    }
-
-    /**
-     * Returns true if the event code represents a custom event, meaning there is no in-app functionality built
-     * around it. The event is purely a label representing some state change that is managed outside of the app.
-     */
-    boolean isCustomEvent() {
-        return !isSystemEvent
-    }
-
-    static List<EventCode> listCustomEventTypeCodes() {
-        return values().findAll { it.isCustomEvent() }
-    }
-
-    static List<EventCode> listReceiptEventTypeCodes() {
-        return [
-                PARTIALLY_RECEIVED,
-                RECEIVED,
+    static list() {
+        [
+            SCHEDULED,
+            SHIPPED,
+            IN_TRANSIT,
+            CUSTOMS_ENTRY,
+            CUSTOMS_HOLD,
+            CUSTOMS_RELEASE,
+            DELIVERED,
+            RECEIVED,
+            PARTIALLY_RECEIVED,
+            CANCELLED,
+            PENDING_APPROVAL,
+            APPROVED,
+            REJECTED,
+            SUBMITTED
         ]
     }
 
-    boolean isReceiptEvent() {
-        return listReceiptEventTypeCodes().contains(this)
+    static listInTransit() {
+        [SHIPPED, IN_TRANSIT, CUSTOMS_ENTRY, CUSTOMS_HOLD, CUSTOMS_RELEASE]
     }
+
+    static listPending() {
+        [SCHEDULED]
+    }
+
+    static List<EventCode> listSystemEventTypeCodes() {
+        return [
+            CREATED,
+            SHIPPED,
+            RECEIVED,
+            PARTIALLY_RECEIVED,
+            REJECTED,
+            SUBMITTED,
+            PENDING_APPROVAL,
+            APPROVED
+        ]
+    }
+
+    static List<EventCode> listCustomEventTypeCodes() {
+        return values() - listSystemEventTypeCodes()
+    }
+
 }
+

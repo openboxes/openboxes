@@ -9,28 +9,16 @@
  **/
 package org.pih.warehouse.core
 
+
 /**
- * Represents a state-altering Event on some entity or system.
+ * Represents a particular Event of interest during the course of a Shipment
+ * Examples might be:
  *
- * The Event table is feature-agnostic, and so it is left to the individual features to determine what specific events
- * (as defined in {@link EventType}) are worthy of an entry in this table.
- *
- * Generally, Events are meant to track changes to the state of a system (ex: receiving a shipment) and are NOT meant
- * to be a full audit/event log (ex: changing the recipient of a shipment will not create an Event). If you need a
- * full audit log, use Event in combination with {@link org.pih.warehouse.core.history.EventLog}.
- *
- * Additionally, we only store a single Event per EventType/state change. For example, if a receipt rollback occurs,
- * the Event associated with that receipt will be deleted. As such, the Event table can be viewed as a means to document
- * the "active" state changes of some system. This makes it a useful tool for standardizing and simplifying how we store
- * and calculate system state, but should NOT be used to determine historical state changes, especially when state is
- * non-linear (ie if we allow state to be rolled back).
- *
- * Example Events for a Shipment might be:
- * - Shipment is created in Boston on Jan 1 -> [eventDate: 2025-01-01, eventLocation: Boston, eventType: CREATED]
- * - Shipment departs from Boston on Jan 2  -> [eventDate: 2025-01-02, eventLocation: Boston, eventType: SHIPPED]
- * - Shipment arrives at X Depot on Jan 20  -> [eventDate: 2025-01-20, eventLocation: X Depot, eventType: RECEIVED]
- */
-class Event implements Comparable, Serializable {
+ *  Shipment #1 Departed from Boston on 1/1/2010:
+ *{eventDate: 1/1/2010, eventLocation: Boston, eventType: SHIPPED}*
+ *  Shipment #2 Arrived at Customs on 5/5/2010:
+ *{eventDate: 5/5/2010, eventLocation: Customs, eventType: ARRIVED}*/
+class Event implements Comparable, Serializable, Historizable {
 
     String id
     Date eventDate                // The date and time on which the Event occurred
@@ -45,12 +33,35 @@ class Event implements Comparable, Serializable {
         id generator: 'uuid'
     }
 
+
     static constraints = {
         eventDate(nullable: true)
         eventType(nullable: true)
         eventLocation(nullable: true)
         createdBy(nullable: true)
         comment(nullable: true)
+    }
+
+    @Override
+    ReferenceDocument getReferenceDocument() {
+        return new ReferenceDocument(
+                label: eventType?.description,
+                id: id,
+                identifier: id,
+        )
+    }
+
+    @Override
+    List<HistoryItem<Event>> getHistory() {
+        HistoryItem<Event> historyItem = new HistoryItem<>(
+                date: eventDate,
+                location: eventLocation,
+                eventType: eventType?.toDto(),
+                comment: comment,
+                createdBy: createdBy,
+                referenceDocument: getReferenceDocument()
+        )
+       return [historyItem]
     }
 
     String toString() { return "$eventType $eventLocation on $eventDate" }
@@ -64,15 +75,6 @@ class Event implements Comparable, Serializable {
             diff = obj?.dateCreated <=> dateCreated
         }
         return diff
-    }
-
-    @Override
-    boolean equals(Object obj) {
-        if (!(obj instanceof Event)) {
-            return false
-        }
-
-        return this.id == obj.id
     }
 
     Map toJson() {

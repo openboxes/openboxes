@@ -17,7 +17,9 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
@@ -41,7 +43,6 @@ import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentEventManager
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
@@ -52,7 +53,6 @@ class FulfillmentService {
     TransactionIdentifierService transactionIdentifierService
     RequisitionIdentifierService requisitionIdentifierService
     ProductAvailabilityService productAvailabilityService
-    ShipmentEventManager shipmentEventManager
 
     /**
      * Adds a fulfillment item to a fulfillment object and saves the parent.
@@ -328,9 +328,19 @@ class FulfillmentService {
 
     void sendShipment(Shipment shipment) {
         shipment.requisition.status = RequisitionStatus.ISSUED
+        EventType eventType = EventType.findByEventCode(EventCode.SHIPPED)
 
-        shipmentEventManager.createEvent(
-                shipment, shipment.expectedShippingDate, EventCode.SHIPPED, AuthService.currentLocation)
+        Event shippedEvent = new Event(
+                createdBy: AuthService.currentUser,
+                eventType: eventType,
+                eventDate: shipment.expectedShippingDate,
+                eventLocation: AuthService.currentLocation,
+        )
+        if (!shippedEvent.validate()) {
+            throw new ValidationException("Invalid event", shippedEvent.errors)
+        }
+        shipment.addToEvents(shippedEvent)
+        shippedEvent.save()
 
         Holders.grailsApplication.mainContext.publishEvent(new ShipmentStatusTransitionEvent(shipment, ShipmentStatusCode.SHIPPED))
     }
