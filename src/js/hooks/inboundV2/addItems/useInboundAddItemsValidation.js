@@ -54,14 +54,26 @@ const useInboundAddItemsV2Validation = () => {
       path: ['expirationDate'],
     })
     .refine(
-      (data) => !data.product?.lotAndExpiryControl || Boolean(data.expirationDate),
+      (data) => {
+        // If product has lot and expiry control, it has to have the expiration date filled
+        if (data.product?.lotAndExpiryControl) {
+          return Boolean(data.expirationDate);
+        }
+        return true;
+      },
       {
         message: translate('react.stockMovement.error.lotAndExpiryControl.label', 'Both lot number and expiry date are required for this item.'),
         path: ['expirationDate'],
       },
     )
     .refine(
-      (data) => !data.product?.lotAndExpiryControl || Boolean(data.lotNumber),
+      (data) => {
+        // If product has lot and expiry control, it has to have the lotNumber filled
+        if (data.product?.lotAndExpiryControl) {
+          return Boolean(data.lotNumber);
+        }
+        return true;
+      },
       {
         message: translate('react.stockMovement.error.lotAndExpiryControl.label', 'Both lot number and expiry date are required for this item.'),
         path: ['lotNumber'],
