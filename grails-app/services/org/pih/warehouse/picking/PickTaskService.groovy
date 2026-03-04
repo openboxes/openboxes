@@ -6,6 +6,7 @@ import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.PickTaskStatus
+import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.picking.SearchPickTaskCommand
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.DeliveryTypeCode
@@ -23,6 +24,7 @@ import org.pih.warehouse.picklist.PicklistService
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.shipping.Shipment
 
 @Transactional
 class PickTaskService {
@@ -244,6 +246,12 @@ class PickTaskService {
 
             if (allTasksStaged) {
                 requisition.status = RequisitionStatus.STAGED
+
+                if (!requisition.shipment) {
+                    StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
+                    Shipment shipment = stockMovementService.createShipment(stockMovement)
+                    stockMovementService.createMissingShipmentItems(requisition, shipment)
+                }
             }
         }
 
