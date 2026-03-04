@@ -1,4 +1,9 @@
-import { useCallback, useMemo, useState } from 'react';
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -27,13 +32,16 @@ const useCountStep = () => {
   const history = useHistory();
   const currentLocationId = useSelector(getCurrentLocationId);
   const currentUserId = useSelector(getCurrentUserId);
-  const cycleCountIds = useSelector(getCycleCountRequestIds);
+  // Read only once on mount - locationId changes should not update cycleCountIds.
+  // If user changes location during counting, we keep showing the same count form
+  // until they navigate back to the list and start a new count.
+  const cycleCountIds = useRef(useSelector(getCycleCountRequestIds));
   const locale = useSelector(getCurrentLocale);
 
   // 1. Data Fetching
   const { uniqueProductIds } = useCycleCountFetchData(
     currentLocationId,
-    cycleCountIds,
+    cycleCountIds.current,
     sortByProductName,
     isStepEditable,
   );
@@ -50,7 +58,7 @@ const useCountStep = () => {
     setIsSaveDisabled,
   } = useCycleCountPersistence(
     currentLocationId,
-    cycleCountIds,
+    cycleCountIds.current,
     sortByProductName,
     currentUserId,
     locale,
@@ -109,7 +117,7 @@ const useCountStep = () => {
   }, [dispatch, history]);
 
   return useMemo(() => ({
-    cycleCountIds,
+    cycleCountIds: cycleCountIds.current,
     currentLocationId,
 
     // State
