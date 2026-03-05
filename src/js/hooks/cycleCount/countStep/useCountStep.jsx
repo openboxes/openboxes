@@ -1,8 +1,9 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import {
+  getCountWorkflowEntityIds,
   getCurrentLocale,
   getCurrentLocationId,
   getCurrentUserId,
@@ -27,7 +28,26 @@ const useCountStep = () => {
   const history = useHistory();
   const currentLocationId = useSelector(getCurrentLocationId);
   const currentUserId = useSelector(getCurrentUserId);
-  const cycleCountIds = useSelector(getCycleCountRequestIds);
+
+  /** TODO: While improving the performance, we introduced a separate reducer for count workflow,
+   *  but we kept using requestIds as source of truth for cycle count ids in count step,
+   *  however when we click sort alphabetically, we update the new reducer's data
+   *  via FETCH_CYCLE_COUNTS action,
+   *  while the requestIds stays untouched, hence the sorted cycle counts were not used.
+   *  For now, we still need requestIds for the initial load of count step,
+   *  but we should consider removing it in the future.
+   */
+  const countWorkflowIds = useSelector(getCountWorkflowEntityIds, shallowEqual);
+  // TODO: Technically those are not requestIds, but cycleCountIds,
+  // we should consider renaming it in the future to avoid confusion
+  // requestIds are used on the all products tab, before starting the count.
+  const requestIds = useSelector(getCycleCountRequestIds);
+  // For the count step, we want to use the ids from the new reducer ,
+  // to reflect the sorting and other updates but if those ids are not available
+  // (e.g. on the initial load), we can make a fallback to requestIds.
+  // When two of them are available, both should return the same ids, just in different order.
+  const cycleCountIds = countWorkflowIds?.length ? countWorkflowIds : requestIds;
+
   const locale = useSelector(getCurrentLocale);
 
   // 1. Data Fetching

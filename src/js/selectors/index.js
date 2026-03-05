@@ -250,6 +250,11 @@ export const getCountWorkflowEntities = createSelector(
   (wf) => wf?.entities,
 );
 
+export const getCountWorkflowEntityIds = createSelector(
+  getCountWorkflowEntities,
+  (entities) => (entities ? Object.keys(entities) : []),
+);
+
 export const getCountWorkflowEntityById = createSelector(
   getCountWorkflowEntities,
   (_, cycleCountId) => cycleCountId,
