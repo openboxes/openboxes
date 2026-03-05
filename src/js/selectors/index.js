@@ -233,13 +233,6 @@ export const getShipmentTypes = (state) => state.stockMovementCommon.shipmentTyp
 export const getLotNumbersByProductId = (state, productId) =>
   getLotNumbersWithExpiration(state)?.[productId] || [];
 
-export const makeGetLotNumbersByProductId = () =>
-  createSelector(
-    [getLotNumbersWithExpiration],
-    (_, productId) => productId,
-    (lotNumbers, productId) => lotNumbers?.[productId] || [],
-  );
-
 /**
  * COUNT WORKFLOW
  */
