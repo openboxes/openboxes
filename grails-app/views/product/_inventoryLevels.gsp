@@ -28,6 +28,7 @@
                 <th class="center border-right"><warehouse:message code="default.maximum.label" default="Maximum"/></th>
                 <th class="center"><warehouse:message code="inventoryLevel.forecastQuantity.label"/></th>
                 <th class="center border-right"><warehouse:message code="inventoryLevel.forecastPeriodDays.label"/></th>
+                <th class="center border-right"><warehouse:message code="inventoryLevel.cycleCountFrequencyDays.label" /></th>
                 <th class="center"><warehouse:message code="default.comments.label"/></th>
                 <th class="center"><warehouse:message code="default.lastUpdated.label"/></th>
                 <th><warehouse:message code="default.actions.label"/></th>
@@ -94,6 +95,10 @@
                         ${inventoryLevelInstance?.forecastPeriodDays?:0 }
                         ${warehouse.message(code:'default.days.label')}
                     </td>
+                    <td class="center middle border-right">
+                        ${inventoryLevelInstance?.cycleCountFrequencyDays?:0 }
+                        ${warehouse.message(code:'default.days.label')}
+                    </td>
                     <td class="center middle">
                         ${inventoryLevelInstance?.comments }
                     </td>
@@ -111,7 +116,7 @@
             </g:each>
             <g:unless test="${productInstance?.inventoryLevels}">
                 <tr>
-                    <td colspan="15" class="center">
+                    <td colspan="16" class="center">
                         <div class="empty center">
                             <warehouse:message code="product.hasNoInventoryLevels.label" default="There are no stock levels"/>
                         </div>
@@ -121,7 +126,7 @@
             </tbody>
             <tfoot>
             <tr class="prop">
-                <td colspan="15" class="center">
+                <td colspan="16" class="center">
 
                     <a href="javascript:void(0);" class="button btn-show-dialog"
                        data-title="${warehouse.message(code:'inventoryLevel.create.label', default: 'Create stock level')}" data-width="900" data-height="500"
