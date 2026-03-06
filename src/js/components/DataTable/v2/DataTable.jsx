@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import PropTypes from 'prop-types';
 
 import DataTableBody from 'components/DataTable/v2/DataTableBody';
@@ -12,13 +11,12 @@ import useWindowWidthCheck from 'hooks/useWindowWidthCheck';
 import 'react-table/react-table.css';
 import 'components/DataTable/DataTable.scss';
 
-// To enable virtualization of the table the "virtualize" object should be passed.
+// To enable row virtualization pass the `virtualize` config object:
 // virtualize: {
 //    enabled: true/false - ability to dynamically turn on/off virtualization
-//    customRowsHeight: true/false - if true, the height of rows will be recalculated
-//                      while scrolling, it has worse performance than hardcoded
-//                      row height
-//    estimatedSize: number - this value is required even if the customRowsHeight is
+//    minSize: number - minimum number of rows required to enable virtualization.
+//              Virtualization will be enabled only when enabled === true and dataLength >= minSize.
+//    estimateSize: number - this value is required even if the customRowsHeight is
 //                   set to true. The value should be set to the average height of the
 //                   row to ensure that any issues won't be seen before attaching the
 //                   ResizeObserver to the browser.
@@ -26,6 +24,9 @@ import 'components/DataTable/DataTable.scss';
 //                       Increasing this number will increase the amount of time it takes
 //                       to render the virtualizer, but might decrease the likelihood of seeing
 //                       slow-rendering blank items
+//    customRowsHeight: true/false - if true, the height of rows will be recalculated
+//                      while scrolling, it has worse performance than hardcoded
+//                      row height
 // }
 const DataTable = ({
   columns,
@@ -57,14 +58,6 @@ const DataTable = ({
     filterParams,
   });
 
-  const tableVirtualizer = virtualize.enabled
-    ? useWindowVirtualizer({
-      count: data?.length || 0,
-      estimateSize: () => virtualize.estimatedSize,
-      overscan: virtualize.overscan,
-    })
-    : {};
-
   const shouldDisplayPagination = Boolean(data?.length && !loading) && !disablePagination;
 
   const isScreenWiderThanTable = useWindowWidthCheck(table.getTotalSize());
@@ -80,9 +73,7 @@ const DataTable = ({
             emptyTableMessage={emptyTableMessage}
           />
           <DataTableBody
-            tableVirtualizer={tableVirtualizer}
-            isVirtualizationEnabled={virtualize.enabled}
-            isCustomRowsHeightEnabled={virtualize.customRowsHeight}
+            virtualize={virtualize}
             emptyTableMessage={emptyTableMessage}
             loadingMessage={loadingMessage}
             defaultLoadingTableMessage={defaultLoadingTableMessage}
@@ -133,9 +124,10 @@ DataTable.propTypes = {
   tableWithPinnedColumns: PropTypes.bool,
   virtualize: PropTypes.shape({
     enabled: PropTypes.bool,
-    customRowsHeight: PropTypes.bool,
-    estimatedSize: PropTypes.number,
+    minSize: PropTypes.number,
+    estimateSize: PropTypes.number,
     overscan: PropTypes.number,
+    customRowsHeight: PropTypes.bool,
   }),
   overflowVisible: PropTypes.bool,
 };
@@ -152,9 +144,10 @@ DataTable.defaultProps = {
   tableWithPinnedColumns: false,
   virtualize: {
     enabled: false,
-    customRowsHeight: false,
-    estimatedSize: 50,
+    minSize: 20,
+    estimateSize: 50,
     overscan: 10,
+    customRowsHeight: false,
   },
   // it allows tooltips to overflow outside the table
   overflowVisible: false,

@@ -84,25 +84,24 @@ class ProductAssociationController {
     }
 
     def save() {
-        def productAssociationInstance = new ProductAssociation(params)
-        validateAssociation(productAssociationInstance)
+        ProductAssociation productAssociationInstance = new ProductAssociation(params)
+        if (params.hasMutualAssociation) {
+            ProductAssociation mutualAssociationInstance = new ProductAssociation()
+            bindMutualAssociationData(mutualAssociationInstance, params)
+
+            mutualAssociationInstance.mutualAssociation = productAssociationInstance
+            // Save the assocation before assigning it to the main instance, otherwise given the transaction commit that is proceeded in the controller
+            // the mutual association instance might not be assigned to the productAssociationInstance after rendering the view
+            mutualAssociationInstance.save(flush: true)
+            productAssociationInstance.mutualAssociation = mutualAssociationInstance
+        }
+        productAssociationInstance.validate()
         if (!productAssociationInstance.hasErrors() && productAssociationInstance.save(flush: true)) {
-            if (params.hasMutualAssociation) {
-                def mutualAssociationInstance = new ProductAssociation()
-                bindMutualAssociationData(mutualAssociationInstance, params)
-
-                mutualAssociationInstance.mutualAssociation = productAssociationInstance
-                productAssociationInstance.mutualAssociation = mutualAssociationInstance
-
-                mutualAssociationInstance.save(flush: true, failOnError: true)
-            }
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), productAssociationInstance.id])}"
-
             if (params.dialog) {
                 redirect(controller: "product", action: "edit", id: productAssociationInstance?.product?.id)
                 return
             }
-
             redirect(controller: "product", action: "edit", id: productAssociationInstance?.product?.id)
         } else {
             render(view: "create", model: [productAssociationInstance: productAssociationInstance])
@@ -130,7 +129,7 @@ class ProductAssociationController {
     }
 
     def update() {
-        def productAssociationInstance = ProductAssociation.get(params.id)
+        ProductAssociation productAssociationInstance = ProductAssociation.get(params.id)
         if (productAssociationInstance) {
             if (params.version) {
                 def version = params.version.toLong()
@@ -154,6 +153,20 @@ class ProductAssociationController {
                 }
 
                 bindMutualAssociationData(mutualAssociationInstance, params)
+                if (!mutualAssociationInstance.validate()) {
+                    // Add mutual association errors to the main association so they can be displayed in the same view
+                    mutualAssociationInstance.errors.allErrors.each { error ->
+                        productAssociationInstance.errors.addError(error)
+                    }
+                    // Re-read product association to reset any changes made to it before rendering the view
+                    // TODO: This all logic should be moved to a transactional service, as having it in the controller which is transactional
+                    // causes the bug that even though we wouldn't update a productAssociationInstance, the rollback takes place after rendering the view
+                    // Ideally the rollback should happen in the service so that when the instance comes back to the controller, all the dirty fields
+                    // are reset to the original values and we don't have to manually refresh the instance here
+                    productAssociationInstance.refresh()
+                    render(view: "edit", model: [productAssociationInstance: productAssociationInstance])
+                    return
+                }
                 mutualAssociationInstance.save(flush: true, failOnError: true)
             } else if (productAssociationInstance.mutualAssociation && !params.hasMutualAssociation) {
                 mutualAssociationInstance = productAssociationInstance.mutualAssociation
@@ -162,7 +175,6 @@ class ProductAssociationController {
             }
 
             productAssociationInstance.properties = params
-            validateAssociation(productAssociationInstance)
             if (!productAssociationInstance.hasErrors() && productAssociationInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), productAssociationInstance.id])}"
                 redirect(controller: "product", action: "edit", id: productAssociationInstance?.product?.id)
@@ -238,19 +250,5 @@ class ProductAssociationController {
         mutualAssociation.comments = params.comments
     }
 
-    void validateAssociation(ProductAssociation productAssociation) {
-        // associate to itself
-        if (productAssociation.product?.id == productAssociation.associatedProduct?.id) {
-            productAssociation.errors.reject("Cannot associate a product with itself")
-        }
-        // duplicates
-        List<ProductAssociation> foundProductAssociations = ProductAssociation.findAllWhere([
-                product             : productAssociation.product,
-                associatedProduct   : productAssociation.associatedProduct,
-                code                : productAssociation.code,
-        ])
-        if (foundProductAssociations && foundProductAssociations.size() > 0) {
-            productAssociation.errors.reject("Association with given parameters already exists")
-        }
-    }
+
 }

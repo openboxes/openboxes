@@ -14,6 +14,13 @@
     .sortable tr { margin: 0 5px 5px 5px; padding: 5px; font-size: 1.2em; height: 1.5em; }
     html>body .sortable li { height: 1.5em; line-height: 1.2em; }
     .ui-state-highlight { height: 1.5em; line-height: 1.2em; }
+    /*
+      There are two classes indicating errors, to avoid clearing error highlights from the table when user changes
+      product selection in the new line. line-error class is for existing lines with duplicated products,
+      and new-line-error is for the new line with duplicated product selection.
+    */
+    .line-error, .new-line-error { background-color: rgba(255, 0, 0, 0.31) !important; }
+    #add-requisition-item:disabled { cursor: not-allowed;}
     </style>
 </head>
 <body>
@@ -121,7 +128,7 @@
                         </tbody>
                         <tfoot>
                             <g:isUserAdmin>
-                                <tr class="prop">
+                                <tr class="prop" id="new-row">
                                     <g:if test="${requisition.replenishmentTypeCode == ReplenishmentTypeCode.PULL}">
                                         <td></td>
                                         <td>
@@ -191,10 +198,61 @@
     </div>
 </div>
 <script>
+  function getDuplicateProductIndexes(table, productId) {
+    const data = table.fnGetData();
+
+    return data.reduce((duplicates, currentRow, index) => {
+      if (currentRow?.product?.id === productId) {
+        return [...duplicates, index];
+      }
+      return duplicates;
+    }, [])
+  }
+
+  function validate(table) {
+    const selectedProductId = $("#product-id").val();
+    const addButton = $("#add-requisition-item");
+
+    $(table.fnGetNodes()).removeClass('new-line-error');
+
+    if (!selectedProductId) {
+      $("#new-row").removeClass("new-line-error");
+      addButton.prop("disabled", false);
+      addButton.prop("title", "");
+      return;
+    }
+
+    const duplicates = getDuplicateProductIndexes(table, selectedProductId);
+
+    if (duplicates.length > 0) {
+      $("#new-row").addClass("new-line-error");
+      addButton.prop("disabled", true);
+      addButton.prop(
+        "title",
+        "${g.message(code: 'requisitionTemplate.duplicatedLine.error.label', default: 'Item already exists in the stocklist')}"
+      );
+
+      duplicates.forEach(index => {
+        $(table.fnGetNodes()[index]).addClass('new-line-error');
+      });
+    } else {
+      $("#new-row").removeClass("new-line-error");
+      addButton.prop("disabled", false);
+      addButton.prop("title", "");
+    }
+  }
+
     $(document).ready(function() {
         var columns = [];
         const replenishmentType = $("#replenishmentTypeCode").val();
         const pullType = $("#pullType").val();
+
+      // When user selects product in the dropdown, we want to check if this product already exists in the table.
+      // If it does, we will display error message and highlight all lines with duplicated product.
+      // When user changes selection, we want to remove error message and highlights from previously duplicated lines.
+      $("#product-id").on("change", function () {
+        validate(table);
+      });
 
         if (replenishmentType == pullType) {
             columns = [
@@ -258,6 +316,15 @@
             "aoColumns": columns,
             "bUseRendered": false,
             "fnRowCallback": function( nRow, aData) {
+              const isDuplicate = getDuplicateProductIndexes(table, aData?.product?.id).length > 1;
+              // Displaying error for duplicated products that are currently in the table.
+              // This can happen when user saved invalid line before that validation existed
+              if (isDuplicate) {
+                $(nRow).addClass('line-error');
+              } else {
+                $(nRow).removeClass('line-error');
+              }
+
                 // If product is inactive, the row should be gray and have a tooltip with an information
                 if (!aData.product?.active) {
                   $(nRow)
@@ -291,6 +358,7 @@
                             dataType: "json",
                             success: function() {
                                 table.fnDeleteRow(nRow);
+                                validate(table);
                             },
                             error: handleAjaxError
                         });

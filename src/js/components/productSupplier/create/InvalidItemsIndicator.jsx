@@ -5,7 +5,7 @@ import { RiCheckboxCircleLine } from 'react-icons/all';
 import { RiErrorWarningLine } from 'react-icons/ri';
 
 import Button from 'components/form-elements/Button';
-import useResetScrollbar from 'hooks/useResetScrollbar';
+import useScrollbar from 'hooks/useScrollbar';
 
 const invalidLinesButton = {
   Icon: RiErrorWarningLine,
@@ -40,14 +40,14 @@ const InvalidItemsIndicator = ({
     isFiltered,
   });
 
-  const { resetScrollbar } = useResetScrollbar({
+  const { scrollToTop } = useScrollbar({
     selector: '.rt-table',
   });
 
   useEffect(() => {
     if (!errorsCounter) {
       setIsFiltered(false);
-      resetScrollbar();
+      scrollToTop();
     }
   }, [errorsCounter]);
 

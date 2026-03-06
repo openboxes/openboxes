@@ -436,24 +436,25 @@ class Shipment implements Comparable, Serializable, Historizable<ShipmentHistory
      * Dynamically recomputes the current status of the shipment based on the shipment events that have occurred.
      */
     ShipmentStatus getStatus() {
-        Event event = getMostRecentSystemEvent()
-        switch(event?.eventType?.eventCode) {
-            case EventCode.SHIPPED:
-                return new ShipmentStatus(code      : ShipmentStatusCode.SHIPPED,
-                                            date    : event.eventDate,
-                                            location: this.origin)
-            case EventCode.PARTIALLY_RECEIVED:
-                return new ShipmentStatus(code      : ShipmentStatusCode.PARTIALLY_RECEIVED,
-                                            date    : event.eventDate,
-                                            location: this.destination)
-            case EventCode.RECEIVED:
-                return new ShipmentStatus(code      : ShipmentStatusCode.RECEIVED,
-                                            date    : event.eventDate,
-                                            location: this.destination)
-            default:
-                return new ShipmentStatus(code      : ShipmentStatusCode.PENDING,
-                                            date    : null,
-                                            location: null)
+        // TODO: we should set the status based on getMostRecentSystemEvent(), but there is a bug in the compareTo()
+        //       check in EventType that causes PARTIALLY_RECEIVED events to be before RECEIVED ones if they share the
+        //       same eventDate. Once that is fixed then we can refactor this method to use getMostRecentSystemEvent()
+        if (this.wasReceived()) {
+            return new ShipmentStatus([code    : ShipmentStatusCode.RECEIVED,
+                                       date    : this.getActualDeliveryDate(),
+                                       location: this.destination])
+        } else if (wasPartiallyReceived()) {
+            return new ShipmentStatus([code    : ShipmentStatusCode.PARTIALLY_RECEIVED,
+                                       date    : this.getActualDeliveryDate(),
+                                       location: this.destination])
+        } else if (this.hasShipped()) {
+            return new ShipmentStatus([code    : ShipmentStatusCode.SHIPPED,
+                                       date    : this.getActualShippingDate(),
+                                       location: this.origin])
+        } else {
+            return new ShipmentStatus([code    : ShipmentStatusCode.PENDING,
+                                       date    : null,
+                                       location: null])
         }
     }
 

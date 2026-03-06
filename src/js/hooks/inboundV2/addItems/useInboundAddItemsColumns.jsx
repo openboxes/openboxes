@@ -60,7 +60,7 @@ const useInboundAddItemsColumns = ({
     [debounceTime, minSearchLength],
   );
   const handleDelete = async (row) => {
-    if (getValues('currentLineItems').find((item) => item.id === row?.original?.itemId)) {
+    if (getValues('currentLineItems').find((item) => item.id && item.id === row?.original?.itemId)) {
       await removeSavedRow(row?.original?.itemId);
     }
     removeRow(row.index);
