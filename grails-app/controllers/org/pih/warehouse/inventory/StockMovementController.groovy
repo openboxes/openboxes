@@ -707,10 +707,6 @@ class StockMovementController {
         try {
             Requisition requisition = Requisition.get(params.id)
 
-            if (false) {
-                throw new ValidationException("Hold Until Complete (Allocation) for ${requisition?.requestNumber}")
-            }
-
             List<AllocationStrategy> strategyList = [AllocationStrategy.WAREHOUSE_FIRST]
             allocationService.allocate(requisition, AllocationMode.AUTO, strategyList)
             stockMovementService.updateRequisitionStatus(params.id, RequisitionStatus.PICKING)

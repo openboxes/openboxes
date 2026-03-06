@@ -38,6 +38,9 @@ class StockMovementItem {
     BigDecimal quantityShipped
     BigDecimal quantityAllocated
 
+    BigDecimal quantityBackordered
+    String backorderedReasonCode
+
     String unitOfMeasure
 
     // saved QOH in ward request
@@ -125,6 +128,8 @@ class StockMovementItem {
         quantityPicked(nullable: true)
         quantityCounted(nullable: true)
         quantityAllocated(nullable: true)
+        quantityBackordered(nullable: true)
+        backorderedReasonCode(nullable: true)
         statusCode(nullable: true)
         reasonCode(nullable: true)
         comments(nullable: true)
@@ -172,6 +177,8 @@ class StockMovementItem {
                 unitOfMeasure             : unitOfMeasure,
                 packsRequested            : packsRequested,
                 quantityRequired          : quantityRequired,
+                quantityBackordered       : quantityBackordered,
+                backorderedReasonCode                : backorderedReasonCode,
                 reasonCode                : reasonCode,
                 comments                  : comments,
                 recipient                 : recipient,
@@ -264,6 +271,8 @@ class StockMovementItem {
                 quantityRevised: requisitionItem.calculateQuantityRevised(),
                 quantityPicked: requisitionItem?.totalQuantityPicked(),
                 substitutionItems: substitutionItems,
+                quantityBackordered: requisitionItem.quantityBackordered,
+                backorderedReasonCode: requisitionItem.backorderedReasonCode,
                 reasonCode: requisitionItem.cancelReasonCode,
                 comments: requisitionItem.comment,
                 recipient: requisitionItem.recipient ?: requisitionItem?.parentRequisitionItem?.recipient,

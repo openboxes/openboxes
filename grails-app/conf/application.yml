@@ -549,6 +549,11 @@ openboxes:
             delayInMilliseconds: 1000
             bulkShipmentAutoReceipt: true
 
+        backorderReAllocationJob:
+            enabled: true
+            cronExpression: "0 */5 * * * ?" # every five minutes
+            delayInMilliseconds: 10000
+
     # LDAP configuration
     ldap:
         enabled: false

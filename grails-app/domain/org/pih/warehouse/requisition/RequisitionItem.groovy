@@ -846,7 +846,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                 isCompleted           : isCompleted(),
                 isApproved            : isApproved(),
                 isCanceled            : isCanceled(),
-                isBackordered         : isBacxkordered(),
+                isBackordered         : isBackordered(),
                 orderIndex            : orderIndex
         ]
     }
