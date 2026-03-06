@@ -12,7 +12,7 @@ const useInboundAddItemsV2Validation = () => {
       id: z.string(),
       value: z.string(),
       label: z.string(),
-      lotAndExpiryControl: z.boolean().optional(),
+      lotAndExpiryControl: z.boolean().optional().nullable(),
     }).optional().nullable(),
     lotNumber: z.string().optional(),
     expirationDate: z.string().optional().nullable(),

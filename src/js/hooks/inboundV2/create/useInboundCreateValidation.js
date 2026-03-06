@@ -44,6 +44,24 @@ const useInboundCreateValidation = () => {
     label: z.string(),
   }).optional().nullable();
 
+  const dateRequestedSchema = z
+    .string({
+      invalid_type_error: requiredFieldMessage,
+      required_error: requiredFieldMessage,
+    })
+    .refine((pickedDate) => validateFutureDateFns(pickedDate), {
+      message: translate('react.default.error.futureDate.label', 'The date cannot be in the future'),
+    })
+    .refine((pickedDate) => {
+      if (!pickedDate) {
+        return true;
+      }
+      const date = new Date(pickedDate);
+      return date.getFullYear() >= 2000;
+    }, {
+      message: translate('react.stockMovement.error.invalidDate.label', 'This date is invalid. Please enter a date after 2000.'),
+    });
+
   const validationSchema = () => z.object({
     description: z
       .string({
@@ -55,14 +73,7 @@ const useInboundCreateValidation = () => {
     destination: destinationSchema,
     stocklist: stocklistSchema,
     requestedBy: requestedBySchema,
-    dateRequested: z
-      .string({
-        invalid_type_error: requiredFieldMessage,
-        required_error: requiredFieldMessage,
-      })
-      .refine((pickedDate) => validateFutureDateFns(pickedDate), {
-        message: translate('react.default.error.futureDate.label', 'The date cannot be in the future'),
-      }),
+    dateRequested: dateRequestedSchema,
   });
 
   return {
