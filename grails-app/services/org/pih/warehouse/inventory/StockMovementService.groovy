@@ -1923,7 +1923,7 @@ class StockMovementService {
         requisitionItem.autoAllocated = isAutoAllocated
 
         // Remove from picklist
-        if (quantityPicked == null) {
+        if (quantityPicked == null && quantityToPick == null) {
             picklist.removeFromPicklistItems(picklistItem)
         }
         // Populate picklist item
@@ -1937,7 +1937,7 @@ class StockMovementService {
             picklistItem.inventoryItem = inventoryItem
             picklistItem.binLocation = binLocation
             picklistItem.quantity = quantityToPick ?: quantityPicked
-            picklistItem.quantityPicked = quantityPicked
+            picklistItem.quantityPicked = quantityPicked ?: 0
             picklistItem.reasonCode = reasonCode
             picklistItem.comment = comment
             picklistItem.sortOrder = requisitionItem.orderIndex
@@ -2014,10 +2014,15 @@ class StockMovementService {
             BigDecimal quantityPicked = (picklistItemMap.quantityPicked != null && picklistItemMap.quantityPicked != "") ?
                     new BigDecimal(picklistItemMap.quantityPicked) : null
 
+            BigDecimal quantityAllocated = (picklistItemMap.quantityAllocated != null && picklistItemMap.quantityAllocated != "") ?
+                    new BigDecimal(picklistItemMap.quantityAllocated) : null
+
+            Integer quantityToPick = quantityAllocated?.intValueExact()
+
             String comment = picklistItemMap.comment
 
             createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation,
-                    quantityPicked?.intValueExact(), reasonCode, comment, isAutoAllocated)
+                    quantityPicked?.intValueExact(), reasonCode, comment, isAutoAllocated, quantityToPick)
         }
     }
 
