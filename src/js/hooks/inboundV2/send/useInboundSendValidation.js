@@ -2,7 +2,7 @@ import moment from 'moment';
 import { z } from 'zod';
 
 import useTranslate from 'hooks/useTranslate';
-import { validateFutureDateFns } from 'utils/dateUtils';
+import { validateFutureDateFns, validateMinYear } from 'utils/dateUtils';
 
 const useInboundSendValidation = () => {
   const translate = useTranslate();
@@ -30,13 +30,7 @@ const useInboundSendValidation = () => {
     .refine((pickedDate) => validateFutureDateFns(pickedDate), {
       message: translate('react.default.error.futureDate.label', 'The date cannot be in the future'),
     })
-    .refine((pickedDate) => {
-      if (!pickedDate) {
-        return true;
-      }
-      const date = new Date(pickedDate);
-      return date.getFullYear() >= 2000;
-    }, {
+    .refine((pickedDate) => validateMinYear(pickedDate, 2000), {
       message: translate('react.stockMovement.error.invalidDate.label', 'This date is invalid. Please enter a date after 2000.'),
     });
 
@@ -45,13 +39,7 @@ const useInboundSendValidation = () => {
       required_error: requiredFieldMessage,
       invalid_type_error: requiredFieldMessage,
     })
-    .refine((pickedDate) => {
-      if (!pickedDate) {
-        return true;
-      }
-      const date = new Date(pickedDate);
-      return date.getFullYear() >= 2000;
-    }, {
+    .refine((pickedDate) => validateMinYear(pickedDate, 2000), {
       message: translate('react.stockMovement.error.invalidDate.label', 'This date is invalid. Please enter a date after 2000.'),
     });
 

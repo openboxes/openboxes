@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import useTranslate from 'hooks/useTranslate';
+import { validateMinYear } from 'utils/dateUtils';
 
 const useInboundAddItemsV2Validation = () => {
   const translate = useTranslate();
@@ -15,7 +16,15 @@ const useInboundAddItemsV2Validation = () => {
       lotAndExpiryControl: z.boolean().optional().nullable(),
     }).optional().nullable(),
     lotNumber: z.string().optional(),
-    expirationDate: z.string().optional().nullable(),
+    expirationDate: z
+      .string()
+      .optional()
+      .nullable()
+      .refine(
+        (date) => validateMinYear(date, 2000), {
+          message: translate('react.stockMovement.error.invalidDate.label', 'This date is invalid. Please enter a date after 2000.'),
+        },
+      ),
     quantityRequested: z.number()
       .min(0, translate('react.stockMovement.error.enterQuantity.label', 'Enter proper quantity'))
       .optional()
@@ -42,16 +51,6 @@ const useInboundAddItemsV2Validation = () => {
     }, {
       message: translate('react.stockMovement.error.enterQuantity.label', 'Enter proper quantity'),
       path: ['quantityRequested'],
-    })
-    .refine((data) => {
-      if (!data.expirationDate) {
-        return true;
-      }
-      const date = new Date(data.expirationDate);
-      return date.getFullYear() >= 2000;
-    }, {
-      message: translate('react.stockMovement.error.invalidDate.label', 'This date is invalid. Please enter a date after 2000.'),
-      path: ['expirationDate'],
     })
     .refine(
       (data) => {

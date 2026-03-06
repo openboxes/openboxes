@@ -194,3 +194,10 @@ export const validateFutureDateFns = (date) => {
   const today = startOfDay(new Date());
   return !isAfter(startOfDay(date), today);
 };
+
+export const validateMinYear = (date, minYear = 2000) => {
+  if (!date) {
+    return true;
+  }
+  return new Date(date).getFullYear() >= minYear;
+};
