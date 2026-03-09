@@ -7,7 +7,6 @@ import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.joda.time.LocalDate
 import org.springframework.web.context.request.RequestContextHolder
 import org.pih.warehouse.DateUtil
-import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.api.putaway.SearchPutawayTaskCommand
 import org.pih.warehouse.api.StatusCategory
 import org.pih.warehouse.api.StockMovementDirection
@@ -351,12 +350,11 @@ class NumberDataService {
     NumberData getOpenPutawayTasks(Location location) {
         def webRequest = RequestContextHolder.requestAttributes
         def grailsParams = new GrailsParameterMap([:], webRequest.request)
-        grailsParams.status = PutawayTaskStatus.PENDING
-        def command = new SearchPutawayTaskCommand(facility: location)
-        def tasks = putawayTaskService.search(command, grailsParams)
+        def command = new SearchPutawayTaskCommand(facility: location, statusCategory: StatusCategory.OPEN)
+        def count = putawayTaskService.count(command, grailsParams)
         String urlContextPath = ConfigHelper.contextPath
         return new NumberData(
-                tasks?.size() ?: 0,
+                count ?: 0,
                 "${urlContextPath}/order/list?orderType=PUTAWAY_ORDER&status=PENDING"
         )
     }
