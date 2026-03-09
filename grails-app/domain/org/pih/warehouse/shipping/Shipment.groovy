@@ -35,10 +35,6 @@ class Shipment implements Comparable, Serializable, Historizable {
         Holders.grailsApplication.mainContext.publishEvent(new AutomaticReceiptEvent(this.id))
     }
 
-    def tryBackorderReAllocation() {
-        Holders.grailsApplication.mainContext.publishEvent(new ReAllocationEvent(this.id))
-    }
-
     def beforeInsert() {
         createdBy = AuthService.currentUser
         updatedBy = AuthService.currentUser
@@ -59,7 +55,6 @@ class Shipment implements Comparable, Serializable, Historizable {
     def afterUpdate() {
         publishRefreshEvent()
         publishAutomaticReceiptEvent()
-        tryBackorderReAllocation()
     }
 
     String id

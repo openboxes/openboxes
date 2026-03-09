@@ -178,7 +178,7 @@ class StockMovementItem {
                 packsRequested            : packsRequested,
                 quantityRequired          : quantityRequired,
                 quantityBackordered       : quantityBackordered,
-                backorderedReasonCode                : backorderedReasonCode,
+                backorderedReasonCode     : backorderedReasonCode,
                 reasonCode                : reasonCode,
                 comments                  : comments,
                 recipient                 : recipient,

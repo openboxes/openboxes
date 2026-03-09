@@ -13,6 +13,7 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import grails.validation.ValidationException
+import org.pih.warehouse.allocation.ReAllocationEvent
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
@@ -509,6 +510,7 @@ class ReceiptService {
         shippedShipments.each { Shipment shipment ->
             log.info "Creating automated receipt for shipment ${shipment}"
             receiveInboundShipment(shipment)
+            tryBackorderReAllocation(shipment.id)
         }
     }
 
@@ -543,6 +545,10 @@ class ReceiptService {
         if (shipment.destination.supports(ActivityCode.DYNAMIC_SLOTTING)) {
             inboundSortationService.createPutawayOrdersFromReceipt(shipment.receipt)
         }
+    }
+
+    def tryBackorderReAllocation(String shipmentId) {
+        Holders.grailsApplication.mainContext.publishEvent(new ReAllocationEvent(shipmentId))
     }
 
     PartialReceipt createAutomaticReceipt(Shipment shipment) {
