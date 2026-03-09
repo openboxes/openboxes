@@ -1,7 +1,7 @@
+import { isBefore } from 'date-fns';
 import { z } from 'zod';
 
 import useTranslate from 'hooks/useTranslate';
-import { validateMinYear } from 'utils/dateUtils';
 
 const useInboundAddItemsV2Validation = () => {
   const translate = useTranslate();
@@ -21,7 +21,7 @@ const useInboundAddItemsV2Validation = () => {
       .optional()
       .nullable()
       .refine(
-        (date) => validateMinYear(date, 2000), {
+        (date) => !date || !isBefore(date, new Date(2000, 0, 1)), {
           message: translate('react.stockMovement.error.invalidDate.label', 'This date is invalid. Please enter a date after 2000.'),
         },
       ),
