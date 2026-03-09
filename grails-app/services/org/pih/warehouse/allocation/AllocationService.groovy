@@ -161,6 +161,7 @@ class AllocationService {
     Boolean deallocate(RequisitionItem requisitionItem) {
         validateNothingPicked(requisitionItem)
         stockMovementService.clearPicklist(requisitionItem)
+        requisitionItem.autoAllocated = null
         return true
     }
 
