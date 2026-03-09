@@ -2019,6 +2019,10 @@ class StockMovementService {
 
             Integer quantityToPick = quantityAllocated?.intValueExact()
 
+            if (quantityPicked == null && quantityToPick == null) {
+                return
+            }
+
             String comment = picklistItemMap.comment
 
             createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation,
