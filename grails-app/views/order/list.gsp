@@ -44,7 +44,7 @@
 					<div class="box">
 						<h2>
 							<warehouse:message code="default.list.label" args="[entityName]" />
-							<small>(<g:formatNumber number="${totalPrice}"/> ${grailsApplication.config.openboxes.locale.defaultCurrencyCode})</small>
+							<small>(${orders.totalCount})</small>
 						</h2>
 						<table>
 							<thead>
@@ -66,14 +66,16 @@
 										<th>${warehouse.message(code: 'order.shipped.label')}</th>
 										<th>${warehouse.message(code: 'order.received.label')}</th>
 									</g:if>
-									<th>
-										<div>${warehouse.message(code: 'order.totalPrice.label')}</div>
-										<small>${warehouse.message(code: 'order.localCurrency.label', default: 'Local Currency')}</small>
-									</th>
-									<th>
-										<div>${warehouse.message(code: 'order.totalPrice.label')}</div>
-										<small>${warehouse.message(code: 'order.defaultCurrency.label', default: 'Default Currency')}</small>
-									</th>
+									<g:if test="${orderType != OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
+										<th>
+											<div>${warehouse.message(code: 'order.totalPrice.label')}</div>
+											<small>${warehouse.message(code: 'order.localCurrency.label', default: 'Local Currency')}</small>
+										</th>
+										<th>
+											<div>${warehouse.message(code: 'order.totalPrice.label')}</div>
+											<small>${warehouse.message(code: 'order.defaultCurrency.label', default: 'Default Currency')}</small>
+										</th>
+									</g:if>
 								</tr>
 							</thead>
 							<tbody>
@@ -170,28 +172,32 @@
 												${orderInstance?.receivedOrderItems?.size()?:0}
 											</td>
 										</g:if>
-										<td data-testid="total-${i}" class="center middle">
-											<g:formatNumber number="${orderInstance.total}"/>
-											${orderInstance.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-										</td>
-										<td data-testid="total-normalized-${i}" class="center middle">
-											<g:formatNumber number="${orderInstance.totalNormalized}"/>
-											${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-										</td>
+										<g:if test="${orderType != OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
+											<td data-testid="total-${i}" class="center middle">
+												<g:formatNumber number="${orderInstance.total}"/>
+												${orderInstance.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+											</td>
+											<td data-testid="total-normalized-${i}" class="center middle">
+												<g:formatNumber number="${orderInstance.totalNormalized}"/>
+												${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+											</td>
+										</g:if>
 									</tr>
 								</g:each>
 							</tbody>
-							<tfoot>
-								<tr class="odd">
-									<g:set var="colspan" value="${orderType == OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name()) ? 12 : 8}"/>
-									<th colspan="${colspan}"></th>
-									<th><label>${warehouse.message(code:'order.totalPrice.label')}</label></th>
-									<th colspan="2" class="center middle">
-										<g:formatNumber number="${totalPrice}"/>
-										${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-									</th>
-								</tr>
-							</tfoot>
+							<g:if test="${orderType != OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
+								<tfoot>
+									<tr class="odd">
+										<g:set var="colspan" value="${orderType == OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name()) ? 12 : 8}"/>
+										<th colspan="${colspan}"></th>
+										<th><label>${warehouse.message(code:'order.totalPrice.label')}</label></th>
+										<th colspan="2" class="center middle">
+											<g:formatNumber number="${totalPrice}"/>
+											${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+										</th>
+									</tr>
+								</tfoot>
+							</g:if>
 						</table>
 						<div class="paginateButtons">
 							<g:set var="pageParams" value="${pageScope.variables['params']}"/>
@@ -225,8 +231,8 @@
 					.val('')
 					.trigger("chosen:updated");
 					$("#status")
-					.val('')
-					.trigger("chosen:updated");
+					.val(null)
+					.trigger("change");
 				});
 
 				$("#clearStartDate")
