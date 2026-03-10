@@ -232,6 +232,11 @@ const AsyncStockTransferList = Loadable({
   loading: Loading,
 });
 
+const AsyncPutawayTaskList = Loadable({
+  loader: () => import('components/putaway-task/list/PutawayTaskList'),
+  loading: Loading,
+});
+
 const Router = () => {
   useConnectionListener();
 
@@ -251,6 +256,7 @@ const Router = () => {
       <BrowserRouter>
         <FlashScopeListenerWrapper>
           <Switch>
+            <MainLayoutRoute path="**/putawayTask/list" component={AsyncPutawayTaskList} />
             <MainLayoutRoute path="**/putaway/create/:putAwayId?" component={AsyncPutAwayMainPage} />
             <MainLayoutRoute path="**/stockMovement/list" component={StockMovementList} />
             <MainLayoutRoute path="**/stockMovement/createOutbound/:stockMovementId?" component={AsyncStockMovement} />
