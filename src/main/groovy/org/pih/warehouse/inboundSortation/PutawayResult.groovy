@@ -12,4 +12,5 @@ class PutawayResult {
     Location container
     Location destination
     Integer quantity
+    String comment
 }

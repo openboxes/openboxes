@@ -37,6 +37,7 @@ class PutawayItem implements Validateable {
     Location containerLocation
     Receipt receipt
     ReceiptItem receiptItem
+    String comment
 
     Boolean delete = Boolean.FALSE
     List<PutawayItem> splitItems = []

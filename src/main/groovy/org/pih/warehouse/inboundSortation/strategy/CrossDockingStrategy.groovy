@@ -68,7 +68,8 @@ class CrossDockingStrategy implements PutawayStrategy {
                         location: context.currentBinLocation,
                         destination: destination,
                         quantity: quantityForDemand,
-                        container: putawayContainer
+                        container: putawayContainer,
+                        comment: "Cross-Docking",
                 )
 
                 availableQuantity -= quantityForDemand
