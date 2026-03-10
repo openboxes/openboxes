@@ -10,7 +10,7 @@ class SlottingService {
     List<PutawayResult> execute(PutawayContext context) {
         List<PutawayResult> results = []
         int quantityRemaining = context.quantity
-        def locations = context.facility.internalLocations
+        def locations = context.facility.activeStorageLocations
 
         for (PutawayStrategy strategy in strategies) {
             if (quantityRemaining <= 0) break
