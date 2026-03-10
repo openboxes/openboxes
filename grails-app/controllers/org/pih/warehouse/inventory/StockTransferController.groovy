@@ -15,6 +15,7 @@ import grails.converters.JSON
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderStatus
 
 class StockTransferController {
 
@@ -35,7 +36,7 @@ class StockTransferController {
 
         boolean isSameOrigin = orderInstance?.origin?.id == currentLocation?.id
         boolean isSameDestination = orderInstance?.destination?.id == currentLocation?.id
-        if (!(isSameOrigin || isSameDestination)) {
+        if (!(isSameOrigin || isSameDestination) || orderInstance.status in [OrderStatus.PARTIALLY_RECEIVED, OrderStatus.RECEIVED, OrderStatus.COMPLETED]) {
             flash.error = g.message(code: "retrunOrder.isDifferentLocation.message")
             redirect(controller: "stockMovement", action: "show", id: params.id)
             return
