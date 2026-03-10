@@ -232,18 +232,12 @@
             }
         }
 
-        .table-toolbar {
+        .add-button {
             position: absolute;
             margin-top: 0;
             top: -40px;
         }
     }
-
-  .table-toolbar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 10px;
 
     .add-button {
       .draft-button {
@@ -259,15 +253,6 @@
         padding: 4px 8px;
       }
     }
-
-    .filter-input {
-      background-color: white;
-      margin-top: 3px;
-      box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
-      color: gray;
-      padding: 4px 8px;
-    }
-  }
 
     // Buttons
     .submit-buttons {
@@ -298,6 +283,9 @@
             box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
             color: grey;
             padding: 4px 8px;
+        }
+        .add-button {
+          color: #30a64a;
         }
     }
 
