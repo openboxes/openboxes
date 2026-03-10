@@ -23,7 +23,7 @@ class ShipmentEventLogger {
      * Log the occurrence of some shipment related action.
      */
     private EventLog createEventLog(Shipment shipment, EventLog eventLog) {
-        if (!eventLog.validate()) {
+        if (!eventLog.save()) {
             throw new ValidationException("Unable to create shipment event log", eventLog.errors)
         }
         shipment.addToEventLogs(eventLog)

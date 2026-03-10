@@ -95,8 +95,8 @@ class EventLog implements Comparable<EventLog>, Serializable {
         return eventDate <=> other?.eventDate ?:
                dateCreated <=> other?.dateCreated ?:
                lastUpdated <=> other?.lastUpdated ?:
-               // A failsafe in the rare case where we have two almost identical logs. This should not be possible
-               // in the real world because lastUpdated precision is to the second, but it is possible for E2E tests.
+               // A failsafe in the rare case where we have logs that are created within the same second.
+               // This is incredibly unlikely in the real world, but it happens in E2E tests.
                event?.eventType <=> other?.event?.eventType ?:
                id <=> other?.id
     }

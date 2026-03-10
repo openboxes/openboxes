@@ -23,7 +23,7 @@ class ShipmentEventManager {
      * Create a new Shipment event representing some state change to the shipment, then logs the action.
      */
     Event createEvent(Shipment shipment, Event event) {
-        if (!event.validate()) {
+        if (!event.save()) {
             throw new ValidationException("Unable to create shipment event", event.errors)
         }
         shipment.addToEvents(event)

@@ -82,7 +82,6 @@ class Shipment implements Comparable, Serializable, Historizable<ShipmentHistory
 
     // One-to-many associations
     SortedSet events
-    SortedSet<EventLog> eventLogs
 
     Requisition requisition
 
