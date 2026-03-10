@@ -72,6 +72,10 @@ class PutawayTaskApiController extends RestfulController<PutawayTask> {
         // FIXME Improve error handling
         PutawayTask task = putawayTaskService.patch(params.id, jsonBody)
         if (!task) {
+            if (jsonBody?.action == 'rerunStrategy') {
+                render(status: HttpStatus.NO_CONTENT.value())
+                return
+            }
             return render(status: HttpStatus.NOT_FOUND.value())
         }
         render([data: task] as JSON)

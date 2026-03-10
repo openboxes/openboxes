@@ -153,6 +153,11 @@ class PutawayTaskService {
                 //putawayService.savePutaway(task.toPutaway())
                 break
 
+            case 'rerunStrategy':
+                inboundSortationService.rerunPutawayStrategy(task)
+                task = null  // original task is deleted
+                break
+
             default:
                 throw new UnsupportedOperationException("Unsupported action: ${data?.action}")
         }
