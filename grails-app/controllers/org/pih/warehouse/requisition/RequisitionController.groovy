@@ -17,6 +17,7 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.hibernate.HibernateException
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -25,6 +26,7 @@ import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
+import org.pih.warehouse.shipping.Shipment
 import org.springframework.orm.hibernate5.HibernateSystemException
 
 @Transactional
@@ -460,7 +462,13 @@ class RequisitionController {
     def issue() {
         def requisition = Requisition.get(params.id)
         try {
-            stockMovementService.createMissingShipmentItems(requisition, requisition?.shipment)
+            if (!requisition.shipment) {
+                StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
+                Shipment shipment = stockMovementService.createShipment(stockMovement)
+                stockMovementService.createMissingShipmentItems(requisition, shipment)
+            } else {
+                stockMovementService.createMissingShipmentItems(requisition, requisition?.shipment)
+            }
             stockMovementService.issueRequisitionBasedStockMovement(params.id, true)
             requisitionService.triggerRequisitionStatusTransition(
                 requisition,

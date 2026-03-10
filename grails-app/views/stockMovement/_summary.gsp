@@ -167,13 +167,13 @@
                             <warehouse:message code="stockMovement.status.label" default="Status"/>
                         </div>
                     </div>
-                    <g:if test="${stockMovement?.fulfillmentSummaryStatus}">
+                    <g:if test="${stockMovement?.fulfillmentStatus}">
                         <div>
                             <div class="tag tag-info" style="margin: 0; background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb;">
-                                ${stockMovement?.fulfillmentSummaryStatus?.label}
+                                ${stockMovement?.fulfillmentStatus?.label}
                             </div>
                             <div style="font-size: 0.8em; color: #666; text-align: right; padding-right: 4px;">
-                                <warehouse:message code="stockMovement.fulfillmentSummaryStatus.fulfillment" default="Fulfillment"/>
+                                <warehouse:message code="stockMovement.fulfillmentStatus.fulfillment" default="Fulfillment"/>
                             </div>
                         </div>
                     </g:if>

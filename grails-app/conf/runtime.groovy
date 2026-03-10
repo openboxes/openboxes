@@ -1456,6 +1456,17 @@ openboxes {
     }
 }
 
+// Default n8n webhook configuration (OBLS-610), will be improved in BLS-592
+openboxes {
+    n8n {
+        enabled = false
+        endpoint {
+            url = ''
+            headers = [:]
+        }
+    }
+}
+
 openboxes.inventoryCount.transactionTypes = [
         Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
         Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID,
