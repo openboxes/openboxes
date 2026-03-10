@@ -87,6 +87,7 @@ class PickTask {
                 id              : id,
                 identifier      : identifier,
                 requisitionId   : requisition?.id,
+                requisitionItemId: requisitionItem?.id,
                 requisitionNumber : requisition?.requestNumber,
                 deliveryTypeCode: deliveryTypeCode?.name(),
                 dateRequested   : dateRequested,

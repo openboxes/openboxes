@@ -12,6 +12,7 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.StockMovementService
@@ -19,6 +20,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionAction
 import org.pih.warehouse.inventory.TransactionSource
 import org.pih.warehouse.inventory.TransferStockCommand
+import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.picklist.PicklistService
 import org.pih.warehouse.requisition.Requisition
@@ -200,6 +202,53 @@ class PickTaskService {
         }
 
         save(task)
+    }
+
+    List<PickTask> reallocate(PickTask task, List picklistItems) {
+        if (!picklistItems) {
+            throw new IllegalArgumentException("Must specify picklistItems")
+        }
+
+        RequisitionItem requisitionItem = task.requisitionItem
+        if (!requisitionItem) {
+            throw new IllegalStateException("Pick task ${task.id} has no associated requisition item")
+        }
+
+        // Delete only the specific picklist item being reallocated (task.id === picklistItem.id)
+        PicklistItem currentPicklistItem = PicklistItem.get(task.id)
+        if (currentPicklistItem) {
+            Picklist picklist = currentPicklistItem.picklist
+            currentPicklistItem.disableRefresh = Boolean.TRUE
+            picklist?.removeFromPicklistItems(currentPicklistItem)
+            requisitionItem.removeFromPicklistItems(currentPicklistItem)
+            currentPicklistItem.delete(flush: true)
+        }
+
+        // Create new picklist items for each selected bin location
+        picklistItems.each { item ->
+            InventoryItem inventoryItem = item.inventoryItem?.id ?
+                    InventoryItem.get(item.inventoryItem.id) : null
+
+            Location binLocation = item.binLocation?.id ?
+                    Location.get(item.binLocation.id) : null
+
+            Integer quantityToPick = item.quantity ? new Integer(item.quantity) : null
+
+            stockMovementService.createOrUpdatePicklistItem(
+                    requisitionItem,
+                    null,
+                    inventoryItem,
+                    binLocation,
+                    0,
+                    null,
+                    null,
+                    false,
+                    quantityToPick
+            )
+        }
+
+        // Return newly created pick tasks for this requisition item
+        return PickTask.findAllByRequisitionItem(requisitionItem)
     }
 
     def drop(String outboundContainerId, Map data = [:]) {

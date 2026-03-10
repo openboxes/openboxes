@@ -13,6 +13,11 @@ class PickUrlMappings {
             action = [GET: "read", PATCH: "patch"]
         }
 
+        "/api/facilities/$facility/pick-tasks/$id/reallocate" {
+            controller = "pickTaskApi"
+            action = [POST: "reallocate"]
+        }
+
         "/api/facilities/$facility/pick-tasks/containers/$outboundContainerId" {
             controller = "pickTaskApi"
             action = [PATCH: "drop"]
