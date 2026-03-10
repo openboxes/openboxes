@@ -351,13 +351,13 @@ class NumberDataService {
     NumberData getOpenPutawayTasks(Location location) {
         def webRequest = RequestContextHolder.requestAttributes
         def grailsParams = new GrailsParameterMap([:], webRequest.request)
-        grailsParams.status = PutawayTaskStatus.PENDING
         def command = new SearchPutawayTaskCommand(facility: location)
+        command.statusCategory = StatusCategory.OPEN
         def tasks = putawayTaskService.search(command, grailsParams)
         String urlContextPath = ConfigHelper.contextPath
         return new NumberData(
                 tasks?.size() ?: 0,
-                "${urlContextPath}/order/list?orderType=PUTAWAY_ORDER&status=PENDING"
+                "${urlContextPath}/putawayTask/list?statusCategory=OPEN"
         )
     }
 

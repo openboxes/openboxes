@@ -699,7 +699,7 @@ class LocationService {
     }
 
     List<Location> searchInternalLocations(Map params, LocationTypeCode[] locationTypeCodes) {
-        return Location.createCriteria().list(params) {
+        List<Location> locations = Location.createCriteria().list(params) {
             if (!params.includeInactive) {
                 eq("active", Boolean.TRUE)
             }
@@ -724,6 +724,15 @@ class LocationService {
             order("sortOrder", "asc")
             order("name", "asc")
         }
+
+        if (params.activityCodes) {
+            List<String> activityCodes = params.list("activityCodes")
+            locations = locations.findAll { Location loc ->
+                activityCodes.any { String code -> loc.supports(code) }
+            }
+        }
+
+        return locations
     }
 
     def importLocationCsv(ImportDataCommand command) {

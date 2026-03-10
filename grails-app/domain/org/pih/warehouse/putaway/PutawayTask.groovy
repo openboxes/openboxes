@@ -97,6 +97,7 @@ class PutawayTask {
                 quantity        : quantity,
                 container       : container?.toJson(container?.locationType?.locationTypeCode),
                 destination     : destination?.toJson(destination?.locationType?.locationTypeCode),
+                putawayOrder    : putawayOrder ? [id: putawayOrder.id, orderNumber: putawayOrder.orderNumber] : null,
                 deliveryTypeCode: deliveryTypeCode?.name(),
                 assignee        : assignee,
                 orderedBy       : orderedBy,

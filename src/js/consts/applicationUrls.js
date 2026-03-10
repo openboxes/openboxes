@@ -68,6 +68,12 @@ const PUTAWAY_URL = {
   base: `${CONTEXT_PATH}/putaway`,
   create: () => `${PUTAWAY_URL.base}/create`,
   edit: (id) => `${PUTAWAY_URL.create()}/${id}`,
+  show: (id) => `${PUTAWAY_URL.base}/show/${id}`,
+};
+
+const PUTAWAY_TASK_URL = {
+  base: `${CONTEXT_PATH}/putawayTask`,
+  list: () => `${PUTAWAY_TASK_URL.base}/list`,
 };
 
 const STOCK_TRANSFER_URL = {
@@ -171,6 +177,7 @@ export {
   PRODUCT_SUPPLIER_URL,
   PRODUCT_URL,
   PURCHASE_ORDER_URL,
+  PUTAWAY_TASK_URL,
   PUTAWAY_URL,
   REPLENISHMENT_URL,
   REQUISITION_TEMPLATE_URL,

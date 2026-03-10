@@ -123,6 +123,9 @@ export const LOCATION = (id) => `${LOCATION_API}/${id}`;
 // PUTAWAY
 export const PUTAWAY_GENERATE_PDF = (id) => `/putaway/generatePdf/${id}`;
 
+// PUTAWAY TASK
+export const PUTAWAY_TASK_API = (facilityId) => `${API}/facilities/${facilityId}/putaway-tasks`;
+
 // SUPPORT LINKS
 export const SUPPORT_LINKS = `${CONTEXT_PATH}${API}/supportLinks`;
 
