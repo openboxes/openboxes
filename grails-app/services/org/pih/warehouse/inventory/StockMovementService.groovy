@@ -1936,9 +1936,9 @@ class StockMovementService {
             requisitionItem.addToPicklistItems(picklistItem)
             picklistItem.inventoryItem = inventoryItem
             picklistItem.binLocation = binLocation
-            picklistItem.quantity = quantityToPick ?: quantityPicked
+            picklistItem.quantity = quantityPicked ?: quantityToPick
             picklistItem.quantityPicked = quantityPicked ?: 0
-            picklistItem.reasonCode = reasonCode
+            picklistItem.reasonCode = reasonCode ?: null
             picklistItem.comment = comment
             picklistItem.sortOrder = requisitionItem.orderIndex
             picklistItem.disableRefresh = Boolean.TRUE
