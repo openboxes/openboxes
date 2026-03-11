@@ -5,7 +5,7 @@
     <g:hiddenField id ="dlgQuantityInShipments" name="quantityInShipments" value="${orderItem?.quantityInShipments}"/>
     <g:hiddenField id ="dlgQuantityInvoiced" name="quantityInvoiced" value="${orderItem?.quantityInvoiced}"/>
     <g:hiddenField id ="dlgHasInvoices" name="hasInvoices" value="${orderItem?.hasInvoices}"/>
-    <g:hiddenField id="dlgInvoiceNumbers" name="invoiceNumbers" value="${orderItem?.invoices?.collect { it.invoiceNumber }?.join(', ')}" />
+    <g:hiddenField id="dlgReqularInvoiceNumbers" name="regularInvoiceNumbers" value="${regularInvoiceNumbers}"/>
     <table>
         <tbody>
 
@@ -366,7 +366,7 @@
     var quantityInShipments = parseInt($("#dlgQuantityInShipments").val())
     const quantityInvoiced = parseInt($("#dlgQuantityInvoiced").val())
     const hasInvoices = ($("#dlgHasInvoices").val() === "true");
-    const invoiceNumbers = $("#dlgInvoiceNumbers").val();
+    const regularInvoiceNumbers = $("#dlgReqularInvoiceNumbers").val();
     const quantityPerUom = $("#dlgQuantityPerUom").val();
 
     if (quantityPerUom < 1) {
@@ -378,7 +378,7 @@
         return false
     }
     if (hasInvoices && quantity < quantityInvoiced) {
-      $("#dlgQuantity").notify("Must enter a quantity greater than or equal to the quantity invoiced (" + quantityInvoiced + "). Pending invoices: " + invoiceNumbers);
+      $("#dlgQuantity").notify("Must enter a quantity greater than or equal to the quantity invoiced (" + quantityInvoiced + "). Pending invoices: " + regularInvoiceNumbers);
       return false;
     }
     var isAccountingRequired = ($("#isAccountingRequired").val() === "true");

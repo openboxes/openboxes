@@ -811,8 +811,8 @@ class OrderService {
                     }
 
                     if (orderItem.hasInvoices && parsedQty < orderItem.quantityInvoiced) {
-                        String invoiceNumbers = orderItem.invoices?.collect { it.invoiceNumber }?.join(", ")
-                        throw new IllegalArgumentException("Must enter a quantity greater than or equal to the quantity invoiced (${orderItem.quantityInvoiced}). Pending invoices: ${invoiceNumbers}")
+                        String regularInvoiceNumbers = orderItem.regularInvoiceNumbers.join(", ")
+                        throw new IllegalArgumentException("Must enter a quantity greater than or equal to the quantity invoiced (${orderItem.quantityInvoiced}). Pending invoices: ${regularInvoiceNumbers}")
                     }
 
                     BigDecimal parsedUnitPrice = CSVUtils.parseNumber(unitPrice, "unitPrice")

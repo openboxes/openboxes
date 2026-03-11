@@ -435,6 +435,12 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         return invoices.any { it.invoiceType == null || it.invoiceType?.code == InvoiceTypeCode.INVOICE }
     }
 
+    List<String> getRegularInvoiceNumbers() {
+        return invoices?.findAll {
+            it.invoiceType?.code == InvoiceTypeCode.INVOICE
+        }?.collect { it.invoiceNumber } ?: []
+    }
+
     Integer getPostedQuantityInvoiced() {
         return allInvoiceItems?.findAll {
             it?.invoice?.datePosted != null && !it?.invoice?.isPrepaymentInvoice && !it.inverse
