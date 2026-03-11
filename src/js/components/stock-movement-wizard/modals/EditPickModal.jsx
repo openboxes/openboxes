@@ -117,13 +117,20 @@ const FIELDS = {
         },
       },
       quantityAllocated: {
-        type: LabelField,
+        type: TextField,
+        fieldKey: '',
         label: 'react.stockMovement.allocated.label',
         defaultMessage: 'Allocated',
+        headerAlign: 'left',
         fixedWidth: '150px',
         attributes: {
-          formatValue: (value) => (value || value === 0 ? value.toLocaleString('en-US') : null),
+          type: 'number',
         },
+        getDynamicAttr: ({ fieldValue }) => ({
+          disabled: fieldValue
+              && !fieldValue.quantityAvailable
+              && !fieldValue.quantityAllocated,
+        }),
       },
       quantityPicked: {
         type: TextField,
@@ -149,13 +156,35 @@ function validate(values) {
   const errors = {};
   errors.availableItems = [];
   _.forEach(values.availableItems, (item, key) => {
+    errors.availableItems[key] = errors.availableItems[key] || {};
     if (item.quantityPicked > item.quantityAvailable) {
-      errors.availableItems[key] = { quantityPicked: 'react.stockMovement.errors.higherTyPicked.label' };
+      errors.availableItems[key].quantityPicked = 'react.stockMovement.errors.higherTyPicked.label';
     }
     if (item.quantityPicked < 0) {
-      errors.availableItems[key] = { quantityPicked: 'react.stockMovement.errors.negativeQtyPicked.label' };
+      errors.availableItems[key].quantityPicked = 'react.stockMovement.errors.negativeQtyPicked.label';
+    }
+    if (item.quantityAllocated < 0) {
+      errors.availableItems[key].quantityAllocated = 'react.stockMovement.errors.negativeQtyAllocated.label';
+    }
+    if (item.quantityAllocated > item.quantityAvailable) {
+      errors.availableItems[key].quantityAllocated = 'react.stockMovement.errors.higherThanAvailable.label';
     }
   });
+
+  const allocatedSum = _.reduce(
+    values.availableItems, (sum, val) =>
+      (sum + (val.quantityAllocated ? _.toInteger(val.quantityAllocated) : 0)),
+    0,
+  );
+
+  if (allocatedSum > values.quantityRequired) {
+    _.forEach(values.availableItems, (item, key) => {
+      if (item.quantityAllocated > 0) {
+        errors.availableItems[key] = errors.availableItems[key] || {};
+        errors.availableItems[key].quantityAllocated = 'react.stockMovement.errors.allocatedHigherThanRequired.label';
+      }
+    });
+  }
 
   const pickedSum = _.reduce(
     values.availableItems, (sum, val) =>
@@ -224,6 +253,7 @@ class EditPickModal extends Component {
         inventoryItem: { id: avItem['inventoryItem.id'] },
         binLocation: { id: avItem['binLocation.id'] || '' },
         quantityPicked: _.isNil(avItem.quantityPicked) ? '' : avItem.quantityPicked,
+        quantityAllocated: _.isNil(avItem.quantityAllocated) ? '' : avItem.quantityAllocated,
       })),
       reasonCode: values.reasonCode.value || '',
     };
@@ -253,6 +283,12 @@ class EditPickModal extends Component {
   calculatePicked(values) {
     return (
       <div>
+        <div className="font-weight-bold">
+          <Translate id="react.stockMovement.quantityAllocated.label" defaultMessage="Qty Allocated" />
+          :
+          {_.reduce(values.availableItems, (sum, val) =>
+            (sum + (val.quantityAllocated ? _.toInteger(val.quantityAllocated) : 0)), 0)}
+        </div>
         <div className="font-weight-bold pb-2">
           <Translate id="react.stockMovement.quantityPicked.label" defaultMessage="Qty Picked" />
           :
@@ -363,11 +399,6 @@ class EditPickModal extends Component {
             <Translate id="react.stockMovement.quantityRequired.label" defaultMessage="Qty Required" />
             :
             {this.state.formValues.quantityRequired}
-          </div>
-          <div className="font-weight-bold">
-            <Translate id="react.stockMovement.quantityAllocated.label" defaultMessage="Qty Allocated" />
-            :
-            {this.state.formValues.quantityAllocated}
           </div>
         </div>
       </ModalWrapper>
