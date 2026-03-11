@@ -155,8 +155,7 @@ const FIELDS = {
         fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => {
           let className = 'text-right';
-          if (fieldValue && (!fieldValue.quantityBackordered
-            || fieldValue.quantityBackordered < fieldValue.quantityRequested)) {
+          if (fieldValue && fieldValue.quantityBackordered && fieldValue.quantityBackordered > 0) {
             className = `${className} text-danger`;
           }
           return {

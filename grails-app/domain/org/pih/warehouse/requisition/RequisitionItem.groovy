@@ -255,6 +255,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         } else {
             quantityApproved = 0
             quantityCanceled = 0
+            quantityBackordered = null
+            backorderedReasonCode = null
             cancelComments = null
             cancelReasonCode = null
 
@@ -642,7 +644,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
     def calculateQuantityRevised() {
         return modificationItem ? modificationItem?.quantity :
-                quantityCanceled ? (quantity - quantityCanceled) : null
+                quantityCanceled ? (quantity - quantityCanceled) :
+                quantityBackordered ? (quantity - quantityBackordered) : null
     }
 
     def calculateQuantityRequired() {
