@@ -14,7 +14,8 @@ class PickTaskApiController extends RestfulController<PickTask> {
             search: 'GET',
             read: 'GET',
             patch: 'PATCH',
-            drop: 'PATCH'
+            drop: 'PATCH',
+            reallocate: 'POST'
     ]
 
     PickTaskService pickTaskService
@@ -62,6 +63,20 @@ class PickTaskApiController extends RestfulController<PickTask> {
         }
 
         render([data: task.toJson()] as JSON)
+    }
+
+    def reallocate() {
+        def jsonBody = request.JSON ?: [:]
+
+        PickTask task = pickTaskService.get(params.id)
+        if (!task) {
+            render (status: HttpStatus.NOT_FOUND.value(), [errorCode: 404, message: "Pick task not found"] as JSON)
+            return
+        }
+
+        List<PickTask> newTasks = pickTaskService.reallocate(task, jsonBody.picklistItems as List)
+
+        render([data: newTasks.collect { it.toJson() }] as JSON)
     }
 
     def drop() {
