@@ -94,6 +94,37 @@ class PutawayTaskService {
         return tasks
     }
 
+    @Transactional(readOnly = true)
+    Integer count(SearchPutawayTaskCommand command, Map params = [:]) {
+        log.info "Counting putaway tasks with command=${command?.properties} and params=${params}"
+
+        List<PutawayTaskStatus> statuses = params.list("status").collect { it as PutawayTaskStatus }
+
+        List<PutawayTaskStatus> statusesByStatusCategory = PutawayTaskStatus.toSet(command.statusCategory)
+        statuses += statusesByStatusCategory
+
+        Integer count = PutawayTask.where {
+            if (statuses) {
+                status in statuses
+            }
+            if (command.product) {
+                product == command.product
+            }
+            if (command.facility) {
+                facility == command.facility
+            }
+            if (command.container) {
+                container == command.container
+            }
+            if (command.order) {
+                putawayOrder == command.order
+            }
+
+        }.count()
+
+        return count
+    }
+
     PutawayTask get(String id) {
         if (!id) return null
         return PutawayTask.get(id)
