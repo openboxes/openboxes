@@ -811,7 +811,7 @@ class OrderService {
                     }
 
                     if (orderItem.hasInvoices && parsedQty < orderItem.quantityInvoiced) {
-                        String regularInvoiceNumbers = orderItem.regularInvoiceNumbers.join(", ")
+                        String regularInvoiceNumbers = orderItem.regularInvoices?.collect { it.invoiceNumber }?.join(", ")
                         throw new IllegalArgumentException("Must enter a quantity greater than or equal to the quantity invoiced (${orderItem.quantityInvoiced}). Pending invoices: ${regularInvoiceNumbers}")
                     }
 

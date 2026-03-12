@@ -685,11 +685,8 @@ class OrderController {
         if (!canEditOrder) {
             throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
         }
-
-        String regularInvoiceNumbers = orderItem.regularInvoiceNumbers.join(", ")
-
         render(template: "orderItemFormDialog",
-                model: [orderItem: orderItem, canEdit: canEditOrder, isAccountingRequired: isAccountingRequired, regularInvoiceNumbers: regularInvoiceNumbers])
+                model: [orderItem: orderItem, canEdit: canEditOrder, isAccountingRequired: isAccountingRequired,  regularInvoices: orderItem.regularInvoices])
     }
 
     def productSourceFormDialog() {
