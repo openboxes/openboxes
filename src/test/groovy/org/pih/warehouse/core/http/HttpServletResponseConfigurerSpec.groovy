@@ -8,7 +8,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import org.pih.warehouse.core.file.FileNameGenerator
-import org.pih.warehouse.core.file.FileType
+import org.pih.warehouse.core.file.FileExtension
 
 @Unroll
 class HttpServletResponseConfigurerSpec extends Specification {
@@ -31,14 +31,14 @@ class HttpServletResponseConfigurerSpec extends Specification {
         HttpServletResponse response = new MockHttpServletResponse()
 
         and:
-        fileNameGeneratorStub.generate(_ as FileType, _ as Collection<Object>) >> fileName
+        fileNameGeneratorStub.generate(_ as FileExtension, _ as Collection<Object>) >> fileName
 
         when:
         httpServletResponseConfigurer.withFile(response, contentType, [])
 
         then:
         assert response.getHeaderValue(HttpHeaders.CONTENT_DISPOSITION) == expectedContentDisposition
-        assert response.contentType == contentType.mimeType
+        assert response.contentType == contentType.mediaType.toString()
 
         where:
         contentType     | fileName              || expectedContentDisposition                                                                              | scenario
@@ -49,5 +49,6 @@ class HttpServletResponseConfigurerSpec extends Specification {
         ContentType.XLS | "a b.xls"             || "attachment; filename=\"a b.xls\"; filename*=UTF-8''a%20b.xls"                                          | "Space in name"
         ContentType.XLS | "1()&\$#@+=_-.,'.xls" || "attachment; filename=\"1()&\$#@+=_-.,'.xls\"; filename*=UTF-8''1%28%29%26%24%23%40%2B%3D_-.%2C%27.xls" | "Special characters"
         ContentType.XLS | "你好.xls"             || "attachment; filename=\".xls\"; filename*=UTF-8''%E4%BD%A0%E5%A5%BD.xls"                                | "Unicode characters"
+        ContentType.XLS | "a​b.xls"          || "attachment; filename=\"ab.xls\"; filename*=UTF-8''a%E2%80%8Bb.xls"                                     | "OBS-1960: Zero width joiner"
     }
 }

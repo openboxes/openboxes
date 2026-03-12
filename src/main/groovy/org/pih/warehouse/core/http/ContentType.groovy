@@ -1,34 +1,40 @@
 package org.pih.warehouse.core.http
 
-import org.pih.warehouse.core.file.FileType
+import org.springframework.http.MediaType
+
+import org.pih.warehouse.core.file.FileExtension
 
 /**
- * Enumerates the HTTP content types that we operate on within the application.
+ * Enumerates the HTTP header content types that we operate on within the application.
  */
 enum ContentType {
 
-    CSV("text/csv", FileType.CSV),
-    JSON("application/json", FileType.JSON),
-    PDF("application/pdf", FileType.PDF),
-    XLS("application/vnd.ms-excel", FileType.XLS),
-    XLSX("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", FileType.XLSX)
+    CSV(FileExtension.CSV, MediaType.parseMediaType("text/csv")),
+    DOCX(FileExtension.DOCX, MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")),
+    JSON(FileExtension.JSON, MediaType.APPLICATION_JSON),
+    PDF(FileExtension.PDF, MediaType.APPLICATION_PDF),
+    TXT(FileExtension.TXT, MediaType.TEXT_PLAIN),
+    XLS(FileExtension.XLS, MediaType.parseMediaType("application/vnd.ms-excel")),
+    XLSX(FileExtension.XLSX, MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")),
+    XML(FileExtension.XML, MediaType.TEXT_XML)
 
     /**
-     * The media type, indicating the data type of the content.
+     * The file extension associated with the content.
      *
-     * Note that MIME type is just the content type but without any character encoding (ie excluding "charset=utf-8").
+     * If the content type is not associated with a file, this should be defined with a value of null so that
+     * it can be distinguished from the FileExtension.NONE case (which should be used if the content type is
+     * associated with a file that does not have an extension).
      */
-    String mimeType
+    FileExtension fileExtension
 
     /**
-     * The file type associated with the content.
-     *
-     * If the content type is not associated with a file, this will be FileType.NONE
+     * The media type (which is what the content type header uses) indicating the data type of the content.
+     * Media type is MIME type (ex: "application/json") + an optional character encoding (ex: "charset=utf-8")
      */
-    FileType fileType
+    MediaType mediaType
 
-    ContentType(String mimeType, FileType fileType) {
-        this.mimeType = mimeType
-        this.fileType = fileType
+    ContentType(FileExtension fileExtension, MediaType mediaType) {
+        this.fileExtension = fileExtension
+        this.mediaType = mediaType
     }
 }

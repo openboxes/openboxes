@@ -38,7 +38,7 @@ class HttpServletResponseConfigurer {
      * Sets the content type of the response.
      */
     HttpServletResponseConfigurer withContentType(HttpServletResponse response, ContentType contentType) {
-        response.setContentType(contentType.mimeType)
+        response.setContentType(contentType.mediaType.toString())
         return this
     }
 
@@ -50,7 +50,7 @@ class HttpServletResponseConfigurer {
 
         withContentType(response, contentType)
 
-        String fileName = fileNameGenerator.generate(contentType.fileType, fileNameArgs)
+        String fileName = fileNameGenerator.generate(contentType.fileExtension, fileNameArgs)
         withContentDisposition(response, fileName)
 
         return this

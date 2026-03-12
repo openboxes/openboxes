@@ -15,57 +15,72 @@ import org.pih.warehouse.core.date.DateFormatter
 @Component
 class FileNameGenerator {
 
-    final String FIELD_DELIMITER = '_'
+    private final String FILE_NAME_PART_DELIMITER = '_'
 
     @Autowired
     DateFormatter dateFormatter
 
     /**
-     * Generates a file name for the given file type using the given fields.
+     * Generates a file name for the given file extension using the given fields.
+     *
+     * @param fileExtension the file extension to use when generating the file name
+     * @param fields the fields to include in the file name
+     * @param delimiter the separator between each field in the file name
      */
-    String generate(FileType fileType, Collection<Object> fields) {
+    String generate(FileExtension fileExtension, Collection<Object> fields, String delimiter=FILE_NAME_PART_DELIMITER) {
         String fileName = ""
+        for (Object field in fields) {
+            String formattedField = formatFieldForFileName(field)
 
-        Iterator<Object> iterator = fields.iterator()
-        while(iterator.hasNext()) {
-            Object field = iterator.next()
-            if (!field) {
+            // Formatting the field may filter out all characters. Exclude the field entirely in this case
+            if (StringUtils.isBlank(formattedField)) {
                 continue
             }
 
-            switch (field) {
-                case Instant:
-                case LocalDate:
-                case ZonedDateTime:
-                case Date:
-                    fileName += dateFormatter.formatForFileName(field)
-                    break
-                case String:
-                    fileName += field.trim()
-                    break
-                default:
-                    fileName += field.toString().trim()
-                    break
+            // Otherwise we're adding the field to the name, but only prepend the delimiter if it's not the first field
+            if (StringUtils.isNotEmpty(fileName)) {
+                fileName += delimiter
             }
 
-            if (iterator.hasNext()) {
-                fileName += FIELD_DELIMITER
-            }
+            fileName += formattedField
         }
 
-        if (fileType) {
-             fileName += fileType.extension
+        if (fileExtension) {
+             fileName += fileExtension.extension
         }
 
-        return sanitizeFileName(fileName)
+        return fileName
     }
 
-    private String sanitizeFileName(String fileName) {
-        if (StringUtils.isBlank(fileName)) {
+    private String formatFieldForFileName(Object field) {
+        String fieldString
+        switch (field) {
+            case Instant:
+            case LocalDate:
+            case ZonedDateTime:
+            case Date:
+                fieldString = dateFormatter.formatForFileName(field)
+                break
+            case String:
+                fieldString = field
+                break
+            case null:
+                fieldString = null
+                break
+            default:
+                fieldString = field.toString()
+                break
+        }
+
+        return sanitizeFieldForFileName(fieldString)
+    }
+
+    private String sanitizeFieldForFileName(String field) {
+        if (field == null) {
             return ''
         }
 
-        return fileName.trim()
+        return field.trim()
                 // Remove all characters that are invalid in Windows file names
                 .replaceAll("[\\\\/:*?\"<>|]", '')
     }
