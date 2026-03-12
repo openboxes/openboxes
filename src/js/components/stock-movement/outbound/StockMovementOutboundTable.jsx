@@ -307,6 +307,12 @@ const StockMovementOutboundTable = ({
       Cell: (row) => (<TableCell {...row} tooltip defaultValue="None" />),
     },
     {
+      Header: <Translate id="react.stockMovement.column.priority.label" defaultMessage="Priority" />,
+      accessor: 'priority',
+      width: 100,
+      Cell: (row) => (<TableCell {...row} defaultValue="0" />),
+    },
+    {
       Header: <Translate id="react.stockMovement.requestedBy.label" defaultMessage="Requested by" />,
       accessor: 'requestedBy.name',
       minWidth: 250,

@@ -14,6 +14,7 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.requisition.PriorityLevel
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
@@ -57,6 +58,7 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
     Shipment shipment
     Order order
 
+    Integer priority
     Integer statusSortOrder
 
     List<ShipmentStatusCode> receiptStatusCodes // For filtering
@@ -107,6 +109,7 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
         stockMovementType(nullable: true)
         statusCode(nullable: true)
 
+        priority(nullable: true)
         statusSortOrder(nullable: true)
     }
 
@@ -181,6 +184,8 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
                 shipmentType        : shipment?.shipmentType,
                 approvers           : requisition?.approvers?.toList(),
                 deliveryTypeCode    : deliveryTypeCode,
+                priority            : priority,
+                priorityLevel       : PriorityLevel.fromPriority(priority)?.name(),
 
                 // Required by mobile app
                 expectedShippingDate : shipment?.expectedShippingDate?.format("MM/dd/yyyy HH:mm XXX"),
