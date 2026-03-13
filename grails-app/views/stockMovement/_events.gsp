@@ -15,9 +15,9 @@
             <thead>
             <tr class="odd">
                 <th><g:message code="default.event.label" default="Event"/></th>
-                <th><g:message code="default.dateTime.label" default="Date/Time"/></th>
+                <th><g:message code="event.dateLogged.label" default="Date Logged"/></th>
+                <th><g:message code="event.eventDate.label" default="Event Date"/></th>
                 <th><g:message code="default.location.label" default="Location"/></th>
-                <th><g:message code="default.reference.label" default="Reference"/></th>
                 <th><g:message code="default.createdBy.label" default="Created by"/></th>
                 <th><g:message code="default.comment.label" default="Comment"/></th>
             </tr>
@@ -29,13 +29,13 @@
                         ${historyItem?.eventType?.name}
                     </td>
                     <td>
+                        ${historyItem?.dateLogged?.format(Constants.EUROPEAN_DATE_FORMAT_WITH_TIME)}
+                    </td>
+                    <td>
                         ${historyItem?.date?.format(Constants.EUROPEAN_DATE_FORMAT_WITH_TIME)}
                     </td>
                     <td>
                         ${historyItem?.location}
-                    </td>
-                    <td>
-                        ${historyItem?.referenceDocument?.identifier}
                     </td>
                     <td>
                         ${historyItem?.createdBy}
