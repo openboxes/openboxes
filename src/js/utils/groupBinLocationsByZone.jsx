@@ -15,7 +15,7 @@ const groupBinLocationsByZone = (binLocations, translate) => {
   const groupedByZone = _.groupBy(binLocations, (bin) => bin.zoneId || 'no-zone');
   return Object.entries(groupedByZone)
     .map(([zoneKey, bins]) => {
-      const zoneName = bins[0].zoneName || translate('react.cycleCount.noZone', 'No Zone') || 'No Zone';
+      const zoneName = bins[0].zoneName || translate?.('react.cycleCount.noZone', 'No Zone') || 'No Zone';
 
       return {
         id: `zone-${zoneKey}`,
