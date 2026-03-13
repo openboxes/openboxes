@@ -73,6 +73,11 @@
      .click(function () {
        const primaryProductId = $("#primary-product-id").val();
        const obsoleteProductId = $("#obsolete-product-id").val();
+
+       // because format is "<product code> <product name>" here
+       const primaryProductCode = $("#primary-product-suggest").val().split(" ")[0];
+       const obsoleteProductCode = $("#obsolete-product-suggest").val().split(" ")[0];
+
        const errors = {
          "primary-product": null,
          "obsolete-product": null,
@@ -82,10 +87,10 @@
        if (primaryProductId === obsoleteProductId) errors["obsolete-product"] = "Can't merge same product - please choose a different product";
 
        if (Object.values(errors).every(err => !err)) {
-         const warningMessage = $("#merge-product-warning-message")
-           .text()
-           .replaceAll("{0}", primaryProductId)
-           .replaceAll("{1}", obsoleteProductId);
+         const template = $("#merge-product-warning-message").data("template");
+         const warningMessage = template
+           .replaceAll("{0}", primaryProductCode)
+           .replaceAll("{1}", obsoleteProductCode);
          $("#merge-product-warning-message").text(warningMessage)
 
          $('#merge-product-confirmation-dialog')
