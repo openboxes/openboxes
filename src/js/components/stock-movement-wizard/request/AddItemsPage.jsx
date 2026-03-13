@@ -17,6 +17,7 @@ import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import { STOCK_MOVEMENT_STATUS, STOCK_MOVEMENT_UPDATE_ITEMS } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
+import FilterInput from 'components/form-elements/FilterInput';
 import LabelField from 'components/form-elements/LabelField';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import TextField from 'components/form-elements/TextField';
@@ -33,28 +34,6 @@ import { isRequestFromWard, supports } from 'utils/supportedActivitiesUtils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
-function addButton({
-  // eslint-disable-next-line react/prop-types
-  addRow, getSortOrder, newItemAdded, updateTotalCount,
-}) {
-  return (
-    <button
-      type="button"
-      className="btn btn-outline-success btn-xs"
-      onClick={() => {
-        updateTotalCount(1);
-        addRow({ sortOrder: getSortOrder() });
-        newItemAdded();
-      }}
-    >
-      <span>
-        <i className="fa fa-plus pr-2" />
-        <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
-      </span>
-    </button>
-  );
-}
 
 // Used for util function to calculate quantityRequested for requests from wards
 // where quantityRequested is calculated by subtracting one of below from QOH
@@ -211,8 +190,6 @@ const LINE_ITEMS_ATTR = {
   isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
   loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
   isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
-  addButton,
-  showItemFilter: true,
   getDynamicRowAttr: ({ rowValues, itemFilter }) => {
     const hideRow = itemFilter && !matchesProductCodeOrName({
       product: rowValues?.product,
@@ -1606,6 +1583,16 @@ class AddItemsPage extends Component {
     });
   }
 
+  handleAddLine = (mutators) => {
+    this.updateTotalCount(1);
+    mutators.push('lineItems', { sortOrder: this.getSortOrder() });
+    this.newItemAdded();
+    const table = document.querySelectorAll('[role="rowgroup"]')[0];
+    if (table) {
+      table.scrollIntoView({ block: 'end' });
+    }
+  };
+
   render() {
     const { origin } = this.state.values;
     return (
@@ -1614,9 +1601,28 @@ class AddItemsPage extends Component {
         validate={this.validate}
         mutators={{ ...arrayMutators }}
         initialValues={this.state.values}
-        render={({ handleSubmit, values, invalid }) => (
+        render={({
+          handleSubmit, values, invalid, form: { mutators },
+        }) => (
           <div className="d-flex flex-column">
             <span className="buttons-container">
+              <div className="d-flex align-items-center gap-8 mr-auto">
+                <button
+                  type="button"
+                  className="btn btn-outline-success btn-xs add-button mb-1"
+                  onClick={() => this.handleAddLine(mutators)}
+                >
+                  <span>
+                    <i className="fa fa-plus pr-2" />
+                    <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
+                  </span>
+                </button>
+                <FilterInput
+                  itemFilter={this.state.itemFilter}
+                  onChange={(e) => this.updateFilter(e.target.value)}
+                  onClear={() => this.updateFilter('')}
+                />
+              </div>
               <label
                 htmlFor="csvInput"
                 className={`float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs ${this.state.isRequestFromWard ? 'disabled' : ''}`}

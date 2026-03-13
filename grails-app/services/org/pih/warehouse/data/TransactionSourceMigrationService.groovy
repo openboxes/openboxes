@@ -222,9 +222,11 @@ class TransactionSourceMigrationService {
             adjustmentTransaction.transactionSource = transactionSource
         }
         List<InventoryCount> recordStockCounts = InventoryCount.createCriteria().list {
-            not {
-                // Exclude adjustment transactions that have just been processed
-                inList("id", adjustStockCounts.id)
+            if (adjustStockCounts) {
+                not {
+                    // Exclude adjustment transactions that have just been processed
+                    inList("id", adjustStockCounts.id)
+                }
             }
             transaction {
                 isNull("transactionSource")

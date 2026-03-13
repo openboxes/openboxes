@@ -144,7 +144,7 @@ class StockMovementController {
                 break
             case StockMovementDirection.INBOUND:
                 String step = (stockMovement.statusCode in [StockMovementStatusCode.CREATED.name(), StockMovementStatusCode.REQUESTING.name()]) ?  InboundWorkflowState.ADD_ITEMS : InboundWorkflowState.SEND_SHIPMENT
-                redirect(action: "createInbound", params: params + [step: step])
+                redirect(action: "createInbound", params: params + [direction: StockMovementDirection.INBOUND, step: step])
                 break
             default:
                 redirect(action: "createOutbound", params: params)
