@@ -13,6 +13,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.StockMovementStatusCode
+import org.pih.warehouse.requisition.PriorityLevel
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.requisition.Requisition
@@ -247,6 +248,8 @@ class StockMovement implements Validateable{
             autoAllocationEnabled   : requisition?.autoAllocationEnabled,
             partialAllocationAllowed: requisition?.partialAllocationAllowed,
             partialIssuanceAllowed  : requisition?.partialIssuanceAllowed,
+            priority                : requisition?.priority,
+            priorityLevel           : PriorityLevel.fromPriority(requisition?.priority)?.name(),
         ]
     }
 
