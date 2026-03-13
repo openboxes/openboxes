@@ -9,11 +9,13 @@ import cycleCountColumn from 'consts/cycleCountColumn';
 import NotificationType from 'consts/notificationTypes';
 import useAssignCycleCountModal from 'hooks/cycleCount/useAssignCycleCountModal';
 
+const mockDispatch = jest.fn();
 jest.mock('react-redux', () => ({
   useSelector: jest.fn().mockImplementation(() => ({
     currentLocation: { id: 'loc-123' },
     cycleCountIds: ['req-1'],
   })),
+  useDispatch: () => mockDispatch,
   connect: jest.fn(() => (Component) => Component),
 }));
 jest.mock('hooks/useTranslate', () => jest.fn(() => (key) => key));

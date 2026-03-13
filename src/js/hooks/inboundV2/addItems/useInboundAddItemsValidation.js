@@ -1,3 +1,4 @@
+import { isBefore } from 'date-fns';
 import { z } from 'zod';
 
 import useTranslate from 'hooks/useTranslate';
@@ -12,9 +13,18 @@ const useInboundAddItemsV2Validation = () => {
       id: z.string(),
       value: z.string(),
       label: z.string(),
+      lotAndExpiryControl: z.boolean().optional().nullable(),
     }).optional().nullable(),
     lotNumber: z.string().optional(),
-    expirationDate: z.string().optional().nullable(),
+    expirationDate: z
+      .string()
+      .optional()
+      .nullable()
+      .refine(
+        (date) => !date || !isBefore(date, new Date(2000, 0, 1)), {
+          message: translate('react.stockMovement.error.invalidDate.label', 'This date is invalid. Please enter a date after 2000.'),
+        },
+      ),
     quantityRequested: z.number()
       .min(0, translate('react.stockMovement.error.enterQuantity.label', 'Enter proper quantity'))
       .optional()
@@ -42,16 +52,32 @@ const useInboundAddItemsV2Validation = () => {
       message: translate('react.stockMovement.error.enterQuantity.label', 'Enter proper quantity'),
       path: ['quantityRequested'],
     })
-    .refine((data) => {
-      if (!data.expirationDate) {
+    .refine(
+      (data) => {
+        // If product has lot and expiry control, it has to have the expiration date filled
+        if (data.product?.lotAndExpiryControl) {
+          return Boolean(data.expirationDate);
+        }
         return true;
-      }
-      const date = new Date(data.expirationDate);
-      return date.getFullYear() >= 2000;
-    }, {
-      message: translate('react.stockMovement.error.invalidDate.label', 'This date is invalid. Please enter a date after 2000.'),
-      path: ['expirationDate'],
-    });
+      },
+      {
+        message: translate('react.stockMovement.error.lotAndExpiryControl.label', 'Both lot number and expiry date are required for this item.'),
+        path: ['expirationDate'],
+      },
+    )
+    .refine(
+      (data) => {
+        // If product has lot and expiry control, it has to have the lotNumber filled
+        if (data.product?.lotAndExpiryControl) {
+          return Boolean(data.lotNumber);
+        }
+        return true;
+      },
+      {
+        message: translate('react.stockMovement.error.lotAndExpiryControl.label', 'Both lot number and expiry date are required for this item.'),
+        path: ['lotNumber'],
+      },
+    );
 
   const validationSchema = z.object({
     values: z.object({

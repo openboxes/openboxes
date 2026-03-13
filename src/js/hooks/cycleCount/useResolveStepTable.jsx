@@ -9,7 +9,7 @@ import _ from 'lodash';
 import { RiChat3Line, RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
-import { makeGetLotNumbersByProductId } from 'selectors';
+import { getLotNumbersByProductId } from 'selectors';
 
 import { fetchReasonCodes } from 'actions';
 import { FETCH_CYCLE_COUNT_REASON_CODES } from 'actions/types';
@@ -53,8 +53,6 @@ const useResolveStepTable = ({
   // State for saving data for binLocation dropdown
   const translate = useTranslate();
   const events = new EventEmitter();
-
-  const getLotNumbersByProductId = useMemo(() => makeGetLotNumbersByProductId(), []);
 
   const {
     users,

@@ -1,3 +1,4 @@
+import { isBefore } from 'date-fns';
 import { z } from 'zod';
 
 import useTranslate from 'hooks/useTranslate';
@@ -44,6 +45,20 @@ const useInboundCreateValidation = () => {
     label: z.string(),
   }).optional().nullable();
 
+  const dateRequestedSchema = z
+    .string({
+      invalid_type_error: requiredFieldMessage,
+      required_error: requiredFieldMessage,
+    })
+    .refine((pickedDate) => validateFutureDateFns(pickedDate), {
+      message: translate('react.default.error.futureDate.label', 'The date cannot be in the future'),
+    })
+    .refine(
+      (date) => !date || !isBefore(date, new Date(2000, 0, 1)), {
+        message: translate('react.stockMovement.error.invalidDate.label', 'This date is invalid. Please enter a date after 2000.'),
+      },
+    );
+
   const validationSchema = () => z.object({
     description: z
       .string({
@@ -55,14 +70,7 @@ const useInboundCreateValidation = () => {
     destination: destinationSchema,
     stocklist: stocklistSchema,
     requestedBy: requestedBySchema,
-    dateRequested: z
-      .string({
-        invalid_type_error: requiredFieldMessage,
-        required_error: requiredFieldMessage,
-      })
-      .refine((pickedDate) => validateFutureDateFns(pickedDate), {
-        message: translate('react.default.error.futureDate.label', 'The date cannot be in the future'),
-      }),
+    dateRequested: dateRequestedSchema,
   });
 
   return {

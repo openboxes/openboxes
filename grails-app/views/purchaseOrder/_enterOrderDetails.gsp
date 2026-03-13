@@ -98,7 +98,7 @@
                             <tr class='prop'>
                                 <td class='name middle'><label><warehouse:message code="order.destinationParty.label"/></label></td>
                                 <td valign='top' class='value ${hasErrors(bean:order,field:'destinationParty','errors')}'>
-                                    ${order.destinationParty.name} (${order.destinationParty?.code})
+                                    ${order.destinationParty?.name} (${order.destinationParty?.code})
                                     <g:hiddenField name="destinationParty.id" value="${order?.destinationParty?.id}"/>
                                 </td>
                             </tr>

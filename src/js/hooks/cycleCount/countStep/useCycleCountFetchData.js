@@ -24,7 +24,6 @@ const useCycleCountFetchData = (
   const dispatch = useDispatch();
   const supportedActivities = useSelector(getCurrentLocationSupportedActivities);
   const uniqueProductIds = useSelector(getAllCycleCountProducts);
-
   const showBinLocation = useMemo(
     () => checkBinLocationSupport(supportedActivities),
     [supportedActivities],
@@ -41,9 +40,11 @@ const useCycleCountFetchData = (
   }, [currentLocationId, showBinLocation]);
 
   useEffect(() => {
-    dispatch(
-      fetchCycleCounts(cycleCountIds, currentLocationId, sortByProductName, showBinLocation),
-    );
+    if (cycleCountIds.length > 0) {
+      dispatch(
+        fetchCycleCounts(cycleCountIds, currentLocationId, sortByProductName, showBinLocation),
+      );
+    }
 
     return () => {
       dispatch(clearErrorsData);
