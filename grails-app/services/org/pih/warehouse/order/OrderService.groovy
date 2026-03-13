@@ -213,7 +213,9 @@ class OrderService {
                 if (orderTemplate.origin) {
                     eq("origin", orderTemplate.origin)
                 }
-                if (orderTemplate.status) {
+                if (params.statuses) {
+                    'in'("status", params.statuses)
+                } else if (orderTemplate.status) {
                     eq("status", orderTemplate.status)
                 }
                 if (dateOrderedFrom) {

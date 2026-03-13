@@ -15,6 +15,7 @@ import grails.validation.ValidationException
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.api.StatusCategory
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
@@ -64,7 +65,12 @@ class OrderController {
 
         OrderType orderType = params.orderType ? OrderType.findByIdOrCode(params.orderType, params.orderType) : OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())
 
-        params.status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
+        List<OrderStatus> statuses = params.list("status")
+                .collect { Enum.valueOf(OrderStatus.class, it as String) }
+        if (params.statusCategory) {
+            statuses += OrderStatus.toSet(params.statusCategory as StatusCategory)
+        }
+        params.statuses = statuses?.unique() ?: null
         params.destinationParty = isCentralPurchasingEnabled ? currentLocation?.organization?.id : params.destinationParty
 
         // Pagination parameters
@@ -205,7 +211,7 @@ class OrderController {
         [
                 orders         : orders,
                 command        : command,
-                status         : orderTemplate.status,
+                statuses       : params.statuses,
                 statusStartDate: statusStartDate,
                 statusEndDate  : statusEndDate,
                 totalPrice     : totalPrice,

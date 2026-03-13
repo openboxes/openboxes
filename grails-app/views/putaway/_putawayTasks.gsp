@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.api.PutawayTaskStatus" %>
 <div id="tab-content" class="box">
     <h2>
         <warehouse:message code="putaway.tasks.label" default="Putaway Tasks"/>
@@ -18,6 +19,7 @@
             <th><warehouse:message code="putawayTask.dateCompleted.label" default="Date Completed"/></th>
             <th><warehouse:message code="putawayTask.dateCanceled.label" default="Date Canceled"/></th>
             <th><warehouse:message code="putawayTask.discrepancyReasonCode.label" default="Date Canceled"/></th>
+            <th><warehouse:message code="default.actions.label" default="Actions"/></th>
         </tr>
         </thead>
         <tbody>
@@ -35,12 +37,23 @@
                 <td><g:formatDate date="${task.dateCompleted}" format="dd/MM/yyyy"/></td>
                 <td><g:formatDate date="${task.dateCanceled}" format="dd/MM/yyyy"/></td>
                 <td>${task.discrepancyReasonCode}</td>
+                <td>
+                    <g:if test="${task.status == PutawayTaskStatus.PENDING}">
+                        <a href="javascript:void(0)"
+                           class="btn-rerun-strategy button"
+                           data-task-id="${task.id}"
+                           data-facility-id="${orderInstance?.destination?.id}">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}" />&nbsp;
+                            <warehouse:message code="react.putawayTask.rerunStrategy.label" default="Rerun Strategy"/>
+                        </a>
+                    </g:if>
+                </td>
             </tr>
         </g:each>
 
         <g:unless test="${putawayTasks}">
             <tr>
-                <td colspan="11" class="center">
+                <td colspan="13" class="center">
                     <warehouse:message code="putawayTask.noTasks.label" default="No tasks available"/>
                 </td>
             </tr>
@@ -48,3 +61,28 @@
         </tbody>
     </table>
 </div>
+<script>
+    $(document).on('click', '.btn-rerun-strategy', function(e) {
+        e.preventDefault();
+        var taskId = $(this).data('task-id');
+        var facilityId = $(this).data('facility-id');
+        var confirmMessage = '${warehouse.message(code: "react.putawayTask.rerunStrategy.confirm.label", default: "Are you sure you want to rerun the putaway strategy? The current task will be replaced with new strategy results.")}';
+        if (!confirm(confirmMessage)) {
+            return;
+        }
+        var url = '${request.contextPath}/api/facilities/' + facilityId + '/putaway-tasks/' + taskId;
+        $.ajax({
+            url: url,
+            type: 'PATCH',
+            contentType: 'application/json',
+            data: JSON.stringify({ action: 'rerunStrategy' }),
+            success: function() {
+                alert('${warehouse.message(code: "react.putawayTask.rerunStrategy.success.label", default: "Putaway strategy has been rerun successfully")}');
+                window.location.reload();
+            },
+            error: function(xhr) {
+                alert('Error: ' + (xhr.responseJSON?.message || xhr.statusText));
+            }
+        });
+    });
+</script>

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { Form } from 'react-final-form';
+import { Form, FormSpy } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
@@ -15,6 +15,24 @@ import { renderFormField } from 'utils/form-utils';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/Filter/FilterStyles.scss';
+
+const AutoSubmitOnChange = ({ values, excludeField, onSubmit }) => {
+  const prevValuesRef = useRef(null);
+
+  useEffect(() => {
+    const current = _.omit(values, excludeField);
+    const previous = prevValuesRef.current
+      ? _.omit(prevValuesRef.current, excludeField)
+      : null;
+
+    if (previous !== null && !_.isEqual(current, previous)) {
+      onSubmit();
+    }
+    prevValuesRef.current = values;
+  }, [values]);
+
+  return null;
+};
 
 const FilterForm = ({
   filterFields,
@@ -37,6 +55,7 @@ const FilterForm = ({
   showFilterVisibilityToggler,
   showSearchField,
   disableAutoUpdateFilterParams,
+  autoSubmitOnFilterChange,
   onSubmit,
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
@@ -144,6 +163,17 @@ const FilterForm = ({
           countFilled(values);
           return (
             <form onSubmit={handleSubmit} className="w-100 m-0">
+              {autoSubmitOnFilterChange && (
+                <FormSpy subscription={{ values: true }}>
+                  {({ values: formValues }) => (
+                    <AutoSubmitOnChange
+                      values={formValues}
+                      excludeField={searchFieldId}
+                      onSubmit={handleSubmit}
+                    />
+                  )}
+                </FormSpy>
+              )}
               <div className="classic-form with-description align-items-center flex-wrap">
                 <div className="w-100 d-flex filter-header align-items-center">
                   <div className="min-w-50 d-flex align-items-center gap-8">
@@ -234,6 +264,7 @@ FilterForm.propTypes = {
   customSubmitButtonDefaultLabel: PropTypes.string,
   showFilterVisibilityToggler: PropTypes.bool,
   disableAutoUpdateFilterParams: PropTypes.bool,
+  autoSubmitOnFilterChange: PropTypes.bool,
   onSubmit: PropTypes.func,
 };
 
@@ -253,5 +284,6 @@ FilterForm.defaultProps = {
   customSubmitButtonDefaultLabel: null,
   showFilterVisibilityToggler: true,
   disableAutoUpdateFilterParams: false,
+  autoSubmitOnFilterChange: false,
   onSubmit: () => {},
 };

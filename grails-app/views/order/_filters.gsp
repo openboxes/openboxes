@@ -44,8 +44,8 @@
                           from="${OrderStatus.list()}"
                           class="select2"
                           optionValue="${{ format.metadata(obj: it) }}"
-                          value="${params.status}"
-                          noSelection="['': '']"
+                          value="${statuses}"
+                          multiple="true"
                           data-testid="status.select"
                 />
             </div>

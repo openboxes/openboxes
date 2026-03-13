@@ -18,6 +18,7 @@ class RandomSlottingStrategy implements PutawayStrategy {
                     location: context.currentBinLocation,
                     destination: randomLocation,
                     quantity: quantityRemaining,
+                    comment: "Random",
             )
         }
 
