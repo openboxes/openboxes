@@ -56,6 +56,13 @@ const STOCK_MOVEMENT_URL = {
   uploadDocuments: (id) => `${STOCK_MOVEMENT_URL.base}/uploadDocuments/${id}`,
 };
 
+const OUTBOUND_MOVEMENT_URL = {
+  base: `${CONTEXT_PATH}/outboundMovement`,
+  list: () => `${OUTBOUND_MOVEMENT_URL.base}/list`,
+  listRequest: () => `${OUTBOUND_MOVEMENT_URL.list()}?sourceType=ELECTRONIC`,
+  show: (id) => `${OUTBOUND_MOVEMENT_URL.base}/show/${id}`,
+};
+
 const INVOICE_URL = {
   base: `${CONTEXT_PATH}/invoice`,
   create: () => `${INVOICE_URL.base}/create`,
@@ -167,6 +174,7 @@ export {
   LOCATION_CONFIGURATION_URL,
   LOCATION_URL,
   ORDER_URL,
+  OUTBOUND_MOVEMENT_URL,
   PRODUCT_CONFIGURATION_URL,
   PRODUCT_SUPPLIER_URL,
   PRODUCT_URL,
