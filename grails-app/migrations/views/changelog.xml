@@ -201,4 +201,7 @@
   <changeSet id="181120251300-1" author="druchniewicz" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/pick-task.sql"/>
   </changeSet>
+  <changeSet id="100320261200-0" author="druchniewicz" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/replenishment-task.sql"/>
+  </changeSet>
 </databaseChangeLog>
