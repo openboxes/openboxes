@@ -25,7 +25,9 @@ const usePutawayTaskListTableData = (filterParams) => {
     state,
     sortingParams,
   }) => {
-    const { statusCategory, status, searchTerm, container, destination } = filterParams;
+    const {
+      statusCategory, status, searchTerm, container, destination,
+    } = filterParams;
     return _.omitBy({
       offset: `${offset}`,
       max: `${state.pageSize}`,
