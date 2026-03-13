@@ -66,6 +66,15 @@
                 <img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
                 <warehouse:message code="default.list.label" args="[g.message(code: 'orders.label')]" default="List orders"/>
             </g:link>
+            <g:set var="disabled" value="${orderInstance?.status in [OrderStatus.COMPLETED, OrderStatus.CANCELED]}"/>
+            <g:link controller="putaway" action="create" id="${orderInstance?.id}" class="button" disabled="${disabled}" disabledMessage="This feature is not available for completed and canceled putaways">
+                <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
+                <warehouse:message code="default.edit.label" args="[warehouse.message(code:'putawayOrder.label')]"/>
+            </g:link>
+            <g:link controller="putaway" action="generatePdf" id="${orderInstance?.id}" class="button" target="_blank">
+                <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />&nbsp;
+                <warehouse:message code="putaway.printPutaways.label" default="Print Putaways"/>
+            </g:link>
             <div class="button-group right">
                 <g:link controller="order" action="addComment" id="${orderInstance?.id}" class="button">
                     <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
@@ -75,17 +84,8 @@
                     <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
                     <warehouse:message code="order.addDocument.label" default="Add document"/>
                 </g:link>
-                <g:link controller="putaway" action="generatePdf" id="${orderInstance?.id}" class="button" target="_blank">
-                    <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />&nbsp;
-                    <warehouse:message code="putaway.generatePutawayList.label" default="Generate Putaway List"/>
-                </g:link>
             </div>
             <div class="button-group right">
-                <g:set var="disabled" value="${orderInstance?.status in [OrderStatus.COMPLETED, OrderStatus.CANCELED]}"/>
-                <g:link controller="putaway" action="create" id="${orderInstance?.id}" class="button" disabled="${disabled}" disabledMessage="This feature is not available for completed and canceled putaways">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
-                    <warehouse:message code="default.edit.label" args="[warehouse.message(code:'putawayOrder.label')]"/>
-                </g:link>
                 <g:if test="${orderInstance?.status != OrderStatus.PENDING}">
                     <g:link controller="putaway" action="rollback" id="${orderInstance.id}" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;

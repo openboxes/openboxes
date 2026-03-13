@@ -12,6 +12,7 @@
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
         <style>
             .canceled-item { background-color: grey; }
+            .dlg { display: none; }
         </style>
     </head>
     <body>
@@ -162,6 +163,9 @@
                     </div>
                 </div>
             </div>
+            <div id="edit-putaway-task-dialog" class="dlg box">
+                <!-- contents will be lazy loaded -->
+            </div>
         </div>
 
         <script>
@@ -188,7 +192,33 @@
                     },
                     selected: ${params.tab ? params.tab : 0}
                 });
+
+                $("#edit-putaway-task-dialog").dialog({
+                    autoOpen: false,
+                    modal: true,
+                    width: 800,
+                    title: "${warehouse.message(code: 'putawayTask.edit.label', default: 'Edit Putaway Task')}"
+                });
             });
+
+            function editPutawayTask(taskId) {
+                var url = "${request.contextPath}/putaway/putawayTaskFormDialog/" + taskId;
+                $('.loading').show();
+                $("#edit-putaway-task-dialog").html("Loading ...").load(url, function(response, status, xhr) {
+                    $('.loading').hide();
+                    if (status == "error") {
+                        $.notify("Error loading putaway task", "error");
+                    } else {
+                        $(this).dialog("open");
+                    }
+                });
+            }
+
+            function reloadPutawayTasks() {
+                var orderId = $("#orderId").val();
+                var url = "${request.contextPath}/putaway/putawayTasks/" + orderId;
+                $(".tabs .ui-tabs-panel").load(url);
+            }
         </script>
     </body>
 </html>

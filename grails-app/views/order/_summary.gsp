@@ -104,7 +104,7 @@
                     </g:link>
                     <g:link controller="putAway" action="generatePdf" id="${orderInstance?.id}" class="button" target="_blank">
                         <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />&nbsp;
-                        <warehouse:message code="putaway.generatePutawayList.label" default="Generate Putaway List"/>
+                        <warehouse:message code="putaway.printPutaways.label" default="Print Putaways"/>
                     </g:link>
                 </div>
                 <div class="button-group right">

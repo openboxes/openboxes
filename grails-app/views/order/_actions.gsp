@@ -105,7 +105,7 @@
 				<div class="action-menu-item">
 					<g:link controller="putAway" action="generatePdf" id="${orderInstance?.id}" target="_blank">
 						<img src="${resource(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>
-						<warehouse:message code="putaway.generatePutawayList.label" default="Generate Putaway List"/>
+						<warehouse:message code="putaway.printPutaways.label" default="Print Putaways"/>
 					</g:link>
 				</div>
 			</g:elseif>
