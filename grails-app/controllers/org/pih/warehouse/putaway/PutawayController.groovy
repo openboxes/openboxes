@@ -1,16 +1,22 @@
 package org.pih.warehouse.putaway
 
+import com.google.zxing.BarcodeFormat
+import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
+import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.api.putaway.SearchPutawayTaskCommand
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.order.Order
 
 @Transactional
 class PutawayController {
 
+    def barcodeService
     def productAvailabilityService
     PutawayService putawayService
     PutawayTaskService putawayTaskService
@@ -70,6 +76,87 @@ class PutawayController {
         redirect(controller: "order", action: "list", params: [orderType: "PUTAWAY_ORDER", status: "PENDING"])
     }
 
+    @Transactional(readOnly = true)
+    def putawayTaskFormDialog(String id) {
+        PutawayTask task = putawayTaskService.get(id)
+        if (!task) {
+            render status: 404, text: "Putaway task not found"
+            return
+        }
+        render(template: "putawayTaskFormDialog", model: [task: task, facility: task.facility])
+    }
+
+    def savePutawayTask() {
+        try {
+            PutawayTask task = putawayTaskService.get(params['task.id'])
+            if (!task) {
+                response.status = 404
+                render([errorMessage: "Putaway task not found"] as JSON)
+                return
+            }
+            if (params.status) {
+                task.status = params.status as PutawayTaskStatus
+            }
+            if (params.containsKey('destination.id')) {
+                task.destination = params['destination.id'] ? Location.get(params['destination.id']) : null
+            }
+            if (params.containsKey('container.id')) {
+                task.container = params['container.id'] ? Location.get(params['container.id']) : null
+            }
+            if (params.containsKey('assignee.id')) {
+                task.assignee = params['assignee.id'] ? Person.get(params['assignee.id']) : null
+            }
+            task.dateStarted = parseDateStruct(params, 'dateStarted')
+            task.dateCompleted = parseDateStruct(params, 'dateCompleted')
+            putawayTaskService.save(task)
+            render(status: 200, text: "OK")
+        } catch (Exception e) {
+            log.error("Error saving putaway task", e)
+            response.status = 500
+            render([errorMessage: e.message] as JSON)
+        }
+    }
+
+    @Transactional(readOnly = true)
+    def putawayTaskTicket(String id) {
+        PutawayTask task = putawayTaskService.get(id)
+        if (!task) {
+            flash.message = "Putaway task not found"
+            redirect(action: "show", id: id)
+            return
+        }
+        render(template: "putawayTaskTicket", model: [task: task, pdfMode: false])
+    }
+
+    @Transactional(readOnly = true)
+    def downloadPutawayTaskTicket(String id) {
+        PutawayTask task = putawayTaskService.get(id)
+        if (!task) {
+            render status: 404, text: "Putaway task not found"
+            return
+        }
+
+        def productCodeBytes = generateBarcode(task.product?.productCode)
+        def destinationBytes = generateBarcode(task.destination?.locationNumber ?: task.destination?.name)
+        def containerBytes = generateBarcode(task.container?.locationNumber ?: task.container?.name)
+
+        renderPdf(
+                template: "putawayTaskTicket",
+                model: [task: task, pdfMode: true,
+                        productCodeBytes: productCodeBytes,
+                        destinationBytes: destinationBytes,
+                        containerBytes: containerBytes],
+                filename: "PutawayTask-${task.identifier ?: task.id}.pdf"
+        )
+    }
+
+    private byte[] generateBarcode(String data) {
+        if (!data) return null
+        def baos = new ByteArrayOutputStream()
+        barcodeService.renderImage(baos, data, 200, 50, BarcodeFormat.CODE_128)
+        return baos.toByteArray()
+    }
+
     def generatePdf() {
         log.info "Params " + params
 
@@ -95,5 +182,22 @@ class PutawayController {
                 model: [jsonObject: jsonObject],
                 filename: "Putaway ${putaway?.putawayNumber}.pdf"
         )
+    }
+
+    private Date parseDateStruct(def params, String prefix) {
+        if (params["${prefix}"] != 'struct' || !params["${prefix}_year"]) {
+            return null
+        }
+        Calendar cal = Calendar.instance
+        cal.clear()
+        cal.set(
+            params.int("${prefix}_year"),
+            params.int("${prefix}_month") - 1,
+            params.int("${prefix}_day"),
+            params.int("${prefix}_hour") ?: 0,
+            params.int("${prefix}_minute") ?: 0,
+            0
+        )
+        return cal.time
     }
 }

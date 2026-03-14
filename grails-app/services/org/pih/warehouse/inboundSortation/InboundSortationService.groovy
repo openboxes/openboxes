@@ -49,14 +49,7 @@ class InboundSortationService {
             throw new IllegalStateException("Can only rerun strategy on PENDING putaway tasks")
         }
 
-        // 2. Capture context from existing order item (before deletion)
-        OrderItem orderItem = OrderItem.get(task.putawayOrderItem.id)
-        Order order = orderItem.order
-        Receipt receipt = orderItem.receipt
-        ReceiptItem receiptItem = orderItem.receiptItem
-        User createdBy = order.orderedBy
-
-        // 3. Build PutawayContext
+        // 2. Build PutawayContext from existing task
         PutawayContext context = new PutawayContext(
                 facility: task.facility,
                 product: task.product,
@@ -68,24 +61,16 @@ class InboundSortationService {
                 quantity: task.quantity.intValue()
         )
 
-        // 4. Delete old putaway order (rollbackAndDelete handles PENDING correctly — no-op rollback + delete)
-        task.discard()
-        putawayService.rollbackAndDelete(Putaway.createFromOrder(order))
-
-        // 5. Execute strategy chain
+        // 3. Execute strategy chain
         List<PutawayResult> results = slottingService.execute(context)
+        PutawayResult result = results?.find { it.quantity > 0 }
 
-        // 6. Create new putaway orders from results (same pattern as createPutawayOrdersFromReceipt)
-        results.each { PutawayResult result ->
-            if (result.quantity > 0) {
-                Putaway putaway = createPutaway(context, createdBy)
-                PutawayItem putawayItem = createPutawayItem(result)
-                putawayItem.receipt = receipt
-                putawayItem.receiptItem = receiptItem
-                putaway.putawayItems.add(putawayItem)
-                putawayService.savePutaway(putaway)
-            }
-        }
+        // 4. Update existing order item with new strategy results
+        OrderItem orderItem = OrderItem.get(task.putawayOrderItem.id)
+        orderItem.destinationBinLocation = result?.destination
+        orderItem.containerLocation = result?.container
+        orderItem.description = result?.comment
+        orderItem.save(failOnError: true)
     }
 
     private PutawayContext createPutawayContext(ReceiptItem receiptItem) {

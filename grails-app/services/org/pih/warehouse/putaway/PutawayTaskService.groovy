@@ -186,7 +186,7 @@ class PutawayTaskService {
 
             case 'rerunStrategy':
                 inboundSortationService.rerunPutawayStrategy(task)
-                task = null  // original task is deleted
+                task = PutawayTask.get(task.id)  // refresh from view
                 break
 
             default:

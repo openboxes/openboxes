@@ -7,30 +7,94 @@
     <table class="table table-bordered">
         <thead>
         <tr>
+            <th><warehouse:message code="default.actions.label" default="Actions"/></th>
             <th><warehouse:message code="putawayTask.identifier.label" default="Identifier"/></th>
             <th><warehouse:message code="putawayTask.status.label" default="Status"/></th>
+            <th><warehouse:message code="putawayTask.type.label" default="Type"/></th>
             <th><warehouse:message code="putawayTask.product.label" default="Product"/></th>
             <th><warehouse:message code="putawayTask.currentLocation.label" default="Current Location"/></th>
             <th><warehouse:message code="putawayTask.container.label" default="Putaway Container"/></th>
             <th><warehouse:message code="putawayTask.destination.label" default="Destination"/></th>
+            <th><warehouse:message code="putawayTask.strategy.label" default="Strategy"/></th>
             <th><warehouse:message code="putawayTask.quantity.label" default="Quantity"/></th>
             <th><warehouse:message code="putawayTask.assignee.label" default="Assignee"/></th>
             <th><warehouse:message code="putawayTask.dateStarted.label" default="Date Started"/></th>
             <th><warehouse:message code="putawayTask.dateCompleted.label" default="Date Completed"/></th>
             <th><warehouse:message code="putawayTask.dateCanceled.label" default="Date Canceled"/></th>
             <th><warehouse:message code="putawayTask.discrepancyReasonCode.label" default="Date Canceled"/></th>
-            <th><warehouse:message code="default.actions.label" default="Actions"/></th>
+            <th><warehouse:message code="receipt.receiptNumber.label" default="Receipt Number"/></th>
         </tr>
         </thead>
         <tbody>
         <g:each in="${putawayTasks}" var="task" status="i">
             <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+                <td class="middle" width="1%">
+                    <span class="action-menu">
+                        <button class="action-btn">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
+                        </button>
+                        <div class="actions">
+                            <div class="action-menu-item">
+                                <a href="javascript:void(0)"
+                                   class="btn-edit-putaway-task"
+                                   data-task-id="${task.id}">
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />
+                                    &nbsp;<warehouse:message code="putawayTask.edit.label" default="Edit Putaway Task"/>
+                                </a>
+                            </div>
+                            <div class="action-menu-item">
+                                <a href="${createLink(controller: 'putaway', action: 'putawayTaskTicket', id: task.id)}"
+                                   target="_blank">
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />
+                                    &nbsp;<warehouse:message code="putawayTask.ticket.label" default="Print Ticket"/>
+                                </a>
+                            </div>
+                            <g:if test="${task.status == PutawayTaskStatus.PENDING}">
+                                <div class="action-menu-item">
+                                    <a href="javascript:void(0)"
+                                       class="btn-rerun-strategy"
+                                       data-task-id="${task.id}"
+                                       data-facility-id="${orderInstance?.destination?.id}">
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}" />
+                                        &nbsp;<warehouse:message code="react.putawayTask.rerunStrategy.label" default="Rerun Strategy"/>
+                                    </a>
+                                </div>
+                            </g:if>
+                        </div>
+                    </span>
+                </td>
                 <td>${task.identifier ?: '-'}</td>
                 <td>${task.status}</td>
-                <td>${task.product?.productCode} - ${task.product?.name}</td>
-                <td>${task.location?.name}</td>
-                <td>${task.container?.name ?: '-'}</td>
-                <td>${task.destination?.name ?: '-'}</td>
+                <td><format:metadata obj="${task.putawayTypeCode}"/></td>
+                <td>
+                    <g:link controller="inventoryItem" action="showStockCard" params="['product.id': task.product?.id]">
+                        ${task.product?.productCode} - ${task.product?.name}
+                    </g:link>
+                </td>
+                <td>
+                    <g:if test="${task.location}">
+                        <g:link controller="location" action="show" id="${task.location?.id}">
+                            ${task.location?.name}
+                        </g:link>
+                    </g:if>
+                </td>
+                <td>
+                    <g:if test="${task.container}">
+                        <g:link controller="location" action="edit" id="${task.container?.id}">
+                            ${task.container?.name}
+                        </g:link>
+                    </g:if>
+                    <g:else>-</g:else>
+                </td>
+                <td>
+                    <g:if test="${task.destination}">
+                        <g:link controller="location" action="show" id="${task.destination?.id}">
+                            ${task.destination?.name}
+                        </g:link>
+                    </g:if>
+                    <g:else>-</g:else>
+                </td>
+                <td>${task.comment ?: '-'}</td>
                 <td class="right">${task.quantity}</td>
                 <td>${task.assignee?.name ?: warehouse.message(code:'putawayTask.unassigned.label', default:'Unassigned')}</td>
                 <td><g:formatDate date="${task.dateStarted}" format="dd/MM/yyyy"/></td>
@@ -38,22 +102,19 @@
                 <td><g:formatDate date="${task.dateCanceled}" format="dd/MM/yyyy"/></td>
                 <td>${task.discrepancyReasonCode}</td>
                 <td>
-                    <g:if test="${task.status == PutawayTaskStatus.PENDING}">
-                        <a href="javascript:void(0)"
-                           class="btn-rerun-strategy button"
-                           data-task-id="${task.id}"
-                           data-facility-id="${orderInstance?.destination?.id}">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}" />&nbsp;
-                            <warehouse:message code="react.putawayTask.rerunStrategy.label" default="Rerun Strategy"/>
-                        </a>
+                    <g:if test="${task.putawayOrderItem?.receipt}">
+                        <g:link controller="shipment" action="showDetails" id="${task.putawayOrderItem.receipt.shipment?.id}">
+                            ${task.putawayOrderItem.receipt.receiptNumber}
+                        </g:link>
                     </g:if>
+                    <g:else>-</g:else>
                 </td>
             </tr>
         </g:each>
 
         <g:unless test="${putawayTasks}">
             <tr>
-                <td colspan="13" class="center">
+                <td colspan="15" class="center">
                     <warehouse:message code="putawayTask.noTasks.label" default="No tasks available"/>
                 </td>
             </tr>
@@ -61,6 +122,13 @@
         </tbody>
     </table>
 </div>
+<script>
+    $(document).on('click', '.btn-edit-putaway-task', function(e) {
+        e.preventDefault();
+        var taskId = $(this).data('task-id');
+        editPutawayTask(taskId);
+    });
+</script>
 <script>
     $(document).on('click', '.btn-rerun-strategy', function(e) {
         e.preventDefault();

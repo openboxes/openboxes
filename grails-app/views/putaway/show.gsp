@@ -12,6 +12,7 @@
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
         <style>
             .canceled-item { background-color: grey; }
+            .dlg { display: none; }
         </style>
     </head>
     <body>
@@ -35,13 +36,13 @@
                     <div class="yui-u first">
                         <div id="details" class="box">
                             <h2>
-                                <g:message code="order.header.label" default="Order Header"/>
+                                <g:message code="putaway.details.label" default="Putaway Details"/>
                             </h2>
                             <table>
                                 <tbody>
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                        <label><warehouse:message code="order.orderNumber.label"/></label>
+                                        <label><warehouse:message code="putaway.putawayNumber.label" default="Putaway Number"/></label>
                                     </td>
                                     <td valign="top" class="value">
                                         ${orderInstance?.orderNumber}
@@ -52,31 +53,19 @@
                                         <label><warehouse:message code="default.status.label" /></label>
                                     </td>
                                     <td valign="top" id="status" class="value">
-                                        <span class="${orderInstance?.id}">${orderInstance?.getDisplayStatus()}</span>
+                                        <div class="tag tag-alert">
+                                            ${orderInstance?.getDisplayStatus()}
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                        <label><warehouse:message code="order.orderTypeCode.label" /></label>
-                                    </td>
-                                    <td valign="top" id="orderTypeCode" class="value">
-                                        <format:metadata obj="${orderInstance?.orderType?.name}"/>
-                                    </td>
-                                </tr>
-                                <tr class="prop">
-                                    <td valign="top" class="name">
-                                        <label><warehouse:message code="order.origin.label"/></label>
+                                        <label><warehouse:message code="facility.label" default="Facility"/></label>
                                     </td>
                                     <td valign="top" class="value">
-                                        ${orderInstance?.origin?.name}
-                                    </td>
-                                </tr>
-                                <tr class="prop">
-                                    <td valign="top" class="name">
-                                        <label><warehouse:message code="order.destination.label"/></label>
-                                    </td>
-                                    <td valign="top" class="value">
-                                        ${orderInstance?.destination?.name}
+                                        <g:link controller="location" action="show" id="${orderInstance?.destination?.id}">
+                                            ${orderInstance?.destination?.name}
+                                        </g:link>
                                     </td>
                                 </tr>
                                 </tbody>
@@ -132,8 +121,13 @@
                                         <label><warehouse:message code="order.createdBy.label"/></label>
                                     </td>
                                     <td valign="top" class="value">
-                                        <div>${orderInstance?.createdBy?.name }</div>
-                                        <small><format:date obj="${orderInstance?.dateCreated}"/></small>
+                                        <g:if test="${orderInstance?.createdBy}">
+                                            <div>${orderInstance?.createdBy?.name }</div>
+                                            <small><format:date obj="${orderInstance?.dateCreated}"/></small>
+                                        </g:if>
+                                        <g:else>
+                                            <g:message code="default.none.label"/>
+                                        </g:else>
                                     </td>
                                 </tr>
                                 <tr class="prop">
@@ -162,6 +156,9 @@
                     </div>
                 </div>
             </div>
+            <div id="edit-putaway-task-dialog" class="dlg box">
+                <!-- contents will be lazy loaded -->
+            </div>
         </div>
 
         <script>
@@ -188,7 +185,33 @@
                     },
                     selected: ${params.tab ? params.tab : 0}
                 });
+
+                $("#edit-putaway-task-dialog").dialog({
+                    autoOpen: false,
+                    modal: true,
+                    width: 800,
+                    title: "${warehouse.message(code: 'putawayTask.edit.label', default: 'Edit Putaway Task')}"
+                });
             });
+
+            function editPutawayTask(taskId) {
+                var url = "${request.contextPath}/putaway/putawayTaskFormDialog/" + taskId;
+                $('.loading').show();
+                $("#edit-putaway-task-dialog").html("Loading ...").load(url, function(response, status, xhr) {
+                    $('.loading').hide();
+                    if (status == "error") {
+                        $.notify("Error loading putaway task", "error");
+                    } else {
+                        $(this).dialog("open");
+                    }
+                });
+            }
+
+            function reloadPutawayTasks() {
+                var orderId = $("#orderId").val();
+                var url = "${request.contextPath}/putaway/putawayTasks/" + orderId;
+                $(".tabs .ui-tabs-panel").load(url);
+            }
         </script>
     </body>
 </html>
