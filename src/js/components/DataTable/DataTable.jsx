@@ -71,7 +71,7 @@ DataTable.defaultProps = {
   footerComponent: undefined,
   headerComponent: undefined,
   sortable: false,
-  resizable: false,
+  resizable: true,
   className: '',
   multiSort: false,
   totalData: undefined,
