@@ -129,6 +129,7 @@ assets {
 
 bootRun {
     addResources = true
+    dependsOn 'npm_run_bundledev'
     jvmArgs = [
         '-Dspring.output.ansi.enabled=never',
         '-Xdebug',
@@ -374,9 +375,9 @@ node {
     version = '14.21.3'
 }
 
-processResources {
-    dependsOn 'npm_run_bundle'
-}
+// Production webpack bundle runs before war packaging (CI);
+// bootRun uses the fast dev bundle via its own dependency above.
+war.dependsOn 'npm_run_bundle'
 
 repositories {
     mavenCentral()
@@ -851,6 +852,7 @@ task nodeVersionInfo(type: NpmTask) {
 }
 
 npm_run_bundle.dependsOn nodeVersionInfo
+npm_run_bundledev.dependsOn nodeVersionInfo
 
 task prepareDocker(type: Copy, dependsOn: assemble) {
     description = 'Copy files from ./docker and openboxes.war to build directory'
