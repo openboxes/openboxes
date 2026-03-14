@@ -11,6 +11,7 @@ package org.pih.warehouse.picklist
 
 import grails.converters.JSON
 import grails.validation.ValidationException
+import com.google.zxing.BarcodeFormat
 import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.Constants
@@ -20,6 +21,8 @@ import org.pih.warehouse.data.DataService
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.product.BarcodeService
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.picklist.PicklistImportDataCommand
 import org.springframework.web.multipart.MultipartFile
@@ -28,6 +31,7 @@ class PicklistController {
 
     PicklistService picklistService
     StockMovementService stockMovementService
+    BarcodeService barcodeService
     DataService dataService
     DocumentService documentService
 
@@ -92,6 +96,37 @@ class PicklistController {
 
         println location
         render(template: "/picklist/print", model: [requisition: requisition, picklist: picklist, location: location, order: params.order])
+    }
+
+    def printPickTicket() {
+        PicklistItem picklistItem = PicklistItem.get(params.id)
+        if (!picklistItem) {
+            flash.message = "Picklist item not found"
+            redirect(controller: "stockMovement", action: "show", id: params.id)
+            return
+        }
+        def requisition = picklistItem.requisitionItem?.requisition
+        def location = Location.get(session.warehouse.id)
+
+        def barcodes = [:]
+
+        def generateBarcode = { String data, int width = 160, int height = 40 ->
+            if (!data) return null
+            def out = new ByteArrayOutputStream()
+            barcodeService.renderImage(out, data, width, height, BarcodeFormat.CODE_128)
+            return out.toByteArray()
+        }
+
+        barcodes.requestNumber = generateBarcode(requisition?.requestNumber, 180, 40)
+        barcodes.productCode = generateBarcode(picklistItem.requisitionItem?.product?.productCode)
+        barcodes.binLocation = generateBarcode(picklistItem.binLocation?.name)
+        barcodes.lotNumber = generateBarcode(picklistItem.inventoryItem?.lotNumber)
+
+        renderPdf(
+                template: "/picklist/pickTicket",
+                model: [picklistItem: picklistItem, requisition: requisition, location: location, barcodes: barcodes],
+                filename: "Pick Ticket - ${requisition?.requestNumber} - ${picklistItem.requisitionItem?.product?.productCode}"
+        )
     }
 
     def exportPicklistItems() {

@@ -1175,6 +1175,20 @@ button.action-btn, button.previous, button.next {
 
 }
 
+/* Stock Movement Summary — row spacing and field layout */
+#stockMovement-summary td.middle > div:not(.title) {
+    padding: 5px 0;
+    border-bottom: 1px solid #e0e0e0;
+    line-height: 1.8;
+}
+#stockMovement-summary td.middle > div:not(.title):last-child {
+    border-bottom: none;
+}
+#stockMovement-summary td.middle > div:not(.title) > span {
+    display: inline-block;
+    margin-right: 20px;
+}
+
 #product-details-box span.name {   }
 #product-details-box span.value { font-size: 1.0em; }
 #product-details-box th { color: lightgrey; }

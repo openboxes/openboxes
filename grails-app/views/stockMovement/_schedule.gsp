@@ -2,7 +2,7 @@
 <div id="schedule" class="box dialog">
     <h2>
         <img src="${createLinkTo(dir:'images/icons/silk',file:'calendar.png')}" alt="contents" style="vertical-align: middle"/>
-        ${warehouse.message(code:'stockMovement.schedule.label', default: 'Scheduling')}
+        ${warehouse.message(code:'stockMovement.planning.label', default: 'Planning')}
     </h2>
 
         <g:form controller="stockMovement" action="saveSchedule">

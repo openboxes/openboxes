@@ -316,6 +316,12 @@ class StockMovementController {
 
     }
 
+    def picklist() {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        def picklistItems = stockMovement?.requisition?.picklist?.picklistItems
+        render(template: "picklist", model: [stockMovement: stockMovement, picklistItems: picklistItems])
+    }
+
     def schedule = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         render(template: "schedule", model: [stockMovement: stockMovement])
@@ -483,8 +489,40 @@ class StockMovementController {
         List<HistoryItem> historyItems = stockMovement?.shipment?.getHistory()?.sort() ?: []
         render(
                 template: "events",
-                model: [historyItems: historyItems, shipmentId: stockMovement?.shipment?.id]
+                model: [historyItems: historyItems, shipmentId: stockMovement?.shipment?.id, stockMovementId: stockMovement?.id]
         )
+    }
+
+    def addCustomEventDialog() {
+        render(template: "addCustomEventDialog", model: [stockMovementId: params.id])
+    }
+
+    def saveCustomEvent() {
+        StockMovement stockMovement = getStockMovement(params.stockMovementId)
+        if (!stockMovement) {
+            flash.message = "Stock movement not found"
+            redirect(action: "show", id: params.stockMovementId)
+            return
+        }
+
+        Shipment shipment = stockMovement.shipment
+        if (!shipment) {
+            flash.message = "${warehouse.message(code: 'stockMovement.noShipment.message', default: 'Cannot add event because no shipment exists for this stock movement')}"
+            redirect(action: "show", id: params.stockMovementId)
+            return
+        }
+
+        Event event = new Event()
+        bindData(event, params)
+        shipment.addToEvents(event)
+
+        if (params.comment?.comment) {
+            Comment comment = new Comment(comment: params.comment.comment, sender: session.user)
+            shipment.addToComments(comment)
+        }
+
+        shipment.save(flush: true, failOnError: true)
+        redirect(action: "show", id: params.stockMovementId)
     }
 
     // Used by SM show page 'tabs' actions - packing list, documents and receipts

@@ -110,7 +110,7 @@
                     </g:link>
                 </g:if>
                 <g:else>
-                    <g:if test="${isSameDestination || stockMovement?.canEditStockMovement()}">
+                    <g:if test="${stockMovement?.isEditAuthorized(currentLocation)}">
                         <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}" class="button">
                             <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
                             <warehouse:message code="default.button.edit.label" />
@@ -130,6 +130,36 @@
                         </g:link>
                     </g:if>
                 </g:if>
+
+                <g:if test="${grailsApplication.config.openboxes.receiving.manualAutoReceiving.enabled}">
+                    <span class="action-menu">
+                        <button class="action-btn button">
+                            <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />
+                            &nbsp; <warehouse:message code="default.button.receive.label"/>
+                            <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
+                        </button>
+                        <div class="actions">
+                            <div class="action-menu-item">
+                                <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}">
+                                    <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" class="middle"/>&nbsp;
+                                    <warehouse:message code="default.button.receive.label" />
+                                </g:link>
+                            </div>
+                            <div class="action-menu-item">
+                                <g:link controller="partialReceiving" action="autoreceive" id="${stockMovement?.shipment?.id}">
+                                    <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" class="middle"/>&nbsp;
+                                    <warehouse:message code="default.button.autoreceive.label" />
+                                </g:link>
+                            </div>
+                        </div>
+                    </span>
+                </g:if>
+                <g:else>
+                    <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
+                        <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                        <warehouse:message code="default.button.receive.label" />
+                    </g:link>
+                </g:else>
 
                 <g:if test="${stockMovement?.hasBeenStaged()}">
                     <g:link controller="requisition" action="issue" id="${stockMovement?.requisition?.id}" class="button">
@@ -713,19 +743,31 @@
                             </g:link>
                         </li>
                     </g:if>
+                    <g:if test="${!stockMovement?.origin?.isSupplier()}">
+                        <li role="tab">
+                            <g:link controller="stockMovement" action="picklist" params="${[ id: stockMovement?.id ]}">
+                                <g:message code="picklist.label" default="Picklist"/>
+                            </g:link>
+                        </li>
+                    </g:if>
                     <li role="tab">
                         <g:link controller="stockMovement" action="packingList" params="${[ id: stockMovement?.id ]}">
                             <g:message code="shipping.packingList.label" />
                         </g:link>
                     </li>
                     <li role="tab">
-                        <g:link controller="stockMovement" action="receipts" params="${[ id: stockMovement?.id ]}">
-                            <g:message code="receipts.label" default="Receipts"/>
-                        </g:link>
+                          <g:link controller="stockMovement"
+                                  action="schedule"
+                                  id="${stockMovement?.id}"
+                                  params="[id: stockMovement?.id]">
+                            <warehouse:message
+                              code="stockMovement.planning.label"
+                              default="Planning"/>
+                          </g:link>
                     </li>
                     <li role="tab">
-                        <g:link controller="stockMovement" action="events" params="${[ id: stockMovement?.id ]}">
-                            <g:message code="events.label" default="Event"/>
+                        <g:link controller="stockMovement" action="receipts" params="${[ id: stockMovement?.id ]}">
+                            <g:message code="receipts.label" default="Receipts"/>
                         </g:link>
                     </li>
                     <li role="tab">
@@ -747,14 +789,9 @@
                         </li>
                     </g:if>
                     <li role="tab">
-                          <g:link controller="stockMovement"
-                                  action="schedule"
-                                  id="${stockMovement?.id}"
-                                  params="[id: stockMovement?.id]">
-                            <warehouse:message
-                              code="stockMovement.schedule.label"
-                              default="Scheduling"/>
-                          </g:link>
+                        <g:link controller="stockMovement" action="events" params="${[ id: stockMovement?.id ]}">
+                            <g:message code="events.label" default="Events"/>
+                        </g:link>
                     </li>
                 </ul>
             </div>
@@ -768,11 +805,20 @@
       const stockMovementDirection = ${stockMovement?.destination?.id == currentLocation?.id} ? 'inbound' : 'outbound';
       applyActiveSection(stockMovementDirection);
 
+        var defaultTab = ${(stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING && stockMovement?.origin?.id == session.warehouse.id) || stockMovement?.origin?.isSupplier()} ? 0 : 1;
+        var cookieName = "stock-movement-show-tab";
+        var savedTab = $.cookie(cookieName);
+        var tabCount = $(".tabs ul li").length;
+
+        // Use saved tab if valid, otherwise use default
+        var activeTab = (savedTab !== null && savedTab < tabCount) ? parseInt(savedTab) : defaultTab;
+
         $(".tabs").tabs({
             cookie : {
-                expires : 1
+                expires : 1,
+                name: cookieName
             },
-            selected: ${(stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING && stockMovement?.origin?.id == session.warehouse.id) || stockMovement?.origin?.isSupplier()} ? 0 : 1
+            selected: activeTab
         });
     });
 </script>

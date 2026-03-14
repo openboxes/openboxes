@@ -177,33 +177,32 @@
         </g:else>
 
     </td>
-    <td class="middle center">
-        <div class="${requisitionItem?.isCanceled() ? 'canceled' : ''}">
-            ${requisitionItem?.calculateQuantityAllocated() ?: 0}
-        </div>
-    </td>
-    <td class="middle center">
-        <g:if test="${requisitionItem?.isSubstituted()}">
-            <div>
-                ${requisitionItem?.calculateQuantityPicked()?:0}
-            </div>
-        </g:if>
-        <g:elseif test="${requisitionItem?.isCanceled()}">
-            <div class="canceled">
-                ${requisitionItem?.calculateQuantityPicked()?:0}
-            </div>
-        </g:elseif>
-        <g:elseif test="${requisitionItem?.isChanged()}">
-            <div>
-                ${requisitionItem?.modificationItem?.calculateQuantityPicked()?:0}
-            </div>
-        </g:elseif>
-        <g:else>
-            ${requisitionItem?.calculateQuantityPicked()?:0}
-        </g:else>
-
-    </td>
     <g:if test="${!requestTab}">
+        <td class="middle center">
+            <div class="${requisitionItem?.isCanceled() ? 'canceled' : ''}">
+                ${requisitionItem?.calculateQuantityAllocated() ?: 0}
+            </div>
+        </td>
+        <td class="middle center">
+            <g:if test="${requisitionItem?.isSubstituted()}">
+                <div>
+                    ${requisitionItem?.calculateQuantityPicked()?:0}
+                </div>
+            </g:if>
+            <g:elseif test="${requisitionItem?.isCanceled()}">
+                <div class="canceled">
+                    ${requisitionItem?.calculateQuantityPicked()?:0}
+                </div>
+            </g:elseif>
+            <g:elseif test="${requisitionItem?.isChanged()}">
+                <div>
+                    ${requisitionItem?.modificationItem?.calculateQuantityPicked()?:0}
+                </div>
+            </g:elseif>
+            <g:else>
+                ${requisitionItem?.calculateQuantityPicked()?:0}
+            </g:else>
+        </td>
         <td class="middle center">
             <g:if test="${requisitionItem?.isSubstituted()}">
                 <div>
@@ -226,16 +225,6 @@
         </td>
     </g:if>
     <g:if test="${requestTab}">
-        <td class="middle center">
-            <g:if test="${requisitionItem?.isCanceled()}">
-                <div>
-                    ${requisitionItem?.quantityAdjusted?:0}
-                </div>
-            </g:if>
-            <g:else>
-                ${requisitionItem?.quantityAdjusted?:0}
-            </g:else>
-        </td>
         <td class="middle center">
             <g:if test="${requisitionItem?.isSubstituted()}">
                 <div>
