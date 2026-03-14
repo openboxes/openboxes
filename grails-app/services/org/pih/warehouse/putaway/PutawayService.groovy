@@ -518,7 +518,7 @@ class PutawayService implements EventPublisher  {
             }
 
             itemsToKeep.each { item ->
-                item.orderItemStatusCode = OrderItemStatusCode.IN_PROGRESS
+                item.orderItemStatusCode = OrderItemStatusCode.PENDING
                 item.discrepancyReasonCode = null
             }
 
