@@ -62,9 +62,9 @@
 <div class="buttonBar">
     <div class="button-container">
         <g:if test="${orderInstance?.id}">
-            <g:link controller="order" action="list" class="button" params="[orderType: Constants.PUTAWAY_ORDER]">
+            <g:link controller="putawayTask" action="list" class="button">
                 <img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
-                <warehouse:message code="default.list.label" args="[g.message(code: 'orders.label')]" default="List orders"/>
+                <warehouse:message code="default.list.label" args="[g.message(code: 'putaways.label', default: 'Putaways')]" default="List Putaways"/>
             </g:link>
             <g:set var="disabled" value="${orderInstance?.status in [OrderStatus.COMPLETED, OrderStatus.CANCELED]}"/>
             <g:link controller="putaway" action="create" id="${orderInstance?.id}" class="button" disabled="${disabled}" disabledMessage="This feature is not available for completed and canceled putaways">

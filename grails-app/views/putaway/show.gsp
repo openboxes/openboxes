@@ -36,13 +36,13 @@
                     <div class="yui-u first">
                         <div id="details" class="box">
                             <h2>
-                                <g:message code="order.header.label" default="Order Header"/>
+                                <g:message code="putaway.details.label" default="Putaway Details"/>
                             </h2>
                             <table>
                                 <tbody>
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                        <label><warehouse:message code="order.orderNumber.label"/></label>
+                                        <label><warehouse:message code="putaway.putawayNumber.label" default="Putaway Number"/></label>
                                     </td>
                                     <td valign="top" class="value">
                                         ${orderInstance?.orderNumber}
@@ -53,31 +53,19 @@
                                         <label><warehouse:message code="default.status.label" /></label>
                                     </td>
                                     <td valign="top" id="status" class="value">
-                                        <span class="${orderInstance?.id}">${orderInstance?.getDisplayStatus()}</span>
+                                        <div class="tag tag-alert">
+                                            ${orderInstance?.getDisplayStatus()}
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                        <label><warehouse:message code="order.orderTypeCode.label" /></label>
-                                    </td>
-                                    <td valign="top" id="orderTypeCode" class="value">
-                                        <format:metadata obj="${orderInstance?.orderType?.name}"/>
-                                    </td>
-                                </tr>
-                                <tr class="prop">
-                                    <td valign="top" class="name">
-                                        <label><warehouse:message code="order.origin.label"/></label>
+                                        <label><warehouse:message code="facility.label" default="Facility"/></label>
                                     </td>
                                     <td valign="top" class="value">
-                                        ${orderInstance?.origin?.name}
-                                    </td>
-                                </tr>
-                                <tr class="prop">
-                                    <td valign="top" class="name">
-                                        <label><warehouse:message code="order.destination.label"/></label>
-                                    </td>
-                                    <td valign="top" class="value">
-                                        ${orderInstance?.destination?.name}
+                                        <g:link controller="location" action="show" id="${orderInstance?.destination?.id}">
+                                            ${orderInstance?.destination?.name}
+                                        </g:link>
                                     </td>
                                 </tr>
                                 </tbody>
@@ -133,8 +121,13 @@
                                         <label><warehouse:message code="order.createdBy.label"/></label>
                                     </td>
                                     <td valign="top" class="value">
-                                        <div>${orderInstance?.createdBy?.name }</div>
-                                        <small><format:date obj="${orderInstance?.dateCreated}"/></small>
+                                        <g:if test="${orderInstance?.createdBy}">
+                                            <div>${orderInstance?.createdBy?.name }</div>
+                                            <small><format:date obj="${orderInstance?.dateCreated}"/></small>
+                                        </g:if>
+                                        <g:else>
+                                            <g:message code="default.none.label"/>
+                                        </g:else>
                                     </td>
                                 </tr>
                                 <tr class="prop">

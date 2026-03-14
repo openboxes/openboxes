@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 
 import PropTypes from 'prop-types';
-import { RiRefreshLine } from 'react-icons/ri';
+import { RiInformationLine, RiRefreshLine } from 'react-icons/ri';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
@@ -31,7 +31,15 @@ const PutawayTaskListTable = ({ filterParams }) => {
     tableRef,
   } = usePutawayTaskListTableData(filterParams);
 
-  const actions = useMemo(() => [
+  const getActions = (row) => [
+    {
+      label: 'react.putawayTask.showDetails.label',
+      defaultLabel: 'Show Details',
+      leftIcon: <RiInformationLine />,
+      href: row?.putawayOrder?.id
+        ? () => PUTAWAY_URL.show(row.putawayOrder.id)
+        : undefined,
+    },
     {
       label: 'react.putawayTask.rerunStrategy.label',
       defaultLabel: 'Rerun Strategy',
@@ -39,7 +47,7 @@ const PutawayTaskListTable = ({ filterParams }) => {
       statuses: ['PENDING'],
       onClick: (id) => rerunHandler(id),
     },
-  ], [rerunHandler]);
+  ];
 
   const columns = useMemo(() => [
     {
@@ -52,7 +60,7 @@ const PutawayTaskListTable = ({ filterParams }) => {
         <ContextMenu
           positions={['right']}
           dropdownClasses="action-dropdown-offset"
-          actions={findActions(actions, row, {})}
+          actions={findActions(getActions(row.original), row, {})}
           id={row.original.id}
         />
       ),
@@ -137,7 +145,7 @@ const PutawayTaskListTable = ({ filterParams }) => {
       headerClassName: 'header',
     },
     {
-      Header: <Translate id="react.putawayTask.column.comment.label" defaultMessage="Comment" />,
+      Header: <Translate id="react.putawayTask.column.strategy.label" defaultMessage="Strategy" />,
       accessor: 'comment',
       className: 'd-flex align-items-center',
       headerClassName: 'header',
@@ -148,7 +156,7 @@ const PutawayTaskListTable = ({ filterParams }) => {
       className: 'd-flex align-items-center',
       Cell: (row) => <DateCell {...row} />,
     },
-  ], [actions]);
+  ], [rerunHandler]);
 
   return (
     <div className="list-page-list-section">

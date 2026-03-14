@@ -15,6 +15,7 @@
             <th><warehouse:message code="putawayTask.currentLocation.label" default="Current Location"/></th>
             <th><warehouse:message code="putawayTask.container.label" default="Putaway Container"/></th>
             <th><warehouse:message code="putawayTask.destination.label" default="Destination"/></th>
+            <th><warehouse:message code="putawayTask.strategy.label" default="Strategy"/></th>
             <th><warehouse:message code="putawayTask.quantity.label" default="Quantity"/></th>
             <th><warehouse:message code="putawayTask.assignee.label" default="Assignee"/></th>
             <th><warehouse:message code="putawayTask.dateStarted.label" default="Date Started"/></th>
@@ -22,7 +23,6 @@
             <th><warehouse:message code="putawayTask.dateCanceled.label" default="Date Canceled"/></th>
             <th><warehouse:message code="putawayTask.discrepancyReasonCode.label" default="Date Canceled"/></th>
             <th><warehouse:message code="receipt.receiptNumber.label" default="Receipt Number"/></th>
-            <th><warehouse:message code="default.actions.label" default="Actions"/></th>
         </tr>
         </thead>
         <tbody>
@@ -49,6 +49,17 @@
                                     &nbsp;<warehouse:message code="putawayTask.ticket.label" default="Print Ticket"/>
                                 </a>
                             </div>
+                            <g:if test="${task.status == PutawayTaskStatus.PENDING}">
+                                <div class="action-menu-item">
+                                    <a href="javascript:void(0)"
+                                       class="btn-rerun-strategy"
+                                       data-task-id="${task.id}"
+                                       data-facility-id="${orderInstance?.destination?.id}">
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}" />
+                                        &nbsp;<warehouse:message code="react.putawayTask.rerunStrategy.label" default="Rerun Strategy"/>
+                                    </a>
+                                </div>
+                            </g:if>
                         </div>
                     </span>
                 </td>
@@ -60,9 +71,30 @@
                         ${task.product?.productCode} - ${task.product?.name}
                     </g:link>
                 </td>
-                <td>${task.location?.name}</td>
-                <td>${task.container?.name ?: '-'}</td>
-                <td>${task.destination?.name ?: '-'}</td>
+                <td>
+                    <g:if test="${task.location}">
+                        <g:link controller="location" action="show" id="${task.location?.id}">
+                            ${task.location?.name}
+                        </g:link>
+                    </g:if>
+                </td>
+                <td>
+                    <g:if test="${task.container}">
+                        <g:link controller="location" action="edit" id="${task.container?.id}">
+                            ${task.container?.name}
+                        </g:link>
+                    </g:if>
+                    <g:else>-</g:else>
+                </td>
+                <td>
+                    <g:if test="${task.destination}">
+                        <g:link controller="location" action="show" id="${task.destination?.id}">
+                            ${task.destination?.name}
+                        </g:link>
+                    </g:if>
+                    <g:else>-</g:else>
+                </td>
+                <td>${task.comment ?: '-'}</td>
                 <td class="right">${task.quantity}</td>
                 <td>${task.assignee?.name ?: warehouse.message(code:'putawayTask.unassigned.label', default:'Unassigned')}</td>
                 <td><g:formatDate date="${task.dateStarted}" format="dd/MM/yyyy"/></td>
@@ -76,17 +108,6 @@
                         </g:link>
                     </g:if>
                     <g:else>-</g:else>
-                </td>
-                <td>
-                    <g:if test="${task.status == PutawayTaskStatus.PENDING}">
-                        <a href="javascript:void(0)"
-                           class="btn-rerun-strategy button"
-                           data-task-id="${task.id}"
-                           data-facility-id="${orderInstance?.destination?.id}">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}" />&nbsp;
-                            <warehouse:message code="react.putawayTask.rerunStrategy.label" default="Rerun Strategy"/>
-                        </a>
-                    </g:if>
                 </td>
             </tr>
         </g:each>
