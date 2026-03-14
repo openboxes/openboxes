@@ -15,7 +15,7 @@
                     </td>
                     <td valign="top"
                         class="value ${hasErrors(bean: stockMovement, field: 'priority', 'errors')}">
-                        <g:textField name="priority" value="${stockMovement.requisition.priority}" class="text medium"/>
+                        <g:textField name="priority" value="${stockMovement.requisition?.priority}" class="text medium"/>
                     </td>
                 </tr>
                 <tr class="prop">

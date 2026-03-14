@@ -262,6 +262,33 @@ export const fetchBins = async (
   return response.data.data;
 };
 
+export const debounceInternalLocationsFetch = (
+  waitTime,
+  minSearchLength,
+  locationId,
+  extraParams = {},
+) =>
+  _.debounce((searchTerm, callback) => {
+    if (!searchTerm || searchTerm.length >= minSearchLength) {
+      apiClient.get(`${INTERNAL_LOCATIONS}/search`, {
+        paramsSerializer: (parameters) => queryString.stringify(parameters),
+        params: {
+          searchTerm: searchTerm || undefined,
+          'parentLocation.id': locationId,
+          ...extraParams,
+        },
+      }).then((result) => callback(_.map(result.data.data, (loc) => ({
+        id: loc.id,
+        value: loc.id,
+        name: loc.name,
+        label: loc.name,
+      }))))
+        .catch(() => callback([]));
+    } else {
+      callback([]);
+    }
+  }, waitTime);
+
 export const fetchLocations = async ({ activityCodes }) => {
   const response = await locationApi.getLocations({
     paramsSerializer: (parameters) => queryString.stringify(parameters),

@@ -39,6 +39,7 @@ CREATE OR REPLACE VIEW putaway_task AS
             END AS delivery_type_code,
         order_item.quantity,
         order_item.discrepancy_reason_code,
+        order_item.description as comment,
         `order`.id as putaway_order_id,
         `order_item`.id as putaway_order_item_id,
         -- FIXME need to resolve these

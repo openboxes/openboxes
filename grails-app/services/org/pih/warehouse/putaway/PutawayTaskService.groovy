@@ -29,6 +29,7 @@ import org.pih.warehouse.putaway.discrepancy.PutawayDiscrepancyEvent
 class PutawayTaskService {
 
     GrailsApplication grailsApplication
+    def inboundSortationService
     InventoryService inventoryService
     PutawayService putawayService
     def sessionFactory
@@ -46,30 +47,49 @@ class PutawayTaskService {
         // Get user-provided statuses
         List<PutawayTaskStatus> statuses = params.list("status").collect { it as PutawayTaskStatus }
 
-        // Resolve the status category to a set of statuses and added to user-provided
-        //StatusCategory statusCategory = params.statusCategory as StatusCategory
+        // Resolve the status category to a set of statuses
         List<PutawayTaskStatus> statusesByStatusCategory = PutawayTaskStatus.toSet(command.statusCategory)
-        statuses += statusesByStatusCategory
+
+        // If both are provided, intersect (AND); otherwise use whichever is available
+        if (statuses && statusesByStatusCategory) {
+            statuses = statuses.intersect(statusesByStatusCategory)
+        } else if (statusesByStatusCategory) {
+            statuses = statusesByStatusCategory
+        }
 
         // Search for putaway tasks based on user-provided search parameters
-        List<PutawayTask> tasks = PutawayTask.where {
+        List<PutawayTask> tasks = PutawayTask.createCriteria().list(max: max, offset: offset, sort: sort, order: sortOrder) {
             if (statuses) {
-                status in statuses
+                'in'('status', statuses)
             }
             if (command.product) {
-                product == command.product
+                eq('product', command.product)
+            }
+            if (command.searchTerm) {
+                or {
+                    ilike('identifier', "%${command.searchTerm}%")
+                    product {
+                        or {
+                            ilike('productCode', "${command.searchTerm}%")
+                            ilike('name', "%${command.searchTerm}%")
+                            ilike('description', "%${command.searchTerm}%")
+                        }
+                    }
+                }
             }
             if (command.facility) {
-                facility == command.facility
+                eq('facility', command.facility)
             }
             if (command.container) {
-                container == command.container
+                eq('container', command.container)
+            }
+            if (command.destination) {
+                eq('destination', command.destination)
             }
             if (command.order) {
-                putawayOrder == command.order
+                eq('putawayOrder', command.order)
             }
-
-        }.list(max: max, offset: offset, sort: sort, order: sortOrder)
+        }
 
         return tasks
     }
@@ -162,6 +182,11 @@ class PutawayTaskService {
             case 'cancel':
                 //executeStatusChange(task, PutawayTaskStatus.CANCELED)
                 //putawayService.savePutaway(task.toPutaway())
+                break
+
+            case 'rerunStrategy':
+                inboundSortationService.rerunPutawayStrategy(task)
+                task = null  // original task is deleted
                 break
 
             default:

@@ -108,7 +108,13 @@
 						<warehouse:message code="putaway.printPutaways.label" default="Print Putaways"/>
 					</g:link>
 				</div>
-			</g:elseif>
+                <div class="action-menu-item">
+                    <g:link controller="putaway" action="rollback" id="${orderInstance.id}" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
+                        <g:message code="default.rollback.label" args="[g.message(code: 'order.label')]" default="Rollback Putaway"/>
+                    </g:link>
+                </div>
+            </g:elseif>
 			<g:if test="${orderInstance?.orderType == PURCHASE_ORDER}">
 				<g:supports activityCode="${ActivityCode.PLACE_ORDER}">
 					<g:isSuperuser>
@@ -160,7 +166,7 @@
 							&nbsp;${warehouse.message(code: 'order.deleteOrder.label')}
 						</g:link>
 					</div>
-				</g:isUserInRole>
+                </g:isUserInRole>
 			</g:elseif>
 		</div>
 	</span>

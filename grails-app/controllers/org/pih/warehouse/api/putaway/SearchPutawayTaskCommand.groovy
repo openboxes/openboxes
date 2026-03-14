@@ -18,6 +18,9 @@ class SearchPutawayTaskCommand implements Validateable {
     // Should be bound from the URL
     Location facility
 
+    // Fuzzy search by product code (prefix), name, or description (substring)
+    String searchTerm
+
     @BindUsing({ SearchPutawayTaskCommand obj, DataBindingSource src ->
         String identifier = src['product']
         // Used in constraints to validate whether an identifier was provided when a product is not found
@@ -48,6 +51,19 @@ class SearchPutawayTaskCommand implements Validateable {
     String containerIdentifier
 
     @BindUsing({ SearchPutawayTaskCommand obj, DataBindingSource src ->
+        String identifier = src['destination']
+        obj.destinationIdentifier = identifier
+        if (!identifier) return null
+        Location destination = Location.findByIdOrLocationNumber(identifier, identifier)
+        if (identifier && !destination) {
+            obj.errors.rejectValue("destination", "notFound", [identifier].toArray(), "Destination {0} could not be found")
+        }
+        return destination
+    })
+    Location destination
+    String destinationIdentifier
+
+    @BindUsing({ SearchPutawayTaskCommand obj, DataBindingSource src ->
         String identifier = src['order']
         obj.orderIdentifier = identifier
         if (!identifier) return null
@@ -67,10 +83,20 @@ class SearchPutawayTaskCommand implements Validateable {
         status nullable: true
         statusCategory nullable: true
         facility nullable: true
+        searchTerm nullable: true
         productIdentifier nullable: true
         containerIdentifier nullable: true
+        destinationIdentifier nullable: true
         order nullable: true
         orderIdentifier nullable: true
+        destination nullable: true, validator: { Location val, obj, Errors errors ->
+            if (obj.destinationIdentifier && !val) {
+                errors.rejectValue('destination', 'notFound',
+                        [obj.destinationIdentifier] as Object[], "Destination {0} not found")
+                return false
+            }
+            return true
+        }
         product nullable: true, validator: { Product val, obj, Errors errors ->
             if (obj.productIdentifier && !val) {
                 errors.rejectValue('product', 'notFound',

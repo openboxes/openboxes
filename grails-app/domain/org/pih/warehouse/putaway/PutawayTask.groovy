@@ -47,6 +47,7 @@ class PutawayTask {
     Location destination                // target storage or outbound staging
     ReasonCode discrepancyReasonCode
     DeliveryTypeCode deliveryTypeCode
+    String comment
 
     // Auditing fields
     Date dateCreated
@@ -69,6 +70,7 @@ class PutawayTask {
         putawayOrder nullable: true
         putawayOrderItem nullable: true
         discrepancyReasonCode nullable: true
+        comment nullable: true
     }
 
     static mapping = {
@@ -97,7 +99,9 @@ class PutawayTask {
                 quantity        : quantity,
                 container       : container?.toJson(container?.locationType?.locationTypeCode),
                 destination     : destination?.toJson(destination?.locationType?.locationTypeCode),
+                putawayOrder    : putawayOrder ? [id: putawayOrder.id, orderNumber: putawayOrder.orderNumber] : null,
                 deliveryTypeCode: deliveryTypeCode?.name(),
+                comment         : comment,
                 assignee        : assignee,
                 orderedBy       : orderedBy,
                 dateStarted     : dateStarted,

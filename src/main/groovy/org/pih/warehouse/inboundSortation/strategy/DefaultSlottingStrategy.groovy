@@ -17,6 +17,7 @@ class DefaultSlottingStrategy implements PutawayStrategy {
                     location: context.currentBinLocation,
                     destination: context.preferredBin,
                     quantity: quantityRemaining,
+                    comment: "Default Location",
             )
         }
 

@@ -9,25 +9,33 @@
  **/
 package org.pih.warehouse.order
 
+import org.pih.warehouse.api.StatusCategory
 import org.pih.warehouse.core.StatusType
 
 enum OrderStatus {
 
-    PENDING(10, StatusType.WARNING),
-    APPROVED(20, StatusType.PRIMARY),
-    PLACED(30, StatusType.PRIMARY),
-    PARTIALLY_RECEIVED(40, StatusType.PRIMARY),
-    RECEIVED(50, StatusType.PRIMARY),
-    COMPLETED(60, StatusType.SUCCESS),
-    CANCELED(70, StatusType.DANGER),
-    REJECTED(80, StatusType.DANGER)
+    PENDING(10, StatusType.WARNING, StatusCategory.OPEN),
+    APPROVED(20, StatusType.PRIMARY, StatusCategory.OPEN),
+    PLACED(30, StatusType.PRIMARY, StatusCategory.OPEN),
+    PARTIALLY_RECEIVED(40, StatusType.PRIMARY, StatusCategory.OPEN),
+    RECEIVED(50, StatusType.PRIMARY, StatusCategory.CLOSED),
+    COMPLETED(60, StatusType.SUCCESS, StatusCategory.CLOSED),
+    CANCELED(70, StatusType.DANGER, StatusCategory.CLOSED),
+    REJECTED(80, StatusType.DANGER, StatusCategory.CLOSED)
 
     int sortOrder
     StatusType variant
+    StatusCategory statusCategory
 
-    OrderStatus(int sortOrder, StatusType variant) {
+    OrderStatus(int sortOrder, StatusType variant, StatusCategory statusCategory) {
         this.sortOrder = sortOrder
         this.variant = variant
+        this.statusCategory = statusCategory
+    }
+
+    static List<OrderStatus> toSet(StatusCategory statusCategory) {
+        if (!statusCategory) return []
+        return values().findAll { it.statusCategory == statusCategory } as List<OrderStatus>
     }
 
     static int compare(OrderStatus a, OrderStatus b) {

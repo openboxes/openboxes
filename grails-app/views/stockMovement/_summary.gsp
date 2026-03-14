@@ -56,6 +56,10 @@
                                 <label>${format.metadata(obj:stockMovement?.shipmentType)}</label>
                             </span>
                         </g:if>
+                        <span class="priority">
+                            <warehouse:message code="requisition.priority.label"/>:
+                            <label><g:message code="enum.PriorityLevel.${org.pih.warehouse.requisition.PriorityLevel.fromPriority(requisition?.priority)}" default="${requisition?.priority}"/></label>
+                        </span>
                         <g:if test="${stockMovement?.origin }">
                             <span class="origin">
                                 <warehouse:message code="shipping.origin.label"/>:
@@ -68,6 +72,8 @@
                                 <label>${format.metadata(obj:stockMovement?.destination)}</label>
                             </span>
                         </g:if>
+                    </div>
+                    <div>
                         <span>
                             <warehouse:message code="stockMovement.lineItems.label"/>:
                             <label>${stockMovement.lineItems.size()?:0 }</label>

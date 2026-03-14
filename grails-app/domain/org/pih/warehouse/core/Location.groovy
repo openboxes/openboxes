@@ -312,6 +312,10 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return locations?.toList()?.findAll { it.isInternalLocation() && it.zone?.id == zone?.id }
     }
 
+    List<Location> getActiveStorageLocations() {
+        return locations?.toList()?.findAll { it.active && it.isInternalLocation() && it.supports(ActivityCode.PICK_STOCK)}
+    }
+
     /**
      * Gets all bin locations for the given location.
      *

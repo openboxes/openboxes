@@ -355,7 +355,7 @@ class NumberDataService {
         String urlContextPath = ConfigHelper.contextPath
         return new NumberData(
                 count ?: 0,
-                "${urlContextPath}/order/list?orderType=PUTAWAY_ORDER&status=PENDING"
+                "${urlContextPath}/putawayTask/list?statusCategory=OPEN"
         )
     }
 
