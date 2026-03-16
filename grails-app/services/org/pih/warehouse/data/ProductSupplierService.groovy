@@ -39,6 +39,7 @@ import org.pih.warehouse.product.ProductSupplierFilterCommand
 import org.pih.warehouse.product.ProductSupplierDetailsCommand
 import org.pih.warehouse.product.ProductSupplierImportCommand
 import org.pih.warehouse.product.ProductSupplierPreference
+import org.pih.warehouse.product.ProductSupplierPreferenceService
 
 @Transactional
 class ProductSupplierService {
@@ -51,6 +52,7 @@ class ProductSupplierService {
     def dataSource
     ProductSupplierDataService productSupplierGormService
     ProductPackageService productPackageService
+    ProductSupplierPreferenceService productSupplierPreferenceService
     DataService dataService
 
     List<ProductSupplier> getProductSuppliers(ProductSupplierFilterCommand command, boolean forExport = false) {
@@ -458,6 +460,7 @@ class ProductSupplierService {
         ProductSupplier productSupplier = productSupplierGormService.get(productSupplierId)
         productSupplier.defaultProductPackage = null
         productPackageService.delete(productSupplier.productPackages)
+        productSupplierPreferenceService.delete(productSupplier.productSupplierPreferences)
         productSupplierGormService.delete(productSupplierId)
     }
 
