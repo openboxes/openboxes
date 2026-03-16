@@ -30,7 +30,8 @@ const QuantityCell = ({
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
-    setValue(initialValue || '');
+    const newValue = (!initialValue && initialValue !== 0) ? '' : initialValue;
+    setValue(newValue);
   }, [initialValue]);
 
   if (!isStepEditable) {

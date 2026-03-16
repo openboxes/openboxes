@@ -406,7 +406,12 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
      * Either directly related to that order item or from related shipment items.
      **/
     List<InvoiceItem> getAllInvoiceItems() {
-        (shipmentItems*.invoiceItems + invoiceItems)?.flatten()?.unique() ?: []
+        Set<InvoiceItem> shipmentInvoiceItems = shipmentItems*.invoiceItems ?: []
+        Set<InvoiceItem> directInvoiceItems   = invoiceItems ?: []
+        return (shipmentInvoiceItems + directInvoiceItems)
+                .flatten()
+                .unique()
+                .toList()
     }
 
     // Check quantity (standard uom) in posted invoices

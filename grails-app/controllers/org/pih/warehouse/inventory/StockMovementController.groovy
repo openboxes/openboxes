@@ -26,7 +26,7 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCommand
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.DocumentType
-import org.pih.warehouse.core.HistoryItem
+import org.pih.warehouse.core.history.HistoryItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.User
@@ -144,7 +144,7 @@ class StockMovementController {
                 break
             case StockMovementDirection.INBOUND:
                 String step = (stockMovement.statusCode in [StockMovementStatusCode.CREATED.name(), StockMovementStatusCode.REQUESTING.name()]) ?  InboundWorkflowState.ADD_ITEMS : InboundWorkflowState.SEND_SHIPMENT
-                redirect(action: "createInbound", params: params + [step: step])
+                redirect(action: "createInbound", params: params + [direction: StockMovementDirection.INBOUND, step: step])
                 break
             default:
                 redirect(action: "createOutbound", params: params)

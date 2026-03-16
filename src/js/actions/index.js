@@ -8,7 +8,7 @@ import {
   ADD_STOCK_MOVEMENT_DRAFT,
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
-  CLEAR_CYCLE_COUNT_DATA,
+  CLEAR_COUNT_WORKFLOW,
   CLEAR_ERRORS_DATA,
   CLOSE_INFO_BAR,
   ERASE_DRAFT,
@@ -981,14 +981,14 @@ export const submitForm = (dispatch) => {
   });
 };
 
-export const clearCycleCountData = (dispatch) => {
-  dispatch({
-    type: CLEAR_CYCLE_COUNT_DATA,
-  });
-};
-
 export const clearErrorsData = (dispatch) => {
   dispatch({
     type: CLEAR_ERRORS_DATA,
+  });
+};
+
+export const clearCountWorkflow = (dispatch) => {
+  dispatch({
+    type: CLEAR_COUNT_WORKFLOW,
   });
 };
