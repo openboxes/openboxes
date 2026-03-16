@@ -2,6 +2,8 @@ package org.pih.warehouse.jobs
 
 import grails.util.Holders
 import org.pih.warehouse.allocation.AllocationMode
+import org.pih.warehouse.allocation.AllocationRequest
+import org.pih.warehouse.allocation.AllocationResult
 import org.pih.warehouse.allocation.AllocationStrategy
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.requisition.Requisition
@@ -54,15 +56,25 @@ class BackorderReAllocationJob {
                     }
 
                     backorders.forEach { Requisition requisition ->
-                        def result = allocationService.allocate(requisition, AllocationMode.AUTO, strategies)
-                        if (result && !result.empty) {
-                            requisition.requisitionItems.forEach {
-                                it.quantityBackordered = null
-                                it.backorderedReasonCode = null
+                        if (requisition.autoAllocationEnabled) {
+                            List<AllocationResult> result = []
+                            requisition?.requisitionItems?.each { requisitionItem ->
+                                def picklistItems = requisitionItem.picklistItems
+                                if (!picklistItems || picklistItems.isEmpty()) {
+                                    AllocationRequest allocationRequest = new AllocationRequest(requisitionItem: requisitionItem, allocationMode: AllocationMode.AUTO, allocationStrategies: strategies)
+                                    AllocationResult singleResult = allocationService.allocate(allocationRequest)
+                                    result.add(singleResult)
+                                }
                             }
-                            stockMovementService.updateRequisitionStatus(requisition.id, RequisitionStatus.PICKING)
+                            if (result && !result.empty) {
+                                requisition.requisitionItems.forEach {
+                                    it.quantityBackordered = null
+                                    it.backorderedReasonCode = null
+                                }
+                                stockMovementService.updateRequisitionStatus(requisition.id, RequisitionStatus.PICKING)
+                            }
+                            log.info("Re-allocate ${result}")
                         }
-                        log.info("Re-allocate ${result}")
                     }
                 }
             } catch (Exception e) {

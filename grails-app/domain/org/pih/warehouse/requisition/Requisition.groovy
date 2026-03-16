@@ -133,7 +133,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     DeliveryTypeCode deliveryTypeCode = DeliveryTypeCode.DEFAULT
 
     // for controlling partial allocation and issuance
-    Boolean autoAllocationEnabled
+    Boolean autoAllocationEnabled = Boolean.TRUE
     Boolean partialAllocationAllowed
     Boolean partialIssuanceAllowed
 

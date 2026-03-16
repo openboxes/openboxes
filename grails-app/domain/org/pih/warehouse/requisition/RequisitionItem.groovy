@@ -211,6 +211,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             return RequisitionItemStatus.COMPLETED
         }
 
+        if (isBackordered()) {
+            return RequisitionItemStatus.BACKORDERED
+        }
+
         return RequisitionItemStatus.PENDING
     }
 
@@ -487,15 +491,15 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      * @return true if the requisition item has been completely canceled
      */
     def isCanceled() {
-        return totalQuantityCanceled() == totalQuantity() && !modificationItem && !substitutionItem && !requisitionItems
+        return totalQuantityCanceled() == totalQuantity() && !modificationItem && !substitutionItem && !requisitionItems && !isBackordered()
     }
 
     def isBackordered() {
-        return totalQuantityBackordered() == totalQuantity() && !isChanged() && !isCanceled()
+        return totalQuantityBackordered() > 0
     }
 
     def isCanceledDuringPick() {
-         return requisition.status >= RequisitionStatus.PICKING && (modificationItem ? modificationItem.calculateQuantityPicked() == 0 : calculateQuantityPicked() == 0)
+         return requisition.status >= RequisitionStatus.PICKING && (modificationItem ? modificationItem.calculateQuantityPicked() == 0 : calculateQuantityPicked() == 0) && !isBackordered()
     }
 
     /**
@@ -507,11 +511,11 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     def isIncreased() {
-        return (modificationItem ? quantity - modificationItem.quantity : requisition.status >= RequisitionStatus.PICKING ? quantity - calculateQuantityPicked() : 0) < 0
+        return (modificationItem ? quantity - modificationItem.quantity : requisition.status >= RequisitionStatus.PICKING ? quantity - calculateQuantityPicked() : 0) < 0 && !isBackordered()
     }
 
     def isReduced() {
-        return (modificationItem ? quantity - modificationItem.quantity : requisition.status >= RequisitionStatus.PICKING ? quantity - calculateQuantityPicked() : 0) > 0
+        return (modificationItem ? quantity - modificationItem.quantity : requisition.status >= RequisitionStatus.PICKING ? quantity - calculateQuantityPicked() : 0) > 0 && !isBackordered()
     }
 
     /**
@@ -650,7 +654,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
     def calculateQuantityRequired() {
         return modificationItem ? modificationItem?.quantity :
-                quantityCanceled ? (quantity - quantityCanceled) : quantity
+                quantityCanceled ? (quantity - quantityCanceled) :
+                quantityBackordered ? (quantity - quantityBackordered) : quantity
     }
 
     def calculateQuantityRemaining() {
