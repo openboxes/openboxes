@@ -25,4 +25,8 @@ class ProductSupplierPreferenceService {
     void delete(String id) {
         productSupplierPreferenceDataService.delete(id)
     }
+
+    void delete(Set<ProductSupplierPreference> productSupplierPreferences) {
+        productSupplierPreferences.each { delete(it.id) }
+    }
 }
