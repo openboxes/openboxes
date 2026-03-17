@@ -102,15 +102,17 @@
 					</div>
 
 					<g:isSuperuser>
-						<div class="button-group">
-							<g:if test="${grailsApplication.config.openboxes.products.merge.enabled}">
-								<button class="btn-show-dialog button" data-title="${g.message(code:'product.mergeProducts.label')}"
-								   data-url="${request.contextPath}/product/showMergeProductDialog?primaryProduct=${productInstance?.id}&template=mergeProducts">
-									<img src="${resource(dir: 'images/icons/silk', file: 'share.png')}"/>&nbsp;
-									<g:message code="product.mergeProducts.label" default="Merge Products"/>
-								</button>
-							</g:if>
-						</div>
+                        <g:hasRoleProductManager>
+                            <div class="button-group">
+                                <g:if test="${grailsApplication.config.openboxes.products.merge.enabled}">
+                                    <button class="btn-show-dialog button" data-title="${g.message(code:'product.mergeProducts.label')}"
+                                       data-url="${request.contextPath}/product/showMergeProductDialog?primaryProduct=${productInstance?.id}&template=mergeProducts">
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'share.png')}"/>&nbsp;
+                                        <g:message code="product.mergeProducts.label" default="Merge Products"/>
+                                    </button>
+                                </g:if>
+						    </div>
+                        </g:hasRoleProductManager>
 					</g:isSuperuser>
 					<div class="button-group right">
 						<g:link controller="product" action="addDocument" id="${productInstance?.id}" class="button">
