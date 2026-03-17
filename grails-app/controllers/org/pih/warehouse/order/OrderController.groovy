@@ -686,7 +686,7 @@ class OrderController {
             throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
         }
         render(template: "orderItemFormDialog",
-                model: [orderItem:orderItem, canEdit: canEditOrder, isAccountingRequired: isAccountingRequired])
+                model: [orderItem: orderItem, canEdit: canEditOrder, isAccountingRequired: isAccountingRequired, regularInvoices: orderItem.regularInvoices])
     }
 
     def productSourceFormDialog() {

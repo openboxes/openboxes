@@ -18,6 +18,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.invoice.Invoice
 import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.invoice.InvoiceTypeCode
 import org.pih.warehouse.picklist.PicklistItem
@@ -433,6 +434,10 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     Boolean getHasRegularInvoice() {
         return invoices.any { it.invoiceType == null || it.invoiceType?.code == InvoiceTypeCode.INVOICE }
+    }
+
+    List<Invoice> getRegularInvoices() {
+        return invoices.findAll { it.invoiceType?.code == InvoiceTypeCode.INVOICE }
     }
 
     Integer getPostedQuantityInvoiced() {
