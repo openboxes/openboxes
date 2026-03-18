@@ -169,10 +169,9 @@ class LocationImportDataService implements ImportDataService {
 
         // Add required association to organization for depots and suppliers
         if (!(location.locationType?.isInternalLocation() || location.locationType?.isZone()) && !location.organization) {
-            def locationCode = organizationIdentifierService.generate(params.organization)
             Organization organization = (location.locationType?.locationTypeCode == LocationTypeCode.SUPPLIER) ?
-                    organizationService.findOrCreateSupplierOrganization(params?.organization, locationCode) :
-                    organizationService.findOrCreateOrganization(params?.organization, locationCode)
+                    organizationService.findOrCreateSupplierOrganization(params?.organization as String) :
+                    organizationService.findOrCreateOrganization(params?.organization as String)
 
             location.organization = organization
         }

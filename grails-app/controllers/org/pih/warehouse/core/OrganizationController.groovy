@@ -68,7 +68,7 @@ class OrganizationController {
         Organization organizationInstance = new Organization(params)
 
         if (organizationInstance.name && !organizationInstance.code) {
-            organizationInstance.code = organizationIdentifierService.generate(organizationInstance.name)
+            organizationInstance.code = organizationIdentifierService.generate(organizationInstance)
         }
 
         if (organizationInstance.validate()) {
@@ -96,7 +96,7 @@ class OrganizationController {
                 organizationInstance.sequences = params.sequences
             }
             if (!organizationInstance.code) {
-                organizationInstance.code = organizationIdentifierService.generate(organizationInstance.name)
+                organizationInstance.code = organizationIdentifierService.generate(organizationInstance)
             }
 
             if (organizationInstance.validate()) {

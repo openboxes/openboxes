@@ -40,16 +40,15 @@ class OrganizationService {
         }
     }
 
-    Organization findOrCreateOrganization(String name, String code) {
-        return findOrCreateOrganization(name, code, [])
-    }
-
     Organization findOrganization(String name, String code) {
-        Organization organization = Organization.createCriteria().get {
+        // First, search by code if one was provided
+        Organization organization = StringUtils.isBlank(code) ? null : Organization.createCriteria().get {
             eq("code", code)
             ne("code", StringUtils.EMPTY)
             isNotNull("code")
-        }
+        } as Organization
+
+        // Then search by name, which is not strictly unique so in case multiple are found, return the newest one
         if (!organization) {
             organization = Organization.createCriteria().list(max: 1) {
                 eq("name", name)
@@ -61,13 +60,13 @@ class OrganizationService {
         return organization
     }
 
-    Organization findOrCreateOrganization(String name, String code, List<RoleType> roleTypes) {
+    Organization findOrCreateOrganization(String name, String code=null, List<RoleType> roleTypes=[]) {
         Organization organization = findOrganization(name, code)
         if (!organization) {
             organization = new Organization()
             organization.name = name
             organization.partyType = PartyType.findByCode(Constants.DEFAULT_ORGANIZATION_CODE)
-            organization.code = code?:organizationIdentifierService.generate(name)
+            organization.code = code ?: organizationIdentifierService.generate(organization)
         }
 
         if (roleTypes) {
@@ -90,7 +89,7 @@ class OrganizationService {
 
     Organization createOrganization(Organization organization) {
         if (!organization.code) {
-            organization.code = organizationIdentifierService.generate(organization.name)
+            organization.code = organizationIdentifierService.generate(organization)
         }
 
         if (!organization.partyType) {
@@ -100,11 +99,7 @@ class OrganizationService {
         return saveOrganization(organization)
     }
 
-    Organization findOrCreateBuyerOrganization(String name, String code) {
-        return findOrCreateOrganization(name, code, [RoleType.ROLE_BUYER, RoleType.ROLE_DISTRIBUTOR])
-    }
-
-    Organization findOrCreateSupplierOrganization(String name, String code) {
+    Organization findOrCreateSupplierOrganization(String name, String code=null) {
         return findOrCreateOrganization(name, code, [RoleType.ROLE_SUPPLIER, RoleType.ROLE_MANUFACTURER])
     }
 

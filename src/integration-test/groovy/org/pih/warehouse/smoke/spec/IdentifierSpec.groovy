@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationIdentifierService
+import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.OrganizationIdentifierService
 import org.pih.warehouse.core.identification.IdentifierGeneratorContext
 import org.pih.warehouse.data.ProductSupplierIdentifierService
@@ -210,8 +211,14 @@ class IdentifierSpec extends SmokeSpec {
     }
 
     void 'organizationIdentifierService can generate identifiers with the current configuration'() {
+        given:
+        Organization organization = new Organization(
+                name: "Good Organization Name",
+                description: "description",
+        )
+
         when:
-        String identifier = organizationIdentifierService.generate("Good Organization Name")
+        String identifier = organizationIdentifierService.generate(organization)
 
         then:
         assert StringUtils.isNotBlank(identifier)

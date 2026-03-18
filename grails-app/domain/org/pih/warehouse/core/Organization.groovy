@@ -37,9 +37,7 @@ class Organization extends Party {
     }
 
     static constraints = {
-        code(nullable: false, blank: false, unique: true,
-                minSize: Holders.grailsApplication.config.openboxes.identifier.organization.minSize,
-                maxSize: Holders.grailsApplication.config.openboxes.identifier.organization.maxSize)
+        code(nullable: false, blank: false, unique: true)
         name(nullable: false, blank: false, maxSize: 255)
         description(nullable: true, maxSize: 255)
         defaultLocation(nullable: true)

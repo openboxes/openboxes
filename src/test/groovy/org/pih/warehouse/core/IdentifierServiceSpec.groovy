@@ -6,7 +6,6 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.identification.IdentifierGeneratorContext
 import org.pih.warehouse.core.identification.RandomCondition
 import org.pih.warehouse.core.identification.RandomIdentifierGenerator
@@ -26,6 +25,12 @@ class IdentifierServiceSpec extends Specification implements ServiceUnitTest<Inv
     @Shared
     ConfigService configServiceStub
 
+    @Shared
+    RandomIdentifierGenerator randomIdentifierGeneratorStub
+
+    @Shared
+    StringAbbreviator stringAbbreviatorStub
+
     void setupSpec() {
         mockDomain(Invoice)
     }
@@ -33,6 +38,12 @@ class IdentifierServiceSpec extends Specification implements ServiceUnitTest<Inv
     void setup() {
         configServiceStub = Stub(ConfigService)
         service.configService = configServiceStub
+
+        randomIdentifierGeneratorStub = Stub(RandomIdentifierGenerator)
+        service.randomIdentifierGenerator = randomIdentifierGeneratorStub
+
+        stringAbbreviatorStub = Stub(StringAbbreviator)
+        service.stringAbbreviator = stringAbbreviatorStub
     }
 
     void 'generate should return the format as provided if no keywords are specified'() {
@@ -90,10 +101,8 @@ class IdentifierServiceSpec extends Specification implements ServiceUnitTest<Inv
     }
 
     void 'generate should return #expectedIdentifier given a format #format with randomness in it'() {
-        given:
-        service.randomIdentifierGenerator = Stub(RandomIdentifierGenerator) {
-            generate(_ as String) >> "ABC123"
-        }
+        given: 'a not so random random'
+        randomIdentifierGeneratorStub.generate(_ as String) >> "ABC123"
 
         and:
         configServiceStub.getProperty('openboxes.identifier.attempts.max', Integer) >> 1
@@ -113,9 +122,7 @@ class IdentifierServiceSpec extends Specification implements ServiceUnitTest<Inv
 
     void 'generate should add conditional randomness only if there are no duplicates without it'() {
         given: 'a not so random random'
-        service.randomIdentifierGenerator = Stub(RandomIdentifierGenerator) {
-            generate(_ as String) >> "-ABC123"
-        }
+        randomIdentifierGeneratorStub.generate(_ as String) >> "-ABC123"
 
         and:
         configServiceStub.getProperty('openboxes.identifier.attempts.max', Integer) >> 1
@@ -138,9 +145,7 @@ class IdentifierServiceSpec extends Specification implements ServiceUnitTest<Inv
 
     void 'generate should return null if we exceed the number of retries'() {
         given: 'a not so random random'
-        service.randomIdentifierGenerator = Stub(RandomIdentifierGenerator) {
-            generate(_ as String) >> "ABC123"
-        }
+        randomIdentifierGeneratorStub.generate(_ as String) >> "ABC123"
 
         and:
         configServiceStub.getProperty('openboxes.identifier.attempts.max', Integer) >> 1
@@ -269,5 +274,52 @@ class IdentifierServiceSpec extends Specification implements ServiceUnitTest<Inv
 
         expect:
         assert service.generate(new Invoice()) == "x.y"
+    }
+
+    void 'generate should abbreviate successfully'() {
+        given:
+        configServiceStub.getProperty('openboxes.identifier.invoice.format', String) >> "\${abbreviation}"
+        configServiceStub.getProperty('openboxes.identifier.invoice.abbreviation.field', String) >> "name"
+        configServiceStub.getProperty('openboxes.identifier.invoice.abbreviation.minSize', Integer) >> 1
+        configServiceStub.getProperty('openboxes.identifier.invoice.abbreviation.maxSize', Integer) >> 10
+        configServiceStub.getProperty('openboxes.identifier.invoice.properties', Map) >> null
+
+        and:
+        stringAbbreviatorStub.abbreviate("Apple Berry Cherry", 1, 10, ',') >> "ABC"
+
+        and:
+        Invoice invoice = new Invoice(name: "Apple Berry Cherry")
+
+        expect:
+        assert service.generate(invoice) == "ABC"
+    }
+
+    void 'generate should abbreviate and add conditional randomness only if there are no duplicates without it'() {
+        given: 'a not so random random'
+        randomIdentifierGeneratorStub.generate(_ as String) >> "-ABC123"
+
+        and:
+        configServiceStub.getProperty('openboxes.identifier.attempts.max', Integer) >> 1
+        configServiceStub.getProperty('openboxes.identifier.invoice.format', String) >> "\${abbreviation}\${random}"
+        configServiceStub.getProperty('openboxes.identifier.invoice.abbreviation.field', String) >> "name"
+        configServiceStub.getProperty('openboxes.identifier.invoice.abbreviation.minSize', Integer) >> 1
+        configServiceStub.getProperty('openboxes.identifier.invoice.abbreviation.maxSize', Integer) >> 10
+        configServiceStub.getProperty('openboxes.identifier.invoice.random.condition', RandomCondition) >> RandomCondition.ON_DUPLICATE
+        configServiceStub.getProperty('openboxes.identifier.invoice.properties', Map) >> null
+
+        and:
+        stringAbbreviatorStub.abbreviate("Apple Berry Cherry", 1, 10, ',') >> "ABC"
+
+        when:
+        String identifier = service.generate(new Invoice(name: "Apple Berry Cherry"))
+
+        then: 'randomness is not needed'
+        assert identifier == "ABC"
+
+        when: 'we have an invoice that already exists with that id'
+        new Invoice(invoiceNumber: "ABC").save(validate: false)
+
+        then: 'randomness is now needed'
+        assert service.generate(new Invoice(name: "Apple Berry Cherry")) == "ABC-ABC123"
     }
 }

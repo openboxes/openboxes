@@ -17,6 +17,8 @@ openboxes.identifier.default.random.condition = RandomCondition.ALWAYS  // By de
 openboxes.identifier.default.delimiter = "-"
 openboxes.identifier.default.prefix.enabled = true
 openboxes.identifier.default.sequenceNumber.minSize = 5  // Aka five digits
+openboxes.identifier.default.abbreviation.minSize = 2
+openboxes.identifier.default.abbreviation.maxSize = 6
 
 // Transaction identifier
 openboxes.identifier.transaction.random.template = "AAA-AAA-AAA"
@@ -33,9 +35,10 @@ openboxes.identifier.productSupplier.random.template = "-NNNN"
 openboxes.identifier.productSupplier.random.condition = RandomCondition.ON_DUPLICATE
 
 // Organization identifier
-openboxes.identifier.organization.random.template = "AAA"
-openboxes.identifier.organization.minSize = 2
-openboxes.identifier.organization.maxSize = 3
+openboxes.identifier.organization.format = "\${abbreviation}\${random}"
+openboxes.identifier.organization.random.template = "-NNNLLL"
+openboxes.identifier.organization.random.condition = RandomCondition.ON_DUPLICATE
+openboxes.identifier.organization.abbreviation.field = "name"
 
 // Purchase Order identifier
 openboxes.identifier.purchaseOrder.format = "PO-\${destinationPartyCode}-\${sequenceNumber}"
