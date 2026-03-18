@@ -14,9 +14,11 @@ enum RequisitionItemStatus {
     BACKORDERED(1),
     APPROVED(2),
     SUBSTITUTED(3),
-    CHANGED(4),
-    CANCELED(5),
-    COMPLETED(6)
+    REDUCED(4),
+    INCREASED(5),
+    CHANGED(6),
+    CANCELED(7),
+    COMPLETED(8)
 
     int sortOrder
 
@@ -31,7 +33,7 @@ enum RequisitionItemStatus {
     }
 
     static list() {
-        [PENDING, BACKORDERED, APPROVED, SUBSTITUTED, CHANGED, CANCELED, COMPLETED]
+        [PENDING, BACKORDERED, APPROVED, SUBSTITUTED, REDUCED, INCREASED, CHANGED, CANCELED, COMPLETED]
     }
 
     String toString() {

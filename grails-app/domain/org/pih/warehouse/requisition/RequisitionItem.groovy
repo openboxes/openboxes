@@ -197,6 +197,13 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
         if (isSubstituted()) {
             return RequisitionItemStatus.SUBSTITUTED
+        } else {
+            if (isReduced()) {
+                return RequisitionItemStatus.REDUCED
+            }
+            if (isIncreased()) {
+                return RequisitionItemStatus.INCREASED
+            }
         }
 
         if (isChanged()) {
@@ -225,6 +232,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
         if (isParentRequisitionRejected()) {
             return RequisitionItemStatus.CANCELED
+        }
+
+        if (isCanceledDuringPick()) {
+            return  RequisitionItemStatus.CANCELED
         }
 
         return getStatus()
@@ -499,7 +510,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     def isCanceledDuringPick() {
-         return requisition.status >= RequisitionStatus.PICKING && (modificationItem ? modificationItem.calculateQuantityPicked() == 0 : calculateQuantityPicked() == 0) && !isBackordered()
+         return requisition.status >= RequisitionStatus.PICKED && (modificationItem ? modificationItem.calculateQuantityPicked() == 0 : calculateQuantityPicked() == 0) && !isBackordered()
     }
 
     /**
@@ -511,11 +522,11 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     def isIncreased() {
-        return (modificationItem ? quantity - modificationItem.quantity : requisition.status >= RequisitionStatus.PICKING ? quantity - calculateQuantityPicked() : 0) < 0 && !isBackordered()
+        return (modificationItem ? quantity - modificationItem.quantity : requisition.status >= RequisitionStatus.PICKED ? quantity - calculateQuantityPicked() : 0) < 0 && !isBackordered()
     }
 
     def isReduced() {
-        return (modificationItem ? quantity - modificationItem.quantity : requisition.status >= RequisitionStatus.PICKING ? quantity - calculateQuantityPicked() : 0) > 0 && !isBackordered()
+        return (modificationItem ? quantity - modificationItem.quantity : requisition.status >= RequisitionStatus.PICKED ? quantity - calculateQuantityPicked() : 0) > 0 && !isBackordered()
     }
 
     /**
