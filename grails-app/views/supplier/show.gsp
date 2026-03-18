@@ -14,7 +14,7 @@
             </g:if>
             <div>
                 <div style="border-width: 5px">
-                    <h2>${supplier?.name}</h2>
+                    <h2>${supplier?.displayName}</h2>
                     <g:each var="location" in="${supplier.locations.sort { it.name } }">
                         <div style="margin: 10px 0 10px 30px;">
                             <g:link controller="location" action="show" id="${location.id}">

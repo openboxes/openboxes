@@ -69,7 +69,7 @@ const useProductSupplierForm = () => {
           ? {
             id: productSupplier?.supplier?.id,
             value: productSupplier?.supplier?.id,
-            label: `${productSupplier?.supplier?.code} ${productSupplier?.supplier?.name}`,
+            label: productSupplier?.supplier?.displayName,
           } : undefined,
         supplierCode: productSupplier?.supplierCode ?? undefined,
         name: productSupplier?.name ?? undefined,
@@ -90,7 +90,7 @@ const useProductSupplierForm = () => {
           ? {
             id: productSupplier?.manufacturer.id,
             value: productSupplier?.manufacturer.id,
-            label: productSupplier?.manufacturer.name,
+            label: productSupplier?.manufacturer.displayName,
           }
           : undefined,
         ratingTypeCode: productSupplier?.ratingTypeCode
@@ -107,7 +107,7 @@ const useProductSupplierForm = () => {
         ...preferenceType,
         destinationParty: {
           id: preferenceType.destinationParty?.id,
-          label: preferenceType.destinationParty?.name,
+          label: preferenceType.destinationParty?.displayName,
           value: preferenceType.destinationParty?.id,
         },
         preferenceType: {

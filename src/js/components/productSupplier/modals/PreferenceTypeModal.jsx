@@ -52,7 +52,7 @@ const PreferenceTypeModal = ({
       preferenceTypes: [
         ...acc.preferenceTypes,
         {
-          destination: destinationParty?.name,
+          destination: destinationParty?.displayName,
           name,
         },
       ],
@@ -124,6 +124,7 @@ PreferenceTypeModal.propTypes = {
     destinationParty: PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string,
+      displayName: PropTypes.string,
       description: PropTypes.string,
       code: PropTypes.string,
       dateCreated: PropTypes.string,

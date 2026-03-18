@@ -539,7 +539,7 @@ export function fetchSuppliers({
               id: obj.id,
               value: obj.id,
               name: obj.name,
-              label: `${obj.name}`,
+              label: obj.displayName,
             }
           ));
           dispatch({
@@ -566,7 +566,7 @@ export function fetchBuyers(active = false) {
               id: obj.id,
               value: obj.id,
               name: obj.name,
-              label: `${obj.name}`,
+              label: obj.displayName,
             }
           ));
           dispatch({
