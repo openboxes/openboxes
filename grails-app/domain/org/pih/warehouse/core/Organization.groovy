@@ -49,7 +49,7 @@ class Organization extends Party {
     }
 
     String getDisplayName() {
-        return "${code} ${name}"
+        return "${code} - ${name}"
     }
 
     String toString() {
