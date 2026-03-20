@@ -30,6 +30,8 @@ class Organization extends Party {
 
     Map<IdentifierTypeCode, String> sequences
 
+    static transients = ['displayName']
+
     static mapping = {
         id generator: 'uuid'
         sequences joinTable: [key: 'sequences']
@@ -44,6 +46,10 @@ class Organization extends Party {
         description(nullable: true, maxSize: 255)
         defaultLocation(nullable: true)
         active(nullable: false)
+    }
+
+    String getDisplayName() {
+        return "${code} - ${name}"
     }
 
     String toString() {
@@ -85,6 +91,7 @@ class Organization extends Party {
         return [
                 id             : id,
                 name           : name,
+                displayName    : displayName,
                 description    : description,
                 code           : code,
                 dateCreated    : dateCreated,

@@ -18,7 +18,7 @@ export default {
           id: organization.id,
           value: organization.id,
           name: organization.name,
-          label: organization.name,
+          label: organization.displayName,
         },
       ],
     }),
