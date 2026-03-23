@@ -37,12 +37,14 @@ class CrossDockingBackorderReferenceStrategy implements PutawayStrategy {
         ActivityCode deliveryTypeCode = requisitionItem.requisition.deliveryTypeCode.activityCode
         Location putawayLocation = locations.find { (deliveryTypeCode && it.supports(deliveryTypeCode)) && it.supports(ActivityCode.STAGING_LOCATION) }
         if (putawayLocation) {
+            Location putawayContainer = locations.find { (deliveryTypeCode && it.supports(deliveryTypeCode)) && it.supports(ActivityCode.PUTAWAY_CART) }
             putawayTasks << new PutawayResult(
                     facility: context.facility,
                     product: context.product,
                     inventoryItem: context.inventoryItem,
                     location: context.currentBinLocation,
                     destination: putawayLocation,
+                    container: putawayContainer,
                     quantity: requisitionItem.quantity,
             )
         }
