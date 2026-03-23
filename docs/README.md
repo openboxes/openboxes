@@ -33,7 +33,7 @@
 
 1. Run the mkdocs server
     ```shell
-    mkdocs serve &
+    mkdocs serve --livereload
     ```
 1. Open docs in browser
 
@@ -52,6 +52,10 @@ git checkout -b docs/1234-fix-typo
 >   and summary in your branch name.
 
 2. Make documentation changes in an editor of your choice
+
+> [!TIP]
+>   If adding a new page, remember to add a link to it somewhere in the `mkdocs.yml` file.
+
 3. Commit changes to branch with meaningful commit message 
 ```
 git commit -m "#1234: fixed typo in docs"

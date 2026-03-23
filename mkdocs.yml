@@ -205,6 +205,7 @@ nav:
       - File Uploads Location: admin-guide/configuration/uploads.md
       - File Uploads Size: admin-guide/configuration/upload-max-file-size.md
       - Localization: admin-guide/configuration/localization.md
+      - Object Identifiers: admin-guide/configuration/object-identifiers.md
 
     - White-labeling:
       - Default Logo: admin-guide/configuration/logo.md
