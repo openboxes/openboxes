@@ -50,6 +50,7 @@ import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
@@ -2526,5 +2527,17 @@ class ShipmentService {
     void updateContainerStatus(Container container, ContainerStatus containerStatus) {
         container.containerStatus = containerStatus
         container.save()
+    }
+
+    void clearBackorderItemToReferenceForRequisition(Requisition requisition) {
+        Set<ShipmentItem> shipmentItems = []
+        requisition?.requisitionItems?.forEach {
+            List<ShipmentItem> shipmentItemList = ShipmentItem.findAllByBackorderItem(it)
+            shipmentItems.addAll(shipmentItemList)
+        }
+        shipmentItems.forEach {
+            it.backorderItem = null
+            it.backorderReference = requisition.requestNumber
+        }
     }
 }
