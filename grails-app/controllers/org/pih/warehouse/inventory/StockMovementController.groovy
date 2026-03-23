@@ -274,7 +274,10 @@ class StockMovementController {
         if (stockMovement.isDeleteOrRollbackAuthorized(currentLocation)) {
             if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus) {
                 try {
-                    stockMovementService.deleteStockMovement(params.id)
+                    Requisition requisition = stockMovement?.requisition
+                    shipmentService.clearBackorderItemToReferenceForRequisition(requisition)
+                    pickTaskService.rollbackPickTasks(requisition)
+                    stockMovementService.deleteStockMovement(stockMovement)
                     flash.message = g.message(
                             code: 'react.stockMovement.deleted.success.message.label',
                             default: 'Stock Movement has been deleted successfully',
