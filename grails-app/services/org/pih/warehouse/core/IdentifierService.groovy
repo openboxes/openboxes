@@ -17,6 +17,7 @@ import org.pih.warehouse.data.DataService
 abstract class IdentifierService<T extends GormEntity> {
 
     RandomIdentifierGenerator randomIdentifierGenerator
+    StringAbbreviator stringAbbreviator
     DataService dataService
     ConfigService configService
 
@@ -41,6 +42,7 @@ abstract class IdentifierService<T extends GormEntity> {
      * - ${delimiter} filled in with the value defined in "openboxes.identifier.x.delimiter"
      * - ${sequenceNumber} filled in with a sequential value as defined in "openboxes.identifier.x.sequenceNumber"
      * - ${random} filled in with a random string as defined in "openboxes.identifier.x.random.template"
+     * - ${abbreviation} filled in with an abbreviation of the field in "openboxes.identifier.x.abbreviation.field"
      * - any other keywords are populated from the template map and entities in IdentifierGeneratorContext
      */
     String generate(T entity, IdentifierGeneratorContext context=null) {
@@ -115,6 +117,7 @@ abstract class IdentifierService<T extends GormEntity> {
         values.putAll(getEntityValues(entity))
         values.putAll(getCustomValues(context))
         values.putAll(getDelimiterValues())
+        values.put(Constants.IDENTIFIER_FORMAT_KEYWORD_ABBREVIATION, getAbbreviation(entity, format))
 
         format = StrSubstitutor.replace(format, values)
         return sanitizeFormat(format)
@@ -180,13 +183,46 @@ abstract class IdentifierService<T extends GormEntity> {
         return delimiter ? [(Constants.IDENTIFIER_FORMAT_KEYWORD_DELIMITER): delimiter] : Collections.emptyMap()
     }
 
+    /**
+     * Builds and returns the abbreviation to use when populating the identifier format.
+     */
+    private String getAbbreviation(T entity, String format) {
+        if (!format.contains(Constants.IDENTIFIER_FORMAT_KEYWORD_ABBREVIATION_EMBEDDED)) {
+            return null
+        }
+
+        String fieldToAbbreviate = getIdentifierProperty("abbreviation.field")
+        if (StringUtils.isBlank(fieldToAbbreviate)) {
+            return null
+        }
+
+        if (!entity.hasProperty(fieldToAbbreviate)) {
+            throw new IllegalArgumentException("Cannot abbreviate on field ${fieldToAbbreviate} because it does not exist on the entity ${entity.class}")
+        }
+
+        String fieldValueToAbbreviate = entity[fieldToAbbreviate]
+        Integer minSize = getIdentifierPropertyWithDefault("abbreviation.minSize", Integer)
+        Integer maxSize = getIdentifierPropertyWithDefault("abbreviation.maxSize", Integer)
+
+        // TODO: make this customizable instead of always splitting on ','
+        return stringAbbreviator.abbreviate(fieldValueToAbbreviate, minSize, maxSize, ',')
+    }
+
+    /**
+     * Fetch a feature-specific identifier property.
+     *
+     * Ex: 'openboxes.identifier.product.format'
+     */
+    protected <Clazz> Clazz getIdentifierProperty(String propertyName, Class<Clazz> type=String) {
+        return configService.getProperty("openboxes.identifier.${identifierName}.${propertyName}", type)
+    }
+
+    /**
+     * Fetch a feature-specific identifier property with a fall back to the global default.
+     */
     protected <Clazz> Clazz getIdentifierPropertyWithDefault(String propertyName, Class<Clazz> type=String) {
-        // If there's a custom property defined for the entity, use that. Ex: 'openboxes.identifier.product.format'
-        Clazz property = configService.getProperty("openboxes.identifier.${identifierName}.${propertyName}", type)
-
-        // Otherwise use the default/fallback option. Ex: 'openboxes.identifier.default.format'
+        Clazz property = getIdentifierProperty(propertyName, type)
         return property ?: configService.getProperty("openboxes.identifier.default.${propertyName}", type)
-
     }
 
     /**

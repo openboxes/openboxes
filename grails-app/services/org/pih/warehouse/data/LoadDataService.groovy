@@ -91,9 +91,9 @@ class LoadDataService {
 
             Organization organization = new Organization(
                     name: organizationName,
-                    code: organizationIdentifierService.generate(organizationName),
                     partyType: PartyType.findByCode("ORG") // FIXME: Should party type be provided?
             )
+            organization.code = organizationIdentifierService.generate(organization)
 
             RoleType roleType = RoleType.valueOf(partyRole)
             organization.addToRoles(new PartyRole(roleType: roleType))

@@ -139,6 +139,8 @@ class Constants {
     static final String IDENTIFIER_FORMAT_KEYWORD_RANDOM_EMBEDDED = "\${random}"
     static final String IDENTIFIER_FORMAT_KEYWORD_DELIMITER = "delimiter"
     static final String IDENTIFIER_FORMAT_KEYWORD_SEQUENCE_NUMBER = "sequenceNumber"
+    static final String IDENTIFIER_FORMAT_KEYWORD_ABBREVIATION = "abbreviation"
+    static final String IDENTIFIER_FORMAT_KEYWORD_ABBREVIATION_EMBEDDED = "\${abbreviation}"
 
     // Default random number formats
     static final String DEFAULT_SEQUENCE_NUMBER_FORMAT_CHAR = "0"
