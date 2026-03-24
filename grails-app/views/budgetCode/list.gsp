@@ -49,19 +49,19 @@
                     <thead>
                         <tr>
 
-                            <g:sortableColumn property="active" title="${warehouse.message(code: 'user.active.label')}"  params="${params}" />
+                            <g:sortableColumn property="active" title="${warehouse.message(code: 'user.active.label')}" params="${params}" />
 
-                            <g:sortableColumn property="id" title="${warehouse.message(code: 'budgetCode.id.label', default: 'Id')}"  params="${params}" />
+                            <g:sortableColumn property="id" title="${warehouse.message(code: 'budgetCode.id.label', default: 'Id')}" params="${params}" />
 
-                            <g:sortableColumn property="code" title="${warehouse.message(code: 'budgetCode.code.label', default: 'Code')}"  params="${params}" />
+                            <g:sortableColumn property="code" title="${warehouse.message(code: 'budgetCode.code.label', default: 'Code')}" params="${params}" />
 
-                            <g:sortableColumn property="name" title="${warehouse.message(code: 'budgetCode.name.label', default: 'Name')}"  params="${params}" />
+                            <g:sortableColumn property="name" title="${warehouse.message(code: 'budgetCode.name.label', default: 'Name')}" params="${params}" />
 
-                            <g:sortableColumn property="description" title="${warehouse.message(code: 'budgetCode.description.label', default: 'Description')}"  params="${params}" />
+                            <g:sortableColumn property="description" title="${warehouse.message(code: 'budgetCode.description.label', default: 'Description')}" params="${params}" />
 
-                            <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'budgetCode.dateCreated.label', default: 'Date Created')}"  params="${params}" />
+                            <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'budgetCode.dateCreated.label', default: 'Date Created')}" params="${params}" />
 
-                            <g:sortableColumn property="lastUpdated" title="${warehouse.message(code: 'budgetCode.lastUpdated.label', default: 'Date Updated')}"  params="${params}" />
+                            <g:sortableColumn property="lastUpdated" title="${warehouse.message(code: 'budgetCode.lastUpdated.label', default: 'Date Updated')}" params="${params}" />
 
                         </tr>
                     </thead>

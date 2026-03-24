@@ -39,15 +39,15 @@
                         <thead>
                             <tr>
 
-                                <g:sortableColumn property="active" title="${warehouse.message(code: 'user.active.label')}"  params="${params}" />
+                                <g:sortableColumn property="active" title="${warehouse.message(code: 'user.active.label')}" params="${params}" />
 
-                                <g:sortableColumn property="lastName" title="${warehouse.message(code: 'default.name.label')}"  params="${params}" />
+                                <g:sortableColumn property="lastName" title="${warehouse.message(code: 'default.name.label')}" params="${params}" />
 
-                                <g:sortableColumn property="type" title="${warehouse.message(code: 'person.type.label')}"  params="${params}" />
+                                <g:sortableColumn property="type" title="${warehouse.message(code: 'person.type.label')}" params="${params}" />
 
-                                <g:sortableColumn property="email" title="${warehouse.message(code: 'person.email.label')}"  params="${params}" />
+                                <g:sortableColumn property="email" title="${warehouse.message(code: 'person.email.label')}" params="${params}" />
 
-                                <g:sortableColumn property="phoneNumber" title="${warehouse.message(code: 'person.phoneNumber.label')}"  params="${params}" />
+                                <g:sortableColumn property="phoneNumber" title="${warehouse.message(code: 'person.phoneNumber.label')}" params="${params}" />
 
                                 <th><g:message code="default.actions.label"/></th>
                             </tr>

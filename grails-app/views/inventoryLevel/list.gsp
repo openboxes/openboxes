@@ -45,8 +45,8 @@
                                         <label>
                                             ${g.message(code:'inventory.label')}
                                         </label>
-                                        <g:selectLocation name="location.id" class="chzn-select-deselect" noSelection="['':'']"
-                                                          value="${params?.location?.id}"/>
+                                        <g:selectLocation name="locationId" class="chzn-select-deselect" noSelection="['':'']"
+                                                          value="${params.locationId}"/>
                                     </div>
                                 </div>
                                 <div class="buttons">
@@ -67,26 +67,25 @@
                         <div class="box">
                             <h2><warehouse:message code="results.label" default="Results"/></h2>
 
-                            <g:set var="pageParams" value="${['location.id': params?.location?.id, q: params.q].findAll {it.value}}"/>
                             <table>
                                 <thead>
                                     <tr>
 
-                                        <g:sortableColumn property="status" title="${warehouse.message(code: 'inventoryLevel.status.label', default: 'Status')}"  params="${pageParams}" />
+                                        <g:sortableColumn property="status" title="${warehouse.message(code: 'inventoryLevel.status.label', default: 'Status')}"  params="${params}" />
 
                                         <th><warehouse:message code="product.productCode.label" default="Product Code" /></th>
 
                                         <th><warehouse:message code="product.label" default="Product" /></th>
 
-                                        <g:sortableColumn property="inventory" title="${warehouse.message(code: 'inventoryLevel.inventory.label', default: 'Inventory')}"  params="${pageParams}" />
+                                        <g:sortableColumn property="inventory" title="${warehouse.message(code: 'inventoryLevel.inventory.label', default: 'Inventory')}"  params="${params}" />
 
-                                        <g:sortableColumn property="minQuantity" title="${warehouse.message(code: 'inventoryLevel.minQuantity.label', default: 'Min Quantity')}"  params="${pageParams}" />
+                                        <g:sortableColumn property="minQuantity" title="${warehouse.message(code: 'inventoryLevel.minQuantity.label', default: 'Min Quantity')}"  params="${params}" />
 
-                                        <g:sortableColumn property="reorderQuantity" title="${warehouse.message(code: 'inventoryLevel.reorderQuantity.label', default: 'Reorder Quantity')}"  params="${pageParams}" />
+                                        <g:sortableColumn property="reorderQuantity" title="${warehouse.message(code: 'inventoryLevel.reorderQuantity.label', default: 'Reorder Quantity')}"  params="${params}" />
 
-                                        <g:sortableColumn property="maxQuantity" title="${warehouse.message(code: 'inventoryLevel.maxQuantity.label', default: 'Max Quantity')}"  params="${pageParams}" />
+                                        <g:sortableColumn property="maxQuantity" title="${warehouse.message(code: 'inventoryLevel.maxQuantity.label', default: 'Max Quantity')}"  params="${params}" />
 
-                                        <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'inventoryLevel.dateCreated.label', default: 'Date Created')}"  params="${pageParams}" />
+                                        <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'inventoryLevel.dateCreated.label', default: 'Date Created')}"  params="${params}" />
 
                                     </tr>
                                 </thead>
@@ -122,10 +121,7 @@
                             </table>
                             <div class="paginateButtons">
 
-                                <g:set var="pageParams"
-                                       value="${['location.id': params?.location?.id, q: params.q].findAll {it.value}}"/>
-
-                                <g:paginate total="${inventoryLevelInstanceTotal}" params="${pageParams}"/>
+                                <g:paginate total="${inventoryLevelInstanceTotal}" params="${params}"/>
                             </div>
                         </div>
                     </div>

@@ -33,6 +33,7 @@ import static org.springframework.util.StringUtils.stripFilenameExtension
 @Transactional
 class DocumentController {
 
+    def documentService
     def documentTemplateService
     def fileService
     def shipmentService
@@ -52,31 +53,8 @@ class DocumentController {
         log.info "params: " + params
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
 
-        def documentType = DocumentType.get(params?.documentType?.id)
-
-        def documentInstanceList = []
-        def documentInstanceTotal = 0
-
-        if (params.q || documentType) {
-            def q = "%" + params.q + "%"
-            def queryClosure = {
-                ilike("name", q)
-                if (documentType) {
-                    eq("documentType", documentType)
-                }
-                if (params.sort) {
-                    order(params.sort, params.order ?: 'asc')
-                }
-                maxResults(params.max)
-            }
-
-            documentInstanceList = Document.createCriteria().list(queryClosure)
-            documentInstanceTotal = Document.createCriteria().count(queryClosure)
-        } else {
-            log.info "show all: " + params
-            documentInstanceList = Document.list(params)
-            documentInstanceTotal = Document.count()
-        }
+        List<Document> documentInstanceList = documentService.getDocuments(params)
+        int documentInstanceTotal = documentInstanceList.totalCount
 
         [documentInstanceList: documentInstanceList, documentInstanceTotal: documentInstanceTotal]
     }

@@ -33,8 +33,8 @@
                                 </div>
                                 <div class="filter-list-item">
                                     <label><warehouse:message code="documentType.label"/></label>
-                                    <g:select class="chzn-select-deselect" name="documentType.id" from="${org.pih.warehouse.core.DocumentType.list()}"
-                                              optionKey="id" value="${params?.documentType?.id}" noSelection="['null': '']" />
+                                    <g:select class="chzn-select-deselect" name="documentTypeId" from="${org.pih.warehouse.core.DocumentType.list()}"
+                                              optionKey="id" value="${params.documentTypeId}" noSelection="['null': '']" />
                                 </div>
                                 <hr/>
                                 <div class="filter-list-item">
@@ -55,18 +55,17 @@
                                 <thead>
                                 <tr>
 
-                                    <g:set var="filterParams" value="${[q: params.q, 'documentType.id': params['documentType.id']]}"/>
-                                    <g:sortableColumn property="id" title="${warehouse.message(code: 'document.id.label', default: 'Id')}" params="${filterParams}" />
+                                    <g:sortableColumn property="id" title="${warehouse.message(code: 'document.id.label', default: 'Id')}" params="${params}" />
 
-                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'document.name.label', default: 'Name')}" params="${filterParams}" />
+                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'document.name.label', default: 'Name')}" params="${params}" />
 
-                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'document.documentType.label', default: 'Document Type')}" params="${filterParams}" />
+                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'document.documentType.label', default: 'Document Type')}" params="${params}" />
 
-                                    <g:sortableColumn property="filename" title="${warehouse.message(code: 'document.filename.label', default: 'Filename')}" params="${filterParams}" />
+                                    <g:sortableColumn property="filename" title="${warehouse.message(code: 'document.filename.label', default: 'Filename')}" params="${params}" />
 
-                                    <g:sortableColumn property="extension" title="${warehouse.message(code: 'document.extension.label', default: 'Extension')}" params="${filterParams}" />
+                                    <g:sortableColumn property="extension" title="${warehouse.message(code: 'document.extension.label', default: 'Extension')}" params="${params}" />
 
-                                    <g:sortableColumn property="contentType" title="${warehouse.message(code: 'document.contentType.label', default: 'Content Type')}" params="${filterParams}" />
+                                    <g:sortableColumn property="contentType" title="${warehouse.message(code: 'document.contentType.label', default: 'Content Type')}" params="${params}" />
 
                                 </tr>
                                 </thead>
@@ -91,7 +90,7 @@
                                 </tbody>
                             </table>
                             <div class="paginateButtons">
-                                <g:paginate total="${documentInstanceTotal}" params="${filterParams}"/>
+                                <g:paginate total="${documentInstanceTotal}" params="${params}"/>
                             </div>
                         </div>
                     </div>

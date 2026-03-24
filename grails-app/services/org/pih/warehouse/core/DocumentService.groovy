@@ -1639,4 +1639,18 @@ class DocumentService {
         }.sort { it.name }
     }
 
+    List<Document> getDocuments(params) {
+        return org.pih.warehouse.core.Document.createCriteria().list(max: params.max, offset: params.offset) {
+            if (params.q) {
+                ilike("name", "%" + params.q + "%")
+            }
+            DocumentType documentType = DocumentType.get(params.documentTypeId)
+            if (documentType) {
+                eq("documentType", documentType)
+            }
+            if (params.sort) {
+                order(params.sort, params.order ?: 'asc')
+            }
+        } as List<Document>
+    }
 }

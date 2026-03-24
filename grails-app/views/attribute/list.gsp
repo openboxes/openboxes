@@ -51,13 +51,13 @@
                             <table>
                                 <thead>
                                 <tr>
-                                    <g:sortableColumn property="code" title="${warehouse.message(code: 'default.code.label')}"  params="${params}" />
-                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}"  params="${params}" />
-                                    <g:sortableColumn property="entityTypeCode" title="${warehouse.message(code: 'attribute.entityTypeCode.label', default: 'Entity Type')}"  params="${params}" />
-                                    <g:sortableColumn property="options" title="${warehouse.message(code: 'attribute.options.label')}"  params="${params}" />
-                                    <g:sortableColumn property="active" title="${warehouse.message(code: 'default.active.label')}"  params="${params}" />
-                                    <g:sortableColumn property="required" title="${warehouse.message(code: 'default.required.label')}"  params="${params}" />
-                                    <g:sortableColumn property="allowOther" title="${warehouse.message(code: 'attribute.allowOther.label')}"  params="${params}" />
+                                    <g:sortableColumn property="code" title="${warehouse.message(code: 'default.code.label')}" />
+                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" />
+                                    <g:sortableColumn property="entityTypeCode" title="${warehouse.message(code: 'attribute.entityTypeCode.label', default: 'Entity Type')}" />
+                                    <g:sortableColumn property="options" title="${warehouse.message(code: 'attribute.options.label')}" />
+                                    <g:sortableColumn property="active" title="${warehouse.message(code: 'default.active.label')}" />
+                                    <g:sortableColumn property="required" title="${warehouse.message(code: 'default.required.label')}" />
+                                    <g:sortableColumn property="allowOther" title="${warehouse.message(code: 'attribute.allowOther.label')}" />
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -75,7 +75,7 @@
                                 </tbody>
                             </table>
                             <div class="paginateButtons">
-                                <g:paginate total="${attributeInstanceTotal}" params="${params}" />
+                                <g:paginate total="${attributeInstanceTotal}" />
                             </div>
 
                         </div>

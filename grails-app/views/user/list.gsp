@@ -58,13 +58,13 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <g:sortableColumn property="active" title="${warehouse.message(code: 'user.active.label')}"  params="${params}" />
-                                    <g:sortableColumn property="username" title="${warehouse.message(code: 'user.username.label')}"  params="${params}" />
-                                    <g:sortableColumn property="lastName" title="${warehouse.message(code: 'default.name.label')}"  params="${params}" />
-                                    <g:sortableColumn property="email" title="${warehouse.message(code: 'user.email.label')}"  params="${params}" />
-                                    <g:sortableColumn property="locale" title="${warehouse.message(code: 'default.locale.label')}"  params="${params}" />
-                                    <g:sortableColumn property="role" title="${warehouse.message(code: 'user.roles.label')}"  params="${params}" />
-                                    <g:sortableColumn property="lastLoginDate" title="${warehouse.message(code: 'user.lastLoginDate.label')}"  params="${params}" />
+                                    <g:sortableColumn property="active" title="${warehouse.message(code: 'user.active.label')}" params="${params}" />
+                                    <g:sortableColumn property="username" title="${warehouse.message(code: 'user.username.label')}" params="${params}" />
+                                    <g:sortableColumn property="lastName" title="${warehouse.message(code: 'default.name.label')}" params="${params}" />
+                                    <g:sortableColumn property="email" title="${warehouse.message(code: 'user.email.label')}" params="${params}" />
+                                    <g:sortableColumn property="locale" title="${warehouse.message(code: 'default.locale.label')}" params="${params}" />
+                                    <g:sortableColumn property="role" title="${warehouse.message(code: 'user.roles.label')}" params="${params}" />
+                                    <g:sortableColumn property="lastLoginDate" title="${warehouse.message(code: 'user.lastLoginDate.label')}" params="${params}" />
                                 </tr>
                             </thead>
                             <tbody>
