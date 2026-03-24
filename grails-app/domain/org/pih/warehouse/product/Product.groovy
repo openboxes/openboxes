@@ -300,7 +300,7 @@ class Product implements Comparable, Serializable, Validatable<ProductValidator>
         category(nullable: false, validator: { Category category, Product product ->
             // If the category is not dirty, let the existing categories exist even if they
             // are not valid in terms of the parent category assignment rules. (OBS-1963).
-            if (!category.dirty) {
+            if (!product.isDirty("category")) {
                 return true
             }
             // If assigning a parent category to product is enabled, and the category is the parent (it has children), throw an error
