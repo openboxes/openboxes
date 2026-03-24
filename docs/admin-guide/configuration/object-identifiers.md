@@ -20,10 +20,11 @@ of keywords that you can use when specifying the format:
     - `\${custom.*}`: Adds a custom value to the identifier. See the section below for details.
 - `openboxes.identifier.default.delimiter`: The separator character to use between fields of the identifier. Is
 inserted whenever `\${delimiter}` appears in the format.
-- `openboxes.identifier.default.prefix.enabled`: True if we allow custom prefix characters to be prepended to the
-identifier. The prefix is specified in the code so is highly feature-specific and not configurable. This is typically
-used to emphasize the domain that we're generating an identifier for. For example, we prepend "PO-" to the identifier
-for purchase orders.
+- `openboxes.identifier.default.prefix.enabled`: True if we allow prefix characters to be prepended to the identifier
+in certain scenarios. This type of prefix is specified in the code via the "prefix" context field and is meant to
+handle conditional logic. For example, we prepend "R-" to the identifier for replenishments but don't do so for regular
+orders. If you want an identifier to *always* have a prefix, you can specify it directly in the format. For example:
+`openboxes.identifier.purchaseOrder.format = "PO-\${sequenceNumber}"`
 
 !!! warning
     Remember that identifiers are meant to be unique, and so it is important that your format can generate unique
@@ -35,7 +36,7 @@ for purchase orders.
 
     3) A combination of custom or entity fields that are guaranteed to be unique
 
-You can see our default property configurations in `/grail-apps/conf/runtime.groovy`
+You can see our default property configurations in `/grails-app/conf/runtime.groovy`
 
 ## Overriding Base Configuration
 In case you don't want to use a single format across all of your entity types, most of the identifier configuration
@@ -56,7 +57,7 @@ Randomization can be added to the identifier by adding `"\${random}"` to the for
 can be configured in a number of ways:
 
 - `openboxes.identifier.attempts.max`: The maximum number of times to attempt to generate the random identifier before
-  giving up. Useful in case we happen to generate a random value that already exists.
+  giving up and returning null. Useful in case we happen to generate a random value that already exists.
 - `openboxes.identifier.numeric`: The set of characters to select from when populating the `N` (number) character in
 the random sequence
 - `openboxes.identifier.alphabetic`: The set of characters to select from when populating the `L` (letter) character

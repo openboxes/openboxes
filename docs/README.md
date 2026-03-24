@@ -54,7 +54,13 @@ git checkout -b docs/1234-fix-typo
 2. Make documentation changes in an editor of your choice
 
 > [!TIP]
->   If adding a new page, remember to add a link to it somewhere in the `mkdocs.yml` file.
+>   If adding a new page, remember to add a link to it somewhere in the `mkdocs.yml` file. Otherwise, you'll encounter
+>   the following warning and won't be able to navigate to the page:
+> ```
+>   INFO    -  The following pages exist in the docs directory, but are not included in the "nav" configuration:
+>    - xyz.md
+>    - ...
+> ```
 
 3. Commit changes to branch with meaningful commit message 
 ```
