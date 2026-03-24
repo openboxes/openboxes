@@ -75,7 +75,7 @@ class LocationControllerSpec extends Specification implements ControllerUnitTest
         params.put('offset', 0)
 
         and:
-        controller.locationService.getLocations(_, _, _, _, params.max, params.offset) >>
+        controller.locationService.getLocations(_, _, _, _, params.max, params.offset, _, _) >>
                 buildStubbedPagedResultList([bostonDepot, miamiDepot])
 
         when:
@@ -89,14 +89,14 @@ class LocationControllerSpec extends Specification implements ControllerUnitTest
     void "when fetching locations by some filter criteria expect some locations can be returned"() {
         given:
         params.put('q', "Bos")
-        params.put('locationGroup.id', bostonGroup.id)
-        params.put('organization.id', mainOrg.id)
-        params.put('locationType.id', depotLocationType.id)
+        params.put('locationGroupId', bostonGroup.id)
+        params.put('organizationId', mainOrg.id)
+        params.put('locationTypeId', depotLocationType.id)
         params.put('max', 10)
         params.put('offset', 0)
 
         and:
-        controller.locationService.getLocations(mainOrg, depotLocationType, bostonGroup, params.q, params.max, params.offset) >>
+        controller.locationService.getLocations(mainOrg, depotLocationType, bostonGroup, params.q, params.max, params.offset, _, _) >>
                 buildStubbedPagedResultList([bostonDepot])
 
         when:
