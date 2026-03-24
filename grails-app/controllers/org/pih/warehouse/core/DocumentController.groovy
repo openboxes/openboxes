@@ -64,6 +64,9 @@ class DocumentController {
                 if (documentType) {
                     eq("documentType", documentType)
                 }
+                if (params.sort) {
+                    order(params.sort, params.order ?: 'asc')
+                }
                 maxResults(params.max)
             }
 

@@ -55,17 +55,18 @@
                                 <thead>
                                 <tr>
 
-                                    <g:sortableColumn property="id" title="${warehouse.message(code: 'document.id.label', default: 'Id')}" />
+                                    <g:set var="filterParams" value="${[q: params.q, 'documentType.id': params['documentType.id']]}"/>
+                                    <g:sortableColumn property="id" title="${warehouse.message(code: 'document.id.label', default: 'Id')}" params="${filterParams}" />
 
-                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'document.name.label', default: 'Name')}" />
+                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'document.name.label', default: 'Name')}" params="${filterParams}" />
 
-                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'document.documentType.label', default: 'Document Type')}" />
+                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'document.documentType.label', default: 'Document Type')}" params="${filterParams}" />
 
-                                    <g:sortableColumn property="filename" title="${warehouse.message(code: 'document.filename.label', default: 'Filename')}" />
+                                    <g:sortableColumn property="filename" title="${warehouse.message(code: 'document.filename.label', default: 'Filename')}" params="${filterParams}" />
 
-                                    <g:sortableColumn property="extension" title="${warehouse.message(code: 'document.extension.label', default: 'Extension')}" />
+                                    <g:sortableColumn property="extension" title="${warehouse.message(code: 'document.extension.label', default: 'Extension')}" params="${filterParams}" />
 
-                                    <g:sortableColumn property="contentType" title="${warehouse.message(code: 'document.contentType.label', default: 'Content Type')}" />
+                                    <g:sortableColumn property="contentType" title="${warehouse.message(code: 'document.contentType.label', default: 'Content Type')}" params="${filterParams}" />
 
                                 </tr>
                                 </thead>
@@ -90,7 +91,7 @@
                                 </tbody>
                             </table>
                             <div class="paginateButtons">
-                                <g:paginate total="${documentInstanceTotal}" />
+                                <g:paginate total="${documentInstanceTotal}" params="${filterParams}"/>
                             </div>
                         </div>
                     </div>

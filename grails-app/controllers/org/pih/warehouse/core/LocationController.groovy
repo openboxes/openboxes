@@ -46,7 +46,7 @@ class LocationController {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         params.offset = params.offset ? params.int("offset") : 0
 
-        def locations = locationService.getLocations(organization, locationType, locationGroup, params.q, params.max, params.offset as int)
+        def locations = locationService.getLocations(organization, locationType, locationGroup, params.q, params.max, params.offset as int, params.sort ?: "name", params.order ?: "asc")
 
         [locationInstanceList: locations, locationInstanceTotal: locations.totalCount, defaultLocationType:defaultLocationType]
     }

@@ -45,9 +45,9 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <g:sortableColumn property="id" title="${warehouse.message(code: 'tag.id.label', default: 'Id')}" />
+                                        <g:sortableColumn property="id" title="${warehouse.message(code: 'tag.id.label', default: 'Id')}"  params="${params}" />
 
-                                        <g:sortableColumn property="tag" title="${warehouse.message(code: 'tag.tag.label', default: 'Tag')}" />
+                                        <g:sortableColumn property="tag" title="${warehouse.message(code: 'tag.tag.label', default: 'Tag')}"  params="${params}" />
 
                                         <th><warehouse:message code="tag.products.label" default="Products"/></th>
 
@@ -57,9 +57,9 @@
 
                                         <th><warehouse:message code="tag.createdBy.label" default="Created By" /></th>
 
-                                        <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'tag.dateCreated.label', default: 'Date Created')}" />
+                                        <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'tag.dateCreated.label', default: 'Date Created')}"  params="${params}" />
 
-                                        <g:sortableColumn property="lastUpdated" title="${warehouse.message(code: 'tag.lastUpdated.label', default: 'Last Updated')}" />
+                                        <g:sortableColumn property="lastUpdated" title="${warehouse.message(code: 'tag.lastUpdated.label', default: 'Last Updated')}"  params="${params}" />
                                     </tr>
                                 </thead>
                                 <tbody>

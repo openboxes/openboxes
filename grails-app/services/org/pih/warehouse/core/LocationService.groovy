@@ -173,7 +173,7 @@ class LocationService {
         return locations
     }
 
-    def getLocations(Organization organization, LocationType locationType, LocationGroup locationGroup, String query, Integer max, Integer offset) {
+    def getLocations(Organization organization, LocationType locationType, LocationGroup locationGroup, String query, Integer max, Integer offset, String sort, String order) {
         def terms = "%" + query + "%"
         def locations = Location.createCriteria().list(max: max, offset: offset) {
             if (query) {
@@ -197,7 +197,7 @@ class LocationService {
             } else {
                 isNull("parentLocation")
             }
-            order("name")
+            order(sort, order)
         }
         return locations
 

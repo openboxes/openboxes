@@ -18,6 +18,9 @@ class BudgetCodeService {
             if (params.q) {
                 ilike("code", "%" + params.q + "%")
             }
+            if (params.sort) {
+                order(params.sort, params.order ?: 'asc')
+            }
         }
     }
 }
