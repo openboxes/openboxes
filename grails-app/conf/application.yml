@@ -549,7 +549,7 @@ openboxes:
             delayInMilliseconds: 1000
             bulkShipmentAutoReceipt: true
 
-        backorderReAllocationJob:
+        reallocationJob:
             enabled: true
             cronExpression: "0 */5 * * * ?" # every five minutes
             delayInMilliseconds: 10000

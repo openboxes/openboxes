@@ -5,14 +5,13 @@ import org.pih.warehouse.allocation.AllocationMode
 import org.pih.warehouse.allocation.AllocationRequest
 import org.pih.warehouse.allocation.AllocationResult
 import org.pih.warehouse.allocation.AllocationStrategy
-import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.quartz.JobExecutionContext
 
-class BackorderReAllocationJob {
+class ReallocationJob {
 
     def shipmentService
     def allocationService
@@ -21,12 +20,12 @@ class BackorderReAllocationJob {
     def sessionRequired = false
 
     static triggers = {
-        cron name: JobUtils.getCronName(BackorderReAllocationJob),
-        cronExpression: JobUtils.getCronExpression(BackorderReAllocationJob)
+        cron name: JobUtils.getCronName(ReallocationJob),
+        cronExpression: JobUtils.getCronExpression(ReallocationJob)
     }
 
     def execute(JobExecutionContext context) {
-        if (!Holders.config.openboxes.jobs.backorderReAllocationJob.enabled) {
+        if (!Holders.config.openboxes.jobs.reallocationJob.enabled) {
             log.info"Backorder re-allocation job is disabled"
             return
         }

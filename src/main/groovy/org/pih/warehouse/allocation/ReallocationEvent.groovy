@@ -11,9 +11,9 @@ package org.pih.warehouse.allocation
 
 import org.springframework.context.ApplicationEvent
 
-class ReAllocationEvent extends ApplicationEvent {
+class ReallocationEvent extends ApplicationEvent {
 
-    ReAllocationEvent(String shipmentId) {
+    ReallocationEvent(String shipmentId) {
         super(shipmentId)
     }
 }

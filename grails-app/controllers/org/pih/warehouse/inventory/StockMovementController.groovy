@@ -13,7 +13,6 @@ package org.pih.warehouse.inventory
 import grails.converters.JSON
 import grails.core.GrailsApplication
 import grails.plugins.csv.CSVWriter
-import grails.validation.ValidationException
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.allocation.AllocationMode
 import org.pih.warehouse.allocation.AllocationService

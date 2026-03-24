@@ -12,7 +12,6 @@ package org.pih.warehouse.shipping
 import grails.util.Holders
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
-import org.pih.warehouse.allocation.ReAllocationEvent
 import org.pih.warehouse.core.*
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.donation.Donor

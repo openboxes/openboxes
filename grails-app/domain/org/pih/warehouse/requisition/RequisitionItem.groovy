@@ -10,18 +10,19 @@
 package org.pih.warehouse.requisition
 
 import grails.validation.ValidationException
+import org.pih.warehouse.allocation.AllocationStatus
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Inventory
-import org.pih.warehouse.allocation.AllocationStatus
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductPackage
-import org.pih.warehouse.core.Person
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.product.Product
 
 class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
@@ -139,7 +140,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         quantityBackordered(nullable: true,
                 validator: { value, obj ->
                     // Must have a backordered reason code
-                    if (value > 0 && "BACKORDER" != obj.backorderedReasonCode) {
+                    if (value > 0 && ReasonCode.BACKORDER.toString() != obj.backorderedReasonCode) {
                         return false
                     } else {
                         return true
@@ -197,13 +198,14 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
         if (isSubstituted()) {
             return RequisitionItemStatus.SUBSTITUTED
-        } else {
-            if (isReduced()) {
-                return RequisitionItemStatus.REDUCED
-            }
-            if (isIncreased()) {
-                return RequisitionItemStatus.INCREASED
-            }
+        }
+
+        if (isReduced()) {
+            return RequisitionItemStatus.REDUCED
+        }
+
+        if (isIncreased()) {
+            return RequisitionItemStatus.INCREASED
         }
 
         if (isChanged()) {
@@ -331,7 +333,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         log.info "Change quantity: ${newQuantity} ${reasonCode} ${comments}"
         // And then create a new requisition item for the remaining quantity (if not 0)
         if (newQuantity == 0) {
-            if ("BACKORDER" == reasonCode) {
+            if (ReasonCode.BACKORDER.toString() == reasonCode) {
                 quantityBackordered = quantity
                 backorderedReasonCode = reasonCode
             } else {
