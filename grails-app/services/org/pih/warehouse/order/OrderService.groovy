@@ -410,7 +410,7 @@ class OrderService {
                         orderInstance.status = OrderStatus.PLACED
                         orderInstance.dateApproved = new Date()
                         orderInstance.approvedBy = userInstance
-                        if (!orderInstance.hasErrors() && orderInstance.merge()) {
+                        if (!orderInstance.hasErrors() && orderInstance.save()) {
                             grailsApplication.mainContext.publishEvent(new OrderStatusEvent(OrderStatus.PLACED, orderInstance))
                             return orderInstance
                         }
@@ -591,7 +591,7 @@ class OrderService {
                 BigDecimal pricePerUnit = pricePerPackage / orderItem?.quantityPerUom
                 if (pricePerUnit != 0) {
                     orderItem.product.pricePerUnit = pricePerUnit
-                    orderItem.product.save()
+                    orderItem.product.save(failOnError: true)
                 }
             }
             else {
