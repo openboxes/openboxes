@@ -17,6 +17,7 @@ import grails.gorm.PagedResultList
 import grails.validation.Validateable
 import org.apache.http.client.fluent.Request
 import org.apache.http.entity.ContentType
+import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.OutboundStockMovementService
 import org.pih.warehouse.inventory.StockMovementService
@@ -39,7 +40,7 @@ class DocumentController {
     def fileService
     def shipmentService
     GrailsApplication grailsApplication
-    TemplateService templateService
+    BeanPropertyTemplateService beanPropertyTemplateService
     StockMovementService stockMovementService
     OutboundStockMovementService outboundStockMovementService
 
@@ -537,12 +538,12 @@ class DocumentController {
     }
 
     def printZebraTemplate() {
-        Document document = Document.load(params.id)
+        Document document = loadZebraTemplate(params.id)
         Location location = Location.load(session.warehouse.id)
         InventoryItem inventoryItem = InventoryItem.load(params?.inventoryItem?.id)
 
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
-        String renderedContent = templateService.renderTemplate(document, model)
+        String renderedContent = beanPropertyTemplateService.renderTemplate(document, model)
 
         try {
             if (params.protocol=="usb") {
@@ -570,21 +571,21 @@ class DocumentController {
     }
 
     def buildZebraTemplate() {
-        Document document = Document.load(params.id)
+        Document document = loadZebraTemplate(params.id)
         InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
         Location location = Location.load(session.warehouse.id)
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
-        String renderedContent = templateService.renderTemplate(document, model)
+        String renderedContent = beanPropertyTemplateService.renderTemplate(document, model)
         log.info "renderedContent: ${renderedContent}"
         render(renderedContent)
     }
 
     def renderZebraTemplate() {
-        Document document = Document.load(params.id)
+        Document document = loadZebraTemplate(params.id)
         InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
         Location location = Location.load(session.warehouse.id)
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
-        String body = templateService.renderTemplate(document, model)
+        String body = beanPropertyTemplateService.renderTemplate(document, model)
 
         response.contentType = 'image/png'
         // TODO Move labelary URL to application.yml
@@ -597,14 +598,25 @@ class DocumentController {
 
 
     def exportZebraTemplate() {
-        Document document = Document.load(params.id)
+        Document document = loadZebraTemplate(params.id)
         InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
         Location location = Location.load(session.warehouse.id)
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
-        String renderedContent = templateService.renderTemplate(document, model)
+        String renderedContent = beanPropertyTemplateService.renderTemplate(document, model)
         // TODO Move labelary URL to application.yml
         String url = "http://labelary.com/viewer.html?zpl=" + renderedContent
         redirect(url: url)
+    }
+
+    private Document loadZebraTemplate(Serializable id) {
+        Document document = Document.get(id)
+        if (document == null) {
+            throw new ObjectNotFoundException(id, Document.name)
+        }
+        if (document.documentType?.documentCode != DocumentCode.ZEBRA_TEMPLATE) {
+            throw new IllegalArgumentException("Only documents of type ZEBRA_TEMPLATE can be rendered as Zebra templates")
+        }
+        return document
     }
 
 }
