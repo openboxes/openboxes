@@ -37,14 +37,19 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
 
     void 'RequisitionItem.getDisplayStatus() should return: #status when at least one child item is type of #childItemType and RequisitionItem.isSubstituted() should return: #isSubstituted'() {
         given:
+        RequisitionItem requisitionItem = Spy(RequisitionItem) {
+            calculateQuantityPicked() >> 1
+        }
         RequisitionItem item = new RequisitionItem()
         item.requisitionItemType = childItemType
-        domain.requisition.status = RequisitionStatus.CHECKING
-        domain.addToRequisitionItems(item)
+        requisitionItem.requisition = new Requisition()
+        requisitionItem.requisition.status = RequisitionStatus.CHECKING
+        requisitionItem.addToRequisitionItems(item)
+        requisitionItem.quantity = 1
 
         expect:
-        domain.isSubstituted() == isSubstituted
-        domain.displayStatus == status
+        requisitionItem.isSubstituted() == isSubstituted
+        requisitionItem.displayStatus == status
 
         where:
         childItemType                    || isSubstituted | status
@@ -54,13 +59,17 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
 
     void 'RequisitionItem.getDisplayStatus() should return: #status when qty is #quantity and the qty approved is #quantityApproved and RequisitionItem.isApproved() should return: #isApproved'() {
         given:
-        domain.requisition.status = RequisitionStatus.CHECKING
-        domain.quantity = quantity
-        domain.quantityApproved = quantityApproved
+        RequisitionItem requisitionItem = Spy(RequisitionItem) {
+            calculateQuantityPicked() >> 1
+        }
+        requisitionItem.requisition = new Requisition()
+        requisitionItem.requisition.status = RequisitionStatus.CHECKING
+        requisitionItem.quantity = quantity
+        requisitionItem.quantityApproved = quantityApproved
 
         expect:
-        domain.isApproved() == isApproved
-        domain.displayStatus == status
+        requisitionItem.isApproved() == isApproved
+        requisitionItem.displayStatus == status
 
         where:
         quantity | quantityApproved || isApproved | status
@@ -70,13 +79,22 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
 
     void 'RequisitionItem.getDisplayStatus() should return: #status when item has child item and the quantity cancelled is #quantityCancelled and RequisitionItem.isChanged() is #isChanged'() {
         given:
-        domain.requisition.status = RequisitionStatus.CHECKING
-        domain.quantityCanceled = quantityCancelled
-        domain.modificationItem = new RequisitionItem()
+        RequisitionItem requisitionItem = Spy(RequisitionItem) {
+            calculateQuantityPicked() >> 1
+        }
+        RequisitionItem modificationItem = Spy(RequisitionItem) {
+            calculateQuantityPicked() >> 1
+        }
+        requisitionItem.requisition = new Requisition()
+        requisitionItem.requisition.status = RequisitionStatus.CHECKING
+        requisitionItem.quantityCanceled = quantityCancelled
+        modificationItem.quantity = 1
+        requisitionItem.modificationItem = modificationItem
+        requisitionItem.quantity = 1
 
         expect:
-        domain.isChanged() == isChanged
-        domain.displayStatus == status
+        requisitionItem.isChanged() == isChanged
+        requisitionItem.displayStatus == status
 
         where:
         quantityCancelled || isChanged | status
@@ -86,18 +104,22 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
 
     void 'RequisitionItem.getDisplayStatus() should return: #status when item has quantity cancelled #quantityCancelled and quantity #quantity and RequisitionItem.isCancelled() is #isCancelled'() {
         given:
-        domain.requisition.status = RequisitionStatus.CHECKING
-        domain.quantityCanceled = quantityCancelled
-        domain.quantity = quantity
+        RequisitionItem requisitionItem = Spy(RequisitionItem) {
+            calculateQuantityPicked() >> quantityPicked
+        }
+        requisitionItem.requisition = new Requisition()
+        requisitionItem.requisition.status = RequisitionStatus.CHECKING
+        requisitionItem.quantityCanceled = quantityCancelled
+        requisitionItem.quantity = quantity
 
         expect:
-        domain.isCanceled() == isCancelled
-        domain.displayStatus == status
+        requisitionItem.isCanceled() == isCancelled
+        requisitionItem.displayStatus == status
 
         where:
-        quantity | quantityCancelled || isCancelled | status
-        1        | 1                 || true        | RequisitionItemStatus.CANCELED
-        2        | 1                 || false       | RequisitionItemStatus.PENDING
+        quantity | quantityCancelled | quantityPicked || isCancelled | status
+        1        | 1                 | 1              || true        | RequisitionItemStatus.CANCELED
+        2        | 1                 | 2              || false       | RequisitionItemStatus.PENDING
     }
 
     void 'RequisitionItem.changeQuantity() should cancel old #quantity and assign #reasonCode and #comment'() {
