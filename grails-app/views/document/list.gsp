@@ -33,8 +33,8 @@
                                 </div>
                                 <div class="filter-list-item">
                                     <label><warehouse:message code="documentType.label"/></label>
-                                    <g:select class="chzn-select-deselect" name="documentTypeId" from="${org.pih.warehouse.core.DocumentType.list()}"
-                                              optionKey="id" value="${params.documentTypeId}" noSelection="['null': '']" />
+                                    <g:select class="chzn-select-deselect" name="documentType.id" from="${org.pih.warehouse.core.DocumentType.list()}"
+                                              optionKey="id" value="${params?.documentType?.id}" noSelection="['null': '']" />
                                 </div>
                                 <hr/>
                                 <div class="filter-list-item">
@@ -50,22 +50,24 @@
                     <div class="yui-u">
 
                         <div class="box">
+                            <g:set var="pageParams"
+                                   value="${['documentType.id': params?.documentType?.id, q: params.q].findAll {it.value}}"/>
                             <h2><warehouse:message code="default.list.label" args="[entityName]" /></h2>
                             <table>
                                 <thead>
                                 <tr>
 
-                                    <g:sortableColumn property="id" title="${warehouse.message(code: 'document.id.label', default: 'Id')}" params="${params}" />
+                                    <g:sortableColumn property="id" title="${warehouse.message(code: 'document.id.label', default: 'Id')}" params="${pageParams}" />
 
-                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'document.name.label', default: 'Name')}" params="${params}" />
+                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'document.name.label', default: 'Name')}" params="${pageParams}" />
 
-                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'document.documentType.label', default: 'Document Type')}" params="${params}" />
+                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'document.documentType.label', default: 'Document Type')}" params="${pageParams}" />
 
-                                    <g:sortableColumn property="filename" title="${warehouse.message(code: 'document.filename.label', default: 'Filename')}" params="${params}" />
+                                    <g:sortableColumn property="filename" title="${warehouse.message(code: 'document.filename.label', default: 'Filename')}" params="${pageParams}" />
 
-                                    <g:sortableColumn property="extension" title="${warehouse.message(code: 'document.extension.label', default: 'Extension')}" params="${params}" />
+                                    <g:sortableColumn property="extension" title="${warehouse.message(code: 'document.extension.label', default: 'Extension')}" params="${pageParams}" />
 
-                                    <g:sortableColumn property="contentType" title="${warehouse.message(code: 'document.contentType.label', default: 'Content Type')}" params="${params}" />
+                                    <g:sortableColumn property="contentType" title="${warehouse.message(code: 'document.contentType.label', default: 'Content Type')}" params="${pageParams}" />
 
                                 </tr>
                                 </thead>
@@ -90,7 +92,7 @@
                                 </tbody>
                             </table>
                             <div class="paginateButtons">
-                                <g:paginate total="${documentInstanceTotal}" params="${params}"/>
+                                <g:paginate total="${documentInstanceTotal}" params="${pageParams}"/>
                             </div>
                         </div>
                     </div>

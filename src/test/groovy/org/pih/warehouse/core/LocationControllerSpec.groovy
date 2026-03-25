@@ -89,9 +89,9 @@ class LocationControllerSpec extends Specification implements ControllerUnitTest
     void "when fetching locations by some filter criteria expect some locations can be returned"() {
         given:
         params.put('q', "Bos")
-        params.put('locationGroupId', bostonGroup.id)
-        params.put('organizationId', mainOrg.id)
-        params.put('locationTypeId', depotLocationType.id)
+        params.put('locationGroup.id', bostonGroup.id)
+        params.put('organization.id', mainOrg.id)
+        params.put('locationType.id', depotLocationType.id)
         params.put('max', 10)
         params.put('offset', 0)
 

@@ -43,24 +43,24 @@
                                     <div class="filter-list-item">
                                         <label><warehouse:message code="organization.label"/></label>
                                         <div data-testid="organization-select">
-                                            <g:selectOrganization name="organizationId" class="chzn-select-deselect"
-                                                                  value="${params.organizationId}" noSelection="['null':'']" />
+                                            <g:selectOrganization name="organization.id" class="chzn-select-deselect"
+                                                                  value="${params?.organization?.id}" noSelection="['null':'']" />
                                         </div>
                                     </div>
                                     <div class="filter-list-item">
                                         <label><warehouse:message code="location.locationType.label"/></label>
                                         <div data-testid="location-type-select">
-                                            <g:select name="locationTypeId" from="${org.pih.warehouse.core.LocationType.list()}"
+                                            <g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}"
                                                       optionKey="id" optionValue="${{format.metadata(obj:it)}}" class="chzn-select-deselect"
-                                                      value="${params.locationTypeId ?: defaultLocationType?.id}" noSelection="['null':'']" />
+                                                      value="${params?.locationType?.id?:defaultLocationType?.id}" noSelection="['null':'']" />
                                         </div>
                                     </div>
                                     <div class="filter-list-item">
                                         <label><warehouse:message code="location.locationGroup.label"/></label>
                                         <div data-testid="location-group-select">
-                                            <g:select name="locationGroupId" from="${org.pih.warehouse.core.LocationGroup.list()}"
+                                            <g:select name="locationGroup.id" from="${org.pih.warehouse.core.LocationGroup.list()}"
                                                       optionKey="id" optionValue="${{format.metadata(obj:it)}}" class="chzn-select-deselect"
-                                                      value="${params.locationGroupId}" noSelection="['null':'']" />
+                                                      value="${params?.locationGroup?.id}" noSelection="['null':'']" />
                                         </div>
                                     </div>
 
@@ -86,11 +86,13 @@
                                 <thead>
                                     <tr style="height: 100px;">
                                         <th></th>
-                                        <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" class="bottom" params="${params}"/>
-                                        <g:sortableColumn property="locationNumber" title="${warehouse.message(code: 'location.locationNumber.label')}" class="bottom" params="${params}"/>
-                                        <g:sortableColumn property="locationType" title="${warehouse.message(code: 'location.locationType.label')}" class="bottom" params="${params}"/>
-                                        <g:sortableColumn property="locationGroup" title="${warehouse.message(code: 'location.locationGroup.label')}" class="bottom" params="${params}"/>
-                                        <g:sortableColumn property="active" title="${warehouse.message(code: 'location.status.label')}" class="bottom" params="${params}"/>
+                                        <g:set var="pageParams"
+                                               value="${['locationType.id': params?.locationType?.id, 'locationGroup.id': params?.locationGroup?.id, q: params.q, 'organization.id': params?.organization?.id].findAll {it.value}}"/>
+                                        <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" class="bottom" params="${pageParams}"/>
+                                        <g:sortableColumn property="locationNumber" title="${warehouse.message(code: 'location.locationNumber.label')}" class="bottom" params="${pageParams}"/>
+                                        <g:sortableColumn property="locationType" title="${warehouse.message(code: 'location.locationType.label')}" class="bottom" params="${pageParams}"/>
+                                        <g:sortableColumn property="locationGroup" title="${warehouse.message(code: 'location.locationGroup.label')}" class="bottom" params="${pageParams}"/>
+                                        <g:sortableColumn property="active" title="${warehouse.message(code: 'location.status.label')}" class="bottom" params="${pageParams}"/>
                                         <th class="bottom"><span class="vertical-text"><warehouse:message code="warehouse.active.label" /></span></th>
                                         <g:each var="activity" in="${ActivityCode.list()}">
                                             <th class="bottom">
@@ -151,7 +153,7 @@
 
                             <g:if test="${locationInstanceTotal >= params.max }">
                                 <div class="paginateButtons">
-                                    <g:paginate total="${locationInstanceTotal}" max="${params.max}" offset="${params.offset}" params="${params}"/>
+                                    <g:paginate total="${locationInstanceTotal}" max="${params.max}" offset="${params.offset}" params="${pageParams}"/>
                                 </div>
                             </g:if>
                         </div>

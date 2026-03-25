@@ -39,7 +39,7 @@ class InventoryLevelController {
 
         def terms = params.q ? params?.q?.split(" ") : null
         def products = terms ? productService.searchProducts(terms, null) : []
-        def location = Location.get(params.locationId)
+        def location = Location.get(params?.location?.id)
 
         // Remove paging parameters if user is downloading CSV export
         if (params.format) {

@@ -12,6 +12,7 @@ package org.pih.warehouse.core
 import fr.opensagres.xdocreport.converter.ConverterTypeTo
 import fr.w3blog.zpl.utils.ZebraUtils
 import grails.core.GrailsApplication
+import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import grails.validation.Validateable
 import org.apache.http.client.fluent.Request
@@ -48,12 +49,11 @@ class DocumentController {
         redirect(action: "list", params: params)
     }
 
-    def list() {
+    def list(DocumentFilterCommand command) {
 
         log.info "params: " + params
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
 
-        List<Document> documentInstanceList = documentService.getDocuments(params)
+        PagedResultList<Document> documentInstanceList = documentService.getDocuments(command)
         int documentInstanceTotal = documentInstanceList.totalCount
 
         [documentInstanceList: documentInstanceList, documentInstanceTotal: documentInstanceTotal]

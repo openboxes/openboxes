@@ -39,9 +39,9 @@ class LocationController {
 
     def list() {
         def defaultLocationType = LocationType.findByLocationTypeCode(LocationTypeCode.DEPOT)
-        def locationType = params.containsKey("locationTypeId") ? LocationType.get(params.locationTypeId) ?: null : defaultLocationType
-        def locationGroup = LocationGroup.get(params.locationGroupId)
-        def organization = Organization.get(params.organizationId)
+        def locationType = params.containsKey("locationType.id")?LocationType.get(params["locationType.id"])?:null:defaultLocationType
+        def locationGroup = LocationGroup.get(params["locationGroup.id"])
+        def organization = Organization.get(params["organization.id"])
 
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         params.offset = params.offset ? params.int("offset") : 0

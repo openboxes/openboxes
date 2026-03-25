@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 import grails.core.GrailsApplication
+import grails.gorm.PagedResultList
 import grails.util.Holders
 import org.apache.commons.io.FilenameUtils
 import org.apache.poi.hssf.usermodel.HSSFSheet
@@ -1639,18 +1640,17 @@ class DocumentService {
         }.sort { it.name }
     }
 
-    List<Document> getDocuments(params) {
-        return org.pih.warehouse.core.Document.createCriteria().list(max: params.max, offset: params.offset) {
-            if (params.q) {
-                ilike("name", "%" + params.q + "%")
+    PagedResultList<Document> getDocuments(DocumentFilterCommand command) {
+        return org.pih.warehouse.core.Document.createCriteria().list(max: command.max, offset: command.offset) {
+            if (command.q) {
+                ilike("name", "%" + command.q + "%")
             }
-            DocumentType documentType = DocumentType.get(params.documentTypeId)
-            if (documentType) {
-                eq("documentType", documentType)
+            if (command.documentType) {
+                eq("documentType", command.documentType)
             }
-            if (params.sort) {
-                order(params.sort, params.order ?: 'asc')
+            if (command.sort) {
+                order(command.sort, command.order ?: "asc")
             }
-        } as List<Document>
+        }
     }
 }
