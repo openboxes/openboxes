@@ -4,6 +4,7 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
+import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.api.StockMovement
@@ -96,7 +97,7 @@ class PickTaskService {
 
             order("priority", "asc")
             order("dateCreated", "asc")
-            createAlias("location", "l")
+            createAlias("location", "l", CriteriaSpecification.LEFT_JOIN)
             order("l.name", "asc")
         }
 
