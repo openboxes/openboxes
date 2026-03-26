@@ -9,9 +9,11 @@ import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -231,16 +233,32 @@ class AllocationService {
             return items
         }
 
-        List<AvailableItem> result = new ArrayList<>(items)
+        def availableItems = new ArrayList<>(items)
+        def displayItems = availableItems.findAll { it.binLocation?.isDisplay() }
+        def warehouseItems = availableItems.findAll { !it.binLocation?.isDisplay() }
+        def preferredBinLocations = getPreferredBinLocations(warehouseItems)
+        def preferredItems = warehouseItems.findAll {preferredBinLocations.contains(it.binLocation) }
+        warehouseItems.removeAll(preferredItems)
+        def remainingItems = warehouseItems
+        List<AvailableItem> result = []
 
         strategies.each { strategy ->
             switch (strategy) {
                 case AllocationStrategy.DISPLAY_FIRST:
-                    result = result.findAll { it.binLocation?.isDisplay() }
+                    result.addAll(displayItems)
+                    result.addAll(preferredItems)
+                    result.addAll(remainingItems)
                     break
 
                 case AllocationStrategy.WAREHOUSE_FIRST:
-                    result = result.findAll { !it.binLocation?.isDisplay() }
+                    result.addAll(preferredItems)
+                    result.addAll(remainingItems)
+                    result.addAll(displayItems)
+                    break
+
+                case AllocationStrategy.WAREHOUSE_ONLY:
+                    result.addAll(preferredItems)
+                    result.addAll(remainingItems)
                     break
 
                 case AllocationStrategy.FEFO:
@@ -250,6 +268,15 @@ class AllocationService {
         }
 
         return result
+    }
+
+    private Set<Location> getPreferredBinLocations(List<AvailableItem> result) {
+        Set<Location> preferredBinLocations = []
+        if (result) {
+            def inventoryLevels = result.find()?.inventoryItem?.product?.inventoryLevels
+            inventoryLevels?.each { it.preferredBinLocation ? preferredBinLocations.add(it.preferredBinLocation) : null }
+        }
+        return preferredBinLocations
     }
 
     private AllocationDetailsDto buildAllocationDetailsDto(RequisitionItem requisitionItem) {
