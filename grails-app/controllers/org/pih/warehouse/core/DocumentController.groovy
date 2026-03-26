@@ -12,7 +12,6 @@ package org.pih.warehouse.core
 import fr.opensagres.xdocreport.converter.ConverterTypeTo
 import fr.w3blog.zpl.utils.ZebraUtils
 import grails.core.GrailsApplication
-import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import grails.validation.Validateable
 import org.apache.http.client.fluent.Request
@@ -34,7 +33,7 @@ import static org.springframework.util.StringUtils.stripFilenameExtension
 @Transactional
 class DocumentController {
 
-    def documentService
+    DocumentService documentService
     def documentTemplateService
     def fileService
     def shipmentService
@@ -53,10 +52,9 @@ class DocumentController {
 
         log.info "params: " + params
 
-        PagedResultList<Document> documentInstanceList = documentService.getDocuments(command)
-        int documentInstanceTotal = documentInstanceList.totalCount
+        List<Document> documentInstanceList = documentService.getDocuments(command)
 
-        [documentInstanceList: documentInstanceList, documentInstanceTotal: documentInstanceTotal]
+        [documentInstanceList: documentInstanceList, documentInstanceTotal: documentInstanceList.totalCount]
     }
 
     def create() {

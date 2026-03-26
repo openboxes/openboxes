@@ -66,7 +66,7 @@
 
                         <div class="box">
                             <g:set var="pageParams"
-                                   value="${['location.id': params?.location?.id, q: params.q].findAll {it.value}}"/>
+                                   value="${['location.id': params?.location?.id, q: params.q]}"/>
                             <h2><warehouse:message code="results.label" default="Results"/></h2>
 
                             <table>

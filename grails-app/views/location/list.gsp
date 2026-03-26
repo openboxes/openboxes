@@ -87,7 +87,7 @@
                                     <tr style="height: 100px;">
                                         <th></th>
                                         <g:set var="pageParams"
-                                               value="${['locationType.id': params?.locationType?.id, 'locationGroup.id': params?.locationGroup?.id, q: params.q, 'organization.id': params?.organization?.id].findAll {it.value}}"/>
+                                               value="${['locationType.id': params?.locationType?.id, 'locationGroup.id': params?.locationGroup?.id, q: params.q, 'organization.id': params?.organization?.id]}"/>
                                         <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" class="bottom" params="${pageParams}"/>
                                         <g:sortableColumn property="locationNumber" title="${warehouse.message(code: 'location.locationNumber.label')}" class="bottom" params="${pageParams}"/>
                                         <g:sortableColumn property="locationType" title="${warehouse.message(code: 'location.locationType.label')}" class="bottom" params="${pageParams}"/>

@@ -51,7 +51,7 @@
 
                         <div class="box">
                             <g:set var="pageParams"
-                                   value="${['documentType.id': params?.documentType?.id, q: params.q].findAll {it.value}}"/>
+                                   value="${['documentType.id': params?.documentType?.id, q: params.q]}"/>
                             <h2><warehouse:message code="default.list.label" args="[entityName]" /></h2>
                             <table>
                                 <thead>
