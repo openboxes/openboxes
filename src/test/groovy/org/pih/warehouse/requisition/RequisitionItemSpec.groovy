@@ -118,8 +118,8 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
 
         where:
         quantity | quantityCancelled | quantityPicked || isCancelled | status
-        1        | 1                 | 1              || true        | RequisitionItemStatus.CANCELED
-        2        | 1                 | 2              || false       | RequisitionItemStatus.PENDING
+        1        | 1                 | 0              || true        | RequisitionItemStatus.CANCELED
+        2        | 1                 | 1              || false       | RequisitionItemStatus.REDUCED
     }
 
     void 'RequisitionItem.changeQuantity() should cancel old #quantity and assign #reasonCode and #comment'() {
