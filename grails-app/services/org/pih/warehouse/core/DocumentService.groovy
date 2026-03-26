@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 import grails.core.GrailsApplication
+import grails.gorm.PagedResultList
 import grails.util.Holders
 import org.apache.commons.io.FilenameUtils
 import org.apache.poi.hssf.usermodel.HSSFSheet
@@ -1639,7 +1640,7 @@ class DocumentService {
         }.sort { it.name }
     }
 
-    List<org.pih.warehouse.core.Document> getDocuments(DocumentFilterCommand command) {
+    PagedResultList<org.pih.warehouse.core.Document> getDocuments(DocumentFilterCommand command) {
         return org.pih.warehouse.core.Document.createCriteria().list(max: command.max, offset: command.offset) {
             if (command.q) {
                 ilike("name", "%" + command.q + "%")

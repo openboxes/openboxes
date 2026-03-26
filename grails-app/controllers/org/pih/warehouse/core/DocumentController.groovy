@@ -13,6 +13,7 @@ import fr.opensagres.xdocreport.converter.ConverterTypeTo
 import fr.w3blog.zpl.utils.ZebraUtils
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.gorm.PagedResultList
 import grails.validation.Validateable
 import org.apache.http.client.fluent.Request
 import org.apache.http.entity.ContentType
@@ -52,7 +53,7 @@ class DocumentController {
 
         log.info "params: " + params
 
-        List<Document> documentInstanceList = documentService.getDocuments(command)
+        PagedResultList<Document> documentInstanceList = documentService.getDocuments(command)
 
         [documentInstanceList: documentInstanceList, documentInstanceTotal: documentInstanceList.totalCount]
     }
