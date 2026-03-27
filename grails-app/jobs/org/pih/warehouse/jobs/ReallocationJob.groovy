@@ -11,6 +11,7 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.quartz.JobExecutionContext
 
+# TODO: this should turn into AutomaticAllocationJob and also handle non-backordered outbounds
 class ReallocationJob {
 
     def shipmentService
