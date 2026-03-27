@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+// import Tippy from '@tippyjs/react';
 import update from 'immutability-helper';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -7,7 +8,6 @@ import queryString from 'query-string';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import ReactTable from 'react-table';
-import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { TableCell } from 'components/DataTable';
@@ -95,7 +95,8 @@ class StockTransferSecondPage extends Component {
     this.fetchStockTransfer();
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.stockTransferTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchBins();
@@ -220,15 +221,15 @@ class StockTransferSecondPage extends Component {
         }
 
         return (
-          <Tooltip
-            html={disabledMessage}
-            disabled={!disabled}
-            theme="transparent"
-            arrow="true"
-            delay="150"
-            duration="250"
-            hideDelay="50"
-          >
+          // <Tippy
+          //   content={disabledMessage}
+          //   disabled={!disabled}
+          //   theme="transparent"
+          //   arrow="true"
+          //   delay="150"
+          //   duration="250"
+          //   hideDelay="50"
+          // >
             <div className={disabled && props.original.status !== StockTransferStatus.CANCELED ? 'has-error' : ''}>
               <input
                 type="number"
@@ -243,7 +244,7 @@ class StockTransferSecondPage extends Component {
                 }}
               />
             </div>
-          </Tooltip>
+          // </Tippy>
         );
       },
       Filter,

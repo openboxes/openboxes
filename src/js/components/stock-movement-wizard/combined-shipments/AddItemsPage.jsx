@@ -12,7 +12,7 @@ import { RiDeleteBinLine } from 'react-icons/ri';
 import { TbArrowsSplit2 } from 'react-icons/tb';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 import { Tooltip } from 'react-tippy';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
@@ -406,7 +406,8 @@ class AddItemsPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
@@ -961,7 +962,7 @@ class AddItemsPage extends Component {
         this.saveItems(lineItems);
       }
     } else {
-      Alert.error(this.props.translate('react.stockMovement.error.noShipmentItems.label', 'Cannot save shipment from PO with no items.'), { timeout: 2000 });
+      toast(this.props.translate('react.stockMovement.error.noShipmentItems.label', 'Cannot save shipment from PO with no items.'), { type: 'error', autoClose: 2000 });
     }
   }
 
@@ -999,7 +1000,7 @@ class AddItemsPage extends Component {
         });
       }
     } else {
-      Alert.error(this.props.translate('react.stockMovement.error.noShipmentItems.label', 'Cannot save shipment from PO with no items.'), { timeout: 2000 });
+      toast(this.props.translate('react.stockMovement.error.noShipmentItems.label', 'Cannot save shipment from PO with no items.'), { type: 'error', autoClose: 2000 });
     }
   }
 
@@ -1014,7 +1015,7 @@ class AddItemsPage extends Component {
     this.saveRequisitionItemsInCurrentStep(lineItems)
       .then(() => {
         this.props.hideSpinner();
-        Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
+        toast(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { type: 'success', autoClose: 3000 });
       })
       .catch(() => this.props.hideSpinner());
   }

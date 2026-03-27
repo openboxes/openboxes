@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import withRouter from 'utils/withRouter';
 
 import { fetchTranslations } from 'actions';
 import LoadDemoDataInfo from 'components/load-demo-data/LoadDemoDataInfo';
@@ -33,7 +33,8 @@ class LoadDemoDataPage extends Component {
       });
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'loadData');
     }

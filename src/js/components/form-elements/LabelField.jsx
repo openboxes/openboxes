@@ -1,12 +1,10 @@
 import React from 'react';
 
+// import Tippy from '@tippyjs/react';
 import PropTypes from 'prop-types';
 import { Field } from 'react-final-form';
-import { Tooltip } from 'react-tippy';
 
 import Translate from 'utils/Translate';
-
-import 'react-tippy/dist/tippy.css';
 
 const LabelField = (props) => {
   const {
@@ -53,33 +51,33 @@ const LabelField = (props) => {
     const formattedValue = formatValue ? formatValue(fieldValue) : fieldValue;
     return (
       <div className="form-group my-0" data-testid="label-field" aria-label={defaultMessage}>
-        <Tooltip
-          html={tooltipValue || (<div className="text-truncate">{formattedValue}</div>)}
-          disabled={!showValueTooltip}
-          theme="dark"
-          delay="150"
-          duration="250"
-          hideDelay="50"
-          arrow
-        >
-          {url
-            ? (
-              <div {...otherAttr} className={`font-size-xs ${className}`}>
-                <a
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <span>{formattedValue}</span>
-                </a>
-              </div>
-            )
-            : (
-              <div style={{ color }} {...otherAttr} className={`font-size-xs ${className}`}>
-                {formattedValue}
-              </div>
-            )}
-        </Tooltip>
+        {/* <Tippy */}
+        {/*   content={tooltipValue || (<div className="text-truncate">{formattedValue}</div>)} */}
+        {/*   disabled={!showValueTooltip} */}
+        {/*   theme="dark" */}
+        {/*   delay="150" */}
+        {/*   duration="250" */}
+        {/*   hideDelay="50" */}
+        {/*   arrow */}
+        {/* > */}
+        {url
+          ? (
+            <div {...otherAttr} className={`font-size-xs ${className}`}>
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span>{formattedValue}</span>
+              </a>
+            </div>
+          )
+          : (
+            <div style={{ color }} {...otherAttr} className={`font-size-xs ${className}`}>
+              {formattedValue}
+            </div>
+          )}
+        {/* </Tippy> */}
       </div>
     );
   }

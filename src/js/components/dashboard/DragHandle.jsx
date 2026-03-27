@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { sortableHandle } from 'react-sortable-hoc';
-
-const DragHandle = sortableHandle(() => (
+const DragHandle = (() => (
   <span className="drag-handler">
     <i className="fa fa-ellipsis-v" />
   </span>

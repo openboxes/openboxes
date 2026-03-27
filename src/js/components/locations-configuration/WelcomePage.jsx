@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import withRouter from 'utils/withRouter';
 
 import { fetchTranslations } from 'actions';
 import { DASHBOARD_URL, LOCATION_CONFIGURATION_URL } from 'consts/applicationUrls';
@@ -13,7 +13,8 @@ class WelcomePage extends Component {
     this.props.fetchTranslations('', 'locationsConfiguration');
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'locationsConfiguration');
     }

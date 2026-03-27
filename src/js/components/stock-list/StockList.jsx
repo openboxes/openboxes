@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { withRouter } from 'react-router-dom';
+import withRouter from 'utils/withRouter';
 
 import filterFields from 'components/stock-list/FilterFields';
 import StockListFilters from 'components/stock-list/StockListFilters';

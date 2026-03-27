@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router-dom';
+import withRouter from 'utils/withRouter';
 
 import { DASHBOARD_URL } from 'consts/applicationUrls';
 import Translate from 'utils/Translate';

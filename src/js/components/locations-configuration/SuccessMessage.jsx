@@ -2,7 +2,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import Modal from 'react-modal';
-import { withRouter } from 'react-router-dom';
+import withRouter from 'utils/withRouter';
 
 import { LOCATION_CONFIGURATION_URL, LOCATION_URL, PRODUCT_CONFIGURATION_URL } from 'consts/applicationUrls';
 import Translate from 'utils/Translate';

@@ -8,7 +8,6 @@ import {
 } from 'react-chartjs-2';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { SortableElement } from 'react-sortable-hoc';
 
 import DragHandle from 'components/dashboard/DragHandle';
 import LoadingCard from 'components/dashboard/LoadingCard';
@@ -192,7 +191,7 @@ const handleChartClick = (elements) => {
   }
 };
 
-const GraphCard = SortableElement(({
+const GraphCard = (({
   cardId,
   widgetId,
   cardTitle,
@@ -328,7 +327,6 @@ GraphCard.propTypes = {
   cardTitle: PropTypes.string.isRequired,
   cardType: PropTypes.string.isRequired,
   cardInfo: PropTypes.string.isRequired,
-  timeLimit: PropTypes.number,
   loadIndicator: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
 };

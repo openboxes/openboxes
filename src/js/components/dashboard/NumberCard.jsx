@@ -1,11 +1,10 @@
 import React from 'react';
 
+// import Tippy from '@tippyjs/react';
 import PropTypes from 'prop-types';
 import { Line } from 'react-chartjs-2';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { SortableElement } from 'react-sortable-hoc';
-import { Tooltip } from 'react-tippy';
 
 import DragHandle from 'components/dashboard/DragHandle';
 import { getColorByName } from 'consts/dataFormat/colorMapping';
@@ -92,7 +91,7 @@ const NumberSparklineCard = ({
   </div>
 );
 
-const NumberCard = SortableElement(({
+const NumberCard = (({
   cardTitle,
   cardTitleDefaultValue,
   cardNumber,
@@ -120,35 +119,35 @@ const NumberCard = SortableElement(({
   }
   const cardNumberLocale = cardNumber ? cardNumber.toLocaleString() : ZERO.toLocaleString();
   const card = !isSparkline ? (
-    <Tooltip
-      html={(
-        <p style={{ whiteSpace: 'pre' }}>
+  //     <Tippy
+  //       content={(
+  //         <p style={{ whiteSpace: 'pre' }}>
+  //           {' '}
+  //           {cardDataTooltip}
+  //           {' '}
+  //         </p>
+  // )}
+  //       theme="transparent"
+  //       arrow="true"
+  //       disabled={!cardDataTooltip}
+  //     >
+    <div className="number-div">
+      <div className="number-body">
+        <span className="title-card">
+          {translate(cardTitle, cardTitleDefaultValue || cardTitle)}
+        </span>
+        <span className="result-card">
           {' '}
-          {cardDataTooltip}
+          {cardNumberType === 'number' ? `${cardNumberLocale}${showPercentSign ? '%' : ''}` : `${cardNumberLocale} ${currencyCode}`}
           {' '}
-        </p>
-)}
-      theme="transparent"
-      arrow="true"
-      disabled={!cardDataTooltip}
-    >
-      <div className="number-div">
-        <div className="number-body">
-          <span className="title-card">
-            {translate(cardTitle, cardTitleDefaultValue || cardTitle)}
-          </span>
-          <span className="result-card">
-            {' '}
-            {cardNumberType === 'number' ? `${cardNumberLocale}${showPercentSign ? '%' : ''}` : `${cardNumberLocale} ${currencyCode}`}
-            {' '}
-          </span>
-          <span className={`subtitle-card ${disableSubtitleEllipsis ? '' : ' text-overflow-ellipsis text-nowrap'}`}>
-            {cardSubtitleValue}
-            {' '}
-            {translate(cardSubtitle, cardSubtitleDefaultValue || cardSubtitle)}
-          </span>
-        </div>
-        {
+        </span>
+        <span className={`subtitle-card ${disableSubtitleEllipsis ? '' : ' text-overflow-ellipsis text-nowrap'}`}>
+          {cardSubtitleValue}
+          {' '}
+          {translate(cardSubtitle, cardSubtitleDefaultValue || cardSubtitle)}
+        </span>
+      </div>
+      {
           cardInfo
             ? (
               <div className="number-infos">
@@ -163,9 +162,9 @@ const NumberCard = SortableElement(({
             )
             : null
 }
-        {!hideDraghandle && <DragHandle />}
-      </div>
-    </Tooltip>
+      {!hideDraghandle && <DragHandle />}
+    </div>
+  // </Tippy>
   )
     : (
       <NumberSparklineCard
@@ -200,7 +199,6 @@ NumberCard.defaultProps = {
   cardLink: '',
   cardDataTooltip: '',
   cardInfoDefaultValue: '',
-  sparklineData: null,
   showPercentSign: false,
   infoIcon: null,
   disableSubtitleEllipsis: false,
@@ -209,8 +207,6 @@ NumberCard.defaultProps = {
 NumberCard.propTypes = {
   cardTitle: PropTypes.string.isRequired,
   cardTitleDefaultValue: PropTypes.string,
-  cardNumber: PropTypes.number,
-  cardNumberType: PropTypes.string,
   cardSubtitle: PropTypes.string,
   cardSubtitleDefaultValue: PropTypes.string,
   cardSubtitleValue: PropTypes.string,

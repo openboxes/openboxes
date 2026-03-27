@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import queryString from 'query-string';
 import { getTranslate } from 'react-localize-redux';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { fetchInvoiceStatuses, fetchInvoiceTypeCodes, fetchSuppliers } from 'actions';
 import filterFields from 'components/invoice/list/FilterFields';
@@ -34,11 +34,11 @@ const useInvoiceFilters = ({ setFilterParams }) => {
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const clearFilterValues = () => {
-    const { pathname } = history.location;
-    history.push({ pathname });
+    navigate(location.pathname);
   };
 
   const initializeDefaultFilterValues = async () => {
@@ -48,7 +48,7 @@ const useInvoiceFilters = ({ setFilterParams }) => {
       if (!acc[key]) return { ...acc, [key]: '' };
       return acc;
     }, {});
-    const queryProps = queryString.parse(history.location.search);
+    const queryProps = queryString.parse(location.search);
 
     // IF VALUE IS IN A SEARCH QUERY SET DEFAULT VALUES
     if (queryProps.status) {
@@ -112,8 +112,7 @@ const useInvoiceFilters = ({ setFilterParams }) => {
     if (Object.keys(values).length) {
       const transformedParams = transformFilterParams(values, filterAccessors);
       const queryFilterParams = queryString.stringify(transformedParams);
-      const { pathname } = history.location;
-      history.push({ pathname, search: queryFilterParams });
+      navigate({ search: `?${queryFilterParams}` });
     }
     setFilterParams(values);
   }, []);

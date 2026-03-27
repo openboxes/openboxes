@@ -32,8 +32,7 @@ const useWizard = ({ initialKey, steps }) => {
 
     // Now we check if we passed a pathId and if it's different from the last segment
     // of the current path to avoid duplicating the id in the URL.
-    const targetPath =
-      pathId && lastSegment !== pathId ? `${trimmedPath}/${pathId}` : currentPath;
+    const targetPath = pathId && lastSegment !== pathId ? `${trimmedPath}/${pathId}` : currentPath;
 
     history.push(
       queryString.stringifyUrl(
