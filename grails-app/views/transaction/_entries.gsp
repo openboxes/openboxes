@@ -4,7 +4,9 @@
         <table id="prodEntryTable">
             <thead>
             <tr class="odd">
+                <g:isSuperuser>
                 <th></th>
+                </g:isSuperuser>
                 <th><warehouse:message code="product.label"/></th>
                 <th style="text-align: center"><warehouse:message code="location.binLocation.label"/></th>
                 <th style="text-align: center"><warehouse:message code="product.lotNumber.label"/></th>
@@ -22,12 +24,13 @@
                     <g:set var="transactionSum" value="${transactionSum + transactionEntry?.quantity}"/>
                     <g:set var="transactionCount" value="${transactionCount+1 }"/>
                     <tr class="${status%2?'odd':'even' } ${selected?'selected':''}">
+                        <g:isSuperuser>
                         <td>
                             <g:link controller="transactionEntry" action="edit" id="${transactionEntry?.id}">
                                 <img src="${resource(dir:'images/icons/silk',file:'pencil.png')}" style="vertical-align: middle"/>
                             </g:link>
-
                         </td>
+                        </g:isSuperuser>
                         <td style="text-align: left;">
                             <g:link controller="inventoryItem" action="showStockCard" params="['product.id':transactionEntry?.inventoryItem?.product?.id]">
                                 ${transactionEntry?.inventoryItem?.product?.productCode}
