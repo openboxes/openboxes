@@ -4,7 +4,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import withRouter from 'utils/withRouter';
 
 import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
 import PutAwayCheckPage from 'components/put-away/PutAwayCheckPage';
@@ -39,7 +39,8 @@ class PutAwayMainPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'putAway');
     }

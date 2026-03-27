@@ -23,11 +23,10 @@ class StockMovementCombinedShipments extends Component {
       values: this.props.initialValues,
       currentPage: 1,
     };
-
-    this.updateWizardValues = this.updateWizardValues.bind(this);
   }
 
   componentDidMount() {
+    this.updateWizardValues = this.updateWizardValues.bind(this);
     this.props.fetchTranslations('', 'stockMovement');
 
     if (this.props.stockMovementTranslationsFetched) {
@@ -36,7 +35,8 @@ class StockMovementCombinedShipments extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'stockMovement');
     }

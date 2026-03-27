@@ -23,7 +23,8 @@ class Wizard extends Component {
     this.goToPage = this.goToPage.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.currentPage !== this.props.currentPage) {
       this.goToPage(nextProps.currentPage, nextProps.initialValues);
     }

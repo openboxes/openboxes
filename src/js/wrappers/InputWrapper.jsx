@@ -2,7 +2,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { RiQuestionLine } from 'react-icons/ri';
-import { Tooltip } from 'react-tippy';
+import { Tooltip } from 'react-tooltip';
 
 import useTranslate from 'hooks/useTranslate';
 import Translate from 'utils/Translate';
@@ -40,17 +40,20 @@ const InputWrapper = ({
             {title && <Translate id={title?.id} defaultMessage={title?.defaultMessage} />}
           </label>
           {tooltip && (
-            <Tooltip
-              html={(
+            <>
+              <span
+                className="input-wrapper-tooltip"
+                data-tooltip-id={`tooltip-${tooltip.id}`}
+              >
+                <RiQuestionLine className="ml-1" />
+              </span>
+
+              <Tooltip id={`tooltip-${tooltip.id}`} place="top" className="custom-tooltip">
                 <span className="p-1">
                   <Translate id={tooltip.id} defaultMessage={tooltip.defaultMessage} />
                 </span>
-              )}
-            >
-              <span className="input-wrapper-tooltip">
-                <RiQuestionLine className="ml-1" />
-              </span>
-            </Tooltip>
+              </Tooltip>
+            </>
           )}
           {required && <span className="input-wrapper-asterisk ml-1">&#42;</span>}
         </div>

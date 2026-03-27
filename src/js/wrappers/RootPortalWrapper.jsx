@@ -1,15 +1,15 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { Portal } from 'react-overlays';
+// import { Portal } from 'react-overlays';
 
 const RootPortalWrapper = ({ children }) => {
   const rootContainer = document.getElementById('root');
 
   return (
-    <Portal container={rootContainer}>
-      {children}
-    </Portal>
+    // <Portal container={rootContainer}>
+      children
+    // </Portal>
   );
 };
 

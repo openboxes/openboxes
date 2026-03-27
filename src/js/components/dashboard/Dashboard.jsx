@@ -4,7 +4,6 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { defaults } from 'react-chartjs-2';
 import { connect } from 'react-redux';
-import { SortableContainer } from 'react-sortable-hoc';
 
 import {
   addToIndicators,
@@ -22,6 +21,7 @@ import NumberCard from 'components/dashboard/NumberCard';
 import UnarchiveIndicators from 'components/dashboard/UnarchiveIndicators';
 import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -31,7 +31,7 @@ defaults.scale.ticks.beginAtZero = true;
 
 // TODO: OBPIH-4385 Refactor/Split this file into separate components
 
-const SortableCards = SortableContainer(({
+const SortableCards = (({
   data, loadIndicator, allLocations, personalDashboardActive,
 }) => (
   <div className="card-component">
@@ -64,7 +64,7 @@ const SortableCards = SortableContainer(({
   </div>
 ));
 
-const SortableNumberCards = SortableContainer(({ data, personalDashboardActive }) => (
+const SortableNumberCards = (({ data, personalDashboardActive }) => (
   <div className="card-component">
     {data.map((value, index) => (
       (value
@@ -168,10 +168,11 @@ class Dashboard extends Component {
       pageFilters: [],
       subdashboardKeys: [],
     };
-    this.fetchLocations();
   }
 
   componentDidMount() {
+    this.fetchLocations();
+
     if (this.props.currentLocation !== '') {
       this.getSubdashboardKeys().then(() => this.fetchData(this.determineActiveConfig()));
     }
@@ -471,7 +472,7 @@ const mapStateToProps = (state) => ({
   currentUser: state.session.user.id,
 });
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   fetchIndicators,
   reloadIndicator,
   addToIndicators,
@@ -479,7 +480,7 @@ export default connect(mapStateToProps, {
   resetIndicators,
   fetchConfigAndData,
   fetchConfig,
-})(Dashboard);
+})(Dashboard));
 
 Dashboard.defaultProps = {
   currentLocation: '',

@@ -7,7 +7,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import withRouter from 'utils/withRouter';
 
 import { fetchCurrencies, hideSpinner, showSpinner } from 'actions';
 import invoiceApi from 'api/services/InvoiceApi';

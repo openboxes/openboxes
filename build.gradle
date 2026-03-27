@@ -370,8 +370,8 @@ manifest {
 node {
     distBaseUrl = 'https://nodejs.org/dist'
     download = true
-    npmVersion = '6.14.18'
-    version = '14.21.3'
+    npmVersion = '11.11.0'
+    version = '24.9.0'
 }
 
 processResources {

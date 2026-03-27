@@ -1,13 +1,12 @@
 import React from 'react';
 
-import { withRouter } from 'react-router-dom';
-
 import filterFields from 'components/products/FilterFields';
 import ProductsListFilters from 'components/products/ProductsListFilters';
 import ProductsListHeader from 'components/products/ProductsListHeader';
 import ProductsListTable from 'components/products/ProductsListTable';
 import useProductFilters from 'hooks/list-pages/product/useProductFilters';
 import useTranslation from 'hooks/useTranslation';
+import withRouter from 'utils/withRouter';
 
 const ProductsList = () => {
   const {

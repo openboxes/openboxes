@@ -2,7 +2,6 @@ import React from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import ReactLoading from 'react-loading';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
@@ -83,12 +82,13 @@ const ArchivedGraph = (props) => {
     graph = <Numbers />;
   } else if (props.type === 'loading') {
     graph = (
-      <ReactLoading
-        type="bubbles"
-        color={getRandomColor()}
-        height="40px"
-        width="40px"
-      />
+      <div style={{
+        textAlign: 'center',
+        padding: '50px',
+      }}
+      >
+        Loading...
+      </div>
     );
   } else if (props.type === 'error') {
     graph = <i className="fa fa-repeat" />;

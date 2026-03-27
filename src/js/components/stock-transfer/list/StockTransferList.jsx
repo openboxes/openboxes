@@ -2,7 +2,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import withRouter from 'utils/withRouter';
 
 import filterFields from 'components/stock-transfer/list/FilterFields';
 import StockTransferListFilters from 'components/stock-transfer/list/StockTransferListFilters';

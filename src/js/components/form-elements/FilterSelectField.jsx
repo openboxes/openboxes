@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { Overlay } from 'react-overlays';
+// import { Overlay } from 'react-overlays';
 import { components } from 'react-select';
 
 import BaseField from 'components/form-elements/BaseField';
@@ -69,12 +69,12 @@ Dropdown.defaultProps = {
 const Menu = (props) => {
   const inputContainer = document.getElementById(`${props.selectProps.id}-container`);
   return (
-    <Overlay
-      show
-      placement="bottom"
-      target={inputContainer}
-      container={document.getElementById('root')}
-    >
+    // <Overlay
+    //   show
+    //   placement="bottom"
+    //   target={inputContainer}
+    //   container={document.getElementById('root')}
+    // >
       <Dropdown
         inputContainerRec={inputContainer.getBoundingClientRect()}
         hasOptions={!!props.options.length}
@@ -83,7 +83,7 @@ const Menu = (props) => {
           {props.children}
         </div>
       </Dropdown>
-    </Overlay>
+    // </Overlay>
   );
 };
 

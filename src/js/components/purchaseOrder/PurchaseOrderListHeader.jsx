@@ -2,11 +2,11 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
 
 import Button from 'components/form-elements/Button';
 import { ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import Translate from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 const PurchaseOrderListHeader = ({ history, supportedActivities }) => (
   <div className="d-flex list-page-header">

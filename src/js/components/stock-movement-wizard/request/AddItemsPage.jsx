@@ -11,8 +11,7 @@ import { Form } from 'react-final-form';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 import { Tooltip } from 'react-tippy';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
@@ -33,6 +32,7 @@ import { renderFormField } from 'utils/form-utils';
 import { matchesProductCodeOrName } from 'utils/form-values-utils';
 import { isRequestFromWard, supports } from 'utils/supportedActivitiesUtils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -679,7 +679,8 @@ class AddItemsPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
@@ -1323,7 +1324,7 @@ class AddItemsPage extends Component {
               .then((response) => {
                 if (response.status === 204) {
                   this.props.hideSpinner();
-                  Alert.success(this.props.translate(
+                  toast.success(this.props.translate(
                     'react.stockMovement.request.successfullyDeleted.label',
                     'Request was successfully deleted',
                   ), { timeout: 3000 });
@@ -1406,7 +1407,7 @@ class AddItemsPage extends Component {
     return this.saveRequisitionItemsInCurrentStep(lineItems)
       .then(() => {
         this.props.hideSpinner();
-        Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
+        toast.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
       })
       .catch(() => {
         this.props.hideSpinner();
@@ -1497,7 +1498,7 @@ class AddItemsPage extends Component {
     } else {
       this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
     }
-    Alert.success(`${translatedSubmitMessage} ${movementNumber}`);
+    toast.success(`${translatedSubmitMessage} ${movementNumber}`);
     return Promise.resolve();
   }
 

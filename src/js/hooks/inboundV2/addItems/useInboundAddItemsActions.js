@@ -59,7 +59,7 @@ const useInboundAddItemsActions = ({
   });
 
   const getNextSortOrder = () => {
-    const maxSortOrder = Math.max(0, ...getValues('values.lineItems').map(item => item.sortOrder || 0));
+    const maxSortOrder = Math.max(0, ...getValues('values.lineItems').map((item) => item.sortOrder || 0));
     return maxSortOrder + 100;
   };
 

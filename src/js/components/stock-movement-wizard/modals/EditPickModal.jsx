@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 
+// import Tippy from '@tippyjs/react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
 import {
@@ -183,7 +183,8 @@ class EditPickModal extends Component {
     this.onSave = this.onSave.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const {
       fieldConfig: { attributes, getDynamicAttr },
     } = nextProps;
@@ -332,19 +333,19 @@ class EditPickModal extends Component {
             {this.state.formValues.productCode}
           </div>
           <div className="font-weight-bold">
-            <Tooltip
-              html={<div className="text-truncate">{this.state.formValues.productName}</div>}
-              theme="dark"
-              disabled={!this.state.formValues.displayName}
-              position="top-start"
-            >
+            {/* <Tippy */}
+            {/*   content={<div className="text-truncate">{this.state.formValues.productName}</div>} */}
+            {/*   theme="dark" */}
+            {/*   disabled={!this.state.formValues.displayName} */}
+            {/*   position="top-start" */}
+            {/* > */}
               <span className="d-flex">
                 <Translate id="react.stockMovement.productName.label" defaultMessage="Product name" />
                 :
                 {' '}
                 {this.state.formValues.displayName ?? this.state.formValues.productName}
               </span>
-            </Tooltip>
+            {/* </Tippy> */}
           </div>
           <div className="font-weight-bold">
             <Translate id="react.stockMovement.quantityRequired.label" defaultMessage="Qty Required" />

@@ -3,7 +3,7 @@ import React from 'react';
 import {
   RiAlertLine, RiCheckboxCircleLine, RiErrorWarningFill, RiErrorWarningLine, RiInformationLine,
 } from 'react-icons/ri';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import NotificationType from 'consts/notificationTypes';
 
@@ -19,7 +19,7 @@ const notification = (type) => ({
   };
   switch (type) {
     case NotificationType.SUCCESS:
-      return Alert.success(message, {
+      return toast.success(message, {
         ...alertsProps,
         customFields: {
           ...alertsProps.customFields,
@@ -27,7 +27,7 @@ const notification = (type) => ({
         },
       });
     case NotificationType.WARNING:
-      return Alert.warning(message, {
+      return toast.warning(message, {
         ...alertsProps,
         customFields: {
           ...alertsProps.customFields,
@@ -35,7 +35,7 @@ const notification = (type) => ({
         },
       });
     case NotificationType.ERROR_OUTLINED:
-      return Alert.error(message, {
+      return toast.error(message, {
         ...alertsProps,
         customFields: {
           ...alertsProps.customFields,
@@ -43,7 +43,7 @@ const notification = (type) => ({
         },
       });
     case NotificationType.ERROR_FILLED:
-      return Alert.error(message, {
+      return toast.error(message, {
         ...alertsProps,
         customFields: {
           ...alertsProps.customFields,
@@ -51,7 +51,7 @@ const notification = (type) => ({
         },
       });
     default:
-      return Alert.info(message, {
+      return toast.info(message, {
         ...alertsProps,
         customFields: {
           ...alertsProps.customFields,
