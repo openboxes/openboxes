@@ -83,7 +83,7 @@ const InvoiceListTable = ({
     {
       Header: <Translate id="react.invoice.column.status.label" defaultMessage="Status" />,
       accessor: 'status',
-      width: 250,
+      width: 170,
       Cell: (row) => {
         const label = invoiceStatuses
           && invoiceStatuses.find((status) => status.id === row.original.status).label;
@@ -104,11 +104,13 @@ const InvoiceListTable = ({
     {
       Header: <Translate id="react.invoice.vendor.label" defaultMessage="Vendor" />,
       accessor: 'partyCode',
+      minWidth: 170,
+      Cell: (row) => (<TableCell {...row} tooltip />),
     },
     {
       Header: <Translate id="react.invoice.column.vendorInvoiceNumber" defaultMessage="Vendor invoice number" />,
       accessor: 'vendorInvoiceNumber',
-      minWidth: 200,
+      minWidth: 165,
       Cell: (row) => (<TableCell {...row} tooltip />),
     },
     {
