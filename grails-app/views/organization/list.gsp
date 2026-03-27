@@ -34,13 +34,13 @@
                             <thead>
                                 <tr>
 
-                                    <g:sortableColumn property="active" title="${warehouse.message(code: 'user.active.label')}" />
+                                    <g:sortableColumn property="active" title="${warehouse.message(code: 'user.active.label')}" params="${params}" />
 
-                                    <g:sortableColumn property="id" title="${warehouse.message(code: 'organization.id.label', default: 'Id')}" />
+                                    <g:sortableColumn property="id" title="${warehouse.message(code: 'organization.id.label', default: 'Id')}" params="${params}" />
 
-                                    <g:sortableColumn property="code" title="${warehouse.message(code: 'organization.code.label', default: 'Code')}" />
+                                    <g:sortableColumn property="code" title="${warehouse.message(code: 'organization.code.label', default: 'Code')}" params="${params}" />
 
-                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'organization.name.label', default: 'Name')}" />
+                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'organization.name.label', default: 'Name')}" params="${params}" />
 
                                     <th><g:message code="organization.defaultLocation.label" default="Default Location"/></th>
 
@@ -81,7 +81,7 @@
                         </table>
                         <div aria-label="pagination" class="paginateButtons">
                             <g:set var="pageParams" value="${pageScope.variables['params']}"/>
-                            <g:paginate total="${organizationInstanceTotal}" params="${params}" />
+                            <g:paginate total="${organizationInstanceTotal}" action="search" params="${params}" />
                         </div>
                     </div>
                 </div>

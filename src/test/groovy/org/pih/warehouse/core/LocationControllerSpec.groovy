@@ -75,7 +75,7 @@ class LocationControllerSpec extends Specification implements ControllerUnitTest
         params.put('offset', 0)
 
         and:
-        controller.locationService.getLocations(_, _, _, _, params.max, params.offset) >>
+        controller.locationService.getLocations(_, _, _, _, params.max, params.offset, _, _) >>
                 buildStubbedPagedResultList([bostonDepot, miamiDepot])
 
         when:
@@ -96,7 +96,7 @@ class LocationControllerSpec extends Specification implements ControllerUnitTest
         params.put('offset', 0)
 
         and:
-        controller.locationService.getLocations(mainOrg, depotLocationType, bostonGroup, params.q, params.max, params.offset) >>
+        controller.locationService.getLocations(mainOrg, depotLocationType, bostonGroup, params.q, params.max, params.offset, _, _) >>
                 buildStubbedPagedResultList([bostonDepot])
 
         when:

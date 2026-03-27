@@ -11,6 +11,9 @@ class AttributeService {
             if (searchTerm) {
                 ilike("name", "%" + searchTerm + "%")
             }
+            if (params.sort) {
+                order(params.sort ?: 'name', params.order ?: "asc")
+            }
         }
     }
 

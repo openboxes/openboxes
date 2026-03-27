@@ -86,11 +86,13 @@
                                 <thead>
                                     <tr style="height: 100px;">
                                         <th></th>
-                                        <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" class="bottom"/>
-                                        <g:sortableColumn property="locationNumber" title="${warehouse.message(code: 'location.locationNumber.label')}" class="bottom"/>
-                                        <g:sortableColumn property="locationType" title="${warehouse.message(code: 'location.locationType.label')}" class="bottom"/>
-                                        <g:sortableColumn property="locationGroup" title="${warehouse.message(code: 'location.locationGroup.label')}" class="bottom"/>
-                                        <g:sortableColumn property="status" title="${warehouse.message(code: 'location.status.label')}" class="bottom"/>
+                                        <g:set var="pageParams"
+                                               value="${['locationType.id': params?.locationType?.id, 'locationGroup.id': params?.locationGroup?.id, q: params.q, 'organization.id': params?.organization?.id]}"/>
+                                        <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" class="bottom" params="${pageParams}"/>
+                                        <g:sortableColumn property="locationNumber" title="${warehouse.message(code: 'location.locationNumber.label')}" class="bottom" params="${pageParams}"/>
+                                        <g:sortableColumn property="locationType" title="${warehouse.message(code: 'location.locationType.label')}" class="bottom" params="${pageParams}"/>
+                                        <g:sortableColumn property="locationGroup" title="${warehouse.message(code: 'location.locationGroup.label')}" class="bottom" params="${pageParams}"/>
+                                        <g:sortableColumn property="active" title="${warehouse.message(code: 'location.status.label')}" class="bottom" params="${pageParams}"/>
                                         <th class="bottom"><span class="vertical-text"><warehouse:message code="warehouse.active.label" /></span></th>
                                         <g:each var="activity" in="${ActivityCode.list()}">
                                             <th class="bottom">
@@ -149,8 +151,6 @@
                                 </tbody>
                             </table>
 
-                            <g:set var="pageParams"
-                                   value="${['locationType.id': params?.locationType?.id, 'locationGroup.id': params?.locationGroup?.id, q: params.q, 'organization.id': params?.organization?.id].findAll {it.value}}"/>
                             <g:if test="${locationInstanceTotal >= params.max }">
                                 <div class="paginateButtons">
                                     <g:paginate total="${locationInstanceTotal}" max="${params.max}" offset="${params.offset}" params="${pageParams}"/>

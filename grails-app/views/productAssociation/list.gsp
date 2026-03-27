@@ -76,19 +76,19 @@
                                 <thead>
                                 <tr>
 
-                                    <g:sortableColumn property="id" title="${warehouse.message(code: 'productAssociation.id.label', default: 'Id')}" />
+                                    <g:sortableColumn property="id" title="${warehouse.message(code: 'productAssociation.id.label', default: 'Id')}"  params="${params}" />
 
-                                    <g:sortableColumn property="code" title="${warehouse.message(code: 'productAssociation.code.label', default: 'Code')}" />
+                                    <g:sortableColumn property="code" title="${warehouse.message(code: 'productAssociation.code.label', default: 'Code')}"  params="${params}" />
 
                                     <th><warehouse:message code="productAssociation.product.label" default="Product" /></th>
 
                                     <th><warehouse:message code="productAssociation.associatedProduct.label" default="Associated Product" /></th>
 
-                                    <g:sortableColumn property="quantity" title="${warehouse.message(code: 'productAssociation.quantity.label', default: 'Quantity')}" />
+                                    <g:sortableColumn property="quantity" title="${warehouse.message(code: 'productAssociation.quantity.label', default: 'Quantity')}"  params="${params}" />
 
-                                    <g:sortableColumn property="comments" title="${warehouse.message(code: 'productAssociation.comments.label', default: 'Comments')}" />
+                                    <g:sortableColumn property="comments" title="${warehouse.message(code: 'productAssociation.comments.label', default: 'Comments')}"  params="${params}" />
 
-                                    <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'productAssociation.dateCreated.label', default: 'Date Created')}" />
+                                    <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'productAssociation.dateCreated.label', default: 'Date Created')}"  params="${params}" />
 
                                 </tr>
                                 </thead>

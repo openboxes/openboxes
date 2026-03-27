@@ -50,22 +50,24 @@
                     <div class="yui-u">
 
                         <div class="box">
+                            <g:set var="pageParams"
+                                   value="${['documentType.id': params?.documentType?.id, q: params.q]}"/>
                             <h2><warehouse:message code="default.list.label" args="[entityName]" /></h2>
                             <table>
                                 <thead>
                                 <tr>
 
-                                    <g:sortableColumn property="id" title="${warehouse.message(code: 'document.id.label', default: 'Id')}" />
+                                    <g:sortableColumn property="id" title="${warehouse.message(code: 'document.id.label', default: 'Id')}" params="${pageParams}" />
 
-                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'document.name.label', default: 'Name')}" />
+                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'document.name.label', default: 'Name')}" params="${pageParams}" />
 
-                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'document.documentType.label', default: 'Document Type')}" />
+                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'document.documentType.label', default: 'Document Type')}" params="${pageParams}" />
 
-                                    <g:sortableColumn property="filename" title="${warehouse.message(code: 'document.filename.label', default: 'Filename')}" />
+                                    <g:sortableColumn property="filename" title="${warehouse.message(code: 'document.filename.label', default: 'Filename')}" params="${pageParams}" />
 
-                                    <g:sortableColumn property="extension" title="${warehouse.message(code: 'document.extension.label', default: 'Extension')}" />
+                                    <g:sortableColumn property="extension" title="${warehouse.message(code: 'document.extension.label', default: 'Extension')}" params="${pageParams}" />
 
-                                    <g:sortableColumn property="contentType" title="${warehouse.message(code: 'document.contentType.label', default: 'Content Type')}" />
+                                    <g:sortableColumn property="contentType" title="${warehouse.message(code: 'document.contentType.label', default: 'Content Type')}" params="${pageParams}" />
 
                                 </tr>
                                 </thead>
@@ -90,7 +92,7 @@
                                 </tbody>
                             </table>
                             <div class="paginateButtons">
-                                <g:paginate total="${documentInstanceTotal}" />
+                                <g:paginate total="${documentInstanceTotal}" params="${pageParams}"/>
                             </div>
                         </div>
                     </div>

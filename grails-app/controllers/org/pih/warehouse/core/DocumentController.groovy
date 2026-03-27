@@ -13,6 +13,7 @@ import fr.opensagres.xdocreport.converter.ConverterTypeTo
 import fr.w3blog.zpl.utils.ZebraUtils
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.gorm.PagedResultList
 import grails.validation.Validateable
 import org.apache.http.client.fluent.Request
 import org.apache.http.entity.ContentType
@@ -33,6 +34,7 @@ import static org.springframework.util.StringUtils.stripFilenameExtension
 @Transactional
 class DocumentController {
 
+    DocumentService documentService
     def documentTemplateService
     def fileService
     def shipmentService
@@ -47,35 +49,13 @@ class DocumentController {
         redirect(action: "list", params: params)
     }
 
-    def list() {
+    def list(DocumentFilterCommand command) {
 
         log.info "params: " + params
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
 
-        def documentType = DocumentType.get(params?.documentType?.id)
+        PagedResultList<Document> documentInstanceList = documentService.getDocuments(command)
 
-        def documentInstanceList = []
-        def documentInstanceTotal = 0
-
-        if (params.q || documentType) {
-            def q = "%" + params.q + "%"
-            def queryClosure = {
-                ilike("name", q)
-                if (documentType) {
-                    eq("documentType", documentType)
-                }
-                maxResults(params.max)
-            }
-
-            documentInstanceList = Document.createCriteria().list(queryClosure)
-            documentInstanceTotal = Document.createCriteria().count(queryClosure)
-        } else {
-            log.info "show all: " + params
-            documentInstanceList = Document.list(params)
-            documentInstanceTotal = Document.count()
-        }
-
-        [documentInstanceList: documentInstanceList, documentInstanceTotal: documentInstanceTotal]
+        [documentInstanceList: documentInstanceList, documentInstanceTotal: documentInstanceList.totalCount]
     }
 
     def create() {
