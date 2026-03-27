@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import { useDispatch, useSelector } from 'react-redux';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import { fetchShipmentStatusCodes, hideSpinner, showSpinner } from 'actions';
 import stockMovementApi from 'api/services/StockMovementApi';
@@ -91,7 +91,7 @@ const useInboundListTableData = (filterParams) => {
           'react.stockMovement.deleted.success.message.label',
           'Stock Movement has been deleted successfully',
         );
-        Alert.success(successMessage);
+        toast.success(successMessage);
         fireFetchData();
       }
     } finally {

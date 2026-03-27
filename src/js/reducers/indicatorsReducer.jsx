@@ -1,6 +1,5 @@
 import update from 'immutability-helper';
 import _ from 'lodash';
-import { arrayMove } from 'react-sortable-hoc';
 
 import {
   FETCH_CONFIG,
@@ -8,7 +7,6 @@ import {
   FETCH_GRAPHS,
   FETCH_NUMBERS,
   REMOVE_FROM_INDICATORS,
-  REORDER_INDICATORS,
   RESET_INDICATORS, SET_ACTIVE_CONFIG,
 } from 'actions/types';
 import { loadNumbersOptions } from 'consts/dataFormat/customGraphConfig';
@@ -87,29 +85,6 @@ export default function (state = initialState, action) {
         data: [],
         numberData: [],
       };
-    case REORDER_INDICATORS: {
-      if (action.payload.type === 'graph') {
-        return {
-          ...state,
-          data: arrayMove(
-            state.data,
-            action.payload.oldIndex,
-            action.payload.newIndex,
-          ),
-        };
-      }
-      if (action.payload.type === 'number') {
-        return {
-          ...state,
-          numberData: arrayMove(
-            state.numberData,
-            action.payload.oldIndex,
-            action.payload.newIndex,
-          ),
-        };
-      }
-      return state;
-    }
     case REMOVE_FROM_INDICATORS: {
       if (action.payload.type === 'graph') {
         return {

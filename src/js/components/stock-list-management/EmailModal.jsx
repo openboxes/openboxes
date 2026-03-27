@@ -4,7 +4,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
 import CheckboxField from 'components/form-elements/CheckboxField';
@@ -128,14 +128,14 @@ class EmailModal extends Component {
 
     if (!_.some(values.recipients, (recipient) => recipient.email === manager.email)) {
       this.props.hideSpinner();
-      Alert.error(this.props.translate('react.stockListManagement.alert.noManagerSelected.label', 'Please add a manager as a recipient and resend.'), { timeout: 1000 });
+      toast.error(this.props.translate('react.stockListManagement.alert.noManagerSelected.label', 'Please add a manager as a recipient and resend.'), { autoClose: 1000 });
       this.setState({ showModal: true });
     } else {
       apiClient.post(url, payload)
         .then(() => {
           this.props.hideSpinner();
           this.setState({ showModal: false });
-          Alert.success(this.props.translate('react.stockListManagement.alert.emailSend.label', 'Email sent successfully'), { timeout: 1000 });
+          toast.success(this.props.translate('react.stockListManagement.alert.emailSend.label', 'Email sent successfully'), { autoClose: 1000 });
         })
         .catch(() => this.props.hideSpinner());
     }

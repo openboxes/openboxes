@@ -79,7 +79,7 @@ const useAssignCycleCountModal = ({
         assignee: dataToAssign?.[cycleCount.maxCountIndex]?.assignee,
       }))
         // we only want to update items that have an assignee
-        .filter(item => item.assignee);
+        .filter((item) => item.assignee);
     });
     return _.flatten(mappedData);
   };

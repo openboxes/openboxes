@@ -2,7 +2,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import withRouter from 'utils/withRouter';
 
 import { fetchShipmentStatusCodes } from 'actions';
 import filterFields from 'components/stock-movement/inbound/FilterFields';

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 
+import parse from 'html-react-parser';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import ReactHtmlParser from 'react-html-parser';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
@@ -81,7 +81,7 @@ class ConfigureProducts extends Component {
     return (
       <div className="d-flex flex-column p-5">
         <h3>{product.title}</h3>
-        <div className="my-3">{ReactHtmlParser(product.description)}</div>
+        <div className="my-3">{parse(product.description)}</div>
         <div className="align-self-center">
           <button
             type="button"

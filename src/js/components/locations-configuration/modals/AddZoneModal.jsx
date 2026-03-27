@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
@@ -27,7 +27,7 @@ class AddZoneModal extends Component {
     apiClient.post('/api/locations/', flattenRequest({ ...values, parentLocation: { id: this.props.locationId }, locationType: { id: values.locationType.id } }))
       .then(() => {
         this.props.hideSpinner();
-        Alert.success(this.props.translate('react.locationsConfiguration.addZone.success.label', 'Zone location has been created successfully!'), { timeout: 3000 });
+        toast.success(this.props.translate('react.locationsConfiguration.addZone.success.label', 'Zone location has been created successfully!'), { timeout: 3000 });
         this.props.addZoneLocation();
       })
       .catch(() => {

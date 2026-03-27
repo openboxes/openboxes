@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 
+// import Tippy from '@tippyjs/react';
 import update from 'immutability-helper';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
 import ReactTable from 'react-table';
-import { Tooltip } from 'react-tippy';
+import { toast } from 'react-toastify';
 
 import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
 import EmailModal from 'components/stock-list-management/EmailModal';
@@ -55,7 +55,8 @@ class StocklistManagement extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'stockListManagement');
     }
@@ -276,44 +277,44 @@ class StocklistManagement extends Component {
           columns={[
             {
               Header:
-  <Tooltip
-    title={this.props.translate('react.stockListManagement.locationGroup.label', 'Location Group Name')}
-    theme="transparent"
-    delay="150"
-    duration="250"
-    hideDelay="50"
-  >
-    <Translate id="react.stockListManagement.locationGroup.label" defaultMessage="Location Group Name" />
-  </Tooltip>,
+              // <Tippy
+              //   content={this.props.translate('react.stockListManagement.locationGroup.label', 'Location Group Name')}
+              //   theme="transparent"
+              //   delay="150"
+              //   duration="250"
+              //   hideDelay="50"
+              // >
+  <Translate id="react.stockListManagement.locationGroup.label" defaultMessage="Location Group Name" />,
+              // </Tippy>,
               accessor: 'locationGroup.name',
               className: 'w-space-normal',
             },
             {
               Header:
-  <Tooltip
-    title={this.props.translate('react.stockListManagement.locationName.label', 'Location Name')}
-    theme="transparent"
-    delay="150"
-    duration="250"
-    hideDelay="50"
-  >
-    <Translate id="react.stockListManagement.locationName.label" defaultMessage="Location Name" />
-  </Tooltip>,
+              // <Tippy
+              //   content={this.props.translate('react.stockListManagement.locationName.label', 'Location Name')}
+              //   theme="transparent"
+              //   delay="150"
+              //   duration="250"
+              //   hideDelay="50"
+              // >
+  <Translate id="react.stockListManagement.locationName.label" defaultMessage="Location Name" />,
+              // </Tippy>,
               accessor: 'location.name',
               aggregate: () => '',
               className: 'w-space-normal',
             },
             {
               Header:
-  <Tooltip
-    title={this.props.translate('react.stockListManagement.stockListName.label', 'Stocklist Name')}
-    theme="transparent"
-    delay="150"
-    duration="250"
-    hideDelay="50"
-  >
-    <Translate id="react.stockListManagement.stockListName.label" defaultMessage="Stocklist Name" />
-  </Tooltip>,
+              // <Tippy
+              //   content={this.props.translate('react.stockListManagement.stockListName.label', 'Stocklist Name')}
+              //   theme="transparent"
+              //   delay="150"
+              //   duration="250"
+              //   hideDelay="50"
+              // >
+  <Translate id="react.stockListManagement.stockListName.label" defaultMessage="Stocklist Name" />,
+              // </Tippy>,
               accessor: 'name',
               aggregate: () => '',
               // eslint-disable-next-line react/prop-types
@@ -324,30 +325,30 @@ class StocklistManagement extends Component {
 
                 return (
                   <a href={REQUISITION_TEMPLATE_URL.show(original.stocklistId)}>
-                    <Tooltip
-                      title={original.name}
-                      theme="transparent"
-                      delay="150"
-                      duration="250"
-                      hideDelay="50"
-                    >
-                      {original.name}
-                    </Tooltip>
+                    {/* <Tippy */}
+                    {/*   content={original.name} */}
+                    {/*   theme="transparent" */}
+                    {/*   delay="150" */}
+                    {/*   duration="250" */}
+                    {/*   hideDelay="50" */}
+                    {/* > */}
+                    original.name,
+                    {/* </Tippy> */}
                   </a>
                 );
               },
             },
             {
               Header:
-  <Tooltip
-    title={this.props.translate('react.stockListManagement.monthlyStockListQty.label', 'Monthly Stocklist Qty')}
-    theme="transparent"
-    delay="150"
-    duration="250"
-    hideDelay="50"
-  >
-    <Translate id="react.stockListManagement.monthlyStockListQty.label" defaultMessage="Monthly Stocklist Qty" />
-  </Tooltip>,
+              // <Tippy
+              //   content={this.props.translate('react.stockListManagement.monthlyStockListQty.label', 'Monthly Stocklist Qty')}
+              //   theme="transparent"
+              //   delay="150"
+              //   duration="250"
+              //   hideDelay="50"
+              // >
+  <Translate id="react.stockListManagement.monthlyStockListQty.label" defaultMessage="Monthly Stocklist Qty" />,
+              // </Tippy>,
               accessor: 'monthlyDemand',
               aggregate: (vals) => _.sum(vals),
               className: 'text-center',
@@ -357,29 +358,29 @@ class StocklistManagement extends Component {
                 }
 
                 return (
-                  <Tooltip
-                    title={original.monthlyDemand}
-                    theme="transparent"
-                    delay="150"
-                    duration="250"
-                    hideDelay="50"
-                  >
-                    {original.monthlyDemand}
-                  </Tooltip>
+                  // <Tippy
+                  //   content={original.monthlyDemand}
+                  //   theme="transparent"
+                  //   delay="150"
+                  //   duration="250"
+                  //   hideDelay="50"
+                  // >
+                  original.monthlyDemand
+                  // </Tippy>
                 );
               },
             },
             {
               Header:
-  <Tooltip
-    title={this.props.translate('react.stockListManagement.manager.label', 'Manager')}
-    theme="transparent"
-    delay="150"
-    duration="250"
-    hideDelay="50"
-  >
-    <Translate id="react.stockListManagement.manager.label" defaultMessage="Manager" />
-  </Tooltip>,
+              // <Tippy
+              //   content={this.props.translate('react.stockListManagement.manager.label', 'Manager')}
+              //   theme="transparent"
+              //   delay="150"
+              //   duration="250"
+              //   hideDelay="50"
+              // >
+  <Translate id="react.stockListManagement.manager.label" defaultMessage="Manager" />,
+              // </Tippy>,
               accessor: 'manager.name',
               aggregate: () => '',
               Cell: ({ aggregated, original }) => {
@@ -388,29 +389,29 @@ class StocklistManagement extends Component {
                 }
 
                 return (
-                  <Tooltip
-                    title={original.manager.name}
-                    theme="transparent"
-                    delay="150"
-                    duration="250"
-                    hideDelay="50"
-                  >
-                    {original.manager.name}
-                  </Tooltip>
+                  // <Tippy
+                  //   content={original.manager.name}
+                  //   theme="transparent"
+                  //   delay="150"
+                  //   duration="250"
+                  //   hideDelay="50"
+                  // >
+                  original.manager.name
+                  // </Tippy>
                 );
               },
             },
             {
               Header:
-  <Tooltip
-    title={this.props.translate('react.stockListManagement.replenishmentPeriod.label', 'Replenishment period')}
-    theme="transparent"
-    delay="150"
-    duration="250"
-    hideDelay="50"
-  >
-    <Translate id="react.stockListManagement.replenishmentPeriod.label" defaultMessage="Replenishment period" />
-  </Tooltip>,
+              // <Tippy
+              //   content={this.props.translate('react.stockListManagement.replenishmentPeriod.label', 'Replenishment period')}
+              //   theme="transparent"
+              //   delay="150"
+              //   duration="250"
+              //   hideDelay="50"
+              // >
+  <Translate id="react.stockListManagement.replenishmentPeriod.label" defaultMessage="Replenishment period" />,
+              // </Tippy>,
               accessor: 'replenishmentPeriod',
               aggregate: () => '',
               className: 'text-center',
@@ -420,29 +421,29 @@ class StocklistManagement extends Component {
                 }
 
                 return (
-                  <Tooltip
-                    title={original.replenishmentPeriod}
-                    theme="transparent"
-                    delay="150"
-                    duration="250"
-                    hideDelay="50"
-                  >
-                    {original.replenishmentPeriod}
-                  </Tooltip>
+                  // <Tippy
+                  //   content={original.replenishmentPeriod}
+                  //   theme="transparent"
+                  //   delay="150"
+                  //   duration="250"
+                  //   hideDelay="50"
+                  // >
+                  original.replenishmentPeriod
+                  // </Tippy>
                 );
               },
             },
             {
               Header:
-  <Tooltip
-    title={this.props.translate('react.stockListManagement.replenishmentQty.label', 'Replenishment Qty')}
-    theme="transparent"
-    delay="150"
-    duration="250"
-    hideDelay="50"
-  >
-    <Translate id="react.stockListManagement.replenishmentQty.label" defaultMessage="Replenishment Qty" />
-  </Tooltip>,
+              // <Tippy
+              //   content={this.props.translate('react.stockListManagement.replenishmentQty.label', 'Replenishment Qty')}
+              //   theme="transparent"
+              //   delay="150"
+              //   duration="250"
+              //   hideDelay="50"
+              // >
+  <Translate id="react.stockListManagement.replenishmentQty.label" defaultMessage="Replenishment Qty" />,
+              // </Tippy>,
               accessor: 'maxQuantity',
               aggregate: (vals) => _.sum(vals),
               className: 'text-center',
@@ -458,33 +459,33 @@ class StocklistManagement extends Component {
 
                 return (
                   <div className={_.isNil(original.maxQuantity) || original.maxQuantity === '' ? 'has-error' : ''}>
-                    <Tooltip
-                      title={original.maxQuantity}
-                      theme="transparent"
-                      delay="150"
-                      duration="250"
-                      hideDelay="50"
-                    >
-                      <Input
-                        value={original.maxQuantity || ''}
-                        onChange={(value) => this.updateItemField(index, 'maxQuantity', value)}
-                      />
-                    </Tooltip>
+                    {/* <Tippy */}
+                    {/*   content={original.maxQuantity} */}
+                    {/*   theme="transparent" */}
+                    {/*   delay="150" */}
+                    {/*   duration="250" */}
+                    {/*   hideDelay="50" */}
+                    {/* > */}
+                    <Input
+                      value={original.maxQuantity || ''}
+                      onChange={(value) => this.updateItemField(index, 'maxQuantity', value)}
+                    />
+                    {/* </Tippy> */}
                   </div>
                 );
               },
             },
             {
               Header:
-  <Tooltip
-    title={this.props.translate('react.stockListManagement.uom.label', 'Unit of measure')}
-    theme="transparent"
-    delay="150"
-    duration="250"
-    hideDelay="50"
-  >
-    <Translate id="react.stockListManagement.uom.label" defaultMessage="Unit of measure" />
-  </Tooltip>,
+              // <Tippy
+              //   content={this.props.translate('react.stockListManagement.uom.label', 'Unit of measure')}
+              //   theme="transparent"
+              //   delay="150"
+              //   duration="250"
+              //   hideDelay="50"
+              // >
+  <Translate id="react.stockListManagement.uom.label" defaultMessage="Unit of measure" />,
+              // </Tippy>,
               accessor: 'uom',
               aggregate: () => '',
               className: 'text-center',
@@ -494,29 +495,29 @@ class StocklistManagement extends Component {
                 }
 
                 return (
-                  <Tooltip
-                    title={original.uom}
-                    theme="transparent"
-                    delay="150"
-                    duration="250"
-                    hideDelay="50"
-                  >
-                    {original.uom}
-                  </Tooltip>
+                  // <Tippy
+                  //   content={original.uom}
+                  //   theme="transparent"
+                  //   delay="150"
+                  //   duration="250"
+                  //   hideDelay="50"
+                  // >
+                  original.uom
+                  // </Tippy>
                 );
               },
             },
             {
               Header:
-  <Tooltip
-    title={this.props.translate('react.stockListManagement.actions.label', 'Actions')}
-    theme="transparent"
-    delay="150"
-    duration="250"
-    hideDelay="50"
-  >
-    <Translate id="react.stockListManagement.actions.label" defaultMessage="Actions" />
-  </Tooltip>,
+              // <Tippy
+              //   content={this.props.translate('react.stockListManagement.actions.label', 'Actions')}
+              //   theme="transparent"
+              //   delay="150"
+              //   duration="250"
+              //   hideDelay="50"
+              // >
+  <Translate id="react.stockListManagement.actions.label" defaultMessage="Actions" />,
+              // </Tippy>,
               accessor: 'edit',
               minWidth: 230,
               className: 'text-center',
@@ -585,7 +586,7 @@ class StocklistManagement extends Component {
                         <button
                           type="button"
                           className="btn btn-outline-secondary btn-xs mr-1"
-                          onClick={() => Alert.error(this.props.translate('react.stockListManagement.alert.noManagerAssociated.label', 'There is no manager associated with this stock list. Please add a manager and try again.'))}
+                          onClick={() => toast.error(this.props.translate('react.stockListManagement.alert.noManagerAssociated.label', 'There is no manager associated with this stock list. Please add a manager and try again.'))}
                         >
                           <Translate id="react.default.button.email.label" defaultMessage="Email" />
                         </button>

@@ -1,9 +1,9 @@
 import React from 'react';
 
+// import Tippy from '@tippyjs/react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { RiCopyrightLine } from 'react-icons/all';
-import { Tooltip } from 'react-tippy';
 
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
@@ -42,16 +42,16 @@ const INVOICE_ITEMS = {
           if (isPrepLine) {
             return (
               <div className="d-flex align-items-center justify-content-center">
-                <Tooltip
-                  html="Prepayment"
-                  theme="transparent"
-                  delay="150"
-                  duration="250"
-                  hideDelay="50"
-                >
-                  {/* &#x24C5; = hexadecimal circled letter P */}
-                  <b>&#x24C5;</b>
-                </Tooltip>
+                {/* <Tippy */}
+                {/*   content="Prepayment" */}
+                {/*   theme="transparent" */}
+                {/*   delay="150" */}
+                {/*   duration="250" */}
+                {/*   hideDelay="50" */}
+                {/* > */}
+                {/* &#x24C5; = hexadecimal circled letter P */}
+                <b>&#x24C5;</b>
+                {/* </Tippy> */}
               </div>
             );
           }
@@ -126,21 +126,21 @@ const INVOICE_ITEMS = {
           return (
             params.isEditable(invoiceItem?.id) && !invoiceItem?.orderAdjustment
               ? (
-                <Tooltip
-                  html={<div className="custom-tooltip">{errors}</div>}
-                  theme="transparent"
-                  disabled={!errors}
-                >
-                  <TextInput
-                    type="number"
-                    value={invoiceItem.quantity}
-                    showErrorBorder={!!errors}
-                    onChange={
+            // <Tippy
+            //   content={<div className="custom-tooltip">{errors}</div>}
+            //   theme="transparent"
+            //   disabled={!errors}
+            // >
+                <TextInput
+                  type="number"
+                  value={invoiceItem.quantity}
+                  showErrorBorder={!!errors}
+                  onChange={
                       params.updateInvoiceItemData(invoiceItem?.id, 'quantity')
                     }
-                    {...params}
-                  />
-                </Tooltip>
+                  {...params}
+                />
+            // </Tippy>
               )
               : <LabelField {...params} />
           );
@@ -173,21 +173,21 @@ const INVOICE_ITEMS = {
           return (
             params.isEditable(invoiceItem?.id) && invoiceItem?.orderAdjustment
               ? (
-                <Tooltip
-                  html={<div className="custom-tooltip">{errors}</div>}
-                  theme="transparent"
-                  disabled={!errors}
-                >
-                  <TextInput
-                    type="number"
-                    value={invoiceItem.unitPrice}
-                    showErrorBorder={!!errors}
-                    onChange={
+            // <Tippy
+            //   content={<div className="custom-tooltip">{errors}</div>}
+            //   theme="transparent"
+            //   disabled={!errors}
+            // >
+                <TextInput
+                  type="number"
+                  value={invoiceItem.unitPrice}
+                  showErrorBorder={!!errors}
+                  onChange={
                       params.updateInvoiceItemData(invoiceItem?.id, 'unitPrice')
                     }
-                    {...params}
-                  />
-                </Tooltip>
+                  {...params}
+                />
+            // </Tippy>
               )
               : <LabelField {...params} />
           );

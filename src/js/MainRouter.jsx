@@ -33,7 +33,8 @@ class MainRouter extends React.Component {
     });
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.locale !== nextProps.locale) {
       this.props.setActiveLanguage(nextProps.locale);
 

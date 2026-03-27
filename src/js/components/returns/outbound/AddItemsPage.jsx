@@ -10,7 +10,7 @@ import DatePicker from 'react-datepicker';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
@@ -208,7 +208,8 @@ class AddItemsPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.outboundReturnsTranslationsFetched) {
       if (!this.dataFetched) {
         this.dataFetched = true;
@@ -328,7 +329,7 @@ class AddItemsPage extends Component {
   saveAndTransition(callback, status) {
     const errors = validate({ returnItems: _.values(this.state.selectedItems) });
     if (errors && errors.returnItems.length) {
-      Alert.error(this.props.translate('react.outboundReturns.errors.quantityToReturn.label'));
+      toast.error(this.props.translate('react.outboundReturns.errors.quantityToReturn.label'));
       this.setState({
         selectedProductId: '',
         selectedLotNumber: '',
