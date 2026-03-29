@@ -478,11 +478,11 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     def isIncreased() {
-        return (modificationItem ? quantity - modificationItem.quantity : requisition.status >= RequisitionStatus.PICKING ? quantity - calculateQuantityPicked() : 0) < 0
+        return modificationItem ? (quantity - modificationItem.quantity) < 0 : false
     }
 
     def isReduced() {
-        return (modificationItem ? quantity - modificationItem.quantity : requisition.status >= RequisitionStatus.PICKING ? quantity - calculateQuantityPicked() : 0) > 0
+        return modificationItem ? (quantity - modificationItem.quantity) > 0 : false
     }
 
     /**
