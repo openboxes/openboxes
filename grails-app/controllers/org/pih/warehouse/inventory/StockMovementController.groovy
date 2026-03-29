@@ -12,6 +12,7 @@ package org.pih.warehouse.inventory
 
 import grails.converters.JSON
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.allocation.AllocationMode
@@ -497,6 +498,7 @@ class StockMovementController {
         render(template: "addCustomEventDialog", model: [stockMovementId: params.id])
     }
 
+    @Transactional
     def saveCustomEvent() {
         StockMovement stockMovement = getStockMovement(params.stockMovementId)
         if (!stockMovement) {
@@ -513,7 +515,8 @@ class StockMovementController {
         }
 
         Event event = new Event()
-        bindData(event, params)
+        bindData(event, params, [exclude: ['createdBy']])
+        event.createdBy = User.get(session.user.id)
         shipment.addToEvents(event)
 
         if (params.comment?.comment) {

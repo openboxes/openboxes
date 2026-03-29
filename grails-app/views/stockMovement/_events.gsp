@@ -19,10 +19,10 @@
             <div class="button-group">
                 <a href="javascript:void(0);" class="button btn-show-dialog"
                    data-height="400" data-width="800"
-                   data-title="${warehouse.message(code:'default.addCustomEvent.label', default: 'Add Custom Event')}"
+                   data-title="${warehouse.message(code:'default.addEvent.label', default: 'Add Event')}"
                    data-url="${request.contextPath}/stockMovement/addCustomEventDialog/${stockMovementId}">
                     <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
-                    <warehouse:message code="default.addCustomEvent.label" default="Add Custom Event"/>
+                    <warehouse:message code="default.addEvent.label" default="Add Event"/>
                 </a>
             </div>
         </div>

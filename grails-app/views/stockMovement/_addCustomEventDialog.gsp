@@ -1,9 +1,11 @@
 <%@ page import="org.pih.warehouse.core.EventType" %>
 <%@ page import="org.pih.warehouse.core.Location" %>
 
+<g:set var="isSuperuser" value="${false}" />
+<g:isUserAdmin><g:set var="isSuperuser" value="${true}" /></g:isUserAdmin>
+
 <g:form controller="stockMovement" action="saveCustomEvent" method="POST">
     <g:hiddenField name="stockMovementId" value="${stockMovementId}" />
-    <g:hiddenField name="createdBy.id" value="${session.user.id}" />
     <table>
         <tbody>
         <tr class="prop">
@@ -15,7 +17,7 @@
                           name="eventType.id"
                           optionKey="id"
                           noSelection="['': g.message(code: 'default.selectOne.label')]"
-                          from='${EventType.listCustomEventTypes()}'
+                          from='${isSuperuser ? EventType.list() : EventType.listCustomEventTypes()}'
                           optionValue="${{ format.metadata(obj: it) }}"
                           required="${true}"
                           class="chzn-select-deselect">
