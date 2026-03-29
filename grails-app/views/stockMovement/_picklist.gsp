@@ -9,7 +9,7 @@
 
     <div class="button-bar">
         <div class="button-group">
-            <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}" class="button">
+            <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}" params="[stepNumber: '4']" class="button">
                 <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
                 <warehouse:message code="picklist.editPicks.label" default="Edit Picks"/>
             </g:link>
