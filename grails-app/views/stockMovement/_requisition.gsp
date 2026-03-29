@@ -9,11 +9,9 @@
                 <tr class="odd">
                     <th></th>
                     <th><warehouse:message code="requisition.status.label"/></th>
-                    <th><warehouse:message code="product.productCode.label"/></th>
                     <th><warehouse:message code="product.label"/></th>
-                    <th class="center"><warehouse:message code="product.uom.label" /></th>
                     <th class="center"><warehouse:message code="requisitionItem.quantityRequested.label" default="Requested" /></th>
-                    <th class="center"><warehouse:message code="requisitionItem.quantityApproved.label" /></th>
+                    <th class="center"><warehouse:message code="requisitionItem.quantityRequired.label" default="Required" /></th>
                     <th class="center"><warehouse:message code="requisitionItem.quantityFulfilled.label" default="Fulfilled"/></th>
                     <th class="center"><warehouse:message code="requisitionItem.reasonCodes.label" /></th>
                 </tr>
