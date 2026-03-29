@@ -119,47 +119,36 @@
                 </g:else>
 
                 <g:if test="${stockMovement?.hasBeenIssued() && (stockMovement?.hasBeenShipped() || stockMovement?.hasBeenPartiallyReceived())}">
-                    <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
-                        <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
-                        <warehouse:message code="default.button.receive.label" />
-                    </g:link>
                     <g:if test="${grailsApplication.config.openboxes.receiving.manualAutoReceiving.enabled}">
-                        <g:link controller="partialReceiving" action="autoreceive" id="${stockMovement?.shipment?.id}" class="button">
-                            <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
-                            <warehouse:message code="default.button.autoreceive.label" />
-                        </g:link>
+                        <span class="action-menu">
+                            <button class="action-btn button">
+                                <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />
+                                &nbsp; <warehouse:message code="default.button.receive.label"/>
+                                <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
+                            </button>
+                            <div class="actions">
+                                <div class="action-menu-item">
+                                    <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}">
+                                        <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" class="middle"/>&nbsp;
+                                        <warehouse:message code="default.button.receive.label" />
+                                    </g:link>
+                                </div>
+                                <div class="action-menu-item">
+                                    <g:link controller="partialReceiving" action="autoreceive" id="${stockMovement?.shipment?.id}">
+                                        <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" class="middle"/>&nbsp;
+                                        <warehouse:message code="default.button.autoreceive.label" />
+                                    </g:link>
+                                </div>
+                            </div>
+                        </span>
                     </g:if>
+                    <g:else>
+                        <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
+                            <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                            <warehouse:message code="default.button.receive.label" />
+                        </g:link>
+                    </g:else>
                 </g:if>
-
-                <g:if test="${grailsApplication.config.openboxes.receiving.manualAutoReceiving.enabled}">
-                    <span class="action-menu">
-                        <button class="action-btn button">
-                            <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />
-                            &nbsp; <warehouse:message code="default.button.receive.label"/>
-                            <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
-                        </button>
-                        <div class="actions">
-                            <div class="action-menu-item">
-                                <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}">
-                                    <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" class="middle"/>&nbsp;
-                                    <warehouse:message code="default.button.receive.label" />
-                                </g:link>
-                            </div>
-                            <div class="action-menu-item">
-                                <g:link controller="partialReceiving" action="autoreceive" id="${stockMovement?.shipment?.id}">
-                                    <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" class="middle"/>&nbsp;
-                                    <warehouse:message code="default.button.autoreceive.label" />
-                                </g:link>
-                            </div>
-                        </div>
-                    </span>
-                </g:if>
-                <g:else>
-                    <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
-                        <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
-                        <warehouse:message code="default.button.receive.label" />
-                    </g:link>
-                </g:else>
 
                 <g:if test="${stockMovement?.hasBeenStaged()}">
                     <g:link controller="requisition" action="issue" id="${stockMovement?.requisition?.id}" class="button">
