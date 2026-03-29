@@ -101,6 +101,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             "monthlyDemand",
             "totalCost",
             "quantityIssued",
+            "quantityFulfilled",
             "quantityAdjusted",
             "status",
             "change",
@@ -772,6 +773,16 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     Integer getQuantityIssued() {
         return substitutionItems ? substitutionItems?.sum { it.quantityIssued } ?: 0 :
                 requisition?.shipment?.shipmentItems?.findAll { it.requisitionItem == this }?.sum { it.quantity } ?: 0
+    }
+
+    Integer getQuantityFulfilled() {
+        def issued = quantityIssued
+        if (issued > 0) return issued
+
+        def picked = calculateQuantityPicked()
+        def allocated = calculateQuantityAllocated()
+
+        return Math.max(picked, allocated)
     }
 
     Integer getQuantityAdjusted() {

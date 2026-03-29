@@ -188,21 +188,21 @@
         <td class="middle center">
             <g:if test="${requisitionItem?.isSubstituted()}">
                 <div>
-                    ${requisitionItem?.quantityIssued?:0} ${uom}
+                    ${requisitionItem?.quantityFulfilled?:0} ${uom}
                 </div>
             </g:if>
             <g:elseif test="${requisitionItem?.isCanceled()}">
                 <div class="canceled">
-                    ${requisitionItem?.quantityIssued?:0} ${uom}
+                    ${requisitionItem?.quantityFulfilled?:0} ${uom}
                 </div>
             </g:elseif>
             <g:elseif test="${requisitionItem?.isChanged()}">
                 <div>
-                    ${requisitionItem?.modificationItem?.quantityIssued?:0} ${uom}
+                    ${requisitionItem?.modificationItem?.quantityFulfilled?:0} ${uom}
                 </div>
             </g:elseif>
             <g:else>
-                ${requisitionItem?.quantityIssued?:0} ${uom}
+                ${requisitionItem?.quantityFulfilled?:0} ${uom}
             </g:else>
         </td>
         <td class="middle center">
