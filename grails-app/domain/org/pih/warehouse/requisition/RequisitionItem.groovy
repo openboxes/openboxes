@@ -101,6 +101,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             "monthlyDemand",
             "totalCost",
             "quantityIssued",
+            "quantityFulfilled",
             "quantityAdjusted",
             "status",
             "change",
@@ -208,6 +209,55 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
         if (isParentRequisitionRejected()) {
             return RequisitionItemStatus.CANCELED
+        }
+
+        if (isCanceled()) {
+            return RequisitionItemStatus.CANCELED
+        }
+
+        if (isSubstituted()) {
+            return RequisitionItemStatus.SUBSTITUTED
+        }
+
+        if (isChanged()) {
+            return RequisitionItemStatus.CHANGED
+        }
+
+        // Derive fine-grained status from requisition status and item-level quantities
+        def requisitionStatus = requisition?.status
+        if (requisitionStatus) {
+            if (requisitionStatus >= RequisitionStatus.ISSUED) {
+                return RequisitionItemStatus.ISSUED
+            }
+            if (requisitionStatus >= RequisitionStatus.STAGED) {
+                return RequisitionItemStatus.STAGED
+            }
+            if (requisitionStatus >= RequisitionStatus.PICKED) {
+                return RequisitionItemStatus.PICKED
+            }
+            if (requisitionStatus >= RequisitionStatus.PICKING) {
+                def quantityPicked = calculateQuantityPicked() ?: 0
+                def quantityRequired = calculateQuantityRequired() ?: 0
+                if (quantityPicked >= quantityRequired && quantityRequired > 0) {
+                    return RequisitionItemStatus.PICKED
+                }
+                if (quantityPicked > 0) {
+                    return RequisitionItemStatus.PICKING
+                }
+                // Still in picking phase but this item hasn't been picked yet
+                def quantityAllocated = calculateQuantityAllocated() ?: 0
+                if (quantityAllocated > 0) {
+                    return RequisitionItemStatus.ALLOCATED
+                }
+                return RequisitionItemStatus.PICKING
+            }
+            // Check allocation status before picking has started
+            if (isAllocated() || isPartiallyAllocated()) {
+                return RequisitionItemStatus.ALLOCATED
+            }
+            if (requisitionStatus in [RequisitionStatus.REQUESTED, RequisitionStatus.PENDING_APPROVAL]) {
+                return RequisitionItemStatus.REQUESTED
+            }
         }
 
         return getStatus()
@@ -478,11 +528,11 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     def isIncreased() {
-        return (modificationItem ? quantity - modificationItem.quantity : requisition.status >= RequisitionStatus.PICKING ? quantity - calculateQuantityPicked() : 0) < 0
+        return modificationItem ? (quantity - modificationItem.quantity) < 0 : false
     }
 
     def isReduced() {
-        return (modificationItem ? quantity - modificationItem.quantity : requisition.status >= RequisitionStatus.PICKING ? quantity - calculateQuantityPicked() : 0) > 0
+        return modificationItem ? (quantity - modificationItem.quantity) > 0 : false
     }
 
     /**
@@ -723,6 +773,16 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     Integer getQuantityIssued() {
         return substitutionItems ? substitutionItems?.sum { it.quantityIssued } ?: 0 :
                 requisition?.shipment?.shipmentItems?.findAll { it.requisitionItem == this }?.sum { it.quantity } ?: 0
+    }
+
+    Integer getQuantityFulfilled() {
+        def issued = quantityIssued
+        if (issued > 0) return issued
+
+        def picked = calculateQuantityPicked()
+        def allocated = calculateQuantityAllocated()
+
+        return Math.max(picked, allocated)
     }
 
     Integer getQuantityAdjusted() {

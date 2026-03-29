@@ -237,6 +237,12 @@ class StockMovements extends Component {
               break;
           }
 
+          const queryParams = new URLSearchParams(window.location.search);
+          const stepNumber = parseInt(queryParams.get('stepNumber'), 10);
+          if (stepNumber && stepNumber >= 1 && stepNumber <= this.pageList.length) {
+            currentPage = stepNumber;
+          }
+
           this.setState({ values, currentPage });
         })
         .catch(() => this.props.hideSpinner());

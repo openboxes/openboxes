@@ -9,15 +9,10 @@
                 <tr class="odd">
                     <th></th>
                     <th><warehouse:message code="requisition.status.label"/></th>
-                    <th><warehouse:message code="product.productCode.label"/></th>
                     <th><warehouse:message code="product.label"/></th>
-                    <th class="center"><warehouse:message code="product.uom.label" /></th>
                     <th class="center"><warehouse:message code="requisitionItem.quantityRequested.label" default="Requested" /></th>
-                    <th class="center"><warehouse:message code="requisitionItem.quantityApproved.label" /></th>
-                    <th class="center"><warehouse:message code="requisitionItem.quantityAllocated.label" default="Allocated" /></th>
-                    <th class="center"><warehouse:message code="requisitionItem.quantityPicked.label" default="Picked"/></th>
-                    <th class="center"><warehouse:message code="requisitionItem.quantityAdjusted.label" /></th>
-                    <th class="center"><warehouse:message code="requisitionItem.quantityIssued.label" default="Issued"/></th>
+                    <th class="center"><warehouse:message code="requisitionItem.quantityRequired.label" default="Required" /></th>
+                    <th class="center"><warehouse:message code="requisitionItem.quantityFulfilled.label" default="Fulfilled"/></th>
                     <th class="center"><warehouse:message code="requisitionItem.reasonCodes.label" /></th>
                 </tr>
                 </thead>
