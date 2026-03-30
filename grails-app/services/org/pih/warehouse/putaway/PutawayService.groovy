@@ -14,18 +14,18 @@ import grails.gorm.transactions.Transactional
 import org.apache.commons.beanutils.BeanUtils
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
-import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderEventLogger
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
@@ -34,10 +34,11 @@ import org.pih.warehouse.order.OrderType
 @Transactional
 class PutawayService {
 
-    LocationService locationService
+    ConfigService configService
     InventoryService inventoryService
     def productAvailabilityService
     GrailsApplication grailsApplication
+    OrderEventLogger orderEventLogger
 
     def getPutawayCandidates(Location location) {
         List binLocationEntries = productAvailabilityService.getAvailableQuantityOnHandByBinLocation(location)
@@ -158,11 +159,39 @@ class PutawayService {
             inventoryService.transferStock(command)
         }
 
+        logPutaway(order, putaway)
+
         grailsApplication.mainContext.publishEvent(new PutawayCompletedEvent(putaway))
 
         return order
     }
 
+    /**
+     * Logs a putaway event, adding it to the collection of event logs for the putaway order.
+     */
+    private void logPutaway(Order order, Putaway putaway) {
+        Boolean dynamicReceivingBinsEnabled =
+                configService.getStaticProperty("openboxes.receiving.createReceivingLocation.enabled", Boolean)
+
+        if (!dynamicReceivingBinsEnabled || isFinalPutaway(order, putaway)) {
+            orderEventLogger.logPutaway(order, putaway)
+            return
+        }
+        orderEventLogger.logPartialPutaway(order, putaway)
+    }
+
+    /**
+     * Returns true if after the given putaway is completed, all receipts of the original inbound will have
+     * been put away.
+     */
+    private boolean isFinalPutaway(Order order, Putaway putaway) {
+        // TODO
+        // 1) Fetch all completed receipts whose destination receiving bin is the same as the bin the putaway is originating from
+        // 2) Fetch all completed putaways matching each of the receipts
+        // 3) Do a diff between the quantity in the receipts and their matching putaways
+        // 4) If there is no remaining quantity after factoring in this putaway, this is the final putaway
+        return true
+    }
 
     Order savePutaway(Putaway putaway) {
 

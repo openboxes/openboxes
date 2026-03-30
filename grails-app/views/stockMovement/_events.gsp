@@ -15,6 +15,7 @@
             <thead>
             <tr class="odd">
                 <th><g:message code="default.event.label" default="Event"/></th>
+                <th><g:message code="event.identifier.label" default="Event Identifier"/></th>
                 <th><g:message code="event.dateLogged.label" default="Date Logged"/></th>
                 <th><g:message code="event.eventDate.label" default="Event Date"/></th>
                 <th><g:message code="default.location.label" default="Location"/></th>
@@ -27,6 +28,14 @@
                 <tr>
                     <td>
                         ${historyItem?.eventType?.name}
+                    </td>
+                    <td>
+                        %{-- Shipment events link to the SM but we're already on that page so hide those links --}%
+                        <g:if test="${historyItem?.eventType?.eventCode?.isPutawayEvent()}">
+                            <a href="${historyItem?.referenceDocument?.url}">
+                                ${historyItem?.referenceDocument?.identifier}
+                            </a>
+                        </g:if>
                     </td>
                     <td>
                         ${historyItem?.dateLogged?.format(Constants.EUROPEAN_DATE_FORMAT_WITH_TIME)}

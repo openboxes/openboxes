@@ -47,6 +47,7 @@ import org.pih.warehouse.core.StockMovementItemParamsCommand
 import org.pih.warehouse.core.StockMovementItemsParamsCommand
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
+import org.pih.warehouse.core.history.HistoryItem
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.importer.CSVUtils
@@ -1628,6 +1629,20 @@ class StockMovementService {
         return (stockMovement.requisition) ?
                 getRequisitionBasedStockMovementReceiptItems(stockMovement) :
                 getShipmentBasedStockMovementReceiptItems(stockMovement)
+    }
+
+    /**
+     * Returns a chronological history of the events that have occurred on a stock movement. Stock movement
+     * history is built by combining the history from a number of different sources, including shipment and order.
+     */
+    List<HistoryItem> getHistory(StockMovement stockMovement) {
+        List<HistoryItem> history = stockMovement?.shipment?.getHistory() ?: []
+
+        // Currently the only orders that have event history are putaway orders.
+        List<HistoryItem> putawayHistory = stockMovement?.shipment?.getPutawayOrders()?.collectMany { it.getHistory() }
+        history.addAll(putawayHistory ?: [])
+
+        return history.sort()
     }
 
     List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(def stockMovement) {
