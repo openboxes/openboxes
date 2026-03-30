@@ -37,7 +37,6 @@ import org.pih.warehouse.inventory.InventoryLevel
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
-import javax.activation.MimetypesFileTypeMap
 import java.math.RoundingMode
 
 class ProductController {
@@ -440,108 +439,6 @@ class ProductController {
         barcodeService.renderImage(response, params.data, (params.width ?: 125) as int, (params.height ?: 50) as int, format)
     }
 
-
-    /**
-     * Upload a document to a product.
-     */
-    @Transactional
-    def upload(DocumentCommand command) {
-        log.info "Uploading document: " + params
-
-        // HACK - for some reason the Product in document command is not getting bound
-        command.product = Product.get(params.product.id)
-
-        if (params.url) {
-
-            Document documentInstance
-            try {
-                def filename = params.url.tokenize("/")[-1]
-                def fileOutputStream = new FileOutputStream(filename)
-                def out = new BufferedOutputStream(fileOutputStream)
-                out << new URL(params.url).openStream()
-                out.close()
-
-                File file = new File(filename)
-                def contentType = new MimetypesFileTypeMap().getContentType(file)
-
-                documentInstance = new Document(
-                        size: file.size(),
-                        name: file.name,
-                        filename: file.name,
-                        fileContents: file.bytes,
-                        contentType: contentType)
-
-                if (documentInstance?.validate() && !documentInstance?.hasErrors()) {
-                    log.info "Saving document " + documentInstance
-                    command.product.addToDocuments(documentInstance).save(flush: true)
-                    flash.message = "${warehouse.message(code: 'document.successfullySavedToProduct.message', args: [command?.product?.name])}"
-                }
-                // If there are errors, we need to redisplay the document form
-                else {
-                    log.info "Document did not save " + documentInstance.errors
-                    flash.message = "${warehouse.message(code: 'document.cannotSave.message', args: [documentInstance.errors])}"
-                    redirect(controller: "product", action: "edit", id: command?.product?.id,
-                            model: [productInstance: command?.product, documentInstance: documentInstance])
-                    return
-                }
-
-            } catch (IOException e) {
-                flash.message = "An error occurred while uploading image: " + e.message
-                redirect(controller: "product", action: "edit", id: command?.product?.id, model: [productInstance: command?.product])
-                return
-            }
-
-
-        } else {
-            def file = command.fileContents
-            // file must not be empty and must be less than 10MB
-            // FIXME The size limit needs to go somewhere
-            if (!file || file?.isEmpty()) {
-                flash.message = "${warehouse.message(code: 'document.documentCannotBeEmpty.message')}"
-            } else if (file.size < 10 * 1024 * 1000) {
-                log.info "Creating new document "
-                Document documentInstance = new Document(
-                        size: file.size,
-                        name: file.originalFilename,
-                        filename: file.originalFilename,
-                        fileContents: file.bytes,
-                        contentType: file.contentType,
-                        documentNumber: command.documentNumber,
-                        documentType: command.documentType)
-
-                if (!command?.product) {
-                    log.info "Cannot add document " + documentInstance + "  because product does not exist"
-                    flash.message = "${warehouse.message(code: 'document.productDoesNotExist.message')}"
-                    redirect(controller: "product", action: "list")
-                    return
-                } else {
-
-                    // Check to see if there are any errors
-                    if (documentInstance.validate() && !documentInstance.hasErrors()) {
-                        log.info "Saving document " + documentInstance
-                        command.product.addToDocuments(documentInstance).save(flush: true)
-                        flash.message = "${warehouse.message(code: 'document.successfullySavedToProduct.message', args: [command?.product?.name])}"
-                    }
-                    // If there are errors, we need to redisplay the document form
-                    else {
-                        log.info "Document did not save " + documentInstance.errors
-                        flash.message = "${warehouse.message(code: 'document.cannotSave.message', args: [documentInstance.errors])}"
-                        redirect(controller: "product", action: "edit", id: command?.product?.id,
-                                model: [productInstance: command?.product, documentInstance: documentInstance])
-                        return
-                    }
-                }
-            } else {
-                log.info "Document is too large"
-                flash.message = "${warehouse.message(code: 'document.documentTooLarge.message')}"
-            }
-        }
-
-        // This is, admittedly, a hack but I wanted to avoid having to add this code to each of
-        // these controllers.
-        log.info("Redirecting to appropriate show details page " + command?.product?.id)
-        redirect(controller: 'product', action: 'edit', id: command?.product?.id)
-    }
 
     @Transactional
     def deleteDocument() {

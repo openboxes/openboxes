@@ -12,9 +12,15 @@ enum ContentType {
 
     CSV(FileExtension.CSV, MediaType.parseMediaType("text/csv")),
     DOCX(FileExtension.DOCX, MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")),
+    GIF(FileExtension.GIF, MediaType.IMAGE_GIF),
+    JPEG(FileExtension.JPEG, MediaType.IMAGE_JPEG),
+    JPG(FileExtension.JPG, MediaType.IMAGE_JPEG),
     JSON(FileExtension.JSON, MediaType.APPLICATION_JSON),
     PDF(FileExtension.PDF, MediaType.APPLICATION_PDF),
+    PNG(FileExtension.PNG, MediaType.IMAGE_PNG),
+    SVG(FileExtension.SVG, MediaType.parseMediaType("image/svg+xml")),
     TXT(FileExtension.TXT, MediaType.TEXT_PLAIN),
+    WEBP(FileExtension.WEBP, MediaType.parseMediaType("image/webp")),
     XLS(FileExtension.XLS, MediaType.parseMediaType("application/vnd.ms-excel")),
     XLSX(FileExtension.XLSX, MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")),
     XML(FileExtension.XML, MediaType.TEXT_XML)
