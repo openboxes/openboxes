@@ -283,16 +283,20 @@ class LoadDataService {
                 "openboxes.transactions.inventoryBaseline.loadDemoData.enabled",
                 Boolean
         )
+        // This command is needed to create a transaction source record via inventoryImportProductInventoryTransactionService
+        // as the setSourceObject method is abstract and requires the ImportDataCommand to be passed in in order
+        // to use a proper method (from InventoryImportProductInventoryTransactionService)
+        ImportDataCommand importDataCommand = new ImportDataCommand(location: targetWarehouse)
 
         // 2a. If there are available items:
         //   - If inventory snapshot is turned on for load demo data:
         //       - then create an inventory snapshot transaction with entries made from the current stock calculated in 1st point
         // 2b. If there are no available items:
-        //   - then no snapshot is being saved
-        if (availableItems.size() && isInventoryBaselineEnabled) {
+        //   - then a snapshot (baseline transaction) with quantity 0 and default bin is created
+        if (isInventoryBaselineEnabled) {
             InventoryBaselineTransactionCommand baselineTransactionCommand = new InventoryBaselineTransactionCommand(
                     facility: targetWarehouse,
-                    sourceObject: null,
+                    sourceObject: importDataCommand,
                     products: products,
                     availableItems: availableItems,
                     transactionDate: inventoryBaselineTransactionDate
