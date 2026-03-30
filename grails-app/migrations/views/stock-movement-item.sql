@@ -11,6 +11,8 @@ CREATE OR REPLACE VIEW stock_movement_item AS
         product.name,
         requisition_item.quantity,
         requisition_item.quantity_canceled,
+        requisition_item.quantity_backordered,
+        requisition_item.backordered_reason_code,
         requisition_item.quantity_counted,
         requisition_item.order_index,
         requisition_item.cancel_reason_code,
@@ -18,6 +20,7 @@ CREATE OR REPLACE VIEW stock_movement_item AS
         CASE
 		WHEN modification_item.quantity THEN modification_item.quantity
 		WHEN requisition_item.quantity_canceled = requisition_item.quantity THEN 0
+        WHEN requisition_item.quantity_backordered = requisition_item.quantity THEN 0
         ELSE null
 		END AS quantity_revised
     FROM

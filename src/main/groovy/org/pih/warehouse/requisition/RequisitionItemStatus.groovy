@@ -11,11 +11,14 @@ package org.pih.warehouse.requisition
 
 enum RequisitionItemStatus {
     PENDING(0),
-    APPROVED(1),
-    SUBSTITUTED(2),
-    CHANGED(3),
-    CANCELED(4),
-    COMPLETED(5)
+    BACKORDERED(1),
+    APPROVED(2),
+    SUBSTITUTED(3),
+    REDUCED(4),
+    INCREASED(5),
+    CHANGED(6),
+    CANCELED(7),
+    COMPLETED(8)
 
     int sortOrder
 
@@ -30,7 +33,7 @@ enum RequisitionItemStatus {
     }
 
     static list() {
-        [PENDING, APPROVED, SUBSTITUTED, CHANGED, CANCELED, COMPLETED]
+        [PENDING, BACKORDERED, APPROVED, SUBSTITUTED, REDUCED, INCREASED, CHANGED, CANCELED, COMPLETED]
     }
 
     String toString() {

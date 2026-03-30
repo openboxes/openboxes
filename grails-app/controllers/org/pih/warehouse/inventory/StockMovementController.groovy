@@ -705,6 +705,7 @@ class StockMovementController {
     def allocate() {
         try {
             Requisition requisition = Requisition.get(params.id)
+
             List<AllocationStrategy> strategyList = [AllocationStrategy.WAREHOUSE_FIRST]
             allocationService.allocate(requisition, AllocationMode.AUTO, strategyList)
             stockMovementService.updateRequisitionStatus(params.id, RequisitionStatus.PICKING)

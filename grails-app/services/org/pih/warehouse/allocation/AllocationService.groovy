@@ -161,6 +161,7 @@ class AllocationService {
     Boolean deallocate(RequisitionItem requisitionItem) {
         validateNothingPicked(requisitionItem)
         stockMovementService.clearPicklist(requisitionItem)
+        requisitionItem.autoAllocated = null
         return true
     }
 
@@ -206,8 +207,16 @@ class AllocationService {
         List<AvailableItem> filteredItems = applyStrategies(allAvailableItems, strategies)
         List<AvailableItem> includedItems = filteredItems.findAll { !excludeList.contains(it) }
 
+        boolean isBackordered = requisitionItem.isBackordered()
+        if (isBackordered) {
+            quantityRequired = requisitionItem.quantityBackordered
+        }
         Integer quantityAvailable = includedItems.sum { it.quantityAvailable } ?: 0
         if (quantityAvailable < quantityRequired) {
+            boolean partialAllocationAllowed = requisitionItem.requisition.partialAllocationAllowed
+            if (isBackordered && partialAllocationAllowed) {
+                return []
+            }
             throw new IllegalArgumentException("Insufficient stock. Required: ${quantityRequired}, Available: ${quantityAvailable}")
         }
 

@@ -147,6 +147,26 @@ const FIELDS = {
           formatValue: (value) => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
       },
+      quantityBackordered: {
+        type: LabelField,
+        label: 'react.stockMovement.backordered.label',
+        defaultMessage: 'Backordered',
+        flexWidth: '1',
+        fieldKey: '',
+        getDynamicAttr: ({ fieldValue }) => {
+          let className = 'text-right';
+          if (fieldValue && fieldValue.quantityBackordered && fieldValue.quantityBackordered > 0) {
+            className = `${className} text-danger`;
+          }
+          return {
+            className,
+          };
+        },
+        headerAlign: 'right',
+        attributes: {
+          formatValue: (value) => (value.quantityBackordered ? (value.quantityBackordered.toLocaleString('en-US')) : value.quantityBackordered),
+        },
+      },
       quantityDemandFulfilling: {
         type: LabelField,
         label: 'react.stockMovement.demandPerMonth.label',

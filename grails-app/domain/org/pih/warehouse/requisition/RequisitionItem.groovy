@@ -10,18 +10,19 @@
 package org.pih.warehouse.requisition
 
 import grails.validation.ValidationException
+import org.pih.warehouse.allocation.AllocationStatus
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Inventory
-import org.pih.warehouse.allocation.AllocationStatus
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductPackage
-import org.pih.warehouse.core.Person
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.product.Product
 
 class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
@@ -51,6 +52,9 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
     // saved QOH in ward request
     Integer quantityCounted
+
+    Integer quantityBackordered
+    String backorderedReasonCode
 
     // Status is handled dynamically at the moment, but we might want to save it at some point
     //RequisitionItemStatus requisitionItemStatus
@@ -133,6 +137,16 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         requestedBy(nullable: true)
         quantity(nullable: false, min: 0)
         quantityApproved(nullable: true)
+        quantityBackordered(nullable: true,
+                validator: { value, obj ->
+                    // Must have a backordered reason code
+                    if (value > 0 && ReasonCode.BACKORDER.toString() != obj.backorderedReasonCode) {
+                        return false
+                    } else {
+                        return true
+                    }
+                })
+        backorderedReasonCode(nullable: true)
         quantityCanceled(nullable: true,
                 validator: { value, obj ->
                     // Must have a cancel reason code
@@ -186,6 +200,14 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             return RequisitionItemStatus.SUBSTITUTED
         }
 
+        if (isReduced()) {
+            return RequisitionItemStatus.REDUCED
+        }
+
+        if (isIncreased()) {
+            return RequisitionItemStatus.INCREASED
+        }
+
         if (isChanged()) {
             return RequisitionItemStatus.CHANGED
         }
@@ -198,6 +220,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             return RequisitionItemStatus.COMPLETED
         }
 
+        if (isBackordered()) {
+            return RequisitionItemStatus.BACKORDERED
+        }
+
         return RequisitionItemStatus.PENDING
     }
 
@@ -208,6 +234,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
         if (isParentRequisitionRejected()) {
             return RequisitionItemStatus.CANCELED
+        }
+
+        if (isCanceledDuringPick()) {
+            return  RequisitionItemStatus.CANCELED
         }
 
         return getStatus()
@@ -242,6 +272,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         } else {
             quantityApproved = 0
             quantityCanceled = 0
+            quantityBackordered = null
+            backorderedReasonCode = null
             cancelComments = null
             cancelReasonCode = null
 
@@ -301,7 +333,12 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         log.info "Change quantity: ${newQuantity} ${reasonCode} ${comments}"
         // And then create a new requisition item for the remaining quantity (if not 0)
         if (newQuantity == 0) {
-            cancelQuantity(reasonCode, comments)
+            if (ReasonCode.BACKORDER.toString() == reasonCode) {
+                quantityBackordered = quantity
+                backorderedReasonCode = reasonCode
+            } else {
+                cancelQuantity(reasonCode, comments)
+            }
         } else {
 
             if (newProductPackage == productPackage && newQuantity == quantity) {
@@ -337,6 +374,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             modificationItem.save(flush: true, failOnError: true)
         }
     }
+
     def chooseSubstitute(Product newProduct, ProductPackage newProductPackage, Integer newQuantity, String reasonCode, String comments) {
         chooseSubstitute(newProduct, newProductPackage, newQuantity, reasonCode, comments, null)
     }
@@ -441,6 +479,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return (productPackage?.quantity ?: 1) * (quantityCanceled ?: 0)
     }
 
+    def totalQuantityBackordered() {
+        return (productPackage?.quantity ?: 1) * (quantityBackordered ?: 0)
+    }
+
     def totalQuantityApproved() {
         return (productPackage?.quantity ?: 1) * (quantityApproved ?: 0)
     }
@@ -462,11 +504,15 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      * @return true if the requisition item has been completely canceled
      */
     def isCanceled() {
-        return totalQuantityCanceled() == totalQuantity() && !modificationItem && !substitutionItem && !requisitionItems
+        return totalQuantityCanceled() == totalQuantity() && !modificationItem && !substitutionItem && !requisitionItems && !isBackordered()
+    }
+
+    def isBackordered() {
+        return totalQuantityBackordered() > 0
     }
 
     def isCanceledDuringPick() {
-         return requisition.status >= RequisitionStatus.PICKING && (modificationItem ? modificationItem.calculateQuantityPicked() == 0 : calculateQuantityPicked() == 0)
+         return requisition.status >= RequisitionStatus.PICKED && (modificationItem ? modificationItem.calculateQuantityPicked() == 0 : calculateQuantityPicked() == 0) && !isBackordered()
     }
 
     /**
@@ -478,11 +524,11 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     def isIncreased() {
-        return (modificationItem ? quantity - modificationItem.quantity : requisition.status >= RequisitionStatus.PICKING ? quantity - calculateQuantityPicked() : 0) < 0
+        return (modificationItem ? quantity - modificationItem.quantity : requisition.status >= RequisitionStatus.PICKED ? quantity - calculateQuantityPicked() : 0) < 0 && !isBackordered()
     }
 
     def isReduced() {
-        return (modificationItem ? quantity - modificationItem.quantity : requisition.status >= RequisitionStatus.PICKING ? quantity - calculateQuantityPicked() : 0) > 0
+        return (modificationItem ? quantity - modificationItem.quantity : requisition.status >= RequisitionStatus.PICKED ? quantity - calculateQuantityPicked() : 0) > 0 && !isBackordered()
     }
 
     /**
@@ -615,12 +661,14 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
     def calculateQuantityRevised() {
         return modificationItem ? modificationItem?.quantity :
-                quantityCanceled ? (quantity - quantityCanceled) : null
+                quantityCanceled ? (quantity - quantityCanceled) :
+                quantityBackordered ? (quantity - quantityBackordered) : null
     }
 
     def calculateQuantityRequired() {
         return modificationItem ? modificationItem?.quantity :
-                quantityCanceled ? (quantity - quantityCanceled) : quantity
+                quantityCanceled ? (quantity - quantityCanceled) :
+                quantityBackordered ? (quantity - quantityBackordered) : quantity
     }
 
     def calculateQuantityRemaining() {
@@ -819,6 +867,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                 isCompleted           : isCompleted(),
                 isApproved            : isApproved(),
                 isCanceled            : isCanceled(),
+                isBackordered         : isBackordered(),
                 orderIndex            : orderIndex
         ]
     }

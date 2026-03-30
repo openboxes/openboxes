@@ -38,6 +38,9 @@ class StockMovementItem {
     BigDecimal quantityShipped
     BigDecimal quantityAllocated
 
+    BigDecimal quantityBackordered
+    String backorderedReasonCode
+
     String unitOfMeasure
 
     // saved QOH in ward request
@@ -125,6 +128,8 @@ class StockMovementItem {
         quantityPicked(nullable: true)
         quantityCounted(nullable: true)
         quantityAllocated(nullable: true)
+        quantityBackordered(nullable: true)
+        backorderedReasonCode(nullable: true)
         statusCode(nullable: true)
         reasonCode(nullable: true)
         comments(nullable: true)
@@ -172,7 +177,8 @@ class StockMovementItem {
                 unitOfMeasure             : unitOfMeasure,
                 packsRequested            : packsRequested,
                 quantityRequired          : quantityRequired,
-                reasonCode                : reasonCode,
+                quantityBackordered       : quantityBackordered,
+                reasonCode                : reasonCode ?: backorderedReasonCode,
                 comments                  : comments,
                 recipient                 : recipient,
                 substitutionItems         : substitutionItems,
@@ -264,7 +270,8 @@ class StockMovementItem {
                 quantityRevised: requisitionItem.calculateQuantityRevised(),
                 quantityPicked: requisitionItem?.totalQuantityPicked(),
                 substitutionItems: substitutionItems,
-                reasonCode: requisitionItem.cancelReasonCode,
+                quantityBackordered: requisitionItem.quantityBackordered,
+                reasonCode: requisitionItem.cancelReasonCode ?: requisitionItem.backorderedReasonCode,
                 comments: requisitionItem.comment,
                 recipient: requisitionItem.recipient ?: requisitionItem?.parentRequisitionItem?.recipient,
                 palletName: requisitionItem?.palletName ?: "",
@@ -671,7 +678,8 @@ class EditPageItem {
         return [
             requisitionItemId           : requisitionItem.id,
             statusCode                  : requisitionItem.status.name(),
-            reasonCode                  : requisitionItem?.cancelReasonCode,
+            reasonCode                  : requisitionItem?.cancelReasonCode ?: requisitionItem?.backorderedReasonCode,
+            quantityBackordered         : requisitionItem?.quantityBackordered ?: 0,
             comments                    : requisitionItem?.comment,
             productId                   : productId,
             productCode                 : productCode,
@@ -712,7 +720,8 @@ class PickPageItem {
                 productCode         : requisitionItem?.product?.productCode,
                 productId           : requisitionItem?.product?.id,
                 product             : requisitionItem?.product,
-                reasonCode          : requisitionItem?.cancelReasonCode,
+                reasonCode          : requisitionItem?.cancelReasonCode ?: requisitionItem?.backorderedReasonCode,
+                quantityBackordered : requisitionItem?.quantityBackordered ?: 0,
                 autoAllocated       : requisitionItem?.autoAllocated,
                 comments            : requisitionItem?.cancelComments,
                 quantityRequested   : requisitionItem.quantity,

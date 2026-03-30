@@ -32,11 +32,8 @@ class FulfillmentStatusResolver {
         }
 
         // 4. BACKORDERED - Some items shipped but others are unallocated
-        boolean anyShipped = items.any { shippedQuantities[it.id] > 0 }
-        boolean anyUnallocatedActive = items.any {
-            !isCanceled(it) && !isFullyIssued(it, shippedQuantities[it.id]) && !hasAllocation(it)
-        }
-        if (anyShipped && anyUnallocatedActive) {
+        boolean anyBackordered = items.any { isBackordered(it) }
+        if (anyBackordered) {
             return FulfillmentStatusCode.BACKORDERED
         }
 
@@ -80,6 +77,10 @@ class FulfillmentStatusResolver {
 
     private static boolean isCanceled(StockMovementItem item) {
         return item.getQuantityRequired() <= 0
+    }
+
+    private static boolean isBackordered(StockMovementItem item) {
+        return item.getQuantityBackordered() > 0
     }
 
     private static boolean isFullyIssued(StockMovementItem item, BigDecimal shipped) {

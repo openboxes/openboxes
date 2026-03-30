@@ -11,6 +11,8 @@ CREATE OR REPLACE VIEW edit_page_item AS
         stock_movement_item.name,
         stock_movement_item.quantity,
         stock_movement_item.quantity_canceled,
+        stock_movement_item.quantity_backordered,
+        stock_movement_item.backordered_reason_code,
         stock_movement_item.quantity_revised,
         stock_movement_item.quantity_counted,
         stock_movement_item.order_index as sort_order,

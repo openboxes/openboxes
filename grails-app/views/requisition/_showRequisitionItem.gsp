@@ -32,18 +32,9 @@
     <td class="middle">
         <div class="tag ${requisitionItem.isCanceled() || requisitionItem.isCanceledDuringPick() || requisitionItem.isRejected() ? 'tag-danger' :
                 requisitionItem.isSubstituted() || requisitionItem.isReduced() ? 'tag-warning' : 'tag-alert'}">
-            <g:if test="${requisitionItem.isCanceled() || requisitionItem.isCanceledDuringPick()}">
-                <g:message code="enum.RequisitionItemStatus.CANCELED"/>
-            </g:if>
-            <g:elseif test="${requisitionItem.isReduced() && !requisitionItem.isSubstituted()}">
-                <g:message code="enum.RequisitionItemStatus.REDUCED"/>
-            </g:elseif>
-            <g:elseif test="${requisitionItem.isIncreased() && !requisitionItem.isSubstituted()}">
-                <g:message code="enum.RequisitionItemStatus.INCREASED"/>
-            </g:elseif>
-            <g:elseif test="${requisitionItem?.status==RequisitionItemStatus.APPROVED && requisitionItem?.requisition?.status == RequisitionStatus.ISSUED}">
+            <g:if test="${requisitionItem?.status==RequisitionItemStatus.APPROVED && requisitionItem?.requisition?.status == RequisitionStatus.ISSUED}">
                 <format:metadata obj="${requisitionItem?.requisition?.status}"/>
-            </g:elseif>
+            </g:if>
             <g:else>
                 <format:metadata obj="${requisitionItem?.displayStatus}"/>
             </g:else>
