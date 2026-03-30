@@ -55,6 +55,7 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderService
 import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
+import org.pih.warehouse.picking.PickTaskService
 import org.pih.warehouse.picklist.PicklistImportDataCommand
 import org.pih.warehouse.picklist.PicklistItemCommand
 import org.pih.warehouse.picklist.Picklist
@@ -110,6 +111,7 @@ class StockMovementService {
     ReceiptService receiptService
     PutawayService putawayService
     OrderService orderService
+    PickTaskService pickTaskService
 
     def createStockMovement(StockMovement stockMovement) {
         if (!stockMovement.validate()) {
@@ -412,6 +414,9 @@ class StockMovementService {
     // stockMovement could be an instance of StockMovement or OutboundStockMovement
     void deleteStockMovement(def stockMovement) {
         if (stockMovement?.requisition) {
+            Requisition requisition = stockMovement?.requisition
+            shipmentService.clearBackorderItemToReferenceForRequisition(requisition)
+            pickTaskService.rollbackPickTasks(requisition)
             def shipments = stockMovement?.requisition?.shipments
             shipments.toArray().each { Shipment shipment ->
                 stockMovement?.requisition.removeFromShipments(shipment)
@@ -420,7 +425,6 @@ class StockMovementService {
                 }
                 shipmentService.deleteShipment(shipment)
             }
-            Requisition requisition = stockMovement?.requisition
             stockMovement?.shipment = null
             stockMovement?.requisition = null
             requisitionService.deleteRequisition(requisition)
