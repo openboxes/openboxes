@@ -15,6 +15,8 @@ import org.apache.commons.lang.StringUtils
 @Transactional
 class OrganizationService {
 
+    private static final List<RoleType> SUPPLIER_ROLES = [RoleType.ROLE_SUPPLIER, RoleType.ROLE_MANUFACTURER]
+
     OrganizationIdentifierService organizationIdentifierService
 
     List selectOrganizations(ArrayList<RoleType> roleTypes, Boolean active = false, currentOrganizationId) {
@@ -60,34 +62,47 @@ class OrganizationService {
         return organization
     }
 
-    Organization findOrCreateOrganization(String name, String code=null, List<RoleType> roleTypes=[]) {
+    private Organization createOrUpdateOrganization(String name, String code, List<RoleType> roleTypes) {
         Organization organization = findOrganization(name, code)
         if (!organization) {
-            organization = new Organization()
-            organization.name = name
-            organization.partyType = PartyType.findByCode(Constants.DEFAULT_ORGANIZATION_CODE)
-            organization.code = code ?: organizationIdentifierService.generate(organization)
+            return createOrganization(name, code, roleTypes)
         }
-
-        if (roleTypes) {
-            roleTypes.each { RoleType roleType ->
-                if (!organization.hasRoleType(roleType)) {
-                    organization.addToRoles(new PartyRole(roleType: roleType))
-                }
-            }
-        }
-
-        if (organization.validate() && !organization.hasErrors()) {
-            organization.save()
-        }
-        return organization
+        return updateOrganization(organization, roleTypes)
     }
 
-    Organization saveOrganization(Organization organization) {
+    private Organization saveOrganization(Organization organization) {
         return organization.save(failOnError: true)
     }
 
-    Organization createOrganization(Organization organization) {
+    private void addRolesToOrganization(Organization organization, List<RoleType> roleTypes) {
+        if (!roleTypes) {
+            return
+        }
+
+        for (RoleType roleType in roleTypes) {
+            if (organization.hasRoleType(roleType)) {
+                continue
+            }
+            organization.addToRoles(new PartyRole(roleType: roleType))
+        }
+    }
+
+    /**
+     * Persists a new organization with all of the given roles
+     */
+    Organization createOrganization(String name, String code=null, List<RoleType> roleTypes=[]) {
+        Organization organization = new Organization(
+                name: name,
+                code: code,  // If this is null it will be auto-generated later
+        )
+        return createOrganization(organization, roleTypes)
+    }
+
+    /**
+     * Persists a new organization, populating it with any required default or auto-generated fields,
+     * and adding to it all of the given roles
+     */
+    Organization createOrganization(Organization organization, List<RoleType> roleTypes=[]) {
         if (!organization.code) {
             organization.code = organizationIdentifierService.generate(organization)
         }
@@ -96,11 +111,25 @@ class OrganizationService {
             organization.partyType = PartyType.findByCode(Constants.DEFAULT_ORGANIZATION_CODE)
         }
 
+        addRolesToOrganization(organization, roleTypes)
+
         return saveOrganization(organization)
     }
 
+    /**
+     * Updates an existing organization, adding to it all of the given roles
+     */
+    Organization updateOrganization(Organization organization, List<RoleType> roleTypes=[]) {
+        addRolesToOrganization(organization, roleTypes)
+        return saveOrganization(organization)
+    }
+
+    Organization createSupplierOrganization(String name, String code=null) {
+        return createOrganization(name, code, SUPPLIER_ROLES)
+    }
+
     Organization findOrCreateSupplierOrganization(String name, String code=null) {
-        return findOrCreateOrganization(name, code, [RoleType.ROLE_SUPPLIER, RoleType.ROLE_MANUFACTURER])
+        return createOrUpdateOrganization(name, code, SUPPLIER_ROLES)
     }
 
     List<Organization> getOrganizations(Map params) {

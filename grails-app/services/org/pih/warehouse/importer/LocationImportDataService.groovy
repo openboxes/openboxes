@@ -13,7 +13,6 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.Address
-import org.pih.warehouse.core.OrganizationIdentifierService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
@@ -25,7 +24,6 @@ import org.pih.warehouse.inventory.Inventory
 @Transactional
 class LocationImportDataService implements ImportDataService {
     OrganizationService organizationService
-    OrganizationIdentifierService organizationIdentifierService
 
     @Override
     void validateData(ImportDataCommand command) {
@@ -99,7 +97,7 @@ class LocationImportDataService implements ImportDataService {
             }
 
             if (organizations?.size() > 1) {
-                command.errors.reject("Row ${index + 1}: '${organizations.size()}' records found for organization name '${params.organization}'. Please specify by entering the organization code instead")
+                command.errors.reject("Row ${index + 1}: Organization identifier '${params.organization}' matches '${organizations.size()}' records. Please specify a unique organization code instead")
             }
 
             if (organizations && !organizations.first()?.active) {
@@ -115,15 +113,38 @@ class LocationImportDataService implements ImportDataService {
 
     @Override
     void importData(ImportDataCommand command) {
-        command.data.eachWithIndex { params, index ->
-            Location location = bindLocation(params)
+        List<Map> data = command.data
+
+        Map<Object, Organization> organizationsByIdentifier = bindExistingOrganizations(data)
+
+        for (Map params in data) {
+            Location location = bindLocation(params, organizationsByIdentifier)
             if (!location.validate() || !location.save(failOnError: true)) {
                 throw new ValidationException("Invalid location ${location.name}", location.errors)
             }
         }
     }
 
-    Location bindLocation(Map params) {
+    /**
+     * Binds all organizations that already exist in the db into a map keyed on the provided organization name or code.
+     *
+     * If the provided string does not match an existing organization, we do nothing. It will be created
+     * later when we bind the location.
+     */
+    private Map<Object, Organization> bindExistingOrganizations(List<Map> data) {
+        Map<String, Organization> organizationsByIdentifier = [:]
+        for (Map params in data) {
+            // The user can specify either the organization name or code, so make sure to look up by either
+            String identifier = params.organization
+            Organization organization = organizationService.findOrganization(identifier, identifier)
+            if (organization) {
+                organizationsByIdentifier.put(identifier, organization)
+            }
+        }
+        return organizationsByIdentifier
+    }
+
+    private Location bindLocation(Map params, Map<Object, Organization> organizationsByIdentifier) {
         Location location
         if (params.id) {
             location = Location.findById(params.id)
@@ -141,7 +162,6 @@ class LocationImportDataService implements ImportDataService {
         location.locationNumber = params.locationNumber
         location.locationGroup = params.locationGroup ? LocationGroup.findByName(params.locationGroup) : null
         location.parentLocation = params.parentLocation ? Location.findByNameOrLocationNumber(params.parentLocation, params.parentLocation) : null
-        location.organization = params.organization ? Organization.findByCodeOrName(params.organization, params.organization) : null
         location.address = bindAddress(params, location?.address?.id)
 
         if (!location.inventory && !location.parentLocation) {
@@ -169,10 +189,17 @@ class LocationImportDataService implements ImportDataService {
 
         // Add required association to organization for depots and suppliers
         if (!(location.locationType?.isInternalLocation() || location.locationType?.isZone()) && !location.organization) {
-            Organization organization = (location.locationType?.locationTypeCode == LocationTypeCode.SUPPLIER) ?
-                    organizationService.findOrCreateSupplierOrganization(params?.organization as String) :
-                    organizationService.findOrCreateOrganization(params?.organization as String)
 
+            // If the organization does not exist, we need to create it.
+            Organization organization = organizationsByIdentifier.get(params.organization)
+            if (!organization) {
+                organization = location.locationType?.locationTypeCode == LocationTypeCode.SUPPLIER ?
+                        organizationService.createSupplierOrganization(params.organization as String) :
+                        organizationService.createOrganization(params.organization as String)
+
+                // If the same, new organization appears multiple times in the import, we only want to create it once.
+                organizationsByIdentifier.put(params.organization, organization)
+            }
             location.organization = organization
         }
 

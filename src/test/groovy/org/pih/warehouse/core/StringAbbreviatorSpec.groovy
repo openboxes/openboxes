@@ -33,6 +33,7 @@ class StringAbbreviatorSpec extends Specification {
         3       | 5       | null        | "***"                   || null         | "Special characters only is null"
         3       | 5       | null        | "1hi12hi"               || "1HI12"      | "Numbers allowed"
         3       | 5       | null        | " HI "                  || "HI"         | "Whitespace on ends is ignored"
+        2       | 5       | null        | "123 ship"              || "1S"         | "Number only words are allowed"
 
         // Verifying the default settings that we provide
         2       | 6       | ','         | "Do Re Me Fa So La Ti"  || "DRMFSL"     | "Too long, too many words becomes shortened acronym"
