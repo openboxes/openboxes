@@ -74,6 +74,7 @@ class GenericApiService {
         if (domainObject.hasErrors() || !domainObject.save()) {
             throw new ValidationException("Cannot create product due to validation errors", domainObject.errors)
         }
+        saveHasManyAssociations(domainObject)
         return domainObject
     }
 
@@ -93,6 +94,7 @@ class GenericApiService {
         if (domainObject.hasErrors() || !domainObject.save()) {
             throw new ValidationException("Cannot create product due to validation errors", domainObject.errors)
         }
+        saveHasManyAssociations(domainObject)
         return domainObject
     }
 
@@ -100,6 +102,22 @@ class GenericApiService {
         log.debug "Delete " + id
         def domainObject = getObject(resourceName, id)
         return domainObject.delete()
+    }
+
+    void saveHasManyAssociations(Object domainObject) {
+        domainObject.class.hasMany.each { associationName, associatedClass ->
+            if (associatedClass == String || associatedClass.isEnum()) {
+                return
+            }
+            def collection = domainObject."${associationName}"
+            if (collection) {
+                collection.each { child ->
+                    if (child.hasErrors() || !child.save()) {
+                        throw new ValidationException("Cannot save ${associationName} due to validation errors", child.errors)
+                    }
+                }
+            }
+        }
     }
 
     def searchObjects(String resourceName, JSONObject jsonObject, Map params) {
