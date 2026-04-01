@@ -2349,4 +2349,8 @@ class ShipmentService {
             inList("s.destination.id", activeLocationsSupportingActivity)
         } as List<Location>
     }
+
+    List<ShipmentStatusCode> getShipmentStatusCodes(List<String> excludedStatuses = []) {
+        ShipmentStatusCode.list().findAll { !(it.name in excludedStatuses) }
+    }
 }

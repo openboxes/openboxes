@@ -1,12 +1,10 @@
-import { useEffect } from 'react';
-
 import _ from 'lodash';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import { useDispatch, useSelector } from 'react-redux';
 import Alert from 'react-s-alert';
 
-import { fetchShipmentStatusCodes, hideSpinner, showSpinner } from 'actions';
+import { hideSpinner, showSpinner } from 'actions';
 import stockMovementApi from 'api/services/StockMovementApi';
 import { STOCK_MOVEMENT_API, STOCK_MOVEMENT_INCOMING_ITEMS } from 'api/urls';
 import useTableData from 'hooks/list-pages/useTableData';
@@ -56,17 +54,9 @@ const useInboundListTableData = (filterParams) => {
   });
 
   const dispatch = useDispatch();
-  const { isShipmentStatusesFetched, shipmentStatuses, translate } = useSelector((state) => ({
-    isShipmentStatusesFetched: state.shipmentStatuses.data,
-    shipmentStatuses: state.shipmentStatuses.data,
+  const { translate } = useSelector((state) => ({
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
   }));
-
-  useEffect(() => {
-    if (!isShipmentStatusesFetched || !shipmentStatuses.length) {
-      dispatch(fetchShipmentStatusCodes());
-    }
-  }, []);
 
   const exportStockMovements = () => {
     exportFileFromAPI({

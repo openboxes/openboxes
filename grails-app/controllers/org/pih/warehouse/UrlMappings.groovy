@@ -106,6 +106,11 @@ class UrlMappings {
             action = [GET: "handlingRequirementsOptions"]
         }
 
+        "/api/stockMovements/shipmentStatusCodes" {
+            controller = { "selectOptionsApi" }
+            action = [GET: "shipmentStatusCodesOptions"]
+        }
+
         "/api/products"(parseRequest: true) {
             controller = { "productApi" }
             action = [GET: "list", POST: "save"]
@@ -357,11 +362,6 @@ class UrlMappings {
         "/api/stockMovements/createCombinedShipments"(parseRequest: true) {
             controller = "stockMovementApi"
             action = [POST: "createCombinedShipments"]
-        }
-
-        "/api/stockMovements/shipmentStatusCodes" {
-            controller = "stockMovementApi"
-            action = [GET: "shipmentStatusCodes"]
         }
 
         "/api/stockMovements/requisitionsStatusCodes" {
