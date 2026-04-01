@@ -8,6 +8,7 @@
                 <g:set var="isSuperuser" value="${true}"/>
             </g:isSuperuser>
             <tr class="odd">
+                <%-- Show the edit button column header only for superusers - otherwise the header is visible but the edit button is not, leaving an empty column --%>
                 <g:if test="${isSuperuser}">
                     <th></th>
                 </g:if>
