@@ -8,7 +8,8 @@ import org.pih.warehouse.inboundSortation.PutawayResult
 
 /**
  @deprecated This is the Cross Docking strategy that’s based on demand. For now, we want to use the one
- where the cross-dock instruction is provided (through integration). That strategy is available in org.pih.warehouse.inboundSortation.strategy.CrossDockingBackorderReferenceStrategy.
+ where the cross-dock instruction is provided (through integration). 
+ That strategy is available in org.pih.warehouse.inboundSortation.strategy.CrossDockingBackorderReferenceStrategy.
  */
 @Deprecated
 class CrossDockingStrategy implements PutawayStrategy {
