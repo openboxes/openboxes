@@ -24,7 +24,6 @@ import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductField
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.shipping.ShipmentService
-import org.pih.warehouse.shipping.ShipmentStatusCode
 
 class SelectOptionsApiController {
 
@@ -141,14 +140,7 @@ class SelectOptionsApiController {
 
     def shipmentStatusCodesOptions() {
         List<String> excludedStatuses = params.list("excludedStatuses")
-        List<ShipmentStatusCode> options = shipmentService.getShipmentStatusCodes(excludedStatuses).collect {
-            [
-                id: it.name,
-                value: it.name,
-                label: "${g.message(code: 'enum.ShipmentStatusCode.' + it.name)}",
-                variant: it.variant.name
-            ]
-        }
+        List<Map<String, String>> options = shipmentService.getShipmentStatusCodes(excludedStatuses)
         render([data: options] as JSON)
     }
 

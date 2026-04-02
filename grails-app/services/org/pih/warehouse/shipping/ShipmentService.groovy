@@ -44,6 +44,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
+import org.pih.warehouse.core.localization.MessageLocalizer
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
 
@@ -53,6 +54,7 @@ import java.math.RoundingMode
 class ShipmentService {
 
     ShipmentEventManager shipmentEventManager
+    MessageLocalizer messageLocalizer
     def inventoryService
     TransactionIdentifierService transactionIdentifierService
     ShipmentIdentifierService shipmentIdentifierService
@@ -2350,7 +2352,14 @@ class ShipmentService {
         } as List<Location>
     }
 
-    List<ShipmentStatusCode> getShipmentStatusCodes(List<String> excludedStatuses = []) {
-        ShipmentStatusCode.list().findAll { !(it.name in excludedStatuses) }
+    List<Map<String, String>> getShipmentStatusCodes(List<String> excludedStatuses = []) {
+        ShipmentStatusCode.list().findAll { !(it.name in excludedStatuses) }.collect {
+            [
+                id     : it.name,
+                value  : it.name,
+                label  : messageLocalizer.localizeEnumValue(it),
+                variant: it.variant.name,
+            ]
+        }
     }
 }
