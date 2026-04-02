@@ -19,7 +19,7 @@ import org.pih.warehouse.databinding.DataBindingConstants
 class ZonedDateTimeParser extends AbstractDateParser<ZonedDateTime> {
 
     @Override
-    ZonedDateTime parse(Object date, DateParserContext context=null) {
+    ZonedDateTime parseImpl(Object date, DateParserContext<ZonedDateTime> context=null) {
         switch (date) {
             case String:
                 return asZonedDateTime(date as String, currentTimezone)
@@ -31,8 +31,6 @@ class ZonedDateTimeParser extends AbstractDateParser<ZonedDateTime> {
                 return asZonedDateTime(date as Calendar, currentTimezone)
             case Date:
                 return asZonedDateTime(date as Date, currentTimezone)
-            case null:
-                return null
             default:
                 throw new UnsupportedOperationException("Cannot parse date of type [${date.class}]")
         }
