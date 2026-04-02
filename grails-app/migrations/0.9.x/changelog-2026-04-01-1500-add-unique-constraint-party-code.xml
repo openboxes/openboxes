@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <!-- Before adding a unique constraint on the code column in the party table,
+     existing duplicates must be resolved. Duplicate records receive an incremental
+     suffix based on their position within the duplicate group ordered by id,
+     e.g. ABC -> ABC, ABC-2, ABC-3. -->
+    <changeSet id="040120261400-0" author="anadolny">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM (
+                        SELECT code FROM party
+                        GROUP BY code
+                        HAVING COUNT(*) > 1
+                    ) duplicates
+                </sqlCheck>
+            </not>
+        </preConditions>
+
+        <sql>
+            UPDATE party original_party
+            JOIN (
+                SELECT id, code, ROW_NUMBER() OVER (PARTITION BY code ORDER BY id) AS row_number_within_duplicate_group
+                FROM party
+            ) party_with_row_numbers ON original_party.id = party_with_row_numbers.id
+            SET original_party.code = CONCAT(original_party.code, '-', party_with_row_numbers.row_number_within_duplicate_group)
+            WHERE party_with_row_numbers.row_number_within_duplicate_group > 1
+        </sql>
+    </changeSet>
+
+    <!-- uniqueConstraintExists is not supported in Liquibase schema 1.9.
+     Using indexExists instead, since addUniqueConstraint also creates
+     an index with the same name as the constraint. -->
+    <changeSet id="040120261400-1" author="anadolny">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="unique_party_code" />
+            </not>
+        </preConditions>
+
+        <addUniqueConstraint
+                columnNames="code"
+                constraintName="unique_party_code"
+                tableName="party"
+        />
+    </changeSet>
+</databaseChangeLog>
