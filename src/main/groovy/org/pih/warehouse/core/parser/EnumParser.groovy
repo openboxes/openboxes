@@ -44,7 +44,7 @@ class EnumParser<T extends Enum> extends Parser<T, ParserContext<T>> {
     protected T parseImpl(Object toParse, ParserContext<T> context) {
         switch (toParse) {
             case String:
-                return parse(toParse as String, targetType)
+                return parse(toParse as String, targetType, context)
             default:
                 throw new IllegalArgumentException("Cannot parse given value [${toParse}] to the ${targetType} Enum")
         }

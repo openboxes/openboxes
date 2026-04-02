@@ -34,7 +34,7 @@ class StringParser extends Parser<String, ParserContext<String>> {
     protected String parseImpl(Object toParse, ParserContext context) {
         switch (toParse) {
             case String:
-                return parse(toParse as String)
+                return parse(toParse as String, context)
             default:
                 return toParse.toString()
         }

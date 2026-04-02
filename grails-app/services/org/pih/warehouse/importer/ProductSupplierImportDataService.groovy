@@ -19,6 +19,7 @@ import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.core.parser.ParserContext
 import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
@@ -135,7 +136,7 @@ class ProductSupplierImportDataService implements ImportDataService {
         command.data.each { params ->
             // Sanitize the raw import data into a strongly-typed command object
             ProductSupplierImportCommand productSupplierImportCommand = new ProductSupplierImportCommand(
-                    active: BooleanParser.parse(params.active as String, true),  // Default to active if left blank
+                    active: BooleanParser.parseString(params.active as String, new ParserContext<Boolean>(defaultValue: true)),
                     id: sanitizeStringInput(params.id),
                     code: sanitizeStringInput(params.code),
                     name: sanitizeStringInput(params.name),

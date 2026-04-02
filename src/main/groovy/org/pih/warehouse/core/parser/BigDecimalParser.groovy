@@ -34,7 +34,7 @@ class BigDecimalParser extends Parser<BigDecimal, ParserContext<BigDecimal>> {
     protected BigDecimal parseImpl(Object toParse, ParserContext<BigDecimal> context) {
         switch (toParse) {
             case String:
-                return parseString(toParse as String)
+                return parseString(toParse as String, context)
             case Double:
                 return BigDecimal.valueOf(toParse)
             case Long:

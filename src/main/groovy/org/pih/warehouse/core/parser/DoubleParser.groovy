@@ -35,7 +35,7 @@ class DoubleParser extends Parser<Double, ParserContext<Double>> {
     protected Double parseImpl(Object toParse, ParserContext<Double> context) {
         switch (toParse) {
             case String:
-                return parseString(toParse as String)
+                return parseString(toParse as String, context)
             case BigDecimal:
                 return toParse.doubleValue()
             case Double:

@@ -40,7 +40,7 @@ class IntegerParser extends Parser<Integer, ParserContext<Integer>> {
     protected Integer parseImpl(Object toParse, ParserContext<Integer> context) {
         switch (toParse) {
             case String:
-                return parseString(toParse as String)
+                return parseString(toParse as String, context)
             case Double:
                 return toParse.toInteger()
             case Long:

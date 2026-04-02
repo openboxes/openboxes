@@ -43,7 +43,7 @@ class BooleanParser extends Parser<Boolean, ParserContext<Boolean>> {
     protected Boolean parseImpl(Object toParse, ParserContext<Boolean> context) {
         switch (toParse) {
             case String:
-                return parseString(toParse as String)
+                return parseString(toParse as String, context)
             case Boolean:
                 return toParse
             default:
