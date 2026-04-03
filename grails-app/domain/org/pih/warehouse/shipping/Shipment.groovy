@@ -223,22 +223,6 @@ class Shipment implements Comparable, Serializable, Historizable<ShipmentHistory
     }
 
     /**
-     * Returns all putaway orders associated with the shipment.
-     */
-    List<Order> getPutawayOrders() {
-        // If the shipment isn't coming from a receiving bin location, there won't be any putaway orders.
-        if (!origin.supports(ActivityCode.PUTAWAY_STOCK)) {
-            return []
-        }
-
-        List<Order> putaways = []
-        for (Receipt receipt in (receipts as SortedSet<Receipt>)) {
-            putaways.addAll(receipt.getPutawayOrders())
-        }
-        return putaways
-    }
-
-    /**
      * Transient method that gets all shipment items two-levels deep.
      *
      * TODO Need to make this recursive.

@@ -33,6 +33,7 @@ import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
@@ -62,6 +63,8 @@ import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductService
+import org.pih.warehouse.putaway.PutawayService
+import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.ReplenishmentTypeCode
 import org.pih.warehouse.requisition.Requisition
@@ -105,6 +108,7 @@ class StockMovementService {
     UserService userService
     RequisitionDataService requisitionDataService
     GrailsApplication grailsApplication
+    PutawayService putawayService
 
     def createStockMovement(StockMovement stockMovement) {
         if (!stockMovement.validate()) {
@@ -1639,8 +1643,7 @@ class StockMovementService {
         List<HistoryItem> history = stockMovement?.shipment?.getHistory() ?: []
 
         // Currently the only orders that have event history are putaway orders.
-        List<HistoryItem> putawayHistory = stockMovement?.shipment?.getPutawayOrders()?.collectMany { it.getHistory() }
-        history.addAll(putawayHistory ?: [])
+        history.addAll(putawayService.getPutawayOrders(stockMovement?.shipment).collectMany { it.getHistory() })
 
         return history.sort()
     }
