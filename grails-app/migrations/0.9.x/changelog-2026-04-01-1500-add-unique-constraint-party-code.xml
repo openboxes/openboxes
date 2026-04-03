@@ -5,7 +5,7 @@
 
     <!-- Before adding a unique constraint on the code column in the party table,
      existing duplicates must be resolved. Duplicate records receive a random
-     suffix based on UUID(), e.g. ABC -> ABC, ABC-550e8400-e29b-41d4-a716-446655440000 -->
+     suffix based on -NNNLLL format, e.g. ABC -> ABC, ABC-945NRW, ABC-368FXX -->
     <changeSet id="040120261400-0" author="anadolny">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -25,7 +25,13 @@
                 SELECT id, code, ROW_NUMBER() OVER (PARTITION BY code ORDER BY id) AS row_number_within_duplicate_group
                 FROM party
             ) party_with_row_numbers ON original_party.id = party_with_row_numbers.id
-            SET original_party.code = CONCAT(original_party.code, '-', UUID())
+            SET original_party.code = CONCAT(
+                original_party.code, '-',
+                LPAD(FLOOR(RAND() * 1000), 3, '0'),
+                CHAR(65 + FLOOR(RAND() * 26)),
+                CHAR(65 + FLOOR(RAND() * 26)),
+                CHAR(65 + FLOOR(RAND() * 26))
+            )
             WHERE party_with_row_numbers.row_number_within_duplicate_group > 1
         </sql>
     </changeSet>
