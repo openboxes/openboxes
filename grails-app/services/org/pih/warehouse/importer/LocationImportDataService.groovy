@@ -40,7 +40,10 @@ class LocationImportDataService implements ImportDataService {
             LocationType locationType = LocationType
                     .findAllByNameLike(locationTypeName + "%")
                     .find{ LocalizationUtil.getDefaultString(it.name) == locationTypeName}
-            List<Organization> organizations = params.organization ? Organization.findAllByCodeOrName(params.organization, params.organization) : null
+
+            // The user can specify either the organization name or code, so make sure to look up by either
+            String identifier = params.organization
+            List<Organization> organizations = organizationService.findOrganizations(identifier, identifier)
 
             if (params.id && !location) {
                 command.errors.reject("Row ${index + 1}: Id '${params.id}' do not exists in the system.")
