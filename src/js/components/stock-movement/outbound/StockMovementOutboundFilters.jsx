@@ -3,7 +3,6 @@ import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { fetchRequisitionStatusCodes } from 'actions';
 import FilterForm from 'components/Filter/FilterForm';
 import { debounceLocationsFetch, debouncePeopleFetch, debounceUsersFetch } from 'utils/option-utils';
 
@@ -63,11 +62,7 @@ const mapStateToProps = (state) => ({
   minSearchLength: state.session.searchConfig.minSearchLength,
 });
 
-const mapDispatchToProps = {
-  fetchStatuses: fetchRequisitionStatusCodes,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(StockMovementOutboundFilters);
+export default connect(mapStateToProps)(StockMovementOutboundFilters);
 
 StockMovementOutboundFilters.propTypes = {
   setFilterParams: PropTypes.func.isRequired,
