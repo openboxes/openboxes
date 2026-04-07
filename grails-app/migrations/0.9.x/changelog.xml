@@ -42,4 +42,5 @@
     <include file="0.9.x/changelog-2026-02-10-0000-create-table-event-log.xml" />
     <include file="0.9.x/changelog-2026-02-10-1200-create-table-shipment-event-log.xml" />
     <include file="0.9.x/changelog-2026-03-30-0000-create-table-order-event-log.xml" />
+    <include file="0.9.x/changelog-2026-04-01-1500-add-unique-constraint-party-code.xml" />
 </databaseChangeLog>

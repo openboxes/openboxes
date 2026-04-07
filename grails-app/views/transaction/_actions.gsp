@@ -29,6 +29,7 @@
 				</g:link>
 			</div>
 		</g:if>
+		<g:isSuperuser>
 		<g:if test="${params.action != 'editTransaction' }">
 			<div class="action-menu-item">
 				<g:link controller="inventory" action="editTransaction" id="${transactionInstance?.id }">
@@ -43,5 +44,6 @@
 				&nbsp;${warehouse.message(code: 'default.button.delete.label')}
 			</g:link>
 		</div>
+		</g:isSuperuser>
 	</div>
 </span>

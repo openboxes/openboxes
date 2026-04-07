@@ -1,5 +1,6 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 import _ from 'lodash';
+import queryString from 'query-string';
 import { addTranslationForLanguage } from 'react-localize-redux';
 
 import {
@@ -614,9 +615,12 @@ export function fetchInvoiceTypeCodes() {
   };
 }
 
-export function fetchShipmentStatusCodes() {
+export function fetchShipmentStatusCodes({ excludedStatuses = [] } = {}) {
   return (dispatch) => {
-    apiClient.get('/api/stockMovements/shipmentStatusCodes')
+    apiClient.get('/api/stockMovements/shipmentStatusCodes', {
+      params: { excludedStatuses },
+      paramsSerializer: (parameters) => queryString.stringify(parameters),
+    })
       .then((res) => {
         dispatch({
           type: FETCH_SHIPMENT_STATUS_CODES,

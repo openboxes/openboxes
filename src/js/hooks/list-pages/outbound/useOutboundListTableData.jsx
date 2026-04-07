@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-
 import _ from 'lodash';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
@@ -7,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import {
-  fetchRequisitionStatusCodes,
   hideSpinner,
   showSpinner,
 } from 'actions';
@@ -74,17 +71,9 @@ const useOutboundListTableData = (filterParams) => {
   });
 
   const dispatch = useDispatch();
-  const { isRequisitionStatusesFetched, requisitionStatuses, translate } = useSelector((state) => ({
-    isRequisitionStatusesFetched: state.requisitionStatuses.fetched,
-    requisitionStatuses: state.requisitionStatuses.data,
+  const { translate } = useSelector((state) => ({
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
   }));
-
-  useEffect(() => {
-    if (!isRequisitionStatusesFetched || !requisitionStatuses.length) {
-      dispatch(fetchRequisitionStatusCodes());
-    }
-  }, []);
 
   const exportStockMovements = () => {
     exportFileFromAPI({
