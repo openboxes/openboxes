@@ -16,7 +16,7 @@ class ShipmentHistoryProvider extends EventLogHistoryProvider<Shipment> {
     ReferenceDocument getReferenceDocument(Shipment source) {
         return new ReferenceDocument(
                 label: source.shipmentNumber,
-                url: "/stockMovement/show/${source.requisition?.id ?: source.id}",
+                url: "/openboxes/stockMovement/show/${source.requisition?.id ?: source.id}",
                 id: source.id,
                 identifier: source.shipmentNumber,
                 description: source.description,

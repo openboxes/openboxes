@@ -14,30 +14,34 @@ import grails.gorm.transactions.Transactional
 import org.apache.commons.beanutils.BeanUtils
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
-import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderEventLogger
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
+import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.shipping.Shipment
 
 @Transactional
 class PutawayService {
 
-    LocationService locationService
+    ConfigService configService
     InventoryService inventoryService
     def productAvailabilityService
     GrailsApplication grailsApplication
+    OrderEventLogger orderEventLogger
 
     def getPutawayCandidates(Location location) {
         List binLocationEntries = productAvailabilityService.getAvailableQuantityOnHandByBinLocation(location)
@@ -110,6 +114,74 @@ class PutawayService {
         return filteredItems.collect { PutawayItem.createFromOrderItem(it) }
     }
 
+    /**
+     * Returns all putaway orders originating from the given shipment.
+     */
+    Collection<Order> getPutawayOrders(Shipment shipment) {
+        if (!shipment) {
+            return []
+        }
+
+        // Because we don't have a formal relationship between putaway order and receipt, if we are not creating
+        // designated receiving/putaway bins, we can't establish a unique mapping between the receipt and its putaway.
+        Boolean dynamicReceivingBinsEnabled = configService.getProperty(
+                "openboxes.receiving.createReceivingLocation.enabled", Boolean)
+        if (!dynamicReceivingBinsEnabled) {
+            return []
+        }
+
+        // A shipment can be received multiple times into multiple receiving bins, or multiple times into the same
+        // receiving bin, so check each receipt and collect to a unique set of putaways.
+        Set<Order> putaways = []
+        for (Receipt receipt in (shipment.receipts as SortedSet<Receipt>)) {
+            putaways.addAll(getPutawayOrders(receipt))
+        }
+        return putaways
+    }
+
+    /**
+     * Returns all putaway orders originating from the given receipt.
+     */
+    Collection<Order> getPutawayOrders(Receipt receipt) {
+        // TODO: This is an imperfect solution. We should model this relationship between receipt and putaways more
+        //       concretely in the database, likely via a OrderItem (ie putaway item) <-> ReceiptItem relationship.
+        Set<Order> putawayOrders = []
+        for (ReceiptItem receiptItem in receipt.receiptItems) {
+            // If the item was directly received to a non-receiving bin, there won't be any putaway orders.
+            Location receiptBinLocation = receiptItem.binLocation
+            if (!receiptBinLocation.supports(ActivityCode.PUTAWAY_STOCK)) {
+                continue
+            }
+
+            /*
+             * If a location is not using direct putaways, a receipt is made into a newly created receiving bin.
+             * The putaway(s) of that receipt are putaway orders originating from that same receiving bin. Because we
+             * don't have a direct relationship between a receipt and a putaway, we link the two by relying on the fact
+             * that they operate on the same receiving bin location(s).
+             *
+             * Because we are generating new receiving bins for each receipt, we should be able to assume that the
+             * receiving bin does not get used for anything other than the initial receipt and its putaways. However,
+             * we don't strictly block users from using receiving bins as the origin for other stock movements, so
+             * we need to make sure to specifically filter for only the orders that are putaways.
+             */
+            List<Order> putawaysForReceipt = OrderItem.createCriteria().listDistinct {
+                projections {
+                    property "order"
+                }
+                eq("inventoryItem", receiptItem.inventoryItem)
+                eq("originBinLocation", receiptItem.binLocation)
+                order {
+                    orderType {
+                        eq("code", Constants.PUTAWAY_ORDER)
+                    }
+                }
+            } as List<Order>
+            putawayOrders.addAll(putawaysForReceipt)
+        }
+
+        return putawayOrders
+    }
+
     void processSplitItems(Putaway putaway) {
 
         putaway.putawayItems.toArray().each { PutawayItem oldPutawayItem ->
@@ -158,11 +230,40 @@ class PutawayService {
             inventoryService.transferStock(command)
         }
 
+        logPutaway(order, putaway)
+
         grailsApplication.mainContext.publishEvent(new PutawayCompletedEvent(putaway))
 
         return order
     }
 
+    /**
+     * Logs a putaway event, adding it to the collection of event logs for the putaway order.
+     */
+    private void logPutaway(Order order, Putaway putaway) {
+        Boolean dynamicReceivingBinsEnabled =
+                configService.getStaticProperty("openboxes.receiving.createReceivingLocation.enabled", Boolean)
+
+        if (!dynamicReceivingBinsEnabled || isFinalPutaway(order, putaway)) {
+            orderEventLogger.logPutaway(order, putaway)
+            return
+        }
+        orderEventLogger.logPartialPutaway(order, putaway)
+    }
+
+    /**
+     * Returns true if after the given putaway is completed, all receipts of the original inbound will have
+     * been put away.
+     */
+    private boolean isFinalPutaway(Order order, Putaway putaway) {
+        // TODO: We currently do not have a distinction between partial and final putaways. This will need to be
+        //       implemented once we get a better sense of the requirements and can design a more long term solution.
+        // 1) Fetch all completed receipts whose destination receiving bin is the same as the bin the putaway is originating from
+        // 2) Fetch all completed putaways matching each of the receipts
+        // 3) Do a diff between the quantity in the receipts and their matching putaways
+        // 4) If there is no remaining quantity after factoring in this putaway, this is the final putaway
+        return true
+    }
 
     Order savePutaway(Putaway putaway) {
 

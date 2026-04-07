@@ -108,7 +108,7 @@ class ShipmentHistoryProviderSpec extends Specification {
         and: "An expected reference document representing the shipment"
         ReferenceDocument expectedReferenceDocument = new ReferenceDocument(
                 label: "ABC123",
-                url: "/stockMovement/show/0",
+                url: "/openboxes/stockMovement/show/0",
                 id: 0,
                 identifier: "ABC123",
                 description: "Description",
@@ -215,7 +215,7 @@ class ShipmentHistoryProviderSpec extends Specification {
         and: "An expected reference document representing the shipment"
         ReferenceDocument expectedReferenceDocument = new ReferenceDocument(
                 label: "ABC123",
-                url: "/stockMovement/show/0",
+                url: "/openboxes/stockMovement/show/0",
                 id: 0,
                 identifier: "ABC123",
                 description: "Description",
@@ -455,7 +455,7 @@ class ShipmentHistoryProviderSpec extends Specification {
         and: "An expected reference document representing the shipment"
         ReferenceDocument expectedReferenceDocument = new ReferenceDocument(
                 label: "ABC123",
-                url: "/stockMovement/show/0",
+                url: "/openboxes/stockMovement/show/0",
                 id: 0,
                 identifier: "ABC123",
                 description: "Description",

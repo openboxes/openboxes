@@ -36,6 +36,8 @@ enum EventCode {
     APPROVED(true),
     REJECTED(true),
     SUBMITTED(true),
+    PUTAWAY(false),
+    PARTIALLY_PUTAWAY(false)
 
     /**
      * Returns true if the event code represents a system event, meaning there is internal functionality built
@@ -68,5 +70,16 @@ enum EventCode {
 
     boolean isReceiptEvent() {
         return listReceiptEventTypeCodes().contains(this)
+    }
+
+    static List<EventCode> listPutawayEventTypeCodes() {
+        return [
+                PARTIALLY_PUTAWAY,
+                PUTAWAY,
+        ]
+    }
+
+    boolean isPutawayEvent() {
+        return listPutawayEventTypeCodes().contains(this)
     }
 }
