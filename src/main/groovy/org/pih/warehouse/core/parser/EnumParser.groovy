@@ -43,7 +43,8 @@ class EnumParser<T extends Enum> extends Parser<T, ParserContext<T>> {
 
     @Override
     protected T parseImpl(Object toParse, ParserContext<T> context) {
-        // This parser is generic for all enums, and so
+        // This parser is generic and can be used for any enum. Due to Java type erasure, this unfortunately means that
+        // we need to manually specify the Enum class that this parser resolves to.
         if (context.typeToParseTo == null) {
             throw new IllegalArgumentException("Due to type erasure, when parsing Enums you must either specify ParserContext.typeToParseTo, or use the static EnumParser.parseString method")
         }
