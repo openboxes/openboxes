@@ -42,24 +42,30 @@ class OrganizationService {
         }
     }
 
-    Organization findOrganization(String name, String code) {
-        // First, search by code if one was provided
-        Organization organization = StringUtils.isBlank(code) ? null : Organization.createCriteria().get {
-            eq("code", code)
-            ne("code", StringUtils.EMPTY)
-            isNotNull("code")
-        } as Organization
-
-        // Then search by name, which is not strictly unique so in case multiple are found, return the newest one
-        if (!organization) {
-            organization = Organization.createCriteria().list(max: 1) {
-                eq("name", name)
-                ne("name", StringUtils.EMPTY)
-                isNotNull("name")
-                order("dateCreated", "asc")
-            }[0]
+    /**
+     * Returns the organization matching the given code, or if none exist for the given code, returns all
+     * organizations that match the given name.
+     */
+    List<Organization> findOrganizations(String name, String code) {
+        List<Organization> organizations = []
+        if (!StringUtils.isBlank(code)) {
+            Organization organization = Organization.findByCode(code)
+            if (organization) {
+                return [organization]
+            }
         }
-        return organization
+        if (!StringUtils.isBlank(name)) {
+            organizations = Organization.findAllByName(name, [sort: "dateCreated", order: "asc"])
+        }
+        return organizations
+    }
+
+    /**
+     * Returns the organization matching the given code, or if none exist for the given code, returns
+     * the newest organization that matches the given name.
+     */
+    Organization findOrganization(String name, String code) {
+        return findOrganizations(name, code)?.find()
     }
 
     private Organization createOrUpdateOrganization(String name, String code, List<RoleType> roleTypes) {
