@@ -16,7 +16,7 @@ import org.pih.warehouse.databinding.DataBindingConstants
 class LocalDateParser extends AbstractDateParser<LocalDate> {
 
     @Override
-    LocalDate parseImpl(Object date, DateParserContext<LocalDate> context=null) {
+    protected LocalDate parseImpl(Object date, DateParserContext<LocalDate> context) {
         switch (date) {
             case String:
                 return asLocalDate(date as String)

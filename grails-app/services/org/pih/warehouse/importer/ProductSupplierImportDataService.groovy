@@ -81,7 +81,7 @@ class ProductSupplierImportDataService implements ImportDataService {
                 }
             }
 
-            if (params.ratingType && !EnumParser.parse(params.ratingType as String, RatingTypeCode)) {
+            if (params.ratingType && !EnumParser.parseString(params.ratingType as String, RatingTypeCode)) {
                 command.errors.reject("Row ${index + 1}: Rating Type with value '${params.ratingType}' does not exist")
             }
 
@@ -150,7 +150,7 @@ class ProductSupplierImportDataService implements ImportDataService {
                     minOrderQuantity: params.minOrderQuantity,
                     contractPricePrice: params.contractPricePrice ? BigDecimal.valueOf(params.contractPricePrice as double) : null,
                     contractPriceValidUntil: params.contractPriceValidUntil ?: null,
-                    ratingType: EnumParser.parse(params.ratingType as String, RatingTypeCode),
+                    ratingType: EnumParser.parseString(params.ratingType as String, RatingTypeCode),
                     globalPreferenceTypeName: sanitizeStringInput(params.globalPreferenceTypeName),
                     globalPreferenceTypeValidityStartDate: params.globalPreferenceTypeValidityStartDate ?: null,
                     globalPreferenceTypeValidityEndDate: params.globalPreferenceTypeValidityEndDate ?: null,

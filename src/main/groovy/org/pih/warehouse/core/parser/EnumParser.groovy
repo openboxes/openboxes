@@ -12,13 +12,14 @@ class EnumParser<T extends Enum> extends Parser<T, ParserContext<T>> {
     /**
      * Converts the given String to an instance of the given Enum.
      *
-     * Prefer the parse(Object) method when possible as it is much more flexible to variable input.
+     * Due to the complexities in resolving the enum type, in a majority of use cases, this method is likely
+     * preferred over the non-static parse(Object) method.
      *
      * @param toParse the object to convert
      * @param enumClass the class of the Enum that we are parsing into
      * @param context the context object containing information about how to parse the string
      */
-    static T parse(String toParse, Class<T> enumClass, ParserContext<T> context=null) {
+    static T parseString(String toParse, Class<T> enumClass, ParserContext<T> context=null) {
         if (StringUtils.isBlank(toParse)) {
             return context?.defaultValue == null ? null : context.defaultValue
         }
@@ -42,9 +43,14 @@ class EnumParser<T extends Enum> extends Parser<T, ParserContext<T>> {
 
     @Override
     protected T parseImpl(Object toParse, ParserContext<T> context) {
+        // This parser is generic for all enums, and so
+        if (context.typeToParseTo == null) {
+            throw new IllegalArgumentException("Due to type erasure, when parsing Enums you must either specify ParserContext.typeToParseTo, or use the static EnumParser.parseString method")
+        }
+
         switch (toParse) {
             case String:
-                return parse(toParse as String, targetType, context)
+                return parseString(toParse as String, context.typeToParseTo, context)
             default:
                 throw new IllegalArgumentException("Cannot parse given value [${toParse}] to the ${targetType} Enum")
         }

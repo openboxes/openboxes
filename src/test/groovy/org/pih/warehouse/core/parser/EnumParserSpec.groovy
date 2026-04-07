@@ -10,15 +10,15 @@ import org.pih.warehouse.api.PutawayStatus
 class EnumParserSpec extends Specification {
 
     @Shared
-    EnumParser parser
+    EnumParser<PutawayStatus> parser
 
     void setup() {
         parser = new EnumParser<PutawayStatus>()
     }
 
-    void "parse should return #expectedResult when given #toParse and a defaultValue of #defaultValue"() {
+    void "parseString should return #expectedResult when given #toParse and a defaultValue of #defaultValue"() {
         expect:
-        assert parser.parse(toParse, PutawayStatus) == expectedResult
+        assert parser.parseString(toParse, PutawayStatus) == expectedResult
 
         where:
         toParse || expectedResult
@@ -34,17 +34,24 @@ class EnumParserSpec extends Specification {
         ParserContext<PutawayStatus> context = new ParserContext(
                 defaultValue: defaultValue,
                 errorOnParseFailure: false,
+                typeToParseTo: PutawayStatus,
         )
 
         expect:
         assert parser.parse(toParse, context) == expectedResult
 
         where:
-        toParse | defaultValue        || expectedResult
-        null    | null                || null
-        null    | PutawayStatus.READY || PutawayStatus.READY
-        1       | null                || null
-        1       | PutawayStatus.READY || null
+        toParse   | defaultValue        || expectedResult
+        null      | null                || null
+        null      | PutawayStatus.READY || PutawayStatus.READY
+        1         | null                || null
+        1         | PutawayStatus.READY || null  // invalid values always return null
+        ""        | null                || null
+        ""        | PutawayStatus.READY || PutawayStatus.READY
+        " "       | null                || null
+        " "       | PutawayStatus.READY || PutawayStatus.READY
+        " rEaDy " | null                || PutawayStatus.READY
+        "READY"   | null                || PutawayStatus.READY
     }
 
     void "parse should error when errorOnParseFailure==true and given #toParse and a defaultValue of #defaultValue"() {
@@ -52,6 +59,7 @@ class EnumParserSpec extends Specification {
         ParserContext<PutawayStatus> context = new ParserContext(
                 defaultValue: defaultValue,
                 errorOnParseFailure: true,
+                typeToParseTo: PutawayStatus,
         )
 
         when:
@@ -64,5 +72,20 @@ class EnumParserSpec extends Specification {
         toParse | defaultValue        || expectedException
         1       | null                || IllegalArgumentException
         1       | PutawayStatus.READY || IllegalArgumentException
+    }
+
+    void "parse should error when errorOnParseFailure==true and typeToParseTo is not specified"() {
+        given:
+        ParserContext<PutawayStatus> context = new ParserContext(
+                defaultValue: null,
+                errorOnParseFailure: true,
+                typeToParseTo: null,  // We need to specify this when parsing enums
+        )
+
+        when:
+        parser.parse("READY", context)
+
+        then:
+        thrown(IllegalArgumentException)
     }
 }

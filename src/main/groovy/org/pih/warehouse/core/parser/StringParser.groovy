@@ -22,7 +22,7 @@ class StringParser extends Parser<String, ParserContext<String>> {
      * @param toParse the String to convert
      * @param context The context object containing information about how to parse the string
      */
-    static String parse(String toParse, ParserContext<String> context=null) {
+    static String parseString(String toParse, ParserContext<String> context=null) {
         if (StringUtils.isBlank(toParse)) {
             return context?.defaultValue == null ? null : context.defaultValue
         }
@@ -34,7 +34,7 @@ class StringParser extends Parser<String, ParserContext<String>> {
     protected String parseImpl(Object toParse, ParserContext context) {
         switch (toParse) {
             case String:
-                return parse(toParse as String, context)
+                return parseString(toParse as String, context)
             default:
                 return toParse.toString()
         }

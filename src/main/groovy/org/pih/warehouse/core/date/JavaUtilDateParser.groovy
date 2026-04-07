@@ -21,7 +21,7 @@ import org.pih.warehouse.databinding.DataBindingConstants
 class JavaUtilDateParser extends AbstractDateParser<Date> {
 
     @Override
-    Date parseImpl(Object date, DateParserContext<Date> context=null) {
+    protected Date parseImpl(Object date, DateParserContext<Date> context) {
         switch (date) {
             case String:
                 return asDate(date as String)

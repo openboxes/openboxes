@@ -22,7 +22,7 @@ import org.pih.warehouse.databinding.DataBindingConstants
 class InstantParser extends AbstractDateParser<Instant> {
 
     @Override
-    Instant parseImpl(Object date, DateParserContext<Instant> context=null) {
+    protected Instant parseImpl(Object date, DateParserContext<Instant> context) {
         switch (date) {
             case String:
                 return asInstant(date as String, currentTimezone, context)
