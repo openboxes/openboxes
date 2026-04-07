@@ -417,13 +417,13 @@
                                         </g:elseif>
                                         %{-- CHECK IF IT IS STOCK TRANSFER / BIN REPLENISHMENT --}%
                                         <g:elseif test="${stockHistoryEntry?.transaction?.order?.orderType?.isTransferOrder() && !stockHistoryEntry?.transaction?.order?.orderType?.isPutawayOrder()}">
-                                            <g:link controller="stockTransfer" action="show" id="${stockHistoryEntry?.transaction?.order?.id }">
-                                                <div title="${stockHistoryEntry?.transaction?.order?.name }">
+                                            <g:link controller="stockTransfer" action="show" id="${stockHistoryEntry?.transaction?.order?.id}">
+                                                <div title="${stockHistoryEntry?.transaction?.order?.name}">
                                                     <g:message
                                                         code="order.orderType.code.${stockHistoryEntry?.transaction?.order?.orderType?.code}"
                                                         default="${stockHistoryEntry?.transaction?.order?.orderType?.name}"
                                                     />
-                                                    ${stockHistoryEntry?.transaction?.order?.orderNumber }
+                                                    ${stockHistoryEntry?.transaction?.order?.orderNumber}
                                                 </div>
                                             </g:link>
                                         </g:elseif>
