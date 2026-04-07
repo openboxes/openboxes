@@ -18,6 +18,7 @@ import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
 import ProductSelect from 'components/product-select/ProductSelect';
 import DateFormat from 'consts/dateFormat';
+import locationType from 'consts/locationType';
 import StockMovementStatus from 'consts/stockMovementStatus';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
@@ -371,8 +372,7 @@ class AddItemsPage extends Component {
     return apiClient.get(url, {
       paramsSerializer: (parameters) => queryString.stringify(parameters),
       params: {
-        locationTypeCode: ['BIN_LOCATION', 'INTERNAL'],
-        ignoreActivityCodes: ['RECEIVE_STOCK'],
+        locationTypeCode: [locationType.BIN_LOCATION, locationType.INTERNAL],
         'location.id': this.props.locationId,
       },
     })
