@@ -99,8 +99,9 @@ class LocationController {
 
             if (!locationInstance.id && !locationInstance.organization) {
                 if (locationInstance?.locationType?.locationTypeCode == LocationTypeCode.SUPPLIER) {
+                    // When creating new suppliers we also create an org with the same name (unless one already exists)
                     locationInstance.organization =
-                            organizationService.findOrCreateSupplierOrganization(locationInstance.name, locationInstance.locationNumber)
+                            organizationService.findOrCreateSupplierOrganization(locationInstance.name)
                 }
             }
 
