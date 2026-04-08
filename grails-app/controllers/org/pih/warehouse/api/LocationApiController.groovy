@@ -153,16 +153,8 @@ class LocationApiController extends BaseDomainApiController {
         bindLocationData(location, jsonObject)
 
         boolean useDefaultActivities = Boolean.valueOf(params.useDefaultActivities ?: "false")
-        if (useDefaultActivities && location?.supportedActivities) {
-            location.supportedActivities.clear()
-        }
-
-        // If the organization chosen for the created location is inactive, throw an exception
-        if (location.organization && !location.organization?.active) {
-            throw new IllegalArgumentException("The organization ${location.organization.name} is inactive, you can't assign it to the location")
-        }
-
-        locationGormService.save(location)
+        boolean assignCurrentLocationGroup = Boolean.valueOf(params.assignCurrentLocationGroup ?: "false")
+        locationService.createLocation(location, useDefaultActivities, assignCurrentLocationGroup)
 
         render ([data: location] as JSON)
     }

@@ -20,6 +20,7 @@ import org.apache.poi.ss.usermodel.Row
 import grails.plugins.csv.CSVMapReader
 import org.hibernate.sql.JoinType
 
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.sort.SortParamList
 import org.pih.warehouse.sort.SortUtil
 import org.pih.warehouse.api.StockMovementDirection
@@ -34,6 +35,7 @@ class LocationService {
     GrailsApplication grailsApplication
     UserService userService
     LocationImportDataService locationImportDataService
+    LocationDataService locationGormService
 
     Location findInternalLocation(Location parentLocation, String[] names) {
         return Location.createCriteria().get {
@@ -721,5 +723,24 @@ class LocationService {
             zone.removeFromLocations(existingLocation)
         }
         existingLocation.delete(flush: true)
+    }
+
+    Location createLocation(Location location, boolean useDefaultActivities, boolean assignCurrentLocationGroup) {
+        if (assignCurrentLocationGroup) {
+            Location currentLocation = AuthService.currentLocation
+            location.locationGroup = currentLocation?.locationGroup
+        }
+
+        if (useDefaultActivities && location?.supportedActivities) {
+            location.supportedActivities.clear()
+        }
+
+        // If the organization chosen for the created location is inactive, throw an exception
+        if (location.organization && !location.organization?.active) {
+            throw new IllegalArgumentException("The organization ${location.organization.name} is inactive, you can't assign it to the location")
+        }
+
+        locationGormService.save(location)
+        return location
     }
 }

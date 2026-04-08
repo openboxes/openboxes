@@ -12,10 +12,10 @@ import Alert from 'react-s-alert';
 import {
   fetchLocationTypes, fetchTranslations, hideSpinner, showSpinner,
 } from 'actions';
+import LocationApi from 'api/services/LocationApi';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import ActivityCode from 'consts/activityCode';
-import apiClient, { flattenRequest } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation from 'utils/translation-utils';
@@ -120,12 +120,13 @@ class AddDestinationModal extends Component {
 
   save(values) {
     this.props.showSpinner();
-    const url = '/api/locations?useDefaultActivities=true';
-
     const { name, locationType, ...address } = values;
     const payload = { name, locationType: _.get(locationType, 'id') || '' };
 
-    apiClient.post(url, payload)
+    LocationApi.createLocation(
+      payload,
+      { useDefaultActivities: true, assignCurrentLocationGroup: true },
+    )
       .then((response) => {
         Alert.success(this.props.translate('react.stockMovement.success.createDestination.label', 'Destination was successfully created!'), { timeout: 3000 });
         return response.data.data;
@@ -134,8 +135,7 @@ class AddDestinationModal extends Component {
         this.props.onResponse(destination);
 
         if (!_.isEmpty(address)) {
-          const addressUrl = `/api/locations/${destination.id}`;
-          return apiClient.post(addressUrl, flattenRequest({ address }));
+          return LocationApi.updateLocationAddress(destination.id, address);
         }
         return Promise.resolve();
       })
