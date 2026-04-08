@@ -206,7 +206,7 @@ class AllocationService {
     private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationStrategy> strategies, List<AvailableItem> excludeList = []) {
         Location location = requisitionItem.requisition.origin
         List<AvailableItem> allAvailableItems = stockMovementService.getAvailableItems(location, requisitionItem, false)
-        List<AvailableItem> filteredItems = applyStrategies(allAvailableItems, strategies)
+        List<AvailableItem> filteredItems = applyStrategies(location, allAvailableItems, strategies)
         List<AvailableItem> includedItems = filteredItems.findAll { !excludeList.contains(it) }
 
         boolean isBackordered = requisitionItem.isBackordered()
@@ -225,21 +225,19 @@ class AllocationService {
         return stockMovementService.getSuggestedItems(includedItems, quantityRequired)
     }
 
-    private List<AvailableItem> applyStrategies(List<AvailableItem> items, List<AllocationStrategy> strategies) {
+    private List<AvailableItem> applyStrategies(Location location, List<AvailableItem> availableItems, List<AllocationStrategy> strategies) {
         if (!strategies || strategies.isEmpty()) {
             strategies = grailsApplication.config.openboxes.order.allocation.strategies
         }
         if (!strategies || strategies.isEmpty()) {
-            return items
+            return availableItems
         }
 
-        def availableItems = new ArrayList<>(items)
-        def displayItems = availableItems.findAll { it.binLocation?.isDisplay() }
-        def warehouseItems = availableItems.findAll { !it.binLocation?.isDisplay() }
-        def preferredBinLocations = getPreferredBinLocations(warehouseItems)
-        def preferredItems = warehouseItems.findAll {preferredBinLocations.contains(it.binLocation) }
-        warehouseItems.removeAll(preferredItems)
-        def remainingItems = warehouseItems
+        List<AvailableItem> displayItems = availableItems.findAll { it.binLocation?.isDisplay() }
+        List<AvailableItem> warehouseItems = availableItems.findAll { !it.binLocation?.isDisplay() }
+        Set<Location> preferredBinLocations = getPreferredBinLocations(location, warehouseItems?.find()?.inventoryItem?.product)
+        List<AvailableItem> preferredItems = warehouseItems?.findAll {preferredBinLocations.contains(it.binLocation) }
+        List<AvailableItem> remainingItems = (warehouseItems?: 0) - (preferredItems?: 0)
         List<AvailableItem> result = []
 
         strategies.each { strategy ->
@@ -270,13 +268,13 @@ class AllocationService {
         return result
     }
 
-    private Set<Location> getPreferredBinLocations(List<AvailableItem> result) {
-        Set<Location> preferredBinLocations = []
-        if (result) {
-            def inventoryLevels = result.find()?.inventoryItem?.product?.inventoryLevels
-            inventoryLevels?.each { it.preferredBinLocation ? preferredBinLocations.add(it.preferredBinLocation) : null }
+    private Set<Location> getPreferredBinLocations(Location location, Product product) {
+        if (!product) {
+            return []
         }
-        return preferredBinLocations
+
+        Set<InventoryLevel> inventoryLevels = location?.inventory?.configuredProducts?.findAll { it.product == product && it.preferredBinLocation != null }
+        return inventoryLevels?.collect { it.preferredBinLocation }
     }
 
     private AllocationDetailsDto buildAllocationDetailsDto(RequisitionItem requisitionItem) {
