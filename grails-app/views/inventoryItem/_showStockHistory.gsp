@@ -423,6 +423,7 @@
                                                         code="order.orderType.code.${stockHistoryEntry?.transaction?.order?.orderType?.code}"
                                                         default="${stockHistoryEntry?.transaction?.order?.orderType?.name}"
                                                     />
+                                                    &rsaquo;
                                                     ${stockHistoryEntry?.transaction?.order?.orderNumber}
                                                 </div>
                                             </g:link>
