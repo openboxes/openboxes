@@ -74,7 +74,7 @@ class GenericApiService {
         if (domainObject.hasErrors() || !domainObject.save()) {
             throw new ValidationException("Cannot create product due to validation errors", domainObject.errors)
         }
-        saveHasManyAssociations(domainObject)
+        saveAssociations(domainObject)
         return domainObject
     }
 
@@ -94,7 +94,7 @@ class GenericApiService {
         if (domainObject.hasErrors() || !domainObject.save()) {
             throw new ValidationException("Cannot create product due to validation errors", domainObject.errors)
         }
-        saveHasManyAssociations(domainObject)
+        saveAssociations(domainObject)
         return domainObject
     }
 
@@ -104,7 +104,7 @@ class GenericApiService {
         return domainObject.delete()
     }
 
-    void saveHasManyAssociations(Object domainObject) {
+    void saveAssociations(Object domainObject) {
         domainObject.class.hasMany.each { associationName, associatedClass ->
             if (associatedClass == String || associatedClass.isEnum()) {
                 return

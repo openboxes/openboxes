@@ -14,7 +14,7 @@ class AutomaticBackorderAllocationEventService implements ApplicationListener<Au
 
     @Override
     void onApplicationEvent(AutomaticBackorderReallocationEvent event) {
-        if (!Holders.config.openboxes.jobs.automaticAllocationJob.enabled) {
+        if (!Holders.config.openboxes.jobs.automaticBackorderReallocationJob.enabled) {
             log.info"Backorder re-allocation job is disabled"
             return
         }
@@ -28,7 +28,7 @@ class AutomaticBackorderAllocationEventService implements ApplicationListener<Au
 
         if (shipment.isFullyReceived()) {
             def delayInMilliseconds =
-                    Integer.valueOf(grailsApplication.config.openboxes.jobs.automaticAllocationJob.delayInMilliseconds) ?: 2000
+                    Integer.valueOf(grailsApplication.config.openboxes.jobs.automaticBackorderReallocationJob.delayInMilliseconds) ?: 2000
             Date runAt = new Date(System.currentTimeMillis() + delayInMilliseconds)
             log.info "Triggering backorder re-allocation job with ${delayInMilliseconds} ms delay"
             AutomaticBackorderReallocationJob.schedule(runAt, [shipmentId: event.source])

@@ -2,7 +2,6 @@ package org.pih.warehouse.jobs
 
 import grails.util.Holders
 import org.pih.warehouse.allocation.AllocationMode
-import org.pih.warehouse.allocation.AllocationRequest
 import org.pih.warehouse.allocation.AllocationStrategy
 import org.pih.warehouse.requisition.Requisition
 import org.quartz.JobExecutionContext
@@ -14,8 +13,8 @@ class AutomaticAllocationJob {
     def sessionRequired = false
 
     static triggers = {
-        cron name: JobUtils.getCronName(AutomaticReceiptJob),
-        cronExpression: JobUtils.getCronExpression(AutomaticReceiptJob)
+        cron name: JobUtils.getCronName(AutomaticAllocationJob),
+        cronExpression: JobUtils.getCronExpression(AutomaticAllocationJob)
     }
 
     def execute(JobExecutionContext context) {

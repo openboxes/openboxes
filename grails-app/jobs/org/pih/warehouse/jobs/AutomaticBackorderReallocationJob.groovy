@@ -25,7 +25,7 @@ class AutomaticBackorderReallocationJob {
     }
 
     def execute(JobExecutionContext context) {
-        if (!Holders.config.openboxes.jobs.automaticAllocationJob.enabled) {
+        if (!Holders.config.openboxes.jobs.automaticBackorderReallocationJob.enabled) {
             log.info"Backorder re-allocation job is disabled"
             return
         }
