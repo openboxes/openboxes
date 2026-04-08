@@ -125,7 +125,7 @@
 
                                             <tr class="prop ${j%2?'odd':'even'}">
                                                 <td>
-                                                    <g:link controller="requisition" action="show" id="${requisitionItem?.requisitionId}">
+                                                    <g:link controller="stockMovement" action="show" id="${requisitionItem?.requisitionId}">
                                                         ${requisitionItem?.requestNumber}
                                                     </g:link>
                                                 </td>
