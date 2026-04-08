@@ -250,7 +250,7 @@ class PicklistService {
             Location currentLocation = picklistItem?.requisitionItem?.requisition?.origin
             if (currentLocation?.supports(ActivityCode.PICKING_STRATEGY_AUTOMATIC_REALLOCATION)) {
                 log.info "Automatically generate new picklist item for shortage: ${picklistItem?.toJson()}"
-                stockMovementService.createPicklistAfterShortage(picklistItem, Boolean.FALSE)
+                stockMovementService.createPicklistAfterShortage(picklistItem, Boolean.TRUE)
             }
         }
 

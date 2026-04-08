@@ -1859,6 +1859,9 @@ class StockMovementService {
                 }
             }
 
+            // undo quantityAvailable modification from getAvailableItems--calculateQuantityAvailableToPromise
+            availableItems.forEach {if (it.quantityAvailable > it.quantityOnHand) it.quantityAvailable = it.quantityOnHand}
+
             List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
             log.info "Suggested items " + suggestedItems
 
@@ -1882,12 +1885,23 @@ class StockMovementService {
                             suggestedItem.quantityPicked.intValueExact(),)
                 }
             }
-            if (validateSuggestionItemsAvailability && !suggestedItems) {
-                String errorMessage = "Product " + requisitionItem.product.productCode + " has no available inventory. Please go back to edit page and revise quantity"
-                requisitionItem.errors.rejectValue("picklistItems", errorMessage, [
-                        requisitionItem?.product?.productCode,
-                ].toArray(), errorMessage)
-                throw new ValidationException(errorMessage, requisitionItem.errors)
+            if (validateSuggestionItemsAvailability) {
+                if (!suggestedItems) {
+                    String errorMessage = "Product " + requisitionItem.product.productCode + " has no available inventory. Please go back to edit page and revise quantity"
+                    requisitionItem.errors.rejectValue("picklistItems", errorMessage, [
+                            requisitionItem?.product?.productCode,
+                    ].toArray(), errorMessage)
+                    throw new ValidationException(errorMessage, requisitionItem.errors)
+                }
+                Integer suggestedItemsQuantity = 0
+                suggestedItems.forEach { suggestedItemsQuantity += it.quantityPicked }
+                if (suggestedItemsQuantity < quantityRequired) {
+                    String errorMessage = "Product " + requisitionItem.product.productCode + " has less available inventory " + suggestedItemsQuantity + " than required " + quantityRequired + ". Please go back to edit page and revise quantity"
+                    requisitionItem.errors.rejectValue("picklistItems", errorMessage, [
+                            requisitionItem?.product?.productCode,
+                    ].toArray(), errorMessage)
+                    throw new ValidationException(errorMessage, requisitionItem.errors)
+                }
             }
         }
     }
