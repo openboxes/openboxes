@@ -2,7 +2,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Link, withRouter } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { DASHBOARD_URL } from 'consts/applicationUrls';
 
@@ -27,7 +27,7 @@ const mapStateToProps = (state) => ({
   logoUrl: state.session.logoUrl,
 });
 
-export default withRouter(connect(mapStateToProps)(Logo));
+export default connect(mapStateToProps)(Logo);
 
 Logo.propTypes = {
   logoUrl: PropTypes.string,

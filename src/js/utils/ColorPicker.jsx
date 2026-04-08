@@ -1,8 +1,8 @@
 import React from 'react';
 
+// import Tippy from '@tippyjs/react';
 import PropTypes from 'prop-types';
 import { SliderPicker } from 'react-color';
-import { Tooltip } from 'react-tippy';
 
 import Input from 'utils/Input';
 
@@ -15,22 +15,22 @@ const ColorPicker = ({ value, onChange }) => {
   const colorHex = value ? `#${value}` : '#ffffff';
 
   return (
-    <Tooltip
-      html={(
-        <div style={{ width: 350 }}>
-          <SliderPicker
-            color={colorHex}
-            onChangeComplete={handleChange}
-          />
-        </div>
-      )}
-      theme="transparent"
-      arrow="true"
-      trigger="click"
-      interactive
-      delay="150"
-      duration="250"
-    >
+    // <Tippy
+    //   content={(
+    //     <div style={{ width: 350 }}>
+    //       <SliderPicker
+    //         color={colorHex}
+    //         onChangeComplete={handleChange}
+    //       />
+    //     </div>
+    //   )}
+    //   theme="transparent"
+    //   arrow="true"
+    //   trigger="click"
+    //   interactive
+    //   delay="150"
+    //   duration="250"
+    // >
       <div className="input-group">
         <div className="input-group-prepend">
           <span className="input-group-text" style={{ backgroundColor: colorHex }}>&nbsp;&nbsp;</span>
@@ -42,7 +42,7 @@ const ColorPicker = ({ value, onChange }) => {
           </button>
         </div>
       </div>
-    </Tooltip>
+    // </Tippy>
   );
 };
 

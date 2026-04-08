@@ -130,9 +130,11 @@ assets {
 bootRun {
     addResources = true
     jvmArgs = [
-        '-Dspring.output.ansi.enabled=never',
-        '-Xdebug',
-        '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005'
+            '-Dspring.output.ansi.enabled=never',
+            '-Xdebug',
+            '-Xms4000m',
+            '-Xmx4000m',
+            '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005'
     ]
     systemProperties System.properties
 
@@ -368,8 +370,8 @@ manifest {
 node {
     distBaseUrl = 'https://nodejs.org/dist'
     download = true
-    npmVersion = '6.14.18'
-    version = '14.21.3'
+    npmVersion = '11.11.0'
+    version = '24.9.0'
 }
 
 processResources {
@@ -908,7 +910,7 @@ jacocoTestReport {
 tasks.withType(Test) {
     // never consider test tasks as up-to-date - always run them when requested
     outputs.upToDateWhen { false }
-    
+
     // https://github.com/testcontainers/testcontainers-java/pull/11216
     systemProperty 'api.version', dockerApiVersion
 

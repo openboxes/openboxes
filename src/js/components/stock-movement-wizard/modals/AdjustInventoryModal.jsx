@@ -122,7 +122,7 @@ class AdjustInventoryModal extends Component {
     this.onSave = this.onSave.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const {
       fieldConfig: { attributes, getDynamicAttr },
     } = nextProps;

@@ -5,8 +5,8 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import Alert from 'react-s-alert';
+import withRouter from 'utils/withRouter';
+import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { LOCATION } from 'api/urls';
@@ -122,7 +122,7 @@ class LocationAddress extends Component {
 
   nextPage(values) {
     this.saveAddressOfLocation(values, (val) => {
-      Alert.success(this.props.translate('react.locationsConfiguration.alert.addressSaveCompleted.label', 'Address was succesfully added to the location!'), { timeout: 3000 });
+      toast.success(this.props.translate('react.locationsConfiguration.alert.addressSaveCompleted.label', 'Address was succesfully added to the location!'), { timeout: 3000 });
       this.props.nextPage(val);
     });
   }

@@ -1,9 +1,9 @@
 import React from 'react';
 
+// import Tippy from '@tippyjs/react';
 import PropTypes from 'prop-types';
 import { RiAddCircleLine } from 'react-icons/all';
 import { useSelector } from 'react-redux';
-import { Tooltip } from 'react-tippy';
 
 import CycleCountStockDiscrepancyInfoBar from 'components/cycleCount/CycleCountStockDiscrepancyInfoBar';
 import HeaderLabel from 'components/cycleCount/HeaderLabel';
@@ -180,14 +180,14 @@ const ResolveStepTable = ({
         className={`ml-4 mb-3 d-flex ${isStepEditable ? '' : 'pt-3'}`}
       >
         {isStepEditable && (
-        <Tooltip
-          className="d-flex align-items-center"
-          html={(
-            <span className="p-1">
-              {translate('react.cycleCount.addNewRecord.tooltip', 'Use this button to change lot number or bin location.')}
-            </span>
-          )}
-        >
+        // <Tippy
+        //   className="d-flex align-items-center"
+        //   content={(
+        //     <span className="p-1">
+        //       {translate('react.cycleCount.addNewRecord.tooltip', 'Use this button to change lot number or bin location.')}
+        //     </span>
+        //   )}
+        // >
           <Button
             onClick={() => {
               addEmptyRow(product?.id, id);
@@ -198,7 +198,7 @@ const ResolveStepTable = ({
             StartIcon={<RiAddCircleLine size={18} />}
             disabled={isFormDisabled}
           />
-        </Tooltip>
+        // </Tippy>
         )}
       </div>
     </div>

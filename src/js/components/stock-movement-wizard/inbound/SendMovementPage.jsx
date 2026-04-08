@@ -9,7 +9,7 @@ import Dropzone from 'react-dropzone';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
 import DocumentButton from 'components/DocumentButton';
@@ -254,7 +254,7 @@ class SendMovementPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
@@ -285,7 +285,7 @@ class SendMovementPage extends Component {
         if (values.statusCode === 'DISPATCHED') {
           this.fetchStockMovementData();
         }
-        Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
+        toast.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -520,20 +520,20 @@ class SendMovementPage extends Component {
       if (files.length > 1) {
         this.sendFiles(files)
           .then(() => {
-            Alert.success(this.props.translate('react.stockMovement.alert.filesSuccess.label', 'Files uploaded successfuly!'), { timeout: 3000 });
+            toast.success(this.props.translate('react.stockMovement.alert.filesSuccess.label', 'Files uploaded successfuly!'), { timeout: 3000 });
             this.removeFiles(_.map(files, (file) => file.name));
             this.prepareRequestAndSubmitStockMovement(values);
           })
-          .catch(() => Alert.error(this.props.translate('react.stockMovement.alert.filesError.label', 'Error occured during files upload!')))
+          .catch(() => toast.error(this.props.translate('react.stockMovement.alert.filesError.label', 'Error occured during files upload!')))
           .finally(() => this.props.hideSpinner());
       } else if (files.length === 1) {
         this.sendFile(files[0])
           .then(() => {
-            Alert.success(this.props.translate('react.stockMovement.alert.fileSuccess.label', 'File uploaded successfuly!'), { timeout: 3000 });
+            toast.success(this.props.translate('react.stockMovement.alert.fileSuccess.label', 'File uploaded successfuly!'), { timeout: 3000 });
             this.removeFile(files[0].name);
             this.prepareRequestAndSubmitStockMovement(values);
           })
-          .catch(() => Alert.error(this.props.translate('react.stockMovement.alert.fileError.label', 'Error occured during file upload!')))
+          .catch(() => toast.error(this.props.translate('react.stockMovement.alert.fileError.label', 'Error occured during file upload!')))
           .finally(() => this.props.hideSpinner());
       } else {
         this.prepareRequestAndSubmitStockMovement(values);
@@ -552,13 +552,13 @@ class SendMovementPage extends Component {
     };
 
     if ((this.props.currentLocationId !== values.origin.id) && (values.origin.type !== 'SUPPLIER' && values.hasManageInventory)) {
-      Alert.error(this.props.translate(
+      toast.error(this.props.translate(
         'react.stockMovement.alert.sendStockMovement.label',
         'You are not able to send shipment from a location other than origin. Change your current location.',
       ));
       this.props.hideSpinner();
     } else if (values.shipmentType.id === _.find(this.state.shipmentTypes, (shipmentType) => shipmentType.label === 'Default').id) {
-      Alert.error(this.props.translate(
+      toast.error(this.props.translate(
         'react.stockMovement.alert.populateShipmentType.label',
         'Please populate shipment type before continuing',
       ));
@@ -656,7 +656,7 @@ class SendMovementPage extends Component {
         });
     } else {
       this.props.hideSpinner();
-      Alert.error(this.props.translate(
+      toast.error(this.props.translate(
         'react.stockMovement.alert.rollbackShipment.label',
         'You are not able to rollback shipment from your location.',
       ));

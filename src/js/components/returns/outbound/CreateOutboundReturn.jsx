@@ -4,7 +4,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import withRouter from 'utils/withRouter';
 
 import { hideSpinner, showSpinner } from 'actions';
 import SelectField from 'components/form-elements/SelectField';
@@ -106,7 +106,8 @@ class CreateOutboundReturn extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.outboundReturnsTranslationsFetched && nextProps.location.id) {
       if (!this.dataFetched) {
         this.dataFetched = true;

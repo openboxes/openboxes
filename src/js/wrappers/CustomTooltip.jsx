@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 import PropTypes from 'prop-types';
-import { Tooltip } from 'react-tippy';
+import { Tooltip } from 'react-tooltip';
 
 const CustomTooltip = ({
   children,
@@ -9,25 +9,31 @@ const CustomTooltip = ({
   className,
   show,
   icon: Icon,
-}) => (
-  // This div was added to ensure the tooltip works correctly with absolute positioning
-  show ? (
+}) => {
+  const tooltipId = useId();
+  return show ? (
     <div className={className} role="tooltip">
-      <Tooltip
-        delay={150}
-        duration={250}
-        hideDelay={50}
-        className="w-100"
-        html={<div className={`p-2 tooltip-dark-blue ${!content && 'd-none'}`}>{content}</div>}
+      <div
+        className="flex items-center"
+        data-tooltip-id={tooltipId}
       >
-        <div className="flex items-center">
-          {Icon && <Icon className="mr-2" />}
-          {children}
+        {Icon && <Icon className="mr-2" />}
+        {children}
+      </div>
+      <Tooltip
+        id={tooltipId}
+        delayShow={150}
+        delayHide={50}
+        className="w-100"
+        place="top"
+      >
+        <div className={`p-2 tooltip-dark-blue ${!content ? 'd-none' : ''}`}>
+          {content}
         </div>
       </Tooltip>
     </div>
-  ) : children
-);
+  ) : children;
+};
 
 export default CustomTooltip;
 

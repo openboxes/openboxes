@@ -8,7 +8,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
@@ -204,7 +204,8 @@ class SendMovementPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.inboundReturnsTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchInboundReturn();
@@ -266,7 +267,7 @@ class SendMovementPage extends Component {
         });
     } else {
       this.props.hideSpinner();
-      Alert.error(this.props.translate(
+      toast.error(this.props.translate(
         'react.stockMovement.alert.rollbackShipment.label',
         'You are not able to rollback shipment from your location.',
       ));

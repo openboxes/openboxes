@@ -1,212 +1,99 @@
-import React, { useMemo } from 'react';
+import React, { lazy, Suspense, useMemo } from 'react';
 
 import queryString from 'query-string';
-import Loadable from 'react-loadable';
 import { useSelector } from 'react-redux';
 import {
-  BrowserRouter, Redirect, Route, Switch,
+  BrowserRouter, Navigate, Route, Routes,
 } from 'react-router-dom';
-import Alert from 'react-s-alert';
 import { ClimbingBoxLoader } from 'react-spinners';
+import { ToastContainer } from 'react-toastify';
 import {
   getCurrentLocationSupportedActivities,
   getNotificationAutohideDelay,
   getSpinner,
 } from 'selectors';
 
-import CustomAlert from 'components/dashboard/CustomAlert';
-import MainLayoutRoute from 'components/Layout/v2/MainLayoutRoute';
-import Loading from 'components/Loading';
+import MainLayout from 'components/Layout/v2/MainLayout';
 import ActivityCode from 'consts/activityCode';
 import { DASHBOARD_URL } from 'consts/applicationUrls';
 import useConnectionListener from 'hooks/useConnectionListener';
 import FlashScopeListenerWrapper from 'wrappers/FlashScopeListenerWrapper';
 
-import 'react-s-alert/dist/s-alert-default.css';
-import 'react-s-alert/dist/s-alert-css-effects/bouncyflip.css';
-
+import 'react-toastify/dist/ReactToastify.css';
 // TODO: Fix entering Inbound SM from list
 
-const AsyncStockMovement = Loadable({
-  loader: () => import('components/stock-movement-wizard/StockMovement'),
-  loading: Loading,
-});
+const AsyncStockMovement = lazy(() => import('components/stock-movement-wizard/StockMovement'));
 
-const AsyncStockMovementInbound = Loadable({
-  loader: () => import('components/stock-movement-wizard/inboundV2/Inbound'),
-  loading: Loading,
-});
+const AsyncStockMovementInbound = lazy(() => import('components/stock-movement-wizard/inboundV2/Inbound'));
 
-const AsyncStockMovementCombinedShipments = Loadable({
-  loader: () => import('components/stock-movement-wizard/StockMovementCombinedShipments'),
-  loading: Loading,
-});
+const AsyncStockMovementCombinedShipments = lazy(() => import('components/stock-movement-wizard/StockMovementCombinedShipments'));
 
-const AsyncStockMovementRequest = Loadable({
-  loader: () => import('components/stock-movement-wizard/StockMovementRequest'),
-  loading: Loading,
-});
+const AsyncStockMovementRequest = lazy(() => import('components/stock-movement-wizard/StockMovementRequest'));
 
-const AsyncStockMovementVerifyRequest = Loadable({
-  loader: () => import('components/stock-movement-wizard/StockMovementVerifyRequest'),
-  loading: Loading,
-});
+const AsyncStockMovementVerifyRequest = lazy(() => import('components/stock-movement-wizard/StockMovementVerifyRequest'));
 
-const AsyncReceivingPage = Loadable({
-  loader: () => import('components/receiving/ReceivingPage'),
-  loading: Loading,
-});
+const AsyncReceivingPage = lazy(() => import('components/receiving/ReceivingPage'));
 
-const AsyncPutAwayMainPage = Loadable({
-  loader: () => import('components/put-away/PutAwayMainPage'),
-  loading: Loading,
-});
+const AsyncPutAwayMainPage = lazy(() => import('components/put-away/PutAwayMainPage'));
 
-const AsyncManagement = Loadable({
-  loader: () => import('components/stock-list-management/StocklistManagement'),
-  loading: Loading,
-});
+const AsyncManagement = lazy(() => import('components/stock-list-management/StocklistManagement'));
 
-const AsyncDashboard = Loadable({
-  loader: () => import('components/dashboard/Dashboard'),
-  loading: Loading,
-});
+const AsyncDashboard = lazy(() => import('components/dashboard/Dashboard'));
 
-const AsyncStockRequestDashboard = Loadable({
-  loader: () => import('components/dashboard/StockRequestDashboard'),
-  loading: Loading,
-});
+const AsyncStockRequestDashboard = lazy(() => import('components/dashboard/StockRequestDashboard'));
 
 // TODO add megamenu and menu config
-const AsyncInvoice = Loadable({
-  loader: () => import('components/invoice/create/InvoiceWizard'),
-  loading: Loading,
-});
+const AsyncInvoice = lazy(() => import('components/invoice/create/InvoiceWizard'));
 
-const AsyncInvoiceList = Loadable({
-  loader: () => import('components/invoice/list/InvoiceList'),
-  loading: Loading,
-});
+const AsyncInvoiceList = lazy(() => import('components/invoice/list/InvoiceList'));
 
-const AsyncStockTransfer = Loadable({
-  loader: () => import('components/stock-transfer/StockTransferWizard'),
-  loading: Loading,
-});
+const AsyncStockTransfer = lazy(() => import('components/stock-transfer/StockTransferWizard'));
 
-const AsyncOutboundReturns = Loadable({
-  loader: () => import('components/returns/outbound/OutboundReturnsWizard'),
-  loading: Loading,
-});
+const AsyncOutboundReturns = lazy(() => import('components/returns/outbound/OutboundReturnsWizard'));
 
-const AsyncInboundReturns = Loadable({
-  loader: () => import('components/returns/inbound/InboundReturnsWizard'),
-  loading: Loading,
-});
+const AsyncInboundReturns = lazy(() => import('components/returns/inbound/InboundReturnsWizard'));
 
-const AsyncReplenishment = Loadable({
-  loader: () => import('components/replenishment/ReplenishmentWizard'),
-  loading: Loading,
-});
+const AsyncReplenishment = lazy(() => import('components/replenishment/ReplenishmentWizard'));
 
-const AsyncProductsConfiguration = Loadable({
-  loader: () => import('components/products-configuration/ProductsConfigurationWizard'),
-  loading: Loading,
-});
+const AsyncProductsConfiguration = lazy(() => import('components/products-configuration/ProductsConfigurationWizard'));
 
-const AsyncLocationsConfiguration = Loadable({
-  loader: () => import('components/locations-configuration/LocationsConfigurationWizard'),
-  loading: Loading,
-});
+const AsyncLocationsConfiguration = lazy(() => import('components/locations-configuration/LocationsConfigurationWizard'));
 
-const AsyncImportLocations = Loadable({
-  loader: () => import('components/locations-configuration/ImportLocations'),
-  loading: Loading,
-});
+const AsyncImportLocations = lazy(() => import('components/locations-configuration/ImportLocations'));
 
-const AsyncWelcomePage = Loadable({
-  loader: () => import('components/locations-configuration/WelcomePage'),
-  loading: Loading,
-});
+const AsyncWelcomePage = lazy(() => import('components/locations-configuration/WelcomePage'));
 
-const AsyncLoadDataPage = Loadable({
-  loader: () => import('components/load-demo-data/LoadDemoDataPage'),
-  loading: Loading,
-});
+const AsyncLoadDataPage = lazy(() => import('components/load-demo-data/LoadDemoDataPage'));
 
-const AsyncResetInstancePage = Loadable({
-  loader: () => import('components/reset-instance/ResettingInstanceInfoPage'),
-  loading: Loading,
-});
+const AsyncResetInstancePage = lazy(() => import('components/reset-instance/ResettingInstanceInfoPage'));
 
-const AsyncPurchaseOrderList = Loadable({
-  loader: () => import('components/purchaseOrder/PurchaseOrderList'),
-  loading: Loading,
-});
+const AsyncPurchaseOrderList = lazy(() => import('components/purchaseOrder/PurchaseOrderList'));
 
-const AsyncStockList = Loadable({
-  loader: () => import('components/stock-list/StockList'),
-  loading: Loading,
-});
+const AsyncStockList = lazy(() => import('components/stock-list/StockList'));
 
-const AsyncProductsList = Loadable({
-  loader: () => import('components/products/ProductsList'),
-  loading: Loading,
-});
+const AsyncProductsList = lazy(() => import('components/products/ProductsList'));
 
-const AsyncStockMovementInboundList = Loadable({
-  loader: () => import('components/stock-movement/inbound/StockMovementInboundList'),
-  loading: Loading,
-});
+const AsyncStockMovementInboundList = lazy(() => import('components/stock-movement/inbound/StockMovementInboundList'));
 
-const AsyncStockMovementOutboundList = Loadable({
-  loader: () => import('components/stock-movement/outbound/StockMovementOutboundList'),
-  loading: Loading,
-});
+const AsyncStockMovementOutboundList = lazy(() => import('components/stock-movement/outbound/StockMovementOutboundList'));
 
-const AsyncProductSupplierList = Loadable({
-  loader: () => import('components/productSupplier/ProductSupplierList'),
-  loading: Loading,
-});
+const AsyncProductSupplierList = lazy(() => import('components/productSupplier/ProductSupplierList'));
 
-const AsyncProductSupplierCreatePage = Loadable({
-  loader: () => import('components/productSupplier/create/ProductSupplierForm'),
-  loading: Loading,
-});
+const AsyncProductSupplierCreatePage = lazy(() => import('components/productSupplier/create/ProductSupplierForm'));
 
-const AsyncOutboundImport = Loadable({
-  loader: () => import('components/stock-movement-wizard/outboundImport/OutboundImport'),
-  loading: Loading,
-});
+const AsyncOutboundImport = lazy(() => import('components/stock-movement-wizard/outboundImport/OutboundImport'));
 
-const AsyncCycleCount = Loadable({
-  loader: () => import('components/cycleCount/CycleCount'),
-  loading: Loading,
-});
+const AsyncCycleCount = lazy(() => import('components/cycleCount/CycleCount'));
 
-const AsyncCycleCountCountStep = Loadable({
-  loader: () => import('components/cycleCount/toCountTab/CountStep'),
-  loading: Loading,
-});
+const AsyncCycleCountCountStep = lazy(() => import('components/cycleCount/toCountTab/CountStep'));
 
-const AsyncCycleCountResolveStep = Loadable({
-  loader: () => import('components/cycleCount/toResolveTab/ResolveStep'),
-  loading: Loading,
-});
+const AsyncCycleCountResolveStep = lazy(() => import('components/cycleCount/toResolveTab/ResolveStep'));
 
-const AsyncCycleCountReporting = Loadable({
-  loader: () => import('components/cycleCountReporting/CycleCountReporting'),
-  loading: Loading,
-});
+const AsyncCycleCountReporting = lazy(() => import('components/cycleCountReporting/CycleCountReporting'));
 
-const AsyncReorderReport = Loadable({
-  loader: () => import('components/reporting/reorderReport/ReorderReport'),
-  loading: Loading,
-});
+const AsyncReorderReport = lazy(() => import('components/reporting/reorderReport/ReorderReport'));
 
-const AsyncExpirationHistoryReport = Loadable({
-  loader: () => import('components/reporting/expirationHistoryReport/ExpirationHistoryReport'),
-  loading: Loading,
-});
+const AsyncExpirationHistoryReport = lazy(() => import('components/reporting/expirationHistoryReport/ExpirationHistoryReport'));
 
 const StockMovementList = (props) => {
   const parsedSearchQuery = queryString.parse(props?.location?.search);
@@ -223,14 +110,11 @@ const StockMovementList = (props) => {
       );
     }
     default:
-      return <Redirect to={DASHBOARD_URL.base} />;
+      return <Navigate to={DASHBOARD_URL.base} />;
   }
 };
 
-const AsyncStockTransferList = Loadable({
-  loader: () => import('components/stock-transfer/list/StockTransferList'),
-  loading: Loading,
-});
+const AsyncStockTransferList = lazy(() => import('components/stock-transfer/list/StockTransferList'));
 
 const Router = () => {
   useConnectionListener();
@@ -248,51 +132,51 @@ const Router = () => {
 
   return (
     <div>
-      <BrowserRouter>
+      <BrowserRouter basename={window.CONTEXT_PATH || '/openboxes'}>
         <FlashScopeListenerWrapper>
-          <Switch>
-            <MainLayoutRoute path="**/putAway/create/:putAwayId?" component={AsyncPutAwayMainPage} />
-            <MainLayoutRoute path="**/stockMovement/list" component={StockMovementList} />
-            <MainLayoutRoute path="**/stockMovement/createOutbound/:stockMovementId?" component={AsyncStockMovement} />
-            <MainLayoutRoute path="**/stockMovement/importOutboundStockMovement" component={AsyncOutboundImport} />
-            <MainLayoutRoute path="**/report/expirationHistoryReport" component={AsyncExpirationHistoryReport} />
-            <MainLayoutRoute path="**/inventory/reorderReport" component={AsyncReorderReport} />
-            <MainLayoutRoute path="**/inventory/cycleCount/count" component={AsyncCycleCountCountStep} />
-            <MainLayoutRoute path="**/inventory/cycleCount/resolve" component={AsyncCycleCountResolveStep} />
-            <MainLayoutRoute path="**/inventory/cycleCount/reporting" component={AsyncCycleCountReporting} />
-            <MainLayoutRoute path="**/inventory/cycleCount" component={AsyncCycleCount} />
-            <MainLayoutRoute path="**/stockMovement/createInbound/:stockMovementId?" component={AsyncStockMovementInbound} />
-            <MainLayoutRoute path="**/stockMovement/createCombinedShipments/:stockMovementId?" component={AsyncStockMovementCombinedShipments} />
-            <MainLayoutRoute path="**/stockMovement/createRequest/:stockMovementId?" component={AsyncStockMovementRequest} />
-            <MainLayoutRoute path="**/stockMovement/verifyRequest/:stockMovementId?" component={AsyncStockMovementVerifyRequest} />
-            <MainLayoutRoute path="**/stockMovement/create/:stockMovementId?" component={AsyncStockMovement} />
-            <MainLayoutRoute path="**/partialReceiving/create/:shipmentId" component={AsyncReceivingPage} />
-            <MainLayoutRoute path="**/stocklistManagement/index/:productId?" component={AsyncManagement} />
-            <MainLayoutRoute path="**/invoice/create/:invoiceId?" component={AsyncInvoice} />
-            <MainLayoutRoute path="**/invoice/list" component={AsyncInvoiceList} />
-            <MainLayoutRoute path="**/stockTransfer/create/:stockTransferId?" component={AsyncStockTransfer} />
-            <MainLayoutRoute path="**/stockTransfer/createOutboundReturn/:outboundReturnId?" component={AsyncOutboundReturns} />
-            <MainLayoutRoute path="**/stockTransfer/createInboundReturn/:inboundReturnId?" component={AsyncInboundReturns} />
-            <MainLayoutRoute path="**/replenishment/create/:replenishmentId?" component={AsyncReplenishment} />
-            <MainLayoutRoute path="**/productsConfiguration/index" component={AsyncProductsConfiguration} />
-            <MainLayoutRoute path="**/locationsConfiguration/create/:locationId?" component={AsyncLocationsConfiguration} />
-            <MainLayoutRoute path="**/locationsConfiguration/upload" component={AsyncImportLocations} />
-            <Route path="**/locationsConfiguration/index">
-              <AsyncWelcomePage />
-            </Route>
-            <Route path="**/loadData/index"><AsyncLoadDataPage /></Route>
-            <Route path="**/resettingInstanceInfo/index">
-              <AsyncResetInstancePage />
-            </Route>
-            <MainLayoutRoute path="**/purchaseOrder/list" component={AsyncPurchaseOrderList} />
-            <MainLayoutRoute path="**/requisitionTemplate/list" component={AsyncStockList} />
-            <MainLayoutRoute path="**/product/list" component={AsyncProductsList} />
-            <MainLayoutRoute path="**/stockTransfer/list" component={AsyncStockTransferList} />
-            <MainLayoutRoute path="**/productSupplier/list" component={AsyncProductSupplierList} />
-            <MainLayoutRoute path="**/productSupplier/create/:productSupplierId?" component={AsyncProductSupplierCreatePage} />
-            <MainLayoutRoute path="**/dashboard/:configId?" component={Dashboard} />
-            <MainLayoutRoute path="**/" component={Dashboard} />
-          </Switch>
+          <Suspense fallback={<div style={{ textAlign: 'center', padding: '50px' }}>Loading...</div>}>
+            <Routes>
+              <Route element={<MainLayout />}>
+                <Route path="/purchaseOrder/list" element={<AsyncPurchaseOrderList />} />
+                <Route path="/requisitionTemplate/list" element={<AsyncStockList />} />
+                <Route path="/product/list" element={<AsyncProductsList />} />
+                <Route path="/stockTransfer/list" element={<AsyncStockTransferList />} />
+                <Route path="/productSupplier/list" element={<AsyncProductSupplierList />} />
+                <Route path="/productSupplier/create/:productSupplierId?" element={<AsyncProductSupplierCreatePage />} />
+                <Route path="/dashboard/:configId?" element={<Dashboard />} />
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/putAway/create/:putAwayId?" element={<AsyncPutAwayMainPage />} />
+                <Route path="/stockMovement/list" element={<StockMovementList />} />
+                <Route path="/stockMovement/createOutbound/:stockMovementId?" element={<AsyncStockMovement />} />
+                <Route path="/stockMovement/importOutboundStockMovement" element={<AsyncOutboundImport />} />
+                <Route path="/report/expirationHistoryReport" element={<AsyncExpirationHistoryReport />} />
+                <Route path="/inventory/reorderReport" element={<AsyncReorderReport />} />
+                <Route path="/inventory/cycleCount/count" element={<AsyncCycleCountCountStep />} />
+                <Route path="/inventory/cycleCount/resolve" element={<AsyncCycleCountResolveStep />} />
+                <Route path="/inventory/cycleCount/reporting" element={<AsyncCycleCountReporting />} />
+                <Route path="/inventory/cycleCount" element={<AsyncCycleCount />} />
+                <Route path="/stockMovement/createInbound/:stockMovementId?" element={<AsyncStockMovementInbound />} />
+                <Route path="/stockMovement/createCombinedShipments/:stockMovementId?" element={<AsyncStockMovementCombinedShipments />} />
+                <Route path="/stockMovement/createRequest/:stockMovementId?" element={<AsyncStockMovementRequest />} />
+                <Route path="/stockMovement/verifyRequest/:stockMovementId?" element={<AsyncStockMovementVerifyRequest />} />
+                <Route path="/stockMovement/create/:stockMovementId?" element={<AsyncStockMovement />} />
+                <Route path="/partialReceiving/create/:shipmentId" element={<AsyncReceivingPage />} />
+                <Route path="/stocklistManagement/index/:productId?" element={<AsyncManagement />} />
+                <Route path="/invoice/create/:invoiceId?" element={<AsyncInvoice />} />
+                <Route path="/invoice/list" element={<AsyncInvoiceList />} />
+                <Route path="/stockTransfer/create/:stockTransferId?" element={<AsyncStockTransfer />} />
+                <Route path="/stockTransfer/createOutboundReturn/:outboundReturnId?" element={<AsyncOutboundReturns />} />
+                <Route path="/stockTransfer/createInboundReturn/:inboundReturnId?" element={<AsyncInboundReturns />} />
+                <Route path="/replenishment/create/:replenishmentId?" element={<AsyncReplenishment />} />
+                <Route path="/productsConfiguration/index" element={<AsyncProductsConfiguration />} />
+                <Route path="/locationsConfiguration/create/:locationId?" element={<AsyncLocationsConfiguration />} />
+                <Route path="/locationsConfiguration/upload" element={<AsyncImportLocations />} />
+              </Route>
+              <Route path="/locationsConfiguration/index" element={<AsyncWelcomePage />} />
+              <Route path="/loadData/index" element={<AsyncLoadDataPage />} />
+              <Route path="/resettingInstanceInfo/index" element={<AsyncResetInstancePage />} />
+            </Routes>
+          </Suspense>
         </FlashScopeListenerWrapper>
       </BrowserRouter>
       <div className="spinner-container">
@@ -302,14 +186,12 @@ const Router = () => {
           style={{ top: '40%', left: '50%' }}
         />
       </div>
-      <Alert
-        timeout={notificationAutohideDelay}
-        stack={{ limit: 3 }}
-        contentTemplate={CustomAlert}
-        position="top-right"
-        effect="bouncyflip"
-        offset={20}
-      />
+      {/* <ToastContainer */}
+      {/*   autoClose={notificationAutohideDelay} */}
+      {/*   limit={3} */}
+      {/*   position="top-right" */}
+      {/*   hideProgressBar */}
+      {/* /> */}
     </div>
   );
 };

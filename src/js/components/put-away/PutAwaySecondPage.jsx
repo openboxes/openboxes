@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+// import Tippy from '@tippyjs/react';
 import update from 'immutability-helper';
 import fileDownload from 'js-file-download';
 import _ from 'lodash';
@@ -9,7 +10,6 @@ import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import ReactTable from 'react-table';
-import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { PUTAWAY_GENERATE_PDF } from 'api/urls';
@@ -71,7 +71,8 @@ class PutAwaySecondPage extends Component {
     this.fetchPutAway();
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     showLocationChangedAlert(
       this.props.translate, this.state.location, nextProps.location,
       () => { window.location = `${ORDER_URL.list()}?orderType=PUTAWAY_ORDER&status=PENDING`; },
@@ -183,48 +184,48 @@ class PutAwaySecondPage extends Component {
 
         if (edit) {
           return (
-            <Tooltip
-              html={disabledMessage}
-              disabled={!disabledMessage}
-              theme="transparent"
-              arrow="true"
-              delay="150"
-              duration="250"
-              hideDelay="50"
-            >
-              <div className={hasValidationError(props?.value, props.original?.quantityAvailable) ? 'has-error' : ''}>
-                <input
-                  type="number"
-                  className="form-control form-control-xs"
-                  data-testid="quantity-input"
-                  value={props.value}
-                  onChange={(event) => {
-                    const putAway = update(this.state.putAway, {
-                      putawayItems: { [itemIndex]: { quantity: { $set: event.target.value } } },
-                    });
+          // <Tippy
+          //   content={disabledMessage}
+          //   disabled={!disabledMessage}
+          //   theme="transparent"
+          //   arrow="true"
+          //   delay="150"
+          //   duration="250"
+          //   hideDelay="50"
+          // >
+            <div className={hasValidationError(props?.value, props.original?.quantityAvailable) ? 'has-error' : ''}>
+              <input
+                type="number"
+                className="form-control form-control-xs"
+                data-testid="quantity-input"
+                value={props.value}
+                onChange={(event) => {
+                  const putAway = update(this.state.putAway, {
+                    putawayItems: { [itemIndex]: { quantity: { $set: event.target.value } } },
+                  });
 
-                    this.changePutAway(putAway);
-                  }}
-                />
-              </div>
-            </Tooltip>
+                  this.changePutAway(putAway);
+                }}
+              />
+            </div>
+          // </Tippy>
           );
         }
 
         return (
-          <Tooltip
-            html={disabledMessage}
-            disabled={!disabledMessage}
-            theme="transparent"
-            arrow="true"
-            delay="150"
-            duration="250"
-            hideDelay="50"
-          >
-            <div className={hasValidationError(props.value, props.original?.quantityAvailable) ? 'has-error' : ''}>
-              <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>
-            </div>
-          </Tooltip>
+        // <Tippy
+        //   content={disabledMessage}
+        //   disabled={!disabledMessage}
+        //   theme="transparent"
+        //   arrow="true"
+        //   delay="150"
+        //   duration="250"
+        //   hideDelay="50"
+        // >
+          <div className={hasValidationError(props.value, props.original?.quantityAvailable) ? 'has-error' : ''}>
+            <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>
+          </div>
+        // </Tippy>
         );
       },
       Filter,

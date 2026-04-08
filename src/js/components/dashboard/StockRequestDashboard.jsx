@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 
+// import Tippy from '@tippyjs/react';
 import PropTypes from 'prop-types';
 import { RiStickyNoteFill } from 'react-icons/ri';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import ReactTable from 'react-table';
-import { Tooltip } from 'react-tippy';
 
 import { fetchTranslations } from 'actions';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
@@ -42,15 +42,15 @@ const COLUMNS = [
             {row.original.displayStatus?.label}
           </span>
           {comment && (
-            <Tooltip
-              html={comment}
-              theme="transparent"
-              delay="150"
-              duration="250"
-              hideDelay="50"
-            >
-              <RiStickyNoteFill className="text-warning mr-1" />
-            </Tooltip>
+          // <Tippy
+          //   content={comment}
+          //   theme="transparent"
+          //   delay="150"
+          //   duration="250"
+          //   hideDelay="50"
+          // >
+          <RiStickyNoteFill className="text-warning mr-1" />
+          // </Tippy>
           )}
         </span>
       );
@@ -103,7 +103,8 @@ class StockRequestDashboard extends Component {
     this.props.fetchTranslations('', 'stockMovement');
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'stockMovement');
     }

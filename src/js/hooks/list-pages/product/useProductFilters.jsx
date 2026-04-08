@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import queryString from 'query-string';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import filterFields from 'components/products/FilterFields';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
@@ -26,11 +26,11 @@ const useProductFilters = () => {
   const [handlingRequirements, setHandlingRequirements] = useState([]);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const clearFilterValues = () => {
-    const { pathname } = history.location;
-    history.push({ pathname });
+    navigate(location.pathname);
   };
 
   const setDefaultValue = (queryPropsParam, elementsList) => {
@@ -50,7 +50,7 @@ const useProductFilters = () => {
     const defaultValues = Object.keys(filterFields)
       .reduce((acc, key) => ({ ...acc, [key]: '' }), {});
 
-    const queryProps = queryString.parse(history.location.search);
+    const queryProps = queryString.parse(location.search);
 
     const {
       catalogId, tagId, categoryId, glAccountsId, productFamilyId, handlingRequirementId,
@@ -139,9 +139,8 @@ const useProductFilters = () => {
     };
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);
-    const { pathname } = history.location;
     if (Object.keys(values).length) {
-      history.push({ pathname, search: queryFilterParams });
+      navigate({ search: `?${queryFilterParams}` });
     }
     setFilterParams(values);
   };

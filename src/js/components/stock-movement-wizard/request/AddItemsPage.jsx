@@ -10,8 +10,8 @@ import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import Alert from 'react-s-alert';
+import withRouter from 'utils/withRouter';
+import { toast } from 'react-toastify';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import { STOCK_MOVEMENT_STATUS, STOCK_MOVEMENT_UPDATE_ITEMS } from 'api/urls';
@@ -671,7 +671,8 @@ class AddItemsPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
@@ -1293,7 +1294,7 @@ class AddItemsPage extends Component {
               .then((response) => {
                 if (response.status === 204) {
                   this.props.hideSpinner();
-                  Alert.success(this.props.translate(
+                  toast.success(this.props.translate(
                     'react.stockMovement.request.successfullyDeleted.label',
                     'Request was successfully deleted',
                   ), { timeout: 3000 });
@@ -1376,7 +1377,7 @@ class AddItemsPage extends Component {
     return this.saveRequisitionItemsInCurrentStep(lineItems)
       .then(() => {
         this.props.hideSpinner();
-        Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
+        toast.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
       })
       .catch(() => {
         this.props.hideSpinner();
@@ -1466,7 +1467,7 @@ class AddItemsPage extends Component {
     } else {
       this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
     }
-    Alert.success(`${translatedSubmitMessage} ${movementNumber}`);
+    toast.success(`${translatedSubmitMessage} ${movementNumber}`);
     return Promise.resolve();
   }
 

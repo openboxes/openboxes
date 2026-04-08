@@ -1,17 +1,15 @@
-import React from 'react';
+import React, { useId } from 'react';
 
+import parse from 'html-react-parser';
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import ReactHtmlParser from 'react-html-parser';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { Tooltip } from 'react-tippy';
+import { Tooltip } from 'react-tooltip';
 
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
-
-import 'react-tippy/dist/tippy.css';
 
 export const renderFormField = (fieldConfig, fieldName, props = {}) => {
   const FieldType = fieldConfig.type;
@@ -46,21 +44,16 @@ export const renderFormFields = ({
   const hasErrorClass = (touched || fieldTouched || showError) && error ? 'has-error' : '';
   const className = [supplementClass, filterElementClass, requiredClass, hiddenClass, hasErrorClass].join(' ');
   const fieldAriaLabel = ariaLabel || translate(FieldLabel, defaultMessage);
+  const tooltipId = useId();
 
   if (arrayField) {
     return (
-      <Tooltip
-        title={error ? translate(`${error}`) : undefined}
-        disabled={!error || !(touched || fieldTouched)}
-        arrow="true"
-        delay="150"
-        duration="250"
-        hideDelay="50"
-      >
-        <div className={className} data-testid="form-field" aria-label={fieldAriaLabel}>
+      <>
+        <div data-tooltip-id={`arrayField-${tooltipId}`} className={className} data-testid="form-field" aria-label={fieldAriaLabel}>
           {renderInput(input, otherAttr)}
         </div>
-      </Tooltip>
+        <Tooltip id={!error || !(touched || fieldTouched) ? undefined : `arrayField-${tooltipId}`} content={translate(error)} />
+      </>
     );
   }
 
@@ -74,18 +67,22 @@ export const renderFormFields = ({
                 {FieldLabel && <Translate id={FieldLabel} defaultMessage={defaultMessage} />}
                 {otherAttr.withTooltip
                   && (
-                    <Tooltip
-                      interactive="true"
-                      arrow="true"
-                      trigger={trigger}
-                      hideOnClick="true"
-                      html={injectionData
-                        ? ReactHtmlParser(translate(tooltip, tooltip, injectionData))
-                        : translate(tooltip, tooltip)}
-                    >
-                      &nbsp;
-                      <i className="fa fa-question-circle-o text-primary" aria-hidden="true" />
-                    </Tooltip>
+                    <>
+                      <span data-tooltip-id={tooltipId}>
+                        &nbsp;
+                        <i className="fa fa-question-circle-o text-primary" aria-hidden="true" />
+                      </span>
+                      <Tooltip
+                        id={tooltipId}
+                        clickable
+                        events={trigger === 'click' ? ['click'] : ['hover']}
+                        className="custom-tooltip"
+                      >
+                        {injectionData
+                          ? parse(translate(tooltip, tooltip, injectionData))
+                          : translate(tooltip, tooltip)}
+                      </Tooltip>
+                    </>
                   )}
               </label>
             )

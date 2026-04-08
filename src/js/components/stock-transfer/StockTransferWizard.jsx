@@ -4,7 +4,6 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
 
 import {
   fetchTranslations,
@@ -17,6 +16,7 @@ import StockTransferSecondPage from 'components/stock-transfer/StockTransferSeco
 import Wizard from 'components/wizard/Wizard';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'components/stock-transfer/StockTransfer.scss';
 
@@ -43,7 +43,8 @@ class StockTransferWizard extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'stockTransfer');
     }

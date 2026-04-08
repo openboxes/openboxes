@@ -3,7 +3,7 @@ import React, { useRef } from 'react';
 import { format, parse } from 'date-fns';
 import * as locales from 'date-fns/locale';
 import PropTypes from 'prop-types';
-import DatePicker from 'react-datepicker-6';
+import DatePicker from 'react-datepicker';
 import { useSelector } from 'react-redux';
 import { getCurrentLocale } from 'selectors';
 
@@ -19,7 +19,7 @@ import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 
 import 'components/form-elements/DateFilter/DateFilter.scss';
 import 'components/form-elements/v2/style.scss';
-import 'react-datepicker-6/dist/react-datepicker.css';
+// import 'react-datepicker/dist/react-datepicker.css';
 
 const DateFieldDateFns = ({
   title,

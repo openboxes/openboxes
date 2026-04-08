@@ -8,7 +8,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import withRouter from 'utils/withRouter';
 
 import {
   closeInfoBar,
@@ -237,7 +237,8 @@ class CreateStockMovement extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (!this.props.match.params.stockMovementId && this.state.setInitialValues
       && nextProps.location.id) {
       this.setInitialValues(nextProps.location);

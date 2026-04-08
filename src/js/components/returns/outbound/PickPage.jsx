@@ -124,7 +124,8 @@ class PickPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.outboundReturnsTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchOutboundReturn();

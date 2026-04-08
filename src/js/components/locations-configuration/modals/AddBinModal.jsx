@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
@@ -30,7 +30,7 @@ class AddBinModal extends Component {
     }))
       .then(() => {
         this.props.hideSpinner();
-        Alert.success(this.props.translate('react.locationsConfiguration.addBin.success.label', 'Bin location has been created successfully!'), { timeout: 3000 });
+        toast.success(this.props.translate('react.locationsConfiguration.addBin.success.label', 'Bin location has been created successfully!'), { timeout: 3000 });
         this.props.addBinLocation();
       })
       .catch(() => {
