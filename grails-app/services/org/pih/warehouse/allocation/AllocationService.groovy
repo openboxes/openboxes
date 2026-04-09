@@ -225,7 +225,7 @@ class AllocationService {
         return stockMovementService.getSuggestedItems(includedItems, quantityRequired)
     }
 
-    private List<AvailableItem> applyStrategies(Location location, List<AvailableItem> availableItems, List<AllocationStrategy> strategies) {
+    private List<AvailableItem> applyStrategies(Location facility, List<AvailableItem> availableItems, List<AllocationStrategy> strategies) {
         if (!strategies || strategies.isEmpty()) {
             strategies = grailsApplication.config.openboxes.order.allocation.strategies
         }
@@ -235,9 +235,9 @@ class AllocationService {
 
         List<AvailableItem> displayItems = availableItems.findAll { it.binLocation?.isDisplay() }
         List<AvailableItem> warehouseItems = availableItems.findAll { !it.binLocation?.isDisplay() }
-        Set<Location> preferredBinLocations = getPreferredBinLocations(location, warehouseItems?.find()?.inventoryItem?.product)
+        Set<Location> preferredBinLocations = getPreferredBinLocations(facility, warehouseItems?.find()?.inventoryItem?.product)
         List<AvailableItem> preferredItems = warehouseItems?.findAll {preferredBinLocations.contains(it.binLocation) }
-        List<AvailableItem> remainingItems = (warehouseItems?: 0) - (preferredItems?: 0)
+        List<AvailableItem> remainingItems = (warehouseItems?: []) - (preferredItems?: [])
         List<AvailableItem> result = []
 
         strategies.each { strategy ->
@@ -268,12 +268,12 @@ class AllocationService {
         return result
     }
 
-    private Set<Location> getPreferredBinLocations(Location location, Product product) {
+    private Set<Location> getPreferredBinLocations(Location facility, Product product) {
         if (!product) {
             return []
         }
 
-        Set<InventoryLevel> inventoryLevels = location?.inventory?.configuredProducts?.findAll { it.product == product && it.preferredBinLocation != null }
+        Set<InventoryLevel> inventoryLevels = facility?.inventory?.configuredProducts?.findAll { it.product == product && it.preferredBinLocation != null }
         return inventoryLevels?.collect { it.preferredBinLocation }
     }
 
