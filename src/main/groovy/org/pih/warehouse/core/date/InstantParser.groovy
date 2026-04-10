@@ -6,9 +6,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import org.apache.commons.lang.StringUtils
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.DateUtil
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.stereotype.Component
 
 import org.pih.warehouse.databinding.DataBindingConstants
@@ -60,36 +58,40 @@ class InstantParser extends AbstractDateParser<Instant> {
             throw new DateTimeException('Cannot convert an Excel formatted double to an Instant without specifying a timezone')
         }
 
-        // We let Apache POI handle converting the double for us, rounding the date to the nearest second.
-        // The date has no timezone associated with it, so we need to specify it ourselves.
+        /*
+         * Dates can be represented as doubles when they are coming from Excel, so we let Apache POI handle converting
+         * the date for us, rounding the date to the nearest second.
+         *
+         * It's important to note that the date coming from Excel is a datetime with no timezone, which maps most
+         * closely to java.time.LocalDateTime. As such, to convert to an Instant we need the timezone to be specified.
+         *
+         * The decimal portion of the double represents the number of days since epoch, but Excel files have different
+         * epoch dates for different operating systems (see EpochDate for details).
+         *
+         * The decimal portion of the double represents the fraction of time into the day. It ranges from
+         * 0 (midnight) to 0.99999999 (23:59:59 aka 11:59:59 PM). A decimal value of .5 represents noon.
+         *
+         * From Microsoft:
+         *
+         *     Excel stores dates as sequential numbers called serial values. On Windows, January 1, 1900 is serial
+         *     number 1, and January 1, 2008 is serial number 39448 because it is 39,448 days after January 1, 1900.
+         *
+         * But that's not technically correct. For Windows systems, Excel has an off-by-one error due to incorrectly
+         * treating 1900 as a leap year, causing the serial number to be shifted back by one. (Microsoft actually did
+         * this intentionally to match the existing bug/behaviour in their competitor Lotus 1-2-3.)
+         *
+         * Also, dates in Windows systems are 1-index based, so to get t=0, you need to shift the serial number back
+         * AGAIN by one.
+         *
+         * So on Windows machines, the double representing Jan 1st, 1900 is "2.0".
+         *
+         * Fortunately this horrible mess gets abstracted away from us by POI, so we don't need to worry about it here.
+         */
         // TODO: getLocalDateTime is better but is only in POI 4.1.2+. The excel-import plugin (which is no longer
         //       supported) does not support that version so we're stuck with this until we can replace the plugin.
-        Date date = DateUtil.getJavaDate(excelDate, use1904Windowing(context), TimeZone.getTimeZone(zone), true)
+        boolean use1904Windowing = context?.epochDate == EpochDate.EXCEL_1904
+        Date date = DateUtil.getJavaDate(excelDate, use1904Windowing, TimeZone.getTimeZone(zone), true)
         return asInstant(date)
-    }
-
-    /**
-     * Returns true if we should use Excel's 1904 date system, false if we should use the 1900 system.
-     *
-     * Excel represents dates as: "<days since Excel epoch>.<fraction of time into the day>". Annoyingly, Excel epoch
-     * is different for different operating systems. For windows machines, "epoch" is Jan 1st 1900. For apple machines,
-     * it's "Jan 1st 1904".
-     *
-     * So for example: Jan 1st 1904 12:00, is 1462.5 for windows machines and 1.5 for apple machines.
-     *
-     * https://support.microsoft.com/en-us/office/date-systems-in-excel-e7fe7167-48a9-4b96-bb53-5612a800b487
-     */
-    private static boolean use1904Windowing(DateParserContext context) {
-        switch (context.excelWorkbook) {
-            case XSSFWorkbook:  // .xlsx files
-                return (context.excelWorkbook as XSSFWorkbook).isDate1904()
-            case HSSFWorkbook:  // .xls files
-                return (context.excelWorkbook as HSSFWorkbook).internalWorkbook?.isUsing1904DateWindowing() ?: false
-            case null:
-                return false
-            default:
-                throw new UnsupportedOperationException("Unsupported Excel workbook type [${context.excelWorkbook.class}]")
-        }
     }
 
     /**

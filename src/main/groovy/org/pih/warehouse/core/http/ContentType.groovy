@@ -37,4 +37,10 @@ enum ContentType {
         this.fileExtension = fileExtension
         this.mediaType = mediaType
     }
+
+    static ContentType getByMediaType(String mediaType) {
+        return values().find {
+            it.mediaType == MediaType.parseMediaType(mediaType)
+        }
+    }
 }
