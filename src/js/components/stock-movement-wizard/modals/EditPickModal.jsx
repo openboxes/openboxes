@@ -169,6 +169,9 @@ function validate(values) {
     if (item.quantityAllocated > item.quantityAvailable) {
       errors.availableItems[key].quantityAllocated = 'react.stockMovement.errors.higherThanAvailable.label';
     }
+    if (item.quantityPicked > item.quantityAllocated) {
+      errors.availableItems[key].quantityPicked = 'react.stockMovement.errors.pickedHigherThanAllocated.label';
+    }
   });
 
   const allocatedSum = _.reduce(
