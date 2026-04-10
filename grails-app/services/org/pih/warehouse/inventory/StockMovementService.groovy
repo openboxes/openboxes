@@ -1941,6 +1941,8 @@ class StockMovementService {
             requisitionItem.addToPicklistItems(picklistItem)
             picklistItem.inventoryItem = inventoryItem
             picklistItem.binLocation = binLocation
+            // Safeguard: Ensure allocated quantity is never less than picked quantity.
+            // The frontend validates that picked <= allocated, but this protects against API misuse.
             picklistItem.quantity = quantityPicked ?: quantityToPick
             picklistItem.quantityPicked = quantityPicked ?: 0
             picklistItem.reasonCode = reasonCode ?: null
