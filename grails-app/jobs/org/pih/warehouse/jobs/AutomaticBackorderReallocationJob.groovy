@@ -11,8 +11,7 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.quartz.JobExecutionContext
 
-// TODO: this should turn into AutomaticAllocationJob and also handle non-backordered outbounds
-class ReallocationJob {
+class AutomaticBackorderReallocationJob {
 
     def shipmentService
     def allocationService
@@ -21,12 +20,12 @@ class ReallocationJob {
     def sessionRequired = false
 
     static triggers = {
-        cron name: JobUtils.getCronName(ReallocationJob),
-        cronExpression: JobUtils.getCronExpression(ReallocationJob)
+        cron name: JobUtils.getCronName(AutomaticBackorderReallocationJob),
+        cronExpression: JobUtils.getCronExpression(AutomaticBackorderReallocationJob)
     }
 
     def execute(JobExecutionContext context) {
-        if (!Holders.config.openboxes.jobs.reallocationJob.enabled) {
+        if (!Holders.config.openboxes.jobs.automaticBackorderReallocationJob.enabled) {
             log.info"Backorder re-allocation job is disabled"
             return
         }

@@ -13,7 +13,7 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import grails.validation.ValidationException
-import org.pih.warehouse.allocation.ReallocationEvent
+import org.pih.warehouse.allocation.AutomaticBackorderReallocationEvent
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
@@ -548,7 +548,7 @@ class ReceiptService {
     }
 
     def reallocateBackorderedItems(String shipmentId) {
-        Holders.grailsApplication.mainContext.publishEvent(new ReallocationEvent(shipmentId))
+        Holders.grailsApplication.mainContext.publishEvent(new AutomaticBackorderReallocationEvent(shipmentId))
     }
 
     PartialReceipt createAutomaticReceipt(Shipment shipment) {

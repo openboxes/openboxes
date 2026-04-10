@@ -549,12 +549,15 @@ openboxes:
             delayInMilliseconds: 1000
             bulkShipmentAutoReceipt: true
 
-        # TODO: This probably should turn into automaticAllocationJob and handle non-backordered outbounds as well
-        reallocationJob:
+        automaticBackorderReallocationJob:
             enabled: true
             cronExpression: "0 */5 * * * ?" # every five minutes
             delayInMilliseconds: 10000
 
+        automaticAllocationJob:
+            enabled: true
+            cronExpression: "0 */5 * * * ?"     # every five minutes
+            delayInMilliseconds: 1000
     # LDAP configuration
     ldap:
         enabled: false
