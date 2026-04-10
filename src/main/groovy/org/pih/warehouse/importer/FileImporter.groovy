@@ -10,12 +10,12 @@ import org.pih.warehouse.core.file.FileExtension
 interface FileImporter<Config extends DataFileImporterConfig> {
 
     /**
-     *
+     * Imports the file, binding its rows to a simple List of Map of fields.
      */
     abstract FileImportResult importFile(UploadedFile file, Config config)
 
     /**
-     *
+     * @return the list of file extensions that the importer can handle
      */
     abstract List<FileExtension> getSupportedFileExtensions()
 }

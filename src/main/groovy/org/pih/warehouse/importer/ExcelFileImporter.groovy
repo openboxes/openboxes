@@ -98,8 +98,6 @@ class ExcelFileImporter implements FileImporter<ExcelFileImporterConfig> {
             case CellType.STRING:
                 return cellValue.stringValue
             case CellType.NUMERIC:
-                // Note that date fields will be numerics, but we don't attempt to bind them to their date types yet.
-                // We leave that to the data binding step.
                 return cellValue.numberValue
             case CellType.BOOLEAN:
                 return cellValue.booleanValue
