@@ -1893,8 +1893,7 @@ class StockMovementService {
                     ].toArray(), errorMessage)
                     throw new ValidationException(errorMessage, requisitionItem.errors)
                 }
-                Integer suggestedItemsQuantity = 0
-                suggestedItems.forEach { suggestedItemsQuantity += it.quantityPicked }
+                Integer suggestedItemsQuantity = suggestedItems?.sum { it.quantityPicked } ?: 0
                 if (suggestedItemsQuantity < quantityRequired) {
                     String errorMessage = "Product " + requisitionItem.product.productCode + " has less available inventory " + suggestedItemsQuantity + " than required " + quantityRequired + ". Please go back to edit page and revise quantity"
                     requisitionItem.errors.rejectValue("picklistItems", errorMessage, [
