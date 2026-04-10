@@ -9,9 +9,11 @@ import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -204,7 +206,7 @@ class AllocationService {
     private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationStrategy> strategies, List<AvailableItem> excludeList = []) {
         Location location = requisitionItem.requisition.origin
         List<AvailableItem> allAvailableItems = stockMovementService.getAvailableItems(location, requisitionItem, false)
-        List<AvailableItem> filteredItems = applyStrategies(allAvailableItems, strategies)
+        List<AvailableItem> filteredItems = applyStrategies(location, allAvailableItems, strategies)
         List<AvailableItem> includedItems = filteredItems.findAll { !excludeList.contains(it) }
 
         boolean isBackordered = requisitionItem.isBackordered()
@@ -223,24 +225,38 @@ class AllocationService {
         return stockMovementService.getSuggestedItems(includedItems, quantityRequired)
     }
 
-    private List<AvailableItem> applyStrategies(List<AvailableItem> items, List<AllocationStrategy> strategies) {
+    private List<AvailableItem> applyStrategies(Location facility, List<AvailableItem> availableItems, List<AllocationStrategy> strategies) {
         if (!strategies || strategies.isEmpty()) {
             strategies = grailsApplication.config.openboxes.order.allocation.strategies
         }
         if (!strategies || strategies.isEmpty()) {
-            return items
+            return availableItems
         }
 
-        List<AvailableItem> result = new ArrayList<>(items)
+        List<AvailableItem> displayItems = availableItems.findAll { it.binLocation?.isDisplay() }
+        List<AvailableItem> warehouseItems = availableItems.findAll { !it.binLocation?.isDisplay() }
+        Set<Location> preferredBinLocations = getPreferredBinLocations(facility, warehouseItems?.find()?.inventoryItem?.product)
+        List<AvailableItem> preferredItems = warehouseItems?.findAll {preferredBinLocations.contains(it.binLocation) }
+        List<AvailableItem> remainingItems = (warehouseItems?: []) - (preferredItems?: [])
+        List<AvailableItem> result = []
 
         strategies.each { strategy ->
             switch (strategy) {
                 case AllocationStrategy.DISPLAY_FIRST:
-                    result = result.findAll { it.binLocation?.isDisplay() }
+                    result.addAll(displayItems)
+                    result.addAll(preferredItems)
+                    result.addAll(remainingItems)
                     break
 
                 case AllocationStrategy.WAREHOUSE_FIRST:
-                    result = result.findAll { !it.binLocation?.isDisplay() }
+                    result.addAll(preferredItems)
+                    result.addAll(remainingItems)
+                    result.addAll(displayItems)
+                    break
+
+                case AllocationStrategy.WAREHOUSE_ONLY:
+                    result.addAll(preferredItems)
+                    result.addAll(remainingItems)
                     break
 
                 case AllocationStrategy.FEFO:
@@ -250,6 +266,15 @@ class AllocationService {
         }
 
         return result
+    }
+
+    private Set<Location> getPreferredBinLocations(Location facility, Product product) {
+        if (!product) {
+            return []
+        }
+
+        Set<InventoryLevel> inventoryLevels = facility?.inventory?.configuredProducts?.findAll { it.product == product && it.preferredBinLocation != null }
+        return inventoryLevels?.collect { it.preferredBinLocation }
     }
 
     private AllocationDetailsDto buildAllocationDetailsDto(RequisitionItem requisitionItem) {
