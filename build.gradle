@@ -129,6 +129,7 @@ assets {
 
 bootRun {
     addResources = true
+    dependsOn 'webpackDev'
     jvmArgs = [
         '-Dspring.output.ansi.enabled=never',
         '-Xdebug',
@@ -330,7 +331,7 @@ if (targetWebServer() != 'jetty') {
     }
 }
 
-dependencyCheckAnalyze.dependsOn 'npm_run_bundle'
+dependencyCheckAnalyze.dependsOn 'webpackProd'
 dependencyCheck {
     analyzers {
         assemblyEnabled = false
@@ -374,8 +375,11 @@ node {
     version = '14.21.3'
 }
 
+// Ensure webpack output exists before Grails processes resources.
+// The actual webpack task (webpackDev or webpackProd) is chosen
+// by bootRun or war respectively; mustRunAfter ensures ordering.
 processResources {
-    dependsOn 'npm_run_bundle'
+    mustRunAfter 'webpackDev', 'webpackProd'
 }
 
 repositories {
@@ -406,6 +410,7 @@ springBoot {
 }
 
 war {
+    dependsOn 'webpackProd'
     archiveName = 'openboxes.war'
     zip64 = true
 }
@@ -850,7 +855,17 @@ task nodeVersionInfo(type: NpmTask) {
     args = ['version']
 }
 
-npm_run_bundle.dependsOn nodeVersionInfo
+// Production webpack build — full ESLint, minification, and source maps (CI/war)
+task webpackProd(type: NpmTask) {
+    dependsOn nodeVersionInfo
+    args = ['run', 'bundle', '--', '--mode=production']
+}
+
+// Fast dev webpack build — skips ESLint, minification, and full source maps
+task webpackDev(type: NpmTask) {
+    dependsOn nodeVersionInfo
+    args = ['run', 'bundle', '--', '--mode=development']
+}
 
 task prepareDocker(type: Copy, dependsOn: assemble) {
     description = 'Copy files from ./docker and openboxes.war to build directory'
