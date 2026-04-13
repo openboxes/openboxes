@@ -12,10 +12,10 @@ interface FileImporter<Config extends DataFileImporterConfig> {
     /**
      * Imports the file, binding its rows to a simple List of Map of fields.
      */
-    abstract FileImportResult importFile(UploadedFile file, Config config)
+    FileImportResult importFile(UploadedFile file, Config config)
 
     /**
      * @return the list of file extensions that the importer can handle
      */
-    abstract List<FileExtension> getSupportedFileExtensions()
+    List<FileExtension> getSupportedFileExtensions()
 }

@@ -33,8 +33,4 @@ class UploadedFile implements Validateable {
     long getFileSize() {
         return file.size
     }
-
-    static constraints = {
-        file(nullable: false)
-    }
 }
