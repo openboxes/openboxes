@@ -11,7 +11,7 @@ package org.pih.warehouse.inventory
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
-import grails.orm.PagedResultList
+import grails.gorm.PagedResultList
 import grails.plugins.csv.CSVMapReader
 import grails.validation.ValidationException
 import org.grails.plugins.web.taglib.ApplicationTagLib
@@ -431,7 +431,7 @@ class StockMovementService {
         }
     }
 
-    def getInboundStockMovements(StockMovement criteria, Map params) {
+    PagedResultList<InboundStockMovementListItem> getInboundStockMovements(StockMovement criteria, Map params) {
         def max = params.max ? params.int("max") : null
         def offset = params.offset ? params.int("offset") : null
         Date createdAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
@@ -439,7 +439,7 @@ class StockMovementService {
         List<ShipmentType> shipmentTypes = params.list("shipmentType") ? params.list("shipmentType").collect{ ShipmentType.read(it) } : null
         Location currentLocation = AuthService.currentLocation
 
-        PagedResultList shipments = Shipment.createCriteria().list(max: max, offset: offset) {
+        PagedResultList<InboundStockMovementListItem> stockMovements = InboundStockMovementListItem.createCriteria().list(max: max, offset: offset) {
             // OBPIH-6403: We want to hide SMs with requisition of status REJECTED from the inbound list (only for the depot-depot case!!)
             // The "or" is needed, because otherwise, SMs without requisition were also filtered out from the list (e.g. shipment from PO)
             if (!currentLocation?.downstreamConsumer) {
@@ -454,7 +454,7 @@ class StockMovementService {
             if (criteria?.identifier || criteria.name || criteria?.description) {
                 or {
                     if (criteria?.identifier) {
-                        ilike("shipmentNumber", criteria.identifier)
+                        ilike("identifier", criteria.identifier)
                     }
                     if (criteria?.name) {
                         ilike("name", criteria.name)
@@ -504,9 +504,7 @@ class StockMovementService {
                         order("name", params.order ?: "desc")
                     }
                 } else if (params.sort == "dateRequested") {
-                    requisition {
-                        order("dateRequested", params.order ?: "desc")
-                    }
+                    order("dateRequested", params.order ?: "desc")
                 } else if (params.sort == "stocklist.name") {
                     requisition(JoinType.LEFT_OUTER_JOIN.joinTypeValue)  {
                         requisitionTemplate(JoinType.LEFT_OUTER_JOIN.joinTypeValue)  {
@@ -514,7 +512,7 @@ class StockMovementService {
                         }
                     }
                 } else if (params.sort == "identifier") {
-                    order("shipmentNumber", params.order ?: "desc")
+                    order("identifier", params.order ?: "desc")
                 } else {
                     order(params.sort, params.order ?: "desc")
                 }
@@ -522,14 +520,8 @@ class StockMovementService {
                 order("dateCreated", "desc")
             }
         }
-        List<StockMovement> stockMovements = shipments.collect { Shipment shipment ->
-            if (shipment.requisition) {
-                return StockMovement.createFromRequisition(shipment.requisition, params.includeStockMovementItems)
-            } else {
-                return StockMovement.createFromShipment(shipment, params.includeStockMovementItems)
-            }
-        }
-        return new PaginatedList<StockMovement>(stockMovements, shipments.totalCount)
+
+        return stockMovements
     }
 
     def getOutboundStockMovements(Integer maxResults, Integer offset) {
