@@ -11,6 +11,7 @@ package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
 import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.core.Constants
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.StockMovement
@@ -164,8 +165,11 @@ class OutboundStockMovementService {
                 le("dateCreated", createdBefore)
             }
             if (shipmentTypes) {
-                shipment {
+                or {
                     'in'("shipmentType", shipmentTypes)
+                    if (shipmentTypes.any { it.id == Constants.DEFAULT_SHIPMENT_TYPE_ID }) {
+                        isNull("shipmentType")
+                    }
                 }
             }
         }

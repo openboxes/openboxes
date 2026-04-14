@@ -14,6 +14,7 @@ CREATE OR REPLACE VIEW stock_movement_list_item AS
         r.updated_by_id,
         s.id AS shipment_id,
         s.current_status AS shipment_status,
+        s.shipment_type_id,
         # Depreacted, could be removed in a cleanup ticket
         CASE
             WHEN r.status IS NULL THEN 'REQUESTING'
@@ -51,6 +52,7 @@ CREATE OR REPLACE VIEW stock_movement_list_item AS
         o.updated_by_id,
         s.id AS shipment_id,
         s.current_status AS shipment_status,
+        s.shipment_type_id,
         # At point of refactoring status below, (OBPIH-6368) the statusCode seems not to be used anywhere
         # It is marked as deprecated and would be removed soon in a cleanup ticket
         # This is the reason it differs from the status - there was no point to refactor it along with the status in OBPIH-6368
