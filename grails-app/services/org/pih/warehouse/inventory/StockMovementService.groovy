@@ -471,15 +471,7 @@ class StockMovementService {
                 eq("createdBy", criteria?.createdBy)
             }
             if (criteria.requestedBy) {
-                or {
-                    requisition(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                        eq("requestedBy", criteria?.requestedBy)
-                    }
-                    and {
-                        isNull("requisition")
-                        eq("createdBy", criteria?.requestedBy)
-                    }
-                }
+                eq("requestedBy", criteria?.requestedBy)
             }
             if (criteria.updatedBy) {
                 eq("updatedBy", criteria.updatedBy)
@@ -506,10 +498,8 @@ class StockMovementService {
                 } else if (params.sort == "dateRequested") {
                     order("dateRequested", params.order ?: "desc")
                 } else if (params.sort == "stocklist.name") {
-                    requisition(JoinType.LEFT_OUTER_JOIN.joinTypeValue)  {
-                        requisitionTemplate(JoinType.LEFT_OUTER_JOIN.joinTypeValue)  {
-                            order("name", params.order ?: "desc")
-                        }
+                    stocklist(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        order("name", params.order ?: "desc")
                     }
                 } else if (params.sort == "identifier") {
                     order("identifier", params.order ?: "desc")
