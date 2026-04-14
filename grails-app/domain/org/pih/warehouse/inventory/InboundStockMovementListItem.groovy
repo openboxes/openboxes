@@ -39,43 +39,10 @@ class InboundStockMovementListItem implements Serializable, Validateable {
     ShipmentStatusCode currentStatus
     ShipmentType shipmentType
 
-    static transients = [
-        "fromReturnOrder",
-        "lineItemCount",
-        "displayStatus",
-        "status",
-        "received",
-        "partiallyReceived",
-        "pending",
-    ]
-
     static mapping = {
         version false
         cache usage: "read-only"
         table "inbound_stock_movement_list_item"
-
-        shipmentType column: "shipment_type_id"
-    }
-
-    static constraints = {
-        id(nullable: true)
-        name(nullable: true)
-        description(nullable: true)
-        identifier(nullable: true)
-        origin(nullable: false)
-        destination(nullable: false)
-        requestedBy(nullable: false)
-        createdBy(nullable: true)
-        updatedBy(nullable: true)
-        dateRequested(nullable: false)
-        dateCreated(nullable: true)
-        lastUpdated(nullable: true)
-        shipment(nullable: true)
-        requisition(nullable: true)
-        stocklist(nullable: true)
-        order(nullable: true)
-        currentStatus(nullable: true)
-        shipmentType(nullable: true)
     }
 
     String getStatus() {
@@ -135,7 +102,7 @@ class InboundStockMovementListItem implements Serializable, Validateable {
 
     Map toJson() {
         return [
-            id                  : requisition?.id ?: id,
+            id                  : id,
             name                : name,
             description         : description,
             shipmentType        : shipment?.shipmentType,

@@ -2,7 +2,7 @@ CREATE OR REPLACE VIEW inbound_stock_movement_list_item AS
     -- Querying from shipment (not requisition) to include purchase orders (POs never have a requisition).
     -- Requisition data is preferred via COALESCE when available.
     SELECT
-        s.id,
+        COALESCE(r.id, s.id)                               AS id,
         COALESCE(r.name, s.name)                           AS name,
         COALESCE(r.request_number, s.shipment_number)      AS identifier,
         COALESCE(r.description, s.description)             AS description,

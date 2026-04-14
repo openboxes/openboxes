@@ -483,7 +483,12 @@ class StockMovementService {
                 le("dateCreated", createdBefore)
             }
             if (shipmentTypes) {
-                'in'("shipmentType", shipmentTypes)
+                or {
+                    'in'("shipmentType", shipmentTypes)
+                    if (shipmentTypes.any { it.id == Constants.DEFAULT_SHIPMENT_TYPE_ID }) {
+                        isNull("shipmentType")
+                    }
+                }
             }
 
             if (params.sort) {
