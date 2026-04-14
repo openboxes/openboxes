@@ -15,7 +15,6 @@ import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
-import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.api.StockMovementStatusContext
 import util.StockMovementStatusResolver
 
@@ -40,7 +39,6 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
 
 
     ShipmentStatusCode shipmentStatus
-    ShipmentType shipmentType
 
     RequisitionStatus status
     Requisition stocklist
@@ -80,7 +78,6 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
         table "stock_movement_list_item"
 
         statusSortOrder formula: RequisitionStatus.getStatusSortOrderFormula()
-        shipmentType column: "shipment_type_id"
     }
 
     static constraints = {
@@ -104,7 +101,6 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
 
         stockMovementType(nullable: true)
         statusCode(nullable: true)
-        shipmentType(nullable: true)
 
         statusSortOrder(nullable: true)
     }
@@ -176,7 +172,7 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
                 isReturn            : fromReturnOrder,
                 isElectronicType    : electronicType,
                 isApprovalRequired  : requisition?.approvalRequired,
-                shipmentType        : shipmentType,
+                shipmentType        : shipment?.shipmentType,
                 approvers           : requisition?.approvers?.toList()
         ]
     }
