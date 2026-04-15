@@ -4,6 +4,8 @@ services:
       extends: 
         file: docker-compose-base.yml
         service: app
+      volumes:
+        - ./openboxes-config.properties:/app/.grails/openboxes-config.properties:ro
       depends_on: 
         db:
           condition: service_healthy
@@ -23,6 +25,8 @@ services:
         MYSQL_DATABASE: openboxes
         MYSQL_USER: ${DATASOURCE_USERNAME:-openboxes}
         MYSQL_PASSWORD: ${DATASOURCE_PASSWORD:-openboxes}
+      ports:
+        - "3306:3306"
       volumes:
         - ./mysql/:/var/lib/mysql/
       healthcheck:

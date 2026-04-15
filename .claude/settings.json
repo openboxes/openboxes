@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "description": "Enforce custom-path isolation on new source files — blocks Write calls that would create new .groovy/.java/.js/.jsx/.scss files outside a custom/ folder. See .claude/rules/custom-package-isolation.md.",
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR:-$PWD}/.claude/hooks/enforce-custom-path.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

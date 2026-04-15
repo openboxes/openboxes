@@ -1,0 +1,117 @@
+# OpenSpec project configuration
+context:
+  Project: OpenBoxes (EyeSeeTea fork)
+  What it is: |
+    Open-source Logistics Management Information System (LMIS) for healthcare
+    and humanitarian supply chains. This repository is EyeSeeTea's fork, which
+    layers customer-specific customizations on top of upstream PIH OpenBoxes.
+
+  Tech stack:
+    - Language: Groovy 2.4.21, Java 8 (OpenJDK 8), JavaScript (Node 14)
+    - Framework: Grails 3.3.16 on Spring Boot
+    - ORM: GORM / Hibernate 5.2.18
+    - Database: MySQL 8 (MariaDB 10.3 also supported)
+    - Migrations: Liquibase via Grails Database Migration plugin
+    - Frontend: React 16.8 + Redux + Webpack 5
+    - Test runner: JUnit (Gradle) for backend, Jest 29 + React Testing Library for frontend
+    - Build tool: Gradle 5.x (backend), npm 6–7 (frontend)
+    - External APIs: none by default; customer deployments may add CPR feeds, DHIS2, etc.
+    - Deployment: Docker (OpenJDK 8 base), Docker Compose
+
+  Directory structure: |
+    grails-app/
+      controllers/       # thin HTTP layer
+      services/          # business logic (transactional by default)
+      domain/            # GORM domain classes (no JPA annotations)
+      views/             # GSP server-rendered pages
+      migrations/        # Liquibase changesets
+      conf/              # application.yml, application.groovy, resources.groovy
+      i18n/              # message properties (Crowdin-managed)
+      assets/            # asset-pipeline assets
+    src/main/java/       # Java helpers and utilities
+    src/js/              # React frontend (components/, reducers/, api/, …)
+    src/js/custom/       # EST custom frontend (isolate here, not in src/js/)
+    docker/              # docker-compose + dev DB config
+    openspec/            # change proposals and archive (this directory)
+    .claude/             # Claude Code tooling (tracked except .context/)
+
+  Custom code isolation (CRITICAL):
+    - Backend: org.pih.warehouse.custom.<feature>/
+    - Frontend: src/js/custom/<feature>/
+    - Migrations: grails-app/migrations/custom/ (or clearly-prefixed)
+    Every custom file lives under one of these paths so "what's custom?" is a
+    file listing rather than a patch diff against upstream.
+
+  Configuration:
+    - grails-app/conf/application.yml      # Grails config (upstream; prefer external overrides)
+    - grails-app/conf/application.groovy   # Grails config (upstream)
+    - grails-app/conf/spring/resources.groovy  # Spring bean overrides (extension point)
+    - docker/openboxes-config.properties   # dev/container config
+    - External config file path is set per environment; customer config
+      belongs on the customer's release/est/<client>/<version> branch.
+
+  Canonical commands:
+    install: npm install
+    dev: ./gradlew bootRun   # backend; run `npm run watch` alongside for frontend
+    build: ./gradlew assemble && npm run bundle
+    test: ./gradlew test && npm test
+    lint: npm run eslint
+    coverage: ./gradlew jacocoTestReport
+    security: ./gradlew dependencyCheckAnalyze
+
+  Code conventions: |
+    Team-wide conventions from ~/.claude/est/CLAUDE.md apply (Conventional Commits,
+    functional style, test quality, pre-commit self-review, Boy Scout Rule).
+
+    Project-specific adaptations:
+      - Grails conventions: thin controllers, service injection via `def serviceName`,
+        GORM dynamic finders and criteria queries (no JPA annotations, no @Autowired).
+      - Groovy functional style uses .collect/.findAll/.groupBy/.inject/.find/.any/.every
+        instead of Java Streams (Streams are not idiomatic in Groovy 2.4).
+      - Boy Scout Rule is SUSPENDED for upstream files (anything outside
+        org.pih.warehouse.custom.* / src/js/custom/* / grails-app/migrations/custom/*)
+        because incidental edits become merge conflicts on upstream replays.
+      - Language floors: OpenJDK 8, Groovy 2.4, Node 14. Do not use newer syntax.
+      - Upstream-bound commits use `OBPIH-XXXX Description (#PR)` format;
+        EST/customer-branch commits use Conventional Commits.
+
+  Architecture: |
+    Grails MVC layered architecture:
+      Controllers (grails-app/controllers/) → Services (grails-app/services/)
+        → Domain (grails-app/domain/) via GORM
+
+    Frontend is a React SPA under src/js/, bundled by Webpack, served by the
+    same Grails app. Some pages are still server-rendered GSP (grails-app/views/).
+
+    Fork layering (see .claude/docs/FORK_MAINTENANCE.md):
+      release/<version>                    upstream-pristine mirror
+        └─ release/est/<version>           EyeSeeTea shared layer (this branch)
+              ├─ release/est/spocc/<version>     Samaritan's Purse OCC customer layer
+              └─ release/est/<client>/<version>  other customer layers
+
+  Non-goals:
+    - Do NOT reformat, reorder imports, or rename symbols in upstream files.
+    - Do NOT introduce JPA annotations or Spring `@Autowired` — stay Grails-idiomatic.
+    - Do NOT modernize to Java 11+/Groovy 3+/Node 16+ syntax anywhere in the codebase.
+    - Do NOT add top-level docs/ files — that directory is owned by upstream.
+    - Do NOT edit existing upstream Liquibase changesets — always add new ones.
+    - Do NOT commit customer-specific code onto release/est/<version> — push it
+      down to the customer's own release/est/<client>/<version> branch.
+
+  Testing strategy: |
+    Backend:
+      - Unit tests (Spock/JUnit) under src/test/groovy and test/
+      - Integration tests hit a real database via Grails' test harness
+      - Run with ./gradlew test; coverage via ./gradlew jacocoTestReport
+    Frontend:
+      - Jest + React Testing Library under src/js/**/__tests__/ (see jest config
+        in package.json)
+      - Run with npm test
+    Assertions are concrete values, not toBeDefined/toBeTruthy (team-wide rule).
+
+rules:
+  # The team-wide CLAUDE.md and auto-loaded path-scoped rules cover commit style,
+  # functional style, test quality, Boy Scout, etc. This section is for project-specific
+  # rules that deviate from or extend those defaults. See .claude/CLAUDE.md for the
+  # authoritative list of project-specific hard rules (Upstream Compatibility,
+  # Fork Maintenance & Branching, Pre-Commit Self-Review — Project-Specific).
