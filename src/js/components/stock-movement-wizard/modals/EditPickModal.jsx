@@ -157,19 +157,19 @@ function validate(values) {
   errors.availableItems = [];
   _.forEach(values.availableItems, (item, key) => {
     errors.availableItems[key] = errors.availableItems[key] || {};
-    if (item.quantityPicked > item.quantityAvailable) {
+    if ((item.quantityPicked || 0) > (item.quantityAvailable || 0)) {
       errors.availableItems[key].quantityPicked = 'react.stockMovement.errors.higherTyPicked.label';
     }
-    if (item.quantityPicked < 0) {
+    if ((item.quantityPicked || 0) < 0) {
       errors.availableItems[key].quantityPicked = 'react.stockMovement.errors.negativeQtyPicked.label';
     }
-    if (item.quantityAllocated < 0) {
+    if ((item.quantityAllocated || 0) < 0) {
       errors.availableItems[key].quantityAllocated = 'react.stockMovement.errors.negativeQtyAllocated.label';
     }
-    if (item.quantityAllocated > item.quantityAvailable) {
+    if ((item.quantityAllocated || 0) > (item.quantityAvailable || 0)) {
       errors.availableItems[key].quantityAllocated = 'react.stockMovement.errors.higherThanAvailable.label';
     }
-    if (item.quantityPicked > item.quantityAllocated) {
+    if ((item.quantityPicked || 0) > (item.quantityAllocated || 0)) {
       errors.availableItems[key].quantityPicked = 'react.stockMovement.errors.pickedHigherThanAllocated.label';
     }
   });
@@ -194,6 +194,15 @@ function validate(values) {
       (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)),
     0,
   );
+
+  if (pickedSum > values.quantityRequired) {
+    _.forEach(values.availableItems, (item, key) => {
+      if (item.quantityPicked > 0) {
+        errors.availableItems[key] = errors.availableItems[key] || {};
+        errors.availableItems[key].quantityPicked = 'react.stockMovement.errors.pickedHigherThanRequired.label';
+      }
+    });
+  }
 
   if (_.some(values.availableItems, (val) => !_.isNil(val.quantityPicked))
     && !values.reasonCode && pickedSum !== values.quantityRequired) {
