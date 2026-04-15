@@ -11,7 +11,7 @@ CREATE OR REPLACE VIEW inbound_stock_movement_list_item AS
         COALESCE(r.date_created, s.date_created)           AS date_created,
         COALESCE(r.last_updated, s.last_updated)           AS last_updated,
         COALESCE(r.date_requested, s.date_created)         AS date_requested,
-        COALESCE(r.requested_by_id, s.created_by_id)       AS requested_by_id,
+        r.requested_by_id                                  AS requested_by_id,
         COALESCE(r.created_by_id, s.created_by_id)         AS created_by_id,
         COALESCE(r.updated_by_id, s.updated_by_id)         AS updated_by_id,
         s.id                                               AS shipment_id,
