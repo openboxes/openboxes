@@ -2,7 +2,6 @@ package org.pih.warehouse.inventory
 
 import grails.validation.Validateable
 import org.pih.warehouse.api.StockMovementStatusContext
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.order.Order
@@ -79,7 +78,7 @@ class InboundStockMovementListItem implements Serializable, Validateable {
     }
 
     Boolean isReceived() {
-        return (shipment?.status?.code >= ShipmentStatusCode.RECEIVED)
+        return shipment?.currentStatus == ShipmentStatusCode.RECEIVED
     }
 
     Boolean isPartiallyReceived() {
@@ -120,8 +119,8 @@ class InboundStockMovementListItem implements Serializable, Validateable {
                 id: order?.id,
             ],
             stocklist           : stocklist,
-            dateCreated         : dateCreated?.format(Constants.MONTH_DAY_YEAR_DATE_FORMAT),
-            expectedDeliveryDate: shipment?.expectedDeliveryDate?.format(Constants.DELIVERY_DATE_FORMAT),
+            dateCreated         : dateCreated,
+            expectedDeliveryDate: shipment?.expectedDeliveryDate,
             requestedBy         : requestedBy,
             lineItemCount       : lineItemCount,
             isReturn            : fromReturnOrder,
