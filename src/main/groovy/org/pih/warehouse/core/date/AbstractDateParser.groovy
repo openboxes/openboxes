@@ -3,6 +3,7 @@ package org.pih.warehouse.core.date
 import java.time.ZoneId
 import org.springframework.beans.factory.annotation.Autowired
 
+import org.pih.warehouse.core.parser.Parser
 import org.pih.warehouse.core.session.SessionManager
 
 /**
@@ -11,16 +12,10 @@ import org.pih.warehouse.core.session.SessionManager
  * For use only by data importers. Controllers should always use command objects containing date fields,
  * which can automatically handle data binding.
  */
-abstract class AbstractDateParser<T> {
+abstract class AbstractDateParser<T> extends Parser<T, DateParserContext<T>> {
 
     @Autowired
     SessionManager sessionManager
-
-    /**
-     * Deserializes a date object into a date type. Assumes the date is in the user's timezone if the given date
-     * does not have a timezone component.
-     */
-    abstract T parse(Object date, DateParserContext context=null)
 
     /**
      * @return ZoneId the timezone of the requesting user.

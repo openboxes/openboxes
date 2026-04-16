@@ -22,7 +22,7 @@ import org.pih.warehouse.databinding.DataBindingConstants
 class InstantParser extends AbstractDateParser<Instant> {
 
     @Override
-    Instant parse(Object date, DateParserContext context=null) {
+    protected Instant parseImpl(Object date, DateParserContext<Instant> context) {
         switch (date) {
             case String:
                 return asInstant(date as String, currentTimezone, context)
@@ -38,8 +38,6 @@ class InstantParser extends AbstractDateParser<Instant> {
                 return asInstant(date as Date)
             case Calendar:
                 return asInstant(date as Calendar)
-            case null:
-                return null
             default:
                 throw new UnsupportedOperationException("Cannot parse date of type [${date.class}]")
         }
@@ -52,7 +50,7 @@ class InstantParser extends AbstractDateParser<Instant> {
      * @param excelDate An Excel formatted double representing a date
      * @param zone "Z", or "UTC" or "+01:00" or "America/Anchorage" for example.
      */
-    static Instant asInstant(Double excelDate, ZoneId zone, DateParserContext context) {
+    static Instant asInstant(Double excelDate, ZoneId zone, DateParserContext<Instant> context) {
         if (excelDate == null) {
             return null
         }
@@ -79,7 +77,7 @@ class InstantParser extends AbstractDateParser<Instant> {
      *
      * https://support.microsoft.com/en-us/office/date-systems-in-excel-e7fe7167-48a9-4b96-bb53-5612a800b487
      */
-    private static boolean use1904Windowing(DateParserContext context) {
+    private static boolean use1904Windowing(DateParserContext<Instant> context) {
         switch (context.excelWorkbook) {
             case XSSFWorkbook:  // .xlsx files
                 return (context.excelWorkbook as XSSFWorkbook).isDate1904()
@@ -103,7 +101,7 @@ class InstantParser extends AbstractDateParser<Instant> {
      *                    This will typically be the user's timezone. If null, will fail to bind date strings
      *                    that don't have a timezone component.
      */
-    static Instant asInstant(String date, ZoneId defaultZone=null, DateParserContext context=null) {
+    static Instant asInstant(String date, ZoneId defaultZone=null, DateParserContext<Instant> context=null) {
         if (StringUtils.isBlank(date)) {
             return null
         }

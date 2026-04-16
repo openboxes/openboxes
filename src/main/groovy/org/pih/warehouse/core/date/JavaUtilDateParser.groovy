@@ -21,7 +21,7 @@ import org.pih.warehouse.databinding.DataBindingConstants
 class JavaUtilDateParser extends AbstractDateParser<Date> {
 
     @Override
-    Date parse(Object date, DateParserContext context=null) {
+    protected Date parseImpl(Object date, DateParserContext<Date> context) {
         switch (date) {
             case String:
                 return asDate(date as String)
@@ -31,8 +31,6 @@ class JavaUtilDateParser extends AbstractDateParser<Date> {
                 return asDate(date as ZonedDateTime)
             case LocalDate:
                 return asDate(date as LocalDate)
-            case null:
-                return null
             default:
                 throw new UnsupportedOperationException("Cannot parse date of type [${date.class}]")
         }

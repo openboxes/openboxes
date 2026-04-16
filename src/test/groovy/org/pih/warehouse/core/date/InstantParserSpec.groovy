@@ -2,6 +2,7 @@ package org.pih.warehouse.core.date
 
 import java.text.SimpleDateFormat
 import java.time.DateTimeException
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.time.format.DateTimeParseException
@@ -164,7 +165,7 @@ class InstantParserSpec extends Specification {
         sessionManagerStub.timezone >> TimeZone.getTimeZone(timezoneOfDate)
 
         and: 'no workbook (which defaults to the windows 1900 based date system)'
-        DateParserContext context = new DateParserContext(excelWorkbook: null)
+        DateParserContext<Instant> context = new DateParserContext(excelWorkbook: null)
 
         expect:
         assert instantParser.parse(givenDate, context).toString() == expectedConvertedDate
