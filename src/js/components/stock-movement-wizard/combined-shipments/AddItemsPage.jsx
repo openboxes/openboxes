@@ -651,13 +651,18 @@ class AddItemsPage extends Component {
       if (rowIndex === index) {
         return {
           ...lineItem,
+          referenceId: lineItem?.orderItemId,
           fetchedInventoryItem: {
             inventoryItem: data.inventoryItem,
             quantity: data?.quantityOnHand,
           },
         };
       }
-      return lineItem;
+
+      return {
+        ...lineItem,
+        referenceId: lineItem?.orderItemId,
+      };
     });
 
     this.setState((previousState) => ({
@@ -700,11 +705,19 @@ class AddItemsPage extends Component {
       || lineItem?.inventoryItem;
     const quantity = (lineItem?.fetchedInventoryItem
       ? lineItem?.fetchedInventoryItem?.quantity : lineItem?.inventoryItem?.quantity) || 0;
+    // When we are on the page, just after fetching,
+    // the quantity is empty, so we have to rely on packsRequested
+    const packsRequested = _.toInteger(lineItem?.packsRequested) || 0;
+    const enteredQuantity = quantity || packsRequested;
 
-    const expirationDateChanged = lineItem?.expirationDate
+    const isExpirationDateEntered = Boolean(lineItem?.expirationDate);
+    const isExpirationDateSaved = Boolean(inventoryItem?.expirationDate);
+    const areExpirationDatesDifferent = lineItem?.expirationDate !== inventoryItem?.expirationDate;
+    const expirationDateChanged = isExpirationDateEntered
+      && isExpirationDateSaved
       && lineItem?.lotNumber
-      && lineItem?.expirationDate !== inventoryItem?.expirationDate
-      && quantity > 0;
+      && areExpirationDatesDifferent
+      && enteredQuantity > 0;
 
     if (expirationDateChanged) {
       // Despite we have only one item here, we are place it in an array
@@ -724,8 +737,15 @@ class AddItemsPage extends Component {
         return Promise.reject();
       }
 
-      return this.saveRequisitionItems([lineItems[rowIndex]])
-        .then((response) => this.fetchInventoryItem(response.data.data, rowIndex, false));
+      return this.saveRequisitionItems(lineItems)
+        .then((response) => {
+          const sortedLineItems = _.sortBy(response.data.data.lineItems, ['sortOrder']);
+          return this.fetchInventoryItem(
+            { ...response.data.data, lineItems: sortedLineItems },
+            rowIndex,
+            false,
+          );
+        });
     }
     return null;
   }

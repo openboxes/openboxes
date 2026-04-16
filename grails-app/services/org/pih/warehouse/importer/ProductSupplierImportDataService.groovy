@@ -19,6 +19,7 @@ import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.core.parser.ParserContext
 import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
@@ -80,7 +81,7 @@ class ProductSupplierImportDataService implements ImportDataService {
                 }
             }
 
-            if (params.ratingType && !EnumParser.parse(params.ratingType as String, RatingTypeCode)) {
+            if (params.ratingType && !EnumParser.parseString(params.ratingType as String, RatingTypeCode)) {
                 command.errors.reject("Row ${index + 1}: Rating Type with value '${params.ratingType}' does not exist")
             }
 
@@ -135,7 +136,7 @@ class ProductSupplierImportDataService implements ImportDataService {
         command.data.each { params ->
             // Sanitize the raw import data into a strongly-typed command object
             ProductSupplierImportCommand productSupplierImportCommand = new ProductSupplierImportCommand(
-                    active: BooleanParser.parse(params.active as String, true),  // Default to active if left blank
+                    active: BooleanParser.parseString(params.active as String, new ParserContext<Boolean>(defaultValue: true)),
                     id: sanitizeStringInput(params.id),
                     code: sanitizeStringInput(params.code),
                     name: sanitizeStringInput(params.name),
@@ -149,7 +150,7 @@ class ProductSupplierImportDataService implements ImportDataService {
                     minOrderQuantity: params.minOrderQuantity,
                     contractPricePrice: params.contractPricePrice ? BigDecimal.valueOf(params.contractPricePrice as double) : null,
                     contractPriceValidUntil: params.contractPriceValidUntil ?: null,
-                    ratingType: EnumParser.parse(params.ratingType as String, RatingTypeCode),
+                    ratingType: EnumParser.parseString(params.ratingType as String, RatingTypeCode),
                     globalPreferenceTypeName: sanitizeStringInput(params.globalPreferenceTypeName),
                     globalPreferenceTypeValidityStartDate: params.globalPreferenceTypeValidityStartDate ?: null,
                     globalPreferenceTypeValidityEndDate: params.globalPreferenceTypeValidityEndDate ?: null,

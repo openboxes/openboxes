@@ -2,6 +2,7 @@ package org.pih.warehouse.core.date
 
 import java.text.SimpleDateFormat
 import java.time.DateTimeException
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.time.format.DateTimeParseException
@@ -164,7 +165,7 @@ class InstantParserSpec extends Specification {
         sessionManagerStub.timezone >> TimeZone.getTimeZone(timezoneOfDate)
 
         and:
-        DateParserContext context = new DateParserContext(epochDate: epochDate)
+        DateParserContext<Instant> context = new DateParserContext(epochDate: epochDate)
 
         expect:
         assert instantParser.parse(givenDate, context).toString() == expectedConvertedDate

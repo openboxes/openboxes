@@ -2,11 +2,9 @@ package org.pih.warehouse.core.date
 
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.ZoneOffset
 import org.apache.commons.lang.StringUtils
 import org.springframework.stereotype.Component
 
-import org.pih.warehouse.DateUtil
 import org.pih.warehouse.databinding.DataBindingConstants
 
 /**
@@ -18,14 +16,12 @@ import org.pih.warehouse.databinding.DataBindingConstants
 class LocalDateParser extends AbstractDateParser<LocalDate> {
 
     @Override
-    LocalDate parse(Object date, DateParserContext context=null) {
+    protected LocalDate parseImpl(Object date, DateParserContext<LocalDate> context) {
         switch (date) {
             case String:
                 return asLocalDate(date as String)
             case Date:
                 return asLocalDate(date as Date, currentTimezone)
-            case null:
-                return null
             default:
                 throw new UnsupportedOperationException("Cannot parse date of type [${date.class}]")
         }
