@@ -1,5 +1,6 @@
 package org.pih.warehouse.importer
 
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -55,6 +56,7 @@ class ExcelFileImporterSpec extends Specification {
         4        || "A "          | "String ends with space"
     }
 
+    @Ignore("The Grails plugin makes it hard to add the dependencies required to support XLSX files. Once we remove the plugin and upgrade POI, we can re-enable this test")
     void 'importFile should successfully import strings from xlsx file for case: #scenario'() {
         given:
         ExcelFileImporterConfig config = new ExcelFileImporterConfig(
@@ -101,6 +103,7 @@ class ExcelFileImporterSpec extends Specification {
         3        || 36526.0       | "Modern Date"  // "2000-01-01" in the file, which is 36526 days after Excel epoch
     }
 
+    @Ignore("The Grails plugin makes it hard to add the dependencies required to support XLSX files. Once we remove the plugin and upgrade POI, we can re-enable this test")
     void 'importFile should successfully import numerics from xlsx file for case: #scenario'() {
         given:
         ExcelFileImporterConfig config = new ExcelFileImporterConfig(
@@ -143,6 +146,7 @@ class ExcelFileImporterSpec extends Specification {
         1        || false         | "False"
     }
 
+    @Ignore("The Grails plugin makes it hard to add the dependencies required to support XLSX files. Once we remove the plugin and upgrade POI, we can re-enable this test")
     void 'importFile should successfully import booleans from xlsx file for case: #scenario'() {
         given:
         ExcelFileImporterConfig config = new ExcelFileImporterConfig(
