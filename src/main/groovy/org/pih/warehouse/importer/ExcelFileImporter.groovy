@@ -30,10 +30,7 @@ class ExcelFileImporter implements FileImporter<ExcelFileImporterConfig> {
     @Override
     FileImportResult importFile(UploadedFile file, ExcelFileImporterConfig config) {
         Workbook workbook = getWorkbook(file)
-        Sheet sheet = workbook.getSheet(config.sheetName)
-        if (!sheet) {
-            throw new IllegalArgumentException("Excel file does not contain a sheet with name ${config.sheetName}")
-        }
+        Sheet sheet = getSheet(workbook, config.sheetName)
 
         // We probably don't ever use this, but it will resolve any cells that contain a formula
         FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator()
@@ -67,6 +64,22 @@ class ExcelFileImporter implements FileImporter<ExcelFileImporterConfig> {
                 rows: importedRows,
                 epochDate: epochDate,
         )
+    }
+
+    private Sheet getSheet(Workbook workbook, String sheetName) {
+        if (workbook.numberOfSheets == 1) {
+            return workbook.getSheetAt(0)
+        }
+
+        if (StringUtils.isBlank(sheetName)) {
+            throw new IllegalArgumentException("Excel file has multiple sheets. You must specify which sheet to use.")
+        }
+
+        Sheet sheet = workbook.getSheet(sheetName)
+        if (!sheet) {
+            throw new IllegalArgumentException("Excel file does not contain a sheet with name ${sheetName}")
+        }
+        return sheet
     }
 
     private String getCellLetterIndex(Cell cell) {
