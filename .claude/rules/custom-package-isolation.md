@@ -40,7 +40,7 @@ paths:
 | Backend unit tests | `src/test/groovy/org/pih/warehouse/custom/<feature>/` |
 | Backend integration tests | `src/integration-test/groovy/org/pih/warehouse/custom/<feature>/` |
 
-**`<feature>` is a short kebab-case or camelCase name** describing the feature: `gs1-barcode`, `ims-migration`, `seasonCartonCascade`, etc. Match the convention already in use within the custom folder.
+**`<feature>` must be a camelCase name** describing the feature: `stockTransferDocuments`, `seasonCartonCascade`, `imsImport`, etc. Do **not** use kebab-case (`gs1-barcode`) or flat lowercase (`stocktransferdocuments`) — camelCase is the enforced convention for all custom package and folder names across both backend and frontend.
 
 ## Why
 
