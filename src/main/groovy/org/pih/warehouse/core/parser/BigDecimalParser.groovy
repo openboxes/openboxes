@@ -24,7 +24,7 @@ class BigDecimalParser extends Parser<BigDecimal, ParserContext<BigDecimal>> {
      */
     static BigDecimal parseString(String toParse, ParserContext<BigDecimal> context=null) {
         if (StringUtils.isBlank(toParse)) {
-            return context?.defaultValue == null ? null : context.defaultValue
+            return context?.defaultValue
         }
 
         return toParse.toBigDecimal()

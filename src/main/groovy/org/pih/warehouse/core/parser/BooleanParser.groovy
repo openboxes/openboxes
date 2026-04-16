@@ -27,7 +27,7 @@ class BooleanParser extends Parser<Boolean, ParserContext<Boolean>> {
      */
     static Boolean parseString(String toParse, ParserContext<Boolean> context=null) {
         if (StringUtils.isBlank(toParse)) {
-            return context?.defaultValue == null ? null : context.defaultValue
+            return context?.defaultValue
         }
 
         String parsedValue = toParse.trim().toLowerCase()

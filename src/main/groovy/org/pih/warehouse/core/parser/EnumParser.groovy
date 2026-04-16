@@ -21,7 +21,7 @@ class EnumParser<T extends Enum> extends Parser<T, ParserContext<T>> {
      */
     static T parseString(String toParse, Class<T> enumClass, ParserContext<T> context=null) {
         if (StringUtils.isBlank(toParse)) {
-            return context?.defaultValue == null ? null : context.defaultValue
+            return context?.defaultValue
         }
 
         // Because enum values are constants, the naming convention is for them to be uppercase so try that first.

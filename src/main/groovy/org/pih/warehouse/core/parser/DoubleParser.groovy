@@ -25,7 +25,7 @@ class DoubleParser extends Parser<Double, ParserContext<Double>> {
      */
     static Double parseString(String toParse, ParserContext<Double> context=null) {
         if (StringUtils.isBlank(toParse)) {
-            return context?.defaultValue == null ? null : context.defaultValue
+            return context?.defaultValue
         }
 
         return toParse.toDouble()

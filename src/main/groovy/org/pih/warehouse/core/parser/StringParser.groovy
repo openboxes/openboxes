@@ -24,7 +24,7 @@ class StringParser extends Parser<String, ParserContext<String>> {
      */
     static String parseString(String toParse, ParserContext<String> context=null) {
         if (StringUtils.isBlank(toParse)) {
-            return context?.defaultValue == null ? null : context.defaultValue
+            return context?.defaultValue
         }
 
         return toParse.trim()

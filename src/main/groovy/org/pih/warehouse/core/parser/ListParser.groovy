@@ -13,9 +13,6 @@ abstract class ListParser<T> extends Parser<List<T>, ListParserContext<T>> {
     protected abstract Parser<T, ParserContext> getListElementParser()
 
     private List<T> getDefaultValue(ListParserContext<T> context) {
-        if (context?.defaultValue == null) {
-            return null
-        }
         return context?.defaultValue as List<T>
     }
 

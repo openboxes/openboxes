@@ -24,7 +24,7 @@ class IntegerParser extends Parser<Integer, ParserContext<Integer>> {
      */
     static Integer parseString(String toParse, ParserContext<Integer> context=null) {
         if (StringUtils.isBlank(toParse)) {
-            return context?.defaultValue == null ? null : context.defaultValue
+            return context?.defaultValue
         }
 
         try {
