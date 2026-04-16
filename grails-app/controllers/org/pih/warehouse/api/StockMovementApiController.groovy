@@ -691,7 +691,7 @@ class StockMovementApiController {
                 sm.stocklist?.name ?: "",
                 sm.requestedBy ?: warehouse.message(code: 'default.none.label'),
                 sm.dateRequested.format("MM-dd-yyyy") ?: "",
-                sm.requisition?.dateCreated?.format("MM-dd-yyyy") ?: "",
+                sm.dateCreated?.format("MM-dd-yyyy") ?: "",
                 sm.shipment?.expectedShippingDate?.format("MM-dd-yyyy") ?: "",
             )
         }
