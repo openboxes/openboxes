@@ -13,6 +13,7 @@ import grails.util.Holders
 import org.pih.warehouse.allocation.AutomaticAllocationEvent
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.OrderTypeCode
+import org.pih.warehouse.core.SendNotificationPREvent
 import org.pih.warehouse.inboundSortation.DemandTypeCode
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.shipping.Shipment
@@ -33,6 +34,10 @@ class Requisition implements Comparable<Requisition>, Serializable {
         Holders.grailsApplication.mainContext.publishEvent(new AutomaticAllocationEvent(this.id))
     }
 
+    def sendNotificationPR() {
+        Holders.grailsApplication.mainContext.publishEvent(new SendNotificationPREvent(this.id))
+    }
+
     def beforeInsert() {
         createdBy = AuthService.currentUser
         updatedBy = AuthService.currentUser
@@ -44,6 +49,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     def afterInsert() {
         publishAutomaticAllocationEvent()
+        sendNotificationPR()
     }
 
     String id
