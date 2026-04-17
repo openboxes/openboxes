@@ -1,6 +1,6 @@
 package org.pih.warehouse.importer
 
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.CellType
@@ -20,50 +20,67 @@ import org.pih.warehouse.core.file.FileExtension
 /**
  * Imports XLS and XLSX Excel files.
  */
-class ExcelFileImporter implements FileImporter<ExcelFileImporterConfig> {
+class ExcelFileImporter extends FileImporter<ExcelFileImporterConfig> {
 
     @Override
     List<FileExtension> getSupportedFileExtensions() {
-        return [FileExtension.XLS, FileExtension.XLSX]
+        // TODO: Add FileExtension.XLSX back in here once we remove the Grails plugin and can resolve the dependency
+        //       hell around POI. We need to either upgrade to the latest POI or bring in the poi-ooxml dependency.
+        return [FileExtension.XLS]
     }
 
     @Override
-    FileImportResult importFile(UploadedFile file, ExcelFileImporterConfig config) {
-        Workbook workbook = getWorkbook(file)
-        Sheet sheet = getSheet(workbook, config.sheetName)
+    FileImporterResult importFileImpl(UploadedFile file, ExcelFileImporterConfig config) {
+        Workbook workbook = null
+        try {
+            workbook = getWorkbook(file)
+            Sheet sheet = getSheet(workbook, config.sheetName)
 
-        // We probably don't ever use this, but it will resolve any cells that contain a formula
-        FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator()
+            // We probably don't ever use this, but it will resolve any cells that contain a formula
+            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator()
 
-        List<Map<String, Object>> importedRows = []
-        for (Row row : sheet) {
-            if (row.rowNum < config.startRow) {  // zero-index based
-                continue
-            }
-
-            Map<String, Object> importedRow = [:]
-            importedRows.add(importedRow)
-
-            for (Cell cell : row) {
-                // Only bother importing cells whose columns are specified in the config
-                String fieldName = config.columnToFieldMapping.get(getCellLetterIndex(cell))
-                if (StringUtils.isBlank(fieldName)) {
+            Map<String, String> columnMapping = config.columnMapping
+            List<Map<String, Object>> importedRows = []
+            for (Row row : sheet) {
+                if (row.rowNum < config.startRow) {  // zero-index based
                     continue
                 }
 
-                importedRow.put(fieldName, getCellValue(cell, evaluator))
+                Map<String, Object> importedRow = [:]
+                importedRows.add(importedRow)
+
+                for (Cell cell : row) {
+                    // Only bother importing cells whose columns are specified in the config
+                    String fieldName = getFieldName(cell, columnMapping)
+                    if (StringUtils.isBlank(fieldName)) {
+                        continue
+                    }
+
+                    importedRow.put(fieldName, getCellValue(cell, evaluator))
+                }
             }
+
+            // Extract the epoch date that the file uses so that we can properly parse dates in the data binding step.
+            EpochDate epochDate = getEpochDate(workbook)
+
+            return new FileImporterResult(
+                    rows: importedRows,
+                    epochDate: epochDate,
+            )
         }
+        finally {
+            workbook?.close()
+        }
+    }
 
-        // Extract the epoch date that the file uses so that we can properly parse dates in the data binding step.
-        EpochDate epochDate = getEpochDate(workbook)
-
-        workbook.close()
-
-        return new FileImportResult(
-                rows: importedRows,
-                epochDate: epochDate,
-        )
+    /**
+     * Extract the field name from the column mapping config for the given cell.
+     *
+     * We allow our columns in our mapping config to be represented as either zero-indexed numerical keys,
+     * or as letters (as they appear in Excel). Ex: The first column can be represented as "0" or "A".
+     */
+    private String getFieldName(Cell cell, Map<String, String> columnMapping) {
+        return columnMapping.get(cell.columnIndex) ?: columnMapping.get(getCellLetterIndex(cell))
     }
 
     private Sheet getSheet(Workbook workbook, String sheetName) {

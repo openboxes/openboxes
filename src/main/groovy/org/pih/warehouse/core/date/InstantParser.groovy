@@ -63,7 +63,7 @@ class InstantParser extends AbstractDateParser<Instant> {
          * It's important to note that the date coming from Excel is a datetime with no timezone, which maps most
          * closely to java.time.LocalDateTime. As such, to convert to an Instant we need the timezone to be specified.
          *
-         * The decimal portion of the double represents the number of days since epoch, but Excel files have different
+         * The integer portion of the double represents the number of days since epoch, but Excel files have different
          * epoch dates for different operating systems (see EpochDate for details).
          *
          * The decimal portion of the double represents the fraction of time into the day. It ranges from

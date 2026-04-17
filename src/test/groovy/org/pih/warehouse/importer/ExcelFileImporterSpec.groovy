@@ -1,5 +1,6 @@
 package org.pih.warehouse.importer
 
+import grails.validation.ValidationException
 import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
@@ -13,6 +14,7 @@ class ExcelFileImporterSpec extends Specification {
 
     private static final String TEST_XLS_FILE_PATH = "/testfiles/importer/excel-file-importer-spec.xls"
     private static final String TEST_XLSX_FILE_PATH = "/testfiles/importer/excel-file-importer-spec.xlsx"
+    private static final String TEST_TXT_FILE_PATH = "/testfiles/importer/excel-file-importer-spec.txt"
 
     @Shared
     ExcelFileImporter excelFileImporter
@@ -23,9 +25,13 @@ class ExcelFileImporterSpec extends Specification {
     @Shared
     UploadedFile xlsxFile
 
+    @Shared
+    UploadedFile txtFile
+
     void setupSpec() {
         xlsFile = new UploadedFile(file: ResourceUtil.getMultiPartFile(TEST_XLS_FILE_PATH))
         xlsxFile = new UploadedFile(file: ResourceUtil.getMultiPartFile(TEST_XLSX_FILE_PATH))
+        txtFile = new UploadedFile(file: ResourceUtil.getMultiPartFile(TEST_TXT_FILE_PATH))
     }
 
     void setup() {
@@ -37,11 +43,11 @@ class ExcelFileImporterSpec extends Specification {
         ExcelFileImporterConfig config = new ExcelFileImporterConfig(
                 sheetName: "string",
                 startRow: 1,
-                columnToFieldMapping: ["A": "string"],
+                columnMapping: ["A": "string"],
         )
 
         when:
-        FileImportResult result = excelFileImporter.importFile(xlsFile, config)
+        FileImporterResult result = excelFileImporter.importFile(xlsFile, config)
         List<Map<String, Object>> rows = result.rows
 
         then:
@@ -54,6 +60,7 @@ class ExcelFileImporterSpec extends Specification {
         2        || "1A"          | "String starts with number"
         3        || " A"          | "String starts with space"
         4        || "A "          | "String ends with space"
+        5        || "苹果"         | "Special characters"
     }
 
     @Ignore("The Grails plugin makes it hard to add the dependencies required to support XLSX files. Once we remove the plugin and upgrade POI, we can re-enable this test")
@@ -62,11 +69,11 @@ class ExcelFileImporterSpec extends Specification {
         ExcelFileImporterConfig config = new ExcelFileImporterConfig(
                 sheetName: "string",
                 startRow: 1,
-                columnToFieldMapping: ["A": "string"],
+                columnMapping: ["A": "string"],
         )
 
         when:
-        FileImportResult result = excelFileImporter.importFile(xlsxFile, config)
+        FileImporterResult result = excelFileImporter.importFile(xlsxFile, config)
         List<Map<String, Object>> rows = result.rows
 
         then:
@@ -79,6 +86,7 @@ class ExcelFileImporterSpec extends Specification {
         2        || "1A"          | "String starts with number"
         3        || " A"          | "String starts with space"
         4        || "A "          | "String ends with space"
+        5        || "苹果"         | "Special characters"
     }
 
     void 'importFile should successfully import numerics from xls file for case: #scenario'() {
@@ -86,11 +94,11 @@ class ExcelFileImporterSpec extends Specification {
         ExcelFileImporterConfig config = new ExcelFileImporterConfig(
                 sheetName: "numeric",
                 startRow: 1,
-                columnToFieldMapping: ["A": "numeric"],
+                columnMapping: ["A": "numeric"],
         )
 
         when:
-        FileImportResult result = excelFileImporter.importFile(xlsFile, config)
+        FileImporterResult result = excelFileImporter.importFile(xlsFile, config)
 
         then:
         assert result.rows[rowIndex]["numeric"] == expectedValue
@@ -109,11 +117,11 @@ class ExcelFileImporterSpec extends Specification {
         ExcelFileImporterConfig config = new ExcelFileImporterConfig(
                 sheetName: "numeric",
                 startRow: 1,
-                columnToFieldMapping: ["A": "numeric"],
+                columnMapping: ["A": "numeric"],
         )
 
         when:
-        FileImportResult result = excelFileImporter.importFile(xlsxFile, config)
+        FileImporterResult result = excelFileImporter.importFile(xlsxFile, config)
 
         then:
         assert result.rows[rowIndex]["numeric"] == expectedValue
@@ -131,11 +139,11 @@ class ExcelFileImporterSpec extends Specification {
         ExcelFileImporterConfig config = new ExcelFileImporterConfig(
                 sheetName: "boolean",
                 startRow: 1,
-                columnToFieldMapping: ["A": "boolean"],
+                columnMapping: ["A": "boolean"],
         )
 
         when:
-        FileImportResult result = excelFileImporter.importFile(xlsFile, config)
+        FileImporterResult result = excelFileImporter.importFile(xlsFile, config)
 
         then:
         assert result.rows[rowIndex]["boolean"] == expectedValue
@@ -152,11 +160,11 @@ class ExcelFileImporterSpec extends Specification {
         ExcelFileImporterConfig config = new ExcelFileImporterConfig(
                 sheetName: "boolean",
                 startRow: 1,
-                columnToFieldMapping: ["A": "boolean"],
+                columnMapping: ["A": "boolean"],
         )
 
         when:
-        FileImportResult result = excelFileImporter.importFile(xlsxFile, config)
+        FileImporterResult result = excelFileImporter.importFile(xlsxFile, config)
 
         then:
         assert result.rows[rowIndex]["boolean"] == expectedValue
@@ -165,5 +173,48 @@ class ExcelFileImporterSpec extends Specification {
         rowIndex || expectedValue | scenario
         0        || true          | "True"
         1        || false         | "False"
+    }
+
+    void 'importFile should only import rows after startRow'() {
+        given: "we are starting the import on the last row of the file"
+        int numRowsInFile = 7
+        ExcelFileImporterConfig config = new ExcelFileImporterConfig(
+                sheetName: "string",
+                startRow: numRowsInFile - 1,  // -1 because it is zero-indexed
+                columnMapping: ["A": "string"],
+        )
+
+        expect: "only one row to be imported"
+        assert excelFileImporter.importFile(xlsFile, config).rows.size() == 1
+    }
+
+    void 'importFile should fail if given an empty file'() {
+        given:
+        ExcelFileImporterConfig config = new ExcelFileImporterConfig(
+                sheetName: "string",
+                startRow: 1,
+                columnMapping: ["A": "string"],
+        )
+
+        when:
+        excelFileImporter.importFile(new UploadedFile(), config)
+
+        then:
+        thrown(ValidationException)
+    }
+
+    void 'importFile should fail if given a file type that is not supported by the importer'() {
+        given:
+        ExcelFileImporterConfig config = new ExcelFileImporterConfig(
+                sheetName: "string",
+                startRow: 1,
+                columnMapping: ["A": "string"],
+        )
+
+        when:
+        excelFileImporter.importFile(txtFile, config)
+
+        then:
+        thrown(IllegalArgumentException)
     }
 }

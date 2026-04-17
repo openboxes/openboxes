@@ -9,7 +9,7 @@ import org.pih.warehouse.core.date.EpochDate
  * to structure the imported data in exactly the same way, no matter what we imported from (CSV, XLSX...). This
  * saves us from needing to define a separate data binder (part two of the import) for each file type.
  */
-class FileImportResult {
+class FileImporterResult {
 
     /**
      * The resulting rows that were extracted from the file.
