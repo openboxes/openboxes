@@ -27,7 +27,7 @@ import {
   handleValidationErrors,
 } from 'utils/apiClient';
 import { renderFormField, setColumnValue } from 'utils/form-utils';
-import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
+import { formatProductDisplayName, matchesItemFilter, matchesProductCodeOrName } from 'utils/form-values-utils';
 import { debouncePeopleFetch } from 'utils/option-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -45,10 +45,19 @@ const FIELDS = {
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     getDynamicRowAttr: ({ rowValues, itemFilter }) => {
+      const { binLocation, product, lotNumber } = rowValues ?? {};
+      // Format as "Zone: Bin" when zone exists, otherwise just bin name
+      const binLocationValue = binLocation?.zoneName
+        ? `${binLocation.zoneName}: ${binLocation.name}`
+        : binLocation?.name;
       const hideRow = itemFilter
-        && !matchesProductCodeOrName({
-          product: rowValues?.product,
+        && !matchesItemFilter({
           filterValue: itemFilter,
+          matchers: [
+            (filterValue) => matchesProductCodeOrName({ product, filterValue }),
+            lotNumber,
+            binLocationValue,
+          ],
         });
       return { hideRow };
     },
@@ -430,10 +439,18 @@ class PackingPage extends Component {
     const { packPageItems } = formValues;
     const isAnyLineHidden = this.state.itemFilter
       && packPageItems.some((rowValue) => {
-        const { product } = rowValue;
-        return !matchesProductCodeOrName({
-          product,
+        const { product, lotNumber, binLocation } = rowValue;
+        // Format as "Zone: Bin" when zone exists, otherwise just bin name
+        const binLocationValue = binLocation?.zoneName
+          ? `${binLocation.zoneName}: ${binLocation.name}`
+          : binLocation?.name;
+        return !matchesItemFilter({
           filterValue: this.state.itemFilter,
+          matchers: [
+            (filterValue) => matchesProductCodeOrName({ product, filterValue }),
+            lotNumber,
+            binLocationValue,
+          ],
         });
       });
     if (isAnyLineHidden) {
