@@ -108,10 +108,18 @@ export const mapStringToLimitedList = (value, elementsSeparator, lengthLimit) =>
  * that receives filterValue and returns a boolean.
  * @returns {boolean} True if at least one value contains the filter text, false otherwise.
  */
-export const matchesItemFilter = ({ filterValue, matchers = [] }) =>
-  matchers.some((value) => {
+export const matchesItemFilter = ({ filterValue, matchers = [] }) => {
+  const trimmedFilterValue = filterValue?.trim();
+  return matchers.some((value) => {
     if (typeof value === 'function') {
-      return value(filterValue);
+      return value(trimmedFilterValue);
     }
-    return value?.toLowerCase()?.includes(filterValue?.toLowerCase());
+    return value?.toLowerCase()?.includes(trimmedFilterValue?.toLowerCase());
   });
+};
+
+export const formatBinLocation = (binLocation) => (
+  binLocation?.zoneName
+    ? `${binLocation.zoneName}: ${binLocation.name}`
+    : binLocation?.name
+);

@@ -27,7 +27,12 @@ import {
   handleValidationErrors,
 } from 'utils/apiClient';
 import { renderFormField, setColumnValue } from 'utils/form-utils';
-import { formatProductDisplayName, matchesItemFilter, matchesProductCodeOrName } from 'utils/form-values-utils';
+import {
+  formatBinLocation,
+  formatProductDisplayName,
+  matchesItemFilter,
+  matchesProductCodeOrName,
+} from 'utils/form-values-utils';
 import { debouncePeopleFetch } from 'utils/option-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -46,10 +51,7 @@ const FIELDS = {
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     getDynamicRowAttr: ({ rowValues, itemFilter }) => {
       const { binLocation, product, lotNumber } = rowValues ?? {};
-      // Format as "Zone: Bin" when zone exists, otherwise just bin name
-      const binLocationValue = binLocation?.zoneName
-        ? `${binLocation.zoneName}: ${binLocation.name}`
-        : binLocation?.name;
+      const binLocationValue = formatBinLocation(binLocation);
       const hideRow = itemFilter
         && !matchesItemFilter({
           filterValue: itemFilter,
@@ -440,10 +442,7 @@ class PackingPage extends Component {
     const isAnyLineHidden = this.state.itemFilter
       && packPageItems.some((rowValue) => {
         const { product, lotNumber, binLocation } = rowValue;
-        // Format as "Zone: Bin" when zone exists, otherwise just bin name
-        const binLocationValue = binLocation?.zoneName
-          ? `${binLocation.zoneName}: ${binLocation.name}`
-          : binLocation?.name;
+        const binLocationValue = formatBinLocation(binLocation);
         return !matchesItemFilter({
           filterValue: this.state.itemFilter,
           matchers: [
