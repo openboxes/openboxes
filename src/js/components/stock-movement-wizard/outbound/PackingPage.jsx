@@ -28,8 +28,8 @@ import {
 } from 'utils/apiClient';
 import { renderFormField, setColumnValue } from 'utils/form-utils';
 import {
-  formatBinLocation,
   formatProductDisplayName,
+  getBinLocationToDisplay,
   matchesItemFilter,
   matchesProductCodeOrName,
 } from 'utils/form-values-utils';
@@ -51,7 +51,7 @@ const FIELDS = {
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     getDynamicRowAttr: ({ rowValues, itemFilter }) => {
       const { binLocation, product, lotNumber } = rowValues ?? {};
-      const binLocationValue = formatBinLocation(binLocation);
+      const binLocationValue = getBinLocationToDisplay(binLocation);
       const hideRow = itemFilter
         && !matchesItemFilter({
           filterValue: itemFilter,
@@ -442,7 +442,7 @@ class PackingPage extends Component {
     const isAnyLineHidden = this.state.itemFilter
       && packPageItems.some((rowValue) => {
         const { product, lotNumber, binLocation } = rowValue;
-        const binLocationValue = formatBinLocation(binLocation);
+        const binLocationValue = getBinLocationToDisplay(binLocation);
         return !matchesItemFilter({
           filterValue: this.state.itemFilter,
           matchers: [

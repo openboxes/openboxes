@@ -117,9 +117,11 @@ export const matchesItemFilter = ({ filterValue, matchers = [] }) => {
     return value?.toLowerCase()?.includes(trimmedFilterValue?.toLowerCase());
   });
 };
-
-export const formatBinLocation = (binLocation) => (
-  binLocation?.zoneName
-    ? `${binLocation.zoneName}: ${binLocation.name}`
-    : binLocation?.name
+/**
+ * Stringify a bin location for display, prepending the bin's zone if it has one and the zone
+ * isn't already prepended.
+ */
+export const getBinLocationToDisplay = (bin) => (
+  (bin?.zoneName == null || bin?.name.startsWith(`${bin?.zoneName}: `))
+    ? bin?.name : `${bin?.zoneName}: ${bin?.name}`
 );
