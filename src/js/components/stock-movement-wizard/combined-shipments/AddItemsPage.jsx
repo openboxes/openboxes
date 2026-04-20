@@ -165,8 +165,18 @@ const FIELDS = {
           rowIndex,
           values,
           validateExpirationDate,
+          fetchInventoryItem,
         }) => ({
           onBlur: () => {
+            const lineItem = values?.lineItems?.[rowIndex];
+            const alreadyFetched = Boolean(lineItem?.fetchedInventoryItem);
+            // If the inventory item was not yet fetched (e.g. after navigating back/forward),
+            // fetch it
+            if (!alreadyFetched && lineItem?.lotNumber && lineItem?.product?.id) {
+              fetchInventoryItem(values, rowIndex);
+              return;
+            }
+
             validateExpirationDate(values?.lineItems, rowIndex);
           },
         }),
@@ -672,8 +682,13 @@ class AddItemsPage extends Component {
         lineItems: mappedLineItems,
       },
     }), () => {
-      if (!values.lineItems?.[rowIndex]?.expirationDate) {
+      const isAutoFilling = !values.lineItems?.[rowIndex]?.expirationDate
+        && data?.inventoryItem?.expirationDate;
+
+      if (isAutoFilling) {
+        // Auto-filling exp date from inventory item — no modal should appear
         this.changeExpirationDate(mappedLineItems, rowIndex, data?.inventoryItem?.expirationDate);
+        return;
       }
 
       // Prevent an infinite loop between fetchInventoryItem() and validateExpirationDate()
@@ -703,21 +718,19 @@ class AddItemsPage extends Component {
     const lineItem = lineItems?.[rowIndex];
     const inventoryItem = lineItem?.fetchedInventoryItem?.inventoryItem
       || lineItem?.inventoryItem;
-    const quantity = (lineItem?.fetchedInventoryItem
-      ? lineItem?.fetchedInventoryItem?.quantity : lineItem?.inventoryItem?.quantity) || 0;
-    // When we are on the page, just after fetching,
-    // the quantity is empty, so we have to rely on packsRequested
-    const packsRequested = _.toInteger(lineItem?.packsRequested) || 0;
-    const enteredQuantity = quantity || packsRequested;
 
+    // inventoryItem is null when lot does not exist (new lot)
+    const lotExists = Boolean(inventoryItem);
+    const isExpirationDateRemoved = !lineItem.expirationDate && inventoryItem?.expirationDate;
     const isExpirationDateEntered = Boolean(lineItem?.expirationDate);
-    const isExpirationDateSaved = Boolean(inventoryItem?.expirationDate);
     const areExpirationDatesDifferent = lineItem?.expirationDate !== inventoryItem?.expirationDate;
-    const expirationDateChanged = isExpirationDateEntered
-      && isExpirationDateSaved
-      && lineItem?.lotNumber
-      && areExpirationDatesDifferent
-      && enteredQuantity > 0;
+    // Show modal when:
+    // 1. Changing exp date to another (existing lot)
+    // 2. Removing exp date (existing lot)
+    // 3. Creating exp date for existing lot (previously had none)
+    // 4. Never show for new lots that don't exist in the system
+    const expirationDateChanged = lineItem?.lotNumber && lotExists &&
+      (isExpirationDateRemoved || (isExpirationDateEntered && areExpirationDatesDifferent));
 
     if (expirationDateChanged) {
       // Despite we have only one item here, we are place it in an array
