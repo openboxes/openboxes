@@ -1849,7 +1849,7 @@ class StockMovementService {
 
         log.info "QUANTITY REQUIRED: ${quantityRequired}"
         if (quantityRequired) {
-            List<AvailableItem> availableItems = getAvailableItems(location, requisitionItem)
+            List<AvailableItem> availableItems = getAvailableItems(location, requisitionItem, false, false)
 
             // If a picklist item was passed as an argument, remove the picklist item for which we're trying to create an alternative pick
             if (excludedPicklistItem) {
@@ -1858,9 +1858,6 @@ class StockMovementService {
                             availableItem?.inventoryItem?.id == excludedPicklistItem?.inventoryItem?.id
                 }
             }
-
-            // undo quantityAvailable modification from getAvailableItems--calculateQuantityAvailableToPromise
-            availableItems.forEach {if (it.quantityAvailable > it.quantityOnHand) it.quantityAvailable = it.quantityOnHand}
 
             List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
             log.info "Suggested items " + suggestedItems
@@ -2052,12 +2049,14 @@ class StockMovementService {
         return getAvailableItems(location, requisitionItem, false)
     }
 
-    List<AvailableItem> getAvailableItems(Location location, RequisitionItem requisitionItem, Boolean calculateStatus) {
+    List<AvailableItem> getAvailableItems(Location location, RequisitionItem requisitionItem, Boolean calculateStatus, Boolean includeQuantityAllocated = Boolean.TRUE) {
         List<AvailableItem> availableItems = productAvailabilityService.getAllAvailableBinLocations(location, requisitionItem.product?.id)
         def picklistItems = getPicklistItems(requisitionItem)
 
         availableItems = availableItems.findAll { it.quantityOnHand > 0 }
-        availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
+        if (includeQuantityAllocated) {
+            availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
+        }
 
         if (calculateStatus) {
             return calculateAvailableItemsStatus(requisitionItem, availableItems)
