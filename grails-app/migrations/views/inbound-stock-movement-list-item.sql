@@ -22,9 +22,18 @@ CREATE OR REPLACE VIEW inbound_stock_movement_list_item AS
         s.shipment_type_id
     FROM shipment s
     LEFT JOIN requisition r ON r.id = s.requisition_id
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM shipment_item si
+        JOIN order_shipment os ON os.shipment_item_id = si.id
+        JOIN order_item oi ON oi.id = os.order_item_id
+        JOIN `order` o ON o.id = oi.order_id
+        WHERE si.shipment_id = s.id
+          AND o.order_type_id = 'RETURN_ORDER'
+    )
 
     UNION ALL
-    -- Return orders with PENDING status do not have a shipment yet, so they would not be picked up by the query above, hence this separate query
+    -- Return orders excluded from the query above.
     SELECT
         o.id,
         o.name,
@@ -38,12 +47,16 @@ CREATE OR REPLACE VIEW inbound_stock_movement_list_item AS
         o.ordered_by_id                                    AS requested_by_id,
         o.created_by_id,
         o.updated_by_id,
-        NULL                                               AS shipment_id,
+        s.id                                               AS shipment_id,
         NULL                                               AS requisition_id,
         o.id                                               AS order_id,
         NULL                                               AS stocklist_id,
-        o.status                                           AS current_status,
-        NULL                                               AS shipment_type_id
+        COALESCE(s.current_status, o.status)               AS current_status,
+        s.shipment_type_id
     FROM `order` o
+    LEFT JOIN order_item oi ON oi.order_id = o.id
+    LEFT JOIN order_shipment os ON os.order_item_id = oi.id
+    LEFT JOIN shipment_item si ON si.id = os.shipment_item_id
+    LEFT JOIN shipment s ON s.id = si.shipment_id
     WHERE o.order_type_id = 'RETURN_ORDER'
-      AND o.status = 'PENDING';
+    GROUP BY o.id, s.id;
