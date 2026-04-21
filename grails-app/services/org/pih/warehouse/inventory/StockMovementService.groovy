@@ -2008,12 +2008,12 @@ class StockMovementService {
         Integer totalAllocated = 0
         Integer totalPicked = 0
         picklistItems.each { picklistItemMap ->
-            BigDecimal qty = (picklistItemMap.quantityAllocated != null && picklistItemMap.quantityAllocated != "") ?
-                    new BigDecimal(picklistItemMap.quantityAllocated) : null
-            BigDecimal picked = (picklistItemMap.quantityPicked != null && picklistItemMap.quantityPicked != "") ?
-                    new BigDecimal(picklistItemMap.quantityPicked) : null
-            totalAllocated += qty?.intValueExact() ?: 0
-            totalPicked += picked?.intValueExact() ?: 0
+            Integer qty = (picklistItemMap.quantityAllocated != null && picklistItemMap.quantityAllocated != "") ?
+                    picklistItemMap.quantityAllocated as Integer : null
+            Integer picked = (picklistItemMap.quantityPicked != null && picklistItemMap.quantityPicked != "") ?
+                    picklistItemMap.quantityPicked as Integer : null
+            totalAllocated += qty ?: 0
+            totalPicked += picked ?: 0
         }
         if (totalAllocated > quantityRequired) {
             throw new IllegalArgumentException("Total allocated quantity (${totalAllocated}) exceeds quantity required (${quantityRequired})")
@@ -2035,13 +2035,11 @@ class StockMovementService {
             Location binLocation = picklistItemMap.binLocation?.id ?
                     Location.get(picklistItemMap.binLocation?.id) : null
 
-            BigDecimal quantityPicked = (picklistItemMap.quantityPicked != null && picklistItemMap.quantityPicked != "") ?
-                    new BigDecimal(picklistItemMap.quantityPicked) : null
+            Integer quantityPicked = (picklistItemMap.quantityPicked != null && picklistItemMap.quantityPicked != "") ?
+                    picklistItemMap.quantityPicked as Integer : null
 
-            BigDecimal quantityAllocated = (picklistItemMap.quantityAllocated != null && picklistItemMap.quantityAllocated != "") ?
-                    new BigDecimal(picklistItemMap.quantityAllocated) : null
-
-            Integer quantityToPick = quantityAllocated?.intValueExact()
+            Integer quantityToPick = (picklistItemMap.quantityAllocated != null && picklistItemMap.quantityAllocated != "") ?
+                    picklistItemMap.quantityAllocated as Integer : null
 
             if (quantityPicked == null && quantityToPick == null) {
                 return
@@ -2050,7 +2048,7 @@ class StockMovementService {
             String comment = picklistItemMap.comment
 
             createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation,
-                    quantityPicked?.intValueExact(), reasonCode, comment, isAutoAllocated, quantityToPick)
+                    quantityPicked, reasonCode, comment, isAutoAllocated, quantityToPick)
         }
     }
 
