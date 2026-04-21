@@ -33,7 +33,8 @@ CREATE OR REPLACE VIEW inbound_stock_movement_list_item AS
     )
 
     UNION ALL
-    -- Return orders excluded from the query above.
+    -- Some stock movements (such as returns) are based on orders. These stock movements will only have a shipment once
+    -- the order is placed. Return orders are excluded from the query above to avoid duplicates.
     SELECT
         o.id,
         o.name,
