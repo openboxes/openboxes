@@ -2005,16 +2005,9 @@ class StockMovementService {
         Integer quantityRequired = requisitionItem.calculateQuantityRequired() ?: 0
 
         // Server-side safeguard: total allocated and total picked must not exceed quantity required
-        Integer totalAllocated = 0
-        Integer totalPicked = 0
-        picklistItems.each { picklistItemMap ->
-            Integer qty = (picklistItemMap.quantityAllocated != null && picklistItemMap.quantityAllocated != "") ?
-                    picklistItemMap.quantityAllocated as Integer : null
-            Integer picked = (picklistItemMap.quantityPicked != null && picklistItemMap.quantityPicked != "") ?
-                    picklistItemMap.quantityPicked as Integer : null
-            totalAllocated += qty ?: 0
-            totalPicked += picked ?: 0
-        }
+        Integer totalAllocated = picklistItems?.sum { (it.quantityAllocated ?: 0) as Integer } ?: 0
+        Integer totalPicked = picklistItems?.sum { (it.quantityPicked ?: 0) as Integer } ?: 0
+        
         if (totalAllocated > quantityRequired) {
             throw new IllegalArgumentException("Total allocated quantity (${totalAllocated}) exceeds quantity required (${quantityRequired})")
         }
