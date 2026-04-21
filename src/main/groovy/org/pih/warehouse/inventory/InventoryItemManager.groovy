@@ -69,7 +69,7 @@ class InventoryItemManager {
     InventoryItem getInventoryItem(Product product, String lotNumber) {
         // First check if an inventory item exists for the lotNumber as given. We do this check to ensure
         // that any pre-existing lots (from before we were sanitizing inputs) can still be found.
-        InventoryItem inventoryItem = InventoryItem.createCriteria().get() {
+        List<InventoryItem> inventoryItem = InventoryItem.createCriteria().list {
             and {
                 eq("product.id", product.id)
                 if (lotNumber) {
@@ -81,10 +81,13 @@ class InventoryItemManager {
                     }
                 }
             }
-        } as InventoryItem
+        } as List<InventoryItem>
 
+        // We call list instead of get, because of stale data that both empty string and null lot number can exist for a product.
+        // calling createCriteria().get() with eq("lotNumber", null) or eq("lotNumber", "")
+        // can return either of those records, which can cause "query did not return a unique result" exception.
         if (inventoryItem) {
-            return inventoryItem
+            return inventoryItem.get(0)
         }
 
         // Otherwise, sanitize the given lot number and look again (unless the given lot is already sanitized, which
