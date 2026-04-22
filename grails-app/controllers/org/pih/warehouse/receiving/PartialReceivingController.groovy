@@ -22,7 +22,7 @@ class PartialReceivingController {
 
         if (!stockMovement.isReceivingAuthorized(currentLocation)) {
             flash.error = stockMovementService.getDisabledMessage(stockMovement, currentLocation)
-            redirect(controller: "stockMovement", action: "show", id: params.id)
+            redirect(controller: "stockMovement", action: "show", id: stockMovement?.requisition?.id ?: stockMovement?.order?.id ?: params.id)
             return
         }
 

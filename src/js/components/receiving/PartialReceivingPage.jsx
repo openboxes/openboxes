@@ -737,8 +737,8 @@ class PartialReceivingPage extends Component {
   saveAndExit(formValues) {
     this.saveValues(formValues)
       .then(() => {
-        const { requisition, shipmentId } = formValues;
-        window.location = STOCK_MOVEMENT_URL.show(requisition || shipmentId);
+        const { requisition, orderId, shipmentId } = formValues;
+        window.location = STOCK_MOVEMENT_URL.show(requisition || orderId || shipmentId);
       })
       .catch(() => this.props.hideSpinner());
   }

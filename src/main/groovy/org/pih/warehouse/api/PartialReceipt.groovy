@@ -58,6 +58,7 @@ class PartialReceipt {
                 dateDelivered                   : dateDelivered?.format("MM/dd/yyyy HH:mm XXX"),
                 containers                      : partialReceiptContainers,
                 requisition                     : shipment?.requisition?.id,
+                orderId                         : shipment?.returnOrder?.id,
                 description                     : shipment?.description,
                 recipient                       : recipient,
                 isShipmentFromPurchaseOrder     : shipment.isFromPurchaseOrder,
