@@ -12,15 +12,16 @@ import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.apache.poi.ss.util.CellReference
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.springframework.stereotype.Component
 
-import org.pih.warehouse.core.file.UploadedFile
 import org.pih.warehouse.core.date.EpochDate
 import org.pih.warehouse.core.file.FileExtension
 
 /**
- * Imports XLS and XLSX Excel files.
+ * Reads in an Excel file, converting the rows of one of the sheets in the file to a Java-friendly structure.
  */
-class ExcelFileImporter extends FileImporter<ExcelFileImporterConfig> {
+@Component
+class ExcelReader extends FileReader<MultipartFileSource, ExcelReaderConfig> {
 
     @Override
     List<FileExtension> getSupportedFileExtensions() {
@@ -30,24 +31,24 @@ class ExcelFileImporter extends FileImporter<ExcelFileImporterConfig> {
     }
 
     @Override
-    FileImporterResult importFileImpl(UploadedFile file, ExcelFileImporterConfig config) {
+    BulkDataReaderResult readFile(MultipartFileSource source, ExcelReaderConfig config) {
         Workbook workbook = null
         try {
-            workbook = getWorkbook(file)
+            workbook = getWorkbook(source)
             Sheet sheet = getSheet(workbook, config.sheetName)
 
-            // We probably don't ever use this, but it will resolve any cells that contain a formula
+            // Required to be able to resolve any cells that contain a formula
             FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator()
 
             Map<String, String> columnMapping = config.columnMapping
-            List<Map<String, Object>> importedRows = []
+            List<Map<String, Object>> readRows = []
             for (Row row : sheet) {
-                if (row.rowNum < config.startRow) {  // zero-index based
+                if (row.rowNum < config.linesToSkip) {  // rowNum is zero-index based
                     continue
                 }
 
-                Map<String, Object> importedRow = [:]
-                importedRows.add(importedRow)
+                Map<String, Object> readRow = [:]
+                readRows.add(readRow)
 
                 for (Cell cell : row) {
                     // Only bother importing cells whose columns are specified in the config
@@ -56,15 +57,15 @@ class ExcelFileImporter extends FileImporter<ExcelFileImporterConfig> {
                         continue
                     }
 
-                    importedRow.put(fieldName, getCellValue(cell, evaluator))
+                    readRow.put(fieldName, getCellValue(cell, evaluator))
                 }
             }
 
             // Extract the epoch date that the file uses so that we can properly parse dates in the data binding step.
             EpochDate epochDate = getEpochDate(workbook)
 
-            return new FileImporterResult(
-                    rows: importedRows,
+            return new BulkDataReaderResult(
+                    rows: readRows,
                     epochDate: epochDate,
             )
         }
@@ -116,9 +117,13 @@ class ExcelFileImporter extends FileImporter<ExcelFileImporterConfig> {
                 return cell.booleanCellValue
             case CellType.FORMULA:
                 return getFormulaCellValue(cell, evaluator)
-            default:  // BLANK, ERROR
-                // Simply ignore the field if it's not a known type or if it has an invalid value.
+            case CellType.BLANK:
                 return null
+            default:
+                // TODO: Handle this case more gracefully. This method should return a CellValue POJO containing the
+                //       value and any errors that occurred when reading it. Then the caller can use this POJO
+                //       to build a more user friendly error response.
+                throw new IllegalArgumentException("Cell in row ${cell.rowIndex} and column ${cell.columnIndex} contains an invalid value.")
         }
     }
 
@@ -131,16 +136,25 @@ class ExcelFileImporter extends FileImporter<ExcelFileImporterConfig> {
                 return cellValue.numberValue
             case CellType.BOOLEAN:
                 return cellValue.booleanValue
-            default:  // BLANK, ERROR, FORMULA
-                // Simply ignore the field if we couldn't resolve the formula
+            case CellType.BLANK:
                 return null
+            case CellType.FORMULA:
+                // TODO: Handle this case more gracefully. See other todo.
+                // I don't know if this case is even possible, but error if the formula resolves to another formula
+                // so that we don't get stuck in an infinite loop.
+                throw new IllegalArgumentException("Cell in row ${cell.rowIndex} and column ${cell.columnIndex} contains an invalid formula.")
+            default:  // ERROR
+                // TODO: Handle this case more gracefully. This method should return a CellValue POJO containing the
+                //       value and any errors that occurred when reading it. Then the caller can use this POJO
+                //       to build a more user friendly error response.
+                throw new IllegalArgumentException("Cell in row ${cell.rowIndex} and column ${cell.columnIndex} contains an invalid value.")
         }
     }
 
-    private Workbook getWorkbook(UploadedFile file) {
+    private Workbook getWorkbook(MultipartFileSource source) {
         // This automatically determines the Excel workbook file type, creating an HSSFWorkbook for .xls files,
         // and an XSSFWorkbook for .xlsx files.
-        return WorkbookFactory.create(file.file.inputStream)
+        return WorkbookFactory.create(source.source.inputStream)
     }
 
     /**

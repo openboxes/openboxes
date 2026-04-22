@@ -22,7 +22,7 @@ class ResourceUtil {
     /**
      * Fetch a file as a (mock) multipart file from the resource folder for use in tests.
      */
-    static MultipartFile getMultiPartFile(String path) {
+    static MultipartFile getMultipartFile(String path) {
         // We're mocking the multipart file, so we need to extract the content type the hard way, via the file name.
         String contentType = ContentType.getByFileExtension(path.split("\\.")[-1])?.mediaType?.toString()
 

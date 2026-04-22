@@ -7,47 +7,45 @@ import spock.lang.Specification
 import spock.lang.Unroll
 import testutil.ResourceUtil
 
-import org.pih.warehouse.core.file.UploadedFile
-
 @Unroll
-class ExcelFileImporterSpec extends Specification {
+class ExcelReaderSpec extends Specification {
 
     private static final String TEST_XLS_FILE_PATH = "/testfiles/importer/excel-file-importer-spec.xls"
     private static final String TEST_XLSX_FILE_PATH = "/testfiles/importer/excel-file-importer-spec.xlsx"
     private static final String TEST_TXT_FILE_PATH = "/testfiles/importer/excel-file-importer-spec.txt"
 
     @Shared
-    ExcelFileImporter excelFileImporter
+    ExcelReader reader
 
     @Shared
-    UploadedFile xlsFile
+    MultipartFileSource xlsFile
 
     @Shared
-    UploadedFile xlsxFile
+    MultipartFileSource xlsxFile
 
     @Shared
-    UploadedFile txtFile
+    MultipartFileSource txtFile
 
     void setupSpec() {
-        xlsFile = new UploadedFile(file: ResourceUtil.getMultiPartFile(TEST_XLS_FILE_PATH))
-        xlsxFile = new UploadedFile(file: ResourceUtil.getMultiPartFile(TEST_XLSX_FILE_PATH))
-        txtFile = new UploadedFile(file: ResourceUtil.getMultiPartFile(TEST_TXT_FILE_PATH))
+        xlsFile = new MultipartFileSource(source: ResourceUtil.getMultipartFile(TEST_XLS_FILE_PATH))
+        xlsxFile = new MultipartFileSource(source: ResourceUtil.getMultipartFile(TEST_XLSX_FILE_PATH))
+        txtFile = new MultipartFileSource(source: ResourceUtil.getMultipartFile(TEST_TXT_FILE_PATH))
     }
 
     void setup() {
-        excelFileImporter = new ExcelFileImporter()
+        reader = new ExcelReader()
     }
 
     void 'importFile should successfully import strings from xls file for case: #scenario'() {
         given:
-        ExcelFileImporterConfig config = new ExcelFileImporterConfig(
+        ExcelReaderConfig config = new ExcelReaderConfig(
                 sheetName: "string",
-                startRow: 1,
+                linesToSkip: 1,
                 columnMapping: ["A": "string"],
         )
 
         when:
-        FileImporterResult result = excelFileImporter.importFile(xlsFile, config)
+        BulkDataReaderResult result = reader.read(xlsFile, config)
         List<Map<String, Object>> rows = result.rows
 
         then:
@@ -66,14 +64,14 @@ class ExcelFileImporterSpec extends Specification {
     @Ignore("The Grails plugin makes it hard to add the dependencies required to support XLSX files. Once we remove the plugin and upgrade POI, we can re-enable this test")
     void 'importFile should successfully import strings from xlsx file for case: #scenario'() {
         given:
-        ExcelFileImporterConfig config = new ExcelFileImporterConfig(
+        ExcelReaderConfig config = new ExcelReaderConfig(
                 sheetName: "string",
-                startRow: 1,
+                linesToSkip: 1,
                 columnMapping: ["A": "string"],
         )
 
         when:
-        FileImporterResult result = excelFileImporter.importFile(xlsxFile, config)
+        BulkDataReaderResult result = reader.read(xlsxFile, config)
         List<Map<String, Object>> rows = result.rows
 
         then:
@@ -91,14 +89,14 @@ class ExcelFileImporterSpec extends Specification {
 
     void 'importFile should successfully import numerics from xls file for case: #scenario'() {
         given:
-        ExcelFileImporterConfig config = new ExcelFileImporterConfig(
+        ExcelReaderConfig config = new ExcelReaderConfig(
                 sheetName: "numeric",
-                startRow: 1,
+                linesToSkip: 1,
                 columnMapping: ["A": "numeric"],
         )
 
         when:
-        FileImporterResult result = excelFileImporter.importFile(xlsFile, config)
+        BulkDataReaderResult result = reader.read(xlsFile, config)
 
         then:
         assert result.rows[rowIndex]["numeric"] == expectedValue
@@ -114,14 +112,14 @@ class ExcelFileImporterSpec extends Specification {
     @Ignore("The Grails plugin makes it hard to add the dependencies required to support XLSX files. Once we remove the plugin and upgrade POI, we can re-enable this test")
     void 'importFile should successfully import numerics from xlsx file for case: #scenario'() {
         given:
-        ExcelFileImporterConfig config = new ExcelFileImporterConfig(
+        ExcelReaderConfig config = new ExcelReaderConfig(
                 sheetName: "numeric",
-                startRow: 1,
+                linesToSkip: 1,
                 columnMapping: ["A": "numeric"],
         )
 
         when:
-        FileImporterResult result = excelFileImporter.importFile(xlsxFile, config)
+        BulkDataReaderResult result = reader.read(xlsxFile, config)
 
         then:
         assert result.rows[rowIndex]["numeric"] == expectedValue
@@ -136,14 +134,14 @@ class ExcelFileImporterSpec extends Specification {
 
     void 'importFile should successfully import booleans from xls file for case: #scenario'() {
         given:
-        ExcelFileImporterConfig config = new ExcelFileImporterConfig(
+        ExcelReaderConfig config = new ExcelReaderConfig(
                 sheetName: "boolean",
-                startRow: 1,
+                linesToSkip: 1,
                 columnMapping: ["A": "boolean"],
         )
 
         when:
-        FileImporterResult result = excelFileImporter.importFile(xlsFile, config)
+        BulkDataReaderResult result = reader.read(xlsFile, config)
 
         then:
         assert result.rows[rowIndex]["boolean"] == expectedValue
@@ -157,14 +155,14 @@ class ExcelFileImporterSpec extends Specification {
     @Ignore("The Grails plugin makes it hard to add the dependencies required to support XLSX files. Once we remove the plugin and upgrade POI, we can re-enable this test")
     void 'importFile should successfully import booleans from xlsx file for case: #scenario'() {
         given:
-        ExcelFileImporterConfig config = new ExcelFileImporterConfig(
+        ExcelReaderConfig config = new ExcelReaderConfig(
                 sheetName: "boolean",
-                startRow: 1,
+                linesToSkip: 1,
                 columnMapping: ["A": "boolean"],
         )
 
         when:
-        FileImporterResult result = excelFileImporter.importFile(xlsxFile, config)
+        BulkDataReaderResult result = reader.read(xlsxFile, config)
 
         then:
         assert result.rows[rowIndex]["boolean"] == expectedValue
@@ -178,26 +176,26 @@ class ExcelFileImporterSpec extends Specification {
     void 'importFile should only import rows after startRow'() {
         given: "we are starting the import on the last row of the file"
         int numRowsInFile = 7
-        ExcelFileImporterConfig config = new ExcelFileImporterConfig(
+        ExcelReaderConfig config = new ExcelReaderConfig(
                 sheetName: "string",
-                startRow: numRowsInFile - 1,  // -1 because it is zero-indexed
+                linesToSkip: numRowsInFile - 1,  // -1 because it is zero-indexed
                 columnMapping: ["A": "string"],
         )
 
         expect: "only one row to be imported"
-        assert excelFileImporter.importFile(xlsFile, config).rows.size() == 1
+        assert reader.read(xlsFile, config).rows.size() == 1
     }
 
     void 'importFile should fail if given an empty file'() {
         given:
-        ExcelFileImporterConfig config = new ExcelFileImporterConfig(
+        ExcelReaderConfig config = new ExcelReaderConfig(
                 sheetName: "string",
-                startRow: 1,
+                linesToSkip: 1,
                 columnMapping: ["A": "string"],
         )
 
         when:
-        excelFileImporter.importFile(new UploadedFile(), config)
+        reader.read(new MultipartFileSource(), config)
 
         then:
         thrown(ValidationException)
@@ -205,14 +203,14 @@ class ExcelFileImporterSpec extends Specification {
 
     void 'importFile should fail if given a file type that is not supported by the importer'() {
         given:
-        ExcelFileImporterConfig config = new ExcelFileImporterConfig(
+        ExcelReaderConfig config = new ExcelReaderConfig(
                 sheetName: "string",
-                startRow: 1,
+                linesToSkip: 1,
                 columnMapping: ["A": "string"],
         )
 
         when:
-        excelFileImporter.importFile(txtFile, config)
+        reader.read(txtFile, config)
 
         then:
         thrown(IllegalArgumentException)
