@@ -1207,16 +1207,6 @@ class AddItemsPage extends Component {
               </div>
               <button
                 type="button"
-                onClick={() => this.refresh()}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-              >
-                <span>
-                  <i className="fa fa-refresh pr-2" />
-                  <Translate id="react.default.button.refresh.label" defaultMessage="Reload" />
-                </span>
-              </button>
-              <button
-                type="button"
                 disabled={!this.isValidForSave(values)}
                 onClick={() => this.save(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
