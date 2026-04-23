@@ -4,11 +4,13 @@ import grails.util.Holders
 import org.pih.warehouse.allocation.AllocationMode
 import org.pih.warehouse.allocation.AllocationStrategy
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.quartz.JobExecutionContext
 
 class AutomaticAllocationJob {
 
     def allocationService
+    def stockMovementService
 
     def sessionRequired = false
 
@@ -33,6 +35,7 @@ class AutomaticAllocationJob {
                 }
                 log.info("Automatic allocation for requisition ${requisitionId} ...")
                 allocationService.allocate(requisition, AllocationMode.AUTO, [AllocationStrategy.WAREHOUSE_FIRST])
+                stockMovementService.updateRequisitionStatus(requisitionId, RequisitionStatus.PICKING)
             } catch (Exception e) {
                 log.error("Error processing requisition ${requisitionId}", e)
             }
