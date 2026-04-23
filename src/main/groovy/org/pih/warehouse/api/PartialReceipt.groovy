@@ -1,6 +1,7 @@
 package org.pih.warehouse.api
 
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.order.Order
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.shipping.Shipment
 
@@ -33,6 +34,11 @@ class PartialReceipt {
         return partialReceiptContainers.find { it.isDefault() }
     }
 
+    Order getOrder() {
+        // Currently, a receipt will only have an order if it is coming from a return
+        return shipment?.returnOrder
+    }
+
     List<PartialReceiptItem> getPartialReceiptItems() {
         List<PartialReceiptItem> partialReceiptItems = []
         partialReceiptContainers.each {
@@ -58,7 +64,7 @@ class PartialReceipt {
                 dateDelivered                   : dateDelivered?.format("MM/dd/yyyy HH:mm XXX"),
                 containers                      : partialReceiptContainers,
                 requisition                     : shipment?.requisition?.id,
-                orderId                         : shipment?.returnOrder?.id,
+                orderId                         : order?.id,
                 description                     : shipment?.description,
                 recipient                       : recipient,
                 isShipmentFromPurchaseOrder     : shipment.isFromPurchaseOrder,
