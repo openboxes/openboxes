@@ -160,23 +160,26 @@ class InstantParserSpec extends Specification {
         2000 | 1     | 1   | "GMT-05:00"    || "2000-01-01T05:00:00Z" | "timezone behind UTC"
     }
 
-    void 'parse should successfully convert a Double to an Instant when given no workbook for case: #scenario'() {
+    void 'parse should successfully convert a Double to an Instant for case: #scenario'() {
         given:
         sessionManagerStub.timezone >> TimeZone.getTimeZone(timezoneOfDate)
 
-        and: 'no workbook (which defaults to the windows 1900 based date system)'
-        DateParserContext<Instant> context = new DateParserContext(excelWorkbook: null)
+        and:
+        DateParserContext<Instant> context = new DateParserContext(epochDate: epochDate)
 
         expect:
         assert instantParser.parse(givenDate, context).toString() == expectedConvertedDate
 
         where:
-        givenDate | timezoneOfDate || expectedConvertedDate  | scenario
-        1.0       | "Z"            || '1900-01-01T00:00:00Z' | 'midnight UTC on day 1'
-        1.5       | "Z"            || '1900-01-01T12:00:00Z' | 'noon UTC on day 1'
-        367.0     | "Z"            || '1901-01-01T00:00:00Z' | 'midnight UTC on day 367'
-        1.0       | "GMT+05:00"    || '1899-12-31T19:00:00Z' | 'midnight +05 on day 1'
-        1.0       | "GMT-05:00"    || '1900-01-01T05:00:00Z' | 'midnight -05 on day 1'
+        givenDate | timezoneOfDate | epochDate            || expectedConvertedDate  | scenario
+        0.0       | "Z"            | EpochDate.EXCEL_1900 || '1899-12-31T00:00:00Z' | '1900 epoch, midnight UTC on day 0'
+        1.0       | "Z"            | EpochDate.EXCEL_1900 || '1900-01-01T00:00:00Z' | '1900 epoch, midnight UTC on day 1'
+        1.5       | "Z"            | EpochDate.EXCEL_1900 || '1900-01-01T12:00:00Z' | '1900 epoch, noon UTC on day 1'
+        367.0     | "Z"            | EpochDate.EXCEL_1900 || '1901-01-01T00:00:00Z' | '1900 epoch, midnight UTC on day 367'
+        0.0       | "GMT+05:00"    | EpochDate.EXCEL_1900 || '1899-12-30T19:00:00Z' | '1900 epoch, midnight +05 on day 0'
+        0.0       | "GMT-05:00"    | EpochDate.EXCEL_1900 || '1899-12-31T05:00:00Z' | '1900 epoch, midnight -05 on day 0'
+        0.0       | "Z"            | EpochDate.EXCEL_1904 || '1904-01-01T00:00:00Z' | '1904 epoch, midnight UTC on day 0'
+        0.0       | "GMT-05:00"    | EpochDate.EXCEL_1904 || '1904-01-01T05:00:00Z' | '1904 epoch, midnight -05 on day 0'
     }
 
     void 'parse should successfully convert a Date to an Instant for case: #scenario'() {
