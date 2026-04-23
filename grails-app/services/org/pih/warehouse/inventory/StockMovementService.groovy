@@ -1941,9 +1941,7 @@ class StockMovementService {
             requisitionItem.addToPicklistItems(picklistItem)
             picklistItem.inventoryItem = inventoryItem
             picklistItem.binLocation = binLocation
-            // Safeguard: Ensure allocated quantity is never less than picked quantity.
-            // The frontend validates that picked <= allocated, but this protects against API misuse.
-            picklistItem.quantity = quantityPicked ?: quantityToPick
+            picklistItem.quantity = quantityToPick != null ? quantityToPick : (quantityPicked ?: 0)
             picklistItem.quantityPicked = quantityPicked ?: 0
             picklistItem.reasonCode = reasonCode ?: null
             picklistItem.comment = comment
@@ -2004,6 +2002,18 @@ class StockMovementService {
     void updatePicklistItem(StockMovementItem stockMovementItem, List picklistItems, String reasonCode) {
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
         Boolean isAutoAllocated = requisitionItem.autoAllocated ?: false
+        Integer quantityRequired = requisitionItem.calculateQuantityRequired() ?: 0
+
+        // Server-side safeguard: total allocated and total picked must not exceed quantity required
+        Integer totalAllocated = picklistItems?.sum { (it.quantityAllocated ?: 0) as Integer } ?: 0
+        Integer totalPicked = picklistItems?.sum { (it.quantityPicked ?: 0) as Integer } ?: 0
+        
+        if (totalAllocated > quantityRequired) {
+            throw new IllegalArgumentException("Total allocated quantity (${totalAllocated}) exceeds quantity required (${quantityRequired})")
+        }
+        if (totalPicked > quantityRequired) {
+            throw new IllegalArgumentException("Total picked quantity (${totalPicked}) exceeds quantity required (${quantityRequired})")
+        }
 
         clearPicklist(requisitionItem)
 
@@ -2018,13 +2028,11 @@ class StockMovementService {
             Location binLocation = picklistItemMap.binLocation?.id ?
                     Location.get(picklistItemMap.binLocation?.id) : null
 
-            BigDecimal quantityPicked = (picklistItemMap.quantityPicked != null && picklistItemMap.quantityPicked != "") ?
-                    new BigDecimal(picklistItemMap.quantityPicked) : null
+            Integer quantityPicked = (picklistItemMap.quantityPicked != null && picklistItemMap.quantityPicked != "") ?
+                    picklistItemMap.quantityPicked as Integer : null
 
-            BigDecimal quantityAllocated = (picklistItemMap.quantityAllocated != null && picklistItemMap.quantityAllocated != "") ?
-                    new BigDecimal(picklistItemMap.quantityAllocated) : null
-
-            Integer quantityToPick = quantityAllocated?.intValueExact()
+            Integer quantityToPick = (picklistItemMap.quantityAllocated != null && picklistItemMap.quantityAllocated != "") ?
+                    picklistItemMap.quantityAllocated as Integer : null
 
             if (quantityPicked == null && quantityToPick == null) {
                 return
@@ -2033,7 +2041,7 @@ class StockMovementService {
             String comment = picklistItemMap.comment
 
             createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation,
-                    quantityPicked?.intValueExact(), reasonCode, comment, isAutoAllocated, quantityToPick)
+                    quantityPicked, reasonCode, comment, isAutoAllocated, quantityToPick)
         }
     }
 
