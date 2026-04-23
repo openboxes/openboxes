@@ -19,7 +19,12 @@ interface BulkDataSource<SourceType> extends Validateable {
     SourceType getSource()
 
     /**
-     * @return The content type associated with source object.
+     * @return The source object as an input stream of bytes.
+     */
+    InputStream asInputStream()
+
+    /**
+     * @return The content type associated with the source object.
      */
     ContentType getContentType()
 }

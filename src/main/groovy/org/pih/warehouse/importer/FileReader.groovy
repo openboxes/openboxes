@@ -13,7 +13,7 @@ abstract class FileReader<Source extends BulkDataSource, Config extends BulkData
     /**
      * Reads in the file and binds its rows to a List of Map of fields.
      */
-    abstract BulkDataReaderResult readFile(Source source, Config config)
+    abstract protected BulkDataReaderResult readFile(Source source, Config config)
 
     /**
      * @return the list of file extensions that the reader can handle

@@ -13,6 +13,11 @@ class MultipartFileSource implements BulkDataSource<MultipartFile> {
     MultipartFile source
 
     @Override
+    InputStream asInputStream() {
+        return source.inputStream
+    }
+
+    @Override
     ContentType getContentType() {
         if (!source) {
             return null

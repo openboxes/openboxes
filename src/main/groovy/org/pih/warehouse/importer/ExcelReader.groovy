@@ -31,7 +31,7 @@ class ExcelReader extends FileReader<MultipartFileSource, ExcelReaderConfig> {
     }
 
     @Override
-    BulkDataReaderResult readFile(MultipartFileSource source, ExcelReaderConfig config) {
+    protected BulkDataReaderResult readFile(MultipartFileSource source, ExcelReaderConfig config) {
         Workbook workbook = null
         try {
             workbook = getWorkbook(source)
@@ -48,8 +48,6 @@ class ExcelReader extends FileReader<MultipartFileSource, ExcelReaderConfig> {
                 }
 
                 Map<String, Object> readRow = [:]
-                readRows.add(readRow)
-
                 for (Cell cell : row) {
                     // Only bother importing cells whose columns are specified in the config
                     String fieldName = getFieldName(cell, columnMapping)
@@ -59,6 +57,7 @@ class ExcelReader extends FileReader<MultipartFileSource, ExcelReaderConfig> {
 
                     readRow.put(fieldName, getCellValue(cell, evaluator))
                 }
+                readRows.add(readRow)
             }
 
             // Extract the epoch date that the file uses so that we can properly parse dates in the data binding step.
@@ -154,7 +153,7 @@ class ExcelReader extends FileReader<MultipartFileSource, ExcelReaderConfig> {
     private Workbook getWorkbook(MultipartFileSource source) {
         // This automatically determines the Excel workbook file type, creating an HSSFWorkbook for .xls files,
         // and an XSSFWorkbook for .xlsx files.
-        return WorkbookFactory.create(source.source.inputStream)
+        return WorkbookFactory.create(source.asInputStream())
     }
 
     /**

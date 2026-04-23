@@ -36,7 +36,7 @@ class ExcelReaderSpec extends Specification {
         reader = new ExcelReader()
     }
 
-    void 'importFile should successfully import strings from xls file for case: #scenario'() {
+    void 'read should successfully import strings from xls file for case: #scenario'() {
         given:
         ExcelReaderConfig config = new ExcelReaderConfig(
                 sheetName: "string",
@@ -62,7 +62,7 @@ class ExcelReaderSpec extends Specification {
     }
 
     @Ignore("The Grails plugin makes it hard to add the dependencies required to support XLSX files. Once we remove the plugin and upgrade POI, we can re-enable this test")
-    void 'importFile should successfully import strings from xlsx file for case: #scenario'() {
+    void 'read should successfully import strings from xlsx file for case: #scenario'() {
         given:
         ExcelReaderConfig config = new ExcelReaderConfig(
                 sheetName: "string",
@@ -87,7 +87,7 @@ class ExcelReaderSpec extends Specification {
         5        || "苹果"         | "Special characters"
     }
 
-    void 'importFile should successfully import numerics from xls file for case: #scenario'() {
+    void 'read should successfully import numerics from xls file for case: #scenario'() {
         given:
         ExcelReaderConfig config = new ExcelReaderConfig(
                 sheetName: "numeric",
@@ -110,7 +110,7 @@ class ExcelReaderSpec extends Specification {
     }
 
     @Ignore("The Grails plugin makes it hard to add the dependencies required to support XLSX files. Once we remove the plugin and upgrade POI, we can re-enable this test")
-    void 'importFile should successfully import numerics from xlsx file for case: #scenario'() {
+    void 'read should successfully import numerics from xlsx file for case: #scenario'() {
         given:
         ExcelReaderConfig config = new ExcelReaderConfig(
                 sheetName: "numeric",
@@ -132,7 +132,7 @@ class ExcelReaderSpec extends Specification {
         3        || 36526.0       | "Modern Date"  // "2000-01-01" in the file, which is 36526 days after Excel epoch
     }
 
-    void 'importFile should successfully import booleans from xls file for case: #scenario'() {
+    void 'read should successfully import booleans from xls file for case: #scenario'() {
         given:
         ExcelReaderConfig config = new ExcelReaderConfig(
                 sheetName: "boolean",
@@ -153,7 +153,7 @@ class ExcelReaderSpec extends Specification {
     }
 
     @Ignore("The Grails plugin makes it hard to add the dependencies required to support XLSX files. Once we remove the plugin and upgrade POI, we can re-enable this test")
-    void 'importFile should successfully import booleans from xlsx file for case: #scenario'() {
+    void 'read should successfully import booleans from xlsx file for case: #scenario'() {
         given:
         ExcelReaderConfig config = new ExcelReaderConfig(
                 sheetName: "boolean",
@@ -173,7 +173,7 @@ class ExcelReaderSpec extends Specification {
         1        || false         | "False"
     }
 
-    void 'importFile should only import rows after startRow'() {
+    void 'read should only import rows after startRow'() {
         given: "we are starting the import on the last row of the file"
         int numRowsInFile = 7
         ExcelReaderConfig config = new ExcelReaderConfig(
@@ -186,7 +186,7 @@ class ExcelReaderSpec extends Specification {
         assert reader.read(xlsFile, config).rows.size() == 1
     }
 
-    void 'importFile should fail if given an empty file'() {
+    void 'read should fail if given an empty file'() {
         given:
         ExcelReaderConfig config = new ExcelReaderConfig(
                 sheetName: "string",
@@ -201,7 +201,7 @@ class ExcelReaderSpec extends Specification {
         thrown(ValidationException)
     }
 
-    void 'importFile should fail if given a file type that is not supported by the importer'() {
+    void 'read should fail if given a file type that is not supported by the importer'() {
         given:
         ExcelReaderConfig config = new ExcelReaderConfig(
                 sheetName: "string",
