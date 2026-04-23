@@ -1,5 +1,6 @@
 package org.pih.warehouse.core.http
 
+import org.apache.commons.lang3.StringUtils
 import org.springframework.http.MediaType
 
 import org.pih.warehouse.core.file.FileExtension
@@ -36,5 +37,33 @@ enum ContentType {
     ContentType(FileExtension fileExtension, MediaType mediaType) {
         this.fileExtension = fileExtension
         this.mediaType = mediaType
+    }
+
+    static ContentType getByFileExtension(FileExtension fileExtension) {
+        if (!fileExtension) {
+            return null
+        }
+
+        return values().find {
+            it.fileExtension == fileExtension
+        }
+    }
+
+    static ContentType getByFileExtension(String fileExtension) {
+        if (StringUtils.isBlank(fileExtension)) {
+            return null
+        }
+
+        return getByFileExtension(FileExtension.fromExtensionString(fileExtension))
+    }
+
+    static ContentType getByMediaType(String mediaType) {
+        if (StringUtils.isBlank(mediaType)) {
+            return null
+        }
+
+        return values().find {
+            it.mediaType == MediaType.parseMediaType(mediaType)
+        }
     }
 }

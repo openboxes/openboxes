@@ -104,7 +104,7 @@ class InboundStockMovementListItem implements Serializable, Validateable {
             id                  : id,
             name                : name,
             description         : description,
-            shipmentType        : shipment?.shipmentType,
+            shipmentType        : shipmentType,
             displayStatus       : displayStatus,
             identifier          : identifier,
             origin              : [

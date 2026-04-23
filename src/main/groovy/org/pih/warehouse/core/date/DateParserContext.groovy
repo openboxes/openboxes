@@ -1,7 +1,5 @@
 package org.pih.warehouse.core.date
 
-import org.apache.poi.ss.usermodel.Workbook
-
 import org.pih.warehouse.core.parser.ParserContext
 
 /**
@@ -11,7 +9,9 @@ import org.pih.warehouse.core.parser.ParserContext
 class DateParserContext<T> extends ParserContext<T> {
 
     /**
-     * The .xlsx or .xls file used when importing via Excel.
+     * The epoch date to use when parsing to the given date type.
+     *
+     * This is required for parsing dates coming from Excel files and can likely be ignored for all other scenarios.
      */
-    Workbook excelWorkbook
+    EpochDate epochDate = EpochDate.UNIX_EPOCH
 }
