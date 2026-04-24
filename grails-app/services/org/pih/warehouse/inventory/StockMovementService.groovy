@@ -3376,6 +3376,14 @@ class StockMovementService {
                             uri         : g.createLink(controller: 'doc4j', action: "downloadCertificateOfDonation", id: stockMovement?.shipment?.id, absolute: true)
                     ],
                     [
+                            name        : g.message(code: "requisition.deliveryNote.label", default: "Delivery Note"),
+                            documentType: DocumentGroupCode.DELIVERY_NOTE.name(),
+                            contentType : "text/html",
+                            stepNumber  : 5,
+                            uri         : g.createLink(controller: 'deliveryNote', action: "printOutboundReturn", id: stockMovement?.shipment?.id, absolute: true),
+                            hidden      : !stockMovement?.isReturn
+                    ],
+                    [
                             name        : g.message(code: "goodsReceiptNote.label"),
                             documentType: DocumentGroupCode.GOODS_RECEIPT_NOTE.name(),
                             contentType : "text/html",
