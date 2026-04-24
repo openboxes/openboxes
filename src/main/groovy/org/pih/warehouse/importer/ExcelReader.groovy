@@ -21,7 +21,7 @@ import org.pih.warehouse.core.http.ContentType
  * Reads in an Excel file, converting the rows of one of the sheets in the file to a Java-friendly structure.
  */
 @Component
-class ExcelReader extends BulkDataReader<MultipartFileSource, ExcelReaderConfig> {
+class ExcelReader extends BulkDataReader<ExcelReaderConfig> {
 
     @Override
     List<ContentType> getSupportedContentTypes() {
@@ -31,7 +31,7 @@ class ExcelReader extends BulkDataReader<MultipartFileSource, ExcelReaderConfig>
     }
 
     @Override
-    protected BulkDataReaderResult doRead(MultipartFileSource source, ExcelReaderConfig config) {
+    protected BulkDataReaderResult doRead(BulkDataSource source, ExcelReaderConfig config) {
         Workbook workbook = null
         try {
             workbook = getWorkbook(source)
@@ -150,7 +150,7 @@ class ExcelReader extends BulkDataReader<MultipartFileSource, ExcelReaderConfig>
         }
     }
 
-    private Workbook getWorkbook(MultipartFileSource source) {
+    private Workbook getWorkbook(BulkDataSource source) {
         // This automatically determines the Excel workbook file type, creating an HSSFWorkbook for .xls files,
         // and an XSSFWorkbook for .xlsx files.
         return WorkbookFactory.create(source.asInputStream())

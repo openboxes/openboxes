@@ -12,7 +12,7 @@ import org.pih.warehouse.core.http.ContentType
  * Reads in CSV a source object, capturing it as a List of Map rows.
  */
 @Component
-class CsvReader extends BulkDataReader<BulkDataSource, CsvReaderConfig> {
+class CsvReader extends BulkDataReader<CsvReaderConfig> {
 
     @Override
     List<ContentType> getSupportedContentTypes() {

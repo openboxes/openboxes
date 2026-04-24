@@ -11,12 +11,12 @@ import org.pih.warehouse.core.http.ContentType
  * contained within a source object to a standardized format. From there, other components can process the data
  * without needing to know anything about where the data came from.
  */
-abstract class BulkDataReader<Source extends BulkDataSource, Config extends BulkDataReaderConfig> {
+abstract class BulkDataReader<Config extends BulkDataReaderConfig> {
 
     /**
      * Contains the logic for reading in the source object and binding its rows to a List of Map of fields.
      */
-    protected abstract BulkDataReaderResult doRead(Source source, Config config)
+    protected abstract BulkDataReaderResult doRead(BulkDataSource source, Config config)
 
     /**
      * @return The list of content types that the reader can handle.
@@ -26,7 +26,7 @@ abstract class BulkDataReader<Source extends BulkDataSource, Config extends Bulk
     /**
      * Validates the source object, throwing exceptions if it is not valid for the reader.
      */
-    protected void validateSource(Source source) {
+    protected void validateSource(BulkDataSource source) {
         if (!source?.validate()) {
             throw new ValidationException("Source is invalid", source?.errors)
         }
@@ -39,7 +39,7 @@ abstract class BulkDataReader<Source extends BulkDataSource, Config extends Bulk
     /**
      * Reads in the source object, binding its rows to a List of Map of fields.
      */
-    BulkDataReaderResult read(Source source, Config config) {
+    BulkDataReaderResult read(BulkDataSource source, Config config) {
         validateSource(source)
         return doRead(source, config)
     }
