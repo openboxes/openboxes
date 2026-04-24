@@ -1,0 +1,15 @@
+Field1,Field2
+ABC,ABC
+ABC,
+,ABC
+,
+ ABC , ABC 
+"ABC,123,","ABC,"
+"""ABC""","""ABC"
+ABC\n,\nABC
+'ABC,ABC'
+\\ABC,\\\\ABC
+jabłko,苹果
+1, 1 
+1.1, 1.1 
+2000-01-01,2000-01-01T00:00Z
