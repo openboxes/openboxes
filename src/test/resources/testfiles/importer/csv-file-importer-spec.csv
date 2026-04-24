@@ -5,6 +5,10 @@ ABC,
 ,
  ABC , ABC 
 "ABC,123,","ABC,"
+"""ABC""","""ABC"
+ABC\n,\nABC
+'ABC,ABC'
+\\ABC,\\\\ABC
 jabłko,苹果
 1, 1 
 1.1, 1.1 

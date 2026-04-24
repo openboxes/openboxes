@@ -15,23 +15,23 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.stereotype.Component
 
 import org.pih.warehouse.core.date.EpochDate
-import org.pih.warehouse.core.file.FileExtension
+import org.pih.warehouse.core.http.ContentType
 
 /**
  * Reads in an Excel file, converting the rows of one of the sheets in the file to a Java-friendly structure.
  */
 @Component
-class ExcelReader extends FileReader<MultipartFileSource, ExcelReaderConfig> {
+class ExcelReader extends BulkDataReader<MultipartFileSource, ExcelReaderConfig> {
 
     @Override
-    List<FileExtension> getSupportedFileExtensions() {
-        // TODO: Add FileExtension.XLSX back in here once we remove the Grails plugin and can resolve the dependency
+    List<ContentType> getSupportedContentTypes() {
+        // TODO: Add ContentType.XLSX back in here once we remove the Grails plugin and can resolve the dependency
         //       hell around POI. We need to either upgrade to the latest POI or bring in the poi-ooxml dependency.
-        return [FileExtension.XLS]
+        return [ContentType.XLS]
     }
 
     @Override
-    protected BulkDataReaderResult readFile(MultipartFileSource source, ExcelReaderConfig config) {
+    protected BulkDataReaderResult doRead(MultipartFileSource source, ExcelReaderConfig config) {
         Workbook workbook = null
         try {
             workbook = getWorkbook(source)
