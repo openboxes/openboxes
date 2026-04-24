@@ -52,6 +52,7 @@ CREATE OR REPLACE VIEW inbound_stock_movement_list_item AS
         NULL                                               AS requisition_id,
         o.id                                               AS order_id,
         NULL                                               AS stocklist_id,
+        -- Even though these are order-based inbounds, current status on SM views is always in relation to the shipment (this field resolves to ShipmentStatusCode).
         s.current_status,
         s.shipment_type_id
     FROM `order` o
