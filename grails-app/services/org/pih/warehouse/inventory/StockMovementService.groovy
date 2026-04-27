@@ -1849,7 +1849,7 @@ class StockMovementService {
 
         log.info "QUANTITY REQUIRED: ${quantityRequired}"
         if (quantityRequired) {
-            List<AvailableItem> availableItems = getAvailableItems(location, requisitionItem)
+            List<AvailableItem> availableItems = getAvailableItems(location, requisitionItem, false, false)
 
             // If a picklist item was passed as an argument, remove the picklist item for which we're trying to create an alternative pick
             if (excludedPicklistItem) {
@@ -1882,12 +1882,22 @@ class StockMovementService {
                             suggestedItem.quantityPicked.intValueExact(),)
                 }
             }
-            if (validateSuggestionItemsAvailability && !suggestedItems) {
-                String errorMessage = "Product " + requisitionItem.product.productCode + " has no available inventory. Please go back to edit page and revise quantity"
-                requisitionItem.errors.rejectValue("picklistItems", errorMessage, [
-                        requisitionItem?.product?.productCode,
-                ].toArray(), errorMessage)
-                throw new ValidationException(errorMessage, requisitionItem.errors)
+            if (validateSuggestionItemsAvailability) {
+                if (!suggestedItems) {
+                    String errorMessage = "Product " + requisitionItem.product.productCode + " has no available inventory. Please go back to edit page and revise quantity"
+                    requisitionItem.errors.rejectValue("picklistItems", errorMessage, [
+                            requisitionItem?.product?.productCode,
+                    ].toArray(), errorMessage)
+                    throw new ValidationException(errorMessage, requisitionItem.errors)
+                }
+                Integer suggestedItemsQuantity = suggestedItems?.sum { it.quantityPicked } ?: 0
+                if (suggestedItemsQuantity < quantityRequired) {
+                    String errorMessage = "Product " + requisitionItem.product.productCode + " has less available inventory " + suggestedItemsQuantity + " than required " + quantityRequired + ". Please go back to edit page and revise quantity"
+                    requisitionItem.errors.rejectValue("picklistItems", errorMessage, [
+                            requisitionItem?.product?.productCode,
+                    ].toArray(), errorMessage)
+                    throw new ValidationException(errorMessage, requisitionItem.errors)
+                }
             }
         }
     }
@@ -2049,12 +2059,14 @@ class StockMovementService {
         return getAvailableItems(location, requisitionItem, false)
     }
 
-    List<AvailableItem> getAvailableItems(Location location, RequisitionItem requisitionItem, Boolean calculateStatus) {
+    List<AvailableItem> getAvailableItems(Location location, RequisitionItem requisitionItem, Boolean calculateStatus, Boolean includeQuantityAllocated = Boolean.TRUE) {
         List<AvailableItem> availableItems = productAvailabilityService.getAllAvailableBinLocations(location, requisitionItem.product?.id)
         def picklistItems = getPicklistItems(requisitionItem)
 
         availableItems = availableItems.findAll { it.quantityOnHand > 0 }
-        availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
+        if (includeQuantityAllocated) {
+            availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
+        }
 
         if (calculateStatus) {
             return calculateAvailableItemsStatus(requisitionItem, availableItems)
