@@ -10,11 +10,11 @@
 package org.pih.warehouse
 
 import org.grails.core.artefact.DomainClassArtefactHandler
+import org.pih.warehouse.core.BudgetCodeService
 import org.pih.warehouse.product.CategoryService
 import org.springframework.beans.factory.annotation.Value
 
 import org.pih.warehouse.core.ActivityCode
-import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.EntityTypeCode
 import org.pih.warehouse.core.GlAccount
@@ -57,6 +57,7 @@ class SelectTagLib {
     def shipmentService
     def requisitionService
     def organizationService
+    BudgetCodeService budgetCodeService
     CategoryService categoryService
 
     /**
@@ -409,11 +410,7 @@ class SelectTagLib {
     }
 
     def selectBudgetCode = { attrs, body ->
-        if (attrs.active == "true") {
-            attrs.from = BudgetCode.findAllByActive(true)
-        } else {
-            attrs.from = BudgetCode.list()
-        }
+        attrs.from = budgetCodeService.getBudgetCodes([active: attrs.active, includeIds: attrs.value ? [attrs.value] : []])
         attrs.optionKey = 'id'
         attrs.optionValue = { it.code }
         out << g.select(attrs)

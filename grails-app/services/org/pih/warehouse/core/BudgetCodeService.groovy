@@ -9,18 +9,27 @@
 **/
 package org.pih.warehouse.core
 
-import grails.web.servlet.mvc.GrailsParameterMap
-
 class BudgetCodeService {
-    
-    def getBudgetCodes(GrailsParameterMap params) {
+
+    List<BudgetCode> getBudgetCodes(Map params) {
         return BudgetCode.createCriteria().list(max: params.max, offset: params.offset) {
             if (params.q) {
                 ilike("code", "%" + params.q + "%")
             }
+            if (params.active != null || params.includeIds) {
+                or {
+                    if (params.active != null) {
+                        eq("active", params.active?.toBoolean())
+                    }
+                    if (params.includeIds) {
+                        // include provided ids regardless of active filter
+                        'in'("id", params.includeIds)
+                    }
+                }
+            }
             if (params.sort) {
                 order(params.sort, params.order ?: 'asc')
             }
-        }
+        } as List<BudgetCode>
     }
 }
