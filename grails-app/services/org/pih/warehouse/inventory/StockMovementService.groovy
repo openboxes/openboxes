@@ -1124,6 +1124,32 @@ class StockMovementService {
         return packPageItems
     }
 
+    List<Map<String, String>> buildPackTemplateLineItems(String stockMovementId, Map<String, String> csvHeadings) {
+        List<PackPageItem> packPageItems = getPackPageItems(stockMovementId, null, null)
+
+        // We need to create at least one row to ensure an empty template
+        if (packPageItems?.empty) {
+            packPageItems.add(new PackPageItem())
+        }
+
+        return packPageItems.collect { PackPageItem packPageItem ->
+            ShipmentItem shipmentItem = packPageItem?.shipmentItem
+            [
+                    "${csvHeadings.id}"             : shipmentItem?.id ?: "",
+                    "${csvHeadings.productCode}"    : shipmentItem?.product?.productCode ?: "",
+                    "${csvHeadings.productName}"    : shipmentItem?.product?.displayNameWithLocaleCode ?: "",
+                    "${csvHeadings.lotNumber}"      : shipmentItem?.lotNumber ?: "",
+                    "${csvHeadings.expirationDate}" : shipmentItem?.expirationDate ?
+                            shipmentItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
+                    "${csvHeadings.binLocation}"    : shipmentItem?.binLocation?.name ?: "",
+                    "${csvHeadings.quantityShipped}": shipmentItem?.quantity == null ? "" : shipmentItem.quantity,
+                    "${csvHeadings.palletName}"     : packPageItem?.palletName ?: "",
+                    "${csvHeadings.boxName}"        : packPageItem?.boxName ?: "",
+                    "${csvHeadings.recipient}"      : shipmentItem?.recipient?.name ?: "",
+            ]
+        } as List<Map<String, String>>
+    }
+
     List<PicklistItemCommand> parsePickCsvTemplateImport(PicklistImportDataCommand command) {
 
         try {
