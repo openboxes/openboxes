@@ -22,9 +22,9 @@ class BudgetCodeService {
                 if (command.active != null) {
                     eq("active", command.active)
                 }
-                if (command.includeIds) {
+                if (command.budgetCodeIds) {
                     // include provided ids regardless of active filter
-                    inList("id", command.includeIds)
+                    inList("id", command.budgetCodeIds)
                 }
             }
             if (command.sort) {

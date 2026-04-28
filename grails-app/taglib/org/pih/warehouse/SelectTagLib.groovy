@@ -413,7 +413,7 @@ class SelectTagLib {
     def selectBudgetCode = { attrs, body ->
         BudgetCodeFilterCommand command = new BudgetCodeFilterCommand(
             active: attrs.active?.toBoolean(),
-            includeIds: attrs.value ? [attrs.value] : [],
+            budgetCodeIds: attrs.value ? [attrs.value] : [],
             disableMaxLimit: true,
         )
         attrs.from = budgetCodeService.getBudgetCodes(command)
