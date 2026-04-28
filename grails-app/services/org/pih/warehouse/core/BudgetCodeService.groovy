@@ -13,24 +13,22 @@ import grails.gorm.PagedResultList
 
 class BudgetCodeService {
 
-    PagedResultList<BudgetCode> getBudgetCodes(Map params) {
-        return BudgetCode.createCriteria().list(max: params.max, offset: params.offset) {
-            if (params.q) {
-                ilike("code", "%" + params.q + "%")
+    PagedResultList<BudgetCode> getBudgetCodes(BudgetCodeFilterCommand command) {
+        return BudgetCode.createCriteria().list(max: command.max, offset: command.offset) {
+            if (command.q) {
+                ilike("code", "%" + command.q + "%")
             }
-            if (params.active != null || params.includeIds) {
-                or {
-                    if (params.active != null) {
-                        eq("active", params.active?.toBoolean())
-                    }
-                    if (params.includeIds) {
-                        // include provided ids regardless of active filter
-                        'in'("id", params.includeIds)
-                    }
+            or {
+                if (command.active != null) {
+                    eq("active", command.active)
+                }
+                if (command.includeIds) {
+                    // include provided ids regardless of active filter
+                    inList("id", command.includeIds)
                 }
             }
-            if (params.sort) {
-                order(params.sort, params.order ?: 'asc')
+            if (command.sort) {
+                order(command.sort, command.order ?: 'asc')
             }
         } as PagedResultList<BudgetCode>
     }

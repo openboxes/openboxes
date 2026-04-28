@@ -10,6 +10,7 @@
 package org.pih.warehouse
 
 import org.grails.core.artefact.DomainClassArtefactHandler
+import org.pih.warehouse.core.BudgetCodeFilterCommand
 import org.pih.warehouse.core.BudgetCodeService
 import org.pih.warehouse.product.CategoryService
 import org.springframework.beans.factory.annotation.Value
@@ -410,7 +411,12 @@ class SelectTagLib {
     }
 
     def selectBudgetCode = { attrs, body ->
-        attrs.from = budgetCodeService.getBudgetCodes([active: attrs.active, includeIds: attrs.value ? [attrs.value] : []])
+        BudgetCodeFilterCommand command = new BudgetCodeFilterCommand(
+            active: attrs.active?.toBoolean(),
+            includeIds: attrs.value ? [attrs.value] : [],
+            disableMaxLimit: true,
+        )
+        attrs.from = budgetCodeService.getBudgetCodes(command)
         attrs.optionKey = 'id'
         attrs.optionValue = { it.code }
         out << g.select(attrs)
