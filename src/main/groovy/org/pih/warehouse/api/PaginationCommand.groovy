@@ -5,9 +5,20 @@ import org.pih.warehouse.core.PaginationParams
 
 class PaginationCommand extends PaginationParams implements Validateable {
 
+    private static final int ABSOLUTE_MAX = 100
+    private static final int DEFAULT_MAX = 10
+
     @Override
     Integer getMax() {
-        return Math.min(super.max ?: 10, 100)
+        if (paginationDisabled()) {
+            return Integer.MAX_VALUE
+        }
+        return Math.min(super.max ?: DEFAULT_MAX, ABSOLUTE_MAX)
+    }
+
+    // For API safety, we default to always requiring pagination. A child implementation can override this method if it wants to support disabling pagination.
+    boolean paginationDisabled() {
+        return false
     }
 
     @Override

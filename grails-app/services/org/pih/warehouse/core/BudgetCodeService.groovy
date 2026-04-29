@@ -14,7 +14,7 @@ import grails.gorm.PagedResultList
 class BudgetCodeService {
 
     PagedResultList<BudgetCode> getBudgetCodes(BudgetCodeFilterCommand command) {
-        return BudgetCode.createCriteria().list(max: command.max, offset: command.offset) {
+        return BudgetCode.createCriteria().list(command.paginationParams) {
             if (command.q) {
                 ilike("code", "%" + command.q + "%")
             }
