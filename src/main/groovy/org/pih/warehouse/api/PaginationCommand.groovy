@@ -8,17 +8,14 @@ class PaginationCommand extends PaginationParams implements Validateable {
     private static final int ABSOLUTE_MAX = 100
     private static final int DEFAULT_MAX = 10
 
+    Boolean paginationEnabled = true
+
     @Override
     Integer getMax() {
-        if (paginationDisabled()) {
+        if (!paginationEnabled) {
             return Integer.MAX_VALUE
         }
         return Math.min(super.max ?: DEFAULT_MAX, ABSOLUTE_MAX)
-    }
-
-    // For API safety, we default to always requiring pagination. A child implementation can override this method if it wants to support disabling pagination.
-    boolean paginationDisabled() {
-        return false
     }
 
     @Override

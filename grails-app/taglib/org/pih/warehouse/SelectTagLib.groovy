@@ -414,7 +414,7 @@ class SelectTagLib {
         BudgetCodeFilterCommand command = new BudgetCodeFilterCommand(
             active: attrs.active?.toBoolean(),
             budgetCodeIds: attrs.value ? [attrs.value] : [],
-            disablePagination: true,
+            paginationEnabled: false,
         )
         attrs.from = budgetCodeService.getBudgetCodes(command)
         attrs.optionKey = 'id'
