@@ -1,8 +1,8 @@
 package org.pih.warehouse.core
 
-import org.pih.warehouse.api.PaginationCommand
+import org.pih.warehouse.api.OptionalPaginationCommand
 
-class BudgetCodeFilterCommand extends PaginationCommand {
+class BudgetCodeFilterCommand extends OptionalPaginationCommand {
     String q
     Boolean active
     List<String> budgetCodeIds = []
