@@ -24,7 +24,7 @@ import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 
-class Shipment implements Comparable, Serializable, Historizable<ShipmentHistoryProvider> {
+class Shipment implements Comparable, Serializable, Historizable {
 
     def publishRefreshEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this))
@@ -718,5 +718,17 @@ class Shipment implements Comparable, Serializable, Historizable<ShipmentHistory
     void resynchronizeEventAndStatus() {
         currentStatus = getStatus().code
         currentEvent = getMostRecentSystemEvent()
+    }
+
+    @Override
+    ReferenceDocument getReferenceDocument() {
+        return new ReferenceDocument(
+                label: shipmentNumber,
+                url: "/openboxes/stockMovement/show/${requisition?.id ?: id}",
+                id: id,
+                identifier: shipmentNumber,
+                description: description,
+                name: name,
+        )
     }
 }

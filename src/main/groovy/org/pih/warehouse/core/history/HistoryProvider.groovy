@@ -1,17 +1,14 @@
 package org.pih.warehouse.core.history
 
-import org.pih.warehouse.core.ReferenceDocument
-import org.pih.warehouse.core.Referenceable
-
 /**
- * Constructs a history of actions for some Referenceable (and possibly Historizable) entity.
+ * Constructs a history of actions for some historizable entity.
  */
-interface HistoryProvider<T extends Referenceable> {
+abstract class HistoryProvider<T extends Historizable> {
 
     /**
-     * @return A reference (in a standardized format) to the object being historized.
+     * Contains the feature-specific logic for building the history fir a given historizable object.
      */
-    ReferenceDocument getReferenceDocument(T source)
+    abstract List<HistoryItem> doGetHistory(T source, HistoryContext context)
 
     /**
      * Returns a List of HistoryItem representing some historical data on the object being historized. Typically this
@@ -20,5 +17,13 @@ interface HistoryProvider<T extends Referenceable> {
      *
      * Returns a list to allow for a single historizable object to produce multiple history records if needed.
      */
-    List<HistoryItem> getHistory(T source)
+    List<HistoryItem> getHistory(T source, HistoryContext context) {
+        List<HistoryItem> historyItems = doGetHistory(source, context).sort()
+        return limitHistory(historyItems, context)
+    }
+
+    private List<HistoryItem> limitHistory(List<HistoryItem> historyItems, HistoryContext context) {
+        // Assumes the history items have been sorted oldest to newest.
+        return context.limit ? historyItems.takeRight(context.limit) : historyItems
+    }
 }

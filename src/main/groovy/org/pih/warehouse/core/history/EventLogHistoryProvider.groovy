@@ -5,9 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired
 
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Event
+import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.EventTypeDto
-import org.pih.warehouse.core.Referenceable
 import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.core.localization.MessageLocalizer
 
@@ -15,7 +15,7 @@ import org.pih.warehouse.core.localization.MessageLocalizer
  * A convenience base class for any HistoryProvider that operates on entities whose history is based off
  * of a collection of {@link EventLog}.
  */
-abstract class EventLogHistoryProvider<T extends Referenceable> implements HistoryProvider<T> {
+abstract class EventLogHistoryProvider<T extends Historizable> extends HistoryProvider<T> {
 
     @Autowired
     MessageLocalizer messageLocalizer
@@ -26,15 +26,19 @@ abstract class EventLogHistoryProvider<T extends Referenceable> implements Histo
     abstract Collection<EventLog> getEventLogs(T source)
 
     @Override
-    List<HistoryItem> getHistory(T source) {
+    List<HistoryItem> doGetHistory(T source, HistoryContext context=new HistoryContext()) {
         // The default behaviour assumes the event logs contain all the information that we need to build the history.
         Collection<EventLog> eventLogs = getEventLogs(source)
         List<HistoryItem> historyItems = []
         for (EventLog eventLog in eventLogs) {
+            if (!context.includeRolledBackEvents && isRollbackOrRolledBack(eventLog)) {
+                continue
+            }
+
             HistoryItem historyItem = getHistoryItem(source, eventLog)
             historyItems.add(historyItem)
         }
-        return historyItems.sort()
+        return historyItems
     }
 
     /**
@@ -62,14 +66,32 @@ abstract class EventLogHistoryProvider<T extends Referenceable> implements Histo
                 dateLogged: event.dateCreated,
                 date: event.eventDate,
                 location: event.eventLocation,
-                eventType: new EventTypeDto(
-                        name: eventType ? messageLocalizer.localizeEnumValue(eventType.eventCode) : null,
-                        eventCode: eventType?.eventCode,
-                ),
+                eventType: eventTypeToDto(eventType),
                 comment: event.comment,
                 createdBy: event.createdBy,
-                referenceDocument: getReferenceDocument(source),
+                referenceDocument: source.getReferenceDocument(),
         )
+    }
+
+    private EventTypeDto eventTypeToDto(EventType eventType) {
+        if (!eventType) {
+            return new EventTypeDto()
+        }
+
+        EventCode eventCode = eventType.eventCode
+
+        // Custom event types are dynamic and so won't have a localizable name. Simply use the name from the database.
+        String name = eventCode == EventCode.CUSTOM ? eventType.name : messageLocalizer.localizeEnumValue(eventCode)
+
+        return new EventTypeDto(
+                name: name,
+                eventCode: eventCode,
+        )
+    }
+
+    private boolean isRollbackOrRolledBack(EventLog eventLog) {
+        return eventLog.eventLogCode == EventLogCode.EVENT_ROLLBACK_OCCURRED ||
+                (eventLog.eventLogCode == EventLogCode.EVENT_OCCURRED && eventLog.event == null)
     }
 
     private HistoryItem getHistoryItem(T source, EventLog eventLog) {
@@ -98,7 +120,7 @@ abstract class EventLogHistoryProvider<T extends Referenceable> implements Histo
                 ),
                 comment: StringUtils.isBlank(eventLog.message) ? null : new Comment(comment: eventLog.message),
                 createdBy: eventLog.createdBy,
-                referenceDocument: getReferenceDocument(source),
+                referenceDocument: source.getReferenceDocument(),
         )
     }
 }

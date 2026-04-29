@@ -248,6 +248,14 @@
                                 ${stockMovement?.displayStatus?.label}
                             </td>
                         </tr>
+                        <tr class="prop">
+                            <td class="name">
+                                <g:message code="stockMovement.mostRecentEvent.label"/>
+                            </td>
+                            <td class="value">
+                                ${newestHistoryItem?.eventType?.name}
+                            </td>
+                        </tr>
                         <g:if test="${stockMovement?.shipment?.isFromPurchaseOrder}">
                             <tr class="prop">
                                 <td class="name">

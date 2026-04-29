@@ -8,8 +8,10 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.ReferenceDocument
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.history.Historizable
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItemStatusCode
@@ -27,8 +29,7 @@ import org.pih.warehouse.auth.AuthService
 import util.ConfigHelper
 import util.StockMovementStatusResolver
 
-
-class StockMovement implements Validateable{
+class StockMovement implements Validateable, Historizable {
 
     String id
     String name
@@ -126,6 +127,7 @@ class StockMovement implements Validateable{
         lastUpdated(nullable: true)
         requestType(nullable: true)
         sourceType(nullable: true)
+        referenceDocument(nullable: true)
     }
 
     Map toJson() {
@@ -521,5 +523,13 @@ class StockMovement implements Validateable{
                 requisition?.status == RequisitionStatus.PENDING_APPROVAL &&
                 (isLocationDestination || isLocationOrigin)) ||
                 (requisition?.status == RequisitionStatus.APPROVED && isLocationOrigin)
+    }
+
+    @Override
+    ReferenceDocument getReferenceDocument() {
+        // The stock movement itself is not a concrete entity, and so does not have a reference document. The event
+        // history of a stock movement is built from the event history of its sub-components (Shipment, Order),
+        // so the stock movement itself is "referenceable" only in that its sub-components are referenceable.
+        return null
     }
 }

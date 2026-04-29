@@ -9,12 +9,13 @@ import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.event.EventManager
 
 /**
- * Manages the lifecycle (creating and rolling back) of Shipment related {@link Event}s.
+ * Manages the lifecycle (creating and rolling back) of a Shipment related {@link Event}.
  */
 @Component
-class ShipmentEventManager {
+class ShipmentEventManager extends EventManager {
 
     @Autowired
     ShipmentEventLogger shipmentEventLogger
@@ -37,11 +38,7 @@ class ShipmentEventManager {
      * Create a new Shipment Event representing some state change to the shipment, then logs the action.
      */
     Event createEvent(Shipment shipment, Date eventDate, EventCode eventCode, Location location) {
-        EventType eventType = EventType.findByEventCode(eventCode)
-        if (!eventType) {
-            throw new RuntimeException("Unable to find event type for event code ${eventCode}")
-        }
-
+        EventType eventType = getOrCreateEventType(eventCode)
         Event event = new Event(
                 eventDate: eventDate,
                 eventType: eventType,
