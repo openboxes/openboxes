@@ -98,7 +98,7 @@ const FIELDS = {
         type: DateField,
         label: 'react.inboundReturns.expiry.label',
         defaultMessage: 'Expiry',
-        flexWidth: '1.5',
+        fixedWidth: '11ch',
         attributes: {
           localizeDate: true,
           showLocalizedPlaceholder: true,
@@ -569,7 +569,7 @@ class AddItemsPage extends Component {
                 type="button"
                 disabled={invalid}
                 onClick={() => this.removeAll()}
-                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs"
+                className="float-right mb-1 btn btn-outline-danger align-self-end ml-1 btn-xs"
               >
                 <span>
                   <i className="fa fa-remove pr-2" />
