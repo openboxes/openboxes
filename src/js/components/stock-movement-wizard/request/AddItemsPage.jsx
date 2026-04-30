@@ -68,6 +68,7 @@ const FIELDS = {
     flexWidth: '1.7',
     attributes: {
       type: 'number',
+      className: 'text-right',
     },
   },
   quantityOnHandAtRequestSite: {
@@ -86,6 +87,7 @@ const FIELDS = {
     flexWidth: '1.7',
     attributes: {
       type: 'number',
+      className: 'text-right',
     },
   },
   quantityAllowed: {
@@ -101,15 +103,18 @@ const FIELDS = {
     type: LabelField,
     label: 'react.stockMovement.demandPerMonth.label',
     defaultMessage: 'Demand per Month',
+    multilineHeader: true,
     flexWidth: '1.7',
     attributes: {
       type: 'number',
+      className: 'text-right',
     },
   },
   quantityRequested: {
     type: TextField,
     label: 'react.stockMovement.neededQuantity.label',
     defaultMessage: 'Needed Qty',
+    multilineHeader: true,
     flexWidth: '1.7',
     attributes: {
       type: 'number',
@@ -207,7 +212,7 @@ const NO_STOCKLIST_FIELDS = {
       product: {
         ...FIELDS.product,
         fieldKey: '',
-        flexWidth: '9.5',
+        flexWidth: '14',
         getDynamicAttr: ({
           rowIndex, rowCount, updateProductData, values, originId, focusField, newItem,
         }) => ({
@@ -226,7 +231,7 @@ const NO_STOCKLIST_FIELDS = {
       monthlyDemand: FIELDS.monthlyDemand,
       quantityRequested: {
         ...FIELDS.quantityRequested,
-        flexWidth: '2.5',
+        fixedWidth: '10ch',
         fieldKey: '',
         getDynamicAttr: ({
           updateRow, values, rowIndex,
@@ -234,8 +239,15 @@ const NO_STOCKLIST_FIELDS = {
           onBlur: () => updateRow(values, rowIndex),
         }),
       },
-      comments: FIELDS.comments,
-      deleteButton: DELETE_BUTTON_FIELD,
+      comments: {
+        ...FIELDS.comments,
+        flexWidth: '6',
+      },
+      deleteButton: {
+        ...DELETE_BUTTON_FIELD,
+        label: '',
+        defaultMessage: '',
+      },
     },
   },
 };
