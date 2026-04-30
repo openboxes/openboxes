@@ -48,7 +48,7 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
-        flexWidth: '2',
+        flexWidth: '4',
         headerAlign: 'left',
         getDynamicAttr: ({ fieldValue }) => ({
           tooltipValue: fieldValue?.name,
@@ -58,6 +58,21 @@ const FIELDS = {
           className: 'text-left ml-1',
           showValueTooltip: true,
         },
+      },
+      lotNumber: {
+        type: LabelField,
+        label: 'react.outboundReturns.lot.label',
+        defaultMessage: 'Lot',
+        flexWidth: '1',
+      },
+      expirationDate: {
+        type: LabelField,
+        label: 'react.outboundReturns.expiry.label',
+        defaultMessage: 'Expiry',
+        flexWidth: '1',
+        getDynamicAttr: ({ formatLocalizedDate }) => ({
+          formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
+        }),
       },
       originZone: {
         type: LabelField,
@@ -80,26 +95,14 @@ const FIELDS = {
           formatValue: (value) => value || 'DEFAULT',
         }),
       },
-      lotNumber: {
-        type: LabelField,
-        label: 'react.outboundReturns.lot.label',
-        defaultMessage: 'Lot',
-        flexWidth: '1',
-      },
-      expirationDate: {
-        type: LabelField,
-        label: 'react.outboundReturns.expiry.label',
-        defaultMessage: 'Expiry',
-        flexWidth: '1',
-        getDynamicAttr: ({ formatLocalizedDate }) => ({
-          formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
-        }),
-      },
       quantity: {
         type: LabelField,
         label: 'react.outboundReturns.quantity.label',
         defaultMessage: 'Qty to Return',
         flexWidth: '1',
+        attributes: {
+          className: 'text-right',
+        },
       },
     },
   },
