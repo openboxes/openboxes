@@ -163,6 +163,11 @@ const AsyncStockMovementOutboundList = Loadable({
   loading: Loading,
 });
 
+const AsyncStockMovementOutboundShow = Loadable({
+  loader: () => import('components/stock-movement/outbound/show/StockMovementOutboundShow'),
+  loading: Loading,
+});
+
 const AsyncProductSupplierList = Loadable({
   loader: () => import('components/productSupplier/ProductSupplierList'),
   loading: Loading,
@@ -207,6 +212,16 @@ const AsyncExpirationHistoryReport = Loadable({
   loader: () => import('components/reporting/expirationHistoryReport/ExpirationHistoryReport'),
   loading: Loading,
 });
+
+const OutboundMovementList = (props) => {
+  const parsedSearchQuery = queryString.parse(props?.location?.search);
+  return (
+    <AsyncStockMovementOutboundList
+      {...props}
+      sourceType={parsedSearchQuery?.sourceType?.toUpperCase()}
+    />
+  );
+};
 
 const StockMovementList = (props) => {
   const parsedSearchQuery = queryString.parse(props?.location?.search);
@@ -258,6 +273,8 @@ const Router = () => {
           <Switch>
             <MainLayoutRoute path="**/putawayTask/list" component={AsyncPutawayTaskList} />
             <MainLayoutRoute path="**/putaway/create/:putAwayId?" component={AsyncPutAwayMainPage} />
+            <MainLayoutRoute path="**/outboundMovement/list" component={OutboundMovementList} />
+            <MainLayoutRoute path="**/outboundMovement/show/:stockMovementId" component={AsyncStockMovementOutboundShow} />
             <MainLayoutRoute path="**/stockMovement/list" component={StockMovementList} />
             <MainLayoutRoute path="**/stockMovement/createOutbound/:stockMovementId?" component={AsyncStockMovement} />
             <MainLayoutRoute path="**/stockMovement/importOutboundStockMovement" component={AsyncOutboundImport} />

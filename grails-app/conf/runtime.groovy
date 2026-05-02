@@ -131,7 +131,7 @@ openboxes.menuSectionsUrlParts = [
     products: ["product"],
     purchasing: ["purchaseOrder"],
     invoicing: ["invoice"],
-    outbound: ["verifyRequest"],
+    outbound: ["verifyRequest", "outboundMovement"],
     requisitionTemplate: ["requisitionTemplate"],
     configuration: ["locationsConfiguration"],
     // for inbound / outbound and purchasing / putaway the same url is used,
@@ -281,8 +281,8 @@ openboxes {
                     menuItems: [
                         [label: "outbound.create.label", defaultLabel: "Create Outbound Movements", href: "/stockMovement/createOutbound?direction=OUTBOUND"],
                         [label: "outbound.import.label", defaultLabel: "Import Completed Outbound", href: "/stockMovement/importOutboundStockMovement"],
-                        [label: "outbound.list.label", defaultLabel: "List Outbound Movements", href: "/stockMovement/list?direction=OUTBOUND"],
-                        [label: "requests.list.label", defaultLabel: "List Requests", href: "/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC"],
+                        [label: "outbound.list.label", defaultLabel: "List Outbound Movements", href: "/outboundMovement/list"],
+                        [label: "requests.list.label", defaultLabel: "List Requests", href: "/outboundMovement/list?sourceType=ELECTRONIC"],
                         [label: "outboundReturns.create.label", defaultLabel: "Create Outbound Return", href: "/stockTransfer/createOutboundReturn"]
                     ]
                 ],
