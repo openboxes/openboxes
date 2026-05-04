@@ -217,20 +217,7 @@ class PicklistController {
     def exportPackTemplate() {
         String format = params.get("format", "csv")
 
-        Map<String, String> csvHeadings = [
-                id: g.message(code: 'default.id.label', default: 'Id'),
-                productCode: g.message(code: 'product.productCode.label', default: 'Code'),
-                productName: g.message(code: 'product.name.label', default: 'Name'),
-                lotNumber: g.message(code: 'inventoryItem.lotNumber.label', default: 'Serial / Lot Number'),
-                expirationDate: g.message(code: 'inventoryItem.expirationDate.label', default: 'Expiration date'),
-                binLocation: g.message(code: 'inventoryItem.binLocation.label', default: 'Bin Location'),
-                quantityShipped: g.message(code: 'shipping.quantityShipped.label', default: 'Quantity shipped'),
-                palletName: g.message(code: 'packLevel1.label', default: 'Pack level 1'),
-                boxName: g.message(code: 'packLevel2.label', default: 'Pack level 2'),
-                recipient: g.message(code: 'shipping.recipient.label', default: 'Recipient'),
-        ]
-
-        List<Map<String, String>> lineItems = stockMovementService.buildPackTemplateLineItems(params.id, csvHeadings)
+        List<Map<String, String>> lineItems = stockMovementService.buildPackTemplateLineItems(params.id)
 
         String fileName = "PackListItems\$-${params.id}-template"
 

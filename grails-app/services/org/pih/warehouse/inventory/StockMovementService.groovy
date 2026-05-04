@@ -49,6 +49,7 @@ import org.pih.warehouse.core.StockMovementItemsParamsCommand
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.core.history.HistoryItem
+import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.importer.CSVUtils
@@ -109,6 +110,7 @@ class StockMovementService {
     RequisitionDataService requisitionDataService
     GrailsApplication grailsApplication
     PutawayService putawayService
+    MessageLocalizer messageLocalizer
 
     def createStockMovement(StockMovement stockMovement) {
         if (!stockMovement.validate()) {
@@ -1124,7 +1126,20 @@ class StockMovementService {
         return packPageItems
     }
 
-    List<Map<String, String>> buildPackTemplateLineItems(String stockMovementId, Map<String, String> csvHeadings) {
+    List<Map<String, String>> buildPackTemplateLineItems(String stockMovementId) {
+        Map<String, String> csvHeadings = [
+                id: messageLocalizer.localize('default.id.label', 'Id'),
+                productCode: messageLocalizer.localize('product.productCode.label', 'Code'),
+                productName: messageLocalizer.localize('product.name.label', 'Name'),
+                lotNumber: messageLocalizer.localize('inventoryItem.lotNumber.label', 'Serial / Lot Number'),
+                expirationDate: messageLocalizer.localize('inventoryItem.expirationDate.label', 'Expiration date'),
+                binLocation: messageLocalizer.localize('inventoryItem.binLocation.label', 'Bin Location'),
+                quantityShipped: messageLocalizer.localize('shipping.quantityShipped.label', 'Quantity shipped'),
+                palletName: messageLocalizer.localize('packLevel1.label', 'Pack level 1'),
+                boxName: messageLocalizer.localize('packLevel2.label', 'Pack level 2'),
+                recipient: messageLocalizer.localize('shipping.recipient.label', 'Recipient'),
+        ]
+
         List<PackPageItem> packPageItems = getPackPageItems(stockMovementId, null, null)
 
         // We need to create at least one row to ensure an empty template
