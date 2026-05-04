@@ -9,18 +9,27 @@
 **/
 package org.pih.warehouse.core
 
-import grails.web.servlet.mvc.GrailsParameterMap
+import grails.gorm.PagedResultList
 
 class BudgetCodeService {
-    
-    def getBudgetCodes(GrailsParameterMap params) {
-        return BudgetCode.createCriteria().list(max: params.max, offset: params.offset) {
-            if (params.q) {
-                ilike("code", "%" + params.q + "%")
+
+    PagedResultList<BudgetCode> getBudgetCodes(BudgetCodeFilterCommand command) {
+        return BudgetCode.createCriteria().list(command.paginationParams) {
+            if (command.q) {
+                ilike("code", "%" + command.q + "%")
             }
-            if (params.sort) {
-                order(params.sort, params.order ?: 'asc')
+            or {
+                if (command.active != null) {
+                    eq("active", command.active)
+                }
+                if (command.budgetCodeIds) {
+                    // include provided ids regardless of active filter
+                    inList("id", command.budgetCodeIds)
+                }
             }
-        }
+            if (command.sort) {
+                order(command.sort, command.order ?: 'asc')
+            }
+        } as PagedResultList<BudgetCode>
     }
 }

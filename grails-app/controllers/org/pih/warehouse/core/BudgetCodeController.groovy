@@ -9,6 +9,7 @@
 **/
 package org.pih.warehouse.core
 
+import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 
 class BudgetCodeController {
@@ -18,10 +19,8 @@ class BudgetCodeController {
         redirect(action: "list", params: params)
     }
 
-    def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        params.offset = params.offset ?: 0
-        def budgetCodeList = budgetCodeService.getBudgetCodes(params)
+    def list(BudgetCodeFilterCommand command) {
+        PagedResultList<BudgetCode> budgetCodeList = budgetCodeService.getBudgetCodes(command)
         return [budgetCodes: budgetCodeList, budgetCodesTotal: budgetCodeList.totalCount]
     }
 
