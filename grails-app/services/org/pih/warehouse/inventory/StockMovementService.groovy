@@ -1128,16 +1128,16 @@ class StockMovementService {
 
     List<Map<String, String>> buildPackTemplateLineItems(String stockMovementId) {
         Map<String, String> csvHeadings = [
-                id: messageLocalizer.localize('default.id.label', 'Id'),
-                productCode: messageLocalizer.localize('product.productCode.label', 'Code'),
-                productName: messageLocalizer.localize('product.name.label', 'Name'),
-                lotNumber: messageLocalizer.localize('inventoryItem.lotNumber.label', 'Serial / Lot Number'),
-                expirationDate: messageLocalizer.localize('inventoryItem.expirationDate.label', 'Expiration date'),
-                binLocation: messageLocalizer.localize('inventoryItem.binLocation.label', 'Bin Location'),
-                quantityShipped: messageLocalizer.localize('shipping.quantityShipped.label', 'Quantity shipped'),
-                palletName: messageLocalizer.localize('packLevel1.label', 'Pack level 1'),
-                boxName: messageLocalizer.localize('packLevel2.label', 'Pack level 2'),
-                recipient: messageLocalizer.localize('shipping.recipient.label', 'Recipient'),
+                id: messageLocalizer.localize('default.id.label'),
+                productCode: messageLocalizer.localize('product.productCode.label'),
+                productName: messageLocalizer.localize('product.name.label'),
+                lotNumber: messageLocalizer.localize('inventoryItem.lotNumber.label'),
+                expirationDate: messageLocalizer.localize('inventoryItem.expirationDate.label'),
+                binLocation: messageLocalizer.localize('inventoryItem.binLocation.label'),
+                quantityShipped: messageLocalizer.localize('shipping.quantityShipped.label'),
+                palletName: messageLocalizer.localize('packLevel1.label'),
+                boxName: messageLocalizer.localize('packLevel2.label'),
+                recipient: messageLocalizer.localize('shipping.recipient.label'),
         ]
 
         List<PackPageItem> packPageItems = getPackPageItems(stockMovementId, null, null)
