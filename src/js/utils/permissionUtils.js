@@ -8,7 +8,7 @@ const canEditRequest = (currentUser, request, location) => {
     ActivityCode.REQUIRE_MOBILE_PICKING,
   );
 
-  if (hasMobilePicking) {
+  if (hasMobilePicking && !request?.isReturn) {
     const blockEditingStatuses = [
       StockMovementStatus.PICKING,
       StockMovementStatus.PICKED,
