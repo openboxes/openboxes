@@ -57,6 +57,7 @@ const DELETE_BUTTON_FIELD = {
 const FIELDS = {
   returnItems: {
     type: ArrayField,
+    overflowStyle: 'hidden',
     arrowsNavigation: true,
     // eslint-disable-next-line react/prop-types
     addButton: ({ addRow, getSortOrder }) => (

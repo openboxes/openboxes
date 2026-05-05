@@ -116,6 +116,7 @@ const SHIPMENT_FIELDS = {
 const FIELDS = {
   stockTransferItems: {
     type: ArrayField,
+    overflowStyle: 'hidden',
     getDynamicRowAttr: ({ rowValues, translate }) => {
       let className = '';
       let tooltip = '';
