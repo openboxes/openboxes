@@ -1819,8 +1819,6 @@ class InventoryService implements ApplicationContextAware {
     List<TransactionEntry> getTransactionEntriesByInventoryAndProductForStockHistory(Inventory inventory, List<Product> products) {
         long startTime = System.currentTimeMillis()
         List<TransactionEntry> transactionEntries = TransactionEntry.createCriteria().list {
-            //setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
-
             createAlias("inventoryItem", "ii", JoinType.INNER_JOIN)
             inList("ii.product", products)
 
