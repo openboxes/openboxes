@@ -157,19 +157,24 @@ function validate(values) {
   errors.availableItems = [];
   _.forEach(values.availableItems, (item, key) => {
     errors.availableItems[key] = errors.availableItems[key] || {};
-    if ((item.quantityPicked || 0) > (item.quantityAvailable || 0)) {
+
+    const picked = _.toInteger(item.quantityPicked);
+    const allocated = _.toInteger(item.quantityAllocated);
+    const available = _.toInteger(item.quantityAvailable);
+
+    if (picked > available) {
       errors.availableItems[key].quantityPicked = 'react.stockMovement.errors.higherTyPicked.label';
     }
-    if ((item.quantityPicked || 0) < 0) {
+    if (picked < 0) {
       errors.availableItems[key].quantityPicked = 'react.stockMovement.errors.negativeQtyPicked.label';
     }
-    if ((item.quantityAllocated || 0) < 0) {
+    if (allocated < 0) {
       errors.availableItems[key].quantityAllocated = 'react.stockMovement.errors.negativeQtyAllocated.label';
     }
-    if ((item.quantityAllocated || 0) > (item.quantityAvailable || 0)) {
+    if (allocated > available) {
       errors.availableItems[key].quantityAllocated = 'react.stockMovement.errors.higherThanAvailable.label';
     }
-    if ((item.quantityPicked || 0) > (item.quantityAllocated || 0)) {
+    if (picked > allocated) {
       errors.availableItems[key].quantityPicked = 'react.stockMovement.errors.pickedHigherThanAllocated.label';
     }
   });
