@@ -8,6 +8,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
+import { RiDeleteBinLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
@@ -164,13 +165,13 @@ const FIELDS = {
   },
 };
 
+const DeleteIcon = () => <RiDeleteBinLine />;
+
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
-  label: 'react.default.button.delete.label',
-  defaultMessage: 'Delete',
   flexWidth: '1',
   fieldKey: '',
-  buttonLabel: 'react.default.button.delete.label',
+  buttonLabel: DeleteIcon,
   buttonDefaultMessage: 'Delete',
   getDynamicAttr: ({
     fieldValue, removeItem, removeRow, updateTotalCount,
@@ -183,7 +184,11 @@ const DELETE_BUTTON_FIELD = {
     } : () => { updateTotalCount(-1); removeRow(); },
   }),
   attributes: {
-    className: 'btn btn-outline-danger',
+    className: 'btn btn-outline-danger mr-1',
+    style: {
+      border: 'none',
+      'font-size': '1rem',
+    },
   },
 };
 
@@ -243,11 +248,7 @@ const NO_STOCKLIST_FIELDS = {
         ...FIELDS.comments,
         flexWidth: '6',
       },
-      deleteButton: {
-        ...DELETE_BUTTON_FIELD,
-        label: '',
-        defaultMessage: '',
-      },
+      deleteButton: DELETE_BUTTON_FIELD,
     },
   },
 };
