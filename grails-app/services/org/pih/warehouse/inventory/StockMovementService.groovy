@@ -2015,6 +2015,14 @@ class StockMovementService {
             throw new IllegalArgumentException("Total picked quantity (${totalPicked}) exceeds quantity required (${quantityRequired})")
         }
 
+        picklistItems?.each { picklistItemMap ->
+            Integer rowPicked = (picklistItemMap.quantityPicked ?: 0) as Integer
+            Integer rowAllocated = (picklistItemMap.quantityAllocated ?: 0) as Integer
+            if (rowPicked > rowAllocated) {
+                throw new IllegalArgumentException("Picked quantity (${rowPicked}) exceeds allocated quantity (${rowAllocated})")
+            }
+        }
+
         clearPicklist(requisitionItem)
 
         picklistItems.each { picklistItemMap ->
