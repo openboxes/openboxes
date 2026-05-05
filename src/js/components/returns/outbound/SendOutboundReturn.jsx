@@ -116,6 +116,7 @@ const SHIPMENT_FIELDS = {
 const FIELDS = {
   picklistItems: {
     type: ArrayField,
+    overflowStyle: 'hidden',
     getDynamicRowAttr: ({ rowValues, translate }) => {
       let className = '';
       let tooltip = '';
@@ -195,7 +196,7 @@ const FIELDS = {
         defaultMessage: 'Qty to Return',
         flexWidth: '1',
         attributes: {
-          className: 'text-right',
+          className: 'text-right mr-1',
         },
       },
     },

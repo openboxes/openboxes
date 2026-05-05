@@ -35,6 +35,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 const FIELDS = {
   returnItems: {
     type: ArrayField,
+    overflowStyle: 'hidden',
     maxTableHeight: 'calc(100vh - 500px)',
     getDynamicRowAttr: ({ rowValues, translate }) => {
       let className = '';
@@ -111,7 +112,7 @@ const FIELDS = {
         defaultMessage: 'QOH',
         flexWidth: '1',
         attributes: {
-          className: 'text-right',
+          className: 'text-right mr-1',
         },
       },
       quantityNotPicked: {
@@ -123,7 +124,7 @@ const FIELDS = {
         multilineHeader: true,
         flexWidth: '1',
         attributes: {
-          className: 'text-right',
+          className: 'text-right mr-1',
         },
       },
       originZone: {
