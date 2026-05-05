@@ -606,9 +606,9 @@ class IndicatorDataService {
         ]).first()
 
         OutgoingStockMovementCounts counts = new OutgoingStockMovementCounts(
-                lessThan4DaysAgo   : (result[0] ?: 0) as Integer,
-                between4And7DaysAgo: (result[1] ?: 0) as Integer,
-                moreThan7DaysAgo   : (result[2] ?: 0) as Integer,
+                createdLessThan4DaysAgo   : (result[0] ?: 0) as Integer,
+                createdBetween4And7DaysAgo: (result[1] ?: 0) as Integer,
+                createdMoreThan7DaysAgo   : (result[2] ?: 0) as Integer,
         )
 
         String urlContextPath = ConfigHelper.contextPath;
@@ -620,9 +620,9 @@ class IndicatorDataService {
         String createdBetweenQuery = "&createdAfter=${sevenDaysAgo.format(dateFormat)}&createdBefore=${fourDaysAgo.format(dateFormat)}"
         String createdBeforeQuery = "&createdBefore=${sevenDaysAgo.format(dateFormat)}"
 
-        ColorNumber green = new ColorNumber(counts.lessThan4DaysAgo, 'Created < 4 days ago', baseUrl + statusQuery + createdAfterQuery)
-        ColorNumber yellow = new ColorNumber(counts.between4And7DaysAgo, 'Created > 4 days ago', baseUrl + statusQuery + createdBetweenQuery)
-        ColorNumber red = new ColorNumber(counts.moreThan7DaysAgo, 'Created > 7 days ago', baseUrl + statusQuery + createdBeforeQuery)
+        ColorNumber green = new ColorNumber(counts.createdLessThan4DaysAgo, 'Created < 4 days ago', baseUrl + statusQuery + createdAfterQuery)
+        ColorNumber yellow = new ColorNumber(counts.createdBetween4And7DaysAgo, 'Created > 4 days ago', baseUrl + statusQuery + createdBetweenQuery)
+        ColorNumber red = new ColorNumber(counts.createdMoreThan7DaysAgo, 'Created > 7 days ago', baseUrl + statusQuery + createdBeforeQuery)
 
         NumbersIndicator numbersIndicator = new NumbersIndicator(green, yellow, red)
 
