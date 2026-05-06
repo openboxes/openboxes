@@ -28,7 +28,6 @@ import org.pih.warehouse.shipping.Shipment
  * this whole refactor measured against those individual steps. The facade entry point
  * is {@link #assembleStockHistoryPage} - controllers should call that.
  */
-@Component
 @Slf4j
 class StockHistoryAssembler {
 
