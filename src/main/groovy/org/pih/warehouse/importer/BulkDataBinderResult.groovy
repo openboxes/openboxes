@@ -27,6 +27,6 @@ class BulkDataBinderResult<T extends Importable> {
     }
 
     void addErrors(Collection<BulkDataError> errors) {
-        errors.addAll(errors)
+        this.errors.addAll(errors)
     }
 }

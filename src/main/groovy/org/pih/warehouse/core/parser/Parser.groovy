@@ -50,7 +50,7 @@ abstract class Parser<Type, Context extends ParserContext<Type>> {
      * Constructs a context object containing all default values.
      * For use primarily when no context is specified for the parse.
      */
-    private Context getDefaultContext() {
+    Context getDefaultContext() {
         return getContextType().newInstance() as Context
     }
 

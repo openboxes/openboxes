@@ -29,14 +29,14 @@ trait ConfiguresBulkDataBinder<T extends Importable> {
      * To provide custom binding logic, a feature will typically override customBindDataRow. However, if you need
      * the custom logic to be more complex, such as comparing data across rows, this method can also be overridden.
      */
-    void customBindData(List<LinkedHashMap<String, Object>> rawRows, BulkDataBinderResult<T> result) {
+    void customBindData(List<Map<String, BulkDataCell>> rawRows, BulkDataBinderResult<T> result) {
         // We assume that we are given the same number of raw rows and bound rows. There's a check for this in
         // the bulk data binder so we don't bother checking again here.
         List<T> boundRows = result.boundRows
         for (int rowIndex = 0; rowIndex < rawRows.size(); rowIndex++) {
             // We expect customBindDataRow to directly write to the Importable object for each row so we don't need
-            // to do any further data binding. All we do here is collect the errors.
-            List<BulkDataError> errors = customBindDataRow(rowIndex, rawRows.get(rowIndex), boundRows.get(rowIndex))
+            // to do any further data binding. All we do here is collect any errors that occurred when custom binding.
+            List<BulkDataError> errors = customBindDataRow(rawRows.get(rowIndex), boundRows.get(rowIndex))
             result.addErrors(errors)
         }
     }
@@ -49,12 +49,11 @@ trait ConfiguresBulkDataBinder<T extends Importable> {
      *
      * Any errors that occur when custom binding the row should be collected and returned by this method.
      *
-     * @param rowIndex The zero-based index of both the raw and bound rows.
      * @param rawRow The raw input data. Read only.
      * @param boundRow The strongly typed object that the raw data was bound to. Custom binding writes to this object.
      * @return The list of errors that occurred when custom binding the fields of the row.
      */
-    List<BulkDataError> customBindDataRow(int rowIndex, LinkedHashMap<String, Object> rawRow, T boundRow) {
+    List<BulkDataError> customBindDataRow(Map<String, BulkDataCell> rawRow, T boundRow) {
         return []  // Do nothing by default
     }
 }

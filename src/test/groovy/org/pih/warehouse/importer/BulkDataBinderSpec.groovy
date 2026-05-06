@@ -7,6 +7,7 @@ import spock.lang.Unroll
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.core.parser.DefaultTypeParser
 import org.pih.warehouse.core.parser.Parser
+import org.pih.warehouse.core.parser.ParserContext
 import org.pih.warehouse.core.parser.StringParser
 
 @Unroll
@@ -20,7 +21,14 @@ class BulkDataBinderSpec extends Specification {
     Parser parserStub
 
     void setup() {
-        defaultTypeParserStub = Stub(DefaultTypeParser)
+        parserStub = Stub(Parser)
+        ApplicationContext contextStub = Stub(ApplicationContext) {
+            getBean(_ as Class<Parser>) >> parserStub
+        }
+
+        defaultTypeParserStub = Stub(DefaultTypeParser) {
+            getDefaultParser(_ as Class<Object>) >> parserStub
+        }
 
         bulkDataBinderConfigurerStub = Stub(ConfiguresBulkDataBinder)
         BulkDataImportComponentResolver componentResolverStub = Stub(BulkDataImportComponentResolver) {
@@ -31,11 +39,6 @@ class BulkDataBinderSpec extends Specification {
             localize(_ as String, _ as Object[]) >> "LOCALIZED MESSAGE"
         }
 
-        parserStub = Stub(Parser)
-        ApplicationContext contextStub = Stub(ApplicationContext) {
-            getBean(_ as Class<Parser>) >> parserStub
-        }
-
         bulkDataBinder = new BulkDataBinder(
                 componentResolverStub, defaultTypeParserStub, messageLocalizerStub, contextStub)
     }
@@ -43,9 +46,12 @@ class BulkDataBinderSpec extends Specification {
     void "bindData should successfully bind data to a strongly-typed object"() {
         given: "the raw data being bound"
         BulkDataType dataImportType = BulkDataType.PERSON
-        List<LinkedHashMap<String, Object>> rawRows = [
-                ["stringField": "Hi", "integerField": 1],
-        ]
+        BulkDataReaderResult readerResult = new BulkDataReaderResult(rows: [
+                [
+                        "stringField": new BulkDataCell(row: 0, column: 0, fieldName: "stringField", value: "Hi"),
+                        "integerField": new BulkDataCell(row: 0, column: 1, fieldName: "integerField", value: 1)
+                ],
+        ])
 
         and: "the config to use when data binding"
         bulkDataBinderConfigurerStub.bulkDataBinderConfig >> new BulkDataBinderConfig(
@@ -57,11 +63,11 @@ class BulkDataBinderSpec extends Specification {
         )
 
         and: "stubbed values for the parser to return"
-        defaultTypeParserStub.parse("Hi", String, null) >> "Hi"
-        defaultTypeParserStub.parse(1, Integer, null) >> 1
+        parserStub.parse("Hi", _ as ParserContext) >> "Hi"
+        parserStub.parse(1, _ as ParserContext) >> 1
 
         when:
-        BulkDataBinderResult result = bulkDataBinder.bindData(dataImportType, rawRows)
+        BulkDataBinderResult result = bulkDataBinder.bindData(dataImportType, readerResult)
         List<ImportableStub> rows = result.boundRows as List<ImportableStub>
 
         then:
@@ -75,9 +81,12 @@ class BulkDataBinderSpec extends Specification {
     void "bindData should ignore fields that are not specified in the config"() {
         given: "the raw data being bound"
         BulkDataType dataImportType = BulkDataType.PERSON
-        List<LinkedHashMap<String, Object>> rawRows = [
-                ["stringField": "Hi", "integerField": 1],
-        ]
+        BulkDataReaderResult readerResult = new BulkDataReaderResult(rows: [
+                [
+                        "stringField": new BulkDataCell(row: 0, column: 0, fieldName: "stringField", value: "Hi"),
+                        "integerField": new BulkDataCell(row: 0, column: 1, fieldName: "integerField", value: 1)
+                ],
+        ])
 
         and: "the config to use when data binding"
         bulkDataBinderConfigurerStub.bulkDataBinderConfig >> new BulkDataBinderConfig(
@@ -89,11 +98,11 @@ class BulkDataBinderSpec extends Specification {
         )
 
         and: "stubbed values for the parser to return"
-        defaultTypeParserStub.parse("Hi", String, null) >> "Hi"
-        defaultTypeParserStub.parse(1, Integer, null) >> 1
+        parserStub.parse("Hi", _ as ParserContext) >> "Hi"
+        parserStub.parse(1, _ as ParserContext) >> 1
 
         when:
-        BulkDataBinderResult result = bulkDataBinder.bindData(dataImportType, rawRows)
+        BulkDataBinderResult result = bulkDataBinder.bindData(dataImportType, readerResult)
         List<ImportableStub> rows = result.boundRows as List<ImportableStub>
 
         then:
@@ -107,9 +116,12 @@ class BulkDataBinderSpec extends Specification {
     void "bindData should capture parser errors"() {
         given: "the raw data being bound"
         BulkDataType dataImportType = BulkDataType.PERSON
-        List<LinkedHashMap<String, Object>> rawRows = [
-                ["stringField": "Hi", "integerField": 1],
-        ]
+        BulkDataReaderResult readerResult = new BulkDataReaderResult(rows: [
+                [
+                        "stringField": new BulkDataCell(row: 0, column: 0, fieldName: "stringField", value: "Hi"),
+                        "integerField": new BulkDataCell(row: 0, column: 1, fieldName: "integerField", value: 1)
+                ],
+        ])
 
         and: "the config to use when data binding"
         bulkDataBinderConfigurerStub.bulkDataBinderConfig >> new BulkDataBinderConfig(
@@ -123,11 +135,11 @@ class BulkDataBinderSpec extends Specification {
         )
 
         and: "stubbed values for the parser to return"
-        parserStub.parse("Hi", null) >> "Hi"
-        parserStub.parse(1, null) >> { throw new RuntimeException("PARSER ERROR") }
+        parserStub.parse("Hi", _ as ParserContext) >> "Hi"
+        parserStub.parse(1, _ as ParserContext) >> { throw new RuntimeException("PARSER ERROR") }
 
         when:
-        BulkDataBinderResult result = bulkDataBinder.bindData(dataImportType, rawRows)
+        BulkDataBinderResult result = bulkDataBinder.bindData(dataImportType, readerResult)
         List<ImportableStub> rows = result.boundRows as List<ImportableStub>
 
         then:
@@ -146,9 +158,11 @@ class BulkDataBinderSpec extends Specification {
     void "bindData should successfully custom bind data"() {
         given: "the raw data being bound"
         BulkDataType dataImportType = BulkDataType.PERSON
-        List<LinkedHashMap<String, Object>> rawRows = [
-                ["stringField": "Hi"],
-        ]
+        BulkDataReaderResult readerResult = new BulkDataReaderResult(rows: [
+                [
+                        "stringField": new BulkDataCell(row: 0, column: 0, fieldName: "stringField", value: "Hi"),
+                ],
+        ])
 
         and: "the config to use when data binding"
         bulkDataBinderConfigurerStub.bulkDataBinderConfig >> new BulkDataBinderConfig(
@@ -166,7 +180,7 @@ class BulkDataBinderSpec extends Specification {
         }
 
         when:
-        BulkDataBinderResult result = bulkDataBinder.bindData(dataImportType, rawRows)
+        BulkDataBinderResult result = bulkDataBinder.bindData(dataImportType, readerResult)
         List<ImportableStub> rows = result.boundRows as List<ImportableStub>
 
         then:
@@ -179,9 +193,11 @@ class BulkDataBinderSpec extends Specification {
     void "bindData should handle errors when custom bind data"() {
         given: "the raw data being bound"
         BulkDataType dataImportType = BulkDataType.PERSON
-        List<LinkedHashMap<String, Object>> rawRows = [
-                ["stringField": "Hi"],
-        ]
+        BulkDataReaderResult readerResult = new BulkDataReaderResult(rows: [
+                [
+                        "stringField": new BulkDataCell(row: 0, column: 0, fieldName: "stringField", value: "Hi"),
+                ],
+        ])
 
         and: "the config to use when data binding"
         bulkDataBinderConfigurerStub.bulkDataBinderConfig >> new BulkDataBinderConfig(
@@ -203,7 +219,7 @@ class BulkDataBinderSpec extends Specification {
         }
 
         when:
-        BulkDataBinderResult result = bulkDataBinder.bindData(dataImportType, rawRows)
+        BulkDataBinderResult result = bulkDataBinder.bindData(dataImportType, readerResult)
         List<ImportableStub> rows = result.boundRows as List<ImportableStub>
 
         then:
