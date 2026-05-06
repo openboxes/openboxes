@@ -12,6 +12,9 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.putaway.PutawayTask
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentItem
 
 @Transactional
 class InboundSortationService {
@@ -19,6 +22,32 @@ class InboundSortationService {
     def orderIdentifierService
     def putawayService
     def slottingService
+
+    /**
+     * Returns an error message if any shipment item has an unresolvable backorder reference,
+     * or null if all backorder references can be matched. Used to short-circuit the receive
+     * flow before status changes / receipt creation happen.
+     */
+    String validateBackorderReferences(Shipment shipment) {
+        for (ShipmentItem item : shipment.shipmentItems) {
+            if (!item.backorderReference || item.backorderItem) {
+                continue
+            }
+            Requisition backorder = Requisition.findByRequestNumber(item.backorderReference)
+            if (!backorder) {
+                return "Auto-receive paused: backorder '${item.backorderReference}' was not found in the system. " +
+                        "Will retry once the backorder is available."
+            }
+            boolean hasMatch = backorder.requisitionItems.any {
+                it.product == item.product && it.quantity <= item.quantity && !it.isAllocated()
+            }
+            if (!hasMatch) {
+                return "Auto-receive paused: backorder '${item.backorderReference}' has no available line for product '${item.product}' " +
+                        "with quantity ${item.quantity}. Will retry once a matching line is available."
+            }
+        }
+        return null
+    }
 
     void createPutawayOrdersFromReceipt(Receipt receipt) {
         receipt.receiptItems.each { ReceiptItem receiptItem ->

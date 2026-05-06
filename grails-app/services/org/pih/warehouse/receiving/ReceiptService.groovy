@@ -14,6 +14,7 @@ import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import grails.validation.ValidationException
 import org.pih.warehouse.allocation.AutomaticBackorderReallocationEvent
+import org.pih.warehouse.core.Comment
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
@@ -531,6 +532,21 @@ class ReceiptService {
         if (hasPendingReceipt) {
             log.debug "Shipment ${shipment.id} has a pending receipt"
             return
+        }
+
+        // Skip the receive flow when a backorder reference can't be resolved yet, so the
+        // shipment stays in SHIPPED and AutomaticReceiptJob can retry once the backorder
+        // arrives. We surface the reason as a comment on the shipment for visibility.
+        if (shipment.destination.supports(ActivityCode.DYNAMIC_SLOTTING)) {
+            String backorderError = inboundSortationService.validateBackorderReferences(shipment)
+            if (backorderError) {
+                log.warn("Skipping auto-receive for shipment ${shipment.id}: ${backorderError}")
+                shipment.addToComments(new Comment(
+                        comment: backorderError,
+                        sender: AuthService.currentUser ?: shipment.createdBy,
+                ))
+                return
+            }
         }
 
         // Create the partial receipt
