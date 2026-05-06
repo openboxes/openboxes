@@ -1278,7 +1278,7 @@ class StockMovementService {
 
             shipmentItem.recipient = row.recipient ? personService.getPerson(row.recipient) : shipmentItem.recipient
             shipmentItem.container = createOrUpdateContainer(shipment, row.palletName, row.boxName)
-            shipmentItem.save(flush: true)
+            shipmentItem.save()
         }
     }
 
