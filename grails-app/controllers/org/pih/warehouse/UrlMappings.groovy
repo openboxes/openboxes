@@ -328,6 +328,11 @@ class UrlMappings {
             action = [GET: "exportPicklistTemplate"]
         }
 
+        "/api/stockMovements/packlistTemplate/$id"(parseRequest: true) {
+            controller = "picklist"
+            action = [GET: "exportPackTemplate"]
+        }
+
         "/api/stockMovements/createPickList/$id"(parseRequest: true) {
             controller = "stockMovementApi"
             action = [GET: "createPickList"]

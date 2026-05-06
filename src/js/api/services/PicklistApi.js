@@ -1,4 +1,5 @@
 import {
+  PACKLIST_TEMPLATE_EXPORT,
   PICKLIST_CLEAR,
   PICKLIST_IMPORT,
   PICKLIST_ITEMS_EXPORT,
@@ -19,6 +20,12 @@ export default {
     exportFileFromAPI({
       url: PICKLIST_TEMPLATE_EXPORT(id),
       filename: fileName ?? 'PickListItems-template',
+      format: format ?? 'csv',
+    }),
+  exportPacklistTemplate: (id, { format, fileName }) =>
+    exportFileFromAPI({
+      url: PACKLIST_TEMPLATE_EXPORT(id),
+      filename: fileName ?? 'PackListItems-template',
       format: format ?? 'csv',
     }),
   importPicklist: (id, file) => {

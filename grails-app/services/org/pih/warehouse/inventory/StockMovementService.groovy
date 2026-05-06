@@ -49,6 +49,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.core.history.HistoryContext
 import org.pih.warehouse.core.history.HistoryItem
+import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.importer.CSVUtils
@@ -107,6 +108,8 @@ class StockMovementService {
     RequisitionDataService requisitionDataService
     GrailsApplication grailsApplication
     StockMovementHistoryProvider stockMovementHistoryProvider
+    PutawayService putawayService
+    MessageLocalizer messageLocalizer
 
     def createStockMovement(StockMovement stockMovement) {
         if (!stockMovement.validate()) {
@@ -1120,6 +1123,45 @@ class StockMovementService {
         }
 
         return packPageItems
+    }
+
+    List<Map<String, String>> buildPackTemplateLineItems(String stockMovementId) {
+        Map<String, String> csvHeadings = [
+                id: messageLocalizer.localize('default.id.label'),
+                productCode: messageLocalizer.localize('product.productCode.label'),
+                productName: messageLocalizer.localize('product.name.label'),
+                lotNumber: messageLocalizer.localize('inventoryItem.lotNumber.label'),
+                expirationDate: messageLocalizer.localize('inventoryItem.expirationDate.label'),
+                binLocation: messageLocalizer.localize('inventoryItem.binLocation.label'),
+                quantityShipped: messageLocalizer.localize('shipping.quantityShipped.label'),
+                palletName: messageLocalizer.localize('packLevel1.label'),
+                boxName: messageLocalizer.localize('packLevel2.label'),
+                recipient: messageLocalizer.localize('shipping.recipient.label'),
+        ]
+
+        List<PackPageItem> packPageItems = getPackPageItems(stockMovementId, null, null)
+
+        // We need to create at least one row to ensure an empty template
+        if (packPageItems?.empty) {
+            packPageItems.add(new PackPageItem())
+        }
+
+        return packPageItems.collect { PackPageItem packPageItem ->
+            ShipmentItem shipmentItem = packPageItem?.shipmentItem
+            [
+                    "${csvHeadings.id}"             : shipmentItem?.id ?: "",
+                    "${csvHeadings.productCode}"    : shipmentItem?.product?.productCode ?: "",
+                    "${csvHeadings.productName}"    : shipmentItem?.product?.displayNameWithLocaleCode ?: "",
+                    "${csvHeadings.lotNumber}"      : shipmentItem?.lotNumber ?: "",
+                    "${csvHeadings.expirationDate}" : shipmentItem?.expirationDate ?
+                            shipmentItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
+                    "${csvHeadings.binLocation}"    : shipmentItem?.binLocation?.name ?: "",
+                    "${csvHeadings.quantityShipped}": shipmentItem?.quantity == null ? "" : shipmentItem.quantity,
+                    "${csvHeadings.palletName}"     : packPageItem?.palletName ?: "",
+                    "${csvHeadings.boxName}"        : packPageItem?.boxName ?: "",
+                    "${csvHeadings.recipient}"      : shipmentItem?.recipient?.name ?: "",
+            ]
+        } as List<Map<String, String>>
     }
 
     List<PicklistItemCommand> parsePickCsvTemplateImport(PicklistImportDataCommand command) {

@@ -11,6 +11,7 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
+import picklistApi from 'api/services/PicklistApi';
 import ArrayField from 'components/form-elements/ArrayField';
 import FilterInput from 'components/form-elements/FilterInput';
 import LabelField from 'components/form-elements/LabelField';
@@ -337,6 +338,15 @@ class PackingPage extends Component {
     return !!this.state.values.packPageItems[index];
   }
 
+  handleExport(formValues) {
+    this.props.showSpinner();
+    const { movementNumber, stockMovementId } = formValues;
+
+    const fileName = `PackListItems${movementNumber ? `-${movementNumber}` : ''}-template`;
+    picklistApi.exportPacklistTemplate(stockMovementId, { fileName })
+      .finally(() => this.props.hideSpinner());
+  }
+
   /**
    * Fetches 5th step data from current stock movement.
    * @public
@@ -555,6 +565,19 @@ class PackingPage extends Component {
                   />
                   <button
                     type="button"
+                    onClick={() => this.handleExport(values)}
+                    className="dropdown-button float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                  >
+                    <span>
+                      <i className="fa fa-sign-out pr-2" />
+                      <Translate
+                        id="react.default.button.exportTemplate.label"
+                        defaultMessage="Export template"
+                      />
+                    </span>
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => this.refresh()}
                     className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                   >
@@ -567,7 +590,7 @@ class PackingPage extends Component {
                     type="button"
                     disabled={invalid}
                     onClick={() => this.save(values)}
-                    className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-3"
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                   >
                     <span>
                       <i className="fa fa-save pr-2" />
@@ -578,14 +601,18 @@ class PackingPage extends Component {
                     type="button"
                     disabled={invalid}
                     onClick={() =>
-                      this.savePackingData(values.packPageItems).then(() => {
-                        window.location = STOCK_MOVEMENT_URL.show(values.stockMovementId);
-                      })}
-                    className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                      this.savePackingData(values.packPageItems)
+                        .then(() => {
+                          window.location = STOCK_MOVEMENT_URL.show(values.stockMovementId);
+                        })}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                   >
                     <span>
                       <i className="fa fa-sign-out pr-2" />
-                      <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
+                      <Translate
+                        id="react.default.button.saveAndExit.label"
+                        defaultMessage="Save and exit"
+                      />
                     </span>
                   </button>
                 </span>

@@ -10,19 +10,14 @@
 package org.pih.warehouse.picklist
 
 import grails.converters.JSON
-import grails.validation.ValidationException
 import org.pih.warehouse.api.PickPageItem
-import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.data.DataService
-import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.picklist.PicklistImportDataCommand
-import org.springframework.web.multipart.MultipartFile
 
 class PicklistController {
 
@@ -201,6 +196,30 @@ class PicklistController {
         }
 
         String fileName = "PickListItems\$-${params.id}-template"
+
+        switch (format) {
+            case "csv":
+                String csv = dataService.generateCsv(lineItems)
+                response.setHeader("Content-disposition", "attachment; filename=\"${fileName}.csv\"")
+                render(contentType: "text/csv", text: csv, encoding: "UTF-8")
+                break
+            case "xls":
+                response.contentType = "application/vnd.ms-excel"
+                response.setHeader("Content-disposition", "attachment; filename=\"${fileName}.xls\"")
+                documentService.generateExcel(response.outputStream, lineItems)
+                response.outputStream.flush()
+                break
+            default:
+                throw new IllegalFormatException("Unable to determine the proper rendering format for request for format ${format}")
+        }
+    }
+
+    def exportPackTemplate() {
+        String format = params.get("format", "csv")
+
+        List<Map<String, String>> lineItems = stockMovementService.buildPackTemplateLineItems(params.id)
+
+        String fileName = "PackListItems\$-${params.id}-template"
 
         switch (format) {
             case "csv":
