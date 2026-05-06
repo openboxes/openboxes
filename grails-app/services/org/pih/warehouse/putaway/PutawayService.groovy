@@ -14,18 +14,20 @@ import grails.gorm.transactions.Transactional
 import org.apache.commons.beanutils.BeanUtils
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
+import org.springframework.beans.factory.annotation.Value
+
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.ActivityCode
-import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.order.Order
-import org.pih.warehouse.order.OrderEventLogger
+import org.pih.warehouse.order.OrderEventManager
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
@@ -37,11 +39,13 @@ import org.pih.warehouse.shipping.Shipment
 @Transactional
 class PutawayService {
 
-    ConfigService configService
     InventoryService inventoryService
     def productAvailabilityService
     GrailsApplication grailsApplication
-    OrderEventLogger orderEventLogger
+    OrderEventManager orderEventManager
+
+    @Value('${openboxes.receiving.createReceivingLocation.enabled}')
+    Boolean dynamicReceivingBinsEnabled
 
     def getPutawayCandidates(Location location) {
         List binLocationEntries = productAvailabilityService.getAvailableQuantityOnHandByBinLocation(location)
@@ -124,8 +128,6 @@ class PutawayService {
 
         // Because we don't have a formal relationship between putaway order and receipt, if we are not creating
         // designated receiving/putaway bins, we can't establish a unique mapping between the receipt and its putaway.
-        Boolean dynamicReceivingBinsEnabled = configService.getProperty(
-                "openboxes.receiving.createReceivingLocation.enabled", Boolean)
         if (!dynamicReceivingBinsEnabled) {
             return []
         }
@@ -149,7 +151,7 @@ class PutawayService {
         for (ReceiptItem receiptItem in receipt.receiptItems) {
             // If the item was directly received to a non-receiving bin, there won't be any putaway orders.
             Location receiptBinLocation = receiptItem.binLocation
-            if (!receiptBinLocation.supports(ActivityCode.PUTAWAY_STOCK)) {
+            if (!receiptBinLocation?.supports(ActivityCode.PUTAWAY_STOCK)) {
                 continue
             }
 
@@ -230,7 +232,7 @@ class PutawayService {
             inventoryService.transferStock(command)
         }
 
-        logPutaway(order, putaway)
+        createPutawayEvent(order, putaway)
 
         grailsApplication.mainContext.publishEvent(new PutawayCompletedEvent(putaway))
 
@@ -238,17 +240,14 @@ class PutawayService {
     }
 
     /**
-     * Logs a putaway event, adding it to the collection of event logs for the putaway order.
+     * Create a putaway event and log its occurrence.
      */
-    private void logPutaway(Order order, Putaway putaway) {
-        Boolean dynamicReceivingBinsEnabled =
-                configService.getStaticProperty("openboxes.receiving.createReceivingLocation.enabled", Boolean)
+    private void createPutawayEvent(Order order, Putaway putaway) {
+        EventCode eventCode = !dynamicReceivingBinsEnabled || isFinalPutaway(order, putaway) ?
+                EventCode.PUTAWAY :
+                EventCode.PARTIALLY_PUTAWAY
 
-        if (!dynamicReceivingBinsEnabled || isFinalPutaway(order, putaway)) {
-            orderEventLogger.logPutaway(order, putaway)
-            return
-        }
-        orderEventLogger.logPartialPutaway(order, putaway)
+        orderEventManager.createPutawayEvent(order, putaway, eventCode)
     }
 
     /**

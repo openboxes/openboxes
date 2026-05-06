@@ -21,7 +21,7 @@ import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
-class Order implements Serializable, Historizable<OrderHistoryProvider> {
+class Order implements Serializable, Historizable {
 
     def beforeInsert() {
         createdBy = AuthService.currentUser
@@ -612,5 +612,17 @@ class Order implements Serializable, Historizable<OrderHistoryProvider> {
             default:
                 return toJson()
         }
+    }
+
+    @Override
+    ReferenceDocument getReferenceDocument() {
+        return new ReferenceDocument(
+                label: orderNumber,
+                url: "/openboxes/order/show/${id}",
+                id: id,
+                identifier: orderNumber,
+                description: description,
+                name: name,
+        )
     }
 }

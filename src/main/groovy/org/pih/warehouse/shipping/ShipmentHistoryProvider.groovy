@@ -4,8 +4,8 @@ import org.springframework.stereotype.Component
 
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventTypeDto
+import org.pih.warehouse.core.history.HistoryContext
 import org.pih.warehouse.core.history.HistoryItem
-import org.pih.warehouse.core.ReferenceDocument
 import org.pih.warehouse.core.history.EventLog
 import org.pih.warehouse.core.history.EventLogHistoryProvider
 
@@ -13,48 +13,34 @@ import org.pih.warehouse.core.history.EventLogHistoryProvider
 class ShipmentHistoryProvider extends EventLogHistoryProvider<Shipment> {
 
     @Override
-    ReferenceDocument getReferenceDocument(Shipment source) {
-        return new ReferenceDocument(
-                label: source.shipmentNumber,
-                url: "/openboxes/stockMovement/show/${source.requisition?.id ?: source.id}",
-                id: source.id,
-                identifier: source.shipmentNumber,
-                description: source.description,
-                name: source.name,
-        )
-    }
-
-    @Override
     Collection<EventLog> getEventLogs(Shipment source) {
         return source.eventLogs
     }
 
     @Override
-    List<HistoryItem> getHistory(Shipment source) {
+    List<HistoryItem> doGetHistory(Shipment source, HistoryContext context=new HistoryContext()) {
         // A (temporary) backwards compatibility check. We don't want to generate a partial history for shipments that
         // were in progress when event logs were first introduced so we only rely on event logs if all of the shipment
         // events have been logged. We know that the SHIPPED event is the first logged event, so if the shipment has it,
-        // it's safe to rely on event logs.
-        if (source.eventLogs?.any { it.eventCode == EventCode.SHIPPED }) {
-            return getHistoryFromEventLogs(source)
-        }
-        // Gracefully handle fetching history for shipments from before we introduced event logs.
-        return getHistoryFromEvents(source)
+        // it's safe to rely on event logs. Otherwise, we'll rely on the events.
+        return source.eventLogs?.any { it.eventCode == EventCode.SHIPPED } ?
+                getHistoryFromEventLogs(source, context) :
+                getHistoryFromEvents(source)
     }
 
     /**
      * Build the history for the shipment using its EventLogs.
      */
-    private List<HistoryItem> getHistoryFromEventLogs(Shipment source) {
+    private List<HistoryItem> getHistoryFromEventLogs(Shipment source, HistoryContext context) {
         List<HistoryItem> historyItems = []
 
         // The entry for the initial CREATED event must be added manually. See the docstring for details.
         historyItems.add(getCreatedHistoryItem(source))
 
         // Then we can simply collect history of each of the EventLogs
-        historyItems.addAll(super.getHistory(source))
+        historyItems.addAll(super.doGetHistory(source, context))
 
-        return historyItems.sort()
+        return historyItems
     }
 
     /**
@@ -62,15 +48,16 @@ class ShipmentHistoryProvider extends EventLogHistoryProvider<Shipment> {
      * For use on shipments that were started before we introduced event logs.
      */
     private List<HistoryItem> getHistoryFromEvents(Shipment source) {
-        List<HistoryItem> histories = []
+        List<HistoryItem> historyItems = []
 
         // The entry for the initial CREATED event must be added manually. See the docstring for details.
-        histories.add(getCreatedHistoryItem(source))
+        historyItems.add(getCreatedHistoryItem(source))
 
-        // Then we can simply collect history of each of the Events
-        histories.addAll(getHistoryItemsFromEvents(source, source.events))
+        // Then we can simply collect history of each of the Events. We don't need to filter for rollbacks
+        // because Events are deleted when they're rolled back.
+        historyItems.addAll(getHistoryItemsFromEvents(source, source.events))
 
-        return histories.sort()
+        return historyItems
     }
 
     /**
@@ -89,7 +76,7 @@ class ShipmentHistoryProvider extends EventLogHistoryProvider<Shipment> {
                         name: messageLocalizer.localizeEnumValue(EventCode.CREATED),
                         eventCode: EventCode.CREATED,
                 ),
-                referenceDocument: getReferenceDocument(source),
+                referenceDocument: source.getReferenceDocument(),
                 createdBy: source.createdBy,
         )
     }

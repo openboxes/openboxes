@@ -10,11 +10,13 @@
 package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
-import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Constants
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.core.history.HistoryContext
+import org.pih.warehouse.core.history.HistoryItem
+import org.pih.warehouse.outbound.OutboundHistoryProvider
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.ShipmentType
@@ -22,7 +24,9 @@ import org.pih.warehouse.shipping.ShipmentType
 @Transactional
 class OutboundStockMovementService {
 
-    def getStockMovement(String id) {
+    OutboundHistoryProvider outboundHistoryProvider
+
+    OutboundStockMovement getStockMovement(String id) {
         OutboundStockMovement outboundStockMovement = OutboundStockMovement.get(id)
 
         // Temporary returning outboundStockMovement even if not found.
@@ -216,5 +220,28 @@ class OutboundStockMovementService {
         }
 
         return stockMovements
+    }
+
+    /**
+     * Returns a chronological history of the events that have occurred on an outbound stock movement.
+     */
+    List<HistoryItem> getHistory(OutboundStockMovement stockMovement) {
+        HistoryContext context = new HistoryContext(
+                includeRolledBackEvents: true,
+                limit: null, // Fetch the full history
+        )
+        return outboundHistoryProvider.getHistory(stockMovement, context)
+    }
+
+    /**
+     * Returns the most recently added event that occurred on an outbound stock movement.
+     */
+    HistoryItem getLatestHistoryItem(OutboundStockMovement stockMovement) {
+        HistoryContext context = new HistoryContext(
+                includeRolledBackEvents: true,  // Noting that we *do* want to count rollbacks here
+                limit: 1,
+        )
+        List<HistoryItem> historyItems = outboundHistoryProvider.getHistory(stockMovement, context)
+        return historyItems ? historyItems[0] : null
     }
 }
