@@ -237,6 +237,12 @@
             margin-top: 0;
             top: -40px;
         }
+
+        .inbound-actions {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+        }
     }
 
     .add-button {
