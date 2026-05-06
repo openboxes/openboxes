@@ -19,7 +19,7 @@ abstract class EventManager {
             throw new RuntimeException("Event code is not a unique identifier for custom events. Fetch by id instead.")
         }
 
-        // Non-custom event types are expected to have a one-to-one mapping to event code
+        // System event types are expected to have a one-to-one mapping to event code
         EventType eventType = EventType.findByEventCode(eventCode)
         if (eventType) {
             return eventType
@@ -28,8 +28,8 @@ abstract class EventManager {
         /*
          * We create the event type if one does not exist for the given code purely for the sake of convenience.
          * It saves us from needing to also create an event type via migration when we add a new event code to
-         * the system. This is only safe to do because non-custom event types have a one-to-one mapping to code.
-         * Implementations will still be able to disable these event types by setting supported to false.
+         * the system. This is only safe to do because system event types have a one-to-one mapping to code.
+         * Implementations will still be able to disable these event types by setting enabled to false.
          */
         return new EventType(
                 name: eventCode.toString(),

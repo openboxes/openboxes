@@ -234,13 +234,14 @@ class OutboundStockMovementService {
     }
 
     /**
-     * Returns the most recently added non-rolled back event that occurred on an outbound stock movement.
+     * Returns the most recently added event that occurred on an outbound stock movement.
      */
-    HistoryItem getNewestHistoryItem(OutboundStockMovement stockMovement) {
+    HistoryItem getLatestHistoryItem(OutboundStockMovement stockMovement) {
         HistoryContext context = new HistoryContext(
-                includeRolledBackEvents: false,
+                includeRolledBackEvents: true,  // Noting that we *do* want to count rollbacks here
                 limit: 1,
         )
-        return outboundHistoryProvider.getHistory(stockMovement, context)?.first()
+        List<HistoryItem> historyItems = outboundHistoryProvider.getHistory(stockMovement, context)
+        return historyItems ? historyItems[0] : null
     }
 }

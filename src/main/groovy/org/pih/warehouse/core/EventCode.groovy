@@ -13,7 +13,8 @@ package org.pih.warehouse.core
  * Enumerates the specific, discrete types of {@link Event} that can be triggered via interactions with
  * the application (even if those events don't end up altering state or status).
  *
- * Custom, implementation-specific events should be defined by adding an {@link EventType} with the CUSTOM code.
+ * Custom, implementation-specific events that are not triggered via application logic should be defined
+ * by adding an {@link EventType} with the CUSTOM code.
  *
  * Avoid working directly with EventCode. Anything that references an EventCode should do so via it's EventType(s).
  */
@@ -51,11 +52,11 @@ enum EventCode {
     CUSTOM(false)
 
     /**
-     * Returns true if the event code represents an event that is core to the system, meaning it is directly
-     * tied to state-altering application logic.
+     * Returns true if the event code represents an event that is core to the system, meaning it is triggered
+     * by application logic.
      *
-     * Note that an event can be a non-system event and also not be a custom event. This represents events that
-     * are triggered via application logic but don't have any actual impact on state.
+     * This field only exists for backwards compatability reasons from before we had the CUSTOM code. Going forward,
+     * every event code that is not CUSTOM should be a system event.
      */
     boolean isSystemEvent
 
@@ -65,7 +66,7 @@ enum EventCode {
 
     /**
      * Returns true if the event code represents a custom event, meaning there is no in-app functionality built
-     * around it. The event is purely a label representing some state change that is managed outside of the app.
+     * around it. Custom events are purely labels representing some state change that is managed outside of the app.
      */
     boolean isCustomEvent() {
         // This check on isSystemEvent is to support legacy behaviour from before we added the CUSTOM event.

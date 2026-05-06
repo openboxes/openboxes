@@ -1632,14 +1632,15 @@ class StockMovementService {
     }
 
     /**
-     * Returns the most recently added non-rolled back event that occurred on a stock movement.
+     * Returns the most recently added event that occurred on a stock movement.
      */
-    HistoryItem getNewestHistoryItem(StockMovement stockMovement) {
+    HistoryItem getLatestHistoryItem(StockMovement stockMovement) {
         HistoryContext context = new HistoryContext(
-                includeRolledBackEvents: false,
+                includeRolledBackEvents: true,  // Noting that we *do* want to count rollbacks here
                 limit: 1,
         )
-        return stockMovementHistoryProvider.getHistory(stockMovement, context)?.first()
+        List<HistoryItem> historyItems = stockMovementHistoryProvider.getHistory(stockMovement, context)
+        return historyItems ? historyItems[0] : null
     }
 
     List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(def stockMovement) {

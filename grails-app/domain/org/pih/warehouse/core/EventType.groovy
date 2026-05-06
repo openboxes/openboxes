@@ -32,22 +32,22 @@ class EventType implements Comparable<EventType>, Serializable {
     EventCode eventCode
 
     /**
-     * True if the event type is supported by the application instance.
+     * True if the event type is enabled by the application instance.
      *
      * We add this field so that implementations can disable the event type while still being able to see it
-     * in event type list views. This is especially useful for non-custom event types, which will be created
+     * in event type list views. This is especially useful for system event types, which will be created
      * and enabled by default.
      */
-    boolean supported = true
+    boolean active = true
 
     static transients = ["optionValue"]
     static constraints = {
         name(nullable: false, maxSize: 255)
         description(nullable: true, maxSize: 255)
         sortOrder(nullable: true)
-        eventCode(nullable: false, validator: {
-            if (!it.customEvent && countByEventCode(it) > 0) {
-                return ["invalid.notUnique", it]
+        eventCode(nullable: false, validator: { EventCode eventCode, EventType eventType ->
+            if (eventType.isDirty("eventCode") && !eventCode.customEvent && countByEventCode(eventCode) > 0) {
+                return ["invalid.notUnique", eventCode]
             }
             return true
         })
@@ -76,7 +76,7 @@ class EventType implements Comparable<EventType>, Serializable {
     static List<EventType> listCustomEventTypes() {
         return createCriteria().list {
             'in'('eventCode', EventCode.listCustomEventTypeCodes())
-            eq("supported", true)
+            eq("active", true)
         }
     }
 }

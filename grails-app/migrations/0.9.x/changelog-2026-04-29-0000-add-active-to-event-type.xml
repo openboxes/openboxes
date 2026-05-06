@@ -6,11 +6,11 @@
     <changeSet author="ewaterman" id="260420260000-0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="event_type" columnName="supported"/>
+                <columnExists tableName="event_type" columnName="active"/>
             </not>
         </preConditions>
         <addColumn tableName="event_type">
-            <column name="supported" type="BIT" defaultValueBoolean="true">
+            <column name="active" type="BIT" defaultValueBoolean="true">
                 <constraints nullable="false" />
             </column>
         </addColumn>

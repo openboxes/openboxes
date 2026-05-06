@@ -6,7 +6,7 @@ package org.pih.warehouse.core.history
 abstract class HistoryProvider<T extends Historizable> {
 
     /**
-     * Contains the feature-specific logic for building the history fir a given historizable object.
+     * Contains the feature-specific logic for building the history for a given historizable object.
      */
     abstract List<HistoryItem> doGetHistory(T source, HistoryContext context)
 
