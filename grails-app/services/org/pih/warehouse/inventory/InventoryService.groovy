@@ -1817,11 +1817,12 @@ class InventoryService implements ApplicationContextAware {
     }
 
     List<TransactionEntry> getTransactionEntriesByInventoryAndProductForStockHistory(Inventory inventory, List<Product> products) {
-        long startTime = System.currentTimeMillis()
         List<TransactionEntry> transactionEntries = TransactionEntry.createCriteria().list {
             createAlias("inventoryItem", "ii", JoinType.INNER_JOIN)
             inList("ii.product", products)
 
+            // Those aliases FETCH JOIN the associations further used by the view,
+            // so that we don't have n+1 queries when rendering the stock history page
             createAlias("transaction", "t", JoinType.INNER_JOIN)
             createAlias("t.createdBy", "createdBy", JoinType.INNER_JOIN)
             createAlias("t.source", "source", JoinType.LEFT_OUTER_JOIN)
@@ -1839,7 +1840,6 @@ class InventoryService implements ApplicationContextAware {
             order("t.dateCreated", "asc")
         } as List<TransactionEntry>
 
-        log.info("getTransactionEntriesByInventoryAndProductForStockHistory(): " + (System.currentTimeMillis() - startTime) + " ms")
         return transactionEntries
     }
 

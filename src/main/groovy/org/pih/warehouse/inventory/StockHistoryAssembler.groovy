@@ -25,7 +25,7 @@ import org.pih.warehouse.shipping.Shipment
  *
  * Most of the methods here exist primarily so they can be tuned independently: each
  * one carries its own per-step timing log, and the original perf work that motivated
- * this whole refactor measured against those individual steps. The fasade entry point
+ * this whole refactor measured against those individual steps. The facade entry point
  * is {@link #assembleStockHistoryPage} - controllers should call that.
  */
 @Component
@@ -77,7 +77,7 @@ class StockHistoryAssembler {
     /**
      * Fetches and populates a StockCardCommand for the stock history page.
      */
-    StockCardCommand getStockHistoryCommand(StockCardCommand cmd, Map params) {
+    private StockCardCommand getStockHistoryCommand(StockCardCommand cmd, Map params) {
         cmd.product = Product.get(params?.product?.id ?: params.id)
         if (!cmd.product) {
             throw new ProductException("Product with identifier '${params?.product?.id ?: params.id}' could not be found")
@@ -95,7 +95,7 @@ class StockHistoryAssembler {
      * pairing, in one query, keyed by transaction id. Avoids per-row lazy loads of
      * Transaction.getOtherTransaction() / transaction.localTransfer.
      */
-    LocalTransferContext buildLocalTransferContext(
+    private static LocalTransferContext buildLocalTransferContext(
             List<Transaction> transactions,
             Map<Transaction, List<TransactionEntry>> transactionMap) {
 
@@ -148,7 +148,7 @@ class StockHistoryAssembler {
      * transaction.order?.id in Groovy: those calls would trigger an additional SQL query per transaction
      * to fetch the Requisition / Order entity, which would also trigger the eager one-to-one load of Picklist and all its fields.
      */
-    static TransactionRefIds getTransactionRefIds(List<Transaction> transactions) {
+    private static TransactionRefIds getTransactionRefIds(List<Transaction> transactions) {
         TransactionRefIds refIds = new TransactionRefIds()
         if (!transactions) {
             return refIds
@@ -174,7 +174,7 @@ class StockHistoryAssembler {
     /**
      * Build the stock history rows by iterating over the transactions and their entries.
      */
-    static StockHistoryResult computeStockHistoryRows(
+   private static StockHistoryResult computeStockHistoryRows(
             Map<Transaction, List<TransactionEntry>> transactionMap,
             LocalTransferContext localTransferContext,
             TransactionRefIds transactionRefIds) {
@@ -310,7 +310,7 @@ class StockHistoryAssembler {
      * link / label cells (shipment PO/RO classification, requisition fields, order +
      * orderType fields) in a single call.
      */
-    static StockHistoryDisplayContext buildStockHistoryDisplayContext(
+    private static StockHistoryDisplayContext buildStockHistoryDisplayContext(
             List<Transaction> transactions,
             TransactionRefIds transactionRefIds) {
 
@@ -341,7 +341,6 @@ class StockHistoryAssembler {
         if (!shipmentIds) {
             return result
         }
-        long startTime = System.currentTimeMillis()
 
         List<Object[]> rows = Shipment.executeQuery("""
             SELECT DISTINCT s.id, ot.code, ot.orderTypeCode, ot.name
@@ -370,7 +369,6 @@ class StockHistoryAssembler {
             result[shipmentId] = dto
         }
 
-        log.info("loadShipmentDtos(): " + (System.currentTimeMillis() - startTime) + " ms")
         return result
     }
 
@@ -385,7 +383,6 @@ class StockHistoryAssembler {
         if (!requisitionIds) {
             return result
         }
-        long startTime = System.currentTimeMillis()
 
         Requisition.executeQuery("""
             SELECT r.id, r.requestNumber, r.name
@@ -400,7 +397,6 @@ class StockHistoryAssembler {
             )
         }
 
-        log.info("loadRequisitionDtos(): " + (System.currentTimeMillis() - startTime) + " ms")
         return result
     }
 
@@ -414,7 +410,6 @@ class StockHistoryAssembler {
         if (!orderIds) {
             return result
         }
-        long startTime = System.currentTimeMillis()
 
         Order.executeQuery("""
             SELECT o.id, o.orderNumber, o.name, ot.code, ot.name, ot.orderTypeCode
@@ -436,7 +431,6 @@ class StockHistoryAssembler {
             )
         }
 
-        log.info("loadOrderDtos(): " + (System.currentTimeMillis() - startTime) + " ms")
         return result
     }
 }
