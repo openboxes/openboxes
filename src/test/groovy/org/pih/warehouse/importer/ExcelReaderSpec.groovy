@@ -46,10 +46,13 @@ class ExcelReaderSpec extends Specification {
 
         when:
         BulkDataReaderResult result = reader.read(xlsFile, config)
-        List<Map<String, Object>> rows = result.rows
 
         then:
-        assert rows[rowIndex]["string"] == expectedValue
+        BulkDataCell cell = result.rows[rowIndex]["string"]
+        assert cell.value == expectedValue
+        assert cell.row == rowIndex + 1  // +1 because of the header row
+        assert cell.column == 0
+        assert cell.fieldName == "string"
 
         where:
         rowIndex || expectedValue | scenario
@@ -72,10 +75,13 @@ class ExcelReaderSpec extends Specification {
 
         when:
         BulkDataReaderResult result = reader.read(xlsxFile, config)
-        List<Map<String, Object>> rows = result.rows
 
         then:
-        assert rows[rowIndex]["string"] == expectedValue
+        BulkDataCell cell = result.rows[rowIndex]["string"]
+        assert cell.value == expectedValue
+        assert cell.row == rowIndex + 1  // +1 because of the header row
+        assert cell.column == 0
+        assert cell.fieldName == "string"
 
         where:
         rowIndex || expectedValue | scenario
@@ -99,7 +105,11 @@ class ExcelReaderSpec extends Specification {
         BulkDataReaderResult result = reader.read(xlsFile, config)
 
         then:
-        assert result.rows[rowIndex]["numeric"] == expectedValue
+        BulkDataCell cell = result.rows[rowIndex]["numeric"]
+        assert cell.value == expectedValue
+        assert cell.row == rowIndex + 1  // +1 because of the header row
+        assert cell.column == 0
+        assert cell.fieldName == "numeric"
 
         where:
         rowIndex || expectedValue | scenario
@@ -122,7 +132,11 @@ class ExcelReaderSpec extends Specification {
         BulkDataReaderResult result = reader.read(xlsxFile, config)
 
         then:
-        assert result.rows[rowIndex]["numeric"] == expectedValue
+        BulkDataCell cell = result.rows[rowIndex]["numeric"]
+        assert cell.value == expectedValue
+        assert cell.row == rowIndex + 1  // +1 because of the header row
+        assert cell.column == 0
+        assert cell.fieldName == "string"
 
         where:
         rowIndex || expectedValue | scenario
@@ -144,7 +158,11 @@ class ExcelReaderSpec extends Specification {
         BulkDataReaderResult result = reader.read(xlsFile, config)
 
         then:
-        assert result.rows[rowIndex]["boolean"] == expectedValue
+        BulkDataCell cell = result.rows[rowIndex]["boolean"]
+        assert cell.value == expectedValue
+        assert cell.row == rowIndex + 1  // +1 because of the header row
+        assert cell.column == 0
+        assert cell.fieldName == "boolean"
 
         where:
         rowIndex || expectedValue | scenario
@@ -165,7 +183,11 @@ class ExcelReaderSpec extends Specification {
         BulkDataReaderResult result = reader.read(xlsxFile, config)
 
         then:
-        assert result.rows[rowIndex]["boolean"] == expectedValue
+        BulkDataCell cell = result.rows[rowIndex]["boolean"]
+        assert cell.value == expectedValue
+        assert cell.row == rowIndex + 1  // +1 because of the header row
+        assert cell.column == 0
+        assert cell.fieldName == "boolean"
 
         where:
         rowIndex || expectedValue | scenario

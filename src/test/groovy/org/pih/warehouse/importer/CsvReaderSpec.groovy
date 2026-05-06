@@ -39,28 +39,37 @@ class CsvReaderSpec extends Specification {
 
         when:
         BulkDataReaderResult result = reader.read(csvFile, config)
-        List<Map<String, Object>> rows = result.rows
+        List<Map<String, BulkDataCell>> rows = result.rows
 
         then:
-        assert rows[rowIndex]["field1"] == field1ExpectedValue
-        assert rows[rowIndex]["field2"] == field2ExpectedValue
+        BulkDataCell field1Cell = rows[resultListIndex]["field1"]
+        assert field1Cell.value == field1ExpectedValue
+        assert field1Cell.row == rowIndex
+        assert field1Cell.column == 0
+        assert field1Cell.fieldName == "field1"
+
+        BulkDataCell field2Cell = rows[resultListIndex]["field2"]
+        assert field2Cell.value == field2ExpectedValue
+        assert field2Cell.row == rowIndex
+        assert field2Cell.column == 1
+        assert field2Cell.fieldName == "field2"
 
         where:
-        rowIndex || field1ExpectedValue | field2ExpectedValue | scenario
-        0        || "ABC"               | "ABC"               | "plain text"
-        1        || "ABC"               | ""                  | "blank after delimiter"
-        2        || ""                  | "ABC"               | "blank before delimiter"
-        3        || ""                  | ""                  | "all fields blank"
-        4        || " ABC "             | " ABC "             | "spaces around strings"
-        5        || "ABC,123,"          | "ABC,"              | "delimiters within cells"
-        6        || "\"ABC\""           | "\"ABC"             | "double quotes within cells"
-        7        || "ABC\\n"            | "\\nABC"            | "new line characters within cells"
-        8        || "'ABC"              | "ABC'"              | "single quotes within cells"
-        9        || "\\\\ABC"           | "\\\\\\\\ABC"       | "backslash within cells"
-        10       || "jabłko"            | "苹果"               | "special characters"
-        11       || "1"                 | " 1 "               | "integers"
-        12       || "1.1"               | " 1.1 "             | "decimals"
-        13       || "2000-01-01"        | "2000-01-01T00:00Z" | "dates"
+        rowIndex | resultListIndex || field1ExpectedValue | field2ExpectedValue | scenario
+        1        | 0               || "ABC"               | "ABC"               | "plain text"
+        2        | 1               || "ABC"               | ""                  | "blank after delimiter"
+        3        | 2               || ""                  | "ABC"               | "blank before delimiter"
+        4        | 3               || ""                  | ""                  | "all fields blank"
+        5        | 4               || " ABC "             | " ABC "             | "spaces around strings"
+        6        | 5               || "ABC,123,"          | "ABC,"              | "delimiters within cells"
+        7        | 6               || "\"ABC\""           | "\"ABC"             | "double quotes within cells"
+        8        | 7               || "ABC\\n"            | "\\nABC"            | "new line characters within cells"
+        9        | 8               || "'ABC"              | "ABC'"              | "single quotes within cells"
+        10       | 9               || "\\\\ABC"           | "\\\\\\\\ABC"       | "backslash within cells"
+        11       | 10              || "jabłko"            | "苹果"               | "special characters"
+        12       | 11              || "1"                 | " 1 "               | "integers"
+        13       | 12              || "1.1"               | " 1.1 "             | "decimals"
+        14       | 13              || "2000-01-01"        | "2000-01-01T00:00Z" | "dates"
     }
 
     void "read should successfully read from csv String for case: #scenario"() {
@@ -99,37 +108,46 @@ class CsvReaderSpec extends Specification {
 
         when:
         BulkDataReaderResult result = reader.read(csvString, config)
-        List<Map<String, Object>> rows = result.rows
+        List<Map<String, BulkDataCell>> rows = result.rows
 
         then:
-        assert rows[rowIndex]["field1"] == field1ExpectedValue
-        assert rows[rowIndex]["field2"] == field2ExpectedValue
+        BulkDataCell field1Cell = rows[resultListIndex]["field1"]
+        assert field1Cell.value == field1ExpectedValue
+        assert field1Cell.row == rowIndex
+        assert field1Cell.column == 0
+        assert field1Cell.fieldName == "field1"
+
+        BulkDataCell field2Cell = rows[resultListIndex]["field2"]
+        assert field2Cell.value == field2ExpectedValue
+        assert field2Cell.row == rowIndex
+        assert field2Cell.column == 1
+        assert field2Cell.fieldName == "field2"
 
         where:
-        rowIndex || field1ExpectedValue | field2ExpectedValue | scenario
-        0        || "ABC"               | "ABC"               | "plain text"
-        1        || "ABC"               | ""                  | "blank after delimiter"
-        2        || ""                  | "ABC"               | "blank before delimiter"
-        3        || ""                  | ""                  | "all fields blank"
-        4        || " ABC "             | " ABC "             | "spaces around strings"
-        5        || "ABC,123,"          | "ABC,"              | "delimiters within cells"
-        6        || "\"ABC\""           | "\"ABC"             | "double quotes within cells"
-        7        || "ABC\\n"            | "\\nABC"            | "new line characters within cells"
-        8        || "'ABC"              | "ABC'"              | "single quotes within cells"
-        9        || "\\\\ABC"           | "\\\\\\\\ABC"       | "backslash within cells"
-        10       || "jabłko"            | "苹果"               | "special characters"
-        11       || "1"                 | " 1 "               | "integers"
-        12       || "1.1"               | " 1.1 "             | "decimals"
-        13       || "2000-01-01"        | "2000-01-01T00:00Z" | "dates"
+        rowIndex | resultListIndex || field1ExpectedValue | field2ExpectedValue | scenario
+        1        | 0               || "ABC"               | "ABC"               | "plain text"
+        2        | 1               || "ABC"               | ""                  | "blank after delimiter"
+        3        | 2               || ""                  | "ABC"               | "blank before delimiter"
+        4        | 3               || ""                  | ""                  | "all fields blank"
+        5        | 4               || " ABC "             | " ABC "             | "spaces around strings"
+        6        | 5               || "ABC,123,"          | "ABC,"              | "delimiters within cells"
+        7        | 6               || "\"ABC\""           | "\"ABC"             | "double quotes within cells"
+        8        | 7               || "ABC\\n"            | "\\nABC"            | "new line characters within cells"
+        9        | 8               || "'ABC"              | "ABC'"              | "single quotes within cells"
+        10       | 9               || "\\\\ABC"           | "\\\\\\\\ABC"       | "backslash within cells"
+        11       | 10              || "jabłko"            | "苹果"               | "special characters"
+        12       | 11              || "1"                 | " 1 "               | "integers"
+        13       | 12              || "1.1"               | " 1.1 "             | "decimals"
+        14       | 13              || "2000-01-01"        | "2000-01-01T00:00Z" | "dates"
     }
 
-    void "read should successfully handle incorrect number of columns for case: #scenario"() {
+    void "read should successfully handle blank rows for case: #scenario"() {
         given:
         StringSource csvString = new StringSource(
-                source: "ABC,DEF,GHI\n" +
-                        "ABC,,GHI\n" +
+                source: "\n" +
+                        "ABC,DEF\n" +
                         "\n" +
-                        "ABC\n" +
+                        "GHI,JKL\n" +
                         "\n",
                 contentType: ContentType.CSV,
         )
@@ -146,18 +164,96 @@ class CsvReaderSpec extends Specification {
 
         when:
         BulkDataReaderResult result = reader.read(csvString, config)
-        List<Map<String, Object>> rows = result.rows
+        List<Map<String, BulkDataCell>> rows = result.rows
 
         then:
-        assert rows.size() == 3  // The blank rows are left out entirely
-        assert rows[rowIndex]["field1"] == field1ExpectedValue
-        assert rows[rowIndex]["field2"] == field2ExpectedValue
+        assert rows.size() == 2  // The blank rows are left out entirely
+
+        BulkDataCell field1Cell = rows[resultListIndex]["field1"]
+        assert field1Cell.value == field1ExpectedValue
+        assert field1Cell.row == rowIndex
+        assert field1Cell.column == 0
+        assert field1Cell.fieldName == "field1"
+
+        BulkDataCell field2Cell = rows[resultListIndex]["field2"]
+        assert field2Cell.value == field2ExpectedValue
+        assert field2Cell.row == rowIndex
+        assert field2Cell.column == 1
+        assert field2Cell.fieldName == "field2"
+
+        // It's worth noting that the apache commons CSV reader automatically trims out blank rows from the CSV
+        // prior to us looping through them, so even though there are blanks in the file, the indexes stay in sync.
+        where:
+        rowIndex | resultListIndex || field1ExpectedValue | field2ExpectedValue | scenario
+        0        | 0               || "ABC"               | "DEF"               | "too many columns"
+        1        | 1               || "GHI"               | "JKL"               | "too many columns with blank"
+    }
+
+    void "read should successfully handle too many columns for case: #scenario"() {
+        given:
+        StringSource csvString = new StringSource(
+                source: "ABC,DEF,GHI\n" +
+                        "ABC,,GHI",
+                contentType: ContentType.CSV,
+        )
+
+        and:
+        CsvReaderConfig config = new CsvReaderConfig(
+                delimiter: ",",
+                linesToSkip: 0,
+                columnMapping: [
+                        "0": "field1",
+                        "1": "field2",
+                ],
+        )
+
+        when:
+        BulkDataReaderResult result = reader.read(csvString, config)
+        List<Map<String, BulkDataCell>> rows = result.rows
+
+        then:
+        assert rows.size() == 2
+
+        BulkDataCell field1Cell = rows[resultListIndex]["field1"]
+        assert field1Cell.value == field1ExpectedValue
+        assert field1Cell.row == rowIndex
+        assert field1Cell.column == 0
+        assert field1Cell.fieldName == "field1"
+
+        BulkDataCell field2Cell = rows[resultListIndex]["field2"]
+        assert field2Cell.value == field2ExpectedValue
+        assert field2Cell.row == rowIndex
+        assert field2Cell.column == 1
+        assert field2Cell.fieldName == "field2"
 
         where:
-        rowIndex || field1ExpectedValue | field2ExpectedValue | scenario
-        0        || "ABC"               | "DEF"               | "too many columns"
-        1        || "ABC"               | ""                  | "too many columns with blank"
-        2        || "ABC"               | null                | "too few columns"
+        rowIndex | resultListIndex || field1ExpectedValue | field2ExpectedValue | scenario
+        0        | 0               || "ABC"               | "DEF"               | "too many columns no blanks"
+        1        | 1               || "ABC"               | ""                  | "too many columns with blank"
+    }
+
+    void "read should error when there are too few columns"() {
+        given:
+        StringSource csvString = new StringSource(
+                source: "ABC",
+                contentType: ContentType.CSV,
+        )
+
+        and:
+        CsvReaderConfig config = new CsvReaderConfig(
+                delimiter: ",",
+                linesToSkip: 0,
+                columnMapping: [
+                        "0": "field1",
+                        "1": "field2",
+                ],
+        )
+
+        when:
+        reader.read(csvString, config)
+
+        then:
+        thrown(RuntimeException)
     }
 
     void "read should successfully work with delimiter: #delimiter"() {
@@ -179,13 +275,13 @@ class CsvReaderSpec extends Specification {
 
         when:
         BulkDataReaderResult result = reader.read(csvString, config)
-        List<Map<String, Object>> rows = result.rows
+        List<Map<String, BulkDataCell>> rows = result.rows
 
         then:
-        assert rows[0]["field1"] == "ABC"
-        assert rows[0]["field2"] == "DEF"
-        assert rows[1]["field1"] == "GHI"
-        assert rows[1]["field2"] == "JKL"
+        assert rows[0]["field1"].value == "ABC"
+        assert rows[0]["field2"].value == "DEF"
+        assert rows[1]["field1"].value == "GHI"
+        assert rows[1]["field2"].value == "JKL"
 
         where:
         delimiter << ["|", ";", "\t", "‍"]

@@ -1,0 +1,33 @@
+package org.pih.warehouse.importer
+
+/**
+ * Enumerates the different data structures that we support importing bulk data to.
+ */
+enum BulkDataType {
+    CATEGORY,
+    CYCLE_COUNT_ITEM,
+    CYCLE_COUNT_RECOUNT_ITEM,
+    INVENTORY,
+    INVENTORY_ITEM,
+    INVENTORY_LEVEL,
+    LOCATION,
+    OUTBOUND_STOCK_MOVEMENT,
+    PACKING_LIST,
+    PERSON,
+    PRODUCT,
+    PRODUCT_ASSOCIATION,
+    PRODUCT_ATTRIBUTE,
+    PRODUCT_CATALOG,
+    PRODUCT_CATALOG_ITEM,
+    PRODUCT_GROUP,
+    PRODUCT_PACKAGE,
+    PRODUCT_SUPPLIER,
+    PRODUCT_SYNONYM,
+    PRODUCT_SUPPLIER_ATTRIBUTE,
+    PRODUCT_SUPPLIER_PREFERENCE,
+    PURCHASE_ORDER,
+    PURCHASE_ORDER_ACTUAL_READY_DATE,
+    TAG,
+    USER,
+    USER_LOCATION,
+}
