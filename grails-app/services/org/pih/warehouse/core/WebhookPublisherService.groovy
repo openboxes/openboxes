@@ -59,7 +59,7 @@ class WebhookPublisherService {
         publishEvent(payload)
     }
 
-    def publishRequisitionEvent(Requisition requisition, NotificationEventType eventType) {
+    def publishRequisitionEvent(Requisition requisition, WebhookEventType eventType) {
         if (!requisition) {
             log.warn "Cannot publish order confirmation webhook event without a requisition"
             return

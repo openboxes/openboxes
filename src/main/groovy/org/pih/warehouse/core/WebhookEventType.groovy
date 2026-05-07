@@ -1,6 +1,6 @@
 package org.pih.warehouse.core
 
-enum NotificationEventType {
+enum WebhookEventType {
     REQUISITION_CREATED('requisition.created'),
     REQUISITION_ISSUED('requisition.issued'),
     PICK_STARTED('pick.started'),
@@ -10,7 +10,7 @@ enum NotificationEventType {
 
     String name
 
-    NotificationEventType(String name) {
+    WebhookEventType(String name) {
         this.name = name
     }
 }

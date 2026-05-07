@@ -12,7 +12,7 @@ package org.pih.warehouse.requisition
 import grails.util.Holders
 import org.pih.warehouse.allocation.AutomaticAllocationEvent
 import org.pih.warehouse.core.DeliveryTypeCode
-import org.pih.warehouse.core.NotificationEventType
+import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.core.OrderTypeCode
 import org.pih.warehouse.core.SendRequisitionNotificationEvent
 import org.pih.warehouse.inboundSortation.DemandTypeCode
@@ -35,7 +35,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         Holders.grailsApplication.mainContext.publishEvent(new AutomaticAllocationEvent(this.id))
     }
 
-    def sendRequisitionEvent(NotificationEventType eventType) {
+    def sendRequisitionEvent(WebhookEventType eventType) {
         Holders.grailsApplication.mainContext.publishEvent(new SendRequisitionNotificationEvent(this.id, eventType))
     }
 
@@ -50,7 +50,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     def afterInsert() {
         publishAutomaticAllocationEvent()
-        sendRequisitionEvent(NotificationEventType.REQUISITION_CREATED)
+        sendRequisitionEvent(WebhookEventType.REQUISITION_CREATED)
     }
 
     String id
