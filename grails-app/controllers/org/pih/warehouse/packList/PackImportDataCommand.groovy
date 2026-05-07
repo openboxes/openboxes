@@ -1,4 +1,4 @@
-package org.pih.warehouse.picklist
+package org.pih.warehouse.packList
 
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.auth.AuthService

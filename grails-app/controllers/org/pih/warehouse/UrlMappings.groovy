@@ -319,7 +319,7 @@ class UrlMappings {
         }
 
         "/api/stockMovements/importPackListItems/$id"(parseRequest: true) {
-            controller = "picklist"
+            controller = "packListApi"
             action = [POST: "importPackListItems"]
         }
 
@@ -334,7 +334,7 @@ class UrlMappings {
         }
 
         "/api/stockMovements/packlistTemplate/$id"(parseRequest: true) {
-            controller = "picklist"
+            controller = "packListApi"
             action = [GET: "exportPackTemplate"]
         }
 

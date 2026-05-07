@@ -33,7 +33,6 @@ import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
-import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
@@ -59,8 +58,8 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
-import org.pih.warehouse.picklist.PackImportDataCommand
-import org.pih.warehouse.picklist.PackImportItemCommand
+import org.pih.warehouse.packList.PackImportDataCommand
+import org.pih.warehouse.packList.PackImportItemCommand
 import org.pih.warehouse.picklist.PicklistImportDataCommand
 import org.pih.warehouse.picklist.PicklistItemCommand
 import org.pih.warehouse.picklist.Picklist
@@ -69,7 +68,6 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.putaway.PutawayService
-import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.ReplenishmentTypeCode
 import org.pih.warehouse.requisition.Requisition
@@ -1203,8 +1201,8 @@ class StockMovementService {
                     'expirationDate',
                     'binLocation',
                     'quantityShipped',
-                    'palletName',
-                    'boxName',
+                    'packLevel1',
+                    'packLevel2',
                     'recipient',
             ]
             char separatorChar = CSVUtils.getSeparator(text, fieldKeys.size())
@@ -1217,8 +1215,8 @@ class StockMovementService {
             return csvMapReader.toList().collect { it ->
                 new PackImportItemCommand(
                         id: it.id,
-                        palletName: it.palletName,
-                        boxName: it.boxName,
+                        packLevel1: it.packLevel1,
+                        packLevel2: it.packLevel2,
                         recipient: it.recipient,
                 )
             }
@@ -1266,18 +1264,18 @@ class StockMovementService {
     void importPackListItems(PackImportDataCommand command) {
         Shipment shipment = command.stockMovement.shipment
 
-        command.packImportItems.each { PackImportItemCommand row ->
+        for (row in command.packImportItems) {
             if (row.hasErrors()) {
-                return
+                continue
             }
 
             ShipmentItem shipmentItem = ShipmentItem.get(row.id)
             if (!shipmentItem) {
-                return
+                continue
             }
 
             shipmentItem.recipient = row.recipient ? personService.getPerson(row.recipient) : shipmentItem.recipient
-            shipmentItem.container = createOrUpdateContainer(shipment, row.palletName, row.boxName)
+            shipmentItem.container = createOrUpdateContainer(shipment, row.packLevel1, row.packLevel2)
             shipmentItem.save()
         }
     }
