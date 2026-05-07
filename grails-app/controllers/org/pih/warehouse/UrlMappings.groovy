@@ -318,6 +318,11 @@ class UrlMappings {
             action = [POST: "importPickListItems"]
         }
 
+        "/api/stockMovements/importPackListItems/$id"(parseRequest: true) {
+            controller = "picklist"
+            action = [POST: "importPackListItems"]
+        }
+
         "/api/stockMovements/exportPickListItems/$id"(parseRequest: true) {
             controller = "picklist"
             action = [GET: "exportPicklistItems"]

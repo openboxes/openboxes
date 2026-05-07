@@ -42,6 +42,7 @@ import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.StockMovementItemParamsCommand
@@ -51,12 +52,15 @@ import org.pih.warehouse.core.UserService
 import org.pih.warehouse.core.history.HistoryItem
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.data.DataService
+import org.pih.warehouse.data.PersonService
 import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
+import org.pih.warehouse.picklist.PackImportDataCommand
+import org.pih.warehouse.picklist.PackImportItemCommand
 import org.pih.warehouse.picklist.PicklistImportDataCommand
 import org.pih.warehouse.picklist.PicklistItemCommand
 import org.pih.warehouse.picklist.Picklist
@@ -111,6 +115,7 @@ class StockMovementService {
     GrailsApplication grailsApplication
     PutawayService putawayService
     MessageLocalizer messageLocalizer
+    PersonService personService
 
     def createStockMovement(StockMovement stockMovement) {
         if (!stockMovement.validate()) {
@@ -1163,6 +1168,118 @@ class StockMovementService {
                     "${csvHeadings.recipient}"      : shipmentItem?.recipient?.name ?: "",
             ]
         } as List<Map<String, String>>
+    }
+
+    List<String> processPackListImport(PackImportDataCommand command, String stockMovementId) {
+        command.stockMovement = getStockMovement(stockMovementId)
+        command.location = command.location ?: AuthService.currentLocation
+        command.packImportItems = parsePackCsvTemplateImport(command)
+
+        validatePackListImport(command)
+
+        List<String> errors = []
+        errors.addAll(command.errors.allErrors.collect { messageLocalizer.localize(it.code, it.arguments) })
+        command.packImportItems.eachWithIndex { PackImportItemCommand row, int index ->
+            row.errors.allErrors.each {
+                errors << "Row ${index + 1}: ${messageLocalizer.localize(it.code, it.arguments)}"
+            }
+        }
+
+        importPackListItems(command)
+
+        return errors
+    }
+
+    List<PackImportItemCommand> parsePackCsvTemplateImport(PackImportDataCommand command) {
+        try {
+            String text = new String(command.importFile.bytes)
+
+            // Field positions match buildPackTemplateLineItems export order.
+            List<String> fieldKeys = [
+                    'id',
+                    'code',
+                    'name',
+                    'lotNumber',
+                    'expirationDate',
+                    'binLocation',
+                    'quantityShipped',
+                    'palletName',
+                    'boxName',
+                    'recipient',
+            ]
+            char separatorChar = CSVUtils.getSeparator(text, fieldKeys.size())
+
+            CSVMapReader csvMapReader = new CSVMapReader(
+                    new StringReader(text),
+                    [skipLines: 1, separatorChar: separatorChar]
+            )
+            csvMapReader.fieldKeys = fieldKeys
+            return csvMapReader.toList().collect { it ->
+                new PackImportItemCommand(
+                        id: it.id,
+                        palletName: it.palletName,
+                        boxName: it.boxName,
+                        recipient: it.recipient,
+                )
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing pack template CSV: " + e.message, e)
+        }
+    }
+
+    private void validatePackImportRow(PackImportItemCommand row, PackPageItem matchingItem) {
+        row.validate()
+
+        if (!row.id) {
+            return
+        }
+
+        if (!matchingItem) {
+            row.errors.rejectValue(
+                    "id",
+                    "packImportDataCommand.shipmentItem.notFound.error",
+                    [row.id] as Object[],
+                    "Shipment item with id: ${row.id} not found"
+            )
+            return
+        }
+
+        if (row.recipient && !Person.findByNameOrEmail(row.recipient)) {
+            row.errors.rejectValue(
+                    "recipient",
+                    "packImportDataCommand.recipient.notFound.error",
+                    [row.recipient] as Object[],
+                    "Recipient {0} not found"
+            )
+        }
+    }
+
+    void validatePackListImport(PackImportDataCommand command) {
+        List<PackPageItem> packPageItems = getPackPageItems(command.stockMovement.id, null, null)
+
+        command.packImportItems.each { PackImportItemCommand row ->
+            PackPageItem matchingItem = packPageItems.find { it.shipmentItem?.id == row.id }
+            validatePackImportRow(row, matchingItem)
+        }
+    }
+
+    void importPackListItems(PackImportDataCommand command) {
+        Shipment shipment = command.stockMovement.shipment
+
+        command.packImportItems.each { PackImportItemCommand row ->
+            if (row.hasErrors()) {
+                return
+            }
+
+            ShipmentItem shipmentItem = ShipmentItem.get(row.id)
+            if (!shipmentItem) {
+                return
+            }
+
+            shipmentItem.recipient = row.recipient ? personService.getPerson(row.recipient) : shipmentItem.recipient
+            shipmentItem.container = createOrUpdateContainer(shipment, row.palletName, row.boxName)
+            shipmentItem.save()
+        }
     }
 
     List<PicklistItemCommand> parsePickCsvTemplateImport(PicklistImportDataCommand command) {

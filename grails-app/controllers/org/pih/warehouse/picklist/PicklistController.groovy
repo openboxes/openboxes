@@ -238,6 +238,17 @@ class PicklistController {
         }
     }
 
+    def importPackListItems(PackImportDataCommand command) {
+        command.location = command.location ?: Location.get(session.warehouse.id)
+        List<String> errors = stockMovementService.processPackListImport(command, params.id)
+
+        if (!errors.isEmpty()) {
+            render([message: "Data imported with errors", errors: errors] as JSON)
+        }
+
+        render([message: "Data imported successfully"] as JSON)
+    }
+
     def importPickListItems(PicklistImportDataCommand command) {
 
         // Bind stock movement based on provided ID
