@@ -1217,13 +1217,6 @@ class InventoryService implements ApplicationContextAware {
         return quantityMap
     }
 
-    /**
-     * Fetches and populates a StockCard Command object
-     *
-     * @param cmd
-     * @param params
-     * @return
-     */
     StockCardCommand getStockCardCommand(StockCardCommand cmd, Map params) {
         // Get basic details required for the whole page
         cmd.product = Product.get(params?.product?.id ?: params.id)  // check product.id and id
@@ -1243,7 +1236,7 @@ class InventoryService implements ApplicationContextAware {
         cmd.totalQuantity = getQuantityOnHand(cmd.warehouse, cmd.product)
 
         // Get transaction log for a particular product within an inventory
-        cmd.transactionEntryList = getTransactionEntriesByInventoryAndProduct(cmd.inventory, [cmd.product])
+        cmd.transactionEntryList = getTransactionEntriesByInventoryAndProductForStockHistory(cmd.inventory, [cmd.product])
         cmd.transactionEntriesByInventoryItemMap = cmd.transactionEntryList.groupBy {
             it.inventoryItem
         }
@@ -1823,13 +1816,40 @@ class InventoryService implements ApplicationContextAware {
         return transactionEntries
     }
 
+    List<TransactionEntry> getTransactionEntriesByInventoryAndProductForStockHistory(Inventory inventory, List<Product> products) {
+        List<TransactionEntry> transactionEntries = TransactionEntry.createCriteria().list {
+            createAlias("inventoryItem", "ii", JoinType.INNER_JOIN)
+            inList("ii.product", products)
+
+            // Those aliases FETCH JOIN the associations further used by the view,
+            // so that we don't have n+1 queries when rendering the stock history page
+            createAlias("transaction", "t", JoinType.INNER_JOIN)
+            createAlias("t.createdBy", "createdBy", JoinType.INNER_JOIN)
+            createAlias("t.source", "source", JoinType.LEFT_OUTER_JOIN)
+            createAlias("t.transactionType", "transactionType", JoinType.INNER_JOIN)
+            createAlias("t.destination", "destination", JoinType.LEFT_OUTER_JOIN)
+            createAlias("binLocation", "binLocation", JoinType.LEFT_OUTER_JOIN)
+            createAlias("binLocation.zone", "zone", JoinType.LEFT_OUTER_JOIN)
+
+            createAlias("t.incomingShipment", "incShipment", JoinType.LEFT_OUTER_JOIN)
+            createAlias("t.outgoingShipment", "outShipment", JoinType.LEFT_OUTER_JOIN)
+
+
+            eq("t.inventory", inventory)
+            order("t.transactionDate", "asc")
+            order("t.dateCreated", "asc")
+        } as List<TransactionEntry>
+
+        return transactionEntries
+    }
+
     /**
      * Get all transaction entries over list of products/inventory items.
      *
      * @param inventoryInstance
      * @return
      */
-    List getTransactionEntriesByInventoryAndProduct(Inventory inventory, List<Product> products) {
+    List<TransactionEntry> getTransactionEntriesByInventoryAndProduct(Inventory inventory, List<Product> products) {
         def criteria = TransactionEntry.createCriteria()
         def transactionEntries = criteria.list {
             transaction {

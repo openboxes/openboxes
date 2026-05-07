@@ -44,6 +44,7 @@ class InventoryItemController {
     def productAvailabilityService
     GrailsApplication grailsApplication
     InventoryItemDataService inventoryItemDataService
+    StockHistoryAssembler stockHistoryAssembler
 
     def index() {
         redirect(controller: "inventory", action: "browse")
@@ -161,157 +162,35 @@ class InventoryItemController {
 
     def showStockHistory(StockCardCommand cmd) {
         def startTime = System.currentTimeMillis()
-        // add the current warehouse to the command object
         cmd.warehouse = Location.get(session?.warehouse?.id)
 
-        // now populate the rest of the commmand object
-        def commandInstance = inventoryService.getStockCardCommand(cmd, params)
-
-        def stockHistoryList = []
-
-
-        int totalDebit = 0, totalCredit = 0, totalBalance = 0, totalCount = 0
-        def balance = [:]
-        def count = [:]
-        def transactionMap = commandInstance?.getTransactionLogMap(false)
-        Transaction previousTransaction = null
-
-
-        transactionMap.each { Transaction transaction, List transactionEntries ->
-
-            // skip current transaction if it is internal and is connected to previous transaction
-            if (transaction.isInternal && previousTransaction == transaction.otherTransaction)  {
-                return
-            }
-
-            TransactionCode currentTransactionCode = transaction?.transactionType?.transactionCode
-
-            // For PRODUCT INVENTORY transactions we just need to clear the balance completely and start over
-            if (currentTransactionCode == TransactionCode.PRODUCT_INVENTORY) {
-                balance = [:]
-                count = [:]
-                totalCredit = 0
-                totalDebit = 0
-            }
-
-            transactionEntries.eachWithIndex { TransactionEntry transactionEntry, i ->
-
-                boolean isBaseline = false
-                boolean isCredit = false
-                boolean isDebit = false
-
-                String index = (transactionEntry.binLocation?.name ?: "DefaultBin") + "-" + (transactionEntry?.inventoryItem?.lotNumber ?: "DefaultLot")
-
-                if (!balance[index]) {
-                    balance[index] = 0
-                    count[index] = 0
-                }
-
-                if (transaction.isInternal) {
-                    totalDebit += transactionEntry?.quantity
-                    totalCredit += transactionEntry?.quantity
-                } else {
-                    switch (currentTransactionCode) {
-                        case TransactionCode.DEBIT:
-                            balance[index] -= transactionEntry?.quantity
-                            totalDebit += transactionEntry?.quantity
-                            isDebit = transactionEntry?.quantity > 0
-                            isCredit = transactionEntry.quantity < 0
-                            break
-                        case TransactionCode.CREDIT:
-                            balance[index] += transactionEntry?.quantity
-                            totalCredit += transactionEntry?.quantity
-                            isDebit = transactionEntry.quantity < 0
-                            isCredit = transactionEntry?.quantity >= 0
-                            break
-                        case TransactionCode.INVENTORY:
-                            balance[index] = transactionEntry?.quantity
-                            count[index] = transactionEntry?.quantity
-                            break
-                        case TransactionCode.PRODUCT_INVENTORY:
-                            balance[index] += transactionEntry?.quantity
-                            count[index] += transactionEntry?.quantity
-                            isBaseline = i == 0
-                            break
-                    }
-                }
-
-                // Normalize quantity (inventory transactions were all converted to CREDIT so some may have negative quantity)
-                def quantity = (transactionEntry.quantity > 0) ? transactionEntry.quantity : -transactionEntry.quantity
-
-                String transactionYear = (transaction.transactionDate.year + 1900).toString()
-                String transactionMonth = (transaction.transactionDate.month).toString()
-
-                // FIXME Find a better way to get binLocation of the "otherTransaction" for internal transaction
-                def otherTransactionEntries = transaction.otherTransaction?.transactionEntries;
-                def otherBinLocation = transaction.isInternal && otherTransactionEntries.size() > 0 ? otherTransactionEntries[0].binLocation : null
-
-                def sourceBinLocation = transactionEntry.binLocation;
-                def destinationBinLocation = null;
-
-                if (transaction.isInternal) {
-                    if (currentTransactionCode == TransactionCode.DEBIT) {
-                        destinationBinLocation = otherBinLocation
-                    } else {
-                        sourceBinLocation = otherBinLocation
-                        destinationBinLocation = transactionEntry.binLocation
-                    }
-                }
-                stockHistoryList << [
-                        transactionYear         : transactionYear,
-                        transactionMonth        : transactionMonth,
-                        transactionDate         : transaction.transactionDate,
-                        transactionCode         : currentTransactionCode,
-                        transaction             : transaction,
-                        shipment                : null,
-                        requisition             : null,
-                        destinationBinLocation  : destinationBinLocation,
-                        binLocation             : sourceBinLocation,
-                        inventoryItem           : transactionEntry.inventoryItem,
-                        comments                : transactionEntry.comments,
-                        quantity                : quantity,
-                        isDebit                 : isDebit,
-                        isCredit                : isCredit,
-                        balance                 : balance.values().sum(),
-                        showDetails             : (i == 0),
-                        isBaseline              : isBaseline,
-                        isSameTransaction       : (previousTransaction?.id == transaction?.id),
-                        isInternal              : transaction.isInternal,
-                ]
-
-                previousTransaction = transaction
-            }
-
-            totalBalance = balance.values().sum()
-            totalCount = count.values().sum()
-        }
-
+        StockHistoryPageModel pageModel = stockHistoryAssembler.assembleStockHistoryPage(cmd, params)
 
         log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
 
+        StockHistoryResult stockHistory = pageModel.stockHistory
+
         if (params.print) {
             render(template: "printStockHistory", model: [
-                    commandInstance     : commandInstance,
-                    stockHistoryList    : stockHistoryList,
-                    totalBalance        : totalBalance,
-                    totalCount          : totalCount,
-                    totalCredit         : totalCredit,
-                    totalDebit          : totalDebit
+                    commandInstance     : pageModel.commandInstance,
+                    stockHistoryList    : stockHistory.stockHistoryList,
+                    totalBalance        : stockHistory.totalBalance,
+                    totalCount          : stockHistory.totalCount,
+                    totalCredit         : stockHistory.totalCredit,
+                    totalDebit          : stockHistory.totalDebit
             ])
         } else {
-            stockHistoryList = stockHistoryList.groupBy({ it.transactionYear })
-            def groupedStockHistoryList = [:]
-            stockHistoryList.each { year, history ->
-                history = history.groupBy { it.transactionMonth }
-                groupedStockHistoryList.get(year, [:]) << history
-            }
+            StockHistoryDisplayContext displayContext = pageModel.displayContext
             render(template: "showStockHistory", model: [
-                    commandInstance     : commandInstance,
-                    stockHistoryList    : groupedStockHistoryList,
-                    totalBalance        : totalBalance,
-                    totalCount          : totalCount,
-                    totalCredit         : totalCredit,
-                    totalDebit          : totalDebit
+                    productId             : pageModel.commandInstance.product.id,
+                    stockHistoryList      : pageModel.groupedStockHistoryList,
+                    shipmentDtoById       : displayContext.shipmentDtoById,
+                    requisitionDtoById    : displayContext.requisitionDtoById,
+                    orderDtoById          : displayContext.orderDtoById,
+                    totalBalance          : stockHistory.totalBalance,
+                    totalCount            : stockHistory.totalCount,
+                    totalCredit           : stockHistory.totalCredit,
+                    totalDebit            : stockHistory.totalDebit
             ])
         }
     }
