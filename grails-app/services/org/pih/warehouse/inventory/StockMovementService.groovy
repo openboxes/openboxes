@@ -3305,6 +3305,15 @@ class StockMovementService {
         return true
     }
 
+    List<Map> getDocuments(String stockMovementId) {
+        // First attempt to get outbound stock movement, because stock movement throws exception if it can't find a
+        // stock movement with the given ID, while outbound stock movement will return null if it can't find a match
+        def stockMovement = outboundStockMovementService.getStockMovement(stockMovementId) ?: getStockMovement(stockMovementId)
+        if (!stockMovement) {
+            throw new IllegalArgumentException("Could not find stock movement with ID ${stockMovementId}")
+        }
+        return getDocuments(stockMovement)
+    }
 
     List<Map> getDocuments(def stockMovement) {
         def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
