@@ -38,8 +38,10 @@ import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
+import org.springframework.context.annotation.Lazy
 import org.springframework.validation.Errors
 
 import java.sql.Timestamp
@@ -51,7 +53,12 @@ class InventoryService implements ApplicationContextAware {
 
     def sessionFactory
     def persistenceInterceptor
+
+    // DataServices compile before the Spring context is initialized, so we lazy load them to avoid null pointers
+    // when one exists down the chain from a Spring component (even when there's a Grails component in between).
+    @Autowired @Lazy
     TransactionEntryDataService transactionEntryDataService
+
     RecordStockProductInventoryTransactionService recordStockProductInventoryTransactionService
     ProductAvailabilityService productAvailabilityService
     ConfigService configService

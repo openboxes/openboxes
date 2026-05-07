@@ -29,6 +29,7 @@ import org.pih.warehouse.shipping.Shipment
  * is {@link #assembleStockHistoryPage} - controllers should call that.
  */
 @Slf4j
+@Component
 class StockHistoryAssembler {
 
     @Autowired
