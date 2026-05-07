@@ -35,6 +35,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 const FIELDS = {
   returnItems: {
     type: ArrayField,
+    overflowStyle: 'hidden',
     maxTableHeight: 'calc(100vh - 500px)',
     getDynamicRowAttr: ({ rowValues, translate }) => {
       let className = '';
@@ -55,7 +56,7 @@ const FIELDS = {
       checked: {
         fieldKey: '',
         label: '',
-        flexWidth: '0.5',
+        fixedWidth: '1rem',
         type: ({
           // eslint-disable-next-line react/prop-types
           rowIndex, fieldValue, selectRow,
@@ -63,7 +64,7 @@ const FIELDS = {
           <Checkbox
             id={rowIndex.toString()}
             disabled={false}
-            className="ml-4"
+            className="ml-1 mr-1"
             value={fieldValue.checked}
             onChange={(value) => selectRow(value, rowIndex)}
           />
@@ -80,6 +81,7 @@ const FIELDS = {
         label: 'react.outboundReturns.productName.label',
         defaultMessage: 'Product',
         flexWidth: '4.5',
+        headerAlign: 'left',
         getDynamicAttr: ({ fieldValue }) => ({
           tooltipValue: fieldValue?.name,
         }),
@@ -99,7 +101,7 @@ const FIELDS = {
         type: LabelField,
         label: 'react.outboundReturns.expiry.label',
         defaultMessage: 'Expiry',
-        flexWidth: '1',
+        fixedWidth: '11ch',
         getDynamicAttr: ({ formatLocalizedDate }) => ({
           formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
         }),
@@ -109,14 +111,21 @@ const FIELDS = {
         label: 'react.outboundReturns.qoh.label',
         defaultMessage: 'QOH',
         flexWidth: '1',
+        attributes: {
+          className: 'text-right mr-1',
+        },
       },
       quantityNotPicked: {
         type: LabelField,
         label: 'react.outboundReturns.qtyNotPicked.label',
-        defaultMessage: 'Quantity Available to Return',
+        defaultMessage: 'Qty Available to Return',
         headerTooltip: 'react.outboundReturns.qtyNotPickedTooltip.label',
         headerDefaultTooltip: 'This is the quantity on hand that is not currently picked in a shipment',
+        multilineHeader: true,
         flexWidth: '1',
+        attributes: {
+          className: 'text-right mr-1',
+        },
       },
       originZone: {
         type: LabelField,
@@ -140,6 +149,7 @@ const FIELDS = {
         type: TextField,
         label: 'react.outboundReturns.quantity.label',
         defaultMessage: 'Qty to Return',
+        headerAlign: 'left',
         flexWidth: '1',
         attributes: {
           type: 'number',
