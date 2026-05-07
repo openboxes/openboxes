@@ -6,6 +6,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
+import { RiDeleteBinLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
@@ -31,13 +32,15 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
+const DeleteIcon = () => <RiDeleteBinLine />;
+
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
   label: 'react.default.button.delete.label',
   defaultMessage: 'Delete',
-  flexWidth: '1',
+  flexWidth: '0.4',
   fieldKey: '',
-  buttonLabel: 'react.default.button.delete.label',
+  buttonLabel: DeleteIcon,
   buttonDefaultMessage: 'Delete',
   getDynamicAttr: ({
     fieldValue, removeItem, removeRow,
@@ -51,12 +54,17 @@ const DELETE_BUTTON_FIELD = {
   }),
   attributes: {
     className: 'btn btn-outline-danger',
+    style: {
+      border: 'none',
+      'font-size': '1rem',
+    },
   },
 };
 
 const FIELDS = {
   returnItems: {
     type: ArrayField,
+    overflowStyle: 'hidden',
     arrowsNavigation: true,
     // eslint-disable-next-line react/prop-types
     addButton: ({ addRow, getSortOrder }) => (
@@ -98,7 +106,7 @@ const FIELDS = {
         type: DateField,
         label: 'react.inboundReturns.expiry.label',
         defaultMessage: 'Expiry',
-        flexWidth: '1.5',
+        fixedWidth: '11ch',
         attributes: {
           localizeDate: true,
           showLocalizedPlaceholder: true,
@@ -569,7 +577,7 @@ class AddItemsPage extends Component {
                 type="button"
                 disabled={invalid}
                 onClick={() => this.removeAll()}
-                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs"
+                className="float-right mb-1 btn btn-outline-danger align-self-end ml-1 btn-xs"
               >
                 <span>
                   <i className="fa fa-remove pr-2" />
