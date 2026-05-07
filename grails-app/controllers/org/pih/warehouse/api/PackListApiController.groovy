@@ -4,7 +4,7 @@ import grails.converters.JSON
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.inventory.StockMovementService
-import org.pih.warehouse.packList.PackImportDataCommand
+import org.pih.warehouse.packList.ImportPackListCommand
 
 class PackListApiController {
 
@@ -36,7 +36,7 @@ class PackListApiController {
         }
     }
 
-    def importPackListItems(PackImportDataCommand command) {
+    def importPackListItems(ImportPackListCommand command) {
         List<String> errors = stockMovementService.processPackListImport(command, params.id)
 
         if (!errors.isEmpty()) {

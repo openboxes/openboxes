@@ -58,8 +58,8 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
-import org.pih.warehouse.packList.PackImportDataCommand
-import org.pih.warehouse.packList.PackImportItemCommand
+import org.pih.warehouse.packList.ImportPackListCommand
+import org.pih.warehouse.packList.ImportPackListItemCommand
 import org.pih.warehouse.picklist.PicklistImportDataCommand
 import org.pih.warehouse.picklist.PicklistItemCommand
 import org.pih.warehouse.picklist.Picklist
@@ -1168,7 +1168,7 @@ class StockMovementService {
         } as List<Map<String, String>>
     }
 
-    List<String> processPackListImport(PackImportDataCommand command, String stockMovementId) {
+    List<String> processPackListImport(ImportPackListCommand command, String stockMovementId) {
         command.stockMovement = getStockMovement(stockMovementId)
         command.location = command.location ?: AuthService.currentLocation
         command.packImportItems = parsePackCsvTemplateImport(command)
@@ -1177,7 +1177,7 @@ class StockMovementService {
 
         List<String> errors = []
         errors.addAll(command.errors.allErrors.collect { messageLocalizer.localize(it.code, it.arguments) })
-        command.packImportItems.eachWithIndex { PackImportItemCommand row, int index ->
+        command.packImportItems.eachWithIndex { ImportPackListItemCommand row, int index ->
             row.errors.allErrors.each {
                 errors << "Row ${index + 1}: ${messageLocalizer.localize(it.code, it.arguments)}"
             }
@@ -1188,7 +1188,7 @@ class StockMovementService {
         return errors
     }
 
-    List<PackImportItemCommand> parsePackCsvTemplateImport(PackImportDataCommand command) {
+    List<ImportPackListItemCommand> parsePackCsvTemplateImport(ImportPackListCommand command) {
         try {
             String text = new String(command.importFile.bytes)
 
@@ -1213,7 +1213,7 @@ class StockMovementService {
             )
             csvMapReader.fieldKeys = fieldKeys
             return csvMapReader.toList().collect { it ->
-                new PackImportItemCommand(
+                new ImportPackListItemCommand(
                         id: it.id,
                         packLevel1: it.packLevel1,
                         packLevel2: it.packLevel2,
@@ -1225,7 +1225,7 @@ class StockMovementService {
         }
     }
 
-    private void validatePackImportRow(PackImportItemCommand row, PackPageItem matchingItem) {
+    private void validatePackImportRow(ImportPackListItemCommand row, PackPageItem matchingItem) {
         row.validate()
 
         if (!row.id) {
@@ -1252,16 +1252,16 @@ class StockMovementService {
         }
     }
 
-    void validatePackListImport(PackImportDataCommand command) {
+    void validatePackListImport(ImportPackListCommand command) {
         List<PackPageItem> packPageItems = getPackPageItems(command.stockMovement.id, null, null)
 
-        command.packImportItems.each { PackImportItemCommand row ->
+        command.packImportItems.each { ImportPackListItemCommand row ->
             PackPageItem matchingItem = packPageItems.find { it.shipmentItem?.id == row.id }
             validatePackImportRow(row, matchingItem)
         }
     }
 
-    void importPackListItems(PackImportDataCommand command) {
+    void importPackListItems(ImportPackListCommand command) {
         Shipment shipment = command.stockMovement.shipment
 
         for (row in command.packImportItems) {
