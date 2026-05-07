@@ -16,7 +16,7 @@ package org.pih.warehouse.core
  * Custom, implementation-specific events that are not triggered via application logic should be defined
  * by adding an {@link EventType} with the CUSTOM code.
  *
- * Avoid working directly with EventCode. Anything that references an EventCode should do so via it's EventType(s).
+ * Avoid working directly with EventCode. Anything that references an EventCode should do so via its EventType(s).
  */
 enum EventCode {
 
