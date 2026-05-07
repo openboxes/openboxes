@@ -8,6 +8,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
+import { RiDeleteBinLine, RiScissorsCutLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
@@ -25,7 +26,6 @@ import {
   STOCK_MOVEMENT_UPDATE_ITEMS,
 } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
-import ButtonField from 'components/form-elements/ButtonField';
 import DateField from 'components/form-elements/DateField';
 import LabelField from 'components/form-elements/LabelField';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
@@ -44,28 +44,27 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-const DELETE_BUTTON_FIELD = {
-  type: ButtonField,
-  label: 'react.default.button.delete.label',
-  defaultMessage: 'Delete',
-  flexWidth: '1',
-  fieldKey: '',
-  buttonLabel: 'react.default.button.delete.label',
-  buttonDefaultMessage: 'Delete',
-  getDynamicAttr: ({
-    fieldValue, removeItem, removeRow, updateTotalCount,
-  }) => ({
-    onClick: fieldValue && fieldValue.id ? () => {
-      removeItem(fieldValue.id).then(() => {
-        removeRow();
-        updateTotalCount(-1);
-      });
-    } : () => { updateTotalCount(-1); removeRow(); },
-    disabled: fieldValue && fieldValue.statusCode === 'SUBSTITUTED',
-  }),
-  attributes: {
-    className: 'btn btn-outline-danger',
-  },
+const handleDelete = async (fieldValue, removeItem, removeRow, updateTotalCount) => {
+  if (fieldValue && fieldValue.id) {
+    removeItem(fieldValue.id);
+  }
+  updateTotalCount(-1);
+  removeRow();
+};
+
+const handleSplit = async (fieldValue, addRow, rowIndex, updateTotalCount) => {
+  updateTotalCount(1);
+  addRow({
+    product: fieldValue.product,
+    recipient: fieldValue.recipient,
+    sortOrder: fieldValue.sortOrder + 1,
+    orderItemId: fieldValue.orderItemId,
+    referenceId: fieldValue.orderItemId,
+    orderNumber: fieldValue.orderNumber,
+    packSize: fieldValue.packSize,
+    unitOfMeasure: fieldValue.unitOfMeasure,
+    quantityAvailable: fieldValue.quantityAvailable,
+  }, rowIndex);
 };
 
 const FIELDS = {
@@ -100,7 +99,8 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.orderNumber.label',
         defaultMessage: 'Order number',
-        flexWidth: '1',
+        multilineHeader: true,
+        fixedWidth: '12ch',
         fieldKey: '',
         getDynamicAttr: ({
           fieldValue,
@@ -116,6 +116,7 @@ const FIELDS = {
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
         headerAlign: 'left',
+        multilineHeader: true,
         flexWidth: '4',
         required: true,
         attributes: {
@@ -136,7 +137,8 @@ const FIELDS = {
         type: TextField,
         label: 'react.stockMovement.lot.label',
         defaultMessage: 'Lot',
-        flexWidth: '1',
+        multilineHeader: true,
+        flexWidth: '15ch',
         getDynamicAttr: ({
           rowIndex,
           values,
@@ -155,7 +157,8 @@ const FIELDS = {
         type: DateField,
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
-        flexWidth: '1.5',
+        multilineHeader: true,
+        fixedWidth: '11ch',
         attributes: {
           dateFormat: 'MM/DD/YYYY',
           autoComplete: 'off',
@@ -185,7 +188,7 @@ const FIELDS = {
         type: TextField,
         label: 'react.stockMovement.quantityPOUom.label',
         defaultMessage: 'Quantity (in PO UoM)',
-        fixedWidth: '120px',
+        fixedWidth: '11ch',
         required: true,
         headerTooltip: 'react.stockMovement.quantityPerUom.InputTooltip.label',
         multilineHeader: true,
@@ -198,7 +201,8 @@ const FIELDS = {
         type: TextField,
         label: 'react.stockMovement.POUom.label',
         defaultMessage: 'PO UoM',
-        fixedWidth: '110px',
+        multilineHeader: true,
+        fixedWidth: '9ch',
         attributes: {
           disabled: true,
         },
@@ -208,9 +212,10 @@ const FIELDS = {
         label: 'react.stockMovement.quantityEach.label',
         defaultMessage: 'Quantity (each)',
         multilineHeader: true,
-        flexWidth: 1,
+        fixedWidth: '11ch',
         attributes: {
           disabled: true,
+          type: 'number',
         },
         getDynamicAttr: ({ rowIndex, values }) => ({
           formatValue: () => {
@@ -225,6 +230,7 @@ const FIELDS = {
         type: TextField,
         label: 'react.stockMovement.packLevel1.label',
         defaultMessage: 'Pack level 1',
+        multilineHeader: true,
         flexWidth: '1',
         getDynamicAttr: ({
           rowIndex, rowCount,
@@ -236,12 +242,14 @@ const FIELDS = {
         type: TextField,
         label: 'react.stockMovement.packLevel2.label',
         defaultMessage: 'Pack level 2',
+        multilineHeader: true,
         flexWidth: '1',
       },
       recipient: {
         type: SelectField,
         label: 'react.stockMovement.recipient.label',
         defaultMessage: 'Recipient',
+        multilineHeader: true,
         flexWidth: '1.5',
         getDynamicAttr: ({
           recipients,
@@ -268,37 +276,32 @@ const FIELDS = {
           openOnClick: false,
         },
       },
-      split: {
-        type: ButtonField,
-        label: 'react.stockMovement.splitLine.label',
-        defaultMessage: 'Split',
+      actions: {
+        label: 'react.stockMovement.actions.label',
+        defaultMessage: 'Actions',
         flexWidth: '1',
         fieldKey: '',
-        buttonLabel: 'react.stockMovement.splitLine.label',
-        buttonDefaultMessage: 'Split line',
-        getDynamicAttr: ({
-          fieldValue, addRow, rowIndex, updateTotalCount,
-        }) => ({
-          onClick: () => {
-            updateTotalCount(1);
-            addRow({
-              product: fieldValue.product,
-              recipient: fieldValue.recipient,
-              sortOrder: fieldValue.sortOrder + 1,
-              orderItemId: fieldValue.orderItemId,
-              referenceId: fieldValue.orderItemId,
-              orderNumber: fieldValue.orderNumber,
-              packSize: fieldValue.packSize,
-              unitOfMeasure: fieldValue.unitOfMeasure,
-              quantityAvailable: fieldValue.quantityAvailable,
-            }, rowIndex);
-          },
-        }),
-        attributes: {
-          className: 'btn btn-outline-success',
-        },
+        type: ({
+          fieldValue, removeItem, removeRow, updateTotalCount, addRow, rowIndex, translate,
+        }) => (
+          <span className="inbound-actions">
+            <div title={translate('react.stockMovement.splitLine.label', 'Split line')} aria-label={translate('react.stockMovement.splitLine.label', 'Split line')} role="button">
+              <RiScissorsCutLine
+                className="btn-outline-success"
+                onClick={() => handleSplit(fieldValue, addRow, rowIndex, updateTotalCount)}
+                disabled={fieldValue && fieldValue.statusCode === 'SUBSTITUTED'}
+              />
+            </div>
+            <div title={translate('react.default.button.delete.label', 'Delete')} aria-label={translate('react.default.button.delete.label', 'Delete')} role="button">
+              <RiDeleteBinLine
+                className="btn-outline-danger"
+                onClick={() => handleDelete(fieldValue, removeItem, removeRow, updateTotalCount)}
+                disabled={fieldValue && fieldValue.statusCode === 'SUBSTITUTED'}
+              />
+            </div>
+          </span>
+        ),
       },
-      deleteButton: DELETE_BUTTON_FIELD,
     },
   },
 };
