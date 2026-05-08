@@ -108,7 +108,6 @@ class StockMovementService {
     RequisitionDataService requisitionDataService
     GrailsApplication grailsApplication
     StockMovementHistoryProvider stockMovementHistoryProvider
-    PutawayService putawayService
     MessageLocalizer messageLocalizer
 
     def createStockMovement(StockMovement stockMovement) {
