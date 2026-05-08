@@ -389,6 +389,11 @@ class UrlMappings {
             action = [GET: "downloadPackingListTemplate"]
         }
 
+        "/api/stockMovements/$id/documents" {
+            controller = "stockMovementApi"
+            action = [GET: "getDocuments"]
+        }
+
         "/api/picklists/$id/items" {
             controller = "picklistApi"
             action = [DELETE: "clearPicklist"]

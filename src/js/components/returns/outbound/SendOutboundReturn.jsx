@@ -11,6 +11,7 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
+import stockMovementApi from 'api/services/StockMovementApi';
 import ArrayField from 'components/form-elements/ArrayField';
 import DateField from 'components/form-elements/DateField';
 import LabelField from 'components/form-elements/LabelField';
@@ -19,6 +20,7 @@ import TextField from 'components/form-elements/TextField';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import DocumentsDropdown from 'utils/DocumentsDropdown';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -204,6 +206,7 @@ class SendMovementPage extends Component {
     super(props);
     this.state = {
       shipmentTypes: [],
+      documents: [],
       values: { outboundReturn: { ...this.props.initialValues } },
     };
 
@@ -216,6 +219,7 @@ class SendMovementPage extends Component {
     if (this.props.outboundReturnsTranslationsFetched) {
       this.dataFetched = true;
       this.fetchOutboundReturn();
+      this.fetchDocuments();
     }
   }
 
@@ -223,6 +227,16 @@ class SendMovementPage extends Component {
     if (nextProps.outboundReturnsTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchOutboundReturn();
+    }
+  }
+
+  async fetchDocuments() {
+    try {
+      const response = await stockMovementApi
+        .getDocuments(this.props.match.params.outboundReturnId);
+      this.setState({ documents: response.data.data || [] });
+    } catch (e) {
+      this.props.hideSpinner();
     }
   }
 
@@ -438,13 +452,14 @@ class SendMovementPage extends Component {
           <form onSubmit={handleSubmit}>
             <div className="classic-form classic-form-condensed">
               <span className="buttons-container classic-form-buttons">
+                <DocumentsDropdown documents={this.state.documents} />
                 { !(values && values.status === 'COMPLETED')
                   ? (
                     <span>
                       <button
                         type="button"
                         onClick={() => this.save(values)}
-                        className="btn btn-outline-secondary float-right btn-form btn-xs"
+                        className="btn btn-outline-secondary float-right btn-form btn-xs ml-1"
                         disabled={invalid}
                       >
                         <span>
