@@ -39,8 +39,8 @@ enum EventCode {
     APPROVED(true),
     REJECTED(true),
     SUBMITTED(true),
-    PUTAWAY(false),
-    PARTIALLY_PUTAWAY(false),
+    PUTAWAY(true),
+    PARTIALLY_PUTAWAY(true),
 
     /**
      * Custom, implementation-specific events that are not triggered by application logic. Custom events
