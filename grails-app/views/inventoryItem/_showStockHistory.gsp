@@ -189,7 +189,7 @@
         <div>
             <warehouse:message code="inventory.stockHistory.label"/>
             <div class="print-history">
-                <g:link controller="inventoryItem" action="showStockHistory" params="[print:true]" id="${commandInstance.product.id}" class="button">
+                <g:link controller="inventoryItem" action="showStockHistory" params="[print:true]" id="${productId}" class="button">
                     <img src="${resource(dir:'images/icons',file:'pdf.png')}" />
                     ${warehouse.message(code: 'inventory.exportPdf.label', default: 'Export to PDF')}
                 </g:link>
@@ -334,13 +334,12 @@
                             <td class="middle">
                                 <g:if test="${stockHistoryEntry?.showDetails}">
                                     <g:if test="${stockHistoryEntry?.isInternal}">
-                                        <g:set var="localTransfer" value="${stockHistoryEntry?.transaction?.localTransfer}"/>
-                                        <g:link controller="inventory" action="showTransaction" id="${localTransfer.destinationTransaction?.id }">
-                                            <format:metadata obj="${localTransfer?.destinationTransaction?.transactionType}"/>
+                                        <g:link controller="inventory" action="showTransaction" id="${stockHistoryEntry?.localTransferInfo?.destinationTransactionId}">
+                                            <format:metadata obj="${stockHistoryEntry?.localTransferInfo?.destinationTransactionType}"/>
                                         </g:link>
                                         /
-                                        <g:link controller="inventory" action="showTransaction" id="${localTransfer.sourceTransaction?.id }">
-                                            <format:metadata obj="${localTransfer?.sourceTransaction?.transactionType}"/>
+                                        <g:link controller="inventory" action="showTransaction" id="${stockHistoryEntry?.localTransferInfo?.sourceTransactionId}">
+                                            <format:metadata obj="${stockHistoryEntry?.localTransferInfo?.sourceTransactionType}"/>
                                         </g:link>
                                     </g:if>
                                     <g:else>
@@ -371,24 +370,27 @@
 
                                 <g:if test="${stockHistoryEntry?.showDetails}">
                                     <g:set var="shipment" value="${stockHistoryEntry?.transaction?.incomingShipment ?: stockHistoryEntry?.transaction?.outgoingShipment}"/>
+                                    <g:set var="shipmentDto" value="${shipment ? shipmentDtoById?.get(shipment.id) : null}"/>
+                                    <g:set var="requisitionDto" value="${requisitionDtoById?.get(stockHistoryEntry?.requisitionId)}"/>
+                                    <g:set var="orderDto" value="${orderDtoById?.get(stockHistoryEntry?.orderId)}"/>
                                     <div>
                                         %{-- CHECK IF IT IS PURCHASE ORDER RELATED --}%
-                                        <g:if test="${shipment?.isFromPurchaseOrder}">
+                                        <g:if test="${shipmentDto?.isFromPurchaseOrder}">
                                             <g:link controller="stockMovement" action="show" id="${shipment?.id }">
                                                 <div class="ellipsis" title="${shipment?.shipmentNumber} &rsaquo; ${shipment?.name}">
-                                                    <format:metadata obj="${shipment?.purchaseOrder?.orderType?.orderTypeCode }"/>
+                                                    <format:metadata obj="${shipmentDto?.purchaseOrderTypeCode}"/>
                                                     &rsaquo;
                                                     ${shipment?.shipmentNumber}
                                                 </div>
                                             </g:link>
                                         </g:if>
                                         %{-- CHECK IF IT IS RETURN ORDER RELATED --}%
-                                        <g:elseif test="${shipment?.isFromReturnOrder}">
+                                        <g:elseif test="${shipmentDto?.isFromReturnOrder}">
                                             <g:link controller="stockMovement" action="show" id="${shipment?.id}">
                                                 <div class="ellipsis" title="${shipment?.shipmentNumber} &rsaquo; ${shipment?.name}">
                                                     <g:message
-                                                        code="order.orderType.code.${shipment?.returnOrder?.orderType?.code}"
-                                                        default="${shipment?.returnOrder?.orderType?.name}"
+                                                        code="order.orderType.code.${shipmentDto?.returnOrderTypeCode}"
+                                                        default="${shipmentDto?.returnOrderTypeName}"
                                                     />
                                                     &rsaquo;
                                                     ${shipment?.shipmentNumber}
@@ -396,12 +398,12 @@
                                             </g:link>
                                         </g:elseif>
                                         %{-- CHECK IF IT IS INBOUND OR OUTBOUND STOCK MOVEMENT --}%
-                                        <g:elseif test="${stockHistoryEntry?.transaction?.requisition }">
-                                            <g:link controller="stockMovement" action="show" id="${stockHistoryEntry?.transaction?.requisition?.id }">
-                                                <div title="${stockHistoryEntry?.transaction?.requisition?.requestNumber } &rsaquo; ${stockHistoryEntry?.transaction?.requisition?.name }">
+                                        <g:elseif test="${requisitionDto}">
+                                            <g:link controller="stockMovement" action="show" id="${requisitionDto.id}">
+                                                <div title="${requisitionDto.requestNumber} &rsaquo; ${requisitionDto.name}">
                                                     <g:message code="requisition.label"/>
                                                     &rsaquo;
-                                                    ${stockHistoryEntry?.transaction?.requisition?.requestNumber }
+                                                    ${requisitionDto.requestNumber}
                                                 </div>
                                             </g:link>
                                         </g:elseif>
@@ -416,34 +418,37 @@
                                             </g:link>
                                         </g:elseif>
                                         %{-- CHECK IF IT IS STOCK TRANSFER / BIN REPLENISHMENT --}%
-                                        <g:elseif test="${stockHistoryEntry?.transaction?.order?.orderType?.isTransferOrder() && !stockHistoryEntry?.transaction?.order?.orderType?.isPutawayOrder()}">
-                                            <g:link controller="stockTransfer" action="show" id="${stockHistoryEntry?.transaction?.order?.id}">
-                                                <div title="${stockHistoryEntry?.transaction?.order?.name}">
+                                        <g:elseif test="${orderDto?.isTransferOrder && !orderDto?.isPutawayOrder}">
+                                            <g:link controller="stockTransfer" action="show" id="${orderDto.id}">
+                                                <div title="${orderDto.name}">
                                                     <g:message
-                                                        code="order.orderType.code.${stockHistoryEntry?.transaction?.order?.orderType?.code}"
-                                                        default="${stockHistoryEntry?.transaction?.order?.orderType?.name}"
+                                                        code="order.orderType.code.${orderDto.orderTypeCode}"
+                                                        default="${orderDto.orderTypeName}"
                                                     />
                                                     &rsaquo;
-                                                    ${stockHistoryEntry?.transaction?.order?.orderNumber}
+                                                    ${orderDto.orderNumber}
                                                 </div>
                                             </g:link>
                                         </g:elseif>
                                         %{-- FALLBACK FOR OTHER ORDER TYPES --}%
-                                        <g:elseif test="${stockHistoryEntry?.transaction?.order }">
-                                            <g:link controller="order" action="show" id="${stockHistoryEntry?.transaction?.order?.id }">
-                                                <div title="${stockHistoryEntry?.transaction?.order?.name }">
+                                        <g:elseif test="${orderDto}">
+                                            <g:link controller="order" action="show" id="${orderDto.id}">
+                                                <div title="${orderDto.name}">
                                                     <g:message
-                                                        code="order.orderType.code.${stockHistoryEntry?.transaction?.order?.orderType?.code}"
-                                                        default="${stockHistoryEntry?.transaction?.order?.orderType?.name}"
+                                                        code="order.orderType.code.${orderDto.orderTypeCode}"
+                                                        default="${orderDto.orderTypeName}"
                                                     />
                                                     &rsaquo;
-                                                    ${stockHistoryEntry?.transaction?.order?.orderNumber }
+                                                    ${orderDto.orderNumber}
                                                 </div>
                                             </g:link>
                                         </g:elseif>
                                     </div>
                                     %{-- reset shipment value --}%
                                     <g:set var="shipment" value="${null}"/>
+                                    <g:set var="shipmentDto" value="${null}"/>
+                                    <g:set var="requisitionDto" value="${null}"/>
+                                    <g:set var="orderDto" value="${null}"/>
                                 </g:if>
                             </td>
                             <td class="border-right middle center">
