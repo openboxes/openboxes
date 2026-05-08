@@ -56,7 +56,8 @@ class InventoryService implements ApplicationContextAware {
 
     // DataServices compile before the Spring context is initialized, so we lazy load them to avoid null pointers
     // when one exists down the chain from a Spring component (even when there's a Grails component in between).
-    @Autowired @Lazy
+    @Autowired
+    @Lazy
     TransactionEntryDataService transactionEntryDataService
 
     RecordStockProductInventoryTransactionService recordStockProductInventoryTransactionService
