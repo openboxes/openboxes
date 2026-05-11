@@ -7,13 +7,9 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
-package org.pih.warehouse.shipping
+package org.pih.warehouse.core
 
-import org.pih.warehouse.shipping.Shipment
-
-class ShipmentException extends RuntimeException {
-    String message
-    String messageCode
-    Object[] messageArgs
-    Shipment shipment
+enum CommentType {
+    SYSTEM,
+    USER
 }

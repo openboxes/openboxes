@@ -35,6 +35,12 @@ class Comment implements Comparable, Serializable {
         dateRead(nullable: true)
     }
 
+    static transients = ['type']
+
+    CommentType getType() {
+        return sender ? CommentType.USER : CommentType.SYSTEM
+    }
+
     String toString() { return "$comment" }
 
     int compareTo(obj) {

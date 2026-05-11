@@ -259,6 +259,12 @@ class Shipment implements Comparable, Serializable, Historizable {
         return shipmentItems.findAll { !it.container }
     }
 
+    Set<String> getUniqueBackorderReferences() {
+        return shipmentItems.findAll { it.backorderReference && !it.backorderItem }
+                .collect { it.backorderReference }
+                .toSet() as Set<String>
+    }
+
     /**
      * Invoking the default sort() method from a GSP on the shipment items association does not seem to work reliably,
      * so we're going to try to perform the sort operation within the shipment.

@@ -14,7 +14,9 @@ import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import grails.validation.ValidationException
 import org.pih.warehouse.allocation.AutomaticBackorderReallocationEvent
+import org.pih.warehouse.allocation.BackorderService
 import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.CommentType
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
@@ -38,10 +40,14 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentService
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.transaction.annotation.Propagation
 
 @Transactional
 class ReceiptService {
@@ -55,6 +61,8 @@ class ReceiptService {
     GrailsApplication grailsApplication
     ProductAvailabilityService productAvailabilityService
     InboundSortationService inboundSortationService
+    BackorderService backorderService
+    MessageSource messageSource
 
     @Transactional(readOnly=true)
     PartialReceipt getPartialReceipt(String id, String stepNumber, String sort = null) {
@@ -534,17 +542,11 @@ class ReceiptService {
             return
         }
 
-        // Skip the receive flow when a backorder reference can't be resolved yet, so the
-        // shipment stays in SHIPPED and AutomaticReceiptJob can retry once the backorder
-        // arrives. We surface the reason as a comment on the shipment for visibility.
         if (shipment.destination.supports(ActivityCode.DYNAMIC_SLOTTING)) {
-            String backorderError = inboundSortationService.validateBackorderReferences(shipment)
-            if (backorderError) {
-                log.warn("Skipping auto-receive for shipment ${shipment.id}: ${backorderError}")
-                shipment.addToComments(new Comment(
-                        comment: backorderError,
-                        sender: AuthService.currentUser ?: shipment.createdBy,
-                ))
+            try {
+                backorderService.validateBackorderReferences(shipment)
+            } catch (ShipmentException e) {
+                logShipmentEvent(e)
                 return
             }
         }
@@ -565,6 +567,21 @@ class ReceiptService {
 
     def reallocateBackorderedItems(String shipmentId) {
         Holders.grailsApplication.mainContext.publishEvent(new AutomaticBackorderReallocationEvent(shipmentId))
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    void logShipmentEvent(ShipmentException e) {
+        String message = messageSource.getMessage(e.messageCode, e.messageArgs, LocaleContextHolder.locale)
+        Shipment shipment = Shipment.get(e.shipment.id)
+
+        boolean alreadyLogged = shipment.comments.any {
+            it.type == CommentType.SYSTEM && it.comment == message
+        }
+        if (!alreadyLogged) {
+            shipment.addToComments(new Comment(comment: message, sender: null))
+            shipment.save(failOnError: true)
+        }
+        log.warn("Shipment ${shipment.id}: ${message}")
     }
 
     PartialReceipt createAutomaticReceipt(Shipment shipment) {
