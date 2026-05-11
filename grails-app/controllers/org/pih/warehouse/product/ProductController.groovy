@@ -17,6 +17,8 @@ import grails.validation.ValidationException
 import grails.web.context.ServletContextHolder
 import org.apache.commons.io.FilenameUtils
 import org.hibernate.Criteria
+import org.springframework.beans.factory.annotation.Value
+
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Location
@@ -51,6 +53,9 @@ class ProductController {
     def localizationService
     ProductDataService productDataService
     CategoryService categoryService
+
+    @Value('${openboxes.import.product.createMissingCategories}')
+    boolean createMissingCategories
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -750,7 +755,7 @@ class ProductController {
                     // Create default tag based on base filename
                     tag = FilenameUtils.getBaseName(command?.importFile?.originalFilename)
 
-                    command.products = productService.validateProducts(csv)
+                    command.products = productService.validateProducts(csv, createMissingCategories)
 
                     flash.message = "Uploaded file ${uploadFile?.originalFilename} to ${localFile.absolutePath}"
                 } catch (RuntimeException e) {
@@ -798,8 +803,7 @@ class ProductController {
                 tags = params?.tagsToBeAdded?.split(",") as List
 
                 // Import products
-                command.products = productService.validateProducts(csv)
-
+                command.products = productService.validateProducts(csv, createMissingCategories)
 
                 productService.importProducts(command.products, tags)
                 flash.message = "All ${command?.products?.size()} product(s) were imported successfully."
