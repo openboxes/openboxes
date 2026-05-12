@@ -28,6 +28,7 @@ import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.picklist.PicklistService
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionService
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 
@@ -40,6 +41,7 @@ class PickTaskService {
     PicklistService picklistService
     StockMovementService stockMovementService
     WebhookPublisherService webhookPublisherService
+    RequisitionService requisitionService
 
     @Transactional(readOnly = true)
     List<PickTask> search(SearchPickTaskCommand command, Map params = [:]) {
@@ -207,6 +209,13 @@ class PickTaskService {
         }
 
         save(task)
+        // has to be done after save() because we need new requisition status for isCanceledDuringPick() check
+        if (!existingPickItem.quantityPicked || existingPickItem.quantityPicked == 0) {
+            Set<PicklistItem> list = existingPickItem.picklist.picklistItems
+            if (list.every { it.requisitionItem.isCanceled() || it.requisitionItem.isCanceledDuringPick() }) {
+                requisitionService.cancelRequisition(existingPickItem.requisitionItem?.requisition)
+            }
+        }
     }
 
     List<PickTask> reallocate(PickTask task, List picklistItems) {

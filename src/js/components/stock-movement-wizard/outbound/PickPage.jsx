@@ -826,7 +826,9 @@ class PickPage extends Component {
         values: ({
           ...prevState.values,
           pickPageItems: picklistItems
-            .map((item) => ({ ...item, picklistItems: [], quantityPicked: 0 })),
+            .map((item) => ({
+              ...item, picklistItems: [], quantityPicked: 0, quantityAllocated: 0,
+            })),
         }),
       }));
     } finally {
