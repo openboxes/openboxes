@@ -1231,6 +1231,18 @@ class UrlMappings {
             action = [POST: "allocate"]
         }
 
+        // Allocation API endpoints
+
+        "/api/requisitions/$id/allocate"(parseRequest: true) {
+            controller = "allocationApi"
+            action = [POST: "allocate"]
+        }
+
+        "/api/requisitions/$id/deallocate"(parseRequest: true) {
+            controller = "allocationApi"
+            action = [POST: "deallocate"]
+        }
+
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")

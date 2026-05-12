@@ -1,68 +1,70 @@
 package org.pih.warehouse.allocation
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.springframework.http.HttpStatus
 
+@Transactional
 class AllocationApiController {
+
     AllocationService allocationService
     StockMovementService stockMovementService
 
     def allocate() {
+        Requisition requisition = Requisition.get(params.id)
+        if (!requisition) {
+            render(status: HttpStatus.NOT_FOUND.value(),
+                    [errorCode: 404, errorMessage: "Requisition not found for id: ${params.id}"] as JSON)
+            return
+        }
+
         try {
             def jsonBody = request.JSON ?: [:]
-            AllocationMode mode = jsonBody.mode as AllocationMode
-            Requisition requisition = Requisition.get(params.id)
-            List<AllocationStrategy> strategies = []
-            if (jsonBody.strategies) {
-                strategies = jsonBody.strategies.collect { String strategy ->
-                    try {
-                        return AllocationStrategy.valueOf(strategy)
-                    } catch (IllegalArgumentException e) {
-                        return null
-                    }
-                }.findAll { it != null }
+            AllocationMode mode = (jsonBody.mode as AllocationMode) ?: AllocationMode.AUTO
+            List<AllocationStrategy> strategies = parseStrategies(jsonBody.strategies)
+
+            List<AllocationResult> results = allocationService.allocate(requisition, mode, strategies)
+            if (results && !results.empty) {
+                stockMovementService.updateRequisitionStatus(requisition.id, RequisitionStatus.PICKING)
             }
-            def result = allocationService.allocate(requisition, mode ?: AllocationMode.AUTO, strategies)
-            if (result && !result.empty) {
-                stockMovementService.updateRequisitionStatus(params.id, RequisitionStatus.PICKING)
-            }
-            redirect(controller: "stockMovement", action: "show", id: params.id)
+
+            render([data: results] as JSON)
         } catch (Exception e) {
-            render(status: 500, [errorCode: 500, errorMessage: e.message] as JSON)
+            render(status: HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    [errorCode: 500, errorMessage: e.message] as JSON)
         }
     }
 
     def deallocate() {
+        Requisition requisition = Requisition.get(params.id)
+        if (!requisition) {
+            render(status: HttpStatus.NOT_FOUND.value(),
+                    [errorCode: 404, errorMessage: "Requisition not found for id: ${params.id}"] as JSON)
+            return
+        }
+
         try {
-            Requisition requisition = Requisition.get(params.id)
-            if (!requisition) {
-                flash.error = "Requisition not found for id: ${params.id}"
-                redirect(controller: "stockMovement", action: "show", id: params.id)
-                return
-            }
             allocationService.deallocate(requisition)
-            redirect(controller: "stockMovement", action: "show", id: params.id)
+            render(status: HttpStatus.NO_CONTENT.value())
         } catch (Exception e) {
-            flash.error = "Error while clearing allocation for stock movement: ${e.message}"
-            redirect(controller: "stockMovement", action: "show", id: params.id)
+            render(status: HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    [errorCode: 500, errorMessage: e.message] as JSON)
         }
     }
 
-    def redoAutopick() {
-        try {
-            Requisition requisition = Requisition.get(params.id)
-            if (!requisition) {
-                flash.error = "Requisition not found for id: ${params.id}"
-                redirect(controller: "stockMovement", action: "show", id: params.id)
-                return
-            }
-            allocationService.deallocate(requisition)
-            redirect(action: "allocate", id: params.id)
-        } catch (Exception e) {
-            flash.error = "Error while redoing picklist for stock movement: ${e.message}"
-            redirect(controller: "stockMovement", action: "show", id: params.id)
+    private static List<AllocationStrategy> parseStrategies(def strategies) {
+        if (!strategies) {
+            return []
         }
+        return strategies.collect { String strategy ->
+            try {
+                return AllocationStrategy.valueOf(strategy)
+            } catch (IllegalArgumentException e) {
+                return null
+            }
+        }.findAll { it != null }
     }
 }

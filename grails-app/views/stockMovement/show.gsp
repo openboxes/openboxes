@@ -238,7 +238,7 @@
                             </g:if>
                             <g:else>
                                 <g:link
-                                        controller="allocationApi"
+                                        controller="allocation"
                                         action="deallocate"
                                         id="${stockMovement?.requisition?.id}"
                                         class="button"
@@ -247,7 +247,7 @@
                                     <warehouse:message code="stockMovement.clearAllocation.label" default="Clear Allocation"/>
                                 </g:link>
                                 <g:link
-                                        controller="allocationApi"
+                                        controller="allocation"
                                         action="redoAutopick"
                                         id="${stockMovement?.requisition?.id}"
                                         class="button"
