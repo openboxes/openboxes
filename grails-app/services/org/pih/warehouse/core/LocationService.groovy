@@ -253,6 +253,34 @@ class LocationService {
         return locations
     }
 
+    // Method to return login locations with details, that would be further
+    // fetched to receive details like location type and location group.
+    // This method is supposed to reduce N+1 calls on location type, location group and supported activities.
+    List<Location> getLoginLocationsWithDetails() {
+        List<String> requiredActivities = ConfigHelper.listValue(
+                grailsApplication.config.openboxes.chooseLocation.requiredActivities)
+        if (!requiredActivities) {
+            return []
+        }
+        Set<Location> locations = new LinkedHashSet<>()
+        requiredActivities.each { String activity ->
+            locations.addAll(findLocationsWithDetailsSupporting(activity))
+        }
+        return locations as List<Location>
+    }
+
+    private static List<Location> findLocationsWithDetailsSupporting(String activity) {
+        return Location.executeQuery("""
+            SELECT l
+            FROM Location l
+            LEFT JOIN FETCH l.locationType lt
+            LEFT JOIN FETCH l.locationGroup
+            WHERE l.inventory IS NOT NULL
+              AND (:activity IN ELEMENTS(l.supportedActivities)
+                   OR (size(l.supportedActivities) = 0 AND :activity IN ELEMENTS(lt.supportedActivities)))
+        """, [activity: activity])
+    }
+
 
     Map getLoginLocationsMap(User user, Location currentLocation, Boolean excludeDisabled = false) {
         log.info "Get login locations for user ${user} and location ${currentLocation})"
