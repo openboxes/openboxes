@@ -350,8 +350,12 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return supports(ActivityCode.HOLD_STOCK)
     }
 
+    Boolean isLostAndFound() {
+        return supports(ActivityCode.LOST_AND_FOUND)
+    }
+
     Boolean isPickable() {
-        return !onHold
+        return !onHold && !lostAndFound
     }
 
     Boolean isDownstreamConsumer() {

@@ -1509,8 +1509,8 @@ class StockMovementService {
             log.info " - Available item " + it.toJson()
         }
 
-        // filter out hold locations
-        availableItems = availableItems.findAll { !it.isOnHold() }
+        // filter out hold and lost-and-found locations
+        availableItems = availableItems.findAll { !it.isOnHold() && !it.binLocation?.lostAndFound }
 
         // If there's only one pickable location, it should either be a default location or
         if (availableItems.count { it.pickable } == 1) {

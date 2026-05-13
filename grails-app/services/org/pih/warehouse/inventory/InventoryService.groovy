@@ -886,7 +886,8 @@ class InventoryService implements ApplicationContextAware {
                                 inventoryItem    : inventoryItem,
                                 binLocation      : binLocation,
                                 quantity         : quantity,
-                                isOnHold         : binLocation?.isOnHold()
+                                isOnHold         : binLocation?.isOnHold(),
+                                isLostAndFound   : binLocation?.isLostAndFound()
                             ]))
                     }
                 }

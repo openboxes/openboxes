@@ -23,6 +23,8 @@ class BinLocationItem implements Comparable<BinLocationItem> {
 
     Boolean isOnHold
 
+    Boolean isLostAndFound
+
     @Override
     int compareTo(BinLocationItem obj) {
         inventoryItem?.expirationDate <=> obj?.inventoryItem?.expirationDate
