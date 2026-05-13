@@ -337,6 +337,7 @@ class StockTransferService {
         orderItem.destinationBinLocation = stockTransferItem.destinationBinLocation
         orderItem.recipient = stockTransferItem.recipient
         orderItem.orderIndex = stockTransferItem.orderIndex
+        orderItem.discrepancyReasonCode = stockTransferItem.reasonCode
         return orderItem
     }
 

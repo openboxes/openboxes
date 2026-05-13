@@ -123,6 +123,11 @@ class StockTransferSecondPage extends Component {
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
+      Header: <Translate id="react.stockTransfer.reasonForShortage.label" defaultMessage="Reason for Shortage" />,
+      accessor: 'reasonCode',
+      style: { whiteSpace: 'normal' },
+      Filter,
+    }, {
       Header: <Translate id="react.stockTransfer.qtyToTransfer.label" defaultMessage="Qty to Transfer" />,
       accessor: 'quantity',
       style: { whiteSpace: 'normal' },

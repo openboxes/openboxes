@@ -9,9 +9,10 @@ import { connect } from 'react-redux';
 import ReactTable from 'react-table';
 import { Tooltip } from 'react-tippy';
 
-import { hideSpinner, showSpinner } from 'actions';
+import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
 import { TableCell } from 'components/DataTable';
 import { extractStockTransferItems, prepareRequest } from 'components/stock-transfer/utils';
+import ActivityCode from 'consts/activityCode';
 import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
 import StockTransferStatus from 'consts/stockTransferStatus';
@@ -91,6 +92,7 @@ class StockTransferSecondPage extends Component {
     if (this.props.stockTransferTranslationsFetched) {
       this.dataFetched = true;
       this.fetchBins();
+      this.props.fetchReasonCodes(ActivityCode.SHORTAGE_QTY_UNDER_RECEIPT);
     }
     this.fetchStockTransfer();
   }
@@ -99,6 +101,7 @@ class StockTransferSecondPage extends Component {
     if (nextProps.stockTransferTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchBins();
+      this.props.fetchReasonCodes(ActivityCode.SHORTAGE_QTY_UNDER_RECEIPT);
     }
   }
 
@@ -159,6 +162,23 @@ class StockTransferSecondPage extends Component {
       Header: <Translate id="react.stockTransfer.currentBinLocation.label" defaultMessage="Current Bin Location" />,
       accessor: 'originBinLocation.name',
       style: { whiteSpace: 'normal' },
+      Filter,
+    }, {
+      Header: <Translate id="react.stockTransfer.reasonForShortage.label" defaultMessage="Reason for Shortage" />,
+      accessor: 'reasonCode',
+      Cell: (cellInfo) => (
+        <Select
+          options={this.props.reasonCodes}
+          value={_.find(this.props.reasonCodes, { id: _.get(this.state.stockTransfer.stockTransferItems, `[${cellInfo.index}].reasonCode`) }) || null}
+          onChange={(value) => this.changeStockTransfer(update(this.state.stockTransfer, {
+            stockTransferItems: { [cellInfo.index]: { reasonCode: { $set: value?.id } } },
+          }))}
+          valueKey="id"
+          labelKey="label"
+          className="select-xs"
+          disabled={cellInfo.original.status === StockTransferStatus.CANCELED}
+        />
+      ),
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.qtyToTransfer.label" defaultMessage="Qty to Transfer" />,
@@ -630,12 +650,13 @@ const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockTransferTranslationsFetched: state.session.fetchedTranslations.stockTransfer,
   formatLocalizedDate: formatDate(state.localize),
+  reasonCodes: state.reasonCodes.data,
 });
 
 export default connect(
   mapStateToProps,
   {
-    showSpinner, hideSpinner,
+    showSpinner, hideSpinner, fetchReasonCodes,
   },
 )(StockTransferSecondPage);
 
@@ -644,6 +665,10 @@ StockTransferSecondPage.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
+  /** Function fetching reason codes */
+  fetchReasonCodes: PropTypes.func.isRequired,
+  /** Array of available reason codes */
+  reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   /** Function taking user to the next page */
   nextPage: PropTypes.func.isRequired,
   /** Function taking user to the previous page */

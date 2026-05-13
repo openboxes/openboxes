@@ -14,6 +14,7 @@ import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
@@ -174,6 +175,7 @@ class StockTransferApiController {
             stockTransferItem.quantity = stockTransferItemMap["quantity"] ? new BigDecimal(stockTransferItemMap["quantity"]) : 0
             stockTransferItem.status = stockTransferItemMap["status"] ? stockTransferItemMap["status"] : null
             stockTransferItem.recipient = stockTransferItemMap?.recipient?.id ? Person.load(stockTransferItemMap?.recipient?.id) : null
+            stockTransferItem.reasonCode = stockTransferItemMap["reasonCode"] ? stockTransferItemMap["reasonCode"] as ReasonCode : null
 
             if (!stockTransferItem.location) {
                 stockTransferItem.location = stockTransfer.origin
