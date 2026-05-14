@@ -2835,7 +2835,7 @@ class InventoryService implements ApplicationContextAware {
 
     List<Map> getCurrentStockAllLocations(Product product, User currentUser) {
         log.info("Get getQuantityOnHand() for product ${product?.name} at all locations")
-        List<Location> locations = locationService.getLoginLocationsWithDetails().findAll { Location location ->
+        List<Location> locations = locationService.getLoginLocationsWithEagerJoins().findAll { Location location ->
             location.isWarehouse() && currentUser.getEffectiveRoles(location)
         }
 

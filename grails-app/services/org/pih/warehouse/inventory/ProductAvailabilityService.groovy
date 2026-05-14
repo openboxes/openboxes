@@ -648,17 +648,19 @@ class ProductAvailabilityService {
 
     Map<Location, Integer> getQuantityOnHandByLocation(Product product, List<Location> locations) {
         Map<Location, Integer> quantityMap = [:]
-        if (product && locations) {
-            def results = ProductAvailability.executeQuery("""
-						select pa.location, sum(pa.quantityOnHand)
-						from ProductAvailability pa
-						where pa.product = :product
-						and pa.location in (:locations)
-						group by pa.location
-						""", [product: product, locations: locations])
-            results.each {
-                quantityMap[it[0]] = it[1] as Integer
-            }
+        if (!product || !locations) {
+            return quantityMap
+        }
+
+        List results = ProductAvailability.executeQuery("""
+                    select pa.location, sum(pa.quantityOnHand)
+                    from ProductAvailability pa
+                    where pa.product = :product
+                    and pa.location in (:locations)
+                    group by pa.location
+                    """, [product: product, locations: locations])
+        results.each {
+            quantityMap[it[0]] = it[1] as Integer
         }
 
         return quantityMap

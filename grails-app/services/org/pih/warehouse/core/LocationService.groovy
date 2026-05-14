@@ -253,10 +253,10 @@ class LocationService {
         return locations
     }
 
-    // Method to return login locations with details, that would be further
-    // fetched to receive details like location type and location group.
-    // This method is supposed to reduce N+1 calls on location type, location group and supported activities.
-    List<Location> getLoginLocationsWithDetails() {
+    /**
+     * Returns all locations that can be logged in to. Prefetches the relationship entities (such as location type and group) to reduce N+1 calls.
+     */
+    List<Location> getLoginLocationsWithEagerJoins() {
         List<String> requiredActivities = ConfigHelper.listValue(
                 grailsApplication.config.openboxes.chooseLocation.requiredActivities)
         if (!requiredActivities) {
@@ -264,12 +264,12 @@ class LocationService {
         }
         Set<Location> locations = new LinkedHashSet<>()
         requiredActivities.each { String activity ->
-            locations.addAll(findLocationsWithDetailsSupporting(activity))
+            locations.addAll(getLocationsSupportingActivityWithEagerJoins(activity))
         }
         return locations as List<Location>
     }
 
-    private static List<Location> findLocationsWithDetailsSupporting(String activity) {
+    private static List<Location> getLocationsSupportingActivityWithEagerJoins(String activity) {
         return Location.executeQuery("""
             SELECT l
             FROM Location l
