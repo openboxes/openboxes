@@ -125,7 +125,7 @@ const FIELDS = {
     type: TextField,
     label: 'react.stockMovement.comments.label',
     defaultMessage: 'Comments',
-    flexWidth: '1.7',
+    flexWidth: '6',
     getDynamicAttr: ({
       addRow, rowCount, rowIndex, getSortOrder,
       updateTotalCount, updateRow, values,
@@ -184,8 +184,9 @@ const DELETE_BUTTON_FIELD = {
     } : () => { updateTotalCount(-1); removeRow(); },
   }),
   attributes: {
-    className: 'btn btn-outline-danger mr-1',
+    className: 'btn mr-1',
     style: {
+      color: '#dc3545',
       border: 'none',
       'font-size': '1rem',
     },
@@ -244,10 +245,7 @@ const NO_STOCKLIST_FIELDS = {
           onBlur: () => updateRow(values, rowIndex),
         }),
       },
-      comments: {
-        ...FIELDS.comments,
-        flexWidth: '6',
-      },
+      comments: FIELDS.comments,
       deleteButton: DELETE_BUTTON_FIELD,
     },
   },
