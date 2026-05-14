@@ -53,8 +53,9 @@ const DELETE_BUTTON_FIELD = {
     disabled: fieldValue && fieldValue.statusCode === 'SUBSTITUTED',
   }),
   attributes: {
-    className: 'btn btn-outline-danger',
+    className: 'btn',
     style: {
+      color: '#dc3545',
       border: 'none',
       'font-size': '1rem',
     },
@@ -64,7 +65,7 @@ const DELETE_BUTTON_FIELD = {
 const FIELDS = {
   returnItems: {
     type: ArrayField,
-    overflowStyle: 'hidden',
+    overflowStyle: 'auto',
     arrowsNavigation: true,
     // eslint-disable-next-line react/prop-types
     addButton: ({ addRow, getSortOrder }) => (
