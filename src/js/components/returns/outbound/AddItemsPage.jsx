@@ -35,7 +35,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 const FIELDS = {
   returnItems: {
     type: ArrayField,
-    overflowStyle: 'hidden',
+    overflowStyle: 'auto',
     maxTableHeight: 'calc(100vh - 500px)',
     getDynamicRowAttr: ({ rowValues, translate }) => {
       let className = '';

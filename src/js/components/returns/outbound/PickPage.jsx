@@ -22,7 +22,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 const FIELDS = {
   picklistItems: {
     type: ArrayField,
-    overflowStyle: 'hidden',
+    overflowStyle: 'auto',
     getDynamicRowAttr: ({ rowValues, translate }) => {
       let className = '';
       let tooltip = '';
@@ -41,7 +41,7 @@ const FIELDS = {
     fields: {
       'product.productCode': {
         type: LabelField,
-        label: 'react.stockMovement.productCode.label',
+        label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
         flexWidth: '0.5',
       },

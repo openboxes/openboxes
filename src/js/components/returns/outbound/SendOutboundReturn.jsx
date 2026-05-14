@@ -116,7 +116,7 @@ const SHIPMENT_FIELDS = {
 const FIELDS = {
   picklistItems: {
     type: ArrayField,
-    overflowStyle: 'hidden',
+    overflowStyle: 'auto',
     getDynamicRowAttr: ({ rowValues, translate }) => {
       let className = '';
       let tooltip = '';
@@ -135,7 +135,7 @@ const FIELDS = {
     fields: {
       'product.productCode': {
         type: LabelField,
-        label: 'react.stockMovement.productCode.label',
+        label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
         flexWidth: '0.5',
       },
