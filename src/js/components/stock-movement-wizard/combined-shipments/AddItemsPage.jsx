@@ -8,7 +8,8 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
-import { RiDeleteBinLine, RiScissorsCutLine } from 'react-icons/ri';
+import { RiDeleteBinLine } from 'react-icons/ri';
+import { TbArrowsSplit2 } from 'react-icons/tb';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
@@ -300,7 +301,7 @@ const FIELDS = {
                 duration="250"
                 hideDelay="50"
               >
-                <RiScissorsCutLine
+                <TbArrowsSplit2
                   style={{ color: '#28a745' }}
                   onClick={() => handleSplit(fieldValue, addRow, rowIndex, updateTotalCount)}
                   disabled={fieldValue?.statusCode === requisitionStatus.SUBSTITUTED}
