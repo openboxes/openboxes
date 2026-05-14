@@ -152,7 +152,7 @@ class AllocationService {
         }
         if (result) {
             // Set requisition status back to VERIFYING
-            requisition.status = RequisitionStatus.VERIFYING
+            requisition.status = RequisitionStatus.CREATED
             requisition.save()
         }
         return result
