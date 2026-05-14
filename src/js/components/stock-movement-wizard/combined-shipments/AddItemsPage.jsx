@@ -301,7 +301,7 @@ const FIELDS = {
                 hideDelay="50"
               >
                 <RiScissorsCutLine
-                  className="btn-outline-success"
+                  style={{ color: '#28a745' }}
                   onClick={() => handleSplit(fieldValue, addRow, rowIndex, updateTotalCount)}
                   disabled={fieldValue?.statusCode === requisitionStatus.SUBSTITUTED}
                 />
@@ -317,7 +317,7 @@ const FIELDS = {
                 hideDelay="50"
               >
                 <RiDeleteBinLine
-                  className="btn-outline-danger"
+                  style={{ color: '#dc3545' }}
                   onClick={() => handleDelete(fieldValue, removeItem, removeRow, updateTotalCount)}
                   disabled={fieldValue?.statusCode === requisitionStatus.SUBSTITUTED}
                 />

@@ -154,25 +154,11 @@ const SUPPLIER_FIELDS = {
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     fields: {
-      palletName: {
-        type: LabelField,
-        label: 'react.stockMovement.packLevel1.label',
-        defaultMessage: 'Pack level 1',
-        flexWidth: '3',
-        getDynamicAttr: ({ isPalletNameEmpty }) => ({ hide: isPalletNameEmpty }),
-      },
-      boxName: {
-        type: LabelField,
-        label: 'react.stockMovement.packLevel2.label',
-        defaultMessage: 'Pack level 2',
-        flexWidth: '3',
-        getDynamicAttr: ({ isBoxNameEmpty }) => ({ hide: isBoxNameEmpty }),
-      },
       productCode: {
         type: LabelField,
         label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
-        flexWidth: '3.5',
+        fixedWidth: '100px',
       },
       product: {
         type: LabelField,
@@ -233,6 +219,23 @@ const SUPPLIER_FIELDS = {
         fixedWidth: '150px',
         label: 'react.stockMovement.quantityPickedEach.label',
         defaultMessage: 'Qty Picked (each)',
+        attributes: {
+          className: 'text-right',
+        },
+      },
+      palletName: {
+        type: LabelField,
+        label: 'react.stockMovement.packLevel1.label',
+        defaultMessage: 'Pack level 1',
+        flexWidth: '2',
+        getDynamicAttr: ({ isPalletNameEmpty }) => ({ hide: isPalletNameEmpty }),
+      },
+      boxName: {
+        type: LabelField,
+        label: 'react.stockMovement.packLevel2.label',
+        defaultMessage: 'Pack level 2',
+        flexWidth: '2',
+        getDynamicAttr: ({ isBoxNameEmpty }) => ({ hide: isBoxNameEmpty }),
       },
       'recipient.name': {
         type: LabelField,
