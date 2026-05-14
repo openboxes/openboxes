@@ -91,11 +91,15 @@ class InventoryItemController {
 
     def showCurrentStockAllLocations(StockCardCommand cmd) {
         def startTime = System.currentTimeMillis()
+        // TODO: This whole logic below should be moved to the service layer to return only POJOs used by the views
         User currentUser = User.get(session.user.id)
         Location currentLocation = Location.get(session?.warehouse?.id)
         cmd.warehouse = currentLocation
-        def commandInstance = inventoryService.getStockCardCommand(cmd, params)
-        def quantityMap = inventoryService.getCurrentStockAllLocations(commandInstance?.product, currentLocation, currentUser)
+        cmd.product = Product.get(params?.product?.id ?: params.id)
+        if (!cmd.product) {
+            throw new ProductException("Product with identifier '${params?.product?.id ?: params.id}' could not be found")
+        }
+        List<Map> quantityMap = inventoryService.getCurrentStockAllLocations(cmd.product, currentUser)
         if (params.download && quantityMap) {
             def sw = new StringWriter()
 
@@ -112,8 +116,8 @@ class InventoryItemController {
                 it.each { key, values ->
                     values.locations.each { value ->
                         csv << [
-                                code         : commandInstance?.product?.productCode,
-                                product      : commandInstance?.product?.name,
+                                code         : cmd?.product?.productCode,
+                                product      : cmd?.product?.name,
                                 locationGroup: key ?: g.message(code: 'locationGroup.empty.label'),
                                 location     : value?.location?.name,
                                 qtyOnHand    : value.quantity,
@@ -123,14 +127,14 @@ class InventoryItemController {
                 }
             }
 
-            response.setHeader("Content-disposition", "attachment; filename=\"All-Locations-${commandInstance?.product?.productCode}.csv\"")
+            response.setHeader("Content-disposition", "attachment; filename=\"All-Locations-${cmd?.product?.productCode}.csv\"")
             render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
             return
         } else {
-            def targetUri = "/inventoryItem/showStockCard/${commandInstance?.product?.id}"
+            def targetUri = "/inventoryItem/showStockCard/${cmd?.product?.id}"
             log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
 
-            render(template: "showCurrentStockAllLocations", model: [commandInstance: commandInstance, quantityMap: quantityMap, targetUri: targetUri])
+            render(template: "showCurrentStockAllLocations", model: [commandInstance: cmd, quantityMap: quantityMap, targetUri: targetUri])
         }
     }
 

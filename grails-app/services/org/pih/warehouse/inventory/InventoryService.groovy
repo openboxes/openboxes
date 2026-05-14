@@ -21,6 +21,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.localization.MessageLocalizer
@@ -2564,7 +2565,7 @@ class InventoryService implements ApplicationContextAware {
         def ids = productIds.collect { "'${it}'" }.join(",")
         def result = [:]
         if (ids) {
-            def sql = "select te from TransactionEntry as te where te.transaction.inventory.id=:inventoryId and te.inventoryItem.product.id in (:productIds)"
+            def sql = "select te from TransactionEntry as te left join fetch te.binLocation where te.transaction.inventory.id=:inventoryId and te.inventoryItem.product.id in (:productIds)"
             log.debug "SQL: " + sql
             def transactionEntries = TransactionEntry.executeQuery(sql, [inventoryId:inventory.id, productIds:productIds])
             log.debug "transactionEntries " + transactionEntries
@@ -2832,33 +2833,31 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
-    def getCurrentStockAllLocations(Product product, Location currentLocation, User currentUser) {
+    List<Map> getCurrentStockAllLocations(Product product, User currentUser) {
         log.info("Get getQuantityOnHand() for product ${product?.name} at all locations")
-        def locations = locationService.getLoginLocations(currentLocation)
-
-        locations = locations.findAll { Location location ->
-            location.inventory && location.isWarehouse() && currentUser.getEffectiveRoles(location)
+        List<Location> locations = locationService.getLoginLocationsWithEagerJoins().findAll { Location location ->
+            location.isWarehouse() && currentUser.getEffectiveRoles(location)
         }
 
-        locations = locations.collect { Location location ->
-            def quantity = getQuantityOnHand(location, product) ?: 0
-            def unitPrice = product?.pricePerUnit ?: 0
+        Map<Location, Integer> quantityByLocation =
+                productAvailabilityService.getQuantityOnHandByLocation(product, locations)
+        BigDecimal unitPrice = product?.pricePerUnit ?: 0
+
+        List<Map> rows = locations.collect { Location location ->
+            Integer quantity = quantityByLocation[location] ?: 0
             [
                     location     : location,
                     locationGroup: location?.locationGroup,
                     quantity     : quantity,
-                    value        : quantity * unitPrice
+                    value        : quantity * unitPrice,
             ]
+        }.findAll { it.quantity > 0 }
+         .sort { it.locationGroup }
+
+        Map<LocationGroup, List<Map>> rowsByLocationGroup = rows.groupBy { it.locationGroup as LocationGroup }
+        return rowsByLocationGroup.collect { LocationGroup locationGroup, List<Map> groupRows ->
+            [(locationGroup): [totalValue: groupRows.value.sum(), totalQuantity: groupRows.quantity.sum(), locations: groupRows]]
         }
-
-        locations = locations.findAll { it?.quantity > 0 }
-        locations.sort { it.locationGroup }
-
-        def quantityMap = locations.groupBy { it?.locationGroup }.collect { k, v ->
-            [(k): [totalValue: v.value.sum(), totalQuantity: v.quantity.sum(), locations: v]]
-        }
-
-        return quantityMap
     }
     /**
      * Calculate pending quantity for a given product and location.
