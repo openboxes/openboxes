@@ -12,6 +12,7 @@ import { RiDeleteBinLine, RiScissorsCutLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
+import { Tooltip } from 'react-tippy';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import ProductApi from 'api/services/ProductApi';
@@ -34,6 +35,7 @@ import TextField from 'components/form-elements/TextField';
 import ConfirmExpirationDateModal from 'components/modals/ConfirmExpirationDateModal';
 import CombinedShipmentItemsModal from 'components/stock-movement-wizard/modals/CombinedShipmentItemsModal';
 import { ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import requisitionStatus from 'consts/requisitionStatus';
 import AlertMessage from 'utils/AlertMessage';
 import apiClient from 'utils/apiClient';
 import { renderFormField, setColumnValue } from 'utils/form-utils';
@@ -44,15 +46,19 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-const handleDelete = async (fieldValue, removeItem, removeRow, updateTotalCount) => {
+const handleDelete = (fieldValue, removeItem, removeRow, updateTotalCount) => {
   if (fieldValue && fieldValue.id) {
-    removeItem(fieldValue.id);
+    removeItem(fieldValue.id).then(() => {
+      removeRow();
+      updateTotalCount(-1);
+    });
+  } else {
+    updateTotalCount(-1);
+    removeRow();
   }
-  updateTotalCount(-1);
-  removeRow();
 };
 
-const handleSplit = async (fieldValue, addRow, rowIndex, updateTotalCount) => {
+const handleSplit = (fieldValue, addRow, rowIndex, updateTotalCount) => {
   updateTotalCount(1);
   addRow({
     product: fieldValue.product,
@@ -208,14 +214,14 @@ const FIELDS = {
         },
       },
       calculatedQuantityRequested: {
-        type: TextField,
+        type: LabelField,
         label: 'react.stockMovement.quantityEach.label',
         defaultMessage: 'Quantity (each)',
         multilineHeader: true,
-        fixedWidth: '11ch',
+        fixedWidth: '9ch',
         attributes: {
           disabled: true,
-          type: 'number',
+          className: 'text-right',
         },
         getDynamicAttr: ({ rowIndex, values }) => ({
           formatValue: () => {
@@ -285,19 +291,37 @@ const FIELDS = {
           fieldValue, removeItem, removeRow, updateTotalCount, addRow, rowIndex, translate,
         }) => (
           <span className="inbound-actions">
-            <div title={translate('react.stockMovement.splitLine.label', 'Split line')} aria-label={translate('react.stockMovement.splitLine.label', 'Split line')} role="button">
-              <RiScissorsCutLine
-                className="btn-outline-success"
-                onClick={() => handleSplit(fieldValue, addRow, rowIndex, updateTotalCount)}
-                disabled={fieldValue && fieldValue.statusCode === 'SUBSTITUTED'}
-              />
+            <div aria-label={translate('react.stockMovement.splitLine.label', 'Split line')} role="button">
+              <Tooltip
+                html={(<Translate id="react.stockMovement.splitLine.label" defaultMessage="Split line" />)}
+                theme="transparent"
+                arrow="true"
+                delay="150"
+                duration="250"
+                hideDelay="50"
+              >
+                <RiScissorsCutLine
+                  className="btn-outline-success"
+                  onClick={() => handleSplit(fieldValue, addRow, rowIndex, updateTotalCount)}
+                  disabled={fieldValue?.statusCode === requisitionStatus.SUBSTITUTED}
+                />
+              </Tooltip>
             </div>
-            <div title={translate('react.default.button.delete.label', 'Delete')} aria-label={translate('react.default.button.delete.label', 'Delete')} role="button">
-              <RiDeleteBinLine
-                className="btn-outline-danger"
-                onClick={() => handleDelete(fieldValue, removeItem, removeRow, updateTotalCount)}
-                disabled={fieldValue && fieldValue.statusCode === 'SUBSTITUTED'}
-              />
+            <div aria-label={translate('react.default.button.delete.label', 'Delete')} role="button">
+              <Tooltip
+                html={(<Translate id="react.default.button.delete.label" defaultMessage="Delete" />)}
+                theme="transparent"
+                arrow="true"
+                delay="150"
+                duration="250"
+                hideDelay="50"
+              >
+                <RiDeleteBinLine
+                  className="btn-outline-danger"
+                  onClick={() => handleDelete(fieldValue, removeItem, removeRow, updateTotalCount)}
+                  disabled={fieldValue?.statusCode === requisitionStatus.SUBSTITUTED}
+                />
+              </Tooltip>
             </div>
           </span>
         ),
