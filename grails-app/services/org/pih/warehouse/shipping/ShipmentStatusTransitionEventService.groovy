@@ -12,6 +12,7 @@ package org.pih.warehouse.shipping
 import org.pih.warehouse.core.ActivityCode
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.core.RoleType
 import org.springframework.context.ApplicationListener
 
@@ -59,7 +60,7 @@ class ShipmentStatusTransitionEventService implements ApplicationListener<Shipme
             notificationService.sendShipmentItemsShippedNotification(shipment)
             // Temporarily hard-code publishing webhook events for shipped events
             webhookPublisherService.publishShippedEvent(shipment)
-            webhookPublisherService.publishOrderConfirmation(shipment.requisition, "PC")
+            webhookPublisherService.publishRequisitionEvent(shipment.requisition, WebhookEventType.PICK_COMPLETED)
         } else if (event.shipmentStatusCode in [ShipmentStatusCode.RECEIVED, ShipmentStatusCode.PARTIALLY_RECEIVED]) {
             if (originNotificationsEnabled) {
                 notificationService.sendShipmentReceiptNotification(shipment, shipment.origin, outboundReceivedRoleTypes)

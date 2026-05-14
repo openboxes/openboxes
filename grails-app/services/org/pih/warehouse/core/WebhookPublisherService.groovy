@@ -59,7 +59,7 @@ class WebhookPublisherService {
         publishEvent(payload)
     }
 
-    def publishOrderConfirmation(Requisition requisition, String comment) {
+    def publishRequisitionEvent(Requisition requisition, WebhookEventType eventType) {
         if (!requisition) {
             log.warn "Cannot publish order confirmation webhook event without a requisition"
             return
@@ -83,7 +83,7 @@ class WebhookPublisherService {
                 requisitionNumber: requisition.requestNumber,
                 requisitionType: requisition.type,
                 deliveryTypeCode: requisition.deliveryTypeCode.toString(),
-                comment: comment,
+                comment: eventType?.name,
                 triggeredBy: triggeredBy?.name,
                 lines: requisition.shipment?.shipmentItems?.collect { ShipmentItem item ->
                     [

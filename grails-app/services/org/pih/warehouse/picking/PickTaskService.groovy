@@ -12,7 +12,9 @@ import org.pih.warehouse.api.picking.SearchPickTaskCommand
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.WebhookPublisherService
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.ProductAvailabilityService
@@ -38,6 +40,7 @@ class PickTaskService {
     ProductAvailabilityService productAvailabilityService
     PicklistService picklistService
     StockMovementService stockMovementService
+    WebhookPublisherService webhookPublisherService
     RequisitionService requisitionService
 
     @Transactional(readOnly = true)
@@ -150,6 +153,7 @@ class PickTaskService {
 
     void start(PickTask task, String assigneeId) {
         executeStateTransition(task, PickTaskStatus.PICKING)
+        webhookPublisherService.publishRequisitionEvent(task.requisition, WebhookEventType.PICK_STARTED)
 
         PicklistItem existingPickItem = PicklistItem.get(task.id)
         existingPickItem.assignee = Person.get(assigneeId)
