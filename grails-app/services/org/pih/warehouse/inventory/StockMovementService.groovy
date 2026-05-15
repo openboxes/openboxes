@@ -1134,13 +1134,14 @@ class StockMovementService {
                 id: messageLocalizer.localize('default.id.label'),
                 productCode: messageLocalizer.localize('product.productCode.label'),
                 productName: messageLocalizer.localize('product.name.label'),
+                binLocation: messageLocalizer.localize('inventoryItem.binLocation.label'),
                 lotNumber: messageLocalizer.localize('inventoryItem.lotNumber.label'),
                 expirationDate: messageLocalizer.localize('inventoryItem.expirationDate.label'),
-                binLocation: messageLocalizer.localize('inventoryItem.binLocation.label'),
                 quantityShipped: messageLocalizer.localize('shipping.quantityShipped.label'),
+                unitOfMeasure: messageLocalizer.localize('product.unitOfMeasure.label'),
+                recipient: messageLocalizer.localize('shipping.recipient.label'),
                 palletName: messageLocalizer.localize('packLevel1.label'),
                 boxName: messageLocalizer.localize('packLevel2.label'),
-                recipient: messageLocalizer.localize('shipping.recipient.label'),
         ]
 
         List<PackPageItem> packPageItems = getPackPageItems(stockMovementId, null, null)
@@ -1156,14 +1157,15 @@ class StockMovementService {
                     "${csvHeadings.id}"             : shipmentItem?.id ?: "",
                     "${csvHeadings.productCode}"    : shipmentItem?.product?.productCode ?: "",
                     "${csvHeadings.productName}"    : shipmentItem?.product?.displayNameWithLocaleCode ?: "",
+                    "${csvHeadings.binLocation}"    : shipmentItem?.binLocation?.name ?: "",
                     "${csvHeadings.lotNumber}"      : shipmentItem?.lotNumber ?: "",
                     "${csvHeadings.expirationDate}" : shipmentItem?.expirationDate ?
                             shipmentItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
-                    "${csvHeadings.binLocation}"    : shipmentItem?.binLocation?.name ?: "",
                     "${csvHeadings.quantityShipped}": shipmentItem?.quantity == null ? "" : shipmentItem.quantity,
+                    "${csvHeadings.unitOfMeasure}"  : shipmentItem?.product?.unitOfMeasure ?: "",
+                    "${csvHeadings.recipient}"      : shipmentItem?.recipient?.name ?: "",
                     "${csvHeadings.palletName}"     : packPageItem?.palletName ?: "",
                     "${csvHeadings.boxName}"        : packPageItem?.boxName ?: "",
-                    "${csvHeadings.recipient}"      : shipmentItem?.recipient?.name ?: "",
             ]
         } as List<Map<String, String>>
     }
@@ -1197,13 +1199,14 @@ class StockMovementService {
                     'id',
                     'code',
                     'name',
+                    'binLocation',
                     'lotNumber',
                     'expirationDate',
-                    'binLocation',
                     'quantityShipped',
+                    'unitOfMeasure',
+                    'recipient',
                     'packLevel1',
                     'packLevel2',
-                    'recipient',
             ]
             char separatorChar = CSVUtils.getSeparator(text, fieldKeys.size())
 
