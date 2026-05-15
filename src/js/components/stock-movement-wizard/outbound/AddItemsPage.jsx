@@ -1185,29 +1185,6 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Refetch the data, all not saved changes will be lost.
-   * @public
-   */
-  refresh() {
-    confirmAlert({
-      title: this.props.translate('react.stockMovement.message.confirmRefresh.label', 'Confirm refresh'),
-      message: this.props.translate(
-        'react.stockMovement.confirmRefresh.message',
-        'Are you sure you want to refresh? Your progress since last save will be lost.',
-      ),
-      buttons: [
-        {
-          label: this.props.translate('react.default.yes.label', 'Yes'),
-          onClick: () => this.fetchAllData(),
-        },
-        {
-          label: this.props.translate('react.default.no.label', 'No'),
-        },
-      ],
-    });
-  }
-
-  /**
    * Removes chosen item from requisition's items list.
    * @param {string} itemId
    * @public
