@@ -53,12 +53,7 @@ const DELETE_BUTTON_FIELD = {
     disabled: fieldValue && fieldValue.statusCode === 'SUBSTITUTED',
   }),
   attributes: {
-    className: 'btn',
-    style: {
-      color: '#dc3545',
-      border: 'none',
-      'font-size': '1rem',
-    },
+    className: 'btn delete-icon',
   },
 };
 
