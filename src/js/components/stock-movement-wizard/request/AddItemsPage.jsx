@@ -165,13 +165,11 @@ const FIELDS = {
   },
 };
 
-const DeleteIcon = () => <RiDeleteBinLine />;
-
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
   flexWidth: '1',
   fieldKey: '',
-  buttonLabel: DeleteIcon,
+  buttonLabel: RiDeleteBinLine,
   buttonDefaultMessage: 'Delete',
   getDynamicAttr: ({
     fieldValue, removeItem, removeRow, updateTotalCount,
