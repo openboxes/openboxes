@@ -184,12 +184,7 @@ const DELETE_BUTTON_FIELD = {
     } : () => { updateTotalCount(-1); removeRow(); },
   }),
   attributes: {
-    className: 'btn mr-1',
-    style: {
-      color: '#dc3545',
-      border: 'none',
-      'font-size': '1rem',
-    },
+    className: 'btn mr-1 delete-icon',
   },
 };
 
