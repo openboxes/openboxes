@@ -32,15 +32,13 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-const DeleteIcon = () => <RiDeleteBinLine />;
-
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
   label: 'react.default.button.delete.label',
   defaultMessage: 'Delete',
   flexWidth: '0.4',
   fieldKey: '',
-  buttonLabel: DeleteIcon,
+  buttonLabel: RiDeleteBinLine,
   buttonDefaultMessage: 'Delete',
   getDynamicAttr: ({
     fieldValue, removeItem, removeRow,
