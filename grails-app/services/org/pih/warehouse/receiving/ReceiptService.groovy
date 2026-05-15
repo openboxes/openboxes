@@ -543,10 +543,9 @@ class ReceiptService {
         }
 
         if (shipment.destination.supports(ActivityCode.DYNAMIC_SLOTTING)) {
-            try {
-                backorderService.validateBackorderReferences(shipment)
-            } catch (ShipmentException e) {
-                logShipmentEvent(e)
+            List<ShipmentException> validationErrors = backorderService.validateBackorderReferences(shipment)
+            if (validationErrors) {
+                validationErrors.each { logShipmentEvent(it) }
                 return
             }
         }
@@ -573,6 +572,10 @@ class ReceiptService {
     void logShipmentEvent(ShipmentException e) {
         String message = messageSource.getMessage(e.messageCode, e.messageArgs, LocaleContextHolder.locale)
         Shipment shipment = Shipment.get(e.shipment.id)
+        if (!shipment) {
+            log.warn("Unable to log shipment event because shipment ${e.shipment?.id} could not be loaded: ${message}")
+            return
+        }
 
         boolean alreadyLogged = shipment.comments.any {
             it.type == CommentType.SYSTEM && it.comment == message

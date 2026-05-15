@@ -262,7 +262,7 @@ class Shipment implements Comparable, Serializable, Historizable {
     Set<String> getUniqueBackorderReferences() {
         return shipmentItems.findAll { it.backorderReference && !it.backorderItem }
                 .collect { it.backorderReference }
-                .toSet() as Set<String>
+                .toSet()
     }
 
     /**

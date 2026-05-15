@@ -37,6 +37,8 @@ class Comment implements Comparable, Serializable {
 
     static transients = ['type']
 
+    // Treat comments without a sender as system-generated. This is a temporary solution
+    // until we add long-term solution with materialized commentType property
     CommentType getType() {
         return sender ? CommentType.USER : CommentType.SYSTEM
     }
