@@ -302,7 +302,7 @@ const FIELDS = {
                 hideDelay="50"
               >
                 <TbArrowsSplit2
-                  style={{ color: '#28a745' }}
+                  className="split-icon"
                   onClick={() => handleSplit(fieldValue, addRow, rowIndex, updateTotalCount)}
                   disabled={fieldValue?.statusCode === requisitionStatus.SUBSTITUTED}
                 />
@@ -318,7 +318,7 @@ const FIELDS = {
                 hideDelay="50"
               >
                 <RiDeleteBinLine
-                  style={{ color: '#dc3545' }}
+                  className="delete-icon"
                   onClick={() => handleDelete(fieldValue, removeItem, removeRow, updateTotalCount)}
                   disabled={fieldValue?.statusCode === requisitionStatus.SUBSTITUTED}
                 />
