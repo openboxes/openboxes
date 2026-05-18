@@ -126,6 +126,16 @@ class StockTransferSecondPage extends Component {
       Header: <Translate id="react.stockTransfer.reasonForShortage.label" defaultMessage="Reason for Shortage" />,
       accessor: 'reasonCode',
       style: { whiteSpace: 'normal' },
+      // Cell: (props) => (
+      //   <Translate id={`enum.ReasonCode.${props.value}`} defaultMessage={props.value} />
+      // ),
+      // Cell: (props) => (
+      //   <span>
+      //     {
+      //       this.props.translate(`enum.ReasonCode.${props.value}`)
+      //     }
+      //   </span>
+      // ),
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.qtyToTransfer.label" defaultMessage="Qty to Transfer" />,

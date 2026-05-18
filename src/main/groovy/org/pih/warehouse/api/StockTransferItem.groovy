@@ -141,7 +141,7 @@ class StockTransferItem implements Validateable {
                 quantityNotPicked               : quantityNotPicked,
                 status                          : status.name(),
                 recipient                       : recipient,
-                reasonCode                      : reasonCode,
+                reasonCode                      : reasonCode?.name(),
                 splitItems                      : splitItems.sort { a, b ->
                     a.destinationBinLocation?.name <=> b.destinationBinLocation?.name ?:
                         b.quantity <=> a.quantity
