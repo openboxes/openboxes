@@ -25,7 +25,7 @@ const InboundAddItems = ({
       lineItemsArrayFields, columns,
     },
     actions: {
-      loading, addNewLine, removeAllRows, nextPage, previousPage, save, saveAndExit, refresh,
+      loading, addNewLine, removeAllRows, nextPage, previousPage, save, saveAndExit,
     },
     modal: {
       isModalOpen, modalData, modalType, handleModalResponse,
@@ -52,7 +52,6 @@ const InboundAddItems = ({
             addNewLine={addNewLine}
             importTemplate={importTemplate}
             exportTemplate={exportTemplate}
-            refresh={refresh}
             save={save}
             saveAndExit={saveAndExit}
             removeAllRows={removeAllRows}

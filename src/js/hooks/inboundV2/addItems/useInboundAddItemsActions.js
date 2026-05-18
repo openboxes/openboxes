@@ -527,14 +527,6 @@ const useInboundAddItemsActions = ({
     }
   };
 
-  const refresh = async () => {
-    confirmAction(
-      () => fetchData(),
-      'react.stockMovement.confirmRefresh.message',
-      'Are you sure you want to refresh? Your progress since last save will be lost.',
-    );
-  };
-
   useEffect(() => {
     fetchData();
   }, []);
@@ -552,7 +544,6 @@ const useInboundAddItemsActions = ({
     previousPage,
     save,
     saveAndExit,
-    refresh,
   };
 };
 
