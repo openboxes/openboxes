@@ -242,6 +242,16 @@
             color: var(--red);
             font-size: 1rem;
         }
+
+        .split-icon {
+            color: var(--green);
+            font-size: 1rem;
+        }
+
+        .inbound-actions {
+            display: flex;
+            justify-content: space-evenly;
+        }
     }
 
     .add-button {
