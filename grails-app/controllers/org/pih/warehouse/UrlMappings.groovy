@@ -318,6 +318,11 @@ class UrlMappings {
             action = [POST: "importPickListItems"]
         }
 
+        "/api/stockMovements/importPackListItems/$id"(parseRequest: true) {
+            controller = "packListApi"
+            action = [POST: "importPackListItems"]
+        }
+
         "/api/stockMovements/exportPickListItems/$id"(parseRequest: true) {
             controller = "picklist"
             action = [GET: "exportPicklistItems"]
@@ -329,7 +334,7 @@ class UrlMappings {
         }
 
         "/api/stockMovements/packlistTemplate/$id"(parseRequest: true) {
-            controller = "picklist"
+            controller = "packListApi"
             action = [GET: "exportPackTemplate"]
         }
 
@@ -382,6 +387,11 @@ class UrlMappings {
         "/api/stockMovements/packingList/template" {
             controller = "stockMovementApi"
             action = [GET: "downloadPackingListTemplate"]
+        }
+
+        "/api/stockMovements/$id/documents" {
+            controller = "stockMovementApi"
+            action = [GET: "getDocuments"]
         }
 
         "/api/picklists/$id/items" {

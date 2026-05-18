@@ -5,7 +5,6 @@ import {
   RiAddLine,
   RiCloseCircleLine,
   RiPictureInPictureExitLine,
-  RiRefreshLine,
   RiSave2Line,
   RiUpload2Line,
 } from 'react-icons/ri';
@@ -18,7 +17,6 @@ const InboundAddItemsHeader = memo(({
   addNewLine,
   importTemplate,
   exportTemplate,
-  refresh,
   save,
   saveAndExit,
   removeAllRows,
@@ -30,13 +28,6 @@ const InboundAddItemsHeader = memo(({
       StartIcon: <RiUpload2Line className="icon" />,
       defaultLabel: 'Export template',
       label: 'react.default.button.exportTemplate.label',
-      variant: 'primary-outline',
-    },
-    {
-      onClick: refresh,
-      StartIcon: <RiRefreshLine className="icon" />,
-      defaultLabel: 'Reload',
-      label: 'react.default.button.refresh.label',
       variant: 'primary-outline',
     },
     {
@@ -104,7 +95,6 @@ InboundAddItemsHeader.propTypes = {
   addNewLine: PropTypes.func.isRequired,
   importTemplate: PropTypes.func.isRequired,
   exportTemplate: PropTypes.func.isRequired,
-  refresh: PropTypes.func.isRequired,
   save: PropTypes.func.isRequired,
   saveAndExit: PropTypes.func.isRequired,
   removeAllRows: PropTypes.func.isRequired,

@@ -759,4 +759,9 @@ class StockMovementApiController {
             render status: 404
         }
     }
+
+    def getDocuments() {
+        List<Map> documents = stockMovementService.getDocuments(params.id)
+        render([data: documents] as JSON)
+    }
 }
