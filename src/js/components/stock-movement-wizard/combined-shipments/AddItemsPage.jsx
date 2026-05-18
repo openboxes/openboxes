@@ -48,12 +48,9 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const handleDelete = (fieldValue, removeItem, removeRow, updateTotalCount) => {
-  if (fieldValue && fieldValue.id) {
-    removeItem(fieldValue.id).then(() => {
-      removeRow();
-      updateTotalCount(-1);
-    });
-  } else {
+  try {
+    removeItem(fieldValue.id);
+  } finally {
     updateTotalCount(-1);
     removeRow();
   }
