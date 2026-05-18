@@ -3,16 +3,16 @@ import React, { useMemo } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { useParams, withRouter } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 import MenuItem from 'components/Layout/menu/MenuItem';
 import MenuSection from 'components/Layout/menu/MenuSection';
 import MenuSubsection from 'components/Layout/menu/MenuSubsection';
 import { checkActiveSection, getAllMenuUrls } from 'utils/menu-utils';
 
-const Menu = ({ menuConfig, location, menuSectionsUrlParts }) => {
+const Menu = ({ menuConfig, menuSectionsUrlParts }) => {
+  const location = useLocation();
   const params = useParams();
-
   const allMenuUrls = useMemo(() => getAllMenuUrls(menuConfig), [menuConfig]);
   const activeSection = useMemo(() =>
     checkActiveSection({
@@ -68,7 +68,7 @@ const mapStateToProps = (state) => ({
   menuSectionsUrlParts: state.session.menuSectionsUrlParts,
 });
 
-export default withRouter(connect(mapStateToProps)(Menu));
+export default connect(mapStateToProps)(Menu);
 
 const menuItemPropType = PropTypes.shape({
   label: PropTypes.string,
@@ -88,10 +88,6 @@ const sectionPropTypes = PropTypes.shape({
 });
 
 Menu.propTypes = {
-  location: PropTypes.shape({
-    pathname: PropTypes.string,
-    search: PropTypes.string,
-  }).isRequired,
   menuSectionsUrlParts: PropTypes.shape({
     inventory: PropTypes.arrayOf(PropTypes.string),
     products: PropTypes.arrayOf(PropTypes.string),

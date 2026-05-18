@@ -5,8 +5,8 @@ import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
 import ReactTable from 'react-table';
+import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { TableCell } from 'components/DataTable';
@@ -80,7 +80,8 @@ class PutAwayCheckPage extends Component {
     this.save = this.save.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     showLocationChangedAlert(
       this.props.translate, this.state.location, nextProps.location,
       () => { window.location = `${ORDER_URL.list()}?orderType=PUTAWAY_ORDER&status=PENDING`; },
@@ -295,7 +296,7 @@ class PutAwayCheckPage extends Component {
     return apiClient.post(url, payload)
       .then(() => {
         this.props.hideSpinner();
-        Alert.success(this.props.translate('react.putAway.alert.putAwayCompleted.label', 'Putaway was successfully completed!'), { timeout: 3000 });
+        toast.success(this.props.translate('react.putAway.alert.putAwayCompleted.label', 'Putaway was successfully completed!'), { autoClose: 3000 });
         window.location = ORDER_URL.show(this.props.initialValues.putAway.id);
       })
       .catch(() => this.props.hideSpinner());

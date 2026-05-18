@@ -1,7 +1,7 @@
 import React from 'react';
 
+// import Tippy from '@tippyjs/react';
 import PropTypes from 'prop-types';
-import { Tooltip } from 'react-tippy';
 
 import Translate from 'utils/Translate';
 
@@ -27,15 +27,15 @@ const LocationChooserButton = ({ onToggle, location, envTag }) => {
       {
         location && location.name && location.name.length > 20
           ? (
-            <Tooltip
-              html={<div className="custom-tooltip">{location.name}</div>}
-              delay="500"
-              duration="250"
-              hideDelay="50"
-              className="location-chooser__button-title"
-            >
-              { location.name }
-            </Tooltip>
+            // <Tippy
+            //   content={<div className="custom-tooltip">{location.name}</div>}
+            //   delay="500"
+            //   duration="250"
+            //   hideDelay="50"
+            //   className="location-chooser__button-title"
+            // >
+              location.name
+            // </Tippy>
           ) : (
             <span className="location-chooser__button-title">
               { location.name

@@ -1,9 +1,9 @@
 import React from 'react';
 
+// import Tippy from '@tippyjs/react';
 import PropTypes from 'prop-types';
 import { RiErrorWarningLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
-import { Tooltip } from 'react-tippy';
 
 import CustomTooltip from 'wrappers/CustomTooltip';
 
@@ -29,16 +29,16 @@ const TableCell = ({
   if (showError && errorMessage) {
     cellValue = (
       <div className="d-flex flex-row align-items-center">
-        <Tooltip
-          arrow="true"
-          delay="150"
-          duration="250"
-          hideDelay="50"
-          className="text-overflow-ellipsis"
-          html={errorMessage}
-        >
-          <RiErrorWarningLine className="mr-1" />
-        </Tooltip>
+        {/* <Tippy */}
+        {/*   arrow="true" */}
+        {/*   delay="150" */}
+        {/*   duration="250" */}
+        {/*   hideDelay="50" */}
+        {/*   className="text-overflow-ellipsis" */}
+        {/*   content={errorMessage} */}
+        {/* > */}
+        <RiErrorWarningLine className="mr-1" />
+        {/* </Tippy> */}
         {cellValue}
       </div>
     );
@@ -47,17 +47,17 @@ const TableCell = ({
   if (tooltip) {
     cellValue = (
       <div className={`d-flex ${tooltipClassname}`}>
-        <Tooltip
-          arrow="true"
-          delay="150"
-          duration="250"
-          hideDelay="50"
-          className="text-overflow-ellipsis"
-          style={tooltipForm && { width: '100%' }}
-          html={tooltipLabel || value}
-        >
-          {cellValue}
-        </Tooltip>
+        {/* <Tippy */}
+        {/*   arrow="true" */}
+        {/*   delay="150" */}
+        {/*   duration="250" */}
+        {/*   hideDelay="50" */}
+        {/*   className="text-overflow-ellipsis" */}
+        {/*   style={tooltipForm && { width: '100%' }} */}
+        {/*   content={tooltipLabel || value} */}
+        {/* > */}
+        {cellValue}
+        {/* </Tippy> */}
       </div>
     );
   }

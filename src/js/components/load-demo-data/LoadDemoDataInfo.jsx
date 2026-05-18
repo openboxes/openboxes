@@ -1,7 +1,7 @@
 import React from 'react';
 
+import parse from 'html-react-parser';
 import PropTypes from 'prop-types';
-import ReactHtmlParser from 'react-html-parser';
 
 import LOAD_DATA_STEPS from 'consts/loadDataStep';
 import Translate from 'utils/Translate';
@@ -19,7 +19,7 @@ const LoadDemoDataInfo = ({ summaryItemsTitle, summaryItemsList, goToStep }) => 
         {summaryItemsTitle}
         :
       </h5>
-      {ReactHtmlParser(summaryItemsList)}
+      {parse(summaryItemsList)}
     </div>
     <div className="d-flex justify-content-between m-3">
       <button type="button" onClick={() => goToStep(null)} className="btn btn-outline-primary">

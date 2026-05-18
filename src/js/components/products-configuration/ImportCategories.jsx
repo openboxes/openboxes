@@ -4,7 +4,7 @@ import fileDownload from 'js-file-download';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
 import DropzoneFileSelect from 'components/form-elements/v2/DropzoneFileSelect';
@@ -40,7 +40,7 @@ class ImportCategories extends Component {
     return apiClient.post(url, formData, config)
       .then(() => {
         this.props.hideSpinner();
-        Alert.success(this.props.translate('react.productsConfiguration.importSuccessful.label', 'Categories imported successfully'));
+        toast.success(this.props.translate('react.productsConfiguration.importSuccessful.label', 'Categories imported successfully'));
         this.props.nextPage({ categoriesImported: true });
       })
       .catch(() => {

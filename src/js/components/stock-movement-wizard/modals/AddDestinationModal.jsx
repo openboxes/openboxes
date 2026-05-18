@@ -6,8 +6,8 @@ import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import Modal from 'react-modal';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import Alert from 'react-s-alert';
+import withRouter from 'utils/withRouter';
+import { toast } from 'react-toastify';
 
 import {
   fetchLocationTypes, fetchTranslations, hideSpinner, showSpinner,
@@ -128,7 +128,7 @@ class AddDestinationModal extends Component {
       { useDefaultActivities: true, assignCurrentLocationGroup: true },
     )
       .then((response) => {
-        Alert.success(this.props.translate('react.stockMovement.success.createDestination.label', 'Destination was successfully created!'), { timeout: 3000 });
+        toast.success(this.props.translate('react.stockMovement.success.createDestination.label', 'Destination was successfully created!'), { timeout: 3000 });
         return response.data.data;
       })
       .then((destination) => {

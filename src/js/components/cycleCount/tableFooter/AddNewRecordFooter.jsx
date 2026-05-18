@@ -1,9 +1,9 @@
 import React from 'react';
 
+// import Tippy from '@tippyjs/react';
 import PropTypes from 'prop-types';
 import { RiAddCircleLine } from 'react-icons/all';
 import { useDispatch } from 'react-redux';
-import { Tooltip } from 'react-tippy';
 
 import { addEmptyRow } from 'actions';
 import Button from 'components/form-elements/Button';
@@ -23,14 +23,14 @@ const AddNewRecordFooter = ({ cycleCountId, isStepEditable, isFormDisabled }) =>
       <div
         className="ml-4 mb-3 d-flex"
       >
-        <Tooltip
-          className="d-flex align-items-center"
-          html={(
-            <span className="p-1">
-              {translate('react.cycleCount.addNewRecord.tooltip', 'Use this button to change lot number or bin location.')}
-            </span>
-          )}
-        >
+        {/* <Tippy */}
+        {/*   className="d-flex align-items-center" */}
+        {/*   content={( */}
+        {/*     <span className="p-1"> */}
+        {/*       {translate('react.cycleCount.addNewRecord.tooltip', 'Use this button to change lot number or bin location.')} */}
+        {/*     </span> */}
+        {/*   )} */}
+        {/* > */}
           <Button
             onClick={handleAddEmptyRow}
             label="react.cycleCount.addNewRecord.label"
@@ -39,7 +39,7 @@ const AddNewRecordFooter = ({ cycleCountId, isStepEditable, isFormDisabled }) =>
             StartIcon={<RiAddCircleLine size={18} />}
             disabled={isFormDisabled}
           />
-        </Tooltip>
+        {/* </Tippy> */}
       </div>
     )
   );

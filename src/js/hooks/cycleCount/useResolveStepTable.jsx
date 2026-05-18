@@ -5,10 +5,10 @@ import React, {
 } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
+// import Tippy from '@tippyjs/react';
 import _ from 'lodash';
 import { RiChat3Line, RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
-import { Tooltip } from 'react-tippy';
 import { getLotNumbersByProductId } from 'selectors';
 
 import { fetchReasonCodes } from 'actions';
@@ -551,19 +551,19 @@ const useResolveStepTable = ({
         <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
           {quantityCounted ?? <ValueIndicator variant={valueIndicatorVariant.EMPTY} />}
           {commentFromCount && (
-            <Tooltip
-              arrow="true"
-              delay="150"
-              duration="250"
-              hideDelay="50"
-              html={<span className="p-2">{commentFromCount}</span>}
-            >
+            // <Tippy
+            //   arrow="true"
+            //   delay="150"
+            //   duration="250"
+            //   hideDelay="50"
+            //   content={<span className="p-2">{commentFromCount}</span>}
+            // >
               <RiChat3Line
                 role="button"
                 size={16}
                 className="ml-2"
               />
-            </Tooltip>
+            // </Tippy>
           )}
         </TableCell>
       ), []),
@@ -663,18 +663,18 @@ const useResolveStepTable = ({
       header: useMemo(() => <TableHeaderCell />, []),
       cell: useCallback(({ row: { original } }) => (
         <TableCell className="rt-td d-flex justify-content-center count-step-actions">
-          <Tooltip
-            arrow="true"
-            delay="150"
-            duration="250"
-            hideDelay="50"
-            className="text-overflow-ellipsis"
-            html={(
-              <span className="p-2">
-                {translate('react.default.button.delete.label', 'Delete')}
-              </span>
-            )}
-          >
+          {/* <Tippy */}
+          {/*   arrow="true" */}
+          {/*   delay="150" */}
+          {/*   duration="250" */}
+          {/*   hideDelay="50" */}
+          {/*   className="text-overflow-ellipsis" */}
+          {/*   content={( */}
+          {/*     <span className="p-2"> */}
+          {/*       {translate('react.default.button.delete.label', 'Delete')} */}
+          {/*     </span> */}
+          {/*   )} */}
+          {/* > */}
             {(original.id.includes(NEW_ROW) || original.custom) && (
               <RiDeleteBinLine
                 className={isFormDisabled ? 'disabled-icon' : 'cursor-pointer'}
@@ -682,7 +682,7 @@ const useResolveStepTable = ({
                 size={22}
               />
             )}
-          </Tooltip>
+          {/* </Tippy> */}
         </TableCell>
       ), [isFormDisabled]),
       meta: {

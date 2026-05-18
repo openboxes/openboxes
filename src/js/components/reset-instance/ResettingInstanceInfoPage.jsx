@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router-dom';
+import withRouter from 'utils/withRouter';
 
 import { DASHBOARD_URL } from 'consts/applicationUrls';
 import useTranslation from 'hooks/useTranslation';

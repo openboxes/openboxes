@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import { useDispatch, useSelector } from 'react-redux';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
 import stockTransferApi from 'api/services/StockTransferApi';
@@ -61,7 +61,7 @@ const useStockTransferListTableData = (filterParams) => {
       const { status } = await stockTransferApi.deleteStockTransfer(id);
       if (status === 204) {
         const successMessage = translate('react.stockTransfer.delete.success.label', 'Stock transfer has been deleted successfully');
-        Alert.success(successMessage);
+        toast.success(successMessage);
       }
     } finally {
       dispatch(hideSpinner());

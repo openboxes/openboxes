@@ -173,7 +173,8 @@ class ReplenishmentSecondPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.replenishmentTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchReplenishment();

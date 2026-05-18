@@ -5,8 +5,8 @@ import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
 import ReactTable from 'react-table';
+import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { TableCell } from 'components/DataTable';
@@ -58,7 +58,8 @@ class StockTransferSecondPage extends Component {
     this.fetchStockTransfer();
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.stockTransferTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
     }
@@ -188,7 +189,7 @@ class StockTransferSecondPage extends Component {
     return apiClient.put(url, flattenRequest(payload))
       .then(() => {
         this.props.hideSpinner();
-        Alert.success(this.props.translate('react.stockTransfer.alert.stockTransferCompleted.label', 'Stock transfer was successfully completed!'), { timeout: 3000 });
+        toast.success(this.props.translate('react.stockTransfer.alert.stockTransferCompleted.label', 'Stock transfer was successfully completed!'), { timeout: 3000 });
         window.location = STOCK_TRANSFER_URL.show(this.state.stockTransfer.id);
       })
       .catch(() => this.props.hideSpinner());

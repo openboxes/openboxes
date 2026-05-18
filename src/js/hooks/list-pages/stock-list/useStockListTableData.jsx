@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import { useDispatch, useSelector } from 'react-redux';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
 import stockListApi from 'api/services/StockListApi';
@@ -76,7 +76,7 @@ const useStockListTableData = (filterParams) => {
     try {
       const { status } = await stockListApi.deleteStockList(id);
       if (status === 204) {
-        Alert.success(translate(
+        toast(translate(
           'react.stocklists.delete.success.label',
           'Stock List has been deleted successfully',
         ));
@@ -113,7 +113,7 @@ const useStockListTableData = (filterParams) => {
     try {
       const { status } = await stockListApi.clearStockList(id);
       if (status === 200) {
-        Alert.success(translate(
+        toast(translate(
           'react.stocklists.clear.success.label',
           'Stock List has been cleared Stock List has been cloned successfully',
         ));
@@ -150,7 +150,7 @@ const useStockListTableData = (filterParams) => {
     try {
       const { status } = await stockListApi.cloneStockList(id);
       if (status === 200) {
-        Alert.success(translate(
+        toast(translate(
           'react.stocklists.clone.success.label',
           'Stock List has been cloned successfully',
         ));
@@ -166,7 +166,7 @@ const useStockListTableData = (filterParams) => {
     try {
       const { status } = await stockListApi.publishStockList(id);
       if (status === 200) {
-        Alert.success(translate(
+        toast(translate(
           'react.stocklists.publish.success.label',
           'Stock List has been published successfully',
         ));
@@ -182,7 +182,7 @@ const useStockListTableData = (filterParams) => {
     try {
       const { status } = await stockListApi.unpublishStockList(id);
       if (status === 200) {
-        Alert.success(translate(
+        toast(translate(
           'react.stocklists.unpublish.success.label',
           'Stock List has been unpublished successfully',
         ));

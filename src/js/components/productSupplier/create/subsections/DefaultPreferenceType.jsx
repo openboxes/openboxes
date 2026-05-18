@@ -1,10 +1,10 @@
 import React from 'react';
 
+// import Tippy from '@tippyjs/react';
 import PropTypes from 'prop-types';
 import { Controller, useWatch } from 'react-hook-form';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
-import { Tooltip } from 'react-tippy';
 
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
@@ -161,22 +161,22 @@ const DefaultPreferenceType = ({
           />
         </div>
         <div className="p-2 d-flex align-items-center">
-          <Tooltip
-            className="d-flex align-items-center"
-            html={(
-              <span className="p-1">
-                <Translate
-                  id="react.productSupplier.form.deleteGlobalPreference"
-                  defaultMessage="Delete global preference"
-                />
-              </span>
-            )}
-          >
+          {/* <Tippy */}
+          {/*   className="d-flex align-items-center" */}
+          {/*   content={( */}
+          {/*     <span className="p-1"> */}
+          {/*       <Translate */}
+          {/*         id="react.productSupplier.form.deleteGlobalPreference" */}
+          {/*         defaultMessage="Delete global preference" */}
+          {/*       /> */}
+          {/*     </span> */}
+          {/*   )} */}
+          {/* > */}
             <RiDeleteBinLine
               onClick={() => !isPreferenceTypeEmpty && openConfirmationModal()}
               className={`preference-type-bin ${isPreferenceTypeEmpty ? 'disabled' : 'active'}`}
             />
-          </Tooltip>
+          {/* </Tippy> */}
         </div>
       </div>
     </Subsection>

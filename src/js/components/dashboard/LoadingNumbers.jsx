@@ -2,21 +2,19 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import ReactLoading from 'react-loading';
-
-import { getRandomColor } from 'consts/dataFormat/colorMapping';
 
 const LoadingNumbers = ({ numberOfLoadingCards }) => {
   const loadingNumbers = [];
   for (let i = 0; i < numberOfLoadingCards; i += 1) {
     loadingNumbers.push(<div className="number-card" key={i}>
       <div className="loader-div">
-        <ReactLoading
-          type="bubbles"
-          color={getRandomColor()}
-          height="100px"
-          width="100px"
-        />
+        <div style={{
+          textAlign: 'center',
+          padding: '50px',
+        }}
+        >
+          Loading...
+        </div>
       </div>
     </div>);
   }
