@@ -16,6 +16,7 @@ import groovy.xml.Namespace
 import java.time.Instant
 
 import org.pih.warehouse.core.date.DateParser
+import org.pih.warehouse.core.parser.StringParser
 import org.pih.warehouse.importer.CSVUtils
 import java.sql.Timestamp
 import org.apache.commons.lang.StringUtils
@@ -633,29 +634,19 @@ class ProductService {
     }
 
     /**
-     * Import products from csv
+     * Validates a CSV string of products to be imported and binds it to a List of Map of values.
      *
-     * ID,Name,Category,Description,Product Code,Unit of Measure,Manufacturer,Manufacturer Code,Cold Chain,UPC,NDC,Date Created,Date Updated
-     *
-     * @param csv
+     * @param csv The CSV string to import
+     * @param createCategoriesIfNotFound If true, will create the product categories if they do not yet exist
      */
-    List validateProducts(String csv) {
-        return validateProducts(csv, getDelimiter(csv))
-    }
+    List validateProducts(String csv, boolean createCategoriesIfNotFound=false) {
 
-    /**
-     *
-     * @param csv
-     * @param delimiter
-     * @param saveToDatabase
-     * @return
-     */
-    List validateProducts(String csv, String delimiter) {
-
-        def products = []
+        List<Map> products = []
         if (!csv) {
             throw new RuntimeException("CSV cannot be empty")
         }
+
+        String delimiter = getDelimiter(csv)
 
         // Check to make sure the format is comma-separated
         def lines = csv.split("\n")
@@ -777,9 +768,31 @@ class ProductService {
             products << productProperties
         }
 
+        // Bulk fetch (and optionally create) the product categories, then rebind them to each of the products (which
+        // currently only reference the category name). Ideally this would be done in a dedicated data binding step,
+        // but this logic will be simplified when we refactor to use the new importer flow, so this is fine for now.
+        CategoriesBySanitizedName categories = findCategoriesByNameSanitized(
+                products.category as List<String>, createCategoriesIfNotFound)
+        for (int i = 0; i < products.size(); i++) {
+            Map product = products[i]
+            String categoryName = product.category as String
+
+            // If the product wasn't assigned a category, assign it the root category.
+            if (StringUtils.isBlank(categoryName)) {
+                product.category = Category.getRootCategory()
+                continue
+            }
+
+            Category category = categories.get(categoryName)
+            if (!category) {
+                // +2 because of the header row and we want to list it as 1-indexed
+                throw new RuntimeException("Category ${categoryName} does not exist at row ${i + 2}")
+            }
+            product.category = category
+        }
+
         return products
     }
-
 
     def importProducts(products) {
         return importProducts(products, null)
@@ -794,11 +807,8 @@ class ProductService {
     List<Product> importProducts(List<Map<String, Object>> products, List<String> tagNamesForAllProducts) {
         log.info("Importing products " + products + " tags: " + tagNamesForAllProducts)
 
-        // The imported categories and tags are just names at this point. Get or create the actual entities now
+        // The imported tags are just names at this point. Get or create the actual entities now
         // so that we can assign them to the products in the below loop.
-        List<String> allCategoryNames = products.category as List<String>
-        CategoriesByDesensitizedName importedCategories = findOrCreateCategoriesAsMap(allCategoryNames)
-
         List<String> allTagNames = products.tags.flatten() as List<String>
         if (tagNamesForAllProducts) {
             allTagNames.addAll(tagNamesForAllProducts)
@@ -808,12 +818,6 @@ class ProductService {
         List<Product> importedProducts = []
         products.each { productProperties ->
             log.info "Import product code = " + productProperties.productCode + ", name = " + productProperties.name
-
-            // The product category is still just a name at this point so assign the product a proper Category instance
-            // now that they've been created. If the product wasn't assigned a category, assign it the root category.
-            productProperties.category = productProperties.category ?
-                    importedCategories.get((productProperties.category as String)) :
-                    Category.getRootCategory()
 
             // Assign both the product-specific tags and the globally defined tags to the product.
             List<String> tagNames = []
@@ -933,16 +937,16 @@ class ProductService {
     }
 
     /**
-     * A map of Category keyed on the "desensitized" (ie trimmed and lower-cased) category name.
+     * A map of Category keyed on the sanitized (ie trimmed and lower-cased) category name.
      *
-     * We desensitize the name because we want to treat names like "NAME" and "name  " as equivalent, which is useful
+     * We sanitize the name because we want to treat names like "NAME" and "name  " as equivalent, which is useful
      * when importing data since user input errors are common. In other scenarios this equivalency might not be useful
      * (we might want to treat "name" and "NAME" as different), so make sure to be intentional when using this class.
      */
-    private class CategoriesByDesensitizedName {
-        Map<String, Category> categoryByDesensitizedName = [:]
+    private class CategoriesBySanitizedName {
+        Map<String, Category> categoryBySanitizedName = [:]
 
-        CategoriesByDesensitizedName(List<Category> categories) {
+        CategoriesBySanitizedName(List<Category> categories) {
             putAll(categories)
         }
 
@@ -951,46 +955,42 @@ class ProductService {
         }
 
         Category put(Category category) {
-            String desensitizedName = desensitizeName(category.name)
-            return categoryByDesensitizedName.put(desensitizedName, category)
+            String sanitizedName = sanitizeName(category.name)
+            return categoryBySanitizedName.put(sanitizedName, category)
         }
 
         Category get(String categoryName) {
-            String desensitizedName = desensitizeName(categoryName)
-            return categoryByDesensitizedName.get(desensitizedName)
+            String sanitizedName = sanitizeName(categoryName)
+            return categoryBySanitizedName.get(sanitizedName)
         }
 
-        private String desensitizeName(String categoryName) {
-            if (StringUtils.isBlank(categoryName)) {
-                return categoryName
-            }
-            return categoryName.trim().toLowerCase()
+        private String sanitizeName(String categoryName) {
+            return StringParser.parseString(categoryName)?.toLowerCase()
         }
     }
 
     /**
-     * Find or create a list of categories with the given names as a map keyed on "desensitized" (ie trimmed
-     * and lower-cased) category name. Nulls, duplicates, and whitespace will be ignored.
+     * Find a list of categories with the given names. Ignores case and whitespace when comparing categories.
+     *
+     * @param categoryNames The categories to fetch
+     * @param createIfNotFound If true, will create the categories if they do not yet exist.
      */
-    private CategoriesByDesensitizedName findOrCreateCategoriesAsMap(List<String> categoryNames) {
-        return new CategoriesByDesensitizedName(findOrCreateCategories(categoryNames))
-    }
+    private CategoriesBySanitizedName findCategoriesByNameSanitized(
+            List<String> categoryNames, boolean createIfNotFound=false) {
 
-    /**
-     * Find or create a list of categories with the given names. Nulls, duplicates, and whitespace will be ignored.
-     */
-    private List<Category> findOrCreateCategories(List<String> categoryNames) {
         List<String> categoryNamesSanitized = removeBlanksAndDuplicates(categoryNames)
         if (!categoryNamesSanitized) {
-            return Collections.emptyList()
+            return new CategoriesBySanitizedName([])
         }
 
         List<Category> categories = []
         for (categoryName in categoryNamesSanitized) {
-            Category category = findOrCreateCategory(categoryName)
-            categories.add(category)
+            Category category = createIfNotFound ? findOrCreateCategory(categoryName) : findCategory(categoryName)
+            if (category) {
+                categories.add(category)
+            }
         }
-        return categories
+        return new CategoriesBySanitizedName(categories)
     }
 
     private static List<String> removeBlanksAndDuplicates(List<String> strings){
@@ -1003,11 +1003,15 @@ class ProductService {
                 .unique()
     }
 
+    private Category findCategory(String categoryName) {
+        return Category.findByName(categoryName)
+    }
+
     /**
      * Find or create a category with the given name. If the category doesn't exist, its parent category will be root.
      */
     private Category findOrCreateCategory(String categoryName) {
-        Category category = Category.findByName(categoryName)
+        Category category = findCategory(categoryName)
         if (category) {
             return category
         }
@@ -1508,7 +1512,7 @@ class ProductService {
             def fileContent = new URL(productOptionConfig.fileUrl).getBytes()
             String csv = new String(fileContent)
 
-            def products = validateProducts(csv)
+            def products = validateProducts(csv, true)
 
             importProducts(products)
         }

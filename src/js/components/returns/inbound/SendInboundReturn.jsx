@@ -116,6 +116,7 @@ const SHIPMENT_FIELDS = {
 const FIELDS = {
   stockTransferItems: {
     type: ArrayField,
+    overflowStyle: 'auto',
     getDynamicRowAttr: ({ rowValues, translate }) => {
       let className = '';
       let tooltip = '';
@@ -134,15 +135,15 @@ const FIELDS = {
     fields: {
       'product.productCode': {
         type: LabelField,
-        label: 'react.stockMovement.productCode.label',
+        label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
-        flexWidth: '1',
+        fixedWidth: '7ch',
       },
       product: {
         type: LabelField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
-        flexWidth: '2',
+        flexWidth: '4',
         headerAlign: 'left',
         getDynamicAttr: ({ fieldValue }) => ({
           tooltipValue: fieldValue?.name,
@@ -163,7 +164,7 @@ const FIELDS = {
         type: LabelField,
         label: 'react.inboundReturn.expiry.label',
         defaultMessage: 'Expiry',
-        flexWidth: '1',
+        fixedWidth: '11ch',
         getDynamicAttr: ({ formatLocalizedDate }) => ({
           formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
         }),

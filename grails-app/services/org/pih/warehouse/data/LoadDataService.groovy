@@ -116,7 +116,7 @@ class LoadDataService {
         InputStream csvStream = csvURL.newInputStream()
         String csv = new String(csvStream.getBytes())
 
-        def products = productService.validateProducts(csv)
+        def products = productService.validateProducts(csv, true)
         productService.importProducts(products)
         csvStream.close()
     }

@@ -26,10 +26,13 @@ export const STOCK_MOVEMENT_REMOVE_ALL_ITEMS = (id) => `${STOCK_MOVEMENT_BY_ID(i
 export const STOCK_MOVEMENT_STATUS = (id) => `${STOCK_MOVEMENT_BY_ID(id)}/status`;
 export const PICKLIST_ITEMS_EXPORT = (id) => `${STOCK_MOVEMENT_API}/exportPickListItems/${id}`;
 export const PICKLIST_TEMPLATE_EXPORT = (id) => `${STOCK_MOVEMENT_API}/picklistTemplate/${id}`;
+export const PACKLIST_TEMPLATE_EXPORT = (id) => `${STOCK_MOVEMENT_API}/packlistTemplate/${id}`;
 export const PICKLIST_IMPORT = (id) => `${STOCK_MOVEMENT_API}/importPickListItems/${id}`;
+export const PACKLIST_IMPORT = (id) => `${STOCK_MOVEMENT_API}/importPackListItems/${id}`;
 export const PACKING_LIST_TEMPLATE = `${STOCK_MOVEMENT_API}/packingList/template`;
 export const STOCK_MOVEMENT_UPDATE_SHIPMENT = (id) => `${STOCK_MOVEMENT_BY_ID(id)}/updateShipment`;
 export const STOCK_MOVEMENT_UPLOAD_DOCUMENTS = (id) => `${STOCK_MOVEMENT_BY_ID(id)}/uploadDocuments`;
+export const STOCK_MOVEMENT_DOCUMENTS = (id) => `${STOCK_MOVEMENT_BY_ID(id)}/documents`;
 
 // STOCK MOVEMENT ITEMS
 export const STOCK_MOVEMENT_ITEM_API = `${API}/stockMovementItems`;

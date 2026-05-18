@@ -1,6 +1,5 @@
 package spring
 
-import org.pih.warehouse.product.ProductValidator
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.core.Ordered
 
@@ -18,5 +17,4 @@ beans = {
         urlPatterns = ['/*']
         order = Ordered.HIGHEST_PRECEDENCE + 1
     }
-    productValidator(ProductValidator)
 }

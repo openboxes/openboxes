@@ -21,6 +21,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.localization.MessageLocalizer
@@ -38,8 +39,10 @@ import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
+import org.springframework.context.annotation.Lazy
 import org.springframework.validation.Errors
 
 import java.sql.Timestamp
@@ -51,7 +54,13 @@ class InventoryService implements ApplicationContextAware {
 
     def sessionFactory
     def persistenceInterceptor
+
+    // DataServices compile before the Spring context is initialized, so we lazy load them to avoid null pointers
+    // when one exists down the chain from a Spring component (even when there's a Grails component in between).
+    @Autowired
+    @Lazy
     TransactionEntryDataService transactionEntryDataService
+
     RecordStockProductInventoryTransactionService recordStockProductInventoryTransactionService
     ProductAvailabilityService productAvailabilityService
     ConfigService configService
@@ -1217,13 +1226,6 @@ class InventoryService implements ApplicationContextAware {
         return quantityMap
     }
 
-    /**
-     * Fetches and populates a StockCard Command object
-     *
-     * @param cmd
-     * @param params
-     * @return
-     */
     StockCardCommand getStockCardCommand(StockCardCommand cmd, Map params) {
         // Get basic details required for the whole page
         cmd.product = Product.get(params?.product?.id ?: params.id)  // check product.id and id
@@ -1243,7 +1245,7 @@ class InventoryService implements ApplicationContextAware {
         cmd.totalQuantity = getQuantityOnHand(cmd.warehouse, cmd.product)
 
         // Get transaction log for a particular product within an inventory
-        cmd.transactionEntryList = getTransactionEntriesByInventoryAndProduct(cmd.inventory, [cmd.product])
+        cmd.transactionEntryList = getTransactionEntriesByInventoryAndProductForStockHistory(cmd.inventory, [cmd.product])
         cmd.transactionEntriesByInventoryItemMap = cmd.transactionEntryList.groupBy {
             it.inventoryItem
         }
@@ -1823,13 +1825,40 @@ class InventoryService implements ApplicationContextAware {
         return transactionEntries
     }
 
+    List<TransactionEntry> getTransactionEntriesByInventoryAndProductForStockHistory(Inventory inventory, List<Product> products) {
+        List<TransactionEntry> transactionEntries = TransactionEntry.createCriteria().list {
+            createAlias("inventoryItem", "ii", JoinType.INNER_JOIN)
+            inList("ii.product", products)
+
+            // Those aliases FETCH JOIN the associations further used by the view,
+            // so that we don't have n+1 queries when rendering the stock history page
+            createAlias("transaction", "t", JoinType.INNER_JOIN)
+            createAlias("t.createdBy", "createdBy", JoinType.INNER_JOIN)
+            createAlias("t.source", "source", JoinType.LEFT_OUTER_JOIN)
+            createAlias("t.transactionType", "transactionType", JoinType.INNER_JOIN)
+            createAlias("t.destination", "destination", JoinType.LEFT_OUTER_JOIN)
+            createAlias("binLocation", "binLocation", JoinType.LEFT_OUTER_JOIN)
+            createAlias("binLocation.zone", "zone", JoinType.LEFT_OUTER_JOIN)
+
+            createAlias("t.incomingShipment", "incShipment", JoinType.LEFT_OUTER_JOIN)
+            createAlias("t.outgoingShipment", "outShipment", JoinType.LEFT_OUTER_JOIN)
+
+
+            eq("t.inventory", inventory)
+            order("t.transactionDate", "asc")
+            order("t.dateCreated", "asc")
+        } as List<TransactionEntry>
+
+        return transactionEntries
+    }
+
     /**
      * Get all transaction entries over list of products/inventory items.
      *
      * @param inventoryInstance
      * @return
      */
-    List getTransactionEntriesByInventoryAndProduct(Inventory inventory, List<Product> products) {
+    List<TransactionEntry> getTransactionEntriesByInventoryAndProduct(Inventory inventory, List<Product> products) {
         def criteria = TransactionEntry.createCriteria()
         def transactionEntries = criteria.list {
             transaction {
@@ -2536,7 +2565,7 @@ class InventoryService implements ApplicationContextAware {
         def ids = productIds.collect { "'${it}'" }.join(",")
         def result = [:]
         if (ids) {
-            def sql = "select te from TransactionEntry as te where te.transaction.inventory.id=:inventoryId and te.inventoryItem.product.id in (:productIds)"
+            def sql = "select te from TransactionEntry as te left join fetch te.binLocation where te.transaction.inventory.id=:inventoryId and te.inventoryItem.product.id in (:productIds)"
             log.debug "SQL: " + sql
             def transactionEntries = TransactionEntry.executeQuery(sql, [inventoryId:inventory.id, productIds:productIds])
             log.debug "transactionEntries " + transactionEntries
@@ -2804,33 +2833,31 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
-    def getCurrentStockAllLocations(Product product, Location currentLocation, User currentUser) {
+    List<Map> getCurrentStockAllLocations(Product product, User currentUser) {
         log.info("Get getQuantityOnHand() for product ${product?.name} at all locations")
-        def locations = locationService.getLoginLocations(currentLocation)
-
-        locations = locations.findAll { Location location ->
-            location.inventory && location.isWarehouse() && currentUser.getEffectiveRoles(location)
+        List<Location> locations = locationService.getLoginLocationsWithEagerJoins().findAll { Location location ->
+            location.isWarehouse() && currentUser.getEffectiveRoles(location)
         }
 
-        locations = locations.collect { Location location ->
-            def quantity = getQuantityOnHand(location, product) ?: 0
-            def unitPrice = product?.pricePerUnit ?: 0
+        Map<Location, Integer> quantityByLocation =
+                productAvailabilityService.getQuantityOnHandByLocation(product, locations)
+        BigDecimal unitPrice = product?.pricePerUnit ?: 0
+
+        List<Map> rows = locations.collect { Location location ->
+            Integer quantity = quantityByLocation[location] ?: 0
             [
                     location     : location,
                     locationGroup: location?.locationGroup,
                     quantity     : quantity,
-                    value        : quantity * unitPrice
+                    value        : quantity * unitPrice,
             ]
+        }.findAll { it.quantity > 0 }
+         .sort { it.locationGroup }
+
+        Map<LocationGroup, List<Map>> rowsByLocationGroup = rows.groupBy { it.locationGroup as LocationGroup }
+        return rowsByLocationGroup.collect { LocationGroup locationGroup, List<Map> groupRows ->
+            [(locationGroup): [totalValue: groupRows.value.sum(), totalQuantity: groupRows.quantity.sum(), locations: groupRows]]
         }
-
-        locations = locations.findAll { it?.quantity > 0 }
-        locations.sort { it.locationGroup }
-
-        def quantityMap = locations.groupBy { it?.locationGroup }.collect { k, v ->
-            [(k): [totalValue: v.value.sum(), totalQuantity: v.quantity.sum(), locations: v]]
-        }
-
-        return quantityMap
     }
     /**
      * Calculate pending quantity for a given product and location.
