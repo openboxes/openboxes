@@ -1,13 +1,15 @@
 package org.pih.warehouse.core.event
 
-import org.pih.warehouse.core.Event
+import org.springframework.stereotype.Component
+
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventType
 
 /**
- * Manages the lifecycle (creating and rolling back) of an {@link Event}.
+ * Manages the lifecycle (creating and rolling back) of an {@link EventType}.
  */
-abstract class EventManager {
+@Component
+class EventTypeManager {
 
     /**
      * Fetches the event type associated with the given code, creating one if it does not exist yet.

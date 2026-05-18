@@ -76,7 +76,7 @@ class ShipmentHistoryProvider extends EventLogHistoryProvider<Shipment> {
                         name: messageLocalizer.localizeEnumValue(EventCode.CREATED),
                         eventCode: EventCode.CREATED,
                 ),
-                referenceDocument: source.getReferenceDocument(),
+                referenceDocument: source.referenceDocument,
                 createdBy: source.createdBy,
         )
     }

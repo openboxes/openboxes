@@ -24,6 +24,6 @@ abstract class HistoryProvider<T extends Historizable> {
 
     private List<HistoryItem> limitHistory(List<HistoryItem> historyItems, HistoryContext context) {
         // Assumes the history items have been sorted oldest to newest.
-        return context.limit ? historyItems.takeRight(context.limit) : historyItems
+        return context.limit != null && context.limit >= 0 ? historyItems.takeRight(context.limit) : historyItems
     }
 }

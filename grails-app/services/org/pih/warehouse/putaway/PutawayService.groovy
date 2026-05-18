@@ -44,7 +44,7 @@ class PutawayService {
     GrailsApplication grailsApplication
     OrderEventManager orderEventManager
 
-    @Value('${openboxes.receiving.createReceivingLocation.enabled}')
+    @Value('${openboxes.receiving.createReceivingLocation.enabled:true}')
     Boolean dynamicReceivingBinsEnabled
 
     def getPutawayCandidates(Location location) {

@@ -8,18 +8,21 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventType
-import org.pih.warehouse.core.event.EventManager
+import org.pih.warehouse.core.event.EventTypeManager
 
 /**
  * Manages the lifecycle (creating and rolling back) of an Order related {@link Event}.
  */
 @Component
-class OrderEventManager extends EventManager {
+class OrderEventManager {
 
     final OrderEventLogger orderEventLogger
+    final EventTypeManager eventTypeManager
 
-    OrderEventManager(final OrderEventLogger orderEventLogger) {
+    OrderEventManager(final OrderEventLogger orderEventLogger,
+                      final EventTypeManager eventTypeManager) {
         this.orderEventLogger = orderEventLogger
+        this.eventTypeManager = eventTypeManager
     }
 
     private Event createEvent(Order order, Event event) {
@@ -37,7 +40,7 @@ class OrderEventManager extends EventManager {
      * Create a new event representing the putaway of an order, then logs the action.
      */
     Event createPutawayEvent(Order order, Putaway putaway, EventCode eventCode) {
-        EventType eventType = getOrCreateEventType(eventCode)
+        EventType eventType = eventTypeManager.getOrCreateEventType(eventCode)
         Event event = new Event(
                 eventDate: putaway.putawayDate ?: new Date(),
                 eventType: eventType,

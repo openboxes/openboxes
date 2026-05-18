@@ -1783,12 +1783,11 @@ class StockMovementService {
     }
 
     /**
-     * Returns a chronological history of the events that have occurred on a stock movement.
+     * Returns the full, chronological history of the events that have occurred on a stock movement.
      */
     List<HistoryItem> getHistory(StockMovement stockMovement) {
         HistoryContext context = new HistoryContext(
                 includeRolledBackEvents: true,
-                limit: null, // Fetch the full history
         )
         return stockMovementHistoryProvider.getHistory(stockMovement, context)
     }

@@ -1,7 +1,6 @@
 package org.pih.warehouse.shipping
 
 import grails.validation.ValidationException
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 import org.pih.warehouse.auth.AuthService
@@ -9,16 +8,22 @@ import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.event.EventManager
+import org.pih.warehouse.core.event.EventTypeManager
 
 /**
  * Manages the lifecycle (creating and rolling back) of a Shipment related {@link Event}.
  */
 @Component
-class ShipmentEventManager extends EventManager {
+class ShipmentEventManager {
 
-    @Autowired
-    ShipmentEventLogger shipmentEventLogger
+    final ShipmentEventLogger shipmentEventLogger
+    final EventTypeManager eventTypeManager
+
+    ShipmentEventManager(final ShipmentEventLogger shipmentEventLogger,
+                         final EventTypeManager eventTypeManager) {
+        this.shipmentEventLogger = shipmentEventLogger
+        this.eventTypeManager = eventTypeManager
+    }
 
     /**
      * Create a new Shipment event representing some state change to the shipment, then logs the action.
@@ -38,7 +43,7 @@ class ShipmentEventManager extends EventManager {
      * Create a new Shipment Event representing some state change to the shipment, then logs the action.
      */
     Event createEvent(Shipment shipment, Date eventDate, EventCode eventCode, Location location) {
-        EventType eventType = getOrCreateEventType(eventCode)
+        EventType eventType = eventTypeManager.getOrCreateEventType(eventCode)
         Event event = new Event(
                 eventDate: eventDate,
                 eventType: eventType,

@@ -223,12 +223,11 @@ class OutboundStockMovementService {
     }
 
     /**
-     * Returns a chronological history of the events that have occurred on an outbound stock movement.
+     * Returns the full, chronological history of the events that have occurred on an outbound stock movement.
      */
     List<HistoryItem> getHistory(OutboundStockMovement stockMovement) {
         HistoryContext context = new HistoryContext(
                 includeRolledBackEvents: true,
-                limit: null, // Fetch the full history
         )
         return outboundHistoryProvider.getHistory(stockMovement, context)
     }

@@ -46,7 +46,10 @@ class EventType implements Comparable<EventType>, Serializable {
         description(nullable: true, maxSize: 255)
         sortOrder(nullable: true)
         eventCode(nullable: false, validator: { EventCode eventCode, EventType eventType ->
-            if (eventType.isDirty("eventCode") && !eventCode.customEvent && countByEventCode(eventCode) > 0) {
+            // System event codes should have a 1-to-1 mapping to EventType. Only validate if the code is being changed.
+            // Otherwise we can get in a scenario where we count ourselves when checking for types with the given code.
+            boolean codeIsDirty = eventType.id == null || eventType.isDirty("eventCode")
+            if (codeIsDirty && eventCode.isSystemEvent && EventType.countByEventCode(eventCode) > 0) {
                 return ["invalid.notUnique", eventCode]
             }
             return true

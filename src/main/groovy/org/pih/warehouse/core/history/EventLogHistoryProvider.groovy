@@ -69,7 +69,7 @@ abstract class EventLogHistoryProvider<T extends Historizable> extends HistoryPr
                 eventType: eventTypeToDto(eventType),
                 comment: event.comment,
                 createdBy: event.createdBy,
-                referenceDocument: source.getReferenceDocument(),
+                referenceDocument: source.referenceDocument,
         )
     }
 
@@ -120,7 +120,7 @@ abstract class EventLogHistoryProvider<T extends Historizable> extends HistoryPr
                 ),
                 comment: StringUtils.isBlank(eventLog.message) ? null : new Comment(comment: eventLog.message),
                 createdBy: eventLog.createdBy,
-                referenceDocument: source.getReferenceDocument(),
+                referenceDocument: source.referenceDocument,
         )
     }
 }
