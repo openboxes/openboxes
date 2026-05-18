@@ -151,6 +151,13 @@ class MobileProductApiController extends BaseDomainApiController {
 
     def search() {
         JSONObject jsonObject = request.JSON
+
+        def minLength = grailsApplication.config.openboxes.typeahead.minLength
+        if (jsonObject?.value?.size() < minLength) {
+            render([data: []] as JSON)
+            return
+        }
+
         // Don't split scanned value - treat as single term for barcode/product code matching
         String[] terms = jsonObject.value ? [jsonObject.value] as String[] : null
         List products = productService.searchProducts(terms, [])

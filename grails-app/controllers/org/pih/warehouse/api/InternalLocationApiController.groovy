@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.ActivityCode
@@ -26,6 +27,7 @@ class InternalLocationApiController {
 
     LocationService locationService
     ZebraService zebraService
+    GrailsApplication grailsApplication
 
     def list(InternalLocationSearchCommand command) {
         command.location = getFacility(command)
@@ -35,6 +37,12 @@ class InternalLocationApiController {
     }
 
     def search() {
+        def minLength = grailsApplication.config.openboxes.typeahead.minLength
+        if (params?.searchTerm?.size() < minLength) {
+            render([data: [], totalCount: 0] as JSON)
+            return
+        }
+
         LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION]
         List<Location> locations = locationService.searchInternalLocations(params, locationTypeCodes)
 
