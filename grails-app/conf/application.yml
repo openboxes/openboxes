@@ -667,6 +667,9 @@ openboxes:
         pagination:
             enabled: true
             pageSize: 10
+        locations:
+            batch:
+                refreshProductAvailability: true
 
     transactions:
         inventoryBaseline:

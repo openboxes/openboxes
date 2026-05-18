@@ -10,8 +10,11 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.validation.ValidationException
+import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 import org.hibernate.Criteria
+import org.hibernate.SessionFactory
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
@@ -38,6 +41,8 @@ class LocationApiController extends BaseDomainApiController {
     def inventoryService
     def documentService
     LocationDataService locationGormService
+    def productAvailabilityService
+    SessionFactory sessionFactory
 
     def read() {
         Location location = Location.findByIdOrLocationNumber(params.id, params.id)
@@ -187,6 +192,117 @@ class LocationApiController extends BaseDomainApiController {
         locationGormService.save(existingLocation)
 
         render([data: existingLocation] as JSON)
+    }
+
+    def batchUpsert() {
+        def jsonInput = request.JSON
+        List items
+        if (jsonInput instanceof JSONArray) {
+            items = jsonInput as List
+        } else if (jsonInput instanceof JSONObject) {
+            items = [jsonInput]
+        } else {
+            response.status = 400
+            render([errorCode: 400, errorMessage: "Request body must be a JSON object or an array of JSON objects"] as JSON)
+            return
+        }
+
+        if (items.isEmpty()) {
+            response.status = 400
+            render([errorCode: 400, errorMessage: "Request body cannot be empty"] as JSON)
+            return
+        }
+
+        final int CHUNK_SIZE = 50
+
+        List results = []
+        Set<String> parentIdsToRefresh = []
+        int createdCount = 0
+        int updatedCount = 0
+        int errorCount = 0
+
+        items.eachWithIndex { Object rawItem, int idx ->
+            if (!(rawItem instanceof JSONObject)) {
+                results << [index: idx, status: 'error', errorMessage: "Item must be a JSON object"]
+                errorCount++
+                return
+            }
+            JSONObject itemJson = (JSONObject) rawItem
+            boolean isUpdate = itemJson.id as boolean
+
+            String savedLocationId = null
+            String refreshParentId = null
+
+            try {
+                Location.withNewTransaction {
+                    Location location
+                    if (isUpdate) {
+                        location = Location.get(itemJson.id)
+                        if (!location) {
+                            throw new IllegalArgumentException("No Location found for ID ${itemJson.id}")
+                        }
+                    } else {
+                        location = new Location()
+                    }
+
+                    bindLocationData(location, itemJson)
+                    location.disableRefresh = Boolean.TRUE
+
+                    location.save(failOnError: true)
+
+                    savedLocationId = location.id
+                    refreshParentId = location.isInternalLocation() ? location.parentLocation?.id : location.id
+                }
+                if (refreshParentId) {
+                    parentIdsToRefresh << refreshParentId
+                }
+                results << [
+                    index : idx,
+                    status: 'ok',
+                    action: isUpdate ? 'updated' : 'created',
+                    id    : savedLocationId
+                ]
+                if (isUpdate) { updatedCount++ } else { createdCount++ }
+            } catch (ValidationException ve) {
+                errorCount++
+                results << [
+                    index       : idx,
+                    status      : 'error',
+                    errorMessage: "Validation failed",
+                    errors      : ve.errors?.allErrors?.collect { [field: it.field, code: it.code, message: it.defaultMessage] }
+                ]
+            } catch (Exception e) {
+                errorCount++
+                log.error("batchUpsert: error at index ${idx}: ${e.message}", e)
+                results << [
+                    index       : idx,
+                    status      : 'error',
+                    errorMessage: e.message
+                ]
+            }
+
+            if ((idx + 1) % CHUNK_SIZE == 0) {
+                sessionFactory.currentSession.clear()
+            }
+        }
+
+        sessionFactory.currentSession.clear()
+
+        boolean shouldTriggerRefresh = grailsApplication.config.openboxes.api.locations.batch.refreshProductAvailability as Boolean
+        if (shouldTriggerRefresh) {
+            parentIdsToRefresh.each { String parentId ->
+                productAvailabilityService.triggerRefreshProductAvailability(parentId, [], true)
+            }
+        }
+
+        log.info("batchUpsert finished: created=${createdCount}, updated=${updatedCount}, errors=${errorCount}, refreshTriggered=${shouldTriggerRefresh}, parents=${parentIdsToRefresh.size()}")
+
+        render([
+            data                    : results,
+            summary                 : [created: createdCount, updated: updatedCount, errors: errorCount, total: items.size()],
+            refreshTriggered        : shouldTriggerRefresh,
+            refreshedParentLocations: parentIdsToRefresh as List
+        ] as JSON)
     }
 
     Location bindLocationData(Location location, JSONObject jsonObject) {

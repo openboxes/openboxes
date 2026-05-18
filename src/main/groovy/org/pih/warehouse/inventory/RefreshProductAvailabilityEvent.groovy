@@ -34,8 +34,8 @@ class RefreshProductAvailabilityEvent extends ApplicationEvent {
         this.locationId = source?.isInternalLocation() ? source?.parentLocation?.id : source?.id
         this.productIds = []
         this.forceRefresh = forceRefresh
-        // Avoid refreshing PA for all location, when there is no locationId
-        this.disableRefresh = this.locationId ? disableRefresh : Boolean.TRUE
+        // Avoid refreshing PA for all location, when there is no locationId, or when the publisher opted out
+        this.disableRefresh = !this.locationId || source.disableRefresh
     }
 
     RefreshProductAvailabilityEvent(InventoryItem source) {

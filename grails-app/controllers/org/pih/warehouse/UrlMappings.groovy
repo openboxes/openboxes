@@ -201,6 +201,11 @@ class UrlMappings {
             action = [POST: "importCsv"]
         }
 
+        "/api/locations/batch"(parseRequest: true) {
+            controller = { "locationApi" }
+            action = [POST: "batchUpsert"]
+        }
+
         "/api/locations/$id/$action" {
             controller = { "locationApi" }
         }

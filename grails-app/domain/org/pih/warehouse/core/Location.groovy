@@ -67,6 +67,8 @@ class Location implements Comparable<Location>, java.io.Serializable {
     Date dateCreated
     Date lastUpdated
 
+    Boolean disableRefresh = Boolean.FALSE
+
     static belongsTo = [parentLocation: Location, organization: Organization]
     static hasMany = [locations: Location, supportedActivities: String, employees: User]
     static mappedBy = [locations: "parentLocation"]
@@ -129,7 +131,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
         cache true
     }
 
-    static transients = ["managedLocally", "status", "approvalRequired", "locationPurpose"]
+    static transients = ["managedLocally", "status", "approvalRequired", "locationPurpose", "disableRefresh"]
 
     String toString() { return this.name }
 
