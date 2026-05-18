@@ -1501,8 +1501,8 @@ class ShipmentService {
 
     def addTransactionEntries(Transaction transaction, Shipment shipment) {
         shipment.shipmentItems.each { ShipmentItem shipmentItem ->
-            def inventoryItem =
-                    inventoryService.findInventoryItemByProductAndLotNumber(shipmentItem.product, shipmentItem.lotNumber)
+            def inventoryItem = shipmentItem.inventoryItem
+                    ?: inventoryService.findInventoryItemByProductAndLotNumber(shipmentItem.product, shipmentItem.lotNumber)
 
             // If the inventory item doesn't exist, we create a new one
             if (!inventoryItem) {

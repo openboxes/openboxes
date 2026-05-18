@@ -1703,7 +1703,7 @@ class InventoryService implements ApplicationContextAware {
             }
         }
         if (inventoryItems) {
-            return inventoryItems.get(0)
+            return inventoryItems.find { it.expirationDate == null } ?: inventoryItems.get(0)
         }
         return null
     }

@@ -495,12 +495,12 @@ class Product implements Comparable, Serializable, Validatable<ProductValidator>
 
         // Because of data inconsistency default inventory item may have either null or empty string as lot number.
         // To avoid using random inventory item when we have null and empty string lot numbers,
-        // we first try to find inventory item with null lot number.
+        // we first try to find inventory items with null lot number, preferring the one without expiry.
         // TODO: After cleaning up the data we can remove this logic and always use the lot number that
         // TODO: we decided for default inventory items.
-        InventoryItem inventoryItemWithNullLot = InventoryItem.findByProductAndLotNumberIsNull(this)
-        if (inventoryItemWithNullLot) {
-            return inventoryItemWithNullLot
+        List<InventoryItem> inventoryItemsWithNullLot = InventoryItem.findAllByProductAndLotNumberIsNull(this)
+        if (inventoryItemsWithNullLot) {
+            return inventoryItemsWithNullLot.find { it.expirationDate == null } ?: inventoryItemsWithNullLot.get(0)
         }
 
         return InventoryItem.findByProductAndLotNumber(this, "")
