@@ -26,9 +26,10 @@ class InventoryItemManager {
                                            boolean disableRefresh = false) {
         InventoryItem inventoryItem = getInventoryItem(product, lotNumber)
 
-        // If adding a default lot item (no lot, no expiry) but the existing inventoryItem has an expiration date,
-        // create a new one without expiry to avoid reusing it.
-        if (inventoryItem && !lotNumber && !expirationDate && inventoryItem.expirationDate) {
+        // If we search for an inventoryItem with default lot and no expiration date,
+        // and we find one with expirationDate, do not use it, and create a new one without the expiration date.
+        Boolean isSearchingForDefaultLotNoExpiry = !lotNumber && !expirationDate
+        if (inventoryItem && isSearchingForDefaultLotNoExpiry && inventoryItem.expirationDate) {
             return createInventoryItem(product, lotNumber, expirationDate, disableRefresh)
         }
 

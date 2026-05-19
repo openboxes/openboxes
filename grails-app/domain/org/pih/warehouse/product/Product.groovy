@@ -499,7 +499,10 @@ class Product implements Comparable, Serializable, Validatable<ProductValidator>
         // TODO: After cleaning up the data we can remove this logic and always use the lot number that
         // TODO: we decided for default inventory items.
         List<InventoryItem> inventoryItemsWithNullLot = InventoryItem.findAllByProductAndLotNumberIsNull(this)
-        if (inventoryItemsWithNullLot) {
+        if (inventoryItemsWithNullLot?.size() == 1) {
+            return inventoryItemsWithNullLot.get(0)
+        }
+        if (inventoryItemsWithNullLot?.size() > 1) {
             return inventoryItemsWithNullLot.find { it.expirationDate == null } ?: inventoryItemsWithNullLot.get(0)
         }
 

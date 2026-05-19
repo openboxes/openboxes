@@ -12,6 +12,9 @@ package org.pih.warehouse.inventory
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
 import grails.validation.ValidationException
+import java.time.LocalDate
+import org.pih.warehouse.DateUtil
+import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.apache.commons.collections.map.MultiKeyMap
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
@@ -1686,10 +1689,12 @@ class InventoryService implements ApplicationContextAware {
      *
      * @param product the product of the desired inventory item
      * @param lotNumber the lot number of the desired inventory item
+     * @param expirationDate optional expiration date — when provided and multiple items share the same lot,
+     * the item with the matching expiry is preferred over the one without
      * @return a single inventory item
      */
-    InventoryItem findInventoryItemByProductAndLotNumber(Product product, String lotNumber) {
-        def inventoryItems = InventoryItem.createCriteria().list() {
+    InventoryItem findInventoryItemByProductAndLotNumber(Product product, String lotNumber, Date expirationDate = null) {
+        List<InventoryItem> inventoryItems = InventoryItem.createCriteria().list() {
             and {
                 eq("product.id", product?.id)
                 if (lotNumber) {
@@ -1700,9 +1705,16 @@ class InventoryService implements ApplicationContextAware {
                         eq("lotNumber", "")
                     }
                 }
+                if (expirationDate) {
+                    ge("expirationDate", JavaUtilDateParser.asDate(DateUtil.toLocalDate(expirationDate)))
+                    lt("expirationDate", JavaUtilDateParser.asDate(DateUtil.toLocalDate(expirationDate).plusDays(1)))
+                }
             }
         }
-        if (inventoryItems) {
+        if (inventoryItems?.size() == 1) {
+            return inventoryItems.get(0)
+        }
+        if (inventoryItems?.size() > 1) {
             return inventoryItems.find { it.expirationDate == null } ?: inventoryItems.get(0)
         }
         return null
@@ -1732,8 +1744,7 @@ class InventoryService implements ApplicationContextAware {
     @Deprecated
     InventoryItem findOrCreateInventoryItem(Product product, String lotNumber, Date expirationDate) {
         def inventoryItem =
-                findInventoryItemByProductAndLotNumber(product, lotNumber)
-
+                findInventoryItemByProductAndLotNumber(product, lotNumber, expirationDate)
         // If the inventory item doesn't exist, we create a new one
         if (!inventoryItem) {
             inventoryItem = new InventoryItem()
@@ -1753,7 +1764,7 @@ class InventoryService implements ApplicationContextAware {
 
     // findOrCreateInventoryItem with option to reassign expiration date for existing records
     InventoryItem findAndUpdateOrCreateInventoryItem(Product product, String lotNumber, Date expirationDate) {
-        def inventoryItem = findInventoryItemByProductAndLotNumber(product, lotNumber)
+        def inventoryItem = findInventoryItemByProductAndLotNumber(product, lotNumber, expirationDate)
         if (!inventoryItem) {
             inventoryItem = new InventoryItem()
             inventoryItem.lotNumber = lotNumber
