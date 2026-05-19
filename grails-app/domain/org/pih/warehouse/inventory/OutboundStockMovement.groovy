@@ -6,8 +6,10 @@ import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.ReferenceDocument
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.history.Historizable
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.requisition.Requisition
@@ -22,7 +24,7 @@ import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.api.StockMovementStatusContext
 import util.StockMovementStatusResolver
 
-class OutboundStockMovement implements Serializable, Validateable {
+class OutboundStockMovement implements Serializable, Validateable, Historizable {
 
     String id
     String name
@@ -132,6 +134,7 @@ class OutboundStockMovement implements Serializable, Validateable {
         statusCode(nullable: true)
 
         statusSortOrder(nullable: true)
+        referenceDocument(nullable: true)
     }
 
 
@@ -343,5 +346,13 @@ class OutboundStockMovement implements Serializable, Validateable {
     // This has to be named with the get prefix to align with the StockMovement DTO
     boolean getIsReturn() {
         return shipment?.isFromReturnOrder
+    }
+
+    @Override
+    ReferenceDocument getReferenceDocument() {
+        // The stock movement itself is not a concrete entity, and so does not have a reference document. The event
+        // history of a stock movement is built from the event history of its sub-components (Shipment, Order),
+        // so the stock movement itself is "referenceable" only in that its sub-components are referenceable.
+        return null
     }
 }

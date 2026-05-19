@@ -248,6 +248,22 @@
                                 ${stockMovement?.displayStatus?.label}
                             </td>
                         </tr>
+                        <tr class="prop">
+                            <td class="name">
+                                <g:message code="stockMovement.mostRecentEvent.label"/>
+                            </td>
+                            <td class="value">
+                                %{-- Shipment events link to the SM but we're already on that page so hide those links --}%
+                                <g:if test="${latestHistoryItem?.eventType?.eventCode?.isPutawayEvent()}">
+                                    <a href="${latestHistoryItem?.referenceDocument?.url}">
+                                        ${latestHistoryItem?.eventType?.name} ${latestHistoryItem?.referenceDocument?.identifier}
+                                    </a>
+                                </g:if>
+                                <g:else>
+                                    ${latestHistoryItem?.eventType?.name}
+                                </g:else>
+                            </td>
+                        </tr>
                         <g:if test="${stockMovement?.shipment?.isFromPurchaseOrder}">
                             <tr class="prop">
                                 <td class="name">

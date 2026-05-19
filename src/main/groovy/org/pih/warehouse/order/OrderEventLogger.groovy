@@ -4,8 +4,7 @@ import grails.validation.ValidationException
 import java.time.Instant
 import org.springframework.stereotype.Component
 
-import org.pih.warehouse.api.Putaway
-import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.date.InstantParser
 import org.pih.warehouse.core.history.EventLog
 import org.pih.warehouse.core.history.EventLogCode
@@ -26,34 +25,17 @@ class OrderEventLogger {
     }
 
     /**
-     * Logs the occurrence of a putaway order being completed.
+     * Log the occurrence of an order event.
      */
-    EventLog logPutaway(Order order, Putaway putaway) {
+    EventLog logEvent(Order order, Event event) {
 
         EventLog eventLog = new EventLog(
-                event: null,  // A putaway is not Event based
-                eventCode: EventCode.PUTAWAY,
-                eventDate: putaway.putawayDate ? InstantParser.asInstant(putaway.putawayDate) : Instant.now(),
+                event: event,
+                eventCode: event.eventType?.eventCode,
+                eventDate: event.eventDate ? InstantParser.asInstant(event.eventDate) : Instant.now(),
                 eventLogCode: EventLogCode.EVENT_OCCURRED,
-                message: order.description,
-                location: putaway.destination,
-        )
-
-        return createEventLog(order, eventLog)
-    }
-
-    /**
-     * Logs the occurrence of a putaway order being partially completed.
-     */
-    EventLog logPartialPutaway(Order order, Putaway putaway) {
-
-        EventLog eventLog = new EventLog(
-                event: null,  // A putaway is not Event based
-                eventCode: EventCode.PARTIALLY_PUTAWAY,
-                eventDate: putaway.putawayDate ? InstantParser.asInstant(putaway.putawayDate) : Instant.now(),
-                eventLogCode: EventLogCode.EVENT_OCCURRED,
-                message: order.description,
-                location: putaway.destination,
+                message: event.comment?.comment ?: order.description,
+                location: event.eventLocation,
         )
 
         return createEventLog(order, eventLog)

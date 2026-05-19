@@ -48,6 +48,7 @@ import org.pih.warehouse.core.StockMovementItemParamsCommand
 import org.pih.warehouse.core.StockMovementItemsParamsCommand
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
+import org.pih.warehouse.core.history.HistoryContext
 import org.pih.warehouse.core.history.HistoryItem
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.data.DataService
@@ -111,7 +112,7 @@ class StockMovementService {
     UserService userService
     RequisitionDataService requisitionDataService
     GrailsApplication grailsApplication
-    PutawayService putawayService
+    StockMovementHistoryProvider stockMovementHistoryProvider
     MessageLocalizer messageLocalizer
     PersonService personService
 
@@ -1782,16 +1783,25 @@ class StockMovementService {
     }
 
     /**
-     * Returns a chronological history of the events that have occurred on a stock movement. Stock movement
-     * history is built by combining the history from a number of different sources, including shipment and order.
+     * Returns the full, chronological history of the events that have occurred on a stock movement.
      */
     List<HistoryItem> getHistory(StockMovement stockMovement) {
-        List<HistoryItem> history = stockMovement?.shipment?.getHistory() ?: []
+        HistoryContext context = new HistoryContext(
+                includeRolledBackEvents: true,
+        )
+        return stockMovementHistoryProvider.getHistory(stockMovement, context)
+    }
 
-        // Currently the only orders that have event history are putaway orders.
-        history.addAll(putawayService.getPutawayOrders(stockMovement?.shipment).collectMany { it.getHistory() })
-
-        return history.sort()
+    /**
+     * Returns the most recently added event that occurred on a stock movement.
+     */
+    HistoryItem getLatestHistoryItem(StockMovement stockMovement) {
+        HistoryContext context = new HistoryContext(
+                includeRolledBackEvents: true,  // Noting that we *do* want to count rollbacks here
+                limit: 1,
+        )
+        List<HistoryItem> historyItems = stockMovementHistoryProvider.getHistory(stockMovement, context)
+        return historyItems ? historyItems[0] : null
     }
 
     List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(def stockMovement) {
