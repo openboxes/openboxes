@@ -344,6 +344,9 @@ class StockTransferSecondPage extends Component {
     if (filter.id === 'product') {
       val = val ? `${val.name} ${val.displayName}` : null;
     }
+    if (filter.id === 'reasonCode') {
+      val = _.find(this.props.reasonCodes, { id: val })?.label;
+    }
     return _.toString(val).toLowerCase().includes(filter.value.toLowerCase());
   };
 
