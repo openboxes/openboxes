@@ -4,7 +4,6 @@ import grails.gorm.transactions.Transactional
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
 
 @Transactional
@@ -17,16 +16,14 @@ class BackorderService {
     // line, so inbound and demanded quantities are expected to match one-to-one.
     // This hard-coded equality rule will eventually be replaced by a strategy pattern
     // (shared with AutomaticBackorderReallocationJob) - here the strategy is equality match.
-    List<ShipmentException> validateBackorderReferences(Shipment shipment) {
-        List<ShipmentException> errors = []
+    void validateBackorderReferences(Shipment shipment) {
         for (String requisitionNumber : shipment.uniqueBackorderReferences) {
             Requisition backorder = Requisition.findByRequestNumber(requisitionNumber)
             if (!backorder) {
-                errors << new ShipmentException(
-                        shipment: shipment,
-                        messageCode: "backorder.notFound.message",
-                        messageArgs: [requisitionNumber] as Object[]
-                )
+                shipment.errors.reject(
+                        "backorder.notFound.message",
+                        [requisitionNumber] as Object[],
+                        "Backorder ${requisitionNumber} not found")
                 continue
             }
             Collection<ShipmentItem> inboundItems = shipment.shipmentItems.findAll {
@@ -41,16 +38,14 @@ class BackorderService {
                             !consumedRequisitionItems.contains(demand)
                 }
                 if (!matchingBackorderItem) {
-                    errors << new ShipmentException(
-                            shipment: shipment,
-                            messageCode: "backorder.unavailable.message",
-                            messageArgs: [inboundItem.product?.productCode, requisitionNumber] as Object[]
-                    )
+                    shipment.errors.reject(
+                            "backorder.unavailable.message",
+                            [inboundItem.product?.productCode, requisitionNumber] as Object[],
+                            "No unallocated lines for ${inboundItem.product?.productCode} on ${requisitionNumber}")
                     continue
                 }
                 consumedRequisitionItems.add(matchingBackorderItem)
             }
         }
-        return errors
     }
 }

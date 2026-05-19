@@ -13,7 +13,5 @@ import org.pih.warehouse.shipping.Shipment
 
 class ShipmentException extends RuntimeException {
     String message
-    String messageCode
-    Object[] messageArgs
     Shipment shipment
 }

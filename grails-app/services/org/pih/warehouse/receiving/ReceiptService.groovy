@@ -40,7 +40,6 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentService
 import org.pih.warehouse.shipping.ShipmentStatusCode
@@ -48,6 +47,7 @@ import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.transaction.annotation.Propagation
+import org.springframework.validation.ObjectError
 
 @Transactional
 class ReceiptService {
@@ -542,10 +542,10 @@ class ReceiptService {
             return
         }
 
-        if (shipment.destination.supports(ActivityCode.DYNAMIC_SLOTTING)) {
-            List<ShipmentException> validationErrors = backorderService.validateBackorderReferences(shipment)
-            if (validationErrors) {
-                validationErrors.each { logShipmentEvent(it) }
+        if (shipment.destination?.supports(ActivityCode.CROSS_DOCKING)) {
+            backorderService.validateBackorderReferences(shipment)
+            if (shipment.hasErrors()) {
+                shipment.errors.allErrors.each { ObjectError error -> logShipmentEvent(shipment, error) }
                 return
             }
         }
@@ -559,7 +559,7 @@ class ReceiptService {
         // FIXME We should consider eventing (shipment.received) and have an event service determine whether
         //  the shipment should be auto received
         log.info "Creating putaway tasks for receipt ${shipment.receipt} "
-        if (shipment.destination.supports(ActivityCode.DYNAMIC_SLOTTING)) {
+        if (shipment.destination?.supports(ActivityCode.CROSS_DOCKING)) {
             inboundSortationService.createPutawayOrdersFromReceipt(shipment.receipt)
         }
     }
@@ -569,22 +569,22 @@ class ReceiptService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    void logShipmentEvent(ShipmentException e) {
-        String message = messageSource.getMessage(e.messageCode, e.messageArgs, LocaleContextHolder.locale)
-        Shipment shipment = Shipment.get(e.shipment.id)
-        if (!shipment) {
-            log.warn("Unable to log shipment event because shipment ${e.shipment?.id} could not be loaded: ${message}")
+    void logShipmentEvent(Shipment shipment, ObjectError error) {
+        String message = messageSource.getMessage(error, LocaleContextHolder.locale)
+        Shipment freshShipment = Shipment.get(shipment.id)
+        if (!freshShipment) {
+            log.warn("Unable to log shipment event because shipment ${shipment?.id} could not be loaded: ${message}")
             return
         }
 
-        boolean alreadyLogged = shipment.comments.any {
+        boolean alreadyLogged = freshShipment.comments.any {
             it.type == CommentType.SYSTEM && it.comment == message
         }
         if (!alreadyLogged) {
-            shipment.addToComments(new Comment(comment: message, sender: null))
-            shipment.save(failOnError: true)
+            freshShipment.addToComments(new Comment(comment: message, sender: null))
+            freshShipment.save(failOnError: true)
         }
-        log.warn("Shipment ${shipment.id}: ${message}")
+        log.warn("Shipment ${freshShipment.id}: ${message}")
     }
 
     PartialReceipt createAutomaticReceipt(Shipment shipment) {
