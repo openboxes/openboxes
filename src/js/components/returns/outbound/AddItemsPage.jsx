@@ -122,7 +122,7 @@ const FIELDS = {
         headerTooltip: 'react.outboundReturns.qtyNotPickedTooltip.label',
         headerDefaultTooltip: 'This is the quantity on hand that is not currently picked in a shipment',
         multilineHeader: true,
-        flexWidth: '1',
+        flexWidth: '1.2',
         attributes: {
           className: 'text-right mr-1',
         },
