@@ -691,8 +691,8 @@ class OrderService {
 
             if (validateOrderItems(orderItems, order)) {
 
-                orderItems.each { item ->
-
+                orderItems.eachWithIndex { item, index ->
+                    try {
                     log.info "Order item: " + item
                     def orderItemId = item["id"]
                     def productCode = item["productCode"]
@@ -896,6 +896,9 @@ class OrderService {
                     }
 
                     count++
+                    } catch (Exception e) {
+                        throw new RuntimeException("${e.message}. Check Row ${index + 1}.", e)
+                    }
                 }
 
                 if (count < orderItems?.size()) {
@@ -969,14 +972,14 @@ class OrderService {
     boolean validateOrderItems(List orderItems, Order order) {
         def propertiesMap = grailsApplication.config.openboxes.purchaseOrder.editableProperties
         def excludedProperties = propertiesMap?.deny
-        orderItems.each { orderItem ->
+        orderItems.eachWithIndex { orderItem, index ->
             OrderItem existingOrderItem = order.orderItems.find { it.id == orderItem.id }
             excludedProperties?.each { property ->
                 if (order.status == propertiesMap.status) {
                     def existingValue = existingOrderItem.toImport()."${property}"
                     def importedValue = orderItem."${property}"
                     if (existingValue != importedValue) {
-                        throw new IllegalArgumentException("Import must not change ${property} of item ${orderItem.productCode}, before: ${existingValue}, after: ${importedValue}")
+                        throw new IllegalArgumentException("Import must not change ${property} of item ${orderItem.productCode}, before: ${existingValue}, after: ${importedValue}. Check Row ${index + 1}.")
                     }
                 }
             }
