@@ -104,7 +104,7 @@ const FIELDS = {
         label: 'react.stockMovement.orderNumber.label',
         defaultMessage: 'Order number',
         multilineHeader: true,
-        fixedWidth: '12ch',
+        fixedWidth: '9.7em',
         fieldKey: '',
         getDynamicAttr: ({
           fieldValue,
@@ -142,7 +142,7 @@ const FIELDS = {
         label: 'react.stockMovement.lot.label',
         defaultMessage: 'Lot',
         multilineHeader: true,
-        flexWidth: '15ch',
+        flexWidth: '9em',
         getDynamicAttr: ({
           rowIndex,
           values,
@@ -162,7 +162,7 @@ const FIELDS = {
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
         multilineHeader: true,
-        fixedWidth: '11ch',
+        fixedWidth: '7.6em',
         attributes: {
           dateFormat: 'MM/DD/YYYY',
           autoComplete: 'off',
@@ -192,7 +192,7 @@ const FIELDS = {
         type: TextField,
         label: 'react.stockMovement.quantityPOUom.label',
         defaultMessage: 'Quantity (in PO UoM)',
-        fixedWidth: '11ch',
+        fixedWidth: '10.8ch',
         required: true,
         headerTooltip: 'react.stockMovement.quantityPerUom.InputTooltip.label',
         multilineHeader: true,
@@ -206,7 +206,7 @@ const FIELDS = {
         label: 'react.stockMovement.POUom.label',
         defaultMessage: 'PO UoM',
         multilineHeader: true,
-        fixedWidth: '9ch',
+        fixedWidth: '7.7em',
         attributes: {
           disabled: true,
         },
@@ -216,7 +216,7 @@ const FIELDS = {
         label: 'react.stockMovement.quantityEach.label',
         defaultMessage: 'Quantity (each)',
         multilineHeader: true,
-        fixedWidth: '9ch',
+        fixedWidth: '9.6ch',
         attributes: {
           disabled: true,
           className: 'text-right',
@@ -235,7 +235,7 @@ const FIELDS = {
         label: 'react.stockMovement.packLevel1.label',
         defaultMessage: 'Pack level 1',
         multilineHeader: true,
-        flexWidth: '1',
+        flexWidth: '5.2em',
         getDynamicAttr: ({
           rowIndex, rowCount,
         }) => ({
@@ -247,7 +247,7 @@ const FIELDS = {
         label: 'react.stockMovement.packLevel2.label',
         defaultMessage: 'Pack level 2',
         multilineHeader: true,
-        flexWidth: '1',
+        flexWidth: '6.7em',
       },
       recipient: {
         type: SelectField,
@@ -278,6 +278,7 @@ const FIELDS = {
         attributes: {
           labelKey: 'name',
           openOnClick: false,
+          showValueTooltip: true,
         },
       },
       actions: {
