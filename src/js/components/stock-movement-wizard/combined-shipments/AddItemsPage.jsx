@@ -262,6 +262,7 @@ const FIELDS = {
               delay="150"
               duration="250"
               hideDelay="50"
+              disabled={!params?.fieldValue}
             >
               <BaseField
                 {...params}
@@ -296,6 +297,7 @@ const FIELDS = {
               delay="150"
               duration="250"
               hideDelay="50"
+              disabled={!params?.fieldValue}
             >
               <BaseField
                 {...params}
