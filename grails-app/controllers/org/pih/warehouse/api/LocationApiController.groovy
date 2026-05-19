@@ -10,11 +10,9 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import grails.validation.ValidationException
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 import org.hibernate.Criteria
-import org.hibernate.SessionFactory
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
@@ -42,7 +40,6 @@ class LocationApiController extends BaseDomainApiController {
     def documentService
     LocationDataService locationGormService
     def productAvailabilityService
-    SessionFactory sessionFactory
 
     def read() {
         Location location = Location.findByIdOrLocationNumber(params.id, params.id)
@@ -194,114 +191,100 @@ class LocationApiController extends BaseDomainApiController {
         render([data: existingLocation] as JSON)
     }
 
-    def batchUpsert() {
-        def jsonInput = request.JSON
-        List items
-        if (jsonInput instanceof JSONArray) {
-            items = jsonInput as List
-        } else if (jsonInput instanceof JSONObject) {
-            items = [jsonInput]
+    def upsert() {
+        def body = request.JSON
+        if (body instanceof JSONArray) {
+            bulkUpsert((JSONArray) body)
         } else {
-            response.status = 400
-            render([errorCode: 400, errorMessage: "Request body must be a JSON object or an array of JSON objects"] as JSON)
-            return
+            create()
         }
+    }
 
-        if (items.isEmpty()) {
-            response.status = 400
-            render([errorCode: 400, errorMessage: "Request body cannot be empty"] as JSON)
-            return
-        }
+    private def bulkUpsert(JSONArray items) {
+        boolean deferRefresh = params.boolean('deferRefresh', false)
 
-        final int CHUNK_SIZE = 50
-
-        List results = []
-        Set<String> parentIdsToRefresh = []
+        List<String> savedLocationIds = []
+        List<Map> invalidLocations = []
+        List<String> errorMessages = []
+        Set<String> facilityIds = []
         int createdCount = 0
         int updatedCount = 0
-        int errorCount = 0
 
-        items.eachWithIndex { Object rawItem, int idx ->
+        items.eachWithIndex { Object rawItem, int index ->
             if (!(rawItem instanceof JSONObject)) {
-                results << [index: idx, status: 'error', errorMessage: "Item must be a JSON object"]
-                errorCount++
+                errorMessages << ("Row ${index + 1}: item must be a JSON object" as String)
                 return
             }
-            JSONObject itemJson = (JSONObject) rawItem
-            boolean isUpdate = itemJson.id as boolean
-
-            String savedLocationId = null
-            String refreshParentId = null
+            JSONObject json = (JSONObject) rawItem
+            boolean isUpdate = json.containsKey('id') && json.id
 
             try {
-                Location.withNewTransaction {
-                    Location location
-                    if (isUpdate) {
-                        location = Location.get(itemJson.id)
-                        if (!location) {
-                            throw new IllegalArgumentException("No Location found for ID ${itemJson.id}")
-                        }
-                    } else {
-                        location = new Location()
+                Location.withNewTransaction { status ->
+                    Location location = isUpdate ? Location.get(json.id) : new Location()
+                    if (isUpdate && !location) {
+                        throw new IllegalArgumentException("No Location found for ID ${json.id}")
                     }
 
-                    bindLocationData(location, itemJson)
-                    location.disableRefresh = Boolean.TRUE
+                    bindLocationData(location, json)
+                    location.disableRefresh = deferRefresh
 
-                    location.save(failOnError: true)
+                    if (!location.validate()) {
+                        status.setRollbackOnly()
+                        invalidLocations << [
+                            index : index,
+                            id    : location.id,
+                            name  : location.name,
+                            errors: location.errors.allErrors.collect {
+                                [field: it.field, code: it.code, message: it.defaultMessage ?: it.code]
+                            }
+                        ]
+                        errorMessages << ("Row ${index + 1}: ${location.errors.allErrors.collect { it.defaultMessage ?: it.code }.join(', ')}" as String)
+                        return
+                    }
 
-                    savedLocationId = location.id
-                    refreshParentId = location.isInternalLocation() ? location.parentLocation?.id : location.id
+                    location.save()
+
+                    savedLocationIds << location.id
+                    if (isUpdate) { updatedCount++ } else { createdCount++ }
+
+                    String facilityId = location.isInternalLocation() ? location.parentLocation?.id : location.id
+                    if (facilityId) {
+                        facilityIds << facilityId
+                    }
                 }
-                if (refreshParentId) {
-                    parentIdsToRefresh << refreshParentId
-                }
-                results << [
-                    index : idx,
-                    status: 'ok',
-                    action: isUpdate ? 'updated' : 'created',
-                    id    : savedLocationId
-                ]
-                if (isUpdate) { updatedCount++ } else { createdCount++ }
-            } catch (ValidationException ve) {
-                errorCount++
-                results << [
-                    index       : idx,
-                    status      : 'error',
-                    errorMessage: "Validation failed",
-                    errors      : ve.errors?.allErrors?.collect { [field: it.field, code: it.code, message: it.defaultMessage] }
-                ]
             } catch (Exception e) {
-                errorCount++
-                log.error("batchUpsert: error at index ${idx}: ${e.message}", e)
-                results << [
-                    index       : idx,
-                    status      : 'error',
-                    errorMessage: e.message
-                ]
-            }
-
-            if ((idx + 1) % CHUNK_SIZE == 0) {
-                sessionFactory.currentSession.clear()
+                log.error("bulkUpsert: error at index ${index}: ${e.message}", e)
+                errorMessages << ("Row ${index + 1}: ${e.message}" as String)
             }
         }
 
-        sessionFactory.currentSession.clear()
-
-        boolean shouldTriggerRefresh = grailsApplication.config.openboxes.api.locations.batch.refreshProductAvailability as Boolean
-        if (shouldTriggerRefresh) {
-            parentIdsToRefresh.each { String parentId ->
-                productAvailabilityService.triggerRefreshProductAvailability(parentId, [], true)
-            }
+        List<String> refreshedFacilities = []
+        if (deferRefresh && facilityIds) {
+            refreshedFacilities = facilityIds.toList()
+            productAvailabilityService.triggerRefreshProductAvailability(refreshedFacilities, true)
         }
 
-        log.info("batchUpsert finished: created=${createdCount}, updated=${updatedCount}, errors=${errorCount}, refreshTriggered=${shouldTriggerRefresh}, parents=${parentIdsToRefresh.size()}")
+        // Reload saved locations from the request-scoped Hibernate session. Entities loaded inside
+        // withNewTransaction become detached when that inner session is closed, which breaks lazy
+        // associations during JSON marshalling (e.g. locationType.supportedActivities).
+        List<Location> savedLocations = savedLocationIds ? Location.getAll(savedLocationIds) : []
 
         render([
-            data                    : results,
-            summary                 : [created: createdCount, updated: updatedCount, errors: errorCount, total: items.size()],
-            refreshTriggered        : shouldTriggerRefresh,
-            refreshedParentLocations: parentIdsToRefresh as List
+            data         : savedLocations,
+            metadata     : [
+                bulk: [
+                    total  : items.size(),
+                    created: createdCount,
+                    updated: updatedCount,
+                    errors : invalidLocations.size(),
+                    refresh: [
+                        deferred           : deferRefresh,
+                        refreshedFacilities: refreshedFacilities
+                    ]
+                ],
+                errors: invalidLocations
+            ],
+            errorMessages: errorMessages
         ] as JSON)
     }
 

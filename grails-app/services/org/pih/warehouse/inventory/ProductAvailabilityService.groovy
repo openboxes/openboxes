@@ -73,6 +73,12 @@ class ProductAvailabilityService {
             [locationId: locationId, productIds: productIds, forceRefresh: forceRefresh])
     }
 
+    def triggerRefreshProductAvailability(List<String> facilityIds, Boolean forceRefresh) {
+        facilityIds?.each { String facilityId ->
+            triggerRefreshProductAvailability(facilityId, [], forceRefresh)
+        }
+    }
+
     def refreshProductsAvailability(String locationId, List<String> productIds, Boolean forceRefresh) {
         // Calculate product availability for a single location/product, or all products within a single location
         if (locationId) {
