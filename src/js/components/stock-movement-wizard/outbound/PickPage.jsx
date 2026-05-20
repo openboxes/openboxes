@@ -407,15 +407,24 @@ class PickPage extends Component {
       params: { stepNumber: OutboundWorkflowState.PICK_ITEMS, refreshPicklistItems: false },
     }).then((response) => {
       const { data } = response.data;
+      const pickPageItems = _.map(
+        parseResponse(data),
+        (item) => this.checkForInitialPicksChanges(item),
+      );
+      // recompute empty picks here to keep the "items require attention" filter after import
+      const emptyPicks = getIndexesOfRowsWithEmptyPicks(pickPageItems);
+      const pickPageItemsWithErrors = pickPageItems.map((item, index) => ({
+        ...item,
+        hasError: emptyPicks.includes(index),
+      }));
       this.setState((prev) => ({
         values: {
           ...prev.values,
-          pickPageItems: _.map(
-            parseResponse(data),
-            (item) => this.checkForInitialPicksChanges(item),
-          ),
+          pickPageItems: pickPageItemsWithErrors,
         },
         sorted: false,
+        // If no items require attention anymore, turn off the filter
+        showOnlyErroredItems: prev.showOnlyErroredItems && emptyPicks.length > 0,
       }));
     });
   }
