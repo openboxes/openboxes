@@ -73,6 +73,36 @@ const handleSplit = (fieldValue, addRow, rowIndex, updateTotalCount) => {
   }, rowIndex);
 };
 
+const customTextFieldWithTooltip = (params) => {
+  const renderInput = ({
+    inputClassName,
+    className,
+    ...attributes
+  }) => (
+    <Input
+      isFormElement
+      className={inputClassName || className}
+      {...attributes}
+    />
+  );
+  return (
+    <Tooltip
+      html={params?.fieldValue}
+      theme="transparent"
+      arrow="true"
+      delay="150"
+      duration="250"
+      hideDelay="50"
+      disabled={!params?.fieldValue}
+    >
+      <BaseField
+        {...params}
+        renderInput={renderInput}
+      />
+    </Tooltip>
+  );
+};
+
 const FIELDS = {
   lineItems: {
     type: ArrayField,
@@ -233,6 +263,7 @@ const FIELDS = {
         }),
       },
       palletName: {
+        type: customTextFieldWithTooltip,
         label: 'react.stockMovement.packLevel1.label',
         defaultMessage: 'Pack level 1',
         multilineHeader: true,
@@ -242,70 +273,13 @@ const FIELDS = {
         }) => ({
           autoFocus: rowIndex === rowCount - 1,
         }),
-        type: (params) => {
-          const renderInput = ({
-            inputClassName,
-            className,
-            ...attributes
-          }) => (
-            <Input
-              isFormElement
-              className={inputClassName || className}
-              {...attributes}
-            />
-          );
-          return (
-            <Tooltip
-              html={params?.fieldValue}
-              theme="transparent"
-              arrow="true"
-              delay="150"
-              duration="250"
-              hideDelay="50"
-              disabled={!params?.fieldValue}
-            >
-              <BaseField
-                {...params}
-                renderInput={renderInput}
-              />
-            </Tooltip>
-          );
-        },
       },
       boxName: {
+        type: customTextFieldWithTooltip,
         label: 'react.stockMovement.packLevel2.label',
         defaultMessage: 'Pack level 2',
         multilineHeader: true,
         flexWidth: '6.7em',
-        type: (params) => {
-          const renderInput = ({
-            inputClassName,
-            className,
-            ...attributes
-          }) => (
-            <Input
-              isFormElement
-              className={inputClassName || className}
-              {...attributes}
-            />
-          );
-          return (
-            <Tooltip
-              html={params?.fieldValue}
-              theme="transparent"
-              arrow="true"
-              delay="150"
-              duration="250"
-              hideDelay="50"
-              disabled={!params?.fieldValue}
-            >
-              <BaseField
-                {...params}
-                renderInput={renderInput}
-              />
-            </Tooltip>
-          );
-        },
       },
       recipient: {
         type: SelectField,
