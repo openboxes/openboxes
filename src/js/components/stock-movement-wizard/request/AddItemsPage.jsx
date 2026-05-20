@@ -165,20 +165,11 @@ const FIELDS = {
   },
 };
 
-const handleDelete = (fieldValue, removeItem, removeRow, updateTotalCount) => {
-  try {
-    removeItem(fieldValue.id);
-  } finally {
-    updateTotalCount(-1);
-    removeRow();
-  }
-};
-
 const DELETE_BUTTON_FIELD = {
   flexWidth: '1',
   fieldKey: '',
   type: ({
-    fieldValue, removeItem, removeRow, updateTotalCount, translate,
+    fieldValue, removeItem, removeRow, updateTotalCount, translate, onDelete,
   }) => (
     <div aria-label={translate('react.default.button.delete.label', 'Delete')} role="button">
       <Tooltip
@@ -191,7 +182,7 @@ const DELETE_BUTTON_FIELD = {
       >
         <RiDeleteBinLine
           className="delete-icon"
-          onClick={() => handleDelete(fieldValue, removeItem, removeRow, updateTotalCount)}
+          onClick={() => onDelete(fieldValue, removeItem, removeRow, updateTotalCount)}
         />
       </Tooltip>
     </div>
@@ -923,6 +914,19 @@ class AddItemsPage extends Component {
   }
 
   dataFetched = false;
+
+  handleDelete = async (fieldValue, removeItem, removeRow, updateTotalCount) => {
+    try {
+      this.props.showSpinner();
+      if (fieldValue && fieldValue.id) {
+        await removeItem(fieldValue.id);
+      }
+    } finally {
+      updateTotalCount(-1);
+      removeRow();
+      this.props.hideSpinner();
+    }
+  };
 
   validate(values) {
     const errors = {};
@@ -1749,6 +1753,7 @@ class AddItemsPage extends Component {
                     itemFilter: this.state.itemFilter,
                     updateFilter: this.updateFilter,
                     translate: this.props.translate,
+                    onDelete: this.handleDelete,
                   }))}
               </div>
               <div className="submit-buttons">
