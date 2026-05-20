@@ -545,7 +545,7 @@ class ReceiptService {
         if (shipment.destination?.supports(ActivityCode.CROSS_DOCKING)) {
             backorderService.validateBackorderReferences(shipment)
             if (shipment.hasErrors()) {
-                shipment.errors.allErrors.each { ObjectError error -> logShipmentEvent(shipment, error) }
+                shipment.errors.allErrors.each { ObjectError error -> logShipmentEvent(shipment.id, error) }
                 return
             }
         }
@@ -558,8 +558,8 @@ class ReceiptService {
 
         // FIXME We should consider eventing (shipment.received) and have an event service determine whether
         //  the shipment should be auto received
-        log.info "Creating putaway tasks for receipt ${shipment.receipt} "
-        if (shipment.destination?.supports(ActivityCode.CROSS_DOCKING)) {
+        log.info "Creating putaway tasks for receipt ${shipment.receipt}"
+        if (shipment.destination?.supports(ActivityCode.AUTOMATED_PUTAWAY_CREATION)) {
             inboundSortationService.createPutawayOrdersFromReceipt(shipment.receipt)
         }
     }
@@ -569,22 +569,22 @@ class ReceiptService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    void logShipmentEvent(Shipment shipment, ObjectError error) {
+    void logShipmentEvent(String shipmentId, ObjectError error) {
         String message = messageSource.getMessage(error, LocaleContextHolder.locale)
-        Shipment freshShipment = Shipment.get(shipment.id)
-        if (!freshShipment) {
-            log.warn("Unable to log shipment event because shipment ${shipment?.id} could not be loaded: ${message}")
+        Shipment shipment = Shipment.get(shipmentId)
+        if (!shipment) {
+            log.warn("Unable to log shipment event because shipment ${shipmentId} could not be loaded: ${message}")
             return
         }
 
-        boolean alreadyLogged = freshShipment.comments.any {
+        boolean alreadyLogged = shipment.comments.any {
             it.type == CommentType.SYSTEM && it.comment == message
         }
         if (!alreadyLogged) {
-            freshShipment.addToComments(new Comment(comment: message, sender: null))
-            freshShipment.save(failOnError: true)
+            shipment.addToComments(new Comment(comment: message, sender: null))
+            shipment.save(failOnError: true)
         }
-        log.warn("Shipment ${freshShipment.id}: ${message}")
+        log.warn("Shipment ${shipment.id}: ${message}")
     }
 
     PartialReceipt createAutomaticReceipt(Shipment shipment) {
