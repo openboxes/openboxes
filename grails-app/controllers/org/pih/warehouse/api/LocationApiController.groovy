@@ -200,91 +200,80 @@ class LocationApiController extends BaseDomainApiController {
         }
     }
 
-    private def bulkUpsert(JSONArray items) {
+    private def bulkUpsert(JSONArray jsonObjects) {
         boolean deferRefresh = params.boolean('deferRefresh', false)
+        List<Map> results = []
 
-        List<String> savedLocationIds = []
-        List<Map> invalidLocations = []
-        List<String> errorMessages = []
-        Set<String> facilityIds = []
-        int createdCount = 0
-        int updatedCount = 0
-
-        items.eachWithIndex { Object rawItem, int index ->
-            if (!(rawItem instanceof JSONObject)) {
-                errorMessages << ("Row ${index + 1}: item must be a JSON object" as String)
-                return
-            }
-            JSONObject json = (JSONObject) rawItem
-            boolean isUpdate = json.containsKey('id') && json.id
-
+        jsonObjects.eachWithIndex { JSONObject json, int index ->
             try {
                 Location.withNewTransaction { status ->
-                    Location location = isUpdate ? Location.get(json.id) : new Location()
-                    if (isUpdate && !location) {
-                        throw new IllegalArgumentException("No Location found for ID ${json.id}")
-                    }
+                    Location location = (json.id ? Location.get(json.id) : null) ?: new Location()
+                    boolean isNew = !location.id
 
                     bindLocationData(location, json)
                     location.disableRefresh = deferRefresh
 
                     if (!location.validate()) {
                         status.setRollbackOnly()
-                        invalidLocations << [
-                            index : index,
-                            id    : location.id,
-                            name  : location.name,
-                            errors: location.errors.allErrors.collect {
+                        results << [
+                            index       : index,
+                            status      : 'error',
+                            errorMessage: 'Validation failed',
+                            errors      : location.errors.allErrors.collect {
                                 [field: it.field, code: it.code, message: it.defaultMessage ?: it.code]
                             }
                         ]
-                        errorMessages << ("Row ${index + 1}: ${location.errors.allErrors.collect { it.defaultMessage ?: it.code }.join(', ')}" as String)
                         return
                     }
 
                     location.save()
-
-                    savedLocationIds << location.id
-                    if (isUpdate) { updatedCount++ } else { createdCount++ }
-
-                    String facilityId = location.isInternalLocation() ? location.parentLocation?.id : location.id
-                    if (facilityId) {
-                        facilityIds << facilityId
-                    }
+                    results << [
+                        index     : index,
+                        status    : 'ok',
+                        action    : isNew ? 'created' : 'updated',
+                        locationId: location.id,
+                        parentId  : location.isInternalLocation() ? location.parentLocation?.id : location.id
+                    ]
                 }
             } catch (Exception e) {
                 log.error("bulkUpsert: error at index ${index}: ${e.message}", e)
-                errorMessages << ("Row ${index + 1}: ${e.message}" as String)
+                results << [
+                    index       : index,
+                    status      : 'error',
+                    errorMessage: e.message
+                ]
             }
         }
 
-        List<String> refreshedFacilities = []
+        List<String> facilityIds = results.findAll { it.status == 'ok' && it.parentId }*.parentId.unique()
         if (deferRefresh && facilityIds) {
-            refreshedFacilities = facilityIds.toList()
-            productAvailabilityService.triggerRefreshProductAvailability(refreshedFacilities, true)
+            productAvailabilityService.triggerRefreshProductAvailability(facilityIds, true)
         }
 
         // Reload saved locations from the request-scoped Hibernate session. Entities loaded inside
         // withNewTransaction become detached when that inner session is closed, which breaks lazy
         // associations during JSON marshalling (e.g. locationType.supportedActivities).
-        List<Location> savedLocations = savedLocationIds ? Location.getAll(savedLocationIds) : []
+        List<String> savedIds = results.findAll { it.status == 'ok' }*.locationId
+        List<Location> savedLocations = savedIds ? Location.getAll(savedIds) : []
 
         render([
-            data         : savedLocations,
-            metadata     : [
-                bulk: [
-                    total  : items.size(),
-                    created: createdCount,
-                    updated: updatedCount,
-                    errors : invalidLocations.size(),
+            data    : savedLocations,
+            metadata: [
+                bulk  : [
+                    total  : results.size(),
+                    created: results.count { it.action == 'created' },
+                    updated: results.count { it.action == 'updated' },
+                    errors : results.count { it.status == 'error' },
                     refresh: [
                         deferred           : deferRefresh,
-                        refreshedFacilities: refreshedFacilities
+                        refreshedFacilities: deferRefresh ? facilityIds : null
                     ]
                 ],
-                errors: invalidLocations
-            ],
-            errorMessages: errorMessages
+                errors: results.findAll { it.status == 'error' }.collect {
+                    [index: it.index, errorMessage: it.errorMessage, errors: it.errors]
+                        .findAll { k, v -> v != null }
+                }
+            ]
         ] as JSON)
     }
 
