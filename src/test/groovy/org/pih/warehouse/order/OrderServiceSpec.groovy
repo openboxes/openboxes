@@ -3,7 +3,9 @@ package org.pih.warehouse.order
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import grails.validation.ValidationException
+import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.BudgetCode
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.LocationTypeCode
@@ -209,6 +211,68 @@ class OrderServiceSpec extends Specification implements DataTest, ServiceUnitTes
         // so we check the message of exception to confirm it's the expected error about inactive supplier.
         RuntimeException e = thrown(RuntimeException)
         e.message.contains("Product source INACTIVE-SUPPLIER for product 11058 is inactive")
+        e.message.contains("Check Row 1.")
+    }
+
+    void 'ImportOrderItems error message should point at the failing row when the failure is not the first row'() {
+        given: 'current location and user'
+        Location currentLocation = new Location(id: "1", name: "Location", organization: new Organization())
+        User user = new User(username: "anadolny")
+
+        and: 'existing order'
+        Order order = new Order(orderNumber: "ORDER-NUMBER", status: OrderStatus.PENDING)
+        order.save(validate: false)
+
+        and: 'product and two suppliers - one active, one inactive'
+        Product product = new Product(productCode: "11058").save(validate: false)
+        new ProductSupplier(
+                code: "ACTIVE-SUPPLIER",
+                product: product,
+                active: true
+        ).save(validate: false)
+        ProductSupplier inactiveSupplier = new ProductSupplier(
+                code: "INACTIVE-SUPPLIER",
+                product: product,
+                active: false
+        ).save(validate: false)
+
+        and: 'valid UOM and BudgetCode'
+        new UnitOfMeasure(code: "EA", name: "Each").save(validate: false)
+        new BudgetCode(code: "BC", active: true).save(validate: false)
+
+        and: 'mocked LocalizationUtil so date parsing works for rows that reach it'
+        GroovyMock(LocalizationUtil, global: true)
+        LocalizationUtil.currentLocale >> Locale.ENGLISH
+        LocalizationUtil.getLocalizedOrderImportDateFormat(_) >> Constants.DEFAULT_ORDER_IMPORT_DATE_FORMAT
+
+        and: 'import data with a valid first row and a failing third row'
+        Map<String, String> validRow = [
+                id: "",
+                productCode: "11058",
+                sourceCode: "ACTIVE-SUPPLIER",
+                quantity: "10",
+                unitOfMeasure: "EA/1",
+                unitPrice: "5",
+                budgetCode: "BC"
+        ]
+        Map<String, String> failingRow = [
+                id: "",
+                productCode: "11058",
+                sourceCode: "INACTIVE-SUPPLIER",
+                quantity: "10",
+                unitOfMeasure: "EA/1",
+                unitPrice: "5",
+                budgetCode: "BC"
+        ]
+        List<Map<String, String>> importItems = [validRow, validRow, failingRow]
+
+        when:
+        service.importOrderItems(order.id, inactiveSupplier.id, importItems, currentLocation, user)
+
+        then:
+        RuntimeException e = thrown(RuntimeException)
+        e.message.contains("Product source INACTIVE-SUPPLIER for product 11058 is inactive")
+        e.message.contains("Check Row 3.")
     }
 
     void 'ImportOrderItems should fail if changing product code for existing item'() {
