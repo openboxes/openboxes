@@ -216,7 +216,9 @@ class AddItemsPage extends Component {
   handleDelete = async (fieldValue, removeItem, removeRow) => {
     try {
       this.props.showSpinner();
-      if (fieldValue && fieldValue.id) { await removeItem(fieldValue.id); }
+      if (fieldValue && fieldValue.id) {
+        await removeItem(fieldValue.id);
+      }
     } finally {
       removeRow();
       this.props.hideSpinner();
