@@ -379,17 +379,17 @@ class AvailableItem {
         if (onHold) {
             return AvailableItemStatus.HOLD
         }
+        if (quantityOnHand <= 0) {
+            return AvailableItemStatus.NOT_AVAILABLE
+        }
         if (available && quantityAvailable < quantityOnHand) {
             return AvailableItemStatus.PICKED
         }
         if (available) {
             return AvailableItemStatus.AVAILABLE
         }
-        if (quantityOnHand <= 0) {
-            return AvailableItemStatus.NOT_AVAILABLE
-        }
 
-        return AvailableItemStatus.PICKED
+        return AvailableItemStatus.NOT_AVAILABLE
     }
 
     Boolean isPickable() {

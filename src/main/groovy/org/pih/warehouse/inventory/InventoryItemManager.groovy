@@ -25,14 +25,6 @@ class InventoryItemManager {
                                            Date expirationDate,
                                            boolean disableRefresh = false) {
         InventoryItem inventoryItem = getInventoryItem(product, lotNumber)
-
-        // If we search for an inventoryItem with default lot and no expiration date,
-        // and we find one with expirationDate, do not use it, and create a new one without the expiration date.
-        Boolean isSearchingForDefaultLotNoExpiry = !lotNumber && !expirationDate
-        if (inventoryItem && isSearchingForDefaultLotNoExpiry && inventoryItem.expirationDate) {
-            return createInventoryItem(product, lotNumber, expirationDate, disableRefresh)
-        }
-
         if (inventoryItem) {
             return inventoryItem
         }
@@ -99,8 +91,7 @@ class InventoryItemManager {
         }
 
         if (inventoryItems?.size() > 1) {
-            // Prefer the item without expiration date.
-            return inventoryItems.find { it.expirationDate == null }
+            return inventoryItems.find { it.lotNumber == null } ?: inventoryItems.get(0)
         }
 
         // Otherwise, sanitize the given lot number and look again (unless the given lot is already sanitized, which
@@ -132,7 +123,7 @@ class InventoryItemManager {
 
     private String sanitizeLotNumber(String lotNumber) {
         if (StringUtils.isEmpty(lotNumber)) {
-            return null
+            return lotNumber
         }
 
         return lotNumber.trim()

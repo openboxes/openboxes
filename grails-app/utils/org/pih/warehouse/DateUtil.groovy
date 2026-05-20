@@ -12,7 +12,6 @@ package org.pih.warehouse
 import grails.validation.ValidationException
 import java.text.SimpleDateFormat
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZoneOffset
 
@@ -50,10 +49,6 @@ class DateUtil {
      */
     static ZoneId getSystemZoneId() {
         return ZoneId.systemDefault()
-    }
-
-    static LocalDate toLocalDate(Date date) {
-        return date?.toInstant()?.atZone(getSystemZoneId())?.toLocalDate()
     }
 
     static Date clearTime(Date date) {
