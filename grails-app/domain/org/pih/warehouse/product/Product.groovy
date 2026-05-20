@@ -459,7 +459,7 @@ class Product implements Comparable, Serializable, Validatable<ProductValidator>
     InventoryLevel getInventoryLevel(String locationId) {
         if (id) {
             def location = Location.get(locationId)
-            return InventoryLevel.findByProductAndInventory(this, location.inventory)
+             return InventoryLevel.findByProductAndInventoryAndInternalLocationIsNull(this, location.inventory)
         }
     }
 
