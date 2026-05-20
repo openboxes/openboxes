@@ -33,21 +33,13 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-const handleDelete = (fieldValue, removeItem, removeRow) => {
-  try {
-    removeItem(fieldValue.id);
-  } finally {
-    removeRow();
-  }
-};
-
 const DELETE_BUTTON_FIELD = {
   label: 'react.default.button.delete.label',
   defaultMessage: 'Delete',
   flexWidth: '0.6',
   fieldKey: '',
   type: ({
-    fieldValue, removeItem, removeRow, translate,
+    fieldValue, removeItem, removeRow, translate, onDelete,
   }) => (
     <div aria-label={translate('react.default.button.delete.label', 'Delete')} role="button">
       <Tooltip
@@ -60,7 +52,7 @@ const DELETE_BUTTON_FIELD = {
       >
         <RiDeleteBinLine
           className="delete-icon"
-          onClick={() => handleDelete(fieldValue, removeItem, removeRow)}
+          onClick={() => onDelete(fieldValue, removeItem, removeRow)}
           disabled={fieldValue?.statusCode === requisitionStatus.SUBSTITUTED}
         />
       </Tooltip>
@@ -220,6 +212,16 @@ class AddItemsPage extends Component {
   }
 
   dataFetched = false;
+
+  handleDelete = async (fieldValue, removeItem, removeRow) => {
+    try {
+      this.props.showSpinner();
+      if (fieldValue && fieldValue.id) { await removeItem(fieldValue.id); }
+    } finally {
+      removeRow();
+      this.props.hideSpinner();
+    }
+  };
 
   validate(values) {
     const errors = {};
@@ -602,6 +604,7 @@ class AddItemsPage extends Component {
                     originId: this.props.initialValues.origin.id,
                     setRecipientValue: (val) => mutators.setColumnValue('returnItems', 'recipient', val),
                     translate: this.props.translate,
+                    onDelete: this.handleDelete,
                   }))}
               </div>
               <div className="submit-buttons">
