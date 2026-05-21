@@ -13,11 +13,11 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
+import { Tooltip } from 'react-tippy';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import { STOCK_MOVEMENT_STATUS, STOCK_MOVEMENT_UPDATE_ITEMS } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
-import ButtonField from 'components/form-elements/ButtonField';
 import FilterInput from 'components/form-elements/FilterInput';
 import LabelField from 'components/form-elements/LabelField';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
@@ -85,7 +85,7 @@ const FIELDS = {
     type: LabelField,
     label: 'react.stockMovement.available.label',
     defaultMessage: 'Available',
-    flexWidth: '1.7',
+    flexWidth: '2.2',
     attributes: {
       type: 'number',
       className: 'text-right',
@@ -105,7 +105,7 @@ const FIELDS = {
     label: 'react.stockMovement.demandPerMonth.label',
     defaultMessage: 'Demand per Month',
     multilineHeader: true,
-    flexWidth: '1.7',
+    flexWidth: '2.5',
     attributes: {
       type: 'number',
       className: 'text-right',
@@ -166,24 +166,27 @@ const FIELDS = {
 };
 
 const DELETE_BUTTON_FIELD = {
-  type: ButtonField,
   flexWidth: '1',
   fieldKey: '',
-  buttonLabel: RiDeleteBinLine,
-  buttonDefaultMessage: 'Delete',
-  getDynamicAttr: ({
-    fieldValue, removeItem, removeRow, updateTotalCount,
-  }) => ({
-    onClick: fieldValue && fieldValue.id ? () => {
-      removeItem(fieldValue.id).then(() => {
-        updateTotalCount(-1);
-        removeRow();
-      });
-    } : () => { updateTotalCount(-1); removeRow(); },
-  }),
-  attributes: {
-    className: 'btn mr-1 delete-icon',
-  },
+  type: ({
+    fieldValue, removeItem, removeRow, updateTotalCount, translate, onDelete,
+  }) => (
+    <div aria-label={translate('react.default.button.delete.label', 'Delete')} role="button">
+      <Tooltip
+        html={(<Translate id="react.default.button.delete.label" defaultMessage="Delete" />)}
+        theme="transparent"
+        arrow="true"
+        delay="150"
+        duration="250"
+        hideDelay="50"
+      >
+        <RiDeleteBinLine
+          className="delete-icon"
+          onClick={() => onDelete(fieldValue, removeItem, removeRow, updateTotalCount)}
+        />
+      </Tooltip>
+    </div>
+  ),
 };
 
 const LINE_ITEMS_ATTR = {
@@ -911,6 +914,19 @@ class AddItemsPage extends Component {
   }
 
   dataFetched = false;
+
+  handleDelete = async (fieldValue, removeItem, removeRow, updateTotalCount) => {
+    try {
+      this.props.showSpinner();
+      if (fieldValue && fieldValue.id) {
+        await removeItem(fieldValue.id);
+      }
+      updateTotalCount(-1);
+      removeRow();
+    } finally {
+      this.props.hideSpinner();
+    }
+  };
 
   validate(values) {
     const errors = {};
@@ -1736,6 +1752,8 @@ class AddItemsPage extends Component {
                     calculateQtyRequested: this.calculateQuantityRequested,
                     itemFilter: this.state.itemFilter,
                     updateFilter: this.updateFilter,
+                    translate: this.props.translate,
+                    onDelete: this.handleDelete,
                   }))}
               </div>
               <div className="submit-buttons">
