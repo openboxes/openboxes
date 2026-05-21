@@ -49,30 +49,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-const handleDelete = (fieldValue, removeItem, removeRow, updateTotalCount) => {
-  try {
-    removeItem(fieldValue.id);
-  } finally {
-    updateTotalCount(-1);
-    removeRow();
-  }
-};
-
-const handleSplit = (fieldValue, addRow, rowIndex, updateTotalCount) => {
-  updateTotalCount(1);
-  addRow({
-    product: fieldValue.product,
-    recipient: fieldValue.recipient,
-    sortOrder: fieldValue.sortOrder + 1,
-    orderItemId: fieldValue.orderItemId,
-    referenceId: fieldValue.orderItemId,
-    orderNumber: fieldValue.orderNumber,
-    packSize: fieldValue.packSize,
-    unitOfMeasure: fieldValue.unitOfMeasure,
-    quantityAvailable: fieldValue.quantityAvailable,
-  }, rowIndex);
-};
-
 const customTextFieldWithTooltip = (params) => {
   const renderInput = ({
     inputClassName,
@@ -322,6 +298,7 @@ const FIELDS = {
         fieldKey: '',
         type: ({
           fieldValue, removeItem, removeRow, updateTotalCount, addRow, rowIndex, translate,
+          onDelete, onSplit,
         }) => (
           <span className="inbound-actions">
             <div aria-label={translate('react.stockMovement.splitLine.label', 'Split line')} role="button">
@@ -335,7 +312,7 @@ const FIELDS = {
               >
                 <TbArrowsSplit2
                   className="split-icon"
-                  onClick={() => handleSplit(fieldValue, addRow, rowIndex, updateTotalCount)}
+                  onClick={() => onSplit(fieldValue, addRow, rowIndex, updateTotalCount)}
                   disabled={fieldValue?.statusCode === requisitionStatus.SUBSTITUTED}
                 />
               </Tooltip>
@@ -351,7 +328,7 @@ const FIELDS = {
               >
                 <RiDeleteBinLine
                   className="delete-icon"
-                  onClick={() => handleDelete(fieldValue, removeItem, removeRow, updateTotalCount)}
+                  onClick={() => onDelete(fieldValue, removeItem, removeRow, updateTotalCount)}
                   disabled={fieldValue?.statusCode === requisitionStatus.SUBSTITUTED}
                 />
               </Tooltip>
@@ -486,6 +463,34 @@ class AddItemsPage extends Component {
   }
 
   dataFetched = false;
+
+  handleDelete = async (fieldValue, removeItem, removeRow, updateTotalCount) => {
+    try {
+      this.props.showSpinner();
+      if (fieldValue && fieldValue.id) {
+        await removeItem(fieldValue.id);
+      }
+      updateTotalCount(-1);
+      removeRow();
+    } finally {
+      this.props.hideSpinner();
+    }
+  };
+
+  handleSplit = (fieldValue, addRow, rowIndex, updateTotalCount) => {
+    updateTotalCount(1);
+    addRow({
+      product: fieldValue.product,
+      recipient: fieldValue.recipient,
+      sortOrder: fieldValue.sortOrder + 1,
+      orderItemId: fieldValue.orderItemId,
+      referenceId: fieldValue.orderItemId,
+      orderNumber: fieldValue.orderNumber,
+      packSize: fieldValue.packSize,
+      unitOfMeasure: fieldValue.unitOfMeasure,
+      quantityAvailable: fieldValue.quantityAvailable,
+    }, rowIndex);
+  };
 
   validate(values, ignoreLotAndExpiry) {
     if (!this.dataFetched) {
@@ -1301,6 +1306,8 @@ class AddItemsPage extends Component {
                     setRecipientValue: (val) => form.mutators.setColumnValue('lineItems', 'recipient', val),
                     translate: this.props.translate,
                     overrideFormValue: form.mutators.override,
+                    onDelete: this.handleDelete,
+                    onSplit: this.handleSplit,
                   }))}
               </div>
               <div className="submit-buttons">
