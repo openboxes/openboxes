@@ -219,8 +219,8 @@ class AddItemsPage extends Component {
       if (fieldValue && fieldValue.id) {
         await removeItem(fieldValue.id);
       }
-    } finally {
       removeRow();
+    } finally {
       this.props.hideSpinner();
     }
   };
