@@ -9,12 +9,12 @@ import { Form } from 'react-final-form';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import { Tooltip } from 'react-tippy';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import ProductApi from 'api/services/ProductApi';
 import stockTransferApi from 'api/services/StockTransferApi';
 import ArrayField from 'components/form-elements/ArrayField';
-import ButtonField from 'components/form-elements/ButtonField';
 import DateField from 'components/form-elements/DateField';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
@@ -24,6 +24,7 @@ import ConfirmExpirationDateModal from 'components/modals/ConfirmExpirationDateM
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
 import NotificationType from 'consts/notificationTypes';
+import requisitionStatus from 'consts/requisitionStatus';
 import StockTransferStatus from 'consts/stockTransferStatus';
 import { flattenRequest, parseResponse } from 'utils/apiClient';
 import { renderFormField, setColumnValue } from 'utils/form-utils';
@@ -33,26 +34,30 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const DELETE_BUTTON_FIELD = {
-  type: ButtonField,
   label: 'react.default.button.delete.label',
   defaultMessage: 'Delete',
-  flexWidth: '0.4',
+  flexWidth: '0.6',
   fieldKey: '',
-  buttonLabel: RiDeleteBinLine,
-  buttonDefaultMessage: 'Delete',
-  getDynamicAttr: ({
-    fieldValue, removeItem, removeRow,
-  }) => ({
-    onClick: fieldValue && fieldValue.id ? () => {
-      removeItem(fieldValue.id).then(() => {
-        removeRow();
-      });
-    } : () => removeRow(),
-    disabled: fieldValue && fieldValue.statusCode === 'SUBSTITUTED',
-  }),
-  attributes: {
-    className: 'btn delete-icon',
-  },
+  type: ({
+    fieldValue, removeItem, removeRow, translate, onDelete,
+  }) => (
+    <div aria-label={translate('react.default.button.delete.label', 'Delete')} role="button">
+      <Tooltip
+        html={(<Translate id="react.default.button.delete.label" defaultMessage="Delete" />)}
+        theme="transparent"
+        arrow="true"
+        delay="150"
+        duration="250"
+        hideDelay="50"
+      >
+        <RiDeleteBinLine
+          className="delete-icon"
+          onClick={() => onDelete(fieldValue, removeItem, removeRow)}
+          disabled={fieldValue?.statusCode === requisitionStatus.SUBSTITUTED}
+        />
+      </Tooltip>
+    </div>
+  ),
 };
 
 const FIELDS = {
@@ -100,7 +105,7 @@ const FIELDS = {
         type: DateField,
         label: 'react.inboundReturns.expiry.label',
         defaultMessage: 'Expiry',
-        fixedWidth: '11ch',
+        fixedWidth: '7.8em',
         attributes: {
           localizeDate: true,
           showLocalizedPlaceholder: true,
@@ -112,7 +117,7 @@ const FIELDS = {
         type: TextField,
         label: 'react.inboundReturns.quantity.label',
         defaultMessage: 'Qty',
-        flexWidth: '1',
+        flexWidth: '1.1',
         required: true,
         attributes: {
           type: 'number',
@@ -207,6 +212,18 @@ class AddItemsPage extends Component {
   }
 
   dataFetched = false;
+
+  handleDelete = async (fieldValue, removeItem, removeRow) => {
+    try {
+      this.props.showSpinner();
+      if (fieldValue && fieldValue.id) {
+        await removeItem(fieldValue.id);
+      }
+      removeRow();
+    } finally {
+      this.props.hideSpinner();
+    }
+  };
 
   validate(values) {
     const errors = {};
@@ -589,6 +606,7 @@ class AddItemsPage extends Component {
                     originId: this.props.initialValues.origin.id,
                     setRecipientValue: (val) => mutators.setColumnValue('returnItems', 'recipient', val),
                     translate: this.props.translate,
+                    onDelete: this.handleDelete,
                   }))}
               </div>
               <div className="submit-buttons">
