@@ -379,7 +379,7 @@ class AvailableItem {
         if (onHold) {
             return AvailableItemStatus.HOLD
         }
-        if (quantityOnHand <= 0) {
+        if (quantityOnHand <= 0 || quantityAvailable <= 0) {
             return AvailableItemStatus.NOT_AVAILABLE
         }
         if (available && quantityAvailable < quantityOnHand) {
