@@ -136,7 +136,7 @@ const FIELDS = {
         label: 'react.stockMovement.orderNumber.label',
         defaultMessage: 'Order number',
         multilineHeader: true,
-        fixedWidth: '9.7em',
+        fixedWidth: '6.5em',
         fieldKey: '',
         getDynamicAttr: ({
           fieldValue,
@@ -153,7 +153,7 @@ const FIELDS = {
         defaultMessage: 'Product',
         headerAlign: 'left',
         multilineHeader: true,
-        flexWidth: '4',
+        flexWidth: '3',
         required: true,
         attributes: {
           showSelectedOptionColor: true,
@@ -174,7 +174,7 @@ const FIELDS = {
         label: 'react.stockMovement.lot.label',
         defaultMessage: 'Lot',
         multilineHeader: true,
-        flexWidth: '9em',
+        flexWidth: '1.5',
         getDynamicAttr: ({
           rowIndex,
           values,
@@ -194,7 +194,7 @@ const FIELDS = {
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
         multilineHeader: true,
-        fixedWidth: '7.6em',
+        fixedWidth: '7.3em',
         attributes: {
           dateFormat: 'MM/DD/YYYY',
           autoComplete: 'off',
@@ -224,7 +224,8 @@ const FIELDS = {
         type: TextField,
         label: 'react.stockMovement.quantityPOUom.label',
         defaultMessage: 'Quantity (in PO UoM)',
-        fixedWidth: '10.8ch',
+        headerAlign: 'right',
+        fixedWidth: '10.9ch',
         required: true,
         headerTooltip: 'react.stockMovement.quantityPerUom.InputTooltip.label',
         multilineHeader: true,
@@ -238,7 +239,7 @@ const FIELDS = {
         label: 'react.stockMovement.POUom.label',
         defaultMessage: 'PO UoM',
         multilineHeader: true,
-        fixedWidth: '7.7em',
+        flexWidth: '0.8',
         attributes: {
           disabled: true,
         },
@@ -248,7 +249,8 @@ const FIELDS = {
         label: 'react.stockMovement.quantityEach.label',
         defaultMessage: 'Quantity (each)',
         multilineHeader: true,
-        fixedWidth: '9.6ch',
+        headerAlign: 'right',
+        fixedWidth: '7.1ch',
         attributes: {
           disabled: true,
           className: 'text-right',
@@ -267,7 +269,7 @@ const FIELDS = {
         label: 'react.stockMovement.packLevel1.label',
         defaultMessage: 'Pack level 1',
         multilineHeader: true,
-        flexWidth: '5.2em',
+        flexWidth: '1',
         getDynamicAttr: ({
           rowIndex, rowCount,
         }) => ({
@@ -279,14 +281,14 @@ const FIELDS = {
         label: 'react.stockMovement.packLevel2.label',
         defaultMessage: 'Pack level 2',
         multilineHeader: true,
-        flexWidth: '6.7em',
+        flexWidth: '1',
       },
       recipient: {
         type: SelectField,
         label: 'react.stockMovement.recipient.label',
         defaultMessage: 'Recipient',
         multilineHeader: true,
-        flexWidth: '1.5',
+        flexWidth: '1.3',
         getDynamicAttr: ({
           recipients,
           translate,
@@ -316,7 +318,7 @@ const FIELDS = {
       actions: {
         label: 'react.stockMovement.actions.label',
         defaultMessage: 'Actions',
-        flexWidth: '1',
+        flexWidth: '0.7',
         fieldKey: '',
         type: ({
           fieldValue, removeItem, removeRow, updateTotalCount, addRow, rowIndex, translate,
