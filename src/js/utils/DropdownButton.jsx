@@ -26,21 +26,23 @@ const DropdownButton = ({
       className="dropdown-menu dropdown-menu-right nav-item padding-8"
       aria-labelledby="dropdownMenuButton"
     >
-      {actions.map((action) => (
-        <a
-          key={action.label}
-          href="#"
-          className="dropdown-item"
-          onClick={action.onClick}
-          role="button"
-          tabIndex={0}
-        >
-          <Translate
-            id={action.label}
-            defaultMessage={action.defaultLabel}
-          />
-        </a>
-      ))}
+      {actions
+        .filter((action) => !action.hidden)
+        .map((action) => (
+          <a
+            key={action.label}
+            href="#"
+            className="dropdown-item"
+            onClick={action.onClick}
+            role="button"
+            tabIndex={0}
+          >
+            <Translate
+              id={action.label}
+              defaultMessage={action.defaultLabel}
+            />
+          </a>
+        ))}
     </div>
   </>
 );

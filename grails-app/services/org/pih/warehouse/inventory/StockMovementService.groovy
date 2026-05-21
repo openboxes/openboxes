@@ -3559,7 +3559,7 @@ class StockMovementService {
                             contentType : "text/html",
                             stepNumber  : 5,
                             uri         : g.createLink(controller: 'deliveryNote', action: "printOutboundReturn", id: stockMovement?.shipment?.id, absolute: true),
-                            hidden      : !stockMovement?.isReturn
+                            hidden      : !stockMovement?.isReturn || AuthService.currentLocation?.id != stockMovement?.origin?.id
                     ],
                     [
                             name        : g.message(code: "goodsReceiptNote.label"),
