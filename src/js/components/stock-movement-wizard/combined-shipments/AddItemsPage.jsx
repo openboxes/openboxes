@@ -129,7 +129,7 @@ const FIELDS = {
         defaultMessage: 'Product',
         headerAlign: 'left',
         multilineHeader: true,
-        flexWidth: '3',
+        flexWidth: '2.7',
         required: true,
         attributes: {
           showSelectedOptionColor: true,
@@ -170,7 +170,7 @@ const FIELDS = {
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
         multilineHeader: true,
-        fixedWidth: '7.3em',
+        fixedWidth: '7.1em',
         attributes: {
           dateFormat: 'MM/DD/YYYY',
           autoComplete: 'off',
@@ -201,7 +201,7 @@ const FIELDS = {
         label: 'react.stockMovement.quantityPOUom.label',
         defaultMessage: 'Quantity (in PO UoM)',
         headerAlign: 'right',
-        fixedWidth: '10.9ch',
+        fixedWidth: '11.5ch',
         required: true,
         headerTooltip: 'react.stockMovement.quantityPerUom.InputTooltip.label',
         multilineHeader: true,
@@ -215,7 +215,7 @@ const FIELDS = {
         label: 'react.stockMovement.POUom.label',
         defaultMessage: 'PO UoM',
         multilineHeader: true,
-        flexWidth: '0.8',
+        flexWidth: '1',
         attributes: {
           disabled: true,
         },
