@@ -12,7 +12,6 @@ package org.pih.warehouse.inventory
 import grails.core.GrailsApplication
 import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
-import grails.plugin.cache.CacheEvict
 import grails.util.Holders
 import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
@@ -335,7 +334,6 @@ class ProductAvailabilityService {
         }
     }
 
-    @CacheEvict(value = "dashboardCache", allEntries = true)
     boolean saveProductAvailability(Location location, Product product, List binLocations, Boolean forceRefresh) {
         log.info "Saving product availability for product=${product?.productCode}, location=${location}"
         def batchSize = Holders.config.openboxes.inventorySnapshot.batchSize ?: 1000

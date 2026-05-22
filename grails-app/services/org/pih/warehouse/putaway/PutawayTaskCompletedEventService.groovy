@@ -9,31 +9,17 @@
  **/
 package org.pih.warehouse.putaway
 
-import org.springframework.context.ApplicationListener
-import org.springframework.transaction.support.TransactionSynchronizationAdapter
-import org.springframework.transaction.support.TransactionSynchronizationManager
+import org.springframework.transaction.event.TransactionPhase
+import org.springframework.transaction.event.TransactionalEventListener
 
-class PutawayTaskCompletedEventService implements ApplicationListener<PutawayTaskCompletedEvent> {
+class PutawayTaskCompletedEventService {
 
     def productAvailabilityService
 
-    void onApplicationEvent(PutawayTaskCompletedEvent event) {
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+    void onPutawayTaskCompleted(PutawayTaskCompletedEvent event) {
         PutawayTask task = (PutawayTask) event.source
-        String facilityId = task?.facility?.id
-        String productId = task?.product?.id
-        Boolean forceRefresh = event?.forceRefresh
-        log.info "Putaway ${task?.id} completed; scheduling product-availability refresh for facility=${facilityId}, product=${productId}"
-
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            // Defer until commit so transferStock's two Transaction inserts are both flushed before the refresh reads transaction_entry.
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
-                @Override
-                void afterCommit() {
-                    productAvailabilityService.refreshProductsAvailability(facilityId, [productId], forceRefresh)
-                }
-            })
-        } else {
-            productAvailabilityService.refreshProductsAvailability(facilityId, [productId], forceRefresh)
-        }
+        log.info "Putaway ${task?.id} completed; refreshing PA for facility=${task?.facility?.id}, product=${task?.product?.id}"
+        productAvailabilityService.triggerRefreshProductAvailability(task?.facility?.id, [task?.product?.id], event?.forceRefresh)
     }
 }
