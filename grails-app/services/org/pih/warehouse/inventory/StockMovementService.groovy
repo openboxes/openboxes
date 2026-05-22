@@ -3559,7 +3559,7 @@ class StockMovementService {
                             contentType : "text/html",
                             stepNumber  : 5,
                             uri         : g.createLink(controller: 'deliveryNote', action: "printOutboundReturn", id: stockMovement?.shipment?.id, absolute: true),
-                            hidden      : !stockMovement?.isReturn
+                            hidden      : !stockMovement?.isReturn || getStockMovementDirection(stockMovement) != StockMovementDirection.OUTBOUND
                     ],
                     [
                             name        : g.message(code: "goodsReceiptNote.label"),
@@ -3721,6 +3721,20 @@ class StockMovementService {
             requisition.dateApproved = null
             requisition.dateRejected = null
         }
+    }
+
+    // def = StockMovement or OutboundStockMovement
+    StockMovementDirection getStockMovementDirection(def stockMovement) {
+        if (stockMovement instanceof OutboundStockMovement) {
+            return StockMovementDirection.OUTBOUND
+        }
+
+        if (stockMovement instanceof StockMovement) {
+            Location currentLocation = AuthService.currentLocation
+            return stockMovement.getStockMovementDirection(currentLocation)
+        }
+
+        return null
     }
 
     Boolean canRollbackApproval(Location location, User user, StockMovement stockMovement) {

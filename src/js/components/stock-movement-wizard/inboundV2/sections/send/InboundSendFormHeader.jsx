@@ -28,6 +28,7 @@ const InboundSendFormHeader = memo(({
     {
       label: document?.name,
       defaultLabel: document?.name,
+      hidden: document?.hidden,
       onClick: (e) => {
         e.preventDefault();
         handleExportFile(document);
