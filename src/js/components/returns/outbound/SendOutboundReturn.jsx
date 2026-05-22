@@ -145,7 +145,7 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
-        flexWidth: '4',
+        flexWidth: '3.7',
         headerAlign: 'left',
         getDynamicAttr: ({ fieldValue }) => ({
           tooltipValue: fieldValue?.name,
@@ -166,7 +166,7 @@ const FIELDS = {
         type: LabelField,
         label: 'react.outboundReturns.expiry.label',
         defaultMessage: 'Expiry',
-        flexWidth: '1',
+        fixedWidth: '11ch',
         getDynamicAttr: ({ formatLocalizedDate }) => ({
           formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
         }),
@@ -175,7 +175,7 @@ const FIELDS = {
         type: LabelField,
         label: 'react.outboundReturns.zone.label',
         defaultMessage: 'Zone',
-        flexWidth: '0.5',
+        flexWidth: '1',
         attributes: {
           showValueTooltip: true,
         },
@@ -196,6 +196,7 @@ const FIELDS = {
         type: LabelField,
         label: 'react.outboundReturns.quantity.label',
         defaultMessage: 'Qty to Return',
+        headerAlign: 'right',
         flexWidth: '1',
         attributes: {
           className: 'text-right mr-1',
