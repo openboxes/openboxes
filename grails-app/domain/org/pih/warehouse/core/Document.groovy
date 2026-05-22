@@ -59,7 +59,7 @@ class Document implements Serializable {
         }
         String extension = FileUtil.getExtension(filename)?.toLowerCase()
         boolean matchesAllowlist = ALLOWED_CONTENT_TYPES.any { ContentType ct ->
-            ct.fileExtension.extension.substring(1) == extension &&
+            ct.fileExtension.extension == extension &&
                     ct.mediaType.toString() == mediaType.toLowerCase()
         }
         if (!matchesAllowlist) {
@@ -83,7 +83,7 @@ class Document implements Serializable {
     }
 
     static Set<String> allowedExtensions() {
-        return ALLOWED_CONTENT_TYPES.collect { it.fileExtension.extension.substring(1) } as Set
+        return ALLOWED_CONTENT_TYPES.collect { it.fileExtension.extension } as Set
     }
 
     String id
