@@ -46,7 +46,6 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.transaction.annotation.Propagation
 import org.springframework.validation.ObjectError
 
 @Transactional
@@ -568,7 +567,6 @@ class ReceiptService {
         Holders.grailsApplication.mainContext.publishEvent(new AutomaticBackorderReallocationEvent(shipmentId))
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     void logShipmentEvent(String shipmentId, ObjectError error) {
         String message = messageSource.getMessage(error, LocaleContextHolder.locale)
         Shipment shipment = Shipment.get(shipmentId)
