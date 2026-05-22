@@ -80,7 +80,7 @@ const FIELDS = {
         type: LabelField,
         label: 'react.outboundReturns.productName.label',
         defaultMessage: 'Product',
-        flexWidth: '4.5',
+        flexWidth: '4.2',
         headerAlign: 'left',
         getDynamicAttr: ({ fieldValue }) => ({
           tooltipValue: fieldValue?.name,
@@ -110,6 +110,7 @@ const FIELDS = {
         type: LabelField,
         label: 'react.outboundReturns.qoh.label',
         defaultMessage: 'QOH',
+        headerAlign: 'right',
         flexWidth: '1',
         attributes: {
           className: 'text-right mr-1',
@@ -122,6 +123,7 @@ const FIELDS = {
         headerTooltip: 'react.outboundReturns.qtyNotPickedTooltip.label',
         headerDefaultTooltip: 'This is the quantity on hand that is not currently picked in a shipment',
         multilineHeader: true,
+        headerAlign: 'right',
         flexWidth: '1.2',
         attributes: {
           className: 'text-right mr-1',
@@ -131,7 +133,7 @@ const FIELDS = {
         type: LabelField,
         label: 'react.outboundReturns.zone.label',
         defaultMessage: 'Zone',
-        flexWidth: '1',
+        flexWidth: '1.4',
         attributes: {
           showValueTooltip: true,
         },
@@ -149,7 +151,7 @@ const FIELDS = {
         type: TextField,
         label: 'react.outboundReturns.quantity.label',
         defaultMessage: 'Qty to Return',
-        headerAlign: 'left',
+        headerAlign: 'right',
         flexWidth: '1',
         attributes: {
           type: 'number',
