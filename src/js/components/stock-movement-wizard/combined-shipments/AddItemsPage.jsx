@@ -211,7 +211,7 @@ const FIELDS = {
         },
       },
       unitOfMeasure: {
-        type: TextField,
+        type: customTextFieldWithTooltip,
         label: 'react.stockMovement.POUom.label',
         defaultMessage: 'PO UoM',
         multilineHeader: true,
