@@ -207,7 +207,8 @@ class LocationApiController extends BaseDomainApiController {
         jsonObjects.eachWithIndex { JSONObject json, int index ->
             try {
                 Location.withNewTransaction { status ->
-                    Location location = (json.id ? Location.get(json.id) : null) ?: new Location()
+                    // FIXME: make the request happen through a service method
+                    Location location = Location.findByIdOrLocationNumber(json.id, json.locationNumber) ?: new Location()
                     boolean isNew = !location.id
 
                     bindLocationData(location, json)
