@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 import org.hibernate.Criteria
 import grails.gorm.transactions.Transactional
@@ -38,6 +39,7 @@ class LocationApiController extends BaseDomainApiController {
     def inventoryService
     def documentService
     LocationDataService locationGormService
+    def productAvailabilityService
 
     def read() {
         Location location = Location.findByIdOrLocationNumber(params.id, params.id)
@@ -187,6 +189,93 @@ class LocationApiController extends BaseDomainApiController {
         locationGormService.save(existingLocation)
 
         render([data: existingLocation] as JSON)
+    }
+
+    def upsert() {
+        def body = request.JSON
+        if (body instanceof JSONArray) {
+            bulkUpsert((JSONArray) body)
+        } else {
+            create()
+        }
+    }
+
+    private def bulkUpsert(JSONArray jsonObjects) {
+        boolean deferRefresh = params.boolean('deferRefresh', false)
+        List<Map> results = []
+
+        jsonObjects.eachWithIndex { JSONObject json, int index ->
+            try {
+                Location.withNewTransaction { status ->
+                    // FIXME: make the request happen through a service method
+                    Location location = Location.findByIdOrLocationNumber(json.id, json.locationNumber) ?: new Location()
+                    boolean isNew = !location.id
+
+                    bindLocationData(location, json)
+                    location.disableRefresh = deferRefresh
+
+                    if (!location.validate()) {
+                        status.setRollbackOnly()
+                        results << [
+                            index       : index,
+                            status      : 'error',
+                            errorMessage: 'Validation failed',
+                            errors      : location.errors.allErrors.collect {
+                                [field: it.field, code: it.code, message: it.defaultMessage ?: it.code]
+                            }
+                        ]
+                        return
+                    }
+
+                    location.save()
+                    results << [
+                        index     : index,
+                        status    : 'ok',
+                        action    : isNew ? 'created' : 'updated',
+                        locationId: location.id,
+                        parentId  : location.isInternalLocation() ? location.parentLocation?.id : location.id
+                    ]
+                }
+            } catch (Exception e) {
+                log.error("bulkUpsert: error at index ${index}: ${e.message}", e)
+                results << [
+                    index       : index,
+                    status      : 'error',
+                    errorMessage: e.message
+                ]
+            }
+        }
+
+        List<String> facilityIds = results.findAll { it.status == 'ok' && it.parentId }*.parentId.unique()
+        if (deferRefresh && facilityIds) {
+            productAvailabilityService.triggerRefreshProductAvailability(facilityIds, true)
+        }
+
+        // Reload saved locations from the request-scoped Hibernate session. Entities loaded inside
+        // withNewTransaction become detached when that inner session is closed, which breaks lazy
+        // associations during JSON marshalling (e.g. locationType.supportedActivities).
+        List<String> savedIds = results.findAll { it.status == 'ok' }*.locationId
+        List<Location> savedLocations = savedIds ? Location.getAll(savedIds) : []
+
+        render([
+            data    : savedLocations,
+            metadata: [
+                bulk  : [
+                    total  : results.size(),
+                    created: results.count { it.action == 'created' },
+                    updated: results.count { it.action == 'updated' },
+                    errors : results.count { it.status == 'error' },
+                    refresh: [
+                        deferred           : deferRefresh,
+                        refreshedFacilities: deferRefresh ? facilityIds : null
+                    ]
+                ],
+                errors: results.findAll { it.status == 'error' }.collect {
+                    [index: it.index, errorMessage: it.errorMessage, errors: it.errors]
+                        .findAll { k, v -> v != null }
+                }
+            ]
+        ] as JSON)
     }
 
     Location bindLocationData(Location location, JSONObject jsonObject) {
