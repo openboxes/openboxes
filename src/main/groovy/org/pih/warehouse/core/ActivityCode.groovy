@@ -66,6 +66,9 @@ enum ActivityCode {
     // Directed putaway
     DIRECTED_PUTAWAY('DIRECTED_PUTAWAY'),
 
+    // Automated putaway creation (creates putaway tasks automatically after auto-receive)
+    AUTOMATED_PUTAWAY_CREATION('AUTOMATED_PUTAWAY_CREATION'),
+
     // Creates a dynamic receiving location during receipt
     DYNAMIC_RECEIVING('DYNAMIC_RECEIVING'),
 
@@ -178,6 +181,7 @@ enum ActivityCode {
                 AUTO_RECEIVING,
                 DYNAMIC_SLOTTING,
                 STATIC_SLOTTING,
+                AUTOMATED_PUTAWAY_CREATION,
                 ENABLE_WEBHOOKS,
                 ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS,
                 ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS,

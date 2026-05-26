@@ -14,6 +14,9 @@ import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import grails.validation.ValidationException
 import org.pih.warehouse.allocation.AutomaticBackorderReallocationEvent
+import org.pih.warehouse.allocation.BackorderService
+import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.CommentType
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
@@ -41,6 +44,9 @@ import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentService
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.validation.ObjectError
 
 @Transactional
 class ReceiptService {
@@ -54,6 +60,8 @@ class ReceiptService {
     GrailsApplication grailsApplication
     ProductAvailabilityService productAvailabilityService
     InboundSortationService inboundSortationService
+    BackorderService backorderService
+    MessageSource messageSource
 
     @Transactional(readOnly=true)
     PartialReceipt getPartialReceipt(String id, String stepNumber, String sort = null) {
@@ -533,6 +541,14 @@ class ReceiptService {
             return
         }
 
+        if (shipment.destination?.supports(ActivityCode.CROSS_DOCKING)) {
+            backorderService.validateBackorderReferences(shipment)
+            if (shipment.hasErrors()) {
+                shipment.errors.allErrors.each { ObjectError error -> logShipmentEvent(shipment.id, error) }
+                return
+            }
+        }
+
         // Create the partial receipt
         PartialReceipt partialReceipt = createAutomaticReceipt(shipment)
 
@@ -541,14 +557,32 @@ class ReceiptService {
 
         // FIXME We should consider eventing (shipment.received) and have an event service determine whether
         //  the shipment should be auto received
-        log.info "Creating putaway tasks for receipt ${shipment.receipt} "
-        if (shipment.destination.supports(ActivityCode.DYNAMIC_SLOTTING)) {
+        log.info "Creating putaway tasks for receipt ${shipment.receipt}"
+        if (shipment.destination?.supports(ActivityCode.AUTOMATED_PUTAWAY_CREATION)) {
             inboundSortationService.createPutawayOrdersFromReceipt(shipment.receipt)
         }
     }
 
     def reallocateBackorderedItems(String shipmentId) {
         Holders.grailsApplication.mainContext.publishEvent(new AutomaticBackorderReallocationEvent(shipmentId))
+    }
+
+    void logShipmentEvent(String shipmentId, ObjectError error) {
+        String message = messageSource.getMessage(error, LocaleContextHolder.locale)
+        Shipment shipment = Shipment.get(shipmentId)
+        if (!shipment) {
+            log.warn("Unable to log shipment event because shipment ${shipmentId} could not be loaded: ${message}")
+            return
+        }
+
+        boolean alreadyLogged = shipment.comments.any {
+            it.type == CommentType.SYSTEM && it.comment == message
+        }
+        if (!alreadyLogged) {
+            shipment.addToComments(new Comment(comment: message, sender: null))
+            shipment.save(failOnError: true)
+        }
+        log.warn("Shipment ${shipment.id}: ${message}")
     }
 
     PartialReceipt createAutomaticReceipt(Shipment shipment) {
