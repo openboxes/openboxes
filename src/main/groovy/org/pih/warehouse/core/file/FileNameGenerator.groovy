@@ -45,8 +45,8 @@ class FileNameGenerator {
             fileName += formattedField
         }
 
-        if (fileExtension) {
-             fileName += fileExtension.extension
+        if (fileExtension?.extension) {
+             fileName += '.' + fileExtension.extension
         }
 
         return fileName
