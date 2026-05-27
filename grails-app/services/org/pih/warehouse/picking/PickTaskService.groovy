@@ -229,13 +229,24 @@ class PickTaskService {
         }
 
         // Delete only the specific picklist item being reallocated (task.id === picklistItem.id)
+        String locationId = null
+        String productId = requisitionItem?.product?.id
+        String facilityId = requisitionItem?.requisition?.origin?.id
         PicklistItem currentPicklistItem = PicklistItem.get(task.id)
         if (currentPicklistItem) {
             Picklist picklist = currentPicklistItem.picklist
+            locationId = currentPicklistItem.binLocation?.id
             currentPicklistItem.disableRefresh = Boolean.TRUE
             picklist?.removeFromPicklistItems(currentPicklistItem)
             requisitionItem.removeFromPicklistItems(currentPicklistItem)
             currentPicklistItem.delete(flush: true)
+        }
+
+        // Refresh product availability for the previous bin location so its quantityAllocated is recalculated.
+        // Current bin locations are refreshed by createOrUpdatePicklistItem below.
+        // TODO Consider one refresh at product or facility level instead of this refresh and second after creating a new pick list item
+        if (locationId && productId && facilityId) {
+            productAvailabilityService.refreshProductsAvailability(facilityId, [productId], [locationId], false)
         }
 
         // Create new picklist items for each selected bin location
