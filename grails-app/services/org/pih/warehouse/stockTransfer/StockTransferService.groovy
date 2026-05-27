@@ -19,7 +19,12 @@ import org.pih.warehouse.api.DocumentGroupCode
 import org.pih.warehouse.api.StockTransfer
 import org.pih.warehouse.api.StockTransferItem
 import org.pih.warehouse.api.StockTransferStatus
+import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.MailService
+import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.order.Order
@@ -43,6 +48,8 @@ class StockTransferService {
     GrailsApplication grailsApplication
     def orderService
     def authService
+    UserService userService
+    MailService mailService
 
     /**
      * Gets paginated list of stock transfers (Orders with TRANSFER_ORDER type)
@@ -352,10 +359,45 @@ class StockTransferService {
 
         createStockTransferTransaction(stockTransfer, order)
 
-        // if (location is under receipt)
-        //      sendStockTransferNotification() -> fetch users with Stocktransfer notification role -> send
+
+        if (stockTransfer?.stockTransferItems?.any {
+            (it.originBinLocation?.supports(ActivityCode.ENABLE_STOCK_TRANSFER_NOTIFICATIONS)
+                    || it.destinationBinLocation?.supports(ActivityCode.ENABLE_STOCK_TRANSFER_NOTIFICATIONS))
+        }) {
+            sendStockTransferNotification(stockTransfer)
+        }
 
         return order
+    }
+
+    private void sendStockTransferNotification(StockTransfer stockTransfer) {
+        try {
+            def recipientList = userService.findUsersByRoleType(RoleType.ROLE_STOCK_TRANSFER_NOTIFICATIONS).collect {
+                it.email
+            }
+            if (recipientList) {
+                def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
+                // try to find StockTransferItem with destinationBinLocation that supports ENABLE_STOCK_TRANSFER_NOTIFICATIONS activity
+                StockTransferItem stockTransferItemWithSupportedLocation = stockTransfer?.stockTransferItems?.find {
+                    it.destinationBinLocation?.supports(ActivityCode.ENABLE_STOCK_TRANSFER_NOTIFICATIONS)
+                }
+                String subject
+                if (stockTransferItemWithSupportedLocation) {
+                    subject = g.message(code: 'email.stockTransfer.message.toLocation', args: [stockTransferItemWithSupportedLocation?.destinationBinLocation?.name])
+                } else {
+                    // else try to find StockTransferItem with originBinLocation that supports ENABLE_STOCK_TRANSFER_NOTIFICATIONS activity
+                    stockTransferItemWithSupportedLocation = stockTransfer?.stockTransferItems?.find {
+                        it.originBinLocation?.supports(ActivityCode.ENABLE_STOCK_TRANSFER_NOTIFICATIONS)
+                    }
+                    subject = g.message(code: 'email.stockTransfer.message.fromLocation', args: [stockTransferItemWithSupportedLocation?.originBinLocation?.name])
+                }
+                def body = "${g.render(template: '/email/stockTransfer', model: [stockTransfer: stockTransfer, stockTransferItem: stockTransferItemWithSupportedLocation])}"
+                mailService.sendHtmlMail(subject, body.toString(), recipientList)
+            }
+        }
+        catch (Exception e) {
+            log.error("Error sending stock transfer notification email: " + e.message, e)
+        }
     }
 
     void updateStockTransferStatus(Order order, OrderStatus orderStatus) {

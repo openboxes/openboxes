@@ -55,7 +55,7 @@ class StockTransferSecondPage extends Component {
   componentDidMount() {
     if (this.props.stockTransferTranslationsFetched) {
       this.dataFetched = true;
-      this.props.fetchReasonCodes(ActivityCode.SHORTAGE_QTY_UNDER_RECEIPT);
+      this.props.fetchReasonCodes(ActivityCode.ENABLE_STOCK_TRANSFER_NOTIFICATIONS);
     }
     this.fetchStockTransfer();
   }
@@ -63,7 +63,7 @@ class StockTransferSecondPage extends Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.stockTransferTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
-      this.props.fetchReasonCodes(ActivityCode.SHORTAGE_QTY_UNDER_RECEIPT);
+      this.props.fetchReasonCodes(ActivityCode.ENABLE_STOCK_TRANSFER_NOTIFICATIONS);
     }
   }
 

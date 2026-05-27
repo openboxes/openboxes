@@ -37,7 +37,7 @@ class ReasonCodeApiController {
             reasonCodes.addAll(getReasonCodes(ReasonCode.listPutawayDiscrepancyCodes()))
         } else if (ActivityCode.PICKING_SHORTAGE in activityCodes) {
             reasonCodes.addAll(getReasonCodes(ReasonCode.listPickingShortageReasonCodes()))
-        } else if (ActivityCode.SHORTAGE_QTY_UNDER_RECEIPT in activityCodes) {
+        } else if (ActivityCode.ENABLE_STOCK_TRANSFER_NOTIFICATIONS in activityCodes) {
             reasonCodes.addAll(getReasonCodes(ReasonCode.listPickingShortageReasonCodes()))
         } else {
             reasonCodes.addAll(getReasonCodes(ReasonCode.listDefault()))
