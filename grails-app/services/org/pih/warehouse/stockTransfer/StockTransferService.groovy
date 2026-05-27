@@ -372,7 +372,7 @@ class StockTransferService {
 
     private void sendStockTransferNotification(StockTransfer stockTransfer) {
         try {
-            def recipientList = userService.findUsersByRoleType(RoleType.ROLE_STOCK_TRANSFER_NOTIFICATIONS).collect {
+            def recipientList = userService.findUsersByRoleType(RoleType.ROLE_STOCK_TRANSFER_NOTIFICATION).collect {
                 it.email
             }
             if (recipientList) {

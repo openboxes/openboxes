@@ -6,14 +6,14 @@
     <changeSet author="abalcerzak" id="270520261000-0">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
-                select count(*) from role where role_type = "ROLE_STOCK_TRANSFER_NOTIFICATIONS";
+                select count(*) from role where role_type = "ROLE_STOCK_TRANSFER_NOTIFICATION";
             </sqlCheck>
         </preConditions>
         <insert tableName="role">
-            <column name="id" value="ROLE_STOCK_TRANSFER_NOTIFICATIONS"/>
+            <column name="id" value="ROLE_STOCK_TRANSFER_NOTIFICATION"/>
             <column name="version" valueNumeric="0"/>
-            <column name="role_type" value="ROLE_STOCK_TRANSFER_NOTIFICATIONS"/>
-            <column name="name" value="Stock Transfer Notification"/>
+            <column name="role_type" value="ROLE_STOCK_TRANSFER_NOTIFICATION"/>
+            <column name="name" value="Stock Transfer Notifications"/>
         </insert>
     </changeSet>
 </databaseChangeLog>
