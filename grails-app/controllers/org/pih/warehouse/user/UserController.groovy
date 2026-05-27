@@ -481,12 +481,25 @@ class UserController {
 
     def deleteLocationRole() {
         LocationRole locationRole = LocationRole.get(params.id)
-        try {
-            String userId = userService.deleteLocationRole(params.id, session.user.id)
-            redirect(action: "edit", id: userId)
-        } catch (ValidationException e) {
-            flash.message = e.message // the service localizes its messages for us
-            redirect(action: "edit", id: locationRole?.user?.id)
+        String redirectUserId
+
+        if (!locationRole) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.locationRole.label'), params.id])}"
+            redirectUserId = params.user?.id
+        } else {
+            try {
+                redirectUserId = userService.deleteLocationRole(params.id, session.user.id) ?: locationRole.user?.id
+            } catch (ValidationException e) {
+                flash.message = e.message // the service localizes its messages for us
+                redirectUserId = locationRole.user?.id ?: params.user?.id
+            }
+        }
+
+        if (redirectUserId) {
+            redirect(action: "edit", id: redirectUserId)
+        } else {
+            // marginally better than going to /user/edit/null if we can't find a user to return to
+            redirect(action: "list")
         }
     }
 

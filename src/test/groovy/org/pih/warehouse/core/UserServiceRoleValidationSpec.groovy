@@ -155,4 +155,66 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
         then:
         thrown(IllegalArgumentException)
     }
+
+    void "saveUser rejects a user instance that already has roles bound"() {
+        given:
+        User newUser = new User(username: 'fresh', password: 'pass', passwordConfirm: 'pass',
+            firstName: 'Fresh', lastName: 'User', email: 'fresh@test.com')
+        newUser.addToRoles(adminRole)
+
+        when:
+        service.saveUser(newUser, admin.id, [])
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
+    void "saveUser rejects a user instance that already has locationRoles bound"() {
+        given:
+        Location location = new Location(name: 'Test').save(validate: false)
+        User newUser = new User(username: 'fresh2', password: 'pass', passwordConfirm: 'pass',
+            firstName: 'Fresh', lastName: 'User', email: 'fresh2@test.com')
+        newUser.addToLocationRoles(new LocationRole(user: newUser, location: location, role: adminRole))
+
+        when:
+        service.saveUser(newUser, admin.id, [])
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
+    void "saveLocationRole rejects a null role in the roles list"() {
+        given:
+        Location location = new Location(name: 'Test').save(validate: false)
+
+        when:
+        service.saveLocationRole(location, null, [adminRole, null], manager, admin.id)
+
+        then:
+        thrown(ValidationException)
+    }
+
+    void "updateUser raises when locationRolePairs contains an unresolvable role id"() {
+        when:
+        service.updateUser(admin.id, superuser.id, [], [locationRolePairs: ['some-loc-id': 'bogus-role-id']])
+
+        then:
+        thrown(ValidationException)
+    }
+
+    void "updateUser raises when locationRolePairs contains an unresolvable location id"() {
+        when:
+        service.updateUser(admin.id, superuser.id, [], [locationRolePairs: ['bogus-loc-id': adminRole.id]])
+
+        then:
+        thrown(ValidationException)
+    }
+
+    void "updateUser raises when requestedRoleIds contains an unresolvable role id"() {
+        when:
+        service.updateUser(admin.id, superuser.id, [adminRole.id, 'bogus-role-id'], [:])
+
+        then:
+        thrown(ValidationException)
+    }
 }

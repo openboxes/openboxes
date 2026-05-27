@@ -156,6 +156,11 @@ class UserService {
 
     private void validateAndApplyRoleChanges(User requestingUser, User user, List<String> requestedRoleIds) {
         List<Role> requestedRoles = Role.findAllByIdInList(requestedRoleIds)
+        if (requestedRoles.size() != requestedRoleIds.size()) {
+            String message = messageLocalizer.localize('user.errors.unresolvedRoleReference.message')
+            user.errors.reject('user.errors.unresolvedRoleReference.message', message)
+            throw new ValidationException(message, user.errors)
+        }
         checkCanAddOrRemoveRoles(requestingUser, user, user.roles, requestedRoles)
 
         /*
@@ -182,6 +187,11 @@ class UserService {
             if (roleId) {
                 Location location = Location.get(locationId)
                 Role role = Role.get(roleId)
+                if (!location || !role) {
+                    String message = messageLocalizer.localize('user.errors.unresolvedRoleReference.message')
+                    user.errors.reject('user.errors.unresolvedRoleReference.message', message)
+                    throw new ValidationException(message, user.errors)
+                }
                 LocationRole existing = user.locationRoles?.find { it.location == location }
                 if (existing?.role == role) {
                     // nothing to do
@@ -372,7 +382,11 @@ class UserService {
         List<Role> after = locationRolePairs.values()
             .findAll { it }
             .collect { Role.get(it) }
-            .findAll { it }
+        if (after.any { it == null }) {
+            String message = messageLocalizer.localize('user.errors.unresolvedRoleReference.message')
+            targetUser.errors.reject('user.errors.unresolvedRoleReference.message', message)
+            throw new ValidationException(message, targetUser.errors)
+        }
         checkCanAddOrRemoveRoles(requestingUser, targetUser, before, after)
     }
 
@@ -639,6 +653,11 @@ class UserService {
          * This method both creates a location role and assigns it. If the
          * requester doesn't have permission to assign the role, stop immediately.
          */
+        if (roles.any { it == null }) {
+            String message = messageLocalizer.localize('user.errors.unresolvedRoleReference.message')
+            user.errors.reject('user.errors.unresolvedRoleReference.message', message)
+            throw new ValidationException(message, user.errors)
+        }
         User requestingUser = User.get(requestingUserId)
         List<Role> before = locationRole ? [locationRole.role] : []
         checkCanAddOrRemoveRoles(requestingUser, user, before, roles)
