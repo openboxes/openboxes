@@ -120,6 +120,7 @@ class InboundStockMovementListItem implements Serializable, Validateable {
             ],
             stocklist           : stocklist,
             dateCreated         : dateCreated,
+            dateRequested       : dateRequested,
             expectedDeliveryDate: shipment?.expectedDeliveryDate,
             requestedBy         : requestedBy,
             lineItemCount       : lineItemCount,
