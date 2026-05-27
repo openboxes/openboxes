@@ -19,6 +19,7 @@ import org.apache.http.client.fluent.Request
 import org.apache.http.entity.ContentType
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.inventory.OutboundStockMovementService
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.invoice.Invoice
@@ -37,6 +38,7 @@ class DocumentController {
 
     DocumentService documentService
     def documentTemplateService
+    MessageLocalizer messageLocalizer
     def fileService
     def shipmentService
     GrailsApplication grailsApplication
@@ -185,21 +187,23 @@ class DocumentController {
         // file must not be empty and must be less than 10MB
         // FIXME The size limit needs to go somewhere
         if (!(file?.size || command.fileUri)) {
-            flash.message = "${warehouse.message(code: 'document.documentTooLarge.message')}"
-        } else if (file.size < 10 * 1024 * 1000) {
+            flash.message = "${warehouse.message(code: 'document.documentCannotBeEmpty.message')}"
+        } else if (file && !Document.isAllowedFile(file.originalFilename, file.contentType, file.inputStream)) {
+            flash.message = messageLocalizer.localize('document.uploadNotAllowed.message', Document.allowedExtensions().join(', '))
+        } else if (!file || file.size < 10 * 1024 * 1000) {
             log.info "Creating new document "
             // Document type with id 9 is "Other" and it's default in case there's no document type chosen
             String typeId = command?.typeId ?: Constants.DEFAULT_DOCUMENT_TYPE_ID;
             DocumentType documentType = DocumentType.get(typeId)
 
             Document documentInstance = new Document(
-                    size: file.size,
-                    name: command.name ?: file.originalFilename,
-                    filename: file.originalFilename,
-                    fileContents: command.fileContents.bytes,
+                    size: file?.size,
+                    name: command.name ?: file?.originalFilename,
+                    filename: file?.originalFilename,
+                    fileContents: command.fileContents?.bytes,
                     fileUri: command.fileUri,
-                    contentType: file.contentType,
-                    extension: FileUtil.getExtension(file.originalFilename),
+                    contentType: file?.contentType,
+                    extension: file?.originalFilename ? FileUtil.getExtension(file.originalFilename) : null,
                     documentNumber: command.documentNumber,
                     documentType: documentType)
 
