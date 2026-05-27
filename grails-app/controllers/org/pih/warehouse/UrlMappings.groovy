@@ -203,7 +203,7 @@ class UrlMappings {
 
         "/api/locations"(parseRequest: true) {
             controller = { "locationApi" }
-            action = [POST: "upsert"]
+            action = [GET: "list", POST: "upsert"]
         }
 
         "/api/locations/$id/$action" {
