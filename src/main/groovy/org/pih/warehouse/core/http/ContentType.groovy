@@ -18,7 +18,6 @@ enum ContentType {
     JSON(FileExtension.JSON, MediaType.APPLICATION_JSON),
     PDF(FileExtension.PDF, MediaType.APPLICATION_PDF),
     PNG(FileExtension.PNG, MediaType.IMAGE_PNG),
-    SVG(FileExtension.SVG, MediaType.parseMediaType("image/svg+xml")),
     TXT(FileExtension.TXT, MediaType.TEXT_PLAIN),
     WEBP(FileExtension.WEBP, MediaType.parseMediaType("image/webp")),
     XLS(FileExtension.XLS, MediaType.parseMediaType("application/vnd.ms-excel")),

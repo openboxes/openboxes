@@ -77,12 +77,11 @@ class DocumentSpec extends Specification implements DomainUnitTest<Document> {
         "report.pdf"    | "application/pdf"                                                            | true
         "data.csv"      | "text/csv"                                                                   | true
         "sheet.xls"     | "application/vnd.ms-excel"                                                   | true
-        "sheet.xlsx"    | "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"           | true
-        "notes.txt"     | "text/plain"                                                                   | true
-        "doc.docx"      | "application/vnd.openxmlformats-officedocument.wordprocessingml.document"      | true
-        "icon.svg"      | "image/svg+xml"                                                                | true
-        "photo.webp"    | "image/webp"                                                                   | true
-        "PHOTO.JPG"     | "image/jpeg"                                                                   | true
+        "sheet.xlsx"    | "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"          | true
+        "notes.txt"     | "text/plain"                                                                 | true
+        "doc.docx"      | "application/vnd.openxmlformats-officedocument.wordprocessingml.document"    | true
+        "photo.webp"    | "image/webp"                                                                 | true
+        "PHOTO.JPG"     | "image/jpeg"                                                                 | true
     }
 
     void "isAllowedFile should reject disallowed extensions"() {
@@ -95,6 +94,7 @@ class DocumentSpec extends Specification implements DomainUnitTest<Document> {
         "script.sh"     | "application/x-sh"
         "page.html"     | "text/html"
         "archive.zip"   | "application/zip"
+        "icon.svg"      | "image/svg+xml"
     }
 
     void "isAllowedFile should reject mismatched extension and content type"() {

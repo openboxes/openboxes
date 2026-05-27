@@ -33,7 +33,6 @@ class Document implements Serializable {
             ContentType.JPG,
             ContentType.PDF,
             ContentType.PNG,
-            ContentType.SVG,
             ContentType.TXT,
             ContentType.WEBP,
             ContentType.XLS,

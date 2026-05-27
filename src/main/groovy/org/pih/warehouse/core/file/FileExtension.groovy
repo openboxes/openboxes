@@ -17,7 +17,6 @@ enum FileExtension {
     JSON('json'),
     PDF('pdf'),
     PNG('png'),
-    SVG('svg'),
     TXT('txt'),
     WEBP('webp'),
     XLS('xls'),
