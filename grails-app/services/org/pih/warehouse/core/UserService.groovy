@@ -15,12 +15,11 @@ import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import grails.validation.ValidationException
 import groovy.sql.Sql
-import org.apache.commons.collections.ListUtils
 import org.apache.http.auth.AuthenticationException
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.auth.AuthService
-import org.grails.plugins.web.taglib.ApplicationTagLib
+import org.pih.warehouse.core.localization.MessageLocalizer
 
 @Transactional
 class UserService {
@@ -28,24 +27,65 @@ class UserService {
     def authService
     def dataSource
     GrailsApplication grailsApplication
+    MessageLocalizer messageLocalizer
 
     User getUser(String id) {
         return User.get(id)
     }
 
-    User saveUser(User user) {
-        return user.save()
+    /**
+     * Persist a newly-created user, along with an initial set of roles.
+     *
+     * Role IDs must be passed as an explicit `requestedRoleIds` argument,
+     * separately from any other user fields, so that the service can run
+     * them through {@link #checkCanAddOrRemoveRoles} before they reach the
+     * database. (See {@link #updateUser} for the full rationale.)
+     */
+    User saveUser(User user, String requestingUserId, List<String> requestedRoleIds) {
+        if (user.roles) {
+            throw new IllegalArgumentException(messageLocalizer.localize(
+                'user.errors.rolesNotAllowedDirectly.message'))
+        }
+        if (user.locationRoles) {
+            throw new IllegalArgumentException(messageLocalizer.localize(
+                'user.errors.locationRolesNotAllowedDirectly.message'))
+        }
+        if (requestedRoleIds) {
+            validateAndApplyRoleChanges(User.get(requestingUserId), user, requestedRoleIds)
+        }
+        return user.save(failOnError: true)
     }
 
-
-    def updateUser(String userId, String currentUserId, Map params) {
+    /**
+     * Apply an update to an existing user.
+     *
+     * Role IDs must be passed as an explicit `requestedRoleIds` argument
+     * rather than being left inside the `params` map.
+     *
+     * Non-role fields (firstName, locale, etc.) are pulled from `params` and
+     * applied directly to the user instance before saving. We don't allow this
+     * for roles because, uniquely, the ability to set them depends on the
+     * requesting user's role and permissions. If left in params, GORM will
+     * cheerfully accept and bind them directly to the user, completely ignoring
+     * the validation logic in {@link #checkCanAddOrRemoveRoles}.
+     *
+     * Controllers must extract role IDs and strip them out of the params map
+     * before calling in to the service; see `UserController.update` / `save`.
+     *
+     * {@link #rejectRoleKeysInParams} makes sure they do their homework.
+     */
+    def updateUser(String userId, String requestingUserId, List<String> requestedRoleIds, Map params) {
 
         User userInstance = User.get(userId)
-        List<Role> updatedRoles = params.roles ? Role.findAllByIdInList(params.list("roles")) : []
+        User requestingUser = User.get(requestingUserId)
 
-        if (params.roles) {
-            userInstance.roles = updatedRoles
-            params.remove("roles")
+        rejectRoleKeysInParams(params)
+
+        if (requestedRoleIds) {
+            validateAndApplyRoleChanges(requestingUser, userInstance, requestedRoleIds)
+        }
+        if (params.locationRolePairs) {
+            validateAndApplyLocationRoleChanges(requestingUser, userInstance, params)
         }
 
         // Password in the db is different from the one specified
@@ -61,39 +101,13 @@ class UserService {
             userInstance.errors.rejectValue("locale", "user.errors.cannotSetLocaleToTranslationLocale.message", "You cannot set your default locale for translation mode locale")
             throw new ValidationException("user.errors.cannotSetLocaleToTranslationLocale.message", userInstance.errors)
         }
-        // If a non-admin user edits their profile they will not have access to
-        // the roles or location roles, so we need to prevent the updateRoles
-        // method from being called.
-        if (params.locationRolePairs) {
-            updateRoles(userInstance, params.locationRolePairs)
-        }
 
-        // We need to cache current role and check edit privilege here because the roles association
-        // may change once we merge user and request parameters
-        if (params.updateRoles) {
-            User currentUser = User.load(currentUserId)
-            Boolean canEditRoles = canEditUserRoles(currentUser, userInstance)
-
-            // Check to make sure the roles are dirty
-            HashSet<Role> currentRoles = new HashSet(userInstance?.roles)
-            boolean isRolesDirty = !ListUtils.isEqualList(updatedRoles, currentRoles)
-            log.info "User update: ${updatedRoles} vs ${currentRoles}: isDirty=${isRolesDirty}, canEditRoles=${canEditRoles}"
-            if (isRolesDirty && !canEditRoles) {
-                Object[] args = [currentUser.username, userInstance.username]
-                userInstance.errors.rejectValue("roles", "user.errors.cannotEditUserRoles.message", args, "User cannot edit user roles")
-                throw new ValidationException("user.errors.cannotEditUserRoles.message", userInstance.errors)
-            }
-        }
-        log.info "User has errors: ${userInstance.hasErrors()} ${userInstance.errors}"
         return userInstance.save(failOnError: true)
     }
 
     void changePassword(User user, String password, String passwordConfirm) {
         if (!canUserEditPassword(AuthService.currentUser, user)) {
-            String errorMessage = applicationTagLib.message(
-                    code: 'errors.accessDenied.message',
-                    default: 'Apologies, but you are not authorized to access this page or to perform this action.',
-            )
+            String errorMessage = messageLocalizer.localize('errors.accessDenied.message')
             throw new AuthenticationException(errorMessage)
         }
 
@@ -124,26 +138,75 @@ class UserService {
         }
     }
 
-    private void updateRoles(user, locationRolePairs) {
-        def newAndUpdatedRoles = locationRolePairs.keySet().collect { locationId ->
-            if (locationRolePairs[locationId]) {
-                def location = Location.get(locationId)
-                def role = Role.get(locationRolePairs[locationId])
-                def existingRole = user.locationRoles.find { it.location == location }
-                if (existingRole) {
-                    existingRole.role = role
+    /**
+     * Controllers must never pass role-related keys in a params map.
+     *
+     * They must be extracted by the controller and passed as separate arguments.
+     */
+    private void rejectRoleKeysInParams(Map params) {
+        if (params.any { key, val -> key?.toString()?.startsWith('roles') }) {
+            throw new IllegalArgumentException(messageLocalizer.localize(
+                'user.errors.rolesNotAllowedDirectly.message'))
+        }
+        if (params.any { key, val -> key?.toString()?.startsWith('locationRoles') }) {
+            throw new IllegalArgumentException(messageLocalizer.localize(
+                'user.errors.locationRolesNotAllowedDirectly.message'))
+        }
+    }
+
+    private void validateAndApplyRoleChanges(User requestingUser, User user, List<String> requestedRoleIds) {
+        List<Role> requestedRoles = Role.findAllByIdInList(requestedRoleIds)
+        if (requestedRoles.size() != requestedRoleIds.size()) {
+            String message = messageLocalizer.localize('user.errors.unresolvedRoleReference.message')
+            user.errors.reject('user.errors.unresolvedRoleReference.message', message)
+            throw new ValidationException(message, user.errors)
+        }
+        checkCanAddOrRemoveRoles(requestingUser, user, user.roles, requestedRoles)
+
+        /*
+         * While it may be tempting to directly assign the roles collection,
+         * it's safer, GORM/Hibernate-wise, to add/remove them one at a time.
+         */
+        Set<Role> before = (user.roles ?: []) as Set
+        Set<Role> after = requestedRoles as Set
+        (before - after).each { user.removeFromRoles(it) }
+        (after - before).each { user.addToRoles(it) }
+    }
+
+    private void validateAndApplyLocationRoleChanges(User requestingUser, User user, Map params) {
+        Map<String, String> locationRolePairs = params.locationRolePairs
+        checkCanAddOrRemoveLocationRoles(requestingUser, user, locationRolePairs)
+
+        // remove location roles not present in the update
+        user.locationRoles
+            ?.findAll { !locationRolePairs[it.location.id] }
+            ?.each { user.removeFromLocationRoles(it) }
+
+        // add or update location roles
+        locationRolePairs.each { locationId, roleId ->
+            if (roleId) {
+                Location location = Location.get(locationId)
+                Role role = Role.get(roleId)
+                if (!location || !role) {
+                    String message = messageLocalizer.localize('user.errors.unresolvedRoleReference.message')
+                    user.errors.reject('user.errors.unresolvedRoleReference.message', message)
+                    throw new ValidationException(message, user.errors)
+                }
+                LocationRole existing = user.locationRoles?.find { it.location == location }
+                if (existing?.role == role) {
+                    // nothing to do
+                } else if (existing) {
+                    // modify existing locationRole with new role type
+                    existing.role = role
                 } else {
-                    def newLocationRole = new LocationRole(user: user, location: location, role: role)
-                    user.addToLocationRoles(newLocationRole)
+                    // no existing locationRole for this location, add new one
+                    user.addToLocationRoles(new LocationRole(user: user, location: location, role: role))
                 }
             }
         }
-        def rolesToRemove = user.locationRoles.findAll { oldRole ->
-            !locationRolePairs[oldRole.location.id]
-        }
-        rolesToRemove.each {
-            user.removeFromLocationRoles(it)
-        }
+
+        // GORM ignores this anyway, but it doesn't hurt to clean up when we're done
+        params.remove('locationRolePairs')
     }
 
     Boolean isSuperuser(User u) {
@@ -266,9 +329,65 @@ class UserService {
         return false
     }
 
-    Boolean canEditUserRoles(User currentUser, User otherUser) {
-        def location = authService.currentLocation
-        return isSuperuser(currentUser) || (currentUser.getHighestRole(location) >= otherUser.getHighestRole(location))
+    /**
+     * Returns true if requestingUser has permission to assign or remove targetRole.
+     */
+    Boolean canAddOrRemoveRole(User requestingUser, Role targetRole) {
+        if (!requestingUser) {
+            return false
+        }
+        if (isSuperuser(requestingUser)) {
+            return true
+        }
+
+        /*
+         * FIXME: we should check the user's highest role at the location
+         * of the role being assigned, not just their highest role overall.
+         */
+        Role currentHighest = requestingUser.getHighestRole(authService.currentLocation)
+        if (!currentHighest) {
+            return false
+        }
+
+        return currentHighest.roleType.sortOrder <= targetRole.roleType.sortOrder
+    }
+
+    private void rejectRoleChange(User targetUser, String messageCode, User requestingUser, Role role) {
+        String message = messageLocalizer.localize(messageCode, requestingUser?.username, role.name)
+        log.warn("Rejected role change on user ${targetUser} by ${requestingUser}: ${messageCode}")
+        targetUser.errors.reject(messageCode, [requestingUser?.username, role.name] as Object[], message)
+        throw new ValidationException(message, targetUser.errors)
+    }
+
+    void checkCanAddOrRemoveRoles(User requestingUser, User targetUser, Collection<Role> before, Collection<Role> after) {
+        if (isSuperuser(requestingUser)) {
+            return
+        }
+        Set<Role> added = ((after ?: []) as Set) - ((before ?: []) as Set)
+        Set<Role> removed = ((before ?: []) as Set) - ((after ?: []) as Set)
+        for (Role role : added) {
+            if (!canAddOrRemoveRole(requestingUser, role)) {
+                rejectRoleChange(targetUser, 'user.errors.cannotAssignRole.message', requestingUser, role)
+            }
+        }
+        for (Role role : removed) {
+            if (!canAddOrRemoveRole(requestingUser, role)) {
+                rejectRoleChange(targetUser, 'user.errors.cannotRemoveRole.message', requestingUser, role)
+            }
+        }
+    }
+
+    private void checkCanAddOrRemoveLocationRoles(User requestingUser, User targetUser, Map<String, String> locationRolePairs) {
+        List<Role> before = targetUser.locationRoles?.collect { it.role }
+        List<Role> after = locationRolePairs.values()
+            .findAll { it }
+            .collect { Role.get(it) }
+        if (after.any { it == null }) {
+            String message = messageLocalizer.localize('user.errors.unresolvedRoleReference.message')
+            targetUser.errors.reject('user.errors.unresolvedRoleReference.message', message)
+            throw new ValidationException(message, targetUser.errors)
+        }
+        checkCanAddOrRemoveRoles(requestingUser, targetUser, before, after)
     }
 
     boolean isUserInAllRoles(String userId, Collection roleTypes, String locationId) {
@@ -529,7 +648,20 @@ class UserService {
         return user.deserializeDashboardConfig()
     }
 
-    def saveLocationRole(Location location, LocationRole locationRole, List<Role> roles, User user) {
+    def saveLocationRole(Location location, LocationRole locationRole, List<Role> roles, User user, String requestingUserId) {
+        /*
+         * This method both creates a location role and assigns it. If the
+         * requester doesn't have permission to assign the role, stop immediately.
+         */
+        if (roles.any { it == null }) {
+            String message = messageLocalizer.localize('user.errors.unresolvedRoleReference.message')
+            user.errors.reject('user.errors.unresolvedRoleReference.message', message)
+            throw new ValidationException(message, user.errors)
+        }
+        User requestingUser = User.get(requestingUserId)
+        List<Role> before = locationRole ? [locationRole.role] : []
+        checkCanAddOrRemoveRoles(requestingUser, user, before, roles)
+
         // Update existing role
         if (locationRole && roles.size() == 1) {
             locationRole.role = roles.first()
@@ -551,6 +683,19 @@ class UserService {
         user.save(failOnError: true)
     }
 
+    String deleteLocationRole(String locationRoleId, String requestingUserId) {
+        LocationRole locationRole = LocationRole.get(locationRoleId)
+        if (locationRole) {
+            User requestingUser = User.get(requestingUserId)
+            checkCanAddOrRemoveRoles(requestingUser, locationRole.user, [locationRole.role], [])
+        }
+        User user = locationRole?.user
+        user?.removeFromLocationRoles(locationRole)
+        locationRole?.delete()
+        user?.save(failOnError: true)
+        return user?.id
+    }
+
     Role[] extractDefaultRoles(String defaultRolesString) {
         String[] defaultRoles = defaultRolesString?.split(",")
         Role[] roles = defaultRoles.collect { String roleTypeName ->
@@ -569,7 +714,4 @@ class UserService {
         currentUser?.id == userToEdit.id || isUserAdmin(currentUser)
     }
 
-    def getApplicationTagLib() {
-        return grailsApplication.mainContext.getBean(ApplicationTagLib)
-    }
 }
