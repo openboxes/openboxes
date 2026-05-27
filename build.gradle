@@ -479,6 +479,8 @@ dependencies {
 
     compile 'commons-lang:commons-lang:2.6'  // FIXME migrate to commons-lang3
 
+    implementation 'org.apache.commons:commons-text:1.15.0'
+
     implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.docx4j:${xDocReportVersion}"
     implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.document:${xDocReportVersion}"
     implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template:${xDocReportVersion}"
@@ -908,7 +910,7 @@ jacocoTestReport {
 tasks.withType(Test) {
     // never consider test tasks as up-to-date - always run them when requested
     outputs.upToDateWhen { false }
-    
+
     // https://github.com/testcontainers/testcontainers-java/pull/11216
     systemProperty 'api.version', dockerApiVersion
 
