@@ -11,6 +11,9 @@ package org.pih.warehouse
 
 import grails.converters.JSON
 import grails.util.Holders
+
+import org.pih.warehouse.core.mapper.MapperComponentResolver
+import org.pih.warehouse.core.mapper.ResponseMapper
 import org.pih.warehouse.inventory.CycleCount
 import org.pih.warehouse.inventory.CycleCountDetails
 import org.pih.warehouse.inventory.CycleCountItem
@@ -106,6 +109,7 @@ class BootStrap {
 
     UploadService uploadService
     DataSource dataSource
+    MapperComponentResolver mapperComponentResolver
 
     def init = { servletContext ->
         log.info("Registering JSON marshallers ...")
@@ -145,6 +149,18 @@ class BootStrap {
     }
 
     void registerJsonMarshallers() {
+
+        /*
+         * Automatically register all of our ResponseMapper components with Grails' JSON marshaller.
+         * Not required for controllers that extend from BaseController as they will call the ResponseMapper directly.
+         * Registering the mappers here allows us to utilize them in controllers that don't extend BaseController.
+         * This way, calling render(X as JSON) will automatically use the ResponseMapper for X if one exists.
+         */
+        for (responseMapperBySource in mapperComponentResolver.allResponseMappers) {
+            Class sourceType = responseMapperBySource.key
+            ResponseMapper responseMapper = responseMapperBySource.value
+            JSON.registerObjectMarshaller(sourceType) { responseMapper.asResponseBody(it) }
+        }
 
         // java.time types. With these marshallers we don't need to call toString() on the java.time fields in the
         // toJson() methods of Domains/DTOs or in the other object marshallers below. When we're on Grails 5+ we can
@@ -643,10 +659,6 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(CycleCountItem) { CycleCountItem cycleCountItem ->
             return cycleCountItem.toJson()
-        }
-
-        JSON.registerObjectMarshaller(CycleCountCandidate) { CycleCountCandidate cycleCountCandidate ->
-            return cycleCountCandidate.toJson()
         }
 
         JSON.registerObjectMarshaller(CycleCountDetails) { CycleCountDetails cycleCountDetails ->

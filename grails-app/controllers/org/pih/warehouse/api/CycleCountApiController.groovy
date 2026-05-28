@@ -1,19 +1,20 @@
 package org.pih.warehouse.api
 
-import grails.converters.JSON
 import grails.orm.PagedResultList
 import grails.validation.ValidationException
+import java.time.Instant
 import org.apache.commons.csv.CSVPrinter
-import org.pih.warehouse.auth.AuthService
+
+import org.pih.warehouse.core.BaseController
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.core.dtos.BatchCommandUtils
+import org.pih.warehouse.core.http.HttpResponseContext
 import org.pih.warehouse.importer.CycleCountItemsExcelImporter
 import org.pih.warehouse.importer.CycleCountRecountItemsExcelImporter
 import org.pih.warehouse.importer.DataImporter
 import org.pih.warehouse.importer.ImportDataCommand
-import org.pih.warehouse.importer.PackingListExcelImporter
 import org.pih.warehouse.inventory.CycleCountCandidate
 import org.pih.warehouse.inventory.CycleCountCandidateFilterCommand
 import org.pih.warehouse.inventory.CycleCountDto
@@ -37,7 +38,7 @@ import org.pih.warehouse.inventory.PendingCycleCountRequest
 import org.pih.warehouse.report.CycleCountReportCommand
 import org.springframework.web.multipart.MultipartFile
 
-class CycleCountApiController {
+class CycleCountApiController extends BaseController {
 
     CycleCountService cycleCountService
     DocumentService documentService
@@ -53,31 +54,31 @@ class CycleCountApiController {
             render(contentType: "text/csv", text: csv.out.toString())
             return
         }
-        render([data: cycleCounts, totalCount: cycleCounts.totalCount] as JSON)
+        renderResponse(cycleCounts)
     }
 
     def getPendingCycleCountRequests(CycleCountCandidateFilterCommand filterParams) {
         List<PendingCycleCountRequest> pendingCycleCountRequests = cycleCountService.getPendingCycleCountRequests(filterParams, params.facilityId)
 
-        render([data: pendingCycleCountRequests, totalCount: pendingCycleCountRequests.totalCount] as JSON)
+        renderResponse(pendingCycleCountRequests)
     }
 
     def createRequests(CycleCountRequestBatchCommand command) {
         BatchCommandUtils.validateBatch(command, "requests")
         List<CycleCountRequest> cycleCountRequests = cycleCountService.createRequests(command)
-        render([data: cycleCountRequests] as JSON)
+        renderResponse(cycleCountRequests)
     }
 
     def updateRequests(CycleCountRequestUpdateBulkCommand command) {
         BatchCommandUtils.validateBatch(command)
         List<CycleCountRequest> cycleCountRequests = cycleCountService.updateRequests(command)
-        render([data: cycleCountRequests] as JSON)
+        renderResponse(cycleCountRequests)
     }
 
     def deleteRequests() {
         List<String> ids = params.list("id")
         cycleCountService.deleteCycleCountRequests(ids)
-        render(status: 204)
+        renderNoContentResponse()
     }
 
     def startCycleCount(CycleCountStartBatchCommand command) {
@@ -86,7 +87,7 @@ class CycleCountApiController {
 
         withFormat {
             json {
-                render([data: cycleCounts] as JSON)
+                renderResponse(cycleCounts)
             }
             xls {
                 exportCountXls(cycleCounts, command.facility.name)
@@ -103,7 +104,7 @@ class CycleCountApiController {
 
         withFormat {
             json {
-                render([data: cycleCounts] as JSON)
+                renderResponse(cycleCounts)
             }
             xls {
                 exportRecountXls(cycleCounts, command.facility.name)
@@ -124,7 +125,7 @@ class CycleCountApiController {
 
         withFormat {
             json {
-                render([data: cycleCounts] as JSON)
+                renderResponse(cycleCounts)
             }
             xls {
                 isRecount ? exportRecountXls(cycleCounts, facilityName) : exportCountXls(cycleCounts, facilityName)
@@ -145,11 +146,12 @@ class CycleCountApiController {
     }
 
     def renderCountPdf(List<CycleCountDto> cycleCounts, String facilityName) {
-        renderPdf(
-                template: "/cycleCount/printCount",
-                model: [cycleCounts: cycleCounts, facilityName: facilityName, datePrinted: new Date()],
-                filename: "Count form - ${facilityName} - ${Constants.DISPLAY_DATE_FORMATTER.format(new Date())}.pdf"
-        )
+        renderResponse(HttpResponseContext.builder()
+                .forTemplateFile(
+                        "/cycleCount/printCount",
+                        [cycleCounts: cycleCounts, facilityName: facilityName, datePrinted: new Date()],
+                        ["Count form", facilityName, Instant.now()],
+                ))
     }
 
     def exportRecountXls(List<CycleCountDto> cycleCounts, String facilityName) {
@@ -162,11 +164,12 @@ class CycleCountApiController {
     }
 
     def renderRecountPdf(List<CycleCountDto> cycleCounts, String facilityName) {
-        renderPdf(
-                template: "/cycleCount/printRecount",
-                model: [cycleCounts: cycleCounts, facilityName: facilityName, datePrinted: new Date()],
-                filename: "Recount form - ${facilityName} - ${Constants.DISPLAY_DATE_FORMATTER.format(new Date())}.pdf"
-        )
+        renderResponse(HttpResponseContext.builder()
+                .forTemplateFile(
+                        "/cycleCount/printRecount",
+                        [cycleCounts: cycleCounts, facilityName: facilityName, datePrinted: new Date()],
+                        ["Recount form", facilityName, Instant.now()],
+                ))
     }
 
     def submitCount(CycleCountSubmitCountCommand command) {
@@ -175,7 +178,7 @@ class CycleCountApiController {
         }
         CycleCountDto cycleCount = cycleCountService.submitCount(command)
 
-        render([data: cycleCount] as JSON)
+        renderResponse(cycleCount)
     }
 
     def submitRecount(CycleCountSubmitRecountCommand command) {
@@ -184,7 +187,7 @@ class CycleCountApiController {
         }
         CycleCountDto cycleCount = cycleCountService.submitCount(command)
 
-        render([data: cycleCount] as JSON)
+        renderResponse(cycleCount)
     }
 
     def updateCycleCountItem(CycleCountUpdateItemCommand command) {
@@ -193,13 +196,13 @@ class CycleCountApiController {
         }
         CycleCountItemDto cycleCountItem = cycleCountService.updateCycleCountItem(command)
 
-        render([data: cycleCountItem] as JSON)
+        renderResponse(cycleCountItem)
     }
 
     def deleteCycleCountItem(String cycleCountItemId) {
         cycleCountService.deleteCycleCountItem(cycleCountItemId)
 
-        render(status: 204)
+        renderNoContentResponse()
     }
 
     def createCycleCountItem(CycleCountItemCommand command) {
@@ -208,14 +211,14 @@ class CycleCountApiController {
         }
         CycleCountItemDto cycleCountItem = cycleCountService.createCycleCountItem(command)
 
-        render([data: cycleCountItem] as JSON)
+        renderResponse(cycleCountItem)
     }
 
     def refreshCycleCount(String cycleCountId) {
         boolean removeOutOfStockItemsImplicitly = params.boolean("removeOutOfStockItemsImplicitly", false)
         CycleCountDto cycleCount = cycleCountService.refreshCycleCount(cycleCountId, removeOutOfStockItemsImplicitly, params.int("countIndex"))
 
-        render([data: cycleCount] as JSON)
+        renderResponse(cycleCount)
     }
 
     def createCycleCountItemBatch(CycleCountItemBatchCommand command) {
@@ -223,7 +226,7 @@ class CycleCountApiController {
 
         List<CycleCountItemDto> cycleCountItems = cycleCountService.createCycleCountItems(command.itemsToCreate)
 
-        render([data: cycleCountItems] as JSON)
+        renderResponse(cycleCountItems)
     }
 
     def updateCycleCountItemBatch(CycleCountUpdateItemBatchCommand command) {
@@ -231,7 +234,7 @@ class CycleCountApiController {
 
         List<CycleCountItemDto> cycleCountItems = cycleCountService.updateCycleCountItems(command.itemsToUpdate)
 
-        render([data: cycleCountItems] as JSON)
+        renderResponse(cycleCountItems)
     }
 
     def uploadCycleCountItems(ImportDataCommand command) {
@@ -244,7 +247,7 @@ class CycleCountApiController {
         cycleCountItemsExcelImporter.validateData(command)
         // Collect the errors after validating the data to readable state
         List<String> errors = cycleCountImportService.buildErrors(command)
-        render([data: command.data, errors: errors] as JSON)
+        renderResponse(data: command.data, additionalFields: [errors: errors])
     }
 
     def uploadCycleCountRecountItems(ImportDataCommand command) {
@@ -257,29 +260,23 @@ class CycleCountApiController {
         cycleCountRecountItemsExcelImporter.validateData(command)
         // Collect the errors after validating the data to readable state
         List<String> errors = cycleCountImportService.buildErrors(command)
-        render([data: command.data, errors: errors] as JSON)
+        renderResponse(data: command.data, additionalFields: [errors: errors])
     }
 
     def getCycleCountDetails(CycleCountReportCommand command) {
         PagedResultList data = cycleCountService.getCycleCountDetailsReport(command)
-        render([
-                data      : data,
-                count     : data?.size() ?: 0,
+        renderResponse(data: data, additionalFields: [
                 max       : command.max,
                 offset    : command.offset,
-                totalCount: data.totalCount,
-        ] as JSON)
+        ])
     }
 
     def getCycleCountSummary(CycleCountReportCommand command) {
         PagedResultList data = cycleCountService.getCycleCountSummaryReport(command)
-        render([
-                data      : data,
-                count     : data?.size() ?: 0,
+        renderResponse(data: data, additionalFields: [
                 max       : command.max,
                 offset    : command.offset,
-                totalCount: data.totalCount,
-        ] as JSON)
+        ])
     }
 
     def getInventoryTransactionsSummary(CycleCountReportCommand command) {
@@ -288,6 +285,6 @@ class CycleCountApiController {
         }
         List<InventoryTransactionsSummary> inventoryTransactions = cycleCountService.getInventoryTransactionsSummary(command)
 
-        render([data: inventoryTransactions, totalCount: inventoryTransactions.totalCount] as JSON)
+        renderResponse(inventoryTransactions)
     }
 }
