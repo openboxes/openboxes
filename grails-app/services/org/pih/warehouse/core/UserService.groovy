@@ -43,12 +43,14 @@ class UserService {
      */
     User saveUser(User user, String requestingUserId, List<String> requestedRoleIds) {
         if (user.roles) {
-            throw new IllegalArgumentException(messageLocalizer.localize(
-                'user.errors.rolesNotAllowedDirectly.message'))
+            String message = messageLocalizer.localize('user.errors.rolesNotAllowedDirectly.message')
+            user.errors.reject('user.errors.rolesNotAllowedDirectly.message', message)
+            throw new ValidationException(message, user.errors)
         }
         if (user.locationRoles) {
-            throw new IllegalArgumentException(messageLocalizer.localize(
-                'user.errors.locationRolesNotAllowedDirectly.message'))
+            String message = messageLocalizer.localize('user.errors.locationRolesNotAllowedDirectly.message')
+            user.errors.reject('user.errors.locationRolesNotAllowedDirectly.message', message)
+            throw new ValidationException(message, user.errors)
         }
         if (requestedRoleIds) {
             validateAndApplyRoleChanges(User.get(requestingUserId), user, requestedRoleIds)
@@ -79,7 +81,7 @@ class UserService {
         User userInstance = User.get(userId)
         User requestingUser = User.get(requestingUserId)
 
-        rejectRoleKeysInParams(params)
+        rejectRoleKeysInParams(userInstance, params)
 
         if (requestedRoleIds) {
             validateAndApplyRoleChanges(requestingUser, userInstance, requestedRoleIds)
@@ -143,14 +145,16 @@ class UserService {
      *
      * They must be extracted by the controller and passed as separate arguments.
      */
-    private void rejectRoleKeysInParams(Map params) {
+    private void rejectRoleKeysInParams(User user, Map params) {
         if (params.any { key, val -> key?.toString()?.startsWith('roles') }) {
-            throw new IllegalArgumentException(messageLocalizer.localize(
-                'user.errors.rolesNotAllowedDirectly.message'))
+            String message = messageLocalizer.localize('user.errors.rolesNotAllowedDirectly.message')
+            user.errors.reject('user.errors.rolesNotAllowedDirectly.message', message)
+            throw new ValidationException(message, user.errors)
         }
         if (params.any { key, val -> key?.toString()?.startsWith('locationRoles') }) {
-            throw new IllegalArgumentException(messageLocalizer.localize(
-                'user.errors.locationRolesNotAllowedDirectly.message'))
+            String message = messageLocalizer.localize('user.errors.locationRolesNotAllowedDirectly.message')
+            user.errors.reject('user.errors.locationRolesNotAllowedDirectly.message', message)
+            throw new ValidationException(message, user.errors)
         }
     }
 
@@ -664,8 +668,7 @@ class UserService {
         user.save(failOnError: true)
     }
 
-    String deleteLocationRole(String locationRoleId, String requestingUserId) {
-        LocationRole locationRole = LocationRole.get(locationRoleId)
+    String deleteLocationRole(LocationRole locationRole, String requestingUserId) {
         if (locationRole) {
             User requestingUser = User.get(requestingUserId)
             checkCanAddOrRemoveRoles(requestingUser, locationRole.user, [locationRole.role], [])

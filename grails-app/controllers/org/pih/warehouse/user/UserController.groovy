@@ -23,7 +23,6 @@ import org.apache.http.auth.AuthenticationException
 import org.pih.warehouse.core.LocalizationService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationRole
-import org.pih.warehouse.core.LocationRoleDataService
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
@@ -37,7 +36,6 @@ class UserController {
     def userService
     def locationService
     LocalizationService localizationService
-    LocationRoleDataService locationRoleDataService
     UserDataService userGormService
 
     /**
@@ -482,7 +480,7 @@ class UserController {
     def deleteLocationRole() {
         LocationRole locationRole = LocationRole.get(params.id)
         try {
-            String userId = userService.deleteLocationRole(params.id, session.user.id)
+            String userId = userService.deleteLocationRole(locationRole, session.user.id)
             redirect(action: "edit", id: userId)
         } catch (ValidationException e) {
             flash.message = e.message // the service localizes its messages for us

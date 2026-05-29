@@ -129,7 +129,7 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
         service.updateUser(admin.id, superuser.id, [], [roles: [adminRole.id]])
 
         then:
-        thrown(IllegalArgumentException)
+        thrown(ValidationException)
     }
 
     void "updateUser rejects params containing roles[] keys"() {
@@ -137,7 +137,7 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
         service.updateUser(admin.id, superuser.id, [], ['roles[0].id': superuserRole.id])
 
         then:
-        thrown(IllegalArgumentException)
+        thrown(ValidationException)
     }
 
     void "updateUser rejects params containing locationRoles keys"() {
@@ -145,7 +145,7 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
         service.updateUser(admin.id, superuser.id, [], [locationRoles: [adminRole.id]])
 
         then:
-        thrown(IllegalArgumentException)
+        thrown(ValidationException)
     }
 
     void "updateUser rejects params containing locationRoles[] keys"() {
@@ -153,6 +153,6 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
         service.updateUser(admin.id, superuser.id, [], ['locationRoles[0].id': adminRole.id])
 
         then:
-        thrown(IllegalArgumentException)
+        thrown(ValidationException)
     }
 }
