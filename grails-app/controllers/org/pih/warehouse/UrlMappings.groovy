@@ -51,6 +51,15 @@ class UrlMappings {
             action = [GET: "read", POST: "save", PUT: "save", DELETE: "delete"]
         }
 
+        "/api/locationGroups"(parseRequest: true) {
+            controller = { "locationGroupApi" }
+            action = [GET: "list", POST: "create"]
+        }
+        "/api/locationGroups/$id"(parseRequest: true) {
+            controller = { "locationGroupApi" }
+            action = [GET: "read", DELETE: "delete"]
+        }
+
         // Category options for filters on  product list page
         "/api/categoryOptions"(parseRequest: true) {
             controller = { "selectOptionsApi" }

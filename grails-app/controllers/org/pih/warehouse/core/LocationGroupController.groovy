@@ -16,13 +16,15 @@ class LocationGroupController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
+    LocationGroupService locationGroupService
+
     def index() {
         redirect(action: "list", params: params)
     }
 
     def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [locationGroupInstanceList: LocationGroup.list(params), locationGroupInstanceTotal: LocationGroup.count()]
+        [locationGroupInstanceList: locationGroupService.getLocationGroups(params), locationGroupInstanceTotal: LocationGroup.count()]
     }
 
     def create() {
@@ -42,22 +44,20 @@ class LocationGroupController {
     }
 
     def show() {
-        def locationGroupInstance = LocationGroup.get(params.id)
-        if (!locationGroupInstance) {
+        try {
+            [locationGroupInstance: locationGroupService.getLocationGroup(params.id)]
+        } catch (IllegalArgumentException e) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
             redirect(action: "list")
-        } else {
-            [locationGroupInstance: locationGroupInstance]
         }
     }
 
     def edit() {
-        def locationGroupInstance = LocationGroup.get(params.id)
-        if (!locationGroupInstance) {
+        try {
+            [locationGroupInstance: locationGroupService.getLocationGroup(params.id)]
+        } catch (IllegalArgumentException e) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
             redirect(action: "list")
-        } else {
-            return [locationGroupInstance: locationGroupInstance]
         }
     }
 
@@ -98,18 +98,16 @@ class LocationGroupController {
     }
 
     def delete() {
-        def locationGroupInstance = LocationGroup.get(params.id)
-        if (locationGroupInstance) {
-            try {
-                locationGroupInstance.delete(flush: true)
-                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
-                redirect(action: "list")
-            }
-            catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
-                redirect(action: "list", id: params.id)
-            }
-        } else {
+        try {
+            locationGroupService.deleteLocationGroup(params.id)
+            flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
+            redirect(action: "list")
+        }
+        catch (org.springframework.dao.DataIntegrityViolationException e) {
+            flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
+            redirect(action: "list", id: params.id)
+        }
+        catch (IllegalArgumentException e) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
             redirect(action: "list")
         }
