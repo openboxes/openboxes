@@ -10,6 +10,10 @@
 # is lost - they just move under the archive root. Optionally a local backup
 # copy can be downloaded first.
 #
+# Point SFTP_DIRS at one or more parent directories. By default the script
+# recurses through all subdirectories and preserves the folder structure under
+# the archive root (set RECURSIVE=false to only process the top level).
+#
 # This is an infrastructure/ops utility, not part of the application. OpenBoxes
 # core has no SFTP poller; file exchange is handled by external middleware, so
 # the host, credentials and directories are environment-specific and must be
@@ -26,7 +30,7 @@
 #     SFTP_HOST=sftp.example.com \
 #     SFTP_USER=vvg \
 #     SFTP_KEY=~/.ssh/vvg_sftp \
-#     SFTP_DIRS="/inbound /outbound" \
+#     SFTP_DIRS="/data/integration" \
 #     DRY_RUN=true \
 #     ./archive-sftp-files.sh
 #
@@ -55,11 +59,15 @@ SFTP_USER="${SFTP_USER:-}"
 SFTP_PASSWORD="${SFTP_PASSWORD:-}"          # optional; prefer key auth
 SFTP_KEY="${SFTP_KEY:-}"                     # path to private key (optional)
 
-# Space-separated list of remote directories whose files should be archived.
+# Space-separated list of remote parent directories to archive. Each is walked
+# recursively (unless RECURSIVE=false) and its files are archived.
 SFTP_DIRS="${SFTP_DIRS:-/inbound /outbound}"
 
-# Glob of files to archive within each directory. Default targets CSV files;
-# set to "*" to archive everything (subdirectories included).
+# Recurse into subdirectories (preserving structure under the archive root).
+RECURSIVE="${RECURSIVE:-true}"
+
+# Glob matched against each file's NAME to decide what to archive. Default
+# targets CSV files; set to "*" to archive every file.
 ARCHIVE_GLOB="${ARCHIVE_GLOB:-*.csv}"
 
 # Remote archive root. A per-run timestamped folder is created beneath it, and
@@ -100,21 +108,54 @@ lftp_open() {
     fi
 }
 
-# List files matching ARCHIVE_GLOB in a remote directory (basenames, one/line).
+# List files under a remote directory, as paths relative to that directory
+# (one per line). Recurses unless RECURSIVE=false. Excludes directory entries,
+# anything under the archive root, and anything whose name does not match
+# ARCHIVE_GLOB.
 list_files() {
     local dir="$1"
-    { lftp <<-EOF 2>/dev/null
-		$(lftp_open)
-		cd "${dir}"
-		cls -1 ${ARCHIVE_GLOB}
-		bye
-	EOF
-    } | sed 's#.*/##' | sed '/^$/d' || true
+    local raw
+    if [[ "$RECURSIVE" == "true" ]]; then
+        # `find` lists recursively; directory entries end with "/".
+        raw="$(lftp <<-EOF 2>/dev/null
+			$(lftp_open)
+			cd "${dir}"
+			find
+			bye
+		EOF
+        )"
+    else
+        # Top level only.
+        raw="$(lftp <<-EOF 2>/dev/null
+			$(lftp_open)
+			cd "${dir}"
+			cls -1 --classify
+			bye
+		EOF
+        )"
+    fi
+
+    local line rel
+    while IFS= read -r line; do
+        [[ -z "$line" ]] && continue
+        rel="${line#./}"                       # strip leading "./" from find
+        [[ "$rel" == "." ]] && continue
+        [[ "$rel" == */ ]] && continue         # skip directories
+        # Skip anything that already lives under the archive root.
+        case "${dir%/}/${rel}" in
+            "${ARCHIVE_ROOT%/}"/*) continue ;;
+        esac
+        # Match the glob against the file name only.
+        case "$(basename -- "$rel")" in
+            $ARCHIVE_GLOB) printf '%s\n' "$rel" ;;
+        esac
+    done <<< "$raw"
 }
 
 echo "=== SFTP archive ==="
 echo "Host:         ${SFTP_USER}@${SFTP_HOST}:${SFTP_PORT}"
 echo "Source dirs:  ${SFTP_DIRS}"
+echo "Recursive:    ${RECURSIVE}"
 echo "Glob:         ${ARCHIVE_GLOB}"
 echo "Archive root: ${ARCHIVE_ROOT}/${TIMESTAMP}"
 [[ -n "$LOCAL_BACKUP_DIR" ]] && echo "Local backup: ${LOCAL_BACKUP_DIR}/${TIMESTAMP}"
@@ -143,23 +184,34 @@ for dir in $SFTP_DIRS; do
         continue
     fi
 
-    # Optional local backup copy before moving.
+    # Unique relative subdirectories that need to be recreated (preserve tree).
+    mapfile -t subdirs < <(
+        for f in "${files[@]}"; do
+            d="$(dirname -- "$f")"
+            [[ "$d" != "." ]] && printf '%s\n' "$d"
+        done | sort -u
+    )
+
+    # Optional local backup copy before moving (structure preserved).
     if [[ -n "$LOCAL_BACKUP_DIR" ]]; then
         local_dir="${LOCAL_BACKUP_DIR}/${TIMESTAMP}/${base}"
         mkdir -p "$local_dir"
+        for d in "${subdirs[@]}"; do mkdir -p "${local_dir}/${d}"; done
         lftp <<-EOF
 			$(lftp_open)
 			lcd "${local_dir}"
 			cd "${dir}"
-			$(for f in "${files[@]}"; do echo "get \"${f}\""; done)
+			$(for f in "${files[@]}"; do echo "get \"${f}\" -o \"${f}\""; done)
 			bye
 		EOF
     fi
 
-    # Create the archive directory and move each matching file into it.
+    # Recreate the subdirectory tree under the archive dir, then move each file
+    # into its matching location.
     lftp <<-EOF
 		$(lftp_open)
 		mkdir -p "${archive_dir}"
+		$(for d in "${subdirs[@]}"; do echo "mkdir -p \"${archive_dir}/${d}\""; done)
 		$(for f in "${files[@]}"; do echo "mv \"${dir}/${f}\" \"${archive_dir}/${f}\""; done)
 		bye
 	EOF
