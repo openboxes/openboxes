@@ -1,14 +1,22 @@
 -- =============================================================================
--- OpenBoxes UAT - Reset transactional data
+-- OpenBoxes - Reset transactional data
 -- =============================================================================
 --
--- Wipes all transactional data (orders, putaways, requisitions/stock movements,
+-- Deletes all TRANSACTIONAL data (orders, putaways, requisitions/stock movements,
 -- shipments, receipts, picks, invoices, cycle counts and all inventory
--- transactions) so a UAT instance (e.g. vvg.openboxes.com) can start from
--- scratch, while PRESERVING master and configuration data: products, categories,
--- locations, organizations, users/persons/roles, inventory items (lots),
--- inventory levels (min/max/reorder), product suppliers, units of measure,
--- shipment/order/transaction types, shipment workflows, product documents, etc.
+-- transactions) so an instance can be returned to an empty operational state,
+-- while PRESERVING master, reference and configuration data:
+--   * MASTER        - products, categories, organizations, persons, inventory
+--                     items (lots)
+--   * REFERENCE     - locations, units of measure, product suppliers
+--   * CONFIGURATION - users/roles, inventory levels (min/max/reorder),
+--                     shipment/order/transaction types, shipment workflows,
+--                     product/workflow documents
+--   (the master/reference/configuration categories are distinct but sometimes
+--    blend together; the common thread is that none of it is transactional.)
+--
+-- Typical uses: refreshing a UAT or demo environment, preparing a sandbox cloned
+-- from production, or onboarding a facility from a copied dataset.
 --
 -- On-hand stock is derived from inventory transactions, so deleting the
 -- transactions zeroes out all stock. The derived/reporting tables cleared at the
@@ -20,7 +28,7 @@
 -- USAGE
 --   1. BACK UP THE DATABASE FIRST. This is irreversible.
 --      mysqldump -u <user> -p <dbname> > backup-before-reset.sql
---   2. Run against the UAT database only:
+--   2. Run against the target (non-production) database:
 --      mysql -u <user> -p <dbname> < reset-transactional-data.sql
 --   3. Restart the application (or clear the Hibernate 2nd-level cache) so no
 --      stale entities remain cached, then let the refresh jobs rebuild the

@@ -1,15 +1,22 @@
 /*
  * =============================================================================
- * OpenBoxes UAT - Reset transactional data (Grails / OpenBoxes console script)
+ * OpenBoxes - Reset transactional data (Grails / OpenBoxes console script)
  * =============================================================================
  *
  * Paste this into the OpenBoxes admin console (Configuration > Console, i.e. the
- * Grails web console) and run it. It wipes all transactional data so a UAT
- * instance (e.g. vvg.openboxes.com) can start from scratch, while PRESERVING
- * master and configuration data: products, categories, locations, organizations,
- * users/persons/roles, inventory items (lots), inventory levels, product
- * suppliers, units of measure, shipment/order/transaction types, shipment
- * workflows, product documents, etc.
+ * Grails web console) and run it. It deletes all TRANSACTIONAL data so an
+ * instance can be returned to an empty operational state, while PRESERVING
+ * master, reference and configuration data:
+ *   - MASTER        : products, categories, organizations, persons, inventory
+ *                     items (lots)
+ *   - REFERENCE     : locations, units of measure, product suppliers
+ *   - CONFIGURATION : users/roles, inventory levels, shipment/order/transaction
+ *                     types, shipment workflows, product/workflow documents
+ *   (these three categories are distinct but sometimes blend together; the
+ *    common thread is that none of it is transactional.)
+ *
+ * Typical uses: refreshing a UAT or demo environment, preparing a sandbox cloned
+ * from production, or onboarding a facility from a copied dataset.
  *
  * What gets cleared:
  *   - Orders / purchase orders / putaways / transfer orders, order items,
@@ -33,7 +40,7 @@
  *
  * IMPORTANT
  *   - BACK UP THE DATABASE BEFORE RUNNING. This is irreversible.
- *   - Run on UAT only.
+ *   - Run on non-production environments only.
  *   - Raw SQL deletes bypass the Hibernate caches, so RESTART the application
  *     afterwards (or clear the 2nd-level cache) and let the refresh jobs rebuild
  *     the derived tables.
