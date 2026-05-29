@@ -14,7 +14,8 @@ class UserControllerSpec extends Specification {
     void setup() {
         mockCodec(PasswordCodec)
 
-        new User(username: "asd",
+        // several controller actions read session.user.id
+        session.user = new User(username: "asd",
             firstName: "Asd",
             lastName: "Qwe",
             password: "test123",
