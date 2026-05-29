@@ -3,10 +3,10 @@ package org.pih.warehouse.inventory
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.http.ResponseBodyFormattable
 import org.pih.warehouse.product.Product
 
-
-class PendingCycleCountRequest {
+class PendingCycleCountRequest implements ResponseBodyFormattable {
 
     String id
 
@@ -45,7 +45,8 @@ class PendingCycleCountRequest {
         version false
     }
 
-    Map toJson() {
+    @Override
+    Map<String, Object> asResponseBody() {
         return [
                 id: id,
                 facility: facility.toBaseJson(),
