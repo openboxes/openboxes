@@ -10,6 +10,9 @@
 package org.pih.warehouse.core
 
 import grails.gorm.transactions.Transactional
+import grails.validation.ValidationException
+import org.springframework.dao.DataIntegrityViolationException
+import org.pih.warehouse.core.LocationGroupCommand
 
 @Transactional
 class LocationGroupService {
@@ -24,5 +27,23 @@ class LocationGroupService {
             }
         }
         return locationGroups
+    }
+
+    LocationGroup getLocationGroup(String id) {
+        LocationGroup locationGroup = LocationGroup.get(id)
+        if (!locationGroup) {
+            throw new IllegalArgumentException("No Location Group found for location group ID ${id}")
+        }
+        return locationGroup
+    }
+
+    LocationGroup createLocationGroup(LocationGroupCommand command) {
+        LocationGroup locationGroup = new LocationGroup(name: command.name)
+        return locationGroup.save(failOnError: true, flush: true)
+    }
+
+    void deleteLocationGroup(String id) {
+        LocationGroup locationGroup = getLocationGroup(id)
+        locationGroup.delete(flush: true)
     }
 }
