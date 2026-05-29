@@ -101,9 +101,6 @@ DELETE FROM order_event;
 DELETE FROM shipment_event;
 DELETE FROM requisition_event;
 
-DELETE FROM order_event_log;
-DELETE FROM shipment_event_log;
-
 DELETE FROM order_document;
 DELETE FROM shipment_document;
 DELETE FROM invoice_document;
@@ -126,6 +123,7 @@ DELETE FROM fulfillment_item;
 DELETE FROM picklist_item;
 DELETE FROM invoice_item;
 DELETE FROM cycle_count_item;
+DELETE FROM putaway_task;
 DELETE FROM transaction_entry;
 
 -- -----------------------------------------------------------------------------
@@ -149,7 +147,6 @@ DELETE FROM local_transfer;
 -- -----------------------------------------------------------------------------
 DELETE FROM comment;
 DELETE FROM event;
-DELETE FROM event_log;
 DELETE FROM reference_number;
 
 -- -----------------------------------------------------------------------------

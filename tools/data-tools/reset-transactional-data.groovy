@@ -21,6 +21,7 @@
  * What gets cleared:
  *   - Orders / purchase orders / putaways / transfer orders, order items,
  *     adjustments and their picklists
+ *   - Putaway tasks
  *   - Requisitions (stock movements), requisition items, fulfillments
  *   - Shipments, shipment items, containers, reference numbers
  *   - Receipts and receipt items
@@ -28,7 +29,7 @@
  *   - Cycle counts, cycle count requests and items
  *   - All inventory transactions + entries (this zeroes on-hand stock) and
  *     transaction sources / local transfers
- *   - Comments, events and event logs attached to the above
+ *   - Comments and events attached to the above
  *   - Documents attached to orders/shipments/invoices (product & workflow
  *     documents are preserved)
  *   - Derived/reporting tables (product availability, snapshots, fact &
@@ -60,20 +61,19 @@ def tablesToClear = [
     'fulfillment_item_shipment_item',
     'order_item_comment', 'order_comment', 'shipment_comment', 'requisition_comment',
     'order_event', 'shipment_event', 'requisition_event',
-    'order_event_log', 'shipment_event_log',
     'order_document', 'shipment_document', 'invoice_document',
     'shipment_reference_number', 'invoice_reference_number',
     'requisition_approvers',
     // line / child tables
     'order_adjustment', 'order_item', 'receipt_item', 'shipment_item', 'container',
     'requisition_item', 'fulfillment_item', 'picklist_item', 'invoice_item',
-    'cycle_count_item', 'transaction_entry',
+    'cycle_count_item', 'putaway_task', 'transaction_entry',
     // parent / root records
     'receipt', 'shipment', '`order`', 'requisition', 'fulfillment', 'picklist',
     'invoice', 'cycle_count', 'cycle_count_request', 'transaction_source',
     '`transaction`', 'local_transfer',
     // shared content tables used only by transactional records
-    'comment', 'event', 'event_log', 'reference_number',
+    'comment', 'event', 'reference_number',
     // derived / reporting tables (rebuilt by scheduled jobs)
     'product_availability', 'inventory_snapshot', 'inventory_item_snapshot',
     'transaction_fact', 'consumption_fact', 'stockout_fact', 'consumption',
