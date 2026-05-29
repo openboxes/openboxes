@@ -1284,7 +1284,12 @@ class StockMovementService {
             }
 
             shipmentItem.recipient = row.recipient ? personService.getPerson(row.recipient) : shipmentItem.recipient
-            shipmentItem.container = createOrUpdateContainer(shipment, row.packLevel1, row.packLevel2)
+
+            String existingPackLevel1 = shipmentItem.container?.parentContainer?.name ?: shipmentItem.container?.name
+            String existingPackLevel2 = shipmentItem.container?.parentContainer ? shipmentItem.container?.name : null
+            String newPackLevel1 = row.packLevel1 ?: existingPackLevel1
+            String newPackLevel2 = row.packLevel2 ?: existingPackLevel2
+            shipmentItem.container = createOrUpdateContainer(shipment, newPackLevel1, newPackLevel2)
             shipmentItem.save()
         }
     }
