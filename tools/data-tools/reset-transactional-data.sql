@@ -28,9 +28,13 @@
 -- USAGE
 --   1. BACK UP THE DATABASE FIRST. This is irreversible.
 --      mysqldump -u <user> -p <dbname> > backup-before-reset.sql
---   2. Run against the target (non-production) database:
+--   2. Opt in explicitly: uncomment the `SET @CONFIRM_RESET = 'YES';` line in
+--      the SAFETY GUARD block below (or pass it on the connection, e.g.
+--      mysql --init-command="SET @CONFIRM_RESET='YES'"). Without this the
+--      script aborts before deleting anything.
+--   3. Run against the target (non-production) database:
 --      mysql -u <user> -p <dbname> < reset-transactional-data.sql
---   3. Restart the application (or clear the Hibernate 2nd-level cache) so no
+--   4. Restart the application (or clear the Hibernate 2nd-level cache) so no
 --      stale entities remain cached, then let the refresh jobs rebuild the
 --      derived tables.
 --
@@ -41,6 +45,27 @@
 --     succeeds.
 --   * `order` is a reserved word and must stay backtick-quoted.
 -- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- SAFETY GUARD - this script refuses to run until you explicitly opt in.
+-- Uncomment the next line to confirm you really want to delete transactional data:
+-- SET @CONFIRM_RESET = 'YES';
+--
+-- The procedure below aborts the script (before any deletes) unless the flag is
+-- set, so an accidental run is a no-op.
+-- -----------------------------------------------------------------------------
+DROP PROCEDURE IF EXISTS _ob_reset_guard;
+DELIMITER //
+CREATE PROCEDURE _ob_reset_guard()
+BEGIN
+    IF COALESCE(@CONFIRM_RESET, '') <> 'YES' THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Refusing to run reset: set @CONFIRM_RESET = ''YES'' to confirm.';
+    END IF;
+END //
+DELIMITER ;
+CALL _ob_reset_guard();
+DROP PROCEDURE _ob_reset_guard;
 
 SET FOREIGN_KEY_CHECKS = 0;
 SET autocommit = 0;
