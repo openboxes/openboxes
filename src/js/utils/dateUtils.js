@@ -111,6 +111,15 @@ export const formatDateToString = ({
   });
 };
 
+export const dateFnsLocale = (currentLocale) => {
+  // Temporary workaround: using 'ar' locale causes the app to crash when selecting a date.
+  // Fallback to 'en' to avoid the crash
+  if (!currentLocale || ['en', 'ar'].includes(currentLocale)) {
+    return locales.enUS;
+  }
+  return locales[currentLocale];
+};
+
 /**
  A method for converting Date to an ISO-formatted date-time string (for formatting API
  request fields)
