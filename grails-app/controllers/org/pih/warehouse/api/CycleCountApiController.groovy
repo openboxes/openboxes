@@ -5,7 +5,6 @@ import grails.validation.ValidationException
 import java.time.Instant
 import org.apache.commons.csv.CSVPrinter
 
-import org.pih.warehouse.core.BaseController
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.UploadService
@@ -38,7 +37,7 @@ import org.pih.warehouse.inventory.PendingCycleCountRequest
 import org.pih.warehouse.report.CycleCountReportCommand
 import org.springframework.web.multipart.MultipartFile
 
-class CycleCountApiController extends BaseController {
+class CycleCountApiController extends BaseApiController {
 
     CycleCountService cycleCountService
     DocumentService documentService

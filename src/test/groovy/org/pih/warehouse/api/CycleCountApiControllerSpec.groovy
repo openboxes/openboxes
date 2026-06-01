@@ -2,19 +2,20 @@ package org.pih.warehouse.api
 
 import grails.gorm.PagedResultList
 import grails.plugins.rendering.pdf.PdfRenderingService
-import grails.testing.gorm.DataTest
-import grails.testing.web.controllers.ControllerUnitTest
 import grails.validation.ValidationException
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
 import org.apache.http.HttpStatus
 import org.grails.datastore.mapping.query.Query
-import org.pih.warehouse.api.CycleCountApiController
+import testutil.ApiControllerSpec
+
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.dtos.BatchCommandUtils
+import org.pih.warehouse.core.mapper.ResponseMapper
 import org.pih.warehouse.inventory.CycleCountCandidate
 import org.pih.warehouse.inventory.CycleCountCandidateFilterCommand
+import org.pih.warehouse.inventory.CycleCountCandidateMapper
 import org.pih.warehouse.inventory.CycleCountDto
 import org.pih.warehouse.inventory.CycleCountRequest
 import org.pih.warehouse.inventory.CycleCountRequestBatchCommand
@@ -28,15 +29,13 @@ import org.pih.warehouse.inventory.CycleCountStartRecountCommand
 import org.pih.warehouse.inventory.PendingCycleCountRequest
 import org.pih.warehouse.product.Product
 import org.testcontainers.shaded.com.google.common.net.HttpHeaders
-import org.w3c.dom.Document
 import spock.lang.Shared
-import spock.lang.Specification
 import spock.lang.Unroll
 
 import javax.servlet.http.HttpServletResponse
 
 @Unroll
-class CycleCountApiControllerSpec extends Specification implements DataTest, ControllerUnitTest<CycleCountApiController> {
+class CycleCountApiControllerSpec extends ApiControllerSpec<CycleCountApiController> {
 
     private static String FACILITY_ID = 'Facility Id'
     private static String JSON_FORMAT = 'application/json'
@@ -74,6 +73,11 @@ class CycleCountApiControllerSpec extends Specification implements DataTest, Con
         controller.cycleCountService = cycleCountService
         controller.documentService = documentService
         controller.pdfRenderingService = pdfRenderingService
+    }
+
+    @Override
+    List<ResponseMapper> setupResponseMappers() {
+        return [new CycleCountCandidateMapper()]
     }
 
     void 'getCandidates should return JSON response when format is not csv'() {

@@ -14,8 +14,8 @@ import org.pih.warehouse.core.http.HttpResponseContext
 /**
  * Base class for all Grails Controller components.
  *
- * We intentionally don't provide methods for rendering error responses.
- * To return an error response, throw an Exception, which will be processed by the {@link ErrorsController}.
+ * We intentionally don't provide methods for rendering error responses. To return an error response,
+ * throw an Exception, which will be processed by the {@link ErrorsController}.
  */
 abstract class BaseController {
 
