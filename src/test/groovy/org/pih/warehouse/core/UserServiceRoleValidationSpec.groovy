@@ -17,6 +17,8 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
     Role browserRole
     Role managerRole
     Role superuserRole
+    Role financeRole
+    Role invoiceRole
 
     User admin
     User manager
@@ -34,6 +36,10 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
         browserRole = new Role(roleType: RoleType.ROLE_BROWSER, name: 'Browser').save(validate: false)
         managerRole = new Role(roleType: RoleType.ROLE_MANAGER, name: 'Manager').save(validate: false)
         superuserRole = new Role(roleType: RoleType.ROLE_SUPERUSER, name: 'Superuser').save(validate: false)
+        // Supplementary roles, both sortOrder 100 (see RoleType) - the collision
+        // that triggered OBPIH-7904 when diffed with Groovy's collection minus.
+        financeRole = new Role(roleType: RoleType.ROLE_FINANCE, name: 'Financial User').save(validate: false)
+        invoiceRole = new Role(roleType: RoleType.ROLE_INVOICE, name: 'Invoice user').save(validate: false)
 
         admin = new User(username: 'admin', password: 'pass', passwordConfirm: 'pass',
             firstName: 'Admin', lastName: 'User', email: 'admin@test.com')
@@ -84,28 +90,28 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
         }
     }
 
-    void "canAddOrRemoveRole #allows #user to add or remove role '#role'"() {
+    void "should #allowOrForbid #user to add or remove the '#role' role"() {
         expect:
-        assert service.canAddOrRemoveRole(userByName(user), roleByName(role)) == (allows == 'allows')
+        assert service.canAddOrRemoveRole(userByName(user), roleByName(role)) == allowed
 
         where:
-        user        | role        || allows
-        'superuser' | 'Admin'     || 'allows'
-        'superuser' | 'Browser'   || 'allows'
-        'superuser' | 'Manager'   || 'allows'
-        'superuser' | 'Superuser' || 'allows'
-        'admin'     | 'Admin'     || 'allows'
-        'admin'     | 'Browser'   || 'allows'
-        'admin'     | 'Manager'   || 'allows'
-        'admin'     | 'Superuser' || 'forbids'
-        'manager'   | 'Admin'     || 'forbids'
-        'manager'   | 'Browser'   || 'allows'
-        'manager'   | 'Manager'   || 'allows'
-        'manager'   | 'Superuser' || 'forbids'
-        'null'      | 'Browser'   || 'forbids'
+        user        | role        | allowOrForbid || allowed
+        'superuser' | 'Admin'     | 'allow'       || true
+        'superuser' | 'Browser'   | 'allow'       || true
+        'superuser' | 'Manager'   | 'allow'       || true
+        'superuser' | 'Superuser' | 'allow'       || true
+        'admin'     | 'Admin'     | 'allow'       || true
+        'admin'     | 'Browser'   | 'allow'       || true
+        'admin'     | 'Manager'   | 'allow'       || true
+        'admin'     | 'Superuser' | 'forbid'      || false
+        'manager'   | 'Admin'     | 'forbid'      || false
+        'manager'   | 'Browser'   | 'allow'       || true
+        'manager'   | 'Manager'   | 'allow'       || true
+        'manager'   | 'Superuser' | 'forbid'      || false
+        'null'      | 'Browser'   | 'forbid'      || false
     }
 
-    void "checkCanAddOrRemoveRoles passes when no roles change"() {
+    void "should allow an update that leaves the roles unchanged"() {
         when:
         service.checkCanAddOrRemoveRoles(admin, manager, [adminRole, managerRole], [adminRole, managerRole])
         service.checkCanAddOrRemoveRoles(manager, admin, [adminRole, managerRole], [adminRole, managerRole])
@@ -114,7 +120,7 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
         noExceptionThrown()
     }
 
-    void "checkCanAddOrRemoveRoles passes for empty before and after"() {
+    void "should allow an update for a user with no roles before or after"() {
         when:
         service.checkCanAddOrRemoveRoles(superuser, admin, [], [])
         service.checkCanAddOrRemoveRoles(manager, admin, [], [])
@@ -124,7 +130,7 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
         noExceptionThrown()
     }
 
-    void "updateUser rejects params containing roles keys"() {
+    void "should reject an update whose params contain a 'roles' key"() {
         when:
         service.updateUser(admin.id, superuser.id, [], [roles: [adminRole.id]])
 
@@ -132,7 +138,7 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
         thrown(ValidationException)
     }
 
-    void "updateUser rejects params containing roles[] keys"() {
+    void "should reject an update whose params contain a 'roles[].id' key"() {
         when:
         service.updateUser(admin.id, superuser.id, [], ['roles[0].id': superuserRole.id])
 
@@ -140,7 +146,7 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
         thrown(ValidationException)
     }
 
-    void "updateUser rejects params containing locationRoles keys"() {
+    void "should reject an update whose params contain a 'locationRoles' key"() {
         when:
         service.updateUser(admin.id, superuser.id, [], [locationRoles: [adminRole.id]])
 
@@ -148,11 +154,41 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
         thrown(ValidationException)
     }
 
-    void "updateUser rejects params containing locationRoles[] keys"() {
+    void "should reject an update whose params contain a 'locationRoles[].id' key"() {
         when:
         service.updateUser(admin.id, superuser.id, [], ['locationRoles[0].id': adminRole.id])
 
         then:
         thrown(ValidationException)
+    }
+
+    void "should remove a role while keeping another that shares its sortOrder"() {
+        given: 'a user with two supplementary roles that share a sortOrder'
+        manager.addToRoles(financeRole)
+        manager.addToRoles(invoiceRole)
+        manager.save(validate: false)
+
+        when: 'a superuser requests the same roles minus invoice'
+        service.validateAndApplyRoleChanges(superuser, manager, [managerRole.id, financeRole.id])
+
+        then: 'invoice is removed'
+        !manager.roles.contains(invoiceRole)
+
+        and: 'the manager and finance roles are kept'
+        manager.roles.contains(managerRole)
+        manager.roles.contains(financeRole)
+    }
+
+    void "should add a role that shares a sortOrder with one the user already has"() {
+        given: 'a user that already has one supplementary role'
+        manager.addToRoles(financeRole)
+        manager.save(validate: false)
+
+        when: 'a superuser requests an additional role with the same sortOrder'
+        service.validateAndApplyRoleChanges(superuser, manager, [managerRole.id, financeRole.id, invoiceRole.id])
+
+        then: 'both supplementary roles are present'
+        manager.roles.contains(financeRole)
+        manager.roles.contains(invoiceRole)
     }
 }

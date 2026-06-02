@@ -51,9 +51,16 @@ class Role implements Serializable, Comparable<Role> {
 
     @Override
     int compareTo(Role role) {
-        if (role) {
-            return this?.roleType?.sortOrder?.compareTo(role?.roleType?.sortOrder)
+        // Sorts a null role last i.e. this role is always greater than a null role
+        if (!role) {
+            return 1
         }
+        // Order by sortOrder, then by id as a stable tiebreaker. The id is
+        // a tiebreaker that keeps compareTo consistent with equality so that
+        // distinct roles sharing a sortOrder never compare as equal. Without
+        // this Comparable-based operations like minus, unique, TreeSet silently
+        // collapse roles with the same sortOrder. See OBPIH-7904.
+        return (this.roleType?.sortOrder ?: 0) <=> (role.roleType?.sortOrder ?: 0) ?: (this.id <=> role.id)
     }
 
 }
