@@ -10,6 +10,12 @@ class BulkDataBinderConfig {
     Class<Importable> bindTo
 
     /**
+     * The feature/data structure associated with this config.
+     * Can be null if the binding is not directly tied to a configurer. In this case, no custom binding will occur.
+     */
+    BulkDataType bulkDataType
+
+    /**
      * Configuration for binding each of the fields of the object.
      *
      * Keyed on the field name as it is in the object being bound to. For data imports, make sure that this

@@ -13,14 +13,25 @@ class BulkDataImportComponentResolver {
 
     private final HashMap<BulkDataType, ConfiguresBulkDataBinder> bulkDataBinderConfigurersByDataType = [:]
 
-    BulkDataImportComponentResolver(final List<ConfiguresBulkDataBinder> bulkDataBinderConfigurers) {
-        bulkDataBinderConfigurers.each { bulkDataBinderConfigurersByDataType.put(it.bulkDataType, it) }
+    // Components are wrapped with optional to avoid an error when no implementations are defined.
+    BulkDataImportComponentResolver(final Optional<List<ConfiguresBulkDataBinder>> bulkDataBinderConfigurers) {
+        populateBulkDataBinderConfigMap(bulkDataBinderConfigurers.orElse([]))
+    }
+
+    private void populateBulkDataBinderConfigMap(List<ConfiguresBulkDataBinder> bulkDataBinderConfigurers) {
+        for (bulkDataBinderConfigurer in bulkDataBinderConfigurers) {
+            BulkDataType bulkDataType = bulkDataBinderConfigurer.bulkDataType
+            if (bulkDataBinderConfigurersByDataType.containsKey(bulkDataType)) {
+                throw new RuntimeException("Found multiple bulk data binder configurers for data type ${bulkDataType}. Only one is allowed.")
+            }
+            bulkDataBinderConfigurersByDataType.put(bulkDataType, bulkDataBinderConfigurer)
+        }
     }
 
     /**
      * @return the bulk data binder configurer associated with the given data type.
      */
     ConfiguresBulkDataBinder getBulkDataBinderConfigurer(BulkDataType dataImportType) {
-        return bulkDataBinderConfigurersByDataType.get(dataImportType)
+        return dataImportType ? bulkDataBinderConfigurersByDataType.get(dataImportType) : null
     }
 }

@@ -11,7 +11,8 @@ trait ConfiguresBulkDataBinder<T extends Importable> {
     abstract BulkDataBinderConfig getBulkDataBinderConfig()
 
     /**
-     * @return the data type for this configuration to be used for.
+     * @return the data type that this configuration is meant to be used for. Bulk data type has a one-to-one
+     *         map to a configurer.
      */
     abstract BulkDataType getBulkDataType()
 

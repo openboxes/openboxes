@@ -35,34 +35,42 @@ class BulkDataBinder {
      * Takes in the result of having read in bulk data and binds it into a list of strongly typed Importable objects
      * by parsing each field in the given data to a specified type.
      *
+     * For use when we want to rely on the default data binder configuration for a given bulk data type.
+     *
      * @param bulkDataType Determines which configurer to use when binding the data.
      * @param readerResult The output of the BulkDataReader.
-     * @param rawRows The rows to be bound.
+     * @return The result of binding the bulk data.
      */
     BulkDataBinderResult bindData(BulkDataType bulkDataType, BulkDataReaderResult readerResult) {
-        return bindData(bulkDataType, readerResult.rows, readerResult.epochDate)
+        ConfiguresBulkDataBinder importConfigurer = componentResolver.getBulkDataBinderConfigurer(bulkDataType)
+        if (!importConfigurer) {
+            throw new RuntimeException("No bulk data binder config was found for type ${bulkDataType}")
+        }
+        return bindData(importConfigurer.bulkDataBinderConfig, readerResult)
     }
 
     /**
-     * Binds the given list of raw, bulk data into a list of strongly typed Importable objects by parsing each field in
-     * the given data to a specified type.
+     * Takes in the result of having read in bulk data and binds it into a list of strongly typed Importable objects
+     * by parsing each field in the given data to a specified type.
      *
-     * @param bulkDataType Determines which configurer to use when binding the data.
-     * @param rawRows The rows to be bound.
+     * For use when we want to provide a custom data binder configuration that overrides the default.
+     *
+     * @param config Configuration for binding the data.
+     * @param readerResult The output of the BulkDataReader.
+     * @return The result of binding the bulk data.
      */
-    BulkDataBinderResult bindData(
-            BulkDataType bulkDataType, List<Map<String, BulkDataCell>> rawRows, EpochDate epochDate) {
-
-        // Fetch the configuration to use when binding the rows
-        ConfiguresBulkDataBinder importConfigurer = componentResolver.getBulkDataBinderConfigurer(bulkDataType)
-        Map<String, BulkDataBinderFieldConfig> fieldConfigs = importConfigurer.bulkDataBinderConfig.fields
+    BulkDataBinderResult bindData(BulkDataBinderConfig config, BulkDataReaderResult readerResult) {
+        Map<String, BulkDataBinderFieldConfig> fieldConfigs = config.fields
+        Class<Importable> bindTo = config.bindTo
+        EpochDate epochDate = readerResult.epochDate
+        List<Map<String, BulkDataCell>> rawRows = readerResult.rows
 
         // Build a map of field names to the types that those columns should be bound to
-        Map<String, Class> fieldNameToTypeMap = mapFieldNamesToType(importConfigurer.bulkDataBinderConfig.bindTo)
+        Map<String, Class> fieldNameToTypeMap = mapFieldNamesToType(bindTo)
 
         BulkDataBinderResult result = new BulkDataBinderResult()
         for (Map<String, BulkDataCell> rawRow in rawRows) {
-            Importable boundRow = importConfigurer.bulkDataBinderConfig.bindTo.newInstance()
+            Importable boundRow = bindTo.newInstance()
             for (BulkDataCell cell in rawRow.values()) {
                 String columnName = cell.fieldName
 
@@ -99,9 +107,13 @@ class BulkDataBinder {
             throw new RuntimeException("Something went wrong during the data binding process. Processed ${rawRows.size()} raw rows but ended up with ${result.boundRows.size()} bound rows.")
         }
 
-        // Now that the automatic data binding has completed, we can perform any custom data binding.
-        // We rely on customBindData to modify the result object itself with any data changes and errors.
-        importConfigurer.customBindData(rawRows, result)
+        // Now that the automatic data binding has completed, we can perform any custom data binding. If no bulk data
+        // type was specified (which can be true if a custom config is specified), no custom binding is required.
+        ConfiguresBulkDataBinder importConfigurer = componentResolver.getBulkDataBinderConfigurer(config.bulkDataType)
+        if (importConfigurer) {
+            // We rely on customBindData to modify the result object itself with any data changes and errors.
+            importConfigurer.customBindData(rawRows, result)
+        }
 
         return result
     }

@@ -13,6 +13,10 @@ import org.pih.warehouse.core.parser.StringParser
 @Unroll
 class BulkDataBinderSpec extends Specification {
 
+    // Chosen arbitrarily. This will be stubbed so all that matters is that we're consistent.
+    private static final BulkDataType BULK_DATA_TYPE = BulkDataType.PERSON
+    private static final BulkDataType UNKNOWN_BULK_DATA_TYPE = BulkDataType.CATEGORY
+
     BulkDataBinder bulkDataBinder
 
     DefaultTypeParser defaultTypeParserStub
@@ -32,7 +36,8 @@ class BulkDataBinderSpec extends Specification {
 
         bulkDataBinderConfigurerStub = Stub(ConfiguresBulkDataBinder)
         BulkDataImportComponentResolver componentResolverStub = Stub(BulkDataImportComponentResolver) {
-            getBulkDataBinderConfigurer(_ as BulkDataType) >> bulkDataBinderConfigurerStub
+            getBulkDataBinderConfigurer(BULK_DATA_TYPE) >> bulkDataBinderConfigurerStub
+            getBulkDataBinderConfigurer(UNKNOWN_BULK_DATA_TYPE) >> null
         }
 
         messageLocalizerStub = Stub(MessageLocalizer) {
@@ -45,7 +50,7 @@ class BulkDataBinderSpec extends Specification {
 
     void "bindData should successfully bind data to a strongly-typed object"() {
         given: "the raw data being bound"
-        BulkDataType dataImportType = BulkDataType.PERSON
+        BulkDataType dataImportType = BULK_DATA_TYPE
         BulkDataReaderResult readerResult = new BulkDataReaderResult(rows: [
                 [
                         "stringField": new BulkDataCell(row: 0, column: 0, fieldName: "stringField", value: "Hi"),
@@ -56,6 +61,7 @@ class BulkDataBinderSpec extends Specification {
         and: "the config to use when data binding"
         bulkDataBinderConfigurerStub.bulkDataBinderConfig >> new BulkDataBinderConfig(
                 bindTo: ImportableStub,
+                bulkDataType: dataImportType,
                 fields: [
                         "stringField": new BulkDataBinderFieldConfig(),
                         "integerField": new BulkDataBinderFieldConfig(),
@@ -80,7 +86,7 @@ class BulkDataBinderSpec extends Specification {
 
     void "bindData should ignore fields that are not specified in the config"() {
         given: "the raw data being bound"
-        BulkDataType dataImportType = BulkDataType.PERSON
+        BulkDataType dataImportType = BULK_DATA_TYPE
         BulkDataReaderResult readerResult = new BulkDataReaderResult(rows: [
                 [
                         "stringField": new BulkDataCell(row: 0, column: 0, fieldName: "stringField", value: "Hi"),
@@ -91,6 +97,7 @@ class BulkDataBinderSpec extends Specification {
         and: "the config to use when data binding"
         bulkDataBinderConfigurerStub.bulkDataBinderConfig >> new BulkDataBinderConfig(
                 bindTo: ImportableStub,
+                bulkDataType: dataImportType,
                 fields: [
                         "stringField": new BulkDataBinderFieldConfig(),
                         // integerField is not included!
@@ -115,7 +122,7 @@ class BulkDataBinderSpec extends Specification {
 
     void "bindData should capture parser errors"() {
         given: "the raw data being bound"
-        BulkDataType dataImportType = BulkDataType.PERSON
+        BulkDataType dataImportType = BULK_DATA_TYPE
         BulkDataReaderResult readerResult = new BulkDataReaderResult(rows: [
                 [
                         "stringField": new BulkDataCell(row: 0, column: 0, fieldName: "stringField", value: "Hi"),
@@ -126,6 +133,7 @@ class BulkDataBinderSpec extends Specification {
         and: "the config to use when data binding"
         bulkDataBinderConfigurerStub.bulkDataBinderConfig >> new BulkDataBinderConfig(
                 bindTo: ImportableStub,
+                bulkDataType: dataImportType,
                 fields: [
                         "stringField": new BulkDataBinderFieldConfig(parser: StringParser),
                         // Wrong type! In reality this wouldn't error because the String parser can handle integers,
@@ -157,7 +165,7 @@ class BulkDataBinderSpec extends Specification {
 
     void "bindData should successfully custom bind data"() {
         given: "the raw data being bound"
-        BulkDataType dataImportType = BulkDataType.PERSON
+        BulkDataType dataImportType = BULK_DATA_TYPE
         BulkDataReaderResult readerResult = new BulkDataReaderResult(rows: [
                 [
                         "stringField": new BulkDataCell(row: 0, column: 0, fieldName: "stringField", value: "Hi"),
@@ -167,6 +175,7 @@ class BulkDataBinderSpec extends Specification {
         and: "the config to use when data binding"
         bulkDataBinderConfigurerStub.bulkDataBinderConfig >> new BulkDataBinderConfig(
                 bindTo: ImportableStub,
+                bulkDataType: dataImportType,
                 fields: [
                         "stringField": new BulkDataBinderFieldConfig(dataBindingMethod: DataBindingMethod.MANUAL),
                 ]
@@ -192,7 +201,7 @@ class BulkDataBinderSpec extends Specification {
 
     void "bindData should handle errors when custom bind data"() {
         given: "the raw data being bound"
-        BulkDataType dataImportType = BulkDataType.PERSON
+        BulkDataType dataImportType = BULK_DATA_TYPE
         BulkDataReaderResult readerResult = new BulkDataReaderResult(rows: [
                 [
                         "stringField": new BulkDataCell(row: 0, column: 0, fieldName: "stringField", value: "Hi"),
@@ -202,6 +211,7 @@ class BulkDataBinderSpec extends Specification {
         and: "the config to use when data binding"
         bulkDataBinderConfigurerStub.bulkDataBinderConfig >> new BulkDataBinderConfig(
                 bindTo: ImportableStub,
+                bulkDataType: dataImportType,
                 fields: [
                         "stringField": new BulkDataBinderFieldConfig(dataBindingMethod: DataBindingMethod.MANUAL),
                 ]
@@ -230,6 +240,23 @@ class BulkDataBinderSpec extends Specification {
         assert result.errors[0].row == 0
         assert result.errors[0].column == 0
         assert result.errors[0].localizedMessage == "CUSTOM BINDING ERROR"
+    }
+
+    void "bindData should fail if there is no configurer associated with the given bulk data type"() {
+        given: "the raw data being bound"
+        BulkDataReaderResult readerResult = new BulkDataReaderResult(rows: [
+                [
+                        "stringField": new BulkDataCell(row: 0, column: 0, fieldName: "stringField", value: "Hi"),
+                        "integerField": new BulkDataCell(row: 0, column: 1, fieldName: "integerField", value: 1)
+                ],
+        ])
+
+        when: "we try to bind data for an unknown bulk data type (and no custom config override is specified)"
+        bulkDataBinder.bindData(UNKNOWN_BULK_DATA_TYPE, readerResult)
+
+        then:
+        RuntimeException e = thrown(RuntimeException)
+        assert e.message.contains("No bulk data binder config was found for type CATEGORY")
     }
 
     class ImportableStub implements Importable {

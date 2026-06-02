@@ -1,7 +1,12 @@
 package org.pih.warehouse.importer
 
 /**
- * Enumerates the different data structures that we support importing bulk data to.
+ * Enumerates the different features/data structures that support importing/exporting bulk data.
+ *
+ * This allows us to:
+ * 1) Abstract away the class being bound to, so that the client doesn't need to work directly with class names
+ * 2) Define default import/export configuration for a feature that binds to/from a Map or another non-concrete type
+ * 3) Define multiple different default import/export configurations for the same data type
  */
 enum BulkDataType {
     CATEGORY,
