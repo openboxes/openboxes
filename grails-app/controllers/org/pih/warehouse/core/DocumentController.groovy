@@ -188,7 +188,8 @@ class DocumentController {
         // FIXME The size limit needs to go somewhere
         if (!(file?.size || command.fileUri)) {
             flash.message = "${warehouse.message(code: 'document.documentCannotBeEmpty.message')}"
-        } else if (file && !Document.isAllowedFile(file.originalFilename, file.contentType, file.inputStream)) {
+        // Validate the file type only if it's an actual file upload (if it has size), not if it's only an URI (stored as a link)
+        } else if (file && file.size && !Document.isAllowedFile(file.originalFilename, file.contentType, file.inputStream)) {
             flash.message = messageLocalizer.localize('document.uploadNotAllowed.message', Document.allowedExtensions().join(', '))
         } else if (!file || file.size < 10 * 1024 * 1000) {
             log.info "Creating new document "
