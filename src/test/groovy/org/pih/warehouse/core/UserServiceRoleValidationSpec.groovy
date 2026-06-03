@@ -123,12 +123,12 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
         'manager'   | 'Superuser'    | 'forbid'      || false
         'manager'   | 'Finance User' | 'allow'       || true
         'manager'   | 'Invoice User' | 'allow'       || true
-        'Browser'   | 'Admin'        | 'forbid'      || false
-        'Browser'   | 'Browser'      | 'forbid'      || false
-        'Browser'   | 'Manager'      | 'forbid'      || false
-        'Browser'   | 'Superuser'    | 'forbid'      || false
-        'Browser'   | 'Finance User' | 'forbid'      || false
-        'Browser'   | 'Invoice User' | 'forbid'      || false
+        'browser'   | 'Admin'        | 'forbid'      || false
+        'browser'   | 'Browser'      | 'forbid'      || false
+        'browser'   | 'Manager'      | 'forbid'      || false
+        'browser'   | 'Superuser'    | 'forbid'      || false
+        'browser'   | 'Finance User' | 'forbid'      || false
+        'browser'   | 'Invoice User' | 'forbid'      || false
         'null'      | 'Browser'      | 'forbid'      || false
     }
 
