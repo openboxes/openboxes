@@ -83,6 +83,7 @@ class InboundSortationService {
                 expirationDate: receiptItem.inventoryItem.expirationDate,
                 currentBinLocation: receiptItem.binLocation,
                 preferredBin: receiptItem.product.getInventoryLevel(shipment.destination.id)?.preferredBinLocation,
+                internalLocation: receiptItem.product.getInventoryLevel(shipment.destination.id)?.internalLocation,
                 quantity: receiptItem.quantityReceived,
                 backorderReference: receiptItem.shipmentItem.backorderReference,
                 backorderItem: receiptItem.shipmentItem.backorderItem,

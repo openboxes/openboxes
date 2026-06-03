@@ -13,6 +13,7 @@ class PutawayContext {
     Date expirationDate
     Location currentBinLocation
     Location preferredBin
+    Location internalLocation
     Integer quantity
     String backorderReference
     RequisitionItem backorderItem

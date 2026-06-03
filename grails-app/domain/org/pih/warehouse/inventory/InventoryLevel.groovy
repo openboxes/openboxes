@@ -10,13 +10,23 @@
 package org.pih.warehouse.inventory
 
 import grails.databinding.BindUsing
+import grails.util.Holders
 import org.apache.commons.lang.StringUtils
 import org.pih.warehouse.EmptyStringsToNullBinder
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import util.InventoryUtil
 
 class InventoryLevel implements Comparable<InventoryLevel> {
+
+    def publishReslottingEvent() {
+        Holders.grailsApplication.mainContext.publishEvent(new ReslottingEvent(this.id, AuthService.currentUser))
+    }
+
+    def afterUpdate() {
+        publishReslottingEvent()
+    }
 
     String id
 
