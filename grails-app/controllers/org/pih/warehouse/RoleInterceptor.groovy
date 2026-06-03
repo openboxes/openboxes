@@ -38,8 +38,7 @@ class RoleInterceptor {
 
     def static managerActions = [
         'inventory'           : ['createOutboundTransfer'],
-        'stockMovementItemApi': ['eraseItem'],
-        'user'                : ['show', 'edit']
+        'stockMovementItemApi': ['eraseItem']
     ]
 
     def static adminControllers = ['createProduct', 'createProductFromTemplate', 'admin']
