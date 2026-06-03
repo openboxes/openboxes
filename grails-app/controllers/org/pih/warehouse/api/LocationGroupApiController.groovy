@@ -33,6 +33,11 @@ class LocationGroupApiController extends BaseDomainApiController {
         render([data: [id: locationGroup.id]] as JSON)
     }
 
+    def update(LocationGroupCommand command) {
+        LocationGroup locationGroup = locationGroupService.updateLocationGroup(params.id, command)
+        render([data: locationGroup] as JSON)
+    }
+
     def delete() {
         locationGroupService.deleteLocationGroup(params.id)
         render status: 204

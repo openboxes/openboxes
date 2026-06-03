@@ -11,7 +11,7 @@ class LocationGroupTestBuilder extends TestBuilder<LocationGroup> {
     @Override
     protected Map<String, Object> getDefaults() {
         return [
-                name: "Test Location Group ${randomUtil.randomStringFieldValue('suffix')}",
+                name: randomUtil.randomStringFieldValue("Location Group"),
         ] as Map<String, Object>
     }
 

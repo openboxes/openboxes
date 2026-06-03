@@ -39,6 +39,14 @@ class LocationGroupApi extends AuthenticatedApi {
         return request(requestSpec, responseSpec, Method.POST, "/locationGroups")
     }
 
+    Response update(String id, String body, ResponseSpecification responseSpec) {
+        RequestSpecification requestSpec = new RequestSpecBuilder()
+                .addPathParam("id", id)
+                .setBody(body)
+                .build()
+        return request(requestSpec, responseSpec, Method.PUT, "/locationGroups/{id}")
+    }
+
     Response delete(String id, ResponseSpecification responseSpec) {
         RequestSpecification requestSpec = new RequestSpecBuilder()
                 .addPathParam("id", id)

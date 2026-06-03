@@ -208,8 +208,9 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(LocationGroup) { LocationGroup locationGroup ->
             [
-                id  : locationGroup.id,
-                name: locationGroup.name
+                id     : locationGroup.id,
+                name   : locationGroup.name,
+                address: locationGroup.address,
             ]
         }
 

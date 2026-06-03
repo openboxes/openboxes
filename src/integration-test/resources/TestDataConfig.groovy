@@ -19,10 +19,6 @@ testDataConfig {
      */
     sampleData {
 
-        'org.pih.warehouse.core.LocationGroup' {
-            name = { -> randomUtil.randomStringFieldValue("name") }
-        }
-
         'org.pih.warehouse.core.Location' {
             // Unique Fields
             id = { -> randomUtil.randomStringFieldValue("id") }

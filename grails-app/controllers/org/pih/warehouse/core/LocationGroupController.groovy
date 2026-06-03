@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 import grails.gorm.transactions.Transactional
+import org.hibernate.ObjectNotFoundException
 
 @Transactional
 class LocationGroupController {
@@ -46,7 +47,7 @@ class LocationGroupController {
     def show() {
         try {
             [locationGroupInstance: locationGroupService.getLocationGroup(params.id)]
-        } catch (IllegalArgumentException e) {
+        } catch (ObjectNotFoundException e) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
             redirect(action: "list")
         }
@@ -63,8 +64,8 @@ class LocationGroupController {
     }
 
     def update() {
-        def locationGroupInstance = LocationGroup.get(params.id)
-        if (locationGroupInstance) {
+        try {
+            LocationGroup locationGroupInstance = locationGroupService.getLocationGroup(params.id)
             if (params.version) {
                 def version = params.version.toLong()
                 if (locationGroupInstance.version > version) {
@@ -92,7 +93,7 @@ class LocationGroupController {
             } else {
                 render(view: "edit", model: [locationGroupInstance: locationGroupInstance])
             }
-        } else {
+        } catch (ObjectNotFoundException e) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
             redirect(action: "list")
         }
@@ -108,7 +109,7 @@ class LocationGroupController {
             flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
             redirect(action: "list", id: params.id)
         }
-        catch (IllegalArgumentException e) {
+        catch (ObjectNotFoundException e) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
             redirect(action: "list")
         }

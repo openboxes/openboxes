@@ -70,7 +70,7 @@ class UrlMappings {
 
         "/api/locationGroups/$id"(parseRequest: true) {
             controller = { "locationGroupApi" }
-            action = [GET: "read", DELETE: "delete"]
+            action = [GET: "read", PUT: "update", DELETE: "delete"]
         }
 
         // Product Group options for filters on  product list page
