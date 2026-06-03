@@ -165,6 +165,10 @@ class UserService {
         /*
          * While it may be tempting to directly assign the roles collection,
          * it's safer, GORM/Hibernate-wise, to add/remove them one at a time.
+         *
+         * Diffing the role objects relies on Role.compareTo being consistent
+         * with equality (it breaks sortOrder ties by id); otherwise Groovy's
+         * minus would collapse same-sortOrder roles. See OBPIH-7904.
          */
         Set<Role> before = (user.roles ?: []) as Set
         Set<Role> after = requestedRoles as Set
