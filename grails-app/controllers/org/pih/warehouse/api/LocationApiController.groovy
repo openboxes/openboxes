@@ -258,7 +258,7 @@ class LocationApiController extends BaseDomainApiController {
         List<Location> savedLocations = savedIds ? Location.getAll(savedIds) : []
 
         render([
-            data    : savedLocations,
+            data    : savedLocations.collect { it.toBaseJson() },
             metadata: [
                 bulk  : [
                     total  : results.size(),
