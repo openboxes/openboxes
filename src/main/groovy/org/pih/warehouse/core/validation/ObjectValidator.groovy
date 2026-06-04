@@ -1,14 +1,15 @@
 package org.pih.warehouse.core.validation
 
 import grails.validation.Validateable
-import org.grails.datastore.mapping.validation.ValidationErrors
+import org.springframework.validation.Errors
 
 /**
  * A validator for a non-domain validatable object (such as a Command Object).
  */
-trait ObjectValidator<T extends Validateable> implements Validator {
+trait ObjectValidator<T extends Validateable> implements Validator<T> {
 
-    ValidationErrors getErrors(T toValidate) {
-        return toValidate.errors as ValidationErrors
+    @Override
+    Errors getErrors(T toValidate) {
+        return toValidate.errors
     }
 }

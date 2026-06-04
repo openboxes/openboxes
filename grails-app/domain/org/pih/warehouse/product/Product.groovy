@@ -27,7 +27,7 @@ import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
-import org.pih.warehouse.core.validation.Validatable
+import org.pih.warehouse.core.validation.DomainValidatable
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
@@ -50,7 +50,7 @@ import org.pih.warehouse.LocalizationUtil
  * 20 mg tablets vs a 50 count bottle of 20 mg tablets will both be stored
  * as 20 mg tablets).
  */
-class Product implements Comparable, Serializable, Validatable<ProductValidator> {
+class Product implements Comparable, Serializable, DomainValidatable<ProductValidator> {
 
     def beforeInsert() {
         createdBy = AuthService.currentUser

@@ -1,15 +1,15 @@
 package org.pih.warehouse.inventory
 
-import grails.validation.Validateable
 import org.pih.warehouse.api.PaginationCommand
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.validation.SimpleObjectValidatable
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductCatalog
 
 import java.time.LocalDate
 
-class CycleCountCandidateFilterCommand extends PaginationCommand implements Validateable {
+class CycleCountCandidateFilterCommand extends PaginationCommand implements SimpleObjectValidatable {
 
     List<CycleCountCandidateStatus> statuses
 
