@@ -411,20 +411,13 @@ class PickPage extends Component {
         parseResponse(data),
         (item) => this.checkForInitialPicksChanges(item),
       );
-      // recompute empty picks here to keep the "items require attention" filter after import
-      const emptyPicks = getIndexesOfRowsWithEmptyPicks(pickPageItems);
-      const pickPageItemsWithErrors = pickPageItems.map((item, index) => ({
-        ...item,
-        hasError: emptyPicks.includes(index),
-      }));
+      // validateEmptyPicks recomputes hasError on each row and returns whether
+      // the picklist is valid
+      const isValid = this.validateEmptyPicks({ pickPageItems });
       this.setState((prev) => ({
-        values: {
-          ...prev.values,
-          pickPageItems: pickPageItemsWithErrors,
-        },
         sorted: false,
         // If no items require attention anymore, turn off the filter
-        showOnlyErroredItems: prev.showOnlyErroredItems && emptyPicks.length > 0,
+        showOnlyErroredItems: prev.showOnlyErroredItems && !isValid,
       }));
     });
   }
