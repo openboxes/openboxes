@@ -109,9 +109,9 @@ trait Validatable<V extends Validator> {
     private V validator() {
         // Determines (statically but at runtime) the class type of the validator and uses that to fetch the bean.
         Class validatorClass = GenericTypeResolver.resolveTypeArgument(getClass(), Validatable.class)
-        // Don't bother resolving the no-op validator since we know it does nothing. Having a null validator
-        // is a valid use case (for example, when you want to use Javax annotations and no custom validator).
-        return (!validatorClass || validatorClass == NoOpValidator) ? null : AppUtil.getBean((Class<V>) validatorClass)
+        // If no validator was specified in the class-level generic declaration, the base Validator type is what the
+        // generic will resolve to. In that case return null because it means there is no custom validator.
+        return (!validatorClass || validatorClass == Validator) ? null : AppUtil.getBean((Class<V>) validatorClass)
     }
 
     /**

@@ -3,13 +3,13 @@ package org.pih.warehouse.inventory
 import org.pih.warehouse.api.PaginationCommand
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Tag
-import org.pih.warehouse.core.validation.SimpleObjectValidatable
+import org.pih.warehouse.core.validation.ObjectValidatable
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductCatalog
 
 import java.time.LocalDate
 
-class CycleCountCandidateFilterCommand extends PaginationCommand implements SimpleObjectValidatable {
+class CycleCountCandidateFilterCommand extends PaginationCommand implements ObjectValidatable {
 
     List<CycleCountCandidateStatus> statuses
 
