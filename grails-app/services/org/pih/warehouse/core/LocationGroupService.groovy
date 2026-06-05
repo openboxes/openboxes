@@ -37,7 +37,7 @@ class LocationGroupService {
 
     LocationGroup createLocationGroup(LocationGroupCommand command) {
         LocationGroup locationGroup = new LocationGroup(name: command.name)
-        return locationGroup.save(failOnError: true, flush: true)
+        return locationGroup.save(failOnError: true)
     }
 
     LocationGroup updateLocationGroup(String id, LocationGroupCommand command) {
@@ -50,20 +50,19 @@ class LocationGroupService {
         locationGroup.name = command.name
 
         if (command.address) {
-            Address address = Address.get(command.address.id)
-            if (!address) {
-                address = new Address()
-            }
-            address.properties = command.address
-            address.save(failOnError: true, flush: true)
-            locationGroup.address = address
+            command.address.save(failOnError: true)
+            locationGroup.address = command.address
         }
 
-        return locationGroup.save(failOnError: true, flush: true)
+        return locationGroup.save(failOnError: true)
     }
 
     void deleteLocationGroup(String id) {
         LocationGroup locationGroup = getLocationGroup(id)
-        locationGroup.delete(flush: true)
+        if (Location.countByLocationGroup(locationGroup) > 0) {
+            throw new IllegalStateException("Cannot delete location group that is assigned to locations")
+        }
+
+        locationGroup.delete()
     }
 }

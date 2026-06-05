@@ -109,6 +109,10 @@ class LocationGroupController {
             flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
             redirect(action: "list", id: params.id)
         }
+        catch (IllegalStateException e) {
+            flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
+            redirect(action: "list", id: params.id)
+        }
         catch (ObjectNotFoundException e) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'locationGroup.label', default: 'LocationGroup'), params.id])}"
             redirect(action: "list")
