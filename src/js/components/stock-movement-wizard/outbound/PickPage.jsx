@@ -407,15 +407,17 @@ class PickPage extends Component {
       params: { stepNumber: OutboundWorkflowState.PICK_ITEMS, refreshPicklistItems: false },
     }).then((response) => {
       const { data } = response.data;
+      const pickPageItems = _.map(
+        parseResponse(data),
+        (item) => this.checkForInitialPicksChanges(item),
+      );
+      // validateEmptyPicks recomputes hasError on each row and returns whether
+      // the picklist is valid
+      const isValid = this.validateEmptyPicks({ pickPageItems });
       this.setState((prev) => ({
-        values: {
-          ...prev.values,
-          pickPageItems: _.map(
-            parseResponse(data),
-            (item) => this.checkForInitialPicksChanges(item),
-          ),
-        },
         sorted: false,
+        // If no items require attention anymore, turn off the filter
+        showOnlyErroredItems: prev.showOnlyErroredItems && !isValid,
       }));
     });
   }
