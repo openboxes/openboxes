@@ -13,8 +13,9 @@ class BulkDataReaderResult {
 
     /**
      * The resulting rows that were extracted from the file.
+     * The keys of the column map are the field names as specified in the data reader configuration.
      */
-    List<Map<String, Object>> rows = []
+    List<Map<String, BulkDataCell>> rows = []
 
     /**
      * The epoch date to use when parsing date fields.

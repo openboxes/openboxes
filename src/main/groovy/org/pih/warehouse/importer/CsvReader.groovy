@@ -30,13 +30,20 @@ class CsvReader extends BulkDataReader<CsvReaderConfig> {
                     .parse(reader)
 
             Map<String, String> columnToFieldMap = config.columnMapping
-            List<Map<String, Object>> readRows = []
+            List<Map<String, BulkDataCell>> readRows = []
             for (CSVRecord csvRow : csvRows) {
-                if (csvRow.recordNumber <= config.linesToSkip) {  // recordNumber is 1-index based
+                if (csvRow.recordNumber <= config.linesToSkip) {  // recordNumber is 1-indexed
                     continue
                 }
 
-                Map<String, Object> readRow = [:]
+                // If a row has fewer columns than we expect, error.
+                // TODO: Instead of throwing an exception, simply add a new BulkDataError and continue processing.
+                //       This requires adding a List<BulkDataError> field to BulkDataReaderResult.
+                if (csvRow.size() < columnToFieldMap.size()) {
+                    throw new RuntimeException("Row at index ${csvRow.recordNumber - 1} contains an unexpected number of cells. Expected at least ${columnToFieldMap.size()} but got ${csvRow.size()}")
+                }
+
+                Map<String, BulkDataCell> readRow = [:]
                 for (int i = 0; i < csvRow.size(); i++) {
                     // Only bother importing cells whose columns are specified in the config
                     String fieldName = columnToFieldMap.get(String.valueOf(i))
@@ -45,7 +52,12 @@ class CsvReader extends BulkDataReader<CsvReaderConfig> {
                     }
 
                     // Read in the cell as a String. Sanitizing and type parsing will be done in the data binding step.
-                    readRow.put(fieldName, csvRow.get(i))
+                    readRow.put(fieldName, new BulkDataCell(
+                            row: csvRow.recordNumber - 1,  // recordNumber is 1-indexed
+                            column: i,
+                            fieldName: fieldName,
+                            value: csvRow.get(i)
+                    ))
                 }
                 readRows.add(readRow)
             }

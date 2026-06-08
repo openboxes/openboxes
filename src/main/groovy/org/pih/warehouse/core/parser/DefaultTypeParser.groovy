@@ -35,10 +35,17 @@ class DefaultTypeParser {
      * @throws IllegalArgumentException If the given type does not have a default parser.
      */
     public <T> T parse(Object toParse, Class<T> clazzToParseTo, ParserContext<T> context=null) {
+        return getDefaultParser(clazzToParseTo).parse(toParse, context) as T
+    }
+
+    /**
+     * @return The default parser associated with the given type.
+     */
+    public <T> Parser getDefaultParser(Class<T> clazzToParseTo) {
         Parser parser = parsersByType.get(clazzToParseTo)
         if (!parser) {
             throw new IllegalArgumentException("No default parser exists for class ${clazzToParseTo}")
         }
-        return parser.parse(toParse, context) as T
+        return parser
     }
 }
