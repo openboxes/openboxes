@@ -1,6 +1,5 @@
 package org.pih.warehouse.core.validation
 
-import org.grails.datastore.mapping.validation.ValidationErrors
 import org.springframework.core.GenericTypeResolver
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
@@ -9,11 +8,13 @@ import org.springframework.validation.ObjectError
 /**
  * Validates instances of some class.
  *
- * We can use validators for objects whose validation involves performing complex operations such as calling out to
- * beans and/or making database queries. By using a validator, we let our objects remain small and single purpose.
+ * We can create validator components s for objects whose validation involves performing complex operations such as
+ * calling out to beans and/or making database queries. By breaking validation logic out into a separate, dedicated
+ * component, we let our objects remain small and single purpose.
  *
  * This validator works in tandem with Grails Domain classes and non-domain classes that implement {@link Validatable}.
- * The validation in this class is in addition to any validation defined in the static constraints block of the object.
+ * The validation in this class is in addition to any validation defined in the static constraints block of the object
+ * as well as to any javax constraint annotations.
  */
 trait Validator<T> implements org.springframework.validation.Validator {
 
@@ -32,7 +33,7 @@ trait Validator<T> implements org.springframework.validation.Validator {
      * Extracts the Errors object from the object to validate (or initializes a new Errors instance).
      * This Errors object will be populated with any validation errors that occur.
      */
-    abstract ValidationErrors getErrors(T toValidate)
+    abstract Errors getErrors(T toValidate)
 
     private Class<T> getClassOfValidatableObject() {
         // Determines (at runtime) the type of the class level generic "T".
@@ -60,11 +61,7 @@ trait Validator<T> implements org.springframework.validation.Validator {
      * @return true if the object is valid, false otherwise.
      */
     boolean validate(T toValidate) {
-
-        // TODO: We may need to clear the ValidationErrors here before proceeding with validation. It's possible
-        //       that if we don't do this, calling validate a second time will still return errors, even if we
-        //       modify the fields to have valid values.
-
+        // We do not clear errors before validating because we assume that will be handled by the framework.
         ObjectValidationResult results = doValidate(toValidate)
         if (results.valid) {
             return true
@@ -72,7 +69,7 @@ trait Validator<T> implements org.springframework.validation.Validator {
 
         // If there are errors, we add them all to the "errors" field of the object being validated.
         // This ensures that the errors will be detected by Grails' object validation.
-        ValidationErrors errors = getErrors(toValidate)
+        Errors errors = getErrors(toValidate)
         for (ObjectError error in results.errors) {
             switch (error) {
                 case FieldError:
@@ -103,13 +100,7 @@ trait Validator<T> implements org.springframework.validation.Validator {
                 "Object",  // objectName will be set automatically when adding the errors to the object being validated.
                 fieldName,
                 rejectedValue,
-                // This is kind of a hack. At the start of the validation flow, Grails clears all errors where
-                // bindingFailure == false. They do this so that if you validate an invalid field, then change the
-                // field to a valid value and re-validate, it won't return the previous validation error. Because our
-                // Validators get called in beforeValidate, we have to set bindingFailure to true, otherwise we'd lose
-                // the validation result. Grails intends bindingFailure to be false for validation errors, but we don't
-                // have a choice here.
-                true,
+                false,  // This is a validation failure. (A binding failure would be if we were given the wrong type.)
                 [errorCode] as String[],
                 errorArgs,
                 errorCode)  // If we don't resolve the errorCode, display the code itself. This helps us catch typos.
