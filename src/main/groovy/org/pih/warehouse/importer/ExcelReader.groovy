@@ -41,13 +41,13 @@ class ExcelReader extends BulkDataReader<ExcelReaderConfig> {
             FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator()
 
             Map<String, String> columnMapping = config.columnMapping
-            List<Map<String, Object>> readRows = []
+            List<Map<String, BulkDataCell>> readRows = []
             for (Row row : sheet) {
                 if (row.rowNum < config.linesToSkip) {  // rowNum is zero-index based
                     continue
                 }
 
-                Map<String, Object> readRow = [:]
+                Map<String, BulkDataCell> readRow = [:]
                 for (Cell cell : row) {
                     // Only bother importing cells whose columns are specified in the config
                     String fieldName = getFieldName(cell, columnMapping)
@@ -55,7 +55,12 @@ class ExcelReader extends BulkDataReader<ExcelReaderConfig> {
                         continue
                     }
 
-                    readRow.put(fieldName, getCellValue(cell, evaluator))
+                    readRow.put(fieldName, new BulkDataCell(
+                            row: cell.rowIndex,
+                            column: cell.columnIndex,
+                            fieldName: fieldName,
+                            value: getCellValue(cell, evaluator)
+                    ))
                 }
                 readRows.add(readRow)
             }

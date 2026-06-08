@@ -5,6 +5,7 @@ import org.apache.commons.lang.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.MessageSource
+import org.springframework.context.support.DefaultMessageSourceResolvable
 import org.springframework.stereotype.Component
 
 import org.pih.warehouse.core.Localization
@@ -33,6 +34,14 @@ class MessageLocalizer {
      */
     String localize(LocalizableMessage message, Locale localeOverride=null) {
         return localize(message.code, message.args, localeOverride)
+    }
+
+    /**
+     * Translates a given localizable message into the locale of the requesting user.
+     * This includes validation errors (as FieldError and ObjectError instances).
+     */
+    String localize(DefaultMessageSourceResolvable error, Locale localeOverride=null) {
+        return localize(error.code, error.arguments, localeOverride)
     }
 
     /**
