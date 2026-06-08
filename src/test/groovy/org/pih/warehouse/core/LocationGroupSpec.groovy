@@ -39,4 +39,44 @@ class LocationGroupSpec extends Specification implements DomainUnitTest<Location
         assert locations[1].name == "HUM"
         assert locations[2].name == "Port au Prince"
     }
+
+    void 'validate should pass when name is null'() {
+        when:
+        domain.name = null
+
+        then:
+        assert domain.validate(['name'])
+    }
+
+    void 'validate should pass when name is within max length'() {
+        when:
+        domain.name = 'a' * 255
+
+        then:
+        assert domain.validate(['name'])
+    }
+
+    void 'validate should fail when name exceeds max length of 255 characters'() {
+        when:
+        domain.name = 'a' * 256
+
+        then:
+        assert !domain.validate(['name'])
+        assert domain.errors['name']?.code == 'maxSize.exceeded'
+    }
+
+    void 'toString should return name when name is set'() {
+        when:
+        domain.name = name
+
+        then:
+        assert domain.toString() == expected
+
+        where:
+        name             || expected
+        'Boston'         || 'Boston'
+        'Port au Prince' || 'Port au Prince'
+        null             || 'null'
+    }
+
 }
