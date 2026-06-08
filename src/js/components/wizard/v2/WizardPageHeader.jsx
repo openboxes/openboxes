@@ -1,12 +1,11 @@
 import React from 'react';
 
-import * as locales from 'date-fns/locale';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { getCurrentLocale } from 'selectors';
 
 import { DateFormatDateFns } from 'consts/timeFormat';
-import { formatDateToString } from 'utils/dateUtils';
+import { formatDateToString, getDateFnsLocale } from 'utils/dateUtils';
 
 /**
  * Generic header bar for v2 wizard pages. Renders a prefix label followed by
@@ -33,7 +32,7 @@ const WizardPageHeader = ({ label, info, status }) => {
                   ? formatDateToString({
                     date: item.text,
                     dateFormat: DateFormatDateFns.DD_MMM_YYYY,
-                    options: { locale: locales[currentLocale] },
+                    options: { locale: getDateFnsLocale(currentLocale) },
                   })
                   : item.text}
               </span>
@@ -55,7 +54,7 @@ const WizardPageHeader = ({ label, info, status }) => {
 export default WizardPageHeader;
 
 WizardPageHeader.propTypes = {
-  /** prefix label, e.g. "Receiving" */
+  /** Prefix label, e.g. "Receiving" */
   label: PropTypes.string,
   /** Colored title segments rendered after the label */
   info: PropTypes.arrayOf(

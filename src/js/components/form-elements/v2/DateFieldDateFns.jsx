@@ -1,7 +1,6 @@
 import React, { useRef } from 'react';
 
 import { format, parse } from 'date-fns';
-import * as locales from 'date-fns/locale';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker-6';
 import { useSelector } from 'react-redux';
@@ -13,7 +12,7 @@ import MAX_DATE_PICKER_DATE from 'consts/datePickerLimits';
 import { DateFormatDateFns, TimeFormat } from 'consts/timeFormat';
 import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import useTranslate from 'hooks/useTranslate';
-import { formatDateToString } from 'utils/dateUtils';
+import { formatDateToString, getDateFnsLocale } from 'utils/dateUtils';
 import InputWrapper from 'wrappers/InputWrapper';
 import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 
@@ -94,16 +93,6 @@ const DateFieldDateFns = ({
     onChange(formatted);
   };
 
-  const dateFnsLocale = () => {
-    // Temporary workaround: using 'ar' locale causes the app to crash when selecting a date.
-    // Fallback to 'en' to avoid the crash
-    if (!currentLocale || ['en', 'ar'].includes(currentLocale)) {
-      return locales.enUS;
-    }
-
-    return locales[currentLocale];
-  };
-
   useFocusOnMatch({
     ...focusProps,
     ref: datePickerRef,
@@ -123,7 +112,7 @@ const DateFieldDateFns = ({
       value={formatDateToString({
         date: value,
         dateFormat: DateFormatDateFns.DD_MMM_YYYY,
-        options: { locale: dateFnsLocale() },
+        options: { locale: getDateFnsLocale(currentLocale) },
       })}
       ariaLabel={ariaLabel}
       hasErrors={Boolean(errorMessage || hasErrors)}
@@ -133,7 +122,7 @@ const DateFieldDateFns = ({
         // ariaLiveMessages is a new prop for displaying a message above the date field.
         // By passing an empty object, we are hiding that message.
         ariaLiveMessages={{}}
-        locale={dateFnsLocale()}
+        locale={getDateFnsLocale(currentLocale)}
         showTimeSelect={showTimeSelect}
         customInput={showCustomInput
           ? <DateFieldInput onClear={onClear} clearable={clearable} />
