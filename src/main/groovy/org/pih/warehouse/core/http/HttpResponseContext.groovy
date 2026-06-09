@@ -39,6 +39,22 @@ class HttpResponseContext {
      */
     Collection<Object> fileNameArgs = []
 
+    /**
+     * A map of custom fields to include in the response object.
+     *
+     * These fields are in addition to the automatically populated fields (such as "data" and "status"),
+     * and will be added at the root level of the response.
+     *
+     * For example, if given an additionalFields == [myField: 0], the response will contain:
+     *
+     * {
+     *     data: [...],
+     *     status: 200,
+     *     myField: 0,
+     * }
+     */
+    Map<String, Object> additionalFields = [:]
+
     HttpResponseContext() {
 
     }
@@ -73,8 +89,9 @@ class HttpResponseContext {
          *
          * Content types: JSON, XML
          */
-        HttpResponseContextBuilder forResponseBody(Object data) {
+        HttpResponseContextBuilder forResponseBody(Object data, Map<String, Object> additionalFields=[:]) {
             context.data = data
+            context.additionalFields = additionalFields
             return this
         }
 

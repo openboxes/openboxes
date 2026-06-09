@@ -91,7 +91,7 @@ class JsonSerializer {
             return toSerialize.asResponseBody()
         }
 
-        // Maintained for backwards compatability. New Dtos should not rely on this method.
+        // Maintained for backwards compatibility. New Dtos should not rely on this method.
         if (toSerialize.metaClass.respondsTo(toSerialize, "toJson")) {
             return toSerialize.toJson()
         }

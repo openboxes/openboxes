@@ -19,8 +19,6 @@ import org.pih.warehouse.core.http.HttpResponseContext
  */
 abstract class BaseController {
 
-    private static final HttpResponseContext NO_CONTENT_CONTEXT = new HttpResponseContext(status: 204)
-
     FileNameGenerator fileNameGenerator
     JsonSerializer jsonSerializer
 
@@ -28,7 +26,7 @@ abstract class BaseController {
      * Returns an empty 204 NO RESPONSE status.
      */
     void renderNoContentResponse() {
-        renderResponse(NO_CONTENT_CONTEXT)
+        render((Map) [status: HttpStatus.NO_CONTENT.value()])
     }
 
     /**
@@ -72,9 +70,11 @@ abstract class BaseController {
         // https://grails.apache.org/docs/latest/guide/theWebLayer.html#contentNegotiation
         withFormat {
             // When the client sends the "Accept: */*" header (meaning it accepts any format), the first format
-            // defined here is used. We put JSON first since it's our preferred format.
+            // defined here is used. We put JSON first since it's our preferred format. This is only relevant for
+            // requests coming from non-browsers. All modern browsers send a variation of the following:
+            // "Accept: text/html,application/xhtml+xml,application/xml" which will correctly enter the "html" block.
             json {
-                renderJsonResponse(context.data, context.status)
+                renderJsonResponse(context.data, context.additionalFields, context.status)
             }
             csv {
                 renderCsvResponse(context.data)
@@ -93,7 +93,7 @@ abstract class BaseController {
             }
             // If we cannot resolve the requested format, fallback to returning JSON.
             '*' {
-                renderJsonResponse(context.data, context.status)
+                renderJsonResponse(context.data, context.additionalFields, context.status)
             }
         }
     }
@@ -104,8 +104,9 @@ abstract class BaseController {
      * @param data Holds all of the data that will be used during rendering
      * @param status
      */
-    void renderJsonResponse(Object data, int status = HttpStatus.OK.value()) {
+    void renderJsonResponse(Object data, Map<String, Object> additionalFields=[:], int status=HttpStatus.OK.value()) {
         render(jsonSerializer.serialize(data, new JsonSerializerContext(
+                additionalFields: additionalFields,
                 status: status,
         )))
     }
