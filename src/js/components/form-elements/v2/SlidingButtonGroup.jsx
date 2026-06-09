@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import Translate from 'utils/Translate';
 
-import './style.scss';
+import 'components/form-elements/v2/style.scss';
 
 const SlidingButtonGroup = ({
   options, defaultOption, onChange, className, style,
