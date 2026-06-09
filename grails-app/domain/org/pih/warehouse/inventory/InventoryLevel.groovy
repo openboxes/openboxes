@@ -21,7 +21,7 @@ import util.InventoryUtil
 class InventoryLevel implements Comparable<InventoryLevel> {
 
     def publishReslottingEvent() {
-        Holders.grailsApplication.mainContext.publishEvent(new ReslottingEvent(this.id, AuthService.currentUser))
+        Holders.grailsApplication.mainContext.publishEvent(new ReslottingEvent(this.id, AuthService.currentUser?.id))
     }
 
     def afterUpdate() {
