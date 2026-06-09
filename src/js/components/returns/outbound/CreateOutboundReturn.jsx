@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
 import { hideSpinner, showSpinner } from 'actions';
+import { STOCK_TRANSFER_API, STOCK_TRANSFER_BY_ID } from 'api/urls';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
@@ -79,7 +80,6 @@ const FIELDS = {
     },
     getDynamicAttr: (props) => ({
       loadOptions: props.debouncedLocationsFetch,
-      disabled: !!props.outboundReturnId,
     }),
   },
 };
@@ -164,14 +164,15 @@ class CreateOutboundReturn extends Component {
   dataFetched = false;
 
   saveOutboundReturns(values) {
-    if (
-      values.origin
-      && values.destination
-      && values.description
-      && !this.props.match.params.outboundReturnId
-    ) {
-      this.props.showSpinner();
+    const { outboundReturnId } = this.props.match.params;
 
+    if (!values.origin || !values.destination || !values.description) {
+      return;
+    }
+
+    this.props.showSpinner();
+
+    if (!outboundReturnId) {
       const payload = {
         description: values.description,
         origin: { id: values.origin.id },
@@ -179,26 +180,23 @@ class CreateOutboundReturn extends Component {
         type: 'RETURN_ORDER',
       };
 
-      const url = '/api/stockTransfers/';
-
-      apiClient.post(url, payload)
+      apiClient.post(STOCK_TRANSFER_API, payload)
         .then((response) => {
           if (response.data) {
             const resp = parseResponse(response.data.data);
-            this.setState({
-              values: resp,
-            }, () => {
+            this.setState({ values: resp }, () => {
               this.props.history.push(STOCK_TRANSFER_URL.editOutbound(this.state.values.id));
               this.props.nextPage(this.state.values);
             });
           }
         })
-        .catch(() => {
-          this.props.hideSpinner();
-        });
-    } else {
-      this.props.nextPage(values);
+        .catch(() => this.props.hideSpinner());
+      return;
     }
+
+    apiClient.put(STOCK_TRANSFER_BY_ID(outboundReturnId), values)
+      .then(() => this.props.nextPage(values))
+      .finally(() => this.props.hideSpinner());
   }
 
   render() {

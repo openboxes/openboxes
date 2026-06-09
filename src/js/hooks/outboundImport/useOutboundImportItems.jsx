@@ -151,7 +151,13 @@ const useOutboundImportItems = ({ itemsInOrder }) => {
       ),
       width: 50,
     },
-  ], [translate, isPalletColumnEmpty, isBoxColumnEmpty, hasBinLocationSupport]);
+  ], [
+    translate,
+    isPalletColumnEmpty,
+    isBoxColumnEmpty,
+    hasBinLocationSupport,
+    lotNumbersWithExpirationDates,
+  ]);
 
   return {
     columns,

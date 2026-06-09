@@ -71,6 +71,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.CycleCountCandidate
 import org.pih.warehouse.inventory.CycleCountRequest
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InboundStockMovementListItem
 import org.pih.warehouse.inventory.OutboundStockMovementListItem
 import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.invoice.InvoiceItemCandidate
@@ -209,8 +210,9 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(LocationGroup) { LocationGroup locationGroup ->
             [
-                id  : locationGroup.id,
-                name: locationGroup.name
+                id     : locationGroup.id,
+                name   : locationGroup.name,
+                address: locationGroup.address,
             ]
         }
 
@@ -665,6 +667,10 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(InventoryTransactionsSummary) { InventoryTransactionsSummary inventoryTransactionsSummary ->
             return inventoryTransactionsSummary.toJson()
+        }
+
+        JSON.registerObjectMarshaller(InboundStockMovementListItem) { InboundStockMovementListItem inboundStockMovementListItem ->
+            return inboundStockMovementListItem.toJson()
         }
 
         JSON.registerObjectMarshaller(PutawayTask) { PutawayTask putawayTask ->

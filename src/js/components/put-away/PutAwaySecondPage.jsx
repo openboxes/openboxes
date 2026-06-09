@@ -196,6 +196,7 @@ class PutAwaySecondPage extends Component {
                 <input
                   type="number"
                   className="form-control form-control-xs"
+                  data-testid="quantity-input"
                   value={props.value}
                   onChange={(event) => {
                     const putAway = update(this.state.putAway, {

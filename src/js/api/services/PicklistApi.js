@@ -1,4 +1,6 @@
 import {
+  PACKLIST_IMPORT,
+  PACKLIST_TEMPLATE_EXPORT,
   PICKLIST_CLEAR,
   PICKLIST_IMPORT,
   PICKLIST_ITEMS_EXPORT,
@@ -21,6 +23,12 @@ export default {
       filename: fileName ?? 'PickListItems-template',
       format: format ?? 'csv',
     }),
+  exportPacklistTemplate: (id, { format, fileName }) =>
+    exportFileFromAPI({
+      url: PACKLIST_TEMPLATE_EXPORT(id),
+      filename: fileName ?? 'PackListItems-template',
+      format: format ?? 'csv',
+    }),
   importPicklist: (id, file) => {
     const formData = new FormData();
     formData.append('importFile', file.slice(0, file.size, 'text/csv'));
@@ -30,5 +38,15 @@ export default {
       },
     };
     return apiClient.post(PICKLIST_IMPORT(id), formData, config);
+  },
+  importPacklist: (id, file) => {
+    const formData = new FormData();
+    formData.append('importFile', file.slice(0, file.size, 'text/csv'));
+    const config = {
+      headers: {
+        'content-type': 'multipart/form-data',
+      },
+    };
+    return apiClient.post(PACKLIST_IMPORT(id), formData, config);
   },
 };

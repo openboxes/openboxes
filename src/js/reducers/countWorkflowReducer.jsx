@@ -3,6 +3,7 @@ import { combineReducers } from 'redux';
 
 import {
   ADD_EMPTY_ROW,
+  CLEAR_COUNT_WORKFLOW,
   FETCH_CYCLE_COUNTS,
   IMPORT_CYCLE_COUNTS,
   MARK_ALL_AS_UPDATED,
@@ -74,6 +75,8 @@ function entitiesReducer(state = {}, action) {
         },
       };
     }
+    case CLEAR_COUNT_WORKFLOW:
+      return {};
     default:
       return state;
   }
@@ -95,6 +98,8 @@ function dateCountedReducer(state = {}, action) {
         ...action.payload.dateCounted,
       };
     }
+    case CLEAR_COUNT_WORKFLOW:
+      return {};
     default:
       return state;
   }
@@ -116,6 +121,8 @@ function countedByReducer(state = {}, action) {
         ...action.payload.countedBy,
       };
     }
+    case CLEAR_COUNT_WORKFLOW:
+      return {};
     default:
       return state;
   }

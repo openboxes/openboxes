@@ -241,9 +241,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
                 id: supplier?.id,
                 name: supplier?.name,
                 code: supplier?.code,
-                displayName: supplier?.name
-                        ? supplier.name + (supplier?.code ? " (${supplier.code})" : "")
-                        : ""
+                displayName: supplier?.displayName,
             ] : null,
             supplierCode: supplierCode,
             defaultProductPackage: defaultProductPackage ?: defaultProductPackageDerived,
@@ -272,6 +270,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
             manufacturer: manufacturer ? [
                 id: manufacturer?.id,
                 name: manufacturer?.name,
+                displayName: manufacturer?.displayName,
             ] : null,
             description: description,
             manufacturerCode: manufacturerCode,

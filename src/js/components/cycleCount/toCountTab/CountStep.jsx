@@ -29,6 +29,7 @@ const CountStep = () => {
     setSortByProductName,
     importErrors,
     isAssignCountModalOpen,
+    handleBackToList,
     closeAssignCountModal,
     assignCountModalData,
     handleCountStepHeaderSave,
@@ -62,6 +63,7 @@ const CountStep = () => {
           sortByProductName={sortByProductName}
           setSortByProductName={setSortByProductName}
           importErrors={importErrors}
+          handleBackToList={handleBackToList}
         />
       ) : (
         <ConfirmStepHeader

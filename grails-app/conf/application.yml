@@ -691,6 +691,12 @@ openboxes:
         refreshProductAvailability:
             alwaysSynchronous: false
 
+    import:
+        product:
+            # True if a product import should create any categories assigned to products that don't yet exist.
+            # False if the import should fail if any categories assigned to products don't exist.
+            createMissingCategories: false
+
     identifier:
         container:
             format: 'LPN-${shipmentNumber}-${sequenceNumber}'

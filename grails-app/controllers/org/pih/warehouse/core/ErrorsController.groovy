@@ -18,14 +18,15 @@ import org.springframework.http.HttpMethod
 import org.springframework.validation.BeanPropertyBindingResult
 import util.ConfigHelper
 
+import org.pih.warehouse.core.localization.MessageLocalizer
+
 class ErrorsController {
 
-    def messageService
     MailService mailService
     def userService
     GrailsApplication grailsApplication
     def userAgentIdentService
-    def localizationService
+    MessageLocalizer messageLocalizer
 
     def handleException() {
         if (RequestUtil.isAjax(request)) {
@@ -104,7 +105,7 @@ class ErrorsController {
             def root = ExceptionUtils.getRootCause(exception)
             BeanPropertyBindingResult errors = root.getErrors()
             List<String> errorMessages = errors.allErrors.collect {
-                return g.message(error: it, locale: localizationService.currentLocale)
+                return messageLocalizer.localize(it)
             }
             render([errorCode: 400,
                     errorMessage: "Validation error. " + root.fullMessage,

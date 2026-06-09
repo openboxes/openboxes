@@ -19,6 +19,7 @@ import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.core.parser.ParserContext
 import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
@@ -80,16 +81,9 @@ class ProductSupplierImportDataService implements ImportDataService {
                 }
             }
 
-            try {
-                def ratingTypeCode = params?.ratingTypeCode ? params?.ratingTypeCode?.toUpperCase() as RatingTypeCode : null
-                if (ratingTypeCode && !RatingTypeCode.inList(ratingTypeCode)) {
-                    command.errors.reject("Row ${index + 1}: Rating Type with value '${params.ratingTypeCode}' exists but is not valid.")
-                }
+            if (params.ratingType && !EnumParser.parseString(params.ratingType as String, RatingTypeCode)) {
+                command.errors.reject("Row ${index + 1}: Rating Type with value '${params.ratingType}' does not exist")
             }
-            catch(IllegalArgumentException e) {
-                command.errors.reject("Row ${index + 1}: Rating Type with value '${params.ratingTypeCode}' does not exist. " + e.message)
-            }
-
 
             if (params.globalPreferenceTypeName && !PreferenceType.findByName(params.globalPreferenceTypeName)) {
                 command.errors.reject("Row ${index + 1}: Preference Type with name '${params.globalPreferenceTypeName}' does not exist")
@@ -118,17 +112,17 @@ class ProductSupplierImportDataService implements ImportDataService {
             }
 
             Date minDate = ConfigHelper.getMinimumExpirationDate()
-            Date preferenceTypeValidityStartDate = params.globalPreferenceTypeValidityStartDate
+            Date preferenceTypeValidityStartDate = params.globalPreferenceTypeValidityStartDate ?: null
             if (preferenceTypeValidityStartDate && minDate > preferenceTypeValidityStartDate) {
                 command.errors.reject("Row ${index + 1}: Validity start date ${preferenceTypeValidityStartDate} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
             }
 
-            Date preferenceTypeValidityEndDate = params.globalPreferenceTypeValidityEndDate
+            Date preferenceTypeValidityEndDate = params.globalPreferenceTypeValidityEndDate ?: null
             if (preferenceTypeValidityEndDate && minDate > preferenceTypeValidityEndDate) {
                 command.errors.reject("Row ${index + 1}: Validity end date ${preferenceTypeValidityEndDate} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
             }
 
-            Date contractPriceValidUntil = params.contractPriceValidUntil
+            Date contractPriceValidUntil = params.contractPriceValidUntil ?: null
             if (contractPriceValidUntil && minDate > contractPriceValidUntil) {
                 command.errors.reject("Row ${index + 1}: Contract Price Valid Until date ${contractPriceValidUntil} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
             }
@@ -142,7 +136,7 @@ class ProductSupplierImportDataService implements ImportDataService {
         command.data.each { params ->
             // Sanitize the raw import data into a strongly-typed command object
             ProductSupplierImportCommand productSupplierImportCommand = new ProductSupplierImportCommand(
-                    active: BooleanParser.parse(params.active as String, false),
+                    active: BooleanParser.parseString(params.active as String, new ParserContext<Boolean>(defaultValue: true)),
                     id: sanitizeStringInput(params.id),
                     code: sanitizeStringInput(params.code),
                     name: sanitizeStringInput(params.name),
@@ -155,11 +149,11 @@ class ProductSupplierImportDataService implements ImportDataService {
                     manufacturerCode: sanitizeStringInput(params.manufacturerCode),
                     minOrderQuantity: params.minOrderQuantity,
                     contractPricePrice: params.contractPricePrice ? BigDecimal.valueOf(params.contractPricePrice as double) : null,
-                    contractPriceValidUntil: params.contractPriceValidUntil,
-                    ratingType: EnumParser.parse(params.ratingType as String, RatingTypeCode),
+                    contractPriceValidUntil: params.contractPriceValidUntil ?: null,
+                    ratingType: EnumParser.parseString(params.ratingType as String, RatingTypeCode),
                     globalPreferenceTypeName: sanitizeStringInput(params.globalPreferenceTypeName),
-                    globalPreferenceTypeValidityStartDate: params.globalPreferenceTypeValidityStartDate,
-                    globalPreferenceTypeValidityEndDate: params.globalPreferenceTypeValidityEndDate,
+                    globalPreferenceTypeValidityStartDate: params.globalPreferenceTypeValidityStartDate ?: null,
+                    globalPreferenceTypeValidityEndDate: params.globalPreferenceTypeValidityEndDate ?: null,
                     globalPreferenceTypeComments: sanitizeStringInput(params.globalPreferenceTypeComments),
                     defaultProductPackageUomCode: sanitizeStringInput(params.defaultProductPackageUomCode),
                     defaultProductPackageQuantity: params.defaultProductPackageQuantity,

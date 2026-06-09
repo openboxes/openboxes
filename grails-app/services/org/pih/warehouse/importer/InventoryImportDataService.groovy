@@ -412,8 +412,9 @@ class InventoryImportDataService implements ImportDataService {
             InventoryItem inventoryItem =
                     inventoryService.findInventoryItemByProductAndLotNumber(product, entry['lotNumber'])
 
-            Integer currentQuantity =
-                    productAvailabilityService.getQuantityOnHand(inventoryItem)
+            Integer currentQuantity = inventoryItem
+                    ? productAvailabilityService.getQuantityOnHand(inventoryItem)
+                    : 0
 
             Integer quantityToImport = entry['quantity'] as Integer
 

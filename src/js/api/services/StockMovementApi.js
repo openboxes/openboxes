@@ -1,6 +1,7 @@
 import {
   STOCK_MOVEMENT_API,
   STOCK_MOVEMENT_BY_ID,
+  STOCK_MOVEMENT_DOCUMENTS,
   STOCK_MOVEMENT_ITEMS,
   STOCK_MOVEMENT_ROLLBACK_APPROVAL,
   STOCK_MOVEMENT_UPDATE_REQUISITION,
@@ -49,4 +50,5 @@ export default {
     apiClient.post(STOCK_MOVEMENT_URL.uploadDocuments(id), formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }),
+  getDocuments: (id) => apiClient.get(STOCK_MOVEMENT_DOCUMENTS(id)),
 };

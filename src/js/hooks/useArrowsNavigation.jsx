@@ -146,11 +146,14 @@ const useArrowsNavigation = ({
       return;
     }
 
-    if (key === navigationKey.ARROW_RIGHT) {
+    if (key === navigationKey.ARROW_RIGHT || key === navigationKey.TAB) {
       const { newColumnId, newRowIndex } = getNextFocus(columnId, rowIndex);
       setColumnId(newColumnId);
       setRowIndex(newRowIndex);
       onBlur();
+
+      e.preventDefault();
+      e.stopPropagation();
     }
 
     if (key === navigationKey.ARROW_LEFT) {

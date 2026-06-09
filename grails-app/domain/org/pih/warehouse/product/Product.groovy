@@ -27,7 +27,7 @@ import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
-import org.pih.warehouse.core.validation.Validatable
+import org.pih.warehouse.core.validation.DomainValidatable
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
@@ -50,7 +50,7 @@ import org.pih.warehouse.LocalizationUtil
  * 20 mg tablets vs a 50 count bottle of 20 mg tablets will both be stored
  * as 20 mg tablets).
  */
-class Product implements Comparable, Serializable, Validatable<ProductValidator> {
+class Product implements Comparable, Serializable, DomainValidatable<ProductValidator> {
 
     def beforeInsert() {
         createdBy = AuthService.currentUser
@@ -298,8 +298,13 @@ class Product implements Comparable, Serializable, Validatable<ProductValidator>
         productCode(nullable: true, maxSize: 255, unique: true)
         unitOfMeasure(nullable: true, maxSize: 255)
         category(nullable: false, validator: { Category category, Product product ->
+            // If the category is not dirty, let the existing categories exist even if they
+            // are not valid in terms of the parent category assignment rules. (OBS-1963).
+            if (!product.isDirty("category")) {
+                return true
+            }
             // If assigning a parent category to product is enabled, and the category is the parent (it has children), throw an error
-            if (!category?.assigningParentToProductEnabled && !category?.categories?.empty) {
+            if (!category?.assigningParentToProductEnabled && category?.categories) {
                 return ["invalid.cannotAssignParentCategoryToProduct"]
             }
         })

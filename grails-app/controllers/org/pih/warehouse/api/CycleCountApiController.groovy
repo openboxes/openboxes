@@ -3,8 +3,8 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import grails.orm.PagedResultList
 import grails.validation.ValidationException
+import javax.validation.Valid
 import org.apache.commons.csv.CSVPrinter
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.UploadService
@@ -13,7 +13,6 @@ import org.pih.warehouse.importer.CycleCountItemsExcelImporter
 import org.pih.warehouse.importer.CycleCountRecountItemsExcelImporter
 import org.pih.warehouse.importer.DataImporter
 import org.pih.warehouse.importer.ImportDataCommand
-import org.pih.warehouse.importer.PackingListExcelImporter
 import org.pih.warehouse.inventory.CycleCountCandidate
 import org.pih.warehouse.inventory.CycleCountCandidateFilterCommand
 import org.pih.warehouse.inventory.CycleCountDto
@@ -44,7 +43,7 @@ class CycleCountApiController {
     UploadService uploadService
     CycleCountImportService cycleCountImportService
 
-    def getCandidates(CycleCountCandidateFilterCommand filterParams) {
+    def getCandidates(@Valid CycleCountCandidateFilterCommand filterParams) {
         List<CycleCountCandidate> cycleCounts = cycleCountService.getCandidates(filterParams, params.facilityId)
 
         if (filterParams.format == "csv") {
@@ -56,7 +55,7 @@ class CycleCountApiController {
         render([data: cycleCounts, totalCount: cycleCounts.totalCount] as JSON)
     }
 
-    def getPendingCycleCountRequests(CycleCountCandidateFilterCommand filterParams) {
+    def getPendingCycleCountRequests(@Valid CycleCountCandidateFilterCommand filterParams) {
         List<PendingCycleCountRequest> pendingCycleCountRequests = cycleCountService.getPendingCycleCountRequests(filterParams, params.facilityId)
 
         render([data: pendingCycleCountRequests, totalCount: pendingCycleCountRequests.totalCount] as JSON)

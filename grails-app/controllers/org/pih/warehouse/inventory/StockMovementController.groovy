@@ -22,7 +22,18 @@ import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.*
+import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.BulkDocumentCommand
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.DocumentCommand
+import org.pih.warehouse.core.DocumentService
+import org.pih.warehouse.core.DocumentType
+import org.pih.warehouse.core.history.HistoryItem
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.order.Order
@@ -139,7 +150,7 @@ class StockMovementController {
                 break
             case StockMovementDirection.INBOUND:
                 String step = (stockMovement.statusCode in [StockMovementStatusCode.CREATED.name(), StockMovementStatusCode.REQUESTING.name()]) ?  InboundWorkflowState.ADD_ITEMS : InboundWorkflowState.SEND_SHIPMENT
-                redirect(action: "createInbound", params: params + [step: step])
+                redirect(action: "createInbound", params: params + [direction: StockMovementDirection.INBOUND, step: step])
                 break
             default:
                 redirect(action: "createOutbound", params: params)
@@ -149,18 +160,29 @@ class StockMovementController {
 
     def show() {
         Location currentLocation = Location.get(session?.warehouse?.id)
+        HistoryItem latestHistoryItem = null
+
         // Pull Outbound Stock movement (Requisition based) or Outbound or Inbound Return (Order based)
         def stockMovement = outboundStockMovementService.getStockMovement(params.id)
+        if (stockMovement) {
+            latestHistoryItem = outboundStockMovementService.getLatestHistoryItem(stockMovement)
+        }
+
         // For inbound stockMovement only
         if (!stockMovement) {
             stockMovement = stockMovementService.getStockMovement(params.id)
+            latestHistoryItem = stockMovementService.getLatestHistoryItem(stockMovement)
         }
         stockMovement.documents = stockMovementService.getDocuments(stockMovement)
 
         if (stockMovement?.order) {
             render(view: "/returns/show", model: [stockMovement: stockMovement, currentLocation: currentLocation])
         } else {
-            render(view: "show", model: [stockMovement: stockMovement, currentLocation: currentLocation])
+            render(view: "show", model: [
+                    stockMovement: stockMovement,
+                    currentLocation: currentLocation,
+                    latestHistoryItem: latestHistoryItem,
+            ])
         }
     }
 
@@ -480,7 +502,7 @@ class StockMovementController {
 
     def events() {
         StockMovement stockMovement = getStockMovement(params.id)
-        List<HistoryItem> historyItems = stockMovement?.shipment?.getHistory()?.sort() ?: []
+        List<HistoryItem> historyItems = stockMovementService.getHistory(stockMovement)
         render(
                 template: "events",
                 model: [historyItems: historyItems, shipmentId: stockMovement?.shipment?.id]

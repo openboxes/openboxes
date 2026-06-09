@@ -24,6 +24,7 @@
 			</div>
 
 			<g:form method="post" >
+				<g:hiddenField name="isFromProductEditPage" value="${params.isFromProductEditPage}" />
 				<g:hiddenField id="productAssociationId" name="id" value="${productAssociationInstance?.id}" />
 				<g:hiddenField name="version" value="${productAssociationInstance?.version}" />
 				<div class="box">

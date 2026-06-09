@@ -362,7 +362,7 @@ class UserService {
                     }
                 }
             }
-            order("lastName", "desc")
+            order(params.sort ?: "lastName", params.order ?: "desc")
         }
         return results
     }

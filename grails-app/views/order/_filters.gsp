@@ -3,7 +3,7 @@
 <%@ page import="org.pih.warehouse.order.OrderStatus;" %>
 <%@ page import="org.pih.warehouse.order.OrderType;" %>
 <%@ page import="org.pih.warehouse.order.OrderTypeCode;" %>
-<div class="box">
+<div class="box" data-testid="filters">
     <h2><warehouse:message code="default.filters.label"/></h2>
     <g:form id="listForm" action="list" method="GET">
         <g:hiddenField name="type" value="${params.type}"/>

@@ -249,7 +249,7 @@ class ProductSupplierController {
         if (productSupplierInstance) {
             def productInstance = productSupplierInstance.product
             try {
-                productSupplierGormService.delete(productSupplierInstance.id)
+                productSupplierService.delete(productSupplierInstance.id)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), params.id])}"
             }
             catch (Exception e) {

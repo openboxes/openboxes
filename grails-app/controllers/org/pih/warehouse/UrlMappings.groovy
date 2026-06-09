@@ -74,6 +74,16 @@ class UrlMappings {
             action = [GET: "catalogOptions"]
         }
 
+        "/api/locationGroups"(parseRequest: true) {
+            controller = { "locationGroupApi" }
+            action = [GET: "list", POST: "create"]
+        }
+
+        "/api/locationGroups/$id"(parseRequest: true) {
+            controller = { "locationGroupApi" }
+            action = [GET: "read", PUT: "update", DELETE: "delete"]
+        }
+
         // Product Group options for filters on  product list page
         "/api/productGroupOptions"(parseRequest: true) {
             controller = { "selectOptionsApi" }
@@ -115,6 +125,11 @@ class UrlMappings {
         "/api/handlingRequirementsOptions" {
             controller = { "selectOptionsApi" }
             action = [GET: "handlingRequirementsOptions"]
+        }
+
+        "/api/stockMovements/shipmentStatusCodes" {
+            controller = { "selectOptionsApi" }
+            action = [GET: "shipmentStatusCodesOptions"]
         }
 
         "/api/products"(parseRequest: true) {
@@ -334,6 +349,11 @@ class UrlMappings {
             action = [POST: "importPickListItems"]
         }
 
+        "/api/stockMovements/importPackListItems/$id"(parseRequest: true) {
+            controller = "packListApi"
+            action = [POST: "importPackListItems"]
+        }
+
         "/api/stockMovements/exportPickListItems/$id"(parseRequest: true) {
             controller = "picklist"
             action = [GET: "exportPicklistItems"]
@@ -342,6 +362,11 @@ class UrlMappings {
         "/api/stockMovements/picklistTemplate/$id"(parseRequest: true) {
             controller = "picklist"
             action = [GET: "exportPicklistTemplate"]
+        }
+
+        "/api/stockMovements/packlistTemplate/$id"(parseRequest: true) {
+            controller = "packListApi"
+            action = [GET: "exportPackTemplate"]
         }
 
         "/api/stockMovements/createPickList/$id"(parseRequest: true) {
@@ -385,11 +410,6 @@ class UrlMappings {
             action = [POST: "packingLocation"]
         }
 
-        "/api/stockMovements/shipmentStatusCodes" {
-            controller = "stockMovementApi"
-            action = [GET: "shipmentStatusCodes"]
-        }
-
         "/api/stockMovements/requisitionsStatusCodes" {
             controller = "stockMovementApi"
             action = [GET: "requisitionStatusCodes"]
@@ -403,6 +423,11 @@ class UrlMappings {
         "/api/stockMovements/packingList/template" {
             controller = "stockMovementApi"
             action = [GET: "downloadPackingListTemplate"]
+        }
+
+        "/api/stockMovements/$id/documents" {
+            controller = "stockMovementApi"
+            action = [GET: "getDocuments"]
         }
 
         "/api/picklists/$id/items" {

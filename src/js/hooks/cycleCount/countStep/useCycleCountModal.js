@@ -1,13 +1,15 @@
 import { useCallback, useRef, useState } from 'react';
 
-import { useStore } from 'react-redux';
+import { useDispatch, useStore } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
+import { clearCountWorkflow } from 'actions';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
 
 const useCycleCountModal = (requestIdsWithDiscrepanciesRef) => {
   const [isAssignCountModalOpen, setIsAssignCountModalOpen] = useState(false);
   const assignCountModalData = useRef([]);
+  const dispatch = useDispatch();
   const history = useHistory();
   const store = useStore();
 
@@ -36,6 +38,7 @@ const useCycleCountModal = (requestIdsWithDiscrepanciesRef) => {
   const closeAssignCountModal = useCallback(() => {
     setIsAssignCountModalOpen(false);
     assignCountModalData.current = [];
+    dispatch(clearCountWorkflow);
     history.push(CYCLE_COUNT.resolveStep());
   }, []);
 

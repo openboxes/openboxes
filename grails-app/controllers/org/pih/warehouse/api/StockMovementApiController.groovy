@@ -697,24 +697,12 @@ class StockMovementApiController {
                 sm.stocklist?.name ?: "",
                 sm.requestedBy ?: warehouse.message(code: 'default.none.label'),
                 sm.dateRequested.format("MM-dd-yyyy") ?: "",
-                sm.requisition?.dateCreated?.format("MM-dd-yyyy") ?: "",
+                sm.dateCreated?.format("MM-dd-yyyy") ?: "",
                 sm.shipment?.expectedShippingDate?.format("MM-dd-yyyy") ?: "",
             )
         }
 
         return csv
-    }
-
-    def shipmentStatusCodes() {
-        def options = ShipmentStatusCode.list()?.collect {
-            [
-                    id: it.name,
-                    value: it.name,
-                    label: "${g.message(code: 'enum.ShipmentStatusCode.' + it.name)}",
-                    variant: it.variant.name
-            ]
-        }
-        render([data: options] as JSON)
     }
 
     def requisitionStatusCodes() {
@@ -776,6 +764,11 @@ class StockMovementApiController {
         } catch (FileNotFoundException e) {
             render status: 404
         }
+    }
+
+    def getDocuments() {
+        List<Map> documents = stockMovementService.getDocuments(params.id)
+        render([data: documents] as JSON)
     }
 
     def packingLocation() {

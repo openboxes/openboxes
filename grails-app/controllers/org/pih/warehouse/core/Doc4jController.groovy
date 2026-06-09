@@ -10,12 +10,16 @@
 package org.pih.warehouse.core
 
 import grails.gorm.transactions.Transactional
+
+import org.pih.warehouse.core.http.ContentType
+import org.pih.warehouse.core.http.HttpServletResponseConfigurer
 import org.pih.warehouse.shipping.Shipment
 
 @Transactional
 class Doc4jController {
 
     def documentService
+    HttpServletResponseConfigurer httpServletResponseConfigurer
 
     /**
      *
@@ -28,10 +32,8 @@ class Doc4jController {
             throw new Exception("Unable to locate shipment with ID ${params.id}")
         }
 
-        def filename = "Packing List - " + shipmentInstance?.name?.trim() + ".xls"
-        log.info("filename " + filename)
-        response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-        response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+        httpServletResponseConfigurer.withFile(response, ContentType.XLS, ["Packing List", shipmentInstance?.name])
+
         documentService.generatePackingList(response.outputStream, shipmentInstance)
         response.outputStream.flush()
         response.outputStream.close()

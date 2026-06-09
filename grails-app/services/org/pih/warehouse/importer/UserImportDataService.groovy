@@ -74,7 +74,7 @@ class UserImportDataService implements ImportDataService {
         if (!user) {
             user = new User(params)
             user.active = true
-            user.password = "password"
+            user.password = "password".encodeAsPassword()
         } else {
             user.properties = params
         }

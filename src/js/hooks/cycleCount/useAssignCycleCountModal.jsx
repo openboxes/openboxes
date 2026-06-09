@@ -5,7 +5,7 @@ import React, { useCallback, useEffect } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   getCurrentLocation,
   getCycleCountIds,
@@ -13,6 +13,7 @@ import {
   getMinSearchLength,
 } from 'selectors';
 
+import { clearCountWorkflow } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
@@ -56,6 +57,7 @@ const useAssignCycleCountModal = ({
   const translate = useTranslate();
   const columnHelper = createColumnHelper();
   const { forceRerender } = useForceRender();
+  const dispatch = useDispatch();
 
   const handleUpdateAssignees = (cycleCountRequestIds, field, value) => {
     // eslint-disable-next-line no-param-reassign
@@ -146,6 +148,7 @@ const useAssignCycleCountModal = ({
         refetchData();
       }
     } finally {
+      dispatch(clearCountWorkflow);
       closeModal();
       spinner.hide();
     }

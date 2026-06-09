@@ -194,7 +194,7 @@ export const debounceOrganizationsFetch = (waitTime, minSearchLength, roleTypes 
             value: obj.id,
             id: obj.id,
             name: obj.name,
-            label: `${obj.code} ${obj.name}`,
+            label: obj.displayName,
           }
         ))))
         .catch(() => callback([]));
@@ -230,7 +230,7 @@ export const organizationsFetch = (roleTypes = ['ROLE_SUPPLIER'], active = false
             id: obj.id,
             value: obj.id,
             name: obj.name,
-            label: `${obj.name}`,
+            label: obj.displayName,
           }
         ));
       }

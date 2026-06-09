@@ -46,6 +46,16 @@
 								</td>
 							</tr>
 
+						<tr class="prop">
+							<td valign="top" class="name">
+								<label for="code"><warehouse:message code="organization.code.label" /></label>
+							</td>
+							<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'code', 'errors')}">
+								<g:textField class="text" size="80" name="code" maxlength="255" value="${organizationInstance?.code}"
+								             placeholder="${warehouse.message(code:'organization.code.placeholder') }"/>
+							</td>
+						</tr>
+
 							<tr class="prop">
 								<td valign="top" class="name">
 									<label for="name"><warehouse:message code="organization.name.label" default="Name" /></label>

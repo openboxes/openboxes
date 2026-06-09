@@ -213,8 +213,10 @@
     }
 
   }
+}
 
-
+.app-react-table,
+.table-v2 .rt-tbody-v2 {
   .rt-noData {
     position: relative;
     width: 100%;
@@ -233,6 +235,10 @@
 }
 
 .table-v2 {
+
+  .ReactTable {
+    border: none;
+  }
 
   .table-footer {
     display: flex;

@@ -8,9 +8,12 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
+import { RiDeleteBinLine } from 'react-icons/ri';
+import { TbArrowsSplit2 } from 'react-icons/tb';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
+import { Tooltip } from 'react-tippy';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import ProductApi from 'api/services/ProductApi';
@@ -25,7 +28,7 @@ import {
   STOCK_MOVEMENT_UPDATE_ITEMS,
 } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
-import ButtonField from 'components/form-elements/ButtonField';
+import BaseField from 'components/form-elements/BaseField';
 import DateField from 'components/form-elements/DateField';
 import LabelField from 'components/form-elements/LabelField';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
@@ -34,38 +37,46 @@ import TextField from 'components/form-elements/TextField';
 import ConfirmExpirationDateModal from 'components/modals/ConfirmExpirationDateModal';
 import CombinedShipmentItemsModal from 'components/stock-movement-wizard/modals/CombinedShipmentItemsModal';
 import { ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import requisitionStatus from 'consts/requisitionStatus';
 import AlertMessage from 'utils/AlertMessage';
 import apiClient from 'utils/apiClient';
 import { renderFormField, setColumnValue } from 'utils/form-utils';
 import { formatProductSupplierSubtext } from 'utils/form-values-utils';
+import Input from 'utils/Input';
 import { debounceProductsFetch } from 'utils/option-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-const DELETE_BUTTON_FIELD = {
-  type: ButtonField,
-  label: 'react.default.button.delete.label',
-  defaultMessage: 'Delete',
-  flexWidth: '1',
-  fieldKey: '',
-  buttonLabel: 'react.default.button.delete.label',
-  buttonDefaultMessage: 'Delete',
-  getDynamicAttr: ({
-    fieldValue, removeItem, removeRow, updateTotalCount,
-  }) => ({
-    onClick: fieldValue && fieldValue.id ? () => {
-      removeItem(fieldValue.id).then(() => {
-        removeRow();
-        updateTotalCount(-1);
-      });
-    } : () => { updateTotalCount(-1); removeRow(); },
-    disabled: fieldValue && fieldValue.statusCode === 'SUBSTITUTED',
-  }),
-  attributes: {
-    className: 'btn btn-outline-danger',
-  },
+const customTextFieldWithTooltip = (params) => {
+  const renderInput = ({
+    inputClassName,
+    className,
+    ...attributes
+  }) => (
+    <Input
+      isFormElement
+      className={inputClassName || className}
+      {...attributes}
+    />
+  );
+  return (
+    <Tooltip
+      html={params?.fieldValue}
+      theme="transparent"
+      arrow="true"
+      delay="150"
+      duration="250"
+      hideDelay="50"
+      disabled={!params?.fieldValue}
+    >
+      <BaseField
+        {...params}
+        renderInput={renderInput}
+      />
+    </Tooltip>
+  );
 };
 
 const FIELDS = {
@@ -100,7 +111,8 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.orderNumber.label',
         defaultMessage: 'Order number',
-        flexWidth: '1',
+        multilineHeader: true,
+        fixedWidth: '6.5em',
         fieldKey: '',
         getDynamicAttr: ({
           fieldValue,
@@ -116,7 +128,8 @@ const FIELDS = {
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
         headerAlign: 'left',
-        flexWidth: '4',
+        multilineHeader: true,
+        flexWidth: '2.7',
         required: true,
         attributes: {
           showSelectedOptionColor: true,
@@ -136,7 +149,8 @@ const FIELDS = {
         type: TextField,
         label: 'react.stockMovement.lot.label',
         defaultMessage: 'Lot',
-        flexWidth: '1',
+        multilineHeader: true,
+        flexWidth: '1.5',
         getDynamicAttr: ({
           rowIndex,
           values,
@@ -155,7 +169,8 @@ const FIELDS = {
         type: DateField,
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
-        flexWidth: '1.5',
+        multilineHeader: true,
+        fixedWidth: '7.1em',
         attributes: {
           dateFormat: 'MM/DD/YYYY',
           autoComplete: 'off',
@@ -165,8 +180,18 @@ const FIELDS = {
           rowIndex,
           values,
           validateExpirationDate,
+          fetchInventoryItem,
         }) => ({
           onBlur: () => {
+            const lineItem = values?.lineItems?.[rowIndex];
+            const alreadyFetched = Boolean(lineItem?.fetchedInventoryItem);
+            // If the inventory item was not yet fetched (e.g. after navigating back/forward),
+            // fetch it
+            if (!alreadyFetched && lineItem?.lotNumber && lineItem?.product?.id) {
+              fetchInventoryItem(values, rowIndex);
+              return;
+            }
+
             validateExpirationDate(values?.lineItems, rowIndex);
           },
         }),
@@ -175,7 +200,8 @@ const FIELDS = {
         type: TextField,
         label: 'react.stockMovement.quantityPOUom.label',
         defaultMessage: 'Quantity (in PO UoM)',
-        fixedWidth: '120px',
+        headerAlign: 'right',
+        fixedWidth: '11.5ch',
         required: true,
         headerTooltip: 'react.stockMovement.quantityPerUom.InputTooltip.label',
         multilineHeader: true,
@@ -185,22 +211,25 @@ const FIELDS = {
         },
       },
       unitOfMeasure: {
-        type: TextField,
+        type: customTextFieldWithTooltip,
         label: 'react.stockMovement.POUom.label',
         defaultMessage: 'PO UoM',
-        fixedWidth: '110px',
+        multilineHeader: true,
+        flexWidth: '1',
         attributes: {
           disabled: true,
         },
       },
       calculatedQuantityRequested: {
-        type: TextField,
+        type: LabelField,
         label: 'react.stockMovement.quantityEach.label',
         defaultMessage: 'Quantity (each)',
         multilineHeader: true,
-        flexWidth: 1,
+        headerAlign: 'right',
+        fixedWidth: '7.1ch',
         attributes: {
           disabled: true,
+          className: 'text-right',
         },
         getDynamicAttr: ({ rowIndex, values }) => ({
           formatValue: () => {
@@ -212,9 +241,10 @@ const FIELDS = {
         }),
       },
       palletName: {
-        type: TextField,
+        type: customTextFieldWithTooltip,
         label: 'react.stockMovement.packLevel1.label',
         defaultMessage: 'Pack level 1',
+        multilineHeader: true,
         flexWidth: '1',
         getDynamicAttr: ({
           rowIndex, rowCount,
@@ -223,16 +253,18 @@ const FIELDS = {
         }),
       },
       boxName: {
-        type: TextField,
+        type: customTextFieldWithTooltip,
         label: 'react.stockMovement.packLevel2.label',
         defaultMessage: 'Pack level 2',
+        multilineHeader: true,
         flexWidth: '1',
       },
       recipient: {
         type: SelectField,
         label: 'react.stockMovement.recipient.label',
         defaultMessage: 'Recipient',
-        flexWidth: '1.5',
+        multilineHeader: true,
+        flexWidth: '1.3',
         getDynamicAttr: ({
           recipients,
           translate,
@@ -256,39 +288,54 @@ const FIELDS = {
         attributes: {
           labelKey: 'name',
           openOnClick: false,
+          showValueTooltip: true,
         },
       },
-      split: {
-        type: ButtonField,
-        label: 'react.stockMovement.splitLine.label',
-        defaultMessage: 'Split',
-        flexWidth: '1',
+      actions: {
+        label: 'react.stockMovement.actions.label',
+        defaultMessage: 'Actions',
+        flexWidth: '0.7',
         fieldKey: '',
-        buttonLabel: 'react.stockMovement.splitLine.label',
-        buttonDefaultMessage: 'Split line',
-        getDynamicAttr: ({
-          fieldValue, addRow, rowIndex, updateTotalCount,
-        }) => ({
-          onClick: () => {
-            updateTotalCount(1);
-            addRow({
-              product: fieldValue.product,
-              recipient: fieldValue.recipient,
-              sortOrder: fieldValue.sortOrder + 1,
-              orderItemId: fieldValue.orderItemId,
-              referenceId: fieldValue.orderItemId,
-              orderNumber: fieldValue.orderNumber,
-              packSize: fieldValue.packSize,
-              unitOfMeasure: fieldValue.unitOfMeasure,
-              quantityAvailable: fieldValue.quantityAvailable,
-            }, rowIndex);
-          },
-        }),
-        attributes: {
-          className: 'btn btn-outline-success',
-        },
+        type: ({
+          fieldValue, removeItem, removeRow, updateTotalCount, addRow, rowIndex, translate,
+          onDelete, onSplit,
+        }) => (
+          <span className="inbound-actions">
+            <div aria-label={translate('react.stockMovement.splitLine.label', 'Split line')} role="button">
+              <Tooltip
+                html={(<Translate id="react.stockMovement.splitLine.label" defaultMessage="Split line" />)}
+                theme="transparent"
+                arrow="true"
+                delay="150"
+                duration="250"
+                hideDelay="50"
+              >
+                <TbArrowsSplit2
+                  className="split-icon"
+                  onClick={() => onSplit(fieldValue, addRow, rowIndex, updateTotalCount)}
+                  disabled={fieldValue?.statusCode === requisitionStatus.SUBSTITUTED}
+                />
+              </Tooltip>
+            </div>
+            <div aria-label={translate('react.default.button.delete.label', 'Delete')} role="button">
+              <Tooltip
+                html={(<Translate id="react.default.button.delete.label" defaultMessage="Delete" />)}
+                theme="transparent"
+                arrow="true"
+                delay="150"
+                duration="250"
+                hideDelay="50"
+              >
+                <RiDeleteBinLine
+                  className="delete-icon"
+                  onClick={() => onDelete(fieldValue, removeItem, removeRow, updateTotalCount)}
+                  disabled={fieldValue?.statusCode === requisitionStatus.SUBSTITUTED}
+                />
+              </Tooltip>
+            </div>
+          </span>
+        ),
       },
-      deleteButton: DELETE_BUTTON_FIELD,
     },
   },
 };
@@ -416,6 +463,34 @@ class AddItemsPage extends Component {
   }
 
   dataFetched = false;
+
+  handleDelete = async (fieldValue, removeItem, removeRow, updateTotalCount) => {
+    try {
+      this.props.showSpinner();
+      if (fieldValue && fieldValue.id) {
+        await removeItem(fieldValue.id);
+      }
+      updateTotalCount(-1);
+      removeRow();
+    } finally {
+      this.props.hideSpinner();
+    }
+  };
+
+  handleSplit = (fieldValue, addRow, rowIndex, updateTotalCount) => {
+    updateTotalCount(1);
+    addRow({
+      product: fieldValue.product,
+      recipient: fieldValue.recipient,
+      sortOrder: fieldValue.sortOrder + 1,
+      orderItemId: fieldValue.orderItemId,
+      referenceId: fieldValue.orderItemId,
+      orderNumber: fieldValue.orderNumber,
+      packSize: fieldValue.packSize,
+      unitOfMeasure: fieldValue.unitOfMeasure,
+      quantityAvailable: fieldValue.quantityAvailable,
+    }, rowIndex);
+  };
 
   validate(values, ignoreLotAndExpiry) {
     if (!this.dataFetched) {
@@ -651,13 +726,18 @@ class AddItemsPage extends Component {
       if (rowIndex === index) {
         return {
           ...lineItem,
+          referenceId: lineItem?.orderItemId,
           fetchedInventoryItem: {
             inventoryItem: data.inventoryItem,
             quantity: data?.quantityOnHand,
           },
         };
       }
-      return lineItem;
+
+      return {
+        ...lineItem,
+        referenceId: lineItem?.orderItemId,
+      };
     });
 
     this.setState((previousState) => ({
@@ -667,8 +747,13 @@ class AddItemsPage extends Component {
         lineItems: mappedLineItems,
       },
     }), () => {
-      if (!values.lineItems?.[rowIndex]?.expirationDate) {
+      const isAutoFilling = !values.lineItems?.[rowIndex]?.expirationDate
+        && data?.inventoryItem?.expirationDate;
+
+      if (isAutoFilling) {
+        // Auto-filling exp date from inventory item — no modal should appear
         this.changeExpirationDate(mappedLineItems, rowIndex, data?.inventoryItem?.expirationDate);
+        return;
       }
 
       // Prevent an infinite loop between fetchInventoryItem() and validateExpirationDate()
@@ -698,13 +783,19 @@ class AddItemsPage extends Component {
     const lineItem = lineItems?.[rowIndex];
     const inventoryItem = lineItem?.fetchedInventoryItem?.inventoryItem
       || lineItem?.inventoryItem;
-    const quantity = (lineItem?.fetchedInventoryItem
-      ? lineItem?.fetchedInventoryItem?.quantity : lineItem?.inventoryItem?.quantity) || 0;
 
-    const expirationDateChanged = lineItem?.expirationDate
-      && lineItem?.lotNumber
-      && lineItem?.expirationDate !== inventoryItem?.expirationDate
-      && quantity > 0;
+    // inventoryItem is null when lot does not exist (new lot)
+    const lotExists = Boolean(inventoryItem);
+    const isExpirationDateRemoved = !lineItem.expirationDate && inventoryItem?.expirationDate;
+    const isExpirationDateEntered = Boolean(lineItem?.expirationDate);
+    const areExpirationDatesDifferent = lineItem?.expirationDate !== inventoryItem?.expirationDate;
+    // Show modal when:
+    // 1. Changing exp date to another (existing lot)
+    // 2. Removing exp date (existing lot)
+    // 3. Creating exp date for existing lot (previously had none)
+    // 4. Never show for new lots that don't exist in the system
+    const expirationDateChanged = lineItem?.lotNumber && lotExists &&
+      (isExpirationDateRemoved || (isExpirationDateEntered && areExpirationDatesDifferent));
 
     if (expirationDateChanged) {
       // Despite we have only one item here, we are place it in an array
@@ -724,8 +815,15 @@ class AddItemsPage extends Component {
         return Promise.reject();
       }
 
-      return this.saveRequisitionItems([lineItems[rowIndex]])
-        .then((response) => this.fetchInventoryItem(response.data.data, rowIndex, false));
+      return this.saveRequisitionItems(lineItems)
+        .then((response) => {
+          const sortedLineItems = _.sortBy(response.data.data.lineItems, ['sortOrder']);
+          return this.fetchInventoryItem(
+            { ...response.data.data, lineItems: sortedLineItems },
+            rowIndex,
+            false,
+          );
+        });
     }
     return null;
   }
@@ -959,29 +1057,6 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Refetch the data, all not saved changes will be lost.
-   * @public
-   */
-  refresh() {
-    confirmAlert({
-      title: this.props.translate('react.stockMovement.message.confirmRefresh.label', 'Confirm refresh'),
-      message: this.props.translate(
-        'react.stockMovement.confirmRefresh.message',
-        'Are you sure you want to refresh? Your progress since last save will be lost.',
-      ),
-      buttons: [
-        {
-          label: this.props.translate('react.default.yes.label', 'Yes'),
-          onClick: () => this.fetchAllData(),
-        },
-        {
-          label: this.props.translate('react.default.no.label', 'No'),
-        },
-      ],
-    });
-  }
-
-  /**
    * Transition to next stock movement status:
    * - 'CHECKING' if origin type is supplier.
    * - 'VERIFYING' if origin type is other than supplier.
@@ -1174,16 +1249,6 @@ class AddItemsPage extends Component {
               </div>
               <button
                 type="button"
-                onClick={() => this.refresh()}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-              >
-                <span>
-                  <i className="fa fa-refresh pr-2" />
-                  <Translate id="react.default.button.refresh.label" defaultMessage="Reload" />
-                </span>
-              </button>
-              <button
-                type="button"
                 disabled={!this.isValidForSave(values)}
                 onClick={() => this.save(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
@@ -1241,6 +1306,8 @@ class AddItemsPage extends Component {
                     setRecipientValue: (val) => form.mutators.setColumnValue('lineItems', 'recipient', val),
                     translate: this.props.translate,
                     overrideFormValue: form.mutators.override,
+                    onDelete: this.handleDelete,
+                    onSplit: this.handleSplit,
                   }))}
               </div>
               <div className="submit-buttons">

@@ -446,8 +446,8 @@ class PutAwayCheckPage extends Component {
                 showPaginationBottom={false}
                 filterable
                 defaultFilterMethod={this.filterMethod}
-                getTdProps={(state, rowInfo) => ({
-                  'data-testid': `row-${rowInfo.level}-${rowInfo.index}`,
+                getTdProps={() => ({
+                  'data-testid': 'putaway-table-cell',
                 })}
               />
             )

@@ -1,5 +1,6 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 import _ from 'lodash';
+import queryString from 'query-string';
 import { addTranslationForLanguage } from 'react-localize-redux';
 
 import {
@@ -8,7 +9,7 @@ import {
   ADD_STOCK_MOVEMENT_DRAFT,
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
-  CLEAR_CYCLE_COUNT_DATA,
+  CLEAR_COUNT_WORKFLOW,
   CLEAR_ERRORS_DATA,
   CLOSE_INFO_BAR,
   ERASE_DRAFT,
@@ -541,7 +542,7 @@ export function fetchSuppliers({
               id: obj.id,
               value: obj.id,
               name: obj.name,
-              label: `${obj.name}`,
+              label: obj.displayName,
             }
           ));
           dispatch({
@@ -568,7 +569,7 @@ export function fetchBuyers(active = false) {
               id: obj.id,
               value: obj.id,
               name: obj.name,
-              label: `${obj.name}`,
+              label: obj.displayName,
             }
           ));
           dispatch({
@@ -616,9 +617,12 @@ export function fetchInvoiceTypeCodes() {
   };
 }
 
-export function fetchShipmentStatusCodes() {
+export function fetchShipmentStatusCodes({ excludedStatuses = [] } = {}) {
   return (dispatch) => {
-    apiClient.get('/api/stockMovements/shipmentStatusCodes')
+    apiClient.get('/api/stockMovements/shipmentStatusCodes', {
+      params: { excludedStatuses },
+      paramsSerializer: (parameters) => queryString.stringify(parameters),
+    })
       .then((res) => {
         dispatch({
           type: FETCH_SHIPMENT_STATUS_CODES,
@@ -983,14 +987,14 @@ export const submitForm = (dispatch) => {
   });
 };
 
-export const clearCycleCountData = (dispatch) => {
-  dispatch({
-    type: CLEAR_CYCLE_COUNT_DATA,
-  });
-};
-
 export const clearErrorsData = (dispatch) => {
   dispatch({
     type: CLEAR_ERRORS_DATA,
+  });
+};
+
+export const clearCountWorkflow = (dispatch) => {
+  dispatch({
+    type: CLEAR_COUNT_WORKFLOW,
   });
 };

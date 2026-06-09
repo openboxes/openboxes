@@ -18,6 +18,7 @@ import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
 import ProductSelect from 'components/product-select/ProductSelect';
 import DateFormat from 'consts/dateFormat';
+import locationType from 'consts/locationType';
 import StockMovementStatus from 'consts/stockMovementStatus';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
@@ -34,6 +35,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 const FIELDS = {
   returnItems: {
     type: ArrayField,
+    overflowStyle: 'auto',
     maxTableHeight: 'calc(100vh - 500px)',
     getDynamicRowAttr: ({ rowValues, translate }) => {
       let className = '';
@@ -54,7 +56,7 @@ const FIELDS = {
       checked: {
         fieldKey: '',
         label: '',
-        flexWidth: '0.5',
+        fixedWidth: '1rem',
         type: ({
           // eslint-disable-next-line react/prop-types
           rowIndex, fieldValue, selectRow,
@@ -62,7 +64,7 @@ const FIELDS = {
           <Checkbox
             id={rowIndex.toString()}
             disabled={false}
-            className="ml-4"
+            className="ml-1 mr-1"
             value={fieldValue.checked}
             onChange={(value) => selectRow(value, rowIndex)}
           />
@@ -78,7 +80,8 @@ const FIELDS = {
         type: LabelField,
         label: 'react.outboundReturns.productName.label',
         defaultMessage: 'Product',
-        flexWidth: '4.5',
+        flexWidth: '4.2',
+        headerAlign: 'left',
         getDynamicAttr: ({ fieldValue }) => ({
           tooltipValue: fieldValue?.name,
         }),
@@ -98,7 +101,7 @@ const FIELDS = {
         type: LabelField,
         label: 'react.outboundReturns.expiry.label',
         defaultMessage: 'Expiry',
-        flexWidth: '1',
+        fixedWidth: '11ch',
         getDynamicAttr: ({ formatLocalizedDate }) => ({
           formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
         }),
@@ -107,21 +110,30 @@ const FIELDS = {
         type: LabelField,
         label: 'react.outboundReturns.qoh.label',
         defaultMessage: 'QOH',
+        headerAlign: 'right',
         flexWidth: '1',
+        attributes: {
+          className: 'text-right mr-1',
+        },
       },
       quantityNotPicked: {
         type: LabelField,
         label: 'react.outboundReturns.qtyNotPicked.label',
-        defaultMessage: 'Quantity Available to Return',
+        defaultMessage: 'Qty Available to Return',
         headerTooltip: 'react.outboundReturns.qtyNotPickedTooltip.label',
         headerDefaultTooltip: 'This is the quantity on hand that is not currently picked in a shipment',
-        flexWidth: '1',
+        multilineHeader: true,
+        headerAlign: 'right',
+        flexWidth: '1.2',
+        attributes: {
+          className: 'text-right mr-1',
+        },
       },
       originZone: {
         type: LabelField,
         label: 'react.outboundReturns.zone.label',
         defaultMessage: 'Zone',
-        flexWidth: '1',
+        flexWidth: '1.4',
         attributes: {
           showValueTooltip: true,
         },
@@ -139,6 +151,7 @@ const FIELDS = {
         type: TextField,
         label: 'react.outboundReturns.quantity.label',
         defaultMessage: 'Qty to Return',
+        headerAlign: 'right',
         flexWidth: '1',
         attributes: {
           type: 'number',
@@ -371,8 +384,7 @@ class AddItemsPage extends Component {
     return apiClient.get(url, {
       paramsSerializer: (parameters) => queryString.stringify(parameters),
       params: {
-        locationTypeCode: ['BIN_LOCATION', 'INTERNAL'],
-        ignoreActivityCodes: ['RECEIVE_STOCK'],
+        locationTypeCode: [locationType.BIN_LOCATION, locationType.INTERNAL],
         'location.id': this.props.locationId,
       },
     })

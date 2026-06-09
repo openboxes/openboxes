@@ -120,6 +120,7 @@ const DateField = ({
         utcOffset={0}
         placeholderText={placeholderText}
         popperContainer={RootPortalWrapper}
+        popperClassName="force-on-top"
         selected={selectedDate}
         highlightDates={highlightedDates}
         onChange={onChangeRaw || onChangeHandler}

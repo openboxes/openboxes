@@ -3,6 +3,7 @@
     <g:hiddenField name="id" value="${productAssociation?.id}"></g:hiddenField>
     <g:hiddenField name="product.id" value="${productAssociation?.product?.id}"></g:hiddenField>
     <g:hiddenField name="dialog" value="true"></g:hiddenField>
+    <g:hiddenField name="isFromProductEditPage" value="${isFromProductEditPage}" />
 
     <table>
         <tbody>

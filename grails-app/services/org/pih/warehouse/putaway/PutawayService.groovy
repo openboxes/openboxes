@@ -9,28 +9,40 @@
  **/
 package org.pih.warehouse.putaway
 
+import grails.core.GrailsApplication
 import grails.events.Event
 import grails.events.EventPublisher
 import grails.events.annotation.Publisher
 import grails.events.annotation.Subscriber
 import grails.gorm.transactions.Transactional
 import org.apache.commons.beanutils.BeanUtils
+import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
+import org.pih.warehouse.inventory.ProductAvailabilityService
+import org.springframework.beans.factory.annotation.Value
+
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderEventManager
+import org.pih.warehouse.order.OrderIdentifierService
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderService
@@ -38,22 +50,24 @@ import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAvailability
-import org.pih.warehouse.inventory.InventoryLevel
-import org.grails.web.json.JSONObject
-import org.pih.warehouse.core.User
-import org.pih.warehouse.order.OrderIdentifierService
+import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.shipping.Shipment
 import org.springframework.context.event.EventListener
 
 @Transactional
 class PutawayService implements EventPublisher  {
 
-    def userService
-    def inventoryService
-    def productAvailabilityService
+    UserService userService
+    InventoryService inventoryService
+    ProductAvailabilityService productAvailabilityService
+    GrailsApplication grailsApplication
     OrderIdentifierService orderIdentifierService
+    OrderEventManager orderEventManager
     OrderService orderService
-    def grailsApplication
 
+    @Value('${openboxes.receiving.createReceivingLocation.enabled:true}')
+    Boolean dynamicReceivingBinsEnabled
 
     Putaway getPutaway(String id) {
         Order putawayOrder = Order.get(id)
@@ -249,6 +263,72 @@ class PutawayService implements EventPublisher  {
         return filteredItems.collect { PutawayItem.createFromOrderItem(it) }
     }
 
+    /**
+     * Returns all putaway orders originating from the given shipment.
+     */
+    Collection<Order> getPutawayOrders(Shipment shipment) {
+        if (!shipment) {
+            return []
+        }
+
+        // Because we don't have a formal relationship between putaway order and receipt, if we are not creating
+        // designated receiving/putaway bins, we can't establish a unique mapping between the receipt and its putaway.
+        if (!dynamicReceivingBinsEnabled) {
+            return []
+        }
+
+        // A shipment can be received multiple times into multiple receiving bins, or multiple times into the same
+        // receiving bin, so check each receipt and collect to a unique set of putaways.
+        Set<Order> putaways = []
+        for (Receipt receipt in (shipment.receipts as SortedSet<Receipt>)) {
+            putaways.addAll(getPutawayOrders(receipt))
+        }
+        return putaways
+    }
+
+    /**
+     * Returns all putaway orders originating from the given receipt.
+     */
+    Collection<Order> getPutawayOrders(Receipt receipt) {
+        // TODO: This is an imperfect solution. We should model this relationship between receipt and putaways more
+        //       concretely in the database, likely via a OrderItem (ie putaway item) <-> ReceiptItem relationship.
+        Set<Order> putawayOrders = []
+        for (ReceiptItem receiptItem in receipt.receiptItems) {
+            // If the item was directly received to a non-receiving bin, there won't be any putaway orders.
+            Location receiptBinLocation = receiptItem.binLocation
+            if (!receiptBinLocation?.supports(ActivityCode.PUTAWAY_STOCK)) {
+                continue
+            }
+
+            /*
+             * If a location is not using direct putaways, a receipt is made into a newly created receiving bin.
+             * The putaway(s) of that receipt are putaway orders originating from that same receiving bin. Because we
+             * don't have a direct relationship between a receipt and a putaway, we link the two by relying on the fact
+             * that they operate on the same receiving bin location(s).
+             *
+             * Because we are generating new receiving bins for each receipt, we should be able to assume that the
+             * receiving bin does not get used for anything other than the initial receipt and its putaways. However,
+             * we don't strictly block users from using receiving bins as the origin for other stock movements, so
+             * we need to make sure to specifically filter for only the orders that are putaways.
+             */
+            List<Order> putawaysForReceipt = OrderItem.createCriteria().listDistinct {
+                projections {
+                    property "order"
+                }
+                eq("inventoryItem", receiptItem.inventoryItem)
+                eq("originBinLocation", receiptItem.binLocation)
+                order {
+                    orderType {
+                        eq("code", Constants.PUTAWAY_ORDER)
+                    }
+                }
+            } as List<Order>
+            putawayOrders.addAll(putawaysForReceipt)
+        }
+
+        return putawayOrders
+    }
+
     void processSplitItems(Putaway putaway) {
 
         putaway.putawayItems.toArray().each { PutawayItem oldPutawayItem ->
@@ -297,9 +377,36 @@ class PutawayService implements EventPublisher  {
             inventoryService.transferStock(command)
         }
 
+        createPutawayEvent(order, putaway)
+
         grailsApplication.mainContext.publishEvent(new PutawayCompletedEvent(putaway))
 
         return order
+    }
+
+    /**
+     * Create a putaway event and log its occurrence.
+     */
+    private void createPutawayEvent(Order order, Putaway putaway) {
+        EventCode eventCode = !dynamicReceivingBinsEnabled || isFinalPutaway(order, putaway) ?
+                EventCode.PUTAWAY :
+                EventCode.PARTIALLY_PUTAWAY
+
+        orderEventManager.createPutawayEvent(order, putaway, eventCode)
+    }
+
+    /**
+     * Returns true if after the given putaway is completed, all receipts of the original inbound will have
+     * been put away.
+     */
+    private boolean isFinalPutaway(Order order, Putaway putaway) {
+        // TODO: We currently do not have a distinction between partial and final putaways. This will need to be
+        //       implemented once we get a better sense of the requirements and can design a more long term solution.
+        // 1) Fetch all completed receipts whose destination receiving bin is the same as the bin the putaway is originating from
+        // 2) Fetch all completed putaways matching each of the receipts
+        // 3) Do a diff between the quantity in the receipts and their matching putaways
+        // 4) If there is no remaining quantity after factoring in this putaway, this is the final putaway
+        return true
     }
 
     Order savePutaway(Putaway putaway) {

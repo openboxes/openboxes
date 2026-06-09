@@ -62,6 +62,10 @@ const StockMovementInboundTable = ({
       href: STOCK_MOVEMENT_URL.show,
     };
 
+    if (isReturn) {
+      showAction.href = () => STOCK_MOVEMENT_URL.show(order?.id);
+    }
+
     actions.push(showAction);
 
     // Edit
@@ -151,12 +155,13 @@ const StockMovementInboundTable = ({
       minWidth: 130,
       Cell: (row) => {
         const {
-          id, shipmentType,
+          isReturn, order, id, shipmentType,
         } = row.original;
+        const stockMovementId = isReturn ? order?.id : id;
         return (
           <TableCell
             {...row}
-            link={STOCK_MOVEMENT_URL.show(id)}
+            link={STOCK_MOVEMENT_URL.show(stockMovementId)}
             tooltip
             tooltipLabel={getShipmentTypeTooltip(translate, shipmentType?.displayName)}
           >
@@ -175,13 +180,14 @@ const StockMovementInboundTable = ({
       sortable: false,
       Cell: (row) => {
         const {
-          id, description, name,
+          isReturn, id, order, description, name,
         } = row.original;
+        const stockMovementId = isReturn ? order?.id : id;
         return (
           <TableCell
             {...row}
             tooltip
-            link={STOCK_MOVEMENT_URL.show(id)}
+            link={STOCK_MOVEMENT_URL.show(stockMovementId)}
             value={description || name}
           />
         );

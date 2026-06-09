@@ -11,6 +11,7 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
+import picklistApi from 'api/services/PicklistApi';
 import ArrayField from 'components/form-elements/ArrayField';
 import FilterInput from 'components/form-elements/FilterInput';
 import LabelField from 'components/form-elements/LabelField';
@@ -27,7 +28,12 @@ import {
   handleValidationErrors,
 } from 'utils/apiClient';
 import { renderFormField, setColumnValue } from 'utils/form-utils';
-import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
+import {
+  formatProductDisplayName,
+  getBinLocationToDisplay,
+  matchesItemFilter,
+  matchesProductCodeOrName,
+} from 'utils/form-values-utils';
 import { debouncePeopleFetch } from 'utils/option-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -45,10 +51,16 @@ const FIELDS = {
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     getDynamicRowAttr: ({ rowValues, itemFilter }) => {
+      const { binLocation, product, lotNumber } = rowValues ?? {};
+      const binLocationValue = getBinLocationToDisplay(binLocation);
       const hideRow = itemFilter
-        && !matchesProductCodeOrName({
-          product: rowValues?.product,
+        && !matchesItemFilter({
           filterValue: itemFilter,
+          matchers: [
+            (filterValue) => matchesProductCodeOrName({ product, filterValue }),
+            lotNumber,
+            binLocationValue,
+          ],
         });
       return { hideRow };
     },
@@ -326,6 +338,49 @@ class PackingPage extends Component {
     return !!this.state.values.packPageItems[index];
   }
 
+  importTemplate(event) {
+    this.props.showSpinner();
+    if (this.state.showAlert) {
+      this.setState({ alertMessage: null, showAlert: false });
+    }
+    const file = event.target.files[0];
+    const { stockMovementId } = this.state.values;
+
+    return picklistApi.importPacklist(stockMovementId, file)
+      .then((resp) => {
+        const { errors } = resp.data;
+        if (errors && errors.length) {
+          this.setState({
+            showAlert: true,
+            alertMessage: errors,
+          });
+        }
+        this.fetchItemsAfterImport();
+      })
+      .finally(() => this.props.hideSpinner());
+  }
+
+  fetchItemsAfterImport() {
+    this.fetchLineItems().then((response) => {
+      const { data } = response.data;
+      this.setState((prev) => ({
+        values: {
+          ...prev.values,
+          packPageItems: data,
+        },
+      }));
+    });
+  }
+
+  handleExport(formValues) {
+    this.props.showSpinner();
+    const { movementNumber, stockMovementId } = formValues;
+
+    const fileName = `PackListItems${movementNumber ? `-${movementNumber}` : ''}-template`;
+    picklistApi.exportPacklistTemplate(stockMovementId, { fileName })
+      .finally(() => this.props.hideSpinner());
+  }
+
   /**
    * Fetches 5th step data from current stock movement.
    * @public
@@ -430,10 +485,15 @@ class PackingPage extends Component {
     const { packPageItems } = formValues;
     const isAnyLineHidden = this.state.itemFilter
       && packPageItems.some((rowValue) => {
-        const { product } = rowValue;
-        return !matchesProductCodeOrName({
-          product,
+        const { product, lotNumber, binLocation } = rowValue;
+        const binLocationValue = getBinLocationToDisplay(binLocation);
+        return !matchesItemFilter({
           filterValue: this.state.itemFilter,
+          matchers: [
+            (filterValue) => matchesProductCodeOrName({ product, filterValue }),
+            lotNumber,
+            binLocationValue,
+          ],
         });
       });
     if (isAnyLineHidden) {
@@ -537,6 +597,42 @@ class PackingPage extends Component {
                     onClear={() => this.setState({ itemFilter: '' })}
                     inputRef={this.inputRef}
                   />
+                  <label
+                    htmlFor="csvInput"
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs mr-1"
+                  >
+                    <span>
+                      <i className="fa fa-download pr-2" />
+                      <Translate
+                        id="react.default.button.importTemplate.label"
+                        defaultMessage="Import template"
+                      />
+                    </span>
+                    <input
+                      id="csvInput"
+                      type="file"
+                      style={{ display: 'none' }}
+                      onChange={(event) => this.importTemplate(event)}
+                      onClick={(event) => {
+                        // eslint-disable-next-line no-param-reassign
+                        event.target.value = null;
+                      }}
+                      accept=".csv"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => this.handleExport(values)}
+                    className="dropdown-button float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                  >
+                    <span>
+                      <i className="fa fa-sign-out pr-2" />
+                      <Translate
+                        id="react.default.button.exportTemplate.label"
+                        defaultMessage="Export template"
+                      />
+                    </span>
+                  </button>
                   <button
                     type="button"
                     onClick={() => this.refresh()}
@@ -551,7 +647,7 @@ class PackingPage extends Component {
                     type="button"
                     disabled={invalid}
                     onClick={() => this.save(values)}
-                    className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-3"
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                   >
                     <span>
                       <i className="fa fa-save pr-2" />
@@ -562,14 +658,18 @@ class PackingPage extends Component {
                     type="button"
                     disabled={invalid}
                     onClick={() =>
-                      this.savePackingData(values.packPageItems).then(() => {
-                        window.location = STOCK_MOVEMENT_URL.show(values.stockMovementId);
-                      })}
-                    className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                      this.savePackingData(values.packPageItems)
+                        .then(() => {
+                          window.location = STOCK_MOVEMENT_URL.show(values.stockMovementId);
+                        })}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                   >
                     <span>
                       <i className="fa fa-sign-out pr-2" />
-                      <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
+                      <Translate
+                        id="react.default.button.saveAndExit.label"
+                        defaultMessage="Save and exit"
+                      />
                     </span>
                   </button>
                 </span>
@@ -588,7 +688,7 @@ class PackingPage extends Component {
                     {' '}
                   </span>
                 </button>
-              ) }
+              )}
             <form onSubmit={handleSubmit}>
               <div className="table-form">
                 {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {

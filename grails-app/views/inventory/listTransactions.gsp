@@ -111,15 +111,15 @@
                                                             <g:link action="showTransaction" id="${transactionInstance?.id }">
                                                                 <img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}" style="vertical-align: middle;"/>&nbsp;<g:message code="default.button.show.label"/>
                                                             </g:link>
+                                                            <g:isSuperuser>
                                                             <g:link action="editTransaction" id="${transactionInstance?.id }">
                                                                 <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" style="vertical-align: middle;"/>&nbsp;<g:message code="default.button.edit.label"/>
                                                             </g:link>
                                                             <hr/>
-                                                            <g:isUserAdmin>
-                                                                <g:link action="deleteTransaction" id="${transactionInstance?.id }">
-                                                                    <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" style="vertical-align: middle;"/>&nbsp;<g:message code="default.button.delete.label"/>
-                                                                </g:link>
-                                                            </g:isUserAdmin>
+                                                            <g:link action="deleteTransaction" id="${transactionInstance?.id }">
+                                                                <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" style="vertical-align: middle;"/>&nbsp;<g:message code="default.button.delete.label"/>
+                                                            </g:link>
+                                                            </g:isSuperuser>
                                                         </div>
                                                     </div>
                                                 </div>

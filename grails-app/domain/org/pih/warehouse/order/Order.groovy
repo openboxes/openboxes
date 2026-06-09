@@ -13,6 +13,8 @@ import grails.util.Holders
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.*
+import org.pih.warehouse.core.history.EventLog
+import org.pih.warehouse.core.history.Historizable
 import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.invoice.InvoiceTypeCode
 import org.pih.warehouse.picklist.Picklist
@@ -20,7 +22,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
-class Order implements Serializable {
+class Order implements Serializable, Historizable {
 
     def beforeInsert() {
         createdBy = AuthService.currentUser
@@ -137,6 +139,7 @@ class Order implements Serializable {
             documents: Document,
             events: Event,
             orderAdjustments: OrderAdjustment,
+            eventLogs: EventLog,
     ]
     static hasOne = [picklist: Picklist]
     static mapping = {
@@ -146,6 +149,8 @@ class Order implements Serializable {
         comments cascade: "all-delete-orphan"
         documents cascade: "all-delete-orphan"
         events cascade: "all-delete-orphan"
+        eventLogs(joinTable: [name: 'order_event_log', key: 'order_id', column: 'event_log_id'],
+                  cascade: "all-delete-orphan")
     }
 
     static constraints = {
@@ -610,6 +615,18 @@ class Order implements Serializable {
             default:
                 return toJson()
         }
+    }
+
+    @Override
+    ReferenceDocument getReferenceDocument() {
+        return new ReferenceDocument(
+                label: orderNumber,
+                url: "/openboxes/order/show/${id}",
+                id: id,
+                identifier: orderNumber,
+                description: description,
+                name: name,
+        )
     }
 
     Set<Product> getAssociatedProducts() {

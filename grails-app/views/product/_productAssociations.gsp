@@ -47,7 +47,7 @@
 
                         <td>
 
-                            <g:link controller="productAssociation" action="edit" id="${productAssociation.id}" class="button">
+                            <g:link controller="productAssociation" action="edit" id="${productAssociation.id}" class="button" params="[isFromProductEditPage: true]">
                                 <g:message code="default.button.edit.label"/>
                             </g:link>
 

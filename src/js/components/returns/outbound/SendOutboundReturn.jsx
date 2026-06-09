@@ -11,6 +11,7 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
+import stockMovementApi from 'api/services/StockMovementApi';
 import ArrayField from 'components/form-elements/ArrayField';
 import DateField from 'components/form-elements/DateField';
 import LabelField from 'components/form-elements/LabelField';
@@ -19,6 +20,7 @@ import TextField from 'components/form-elements/TextField';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import DocumentsDropdown from 'utils/DocumentsDropdown';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -116,6 +118,7 @@ const SHIPMENT_FIELDS = {
 const FIELDS = {
   picklistItems: {
     type: ArrayField,
+    overflowStyle: 'auto',
     getDynamicRowAttr: ({ rowValues, translate }) => {
       let className = '';
       let tooltip = '';
@@ -134,7 +137,7 @@ const FIELDS = {
     fields: {
       'product.productCode': {
         type: LabelField,
-        label: 'react.stockMovement.productCode.label',
+        label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
         flexWidth: '0.5',
       },
@@ -142,22 +145,37 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
-        flexWidth: '2',
+        flexWidth: '3.7',
         headerAlign: 'left',
         getDynamicAttr: ({ fieldValue }) => ({
           tooltipValue: fieldValue?.name,
         }),
         attributes: {
           formatValue: formatProductDisplayName,
-          showValueTooltip: true,
           className: 'text-left ml-1',
+          showValueTooltip: true,
         },
+      },
+      lotNumber: {
+        type: LabelField,
+        label: 'react.outboundReturns.lot.label',
+        defaultMessage: 'Lot',
+        flexWidth: '1',
+      },
+      expirationDate: {
+        type: LabelField,
+        label: 'react.outboundReturns.expiry.label',
+        defaultMessage: 'Expiry',
+        fixedWidth: '11ch',
+        getDynamicAttr: ({ formatLocalizedDate }) => ({
+          formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
+        }),
       },
       originZone: {
         type: LabelField,
         label: 'react.outboundReturns.zone.label',
         defaultMessage: 'Zone',
-        flexWidth: '0.5',
+        flexWidth: '1',
         attributes: {
           showValueTooltip: true,
         },
@@ -174,26 +192,15 @@ const FIELDS = {
           formatValue: (value) => value || 'DEFAULT',
         }),
       },
-      lotNumber: {
-        type: LabelField,
-        label: 'react.outboundReturns.lot.label',
-        defaultMessage: 'Lot',
-        flexWidth: '1',
-      },
-      expirationDate: {
-        type: LabelField,
-        label: 'react.outboundReturns.expiry.label',
-        defaultMessage: 'Expiry',
-        flexWidth: '1',
-        getDynamicAttr: ({ formatLocalizedDate }) => ({
-          formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
-        }),
-      },
       quantity: {
         type: LabelField,
         label: 'react.outboundReturns.quantity.label',
         defaultMessage: 'Qty to Return',
+        headerAlign: 'right',
         flexWidth: '1',
+        attributes: {
+          className: 'text-right mr-1',
+        },
       },
     },
   },
@@ -204,6 +211,7 @@ class SendMovementPage extends Component {
     super(props);
     this.state = {
       shipmentTypes: [],
+      documents: [],
       values: { outboundReturn: { ...this.props.initialValues } },
     };
 
@@ -216,6 +224,7 @@ class SendMovementPage extends Component {
     if (this.props.outboundReturnsTranslationsFetched) {
       this.dataFetched = true;
       this.fetchOutboundReturn();
+      this.fetchDocuments();
     }
   }
 
@@ -223,6 +232,16 @@ class SendMovementPage extends Component {
     if (nextProps.outboundReturnsTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchOutboundReturn();
+    }
+  }
+
+  async fetchDocuments() {
+    try {
+      const response = await stockMovementApi
+        .getDocuments(this.props.match.params.outboundReturnId);
+      this.setState({ documents: response.data.data || [] });
+    } catch (e) {
+      this.props.hideSpinner();
     }
   }
 
@@ -438,13 +457,14 @@ class SendMovementPage extends Component {
           <form onSubmit={handleSubmit}>
             <div className="classic-form classic-form-condensed">
               <span className="buttons-container classic-form-buttons">
+                <DocumentsDropdown documents={this.state.documents} />
                 { !(values && values.status === 'COMPLETED')
                   ? (
                     <span>
                       <button
                         type="button"
                         onClick={() => this.save(values)}
-                        className="btn btn-outline-secondary float-right btn-form btn-xs"
+                        className="btn btn-outline-secondary float-right btn-form btn-xs ml-1"
                         disabled={invalid}
                       >
                         <span>

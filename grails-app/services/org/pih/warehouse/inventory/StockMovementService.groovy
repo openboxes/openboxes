@@ -11,7 +11,7 @@ package org.pih.warehouse.inventory
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
-import grails.orm.PagedResultList
+import grails.gorm.PagedResultList
 import grails.plugins.csv.CSVMapReader
 import grails.validation.ValidationException
 import org.grails.plugins.web.taglib.ApplicationTagLib
@@ -41,13 +41,18 @@ import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.StockMovementItemParamsCommand
 import org.pih.warehouse.core.StockMovementItemsParamsCommand
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
+import org.pih.warehouse.core.history.HistoryContext
+import org.pih.warehouse.core.history.HistoryItem
+import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.data.DataService
+import org.pih.warehouse.data.PersonService
 import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.order.Order
@@ -55,6 +60,8 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderService
 import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
+import org.pih.warehouse.packList.ImportPackListCommand
+import org.pih.warehouse.packList.ImportPackListItemCommand
 import org.pih.warehouse.picking.PickTaskService
 import org.pih.warehouse.picklist.PicklistImportDataCommand
 import org.pih.warehouse.picklist.PicklistItemCommand
@@ -108,6 +115,9 @@ class StockMovementService {
     UserService userService
     RequisitionDataService requisitionDataService
     GrailsApplication grailsApplication
+    StockMovementHistoryProvider stockMovementHistoryProvider
+    MessageLocalizer messageLocalizer
+    PersonService personService
     ReceiptService receiptService
     PutawayService putawayService
     OrderService orderService
@@ -446,7 +456,7 @@ class StockMovementService {
         }
     }
 
-    def getInboundStockMovements(StockMovement criteria, Map params) {
+    PagedResultList<InboundStockMovementListItem> getInboundStockMovements(StockMovement criteria, Map params) {
         def max = params.max ? params.int("max") : null
         def offset = params.offset ? params.int("offset") : null
         Date createdAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
@@ -454,7 +464,7 @@ class StockMovementService {
         List<ShipmentType> shipmentTypes = params.list("shipmentType") ? params.list("shipmentType").collect{ ShipmentType.read(it) } : null
         Location currentLocation = AuthService.currentLocation
 
-        PagedResultList shipments = Shipment.createCriteria().list(max: max, offset: offset) {
+        PagedResultList<InboundStockMovementListItem> stockMovements = InboundStockMovementListItem.createCriteria().list(max: max, offset: offset) {
             // OBPIH-6403: We want to hide SMs with requisition of status REJECTED from the inbound list (only for the depot-depot case!!)
             // The "or" is needed, because otherwise, SMs without requisition were also filtered out from the list (e.g. shipment from PO)
             if (!currentLocation?.downstreamConsumer) {
@@ -469,7 +479,7 @@ class StockMovementService {
             if (criteria?.identifier || criteria.name || criteria?.description) {
                 or {
                     if (criteria?.identifier) {
-                        ilike("shipmentNumber", criteria.identifier)
+                        ilike("identifier", criteria.identifier)
                     }
                     if (criteria?.name) {
                         ilike("name", criteria.name)
@@ -486,15 +496,7 @@ class StockMovementService {
                 eq("createdBy", criteria?.createdBy)
             }
             if (criteria.requestedBy) {
-                or {
-                    requisition(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                        eq("requestedBy", criteria?.requestedBy)
-                    }
-                    and {
-                        isNull("requisition")
-                        eq("createdBy", criteria?.requestedBy)
-                    }
-                }
+                eq("requestedBy", criteria?.requestedBy)
             }
             if (criteria.updatedBy) {
                 eq("updatedBy", criteria.updatedBy)
@@ -506,7 +508,12 @@ class StockMovementService {
                 le("dateCreated", createdBefore)
             }
             if (shipmentTypes) {
-                'in'("shipmentType", shipmentTypes)
+                or {
+                    'in'("shipmentType", shipmentTypes)
+                    if (shipmentTypes.any { it.id == Constants.DEFAULT_SHIPMENT_TYPE_ID }) {
+                        isNull("shipmentType")
+                    }
+                }
             }
 
             if (params.sort) {
@@ -519,17 +526,13 @@ class StockMovementService {
                         order("name", params.order ?: "desc")
                     }
                 } else if (params.sort == "dateRequested") {
-                    requisition {
-                        order("dateRequested", params.order ?: "desc")
-                    }
+                    order("dateRequested", params.order ?: "desc")
                 } else if (params.sort == "stocklist.name") {
-                    requisition(JoinType.LEFT_OUTER_JOIN.joinTypeValue)  {
-                        requisitionTemplate(JoinType.LEFT_OUTER_JOIN.joinTypeValue)  {
-                            order("name", params.order ?: "desc")
-                        }
+                    stocklist(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        order("name", params.order ?: "desc")
                     }
                 } else if (params.sort == "identifier") {
-                    order("shipmentNumber", params.order ?: "desc")
+                    order("identifier", params.order ?: "desc")
                 } else {
                     order(params.sort, params.order ?: "desc")
                 }
@@ -537,14 +540,8 @@ class StockMovementService {
                 order("dateCreated", "desc")
             }
         }
-        List<StockMovement> stockMovements = shipments.collect { Shipment shipment ->
-            if (shipment.requisition) {
-                return StockMovement.createFromRequisition(shipment.requisition, params.includeStockMovementItems)
-            } else {
-                return StockMovement.createFromShipment(shipment, params.includeStockMovementItems)
-            }
-        }
-        return new PaginatedList<StockMovement>(stockMovements, shipments.totalCount)
+
+        return stockMovements
     }
 
     def getOutboundStockMovements(Integer maxResults, Integer offset) {
@@ -1153,6 +1150,160 @@ class StockMovementService {
         return packPageItems
     }
 
+    List<Map<String, String>> buildPackTemplateLineItems(String stockMovementId) {
+        Map<String, String> csvHeadings = [
+                id: messageLocalizer.localize('default.id.label'),
+                productCode: messageLocalizer.localize('product.productCode.label'),
+                productName: messageLocalizer.localize('product.name.label'),
+                binLocation: messageLocalizer.localize('inventoryItem.binLocation.label'),
+                lotNumber: messageLocalizer.localize('inventoryItem.lotNumber.label'),
+                expirationDate: messageLocalizer.localize('inventoryItem.expirationDate.label'),
+                quantityShipped: messageLocalizer.localize('shipping.quantityShipped.label'),
+                unitOfMeasure: messageLocalizer.localize('product.unitOfMeasure.label'),
+                recipient: messageLocalizer.localize('shipping.recipient.label'),
+                palletName: messageLocalizer.localize('packLevel1.label'),
+                boxName: messageLocalizer.localize('packLevel2.label'),
+        ]
+
+        List<PackPageItem> packPageItems = getPackPageItems(stockMovementId, null, null)
+
+        // We need to create at least one row to ensure an empty template
+        if (packPageItems?.empty) {
+            packPageItems.add(new PackPageItem())
+        }
+
+        return packPageItems.collect { PackPageItem packPageItem ->
+            ShipmentItem shipmentItem = packPageItem?.shipmentItem
+            [
+                    "${csvHeadings.id}"             : shipmentItem?.id ?: "",
+                    "${csvHeadings.productCode}"    : shipmentItem?.product?.productCode ?: "",
+                    "${csvHeadings.productName}"    : shipmentItem?.product?.displayNameWithLocaleCode ?: "",
+                    "${csvHeadings.binLocation}"    : shipmentItem?.binLocation?.name ?: "",
+                    "${csvHeadings.lotNumber}"      : shipmentItem?.lotNumber ?: "",
+                    "${csvHeadings.expirationDate}" : shipmentItem?.expirationDate ?
+                            shipmentItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
+                    "${csvHeadings.quantityShipped}": shipmentItem?.quantity == null ? "" : shipmentItem.quantity,
+                    "${csvHeadings.unitOfMeasure}"  : shipmentItem?.product?.unitOfMeasure ?: "",
+                    "${csvHeadings.recipient}"      : shipmentItem?.recipient?.name ?: "",
+                    "${csvHeadings.palletName}"     : packPageItem?.palletName ?: "",
+                    "${csvHeadings.boxName}"        : packPageItem?.boxName ?: "",
+            ]
+        } as List<Map<String, String>>
+    }
+
+    List<String> processPackListImport(ImportPackListCommand command, String stockMovementId) {
+        command.stockMovement = getStockMovement(stockMovementId)
+        command.location = command.location ?: AuthService.currentLocation
+        command.packImportItems = parsePackCsvTemplateImport(command)
+
+        validatePackListImport(command)
+
+        List<String> errors = []
+        errors.addAll(command.errors.allErrors.collect { messageLocalizer.localize(it.code, it.arguments) })
+        command.packImportItems.eachWithIndex { ImportPackListItemCommand row, int index ->
+            row.errors.allErrors.each {
+                errors << "Row ${index + 1}: ${messageLocalizer.localize(it.code, it.arguments)}"
+            }
+        }
+
+        importPackListItems(command)
+
+        return errors
+    }
+
+    List<ImportPackListItemCommand> parsePackCsvTemplateImport(ImportPackListCommand command) {
+        try {
+            String text = new String(command.importFile.bytes)
+
+            // Field positions match buildPackTemplateLineItems export order.
+            List<String> fieldKeys = [
+                    'id',
+                    'code',
+                    'name',
+                    'binLocation',
+                    'lotNumber',
+                    'expirationDate',
+                    'quantityShipped',
+                    'unitOfMeasure',
+                    'recipient',
+                    'packLevel1',
+                    'packLevel2',
+            ]
+            char separatorChar = CSVUtils.getSeparator(text, fieldKeys.size())
+
+            CSVMapReader csvMapReader = new CSVMapReader(
+                    new StringReader(text),
+                    [skipLines: 1, separatorChar: separatorChar]
+            )
+            csvMapReader.fieldKeys = fieldKeys
+            return csvMapReader.toList().collect { it ->
+                new ImportPackListItemCommand(
+                        id: it.id,
+                        packLevel1: it.packLevel1,
+                        packLevel2: it.packLevel2,
+                        recipient: it.recipient,
+                )
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing pack template CSV: " + e.message, e)
+        }
+    }
+
+    private void validatePackImportRow(ImportPackListItemCommand row, PackPageItem matchingItem) {
+        row.validate()
+
+        if (!row.id) {
+            return
+        }
+
+        if (!matchingItem) {
+            row.errors.rejectValue(
+                    "id",
+                    "packImportDataCommand.shipmentItem.notFound.error",
+                    [row.id] as Object[],
+                    "Shipment item with id: ${row.id} not found"
+            )
+            return
+        }
+
+        if (row.recipient && !Person.findByNameOrEmail(row.recipient)) {
+            row.errors.rejectValue(
+                    "recipient",
+                    "packImportDataCommand.recipient.notFound.error",
+                    [row.recipient] as Object[],
+                    "Recipient {0} not found"
+            )
+        }
+    }
+
+    void validatePackListImport(ImportPackListCommand command) {
+        List<PackPageItem> packPageItems = getPackPageItems(command.stockMovement.id, null, null)
+
+        command.packImportItems.each { ImportPackListItemCommand row ->
+            PackPageItem matchingItem = packPageItems.find { it.shipmentItem?.id == row.id }
+            validatePackImportRow(row, matchingItem)
+        }
+    }
+
+    void importPackListItems(ImportPackListCommand command) {
+        Shipment shipment = command.stockMovement.shipment
+
+        for (row in command.packImportItems) {
+            if (row.hasErrors()) {
+                continue
+            }
+
+            ShipmentItem shipmentItem = ShipmentItem.get(row.id)
+            if (!shipmentItem) {
+                continue
+            }
+
+            shipmentItem.recipient = row.recipient ? personService.getPerson(row.recipient) : shipmentItem.recipient
+            shipmentItem.container = createOrUpdateContainer(shipment, row.packLevel1, row.packLevel2)
+            shipmentItem.save()
+        }
+    }
+
     List<PicklistItemCommand> parsePickCsvTemplateImport(PicklistImportDataCommand command) {
 
         try {
@@ -1650,6 +1801,28 @@ class StockMovementService {
                 getShipmentBasedStockMovementReceiptItems(stockMovement)
     }
 
+    /**
+     * Returns the full, chronological history of the events that have occurred on a stock movement.
+     */
+    List<HistoryItem> getHistory(StockMovement stockMovement) {
+        HistoryContext context = new HistoryContext(
+                includeRolledBackEvents: true,
+        )
+        return stockMovementHistoryProvider.getHistory(stockMovement, context)
+    }
+
+    /**
+     * Returns the most recently added event that occurred on a stock movement.
+     */
+    HistoryItem getLatestHistoryItem(StockMovement stockMovement) {
+        HistoryContext context = new HistoryContext(
+                includeRolledBackEvents: true,  // Noting that we *do* want to count rollbacks here
+                limit: 1,
+        )
+        List<HistoryItem> historyItems = stockMovementHistoryProvider.getHistory(stockMovement, context)
+        return historyItems ? historyItems[0] : null
+    }
+
     List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(def stockMovement) {
         def shipments = Shipment.findAllByRequisition(stockMovement.requisition)
         List<ReceiptItem> receiptItems = shipments*.receipts?.flatten()*.sortReceiptItemsBySortOrder()?.flatten()
@@ -2007,7 +2180,7 @@ class StockMovementService {
         // Server-side safeguard: total allocated and total picked must not exceed quantity required
         Integer totalAllocated = picklistItems?.sum { (it.quantityAllocated ?: 0) as Integer } ?: 0
         Integer totalPicked = picklistItems?.sum { (it.quantityPicked ?: 0) as Integer } ?: 0
-        
+
         if (totalAllocated > quantityRequired) {
             throw new IllegalArgumentException("Total allocated quantity (${totalAllocated}) exceeds quantity required (${quantityRequired})")
         }
@@ -3369,6 +3542,15 @@ class StockMovementService {
         return true
     }
 
+    List<Map> getDocuments(String stockMovementId) {
+        // First attempt to get outbound stock movement, because stock movement throws exception if it can't find a
+        // stock movement with the given ID, while outbound stock movement will return null if it can't find a match
+        def stockMovement = outboundStockMovementService.getStockMovement(stockMovementId) ?: getStockMovement(stockMovementId)
+        if (!stockMovement) {
+            throw new IllegalArgumentException("Could not find stock movement with ID ${stockMovementId}")
+        }
+        return getDocuments(stockMovement)
+    }
 
     List<Map> getDocuments(def stockMovement) {
         def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
@@ -3479,6 +3661,14 @@ class StockMovementService {
                             contentType : "application/vnd.ms-excel",
                             stepNumber  : 5,
                             uri         : g.createLink(controller: 'doc4j', action: "downloadCertificateOfDonation", id: stockMovement?.shipment?.id, absolute: true)
+                    ],
+                    [
+                            name        : g.message(code: "requisition.deliveryNote.label", default: "Delivery Note"),
+                            documentType: DocumentGroupCode.DELIVERY_NOTE.name(),
+                            contentType : "text/html",
+                            stepNumber  : 5,
+                            uri         : g.createLink(controller: 'deliveryNote', action: "printOutboundReturn", id: stockMovement?.shipment?.id, absolute: true),
+                            hidden      : !stockMovement?.isReturn || getStockMovementDirection(stockMovement) != StockMovementDirection.OUTBOUND
                     ],
                     [
                             name        : g.message(code: "goodsReceiptNote.label"),
@@ -3640,6 +3830,20 @@ class StockMovementService {
             requisition.dateApproved = null
             requisition.dateRejected = null
         }
+    }
+
+    // def = StockMovement or OutboundStockMovement
+    StockMovementDirection getStockMovementDirection(def stockMovement) {
+        if (stockMovement instanceof OutboundStockMovement) {
+            return StockMovementDirection.OUTBOUND
+        }
+
+        if (stockMovement instanceof StockMovement) {
+            Location currentLocation = AuthService.currentLocation
+            return stockMovement.getStockMovementDirection(currentLocation)
+        }
+
+        return null
     }
 
     Boolean canRollbackApproval(Location location, User user, StockMovement stockMovement) {

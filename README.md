@@ -43,7 +43,7 @@ See [our website](https://openboxes.com/features/) for a list of some of the pri
 ## Quickstart Guide
 See our [local setup instructions](https://openboxes.gitbook.io/contributor-guide/software-development/onboarding/running-openboxes-locally) for a step-by-step guide on how to quickly get an OpenBoxes server running on your local machine.
 
-If you're a system administrator looking to deploy the application to a production server, take a look at our [installation documentation](http://docs.openboxes.com/en/latest/installation/) instead.
+If you're a system administrator looking to deploy the application to a production server, take a look at our [installation documentation](https://docs.openboxes.com/en/latest/admin-guide/installation/) instead.
 
 <br>
 

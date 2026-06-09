@@ -8,15 +8,17 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
+import { RiDeleteBinLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
+import { Tooltip } from 'react-tippy';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import { STOCK_MOVEMENT_STATUS, STOCK_MOVEMENT_UPDATE_ITEMS } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
-import ButtonField from 'components/form-elements/ButtonField';
+import FilterInput from 'components/form-elements/FilterInput';
 import LabelField from 'components/form-elements/LabelField';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import TextField from 'components/form-elements/TextField';
@@ -33,28 +35,6 @@ import { isRequestFromWard, supports } from 'utils/supportedActivitiesUtils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
-function addButton({
-  // eslint-disable-next-line react/prop-types
-  addRow, getSortOrder, newItemAdded, updateTotalCount,
-}) {
-  return (
-    <button
-      type="button"
-      className="btn btn-outline-success btn-xs"
-      onClick={() => {
-        updateTotalCount(1);
-        addRow({ sortOrder: getSortOrder() });
-        newItemAdded();
-      }}
-    >
-      <span>
-        <i className="fa fa-plus pr-2" />
-        <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
-      </span>
-    </button>
-  );
-}
 
 // Used for util function to calculate quantityRequested for requests from wards
 // where quantityRequested is calculated by subtracting one of below from QOH
@@ -89,6 +69,7 @@ const FIELDS = {
     flexWidth: '1.7',
     attributes: {
       type: 'number',
+      className: 'text-right',
     },
   },
   quantityOnHandAtRequestSite: {
@@ -104,9 +85,10 @@ const FIELDS = {
     type: LabelField,
     label: 'react.stockMovement.available.label',
     defaultMessage: 'Available',
-    flexWidth: '1.7',
+    flexWidth: '2.2',
     attributes: {
       type: 'number',
+      className: 'text-right',
     },
   },
   quantityAllowed: {
@@ -122,15 +104,18 @@ const FIELDS = {
     type: LabelField,
     label: 'react.stockMovement.demandPerMonth.label',
     defaultMessage: 'Demand per Month',
-    flexWidth: '1.7',
+    multilineHeader: true,
+    flexWidth: '2.5',
     attributes: {
       type: 'number',
+      className: 'text-right',
     },
   },
   quantityRequested: {
     type: TextField,
     label: 'react.stockMovement.neededQuantity.label',
     defaultMessage: 'Needed Qty',
+    multilineHeader: true,
     flexWidth: '1.7',
     attributes: {
       type: 'number',
@@ -140,7 +125,7 @@ const FIELDS = {
     type: TextField,
     label: 'react.stockMovement.comments.label',
     defaultMessage: 'Comments',
-    flexWidth: '1.7',
+    flexWidth: '6',
     getDynamicAttr: ({
       addRow, rowCount, rowIndex, getSortOrder,
       updateTotalCount, updateRow, values,
@@ -181,26 +166,27 @@ const FIELDS = {
 };
 
 const DELETE_BUTTON_FIELD = {
-  type: ButtonField,
-  label: 'react.default.button.delete.label',
-  defaultMessage: 'Delete',
   flexWidth: '1',
   fieldKey: '',
-  buttonLabel: 'react.default.button.delete.label',
-  buttonDefaultMessage: 'Delete',
-  getDynamicAttr: ({
-    fieldValue, removeItem, removeRow, updateTotalCount,
-  }) => ({
-    onClick: fieldValue && fieldValue.id ? () => {
-      removeItem(fieldValue.id).then(() => {
-        updateTotalCount(-1);
-        removeRow();
-      });
-    } : () => { updateTotalCount(-1); removeRow(); },
-  }),
-  attributes: {
-    className: 'btn btn-outline-danger',
-  },
+  type: ({
+    fieldValue, removeItem, removeRow, updateTotalCount, translate, onDelete,
+  }) => (
+    <div aria-label={translate('react.default.button.delete.label', 'Delete')} role="button">
+      <Tooltip
+        html={(<Translate id="react.default.button.delete.label" defaultMessage="Delete" />)}
+        theme="transparent"
+        arrow="true"
+        delay="150"
+        duration="250"
+        hideDelay="50"
+      >
+        <RiDeleteBinLine
+          className="delete-icon"
+          onClick={() => onDelete(fieldValue, removeItem, removeRow, updateTotalCount)}
+        />
+      </Tooltip>
+    </div>
+  ),
 };
 
 const LINE_ITEMS_ATTR = {
@@ -211,8 +197,6 @@ const LINE_ITEMS_ATTR = {
   isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
   loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
   isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
-  addButton,
-  showItemFilter: true,
   getDynamicRowAttr: ({ rowValues, itemFilter }) => {
     const hideRow = itemFilter && !matchesProductCodeOrName({
       product: rowValues?.product,
@@ -230,7 +214,7 @@ const NO_STOCKLIST_FIELDS = {
       product: {
         ...FIELDS.product,
         fieldKey: '',
-        flexWidth: '9.5',
+        flexWidth: '14',
         getDynamicAttr: ({
           rowIndex, rowCount, updateProductData, values, originId, focusField, newItem,
         }) => ({
@@ -249,7 +233,7 @@ const NO_STOCKLIST_FIELDS = {
       monthlyDemand: FIELDS.monthlyDemand,
       quantityRequested: {
         ...FIELDS.quantityRequested,
-        flexWidth: '2.5',
+        fixedWidth: '10ch',
         fieldKey: '',
         getDynamicAttr: ({
           updateRow, values, rowIndex,
@@ -931,6 +915,19 @@ class AddItemsPage extends Component {
 
   dataFetched = false;
 
+  handleDelete = async (fieldValue, removeItem, removeRow, updateTotalCount) => {
+    try {
+      this.props.showSpinner();
+      if (fieldValue && fieldValue.id) {
+        await removeItem(fieldValue.id);
+      }
+      updateTotalCount(-1);
+      removeRow();
+    } finally {
+      this.props.hideSpinner();
+    }
+  };
+
   validate(values) {
     const errors = {};
     errors.lineItems = [];
@@ -1606,6 +1603,16 @@ class AddItemsPage extends Component {
     });
   }
 
+  handleAddLine = (mutators) => {
+    this.updateTotalCount(1);
+    mutators.push('lineItems', { sortOrder: this.getSortOrder() });
+    this.newItemAdded();
+    const table = document.querySelectorAll('[role="rowgroup"]')[0];
+    if (table) {
+      table.scrollIntoView({ block: 'end' });
+    }
+  };
+
   render() {
     const { origin } = this.state.values;
     return (
@@ -1614,9 +1621,28 @@ class AddItemsPage extends Component {
         validate={this.validate}
         mutators={{ ...arrayMutators }}
         initialValues={this.state.values}
-        render={({ handleSubmit, values, invalid }) => (
+        render={({
+          handleSubmit, values, invalid, form: { mutators },
+        }) => (
           <div className="d-flex flex-column">
             <span className="buttons-container">
+              <div className="d-flex align-items-center gap-8 mr-auto">
+                <button
+                  type="button"
+                  className="btn btn-outline-success btn-xs add-button mb-1"
+                  onClick={() => this.handleAddLine(mutators)}
+                >
+                  <span>
+                    <i className="fa fa-plus pr-2" />
+                    <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
+                  </span>
+                </button>
+                <FilterInput
+                  itemFilter={this.state.itemFilter}
+                  onChange={(e) => this.updateFilter(e.target.value)}
+                  onClear={() => this.updateFilter('')}
+                />
+              </div>
               <label
                 htmlFor="csvInput"
                 className={`float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs ${this.state.isRequestFromWard ? 'disabled' : ''}`}
@@ -1726,6 +1752,8 @@ class AddItemsPage extends Component {
                     calculateQtyRequested: this.calculateQuantityRequested,
                     itemFilter: this.state.itemFilter,
                     updateFilter: this.updateFilter,
+                    translate: this.props.translate,
+                    onDelete: this.handleDelete,
                   }))}
               </div>
               <div className="submit-buttons">

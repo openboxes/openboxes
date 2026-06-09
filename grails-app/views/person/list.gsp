@@ -40,12 +40,12 @@
                 <table>
                     <thead>
                         <tr>
-                            <g:sortableColumn property="active" title="${warehouse.message(code: 'user.active.label')}" />
-                            <g:sortableColumn property="lastName" title="${warehouse.message(code: 'default.name.label')}" />
-                            <g:sortableColumn property="type" title="${warehouse.message(code: 'person.type.label')}" />
-                            <g:sortableColumn property="email" title="${warehouse.message(code: 'person.email.label')}" />
-                            <g:sortableColumn property="phoneNumber" title="${warehouse.message(code: 'person.phoneNumber.label')}" />
-                            <g:sortableColumn property="identifier" title="${warehouse.message(code: 'person.identifier.label', default: 'Identifier')}" />
+                            <g:sortableColumn property="active" title="${warehouse.message(code: 'user.active.label')}" params="${params}"/>
+                            <g:sortableColumn property="lastName" title="${warehouse.message(code: 'default.name.label')}" params="${params}"/>
+                            <g:sortableColumn property="type" title="${warehouse.message(code: 'person.type.label')}" params="${params}"/>
+                            <g:sortableColumn property="email" title="${warehouse.message(code: 'person.email.label')}" params="${params}"/>
+                            <g:sortableColumn property="phoneNumber" title="${warehouse.message(code: 'person.phoneNumber.label')}" params="${params}"/>
+                            <g:sortableColumn property="identifier" title="${warehouse.message(code: 'person.identifier.label', default: 'Identifier')}" params="${params}"/>
                             <th><g:message code="default.actions.label"/></th>
                         </tr>
                     </thead>
@@ -53,12 +53,9 @@
                     <g:each in="${personInstanceList}" status="i" var="personInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                             <td>
-                                <g:if test="${personInstance?.active}">
-                                    <span class="tag tag-success"><warehouse:message code="default.active.label" default="Active"/></span>
-                                </g:if>
-                                <g:else>
-                                    <span class="tag tag-danger"><warehouse:message code="default.inactive.label" default="Inactive"/></span>
-                                </g:else>
+                                <g:if test="${personInstance?.active }">
+                                    <span class="active"><warehouse:message code="default.yes.label"/></span></g:if>
+                                <g:else><span class="inactive"><warehouse:message code="default.no.label"/></span></g:else>
                             </td>
                             <td>
                                 <g:link action="edit" id="${personInstance.id}">
@@ -66,12 +63,7 @@
                                 </g:link>
                             </td>
                             <td>
-                                <g:if test="${personInstance.class.simpleName == 'User'}">
-                                    <span class="tag tag-info"><warehouse:message code="user.label"/></span>
-                                </g:if>
-                                <g:else>
-                                    <span class="tag"><warehouse:message code="person.label"/></span>
-                                </g:else>
+                                ${warehouse.message(code: (personInstance.class.simpleName.toLowerCase() + '.label'))}
                             </td>
                             <td>
                                 <g:if test="${grailsApplication.config.openboxes.anonymize.enabled}">

@@ -30,6 +30,8 @@ class Organization extends Party {
 
     Map<IdentifierTypeCode, String> sequences
 
+    static transients = ['displayName']
+
     static mapping = {
         id generator: 'uuid'
         sequences joinTable: [key: 'sequences']
@@ -37,13 +39,15 @@ class Organization extends Party {
     }
 
     static constraints = {
-        code(nullable: false, blank: false, unique: true,
-                minSize: Holders.grailsApplication.config.openboxes.identifier.organization.minSize,
-                maxSize: Holders.grailsApplication.config.openboxes.identifier.organization.maxSize)
+        code(nullable: false, blank: false, unique: true)
         name(nullable: false, blank: false, maxSize: 255)
         description(nullable: true, maxSize: 255)
         defaultLocation(nullable: true)
         active(nullable: false)
+    }
+
+    String getDisplayName() {
+        return "${code} - ${name}"
     }
 
     String toString() {
@@ -85,6 +89,7 @@ class Organization extends Party {
         return [
                 id             : id,
                 name           : name,
+                displayName    : displayName,
                 description    : description,
                 code           : code,
                 dateCreated    : dateCreated,

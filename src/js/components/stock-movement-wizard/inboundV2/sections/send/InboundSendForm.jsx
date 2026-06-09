@@ -131,6 +131,7 @@ const InboundSendForm = ({ previous }) => {
                     errorMessage={errors.shipDate?.message}
                     showTimeSelect
                     required
+                    disabled={isDispatched}
                     customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
                     customTooltip
                     showCustomInput={false}

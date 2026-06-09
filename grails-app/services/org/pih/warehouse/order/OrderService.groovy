@@ -445,7 +445,7 @@ class OrderService {
                         orderInstance.status = OrderStatus.PLACED
                         orderInstance.dateApproved = new Date()
                         orderInstance.approvedBy = userInstance
-                        if (!orderInstance.hasErrors() && orderInstance.merge()) {
+                        if (!orderInstance.hasErrors() && orderInstance.save()) {
                             grailsApplication.mainContext.publishEvent(new OrderStatusEvent(OrderStatus.PLACED, orderInstance))
                             return orderInstance
                         }
@@ -626,7 +626,7 @@ class OrderService {
                 BigDecimal pricePerUnit = pricePerPackage / orderItem?.quantityPerUom
                 if (pricePerUnit != 0) {
                     orderItem.product.pricePerUnit = pricePerUnit
-                    orderItem.product.save()
+                    orderItem.product.save(failOnError: true)
                 }
             }
             else {
@@ -726,8 +726,7 @@ class OrderService {
 
             if (validateOrderItems(orderItems, order)) {
 
-                orderItems.each { item ->
-
+                orderItems.eachWithIndex { item, index ->
                     log.info "Order item: " + item
                     def orderItemId = item["id"]
                     def productCode = item["productCode"]
@@ -759,28 +758,34 @@ class OrderService {
                     if (productCode) {
                         product = Product.findByProductCode(productCode)
                         if (!product) {
-                            throw new ProductException("Unable to locate product with product code ${productCode}")
+                            throw new ProductException("Unable to locate product with product code ${productCode}. Check Row ${index + 1}.")
                         }
                         if (currentLocation.isAccountingRequired() && !product.glAccount) {
-                            throw new ProductException("Product ${productCode}: Cannot add order item without a valid general ledger code")
+                            throw new ProductException("Product ${productCode}: Cannot add order item without a valid general ledger code. Check Row ${index + 1}.")
                         }
                         if (orderItemId && orderItem.product.productCode != productCode) {
-                            throw new ProductException("Cannot change the product for an existing order item via import")
+                            throw new ProductException("Cannot change the product for an existing order item via import. Check Row ${index + 1}.")
                         }
                         orderItem.product = product
                     } else {
-                        throw new ProductException("No product code specified")
+                        throw new ProductException("No product code specified. Check Row ${index + 1}.")
                     }
 
                     if (sourceCode) {
                         ProductSupplier productSource = ProductSupplier.findByCode(sourceCode)
                         if (productSource) {
                             if (productSource.product != orderItem.product) {
-                                throw new ProductException("Wrong product source for given product")
+                                throw new ProductException("Wrong product source for given product. Check Row ${index + 1}.")
                             }
-                            // Prevent creating order items with inactive product sources, but allow to modify existing order items
-                            if (!productSource.active && orderItemId == "") {
-                                throw new ProductException("Product source ${sourceCode} for product ${productCode} is inactive")
+                            boolean isNewOrderItem = orderItemId == ""
+                            boolean isChangingSource = orderItem.productSupplier != productSource
+                            boolean isInactive = !productSource.active
+                            // Prevent changing product source to another inactive product source, but allow to edit line items with existing inactive product source
+                            // and prevent creating order items with inactive product sources
+                            if (isInactive && (isNewOrderItem || isChangingSource)) {
+                                throw new ProductException(
+                                        "Product source ${sourceCode} for product ${productCode} is inactive. Check Row ${index + 1}."
+                                )
                             }
                             orderItem.productSupplier = productSource
                         }
@@ -802,7 +807,7 @@ class OrderService {
 
                         if (productSupplier) {
                             if (!productSupplier.active && supplierParamFilled) {
-                                throw new ProductException("Product source ${productSupplier.code} for product ${productCode} is inactive")
+                                throw new ProductException("Product source ${productSupplier.code} for product ${productCode} is inactive. Check Row ${index + 1}.")
                             }
                             // If it matches a product source for empty params (rare case), but it's inactive, treat it as if there was not a product source
                             if (productSupplier.active) {
@@ -814,42 +819,42 @@ class OrderService {
                     if (unitOfMeasure) {
                         String[] uomParts = unitOfMeasure.split("/")
                         if (uomParts.length <= 1 || !UnitOfMeasure.findByCodeOrName(uomParts[0], uomParts[0])) {
-                            throw new IllegalArgumentException("Could not find provided Unit of Measure: ${unitOfMeasure}.")
+                            throw new IllegalArgumentException("Could not find provided Unit of Measure: ${unitOfMeasure}. Check Row ${index + 1}.")
                         }
                         UnitOfMeasure uom = uomParts.length > 1 ? UnitOfMeasure.findByCodeOrName(uomParts[0], uomParts[0]) : null
                         orderItem.quantityUom = uom
                         BigDecimal qtyPerUom = uomParts.length > 1 ? CSVUtils.parseNumber(uomParts[1], "unitOfMeasure"): null
                         if (uom?.id == Constants.UOM_EACH_ID && qtyPerUom != 1) {
-                            throw new IllegalArgumentException("Quantity per UoM must be 1, if selected UoM is Each")
+                            throw new IllegalArgumentException("Quantity per UoM must be 1, if selected UoM is Each. Check Row ${index + 1}.")
                         }
                         if (!qtyPerUom || qtyPerUom < 1) {
-                            throw new IllegalArgumentException("Quantity per UoM cannot be empty or less than 1")
+                            throw new IllegalArgumentException("Quantity per UoM cannot be empty or less than 1. Check Row ${index + 1}.")
                         }
                         orderItem.quantityPerUom = qtyPerUom
                     } else {
-                        throw new IllegalArgumentException("Missing unit of measure.")
+                        throw new IllegalArgumentException("Missing unit of measure. Check Row ${index + 1}.")
                     }
 
                     Integer parsedQty = CSVUtils.parseInteger(quantity, "quantity")
                     if (parsedQty <= 0) {
-                        throw new IllegalArgumentException("Wrong quantity value: ${parsedQty}.")
+                        throw new IllegalArgumentException("Wrong quantity value: ${parsedQty}. Check Row ${index + 1}.")
                     }
 
                     if (order.status >= OrderStatus.PLACED && orderItem.quantityInShipments > parsedQty) {
-                        throw new IllegalArgumentException("Must enter a quantity greater than or equal to the quantity in shipments (${orderItem.quantityInShipments})")
+                        throw new IllegalArgumentException("Must enter a quantity greater than or equal to the quantity in shipments (${orderItem.quantityInShipments}). Check Row ${index + 1}.")
                     }
 
                     if (orderItem.hasInvoices && parsedQty < orderItem.quantityInvoiced) {
-                        String invoiceNumbers = orderItem.invoices?.collect { it.invoiceNumber }?.join(", ")
-                        throw new IllegalArgumentException("Must enter a quantity greater than or equal to the quantity invoiced (${orderItem.quantityInvoiced}). Pending invoices: ${invoiceNumbers}")
+                        String regularInvoiceNumbers = orderItem.regularInvoices?.collect { it.invoiceNumber }?.join(", ")
+                        throw new IllegalArgumentException("Must enter a quantity greater than or equal to the quantity invoiced (${orderItem.quantityInvoiced}). Pending invoices: ${regularInvoiceNumbers}. Check Row ${index + 1}.")
                     }
 
                     BigDecimal parsedUnitPrice = CSVUtils.parseNumber(unitPrice, "unitPrice")
                     if (orderItem.id && orderItem.hasRegularInvoice && orderItem.unitPrice != parsedUnitPrice) {
-                        throw new IllegalArgumentException("Cannot update the unit price on a line that is already invoiced.")
+                        throw new IllegalArgumentException("Cannot update the unit price on a line that is already invoiced. Check Row ${index + 1}.")
                     }
                     if (parsedUnitPrice < 0) {
-                        throw new IllegalArgumentException("Wrong unit price value: ${parsedUnitPrice}.")
+                        throw new IllegalArgumentException("Wrong unit price value: ${parsedUnitPrice}. Check Row ${index + 1}.")
                     }
 
                     orderItem.quantity = parsedQty
@@ -858,7 +863,7 @@ class OrderService {
                     if (recipient) {
                         Person person = personService.getActivePerson(recipient)
                         if (!person) {
-                            throw new IllegalArgumentException("Cannot set a recipient who is non-existant or inactive: ${recipient}")
+                            throw new IllegalArgumentException("Cannot set a recipient who is non-existant or inactive: ${recipient}. Check Row ${index + 1}.")
                         }
                         orderItem.recipient = person
                     }
@@ -871,7 +876,7 @@ class OrderService {
                             estReadyDate = readyDateFormat.parse(estimatedReadyDate)
                         } catch (Exception e) {
                             log.error("Unable to parse date: " + e.message, e)
-                            throw new IllegalArgumentException("Could not parse estimated ready date with value: ${estimatedReadyDate}.")
+                            throw new IllegalArgumentException("Could not parse estimated ready date with value: ${estimatedReadyDate}. Check Row ${index + 1}.")
                         }
                     }
                     orderItem.estimatedReadyDate = estReadyDate
@@ -882,13 +887,13 @@ class OrderService {
                             actReadyDate = readyDateFormat.parse(actualReadyDate)
                         } catch (Exception e) {
                             log.error("Unable to parse date: " + e.message, e)
-                            throw new IllegalArgumentException("Could not parse actual ready date with value: ${actualReadyDate}.")
+                            throw new IllegalArgumentException("Could not parse actual ready date with value: ${actualReadyDate}. Check Row ${index + 1}.")
                         }
                     }
                     orderItem.actualReadyDate = actReadyDate
 
                     if (currentLocation.isAccountingRequired() && !code) {
-                        throw new IllegalArgumentException("Budget code is required.")
+                        throw new IllegalArgumentException("Budget code is required. Check Row ${index + 1}.")
                     }
 
                     // There can be more than one budget code with the same code, despite the fact that the code is unique from the domain perspective.
@@ -899,20 +904,20 @@ class OrderService {
                     List<BudgetCode> activeBudgetCodes = foundBudgetCodes.findAll { it.active }
 
                     if (activeBudgetCodes.size() > 1) {
-                        throw new IllegalArgumentException("Found more than one active budget code with the same code.")
+                        throw new IllegalArgumentException("Found more than one active budget code with the same code. Check Row ${index + 1}.")
                     }
 
                     BudgetCode budgetCode = activeBudgetCodes.size() == 0 ? foundBudgetCodes[0] : activeBudgetCodes.first()
 
                     if (orderItem.id && orderItem.hasRegularInvoice && orderItem.budgetCode?.id != budgetCode?.id) {
-                        throw new IllegalArgumentException("Cannot update the budget code on a line that is already invoiced.")
+                        throw new IllegalArgumentException("Cannot update the budget code on a line that is already invoiced. Check Row ${index + 1}.")
                     }
                     if (code) {
                         if (!budgetCode) {
-                            throw new IllegalArgumentException("Could not find budget code with code: ${code}.")
+                            throw new IllegalArgumentException("Could not find budget code with code: ${code}. Check Row ${index + 1}.")
                         }
                         if (!budgetCode.active) {
-                            throw new IllegalArgumentException("Budget code ${code} is inactive.")
+                            throw new IllegalArgumentException("Budget code ${code} is inactive. Check Row ${index + 1}.")
                         }
                     }
                     orderItem.budgetCode = budgetCode
@@ -998,14 +1003,14 @@ class OrderService {
     boolean validateOrderItems(List orderItems, Order order) {
         def propertiesMap = grailsApplication.config.openboxes.purchaseOrder.editableProperties
         def excludedProperties = propertiesMap?.deny
-        orderItems.each { orderItem ->
+        orderItems.eachWithIndex { orderItem, index ->
             OrderItem existingOrderItem = order.orderItems.find { it.id == orderItem.id }
             excludedProperties?.each { property ->
                 if (order.status == propertiesMap.status) {
                     def existingValue = existingOrderItem.toImport()."${property}"
                     def importedValue = orderItem."${property}"
                     if (existingValue != importedValue) {
-                        throw new IllegalArgumentException("Import must not change ${property} of item ${orderItem.productCode}, before: ${existingValue}, after: ${importedValue}")
+                        throw new IllegalArgumentException("Import must not change ${property} of item ${orderItem.productCode}, before: ${existingValue}, after: ${importedValue}. Check Row ${index + 1}.")
                     }
                 }
             }

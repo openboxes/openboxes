@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
-import { fetchShipmentStatusCodes } from 'actions';
 import filterFields from 'components/stock-movement/inbound/FilterFields';
 import StockMovementInboundFilters from 'components/stock-movement/inbound/StockMovementInboundFilters';
 import StockMovementInboundHeader from 'components/stock-movement/inbound/StockMovementInboundHeader';
@@ -41,13 +40,10 @@ const StockMovementInboundList = (props) => {
 
 const mapStateToProps = (state) => ({
   shipmentStatuses: state.shipmentStatuses.data,
-  isShipmentStatusesFetched: state.shipmentStatuses.fetched,
   shipmentTypes: state.stockMovementCommon.shipmentTypes,
 });
 
-export default withRouter(connect(mapStateToProps, {
-  fetchStatuses: fetchShipmentStatusCodes,
-})(StockMovementInboundList));
+export default withRouter(connect(mapStateToProps)(StockMovementInboundList));
 
 StockMovementInboundList.propTypes = {
   shipmentStatuses: PropTypes.arrayOf(PropTypes.shape({

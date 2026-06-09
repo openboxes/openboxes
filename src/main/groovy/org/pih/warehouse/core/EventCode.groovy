@@ -9,76 +9,117 @@
  **/
 package org.pih.warehouse.core
 
+/**
+ * Enumerates the specific, discrete types of {@link Event} that can be triggered via interactions with
+ * the application (even if those events don't end up altering state or status).
+ *
+ * Custom, implementation-specific events that are not triggered via application logic should be defined
+ * by adding an {@link EventType} with the CUSTOM code.
+ *
+ * Avoid working directly with EventCode. Anything that references an EventCode should do so via its EventType(s).
+ */
 enum EventCode {
 
-    CREATED,
-    SCHEDULED,
-    PICKING_SCHEDULED,
-    PICKED,
-    PACKING_SCHEDULED,
-    PACKED,
-    STAGING,
-    LOADING_SCHEDULED,
-    LOADING,
-    SHIPPED,
-    IN_TRANSIT,
-    CUSTOMS_ENTRY,
-    CUSTOMS_HOLD,
-    CUSTOMS_RELEASE,
-    DELIVERED,
-    RECEIVING_SCHEDULED,
-    RECEIVED,
-    PARTIALLY_RECEIVED,
-    CANCELLED,
-    PENDING_APPROVAL,
-    APPROVED,
-    REJECTED,
-    SUBMITTED,
+    CREATED(true),
+    SCHEDULED(false),
+    PICKING_SCHEDULED(false),
+    PICKED(false),
+    PACKING_SCHEDULED(false),
+    PACKED(false),
+    STAGING(false),
+    LOADING_SCHEDULED(false),
+    LOADING(false),
+    SHIPPED(true),
+    IN_TRANSIT(false),
+    CUSTOMS_ENTRY(false),
+    CUSTOMS_HOLD(false),
+    CUSTOMS_RELEASE(false),
+    DELIVERED(false),
+    RECEIVING_SCHEDULED(false),
+    RECEIVED(true),
+    PARTIALLY_RECEIVED(true),
+    CANCELLED(false),
+    PENDING_APPROVAL(true),
+    APPROVED(true),
+    REJECTED(true),
+    SUBMITTED(true),
+    PUTAWAY(true),
+    PARTIALLY_PUTAWAY(true),
 
+    /**
+     * Custom, implementation-specific events that are not triggered by application logic. Custom events
+     * can only be triggered manually by users, likely via some create event API call.
+     *
+     * By default, the system will contain no custom events. Custom events need to be configured by adding
+     * an {@link EventType} to the database with the CUSTOM code.
+     */
+    CUSTOM(false)
 
-    static list() {
-        [
-            SCHEDULED,
-            SHIPPED,
-            IN_TRANSIT,
-            CUSTOMS_ENTRY,
-            CUSTOMS_HOLD,
-            CUSTOMS_RELEASE,
-            DELIVERED,
-            RECEIVED,
-            PARTIALLY_RECEIVED,
-            CANCELLED,
-            PENDING_APPROVAL,
-            APPROVED,
-            REJECTED,
-            SUBMITTED
-        ]
+    /**
+     * Returns true if the event code represents an event that is core to the system, meaning it is triggered
+     * by application logic.
+     *
+     * This field only exists for backwards compatability reasons from before we had the CUSTOM code. Going forward,
+     * every event code that is not CUSTOM should be a system event.
+     */
+    boolean isSystemEvent
+
+    EventCode(boolean isSystemEvent) {
+        this.isSystemEvent = isSystemEvent
     }
 
-    static listInTransit() {
-        [SHIPPED, IN_TRANSIT, CUSTOMS_ENTRY, CUSTOMS_HOLD, CUSTOMS_RELEASE]
-    }
-
-    static listPending() {
-        [SCHEDULED]
-    }
-
-    static List<EventCode> listSystemEventTypeCodes() {
-        return [
-            CREATED,
-            SHIPPED,
-            RECEIVED,
-            PARTIALLY_RECEIVED,
-            REJECTED,
-            SUBMITTED,
-            PENDING_APPROVAL,
-            APPROVED
-        ]
+    /**
+     * Returns true if the event code represents a custom event, meaning there is no in-app functionality built
+     * around it. Custom events are purely labels representing some state change that is managed outside of the app.
+     */
+    boolean isCustomEvent() {
+        // This check on isSystemEvent is to support legacy behaviour from before we added the CUSTOM event.
+        // Going forward, custom events should only represent the events that use the CUSTOM code.
+        return !isSystemEvent || this == CUSTOM
     }
 
     static List<EventCode> listCustomEventTypeCodes() {
-        return values() - listSystemEventTypeCodes()
+        return values().findAll { it.isCustomEvent() }
     }
 
-}
+    static List<EventCode> listReceiptEventTypeCodes() {
+        return [
+                PARTIALLY_RECEIVED,
+                RECEIVED,
+        ]
+    }
 
+    boolean isReceiptEvent() {
+        return listReceiptEventTypeCodes().contains(this)
+    }
+
+    static List<EventCode> listPutawayEventTypeCodes() {
+        return [
+                PARTIALLY_PUTAWAY,
+                PUTAWAY,
+        ]
+    }
+
+    static list() {
+        [
+                SCHEDULED,
+                SHIPPED,
+                IN_TRANSIT,
+                CUSTOMS_ENTRY,
+                CUSTOMS_HOLD,
+                CUSTOMS_RELEASE,
+                DELIVERED,
+                RECEIVED,
+                PARTIALLY_RECEIVED,
+                CANCELLED,
+                PENDING_APPROVAL,
+                APPROVED,
+                REJECTED,
+                SUBMITTED
+        ]
+    }
+
+    boolean isPutawayEvent() {
+        return listPutawayEventTypeCodes().contains(this)
+    }
+}

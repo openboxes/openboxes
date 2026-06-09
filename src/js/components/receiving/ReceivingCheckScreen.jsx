@@ -263,8 +263,8 @@ class ReceivingCheckScreen extends Component {
         receiptStatus: 'COMPLETED',
       }, () => {
         this.setState({ completed: true });
-        const { requisition, shipmentId } = formValues;
-        window.location = STOCK_MOVEMENT_URL.show(requisition || shipmentId);
+        const { requisition, orderId, shipmentId } = formValues;
+        window.location = STOCK_MOVEMENT_URL.show(requisition || orderId || shipmentId);
       });
     }
   }
@@ -319,8 +319,8 @@ class ReceivingCheckScreen extends Component {
             receiptStatus: 'COMPLETED',
           }, () => {
             this.setState({ completed: true });
-            const { requisition, shipmentId } = formValues;
-            window.location = STOCK_MOVEMENT_URL.show(requisition || shipmentId);
+            const { requisition, orderId, shipmentId } = formValues;
+            window.location = STOCK_MOVEMENT_URL.show(requisition || orderId || shipmentId);
           }),
         },
         {
@@ -354,9 +354,9 @@ class ReceivingCheckScreen extends Component {
   saveAndExit(formValues) {
     this.saveValues(formValues)
       .then(() => {
-        const { requisition, shipmentId } = formValues;
+        const { requisition, orderId, shipmentId } = formValues;
 
-        window.location = STOCK_MOVEMENT_URL.show(requisition || shipmentId);
+        window.location = STOCK_MOVEMENT_URL.show(requisition || orderId || shipmentId);
       })
       .catch(() => this.props.hideSpinner());
   }

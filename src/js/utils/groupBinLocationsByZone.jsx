@@ -2,20 +2,13 @@ import React from 'react';
 
 import _ from 'lodash';
 
-/**
- * Stringify a bin location for display, prepending the bin's zone if it has one and the zone
- * isn't already prepended.
- */
-const getBinLocationToDisplay = (bin) => (
-  (bin?.zoneName == null || bin?.name.startsWith(`${bin?.zoneName}: `))
-    ? bin?.name : `${bin?.zoneName}: ${bin?.name}`
-);
+import { getBinLocationToDisplay } from 'utils/form-values-utils';
 
 const groupBinLocationsByZone = (binLocations, translate) => {
   const groupedByZone = _.groupBy(binLocations, (bin) => bin.zoneId || 'no-zone');
   return Object.entries(groupedByZone)
     .map(([zoneKey, bins]) => {
-      const zoneName = bins[0].zoneName || translate('react.cycleCount.noZone', 'No Zone');
+      const zoneName = bins[0].zoneName || translate?.('react.cycleCount.noZone', 'No Zone') || 'No Zone';
 
       return {
         id: `zone-${zoneKey}`,
@@ -32,13 +25,18 @@ const groupBinLocationsByZone = (binLocations, translate) => {
       };
     })
     .sort((a, b) => {
-      if (a.id === 'no-zone') {
+      if (a.id === 'zone-no-zone') {
         return 1;
       }
-      if (b.id === 'no-zone') {
+      if (b.id === 'zone-no-zone') {
         return -1;
       }
-      return a.name.localeCompare(b.name);
+
+      // Just in case if any name turns out to be undefined/null
+      const aName = a.name ?? '';
+      const bName = b.name ?? '';
+
+      return aName.localeCompare(bName);
     });
 };
 

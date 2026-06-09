@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
-import { fetchRequisitionStatusCodes } from 'actions';
 import filterFields from 'components/stock-movement/outbound/FilterFields';
 import StockMovementOutboundFilters from 'components/stock-movement/outbound/StockMovementOutboundFilters';
 import StockMovementOutboundHeader from 'components/stock-movement/outbound/StockMovementOutboundHeader';
@@ -51,14 +50,11 @@ const mapStateToProps = (state) => ({
   currentUser: state.session.user,
   currentLocation: state.session.currentLocation,
   requisitionStatuses: state.requisitionStatuses.data,
-  isRequisitionStatusesFetched: state.requisitionStatuses.fetched,
   shipmentTypes: state.stockMovementCommon.shipmentTypes,
   approvers: state.approvers.data,
 });
 
-export default withRouter(connect(mapStateToProps, {
-  fetchStatuses: fetchRequisitionStatusCodes,
-})(StockMovementOutboundList));
+export default withRouter(connect(mapStateToProps)(StockMovementOutboundList));
 
 StockMovementOutboundList.propTypes = {
   sourceType: PropTypes.string.isRequired,

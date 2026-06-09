@@ -77,7 +77,7 @@ const useInvoiceFilters = ({ setFilterParams }) => {
         id: currentLocation?.organization?.id,
         value: currentLocation?.organization?.id,
         name: currentLocation?.organization?.name,
-        label: currentLocation?.organization?.name,
+        label: currentLocation?.organization?.displayName,
       },
     });
     setFiltersInitialized(true);

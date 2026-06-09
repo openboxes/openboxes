@@ -1,3 +1,4 @@
+import { isEqual, uniq } from 'lodash';
 import { getTranslate } from 'react-localize-redux';
 import { createSelector } from 'reselect';
 
@@ -232,13 +233,6 @@ export const getShipmentTypes = (state) => state.stockMovementCommon.shipmentTyp
 export const getLotNumbersByProductId = (state, productId) =>
   getLotNumbersWithExpiration(state)?.[productId] || [];
 
-export const makeGetLotNumbersByProductId = () =>
-  createSelector(
-    [getLotNumbersWithExpiration],
-    (_, productId) => productId,
-    (lotNumbers, productId) => lotNumbers?.[productId] || [],
-  );
-
 /**
  * COUNT WORKFLOW
  */
@@ -247,6 +241,11 @@ export const getCountWorkflow = (state) => state.countWorkflow;
 export const getCountWorkflowEntities = createSelector(
   [getCountWorkflow],
   (wf) => wf?.entities,
+);
+
+export const getCountWorkflowEntityIds = createSelector(
+  getCountWorkflowEntities,
+  (entities) => (entities ? Object.keys(entities) : []),
 );
 
 export const getCountWorkflowEntityById = createSelector(
@@ -285,14 +284,18 @@ export const makeGetCycleCountCountedBy = () =>
 export const getAllCycleCountProducts = createSelector(
   [getCountWorkflowEntities],
   (entities) => {
-    if (!entities) {
-      return [];
-    }
-
-    return Object.values(entities)
-      .flatMap((cc) => cc?.cycleCountItems || [])
-      .map((item) => item.product?.id)
-      .filter(Boolean);
+    if (!entities) return [];
+    return uniq(
+      Object.values(entities)
+        .flatMap((cc) => cc?.cycleCountItems || [])
+        .map((item) => item.product?.id)
+        .filter(Boolean),
+    );
+  },
+  {
+    memoizeOptions: {
+      resultEqualityCheck: isEqual,
+    },
   },
 );
 

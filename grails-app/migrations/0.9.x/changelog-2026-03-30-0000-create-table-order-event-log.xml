@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <!-- Order has GORM's "hasMany" on EventLog, resulting in this mapping table from order to event log -->
+
+    <changeSet author="ewaterman" id="300320260000-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="order_event_log"/>
+            </not>
+        </preConditions>
+        
+        <createTable tableName="order_event_log">
+            <column name="order_id" type="CHAR(38)">
+                <constraints nullable="false" />
+            </column>
+            <column name="event_log_id" type="CHAR(38)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="ewaterman" id="300320260000-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_order_event_log_order"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseColumnNames="order_id"
+                baseTableName="order_event_log"
+                constraintName="fk_order_event_log_order"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="order"
+        />
+    </changeSet>
+
+    <changeSet author="ewaterman" id="300320260000-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_order_event_log_event_log"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseColumnNames="event_log_id"
+                baseTableName="order_event_log"
+                constraintName="fk_order_event_log_event_log"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="event_log"
+        />
+    </changeSet>
+</databaseChangeLog>

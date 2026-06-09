@@ -15,6 +15,8 @@ import org.apache.commons.lang.StringUtils
 @Transactional
 class OrganizationService {
 
+    private static final List<RoleType> SUPPLIER_ROLES = [RoleType.ROLE_SUPPLIER, RoleType.ROLE_MANUFACTURER]
+
     OrganizationIdentifierService organizationIdentifierService
 
     List selectOrganizations(ArrayList<RoleType> roleTypes, Boolean active = false, currentOrganizationId) {
@@ -40,72 +42,100 @@ class OrganizationService {
         }
     }
 
-    Organization findOrCreateOrganization(String name, String code) {
-        return findOrCreateOrganization(name, code, [])
-    }
-
-    Organization findOrganization(String name, String code) {
-        Organization organization = Organization.createCriteria().get {
-            eq("code", code)
-            ne("code", StringUtils.EMPTY)
-            isNotNull("code")
-        }
-        if (!organization) {
-            organization = Organization.createCriteria().list(max: 1) {
-                eq("name", name)
-                ne("name", StringUtils.EMPTY)
-                isNotNull("name")
-                order("dateCreated", "asc")
-            }[0]
-        }
-        return organization
-    }
-
-    Organization findOrCreateOrganization(String name, String code, List<RoleType> roleTypes) {
-        Organization organization = findOrganization(name, code)
-        if (!organization) {
-            organization = new Organization()
-            organization.name = name
-            organization.partyType = PartyType.findByCode(Constants.DEFAULT_ORGANIZATION_CODE)
-            organization.code = code?:organizationIdentifierService.generate(name)
-        }
-
-        if (roleTypes) {
-            roleTypes.each { RoleType roleType ->
-                if (!organization.hasRoleType(roleType)) {
-                    organization.addToRoles(new PartyRole(roleType: roleType))
-                }
+    /**
+     * Returns the organization matching the given code, or if none exist for the given code, returns all
+     * organizations that match the given name.
+     */
+    List<Organization> findOrganizations(String name, String code) {
+        List<Organization> organizations = []
+        if (!StringUtils.isBlank(code)) {
+            Organization organization = Organization.findByCode(code)
+            if (organization) {
+                return [organization]
             }
         }
-
-        if (organization.validate() && !organization.hasErrors()) {
-            organization.save()
+        if (!StringUtils.isBlank(name)) {
+            organizations = Organization.findAllByName(name, [sort: "dateCreated", order: "asc"])
         }
-        return organization
+        return organizations
     }
 
-    Organization saveOrganization(Organization organization) {
+    /**
+     * Returns the organization matching the given code, or if none exist for the given code, returns
+     * the newest organization that matches the given name.
+     */
+    Organization findOrganization(String name, String code) {
+        return findOrganizations(name, code)?.find()
+    }
+
+    private Organization createOrUpdateOrganization(String name, String code, List<RoleType> roleTypes) {
+        Organization organization = findOrganization(name, code)
+        if (!organization) {
+            return createOrganization(name, code, roleTypes)
+        }
+        return updateOrganization(organization, roleTypes)
+    }
+
+    private Organization saveOrganization(Organization organization) {
         return organization.save(failOnError: true)
     }
 
-    Organization createOrganization(Organization organization) {
+    private void addRolesToOrganization(Organization organization, List<RoleType> roleTypes) {
+        if (!roleTypes) {
+            return
+        }
+
+        for (RoleType roleType in roleTypes) {
+            if (organization.hasRoleType(roleType)) {
+                continue
+            }
+            organization.addToRoles(new PartyRole(roleType: roleType))
+        }
+    }
+
+    /**
+     * Persists a new organization with all of the given roles
+     */
+    Organization createOrganization(String name, String code=null, List<RoleType> roleTypes=[]) {
+        Organization organization = new Organization(
+                name: name,
+                code: code,  // If this is null it will be auto-generated later
+        )
+        return createOrganization(organization, roleTypes)
+    }
+
+    /**
+     * Persists a new organization, populating it with any required default or auto-generated fields,
+     * and adding to it all of the given roles
+     */
+    Organization createOrganization(Organization organization, List<RoleType> roleTypes=[]) {
         if (!organization.code) {
-            organization.code = organizationIdentifierService.generate(organization.name)
+            organization.code = organizationIdentifierService.generate(organization)
         }
 
         if (!organization.partyType) {
             organization.partyType = PartyType.findByCode(Constants.DEFAULT_ORGANIZATION_CODE)
         }
 
+        addRolesToOrganization(organization, roleTypes)
+
         return saveOrganization(organization)
     }
 
-    Organization findOrCreateBuyerOrganization(String name, String code) {
-        return findOrCreateOrganization(name, code, [RoleType.ROLE_BUYER, RoleType.ROLE_DISTRIBUTOR])
+    /**
+     * Updates an existing organization, adding to it all of the given roles
+     */
+    Organization updateOrganization(Organization organization, List<RoleType> roleTypes=[]) {
+        addRolesToOrganization(organization, roleTypes)
+        return saveOrganization(organization)
     }
 
-    Organization findOrCreateSupplierOrganization(String name, String code) {
-        return findOrCreateOrganization(name, code, [RoleType.ROLE_SUPPLIER, RoleType.ROLE_MANUFACTURER])
+    Organization createSupplierOrganization(String name, String code=null) {
+        return createOrganization(name, code, SUPPLIER_ROLES)
+    }
+
+    Organization findOrCreateSupplierOrganization(String name, String code=null) {
+        return createOrUpdateOrganization(name, code, SUPPLIER_ROLES)
     }
 
     List<Organization> getOrganizations(Map params) {

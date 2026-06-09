@@ -61,17 +61,17 @@
                             <thead>
                                 <tr>
 
-                                    <g:sortableColumn property="id" title="${warehouse.message(code: 'localization.id.label', default: 'Id')}" />
+                                    <g:sortableColumn property="id" title="${warehouse.message(code: 'localization.id.label', default: 'Id')}"  params="${params}" />
 
-                                    <g:sortableColumn property="code" title="${warehouse.message(code: 'localization.code.label', default: 'Code')}" />
+                                    <g:sortableColumn property="code" title="${warehouse.message(code: 'localization.code.label', default: 'Code')}"  params="${params}" />
 
-                                    <g:sortableColumn property="locale" title="${warehouse.message(code: 'localization.locale.label', default: 'Locale')}" />
+                                    <g:sortableColumn property="locale" title="${warehouse.message(code: 'localization.locale.label', default: 'Locale')}"  params="${params}" />
 
-                                    <g:sortableColumn property="text" title="${warehouse.message(code: 'localization.text.label', default: 'Text')}" />
+                                    <g:sortableColumn property="text" title="${warehouse.message(code: 'localization.text.label', default: 'Text')}"  params="${params}" />
 
-                                    <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'localization.dateCreated.label', default: 'Date Created')}" />
+                                    <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'localization.dateCreated.label', default: 'Date Created')}"  params="${params}" />
 
-                                    <g:sortableColumn property="lastUpdated" title="${warehouse.message(code: 'localization.lastUpdated.label', default: 'Last Updated')}" />
+                                    <g:sortableColumn property="lastUpdated" title="${warehouse.message(code: 'localization.lastUpdated.label', default: 'Last Updated')}"  params="${params}" />
 
                                     <th><g:message code="default.actions.label"/></th>
                                 </tr>

@@ -49,7 +49,7 @@
                                             <label><warehouse:message code="invoice.vendor.label"/></label>
                                         </td>
                                         <td valign="top" class="value">
-                                            ${invoiceInstance?.party?.code} ${invoiceInstance?.party?.name}
+                                            ${invoiceInstance?.party?.displayName}
                                         </td>
                                     </tr>
                                     <tr class="prop">
@@ -57,7 +57,7 @@
                                             <label><warehouse:message code="invoice.partyFrom.label"/></label>
                                         </td>
                                         <td valign="top" class="value">
-                                            ${invoiceInstance?.partyFrom?.name}
+                                            ${invoiceInstance?.partyFrom?.displayName}
                                         </td>
                                     </tr>
                                     <tr class="prop">

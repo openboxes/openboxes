@@ -5,8 +5,6 @@ import { RiPrinterLine, RiSave2Line } from 'react-icons/ri';
 
 import Button from 'components/form-elements/Button';
 import ButtonFileSelect from 'components/form-elements/v2/ButtonFileSelect';
-import { CYCLE_COUNT } from 'consts/applicationUrls';
-import { TO_COUNT_TAB } from 'consts/cycleCount';
 import FileFormat from 'consts/fileFormat';
 import AlertMessage from 'utils/AlertMessage';
 import RedirectButton from 'utils/RedirectButton';
@@ -21,13 +19,14 @@ const CountStepHeader = ({
   sortByProductName,
   setSortByProductName,
   importErrors,
+  handleBackToList,
 }) => (
   <div>
     <div className="d-flex justify-content-sm-between align-items-end">
       <RedirectButton
         label="react.cycleCount.redirectToList.label"
         defaultMessage="Back to Cycle Count List"
-        redirectTo={CYCLE_COUNT.list(TO_COUNT_TAB)}
+        handleOnClick={handleBackToList}
         className="pt-5"
       />
       <div className="d-flex gap-8">
@@ -103,4 +102,5 @@ CountStepHeader.propTypes = {
   sortByProductName: PropTypes.bool.isRequired,
   setSortByProductName: PropTypes.func.isRequired,
   importErrors: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  handleBackToList: PropTypes.func.isRequired,
 };

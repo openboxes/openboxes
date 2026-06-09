@@ -7,7 +7,6 @@ import grails.plugin.cache.Cacheable
 import grails.util.Holders
 import groovy.transform.TypeCheckingMode
 import org.grails.plugins.web.taglib.ApplicationTagLib
-import org.grails.web.json.JSONObject
 import org.hibernate.SessionFactory
 import org.joda.time.LocalDate
 import org.pih.warehouse.LocalizationUtil
@@ -21,9 +20,10 @@ import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
-import org.pih.warehouse.order.Order
-import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.inventory.OutboundStockMovementListItem
+import org.pih.warehouse.inventory.OutgoingStockMovementCounts
+import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.shipping.Shipment
 import util.ConfigHelper
 
@@ -576,112 +576,53 @@ class IndicatorDataService {
         today.clearTime()
         Date fourDaysAgo = today - 4
         Date sevenDaysAgo = today - 7
-        OrderType returnOrderType = OrderType.get(Constants.RETURN_ORDER)
 
-        def createdAfterRequesitionCount = Requisition.executeQuery("""
-                SELECT COUNT(*) FROM Requisition 
-                WHERE dateCreated > :day 
-                AND origin = :location 
-                AND status NOT IN (:statuses)
-            """,
-            [
-                    'day': fourDaysAgo,
-                    'location': location,
-                    'statuses' : [
-                            RequisitionStatus.ISSUED,
-                            RequisitionStatus.PENDING_APPROVAL,
-                            RequisitionStatus.REJECTED,
-                            RequisitionStatus.VERIFYING,
-                    ],
-            ]).get(0)
+        List<RequisitionStatus> inProgressStatuses = location.isApprovalRequired()
+                ? RequisitionStatus.listOutboundInProgressWhenApprovalRequired()
+                : RequisitionStatus.listOutboundInProgress()
 
-        def createdAfterReturnOrderCount = Order.executeQuery("""
-                SELECT COUNT(DISTINCT o.id) FROM Order o
-                LEFT JOIN o.orderItems oi
-                LEFT JOIN oi.shipmentItems si
-                LEFT JOIN si.shipment s
-                WHERE o.origin = :location
-                AND o.orderType = :orderType
-                AND o.dateCreated > :day 
-                AND (s.currentStatus <> 'SHIPPED' OR s.currentStatus IS NULL)
-            """,
-            ['day': fourDaysAgo, 'location': location, 'orderType': returnOrderType]).get(0)
+        // Count in progress outbound stock movements grouped by 3 date ranges.
+        // ELECTRONIC requests with CREATED status are excluded because they have not been submitted yet
+        // and should not be counted as in progress in the indicator.
+        Object[] result = OutboundStockMovementListItem.executeQuery("""
+            SELECT
+                SUM(CASE WHEN o.dateCreated > :fourDaysAgo THEN 1 ELSE 0 END),
+                SUM(CASE WHEN o.dateCreated >= :sevenDaysAgo AND o.dateCreated <= :fourDaysAgo THEN 1 ELSE 0 END),
+                SUM(CASE WHEN o.dateCreated < :sevenDaysAgo THEN 1 ELSE 0 END)
+            FROM OutboundStockMovementListItem o
+            WHERE o.origin = :location
+            AND o.status IN (:inProgressStatuses)
+            AND (
+                o.sourceType IS NULL
+                OR (o.sourceType = :electronicSourceType AND o.status != :createdStatus)
+            )
+        """, [
+            fourDaysAgo         : fourDaysAgo,
+            sevenDaysAgo        : sevenDaysAgo,
+            location            : location,
+            inProgressStatuses  : inProgressStatuses,
+            electronicSourceType: RequisitionSourceType.ELECTRONIC,
+            createdStatus       : RequisitionStatus.CREATED,
+        ]).first()
 
-
-        def createdBetweenRequesitionCount = Requisition.executeQuery("""
-                SELECT COUNT(*) FROM Requisition 
-                WHERE dateCreated >= :dayFrom
-                AND dateCreated <= :dayTo
-                AND origin = :location 
-                AND status NOT IN (:statuses)
-            """,
-            [
-                    'dayFrom': sevenDaysAgo,
-                    'dayTo': fourDaysAgo,
-                    'location': location,
-                    'statuses' : [
-                            RequisitionStatus.ISSUED,
-                            RequisitionStatus.PENDING_APPROVAL,
-                            RequisitionStatus.REJECTED,
-                            RequisitionStatus.VERIFYING,
-                    ],
-            ]).get(0)
-
-        def createdBetweenReturnOrderCount = Order.executeQuery("""
-                SELECT COUNT(DISTINCT o.id) FROM Order o
-                LEFT JOIN o.orderItems oi
-                LEFT JOIN oi.shipmentItems si
-                LEFT JOIN si.shipment s
-                WHERE o.origin = :location
-                AND o.orderType = :orderType
-                AND o.dateCreated >= :dayFrom
-                AND o.dateCreated <= :dayTo
-                AND (s.currentStatus <> 'SHIPPED' OR s.currentStatus IS NULL)
-            """,
-            ['dayFrom': sevenDaysAgo, 'dayTo': fourDaysAgo, 'location': location, 'orderType': returnOrderType]).get(0)
-
-
-        def createdBeforeRequesitionCount = Requisition.executeQuery("""
-                SELECT COUNT(*) FROM Requisition 
-                WHERE dateCreated < :day 
-                AND origin = :location 
-                AND status NOT IN (:statuses)
-            """,
-            [
-                    'day': sevenDaysAgo,
-                    'location': location,
-                    'statuses' : [
-                            RequisitionStatus.ISSUED,
-                            RequisitionStatus.PENDING_APPROVAL,
-                            RequisitionStatus.REJECTED,
-                            RequisitionStatus.VERIFYING,
-                    ],
-            ]).get(0)
-
-        def createdBeforeReturnOrderCount = Order.executeQuery("""
-                SELECT COUNT(DISTINCT o.id) FROM Order o
-                LEFT JOIN o.orderItems oi
-                LEFT JOIN oi.shipmentItems si
-                LEFT JOIN si.shipment s
-                WHERE o.origin = :location
-                AND o.orderType = :orderType
-                AND o.dateCreated < :day 
-                AND (s.currentStatus <> 'SHIPPED' OR s.currentStatus IS NULL)
-            """,
-            ['day': sevenDaysAgo, 'location': location, 'orderType': returnOrderType]).get(0)
+        OutgoingStockMovementCounts counts = new OutgoingStockMovementCounts(
+                createdLessThan4DaysAgo   : (result[0] ?: 0) as Integer,
+                createdBetween4And7DaysAgo: (result[1] ?: 0) as Integer,
+                createdMoreThan7DaysAgo   : (result[2] ?: 0) as Integer,
+        )
 
         String urlContextPath = ConfigHelper.contextPath;
         String baseUrl = "${urlContextPath}/stockMovement/list?direction=OUTBOUND"
-        String statusQuery = RequisitionStatus.listPending().collect { "&requisitionStatusCode=$it" }.join('')
+        String statusQuery = inProgressStatuses.collect { "&requisitionStatusCode=$it" }.join('')
         String dateFormat = "MM/dd/yyyy"
 
         String createdAfterQuery = "&createdAfter=${fourDaysAgo.format(dateFormat)}"
         String createdBetweenQuery = "&createdAfter=${sevenDaysAgo.format(dateFormat)}&createdBefore=${fourDaysAgo.format(dateFormat)}"
         String createdBeforeQuery = "&createdBefore=${sevenDaysAgo.format(dateFormat)}"
 
-        ColorNumber green = new ColorNumber(createdAfterRequesitionCount + createdAfterReturnOrderCount, 'Created < 4 days ago', baseUrl + statusQuery + createdAfterQuery)
-        ColorNumber yellow = new ColorNumber(createdBetweenRequesitionCount + createdBetweenReturnOrderCount, 'Created > 4 days ago', baseUrl + statusQuery + createdBetweenQuery)
-        ColorNumber red = new ColorNumber(createdBeforeRequesitionCount + createdBeforeReturnOrderCount, 'Created > 7 days ago', baseUrl + statusQuery + createdBeforeQuery)
+        ColorNumber green = new ColorNumber(counts.createdLessThan4DaysAgo, 'Created < 4 days ago', baseUrl + statusQuery + createdAfterQuery)
+        ColorNumber yellow = new ColorNumber(counts.createdBetween4And7DaysAgo, 'Created > 4 days ago', baseUrl + statusQuery + createdBetweenQuery)
+        ColorNumber red = new ColorNumber(counts.createdMoreThan7DaysAgo, 'Created > 7 days ago', baseUrl + statusQuery + createdBeforeQuery)
 
         NumbersIndicator numbersIndicator = new NumbersIndicator(green, yellow, red)
 

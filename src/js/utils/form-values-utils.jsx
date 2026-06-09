@@ -96,3 +96,32 @@ export const omitEmptyValues = (values) => _.omitBy(values, (val) => {
 
 export const mapStringToLimitedList = (value, elementsSeparator, lengthLimit) =>
   (value?.length > lengthLimit ? `${_.take(value, lengthLimit).join('')}...` : value)?.split(elementsSeparator);
+
+/**
+ * Checks whether any of the provided values matches the filter value (case-insensitive).
+ * Used to determine row visibility when a text filter is applied to a list.
+ *
+ * @param {Object} params
+ * @param {string} params.filterValue - The text to search for.
+ * @param {Array<string|function>} [params.matchers=[]] - The list of matchers to apply.
+ * Each entry can be a string (e.g. lot number, bin location) or a matcher function
+ * that receives filterValue and returns a boolean.
+ * @returns {boolean} True if at least one value contains the filter text, false otherwise.
+ */
+export const matchesItemFilter = ({ filterValue, matchers = [] }) => {
+  const trimmedFilterValue = filterValue?.trim();
+  return matchers.some((value) => {
+    if (typeof value === 'function') {
+      return value(trimmedFilterValue);
+    }
+    return value?.toLowerCase()?.includes(trimmedFilterValue?.toLowerCase());
+  });
+};
+/**
+ * Stringify a bin location for display, prepending the bin's zone if it has one and the zone
+ * isn't already prepended.
+ */
+export const getBinLocationToDisplay = (bin) => (
+  (bin?.zoneName == null || bin?.name.startsWith(`${bin?.zoneName}: `))
+    ? bin?.name : `${bin?.zoneName}: ${bin?.name}`
+);

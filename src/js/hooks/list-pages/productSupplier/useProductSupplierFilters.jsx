@@ -77,7 +77,7 @@ const useProductSupplierFilters = (ignoreClearFilters) => {
     if (queryProps.supplier) {
       const supplier = await fetchOrganization(queryProps.supplier);
       if (supplier) {
-        supplier.label = `${supplier.code} ${supplier.name}`;
+        supplier.label = supplier.displayName;
         defaultValues.supplier = supplier;
       }
     }

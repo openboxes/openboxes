@@ -46,7 +46,7 @@ class LocationController {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         params.offset = params.offset ? params.int("offset") : 0
 
-        def locations = locationService.getLocations(organization, locationType, locationGroup, params.q, params.max, params.offset as int)
+        def locations = locationService.getLocations(organization, locationType, locationGroup, params.q, params.max, params.offset as int, params.sort ?: "name", params.order ?: "asc")
 
         [locationInstanceList: locations, locationInstanceTotal: locations.totalCount, defaultLocationType:defaultLocationType]
     }
@@ -99,8 +99,9 @@ class LocationController {
 
             if (!locationInstance.id && !locationInstance.organization) {
                 if (locationInstance?.locationType?.locationTypeCode == LocationTypeCode.SUPPLIER) {
+                    // When creating new suppliers we also create an org with the same name (unless one already exists)
                     locationInstance.organization =
-                            organizationService.findOrCreateSupplierOrganization(locationInstance.name, locationInstance.locationNumber)
+                            organizationService.findOrCreateSupplierOrganization(locationInstance.name)
                 }
             }
 

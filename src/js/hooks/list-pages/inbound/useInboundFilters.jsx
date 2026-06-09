@@ -7,6 +7,7 @@ import { useHistory } from 'react-router-dom';
 import { fetchShipmentStatusCodes, fetchShipmentTypes } from 'actions';
 import filterFields from 'components/stock-movement/inbound/FilterFields';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import ShipmentStatusCode from 'consts/shipmentStatusCode';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
 import { fetchLocationById, fetchUserById } from 'utils/option-utils';
@@ -35,7 +36,7 @@ const useInboundFilters = () => {
   useEffect(() => {
     // TODO: When having full React, if once fetched, fetch only if a current language differs
     // TODO: from the language, that we were fetching this for
-    dispatch(fetchShipmentStatusCodes());
+    dispatch(fetchShipmentStatusCodes({ excludedStatuses: [ShipmentStatusCode.CREATED] }));
     dispatch(fetchShipmentTypes());
   }, [currentLocale]);
 

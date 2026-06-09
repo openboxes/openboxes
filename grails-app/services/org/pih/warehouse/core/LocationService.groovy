@@ -21,6 +21,7 @@ import grails.plugins.csv.CSVMapReader
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.sql.JoinType
 
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.sort.SortParamList
 import org.pih.warehouse.sort.SortUtil
 import org.pih.warehouse.api.StockMovementDirection
@@ -35,6 +36,7 @@ class LocationService {
     GrailsApplication grailsApplication
     UserService userService
     LocationImportDataService locationImportDataService
+    LocationDataService locationGormService
 
     Location findInternalLocation(Location parentLocation, String[] names) {
         return Location.createCriteria().get {
@@ -185,7 +187,7 @@ class LocationService {
         return locations
     }
 
-    def getLocations(Organization organization, LocationType locationType, LocationGroup locationGroup, String query, Integer max, Integer offset) {
+    def getLocations(Organization organization, LocationType locationType, LocationGroup locationGroup, String query, Integer max, Integer offset, String sort, String sortOrder) {
         def terms = "%" + query + "%"
         def locations = Location.createCriteria().list(max: max, offset: offset) {
             if (query) {
@@ -210,7 +212,7 @@ class LocationService {
             if (locationType?.locationTypeCode == LocationTypeCode.BIN_LOCATION || locationType?.locationTypeCode == LocationTypeCode.INTERNAL) {
                 isNotNull("parentLocation")
             }
-            order("name")
+            order(sort, sortOrder)
         }
         return locations
 
@@ -262,6 +264,34 @@ class LocationService {
             }
         }
         return locations
+    }
+
+    /**
+     * Returns all locations that can be logged in to. Prefetches the relationship entities (such as location type and group) to reduce N+1 calls.
+     */
+    List<Location> getLoginLocationsWithEagerJoins() {
+        List<String> requiredActivities = ConfigHelper.listValue(
+                grailsApplication.config.openboxes.chooseLocation.requiredActivities)
+        if (!requiredActivities) {
+            return []
+        }
+        Set<Location> locations = new LinkedHashSet<>()
+        requiredActivities.each { String activity ->
+            locations.addAll(getLocationsSupportingActivityWithEagerJoins(activity))
+        }
+        return locations as List<Location>
+    }
+
+    private static List<Location> getLocationsSupportingActivityWithEagerJoins(String activity) {
+        return Location.executeQuery("""
+            SELECT l
+            FROM Location l
+            LEFT JOIN FETCH l.locationType lt
+            LEFT JOIN FETCH l.locationGroup
+            WHERE l.inventory IS NOT NULL
+              AND (:activity IN ELEMENTS(l.supportedActivities)
+                   OR (size(l.supportedActivities) = 0 AND :activity IN ELEMENTS(lt.supportedActivities)))
+        """, [activity: activity])
     }
 
 
@@ -763,6 +793,25 @@ class LocationService {
             zone.removeFromLocations(existingLocation)
         }
         existingLocation.delete(flush: true)
+    }
+
+    Location createLocation(Location location, boolean useDefaultActivities, boolean assignCurrentLocationGroup) {
+        if (assignCurrentLocationGroup) {
+            Location currentLocation = AuthService.currentLocation
+            location.locationGroup = currentLocation?.locationGroup
+        }
+
+        if (useDefaultActivities && location?.supportedActivities) {
+            location.supportedActivities.clear()
+        }
+
+        // If the organization chosen for the created location is inactive, throw an exception
+        if (location.organization && !location.organization?.active) {
+            throw new IllegalArgumentException("The organization ${location.organization.name} is inactive, you can't assign it to the location")
+        }
+
+        locationGormService.save(location)
+        return location
     }
 
     def getInternalLocation(String parentLocationId, String internalLocationId) {

@@ -90,8 +90,10 @@ class ProductAssociationController {
             bindMutualAssociationData(mutualAssociationInstance, params)
 
             mutualAssociationInstance.mutualAssociation = productAssociationInstance
+            // Save the assocation before assigning it to the main instance, otherwise given the transaction commit that is proceeded in the controller
+            // the mutual association instance might not be assigned to the productAssociationInstance after rendering the view
+            mutualAssociationInstance.save(flush: true)
             productAssociationInstance.mutualAssociation = mutualAssociationInstance
-            mutualAssociationInstance.save()
         }
         productAssociationInstance.validate()
         if (!productAssociationInstance.hasErrors() && productAssociationInstance.save(flush: true)) {
@@ -102,6 +104,10 @@ class ProductAssociationController {
             }
             redirect(controller: "product", action: "edit", id: productAssociationInstance?.product?.id)
         } else {
+            if (params.isFromProductEditPage) {
+                chain(controller: "product", action: "edit", id: productAssociationInstance?.product?.id, model: [productAssociationInstance: productAssociationInstance])
+                return
+            }
             render(view: "create", model: [productAssociationInstance: productAssociationInstance])
         }
     }
@@ -122,7 +128,7 @@ class ProductAssociationController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), params.id])}"
             redirect(action: "list")
         } else {
-            return [productAssociationInstance: productAssociationInstance]
+            return [productAssociationInstance: productAssociationInstance, isFromProductEditPage: params.isFromProductEditPage]
         }
     }
 
@@ -156,6 +162,16 @@ class ProductAssociationController {
                     mutualAssociationInstance.errors.allErrors.each { error ->
                         productAssociationInstance.errors.addError(error)
                     }
+                    // Re-read product association to reset any changes made to it before rendering the view
+                    // TODO: This all logic should be moved to a transactional service, as having it in the controller which is transactional
+                    // causes the bug that even though we wouldn't update a productAssociationInstance, the rollback takes place after rendering the view
+                    // Ideally the rollback should happen in the service so that when the instance comes back to the controller, all the dirty fields
+                    // are reset to the original values and we don't have to manually refresh the instance here
+                    productAssociationInstance.refresh()
+                    if (params.isFromProductEditPage) {
+                        chain(controller: "product", action: "edit", id: productAssociationInstance?.product?.id, model: [productAssociationInstance: productAssociationInstance])
+                        return
+                    }
                     render(view: "edit", model: [productAssociationInstance: productAssociationInstance])
                     return
                 }
@@ -172,6 +188,10 @@ class ProductAssociationController {
                 redirect(controller: "product", action: "edit", id: productAssociationInstance?.product?.id)
 
             } else {
+                if (params.isFromProductEditPage) {
+                    chain(controller: "product", action: "edit", id: productAssociationInstance?.product?.id, model: [productAssociationInstance: productAssociationInstance])
+                    return
+                }
                 render(view: "edit", model: [productAssociationInstance: productAssociationInstance])
             }
         } else {
@@ -220,7 +240,7 @@ class ProductAssociationController {
             productAssociation.code = ProductAssociationTypeCode.SUBSTITUTE
             productAssociation.product = product
         }
-        render(template: "dialog", model: [productAssociation: productAssociation])
+        render(template: "dialog", model: [productAssociation: productAssociation, isFromProductEditPage: true])
     }
 
 

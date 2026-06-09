@@ -6,7 +6,7 @@ import queryString from 'query-string';
 import { useDispatch, useStore } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { eraseDraft, startResolution } from 'actions';
+import { clearCountWorkflow, eraseDraft, startResolution } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT_PENDING_REQUESTS } from 'api/urls';
 import notification from 'components/Layout/notifications/notification';
@@ -113,6 +113,7 @@ const useResolveDiscrepancies = ({
           if (idsWithoutDiscrepancies > 0) {
             showSuccessNotification(idsWithoutDiscrepancies);
           }
+          dispatch(clearCountWorkflow);
           hide();
           onClose?.();
           history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));

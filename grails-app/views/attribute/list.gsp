@@ -26,8 +26,6 @@
                         <div class="box">
                             <h2><warehouse:message code="default.search.label" default="Search"/></h2>
                             <g:form action="list" method="get">
-                                <g:hiddenField name="sort" value="${params.sort?:'name'}"/>
-                                <g:hiddenField name="order" value="${params.order?:'asc'}"/>
                                 <div class="filter-list-item">
                                     <label><warehouse:message code="default.name.label"/></label>
                                     <g:textField name="q" class="text large" value="${params.q}"></g:textField>
@@ -51,13 +49,13 @@
                             <table>
                                 <thead>
                                 <tr>
-                                    <g:sortableColumn property="code" title="${warehouse.message(code: 'default.code.label')}" />
-                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" />
-                                    <g:sortableColumn property="entityTypeCode" title="${warehouse.message(code: 'attribute.entityTypeCode.label', default: 'Entity Type')}" />
-                                    <g:sortableColumn property="options" title="${warehouse.message(code: 'attribute.options.label')}" />
-                                    <g:sortableColumn property="active" title="${warehouse.message(code: 'default.active.label')}" />
-                                    <g:sortableColumn property="required" title="${warehouse.message(code: 'default.required.label')}" />
-                                    <g:sortableColumn property="allowOther" title="${warehouse.message(code: 'attribute.allowOther.label')}" />
+                                    <g:sortableColumn property="code" title="${warehouse.message(code: 'default.code.label')}" params="${params}" />
+                                    <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" params="${params}" />
+                                    <g:sortableColumn property="entityTypeCode" title="${warehouse.message(code: 'attribute.entityTypeCode.label', default: 'Entity Type')}" params="${params}" />
+                                    <g:sortableColumn property="options" title="${warehouse.message(code: 'attribute.options.label')}" params="${params}" />
+                                    <g:sortableColumn property="active" title="${warehouse.message(code: 'default.active.label')}" params="${params}" />
+                                    <g:sortableColumn property="required" title="${warehouse.message(code: 'default.required.label')}" params="${params}" />
+                                    <g:sortableColumn property="allowOther" title="${warehouse.message(code: 'attribute.allowOther.label')}" params="${params}" />
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -75,7 +73,7 @@
                                 </tbody>
                             </table>
                             <div class="paginateButtons">
-                                <g:paginate total="${attributeInstanceTotal}" />
+                                <g:paginate total="${attributeInstanceTotal}" params="${params}" />
                             </div>
 
                         </div>

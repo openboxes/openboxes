@@ -51,7 +51,8 @@ class ProductAssociationValidator implements DomainValidator<ProductAssociation>
                     eq("product", productAssociation.product)
                     eq("associatedProduct", productAssociation.associatedProduct)
                     eq("code", productAssociation.code)
-                    if (productAssociation.id) {
+                    // Exclude product association and its mutual association from the search not to treat it as duplicate of itself
+                    if (productAssociation.id || productAssociation.mutualAssociation?.id) {
                         not {
                             inList("id", [productAssociation.id, productAssociation.mutualAssociation?.id].findAll { it })
                         }
@@ -61,7 +62,8 @@ class ProductAssociationValidator implements DomainValidator<ProductAssociation>
                     eq("product", productAssociation.associatedProduct)
                     eq("associatedProduct", productAssociation.product)
                     eq("code", productAssociation.code)
-                    if (productAssociation.id) {
+                    // Exclude product association and its mutual association from the search not to treat it as duplicate of itself
+                    if (productAssociation.id || productAssociation.mutualAssociation?.id) {
                         not {
                             inList("id", [productAssociation.id, productAssociation.mutualAssociation?.id].findAll { it })
                         }

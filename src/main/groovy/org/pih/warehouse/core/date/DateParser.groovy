@@ -28,28 +28,28 @@ class DateParser {
     /**
      * Parses a given date object into an Instant.
      */
-    Instant parseToInstant(Object date, DateParserContext context=null) {
+    Instant parseToInstant(Object date, DateParserContext<Instant> context=null) {
         return instantParser.parse(date, context)
     }
 
     /**
      * Parses a given date object into a LocalDate.
      */
-    LocalDate parseToLocalDate(Object date, DateParserContext context=null) {
+    LocalDate parseToLocalDate(Object date, DateParserContext<LocalDate> context=null) {
         return localDateParser.parse(date, context)
     }
 
     /**
      * Parses a given date object into a ZonedDateTime.
      */
-    ZonedDateTime parseToZonedDateTime(Object date, DateParserContext context=null) {
+    ZonedDateTime parseToZonedDateTime(Object date, DateParserContext<ZonedDateTime> context=null) {
         return zonedDateTimeParser.parse(date, context)
     }
 
     /**
      * Parses a given date object into a java.util.Date.
      */
-    Date parseToDate(Object date, DateParserContext context=null) {
+    Date parseToDate(Object date, DateParserContext<Date> context=null) {
         return javaUtilDateParser.parse(date, context)
     }
 }

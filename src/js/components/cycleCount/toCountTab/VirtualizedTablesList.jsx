@@ -15,6 +15,9 @@ const VirtualizedTablesList = ({
     // table with ~ 5 rows, average size of the count table
     estimateSize: () => 518,
     overscan: 2,
+    // use the cycle count id as the key for each virtual item to ensure stable keys
+    // even if the order of the cycle counts changes
+    getItemKey: (index) => cycleCountIds[index],
   });
 
   return (
@@ -31,7 +34,7 @@ const VirtualizedTablesList = ({
           return (
             <VirtualizedCountStepTable
               id={id}
-              key={id}
+              key={virtualRow.key}
               start={virtualRow.start}
               index={virtualRow.index}
               measureElement={tableVirtualizer.measureElement}

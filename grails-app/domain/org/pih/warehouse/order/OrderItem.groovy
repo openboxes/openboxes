@@ -19,6 +19,7 @@ import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.invoice.Invoice
 import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.invoice.InvoiceTypeCode
 import org.pih.warehouse.picklist.PicklistItem
@@ -419,7 +420,12 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
      * Either directly related to that order item or from related shipment items.
      **/
     List<InvoiceItem> getAllInvoiceItems() {
-        (shipmentItems*.invoiceItems + invoiceItems)?.flatten()?.unique() ?: []
+        Set<InvoiceItem> shipmentInvoiceItems = shipmentItems*.invoiceItems ?: []
+        Set<InvoiceItem> directInvoiceItems   = invoiceItems ?: []
+        return (shipmentInvoiceItems + directInvoiceItems)
+                .flatten()
+                .unique()
+                .toList()
     }
 
     // Check quantity (standard uom) in posted invoices
@@ -441,6 +447,10 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     Boolean getHasRegularInvoice() {
         return invoices.any { it.invoiceType == null || it.invoiceType?.code == InvoiceTypeCode.INVOICE }
+    }
+
+    List<Invoice> getRegularInvoices() {
+        return invoices.findAll { it.invoiceType?.code == InvoiceTypeCode.INVOICE }
     }
 
     Integer getPostedQuantityInvoiced() {

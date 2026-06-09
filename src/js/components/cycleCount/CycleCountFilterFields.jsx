@@ -8,8 +8,8 @@ const cycleCountFilterFields = {
     dateLastCount: {
       type: DateFilter,
       attributes: {
-        label: 'react.cycleCount.filter.lastCountedDate.label',
-        defaultMessage: 'Last counted date',
+        label: 'react.cycleCount.filter.lastCountedBefore.label',
+        defaultMessage: 'Last counted before',
         dateFormat: DateFormat.DD_MMM_YYYY,
         showLabelTooltip: true,
         filterElement: true,

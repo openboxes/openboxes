@@ -44,7 +44,7 @@
             </div>
         </div>
         <div class="left">
-            ${orderInstance?.destinationParty?.name }
+            ${orderInstance?.destinationParty?.displayName}
             <g:if test="${orderInstance?.destinationParty?.defaultLocation?.address}">
                 <br/>
                 ${orderInstance?.destinationParty?.defaultLocation?.address?.address}<br/>
@@ -84,7 +84,7 @@
                         <label><warehouse:message code="purchaseOrder.buyer.label" default="Buyer"/></label>
                     </td>
                     <td class="top left">
-                        ${orderInstance?.destinationParty?.name}
+                        ${orderInstance?.destinationParty?.displayName}
                     </td>
                 </tr>
                 <tr>
