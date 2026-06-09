@@ -337,6 +337,9 @@ class UserService {
         if (isSuperuser(requestingUser)) {
             return true
         }
+        if (!isUserManager(requestingUser)) {
+            return false
+        }
 
         /*
          * FIXME: we should check the user's highest role at the location
@@ -350,10 +353,10 @@ class UserService {
         return currentHighest.roleType.sortOrder <= targetRole.roleType.sortOrder
     }
 
-    private void rejectRoleChange(User targetUser, String messageCode, User requestingUser, Role role) {
-        String message = messageLocalizer.localize(messageCode, requestingUser?.username, role.name)
+    private void rejectRoleChange(User targetUser, String messageCode, User requestingUser, Role role = null) {
+        String message = messageLocalizer.localize(messageCode, requestingUser?.username, role?.name)
         log.warn("Rejected role change on user ${targetUser} by ${requestingUser}: ${messageCode}")
-        targetUser.errors.reject(messageCode, [requestingUser?.username, role.name] as Object[], message)
+        targetUser.errors.reject(messageCode, [requestingUser?.username, role?.name] as Object[], message)
         throw new ValidationException(message, targetUser.errors)
     }
 
@@ -361,6 +364,10 @@ class UserService {
         if (isSuperuser(requestingUser)) {
             return
         }
+        if (!isUserManager(requestingUser)) {
+            rejectRoleChange(targetUser, 'user.errors.cannotModifyRoles.message', requestingUser)
+        }
+
         Set<Role> added = ((after ?: []) as Set) - ((before ?: []) as Set)
         Set<Role> removed = ((before ?: []) as Set) - ((after ?: []) as Set)
         for (Role role : added) {
