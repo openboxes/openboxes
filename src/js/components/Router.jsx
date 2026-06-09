@@ -52,8 +52,8 @@ const AsyncStockMovementVerifyRequest = Loadable({
   loading: Loading,
 });
 
-const AsyncReceivingPage = Loadable({
-  loader: () => import('components/receiving/ReceivingPage'),
+const AsyncReceiving = Loadable({
+  loader: () => import('components/receiving/Receiving'),
   loading: Loading,
 });
 
@@ -266,7 +266,7 @@ const Router = () => {
             <MainLayoutRoute path="**/stockMovement/createRequest/:stockMovementId?" component={AsyncStockMovementRequest} />
             <MainLayoutRoute path="**/stockMovement/verifyRequest/:stockMovementId?" component={AsyncStockMovementVerifyRequest} />
             <MainLayoutRoute path="**/stockMovement/create/:stockMovementId?" component={AsyncStockMovement} />
-            <MainLayoutRoute path="**/partialReceiving/create/:shipmentId" component={AsyncReceivingPage} />
+            <MainLayoutRoute path="**/partialReceiving/create/:shipmentId" component={AsyncReceiving} />
             <MainLayoutRoute path="**/stocklistManagement/index/:productId?" component={AsyncManagement} />
             <MainLayoutRoute path="**/invoice/create/:invoiceId?" component={AsyncInvoice} />
             <MainLayoutRoute path="**/invoice/list" component={AsyncInvoiceList} />

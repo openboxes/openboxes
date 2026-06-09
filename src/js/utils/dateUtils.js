@@ -87,6 +87,21 @@ export const parseStringToDate = ({
 };
 
 /**
+ * Resolves a date-fns locale object for the given locale code.
+ * `enUS` is a fallback when the locale is missing or unsupported — the 'ar' locale
+ * crashes the date picker, so it is intentionally fallback.
+ * @param {String} localeCode - locale code
+ * @returns {Locale} date-fns locale object
+ */
+export const getDateFnsLocale = (localeCode) => {
+  if (!localeCode || ['en', 'ar'].includes(localeCode)) {
+    return locales.enUS;
+  }
+
+  return locales[localeCode] ?? locales.enUS;
+};
+
+/**
  * Converts a date to a string in specified format
  * @param {Object} params
  * @param {Object} options
