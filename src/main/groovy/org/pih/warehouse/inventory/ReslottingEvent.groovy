@@ -9,13 +9,14 @@
  **/
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.core.User
 import org.springframework.context.ApplicationEvent
 
 class ReslottingEvent extends ApplicationEvent {
-    String updatedByUserId
+    User updatedBy
 
-    ReslottingEvent(String inventoryLevelId, String updatedByUserId) {
+    ReslottingEvent(String inventoryLevelId, User updatedBy) {
         super(inventoryLevelId)
-        this.updatedByUserId = updatedByUserId
+        this.updatedBy = updatedBy
     }
 }
