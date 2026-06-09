@@ -12,7 +12,7 @@ import MAX_DATE_PICKER_DATE from 'consts/datePickerLimits';
 import { DateFormatDateFns, TimeFormat } from 'consts/timeFormat';
 import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import useTranslate from 'hooks/useTranslate';
-import { dateFnsLocale, formatDateToString } from 'utils/dateUtils';
+import { formatDateToString, getDateFnsLocale } from 'utils/dateUtils';
 import InputWrapper from 'wrappers/InputWrapper';
 import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 
@@ -112,7 +112,7 @@ const DateFieldDateFns = ({
       value={formatDateToString({
         date: value,
         dateFormat: DateFormatDateFns.DD_MMM_YYYY,
-        options: { locale: dateFnsLocale(currentLocale) },
+        options: { locale: getDateFnsLocale(currentLocale) },
       })}
       ariaLabel={ariaLabel}
       hasErrors={Boolean(errorMessage || hasErrors)}
@@ -122,7 +122,7 @@ const DateFieldDateFns = ({
         // ariaLiveMessages is a new prop for displaying a message above the date field.
         // By passing an empty object, we are hiding that message.
         ariaLiveMessages={{}}
-        locale={dateFnsLocale(currentLocale)}
+        locale={getDateFnsLocale(currentLocale)}
         showTimeSelect={showTimeSelect}
         customInput={showCustomInput
           ? <DateFieldInput onClear={onClear} clearable={clearable} />
