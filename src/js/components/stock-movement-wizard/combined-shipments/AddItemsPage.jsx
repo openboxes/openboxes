@@ -781,8 +781,10 @@ class AddItemsPage extends Component {
 
   async validateExpirationDate(lineItems, rowIndex) {
     const lineItem = lineItems?.[rowIndex];
-    const inventoryItem = lineItem?.fetchedInventoryItem?.inventoryItem
-      || lineItem?.inventoryItem;
+    const { fetchedInventoryItem } = lineItem ?? {};
+    const inventoryItem = fetchedInventoryItem
+      ? fetchedInventoryItem.inventoryItem
+      : lineItem?.inventoryItem;
 
     // inventoryItem is null when lot does not exist (new lot)
     const lotExists = Boolean(inventoryItem);
