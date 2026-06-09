@@ -23,6 +23,7 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
     User admin
     User manager
     User superuser
+    User browser
 
     void setupSpec() {
         mockDomain(Location)
@@ -56,6 +57,11 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
         superuser.addToRoles(superuserRole)
         superuser.save(validate: false)
 
+        browser = new User(username: 'browser', password: 'pass', passwordConfirm: 'pass',
+            firstName: 'Browser', lastName: 'User', email: 'br@test.com')
+        browser.addToRoles(browserRole)
+        browser.save(validate: false)
+
         /*
          * If currentLocation is null, requestingUser.getHighestRole() can
          * still check global roles. Not ideal (see FIXME in UserService
@@ -77,6 +83,7 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
             case 'superuser': return superuser
             case 'admin':     return admin
             case 'manager':   return manager
+            case 'browser':   return browser
             case 'null':      return null
         }
     }
@@ -87,6 +94,8 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
             case 'Admin':     return adminRole
             case 'Manager':   return managerRole
             case 'Browser':   return browserRole
+            case 'Finance User':   return financeRole
+            case 'Invoice User':   return invoiceRole
         }
     }
 
@@ -95,20 +104,32 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
         assert service.canAddOrRemoveRole(userByName(user), roleByName(role)) == allowed
 
         where:
-        user        | role        | allowOrForbid || allowed
-        'superuser' | 'Admin'     | 'allow'       || true
-        'superuser' | 'Browser'   | 'allow'       || true
-        'superuser' | 'Manager'   | 'allow'       || true
-        'superuser' | 'Superuser' | 'allow'       || true
-        'admin'     | 'Admin'     | 'allow'       || true
-        'admin'     | 'Browser'   | 'allow'       || true
-        'admin'     | 'Manager'   | 'allow'       || true
-        'admin'     | 'Superuser' | 'forbid'      || false
-        'manager'   | 'Admin'     | 'forbid'      || false
-        'manager'   | 'Browser'   | 'allow'       || true
-        'manager'   | 'Manager'   | 'allow'       || true
-        'manager'   | 'Superuser' | 'forbid'      || false
-        'null'      | 'Browser'   | 'forbid'      || false
+        user        | role           | allowOrForbid || allowed
+        'superuser' | 'Admin'        | 'allow'       || true
+        'superuser' | 'Browser'      | 'allow'       || true
+        'superuser' | 'Manager'      | 'allow'       || true
+        'superuser' | 'Superuser'    | 'allow'       || true
+        'superuser' | 'Finance User' | 'allow'       || true
+        'superuser' | 'Invoice User' | 'allow'       || true
+        'admin'     | 'Admin'        | 'allow'       || true
+        'admin'     | 'Browser'      | 'allow'       || true
+        'admin'     | 'Manager'      | 'allow'       || true
+        'admin'     | 'Superuser'    | 'forbid'      || false
+        'admin'     | 'Finance User' | 'allow'       || true
+        'admin'     | 'Invoice User' | 'allow'       || true
+        'manager'   | 'Admin'        | 'forbid'      || false
+        'manager'   | 'Browser'      | 'allow'       || true
+        'manager'   | 'Manager'      | 'allow'       || true
+        'manager'   | 'Superuser'    | 'forbid'      || false
+        'manager'   | 'Finance User' | 'allow'       || true
+        'manager'   | 'Invoice User' | 'allow'       || true
+        'browser'   | 'Admin'        | 'forbid'      || false
+        'browser'   | 'Browser'      | 'forbid'      || false
+        'browser'   | 'Manager'      | 'forbid'      || false
+        'browser'   | 'Superuser'    | 'forbid'      || false
+        'browser'   | 'Finance User' | 'forbid'      || false
+        'browser'   | 'Invoice User' | 'forbid'      || false
+        'null'      | 'Browser'      | 'forbid'      || false
     }
 
     void "should allow an update that leaves the roles unchanged"() {
@@ -128,6 +149,14 @@ class UserServiceRoleValidationSpec extends Specification implements ServiceUnit
 
         then:
         noExceptionThrown()
+    }
+
+    void "should reject an update made by non manager user"() {
+        when:
+        service.checkCanAddOrRemoveRoles(browser, browser, [], [adminRole])
+
+        then:
+        thrown(ValidationException)
     }
 
     void "should reject an update whose params contain a 'roles' key"() {
