@@ -11,6 +11,7 @@ import org.pih.warehouse.receiving.ReceiptIdentifierService
 import org.pih.warehouse.receiving.ReceiptService
 import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentStatusCode
 
 @Transactional(readOnly = true)
 class ReceiptV2Service {
@@ -27,10 +28,7 @@ class ReceiptV2Service {
             throw new ObjectNotFoundException(shipmentId, Shipment.class.toString())
         }
 
-        boolean hasPendingReceipt = shipment.receipts?.any { it.receiptStatusCode == ReceiptStatusCode.PENDING }
-        if (hasPendingReceipt) {
-            throw new IllegalStateException("A pending receipt already exists for shipment ${shipment.shipmentNumber}")
-        }
+        validateShipmentReceivable(shipment)
 
         Receipt receipt = new Receipt()
         receipt.receiptNumber = receiptIdentifierService.generate(receipt)
@@ -48,5 +46,21 @@ class ReceiptV2Service {
         }
 
         return ReceiptDto.toDto(receipt)
+    }
+
+    private static void validateShipmentReceivable(Shipment shipment) {
+        boolean hasPendingReceipt = shipment.receipts?.any { it.receiptStatusCode == ReceiptStatusCode.PENDING }
+        if (hasPendingReceipt) {
+            throw new IllegalStateException("A pending receipt already exists for shipment ${shipment.shipmentNumber}")
+        }
+
+        if (shipment.isFullyReceived()) {
+            throw new IllegalStateException("Shipment ${shipment.shipmentNumber} has already been fully received")
+        }
+
+        if (shipment.currentStatus in [ShipmentStatusCode.CREATED, ShipmentStatusCode.PENDING]) {
+            throw new IllegalStateException(
+                    "Cannot receive shipment ${shipment.shipmentNumber} because it has not been shipped yet")
+        }
     }
 }
