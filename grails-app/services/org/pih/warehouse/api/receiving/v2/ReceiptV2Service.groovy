@@ -4,7 +4,9 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.session.SessionManager
 import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.receiving.ReceiptDto
 import org.pih.warehouse.receiving.ReceiptIdentifierService
 import org.pih.warehouse.receiving.ReceiptService
 import org.pih.warehouse.receiving.ReceiptStatusCode
@@ -13,7 +15,6 @@ import org.pih.warehouse.shipping.Shipment
 @Transactional(readOnly = true)
 class ReceiptV2Service {
 
-    AuthService authService
     ReceiptIdentifierService receiptIdentifierService
 
     // Inject old receipt service to reuse bin creation logic
@@ -34,7 +35,7 @@ class ReceiptV2Service {
         Receipt receipt = new Receipt()
         receipt.receiptNumber = receiptIdentifierService.generate(receipt)
         receipt.receiptStatusCode = ReceiptStatusCode.PENDING
-        receipt.recipient = authService.currentUser
+        receipt.recipient = AuthService.currentUser
         receipt.expectedDeliveryDate = shipment.expectedDeliveryDate
         receipt.actualDeliveryDate = shipment.actualDeliveryDate ?: new Date()
         receipt.disableRefresh = true

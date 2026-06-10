@@ -433,7 +433,7 @@ class UrlMappings {
 
         // Receiving v2 API
 
-        "/api/receiving/v2/shipment/$shipmentId/start" {
+        "/api/receipts/v2/shipment/$shipmentId/start" {
             controller = "receiptApi"
             action = [POST: "start"]
         }

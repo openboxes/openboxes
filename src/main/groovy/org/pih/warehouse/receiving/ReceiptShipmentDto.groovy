@@ -1,4 +1,4 @@
-package org.pih.warehouse.api.receiving.v2
+package org.pih.warehouse.receiving
 
 import org.pih.warehouse.shipping.Shipment
 

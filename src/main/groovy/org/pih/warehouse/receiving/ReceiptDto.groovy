@@ -1,12 +1,13 @@
-package org.pih.warehouse.api.receiving.v2
+package org.pih.warehouse.receiving
 
 import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.shipping.Shipment
 
 class ReceiptDto {
 
     String id
-    String receiptStatus
+    ReceiptStatusCode receiptStatus
     ReceiptShipmentDto shipment
     ReceiptLocationDto origin
     ReceiptLocationDto destination

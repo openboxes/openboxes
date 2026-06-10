@@ -2,6 +2,8 @@ package org.pih.warehouse.api.receiving.v2
 
 import grails.converters.JSON
 
+import org.pih.warehouse.receiving.ReceiptDto
+
 class ReceiptApiController {
 
     ReceiptV2Service receiptV2Service
