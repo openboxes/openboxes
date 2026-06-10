@@ -1,7 +1,12 @@
 import React from 'react';
 
+import ReceivingFilters from 'components/receiving/ReceivingFilters';
+
 const ReceivingStep = () => (
-  <span>Receiving Step</span>
+  <>
+    <ReceivingFilters />
+    {/* Table should be rendered here */}
+  </>
 );
 
 export default ReceivingStep;
