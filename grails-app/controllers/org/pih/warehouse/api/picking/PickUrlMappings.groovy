@@ -8,6 +8,11 @@ class PickUrlMappings {
             action = [GET: "search"]
         }
 
+        "/api/facilities/$facility/pick-tasks/counts" {
+            controller = "pickTaskApi"
+            action = [GET: "counts"]
+        }
+
         "/api/facilities/$facility/pick-tasks/$id" {
             controller = "pickTaskApi"
             action = [GET: "read", PATCH: "patch"]

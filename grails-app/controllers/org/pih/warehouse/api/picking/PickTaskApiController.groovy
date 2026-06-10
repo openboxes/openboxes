@@ -12,6 +12,7 @@ class PickTaskApiController extends RestfulController<PickTask> {
     static responseFormats = ['json']
     static allowedMethods = [
             search: 'GET',
+            counts: 'GET',
             read: 'GET',
             patch: 'PATCH',
             drop: 'PATCH',
@@ -42,6 +43,16 @@ class PickTaskApiController extends RestfulController<PickTask> {
                 max: max,
                 offset: offset
         ] as JSON)
+    }
+
+    def counts(SearchPickTaskCommand command) {
+        if (command.hasErrors()) {
+            throw new ValidationException("Validation errors", command.errors)
+        }
+
+        def data = pickTaskService.countOrdersByDeliveryType(command.facility)
+
+        render([data: data] as JSON)
     }
 
     def read(String id) {
