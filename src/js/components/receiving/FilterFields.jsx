@@ -1,7 +1,7 @@
 import FilterSelectField from 'components/form-elements/FilterSelectField';
 import receiptStatusOptions from 'consts/receiptStatusOptions';
 
-export default {
+const filterFields = (translate) => ({
   receiptStatusCode: {
     type: FilterSelectField,
     attributes: {
@@ -15,11 +15,11 @@ export default {
       defaultPlaceholder: 'Receipt Status',
       ariaLabel: 'Receipt Status',
       showLabelTooltip: true,
+      options: receiptStatusOptions(translate),
       closeMenuOnSelect: false,
       blurInputOnSelect: false,
     },
-    getDynamicAttr: ({ translate }) => ({
-      options: receiptStatusOptions(translate),
-    }),
   },
-};
+});
+
+export default filterFields;
