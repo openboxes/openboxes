@@ -37,6 +37,7 @@ const FilterForm = ({
   showFilterVisibilityToggler,
   showSearchField,
   disableAutoUpdateFilterParams,
+  alignButtonsToFilters,
   onSubmit,
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
@@ -146,7 +147,7 @@ const FilterForm = ({
             <form onSubmit={handleSubmit} className="w-100 m-0">
               <div className="classic-form with-description align-items-center flex-wrap">
                 <div className="w-100 d-flex filter-header align-items-center">
-                  <div className="min-w-50 d-flex align-items-center gap-8">
+                  <div className={`d-flex align-items-center gap-8 ${alignButtonsToFilters ? '' : 'min-w-50'}`}>
                     {_.map(
                       // Render filters with top: true
                       _.pickBy(filterFields, (field) => field.attributes?.top),
@@ -164,7 +165,7 @@ const FilterForm = ({
                     />
                     )}
                   </div>
-                  <div className="d-flex justify-content-end buttons">
+                  <div className={`d-flex buttons ${alignButtonsToFilters ? '' : 'justify-content-end flex-grow-1'}`}>
                     <Button
                       defaultLabel="Clear"
                       label="react.button.clear.label"
@@ -234,6 +235,7 @@ FilterForm.propTypes = {
   customSubmitButtonDefaultLabel: PropTypes.string,
   showFilterVisibilityToggler: PropTypes.bool,
   disableAutoUpdateFilterParams: PropTypes.bool,
+  alignButtonsToFilters: PropTypes.bool,
   onSubmit: PropTypes.func,
 };
 
@@ -253,5 +255,6 @@ FilterForm.defaultProps = {
   customSubmitButtonDefaultLabel: null,
   showFilterVisibilityToggler: true,
   disableAutoUpdateFilterParams: false,
+  alignButtonsToFilters: false,
   onSubmit: () => {},
 };
