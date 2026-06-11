@@ -558,6 +558,10 @@ openboxes:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes
             delayInMilliseconds: 1000
+
+        # should only be triggered by persistence event listener
+        putawayLocationReslottingJob:
+            enabled: true
     # LDAP configuration
     ldap:
         enabled: false

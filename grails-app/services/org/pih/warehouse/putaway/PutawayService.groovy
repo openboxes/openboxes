@@ -329,6 +329,32 @@ class PutawayService implements EventPublisher  {
         return putawayOrders
     }
 
+    List<Putaway> getPutawayOrders(Product product, List<Location> destinationBinLocations, Location origin) {
+        OrderType putawayOrderType = OrderType.findByCode(Constants.PUTAWAY_ORDER)
+
+        List<OrderStatus> statusesBelowCompleted = OrderStatus.values().findAll {
+            it.sortOrder < OrderStatus.COMPLETED.sortOrder
+        }
+        List<OrderItemStatusCode> orderItemStatusCodes = OrderItemStatusCode.values().findAll {
+            it.sortOrder < OrderItemStatusCode.COMPLETED.sortOrder
+        }
+
+        List<Order> orders = OrderItem.createCriteria().list {
+            projections {
+                distinct "order"
+            }
+            eq("product", product)
+            'in'("destinationBinLocation", destinationBinLocations)
+            'in'("orderItemStatusCode", orderItemStatusCodes)
+            order {
+                eq("origin", origin)
+                eq("orderType", putawayOrderType)
+                'in'("status", statusesBelowCompleted)
+            }
+        } as List<OrderItem>
+        return orders?.collect { Putaway.createFromOrder(it)} ?: []
+    }
+
     void processSplitItems(Putaway putaway) {
 
         putaway.putawayItems.toArray().each { PutawayItem oldPutawayItem ->
