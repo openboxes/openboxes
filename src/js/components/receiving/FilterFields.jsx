@@ -15,9 +15,11 @@ export default {
       defaultPlaceholder: 'Receipt Status',
       ariaLabel: 'Receipt Status',
       showLabelTooltip: true,
-      options: receiptStatusOptions,
       closeMenuOnSelect: false,
       blurInputOnSelect: false,
     },
+    getDynamicAttr: ({ translate }) => ({
+      options: receiptStatusOptions(translate),
+    }),
   },
 };
