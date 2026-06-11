@@ -431,6 +431,13 @@ class UrlMappings {
             action = [POST: "exportCsv"]
         }
 
+        // Receiving v2 API
+
+        "/api/receipts/v2/shipment/$shipmentId/start" {
+            controller = "receiptApi"
+            action = [POST: "start"]
+        }
+
         // Internal Locations API
 
         "/api/internalLocations/receiving"(parseRequest: true) {
