@@ -1833,7 +1833,7 @@ class InventoryService implements ApplicationContextAware {
             // Those aliases FETCH JOIN the associations further used by the view,
             // so that we don't have n+1 queries when rendering the stock history page
             createAlias("transaction", "t", JoinType.INNER_JOIN)
-            createAlias("t.createdBy", "createdBy", JoinType.INNER_JOIN)
+            createAlias("t.createdBy", "createdBy", JoinType.LEFT_OUTER_JOIN)
             createAlias("t.source", "source", JoinType.LEFT_OUTER_JOIN)
             createAlias("t.transactionType", "transactionType", JoinType.INNER_JOIN)
             createAlias("t.destination", "destination", JoinType.LEFT_OUTER_JOIN)
