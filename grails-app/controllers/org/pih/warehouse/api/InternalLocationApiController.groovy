@@ -33,7 +33,7 @@ class InternalLocationApiController {
         command.location = getFacility(command)
 
         List<Location> locations = locationService.getInternalLocations(command)
-        render([data: locations?.collect { [id: it.id, name: it.name, zoneId: it.zone?.id, zoneName: it.zone?.name] }] as JSON)
+        render([data: locations?.collect { [id: it.id, name: it.name, locationNumber: it.locationNumber, zoneId: it.zone?.id, zoneName: it.zone?.name] }] as JSON)
     }
 
     def search() {
