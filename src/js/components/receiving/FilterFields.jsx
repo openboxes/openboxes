@@ -11,7 +11,7 @@ const filterFields = (translate) => ({
       className: 'order-1',
       multi: true,
       filterElement: true,
-      placeholder: 'react.partialReceiving.filters.receiptStatus.label',
+      placeholder: 'react.receiving.filters.receiptStatus.label',
       defaultPlaceholder: 'Receipt Status',
       ariaLabel: 'Receipt Status',
       showLabelTooltip: true,

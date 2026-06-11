@@ -41,7 +41,7 @@ const ReceivingFilters = () => {
       </div>
       <FilterForm
         searchFieldId="q"
-        searchFieldPlaceholder="react.partialReceiving.search.placeholder.label"
+        searchFieldPlaceholder="react.receiving.search.placeholder.label"
         searchFieldDefaultPlaceholder="Search..."
         filterFields={fields}
         updateFilterParams={() => {}}
@@ -55,37 +55,37 @@ const ReceivingFilters = () => {
           className="receiving-filters__switch"
           titles={{
             checked: {
-              id: 'react.partialReceiving.enablePutaway.label',
+              id: 'react.receiving.enablePutaway.label',
               defaultMessage: 'Enable Putaway',
             },
             unchecked: {
-              id: 'react.partialReceiving.enablePutaway.label',
+              id: 'react.receiving.enablePutaway.label',
               defaultMessage: 'Enable Putaway',
             },
           }}
         />
         <Button
-          label="react.partialReceiving.resetSorting.label"
+          label="react.receiving.resetSorting.label"
           defaultLabel="Reset sorting"
           variant="secondary"
           EndIcon={<RiRefreshLine size={16} />}
         />
         <Button
-          label="react.partialReceiving.autofillQuantities.label"
+          label="react.receiving.autofillQuantities.label"
           defaultLabel="Autofill quantities"
           variant="secondary"
           EndIcon={<RiMagicLine size={16} />}
         />
 
         <Button
-          label="react.partialReceiving.import.label"
+          label="react.receiving.import.label"
           defaultLabel="Import"
           variant="secondary"
           isDropdown
           EndIcon={<RiArrowDownSLine size={16} />}
         />
         <Button
-          label="react.partialReceiving.saveAndExit.label"
+          label="react.receiving.saveAndExit.label"
           defaultLabel="Save & Exit"
           variant="secondary"
           EndIcon={<RiLogoutBoxRLine size={16} />}
