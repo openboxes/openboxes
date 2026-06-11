@@ -420,8 +420,8 @@ class PutawayTaskService {
         Order order = currentItem.order
 
         Putaway putaway = Putaway.createFromOrder(order)
-        if (!putaway.putawayAssignee) {
-            putaway.putawayAssignee = AuthService.currentUser
+        if (!putaway.orderedBy) {
+            putaway.orderedBy = AuthService.currentUser
         }
         PutawayItem itemToSplit = putaway.putawayItems.find { it.id == currentItem.id }
 

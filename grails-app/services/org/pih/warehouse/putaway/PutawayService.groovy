@@ -94,7 +94,7 @@ class PutawayService implements EventPublisher  {
                 putaway.destination = location
                 putaway.putawayDate = new Date()
                 putaway.putawayStatus = PutawayStatus.PENDING
-                putaway.putawayAssignee = putawayAssignee
+                putaway.orderedBy = putawayAssignee
                 putawayCandidate.putawayLocation = putawayLocation
                 putaway.putawayItems.add(putawayCandidate)
                 savePutaway(putaway)
@@ -448,7 +448,7 @@ class PutawayService implements EventPublisher  {
         if (!order.orderNumber) {
             order.orderNumber = "P-${putaway.putawayNumber ?: orderIdentifierService.generate(order)}"
         }
-        order.orderedBy = putaway.putawayAssignee
+        order.orderedBy = putaway.orderedBy
         order.dateOrdered = new Date()
         order.origin = putaway.origin
         order.destination = putaway.destination

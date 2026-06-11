@@ -151,7 +151,7 @@ class PutawayApiController {
             putaway.putawayNumber = orderIdentifierService.generate(order)
         }
 
-        putaway.putawayAssignee = currentUser
+        putaway.orderedBy = currentUser
 
         return putaway
     }

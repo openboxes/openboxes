@@ -95,7 +95,7 @@ class InboundSortationService {
                 origin: putawayContext.facility,
                 destination: putawayContext.facility,
                 putawayNumber: orderIdentifierService.generate(new Order()),
-                putawayAssignee: createdBy,
+                orderedBy: createdBy,
                 putawayStatus: PutawayStatus.PENDING
         )
     }
