@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import {
   RiArrowDownSLine,
@@ -6,6 +6,8 @@ import {
   RiMagicLine,
   RiRefreshLine,
 } from 'react-icons/ri';
+import { useSelector } from 'react-redux';
+import { getPartialReceivingTranslationsFetched } from 'selectors';
 
 import FilterForm from 'components/Filter/FilterForm';
 import Button from 'components/form-elements/Button';
@@ -23,6 +25,12 @@ import 'components/receiving/ReceivingFilters.scss';
  */
 const ReceivingFilters = () => {
   const translate = useTranslate();
+  // Add loading for filters section. Loading will display before the translations are fetched.
+  // It fixes the issue of untranslated labels in the filters.
+  const translationsFetched = useSelector(getPartialReceivingTranslationsFetched);
+  // Recomputed whenever translations change, so that the field configs hold
+  // already translated labels.
+  const fields = useMemo(() => filterFields(translate), [translate]);
 
   return (
     <div className="receiving-filters">
@@ -35,12 +43,12 @@ const ReceivingFilters = () => {
         searchFieldId="q"
         searchFieldPlaceholder="react.partialReceiving.search.placeholder.label"
         searchFieldDefaultPlaceholder="Search..."
-        filterFields={filterFields}
-        formProps={{ translate }}
+        filterFields={fields}
         updateFilterParams={() => {}}
         hidden={false}
         showFilterVisibilityToggler={false}
         alignButtonsToFilters
+        isLoading={!translationsFetched}
       />
       <div className="receiving-filters__row receiving-filters__actions d-flex flex-wrap justify-content-end align-items-center">
         <Switch
