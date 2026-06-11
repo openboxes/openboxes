@@ -1,0 +1,53 @@
+.receiving-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &__row {
+    gap: 12px;
+  }
+
+  &__autosave-slot {
+    min-height: 24px;
+  }
+
+  &__actions {
+    gap: 12px;
+  }
+
+  .filter-select .filter-select__control {
+    min-height: 36px;
+  }
+
+  &__switch {
+    .switch {
+      margin-bottom: 0;
+    }
+
+    .switch-title {
+      margin-bottom: 0;
+      color: var(--gray-600);
+    }
+  }
+}
+
+.receiving-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.receiving-table {
+  .rt-td {
+    display: flex;
+    align-items: center;
+
+    div {
+      min-width: 0;
+    }
+  }
+
+  .input-wrapper-error-message {
+    min-height: unset !important;
+  }
+}
