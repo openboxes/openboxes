@@ -22,18 +22,18 @@ const HEADER_INFO = [
 ];
 
 const Receiving = () => {
-  useTranslation('partialReceiving');
+  useTranslation('receiving');
   const translate = useTranslate();
 
   const steps = useMemo(() => [
     {
       key: ReceivingStepKey.RECEIVING,
-      title: translate('react.partialReceiving.receiving.label', 'Receiving'),
+      title: translate('react.receiving.receiving.label', 'Receiving'),
       Component: ReceivingStep,
     },
     {
       key: ReceivingStepKey.CHECK,
-      title: translate('react.partialReceiving.check.label', 'Check'),
+      title: translate('react.receiving.check.label', 'Check'),
       Component: CheckStep,
     },
   ], [translate]);
@@ -49,7 +49,7 @@ const Receiving = () => {
   });
 
   const title = {
-    label: translate('react.partialReceiving.receiving.label', 'Receiving'),
+    label: translate('react.receiving.receiving.label', 'Receiving'),
     info: HEADER_INFO,
   };
 
