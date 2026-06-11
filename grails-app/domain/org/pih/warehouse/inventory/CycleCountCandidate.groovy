@@ -46,42 +46,4 @@ class CycleCountCandidate {
         version false
         table "cycle_count_candidate"
     }
-
-    Map toJson() {
-        return [
-                product: [
-                        id: product.id,
-                        name: product.name,
-                        productCode: product.productCode,
-                ],
-                dateLastCount: dateLastCount,
-                dateNextCount: dateNextCount,
-                daysUntilNextCount: daysUntilNextCount,
-                category: [
-                        id: product.category?.id,
-                        name: product.category?.name,
-                ],
-                internalLocations: internalLocations,
-                tags: tagsToJson(),
-                productCatalogs: product.productCatalogs,
-                abcClass: abcClass,
-                quantityOnHand: quantityOnHand,
-                quantityAllocated: quantityAllocated,
-                cycleCountRequest: cycleCountRequest,
-                status: status.toString(),
-                inventoryItemCount: inventoryItemCount,
-                negativeItemCount: negativeItemCount,
-                hasStockOnHandOrNegativeStock: hasStockOnHandOrNegativeStock,
-                sortOrder: sortOrder,
-        ]
-    }
-
-    List<Map> tagsToJson() {
-        return product.tags?.collect { Tag tag ->
-            [
-                    id : tag.id,
-                    tag: tag.tag,
-            ]
-        }
-    }
 }
