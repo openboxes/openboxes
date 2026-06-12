@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import DataTable from 'components/DataTable/v2/DataTable';
 
-import 'components/receiving/receiving.scss';
+import 'components/receivingV2/receiving.scss';
 
 const ReceivingTable = ({ lineItems, columns, loading }) => (
   <div className="receiving-table">
