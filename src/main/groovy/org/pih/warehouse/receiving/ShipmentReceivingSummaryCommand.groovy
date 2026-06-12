@@ -1,5 +1,7 @@
 package org.pih.warehouse.receiving
 
+import org.springframework.web.context.request.RequestContextHolder
+
 import org.pih.warehouse.core.validation.ObjectValidatable
 import org.pih.warehouse.shipping.Shipment
 
@@ -11,6 +13,11 @@ class ShipmentReceivingSummaryCommand implements ObjectValidatable {
 
     Shipment shipment
     ReceiptGrouping grouping = ReceiptGrouping.NONE
+
+    def beforeValidate() {
+        String shipmentId = RequestContextHolder.getRequestAttributes().params?.shipmentId
+        shipment = Shipment.read(shipmentId)
+    }
 
     static constraints = {
         grouping(nullable: true)

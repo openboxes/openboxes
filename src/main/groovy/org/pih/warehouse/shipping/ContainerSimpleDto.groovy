@@ -15,7 +15,7 @@ class ContainerSimpleDto implements ResponseBodyFormattable {
         return !container ? null : new ContainerSimpleDto(
                 id: container.id,
                 name: container.name,
-                parentContainer: from(container),
+                parentContainer: from(container.parentContainer),
         )
     }
 
@@ -24,7 +24,7 @@ class ContainerSimpleDto implements ResponseBodyFormattable {
         return [
                 id: id,
                 name: name,
-                parentContainer: parentContainer.asResponseBody(),
+                parentContainer: parentContainer?.asResponseBody(),
         ]
     }
 }

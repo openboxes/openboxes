@@ -30,7 +30,7 @@ class ProductLotDto implements ResponseBodyFormattable {
     @Override
     Map<String, Object> asResponseBody() {
         return [
-                product: product.asResponseBody(),
+                product: product?.asResponseBody(),
                 lotNumber: lotNumber,
                 expirationDate: expirationDate,
                 lotStatus: lotStatus,

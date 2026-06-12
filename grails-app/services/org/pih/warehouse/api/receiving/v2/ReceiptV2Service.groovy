@@ -24,6 +24,9 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 @Transactional(readOnly = true)
 class ReceiptV2Service {
 
+    // Grouping key used for shipment items that have no container (ie no pack level).
+    private static final String UNPACKED_GROUPING_KEY = "Unpacked"
+
     ReceiptIdentifierService receiptIdentifierService
 
     // Inject old receipt service to reuse bin creation logic
@@ -75,7 +78,8 @@ class ReceiptV2Service {
     /**
      * List all receipts (and their receipt items) that are associated with a shipment.
      */
-    List<ReceiptDto> listShipmentReceipts(Shipment shipment) {
+    List<ReceiptDto> listShipmentReceipts(String shipmentId) {
+        Shipment shipment = Shipment.read(shipmentId)
         if (!shipment) {
             throw new ObjectNotFoundException(shipment.id, Shipment.toString())
         }
@@ -98,7 +102,7 @@ class ReceiptV2Service {
         // items grouped by their shipment item so that we can easily loop both of them together.
         List<ShipmentItem> shipmentItems = shipment.shipmentItems.sort()
         Map<String, List<ReceiptItem>> receiptItemsByShipmentItemId =
-                ReceiptItem.findAllByShipmentItemInList(shipmentItems.id)
+                ReceiptItem.findAllByShipmentItemInList(shipmentItems)
                         .groupBy { it.shipmentItemId.toString() }
 
         ShipmentReceivingSummaryDto shipmentSummary = new ShipmentReceivingSummaryDto(
@@ -148,7 +152,13 @@ class ReceiptV2Service {
             Container packLevel2 = shipmentItem.container
             Container packLevel1 = packLevel2?.parentContainer
 
-            grouping.get(packLevel1?.name).put(packLevel2?.name, shipmentItem.id)
+            // When the item's container has no parent, the container itself is the top pack level, so we group
+            // directly under it. Items with no container at all fall back to the "Unpacked" group. We avoid a null
+            // key both because it groups nothing and because the JSON serializer drops map entries keyed on null.
+            String topLevelName = packLevel1?.name ?: packLevel2?.name ?: UNPACKED_GROUPING_KEY
+            String secondLevelName = packLevel2?.name ?: UNPACKED_GROUPING_KEY
+            grouping.get(topLevelName).put(secondLevelName, shipmentItem.id)
         }
+        return grouping
     }
 }

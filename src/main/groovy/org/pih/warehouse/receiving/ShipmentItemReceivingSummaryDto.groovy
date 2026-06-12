@@ -31,8 +31,8 @@ class ShipmentItemReceivingSummaryDto implements ResponseBodyFormattable {
      * @return The total quantity received for the shipment item across all receipt, including not submitted receipts.
      */
     int getTotalQuantityReceived() {
-        int previousQuantity = previousReceiptItems.sum(0) { ReceiptItemDto item -> item.quantityReceived } as int
-        int currentQuantity = currentReceiptItems.sum(0) { ReceiptItemDto item -> item.quantityReceived } as int
+        int previousQuantity = previousReceiptItems.sum(0) { ReceiptItemDto item -> item.quantityReceived ?: 0 } as int
+        int currentQuantity = currentReceiptItems.sum(0) { ReceiptItemDto item -> item.quantityReceived ?: 0 } as int
         return previousQuantity + currentQuantity
     }
 
@@ -40,8 +40,8 @@ class ShipmentItemReceivingSummaryDto implements ResponseBodyFormattable {
      * @return The total quantity canceled for the shipment item across all receipt, including not submitted receipts.
      */
     int getTotalQuantityCanceled() {
-        int previousQuantity = previousReceiptItems.sum(0) { ReceiptItemDto item -> item.quantityCanceled } as int
-        int currentQuantity = currentReceiptItems.sum(0) { ReceiptItemDto item -> item.quantityCanceled } as int
+        int previousQuantity = previousReceiptItems.sum(0) { ReceiptItemDto item -> item.quantityCanceled ?: 0 } as int
+        int currentQuantity = currentReceiptItems.sum(0) { ReceiptItemDto item -> item.quantityCanceled ?: 0 } as int
         return previousQuantity + currentQuantity
     }
 

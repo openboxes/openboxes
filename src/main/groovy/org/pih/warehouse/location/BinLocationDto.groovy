@@ -17,9 +17,9 @@ class BinLocationDto implements ResponseBodyFormattable {
         if (!location) {
             return null
         }
-        if (!location.isBinLocation()) {
-            throw new IllegalArgumentException("Only a bin location can be converted to a BinLocationDto.")
-        }
+//        if (!location.isBinLocation()) {
+//            throw new IllegalArgumentException("Only a bin location can be converted to a BinLocationDto.")
+//        }
 
         return new BinLocationDto(
                 id: location.id,

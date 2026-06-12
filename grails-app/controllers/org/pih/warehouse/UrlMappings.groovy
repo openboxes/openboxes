@@ -438,12 +438,12 @@ class UrlMappings {
             action = [POST: "start"]
         }
 
-        "/api/receipts/v2/shipment/$shipment" {
+        "/api/receipts/v2/shipment/$shipmentId" {
             controller = "receiptApi"
             action = [GET: "listShipmentReceipts"]
         }
 
-        "/api/receipts/v2/shipment/$shipment/summary" {
+        "/api/receipts/v2/shipment/$shipmentId/summary" {
             controller = "receiptApi"
             action = [GET: "getShipmentReceivingSummary"]
         }
