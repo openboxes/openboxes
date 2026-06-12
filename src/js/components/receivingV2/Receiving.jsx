@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 
-import CheckStep from 'components/receiving/CheckStep';
-import ReceivingStep from 'components/receiving/ReceivingStep';
+import CheckStep from 'components/receivingV2/CheckStep';
+import ReceivingStep from 'components/receivingV2/ReceivingStep';
 import WizardPageLayout from 'components/wizard/v2/WizardPageLayout';
 import useTranslate from 'hooks/useTranslate';
 import useTranslation from 'hooks/useTranslation';

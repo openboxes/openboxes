@@ -13,11 +13,11 @@ import FilterForm from 'components/Filter/FilterForm';
 import Button from 'components/form-elements/Button';
 import SlidingButtonGroup from 'components/form-elements/v2/SlidingButtonGroup';
 import Switch from 'components/form-elements/v2/Switch';
-import filterFields from 'components/receiving/FilterFields';
+import filterFields from 'components/receivingV2/FilterFields';
 import receivingViewOptions from 'consts/receivingViewOptions';
 import useTranslate from 'hooks/useTranslate';
 
-import 'components/receiving/ReceivingFilters.scss';
+import 'components/receivingV2/ReceivingFilters.scss';
 
 /**
  * Filters bar rendered above the receiving table. The filter (search and

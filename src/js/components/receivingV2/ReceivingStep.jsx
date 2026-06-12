@@ -1,6 +1,6 @@
 import React from 'react';
 
-import ReceivingFilters from 'components/receiving/ReceivingFilters';
+import ReceivingFilters from 'components/receivingV2/ReceivingFilters';
 
 const ReceivingStep = () => (
   <>
