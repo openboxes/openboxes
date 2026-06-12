@@ -7,7 +7,7 @@ import org.codehaus.groovy.runtime.typehandling.GroovyCastException
  *
  * This object is intentionally generic, and so is expected to support any grouping structure that is required.
  *
- * The primary use case for this grouping is for proving a suggested display grouping to the client. In such scenarios
+ * The primary use case for this class is providing a suggested display grouping to the client. In such scenarios
  * it is good practice to not nest complex DTOs inside of this grouping object. Instead, have the grouping option
  * contain id keys that can be used by the client to look up object details.
  *
@@ -25,8 +25,8 @@ import org.codehaus.groovy.runtime.typehandling.GroovyCastException
  *     }
  * }
  *
- * To process the data, the client can loop each abcClass in groupByAbcClass and use the product id to fetch more
- * details about the products relating to each abcClass.
+ * To process the data, the client can loop each abcClass group in groupByAbcClass and use the product id to fetch
+ * more details about each product from productsById.
  *
  * Using a grouping structure like this to normalize your data allows you to avoid complex nested DTO structures
  * and saves you from having data duplicated multiple times in one response.
