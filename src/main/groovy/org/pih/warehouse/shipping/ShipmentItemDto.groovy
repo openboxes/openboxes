@@ -1,7 +1,7 @@
 package org.pih.warehouse.shipping
 
 import org.pih.warehouse.core.http.ResponseBodyFormattable
-import org.pih.warehouse.location.BinLocationDto
+import org.pih.warehouse.location.LocationSimpleDto
 import org.pih.warehouse.product.lot.ProductLotDto
 
 class ShipmentItemDto implements ResponseBodyFormattable {
@@ -9,7 +9,7 @@ class ShipmentItemDto implements ResponseBodyFormattable {
     String shipmentId
     String requisitionItemId
     ProductLotDto productLot
-    BinLocationDto binLocation
+    LocationSimpleDto binLocation
     Integer quantity
     String recipientId
     String donorId
@@ -23,7 +23,7 @@ class ShipmentItemDto implements ResponseBodyFormattable {
                 shipmentId: shipmentItem.shipmentId,
                 requisitionItemId: shipmentItem.requisitionItemId,
                 productLot: ProductLotDto.from(shipmentItem.inventoryItem),
-                binLocation: BinLocationDto.from(shipmentItem.binLocation),
+                binLocation: LocationSimpleDto.from(shipmentItem.binLocation),
                 quantity: shipmentItem.quantity,
                 recipientId: shipmentItem.recipientId,
                 donorId: shipmentItem.donorId,

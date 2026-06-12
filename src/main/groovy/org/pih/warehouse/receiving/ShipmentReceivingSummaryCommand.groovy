@@ -12,7 +12,7 @@ import org.pih.warehouse.shipping.Shipment
 class ShipmentReceivingSummaryCommand implements ObjectValidatable {
 
     Shipment shipment
-    ReceiptGrouping grouping = ReceiptGrouping.NONE
+    ReceiptGrouping grouping = ReceiptGrouping.SHIPMENT_ITEM
 
     def beforeValidate() {
         String shipmentId = RequestContextHolder.getRequestAttributes().params?.shipmentId

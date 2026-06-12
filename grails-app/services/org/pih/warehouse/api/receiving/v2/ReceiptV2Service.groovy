@@ -4,6 +4,9 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.DataGrouping
+import org.pih.warehouse.core.OrderedDataGrouping
+import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptDto
 import org.pih.warehouse.receiving.ReceiptGrouping
@@ -24,19 +27,15 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 @Transactional(readOnly = true)
 class ReceiptV2Service {
 
-    // Grouping key used for shipment items that have no container (ie no pack level).
-    private static final String UNPACKED_GROUPING_KEY = "Unpacked"
-
     ReceiptIdentifierService receiptIdentifierService
-
-    // Inject old receipt service to reuse bin creation logic
-    ReceiptService receiptService
+    ReceiptService receiptService  // Inject old receipt service to reuse bin creation logic
+    MessageLocalizer messageLocalizer
 
     @Transactional
     ReceiptDto startReceipt(String shipmentId) {
         Shipment shipment = Shipment.get(shipmentId)
         if (!shipment) {
-            throw new ObjectNotFoundException(shipmentId, Shipment.class.toString())
+            throw new ObjectNotFoundException(shipmentId, Shipment.toString())
         }
 
         validateShipmentReceivable(shipment)
@@ -81,7 +80,7 @@ class ReceiptV2Service {
     List<ReceiptDto> listShipmentReceipts(String shipmentId) {
         Shipment shipment = Shipment.read(shipmentId)
         if (!shipment) {
-            throw new ObjectNotFoundException(shipment.id, Shipment.toString())
+            throw new ObjectNotFoundException(shipmentId, Shipment.toString())
         }
 
         List<Receipt> receipts = Receipt.findAllByShipment(shipment)
@@ -122,8 +121,7 @@ class ReceiptV2Service {
                 ReceiptItemDto receiptItemDto = ReceiptItemDto.from(receiptItem)
                 if (receiptItemDto.receiptId == currentReceiptId) {
                     shipmentItemSummary.currentReceiptItems.add(receiptItemDto)
-                }
-                else {
+                } else {
                     shipmentItemSummary.previousReceiptItems.add(receiptItemDto)
                 }
             }
@@ -131,13 +129,13 @@ class ReceiptV2Service {
         }
 
         // Populate the item grouping map for the client if they requested us to do so.
-        Map dataGrouping
+        OrderedDataGrouping dataGrouping
         switch(grouping) {
             case ReceiptGrouping.PACK_LEVEL:
                 dataGrouping = buildPackLevelGrouping(shipmentItems)
                 break
-            default:
-                dataGrouping = [:]
+            case ReceiptGrouping.SHIPMENT_ITEM:
+                dataGrouping = buildShipmentItemGrouping(shipmentItems)
                 break
         }
         shipmentSummary.setDataGrouping(dataGrouping)
@@ -145,8 +143,10 @@ class ReceiptV2Service {
         return shipmentSummary
     }
 
-    private Map<String, Map<String, String>> buildPackLevelGrouping(List<ShipmentItem> shipmentItems) {
-        Map<String, Map<String, String>> grouping = [:].withDefault { [:] }
+    private OrderedDataGrouping buildPackLevelGrouping(List<ShipmentItem> shipmentItems) {
+        String unpackedGroupName = messageLocalizer.localize("shipping.unpacked.label")
+
+        OrderedDataGrouping packLevel1Grouping = new OrderedDataGrouping()
         for (shipmentItem in shipmentItems) {
             // We (perhaps incorrectly) only group two levels deep. Any additional parent containers will be ignored.
             Container packLevel2 = shipmentItem.container
@@ -155,10 +155,25 @@ class ReceiptV2Service {
             // When the item's container has no parent, the container itself is the top pack level, so we group
             // directly under it. Items with no container at all fall back to the "Unpacked" group. We avoid a null
             // key both because it groups nothing and because the JSON serializer drops map entries keyed on null.
-            String topLevelName = packLevel1?.name ?: packLevel2?.name ?: UNPACKED_GROUPING_KEY
-            String secondLevelName = packLevel2?.name ?: UNPACKED_GROUPING_KEY
-            grouping.get(topLevelName).put(secondLevelName, shipmentItem.id)
+            String packLevel1Name = packLevel1?.name ?: packLevel2?.name ?: unpackedGroupName
+            String packLevel2Name = packLevel1?.name ? (packLevel2?.name ?: unpackedGroupName) : unpackedGroupName
+
+            OrderedDataGrouping packLevel2Grouping = new OrderedDataGrouping()
+            packLevel2Grouping.put(packLevel2Name, shipmentItem.id)
+
+            packLevel1Grouping.put(packLevel1Name, packLevel2Grouping)
         }
-        return grouping
+        return packLevel1Grouping
+    }
+
+    private OrderedDataGrouping buildShipmentItemGrouping(List<ShipmentItem> shipmentItems) {
+        OrderedDataGrouping shipmentItemGrouping = new OrderedDataGrouping()
+        for (shipmentItem in shipmentItems) {
+            // The grouping doesn't really matter here because we're keying on item id so there will always only
+            // ever be one element in each group, but we preserve the format for consistency and so that the client
+            // can still rely on the ordering.
+            shipmentItemGrouping.put(shipmentItem.id, shipmentItem.id)
+        }
+        return shipmentItemGrouping
     }
 }

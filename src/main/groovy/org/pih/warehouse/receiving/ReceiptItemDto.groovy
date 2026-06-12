@@ -1,7 +1,8 @@
 package org.pih.warehouse.receiving
 
+import org.pih.warehouse.core.PersonDto
 import org.pih.warehouse.core.http.ResponseBodyFormattable
-import org.pih.warehouse.location.BinLocationDto
+import org.pih.warehouse.location.LocationSimpleDto
 import org.pih.warehouse.product.lot.ProductLotDto
 
 /**
@@ -12,9 +13,15 @@ class ReceiptItemDto implements ResponseBodyFormattable {
     String id
     String receiptId
     String shipmentItemId
-    String recipientId
+    PersonDto recipient
     ProductLotDto productLot
-    BinLocationDto binLocation
+
+    /**
+     * If doing a direct putaway as a part of the receipt this will be a a bin location.
+     * If direct putaways are disabled, this will be an internal, temporary receiving location.
+     */
+    LocationSimpleDto receivingLocation
+
     Integer quantityReceived = 0
     Integer quantityCanceled = 0
     String comment
@@ -24,11 +31,11 @@ class ReceiptItemDto implements ResponseBodyFormattable {
                 id: receiptItem.id,
                 receiptId: receiptItem.receiptId,
                 shipmentItemId: receiptItem.shipmentItemId,
-                recipientId: receiptItem.recipientId,
+                recipient: PersonDto.from(receiptItem.recipient),
                 productLot: ProductLotDto.from(receiptItem.inventoryItem),
-                binLocation: BinLocationDto.from(receiptItem.binLocation),
-                quantityReceived: receiptItem.quantityReceived,
-                quantityCanceled: receiptItem.quantityCanceled,
+                receivingLocation: LocationSimpleDto.from(receiptItem.binLocation),
+                quantityReceived: receiptItem.quantityReceived ?: 0,
+                quantityCanceled: receiptItem.quantityCanceled ?: 0,
                 comment: receiptItem.comment,
         )
     }
@@ -39,9 +46,9 @@ class ReceiptItemDto implements ResponseBodyFormattable {
                 id: id,
                 receiptId: receiptId,
                 shipmentItemId: shipmentItemId,
-                recipientId: recipientId,
+                recipient: recipient,
                 productLot: productLot?.asResponseBody(),
-                binLocation: binLocation?.asResponseBody(),
+                binLocation: receivingLocation?.asResponseBody(),
                 quantityReceived: quantityReceived,
                 quantityCanceled: quantityCanceled,
                 comment: comment,

@@ -5,9 +5,9 @@ package org.pih.warehouse.receiving
  */
 enum ReceiptGrouping {
     /**
-     * No grouping is required.
+     * Groups data by {@link org.pih.warehouse.shipping.ShipmentItem}.
      */
-    NONE,
+    SHIPMENT_ITEM,
 
     /**
      * Groups data by {@link org.pih.warehouse.shipping.Container}.

@@ -1,0 +1,127 @@
+package org.pih.warehouse.core
+
+import org.codehaus.groovy.runtime.typehandling.GroovyCastException
+
+/**
+ * Provides optional context around how some data might be grouped.
+ *
+ * This object is intentionally generic, and so is expected to support any grouping structure that is required.
+ *
+ * The primary use case for this grouping is for proving a suggested display grouping to the client. In such scenarios
+ * it is good practice to not nest complex DTOs inside of this grouping object. Instead, have the grouping option
+ * contain id keys that can be used by the client to look up object details.
+ *
+ * For example, structure your DTO like the following:
+ *
+ * {
+ *     productsById: {
+ *         p1: { id: "p1", name: "Product 1", abcClass: "A", ... },
+ *         p2: { id: "p2", name: "Product 2", abcClass: "A", ... },
+ *         p3: { id: "p3", name: "Product 3", abcClass: "B", ... },
+ *     }
+ *     groupByAbcClass: {
+ *         A: ["p1", "p2"],
+ *         B: ["p3"],
+ *     }
+ * }
+ *
+ * To process the data, the client can loop each abcClass in groupByAbcClass and use the product id to fetch more
+ * details about the products relating to each abcClass.
+ *
+ * Using a grouping structure like this to normalize your data allows you to avoid complex nested DTO structures
+ * and saves you from having data duplicated multiple times in one response.
+ *
+ * You can group by multiple fields by chaining multiple groups together.
+ *
+ * For example, if you want to group by pack level 1 then by pack level 2, you might have a DTO like:
+ *
+ * {
+ *     shipmentItemsById: {
+ *         si1: { id: "si1", packLevel1: "Crate1", packLevel2: "Box1", ... },
+ *         si2: { id: "si2", packLevel1: "Crate1", packLevel2: "Box2", ... },
+ *         si3: { id: "si3", packLevel1: "Crate2", packLevel2: "Box1", ... },
+ *         si4: { id: "si4", packLevel1: "Crate2", packLevel2: "Box1", ... },
+ *     }
+ *     groupByPackLevel: {
+ *         Crate1: {
+ *             Box1: ["si1"],
+ *             Box2: ["si2"],
+ *         },
+ *         Crate2: {
+ *             Box1: ["si3", "si4"],
+ *         },
+ *     }
+ * }
+ *
+ * See {@link OrderedDataGrouping} if you also want your groupings to be in a particular order.
+ *
+ * Note that while the class declaration says the value type is Object, in reality only a Collection (which will
+ * be converted to a LinkedHashSet) or an additional DataGrouping (for chaining groups) is allowed. Attempting to
+ * put any other structure (such as a plain Map) will cause an error.
+ */
+class DataGrouping extends HashMap<String, Object> {
+
+    @Override
+    Object put(String key, Object object) {
+        switch (object) {
+            case Collection:
+                putCollection(key, object)
+                break
+            case DataGrouping:
+                putDataGrouping(key, object)
+                break
+            case OrderedDataGrouping:
+                putOrderedDataGrouping(key, object)
+                break
+            case null:
+                break
+            // Don't allow non-DataGrouping maps. We want to standardize to a specific structure.
+            case Map:
+                throw new IllegalArgumentException("To put a Map into a data grouping, use another DataGrouping.")
+            // Groupings are collections, so if given a single element, treat it like a singleton.
+            default:
+                putSingleton(key, object)
+        }
+
+        // We never stomp data (we always merge it) so there's nothing to return here.
+        return null
+    }
+
+    private void putCollection(String key, Collection values) {
+        if (!containsKey(key)) {
+            // Use a LinkedHashSet to ensure that we preserve both order and uniqueness in the grouping
+            super.put(key, values as LinkedHashSet)
+            return
+        }
+        (get(key) as LinkedHashSet).addAll(values)
+    }
+
+    private void putDataGrouping(String key, DataGrouping childGrouping) {
+        if (!containsKey(key)) {
+            super.put(key, childGrouping)
+            return
+        }
+        (get(key) as DataGrouping).putAll(childGrouping)
+    }
+
+    private void putOrderedDataGrouping(String key, OrderedDataGrouping childGrouping) {
+        if (!containsKey(key)) {
+            super.put(key, childGrouping)
+            return
+        }
+        (get(key) as OrderedDataGrouping).merge(childGrouping)
+    }
+
+    private void putSingleton(String key, Object object) {
+        if (!containsKey(key)) {
+            super.put(key, [object])
+            return
+        }
+        try {
+            (get(key) as LinkedHashSet).add(object)
+        } catch (GroovyCastException e) {
+            throw new IllegalArgumentException("Failed adding element to group. Expected a collection of values but " +
+                    "got something else. Make sure you're not mixing and matching structures/types within a group", e)
+        }
+    }
+}
