@@ -10,10 +10,12 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import grails.gorm.transactions.Transactional
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import grails.validation.ValidationException
+import org.grails.web.json.JSONArray
+import grails.gorm.transactions.NotTransactional
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
@@ -40,6 +42,7 @@ class ProductApiController extends BaseDomainApiController {
     def forecastingService
     GrailsApplication grailsApplication
     def productAvailabilityService
+    def inventorySnapshotService
 
     def list() {
         boolean includeInactive = params.boolean('includeInactive') ?: false
@@ -334,6 +337,53 @@ class ProductApiController extends BaseDomainApiController {
         //sendProductCreatedNotification(product)
 
         render([product: product.toFullJson()] as JSON)
+    }
+
+    // @NotTransactional to avoid two open sessions with the per-item withNewTransaction
+    @NotTransactional
+    def upsert() {
+        def body = request.JSON
+        if (body instanceof JSONArray) {
+            bulkUpsert((JSONArray) body)
+            return
+        }
+        Product product = Product.findByIdOrProductCode(body.id, body.productCode) ?: new Product()
+        bindData(product, body)
+        save(product)
+    }
+
+    private void bulkUpsert(JSONArray jsonObjects) {
+        boolean deferRefresh = params.boolean('deferRefresh', false)
+        List<Map> results = productService.bulkUpsert(jsonObjects, deferRefresh)
+
+        List<String> productIds = results.findAll { it.status == 'ok' && it.productId }*.productId.unique()
+
+        if (deferRefresh && productIds) {
+            productAvailabilityService.updateProductAvailability(productIds)
+            inventorySnapshotService.updateInventorySnapshots(productIds)
+        }
+
+        List<Product> savedProducts = productIds ? Product.getAll(productIds).findAll { it != null } : []
+
+        render([
+            data    : savedProducts.collect { it.toJson() },
+            metadata: [
+                bulk  : [
+                    total  : results.size(),
+                    created: results.count { it.action == 'created' },
+                    updated: results.count { it.action == 'updated' },
+                    errors : results.count { it.status == 'error' },
+                    refresh: [
+                        deferred         : deferRefresh,
+                        refreshedProducts: deferRefresh ? productIds : null
+                    ]
+                ],
+                errors: results.findAll { it.status == 'error' }.collect {
+                    [index: it.index, errorMessage: it.errorMessage, errors: it.errors]
+                        .findAll { k, v -> v != null }
+                }
+            ]
+        ] as JSON)
     }
 
     def importCsv() {

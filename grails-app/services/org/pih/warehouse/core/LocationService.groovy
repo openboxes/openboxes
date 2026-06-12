@@ -810,7 +810,7 @@ class LocationService {
             throw new IllegalArgumentException("The organization ${location.organization.name} is inactive, you can't assign it to the location")
         }
 
-        locationGormService.save(location)
+        location.save(flush: true)
         return location
     }
 

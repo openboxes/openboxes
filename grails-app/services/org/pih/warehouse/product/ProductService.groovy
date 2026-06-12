@@ -10,8 +10,11 @@
 package org.pih.warehouse.product
 
 import grails.core.GrailsApplication
+import grails.databinding.SimpleMapDataBindingSource
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import grails.web.databinding.DataBindingUtils
+import grails.gorm.transactions.NotTransactional
 import groovy.xml.Namespace
 import java.time.Instant
 
@@ -1209,6 +1212,62 @@ class ProductService {
      */
     String generateProductIdentifier(Product product) {
         return productIdentifierService.generate(product)
+    }
+
+    // @NotTransactional to avoid two open sessions with the per-item withNewTransaction
+    @NotTransactional
+    List<Map> bulkUpsert(List<Map> items, boolean deferRefresh) {
+        List<Map> results = []
+        items.eachWithIndex { Map json, int index ->
+            try {
+                Product.withNewTransaction { status ->
+                    Product product = Product.findByIdOrProductCode(json.id, json.productCode) ?: new Product()
+                    boolean isNew = !product.id
+
+                    bindProductData(product, json)
+
+                    if (!product.productCode) {
+                        product.productCode = generateProductIdentifier(product)
+                    }
+
+                    product.disableRefresh = deferRefresh
+
+                    if (!product.validate()) {
+                        status.setRollbackOnly()
+                        results << [
+                            index       : index,
+                            status      : 'error',
+                            errorMessage: 'Validation failed',
+                            errors      : product.errors.allErrors.collect {
+                                [field: it.field, code: it.code, message: it.defaultMessage ?: it.code]
+                            }
+                        ]
+                        return
+                    }
+
+                    saveProduct(product)
+                    results << [
+                        index    : index,
+                        status   : 'ok',
+                        action   : isNew ? 'created' : 'updated',
+                        productId: product.id
+                    ]
+                }
+            } catch (Exception e) {
+                log.error("bulkUpsert: error at index ${index}: ${e.message}", e)
+                results << [
+                    index       : index,
+                    status      : 'error',
+                    errorMessage: e.message
+                ]
+            }
+        }
+        return results
+    }
+
+    private Product bindProductData(Product product, Map source) {
+        DataBindingUtils.bindObjectToInstance(product, new SimpleMapDataBindingSource(source))
+        return product
     }
 
     /**

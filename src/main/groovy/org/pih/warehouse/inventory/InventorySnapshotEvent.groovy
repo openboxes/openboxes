@@ -35,7 +35,7 @@ class InventorySnapshotEvent extends ApplicationEvent {
     InventorySnapshotEvent(Product source) {
         super(source)
         this.product = source
-        this.disableRefresh = disableRefresh
+        this.disableRefresh = source.disableRefresh
     }
 
 }

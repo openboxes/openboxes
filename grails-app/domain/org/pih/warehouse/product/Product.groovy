@@ -153,6 +153,8 @@ class Product implements Comparable, Serializable, DomainValidatable<ProductVali
     // Used to indicate that the product is to be reconditioned
     Boolean reconditioned = Boolean.FALSE
 
+    Boolean disableRefresh = Boolean.FALSE
+
     // primary category
     Category category
 
@@ -257,7 +259,8 @@ class Product implements Comparable, Serializable, DomainValidatable<ProductVali
                          "displayNames",
                          "displayNameOrDefaultName",
                          "displayNameWithLocaleCode",
-                         "productEvents"
+                         "productEvents",
+                         "disableRefresh"
     ]
 
     static hasMany = [
