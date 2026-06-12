@@ -438,6 +438,16 @@ class UrlMappings {
             action = [POST: "start"]
         }
 
+        "/api/receipts/v2/shipment/$shipment" {
+            controller = "receiptApi"
+            action = [GET: "listShipmentReceipts"]
+        }
+
+        "/api/receipts/v2/shipment/$shipment/summary" {
+            controller = "receiptApi"
+            action = [GET: "getShipmentReceivingSummary"]
+        }
+
         // Internal Locations API
 
         "/api/internalLocations/receiving"(parseRequest: true) {

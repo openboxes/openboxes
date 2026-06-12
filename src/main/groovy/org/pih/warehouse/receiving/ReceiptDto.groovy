@@ -1,43 +1,54 @@
 package org.pih.warehouse.receiving
 
-import org.pih.warehouse.receiving.Receipt
-import org.pih.warehouse.receiving.ReceiptStatusCode
-import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.core.http.ResponseBodyFormattable
 
-class ReceiptDto {
+/**
+ * A simple, general purpose DTO representing a receipt and its items.
+ */
+class ReceiptDto implements Comparable<ReceiptDto>, ResponseBodyFormattable {
 
     String id
     ReceiptStatusCode receiptStatus
-    ReceiptShipmentDto shipment
-    ReceiptLocationDto origin
-    ReceiptLocationDto destination
-    Date dateShipped
+    String shipmentId
     Date dateDelivered
-    ReceiptRequisitionDto requisition
-    ReceiptOrderDto order
-    String description
-    ReceiptRecipientDto recipient
-    // TODO: To be replaced by List<ReceiptItemDto> after the read endpoint is done
-    List receiptItems = []
+    String recipientId
+    Date dateCreated
+    Date lastUpdated
+    List<ReceiptItemDto> receiptItems = []
 
-    static ReceiptDto toDto(Receipt receipt) {
-        if (!receipt) {
-            return null
-        }
-        Shipment shipment = receipt.shipment
-        return new ReceiptDto(
+    static ReceiptDto from(Receipt receipt) {
+        return !receipt ? null : new ReceiptDto(
                 id: receipt.id,
-                receiptStatus: receipt.receiptStatusCode?.name(),
-                shipment: ReceiptShipmentDto.toDto(shipment),
-                origin: ReceiptLocationDto.toDto(shipment?.origin),
-                destination: ReceiptLocationDto.toDto(shipment?.destination),
-                dateShipped: shipment?.actualShippingDate,
+                receiptStatus: receipt.receiptStatusCode,
+                shipmentId: receipt.shipmentId,
                 dateDelivered: receipt.actualDeliveryDate,
-                requisition: ReceiptRequisitionDto.toDto(shipment?.requisition),
-                order: ReceiptOrderDto.toDto(shipment?.purchaseOrder),
-                description: shipment?.description,
-                recipient: ReceiptRecipientDto.toDto(receipt.recipient),
-                receiptItems: receipt.receiptItems
+                recipientId: receipt.recipientId,
+                dateCreated: receipt.dateCreated,
+                lastUpdated: receipt.lastUpdated,
+                receiptItems: receipt.receiptItems.collect { ReceiptItemDto.from(it) },
         )
+    }
+
+    @Override
+    int compareTo(ReceiptDto o) {
+        // When possible, order receipts by when they occurred in reality, otherwise by when they were input.
+        return dateDelivered <=> o.dateDelivered ?:
+               dateCreated <=> o.dateCreated ?:
+               lastUpdated <=> o.lastUpdated ?:
+               id <=> o.id
+    }
+
+    @Override
+    Map<String, Object> asResponseBody() {
+        return [
+                id: id,
+                receiptStatus: receiptStatus,
+                shipmentId: shipmentId,
+                dateDelivered: dateDelivered,
+                recipientId: recipientId,
+                dateCreated: dateCreated,
+                lastUpdated: lastUpdated,
+                receiptItems: asResponseBody(receiptItems),
+        ]
     }
 }
