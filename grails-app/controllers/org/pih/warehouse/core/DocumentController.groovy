@@ -17,7 +17,9 @@ import grails.gorm.PagedResultList
 import grails.validation.Validateable
 import org.apache.http.client.fluent.Request
 import org.apache.http.entity.ContentType
+import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.inventory.OutboundStockMovementService
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.invoice.Invoice
@@ -36,10 +38,11 @@ class DocumentController {
 
     DocumentService documentService
     def documentTemplateService
+    MessageLocalizer messageLocalizer
     def fileService
     def shipmentService
     GrailsApplication grailsApplication
-    TemplateService templateService
+    BeanPropertyTemplateService beanPropertyTemplateService
     StockMovementService stockMovementService
     OutboundStockMovementService outboundStockMovementService
 
@@ -184,21 +187,24 @@ class DocumentController {
         // file must not be empty and must be less than 10MB
         // FIXME The size limit needs to go somewhere
         if (!(file?.size || command.fileUri)) {
-            flash.message = "${warehouse.message(code: 'document.documentTooLarge.message')}"
-        } else if (file.size < 10 * 1024 * 1000) {
+            flash.message = "${warehouse.message(code: 'document.documentCannotBeEmpty.message')}"
+        // Validate the file type only if it's an actual file upload (if it has size), not if it's only an URI (stored as a link)
+        } else if (file && file.size && !Document.isAllowedFile(file.originalFilename, file.contentType, file.inputStream)) {
+            flash.message = messageLocalizer.localize('document.uploadNotAllowed.message', Document.allowedExtensions().join(', '))
+        } else if (!file || file.size < 10 * 1024 * 1000) {
             log.info "Creating new document "
             // Document type with id 9 is "Other" and it's default in case there's no document type chosen
             String typeId = command?.typeId ?: Constants.DEFAULT_DOCUMENT_TYPE_ID;
             DocumentType documentType = DocumentType.get(typeId)
 
             Document documentInstance = new Document(
-                    size: file.size,
-                    name: command.name ?: file.originalFilename,
-                    filename: file.originalFilename,
-                    fileContents: command.fileContents.bytes,
+                    size: file?.size,
+                    name: command.name ?: file?.originalFilename,
+                    filename: file?.originalFilename,
+                    fileContents: command.fileContents?.bytes,
                     fileUri: command.fileUri,
-                    contentType: file.contentType,
-                    extension: FileUtil.getExtension(file.originalFilename),
+                    contentType: file?.contentType,
+                    extension: file?.originalFilename ? FileUtil.getExtension(file.originalFilename) : null,
                     documentNumber: command.documentNumber,
                     documentType: documentType)
 
@@ -537,12 +543,12 @@ class DocumentController {
     }
 
     def printZebraTemplate() {
-        Document document = Document.load(params.id)
+        Document document = loadZebraTemplate(params.id)
         Location location = Location.load(session.warehouse.id)
         InventoryItem inventoryItem = InventoryItem.load(params?.inventoryItem?.id)
 
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
-        String renderedContent = templateService.renderTemplate(document, model)
+        String renderedContent = beanPropertyTemplateService.renderTemplate(document, model)
 
         try {
             if (params.protocol=="usb") {
@@ -570,21 +576,21 @@ class DocumentController {
     }
 
     def buildZebraTemplate() {
-        Document document = Document.load(params.id)
+        Document document = loadZebraTemplate(params.id)
         InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
         Location location = Location.load(session.warehouse.id)
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
-        String renderedContent = templateService.renderTemplate(document, model)
+        String renderedContent = beanPropertyTemplateService.renderTemplate(document, model)
         log.info "renderedContent: ${renderedContent}"
         render(renderedContent)
     }
 
     def renderZebraTemplate() {
-        Document document = Document.load(params.id)
+        Document document = loadZebraTemplate(params.id)
         InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
         Location location = Location.load(session.warehouse.id)
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
-        String body = templateService.renderTemplate(document, model)
+        String body = beanPropertyTemplateService.renderTemplate(document, model)
 
         response.contentType = 'image/png'
         // TODO Move labelary URL to application.yml
@@ -597,14 +603,25 @@ class DocumentController {
 
 
     def exportZebraTemplate() {
-        Document document = Document.load(params.id)
+        Document document = loadZebraTemplate(params.id)
         InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
         Location location = Location.load(session.warehouse.id)
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
-        String renderedContent = templateService.renderTemplate(document, model)
+        String renderedContent = beanPropertyTemplateService.renderTemplate(document, model)
         // TODO Move labelary URL to application.yml
         String url = "http://labelary.com/viewer.html?zpl=" + renderedContent
         redirect(url: url)
+    }
+
+    private Document loadZebraTemplate(Serializable id) {
+        Document document = Document.get(id)
+        if (document == null) {
+            throw new ObjectNotFoundException(id, Document.name)
+        }
+        if (document.documentType?.documentCode != DocumentCode.ZEBRA_TEMPLATE) {
+            throw new IllegalArgumentException("Only documents of type ZEBRA_TEMPLATE can be rendered as Zebra templates")
+        }
+        return document
     }
 
 }

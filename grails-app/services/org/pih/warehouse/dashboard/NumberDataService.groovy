@@ -203,7 +203,7 @@ class NumberDataService {
 
     @Cacheable(value = "dashboardCache", key = { "getExpiredProductsInStock-${location?.id}" })
     NumberData getExpiredProductsInStock(Location location) {
-        Date today = LocalDate.now().toDate()
+        Date today = new Date();
         def expiredProductsInStock = ProductAvailability.executeQuery("""
             SELECT COUNT(distinct pa.inventoryItem) FROM ProductAvailability pa
             WHERE pa.location = :location

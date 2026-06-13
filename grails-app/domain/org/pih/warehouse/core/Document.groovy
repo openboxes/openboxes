@@ -10,6 +10,11 @@
 package org.pih.warehouse.core
 
 import grails.util.Holders
+import groovy.util.logging.Slf4j
+
+import org.pih.warehouse.core.http.ContentType
+
+import util.FileUtil
 
 
 /**
@@ -17,7 +22,68 @@ import grails.util.Holders
  * entity in the system.  Currently, users can only upload and link documents to
  * shipments.
  */
+@Slf4j
 class Document implements Serializable {
+
+    private static final List<ContentType> ALLOWED_CONTENT_TYPES = [
+            ContentType.CSV,
+            ContentType.DOCX,
+            ContentType.GIF,
+            ContentType.JPEG,
+            ContentType.JPG,
+            ContentType.PDF,
+            ContentType.PNG,
+            ContentType.TXT,
+            ContentType.WEBP,
+            ContentType.XLS,
+            ContentType.XLSX,
+    ]
+
+    /**
+     * Check whether the file extension, MIME type, and (where possible)
+     * file content all agree on a file type we allow in our system.
+     *
+     * First we check the (extension, media type) pair against an allowlist.
+     * If an InputStream is provided, we also sniff the file's magic bytes
+     * via URLConnection.guessContentTypeFromStream. If the sniffed type
+     * contradicts the other type data provided, the file is rejected.
+     *
+     * Byte-sniffing only works for certain types (images, HTML, XML).
+     * For types like PDF, CSV, and XLSX, guessContentTypeFromStream
+     * returns null so we can only do the extension/mediaType check.
+     */
+    static boolean isAllowedFile(String filename, String mediaType, InputStream content = null) {
+        if (!filename || !mediaType) {
+            return false
+        }
+        String extension = FileUtil.getExtension(filename)?.toLowerCase()
+        boolean matchesAllowlist = ALLOWED_CONTENT_TYPES.any { ContentType ct ->
+            ct.fileExtension.extension == extension &&
+                    ct.mediaType.toString() == mediaType.toLowerCase()
+        }
+        if (!matchesAllowlist) {
+            return false
+        }
+        if (content != null) {
+            BufferedInputStream buffered = new BufferedInputStream(content)
+            try {
+                String sniffed = URLConnection.guessContentTypeFromStream(buffered)
+                if (sniffed != null && sniffed.toLowerCase() != mediaType.toLowerCase()) {
+                    return false
+                }
+            } catch (IOException e) {
+                log.warn("Rejecting upload of ${filename}: could not read stream to verify content type", e)
+                return false
+            } finally {
+                buffered.close()
+            }
+        }
+        return true
+    }
+
+    static Set<String> allowedExtensions() {
+        return ALLOWED_CONTENT_TYPES.collect { it.fileExtension.extension } as Set
+    }
 
     String id
     String name            // Document name (optional)
