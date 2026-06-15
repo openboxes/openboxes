@@ -23,6 +23,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.receiving.AutomaticReceiptEvent
 import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.requisition.Requisition
 
 class Shipment implements Comparable, Serializable, Historizable {
@@ -393,6 +394,10 @@ class Shipment implements Comparable, Serializable, Historizable {
 
     Boolean isFullyReceived() {
         return shipmentItems?.every { ShipmentItem shipmentItem -> shipmentItem.isFullyReceived() }
+    }
+
+    Boolean hasPendingReceipt() {
+        return receipts?.any { Receipt receipt -> receipt.receiptStatusCode == ReceiptStatusCode.PENDING }
     }
 
     ReferenceNumber getReferenceNumber(String typeName) {
