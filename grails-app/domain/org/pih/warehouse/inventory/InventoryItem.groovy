@@ -13,17 +13,14 @@ import org.pih.warehouse.product.Product
 import grails.util.Holders
 
 /**
- * Represents an instance of a product, referenced by lot number
+ * Also known as ProductLot.
  *
- * Note that an inventory item does not directly reference an inventory,
- * and in fact a single inventory item may be tied to multiple inventories
- * at the same time (if a lot is split between multiple warehouses)
+ * Represents a "lot" of a product, which is a group of product instances that were all made under the same conditions.
+ * As such, the lot number (which uniquely identifies the lot) is typically controlled by the product supplier.
  *
- * Transaction Entries are tied to Inventory Items, and
- * these entries are used to calculate the quantity levels of inventory items
- *
- * We may rename InventoryItem to ProductInstance, as this may
- * be a clearer name
+ * While quantity calculations at facilities are based on inventory item, the inventory item itself is not
+ * associated with a particular inventory. The same inventory item can be used by multiple facilities.
+ * This is why it is clearer to think of inventory item as a product lot. It is tied only to the product itself.
  */
 class InventoryItem implements Serializable {
 

@@ -438,6 +438,16 @@ class UrlMappings {
             action = [POST: "start"]
         }
 
+        "/api/receipts/v2/shipment/$shipmentId" {
+            controller = "receiptApi"
+            action = [GET: "listShipmentReceipts"]
+        }
+
+        "/api/receipts/v2/shipment/$shipmentId/summary" {
+            controller = "receiptApi"
+            action = [GET: "getShipmentReceivingSummary"]
+        }
+
         // TODO: Remove this mapping once the new receiving refactor is complete (legacy PartialReceivingPage)
         "/partialReceiving/create/$id?" {
             controller = "receiptApi"

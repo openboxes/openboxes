@@ -13,7 +13,7 @@ package org.pih.warehouse.core.http
  * Thanks to this interface, we no longer need to manually call JSON.registerObjectMarshaller in BootStrap.groovy
  * for every new Dto that we add.
  */
-interface ResponseBodyFormattable {
+trait ResponseBodyFormattable {
 
     /**
      * Converts an object to a Map for use in an API response body, such as for JSON or XML.
@@ -23,5 +23,13 @@ interface ResponseBodyFormattable {
      *
      * @return a Map of values keyed on field name
      */
-    Map<String, Object> asResponseBody()
+    abstract Map<String, Object> asResponseBody()
+
+    /**
+     * Converts a collection of formattable objects to a List of Map for use in an API response body,
+     * such as for JSON or XML.
+     */
+    static List<Map<String, Object>> asResponseBody(Collection<ResponseBodyFormattable> formattableCollection) {
+        return formattableCollection.collect { it.asResponseBody() }
+    }
 }
