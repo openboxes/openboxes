@@ -11,7 +11,7 @@ import { fetchTranslations } from 'actions';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import apiClient from 'utils/apiClient';
-import { dateFnsLocale, formatDateToString } from 'utils/dateUtils';
+import { formatDateToString, getDateFnsLocale } from 'utils/dateUtils';
 import { getCurrentEventComment } from 'utils/list-utils';
 import Translate from 'utils/Translate';
 
@@ -90,7 +90,7 @@ const getColumns = ({ currentLocale }) => [
     Cell: (row) => formatDateToString({
       date: row.value,
       dateFormat: DateFormatDateFns.DD_MMM_YYYY,
-      options: { locale: dateFnsLocale(currentLocale) },
+      options: { locale: getDateFnsLocale(currentLocale) },
     }),
   },
 ];
