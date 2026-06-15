@@ -19,4 +19,7 @@ enum OrderItemStatusCode {
         [PENDING, STARTED, IN_PROGRESS, COMPLETED, CANCELED, BACKORDER]
     }
 
+    static listPending() {
+        [PENDING, STARTED, IN_PROGRESS]
+    }
 }

@@ -138,6 +138,9 @@ enum ActivityCode {
     // Putaway container codes
     PUTAWAY_CART('PUTAWAY_CART'),
 
+    // Putaway no specific location
+    UNDEFINED_LOCATION('UNDEFINED_LOCATION'),
+
     // Outbound container codes
     OUTBOUND_CONTAINER('OUTBOUND_CONTAINER'),
 
@@ -223,6 +226,7 @@ enum ActivityCode {
                 INBOUND_SORTATION,
                 LOST_AND_FOUND,
                 PUTAWAY_CART,
+                UNDEFINED_LOCATION,
 
                 // Internal locations used for picking
                 OUTBOUND_CONTAINER,

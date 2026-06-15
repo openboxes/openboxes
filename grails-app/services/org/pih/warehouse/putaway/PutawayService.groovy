@@ -10,10 +10,8 @@
 package org.pih.warehouse.putaway
 
 import grails.core.GrailsApplication
-import grails.events.Event
 import grails.events.EventPublisher
 import grails.events.annotation.Publisher
-import grails.events.annotation.Subscriber
 import grails.gorm.transactions.Transactional
 import org.apache.commons.beanutils.BeanUtils
 import org.grails.web.json.JSONObject
@@ -26,7 +24,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
-import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.EventCode
@@ -53,7 +50,6 @@ import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.shipping.Shipment
-import org.springframework.context.event.EventListener
 
 @Transactional
 class PutawayService implements EventPublisher  {
@@ -94,7 +90,7 @@ class PutawayService implements EventPublisher  {
                 putaway.destination = location
                 putaway.putawayDate = new Date()
                 putaway.putawayStatus = PutawayStatus.PENDING
-                putaway.putawayAssignee = putawayAssignee
+                putaway.orderedBy = putawayAssignee
                 putawayCandidate.putawayLocation = putawayLocation
                 putaway.putawayItems.add(putawayCandidate)
                 savePutaway(putaway)
@@ -329,6 +325,28 @@ class PutawayService implements EventPublisher  {
         return putawayOrders
     }
 
+    List<Putaway> getPendingPutawayOrders(Product product, List<Location> destinationBinLocations, Location origin) {
+        OrderType putawayOrderType = OrderType.findByCode(Constants.PUTAWAY_ORDER)
+
+        List<OrderStatus> statusesBelowCompleted = OrderStatus.listPending()
+        List<OrderItemStatusCode> orderItemStatusCodes = OrderItemStatusCode.listPending()
+
+        List<Order> orders = OrderItem.createCriteria().list {
+            projections {
+                distinct "order"
+            }
+            eq("product", product)
+            'in'("destinationBinLocation", destinationBinLocations)
+            'in'("orderItemStatusCode", orderItemStatusCodes)
+            order {
+                eq("origin", origin)
+                eq("orderType", putawayOrderType)
+                'in'("status", statusesBelowCompleted)
+            }
+        } as List<OrderItem>
+        return orders?.collect { Putaway.createFromOrder(it)} ?: []
+    }
+
     void processSplitItems(Putaway putaway) {
 
         putaway.putawayItems.toArray().each { PutawayItem oldPutawayItem ->
@@ -422,7 +440,7 @@ class PutawayService implements EventPublisher  {
         if (!order.orderNumber) {
             order.orderNumber = "P-${putaway.putawayNumber ?: orderIdentifierService.generate(order)}"
         }
-        order.orderedBy = putaway.putawayAssignee
+        order.orderedBy = putaway.orderedBy
         order.dateOrdered = new Date()
         order.origin = putaway.origin
         order.destination = putaway.destination

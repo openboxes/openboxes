@@ -83,6 +83,7 @@ class InboundSortationService {
                 expirationDate: receiptItem.inventoryItem.expirationDate,
                 currentBinLocation: receiptItem.binLocation,
                 preferredBin: receiptItem.product.getInventoryLevel(shipment.destination.id)?.preferredBinLocation,
+                internalLocation: receiptItem.product.getInventoryLevel(shipment.destination.id)?.internalLocation,
                 quantity: receiptItem.quantityReceived,
                 backorderReference: receiptItem.shipmentItem.backorderReference,
                 backorderItem: receiptItem.shipmentItem.backorderItem,
@@ -94,7 +95,7 @@ class InboundSortationService {
                 origin: putawayContext.facility,
                 destination: putawayContext.facility,
                 putawayNumber: orderIdentifierService.generate(new Order()),
-                putawayAssignee: createdBy,
+                orderedBy: createdBy,
                 putawayStatus: PutawayStatus.PENDING
         )
     }
