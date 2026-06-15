@@ -1,9 +1,9 @@
 package org.pih.warehouse.receiving
 
 /**
- * Enumerates the different types of data grouping that we can perform when fetching data relating to Receipts.
+ * Enumerates the different types of data group that we can perform when fetching data relating to Receipts.
  */
-enum ReceiptGrouping {
+enum ReceiptGroup {
     /**
      * Groups data by {@link org.pih.warehouse.shipping.ShipmentItem}.
      */

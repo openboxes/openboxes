@@ -1,6 +1,6 @@
 package org.pih.warehouse.receiving
 
-import org.pih.warehouse.core.OrderedDataGrouping
+import org.pih.warehouse.core.OrderedDataGroup
 import org.pih.warehouse.core.http.ResponseBodyFormattable
 
 /**
@@ -14,22 +14,22 @@ class ShipmentReceivingSummaryDto implements ResponseBodyFormattable {
     /**
      * A map of shipment item receiving summaries, keyed on shipment item id.
      *
-     * Is a Map to make it convenient for the client in case it wants to rely on the dataGrouping
+     * Is a Map to make it convenient for the client in case it wants to rely on the shipmentItemsGrouped ordering.
      */
     Map<String, ShipmentItemReceivingSummaryDto> shipmentItemSummaryById = [:]
 
     /**
-     * Defines a suggested ordered grouping structure for displaying the summary data.
+     * Defines a suggested ordered grouping for displaying the shipment item summary data.
      * Exists purely for client convenience.
      */
-    OrderedDataGrouping dataGrouping
+    OrderedDataGroup shipmentItemsGrouped
 
     @Override
     Map<String, Object> asResponseBody() {
         return [
                 shipmentId: shipmentId,
                 shipmentItemSummaryById: shipmentItemSummaryById.collectEntries { [it.key, it.value.asResponseBody()] },
-                dataGrouping: dataGrouping.asResponseBody(),
+                shipmentItemsGrouped: shipmentItemsGrouped.asResponseBody(),
         ]
     }
 }

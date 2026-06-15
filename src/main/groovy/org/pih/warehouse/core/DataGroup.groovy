@@ -2,13 +2,15 @@ package org.pih.warehouse.core
 
 import org.codehaus.groovy.runtime.typehandling.GroovyCastException
 
+import org.pih.warehouse.core.http.ResponseBodyFormattable
+
 /**
  * Provides optional context around how some data might be grouped.
  *
  * This object is intentionally generic, and so is expected to support any grouping structure that is required.
  *
  * The primary use case for this class is providing a suggested display grouping to the client. In such scenarios
- * it is good practice to not nest complex DTOs inside of this grouping object. Instead, have the grouping option
+ * it is good practice to not nest complex DTOs inside of this group object. Instead, have the grouping option
  * contain id keys that can be used by the client to look up object details.
  *
  * For example, structure your DTO like the following:
@@ -53,32 +55,36 @@ import org.codehaus.groovy.runtime.typehandling.GroovyCastException
  *     }
  * }
  *
- * See {@link OrderedDataGrouping} if you also want your groupings to be in a particular order.
+ * See {@link OrderedDataGroup} if you also want your groups to be in a particular order.
  *
  * Note that while the class declaration says the value type is Object, in reality only a Collection (which will
- * be converted to a LinkedHashSet) or an additional DataGrouping (for chaining groups) is allowed. Attempting to
+ * be converted to a LinkedHashSet) or an additional DataGroup (for chaining groups) is allowed. Attempting to
  * put any other structure (such as a plain Map) will cause an error.
  */
-class DataGrouping extends HashMap<String, Object> {
+class DataGroup implements ResponseBodyFormattable {
 
-    @Override
+    private HashMap<String, Object> group = [:]
+
+    /**
+     * Puts a new object to the group.
+     */
     Object put(String key, Object object) {
         switch (object) {
             case Collection:
                 putCollection(key, object)
                 break
-            case DataGrouping:
-                putDataGrouping(key, object)
+            case DataGroup:
+                putDataGroup(key, object)
                 break
-            case OrderedDataGrouping:
-                putOrderedDataGrouping(key, object)
+            case OrderedDataGroup:
+                putOrderedDataGroup(key, object)
                 break
             case null:
                 break
-            // Don't allow non-DataGrouping maps. We want to standardize to a specific structure.
+            // Don't allow non-DataGroup maps. We want to standardize to a specific structure.
             case Map:
-                throw new IllegalArgumentException("To put a Map into a data grouping, use another DataGrouping.")
-            // Groupings are collections, so if given a single element, treat it like a singleton.
+                throw new IllegalArgumentException("To put a Map into a data group, use another DataGroup.")
+            // Groups are collections, so if given a single element, treat it like a singleton.
             default:
                 putSingleton(key, object)
         }
@@ -87,41 +93,61 @@ class DataGrouping extends HashMap<String, Object> {
         return null
     }
 
+    /**
+     * Merge the elements of the given group into our group.
+     */
+    void putAll(DataGroup other) {
+        merge(other)
+    }
+
+    /**
+     * Merge the elements of the given group into our group.
+     */
+    void merge(DataGroup other) {
+        other.group.each { put(it.key, it.value) }
+    }
+
     private void putCollection(String key, Collection values) {
-        if (!containsKey(key)) {
-            // Use a LinkedHashSet to ensure that we preserve both order and uniqueness in the grouping
-            super.put(key, values as LinkedHashSet)
+        if (!group.containsKey(key)) {
+            // Use a LinkedHashSet to ensure that we preserve both order and uniqueness in the group
+            group.put(key, values as LinkedHashSet)
             return
         }
-        (get(key) as LinkedHashSet).addAll(values)
+        (group.get(key) as LinkedHashSet).addAll(values)
     }
 
-    private void putDataGrouping(String key, DataGrouping childGrouping) {
-        if (!containsKey(key)) {
-            super.put(key, childGrouping)
+    private void putDataGroup(String key, DataGroup childGroup) {
+        if (!group.containsKey(key)) {
+            group.put(key, childGroup)
             return
         }
-        (get(key) as DataGrouping).putAll(childGrouping)
+        (group.get(key) as DataGroup).putAll(childGroup)
     }
 
-    private void putOrderedDataGrouping(String key, OrderedDataGrouping childGrouping) {
-        if (!containsKey(key)) {
-            super.put(key, childGrouping)
+    private void putOrderedDataGroup(String key, OrderedDataGroup childGroup) {
+        if (!group.containsKey(key)) {
+            group.put(key, childGroup)
             return
         }
-        (get(key) as OrderedDataGrouping).merge(childGrouping)
+        (group.get(key) as OrderedDataGroup).merge(childGroup)
     }
 
     private void putSingleton(String key, Object object) {
-        if (!containsKey(key)) {
-            super.put(key, [object])
+        if (!group.containsKey(key)) {
+            group.put(key, [object])
             return
         }
         try {
-            (get(key) as LinkedHashSet).add(object)
+            (group.get(key) as LinkedHashSet).add(object)
         } catch (GroovyCastException e) {
             throw new IllegalArgumentException("Failed adding element to group. Expected a collection of values but " +
                     "got something else. Make sure you're not mixing and matching structures/types within a group", e)
         }
+    }
+
+    @Override
+    Map<String, Object> asResponseBody() {
+        // We don't want to add another nested key in the JSON for the group so simply render the group map itself.
+        return group
     }
 }

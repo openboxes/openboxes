@@ -3,12 +3,12 @@ package org.pih.warehouse.core
 import org.pih.warehouse.core.http.ResponseBodyFormattable
 
 /**
- * Wraps a {@link DataGrouping}, adding an order field that suggests how the groupings should be sorted.
+ * Wraps a {@link DataGroup}, adding an order field that suggests how the groups should be sorted.
  */
-class OrderedDataGrouping implements ResponseBodyFormattable {
+class OrderedDataGroup implements ResponseBodyFormattable {
 
-    DataGrouping groups = [:]
-    LinkedHashSet<String> order = []
+    private DataGroup groups = [:]
+    private LinkedHashSet<String> order = []
 
     /**
      * A null/empty safe method of putting a new value to the group and ordering.
@@ -35,11 +35,11 @@ class OrderedDataGrouping implements ResponseBodyFormattable {
     }
 
     /**
-     * Merge the elements of the given grouping into our grouping.
+     * Merge the elements of the given group into our group.
      */
-    void merge(OrderedDataGrouping otherGrouping) {
-        groups.putAll(otherGrouping.groups)
-        order.addAll(otherGrouping.order)
+    void merge(OrderedDataGroup otherGroup) {
+        groups.putAll(otherGroup.groups)
+        order.addAll(otherGroup.order)
     }
 
     @Override

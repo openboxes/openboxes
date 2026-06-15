@@ -4,12 +4,11 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.DataGrouping
-import org.pih.warehouse.core.OrderedDataGrouping
+import org.pih.warehouse.core.OrderedDataGroup
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptDto
-import org.pih.warehouse.receiving.ReceiptGrouping
+import org.pih.warehouse.receiving.ReceiptGroup
 import org.pih.warehouse.receiving.ReceiptIdentifierService
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptItemDto
@@ -92,7 +91,7 @@ class ReceiptV2Service {
      */
     ShipmentReceivingSummaryDto getShipmentReceivingSummary(ShipmentReceivingSummaryCommand command) {
         Shipment shipment = command.shipment
-        ReceiptGrouping grouping = command.grouping
+        ReceiptGroup group = command.group
 
         String currentReceiptId = Receipt.findByShipmentAndReceiptStatusCode(shipment, ReceiptStatusCode.PENDING)?.id
 
@@ -128,25 +127,25 @@ class ReceiptV2Service {
             shipmentSummary.shipmentItemSummaryById.put(shipmentItemId, shipmentItemSummary)
         }
 
-        // Populate the item grouping map for the client if they requested us to do so.
-        OrderedDataGrouping dataGrouping
-        switch(grouping) {
-            case ReceiptGrouping.PACK_LEVEL:
-                dataGrouping = buildPackLevelGrouping(shipmentItems)
+        // Populate the shipment item group map for the client if they requested us to do so.
+        OrderedDataGroup shipmentItemsGrouped
+        switch(group) {
+            case ReceiptGroup.PACK_LEVEL:
+                shipmentItemsGrouped = buildPackLevelGroup(shipmentItems)
                 break
-            case ReceiptGrouping.SHIPMENT_ITEM:
-                dataGrouping = buildShipmentItemGrouping(shipmentItems)
+            case ReceiptGroup.SHIPMENT_ITEM:
+                shipmentItemsGrouped = buildShipmentItemGroup(shipmentItems)
                 break
         }
-        shipmentSummary.setDataGrouping(dataGrouping)
+        shipmentSummary.setShipmentItemsGrouped(shipmentItemsGrouped)
 
         return shipmentSummary
     }
 
-    private OrderedDataGrouping buildPackLevelGrouping(List<ShipmentItem> shipmentItems) {
+    private OrderedDataGroup buildPackLevelGroup(List<ShipmentItem> shipmentItems) {
         String unpackedGroupName = messageLocalizer.localize("shipping.unpacked.label")
 
-        OrderedDataGrouping packLevel1Grouping = new OrderedDataGrouping()
+        OrderedDataGroup packLevel1Group = new OrderedDataGroup()
         for (shipmentItem in shipmentItems) {
             // We (perhaps incorrectly) only group two levels deep. Any additional parent containers will be ignored.
             Container packLevel2 = shipmentItem.container
@@ -158,22 +157,22 @@ class ReceiptV2Service {
             String packLevel1Name = packLevel1?.name ?: packLevel2?.name ?: unpackedGroupName
             String packLevel2Name = packLevel1?.name ? (packLevel2?.name ?: unpackedGroupName) : unpackedGroupName
 
-            OrderedDataGrouping packLevel2Grouping = new OrderedDataGrouping()
-            packLevel2Grouping.put(packLevel2Name, shipmentItem.id)
+            OrderedDataGroup packLevel2Group = new OrderedDataGroup()
+            packLevel2Group.put(packLevel2Name, shipmentItem.id)
 
-            packLevel1Grouping.put(packLevel1Name, packLevel2Grouping)
+            packLevel1Group.put(packLevel1Name, packLevel2Group)
         }
-        return packLevel1Grouping
+        return packLevel1Group
     }
 
-    private OrderedDataGrouping buildShipmentItemGrouping(List<ShipmentItem> shipmentItems) {
-        OrderedDataGrouping shipmentItemGrouping = new OrderedDataGrouping()
+    private OrderedDataGroup buildShipmentItemGroup(List<ShipmentItem> shipmentItems) {
+        OrderedDataGroup shipmentItemGroup = new OrderedDataGroup()
         for (shipmentItem in shipmentItems) {
             // The grouping doesn't really matter here because we're keying on item id so there will always only
             // ever be one element in each group, but we preserve the format for consistency and so that the client
             // can still rely on the ordering.
-            shipmentItemGrouping.put(shipmentItem.id, shipmentItem.id)
+            shipmentItemGroup.put(shipmentItem.id, shipmentItem.id)
         }
-        return shipmentItemGrouping
+        return shipmentItemGroup
     }
 }
