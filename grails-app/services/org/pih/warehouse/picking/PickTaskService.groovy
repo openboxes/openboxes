@@ -110,6 +110,37 @@ class PickTaskService {
     }
 
     @Transactional(readOnly = true)
+    List<Map> countOrdersByDeliveryType(Location facility) {
+        Map<DeliveryTypeCode, Integer> available = countDistinctRequisitionsByDeliveryType(
+                facility, [PickTaskStatus.PENDING, PickTaskStatus.PICKING])
+
+        Map<DeliveryTypeCode, Integer> total = countDistinctRequisitionsByDeliveryType(facility, null)
+
+        return DeliveryTypeCode.values().collect { DeliveryTypeCode code ->
+            [
+                    deliveryTypeCode: code.name(),
+                    availableCount  : available[code] ?: 0,
+                    totalCount      : total[code] ?: 0,
+            ]
+        }
+    }
+
+    private Map<DeliveryTypeCode, Integer> countDistinctRequisitionsByDeliveryType(
+            Location facility, List<PickTaskStatus> statuses) {
+        List results = PickTask.createCriteria().list {
+            projections {
+                groupProperty("deliveryTypeCode")
+                countDistinct("requisition")
+            }
+            eq("facility", facility)
+            if (statuses) {
+                'in'("status", statuses)
+            }
+        }
+        return results.collectEntries { row -> [(row[0]): (row[1] as Integer)] }
+    }
+
+    @Transactional(readOnly = true)
     PickTask get(String id) {
         if (!id) {
             return null
