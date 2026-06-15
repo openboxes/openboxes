@@ -96,13 +96,6 @@ class DataGroup implements ResponseBodyFormattable {
     /**
      * Merge the elements of the given group into our group.
      */
-    void putAll(DataGroup other) {
-        merge(other)
-    }
-
-    /**
-     * Merge the elements of the given group into our group.
-     */
     void merge(DataGroup other) {
         other.group.each { put(it.key, it.value) }
     }
@@ -121,7 +114,7 @@ class DataGroup implements ResponseBodyFormattable {
             group.put(key, childGroup)
             return
         }
-        (group.get(key) as DataGroup).putAll(childGroup)
+        (group.get(key) as DataGroup).merge(childGroup)
     }
 
     private void putOrderedDataGroup(String key, OrderedDataGroup childGroup) {

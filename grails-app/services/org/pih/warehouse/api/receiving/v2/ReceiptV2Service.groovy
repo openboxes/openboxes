@@ -169,8 +169,8 @@ class ReceiptV2Service {
         OrderedDataGroup shipmentItemGroup = new OrderedDataGroup()
         for (shipmentItem in shipmentItems) {
             // The grouping doesn't really matter here because we're keying on item id so there will always only
-            // ever be one element in each group, but we preserve the format for consistency and so that the client
-            // can still rely on the ordering.
+            // ever be one element in each group, but we preserve the format for consistency (in case the client
+            // wants to create a standard approach to parsing data groups) and so that the client use the ordering.
             shipmentItemGroup.put(shipmentItem.id, shipmentItem.id)
         }
         return shipmentItemGroup

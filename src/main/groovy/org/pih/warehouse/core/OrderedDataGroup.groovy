@@ -38,7 +38,7 @@ class OrderedDataGroup implements ResponseBodyFormattable {
      * Merge the elements of the given group into our group.
      */
     void merge(OrderedDataGroup otherGroup) {
-        groups.putAll(otherGroup.groups)
+        groups.merge(otherGroup.groups)
         order.addAll(otherGroup.order)
     }
 
