@@ -23,18 +23,14 @@ class PutawayLocationReslottingJob {
     PutawayService putawayService
     LocationService locationService
 
-    static concurrent = true
-
     def sessionRequired = false
-
-    // Should never be triggered on a schedule - should only be triggered by persistence event listener
-    static triggers = {}
 
     void execute(JobExecutionContext context) {
         if (!JobUtils.shouldExecute(PutawayLocationReslottingJob)) {
             log.info("Reslotting Putaway location job is disabled")
             return
         }
+        log.info "Executing PutawayLocationReslotting job"
 
         String inventoryLevelId = context.mergedJobDataMap.get('inventoryLevelId')
         InventoryLevel inventoryLevel = InventoryLevel.read(inventoryLevelId)
@@ -53,10 +49,14 @@ class PutawayLocationReslottingJob {
 
         log.info("Reslotting Putaway location for " + inventoryLevel.product)
         List<Location> binLocations = locationService.getLocationsSupportingActivity(ActivityCode.UNDEFINED_LOCATION)
-        List<Putaway> putaways = putawayService.getPutawayOrders(inventoryLevel.product, binLocations, inventoryLevel.inventory.warehouse)
-        putaways?.each { Putaway putaway ->
-            List<PutawayItem> putawayItems = putaway.putawayItems.findAll { it.putawayLocation?.supports(ActivityCode.UNDEFINED_LOCATION) }
-            putawayItems?.each { it.putawayLocation = inventoryLevel.preferredBinLocation ?: inventoryLevel.internalLocation }
+        List<Putaway> pendingPutaways = putawayService.getPendingPutawayOrders(inventoryLevel.product, binLocations, inventoryLevel.inventory.warehouse)
+        pendingPutaways?.each { Putaway putaway ->
+            List<PutawayItem> putawayItems = putaway.putawayItems.findAll {
+                it.putawayLocation?.supports(ActivityCode.UNDEFINED_LOCATION)
+            }
+            putawayItems?.each {
+                it.putawayLocation = inventoryLevel.preferredBinLocation ?: inventoryLevel.internalLocation
+            }
             putawayService.savePutaway(putaway)
         }
     }

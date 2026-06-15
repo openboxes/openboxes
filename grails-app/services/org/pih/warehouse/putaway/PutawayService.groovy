@@ -10,10 +10,8 @@
 package org.pih.warehouse.putaway
 
 import grails.core.GrailsApplication
-import grails.events.Event
 import grails.events.EventPublisher
 import grails.events.annotation.Publisher
-import grails.events.annotation.Subscriber
 import grails.gorm.transactions.Transactional
 import org.apache.commons.beanutils.BeanUtils
 import org.grails.web.json.JSONObject
@@ -26,7 +24,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
-import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.EventCode
@@ -53,7 +50,6 @@ import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.shipping.Shipment
-import org.springframework.context.event.EventListener
 
 @Transactional
 class PutawayService implements EventPublisher  {
@@ -329,15 +325,11 @@ class PutawayService implements EventPublisher  {
         return putawayOrders
     }
 
-    List<Putaway> getPutawayOrders(Product product, List<Location> destinationBinLocations, Location origin) {
+    List<Putaway> getPendingPutawayOrders(Product product, List<Location> destinationBinLocations, Location origin) {
         OrderType putawayOrderType = OrderType.findByCode(Constants.PUTAWAY_ORDER)
 
-        List<OrderStatus> statusesBelowCompleted = OrderStatus.values().findAll {
-            it.sortOrder < OrderStatus.COMPLETED.sortOrder
-        }
-        List<OrderItemStatusCode> orderItemStatusCodes = OrderItemStatusCode.values().findAll {
-            it.sortOrder < OrderItemStatusCode.COMPLETED.sortOrder
-        }
+        List<OrderStatus> statusesBelowCompleted = OrderStatus.listPending()
+        List<OrderItemStatusCode> orderItemStatusCodes = OrderItemStatusCode.listPending()
 
         List<Order> orders = OrderItem.createCriteria().list {
             projections {
