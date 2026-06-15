@@ -990,7 +990,12 @@ class StockMovementService {
 
         def template = requisition.requisitionTemplate
         if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
-            def quantityDemand = forecastingService.getDemand(requisition.destination, null, editPageItem.product)
+            // If request FROM downstream consumer (location without managed inventory but supporting submitting requests),
+            // then pull demand from origin to that location.
+            // If request is NOT FROM downstream consumer, then pull demand outgoing FROM destination to all other locations.
+            Map<String, Object> quantityDemand = requisition?.destination?.isDownstreamConsumer() ?
+                    forecastingService.getDemand(requisition.origin, requisition.destination, editPageItem.product) :
+                    forecastingService.getDemand(requisition.destination, null, editPageItem.product)
             editPageItem << [
                     quantityDemandRequesting        : quantityDemand?.monthlyDemand?:0,
                     demandPerReplenishmentPeriod    : Math.ceil((quantityDemand?.dailyDemand?:0) * (template?.replenishmentPeriod?:30))

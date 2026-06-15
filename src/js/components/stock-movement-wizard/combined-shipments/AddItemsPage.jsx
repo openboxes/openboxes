@@ -112,7 +112,7 @@ const FIELDS = {
         label: 'react.stockMovement.orderNumber.label',
         defaultMessage: 'Order number',
         multilineHeader: true,
-        fixedWidth: '6.5em',
+        fixedWidth: '6.6em',
         fieldKey: '',
         getDynamicAttr: ({
           fieldValue,
@@ -129,7 +129,7 @@ const FIELDS = {
         defaultMessage: 'Product',
         headerAlign: 'left',
         multilineHeader: true,
-        flexWidth: '2.7',
+        flexWidth: '2.6',
         required: true,
         attributes: {
           showSelectedOptionColor: true,
@@ -170,7 +170,7 @@ const FIELDS = {
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
         multilineHeader: true,
-        fixedWidth: '7.1em',
+        fixedWidth: '7.4em',
         attributes: {
           dateFormat: 'MM/DD/YYYY',
           autoComplete: 'off',
@@ -781,8 +781,10 @@ class AddItemsPage extends Component {
 
   async validateExpirationDate(lineItems, rowIndex) {
     const lineItem = lineItems?.[rowIndex];
-    const inventoryItem = lineItem?.fetchedInventoryItem?.inventoryItem
-      || lineItem?.inventoryItem;
+    const { fetchedInventoryItem } = lineItem ?? {};
+    const inventoryItem = fetchedInventoryItem
+      ? fetchedInventoryItem.inventoryItem
+      : lineItem?.inventoryItem;
 
     // inventoryItem is null when lot does not exist (new lot)
     const lotExists = Boolean(inventoryItem);
