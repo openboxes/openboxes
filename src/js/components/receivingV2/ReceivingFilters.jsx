@@ -7,7 +7,7 @@ import {
   RiRefreshLine,
 } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
-import { getPartialReceivingTranslationsFetched } from 'selectors';
+import { getReceivingTranslationsFetched } from 'selectors';
 
 import FilterForm from 'components/Filter/FilterForm';
 import Button from 'components/form-elements/Button';
@@ -27,7 +27,7 @@ const ReceivingFilters = () => {
   const translate = useTranslate();
   // Add loading for filters section. Loading will display before the translations are fetched.
   // It fixes the issue of untranslated labels in the filters.
-  const translationsFetched = useSelector(getPartialReceivingTranslationsFetched);
+  const translationsFetched = useSelector(getReceivingTranslationsFetched);
   // Recomputed whenever translations change, so that the field configs hold
   // already translated labels.
   const fields = useMemo(() => filterFields(translate), [translate]);
