@@ -59,6 +59,11 @@ export const getDefaultTranslationsFetched = createSelector(
   (session) => session.fetchedTranslations.default,
 );
 
+export const getReceivingTranslationsFetched = createSelector(
+  [getSession],
+  (session) => session.fetchedTranslations.receiving,
+);
+
 export const getCurrentUser = createSelector(
   [getSession],
   (session) => session.user,

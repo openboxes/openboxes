@@ -438,6 +438,18 @@ class UrlMappings {
             action = [POST: "start"]
         }
 
+        // TODO: Remove this mapping once the new receiving refactor is complete (legacy PartialReceivingPage)
+        "/partialReceiving/create/$id?" {
+            controller = "receiptApi"
+            action = [GET: "view"]
+        }
+
+        "/receiving/create/$id?" {
+            controller = "receiptApi"
+            action = [GET: "view"]
+        }
+
+
         // Internal Locations API
 
         "/api/internalLocations/receiving"(parseRequest: true) {
