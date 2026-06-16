@@ -28,7 +28,6 @@ import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationType
-import org.pih.warehouse.core.User
 import org.pih.warehouse.inboundSortation.InboundSortationService
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
@@ -528,55 +527,37 @@ class ReceiptService {
         log.info "Receive inbound shipment ${shipment}  forceAutoReceipt${forceAutoReceipt}"
         // Validate that the shipment is valid and ready to be received
         if (!shipment) return
-
-        // In background jobs there is no authenticated user, so audited records (e.g. EventLog with
-        // NOT NULL created_by_id/updated_by_id) would fail to save. Fall back to the shipment creator,
-        // mirroring the manual flow. Only set it when no user is present (restored in the finally block).
-        User previousUser = authService.currentUser
-        boolean assignedFallbackUser = false
-        if (!previousUser && shipment.createdBy) {
-            authService.currentUser = shipment.createdBy
-            assignedFallbackUser = true
+        if (shipment.isFullyReceived()) { log.info("Shipment ${shipment?.id} already fully received"); return; }
+        if (!shipment.hasShipped()) { log.warn("Shipment ${shipment?.id} has no SHIPPED event associated"); return }
+        if (!forceAutoReceipt && !shipment.destination?.supports(ActivityCode.AUTO_RECEIVING)) {
+            log.info("Shipment ${shipment?.id}: destination ${shipment?.destination} does not support activity code ${ActivityCode.AUTO_RECEIVING}")
+            return
         }
 
-        try {
-            if (shipment.isFullyReceived()) { log.info("Shipment ${shipment?.id} already fully received"); return; }
-            if (!shipment.hasShipped()) { log.warn("Shipment ${shipment?.id} has no SHIPPED event associated"); return }
-            if (!forceAutoReceipt && !shipment.destination?.supports(ActivityCode.AUTO_RECEIVING)) {
-                log.info("Shipment ${shipment?.id}: destination ${shipment?.destination} does not support activity code ${ActivityCode.AUTO_RECEIVING}")
+        if (shipment.hasPendingReceipt()) {
+            log.debug "Shipment ${shipment.id} has a pending receipt"
+            return
+        }
+
+        if (shipment.destination?.supports(ActivityCode.CROSS_DOCKING)) {
+            backorderService.validateBackorderReferences(shipment)
+            if (shipment.hasErrors()) {
+                shipment.errors.allErrors.each { ObjectError error -> logShipmentEvent(shipment.id, error) }
                 return
             }
+        }
 
-            if (shipment.hasPendingReceipt()) {
-                log.debug "Shipment ${shipment.id} has a pending receipt"
-                return
-            }
+        // Create the partial receipt
+        PartialReceipt partialReceipt = createAutomaticReceipt(shipment)
 
-            if (shipment.destination?.supports(ActivityCode.CROSS_DOCKING)) {
-                backorderService.validateBackorderReferences(shipment)
-                if (shipment.hasErrors()) {
-                    shipment.errors.allErrors.each { ObjectError error -> logShipmentEvent(shipment.id, error) }
-                    return
-                }
-            }
+        // Automatically complete the partial receipt
+        saveAndCompletePartialReceipt(partialReceipt)
 
-            // Create the partial receipt
-            PartialReceipt partialReceipt = createAutomaticReceipt(shipment)
-
-            // Automatically complete the partial receipt
-            saveAndCompletePartialReceipt(partialReceipt)
-
-            // FIXME We should consider eventing (shipment.received) and have an event service determine whether
-            //  the shipment should be auto received
-            log.info "Creating putaway tasks for receipt ${shipment.receipt}"
-            if (shipment.destination?.supports(ActivityCode.AUTOMATED_PUTAWAY_CREATION)) {
-                inboundSortationService.createPutawayOrdersFromReceipt(shipment.receipt)
-            }
-        } finally {
-            // Clear the fallback user we set above so it doesn't leak onto the next shipment
-            if (assignedFallbackUser) {
-                authService.currentUser = null
-            }
+        // FIXME We should consider eventing (shipment.received) and have an event service determine whether
+        //  the shipment should be auto received
+        log.info "Creating putaway tasks for receipt ${shipment.receipt}"
+        if (shipment.destination?.supports(ActivityCode.AUTOMATED_PUTAWAY_CREATION)) {
+            inboundSortationService.createPutawayOrdersFromReceipt(shipment.receipt)
         }
     }
 

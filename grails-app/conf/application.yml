@@ -330,6 +330,9 @@ openboxes:
     ajaxRequest:
         timeout: 120000
 
+    system:
+        username: "admin"
+
     dashboard:
         yearTypes:
             fiscalYear:
