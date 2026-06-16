@@ -48,7 +48,7 @@ class ReceiptDto implements Comparable<ReceiptDto>, ResponseBodyFormattable {
                 recipientId: recipientId,
                 dateCreated: dateCreated,
                 lastUpdated: lastUpdated,
-                receiptItems: asResponseBody(receiptItems),
+                receiptItems: receiptItems,
         ]
     }
 }

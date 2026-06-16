@@ -28,8 +28,8 @@ class ShipmentReceivingSummaryDto implements ResponseBodyFormattable {
     Map<String, Object> asResponseBody() {
         return [
                 shipmentId: shipmentId,
-                shipmentItemSummaryById: shipmentItemSummaryById.collectEntries { [it.key, it.value.asResponseBody()] },
-                shipmentItemsGrouped: shipmentItemsGrouped.asResponseBody(),
+                shipmentItemSummaryById: shipmentItemSummaryById,
+                shipmentItemsGrouped: shipmentItemsGrouped,
         ]
     }
 }

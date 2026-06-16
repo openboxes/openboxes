@@ -6,7 +6,7 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.mapper.ResponseMapper
 
 @Component
-class CycleCountCandidateMapper extends ResponseMapper<CycleCountCandidate> {
+class CycleCountCandidateMapper implements ResponseMapper<CycleCountCandidate> {
 
     @Override
     Map<String, Object> asResponseBody(CycleCountCandidate source) {

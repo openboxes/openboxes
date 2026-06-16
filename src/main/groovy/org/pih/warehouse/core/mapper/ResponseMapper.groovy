@@ -14,7 +14,7 @@ import org.springframework.core.GenericTypeResolver
  *
  * @param <Source> The object to convert.
  */
-abstract class ResponseMapper<Source> {
+trait ResponseMapper<Source> {
 
     Class<Source> getSourceType() {
         return (Class<Source>) GenericTypeResolver.resolveTypeArgument(getClass(), ResponseMapper.class)

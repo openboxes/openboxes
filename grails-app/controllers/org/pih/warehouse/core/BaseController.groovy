@@ -175,11 +175,11 @@ abstract class BaseController {
             throw new RuntimeException("This endpoint does not support formatting to HTML.")
         }
 
-        render(
+        render((Map) [
                 model: model,
                 template: renderType == RenderType.TEMPLATE ? htmlFile : null,
                 view: renderType == RenderType.VIEW ? htmlFile : null,
-        )
+        ])
     }
 
     /**
