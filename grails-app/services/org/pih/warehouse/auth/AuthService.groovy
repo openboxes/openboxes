@@ -10,13 +10,18 @@
 package org.pih.warehouse.auth
 
 import grails.gorm.transactions.Transactional
+import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.springframework.transaction.annotation.Propagation
 
 @CompileStatic
 @Transactional(readOnly = true)
 class AuthService {
+
+    static final String SYSTEM_USER_USERNAME_CONFIG_KEY = "openboxes.systemUser.username"
+    static final String DEFAULT_SYSTEM_USER_USERNAME = "admin"
 
     private static ThreadLocal<User> threadLocalUser
     private static ThreadLocal<Location> threadLocalLocation
@@ -45,5 +50,45 @@ class AuthService {
 
     static Location getCurrentLocation() {
         return threadLocalLocation?.get()
+    }
+
+    /**
+     * Returns the user that background jobs authenticate as. The username is configurable via
+     * {@code openboxes.systemUser.username} and defaults to the built-in "admin" user.
+     *
+     * The system user is intentionally allowed to be disabled (active = false). Unlike interactive
+     * login, the active flag is not enforced here because this is only used for internal,
+     * non-interactive authentication while a job runs.
+     *
+     * @throws IllegalStateException if no user exists for the configured username
+     */
+    User getSystemUser() {
+        String username = Holders.config.getProperty(
+                SYSTEM_USER_USERNAME_CONFIG_KEY, String, DEFAULT_SYSTEM_USER_USERNAME)
+        User systemUser = (User) User.find("from User as u where u.username = :username", [username: username])
+        if (!systemUser) {
+            throw new IllegalStateException(
+                    ("Unable to authenticate background job: no user found for configured system user '${username}'. " +
+                            "Set '${SYSTEM_USER_USERNAME_CONFIG_KEY}' to the username of an existing user.").toString())
+        }
+        return systemUser
+    }
+
+    /**
+     * Executes the given closure with the system user set as the current user, restoring the
+     * previously authenticated user (if any) afterward. Intended for use by background jobs so that
+     * any records they create or update are stamped with a valid current user.
+     *
+     * @return whatever the closure returns
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    def withSystemUser(Closure closure) {
+        User previousUser = getCurrentUser()
+        try {
+            setCurrentUser(getSystemUser())
+            return closure.call()
+        } finally {
+            setCurrentUser(previousUser)
+        }
     }
 }

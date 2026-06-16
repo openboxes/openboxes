@@ -4,6 +4,7 @@ import org.pih.warehouse.shipping.Shipment
 
 class DataCleaningJob {
 
+    def authService
     def shipmentService
 
     static concurrent = false
@@ -21,10 +22,13 @@ class DataCleaningJob {
         }
 
         Shipment.withNewSession {
-            log.info "Starting data cleaning job at ${new Date()}"
-            def startTime = System.currentTimeMillis()
-            shipmentService.bulkUpdateShipments()
-            log.info "Finished data cleaning job in " + (System.currentTimeMillis() - startTime) + " ms"
+            // Run as the system user so any records updated are stamped with a valid current user.
+            authService.withSystemUser {
+                log.info "Starting data cleaning job at ${new Date()}"
+                def startTime = System.currentTimeMillis()
+                shipmentService.bulkUpdateShipments()
+                log.info "Finished data cleaning job in " + (System.currentTimeMillis() - startTime) + " ms"
+            }
         }
     }
 }
