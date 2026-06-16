@@ -20,7 +20,7 @@ class AuthServiceIntegrationSpec extends IntegrationSpec {
 
         then:
         systemUser != null
-        // Defaults to the built-in admin user (openboxes.systemUser.username)
+        // Defaults to the built-in admin user (openboxes.system.username)
         systemUser.username == AuthService.DEFAULT_SYSTEM_USER_USERNAME
     }
 

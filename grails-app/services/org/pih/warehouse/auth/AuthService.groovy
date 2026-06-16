@@ -19,7 +19,7 @@ import org.pih.warehouse.core.User
 @Transactional(readOnly = true)
 class AuthService {
 
-    static final String SYSTEM_USER_USERNAME_CONFIG_KEY = "openboxes.systemUser.username"
+    static final String SYSTEM_USER_USERNAME_CONFIG_KEY = "openboxes.system.username"
     static final String DEFAULT_SYSTEM_USER_USERNAME = "admin"
 
     private static ThreadLocal<User> threadLocalUser
@@ -57,7 +57,7 @@ class AuthService {
 
     /**
      * Returns the user that background jobs authenticate as. The username is configurable via
-     * {@code openboxes.systemUser.username} and defaults to the built-in "admin" user.
+     * {@code openboxes.system.username} and defaults to the built-in "admin" user.
      *
      * The system user is intentionally allowed to be disabled (active = false). Unlike interactive
      * login, the active flag is not enforced here because this is only used for internal,
