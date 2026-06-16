@@ -14,8 +14,10 @@ import Button from 'components/form-elements/Button';
 import SlidingButtonGroup from 'components/form-elements/v2/SlidingButtonGroup';
 import Switch from 'components/form-elements/v2/Switch';
 import filterFields from 'components/receivingV2/FilterFields';
+import { AutosaveStatus } from 'consts/autosaveStatuses';
 import receivingViewOptions from 'consts/receivingViewOptions';
 import useTranslate from 'hooks/useTranslate';
+import AutosaveIndicator from 'utils/AutosaveIndicator';
 
 import 'components/receivingV2/ReceivingFilters.scss';
 
@@ -36,8 +38,9 @@ const ReceivingFilters = () => {
     <div className="receiving-filters">
       <div className="receiving-filters__row d-flex justify-content-between align-items-center">
         <SlidingButtonGroup options={receivingViewOptions} defaultOption="table" />
-        {/* Autosave indicator should be added here in OBPIH-7850 */}
-        <div className="receiving-filters__autosave-slot" />
+        <div className="receiving-filters__autosave-slot">
+          <AutosaveIndicator status={AutosaveStatus.SAVED} />
+        </div>
       </div>
       <FilterForm
         searchFieldId="q"
