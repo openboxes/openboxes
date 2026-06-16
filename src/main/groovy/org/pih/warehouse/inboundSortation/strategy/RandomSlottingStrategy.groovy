@@ -17,7 +17,7 @@ class RandomSlottingStrategy implements PutawayStrategy {
                     inventoryItem: context.inventoryItem,
                     location: context.currentBinLocation,
                     destination: randomLocation,
-                    container: findPutawayContainerByZone(locations, randomLocation?.zone),
+                    container: resolvePutawayContainer(context, locations, randomLocation),
                     quantity: quantityRemaining,
                     comment: "Random",
             )
