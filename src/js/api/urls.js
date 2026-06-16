@@ -233,3 +233,5 @@ export const EXPIRATION_HISTORY_REPORT = `${API}/inventories/expirationHistoryRe
 // RECEIVING V2
 export const RECEIVING_V2_API = `${API}/receiving/v2`;
 export const RECEIPT_BY_SHIPMENT = (shipmentId) => `${RECEIVING_V2_API}/${shipmentId}`;
+export const RECEIPT_SUMMARY_BY_SHIPMENT = (shipmentId) =>
+  `${API}/receipts/v2/shipment/${shipmentId}/summary`;

@@ -12,7 +12,6 @@ import receivingColumns from 'consts/receivingColumns';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
 import { formatDateToString } from 'utils/dateUtils';
-import { formatProductDisplayName } from 'utils/form-values-utils';
 
 const useReceivingColumns = () => {
   const translate = useTranslate();
@@ -63,11 +62,13 @@ const useReceivingColumns = () => {
       ),
       cell: ({ getValue }) => (
         <TableCell
-          className="rt-td"
+          className="rt-td multiline-cell"
           customTooltip
           tooltipLabel={getValue()?.name}
         >
-          {formatProductDisplayName(getValue())}
+          <div className="limit-lines-2">
+            {getValue()?.name}
+          </div>
         </TableCell>
       ),
       size: 300,

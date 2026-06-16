@@ -41,10 +41,16 @@
   .rt-td {
     display: flex;
     align-items: center;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
 
     div {
       min-width: 0;
     }
+  }
+
+  .input-wrapper-title {
+    display: none;
   }
 
   .input-wrapper-error-message {
