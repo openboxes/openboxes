@@ -25,18 +25,18 @@ export const AutosaveStatusDescription = {
 export const AutosaveConfig = {
   [AutosaveStatus.SAVED]: {
     icon: <RiCheckboxCircleFill size={17} />,
-    label: 'react.receiving.autosave.saved.label',
+    label: 'react.default.autosave.saved.label',
     defaultLabel: 'Your work is auto-saved',
   },
   [AutosaveStatus.SAVING]: {
     icon: <RiLoader4Line size={17} className="autosave-indicator__spinner" />,
-    label: 'react.receiving.autosave.saving.label',
+    label: 'react.default.autosave.saving.label',
     defaultLabel: 'Your work is being saved',
   },
   [AutosaveStatus.ERROR]: {
     icon: <RiErrorWarningFill size={17} />,
-    label: 'react.receiving.autosave.error.label',
-    defaultLabel: 'Failed to save your work',
+    label: 'react.default.autosave.error.label',
+    defaultLabel: 'Your work was not saved',
   },
 };
 
