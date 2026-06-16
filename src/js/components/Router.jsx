@@ -273,7 +273,6 @@ const Router = () => {
             <MainLayoutRoute path="**/stockMovement/createRequest/:stockMovementId?" component={AsyncStockMovementRequest} />
             <MainLayoutRoute path="**/stockMovement/verifyRequest/:stockMovementId?" component={AsyncStockMovementVerifyRequest} />
             <MainLayoutRoute path="**/stockMovement/create/:stockMovementId?" component={AsyncStockMovement} />
-            <MainLayoutRoute path="**/partialReceiving/create/:shipmentId" component={AsyncReceivingPage} />
             <MainLayoutRoute path="**/receiving/create/:shipmentId" component={AsyncReceiving} />
             {/* TODO: Remove this route once the new receiving refactor is complete
             (legacy PartialReceivingPage) */}
