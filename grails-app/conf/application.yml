@@ -330,13 +330,14 @@ openboxes:
     ajaxRequest:
         timeout: 120000
 
-    # The user that background/asynchronous jobs authenticate as when they run.
-    # This user provides the current user context (e.g. for createdBy/updatedBy
-    # audit stamping) while a job executes. It is allowed to be disabled
+    # The robot user that background/asynchronous jobs authenticate as when they
+    # run. A robot user is a non-human account that automated processes run as.
+    # It provides the current user context (e.g. for createdBy/updatedBy audit
+    # stamping) while a job executes, and is allowed to be disabled
     # (active = false) since it is only used for internal, non-interactive
     # authentication. Defaults to the built-in "admin" user but can be pointed
     # at a dedicated account by overriding the username below.
-    system:
+    robot:
         username: "admin"
 
     dashboard:

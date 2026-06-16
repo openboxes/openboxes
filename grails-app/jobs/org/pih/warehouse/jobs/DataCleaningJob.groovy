@@ -22,8 +22,8 @@ class DataCleaningJob {
         }
 
         Shipment.withNewSession {
-            // Run as the system user so any records updated are stamped with a valid current user.
-            AuthService.withSystemUser {
+            // Run as the robot user so any records updated are stamped with a valid current user.
+            AuthService.withRobotUser {
                 log.info "Starting data cleaning job at ${new Date()}"
                 def startTime = System.currentTimeMillis()
                 shipmentService.bulkUpdateShipments()

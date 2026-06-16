@@ -33,10 +33,10 @@ class AssignIdentifierJob {
             return
         }
 
-        // Run as the system user so any records created/updated are stamped with a valid current
-        // user. withNewSession provides the Hibernate session needed to look up the system user.
+        // Run as the robot user so any records created/updated are stamped with a valid current
+        // user. withNewSession provides the Hibernate session needed to look up the robot user.
         User.withNewSession {
-            AuthService.withSystemUser {
+            AuthService.withRobotUser {
                 // Assume that each service will manage their own transactions
                 productIdentifierService.generateForAllUnassignedIdentifiers()
                 shipmentIdentifierService.generateForAllUnassignedIdentifiers()
