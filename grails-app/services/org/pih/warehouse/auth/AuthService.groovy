@@ -14,7 +14,6 @@ import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
-import org.springframework.transaction.annotation.Propagation
 
 @CompileStatic
 @Transactional(readOnly = true)
@@ -26,13 +25,17 @@ class AuthService {
     private static ThreadLocal<User> threadLocalUser
     private static ThreadLocal<Location> threadLocalLocation
 
-    void setCurrentUser(User user) {
+    private static void setThreadLocalUser(User user) {
         if (!threadLocalUser) {
             threadLocalUser = new ThreadLocal<User>()
         }
 
         // misuse get() to prevent javax.persistence.EntityExistsException
         threadLocalUser.set(user?.id ? User.get(user.id) : null)
+    }
+
+    void setCurrentUser(User user) {
+        setThreadLocalUser(user)
     }
 
     static User getCurrentUser() {
@@ -62,7 +65,7 @@ class AuthService {
      *
      * @throws IllegalStateException if no user exists for the configured username
      */
-    User getSystemUser() {
+    static User getSystemUser() {
         String username = Holders.config.getProperty(
                 SYSTEM_USER_USERNAME_CONFIG_KEY, String, DEFAULT_SYSTEM_USER_USERNAME)
         User systemUser = (User) User.find("from User as u where u.username = :username", [username: username])
@@ -79,16 +82,19 @@ class AuthService {
      * previously authenticated user (if any) afterward. Intended for use by background jobs so that
      * any records they create or update are stamped with a valid current user.
      *
+     * This is intentionally not transactional: the GORM lookups it performs only require a bound
+     * Hibernate session (which jobs establish via withNewSession), and keeping it outside the
+     * class-level read-only transaction lets the wrapped services manage their own transactions.
+     *
      * @return whatever the closure returns
      */
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    def withSystemUser(Closure closure) {
+    static def withSystemUser(Closure closure) {
         User previousUser = getCurrentUser()
         try {
-            setCurrentUser(getSystemUser())
+            setThreadLocalUser(getSystemUser())
             return closure.call()
         } finally {
-            setCurrentUser(previousUser)
+            setThreadLocalUser(previousUser)
         }
     }
 }

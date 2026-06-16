@@ -1,10 +1,10 @@
 package org.pih.warehouse.jobs
 
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.User
 
 class DataMigrationJob {
 
-    def authService
     def migrationService
 
     static concurrent = false
@@ -18,7 +18,7 @@ class DataMigrationJob {
             // Run as the system user so any records created/updated are stamped with a valid current
             // user. withNewSession provides the Hibernate session needed to look up the system user.
             User.withNewSession {
-                authService.withSystemUser {
+                AuthService.withSystemUser {
                     log.info "Starting data migration job at ${new Date()}"
                     def startTime = System.currentTimeMillis()
                     migrationService.migrateInventoryTransactions()

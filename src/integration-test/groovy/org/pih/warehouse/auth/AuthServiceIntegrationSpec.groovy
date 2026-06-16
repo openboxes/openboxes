@@ -11,11 +11,12 @@ import org.pih.warehouse.core.User
 @Rollback
 class AuthServiceIntegrationSpec extends IntegrationSpec {
 
+    // Injected only to exercise the instance setCurrentUser API; the system user methods are static.
     AuthService authService
 
     void 'getSystemUser returns the configured system user'() {
         when:
-        User systemUser = authService.getSystemUser()
+        User systemUser = AuthService.getSystemUser()
 
         then:
         systemUser != null
@@ -28,7 +29,7 @@ class AuthServiceIntegrationSpec extends IntegrationSpec {
         assert AuthService.currentUser == null
 
         when:
-        User userDuringExecution = authService.withSystemUser {
+        User userDuringExecution = AuthService.withSystemUser {
             return AuthService.currentUser
         }
 
@@ -46,7 +47,7 @@ class AuthServiceIntegrationSpec extends IntegrationSpec {
         authService.setCurrentUser(previousUser)
 
         when:
-        authService.withSystemUser {
+        AuthService.withSystemUser {
             assert AuthService.currentUser != null
         }
 
@@ -64,7 +65,7 @@ class AuthServiceIntegrationSpec extends IntegrationSpec {
         systemUser.save(flush: true)
 
         when: 'the system user is resolved (active flag is intentionally not enforced)'
-        User resolved = authService.getSystemUser()
+        User resolved = AuthService.getSystemUser()
 
         then: 'the disabled user is still returned for job authentication'
         resolved != null
