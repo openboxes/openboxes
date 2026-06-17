@@ -131,6 +131,10 @@ enum ActivityCode {
     // Inbound sortation
     INBOUND_SORTATION('INBOUND_SORTATION'),
 
+    // Enables assigning a putaway container (cart) during inbound sortation, one code per assignment strategy
+    PUTAWAY_CONTAINER_ASSIGNMENT_BY_ZONE('PUTAWAY_CONTAINER_ASSIGNMENT_BY_ZONE'),
+    PUTAWAY_CONTAINER_ASSIGNMENT_BY_DELIVERY_TYPE('PUTAWAY_CONTAINER_ASSIGNMENT_BY_DELIVERY_TYPE'),
+
     // Putaway discrepancy
     PUTAWAY_DISCREPANCY('PUTAWAY_DISCREPANCY'),
     LOST_AND_FOUND('LOST_AND_FOUND'),
@@ -224,6 +228,8 @@ enum ActivityCode {
 
                 // Internal locations used for inbound sortation and putaway
                 INBOUND_SORTATION,
+                PUTAWAY_CONTAINER_ASSIGNMENT_BY_ZONE,
+                PUTAWAY_CONTAINER_ASSIGNMENT_BY_DELIVERY_TYPE,
                 LOST_AND_FOUND,
                 PUTAWAY_CART,
                 UNDEFINED_LOCATION,

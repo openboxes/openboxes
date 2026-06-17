@@ -1,5 +1,6 @@
 package org.pih.warehouse.inboundSortation
 
+import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
@@ -17,4 +18,5 @@ class PutawayContext {
     Integer quantity
     String backorderReference
     RequisitionItem backorderItem
+    DeliveryTypeCode deliveryTypeCode
 }
