@@ -31,3 +31,30 @@
     }
   }
 }
+
+.receiving-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.receiving-table {
+  .rt-td {
+    display: flex;
+    align-items: center;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+
+    div {
+      min-width: 0;
+    }
+  }
+
+  .input-wrapper-title {
+    display: none;
+  }
+
+  .input-wrapper-error-message {
+    min-height: unset !important;
+  }
+}

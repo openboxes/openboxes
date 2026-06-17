@@ -82,18 +82,6 @@
   justify-content: space-between;
 }
 
-/* Chrome, Safari, Edge, Opera */
-input.hide-arrows::-webkit-outer-spin-button,
-input.hide-arrows::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* Firefox */
-input.hide-arrows[type=number] {
-  -moz-appearance: textfield;
-}
-
 .buttons-container {
   display: flex;
   gap: 4px;

@@ -19,8 +19,6 @@ import receivingViewOptions from 'consts/receivingViewOptions';
 import useTranslate from 'hooks/useTranslate';
 import AutosaveIndicator from 'utils/AutosaveIndicator';
 
-import 'components/receivingV2/ReceivingFilters.scss';
-
 /**
  * Filters bar rendered above the receiving table. The filter (search and
  * receipt status) are rendered through FilterForm from the FilterFields config.
