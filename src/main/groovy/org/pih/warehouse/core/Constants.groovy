@@ -208,4 +208,7 @@ class Constants {
     static final String PUTAWAY_CONTAINER_LOCATION_TYPE_NAME = "Putaway Container"
     static final String OUTBOUND_CONTAINER_LOCATION_TYPE_NAME = "Outbound Container"
     static final String CROSS_DOCKING_LOCATION_TYPE_NAME = "Cross-docking"
+
+    static final String SYSTEM_USER_USERNAME_CONFIG_KEY = "openboxes.system.username"
+    static final String SYSTEM_USER_USERNAME_DEFAULT_VALUE = "admin"
 }

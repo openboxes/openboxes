@@ -10,7 +10,9 @@
 package org.pih.warehouse.auth
 
 import grails.gorm.transactions.Transactional
+import grails.util.Holders
 import groovy.transform.CompileStatic
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 
@@ -45,5 +47,28 @@ class AuthService {
 
     static Location getCurrentLocation() {
         return threadLocalLocation?.get()
+    }
+
+    User getSystemUser() {
+        String username = Holders.config.getProperty(
+                Constants.SYSTEM_USER_USERNAME_CONFIG_KEY, String, Constants.SYSTEM_USER_USERNAME_DEFAULT_VALUE)
+
+        User systemUser = (User) User.find("from User as u where u.username = :username", [username: username])
+
+        if (!systemUser) {
+            throw new IllegalStateException("Unable to find system user with username ${username}")
+        }
+        return systemUser
+    }
+
+    @Transactional
+    def withSystemUser(Closure closure) {
+        User currentUser = getCurrentUser()
+        try {
+            setCurrentUser(getSystemUser())
+            return closure.call()
+        } finally {
+            setCurrentUser(currentUser)
+        }
     }
 }

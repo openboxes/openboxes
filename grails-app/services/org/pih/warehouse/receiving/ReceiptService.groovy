@@ -534,9 +534,7 @@ class ReceiptService {
             return
         }
 
-        // FIXME Consider moving the logic to the shipment
-        Boolean hasPendingReceipt = shipment.receipts.any { Receipt receipt -> receipt.receiptStatusCode == ReceiptStatusCode.PENDING }
-        if (hasPendingReceipt) {
+        if (shipment.hasPendingReceipt()) {
             log.debug "Shipment ${shipment.id} has a pending receipt"
             return
         }
