@@ -12,9 +12,9 @@ class ShipmentReceivingSummaryDto implements ResponseBodyFormattable {
     String shipmentId
 
     /**
-     * The id of the shipment's current (pending) receipt, or null if no receipt is in progress.
+     * The id of the shipment's pending receipt, or null if no receipt is in progress.
      */
-    String currentReceiptId
+    String pendingReceiptId
 
     /**
      * A map of shipment item receiving summaries, keyed on shipment item id.
@@ -33,7 +33,7 @@ class ShipmentReceivingSummaryDto implements ResponseBodyFormattable {
     Map<String, Object> asResponseBody() {
         return [
                 shipmentId: shipmentId,
-                currentReceiptId: currentReceiptId,
+                pendingReceiptId: pendingReceiptId,
                 shipmentItemSummaryById: shipmentItemSummaryById.collectEntries { [it.key, it.value.asResponseBody()] },
                 shipmentItemsGrouped: shipmentItemsGrouped.asResponseBody(),
         ]

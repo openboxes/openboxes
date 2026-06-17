@@ -65,7 +65,7 @@ const useReceivingActions = () => {
         group: ReceiptGroup.SHIPMENT_ITEM,
       });
       // When there's no pending receipt yet, start one
-      if (!summary?.currentReceiptId) {
+      if (!summary?.pendingReceiptId) {
         await receivingApi.startReceipt(shipmentId);
       }
       setLineItems(transformSummaryToLineItems(summary));
