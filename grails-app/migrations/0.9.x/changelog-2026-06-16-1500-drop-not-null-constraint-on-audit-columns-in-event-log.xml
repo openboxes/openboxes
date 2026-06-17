@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda" id="160620261500-0">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="event_log" columnName="created_by_id"/>
+        </preConditions>
+        <dropNotNullConstraint tableName="event_log" columnName="created_by_id" columnDataType="CHAR(38)"/>
+        <rollback>
+            <addNotNullConstraint tableName="event_log" columnName="created_by_id" columnDataType="CHAR(38)"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="160620261500-1">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="event_log" columnName="updated_by_id"/>
+        </preConditions>
+        <dropNotNullConstraint tableName="event_log" columnName="updated_by_id" columnDataType="CHAR(38)"/>
+        <rollback>
+            <addNotNullConstraint tableName="event_log" columnName="updated_by_id" columnDataType="CHAR(38)"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
