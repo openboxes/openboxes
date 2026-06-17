@@ -73,7 +73,7 @@ const useReceivingColumns = () => {
       ),
       size: 300,
     }),
-    columnHelper.accessor((row) => row.container?.name, {
+    columnHelper.display({
       id: receivingColumns.PACK_LEVEL,
       header: () => (
         <TableHeaderCell
