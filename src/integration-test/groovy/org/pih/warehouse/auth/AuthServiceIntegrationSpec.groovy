@@ -5,49 +5,49 @@ import org.pih.warehouse.common.base.IntegrationSpec
 import org.pih.warehouse.core.User
 
 /**
- * Verifies that background jobs can authenticate as the configured robot user via
- * {@link AuthService#withRobotUser(groovy.lang.Closure)}, including when that user is disabled.
+ * Verifies that background jobs can authenticate as the configured system user via
+ * {@link AuthService#withSystemUser(groovy.lang.Closure)}, including when that user is disabled.
  */
 @Rollback
 class AuthServiceIntegrationSpec extends IntegrationSpec {
 
-    // Injected only to exercise the instance setCurrentUser API; the robot user methods are static.
+    // Injected only to exercise the instance setCurrentUser API; the system user methods are static.
     AuthService authService
 
-    void 'getRobotUser returns the configured robot user'() {
+    void 'getSystemUser returns the configured system user'() {
         when:
-        User robotUser = AuthService.getRobotUser()
+        User systemUser = AuthService.getSystemUser()
 
         then:
-        robotUser != null
-        // Defaults to the built-in admin user (openboxes.robot.username)
-        robotUser.username == AuthService.DEFAULT_ROBOT_USERNAME
+        systemUser != null
+        // Defaults to the built-in admin user (openboxes.system.username)
+        systemUser.username == AuthService.DEFAULT_SYSTEM_USER_USERNAME
     }
 
-    void 'withRobotUser sets the current user for the duration of the closure and restores it afterward'() {
+    void 'withSystemUser sets the current user for the duration of the closure and restores it afterward'() {
         given:
         assert AuthService.currentUser == null
 
         when:
-        User userDuringExecution = AuthService.withRobotUser {
+        User userDuringExecution = AuthService.withSystemUser {
             return AuthService.currentUser
         }
 
-        then: 'the robot user is the current user while the closure runs'
+        then: 'the system user is the current user while the closure runs'
         userDuringExecution != null
-        userDuringExecution.username == AuthService.DEFAULT_ROBOT_USERNAME
+        userDuringExecution.username == AuthService.DEFAULT_SYSTEM_USER_USERNAME
 
         and: 'the previous (empty) user context is restored afterward'
         AuthService.currentUser == null
     }
 
-    void 'withRobotUser restores the previously authenticated user'() {
+    void 'withSystemUser restores the previously authenticated user'() {
         given:
-        User previousUser = User.findByUsername(AuthService.DEFAULT_ROBOT_USERNAME)
+        User previousUser = User.findByUsername(AuthService.DEFAULT_SYSTEM_USER_USERNAME)
         authService.setCurrentUser(previousUser)
 
         when:
-        AuthService.withRobotUser {
+        AuthService.withSystemUser {
             assert AuthService.currentUser != null
         }
 
@@ -58,18 +58,18 @@ class AuthServiceIntegrationSpec extends IntegrationSpec {
         authService.setCurrentUser(null)
     }
 
-    void 'getRobotUser resolves the robot user even when the account is disabled'() {
-        given: 'the robot user is disabled'
-        User robotUser = User.findByUsername(AuthService.DEFAULT_ROBOT_USERNAME)
-        robotUser.active = false
-        robotUser.save(flush: true)
+    void 'getSystemUser resolves the system user even when the account is disabled'() {
+        given: 'the system user is disabled'
+        User systemUser = User.findByUsername(AuthService.DEFAULT_SYSTEM_USER_USERNAME)
+        systemUser.active = false
+        systemUser.save(flush: true)
 
-        when: 'the robot user is resolved (active flag is intentionally not enforced)'
-        User resolved = AuthService.getRobotUser()
+        when: 'the system user is resolved (active flag is intentionally not enforced)'
+        User resolved = AuthService.getSystemUser()
 
         then: 'the disabled user is still returned for job authentication'
         resolved != null
-        resolved.username == AuthService.DEFAULT_ROBOT_USERNAME
+        resolved.username == AuthService.DEFAULT_SYSTEM_USER_USERNAME
         !resolved.active
     }
 }

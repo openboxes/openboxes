@@ -15,10 +15,10 @@ class DataMigrationJob {
 
     void execute() {
         if (JobUtils.shouldExecute(DataMigrationJob)) {
-            // Run as the robot user so any records created/updated are stamped with a valid current
-            // user. withNewSession provides the Hibernate session needed to look up the robot user.
+            // Run as the system user so any records created/updated are stamped with a valid current
+            // user. withNewSession provides the Hibernate session needed to look up the system user.
             User.withNewSession {
-                AuthService.withRobotUser {
+                AuthService.withSystemUser {
                     log.info "Starting data migration job at ${new Date()}"
                     def startTime = System.currentTimeMillis()
                     migrationService.migrateInventoryTransactions()

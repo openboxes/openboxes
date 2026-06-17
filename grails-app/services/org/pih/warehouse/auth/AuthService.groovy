@@ -19,8 +19,8 @@ import org.pih.warehouse.core.User
 @Transactional(readOnly = true)
 class AuthService {
 
-    static final String ROBOT_USERNAME_CONFIG_KEY = "openboxes.robot.username"
-    static final String DEFAULT_ROBOT_USERNAME = "admin"
+    static final String SYSTEM_USER_USERNAME_CONFIG_KEY = "openboxes.system.username"
+    static final String DEFAULT_SYSTEM_USER_USERNAME = "admin"
 
     private static ThreadLocal<User> threadLocalUser
     private static ThreadLocal<Location> threadLocalLocation
@@ -56,30 +56,29 @@ class AuthService {
     }
 
     /**
-     * Returns the robot user that background jobs authenticate as. A robot user is a non-human
-     * account that automated processes run as. The username is configurable via
-     * {@code openboxes.robot.username} and defaults to the built-in "admin" user.
+     * Returns the user that background jobs authenticate as. The username is configurable via
+     * {@code openboxes.system.username} and defaults to the built-in "admin" user.
      *
-     * The robot user is intentionally allowed to be disabled (active = false). Unlike interactive
+     * The system user is intentionally allowed to be disabled (active = false). Unlike interactive
      * login, the active flag is not enforced here because this is only used for internal,
      * non-interactive authentication while a job runs.
      *
      * @throws IllegalStateException if no user exists for the configured username
      */
-    static User getRobotUser() {
+    static User getSystemUser() {
         String username = Holders.config.getProperty(
-                ROBOT_USERNAME_CONFIG_KEY, String, DEFAULT_ROBOT_USERNAME)
-        User robotUser = (User) User.find("from User as u where u.username = :username", [username: username])
-        if (!robotUser) {
+                SYSTEM_USER_USERNAME_CONFIG_KEY, String, DEFAULT_SYSTEM_USER_USERNAME)
+        User systemUser = (User) User.find("from User as u where u.username = :username", [username: username])
+        if (!systemUser) {
             throw new IllegalStateException(
-                    ("Unable to authenticate background job: no user found for configured robot user '${username}'. " +
-                            "Set '${ROBOT_USERNAME_CONFIG_KEY}' to the username of an existing user.").toString())
+                    ("Unable to authenticate background job: no user found for configured system user '${username}'. " +
+                            "Set '${SYSTEM_USER_USERNAME_CONFIG_KEY}' to the username of an existing user.").toString())
         }
-        return robotUser
+        return systemUser
     }
 
     /**
-     * Executes the given closure with the robot user set as the current user, restoring the
+     * Executes the given closure with the system user set as the current user, restoring the
      * previously authenticated user (if any) afterward. Intended for use by background jobs so that
      * any records they create or update are stamped with a valid current user.
      *
@@ -89,10 +88,10 @@ class AuthService {
      *
      * @return whatever the closure returns
      */
-    static def withRobotUser(Closure closure) {
+    static def withSystemUser(Closure closure) {
         User previousUser = getCurrentUser()
         try {
-            setThreadLocalUser(getRobotUser())
+            setThreadLocalUser(getSystemUser())
             return closure.call()
         } finally {
             setThreadLocalUser(previousUser)
