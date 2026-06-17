@@ -1,10 +1,9 @@
 package org.pih.warehouse.shipping
 
-import org.pih.warehouse.core.http.ResponseBodyFormattable
 import org.pih.warehouse.location.LocationSimpleDto
 import org.pih.warehouse.product.lot.ProductLotDto
 
-class ShipmentItemDto implements ResponseBodyFormattable {
+class ShipmentItemDto {
     String id
     String shipmentId
     String requisitionItemId
@@ -31,22 +30,5 @@ class ShipmentItemDto implements ResponseBodyFormattable {
                 dateCreated: shipmentItem.dateCreated,
                 lastUpdated: shipmentItem.lastUpdated,
         )
-    }
-
-    @Override
-    Map<String, Object> asResponseBody() {
-        return [
-                id: id,
-                shipmentId: shipmentId,
-                requisitionItemId: requisitionItemId,
-                productLot: productLot,
-                binLocation: binLocation,
-                quantity: quantity,
-                recipientId: recipientId,
-                donorId: donorId,
-                container: container,
-                dateCreated: dateCreated,
-                lastUpdated: lastUpdated,
-        ]
     }
 }

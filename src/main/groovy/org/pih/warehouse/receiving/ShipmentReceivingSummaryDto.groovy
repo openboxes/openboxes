@@ -1,13 +1,12 @@
 package org.pih.warehouse.receiving
 
 import org.pih.warehouse.core.OrderedDataGroup
-import org.pih.warehouse.core.http.ResponseBodyFormattable
 
 /**
  * Pulls together all the receipts (including pending ones) associated with a shipment for the purpose of determining
  * the shipment's current state of receiving.
  */
-class ShipmentReceivingSummaryDto implements ResponseBodyFormattable {
+class ShipmentReceivingSummaryDto {
 
     String shipmentId
 
@@ -23,13 +22,4 @@ class ShipmentReceivingSummaryDto implements ResponseBodyFormattable {
      * Exists purely for client convenience.
      */
     OrderedDataGroup shipmentItemsGrouped
-
-    @Override
-    Map<String, Object> asResponseBody() {
-        return [
-                shipmentId: shipmentId,
-                shipmentItemSummaryById: shipmentItemSummaryById,
-                shipmentItemsGrouped: shipmentItemsGrouped,
-        ]
-    }
 }

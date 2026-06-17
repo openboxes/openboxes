@@ -1,11 +1,9 @@
 package org.pih.warehouse.core
 
-import org.pih.warehouse.core.http.ResponseBodyFormattable
-
 /**
  * A simple, general purpose DTO representing a Person.
  */
-class PersonDto implements ResponseBodyFormattable {
+class PersonDto {
     String id
     String name
     String email
@@ -24,18 +22,5 @@ class PersonDto implements ResponseBodyFormattable {
                 lastUpdated: person.lastUpdated,
                 active: person.active,
         )
-    }
-
-    @Override
-    Map<String, Object> asResponseBody() {
-        return [
-                id: id,
-                name: name,
-                email: email,
-                phoneNumber: phoneNumber,
-                dateCreated: dateCreated,
-                lastUpdated: lastUpdated,
-                active: active,
-        ]
     }
 }

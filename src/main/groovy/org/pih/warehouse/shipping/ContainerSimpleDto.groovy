@@ -1,12 +1,10 @@
 package org.pih.warehouse.shipping
 
-import org.pih.warehouse.core.http.ResponseBodyFormattable
-
 /**
  * A simplified representation of a Container, containing only the fields that are required
  * to display the container in its most basic form.
  */
-class ContainerSimpleDto implements ResponseBodyFormattable {
+class ContainerSimpleDto {
     String id
     String name
     ContainerSimpleDto parentContainer
@@ -17,14 +15,5 @@ class ContainerSimpleDto implements ResponseBodyFormattable {
                 name: container.name,
                 parentContainer: from(container.parentContainer),
         )
-    }
-
-    @Override
-    Map<String, Object> asResponseBody() {
-        return [
-                id: id,
-                name: name,
-                parentContainer: parentContainer?.asResponseBody(),
-        ]
     }
 }
