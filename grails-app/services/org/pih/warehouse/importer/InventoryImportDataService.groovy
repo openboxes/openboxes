@@ -18,6 +18,7 @@ import org.joda.time.LocalDate
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.SendInventoryAdjustmentNotificationEvent
 import org.pih.warehouse.core.date.InstantParser
 import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.inventory.InventoryBaselineTransactionCommand
@@ -192,7 +193,7 @@ class InventoryImportDataService implements ImportDataService {
         // could have a different stock history, but we error if there are any other transactions that exist at
         // that time, so we can guarantee that the available items will be the same for both the baseline
         // and adjustment. This avoids needing to fetch available items twice (which is slow).
-        createAdjustmentTransaction(
+        Transaction adjustmentTransaction = createAdjustmentTransaction(
                 command.location,
                 inventoryImportData,
                 availableItems,
@@ -200,6 +201,13 @@ class InventoryImportDataService implements ImportDataService {
                 comment,
                 baselineTransaction.transactionSource,
                 command)
+
+        grailsApplication.mainContext.publishEvent(new SendInventoryAdjustmentNotificationEvent(
+                inventoryImportData.products.toList(),
+                command.location,
+                baselineTransaction,
+                adjustmentTransaction
+        ))
     }
 
     /**

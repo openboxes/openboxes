@@ -37,6 +37,7 @@ class Constants {
     static final String DEFAULT_MONTH_YEAR_DATE_FORMAT = "dd/MMM/yyyy"
     static final String SHORT_MONTH_YEAR_DATE_FORMAT = "MM/yyyy"
     static final String EXPIRATION_DATE_FORMAT = "MM/dd/yyyy"
+    static final String ISO_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssXXX"
     static final String MONTH_DAY_YEAR_DATE_FORMAT = "MM/dd/yyyy"
     static final String DELIVERY_DATE_FORMAT = "MM/dd/yyyy HH:mm XXX"
     static final String EUROPEAN_DATE_FORMAT = "dd/MM/yyyy"

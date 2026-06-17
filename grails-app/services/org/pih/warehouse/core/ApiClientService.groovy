@@ -9,6 +9,7 @@
 **/
 package org.pih.warehouse.core
 
+import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.apache.commons.io.IOUtils
 import org.apache.http.HttpResponse
@@ -46,8 +47,8 @@ class ApiClientService {
 
     JSONObject execute(HttpEntityEnclosingRequestBase request, Map payload, Map headers) {
         if (payload) {
-            JSONObject jsonObject = new JSONObject(payload)
-            StringEntity entity = new StringEntity(jsonObject.toString(), "UTF-8")
+            String json = JsonOutput.toJson(payload)
+            StringEntity entity = new StringEntity(json, "UTF-8")
             BasicHeader basicHeader = new BasicHeader(HTTP.CONTENT_TYPE,"application/json");
             entity.setContentType(basicHeader);
             request.setEntity(entity)

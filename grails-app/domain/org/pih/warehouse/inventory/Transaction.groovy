@@ -98,7 +98,7 @@ class Transaction implements Comparable, Serializable {
     Boolean confirmed = Boolean.FALSE    // Transactions need to be confirmed by a supervisor
     User confirmedBy
     Date dateConfirmed
-    List transactionEntries
+    List<TransactionEntry> transactionEntries
 
     User createdBy
     User updatedBy

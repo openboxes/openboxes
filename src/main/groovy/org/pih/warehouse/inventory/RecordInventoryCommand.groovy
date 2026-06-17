@@ -24,6 +24,7 @@ class RecordInventoryCommand implements Validateable {
     Integer totalQuantityAvailableToPromise
     Date transactionDate = new Date()
     String comment
+    String reasonCode
     RecordInventoryRowCommand recordInventoryRow
     List<RecordInventoryRowCommand> recordInventoryRows =
             LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(RecordInventoryRowCommand.class))
@@ -36,6 +37,7 @@ class RecordInventoryCommand implements Validateable {
         totalQuantityAvailableToPromise(nullable: true)
         transactionDate(nullable: false)
         comment(nullable: true)
+        reasonCode(nullable: true)
         recordInventoryRow(nullable: true)
         recordInventoryRows(validator: { List<RecordInventoryRowCommand> val,  RecordInventoryCommand obj,  Errors errors ->
             def errorsFound = false

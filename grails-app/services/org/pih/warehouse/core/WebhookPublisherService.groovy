@@ -11,16 +11,26 @@ package org.pih.warehouse.core
 
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
+import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.core.date.InstantParser
+import org.pih.warehouse.core.date.JavaUtilDateParser
+import org.pih.warehouse.inventory.ProductAvailabilityService
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.shipping.ShipmentItem
 
+import static groovy.json.JsonOutput.toJson
+import static groovy.json.JsonOutput.prettyPrint
 
 @Transactional
 class WebhookPublisherService {
 
-    def apiClientService
+    ApiClientService apiClientService
+    ProductAvailabilityService productAvailabilityService
 
     def publishShippedEvent(Shipment shipment) {
 
@@ -79,6 +89,7 @@ class WebhookPublisherService {
 
         Map payload = [
                 eventId: eventId,
+                eventType: eventType?.name,
                 eventDate: dateTriggered.toString(),
                 requisitionNumber: requisition.requestNumber,
                 requisitionType: requisition.type,
@@ -105,6 +116,104 @@ class WebhookPublisherService {
                 ]
         ]
 
+        publishEvent(payload, "openboxes.n8n")
+    }
+
+    /**
+     * Publishing an inventory adjustment notification based on the baseline and/or adjustment transactions
+     * for a product after na inventory adjustment made (or a product inventory record created)
+     * */
+    void publishInventoryAdjustmentEvent(Product product, Location facility, Transaction baselineTransaction,
+                                         Transaction adjustmentTransaction) {
+        if (!product || !facility) {
+            log.warn("Missing required product and/or facility. Skipping sending the webhook notification.")
+            return
+        }
+
+        if (!baselineTransaction && !adjustmentTransaction) {
+            log.warn("Missing baseline and adjustment transaction. Skipping sending the webhook notification.")
+            return
+        }
+
+        String eventId = UUID.randomUUID().toString()
+        String webhookId = UUID.randomUUID().toString()
+        Date dateTriggered = new Date()
+
+        List<AvailableItem> baselineAvailableItems = []
+        if (!baselineTransaction) {
+            // This will be a case of a single row adjustment without baseline, and we need to find adjustment date
+            Date baselineDate = JavaUtilDateParser
+                    .asDate(InstantParser.asInstant(adjustmentTransaction.transactionDate).minusSeconds(1))
+            baselineAvailableItems = productAvailabilityService.getAvailableItemsAtDate(facility,
+                    adjustmentTransaction?.transactionEntries?.inventoryItem?.product?.unique(), baselineDate)
+        }
+
+        User adjustedBy = adjustmentTransaction?.createdBy ?: baselineTransaction?.createdBy
+
+        // Since we are sending a notification for single product, we need to filter the baseline and adjustment
+        // transaction entries for that product only
+        List<TransactionEntry> baselineEntries = baselineTransaction?.transactionEntries?.findAll {
+            it.inventoryItem?.product == product
+        } ?: []
+        List<TransactionEntry> adjustmentEntries = adjustmentTransaction?.transactionEntries?.findAll {
+            it.inventoryItem?.product == product
+        } ?: []
+
+        Integer quantityBeforeAdjustment = (Integer) (baselineTransaction ? baselineEntries?.sum { it.quantity } : baselineAvailableItems?.sum { it.quantityOnHand }) ?: 0
+        Integer quantityVariance = (Integer) adjustmentEntries?.sum { it.quantityVariance } ?: 0
+        Integer quantityAfterAdjustment = quantityBeforeAdjustment + quantityVariance
+
+        Map payload = [
+                eventId: eventId,
+                eventType: WebhookEventType.ADJUSTMENT_CREATED.name,
+                eventDate: dateTriggered.format(Constants.ISO_DATE_FORMAT),
+                triggeredBy: adjustedBy?.name,
+                adjustment: [
+                        id: adjustmentTransaction?.id ?: baselineTransaction?.id,
+                        reasonCodes: adjustmentEntries?.reasonCode?.findAll { it },
+                        comments: adjustmentEntries?.comments?.findAll { it },
+                        adjustedBy: adjustedBy?.name,
+                        dateAdjusted: (adjustmentTransaction ?: baselineTransaction).transactionDate?.format(Constants.ISO_DATE_FORMAT),
+                        products: product.productCode,
+                        totals: [
+                                quantityBeforeAdjustment: quantityBeforeAdjustment,
+                                quantityAfterAdjustment: quantityAfterAdjustment,
+                                quantityVariance: quantityVariance
+                        ],
+                        adjustments: adjustmentEntries?.collect { TransactionEntry entry ->
+                            Integer quantityBefore
+                            if (baselineTransaction) {
+                                quantityBefore = baselineEntries?.find { TransactionEntry it ->
+                                    it.inventoryItem.id == entry.inventoryItem.id && it.binLocation.id == entry.binLocation.id
+                                }?.quantity ?: 0
+                            } else {
+                                quantityBefore = baselineAvailableItems?.find { AvailableItem it ->
+                                    it.inventoryItem.id == entry.inventoryItem.id && it.binLocation?.id == entry.binLocation?.id
+                                }?.quantityOnHand ?: 0
+                            }
+
+                            [
+                                    location: entry.binLocation?.locationNumber,
+                                    inventoryItem: entry.inventoryItem?.id,
+                                    quantityBeforeAdjustment: quantityBefore,
+                                    quantityAfterAdjustment: quantityBefore + entry.quantityVariance,
+                                    quantityVariance: entry.quantityVariance,
+                                    reasonCode: entry.reasonCode,
+                                    comment: entry.comments,
+                            ]
+                        } ?: []
+                ],
+                metadata: [
+                        facilityId: facility.id,
+                        facilityCode: facility.locationNumber,
+                        facilityName: facility.name,
+                        webhookId: webhookId,
+                        attemptNumber: 1
+                ]
+        ]
+
+        log.info("Publishing inventory adjustment webhook event for product ${product?.productCode} at facility ${facility?.name}")
+        log.debug(prettyPrint(toJson(payload).toString()))
         publishEvent(payload, "openboxes.n8n")
     }
 

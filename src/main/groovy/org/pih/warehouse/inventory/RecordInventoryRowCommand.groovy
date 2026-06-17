@@ -23,6 +23,7 @@ class RecordInventoryRowCommand implements Validateable {
     Integer oldQuantity
     Integer newQuantity
     String comment
+    String reasonCode
     Boolean error
 
     static constraints = {
@@ -35,6 +36,7 @@ class RecordInventoryRowCommand implements Validateable {
         oldQuantity(nullable: false)
         newQuantity(nullable: false, min: 0)
         comment(nullable: true)
+        reasonCode(nullable: true)
         error(nullable: true)
     }
 
