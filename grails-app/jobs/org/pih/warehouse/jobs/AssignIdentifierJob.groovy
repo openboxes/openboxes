@@ -1,7 +1,5 @@
 package org.pih.warehouse.jobs
 
-import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.TransactionIdentifierService
 import org.pih.warehouse.order.OrderIdentifierService
 import org.pih.warehouse.product.ProductIdentifierService
@@ -33,18 +31,12 @@ class AssignIdentifierJob {
             return
         }
 
-        // Run as the system user so any records created/updated are stamped with a valid current
-        // user. withNewSession provides the Hibernate session needed to look up the system user.
-        User.withNewSession {
-            AuthService.withSystemUser {
-                // Assume that each service will manage their own transactions
-                productIdentifierService.generateForAllUnassignedIdentifiers()
-                shipmentIdentifierService.generateForAllUnassignedIdentifiers()
-                receiptIdentifierService.generateForAllUnassignedIdentifiers()
-                orderIdentifierService.generateForAllUnassignedIdentifiers()
-                requisitionIdentifierService.generateForAllUnassignedIdentifiers()
-                transactionIdentifierService.generateForAllUnassignedIdentifiers()
-            }
-        }
+        // Assume that each service will manage their own transactions
+        productIdentifierService.generateForAllUnassignedIdentifiers()
+        shipmentIdentifierService.generateForAllUnassignedIdentifiers()
+        receiptIdentifierService.generateForAllUnassignedIdentifiers()
+        orderIdentifierService.generateForAllUnassignedIdentifiers()
+        requisitionIdentifierService.generateForAllUnassignedIdentifiers()
+        transactionIdentifierService.generateForAllUnassignedIdentifiers()
     }
 }
