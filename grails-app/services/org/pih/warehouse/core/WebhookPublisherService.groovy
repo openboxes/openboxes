@@ -120,9 +120,9 @@ class WebhookPublisherService {
     }
 
     /**
-     * Publishing an inventory adjustment notification based on the baseline and/or adjustment transactions
-     * for a product after na inventory adjustment made (or a product inventory record created)
-     * */
+     * Publishes an inventory adjustment notification based on the baseline and/or adjustment transactions
+     * for a product after an inventory adjustment is made (or a product inventory record is created).
+     */
     void publishInventoryAdjustmentEvent(Product product, Location facility, Transaction baselineTransaction,
                                          Transaction adjustmentTransaction) {
         if (!product || !facility) {
@@ -184,7 +184,7 @@ class WebhookPublisherService {
                             Integer quantityBefore
                             if (baselineTransaction) {
                                 quantityBefore = baselineEntries?.find { TransactionEntry it ->
-                                    it.inventoryItem.id == entry.inventoryItem.id && it.binLocation.id == entry.binLocation.id
+                                    it.inventoryItem?.id == entry.inventoryItem?.id && it.binLocation?.id == entry.binLocation?.id
                                 }?.quantity ?: 0
                             } else {
                                 quantityBefore = baselineAvailableItems?.find { AvailableItem it ->

@@ -9,8 +9,8 @@ class SendInventoryAdjustmentNotificationEventService implements ApplicationList
 
     @Override
     void onApplicationEvent(SendInventoryAdjustmentNotificationEvent event) {
-        log.info "Application event $event has been published! " + event.properties
-
+        log.info "Inventory adjustment event published: products=${event?.products*.id} facility=${event?.facility?.id} baseline=${event?.baselineTransaction?.id} adjustment=${event?.adjustmentTransaction?.id}"
+        log.debug "Inventory adjustment event details: ${event?.properties}"
         // Each product should trigger its own notification job
         event?.products?.each { Product product ->
             String delayConfig = Holders.config.openboxes.jobs.sendInventoryAdjustmentNotificationJob.delayInMilliseconds
