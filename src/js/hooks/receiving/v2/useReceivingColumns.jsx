@@ -85,8 +85,8 @@ const useReceivingColumns = () => {
       ),
       cell: ({ row }) => {
         const { container, parentContainer } = row.original;
-        const packLevel1 = parentContainer?.name;
-        const packLevel2 = container?.name;
+        const packLevel1 = parentContainer ? parentContainer.name : container?.name;
+        const packLevel2 = parentContainer ? container?.name : null;
         return (
           <TableCell
             className="rt-td"
