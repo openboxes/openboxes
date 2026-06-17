@@ -13,7 +13,6 @@ class ShipmentReceivingSummaryDto implements ResponseBodyFormattable {
 
     /**
      * The id of the shipment's current (pending) receipt, or null if no receipt is in progress.
-     * Lets the client tell whether a receipt has been started without inspecting the item summaries.
      */
     String currentReceiptId
 
