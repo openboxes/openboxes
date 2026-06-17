@@ -230,7 +230,6 @@ export const INVENTORY_API = (id) => `${API}/facilities/${id}/inventories`;
 export const REORDER_REPORT = (id) => `${INVENTORY_API(id)}/reorderReport`;
 export const EXPIRATION_HISTORY_REPORT = `${API}/inventories/expirationHistoryReport`;
 
-// RECEIVING V2
-export const RECEIVING_V2_API = `${API}/receiving/v2`;
+// RECEIVING
 export const RECEIPT_SUMMARY_BY_SHIPMENT = (shipmentId) =>
   `${API}/receipts/v2/shipment/${shipmentId}/summary`;
