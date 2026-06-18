@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,10 +8,15 @@ import { getUsers } from 'selectors';
 import { fetchUsers } from 'actions';
 import receivingApi from 'api/services/ReceivingApi';
 import ReceiptGroup from 'consts/receiptGroup';
+import {
+  createNormalizedState,
+  normalizeData,
+  updateNormalizedItem,
+} from 'utils/normalizationUtils';
 
 const useReceivingActions = () => {
   const [loading, setLoading] = useState(false);
-  const [lineItems, setLineItems] = useState([]);
+  const [lineItemsState, setLineItemsState] = useState(createNormalizedState());
   const { shipmentId } = useParams();
   const dispatch = useDispatch();
   const users = useSelector(getUsers);
@@ -20,13 +25,11 @@ const useReceivingActions = () => {
   // solution. When line splitting is added, currentReceiptItems may have
   // more entries and each one will become its own row, so this fallback
   // to the first item will not be needed.
-  // TODO (OBPIH-7857): when state normalization is added, this function
-  // will be changed to return a { entities, ids } shape.
   const transformSummaryToLineItems = (data) => {
     const summaryById = data?.shipmentItemSummaryById || {};
     const orderedIds = data?.shipmentItemsGrouped?.order || [];
     const usersById = _.keyBy(users, 'id');
-    return orderedIds.map((id) => {
+    const lineItems = orderedIds.map((id) => {
       const {
         shipmentItem,
         currentReceiptItems = [],
@@ -56,6 +59,11 @@ const useReceivingActions = () => {
           shipmentItem.quantity - totalQuantityReceived - totalQuantityCanceled,
       };
     });
+
+    const test = normalizeData(lineItems, 'shipmentItemId');
+    console.log(test, lineItems);
+
+    return normalizeData(lineItems, 'shipmentItemId');
   };
 
   const loadReceipt = async () => {
@@ -68,11 +76,17 @@ const useReceivingActions = () => {
       if (!summary?.pendingReceiptId) {
         await receivingApi.startReceipt(shipmentId);
       }
-      setLineItems(transformSummaryToLineItems(summary));
+      setLineItemsState(transformSummaryToLineItems(summary));
     } finally {
       setLoading(false);
     }
   };
+
+  // Updates a single line item in the normalized state without rebuilding the whole
+  // collection. Stable identity (useCallback) keeps the table `meta` referentially
+  // stable, so the memoized cells only re-render the line item that actually changed.
+  const updateLineItem = useCallback((shipmentItemId, newData) =>
+    setLineItemsState((state) => updateNormalizedItem(state, shipmentItemId, newData)), []);
 
   useEffect(() => {
     if (!shipmentId) {
@@ -87,7 +101,8 @@ const useReceivingActions = () => {
 
   return {
     loading,
-    lineItems,
+    lineItemsState,
+    updateLineItem,
   };
 };
 

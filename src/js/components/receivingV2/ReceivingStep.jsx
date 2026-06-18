@@ -8,14 +8,19 @@ import 'components/receivingV2/receiving.scss';
 
 const ReceivingStep = () => {
   const {
-    table: { lineItems, columns },
-    actions: { loading },
+    table: { lineItemsState, columns },
+    actions: { loading, updateLineItem },
   } = useReceivingForm();
 
   return (
     <div className="receiving-container">
       <ReceivingFilters />
-      <ReceivingTable lineItems={lineItems} columns={columns} loading={loading} />
+      <ReceivingTable
+        lineItemsState={lineItemsState}
+        columns={columns}
+        loading={loading}
+        updateLineItem={updateLineItem}
+      />
     </div>
   );
 };
