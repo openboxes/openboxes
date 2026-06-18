@@ -29,6 +29,8 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.WebhookEventType
+import org.pih.warehouse.core.WebhookPublisherService
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
@@ -47,6 +49,7 @@ class RequisitionService {
     AuthService authService
     RequisitionIdentifierService requisitionIdentifierService
     def inventoryService
+    WebhookPublisherService webhookPublisherService
 
     def getRequisitionStatistics(Location destination, Location origin, User user) {
         return getRequisitionStatistics(destination, origin, user, null, null)
@@ -881,6 +884,9 @@ class RequisitionService {
                 requisition.dateRejected = new Date()
                 requisition.rejectedBy = currentUser
                 break
+            case RequisitionStatus.ISSUED:
+                webhookPublisherService.publishStatusUpdateEvent(requisition, WebhookEventType.REQUISITION_ISSUED)
+                // no break
             default:
                 requisition.status = newStatus
         }
