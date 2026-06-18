@@ -35,6 +35,9 @@ CREATE OR REPLACE VIEW putaway_task AS
             WHEN EXISTS (SELECT 1 FROM location_effective_supported_activities supported_activities
                          WHERE supported_activities.location_id = order_item.destination_bin_location_id
                            AND supported_activities.supported_activities_string='DELIVERY_TYPE_LOCAL_DELIVERY') THEN 'LOCAL_DELIVERY'
+            WHEN EXISTS (SELECT 1 FROM location_effective_supported_activities supported_activities
+                         WHERE supported_activities.location_id = order_item.destination_bin_location_id
+                           AND supported_activities.supported_activities_string='DELIVERY_TYPE_STOCK_TRANSFER_IBT') THEN 'STOCK_TRANSFER_IBT'
             ELSE 'DEFAULT'
             END AS delivery_type_code,
         order_item.quantity,
