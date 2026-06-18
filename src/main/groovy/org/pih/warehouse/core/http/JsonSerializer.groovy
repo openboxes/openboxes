@@ -1,17 +1,18 @@
 package org.pih.warehouse.core.http
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import grails.gorm.PagedResultList
 import org.springframework.stereotype.Component
 
 /**
- * For converting objects into JSON strings, typically for use in API responses.
+ * For converting objects into JSON strings for use in API responses.
  */
 @Component
 class JsonSerializer {
 
-    final OpenBoxesObjectMapper objectMapper
+    final ObjectMapper objectMapper
 
-    JsonSerializer(final OpenBoxesObjectMapper objectMapper) {
+    JsonSerializer(final ObjectMapper objectMapper) {
         this.objectMapper = objectMapper
     }
 

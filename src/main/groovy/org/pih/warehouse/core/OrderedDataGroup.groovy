@@ -1,16 +1,11 @@
 package org.pih.warehouse.core
 
-import com.fasterxml.jackson.annotation.JsonProperty
-
 /**
  * Wraps a {@link DataGroup}, adding an order field that suggests how the groups should be sorted.
  */
 class OrderedDataGroup {
 
-    @JsonProperty("groups")
     private DataGroup groups = [:]
-
-    @JsonProperty("order")
     private LinkedHashSet<String> order = []
 
     /**

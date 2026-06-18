@@ -1,6 +1,5 @@
 package org.pih.warehouse.core
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import org.codehaus.groovy.runtime.typehandling.GroovyCastException
 
 import org.pih.warehouse.core.http.ResponseBodyFormattable
