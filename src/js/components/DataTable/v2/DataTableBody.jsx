@@ -60,6 +60,14 @@ const DataTableBody = ({
     enabled: isVirtualizationEnabled,
   });
 
+  const getCellContent = (cell, isSeparator) => {
+    if (isSeparator) {
+      const { renderSeparator } = cell.column.columnDef.meta || {};
+      return renderSeparator ? flexRender(renderSeparator, cell.getContext()) : null;
+    }
+    return flexRender(cell.column.columnDef.cell, cell.getContext());
+  };
+
   const dataToMap = isVirtualizationEnabled
     ? rowVirtualizer.getVirtualItems()
     : rowModel.rows;
@@ -115,6 +123,10 @@ const DataTableBody = ({
               label: '',
               defaultMessage: '',
             };
+            // Separator row: cells render column meta.renderSeparator instead of the normal cell.
+            const isSeparator = rowData.original?.isSeparator;
+            // Merge with the row below by removing the separating border.
+            const mergeWithNextRow = rowData.original?.mergeWithNextRow;
             return (
               <CustomTooltip
                 content={isRowDisabled && translate(label, defaultMessage)}
@@ -122,16 +134,17 @@ const DataTableBody = ({
               >
                 <div
                   key={rowData.id}
-                  className="rt-tr-group cell-wrapper"
+                  className={`rt-tr-group cell-wrapper ${mergeWithNextRow ? 'rt-tr-group-merged' : ''}`}
                   role="rowgroup"
                   {...rowProps}
                 >
-                  <TableRow key={rowData.id} className={`rt-tr ${isRowDisabled && 'bg-light'}`}>
+                  <TableRow key={rowData.id} className={`rt-tr ${isRowDisabled && 'bg-light'} ${isSeparator ? 'rt-tr-separator' : ''}`}>
                     {rowData.getVisibleCells().map((cell) => {
                       const { hide, flexWidth, className } = useTableColumnMeta(cell.column);
                       if (hide) {
                         return null;
                       }
+                      const cellContent = getCellContent(cell, isSeparator);
                       return (
                         <div
                           className={`d-flex ${className} ${isRowDisabled && 'text-muted'}`}
@@ -146,7 +159,7 @@ const DataTableBody = ({
                           }}
                           key={cell.id}
                         >
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          {cellContent}
                         </div>
                       );
                     })}
