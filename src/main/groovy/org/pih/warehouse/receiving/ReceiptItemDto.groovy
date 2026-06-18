@@ -27,17 +27,28 @@ class ReceiptItemDto implements ResponseBodyFormattable {
     String comment
 
     static ReceiptItemDto from(ReceiptItem receiptItem) {
-        return !receiptItem ? null : new ReceiptItemDto(
-                id: receiptItem.id,
-                receiptId: receiptItem.receiptId,
-                shipmentItemId: receiptItem.shipmentItemId,
-                recipient: PersonDto.from(receiptItem.recipient),
-                productLot: ProductLotDto.from(receiptItem.inventoryItem),
-                receivingLocation: LocationSimpleDto.from(receiptItem.binLocation),
-                quantityReceived: receiptItem.quantityReceived ?: 0,
-                quantityCanceled: receiptItem.quantityCanceled ?: 0,
-                comment: receiptItem.comment,
-        )
+        if (!receiptItem) {
+            return null
+        }
+        ReceiptItemDto dto = new ReceiptItemDto()
+        dto.populate(receiptItem)
+        return dto
+    }
+
+    /**
+     * Copies the shared receipt item fields onto this instance. Subclasses can reuse this to fill the common fields
+     * instead of re-listing them, then add their own.
+     */
+    protected void populate(ReceiptItem receiptItem) {
+        id = receiptItem.id
+        receiptId = receiptItem.receiptId
+        shipmentItemId = receiptItem.shipmentItemId
+        recipient = PersonDto.from(receiptItem.recipient)
+        productLot = ProductLotDto.from(receiptItem.inventoryItem)
+        receivingLocation = LocationSimpleDto.from(receiptItem.binLocation)
+        quantityReceived = receiptItem.quantityReceived ?: 0
+        quantityCanceled = receiptItem.quantityCanceled ?: 0
+        comment = receiptItem.comment
     }
 
     @Override

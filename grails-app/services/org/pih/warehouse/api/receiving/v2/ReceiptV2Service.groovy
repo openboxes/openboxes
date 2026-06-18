@@ -68,6 +68,11 @@ class ReceiptV2Service {
             throw new ObjectNotFoundException(receiptId, Receipt.class.toString())
         }
 
+        if (receipt.receiptStatusCode != ReceiptStatusCode.PENDING) {
+            throw new IllegalStateException(
+                    "Cannot edit receipt ${receipt.receiptNumber} because it is not pending")
+        }
+
         request.itemsToDelete.each { String receiptItemId -> deleteReceiptItem(receipt, receiptItemId) }
 
         List<ReceiptItemSaveDto> updatedLines = request.itemsToSave.collect { ReceiptItemRequest item ->
@@ -78,23 +83,23 @@ class ReceiptV2Service {
     }
 
     private static ReceiptItemSaveDto createReceiptItem(Receipt receipt, ReceiptItemRequest item) {
-        if (!item.shipmentItem) {
-            throw new IllegalArgumentException("Cannot receive item without a valid shipment item")
-        }
 
-        ReceiptItem receiptItem = new ReceiptItem()
-        receiptItem.product = item.shipmentItem.product
-        receiptItem.inventoryItem = item.shipmentItem.inventoryItem
-        receiptItem.lotNumber = item.shipmentItem.lotNumber
-        receiptItem.expirationDate = item.shipmentItem.expirationDate
-        receiptItem.recipient = item.shipmentItem.recipient
-        receiptItem.quantityShipped = item.shipmentItem.quantity
-        receiptItem.quantityReceived = item.quantityReceiving
-        receiptItem.binLocation = item.binLocation
-        receiptItem.sortOrder = item.shipmentItem.receiptItems.size()
+        ShipmentItem shipmentItem = item.shipmentItem
+
+        ReceiptItem receiptItem = new ReceiptItem(
+                product: shipmentItem.product,
+                inventoryItem: shipmentItem.inventoryItem,
+                lotNumber: shipmentItem.lotNumber,
+                expirationDate: shipmentItem.expirationDate,
+                recipient: shipmentItem.recipient,
+                quantityShipped: shipmentItem.quantity,
+                quantityReceived: item.quantityReceiving,
+                binLocation: item.binLocation,
+                sortOrder: shipmentItem.receiptItems.size(),
+        )
 
         receipt.addToReceiptItems(receiptItem)
-        item.shipmentItem.addToReceiptItems(receiptItem)
+        shipmentItem.addToReceiptItems(receiptItem)
 
         if (!receiptItem.save()) {
             throw new ValidationException("Receipt item is invalid", receiptItem.errors)

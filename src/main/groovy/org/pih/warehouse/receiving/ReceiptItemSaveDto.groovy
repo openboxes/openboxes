@@ -10,22 +10,13 @@ class ReceiptItemSaveDto extends ReceiptItemDto {
     String rowId
 
     static ReceiptItemSaveDto from(ReceiptItem receiptItem, String rowId) {
-        ReceiptItemDto base = ReceiptItemDto.from(receiptItem)
-        if (!base) {
+        if (!receiptItem) {
             return null
         }
-        return new ReceiptItemSaveDto(
-                id: base.id,
-                receiptId: base.receiptId,
-                shipmentItemId: base.shipmentItemId,
-                recipient: base.recipient,
-                productLot: base.productLot,
-                receivingLocation: base.receivingLocation,
-                quantityReceived: base.quantityReceived,
-                quantityCanceled: base.quantityCanceled,
-                comment: base.comment,
-                rowId: rowId,
-        )
+        ReceiptItemSaveDto dto = new ReceiptItemSaveDto()
+        dto.populate(receiptItem)
+        dto.rowId = rowId
+        return dto
     }
 
     @Override
