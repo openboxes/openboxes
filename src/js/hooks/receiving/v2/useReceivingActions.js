@@ -60,9 +60,6 @@ const useReceivingActions = () => {
       };
     });
 
-    const test = normalizeData(lineItems, 'shipmentItemId');
-    console.log(test, lineItems);
-
     return normalizeData(lineItems, 'shipmentItemId');
   };
 
