@@ -31,8 +31,7 @@ import org.pih.warehouse.core.mapper.ResponseMapper
 @Component
 class ObjectMapperConfigurer {
 
-    ObjectMapperConfigurer(final ObjectMapper objectMapper,
-                               final MapperComponentResolver mapperComponentResolver) {
+    ObjectMapperConfigurer(final ObjectMapper objectMapper, final MapperComponentResolver mapperComponentResolver) {
 
         // Prevent getter and boolean is* methods from being automatically serialized as fields.
         // You can still serialize individual getters by annotating them with @JsonProperty.
@@ -108,6 +107,12 @@ class OpenBoxesBeanSerializerModifier extends BeanSerializerModifier {
  */
 class OpenBoxesWrappingSerializer extends JsonSerializer<Object> implements ResolvableSerializer, ContextualSerializer {
 
+    /**
+     * How many layers deep into a JSON object we allow before short circuiting and returning null.
+     * TODO: Make this an application property once we're confident in this flow.
+     */
+    private static final int MAX_JSON_DEPTH = 50
+
     private final MapperComponentResolver mapperComponentResolver
 
     /**
@@ -118,7 +123,7 @@ class OpenBoxesWrappingSerializer extends JsonSerializer<Object> implements Reso
     /**
      * A thread-safe set of object identities used to check for circular references when serializing.
      */
-    private static final ThreadLocal<Set<Object>> CIRCULAR_REFERENCE_STACK = new ThreadLocal<Set<Object>>() {
+    private static final ThreadLocal<Set<Object>> ALREADY_SEEN_OBJECTS = new ThreadLocal<Set<Object>>() {
         @Override
         protected Set<Object> initialValue() {
             return Collections.newSetFromMap(new IdentityHashMap<>())
@@ -138,14 +143,24 @@ class OpenBoxesWrappingSerializer extends JsonSerializer<Object> implements Reso
             return
         }
 
-        // If the circular reference stack already contains the object, we have a circular reference.
-        Set<Object> stack = CIRCULAR_REFERENCE_STACK.get()
+        // If the set already contains the object it means we've seen it before in the hierarchy and so have
+        // a circular reference and need to short circuit. Note that this still allows an object to appear multiple
+        // times in a single response. This check only applies to objects within a single branch of the JSON response.
+        // For example: Object X has a Y field, which has an X field, which has a Y field, ... looping forever!
+        Set<Object> stack = ALREADY_SEEN_OBJECTS.get()
         if (!stack.add(value)) {
             handleCircularReference(value, gen)
             return
         }
 
         try {
+            // Break after some JSON depth. It is very unlikely that a non-erroneous flow would reach this depth.
+            // This is primarily to avoid stack overflows if something is misconfigured.
+            if (stack.size() > MAX_JSON_DEPTH) {
+                gen.writeNull()
+                return
+            }
+
             Map mappedData = applyCustomMapping(value)
             if (mappedData != null) {
                 provider.defaultSerializeValue(mappedData, gen)
@@ -203,7 +218,22 @@ class OpenBoxesWrappingSerializer extends JsonSerializer<Object> implements Reso
      * 3) The object defines a toJson() method
      */
     private Map applyCustomMapping(Object value) {
-        ResponseMapper responseMapper = mapperComponentResolver.getResponseMapper(value.class)
+        if (value == null) {
+            return null
+        }
+
+        // Gracefully handle proxy objects (such as Spock test mocks) that may not accurately return their class type.
+        if (!(value.class instanceof Class)) {
+            return null
+        }
+
+        // Our custom mapping should only ever be applied to classes that we've written, so return early otherwise.
+        Class valueClass = value.class
+        if (valueClass?.package?.name == null || !(valueClass.package.name.startsWith("org.pih.warehouse"))) {
+            return null
+        }
+
+        ResponseMapper responseMapper = mapperComponentResolver.getResponseMapper(valueClass)
         if (responseMapper) {
             return responseMapper.asResponseBody(value)
         }

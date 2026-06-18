@@ -1,5 +1,6 @@
 package testutil
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import grails.testing.web.controllers.ControllerUnitTest
 import org.springframework.core.GenericTypeResolver
 import spock.lang.Specification
@@ -28,10 +29,16 @@ abstract class ApiControllerSpec<T extends BaseApiController> extends Specificat
     }
 
     void setup() {
-        List<ResponseMapper> responseMappers = setupResponseMappers()
-        MapperComponentResolver mapperComponentResolver = new MapperComponentResolver(Optional.of(responseMappers))
+        // Sets up the ResponseMapper components that the spec defines to be used when serializing JSON responses.
+        MapperComponentResolver mapperComponentResolver = new MapperComponentResolver(
+                Optional.of(setupResponseMappers()),
+                Optional.empty())
 
-        controller.jsonSerializer = new JsonSerializer(mapperComponentResolver, null)
+        // Enables controllers to serialize their response objects to JSON during tests.
+        // You can access the result of this via Grails' "response.json" convenience param.
+        ObjectMapper objectMapper = new ObjectMapperTestInitializer(mapperComponentResolver).initialize()
+        controller.jsonSerializer = new JsonSerializer(objectMapper)
+
         controller.fileNameGenerator = Stub(FileNameGenerator)
     }
 
