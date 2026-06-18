@@ -58,19 +58,27 @@ const useReceivingActions = () => {
     });
   };
 
-  const fetchLineItems = async () => {
+  const loadReceipt = async () => {
     setLoading(true);
-    const { data: response } = await receivingApi.getReceiptSummary(shipmentId, {
-      group: ReceiptGroup.SHIPMENT_ITEM,
-    });
-    setLineItems(transformSummaryToLineItems(response?.data));
-    setLoading(false);
+    try {
+      const { data: { data: summary } } = await receivingApi.getReceiptSummary(shipmentId, {
+        group: ReceiptGroup.SHIPMENT_ITEM,
+      });
+      // When there's no pending receipt yet, start one
+      if (!summary?.pendingReceiptId) {
+        await receivingApi.startReceipt(shipmentId);
+      }
+      setLineItems(transformSummaryToLineItems(summary));
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    if (shipmentId) {
-      fetchLineItems();
+    if (!shipmentId) {
+      return;
     }
+    loadReceipt();
   }, [shipmentId]);
 
   useEffect(() => {
