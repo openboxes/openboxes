@@ -1,11 +1,9 @@
 package org.pih.warehouse.receiving
 
-import org.pih.warehouse.core.http.ResponseBodyFormattable
-
 /**
  * A simple, general purpose DTO representing a receipt and its items.
  */
-class ReceiptDto implements Comparable<ReceiptDto>, ResponseBodyFormattable {
+class ReceiptDto implements Comparable<ReceiptDto> {
 
     String id
     ReceiptStatusCode receiptStatus
@@ -36,19 +34,5 @@ class ReceiptDto implements Comparable<ReceiptDto>, ResponseBodyFormattable {
                dateCreated <=> o.dateCreated ?:
                lastUpdated <=> o.lastUpdated ?:
                id <=> o.id
-    }
-
-    @Override
-    Map<String, Object> asResponseBody() {
-        return [
-                id: id,
-                receiptStatus: receiptStatus,
-                shipmentId: shipmentId,
-                dateDelivered: dateDelivered,
-                recipientId: recipientId,
-                dateCreated: dateCreated,
-                lastUpdated: lastUpdated,
-                receiptItems: asResponseBody(receiptItems),
-        ]
     }
 }

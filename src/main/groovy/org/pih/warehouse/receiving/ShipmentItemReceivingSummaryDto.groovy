@@ -1,13 +1,14 @@
 package org.pih.warehouse.receiving
 
-import org.pih.warehouse.core.http.ResponseBodyFormattable
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import org.pih.warehouse.shipping.ShipmentItemDto
 
 /**
  * Pulls together all the receipt items (including pending ones) associated with a specific shipment item
  * for the purpose of determining the shipment item's current state of receiving.
  */
-class ShipmentItemReceivingSummaryDto implements ResponseBodyFormattable {
+class ShipmentItemReceivingSummaryDto {
 
     ShipmentItemDto shipmentItem
 
@@ -30,6 +31,7 @@ class ShipmentItemReceivingSummaryDto implements ResponseBodyFormattable {
     /**
      * @return The total quantity received for the shipment item across all receipt, including not submitted receipts.
      */
+    @JsonProperty("totalQuantityReceived")
     int getTotalQuantityReceived() {
         int previousQuantity = previousReceiptItems.sum(0) { ReceiptItemDto item -> item.quantityReceived ?: 0 } as int
         int currentQuantity = currentReceiptItems.sum(0) { ReceiptItemDto item -> item.quantityReceived ?: 0 } as int
@@ -39,6 +41,7 @@ class ShipmentItemReceivingSummaryDto implements ResponseBodyFormattable {
     /**
      * @return The total quantity canceled for the shipment item across all receipt, including not submitted receipts.
      */
+    @JsonProperty("totalQuantityCanceled")
     int getTotalQuantityCanceled() {
         int previousQuantity = previousReceiptItems.sum(0) { ReceiptItemDto item -> item.quantityCanceled ?: 0 } as int
         int currentQuantity = currentReceiptItems.sum(0) { ReceiptItemDto item -> item.quantityCanceled ?: 0 } as int
@@ -48,20 +51,8 @@ class ShipmentItemReceivingSummaryDto implements ResponseBodyFormattable {
     /**
      * @return True if the quantity shipped for the item is/will be completely received.
      */
+    @JsonProperty("isFullyReceived")
     boolean isFullyReceived() {
         return totalQuantityReceived + totalQuantityCanceled >= shipmentItem.quantity
-    }
-
-    @Override
-    Map<String, Object> asResponseBody() {
-        return [
-                shipmentItem: shipmentItem,
-                previousReceiptItems: previousReceiptItems,
-                currentReceiptItems: currentReceiptItems,
-                // Include the pre-calculated totals in API responses for convenience.
-                totalQuantityReceived: totalQuantityReceived,
-                totalQuantityCanceled: totalQuantityCanceled,
-                isFullyReceived: fullyReceived,
-        ]
     }
 }

@@ -1,6 +1,5 @@
 package org.pih.warehouse.product.lot
 
-import org.pih.warehouse.core.http.ResponseBodyFormattable
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.LotStatusCode
 import org.pih.warehouse.product.ProductSimpleDto
@@ -9,7 +8,7 @@ import org.pih.warehouse.product.ProductSimpleDto
  * Represents a specific lot number of a product.
  * The DTO form of an InventoryItem.
  */
-class ProductLotDto implements ResponseBodyFormattable {
+class ProductLotDto {
 
     ProductSimpleDto product
     String lotNumber
@@ -25,16 +24,5 @@ class ProductLotDto implements ResponseBodyFormattable {
                 lotStatus: inventoryItem.lotStatus,
                 comments: inventoryItem.comments
         )
-    }
-
-    @Override
-    Map<String, Object> asResponseBody() {
-        return [
-                product: product?.asResponseBody(),
-                lotNumber: lotNumber,
-                expirationDate: expirationDate,
-                lotStatus: lotStatus,
-                comments: comments,
-        ]
     }
 }

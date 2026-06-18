@@ -772,6 +772,9 @@ dependencies {
 
     implementation 'com.github.albfernandez:juniversalchardet:2.4.0'
 
+    // Allows Jackson's ObjectMapper to serialize Hibernate domain entities to JSON.
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5:${jacksonVersion}"
+
     // security patch
     compile 'org.yaml:snakeyaml:1.33'
     console 'org.yaml:snakeyaml:1.33'

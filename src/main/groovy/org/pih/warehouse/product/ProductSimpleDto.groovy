@@ -1,12 +1,10 @@
 package org.pih.warehouse.product
 
-import org.pih.warehouse.core.http.ResponseBodyFormattable
-
 /**
  * A simplified representation of a Product, containing only the fields that are required
  * to display the product in its most basic form.
  */
-class ProductSimpleDto implements ResponseBodyFormattable {
+class ProductSimpleDto {
 
     String id
     String productCode
@@ -18,14 +16,5 @@ class ProductSimpleDto implements ResponseBodyFormattable {
                 productCode: product.productCode,
                 name: product.name,
         )
-    }
-
-    @Override
-    Map<String, Object> asResponseBody() {
-        return [
-                id: id,
-                productCode: productCode,
-                name: name,
-        ]
     }
 }
