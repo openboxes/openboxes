@@ -25,7 +25,7 @@ class ShipmentItemDto implements ResponseBodyFormattable {
                 productLot: ProductLotDto.from(shipmentItem.inventoryItem),
                 binLocation: LocationSimpleDto.from(shipmentItem.binLocation),
                 quantity: shipmentItem.quantity,
-                recipientId: shipmentItem.recipientId,
+                recipientId: shipmentItem.recipient?.id,
                 donorId: shipmentItem.donorId,
                 container: ContainerSimpleDto.from(shipmentItem.container),
                 dateCreated: shipmentItem.dateCreated,
