@@ -2,16 +2,17 @@ import useReceivingActions from 'hooks/receiving/v2/useReceivingActions';
 import useReceivingColumns from 'hooks/receiving/v2/useReceivingColumns';
 
 const useReceivingForm = () => {
-  const { loading, lineItems } = useReceivingActions();
+  const { loading, lineItemsState, updateLineItem } = useReceivingActions();
   const { columns } = useReceivingColumns();
 
   return {
     table: {
-      lineItems,
+      lineItemsState,
       columns,
     },
     actions: {
       loading,
+      updateLineItem,
     },
   };
 };

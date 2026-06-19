@@ -1,32 +1,31 @@
 import React, { useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
-import * as locales from 'date-fns/locale';
 import { useSelector } from 'react-redux';
 import { getCurrentLocale } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
-import TextInput from 'components/form-elements/v2/TextInput';
 import receivingColumns from 'consts/receivingColumns';
-import { DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
-import { formatDateToString } from 'utils/dateUtils';
+import ExpirationDateCell from 'utils/cells/ExpirationDateCell';
+import MultilineCell from 'utils/cells/MultilineCell';
+import PackLevelCell from 'utils/cells/PackLevelCell';
+import QuantityInputCell from 'utils/cells/QuantityInputCell';
+import ValueCell from 'utils/cells/ValueCell';
 
 const useReceivingColumns = () => {
   const translate = useTranslate();
   const columnHelper = createColumnHelper();
   const currentLocale = useSelector(getCurrentLocale);
 
-  const formatDate = (date) =>
-    formatDateToString({
-      date,
-      dateFormat: DateFormatDateFns.DD_MMM_YYYY,
-      options: { locale: locales[currentLocale] },
-    });
+  // Rows are line item ids; the entities live in the normalized state passed
+  // through the table `meta`, so each cell reads its item by id at render time.
+  const getItem = (row, table) => table.options.meta?.entities?.[row.original];
 
   const columns = useMemo(() => [
-    columnHelper.accessor(receivingColumns.PRODUCT_CODE, {
+    columnHelper.display({
+      id: receivingColumns.PRODUCT_CODE,
       header: () => (
         <TableHeaderCell
           tooltip
@@ -35,23 +34,22 @@ const useReceivingColumns = () => {
           {translate('react.receiving.code.label', 'Code')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
-        <TableCell
-          className="rt-td"
-          customTooltip
-          tooltipLabel={getValue()}
-        >
-          <div
-            className="text-truncate"
-            aria-label={translate('react.receiving.code.label', 'Code')}
-          >
-            {getValue()}
-          </div>
-        </TableCell>
-      ),
+      cell: ({ row, table }) => {
+        const value = getItem(row, table)?.productCode;
+        return (
+          <ValueCell
+            value={value}
+            tooltipLabel={value}
+            label="react.receiving.code.label"
+            defaultLabel="Code"
+            truncate
+          />
+        );
+      },
       size: 60,
     }),
-    columnHelper.accessor(receivingColumns.PRODUCT, {
+    columnHelper.display({
+      id: receivingColumns.PRODUCT,
       header: () => (
         <TableHeaderCell
           tooltip
@@ -60,16 +58,12 @@ const useReceivingColumns = () => {
           {translate('react.receiving.product.label', 'Product')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
-        <TableCell
-          className="rt-td multiline-cell"
-          customTooltip
-          tooltipLabel={getValue()?.name}
-        >
-          <div className="limit-lines-2">
-            {getValue()?.name}
-          </div>
-        </TableCell>
+      cell: ({ row, table }) => (
+        <MultilineCell
+          value={getItem(row, table)?.product?.name}
+          label="react.receiving.product.label"
+          defaultLabel="Product"
+        />
       ),
       size: 300,
     }),
@@ -83,26 +77,23 @@ const useReceivingColumns = () => {
           {translate('react.receiving.packLevel.label', 'Pack Level')}
         </TableHeaderCell>
       ),
-      cell: ({ row }) => {
-        const { container, parentContainer } = row.original;
+      cell: ({ row, table }) => {
+        const { container, parentContainer } = getItem(row, table) || {};
         const packLevel1 = parentContainer ? parentContainer.name : container?.name;
         const packLevel2 = parentContainer ? container?.name : null;
         return (
-          <TableCell
-            className="rt-td"
-            customTooltip
-            tooltipLabel={[packLevel1, packLevel2].filter(Boolean).join(' / ')}
-          >
-            <div aria-label={translate('react.receiving.packLevel.label', 'Pack Level')}>
-              {packLevel1 && <div className="text-truncate">{packLevel1}</div>}
-              {packLevel2 && <div className="text-truncate">{packLevel2}</div>}
-            </div>
-          </TableCell>
+          <PackLevelCell
+            packLevel1={packLevel1}
+            packLevel2={packLevel2}
+            label="react.receiving.packLevel.label"
+            defaultLabel="Pack Level"
+          />
         );
       },
       size: 100,
     }),
-    columnHelper.accessor(receivingColumns.LOT_NUMBER, {
+    columnHelper.display({
+      id: receivingColumns.LOT_NUMBER,
       header: () => (
         <TableHeaderCell
           tooltip
@@ -111,23 +102,22 @@ const useReceivingColumns = () => {
           {translate('react.receiving.lotSerialNo.short.label', 'Lot/SN')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
-        <TableCell
-          className="rt-td"
-          customTooltip
-          tooltipLabel={getValue()}
-        >
-          <div
-            className="text-truncate"
-            aria-label={translate('react.receiving.lotSerialNo.short.label', 'Lot/SN')}
-          >
-            {getValue()}
-          </div>
-        </TableCell>
-      ),
+      cell: ({ row, table }) => {
+        const value = getItem(row, table)?.lotNumber;
+        return (
+          <ValueCell
+            value={value}
+            tooltipLabel={value}
+            label="react.receiving.lotSerialNo.short.label"
+            defaultLabel="Lot/SN"
+            truncate
+          />
+        );
+      },
       size: 100,
     }),
-    columnHelper.accessor(receivingColumns.EXPIRATION_DATE, {
+    columnHelper.display({
+      id: receivingColumns.EXPIRATION_DATE,
       header: () => (
         <TableHeaderCell
           tooltip
@@ -136,20 +126,18 @@ const useReceivingColumns = () => {
           {translate('react.receiving.expirationDate.short.label', 'Exp Date')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
-        <TableCell
-          className="rt-td"
-          customTooltip
-          tooltipLabel={formatDate(getValue())}
-        >
-          <div aria-label={translate('react.receiving.expirationDate.short.label', 'Exp Date')}>
-            {formatDate(getValue())}
-          </div>
-        </TableCell>
+      cell: ({ row, table }) => (
+        <ExpirationDateCell
+          value={getItem(row, table)?.expirationDate}
+          localeKey={currentLocale}
+          label="react.receiving.expirationDate.short.label"
+          defaultLabel="Exp Date"
+        />
       ),
       size: 100,
     }),
-    columnHelper.accessor(receivingColumns.RECIPIENT, {
+    columnHelper.display({
+      id: receivingColumns.RECIPIENT,
       header: () => (
         <TableHeaderCell
           tooltip
@@ -158,23 +146,22 @@ const useReceivingColumns = () => {
           {translate('react.receiving.recipient.label', 'Recipient')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
-        <TableCell
-          className="rt-td"
-          customTooltip
-          tooltipLabel={getValue()?.name}
-        >
-          <div
-            className="text-truncate"
-            aria-label={translate('react.receiving.recipient.label', 'Recipient')}
-          >
-            {getValue()?.name}
-          </div>
-        </TableCell>
-      ),
+      cell: ({ row, table }) => {
+        const recipient = getItem(row, table)?.recipient;
+        return (
+          <ValueCell
+            value={recipient?.name}
+            tooltipLabel={recipient?.name}
+            label="react.receiving.recipient.label"
+            defaultLabel="Recipient"
+            truncate
+          />
+        );
+      },
       size: 100,
     }),
-    columnHelper.accessor(receivingColumns.QUANTITY_SHIPPED, {
+    columnHelper.display({
+      id: receivingColumns.QUANTITY_SHIPPED,
       header: () => (
         <TableHeaderCell
           tooltip
@@ -183,20 +170,21 @@ const useReceivingColumns = () => {
           {translate('react.receiving.shipped.label', 'Shipped')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
-        <TableCell
-          className="rt-td"
-          customTooltip
-          tooltipLabel={getValue()?.toString()}
-        >
-          <div aria-label={translate('react.receiving.shipped.label', 'Shipped')}>
-            {getValue()}
-          </div>
-        </TableCell>
-      ),
+      cell: ({ row, table }) => {
+        const value = getItem(row, table)?.quantityShipped;
+        return (
+          <ValueCell
+            value={value}
+            tooltipLabel={value?.toString()}
+            label="react.receiving.shipped.label"
+            defaultLabel="Shipped"
+          />
+        );
+      },
       size: 80,
     }),
-    columnHelper.accessor(receivingColumns.QUANTITY_RECEIVING, {
+    columnHelper.display({
+      id: receivingColumns.QUANTITY_RECEIVING,
       header: () => (
         <TableHeaderCell
           tooltip
@@ -205,23 +193,17 @@ const useReceivingColumns = () => {
           {translate('react.receiving.receivingNow.label', 'Receiving Now')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
-        <TableCell className="rt-td">
-          <TextInput
-            type="number"
-            className="hide-arrows input-xs"
-            defaultValue={getValue()}
-            ariaLabel={{
-              id: 'react.receiving.receivingNow.label',
-              defaultMessage: 'Receiving Now',
-            }}
-            onWheel={(e) => e.currentTarget.blur()}
-          />
-        </TableCell>
+      cell: ({ row, table }) => (
+        <QuantityInputCell
+          defaultValue={getItem(row, table)?.quantityReceiving}
+          label="react.receiving.receivingNow.label"
+          defaultLabel="Receiving Now"
+        />
       ),
       size: 100,
     }),
-    columnHelper.accessor(receivingColumns.QUANTITY_REMAINING, {
+    columnHelper.display({
+      id: receivingColumns.QUANTITY_REMAINING,
       header: () => (
         <TableHeaderCell
           tooltip
@@ -230,18 +212,15 @@ const useReceivingColumns = () => {
           {translate('react.receiving.remaining.label', 'Remaining')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => {
-        const value = getValue();
+      cell: ({ row, table }) => {
+        const value = getItem(row, table)?.quantityRemaining;
         return (
-          <TableCell
-            className="rt-td"
-            customTooltip
+          <ValueCell
+            value={value}
             tooltipLabel={value?.toString()}
-          >
-            <div aria-label={translate('react.receiving.remaining.label', 'Remaining')}>
-              {value}
-            </div>
-          </TableCell>
+            label="react.receiving.remaining.label"
+            defaultLabel="Remaining"
+          />
         );
       },
       size: 80,
