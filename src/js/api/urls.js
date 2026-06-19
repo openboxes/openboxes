@@ -229,3 +229,9 @@ export const INDICATORS_INVENTORY_ACCURACY = `${INDICATORS_REPORT}/inventoryAccu
 export const INVENTORY_API = (id) => `${API}/facilities/${id}/inventories`;
 export const REORDER_REPORT = (id) => `${INVENTORY_API(id)}/reorderReport`;
 export const EXPIRATION_HISTORY_REPORT = `${API}/inventories/expirationHistoryReport`;
+
+// RECEIVING
+export const RECEIPT_API = `${API}/receipts/v2`;
+export const RECEIPT_BY_SHIPMENT = (shipmentId) => `${RECEIPT_API}/shipment/${shipmentId}`;
+export const RECEIPT_SUMMARY_BY_SHIPMENT = (shipmentId) => `${RECEIPT_BY_SHIPMENT(shipmentId)}/summary`;
+export const RECEIPT_START = (shipmentId) => `${RECEIPT_BY_SHIPMENT(shipmentId)}/start`;
