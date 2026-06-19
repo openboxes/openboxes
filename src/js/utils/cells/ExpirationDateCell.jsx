@@ -23,7 +23,7 @@ const ExpirationDateCell = React.memo(({
   });
 
   const tooltipLabel = formatted
-    ? translate('react.receiving.expirationDate.tooltip.label', `This item expires on ${formatted}`, [formatted])
+    ? translate('react.default.expirationDate.tooltip.label', `This item expires on ${formatted}`, [formatted])
     : undefined;
 
   return (
