@@ -1,5 +1,4 @@
 import {
-  COMPOSITE_KEY_SEPARATOR,
   createNormalizedState,
   denormalizeData,
   getNormalizedItem,
@@ -25,7 +24,7 @@ describe('resolveKey()', () => {
 
   it('should combine multiple fields into a composite key', () => {
     expect(resolveKey({ shipmentItemId: 1, receiptItemId: 2 }, ['shipmentItemId', 'receiptItemId']))
-      .toBe(`1${COMPOSITE_KEY_SEPARATOR}2`);
+      .toBe('1:2');
   });
 
   it('should support a function descriptor', () => {
@@ -69,7 +68,7 @@ describe('normalizeData()', () => {
       [{ shipmentItemId: 1, receiptItemId: 2, name: 'A' }],
       ['shipmentItemId', 'receiptItemId'],
     );
-    const compositeKey = `1${COMPOSITE_KEY_SEPARATOR}2`;
+    const compositeKey = '1:2';
     expect(normalized.ids)
       .toEqual([compositeKey]);
     expect(normalized.entities[compositeKey].name)
@@ -163,7 +162,7 @@ describe('upsertNormalizedItem()', () => {
 
   it('should upsert using a composite key', () => {
     const keyField = ['shipmentItemId', 'receiptItemId'];
-    const compositeKey = `1${COMPOSITE_KEY_SEPARATOR}2`;
+    const compositeKey = '1:2';
     const inserted = upsertNormalizedItem(
       createNormalizedState(),
       { shipmentItemId: 1, receiptItemId: 2, qty: 1 },

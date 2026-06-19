@@ -6,13 +6,13 @@ import { getCurrentLocale } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
-import DateCell from 'components/receivingV2/cells/DateCell';
-import MultilineCell from 'components/receivingV2/cells/MultilineCell';
-import PackLevelCell from 'components/receivingV2/cells/PackLevelCell';
-import QuantityInputCell from 'components/receivingV2/cells/QuantityInputCell';
-import ValueCell from 'components/receivingV2/cells/ValueCell';
 import receivingColumns from 'consts/receivingColumns';
 import useTranslate from 'hooks/useTranslate';
+import ExpirationDateCell from 'utils/cells/ExpirationDateCell';
+import MultilineCell from 'utils/cells/MultilineCell';
+import PackLevelCell from 'utils/cells/PackLevelCell';
+import QuantityInputCell from 'utils/cells/QuantityInputCell';
+import ValueCell from 'utils/cells/ValueCell';
 
 const useReceivingColumns = () => {
   const translate = useTranslate();
@@ -40,7 +40,8 @@ const useReceivingColumns = () => {
           <ValueCell
             value={value}
             tooltipLabel={value}
-            ariaLabel={translate('react.receiving.code.label', 'Code')}
+            label="react.receiving.code.label"
+            defaultLabel="Code"
             truncate
           />
         );
@@ -58,7 +59,11 @@ const useReceivingColumns = () => {
         </TableHeaderCell>
       ),
       cell: ({ row, table }) => (
-        <MultilineCell value={getItem(row, table)?.product?.name} />
+        <MultilineCell
+          value={getItem(row, table)?.product?.name}
+          label="react.receiving.product.label"
+          defaultLabel="Product"
+        />
       ),
       size: 300,
     }),
@@ -80,7 +85,8 @@ const useReceivingColumns = () => {
           <PackLevelCell
             packLevel1={packLevel1}
             packLevel2={packLevel2}
-            ariaLabel={translate('react.receiving.packLevel.label', 'Pack Level')}
+            label="react.receiving.packLevel.label"
+            defaultLabel="Pack Level"
           />
         );
       },
@@ -102,7 +108,8 @@ const useReceivingColumns = () => {
           <ValueCell
             value={value}
             tooltipLabel={value}
-            ariaLabel={translate('react.receiving.lotSerialNo.short.label', 'Lot/SN')}
+            label="react.receiving.lotSerialNo.short.label"
+            defaultLabel="Lot/SN"
             truncate
           />
         );
@@ -120,10 +127,11 @@ const useReceivingColumns = () => {
         </TableHeaderCell>
       ),
       cell: ({ row, table }) => (
-        <DateCell
+        <ExpirationDateCell
           value={getItem(row, table)?.expirationDate}
           localeKey={currentLocale}
-          ariaLabel={translate('react.receiving.expirationDate.short.label', 'Exp Date')}
+          label="react.receiving.expirationDate.short.label"
+          defaultLabel="Exp Date"
         />
       ),
       size: 100,
@@ -144,7 +152,8 @@ const useReceivingColumns = () => {
           <ValueCell
             value={recipient?.name}
             tooltipLabel={recipient?.name}
-            ariaLabel={translate('react.receiving.recipient.label', 'Recipient')}
+            label="react.receiving.recipient.label"
+            defaultLabel="Recipient"
             truncate
           />
         );
@@ -167,7 +176,8 @@ const useReceivingColumns = () => {
           <ValueCell
             value={value}
             tooltipLabel={value?.toString()}
-            ariaLabel={translate('react.receiving.shipped.label', 'Shipped')}
+            label="react.receiving.shipped.label"
+            defaultLabel="Shipped"
           />
         );
       },
@@ -184,7 +194,11 @@ const useReceivingColumns = () => {
         </TableHeaderCell>
       ),
       cell: ({ row, table }) => (
-        <QuantityInputCell defaultValue={getItem(row, table)?.quantityReceiving} />
+        <QuantityInputCell
+          defaultValue={getItem(row, table)?.quantityReceiving}
+          label="react.receiving.receivingNow.label"
+          defaultLabel="Receiving Now"
+        />
       ),
       size: 100,
     }),
@@ -204,7 +218,8 @@ const useReceivingColumns = () => {
           <ValueCell
             value={value}
             tooltipLabel={value?.toString()}
-            ariaLabel={translate('react.receiving.remaining.label', 'Remaining')}
+            label="react.receiving.remaining.label"
+            defaultLabel="Remaining"
           />
         );
       },
