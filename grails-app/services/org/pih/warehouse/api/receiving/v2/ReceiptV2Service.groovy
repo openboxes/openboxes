@@ -12,6 +12,10 @@ import org.pih.warehouse.receiving.ReceiptGroup
 import org.pih.warehouse.receiving.ReceiptIdentifierService
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptItemDto
+import org.pih.warehouse.receiving.ReceiptItemUpsertRequest
+import org.pih.warehouse.receiving.ReceiptItemSaveDto
+import org.pih.warehouse.receiving.ReceiptItemsBatchRequest
+import org.pih.warehouse.receiving.ReceiptSaveResponseDto
 import org.pih.warehouse.receiving.ReceiptService
 import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.receiving.ShipmentItemReceivingSummaryDto
@@ -55,6 +59,72 @@ class ReceiptV2Service {
         }
 
         return ReceiptDto.from(receipt)
+    }
+
+    @Transactional
+    ReceiptSaveResponseDto updateItemsBatch(String receiptId, ReceiptItemsBatchRequest request) {
+        Receipt receipt = Receipt.get(receiptId)
+        if (!receipt) {
+            throw new ObjectNotFoundException(receiptId, Receipt.class.toString())
+        }
+
+        if (receipt.receiptStatusCode != ReceiptStatusCode.PENDING) {
+            throw new IllegalStateException(
+                    "Cannot edit receipt ${receipt.receiptNumber} because it is not pending")
+        }
+
+        request.itemsToDelete.each { String receiptItemId -> deleteReceiptItem(receipt, receiptItemId) }
+
+        List<ReceiptItemSaveDto> updatedLines = request.itemsToSave.collect { ReceiptItemUpsertRequest item ->
+            item.receiptItem ? updateReceiptItem(item) : createReceiptItem(receipt, item)
+        }
+
+        return new ReceiptSaveResponseDto(updatedLines: updatedLines)
+    }
+
+    private static ReceiptItemSaveDto createReceiptItem(Receipt receipt, ReceiptItemUpsertRequest item) {
+
+        ShipmentItem shipmentItem = item.shipmentItem
+
+        ReceiptItem receiptItem = new ReceiptItem(
+                product: shipmentItem.product,
+                inventoryItem: shipmentItem.inventoryItem,
+                lotNumber: shipmentItem.lotNumber,
+                expirationDate: shipmentItem.expirationDate,
+                recipient: shipmentItem.recipient,
+                quantityShipped: shipmentItem.quantity,
+                quantityReceived: item.quantityReceiving,
+                binLocation: item.binLocation,
+                sortOrder: shipmentItem.receiptItems.size(),
+        )
+
+        receipt.addToReceiptItems(receiptItem)
+        shipmentItem.addToReceiptItems(receiptItem)
+
+        if (!receiptItem.save()) {
+            throw new ValidationException("Receipt item is invalid", receiptItem.errors)
+        }
+
+        return ReceiptItemSaveDto.from(receiptItem, item.rowId)
+    }
+
+    private static ReceiptItemSaveDto updateReceiptItem(ReceiptItemUpsertRequest item) {
+        ReceiptItem receiptItem = item.receiptItem
+        receiptItem.quantityReceived = item.quantityReceiving
+        receiptItem.binLocation = item.binLocation
+
+        return ReceiptItemSaveDto.from(receiptItem, item.rowId)
+    }
+
+    private static void deleteReceiptItem(Receipt receipt, String receiptItemId) {
+        ReceiptItem receiptItem = ReceiptItem.get(receiptItemId)
+        if (!receiptItem) {
+            throw new ObjectNotFoundException(receiptItemId, ReceiptItem.class.toString())
+        }
+
+        receipt.removeFromReceiptItems(receiptItem)
+        receiptItem.shipmentItem?.removeFromReceiptItems(receiptItem)
+        receiptItem.delete()
     }
 
     private static void validateShipmentReceivable(Shipment shipment) {
