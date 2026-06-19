@@ -113,6 +113,10 @@
     .rt-tbody, .rt-tbody-v2 {
       .rt-tr-group {
         border-bottom: 1px solid var(--gray-100);
+
+        &.rt-tr-group-merged {
+          border-bottom: none;
+        }
       }
       .rt-td {
         border-right: none;
@@ -134,6 +138,16 @@
 
           .invalid-cell {
             color: var(--red-500);
+          }
+        }
+
+        &.rt-tr-separator {
+          background-color: var(--blue-200);
+          padding-top: 8px;
+          padding-bottom: 8px;
+
+          &:hover, &:hover .rt-td {
+            background-color: var(--blue-200);
           }
         }
       }
