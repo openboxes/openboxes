@@ -3426,6 +3426,22 @@ class StockMovementService {
         shipmentService.sendShipment(shipment, "Sent on ${new Date()}", user, shipment.origin, stockMovement.dateShipped ?: new Date())
     }
 
+    void issueRequisition(Requisition requisition) {
+        if (!requisition.shipment) {
+            StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
+            Shipment shipment = createShipment(stockMovement)
+            createMissingShipmentItems(requisition, shipment)
+        } else {
+            createMissingShipmentItems(requisition, requisition.shipment)
+        }
+        issueRequisitionBasedStockMovement(requisition.id, true)
+        requisitionService.triggerRequisitionStatusTransition(
+            requisition,
+            AuthService.currentUser,
+            RequisitionStatus.ISSUED
+        )
+    }
+
     void issueRequisitionBasedStockMovement(String id, boolean synchronizeDateShipped = false) {
         User user = authService.currentUser
         StockMovement stockMovement = getStockMovement(id)

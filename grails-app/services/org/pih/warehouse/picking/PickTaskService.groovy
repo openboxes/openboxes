@@ -23,6 +23,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionAction
 import org.pih.warehouse.inventory.TransactionSource
 import org.pih.warehouse.inventory.TransferStockCommand
+import org.pih.warehouse.jobs.AutoissuanceJob
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.picklist.PicklistService
@@ -360,6 +361,11 @@ class PickTaskService {
                     Shipment shipment = stockMovementService.createShipment(stockMovement)
                     stockMovementService.createMissingShipmentItems(requisition, shipment)
                 }
+
+                def delayInMilliseconds = Integer.valueOf(grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds) + 1000 ?: 1000
+                Date runAt = new Date(System.currentTimeMillis() + delayInMilliseconds)
+                log.info "Triggering autoissuance job with ${delayInMilliseconds} ms delay"
+                AutoissuanceJob.schedule(runAt)
             }
         }
 
