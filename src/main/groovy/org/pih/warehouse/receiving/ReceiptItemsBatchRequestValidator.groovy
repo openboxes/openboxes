@@ -23,7 +23,7 @@ class ReceiptItemsBatchRequestValidator implements ObjectValidator<ReceiptItemsB
      * elements have validation errors, propagate the failure up to the batch request.
      */
     private ObjectError validateItemsToSaveAreValid(ReceiptItemsBatchRequest request) {
-        request.itemsToSave.each { ReceiptItemRequest item -> item.validate() }
+        request.itemsToSave.each { ReceiptItemUpsertRequest item -> item.validate() }
 
         return request.itemsToSave.any { it.hasErrors() } ?
                 rejectField("itemsToSave", request.itemsToSave, "receiptItemsBatchRequest.itemsToSave.invalid") :

@@ -12,7 +12,7 @@ import org.pih.warehouse.receiving.ReceiptGroup
 import org.pih.warehouse.receiving.ReceiptIdentifierService
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptItemDto
-import org.pih.warehouse.receiving.ReceiptItemRequest
+import org.pih.warehouse.receiving.ReceiptItemUpsertRequest
 import org.pih.warehouse.receiving.ReceiptItemSaveDto
 import org.pih.warehouse.receiving.ReceiptItemsBatchRequest
 import org.pih.warehouse.receiving.ReceiptSaveResponseDto
@@ -75,14 +75,14 @@ class ReceiptV2Service {
 
         request.itemsToDelete.each { String receiptItemId -> deleteReceiptItem(receipt, receiptItemId) }
 
-        List<ReceiptItemSaveDto> updatedLines = request.itemsToSave.collect { ReceiptItemRequest item ->
+        List<ReceiptItemSaveDto> updatedLines = request.itemsToSave.collect { ReceiptItemUpsertRequest item ->
             item.receiptItem ? updateReceiptItem(item) : createReceiptItem(receipt, item)
         }
 
         return new ReceiptSaveResponseDto(updatedLines: updatedLines)
     }
 
-    private static ReceiptItemSaveDto createReceiptItem(Receipt receipt, ReceiptItemRequest item) {
+    private static ReceiptItemSaveDto createReceiptItem(Receipt receipt, ReceiptItemUpsertRequest item) {
 
         ShipmentItem shipmentItem = item.shipmentItem
 
@@ -108,7 +108,7 @@ class ReceiptV2Service {
         return ReceiptItemSaveDto.from(receiptItem, item.rowId)
     }
 
-    private static ReceiptItemSaveDto updateReceiptItem(ReceiptItemRequest item) {
+    private static ReceiptItemSaveDto updateReceiptItem(ReceiptItemUpsertRequest item) {
         ReceiptItem receiptItem = item.receiptItem
         receiptItem.quantityReceived = item.quantityReceiving
         receiptItem.binLocation = item.binLocation

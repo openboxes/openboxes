@@ -4,7 +4,7 @@ import grails.validation.Validateable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.shipping.ShipmentItem
 
-class ReceiptItemRequest implements Validateable {
+class ReceiptItemUpsertRequest implements Validateable {
 
     // Existing receipt item to update. When not provided, a new receipt item is created.
     ReceiptItem receiptItem
