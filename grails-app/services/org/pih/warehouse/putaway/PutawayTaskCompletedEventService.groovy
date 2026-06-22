@@ -9,17 +9,17 @@
  **/
 package org.pih.warehouse.putaway
 
-import grails.gorm.transactions.Transactional
-import org.springframework.context.ApplicationListener
+import org.springframework.transaction.event.TransactionPhase
+import org.springframework.transaction.event.TransactionalEventListener
 
-@Transactional
-class PutawayTaskCompletedEventService implements ApplicationListener<PutawayTaskCompletedEvent> {
+class PutawayTaskCompletedEventService {
 
     def productAvailabilityService
 
-    void onApplicationEvent(PutawayTaskCompletedEvent event) {
-        PutawayTask task = (PutawayTask) event.source;
-        log.info "Putaway ${task.id} into ${task.facility}:${task.destination} completed by ${task.completedBy} at ${task.dateCompleted} "
-        productAvailabilityService.triggerRefreshProductAvailability(task?.facility?.id, [task.product.id], event?.forceRefresh)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+    void onPutawayTaskCompleted(PutawayTaskCompletedEvent event) {
+        PutawayTask task = (PutawayTask) event.source
+        log.info "Putaway ${task?.id} completed; refreshing PA for facility=${task?.facility?.id}, product=${task?.product?.id}"
+        productAvailabilityService.triggerRefreshProductAvailability(task?.facility?.id, [task?.product?.id], event?.forceRefresh)
     }
 }
