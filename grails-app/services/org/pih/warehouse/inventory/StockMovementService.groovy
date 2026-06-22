@@ -641,19 +641,19 @@ class StockMovementService {
     }
 
     @Transactional(readOnly=true)
-    StockMovement getStockMovement(String id, String stepNumber, boolean includeDocuments = true) {
+    StockMovement getStockMovement(String id, String stepNumber) {
         Requisition requisition = Requisition.get(id)
         if (requisition) {
-            return getRequisitionBasedStockMovement(requisition, stepNumber, includeDocuments)
+            return getRequisitionBasedStockMovement(requisition, stepNumber)
         } else {
             Shipment shipment = Shipment.get(id)
             if (shipment?.requisition) {
                 log.info "Shipment.requisition ${shipment.requisition}"
-                return getRequisitionBasedStockMovement(shipment.requisition, stepNumber, includeDocuments)
+                return getRequisitionBasedStockMovement(shipment.requisition, stepNumber)
             }
             else if (shipment) {
                 log.info "Shipment ${shipment}"
-                return getShipmentBasedStockMovement(shipment, includeDocuments)
+                return getShipmentBasedStockMovement(shipment)
             }
             else {
                 throw new ObjectNotFoundException(id, StockMovement.class.toString())
@@ -661,19 +661,15 @@ class StockMovementService {
         }
     }
 
-    StockMovement getShipmentBasedStockMovement(Shipment shipment, boolean includeDocuments = true) {
+    StockMovement getShipmentBasedStockMovement(Shipment shipment) {
         StockMovement stockMovement = StockMovement.createFromShipment(shipment)
-        if (includeDocuments) {
-            stockMovement.documents = getDocuments(stockMovement)
-        }
+        stockMovement.documents = getDocuments(stockMovement)
         return stockMovement
     }
 
-    StockMovement getRequisitionBasedStockMovement(Requisition requisition, String stepNumber, boolean includeDocuments = true) {
+    StockMovement getRequisitionBasedStockMovement(Requisition requisition, String stepNumber) {
         StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
-        if (includeDocuments) {
-            stockMovement.documents = getDocuments(stockMovement)
-        }
+        stockMovement.documents = getDocuments(stockMovement)
         return stockMovement
     }
 
@@ -3448,11 +3444,7 @@ class StockMovementService {
 
     void issueRequisitionBasedStockMovement(String id, boolean synchronizeDateShipped = false) {
         User user = authService.currentUser
-        // Don't build the document list here: it relies on the GSP message/createLink taglibs, which
-        // resolve the locale and base URL from the current HTTP request. Issuance also runs from the
-        // AutoissuanceJob (a Quartz background thread with no request bound), where that would NPE, and
-        // the documents (UI download links) are not needed to issue the movement anyway.
-        StockMovement stockMovement = getStockMovement(id, (String) null, false)
+        StockMovement stockMovement = getStockMovement(id)
         Requisition requisition = stockMovement.requisition
         def shipment = requisition.shipment
 
