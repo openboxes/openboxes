@@ -336,6 +336,76 @@ class ProductApiController extends BaseDomainApiController {
         render([product: product.toFullJson()] as JSON)
     }
 
+    /**
+     * Create or update one or more products. Accepts either a single product object or an array of
+     * them. Each product is matched to an existing one by id or productCode (the same id-or-code
+     * lookup ProductValueConverter uses) and updated, or created if no match is found.
+     *
+     * Bulk upserts are best-effort: each product is processed in its own transaction so a failure
+     * isolates to that item. The response mirrors the request shape - a single result object for a
+     * single product, an array of results for an array - where each result is either
+     * {status: "created"|"updated", product: {...}} or {status: "error", id, productCode, errors: [...]}.
+     */
+    def upsert() {
+        def json = request.JSON
+        boolean isArray = json instanceof List
+        List items = isArray ? (json as List) : [json]
+        Location location = Location.get(session?.warehouse?.id)
+
+        List results = items.collect { item -> upsertProduct(item, location) }
+
+        render((isArray ? results : results[0]) as JSON)
+    }
+
+    private Map upsertProduct(def item, Location location) {
+        Map result
+        // Each product gets its own transaction so a failure rolls back only that item.
+        Product.withNewTransaction { txStatus ->
+            try {
+                Product product = (item.id || item.productCode) ?
+                        Product.findByIdOrProductCode(item.id as String, item.productCode as String) : null
+                boolean created = product == null
+                if (created) {
+                    product = new Product()
+                }
+
+                // Never rebind the primary key; bind the remaining fields onto the resolved/new product.
+                bindData(product, item, [exclude: ['id']])
+
+                ProductType defaultProductType = ProductType.defaultProductType.list()?.first()
+                if (product.productType?.id != defaultProductType?.id && !product.productType?.code && !product.productType?.productIdentifierFormat) {
+                    throw new IllegalArgumentException(g.message(code: "product.productType.emptyCodeAndIdentifier.error.message"))
+                }
+
+                if (!product?.id || product.validate()) {
+                    if (!product.productCode) {
+                        product.productCode = productService.generateProductIdentifier(product)
+                    }
+                }
+                product.validateRequiredFieldsInLocation(location)
+
+                if (product.hasErrors() || !productService.saveProduct(product)) {
+                    txStatus.setRollbackOnly()
+                    result = [status: "error", id: item.id, productCode: item.productCode,
+                              errors: product.errors.allErrors.collect { g.message(error: it) }]
+                } else {
+                    result = [status: created ? "created" : "updated", product: materializeJson(product.toFullJson())]
+                }
+            } catch (Exception e) {
+                txStatus.setRollbackOnly()
+                result = [status: "error", id: item.id, productCode: item.productCode, errors: [e.message]]
+            }
+        }
+        return result
+    }
+
+    private Object materializeJson(Map jsonMap) {
+        // Render within the open session (forcing lazy associations like Product.attributes to load),
+        // then parse back to plain objects so the response can be serialized after each per-item
+        // transaction/session has closed.
+        return new groovy.json.JsonSlurper().parseText((jsonMap as JSON).toString())
+    }
+
     def importCsv() {
         String fileData = request.inputStream.text
 
