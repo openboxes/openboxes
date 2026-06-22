@@ -3,6 +3,7 @@ import React, { useMemo } from 'react';
 import CheckStep from 'components/receivingV2/CheckStep';
 import ReceivingStep from 'components/receivingV2/ReceivingStep';
 import WizardPageLayout from 'components/wizard/v2/WizardPageLayout';
+import useReceivingHeader from 'hooks/receiving/v2/useReceivingHeader';
 import useTranslate from 'hooks/useTranslate';
 import useTranslation from 'hooks/useTranslation';
 import useWizard from 'hooks/useWizard';
@@ -12,18 +13,10 @@ const ReceivingStepKey = {
   CHECK: 'CHECK',
 };
 
-// TODO: replace the hardcoded header info with the real shipment data
-const HEADER_INFO = [
-  { text: '158BFR', color: '#000000', delimeter: ' - ' },
-  { text: 'Modise Transport T/A Yelloow Line Car Wash', color: '#004d40', delimeter: ' to ' },
-  { text: 'Belladere Depot', color: '#01579b', delimeter: ', ' },
-  { text: '01/31/2026', color: '#4a148c', delimeter: ', ' },
-  { text: 'fdffdf', color: '#770838', delimeter: '' },
-];
-
 const Receiving = () => {
   useTranslation('receiving');
   const translate = useTranslate();
+  const { info } = useReceivingHeader();
 
   const steps = useMemo(() => [
     {
@@ -50,7 +43,7 @@ const Receiving = () => {
 
   const title = {
     label: translate('react.receiving.receiving.label', 'Receiving'),
-    info: HEADER_INFO,
+    info,
   };
 
   return (
