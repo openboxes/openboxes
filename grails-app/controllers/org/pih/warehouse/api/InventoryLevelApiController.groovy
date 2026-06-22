@@ -58,40 +58,33 @@ class InventoryLevelApiController {
         }
 
         boolean deferRefresh = params.boolean('deferRefresh', false)
-        def body = request.JSON
-        if (!(body instanceof JSONArray)) {
+        def json = request.JSON
+        if (!(json instanceof JSONArray)) {
             throw new IllegalArgumentException("Expected a JSON array of inventory levels")
         }
 
-        List<Map> results = inventoryLevelService.bulkUpsert(facility, (JSONArray) body, deferRefresh)
+        List<UpsertResult> results = inventoryLevelService.bulkUpsert(facility, (JSONArray) json, deferRefresh)
 
-        List<String> productIds = results.findAll { it.status == 'ok' && it.productId }*.productId.unique()
+        List<String> productIds = results.findAll { it.status == UpsertStatus.OK && it.productId }*.productId.unique()
         if (deferRefresh && productIds) {
             productAvailabilityService.triggerRefreshProductAvailability(facility.id, productIds, true)
             inventorySnapshotService.triggerRefreshInventorySnapshot(facility.id, productIds, true)
         }
 
-        List<String> savedIds = results.findAll { it.status == 'ok' }*.inventoryLevelId
-        List<InventoryLevel> savedLevels = savedIds ? InventoryLevel.getAll(savedIds) : []
-
         render([
-            data    : savedLevels.collect { toJson(it) },
+            data    : results,
             metadata: [
-                bulk  : [
+                bulk: [
                     total  : results.size(),
-                    created: results.count { it.action == 'created' },
-                    updated: results.count { it.action == 'updated' },
-                    errors : results.count { it.status == 'error' },
+                    created: results.count { it.action == UpsertAction.CREATED },
+                    updated: results.count { it.action == UpsertAction.UPDATED },
+                    errors : results.count { it.status == UpsertStatus.ERROR },
                     refresh: [
                         deferred         : deferRefresh,
                         refreshedFacility: facility.id,
                         refreshedProducts: deferRefresh ? productIds : null
                     ]
-                ],
-                errors: results.findAll { it.status == 'error' }.collect {
-                    [index: it.index, errorMessage: it.errorMessage, errors: it.errors]
-                        .findAll { k, v -> v != null }
-                }
+                ]
             ]
         ] as JSON)
     }
@@ -102,40 +95,19 @@ class InventoryLevelApiController {
             throw new IllegalArgumentException("Unable to find facility with id ${params.facilityId}")
         }
 
-        def body = request.JSON
-        if (!(body instanceof JSONObject)) {
+        def json = request.JSON
+        if (!(json instanceof JSONObject)) {
             throw new IllegalArgumentException("Expected a single inventory level object")
         }
 
-        body.identifier = params.identifier
+        json.identifier = params.identifier
 
-        Map result = inventoryLevelService.bulkUpsert(facility, [body], false).first()
+        UpsertResult result = inventoryLevelService.upsert(facility, json, false)
 
-        if (result.status == 'error') {
+        if (result.status == UpsertStatus.ERROR) {
             response.status = HttpStatus.BAD_REQUEST.value()
-            render([errorCode: 400, errorMessage: result.errorMessage, errors: result.errors].findAll { k, v -> v != null } as JSON)
-            return
         }
 
-        render([data: toJson(InventoryLevel.get(result.inventoryLevelId))] as JSON)
-    }
-
-    private Map toJson(InventoryLevel inventoryLevel) {
-        return [
-            id                   : inventoryLevel.id,
-            identifier           : inventoryLevel.identifier,
-            scope                : inventoryLevel.inventoryLevelScope?.name(),
-            product              : [id: inventoryLevel.product?.id, productCode: inventoryLevel.product?.productCode],
-            status               : inventoryLevel.status?.name(),
-            abcClass             : inventoryLevel.abcClass,
-            cycleCountFrequencyDays: inventoryLevel.cycleCountFrequencyDays,
-            internalLocation     : inventoryLevel.internalLocation?.id,
-            preferredBinLocation : inventoryLevel.preferredBinLocation?.id,
-            replenishmentLocation: inventoryLevel.replenishmentLocation?.id,
-            sortOrder            : inventoryLevel.sortOrder,
-            minQuantity          : inventoryLevel.minQuantity,
-            reorderQuantity      : inventoryLevel.reorderQuantity,
-            maxQuantity          : inventoryLevel.maxQuantity
-        ]
+        render([data: result] as JSON)
     }
 }

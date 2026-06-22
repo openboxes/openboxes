@@ -15,6 +15,9 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import grails.web.databinding.DataBindingUtils
 import grails.gorm.transactions.NotTransactional
+import org.pih.warehouse.api.UpsertResult
+import org.springframework.validation.Errors
+import org.springframework.validation.FieldError
 import groovy.xml.Namespace
 import java.time.Instant
 
@@ -1216,58 +1219,60 @@ class ProductService {
 
     // @NotTransactional to avoid two open sessions with the per-item withNewTransaction
     @NotTransactional
-    List<Map> bulkUpsert(List<Map> items, boolean deferRefresh) {
-        List<Map> results = []
-        items.eachWithIndex { Map json, int index ->
-            try {
-                Product.withNewTransaction { status ->
-                    Product product = Product.findByIdOrProductCode(json.id, json.productCode) ?: new Product()
-                    boolean isNew = !product.id
-
-                    bindProductData(product, json)
-
-                    if (!product.productCode) {
-                        product.productCode = generateProductIdentifier(product)
-                    }
-
-                    product.disableRefresh = deferRefresh
-
-                    if (!product.validate()) {
-                        status.setRollbackOnly()
-                        results << [
-                            index       : index,
-                            status      : 'error',
-                            errorMessage: 'Validation failed',
-                            errors      : product.errors.allErrors.collect {
-                                [field: it.field, code: it.code, message: it.defaultMessage ?: it.code]
-                            }
-                        ]
-                        return
-                    }
-
-                    saveProduct(product)
-                    results << [
-                        index    : index,
-                        status   : 'ok',
-                        action   : isNew ? 'created' : 'updated',
-                        productId: product.id
-                    ]
-                }
-            } catch (Exception e) {
-                log.error("bulkUpsert: error at index ${index}: ${e.message}", e)
-                results << [
-                    index       : index,
-                    status      : 'error',
-                    errorMessage: e.message
-                ]
-            }
-        }
-        return results
+    List<UpsertResult> bulkUpsert(List<Map> items, boolean deferRefresh) {
+        return items.withIndex().collect { Map json, int index -> upsert(json, deferRefresh).withIndex(index) }
     }
 
+    // @NotTransactional to avoid two open sessions with the per-item withNewTransaction
+    @NotTransactional
+    UpsertResult upsert(Map json, boolean deferRefresh) {
+        try {
+            return Product.withNewTransaction { status ->
+                Product product = Product.findByIdOrProductCode(json.id, json.productCode) ?: new Product()
+                boolean isNew = !product.id
+
+                bindProductData(product, json)
+
+                if (!product.productCode) {
+                    product.productCode = generateProductIdentifier(product)
+                }
+
+                product.disableRefresh = deferRefresh
+
+                if (!product.validate()) {
+                    status.setRollbackOnly()
+                    return UpsertResult.error('Validation failed', toErrorMaps(product.errors))
+                }
+
+                if (!saveProduct(product)) {
+                    status.setRollbackOnly()
+                    return UpsertResult.error('Save failed', toErrorMaps(product.errors))
+                }
+
+                return UpsertResult.ok(isNew, product.id, product.id)
+            }
+        } catch (Exception e) {
+            log.error("upsert: ${e.message}", e)
+            return UpsertResult.error(e.message)
+        }
+    }
+
+    private static final List<String> NON_BINDABLE_FIELDS = [
+        'id', 'version', 'createdBy', 'updatedBy', 'dateCreated', 'lastUpdated'
+    ]
+
     private Product bindProductData(Product product, Map source) {
-        DataBindingUtils.bindObjectToInstance(product, new SimpleMapDataBindingSource(source))
+        DataBindingUtils.bindObjectToInstance(
+            product, new SimpleMapDataBindingSource(source), null, NON_BINDABLE_FIELDS, null)
         return product
+    }
+
+    private static List<Map> toErrorMaps(Errors errors) {
+        errors.allErrors.collect {
+            [field  : it instanceof FieldError ? ((FieldError) it).field : null,
+             code   : it.code,
+             message: it.defaultMessage ?: it.code].findAll { k, v -> v != null }
+        }
     }
 
     /**

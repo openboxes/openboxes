@@ -181,7 +181,7 @@ class UrlMappings {
             action = [GET: "list", PUT: "bulkUpsert"]
         }
 
-        // identifier can contains slashes so wildcard ** used
+        // identifier can contain slashes so wildcard ** used
         "/api/facilities/$facilityId/inventory-levels/$identifier**" {
             controller = "inventoryLevelApi"
             action = [PUT: "upsert"]

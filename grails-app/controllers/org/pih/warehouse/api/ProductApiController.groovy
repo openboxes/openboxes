@@ -342,46 +342,40 @@ class ProductApiController extends BaseDomainApiController {
     // @NotTransactional to avoid two open sessions with the per-item withNewTransaction
     @NotTransactional
     def upsert() {
-        def body = request.JSON
-        if (body instanceof JSONArray) {
-            bulkUpsert((JSONArray) body)
+        def json = request.JSON
+        if (json instanceof JSONArray) {
+            bulkUpsert((JSONArray) json)
             return
         }
-        Product product = Product.findByIdOrProductCode(body.id, body.productCode) ?: new Product()
-        bindData(product, body)
+        Product product = Product.findByIdOrProductCode(json.id, json.productCode) ?: new Product()
+        bindData(product, json)
         save(product)
     }
 
     private void bulkUpsert(JSONArray jsonObjects) {
         boolean deferRefresh = params.boolean('deferRefresh', false)
-        List<Map> results = productService.bulkUpsert(jsonObjects, deferRefresh)
+        List<UpsertResult> results = productService.bulkUpsert(jsonObjects, deferRefresh)
 
-        List<String> productIds = results.findAll { it.status == 'ok' && it.productId }*.productId.unique()
+        List<String> productIds = results.findAll { it.status == UpsertStatus.OK && it.productId }*.productId.unique()
 
         if (deferRefresh && productIds) {
             productAvailabilityService.updateProductAvailability(productIds)
             inventorySnapshotService.updateInventorySnapshots(productIds)
         }
 
-        List<Product> savedProducts = productIds ? Product.getAll(productIds).findAll { it != null } : []
-
         render([
-            data    : savedProducts.collect { it.toJson() },
+            data    : results,
             metadata: [
-                bulk  : [
+                bulk: [
                     total  : results.size(),
-                    created: results.count { it.action == 'created' },
-                    updated: results.count { it.action == 'updated' },
-                    errors : results.count { it.status == 'error' },
+                    created: results.count { it.action == UpsertAction.CREATED },
+                    updated: results.count { it.action == UpsertAction.UPDATED },
+                    errors : results.count { it.status == UpsertStatus.ERROR },
                     refresh: [
                         deferred         : deferRefresh,
                         refreshedProducts: deferRefresh ? productIds : null
                     ]
-                ],
-                errors: results.findAll { it.status == 'error' }.collect {
-                    [index: it.index, errorMessage: it.errorMessage, errors: it.errors]
-                        .findAll { k, v -> v != null }
-                }
+                ]
             ]
         ] as JSON)
     }

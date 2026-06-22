@@ -12,9 +12,12 @@ package org.pih.warehouse.inventory
 import grails.databinding.SimpleMapDataBindingSource
 import grails.gorm.transactions.Transactional
 import grails.web.databinding.DataBindingUtils
+import org.pih.warehouse.api.UpsertResult
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import grails.gorm.transactions.NotTransactional
+import org.springframework.validation.Errors
+import org.springframework.validation.FieldError
 
 @Transactional
 class InventoryLevelService {
@@ -31,58 +34,45 @@ class InventoryLevelService {
 
     // @NotTransactional to avoid two open sessions with the per-item withNewTransaction
     @NotTransactional
-    List<Map> bulkUpsert(Location facility, List<Map> items, boolean deferRefresh) {
-        List<Map> results = []
-        items.eachWithIndex { Map json, int index ->
-            try {
-                InventoryLevel.withNewTransaction { status ->
-                    InventoryLevel inventoryLevel =
-                        (json.identifier ? InventoryLevel.findByIdentifier(json.identifier) : null) ?: new InventoryLevel()
-                    boolean isNew = !inventoryLevel.id
+    List<UpsertResult> bulkUpsert(Location facility, List<Map> items, boolean deferRefresh) {
+        return items.withIndex().collect { Map json, int index -> upsert(facility, json, deferRefresh).withIndex(index) }
+    }
 
-                    inventoryLevel.inventory = facility.inventory
-                    bindInventoryLevelData(inventoryLevel, json)
+    // @NotTransactional to avoid two open sessions with the per-item withNewTransaction
+    @NotTransactional
+    UpsertResult upsert(Location facility, Map json, boolean deferRefresh) {
+        try {
+            return InventoryLevel.withNewTransaction { status ->
+                InventoryLevel inventoryLevel =
+                    (json.identifier ? InventoryLevel.findByIdentifierAndInventory(json.identifier, facility.inventory) : null) ?: new InventoryLevel()
+                boolean isNew = !inventoryLevel.id
 
-                    if (!inventoryLevel.validate()) {
-                        status.setRollbackOnly()
-                        results << [
-                            index       : index,
-                            status      : 'error',
-                            errorMessage: 'Validation failed',
-                            errors      : inventoryLevel.errors.allErrors.collect {
-                                [field: it.field, code: it.code, message: it.defaultMessage ?: it.code]
-                            }
-                        ]
-                        return
-                    }
+                inventoryLevel.inventory = facility.inventory
+                bindInventoryLevelData(inventoryLevel, json)
 
-                    inventoryLevel.save()
-
-                    if (!deferRefresh && inventoryLevel.product?.id) {
-                        productAvailabilityService.triggerRefreshProductAvailability(
-                            facility.id, [inventoryLevel.product.id], true)
-                        inventorySnapshotService.triggerRefreshInventorySnapshot(
-                            facility.id, [inventoryLevel.product.id], true)
-                    }
-
-                    results << [
-                        index           : index,
-                        status          : 'ok',
-                        action          : isNew ? 'created' : 'updated',
-                        inventoryLevelId: inventoryLevel.id,
-                        productId       : inventoryLevel.product?.id
-                    ]
+                if (!inventoryLevel.validate()) {
+                    status.setRollbackOnly()
+                    return UpsertResult.error('Validation failed', toErrorMaps(inventoryLevel.errors))
                 }
-            } catch (Exception e) {
-                log.error("bulkUpsert: error at index ${index}: ${e.message}", e)
-                results << [
-                    index       : index,
-                    status      : 'error',
-                    errorMessage: e.message
-                ]
+
+                if (!inventoryLevel.save()) {
+                    status.setRollbackOnly()
+                    return UpsertResult.error('Save failed', toErrorMaps(inventoryLevel.errors))
+                }
+
+                if (!deferRefresh && inventoryLevel.product?.id) {
+                    productAvailabilityService.triggerRefreshProductAvailability(
+                        facility.id, [inventoryLevel.product.id], true)
+                    inventorySnapshotService.triggerRefreshInventorySnapshot(
+                        facility.id, [inventoryLevel.product.id], true)
+                }
+
+                return UpsertResult.ok(isNew, inventoryLevel.id, inventoryLevel.product?.id)
             }
+        } catch (Exception e) {
+            log.error("upsert: ${e.message}", e)
+            return UpsertResult.error(e.message)
         }
-        return results
     }
 
     private InventoryLevel bindInventoryLevelData(InventoryLevel inventoryLevel, Map json) {
@@ -113,5 +103,13 @@ class InventoryLevelService {
         }
         String key = value instanceof Map ? (value.id ?: value.locationNumber) : value
         return key ? Location.findByIdOrLocationNumber(key, key) : null
+    }
+
+    private static List<Map> toErrorMaps(Errors errors) {
+        errors.allErrors.collect {
+            [field  : it instanceof FieldError ? ((FieldError) it).field : null,
+             code   : it.code,
+             message: it.defaultMessage ?: it.code].findAll { k, v -> v != null }
+        }
     }
 }

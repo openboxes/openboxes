@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="druchniewicz" id="170620261200-0">
+        <comment>Normalize blank inventory level identifiers to NULL so they don't collide under the unique constraint</comment>
+        <sql>UPDATE inventory_level SET identifier = NULL WHERE identifier IS NOT NULL AND TRIM(identifier) = ''</sql>
+    </changeSet>
+
+    <changeSet author="druchniewicz" id="170620261200-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="uc_inventory_level_identifier"/>
+            </not>
+        </preConditions>
+        <addUniqueConstraint tableName="inventory_level"
+                             columnNames="identifier"
+                             constraintName="uc_inventory_level_identifier"/>
+    </changeSet>
+
+</databaseChangeLog>

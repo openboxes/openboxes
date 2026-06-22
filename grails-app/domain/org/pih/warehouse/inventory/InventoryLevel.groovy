@@ -120,7 +120,7 @@ class InventoryLevel implements Comparable<InventoryLevel> {
     ]
 
     static constraints = {
-        identifier(nullable: true, maxSize: 255)
+        identifier(nullable: true, unique: true, maxSize: 255)
         sortOrder(nullable: true)
         status(nullable: true)
         inventory(nullable: false)
@@ -232,6 +232,38 @@ class InventoryLevel implements Comparable<InventoryLevel> {
 
     Integer getMonthlyForecastQuantity() {
         return forecastPeriodDays ? Math.ceil(((Double) (forecastQuantity) / forecastPeriodDays) * 30) : (forecastQuantity * 30)
+    }
+
+    Map toJson() {
+        return [
+            id                     : id,
+            identifier             : identifier,
+            scope                  : inventoryLevelScope?.name(),
+            product                : product ? [id: product.id, productCode: product.productCode] : null,
+            inventory              : inventory ? [id: inventory.id] : null,
+            status                 : status?.name(),
+            preferred              : preferred,
+            abcClass               : abcClass,
+            cycleCountFrequencyDays : cycleCountFrequencyDays,
+            dateLastCycleCount     : dateLastCycleCount,
+            dateNextCycleCount     : dateNextCycleCount,
+            internalLocation       : internalLocation ? [id: internalLocation.id, name: internalLocation.name] : null,
+            preferredBinLocation   : preferredBinLocation ? [id: preferredBinLocation.id, name: preferredBinLocation.name] : null,
+            replenishmentLocation  : replenishmentLocation ? [id: replenishmentLocation.id, name: replenishmentLocation.name] : null,
+            binLocation            : binLocation,
+            sortOrder              : sortOrder,
+            minQuantity            : minQuantity,
+            reorderQuantity        : reorderQuantity,
+            maxQuantity            : maxQuantity,
+            forecastQuantity       : forecastQuantity,
+            forecastPeriodDays     : forecastPeriodDays,
+            expectedLeadTimeDays   : expectedLeadTimeDays,
+            replenishmentPeriodDays : replenishmentPeriodDays,
+            demandTimePeriodDays   : demandTimePeriodDays,
+            comments               : comments,
+            dateCreated            : dateCreated,
+            lastUpdated            : lastUpdated
+        ]
     }
 
     static PROPERTIES = [
