@@ -9,14 +9,15 @@ class RandomSlottingStrategy implements PutawayStrategy {
     @Override
     List<PutawayResult> execute(PutawayContext context, List<Location> locations, Integer quantityRemaining, List<PutawayResult> putawayResults) {
         List<PutawayResult> putawayTasks = []
-        Location randomLocation = getRandomLocation(locations)
-        if (randomLocation) {
+        Location destination = getRandomLocation(locations)
+        if (destination) {
             putawayTasks << new PutawayResult(
                     facility: context.facility,
                     product: context.product,
                     inventoryItem: context.inventoryItem,
                     location: context.currentBinLocation,
-                    destination: randomLocation,
+                    destination: destination,
+                    container: resolvePutawayContainer(context, locations, destination),
                     quantity: quantityRemaining,
                     comment: "Random",
             )
