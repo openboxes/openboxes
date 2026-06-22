@@ -47,7 +47,7 @@ class AutoissuanceJob {
                 switch (requisition.deliveryTypeCode) {
                     case DeliveryTypeCode.LOCAL_DELIVERY:
                     case DeliveryTypeCode.SHIP_TO:
-                    case DeliveryTypeCode.STOCK_TRANSFER_IBT:
+                    case DeliveryTypeCode.FACILITY_TRANSFER:
                         try {
                             log.info "Issuing requisition ${requisition.requestNumber} (${requisition.deliveryTypeCode})"
                             stockMovementService.issueRequisition(requisition)

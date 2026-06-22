@@ -12,7 +12,7 @@ SELECT
         WHEN 'LOCAL_DELIVERY' THEN 2
         WHEN 'SERVICE' THEN 2
         WHEN 'WILL_CALL' THEN 3
-        WHEN 'STOCK_TRANSFER_IBT' THEN 3
+        WHEN 'FACILITY_TRANSFER' THEN 3
         WHEN 'SHIP_TO' THEN 4
         ELSE 5
     END AS priority,
@@ -44,7 +44,7 @@ SELECT
                            WHEN 'SERVICE' THEN 'DELIVERY_TYPE_SERVICE'
                            WHEN 'WILL_CALL' THEN 'DELIVERY_TYPE_WILL_CALL'
                            WHEN 'SHIP_TO' THEN 'DELIVERY_TYPE_SHIPPING'
-                           WHEN 'STOCK_TRANSFER_IBT' THEN 'DELIVERY_TYPE_STOCK_TRANSFER_IBT'
+                           WHEN 'FACILITY_TRANSFER' THEN 'DELIVERY_TYPE_FACILITY_TRANSFER'
                            ELSE NULL
                        END
             THEN 1 ELSE 0 END) > 0
