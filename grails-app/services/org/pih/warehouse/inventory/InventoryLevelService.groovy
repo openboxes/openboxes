@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.core.GrailsApplication
 import grails.databinding.SimpleMapDataBindingSource
 import grails.gorm.transactions.Transactional
 import grails.web.databinding.DataBindingUtils
@@ -22,8 +23,7 @@ import org.springframework.validation.FieldError
 @Transactional
 class InventoryLevelService {
 
-    def productAvailabilityService
-    def inventorySnapshotService
+    GrailsApplication grailsApplication
 
     // Associations are resolved explicitly (by id or natural key) rather than via data binding, so we don't
     // expose the raw domain bindings; everything else is bound.
@@ -61,10 +61,8 @@ class InventoryLevelService {
                 }
 
                 if (!deferRefresh && inventoryLevel.product?.id) {
-                    productAvailabilityService.triggerRefreshProductAvailability(
-                        facility.id, [inventoryLevel.product.id], true)
-                    inventorySnapshotService.triggerRefreshInventorySnapshot(
-                        facility.id, [inventoryLevel.product.id], true)
+                    grailsApplication.mainContext.publishEvent(
+                        new InventoryLevelUpdatedEvent(inventoryLevel, facility.id, inventoryLevel.product.id, true))
                 }
 
                 return UpsertResult.ok(isNew, inventoryLevel.id, inventoryLevel.product?.id)

@@ -39,10 +39,9 @@ class InventorySnapshotService {
     def persistenceInterceptor
 
     def triggerRefreshInventorySnapshot(String locationId, List<String> productIds, Boolean forceRefresh) {
-        Date runAt = new Date(System.currentTimeMillis() + 5000)
         productIds?.unique()?.each { String productId ->
             log.info "Triggering refresh inventory snapshot for location ${locationId}, product ${productId}"
-            RefreshInventorySnapshotJob.schedule(runAt,
+            RefreshInventorySnapshotJob.schedule(new Date(),
                 [locationId: locationId, productId: productId, forceRefresh: forceRefresh])
         }
     }
