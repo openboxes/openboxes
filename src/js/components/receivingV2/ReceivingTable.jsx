@@ -42,7 +42,12 @@ const ReceivingTable = ({
 ReceivingTable.propTypes = {
   lineItemsState: PropTypes.shape({
     entities: PropTypes.shape({}),
-    ids: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number])),
+    ids: PropTypes.arrayOf(PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+      // Type for separator rows ({ isSeparator, name })
+      PropTypes.shape({}),
+    ])),
   }).isRequired,
   columns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   loading: PropTypes.bool.isRequired,
