@@ -1,4 +1,5 @@
 <%@ page import="org.pih.warehouse.api.PutawayTaskStatus" %>
+<%@ page import="org.pih.warehouse.requisition.Requisition" %>
 <div id="tab-content" class="box">
     <h2>
         <warehouse:message code="putaway.tasks.label" default="Putaway Tasks"/>
@@ -23,6 +24,8 @@
             <th><warehouse:message code="putawayTask.dateCanceled.label" default="Date Canceled"/></th>
             <th><warehouse:message code="putawayTask.discrepancyReasonCode.label" default="Date Canceled"/></th>
             <th><warehouse:message code="receipt.receiptNumber.label" default="Receipt Number"/></th>
+            <th><warehouse:message code="shipment.shipmentNumber.label" default="Shipment Number"/></th>
+            <th><warehouse:message code="shipmentItem.backorderReference.label" default="Backorder Reference"/></th>
         </tr>
         </thead>
         <tbody>
@@ -105,6 +108,22 @@
                     <g:if test="${task.putawayOrderItem?.receipt}">
                         <g:link controller="shipment" action="showDetails" id="${task.putawayOrderItem.receipt.shipment?.id}">
                             ${task.putawayOrderItem.receipt.receiptNumber}
+                        </g:link>
+                    </g:if>
+                    <g:else>-</g:else>
+                </td>
+                <td>
+                    <g:if test="${task.putawayOrderItem?.receipt?.shipment}">
+                        <g:link controller="stockMovement" action="show" id="${task.putawayOrderItem.receipt.shipment?.id}">
+                            ${task.putawayOrderItem.receipt?.shipment?.shipmentNumber}
+                        </g:link>
+                    </g:if>
+                    <g:else>-</g:else>
+                </td>
+                <td>
+                    <g:if test="${task.backorderReferenceNumber}">
+                        <g:link controller="stockMovement" action="show" id="${Requisition.findByRequestNumber(task.backorderReferenceNumber)?.id}">
+                            ${task.backorderReferenceNumber}
                         </g:link>
                     </g:if>
                     <g:else>-</g:else>

@@ -14,6 +14,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.shipping.Container
+import org.pih.warehouse.shipping.ShipmentItem
 
 class PutawayItem implements Validateable {
 
@@ -104,6 +105,18 @@ class PutawayItem implements Validateable {
         }
     }
 
+    ShipmentItem getShipmentItem() {
+        return receiptItem?.shipmentItem
+    }
+
+    String getBackorderReferenceNumber() {
+        if (shipmentItem?.backorderReference) {
+            return shipmentItem?.backorderReference
+        }
+
+        return shipmentItem?.backorderItem?.requisition?.requestNumber
+    }
+
 
     Map toJson() {
         return [
@@ -143,7 +156,11 @@ class PutawayItem implements Validateable {
                 splitItems                    : splitItems.collect { it?.toJson() },
                 containerLocation             : containerLocation,
                 "receipt.id"                  : receipt?.id,
+                "receipt.receiptNumber"       : receipt?.id,
                 "receiptItem.id"              : receiptItem?.id,
+                "shipment.id"                 : shipmentItem?.shipment?.id,
+                "shipment.shipmentNumber"     : shipmentItem?.shipment?.shipmentNumber,
+                backorderReference            : backorderReferenceNumber,
         ]
     }
 }
