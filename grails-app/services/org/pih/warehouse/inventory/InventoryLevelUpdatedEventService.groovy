@@ -21,6 +21,7 @@ class InventoryLevelUpdatedEventService {
     // the refresh jobs don't need to be scheduled with a delay
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     void onInventoryLevelUpdated(InventoryLevelUpdatedEvent event) {
+        log.info "Inventory level updated; refreshing PA and inventory snapshot for facility=${event.facilityId}, product=${event.productId}"
         productAvailabilityService.triggerRefreshProductAvailability(event.facilityId, [event.productId], event.forceRefresh)
         inventorySnapshotService.triggerRefreshInventorySnapshot(event.facilityId, [event.productId], event.forceRefresh)
     }
