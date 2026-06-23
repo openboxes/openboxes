@@ -354,7 +354,7 @@ class PickTaskService {
             boolean backordered = requisition.requisitionItems?.any { it.isBackordered() }
             if (allTasksStaged && (!partialAllocation || !backordered)) {
                 requisition.status = RequisitionStatus.STAGED
-                webhookPublisherService.publishStatusUpdateEvent(task.requisition, WebhookEventType.REQUISITION_STAGED)
+                webhookPublisherService.publishRequisitionEvent(task.requisition, WebhookEventType.REQUISITION_STAGED)
 
                 if (!requisition.shipment) {
                     StockMovement stockMovement = StockMovement.createFromRequisition(requisition)

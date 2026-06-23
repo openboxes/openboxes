@@ -32,6 +32,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.api.FulfillmentStatusCode
 import util.ConfigHelper
 import util.StockMovementStatusResolver
+import util.StockMovementUtil
 
 class StockMovement implements Validateable, Historizable {
 
@@ -371,18 +372,7 @@ class StockMovement implements Validateable, Historizable {
      * @return
      */
     String generateName() {
-        final String separator =
-                Holders.getConfig().getProperty("openboxes.generateName.separator") ?: Constants.DEFAULT_NAME_SEPARATOR
-
-        String originIdentifier = origin?.locationNumber ?: origin?.name
-        String destinationIdentifier = destination?.locationNumber ?: destination?.name
-        String name = "${originIdentifier}${separator}${destinationIdentifier}"
-        if (dateRequested) name += "${separator}${dateRequested?.format("ddMMMyyyy")}"
-        if (stocklist?.name) name += "${separator}${stocklist.name}"
-        if (trackingNumber) name += "${separator}${trackingNumber}"
-        if (description) name += "${separator}${description}"
-        name = name.replace(" ", "")
-        return name
+        return StockMovementUtil.generateStockMovementName(requisition, trackingNumber)
     }
 
     static StockMovement createFromShipment(Shipment shipment) {

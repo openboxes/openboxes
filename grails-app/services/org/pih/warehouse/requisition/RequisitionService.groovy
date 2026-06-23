@@ -885,7 +885,7 @@ class RequisitionService {
                 requisition.rejectedBy = currentUser
                 break
             case RequisitionStatus.ISSUED:
-                webhookPublisherService.publishStatusUpdateEvent(requisition, WebhookEventType.REQUISITION_ISSUED)
+                webhookPublisherService.publishRequisitionEvent(requisition, WebhookEventType.REQUISITION_ISSUED)
                 // no break
             default:
                 requisition.status = newStatus
@@ -1151,5 +1151,26 @@ class RequisitionService {
         }
 
         return numActiveStocklistItemsForProduct > 0
+    }
+
+    void validateRequisition(Requisition requisition) {
+
+        requisition.requisitionItems.each { requisitionItem ->
+            if (!requisition.origin.isSupplier() && requisition.origin.supports(ActivityCode.MANAGE_INVENTORY) && requisition.status > RequisitionStatus.CREATED) {
+                validateRequisitionItem(requisitionItem)
+            }
+        }
+    }
+
+    void validateRequisitionItem(RequisitionItem requisitionItem) {
+        // check if there is picklist created for each item that has status different than canceled, substituted or changed
+        if (!requisitionItem.picklistItems && !(requisitionItem.status in [RequisitionItemStatus.CANCELED, RequisitionItemStatus.SUBSTITUTED, RequisitionItemStatus.CHANGED])) {
+            throw new ValidationException("There is picklist missing for item " + requisitionItem.product.productCode + " " + requisitionItem.product.name, requisitionItem.errors)
+        } else if (requisitionItem.picklistItems) {
+            // if there is picklist created check if quantity picked is equal to quantity requested if there was no reason code given(items canceled during pick or picked partially have reason code)
+            if (requisitionItem.totalQuantityPicked() != requisitionItem.quantity && !requisitionItem.picklistItems.reasonCode) {
+                throw new ValidationException("Please change the pick qty for item " + requisitionItem.product.productCode + " " + requisitionItem.product.name + " or enter reason code.", requisitionItem.errors)
+            }
+        }
     }
 }

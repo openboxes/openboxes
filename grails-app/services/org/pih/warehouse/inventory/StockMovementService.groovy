@@ -96,6 +96,7 @@ import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.shipping.ShipmentWorkflow
 import org.pih.warehouse.PaginatedList
 import org.springframework.web.multipart.MultipartFile
+import util.StockMovementUtil
 
 @Transactional
 class StockMovementService {
@@ -3078,29 +3079,32 @@ class StockMovementService {
         }
     }
 
-    // TODO: Refactor - Move entire shipment logic to the shipmentService
     Shipment createShipment(StockMovement stockMovement) {
         log.info "create shipment " + (new JSONObject(stockMovement.toBaseJson())).toString(4)
 
-        Requisition requisition = stockMovement.requisition
+        Shipment shipment = shipmentService.createShipment(stockMovement.requisition)
 
-        validateRequisition(requisition)
+        return shipment
+    }
+
+    Shipment createShipment(Requisition requisition) {
+        requisitionService.validateRequisition(requisition)
 
         Shipment shipment = Shipment.findByRequisition(requisition)
 
         if (!shipment) {
             shipment = new Shipment()
         } else {
-            createMissingShipmentItems(stockMovement.requisition, shipment)
+            stockMovementService.createMissingShipmentItems(requisition, shipment)
             return shipment
         }
 
-        shipment.requisition = stockMovement.requisition
-        shipment.shipmentNumber = stockMovement.identifier
+        shipment.requisition = requisition
+        shipment.shipmentNumber = requisition.requestNumber
 
-        shipment.origin = stockMovement.origin
-        shipment.destination = stockMovement.destination
-        shipment.description = stockMovement.description
+        shipment.origin = requisition.origin
+        shipment.destination = requisition.destination
+        shipment.description = requisition.description
 
         // These values need defaults since they are not set until step 6
         shipment.expectedShippingDate = new Date()
@@ -3108,7 +3112,7 @@ class StockMovementService {
         // Set default shipment type so we can save to the database without user input
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
 
-        shipment.name = stockMovement.generateName()
+        shipment.name = StockMovementUtil.generateStockMovementName(requisition)
 
         if (shipment.hasErrors() || !shipment.save(flush: true)) {
             throw new ValidationException("Invalid shipment", shipment.errors)
@@ -3428,8 +3432,7 @@ class StockMovementService {
 
     void issueRequisition(Requisition requisition) {
         if (!requisition.shipment) {
-            StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
-            Shipment shipment = createShipment(stockMovement)
+            Shipment shipment = shipmentService.createShipment(requisition)
             createMissingShipmentItems(requisition, shipment)
         } else {
             createMissingShipmentItems(requisition, requisition.shipment)
@@ -3448,7 +3451,7 @@ class StockMovementService {
         Requisition requisition = stockMovement.requisition
         def shipment = requisition.shipment
 
-        validateRequisition(requisition)
+        requisitionService.validateRequisition(requisition)
 
         if (!shipment) {
             throw new IllegalStateException("There are no shipments associated with stock movement ${requisition.requestNumber}")
@@ -3459,28 +3462,6 @@ class StockMovementService {
         Date dateShipped = stockMovement.dateShipped && !synchronizeDateShipped ? stockMovement.dateShipped : new Date()
         shipmentService.sendShipment(shipment, null, user, requisition.origin, dateShipped)
     }
-
-    void validateRequisition(Requisition requisition) {
-
-        requisition.requisitionItems.each { requisitionItem ->
-            if (!requisition.origin.isSupplier() && requisition.origin.supports(ActivityCode.MANAGE_INVENTORY) && requisition.status > RequisitionStatus.CREATED) {
-                validateRequisitionItem(requisitionItem)
-            }
-        }
-    }
-
-    void validateRequisitionItem(RequisitionItem requisitionItem) {
-        // check if there is picklist created for each item that has status different than canceled, substituted or changed
-        if (!requisitionItem.picklistItems && !(requisitionItem.status in [RequisitionItemStatus.CANCELED, RequisitionItemStatus.SUBSTITUTED, RequisitionItemStatus.CHANGED])) {
-            throw new ValidationException("There is picklist missing for item " + requisitionItem.product.productCode + " " + requisitionItem.product.name, requisitionItem.errors)
-        } else if (requisitionItem.picklistItems) {
-            // if there is picklist created check if quantity picked is equal to quantity requested if there was no reason code given(items canceled during pick or picked partially have reason code)
-            if (requisitionItem.totalQuantityPicked() != requisitionItem.quantity && !requisitionItem.picklistItems.reasonCode) {
-                throw new ValidationException("Please change the pick qty for item " + requisitionItem.product.productCode + " " + requisitionItem.product.name + " or enter reason code.", requisitionItem.errors)
-            }
-        }
-    }
-
 
     void rollbackStockMovement(String id) {
         StockMovement stockMovement = getStockMovement(id)

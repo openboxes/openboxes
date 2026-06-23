@@ -108,31 +108,6 @@ class WebhookPublisherService {
         publishEvent(payload, "openboxes.n8n")
     }
 
-    def publishStatusUpdateEvent(Requisition requisition, WebhookEventType eventType) {
-        if (!requisition) {
-            log.warn "Cannot publish order status update webhook event without a requisition"
-            return
-        }
-
-        boolean webhooksEnabled = requisition.origin.supports(ActivityCode.ENABLE_WEBHOOKS)
-        if (!webhooksEnabled) {
-            log.info "Location ${requisition.origin} does not support activity code ${ActivityCode.ENABLE_WEBHOOKS}"
-            return
-        }
-
-        Date dateTriggered = new Date()
-        User triggeredBy = AuthService.currentUser
-        Map payload = [
-                orderNumber: requisition.requestNumber,
-                status: eventType?.name,
-                branchCode: requisition.origin?.locationNumber,
-                eventDate: dateTriggered.toString(),
-                user: triggeredBy?.name,
-        ]
-
-        publishEvent(payload, "openboxes.n8n")
-    }
-
     def publishEvent(Map payload, String configPath = "openboxes.webhook") {
         try {
             boolean webhooksEnabled = Holders.config.get("${configPath}.enabled")
