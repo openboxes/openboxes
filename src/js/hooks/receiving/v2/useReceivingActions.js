@@ -8,13 +8,21 @@ import { getUsers } from 'selectors';
 import { fetchUsers } from 'actions';
 import receivingApi from 'api/services/ReceivingApi';
 import ReceiptGroup from 'consts/receiptGroup';
+import { ReceivingView } from 'consts/receivingViewOptions';
 import {
   createNormalizedState,
   normalizeData,
   updateNormalizedItem,
 } from 'utils/normalizationUtils';
 
-const useReceivingActions = () => {
+// In packing list view we ask the API to group items by pack level so that we can
+// render separator rows between groups
+const receiptGroupForView = (view) =>
+  (view === ReceivingView.PACKING_LIST ? ReceiptGroup.PACK_LEVEL : ReceiptGroup.SHIPMENT_ITEM);
+
+const buildSeparatorRow = (name) => ({ isSeparator: true, id: `separator-${name}`, name });
+
+const useReceivingActions = (view) => {
   const [loading, setLoading] = useState(false);
   const [lineItemsState, setLineItemsState] = useState(createNormalizedState());
   const { shipmentId } = useParams();
@@ -25,55 +33,93 @@ const useReceivingActions = () => {
   // solution. When line splitting is added, currentReceiptItems may have
   // more entries and each one will become its own row, so this fallback
   // to the first item will not be needed.
-  const transformSummaryToLineItems = (data) => {
-    const summaryById = data?.shipmentItemSummaryById || {};
-    const orderedIds = data?.shipmentItemsGrouped?.order || [];
-    const usersById = _.keyBy(users, 'id');
-    const lineItems = orderedIds.map((id) => {
-      const {
-        shipmentItem,
-        currentReceiptItems = [],
-        totalQuantityReceived = 0,
-        totalQuantityCanceled = 0,
-      } = summaryById[id];
-      const currentReceiptItem = currentReceiptItems[0];
-      return {
-        shipmentItemId: shipmentItem.id,
-        receiptItemId: currentReceiptItem?.id ?? null,
-        productCode: shipmentItem.productLot?.product?.productCode,
-        product: shipmentItem.productLot?.product,
-        parentContainer: shipmentItem.container?.parentContainer,
-        container: shipmentItem.container && {
-          id: shipmentItem.container.id,
-          name: shipmentItem.container.name,
-        },
-        lotNumber: currentReceiptItem?.productLot?.lotNumber
-          ?? shipmentItem.productLot?.lotNumber,
-        expirationDate: currentReceiptItem?.productLot?.expirationDate
-          ?? shipmentItem.productLot?.expirationDate,
-        recipient: currentReceiptItem?.recipient
-          ?? (shipmentItem.recipientId ? usersById[shipmentItem.recipientId] : null),
-        quantityShipped: shipmentItem.quantity,
-        quantityReceiving: currentReceiptItem?.quantityReceived ?? null,
-        quantityRemaining:
-          shipmentItem.quantity - totalQuantityReceived - totalQuantityCanceled,
-      };
+  const buildLineItem = (summary, usersById) => {
+    const {
+      shipmentItem,
+      currentReceiptItems = [],
+      totalQuantityReceived = 0,
+      totalQuantityCanceled = 0,
+    } = summary;
+    const currentReceiptItem = currentReceiptItems[0];
+    return {
+      shipmentItemId: shipmentItem.id,
+      receiptItemId: currentReceiptItem?.id ?? null,
+      productCode: shipmentItem.productLot?.product?.productCode,
+      product: shipmentItem.productLot?.product,
+      parentContainer: shipmentItem.container?.parentContainer,
+      container: shipmentItem.container && {
+        id: shipmentItem.container.id,
+        name: shipmentItem.container.name,
+      },
+      lotNumber: currentReceiptItem?.productLot?.lotNumber
+        ?? shipmentItem.productLot?.lotNumber,
+      expirationDate: currentReceiptItem?.productLot?.expirationDate
+        ?? shipmentItem.productLot?.expirationDate,
+      recipient: currentReceiptItem?.recipient
+        ?? (shipmentItem.recipientId ? usersById[shipmentItem.recipientId] : null),
+      quantityShipped: shipmentItem.quantity,
+      quantityReceiving: currentReceiptItem?.quantityReceived ?? null,
+      quantityRemaining:
+        shipmentItem.quantity - totalQuantityReceived - totalQuantityCanceled,
+    };
+  };
+
+  // Build state used for table view
+  const buildTableViewState = (summaryById, grouped, usersById) => {
+    const lineItems = (grouped?.order || []).map((id) => buildLineItem(summaryById[id], usersById));
+    return normalizeData(lineItems, 'shipmentItemId');
+  };
+
+  // Build state used for packing list.
+  // The parent group (level 1) becomes a separator row, while the child group name
+  // (level 2) is attached to each line item.
+  const buildPackingListViewState = (summaryById, grouped, usersById) => {
+    const { order = [], groups = {} } = grouped || {};
+
+    const toLineItemRow = (id, packLevelGroup) => ({
+      rowId: id,
+      entity: { ...buildLineItem(summaryById[id], usersById), packLevelGroup },
     });
 
-    return normalizeData(lineItems, 'shipmentItemId');
+    // Flatten the two-level grouping into a single ordered list of rows. Each parent group adds
+    // a separator row followed by its line items.
+    const rows = order.flatMap((parentName) => {
+      const { order: childOrder = [], groups: childGroups = {} } = groups[parentName] || {};
+      const lineItemRows = childOrder.flatMap((childName) =>
+        (childGroups[childName] || []).map((id) => toLineItemRow(id, childName)));
+      return [{ rowId: buildSeparatorRow(parentName) }, ...lineItemRows];
+    });
+
+    return rows.reduce((state, { rowId, entity }) => ({
+      entities: entity ? { ...state.entities, [rowId]: entity } : state.entities,
+      ids: [...state.ids, rowId],
+    }), createNormalizedState());
+  };
+
+  // Function calling an appropriate builder based on the current view,
+  // to transform the API response into the shape needed for the table.
+  const transformSummary = (data, currentView) => {
+    const summaryById = data?.shipmentItemSummaryById || {};
+    const grouped = data?.shipmentItemsGrouped;
+    const usersById = _.keyBy(users, 'id');
+
+    if (currentView === ReceivingView.PACKING_LIST) {
+      return buildPackingListViewState(summaryById, grouped, usersById);
+    }
+    return buildTableViewState(summaryById, grouped, usersById);
   };
 
   const loadReceipt = async () => {
     setLoading(true);
     try {
       const { data: { data: summary } } = await receivingApi.getReceiptSummary(shipmentId, {
-        group: ReceiptGroup.SHIPMENT_ITEM,
+        group: receiptGroupForView(view),
       });
       // When there's no pending receipt yet, start one
       if (!summary?.pendingReceiptId) {
         await receivingApi.startReceipt(shipmentId);
       }
-      setLineItemsState(transformSummaryToLineItems(summary));
+      setLineItemsState(transformSummary(summary, view));
     } finally {
       setLoading(false);
     }
@@ -90,7 +136,7 @@ const useReceivingActions = () => {
       return;
     }
     loadReceipt();
-  }, [shipmentId]);
+  }, [shipmentId, view]);
 
   useEffect(() => {
     dispatch(fetchUsers());
