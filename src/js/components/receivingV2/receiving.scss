@@ -50,8 +50,6 @@
   .rt-td {
     display: flex;
     align-items: center;
-    padding-top: 8px !important;
-    padding-bottom: 8px !important;
 
     div {
       min-width: 0;
@@ -78,5 +76,90 @@
     font-weight: 600;
     color: var(--gray-700);
     white-space: nowrap;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .status-cell {
+    color: var(--blue-500);
+    font-weight: bold;
+
+    &--completed {
+      color: var(--color-green);
+    }
+
+    &--over {
+      color: var(--color-yellow);
+    }
+  }
+
+  // Fade every value on disabled rows, keeping colours (e.g. status) just muted.
+  .disabled .rt-td {
+    opacity: 0.5;
+  }
+
+  .shipped-po {
+    &__uom {
+      margin-left: 4px;
+      color: var(--gray-350);
+    }
+  }
+}
+
+.location-header {
+  width: 100%;
+
+  .react-select__control,
+  .react-select__control:hover,
+  .react-select__control.react-select__control--is-focused {
+    border: none !important;
+    background: transparent;
+    min-height: unset;
+    box-shadow: none !important;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .react-select__value-container {
+    padding: 0;
+  }
+
+  .react-select__indicators {
+    display: none;
+  }
+
+  .location-header__placeholder {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .location-header__location {
+    color: var(--gray-600);
+    font-weight: bold;
+  }
+
+  .location-header__autofill {
+    color: var(--blue-500) !important;
+    font-weight: bold;
+  }
+
+  .location-header__caret {
+    margin-left: 4px;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid var(--blue-500);
+  }
+}
+
+.location-header-cell:hover {
+  .location-header__location,
+  .location-header__autofill {
+    color: var(--blue-primary) !important;
+  }
+
+  .location-header__caret {
+    border-top-color: var(--blue-primary);
   }
 }

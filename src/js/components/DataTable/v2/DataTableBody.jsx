@@ -138,7 +138,7 @@ const DataTableBody = ({
                   role="rowgroup"
                   {...rowProps}
                 >
-                  <TableRow key={rowData.id} className={`rt-tr ${isRowDisabled && 'bg-light'} ${isSeparator ? 'rt-tr-separator' : ''}`}>
+                  <TableRow key={rowData.id} className={`rt-tr ${isRowDisabled ? 'bg-light disabled' : ''} ${isSeparator ? 'rt-tr-separator' : ''}`}>
                     {rowData.getVisibleCells().map((cell) => {
                       const { hide, flexWidth, className } = useTableColumnMeta(cell.column);
                       if (hide) {
@@ -155,6 +155,7 @@ const DataTableBody = ({
                               isScreenWiderThanTable,
                               dataLength,
                               loading,
+                              isRowDisabled,
                             ),
                           }}
                           key={cell.id}

@@ -19,9 +19,9 @@ const PackLevelCell = React.memo(({
       customTooltip
       tooltipLabel={[packLevel1, packLevel2].filter(Boolean).join(' / ')}
     >
-      <div aria-label={translate(label, defaultLabel)}>
-        {packLevel1 && <div className="text-truncate">{packLevel1}</div>}
-        {packLevel2 && <div className="text-truncate">{packLevel2}</div>}
+      <div className="pack-level" aria-label={translate(label, defaultLabel)}>
+        {packLevel1 && <div className="pack-level__primary text-truncate">{packLevel1}</div>}
+        {packLevel2 && <div className="pack-level__secondary text-truncate">{packLevel2}</div>}
       </div>
     </TableCell>
   );

@@ -9,14 +9,14 @@ import useTranslate from 'hooks/useTranslate';
  * Memoized cell rendering a single value with an optional tooltip and truncation.
  */
 const ValueCell = React.memo(({
-  value, label, defaultLabel, tooltipLabel, truncate,
+  value, label, defaultLabel, tooltipLabel, truncate, className,
 }) => {
   const translate = useTranslate();
 
   return (
     <TableCell className="rt-td" customTooltip tooltipLabel={tooltipLabel}>
       <div
-        className={truncate ? 'text-truncate' : undefined}
+        className={`${truncate ? 'text-truncate' : ''} ${className}`}
         aria-label={translate(label, defaultLabel)}
       >
         {value}
@@ -33,12 +33,14 @@ ValueCell.propTypes = {
   defaultLabel: PropTypes.string.isRequired,
   tooltipLabel: PropTypes.string,
   truncate: PropTypes.bool,
+  className: PropTypes.string,
 };
 
 ValueCell.defaultProps = {
   value: null,
   tooltipLabel: undefined,
   truncate: false,
+  className: '',
 };
 
 export default ValueCell;
