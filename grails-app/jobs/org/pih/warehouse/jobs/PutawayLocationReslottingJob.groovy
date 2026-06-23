@@ -40,22 +40,25 @@ class PutawayLocationReslottingJob {
         }
         if (inventoryLevel.preferredBinLocation?.supports(ActivityCode.UNDEFINED_LOCATION)) {
             // the update hasn't changed preferredBinLocation type from UNDEFINED; no reslotting
+            log.debug "InventoryLevel with ${ActivityCode.UNDEFINED_LOCATION} preferredBinLocation. Skip."
             return
         }
         if (inventoryLevel.internalLocation?.supports(ActivityCode.UNDEFINED_LOCATION)) {
             // the update hasn't changed internalLocation type from UNDEFINED; no reslotting
+            log.debug "InventoryLevel with ${ActivityCode.UNDEFINED_LOCATION} internalLocation. Skip."
             return
         }
 
-        log.info("Reslotting Putaway location for " + inventoryLevel.product)
         List<Location> binLocations = locationService.getLocationsSupportingActivity(ActivityCode.UNDEFINED_LOCATION)
         List<Putaway> pendingPutaways = putawayService.getPendingPutawayOrders(inventoryLevel.product, binLocations, inventoryLevel.inventory.warehouse)
+        log.info("Reslotting Putaway location for product ${inventoryLevel.product}, found ${pendingPutaways?.size()} putaways")
         pendingPutaways?.each { Putaway putaway ->
             List<PutawayItem> putawayItems = putaway.putawayItems.findAll {
                 it.putawayLocation?.supports(ActivityCode.UNDEFINED_LOCATION)
             }
             putawayItems?.each {
                 it.putawayLocation = inventoryLevel.preferredBinLocation ?: inventoryLevel.internalLocation
+                log.debug "Modified putawayLocation for ${it}"
             }
             putawayService.savePutaway(putaway)
         }
