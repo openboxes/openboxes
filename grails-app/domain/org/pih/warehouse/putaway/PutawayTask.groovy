@@ -81,6 +81,10 @@ class PutawayTask {
         version false // Important: Disable optimistic locking for views
     }
 
+    static transients = {
+        'backorderReference'
+    }
+
     PutawayTypeCode getPutawayTypeCode() {
         if (!destination) return PutawayTypeCode.UNASSIGNED
         else if (destination.supports(ActivityCode.CROSS_DOCKING)) { return PutawayTypeCode.CROSS_DOCK }
@@ -88,27 +92,40 @@ class PutawayTask {
         else { return PutawayTypeCode.STANDARD }
     }
 
+    String getBackorderReferenceNumber() {
+        if (putawayOrderItem?.receiptItem?.shipmentItem?.backorderReference) {
+            return putawayOrderItem?.receiptItem?.shipmentItem?.backorderReference
+        }
+
+        return putawayOrderItem?.receiptItem?.shipmentItem?.backorderItem?.requisition?.requestNumber
+    }
+
     Map toJson() {
         return [
-                id              : id,
-                status          : status?.name(),
-                identifier      : identifier,
-                inventoryItem   : inventoryItem,
-                facility        : facility?.toBaseJson(),
-                location        : location?.toJson(location?.locationType?.locationTypeCode),
-                quantity        : quantity,
-                container       : container?.toJson(container?.locationType?.locationTypeCode),
-                destination     : destination?.toJson(destination?.locationType?.locationTypeCode),
-                putawayOrder    : putawayOrder ? [id: putawayOrder.id, orderNumber: putawayOrder.orderNumber] : null,
-                deliveryTypeCode: deliveryTypeCode?.name(),
-                comment         : comment,
-                assignee        : assignee,
-                orderedBy       : orderedBy,
-                dateStarted     : dateStarted,
-                dateCompleted   : dateCompleted,
-                dateCanceled    : dateCanceled,
-                lastUpdated     : lastUpdated,
-                dateCreated     : dateCreated,
+                id                  : id,
+                status              : status?.name(),
+                identifier          : identifier,
+                inventoryItem       : inventoryItem,
+                facility            : facility?.toBaseJson(),
+                location            : location?.toJson(location?.locationType?.locationTypeCode),
+                quantity            : quantity,
+                container           : container?.toJson(container?.locationType?.locationTypeCode),
+                destination         : destination?.toJson(destination?.locationType?.locationTypeCode),
+                putawayOrder        : putawayOrder ? [id: putawayOrder.id, orderNumber: putawayOrder.orderNumber] : null,
+                deliveryTypeCode    : deliveryTypeCode?.name(),
+                comment             : comment,
+                assignee            : assignee,
+                orderedBy           : orderedBy,
+                dateStarted         : dateStarted,
+                dateCompleted       : dateCompleted,
+                dateCanceled        : dateCanceled,
+                lastUpdated         : lastUpdated,
+                dateCreated         : dateCreated,
+                backorderReference  : backorderReferenceNumber,
+                shipmentNumber      : putawayOrderItem.receiptItem?.shipmentItem?.shipment?.shipmentNumber,
+                shipmentId          : putawayOrderItem.receiptItem?.shipmentItem?.shipment?.id,
+                receiptNumber       : putawayOrderItem.receipt?.receiptNumber,
+                receiptId           : putawayOrderItem.receipt?.id,
         ]
     }
 }

@@ -104,6 +104,14 @@ class PutawayItem implements Validateable {
         }
     }
 
+    String getBackorderReferenceNumber() {
+        if (receiptItem?.shipmentItem?.backorderReference) {
+            return receiptItem?.shipmentItem?.backorderReference
+        }
+
+        return receiptItem?.shipmentItem?.backorderItem?.requisition?.requestNumber
+    }
+
 
     Map toJson() {
         return [
@@ -143,7 +151,11 @@ class PutawayItem implements Validateable {
                 splitItems                    : splitItems.collect { it?.toJson() },
                 containerLocation             : containerLocation,
                 "receipt.id"                  : receipt?.id,
+                "receipt.receiptNumber"       : receipt?.id,
                 "receiptItem.id"              : receiptItem?.id,
+                "shipment.id"                 : receiptItem?.shipmentItem?.shipment?.id,
+                "shipment.shipmentNumber"     : receiptItem?.shipmentItem?.shipment?.shipmentNumber,
+                backorderReference            : backorderReferenceNumber,
         ]
     }
 }
