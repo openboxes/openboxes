@@ -13,6 +13,8 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.shipping.ShipmentItem
 
 class PutawayTask {
 
@@ -81,9 +83,10 @@ class PutawayTask {
         version false // Important: Disable optimistic locking for views
     }
 
-    static transients = {
-        'backorderReference'
-    }
+    static transients = [
+            'backorderReference',
+            'shipmentItem'
+    ]
 
     PutawayTypeCode getPutawayTypeCode() {
         if (!destination) return PutawayTypeCode.UNASSIGNED
@@ -92,12 +95,16 @@ class PutawayTask {
         else { return PutawayTypeCode.STANDARD }
     }
 
+    ShipmentItem getShipmentItem() {
+        return putawayOrderItem?.receiptItem?.shipmentItem
+    }
+
     String getBackorderReferenceNumber() {
-        if (putawayOrderItem?.receiptItem?.shipmentItem?.backorderReference) {
-            return putawayOrderItem?.receiptItem?.shipmentItem?.backorderReference
+        if (shipmentItem?.backorderReference) {
+            return shipmentItem?.backorderReference
         }
 
-        return putawayOrderItem?.receiptItem?.shipmentItem?.backorderItem?.requisition?.requestNumber
+        return shipmentItem?.backorderItem?.requisition?.requestNumber
     }
 
     Map toJson() {
@@ -122,8 +129,8 @@ class PutawayTask {
                 lastUpdated         : lastUpdated,
                 dateCreated         : dateCreated,
                 backorderReference  : backorderReferenceNumber,
-                shipmentNumber      : putawayOrderItem.receiptItem?.shipmentItem?.shipment?.shipmentNumber,
-                shipmentId          : putawayOrderItem.receiptItem?.shipmentItem?.shipment?.id,
+                shipmentNumber      : shipmentItem?.shipment?.shipmentNumber,
+                shipmentId          : shipmentItem?.shipment?.id,
                 receiptNumber       : putawayOrderItem.receipt?.receiptNumber,
                 receiptId           : putawayOrderItem.receipt?.id,
         ]

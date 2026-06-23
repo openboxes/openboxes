@@ -14,6 +14,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.shipping.Container
+import org.pih.warehouse.shipping.ShipmentItem
 
 class PutawayItem implements Validateable {
 
@@ -104,12 +105,16 @@ class PutawayItem implements Validateable {
         }
     }
 
+    ShipmentItem getShipmentItem() {
+        return receiptItem?.shipmentItem
+    }
+
     String getBackorderReferenceNumber() {
-        if (receiptItem?.shipmentItem?.backorderReference) {
-            return receiptItem?.shipmentItem?.backorderReference
+        if (shipmentItem?.backorderReference) {
+            return shipmentItem?.backorderReference
         }
 
-        return receiptItem?.shipmentItem?.backorderItem?.requisition?.requestNumber
+        return shipmentItem?.backorderItem?.requisition?.requestNumber
     }
 
 
@@ -153,8 +158,8 @@ class PutawayItem implements Validateable {
                 "receipt.id"                  : receipt?.id,
                 "receipt.receiptNumber"       : receipt?.id,
                 "receiptItem.id"              : receiptItem?.id,
-                "shipment.id"                 : receiptItem?.shipmentItem?.shipment?.id,
-                "shipment.shipmentNumber"     : receiptItem?.shipmentItem?.shipment?.shipmentNumber,
+                "shipment.id"                 : shipmentItem?.shipment?.id,
+                "shipment.shipmentNumber"     : shipmentItem?.shipment?.shipmentNumber,
                 backorderReference            : backorderReferenceNumber,
         ]
     }
