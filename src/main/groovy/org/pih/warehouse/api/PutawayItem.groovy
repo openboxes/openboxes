@@ -156,7 +156,7 @@ class PutawayItem implements Validateable {
                 splitItems                    : splitItems.collect { it?.toJson() },
                 containerLocation             : containerLocation,
                 "receipt.id"                  : receipt?.id,
-                "receipt.receiptNumber"       : receipt?.id,
+                "receipt.receiptNumber"       : receipt?.receiptNumber,
                 "receiptItem.id"              : receiptItem?.id,
                 "shipment.id"                 : shipmentItem?.shipment?.id,
                 "shipment.shipmentNumber"     : shipmentItem?.shipment?.shipmentNumber,
