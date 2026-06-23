@@ -1,19 +1,19 @@
 package org.pih.warehouse.inventory
 
+import grails.core.GrailsApplication
 import org.pih.warehouse.jobs.PutawayLocationReslottingJob
-import org.springframework.transaction.event.TransactionPhase
-import org.springframework.transaction.event.TransactionalEventListener
-import org.springframework.transaction.support.TransactionSynchronizationManager
+import org.springframework.context.ApplicationListener
 
-class ReslottingEventService {
+class ReslottingEventService implements ApplicationListener<ReslottingEvent> {
+    GrailsApplication grailsApplication
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
-    void onReslottingEvent(ReslottingEvent event) {
+    void onApplicationEvent(ReslottingEvent event) {
         log.info "Application event $event has been published! " + event.properties
 
-        log.debug "isActualTransactionActive = ${TransactionSynchronizationManager.isActualTransactionActive()}"
-        log.debug "isSynchronizationActive = ${TransactionSynchronizationManager.isSynchronizationActive()}"
-
-        PutawayLocationReslottingJob.triggerNow([inventoryLevelId: event.source])
+        def delayInMilliseconds =
+                Integer.valueOf(grailsApplication.config.openboxes.jobs.putawayLocationReslottingJob.delayInMilliseconds) ?: 1000
+        Date runAt = new Date(System.currentTimeMillis() + delayInMilliseconds)
+        log.info "Triggering putaway location reslotting job with ${delayInMilliseconds} ms delay"
+        PutawayLocationReslottingJob.schedule(runAt, [inventoryLevelId: event.source])
     }
 }
