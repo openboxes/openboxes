@@ -2,6 +2,7 @@ package org.pih.warehouse.picking
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.util.Holders
 import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.CriteriaSpecification
@@ -12,6 +13,7 @@ import org.pih.warehouse.api.picking.SearchPickTaskCommand
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.SendRequisitionNotificationEvent
 import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.WebhookPublisherService
@@ -354,18 +356,13 @@ class PickTaskService {
             boolean backordered = requisition.requisitionItems?.any { it.isBackordered() }
             if (allTasksStaged && (!partialAllocation || !backordered)) {
                 requisition.status = RequisitionStatus.STAGED
-                webhookPublisherService.publishRequisitionEvent(task.requisition, WebhookEventType.REQUISITION_STAGED)
+                Holders.grailsApplication.mainContext.publishEvent(new SendRequisitionNotificationEvent(task.requisition.id, WebhookEventType.REQUISITION_STAGED))
 
                 if (!requisition.shipment) {
                     StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
                     Shipment shipment = stockMovementService.createShipment(stockMovement)
                     stockMovementService.createMissingShipmentItems(requisition, shipment)
                 }
-
-                def delayInMilliseconds = Integer.valueOf(grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds) + 1000 ?: 1000
-                Date runAt = new Date(System.currentTimeMillis() + delayInMilliseconds)
-                log.info "Triggering automaticIssuanceJob job with ${delayInMilliseconds} ms delay"
-                AutomaticIssuanceJob.schedule(runAt)
             }
         }
 
