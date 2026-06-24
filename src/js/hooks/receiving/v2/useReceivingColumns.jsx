@@ -7,6 +7,7 @@ import { getCurrentLocale } from 'selectors';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import receivingColumns from 'consts/receivingColumns';
+import { ReceivingView } from 'consts/receivingViewOptions';
 import useTranslate from 'hooks/useTranslate';
 import ExpirationDateCell from 'utils/cells/ExpirationDateCell';
 import MultilineCell from 'utils/cells/MultilineCell';
@@ -14,69 +15,30 @@ import PackLevelCell from 'utils/cells/PackLevelCell';
 import QuantityInputCell from 'utils/cells/QuantityInputCell';
 import ValueCell from 'utils/cells/ValueCell';
 
-const useReceivingColumns = () => {
+const useReceivingColumns = (view) => {
   const translate = useTranslate();
   const columnHelper = createColumnHelper();
   const currentLocale = useSelector(getCurrentLocale);
+  const isPackingListView = view === ReceivingView.PACKING_LIST;
 
   // Rows are line item ids; the entities live in the normalized state passed
   // through the table `meta`, so each cell reads its item by id at render time.
   const getItem = (row, table) => table.options.meta?.entities?.[row.original];
 
-  const columns = useMemo(() => [
-    columnHelper.display({
-      id: receivingColumns.PRODUCT_CODE,
-      header: () => (
-        <TableHeaderCell
-          tooltip
-          tooltipLabel={translate('react.receiving.code.label', 'Code')}
-        >
-          {translate('react.receiving.code.label', 'Code')}
-        </TableHeaderCell>
-      ),
-      cell: ({ row, table }) => {
-        const value = getItem(row, table)?.productCode;
-        return (
-          <ValueCell
-            value={value}
-            tooltipLabel={value}
-            label="react.receiving.code.label"
-            defaultLabel="Code"
-            truncate
-          />
-        );
-      },
-      size: 60,
-    }),
-    columnHelper.display({
-      id: receivingColumns.PRODUCT,
-      header: () => (
-        <TableHeaderCell
-          tooltip
-          tooltipLabel={translate('react.receiving.product.label', 'Product')}
-        >
-          {translate('react.receiving.product.label', 'Product')}
-        </TableHeaderCell>
-      ),
-      cell: ({ row, table }) => (
-        <MultilineCell
-          value={getItem(row, table)?.product?.name}
-          label="react.receiving.product.label"
-          defaultLabel="Product"
-        />
-      ),
-      size: 300,
-    }),
-    columnHelper.display({
+  const columns = useMemo(() => {
+    const packLevelHeader = () => (
+      <TableHeaderCell
+        tooltip
+        tooltipLabel={translate('react.receiving.packLevel.label', 'Pack Level')}
+      >
+        {translate('react.receiving.packLevel.label', 'Pack Level')}
+      </TableHeaderCell>
+    );
+
+    // Third column in table view: shows the item's full pack levels
+    const packLevelColumn = columnHelper.display({
       id: receivingColumns.PACK_LEVEL,
-      header: () => (
-        <TableHeaderCell
-          tooltip
-          tooltipLabel={translate('react.receiving.packLevel.label', 'Pack Level')}
-        >
-          {translate('react.receiving.packLevel.label', 'Pack Level')}
-        </TableHeaderCell>
-      ),
+      header: packLevelHeader,
       cell: ({ row, table }) => {
         const { container, parentContainer } = getItem(row, table) || {};
         const packLevel1 = parentContainer ? parentContainer.name : container?.name;
@@ -91,151 +53,232 @@ const useReceivingColumns = () => {
         );
       },
       size: 100,
-    }),
-    columnHelper.display({
-      id: receivingColumns.LOT_NUMBER,
-      header: () => (
-        <TableHeaderCell
-          tooltip
-          tooltipLabel={translate('react.receiving.lotSerialNo.label', 'Lot/Serial No.')}
-        >
-          {translate('react.receiving.lotSerialNo.short.label', 'Lot/SN')}
-        </TableHeaderCell>
-      ),
+    });
+
+    // Leftmost column in packing list view: the item's own pack level.
+    // The parent group name is rendered on the separator rows between groups.
+    const packLevelGroupColumn = columnHelper.display({
+      id: receivingColumns.PACK_LEVEL_GROUP,
+      header: packLevelHeader,
       cell: ({ row, table }) => {
-        const value = getItem(row, table)?.lotNumber;
+        const value = getItem(row, table)?.packLevelGroup;
         return (
           <ValueCell
             value={value}
             tooltipLabel={value}
-            label="react.receiving.lotSerialNo.short.label"
-            defaultLabel="Lot/SN"
+            label="react.receiving.packLevel.label"
+            defaultLabel="Pack Level"
             truncate
           />
         );
       },
-      size: 100,
-    }),
-    columnHelper.display({
-      id: receivingColumns.EXPIRATION_DATE,
-      header: () => (
-        <TableHeaderCell
-          tooltip
-          tooltipLabel={translate('react.receiving.expirationDate.label', 'Expiration date')}
-        >
-          {translate('react.receiving.expirationDate.short.label', 'Exp Date')}
-        </TableHeaderCell>
-      ),
-      cell: ({ row, table }) => (
-        <ExpirationDateCell
-          value={getItem(row, table)?.expirationDate}
-          localeKey={currentLocale}
-          label="react.receiving.expirationDate.short.label"
-          defaultLabel="Exp Date"
-        />
-      ),
-      size: 100,
-    }),
-    columnHelper.display({
-      id: receivingColumns.RECIPIENT,
-      header: () => (
-        <TableHeaderCell
-          tooltip
-          tooltipLabel={translate('react.receiving.recipient.label', 'Recipient')}
-        >
-          {translate('react.receiving.recipient.label', 'Recipient')}
-        </TableHeaderCell>
-      ),
-      cell: ({ row, table }) => {
-        const recipient = getItem(row, table)?.recipient;
-        return (
-          <ValueCell
-            value={recipient?.name}
-            tooltipLabel={recipient?.name}
-            label="react.receiving.recipient.label"
-            defaultLabel="Recipient"
-            truncate
-          />
-        );
+      meta: {
+        // Light indent on item rows in packing list view.
+        getCellContext: () => ({ className: 'receiving-table__pack-level-group' }),
+        renderSeparator: ({ row }) => (
+          <TableCell className="rt-td receiving-table__separator">
+            <span className="receiving-table__separator-label">{row.original.name}</span>
+          </TableCell>
+        ),
       },
       size: 100,
-    }),
-    columnHelper.display({
-      id: receivingColumns.QUANTITY_SHIPPED,
-      header: () => (
-        <TableHeaderCell
-          tooltip
-          tooltipLabel={translate('react.receiving.shipped.label', 'Shipped')}
-        >
-          {translate('react.receiving.shipped.label', 'Shipped')}
-        </TableHeaderCell>
-      ),
-      cell: ({ row, table }) => {
-        const value = getItem(row, table)?.quantityShipped;
-        return (
-          <ValueCell
-            value={value}
-            tooltipLabel={value?.toString()}
-            label="react.receiving.shipped.label"
-            defaultLabel="Shipped"
+    });
+
+    return [
+      // In the packing list view, the first column is the pack level group (parent group name).
+      // In the table view, the first column is the product code.
+      ...(isPackingListView ? [packLevelGroupColumn] : []),
+      columnHelper.display({
+        id: receivingColumns.PRODUCT_CODE,
+        header: () => (
+          <TableHeaderCell
+            tooltip
+            tooltipLabel={translate('react.receiving.code.label', 'Code')}
+          >
+            {translate('react.receiving.code.label', 'Code')}
+          </TableHeaderCell>
+        ),
+        cell: ({ row, table }) => {
+          const value = getItem(row, table)?.productCode;
+          return (
+            <ValueCell
+              value={value}
+              tooltipLabel={value}
+              label="react.receiving.code.label"
+              defaultLabel="Code"
+              truncate
+            />
+          );
+        },
+        size: 60,
+      }),
+      columnHelper.display({
+        id: receivingColumns.PRODUCT,
+        header: () => (
+          <TableHeaderCell
+            tooltip
+            tooltipLabel={translate('react.receiving.product.label', 'Product')}
+          >
+            {translate('react.receiving.product.label', 'Product')}
+          </TableHeaderCell>
+        ),
+        cell: ({ row, table }) => (
+          <MultilineCell
+            value={getItem(row, table)?.product?.name}
+            label="react.receiving.product.label"
+            defaultLabel="Product"
           />
-        );
-      },
-      size: 80,
-    }),
-    columnHelper.display({
-      id: receivingColumns.QUANTITY_RECEIVING,
-      header: () => (
-        <TableHeaderCell
-          tooltip
-          tooltipLabel={translate('react.receiving.receivingNow.label', 'Receiving now')}
-        >
-          {translate('react.receiving.receivingNow.label', 'Receiving Now')}
-        </TableHeaderCell>
-      ),
-      cell: ({ row, table }) => (
-        <QuantityInputCell
-          defaultValue={getItem(row, table)?.quantityReceiving}
-          label="react.receiving.receivingNow.label"
-          defaultLabel="Receiving Now"
-        />
-      ),
-      size: 100,
-    }),
-    columnHelper.display({
-      id: receivingColumns.QUANTITY_REMAINING,
-      header: () => (
-        <TableHeaderCell
-          tooltip
-          tooltipLabel={translate('react.receiving.remaining.label', 'Remaining')}
-        >
-          {translate('react.receiving.remaining.label', 'Remaining')}
-        </TableHeaderCell>
-      ),
-      cell: ({ row, table }) => {
-        const value = getItem(row, table)?.quantityRemaining;
-        return (
-          <ValueCell
-            value={value}
-            tooltipLabel={value?.toString()}
-            label="react.receiving.remaining.label"
-            defaultLabel="Remaining"
+        ),
+        size: 300,
+      }),
+      // In the packing list view, the pack level column is not needed
+      // because the parent group name is rendered on the separator rows.
+      ...(isPackingListView ? [] : [packLevelColumn]),
+      columnHelper.display({
+        id: receivingColumns.LOT_NUMBER,
+        header: () => (
+          <TableHeaderCell
+            tooltip
+            tooltipLabel={translate('react.receiving.lotSerialNo.label', 'Lot/Serial No.')}
+          >
+            {translate('react.receiving.lotSerialNo.short.label', 'Lot/SN')}
+          </TableHeaderCell>
+        ),
+        cell: ({ row, table }) => {
+          const value = getItem(row, table)?.lotNumber;
+          return (
+            <ValueCell
+              value={value}
+              tooltipLabel={value}
+              label="react.receiving.lotSerialNo.short.label"
+              defaultLabel="Lot/SN"
+              truncate
+            />
+          );
+        },
+        size: 100,
+      }),
+      columnHelper.display({
+        id: receivingColumns.EXPIRATION_DATE,
+        header: () => (
+          <TableHeaderCell
+            tooltip
+            tooltipLabel={translate('react.receiving.expirationDate.label', 'Expiration date')}
+          >
+            {translate('react.receiving.expirationDate.short.label', 'Exp Date')}
+          </TableHeaderCell>
+        ),
+        cell: ({ row, table }) => (
+          <ExpirationDateCell
+            value={getItem(row, table)?.expirationDate}
+            localeKey={currentLocale}
+            label="react.receiving.expirationDate.short.label"
+            defaultLabel="Exp Date"
           />
-        );
-      },
-      size: 80,
-    }),
-    columnHelper.display({
-      id: 'actions',
-      header: () => (
-        <TableHeaderCell>
-          {translate('react.receiving.actions.label', 'Actions')}
-        </TableHeaderCell>
-      ),
-      cell: () => <TableCell className="rt-td" />,
-      size: 60,
-    }),
-  ], [translate, currentLocale]);
+        ),
+        size: 100,
+      }),
+      columnHelper.display({
+        id: receivingColumns.RECIPIENT,
+        header: () => (
+          <TableHeaderCell
+            tooltip
+            tooltipLabel={translate('react.receiving.recipient.label', 'Recipient')}
+          >
+            {translate('react.receiving.recipient.label', 'Recipient')}
+          </TableHeaderCell>
+        ),
+        cell: ({ row, table }) => {
+          const recipient = getItem(row, table)?.recipient;
+          return (
+            <ValueCell
+              value={recipient?.name}
+              tooltipLabel={recipient?.name}
+              label="react.receiving.recipient.label"
+              defaultLabel="Recipient"
+              truncate
+            />
+          );
+        },
+        size: 100,
+      }),
+      columnHelper.display({
+        id: receivingColumns.QUANTITY_SHIPPED,
+        header: () => (
+          <TableHeaderCell
+            tooltip
+            tooltipLabel={translate('react.receiving.shipped.label', 'Shipped')}
+          >
+            {translate('react.receiving.shipped.label', 'Shipped')}
+          </TableHeaderCell>
+        ),
+        cell: ({ row, table }) => {
+          const value = getItem(row, table)?.quantityShipped;
+          return (
+            <ValueCell
+              value={value}
+              tooltipLabel={value?.toString()}
+              label="react.receiving.shipped.label"
+              defaultLabel="Shipped"
+            />
+          );
+        },
+        size: 80,
+      }),
+      columnHelper.display({
+        id: receivingColumns.QUANTITY_RECEIVING,
+        header: () => (
+          <TableHeaderCell
+            tooltip
+            tooltipLabel={translate('react.receiving.receivingNow.label', 'Receiving now')}
+          >
+            {translate('react.receiving.receivingNow.label', 'Receiving Now')}
+          </TableHeaderCell>
+        ),
+        cell: ({ row, table }) => (
+          <QuantityInputCell
+            defaultValue={getItem(row, table)?.quantityReceiving}
+            label="react.receiving.receivingNow.label"
+            defaultLabel="Receiving Now"
+          />
+        ),
+        size: 100,
+      }),
+      columnHelper.display({
+        id: receivingColumns.QUANTITY_REMAINING,
+        header: () => (
+          <TableHeaderCell
+            tooltip
+            tooltipLabel={translate('react.receiving.remaining.label', 'Remaining')}
+          >
+            {translate('react.receiving.remaining.label', 'Remaining')}
+          </TableHeaderCell>
+        ),
+        cell: ({ row, table }) => {
+          const value = getItem(row, table)?.quantityRemaining;
+          return (
+            <ValueCell
+              value={value}
+              tooltipLabel={value?.toString()}
+              label="react.receiving.remaining.label"
+              defaultLabel="Remaining"
+            />
+          );
+        },
+        size: 80,
+      }),
+      columnHelper.display({
+        id: 'actions',
+        header: () => (
+          <TableHeaderCell>
+            {translate('react.receiving.actions.label', 'Actions')}
+          </TableHeaderCell>
+        ),
+        cell: () => <TableCell className="rt-td" />,
+        size: 60,
+      }),
+    ];
+  }, [translate, currentLocale, isPackingListView]);
 
   return { columns };
 };

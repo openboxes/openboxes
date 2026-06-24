@@ -57,4 +57,18 @@
   .input-wrapper-error-message {
     min-height: unset !important;
   }
+
+  &__separator {
+    align-items: center;
+  }
+
+  .rt-tbody-v2 .rt-tr:not(.rt-tr-separator) &__pack-level-group .rt-td {
+    padding-left: 24px;
+  }
+
+  &__separator-label {
+    font-weight: 600;
+    color: var(--gray-700);
+    white-space: nowrap;
+  }
 }

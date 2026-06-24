@@ -2,6 +2,7 @@ const receivingColumns = {
   PRODUCT_CODE: 'productCode',
   PRODUCT: 'product',
   PACK_LEVEL: 'packLevel',
+  PACK_LEVEL_GROUP: 'packLevelGroup',
   LOT_NUMBER: 'lotNumber',
   EXPIRATION_DATE: 'expirationDate',
   RECIPIENT: 'recipient',

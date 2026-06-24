@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 
+import PropTypes from 'prop-types';
 import {
   RiArrowDownSLine,
   RiLogoutBoxRLine,
@@ -23,7 +24,7 @@ import AutosaveIndicator from 'utils/AutosaveIndicator';
  * Filters bar rendered above the receiving table. The filter (search and
  * receipt status) are rendered through FilterForm from the FilterFields config.
  */
-const ReceivingFilters = () => {
+const ReceivingFilters = ({ view, onViewChange }) => {
   const translate = useTranslate();
   // Add loading for filters section. Loading will display before the translations are fetched.
   // It fixes the issue of untranslated labels in the filters.
@@ -35,7 +36,11 @@ const ReceivingFilters = () => {
   return (
     <div className="receiving-filters">
       <div className="receiving-filters__row d-flex justify-content-between align-items-center">
-        <SlidingButtonGroup options={receivingViewOptions} defaultOption="table" />
+        <SlidingButtonGroup
+          options={receivingViewOptions}
+          defaultOption={view}
+          onChange={onViewChange}
+        />
         <div className="receiving-filters__autosave-slot">
           <AutosaveIndicator status={AutosaveStatus.SAVED} />
         </div>
@@ -94,6 +99,11 @@ const ReceivingFilters = () => {
       </div>
     </div>
   );
+};
+
+ReceivingFilters.propTypes = {
+  view: PropTypes.string.isRequired,
+  onViewChange: PropTypes.func.isRequired,
 };
 
 export default ReceivingFilters;
