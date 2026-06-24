@@ -134,7 +134,7 @@ class UrlMappings {
 
         "/api/products"(parseRequest: true) {
             controller = { "productApi" }
-            action = [GET: "list", POST: "save"]
+            action = [GET: "list", POST: "save", PUT: "upsert"]
         }
 
         "/api/products/search"(parseRequest: true) {
@@ -178,7 +178,13 @@ class UrlMappings {
 
         "/api/facilities/$facilityId/inventory-levels(.$format)?" {
             controller = "inventoryLevelApi"
-            action = [GET: "list"]
+            action = [GET: "list", PUT: "bulkUpsert"]
+        }
+
+        // identifier can contain slashes so wildcard ** used
+        "/api/facilities/$facilityId/inventory-levels/$identifier**" {
+            controller = "inventoryLevelApi"
+            action = [PUT: "upsert"]
         }
 
         "/api/facilities/$facilityId/inventory-items"(parseRequest: true) {

@@ -1185,6 +1185,12 @@ class ProductAvailabilityService {
         log.info "Updated ${results} product availability records for product ${product.productCode}"
     }
 
+    void updateProductAvailability(List<String> productIds) {
+        productIds?.unique()?.each { String productId ->
+            updateProductAvailability(Product.get(productId))
+        }
+    }
+
 
     /**
      *

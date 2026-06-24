@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="druchniewicz" id="170620261200-0">
+        <comment>Normalize blank inventory level identifiers to NULL so they don't collide under the unique constraint</comment>
+        <sql>UPDATE inventory_level SET identifier = NULL WHERE identifier IS NOT NULL AND TRIM(identifier) = ''</sql>
+    </changeSet>
+
+    <changeSet author="druchniewicz" id="170620261200-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM (
+                        SELECT identifier FROM inventory_level
+                        WHERE identifier IS NOT NULL
+                        GROUP BY identifier
+                        HAVING COUNT(*) > 1
+                    ) duplicates
+                </sqlCheck>
+            </not>
+        </preConditions>
+        <comment>Resolve existing duplicate (non-null) identifiers before adding the unique constraint, so the migration doesn't fail on databases that still have duplicates</comment>
+        <sql>
+            UPDATE inventory_level original_level
+            JOIN (
+                SELECT id, ROW_NUMBER() OVER (PARTITION BY identifier ORDER BY id) AS row_number_within_duplicate_group
+                FROM inventory_level
+                WHERE identifier IS NOT NULL
+            ) level_with_row_numbers ON original_level.id = level_with_row_numbers.id
+            SET original_level.identifier = CONCAT(
+                original_level.identifier, '-',
+                LPAD(FLOOR(RAND() * 1000), 3, '0'),
+                CHAR(65 + FLOOR(RAND() * 26)),
+                CHAR(65 + FLOOR(RAND() * 26)),
+                CHAR(65 + FLOOR(RAND() * 26))
+            )
+            WHERE level_with_row_numbers.row_number_within_duplicate_group > 1
+        </sql>
+    </changeSet>
+
+    <changeSet author="druchniewicz" id="170620261200-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="uc_inventory_level_identifier"/>
+            </not>
+        </preConditions>
+        <addUniqueConstraint tableName="inventory_level"
+                             columnNames="identifier"
+                             constraintName="uc_inventory_level_identifier"/>
+    </changeSet>
+
+</databaseChangeLog>

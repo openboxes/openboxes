@@ -10,10 +10,12 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import grails.gorm.transactions.Transactional
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import grails.validation.ValidationException
+import org.grails.web.json.JSONArray
+import grails.gorm.transactions.NotTransactional
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
@@ -40,6 +42,7 @@ class ProductApiController extends BaseDomainApiController {
     def forecastingService
     GrailsApplication grailsApplication
     def productAvailabilityService
+    def inventorySnapshotService
 
     def list() {
         boolean includeInactive = params.boolean('includeInactive') ?: false
@@ -334,6 +337,47 @@ class ProductApiController extends BaseDomainApiController {
         //sendProductCreatedNotification(product)
 
         render([product: product.toFullJson()] as JSON)
+    }
+
+    // @NotTransactional to avoid two open sessions with the per-item withNewTransaction
+    @NotTransactional
+    def upsert() {
+        def json = request.JSON
+        if (json instanceof JSONArray) {
+            bulkUpsert((JSONArray) json)
+            return
+        }
+        Product product = Product.findByIdOrProductCode(json.id, json.productCode) ?: new Product()
+        bindData(product, json)
+        save(product)
+    }
+
+    private void bulkUpsert(JSONArray jsonObjects) {
+        boolean deferRefresh = params.boolean('deferRefresh', false)
+        List<UpsertResult> results = productService.bulkUpsert(jsonObjects, deferRefresh)
+
+        List<String> productIds = results.findAll { it.status == UpsertStatus.OK && it.productId }*.productId.unique()
+
+        if (deferRefresh && productIds) {
+            productAvailabilityService.updateProductAvailability(productIds)
+            inventorySnapshotService.updateInventorySnapshots(productIds)
+        }
+
+        render([
+            data    : results,
+            metadata: [
+                bulk: [
+                    total  : results.size(),
+                    created: results.count { it.action == UpsertAction.CREATED },
+                    updated: results.count { it.action == UpsertAction.UPDATED },
+                    errors : results.count { it.status == UpsertStatus.ERROR },
+                    refresh: [
+                        deferred         : deferRefresh,
+                        refreshedProducts: deferRefresh ? productIds : null
+                    ]
+                ]
+            ]
+        ] as JSON)
     }
 
     def importCsv() {

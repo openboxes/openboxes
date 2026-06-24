@@ -22,6 +22,7 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.reporting.TransactionFact
+import org.pih.warehouse.jobs.RefreshInventorySnapshotJob
 import org.pih.warehouse.LocalizationUtil
 
 import java.text.DateFormat
@@ -36,6 +37,14 @@ class InventorySnapshotService {
     def locationService
     def productAvailabilityService
     def persistenceInterceptor
+
+    def triggerRefreshInventorySnapshot(String locationId, List<String> productIds, Boolean forceRefresh) {
+        productIds?.unique()?.each { String productId ->
+            log.info "Triggering refresh inventory snapshot for location ${locationId}, product ${productId}"
+            RefreshInventorySnapshotJob.schedule(new Date(),
+                [locationId: locationId, productId: productId, forceRefresh: forceRefresh])
+        }
+    }
 
     def populateInventorySnapshots(Date date) {
         populateInventorySnapshots(date, false)
@@ -424,5 +433,11 @@ class InventorySnapshotService {
                 ]
         )
         log.info "Updated ${results} inventory snapshots for product ${product}"
+    }
+
+    void updateInventorySnapshots(List<String> productIds) {
+        productIds?.unique()?.each { String productId ->
+            updateInventorySnapshots(Product.get(productId))
+        }
     }
 }
