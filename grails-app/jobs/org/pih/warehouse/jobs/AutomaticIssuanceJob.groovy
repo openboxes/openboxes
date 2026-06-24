@@ -15,14 +15,16 @@ class AutomaticIssuanceJob {
 
     def sessionRequired = false
 
+    static concurrent = false
+
     static triggers = {
         cron name: JobUtils.getCronName(AutomaticIssuanceJob),
                 cronExpression: JobUtils.getCronExpression(AutomaticIssuanceJob)
     }
 
     def execute(JobExecutionContext context) {
-        if (!Holders.config.openboxes.jobs.automaticIssuanceJob.enabled) {
-            log.info "AutomaticIssuanceJob job is disabled"
+        if (!JobUtils.shouldExecute(AutomaticIssuanceJob)) {
+            log.info "Automatic Issuance job is disabled"
             return
         }
 

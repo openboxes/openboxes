@@ -32,7 +32,6 @@ import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.SendRequisitionNotificationEvent
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.WebhookEventType
-import org.pih.warehouse.core.WebhookPublisherService
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
@@ -51,7 +50,6 @@ class RequisitionService {
     AuthService authService
     RequisitionIdentifierService requisitionIdentifierService
     def inventoryService
-    WebhookPublisherService webhookPublisherService
 
     def getRequisitionStatistics(Location destination, Location origin, User user) {
         return getRequisitionStatistics(destination, origin, user, null, null)
