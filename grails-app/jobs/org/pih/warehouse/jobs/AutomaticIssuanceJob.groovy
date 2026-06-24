@@ -3,10 +3,9 @@ package org.pih.warehouse.jobs
 import grails.util.Holders
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.DeliveryTypeCode
-import org.pih.warehouse.core.LocationTypeCode
+import org.pih.warehouse.core.OrderTypeCode
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionStatus
 import org.quartz.JobExecutionContext
 
 class AutomaticIssuanceJob {
@@ -29,54 +28,34 @@ class AutomaticIssuanceJob {
 
         String requisitionId = context.mergedJobDataMap.get('requisitionId')
         if (requisitionId) {
-            Requisition requisition = Requisition.get(requisitionId)
-            if (!requisition) {
-                log.warn("Requisition ${requisitionId} not found, skipping")
-                return
-            }
-            issueRequisition(requisition)
+            issueRequisition(requisitionId)
         } else {
-            // Only auto-issue outbound requisitions, i.e. those fulfilled from an internal inventory
-            // location. Inbound requisitions are fulfilled from a SUPPLIER location (purchasing/receiving)
-            // and must not be issued here.
-            List<Requisition> requisitions = Requisition.createCriteria().list {
-                eq("isTemplate", Boolean.FALSE)
-                eq("status", RequisitionStatus.STAGED)
-                origin {
-                    locationType {
-                        ne("locationTypeCode", LocationTypeCode.SUPPLIER)
-                    }
+            List<String> requisitionIds = stockMovementService.findStagedRequisitionIds()
+            log.info "Found ${requisitionIds.size()} outbound STAGED requisitions to automatic issue"
+
+            requisitionIds.each { String id ->
+                try {
+                    issueRequisition(id)
+                } catch (Exception e) {
+                    // Don't let one failing requisition stop the rest of the batch.
+                    log.error("Error issuing requisition ${id}", e)
                 }
-            }
-
-            log.info "Found ${requisitions.size()} outbound STAGED requisitions to issue"
-
-            requisitions.each { Requisition requisition ->
-                issueRequisition(requisition)
             }
         }
     }
 
-    void issueRequisition(Requisition requisition) {
+    void issueRequisition(String id) {
         authService.withSystemUser {
-            switch (requisition.deliveryTypeCode) {
-                case DeliveryTypeCode.LOCAL_DELIVERY:
-                case DeliveryTypeCode.SHIP_TO:
-                case DeliveryTypeCode.STOCK_TRANSFER_IBT:
-                    try {
-                        log.info "Issuing requisition ${requisition.requestNumber} (${requisition.deliveryTypeCode})"
-                        stockMovementService.issueRequisition(requisition)
-                    } catch (Exception e) {
-                        // Don't let one failing requisition stop the rest of the batch.
-                        log.error("Error issuing requisition ${requisition.requestNumber}", e)
-                    }
-                    break
-                case DeliveryTypeCode.PICK_UP:
-                case DeliveryTypeCode.WILL_CALL:
-                case DeliveryTypeCode.SERVICE:
-                case DeliveryTypeCode.DEFAULT:
-                    // no handling for now
-                    break
+            Requisition requisition = Requisition.get(id)
+            if (!requisition) {
+                log.warn("Requisition ${id} not found, skipping")
+                return
+            }
+
+            if (requisition.deliveryTypeCode in [DeliveryTypeCode.PICK_UP, DeliveryTypeCode.LOCAL_DELIVERY, DeliveryTypeCode.WILL_CALL, DeliveryTypeCode.SHIP_TO, DeliveryTypeCode.DEFAULT]
+                || requisition.orderTypeCode in [OrderTypeCode.SERVICE_ORDER, OrderTypeCode.TRANSFER_ORDER, OrderTypeCode.SALES_ORDER]) {
+                log.info "Automatic issuing requisition ${requisition.requestNumber} (${requisition.deliveryTypeCode})"
+                stockMovementService.issueRequisition(requisition)
             }
         }
     }
