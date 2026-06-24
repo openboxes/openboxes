@@ -9,7 +9,7 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.quartz.JobExecutionContext
 
-class AutoissuanceJob {
+class AutomaticIssuanceJob {
 
     StockMovementService stockMovementService
     AuthService authService
@@ -17,13 +17,13 @@ class AutoissuanceJob {
     def sessionRequired = false
 
     static triggers = {
-        cron name: JobUtils.getCronName(AutoissuanceJob),
-                cronExpression: JobUtils.getCronExpression(AutoissuanceJob)
+        cron name: JobUtils.getCronName(AutomaticIssuanceJob),
+                cronExpression: JobUtils.getCronExpression(AutomaticIssuanceJob)
     }
 
     def execute(JobExecutionContext context) {
-        if (!Holders.config.openboxes.jobs.autoissuanceJob.enabled) {
-            log.info "Autoissuance job is disabled"
+        if (!Holders.config.openboxes.jobs.automaticIssuanceJob.enabled) {
+            log.info "AutomaticIssuanceJob job is disabled"
             return
         }
 
