@@ -55,7 +55,7 @@ class AutomaticIssuanceJob {
             if (requisition.deliveryTypeCode in [DeliveryTypeCode.PICK_UP, DeliveryTypeCode.LOCAL_DELIVERY, DeliveryTypeCode.WILL_CALL, DeliveryTypeCode.SHIP_TO, DeliveryTypeCode.DEFAULT]
                 || requisition.orderTypeCode in [OrderTypeCode.SERVICE_ORDER, OrderTypeCode.TRANSFER_ORDER, OrderTypeCode.SALES_ORDER]) {
                 log.info "Automatic issuing requisition ${requisition.requestNumber} (${requisition.deliveryTypeCode})"
-                stockMovementService.issueRequisition(requisition)
+                stockMovementService.createShipment(requisition)
             }
         }
     }
