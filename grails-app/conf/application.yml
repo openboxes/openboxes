@@ -567,6 +567,9 @@ openboxes:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes
             delayInMilliseconds: 1000
+            notFoundRetryDelayInMilliseconds: 2000
+            notFoundMaxRetries: 5
+            bulkRequisitionAutoAllocation: true
 
         # should only be triggered by persistence event listener
         putawayLocationReslottingJob:
