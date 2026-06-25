@@ -68,7 +68,7 @@ const ReceivingTable = ({
         virtualize={{
           enabled: true,
           minSize: 20,
-          estimateSize: 58,
+          estimateSize: 68,
           overscan: 10,
           // Rows vary in height (2-line product cell, separator rows), so let
           // the virtualizer measure each row instead of using a fixed height.

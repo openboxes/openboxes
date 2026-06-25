@@ -17,11 +17,6 @@ class ShipmentReceivingSummaryDto implements ResponseBodyFormattable {
     String pendingReceiptId
 
     /**
-     * True if the shipment comes from a purchase order.
-     */
-    boolean isShipmentFromPurchaseOrder
-
-    /**
      * A map of shipment item receiving summaries, keyed on shipment item id.
      *
      * Is a Map to make it convenient for the client in case it wants to rely on the shipmentItemsGrouped ordering.
@@ -39,7 +34,6 @@ class ShipmentReceivingSummaryDto implements ResponseBodyFormattable {
         return [
                 shipmentId: shipmentId,
                 pendingReceiptId: pendingReceiptId,
-                isShipmentFromPurchaseOrder: isShipmentFromPurchaseOrder,
                 shipmentItemSummaryById: shipmentItemSummaryById.collectEntries { [it.key, it.value.asResponseBody()] },
                 shipmentItemsGrouped: shipmentItemsGrouped.asResponseBody(),
         ]

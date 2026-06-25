@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import { useSelector } from 'react-redux';
-import { getCurrentLocale } from 'selectors';
+import { getCurrentLocale, getIsShipmentFromPurchaseOrder } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
@@ -24,11 +24,11 @@ import getReceivingRowActions from 'utils/receiving/getReceivingRowActions';
 const useReceivingColumns = ({
   view,
   putawayEnabled,
-  isShipmentFromPurchaseOrder,
 } = {}) => {
   const translate = useTranslate();
   const columnHelper = createColumnHelper();
   const currentLocale = useSelector(getCurrentLocale);
+  const isShipmentFromPurchaseOrder = useSelector(getIsShipmentFromPurchaseOrder);
   const isPackingListView = view === ReceivingView.PACKING_LIST;
 
   // Rows are { id, meta } objects; the entities live in the normalized state
@@ -108,7 +108,11 @@ const useReceivingColumns = ({
         // Light indent on item rows in packing list view.
         getCellContext: () => ({ className: 'receiving-table__pack-level-group' }),
         renderSeparator: ({ row }) => (
-          <TableCell className="rt-td receiving-table__separator">
+          <TableCell
+            className="rt-td receiving-table__separator"
+            customTooltip
+            tooltipLabel={row.original.name}
+          >
             <span className={`receiving-table__separator-label ${putawayEnabled ? 'py-0' : ''}`}>
               {row.original.name}
             </span>
@@ -161,7 +165,7 @@ const useReceivingColumns = ({
             value={getItem(row, table)?.product?.name}
             label="react.receiving.product.label"
             defaultLabel="Product"
-            maxLines={3}
+            maxLines={2}
           />
         ),
         size: 280,

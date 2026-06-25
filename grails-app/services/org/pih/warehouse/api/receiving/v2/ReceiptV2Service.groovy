@@ -176,7 +176,6 @@ class ReceiptV2Service {
         ShipmentReceivingSummaryDto shipmentSummary = new ShipmentReceivingSummaryDto(
                 shipmentId: shipment.id,
                 pendingReceiptId: currentReceiptId,
-                isShipmentFromPurchaseOrder: shipment.isFromPurchaseOrder,
         )
 
         // Build the summary for each shipment item.

@@ -60,7 +60,8 @@ const DataTable = ({
 
   const shouldDisplayPagination = Boolean(data?.length && !loading) && !disablePagination;
 
-  const isScreenWiderThanTable = useWindowWidthCheck(table.getTotalSize());
+  const tableWidth = table.getTotalSize();
+  const isScreenWiderThanTable = useWindowWidthCheck(tableWidth);
 
   return (
     <div className="app-react-table-wrapper table-v2">
@@ -81,6 +82,7 @@ const DataTable = ({
             loading={loading}
             rowModel={table.getRowModel()}
             dataLength={totalCount}
+            tableWidth={tableWidth}
             tableWithPinnedColumns={tableWithPinnedColumns}
             isScreenWiderThanTable={isScreenWiderThanTable}
             overflowVisible={overflowVisible}

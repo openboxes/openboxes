@@ -12,9 +12,8 @@ const useReceivingForm = () => {
     loading,
     lineItemsState,
     updateLineItem,
-    isShipmentFromPurchaseOrder,
   } = useReceivingActions(view);
-  const { columns } = useReceivingColumns({ view, putawayEnabled, isShipmentFromPurchaseOrder });
+  const { columns } = useReceivingColumns({ view, putawayEnabled });
   const commentModal = useCommentModal();
   return {
     view,

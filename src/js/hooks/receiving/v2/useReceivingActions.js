@@ -25,7 +25,6 @@ const buildSeparatorRow = (name) => ({ isSeparator: true, id: `separator-${name}
 const useReceivingActions = (view) => {
   const [loading, setLoading] = useState(false);
   const [lineItemsState, setLineItemsState] = useState(createNormalizedState());
-  const [isShipmentFromPurchaseOrder, setIsShipmentFromPurchaseOrder] = useState(false);
   const { shipmentId } = useParams();
   const dispatch = useDispatch();
   const users = useSelector(getUsers);
@@ -124,7 +123,6 @@ const useReceivingActions = (view) => {
       if (!summary?.pendingReceiptId) {
         await receivingApi.startReceipt(shipmentId);
       }
-      setIsShipmentFromPurchaseOrder(Boolean(summary?.isShipmentFromPurchaseOrder));
       setLineItemsState(transformSummary(summary, view));
     } finally {
       setLoading(false);
@@ -152,7 +150,6 @@ const useReceivingActions = (view) => {
     loading,
     lineItemsState,
     updateLineItem,
-    isShipmentFromPurchaseOrder,
   };
 };
 
