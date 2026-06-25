@@ -1,6 +1,5 @@
 package org.pih.warehouse.jobs
 
-import grails.util.Holders
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.OrderTypeCode

@@ -2,7 +2,6 @@ package org.pih.warehouse.picking
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
-import grails.util.Holders
 import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.CriteriaSpecification
@@ -25,7 +24,6 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionAction
 import org.pih.warehouse.inventory.TransactionSource
 import org.pih.warehouse.inventory.TransferStockCommand
-import org.pih.warehouse.jobs.AutomaticIssuanceJob
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.picklist.PicklistService
@@ -356,7 +354,7 @@ class PickTaskService {
             boolean backordered = requisition.requisitionItems?.any { it.isBackordered() }
             if (allTasksStaged && (!partialAllocation || !backordered)) {
                 requisition.status = RequisitionStatus.STAGED
-                Holders.grailsApplication.mainContext.publishEvent(new SendRequisitionNotificationEvent(task.requisition.id, WebhookEventType.REQUISITION_STAGED))
+                grailsApplication.mainContext.publishEvent(new SendRequisitionNotificationEvent(task.requisition.id, WebhookEventType.REQUISITION_STAGED))
 
                 if (!requisition.shipment) {
                     StockMovement stockMovement = StockMovement.createFromRequisition(requisition)

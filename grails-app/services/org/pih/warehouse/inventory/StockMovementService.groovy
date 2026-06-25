@@ -3082,7 +3082,7 @@ class StockMovementService {
     Shipment createShipment(StockMovement stockMovement) {
         log.info "create shipment " + (new JSONObject(stockMovement.toBaseJson())).toString(4)
 
-        Shipment shipment = shipmentService.createShipment(stockMovement.requisition)
+        Shipment shipment = createShipment(stockMovement.requisition)
 
         return shipment
     }
@@ -3112,7 +3112,7 @@ class StockMovementService {
         // Set default shipment type so we can save to the database without user input
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
 
-        shipment.name = StockMovementUtil.generateStockMovementName(requisition)
+        shipment.name = StockMovementUtil.generateStockMovementName(requisition, null)
 
         if (shipment.hasErrors() || !shipment.save(flush: true)) {
             throw new ValidationException("Invalid shipment", shipment.errors)
