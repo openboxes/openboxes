@@ -39,6 +39,14 @@
 }
 
 .receiving-table {
+  // The virtualizer measures `.rt-tbody-v2` (its scroll container) to decide
+  // how many rows to render. It must be height-bounded and scrollable, otherwise
+  // the body grows to full content height and every row gets rendered.
+  .rt-tbody-v2 {
+    max-height: 600px;
+    overflow-y: auto;
+  }
+
   .rt-td {
     display: flex;
     align-items: center;
