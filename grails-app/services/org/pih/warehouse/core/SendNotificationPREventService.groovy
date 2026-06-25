@@ -1,10 +1,12 @@
 package org.pih.warehouse.core
 
+import grails.core.GrailsApplication
 import org.pih.warehouse.jobs.AutomaticIssuanceJob
 import org.pih.warehouse.requisition.Requisition
 import org.springframework.context.ApplicationListener
 
 class SendRequisitionNotificationEventService implements ApplicationListener<SendRequisitionNotificationEvent> {
+    GrailsApplication grailsApplication
     WebhookPublisherService webhookPublisherService
 
     @Override
@@ -16,9 +18,10 @@ class SendRequisitionNotificationEventService implements ApplicationListener<Sen
             return
         }
 
-        switch(event.eventType) {
+        switch (event.eventType) {
             case WebhookEventType.REQUISITION_STAGED:
-                def delayInMilliseconds = Integer.valueOf(grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds) + 1000 ?: 1000
+                // workaround to delay AutomaticIssuanceJob 1 second after RefreshProductAvailabilityJob; it needs product refresh to complete first
+                def delayInMilliseconds = Integer.valueOf(grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds) + 1000 ?: 0
                 Date runAt = new Date(System.currentTimeMillis() + delayInMilliseconds)
                 log.info "Triggering automaticIssuanceJob job with ${delayInMilliseconds} ms delay"
                 AutomaticIssuanceJob.schedule(runAt)

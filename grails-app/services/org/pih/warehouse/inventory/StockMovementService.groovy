@@ -3095,7 +3095,7 @@ class StockMovementService {
         if (!shipment) {
             shipment = new Shipment()
         } else {
-            stockMovementService.createMissingShipmentItems(requisition, shipment)
+            createMissingShipmentItems(requisition, shipment)
             return shipment
         }
 
