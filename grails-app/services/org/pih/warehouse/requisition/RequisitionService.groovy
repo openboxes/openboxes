@@ -1173,4 +1173,15 @@ class RequisitionService {
             }
         }
     }
+
+    List<String> findStagedRequisitionIds() {
+        List<String> requisitions = Requisition.createCriteria().list {
+            projections {
+                property("id")
+            }
+            eq("isTemplate", Boolean.FALSE)
+            eq("status", RequisitionStatus.STAGED)
+        }
+        return requisitions
+    }
 }

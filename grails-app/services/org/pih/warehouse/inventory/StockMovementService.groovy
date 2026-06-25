@@ -3946,16 +3946,6 @@ class StockMovementService {
         return stockMovement
     }
 
-    List<String> findStagedRequisitionIds() {
-        List<Requisition> requisitions = Requisition.createCriteria().list {
-            projections {
-                property("id")
-            }
-            eq("isTemplate", Boolean.FALSE)
-            eq("status", RequisitionStatus.STAGED)
-        }
-    }
-
     private void disconnectOrderItemsFromReceipts(List<String> receiptIds) {
         receiptIds.each { receiptId ->
             def orderItems = OrderItem.executeQuery(

@@ -6,11 +6,13 @@ import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.OrderTypeCode
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionService
 import org.quartz.JobExecutionContext
 
 class AutomaticIssuanceJob {
 
     StockMovementService stockMovementService
+    RequisitionService requisitionService
     AuthService authService
 
     def sessionRequired = false
@@ -35,7 +37,7 @@ class AutomaticIssuanceJob {
         }
 
         if (Holders.config.openboxes.jobs.automaticIssuanceJob.bulkAutomaticIssuance) {
-            List<String> requisitionIds = stockMovementService.findStagedRequisitionIds()
+            List<String> requisitionIds = requisitionService.findStagedRequisitionIds()
             log.info "Found ${requisitionIds.size()} outbound STAGED requisitions to automatic issue"
 
             requisitionIds.each { String id ->
