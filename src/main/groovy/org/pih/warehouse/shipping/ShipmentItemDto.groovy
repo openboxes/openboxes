@@ -14,6 +14,8 @@ class ShipmentItemDto implements ResponseBodyFormattable {
     String recipientId
     String donorId
     ContainerSimpleDto container
+    String unitOfMeasure
+    BigDecimal packSize
     Date dateCreated
     Date lastUpdated
 
@@ -28,6 +30,8 @@ class ShipmentItemDto implements ResponseBodyFormattable {
                 recipientId: shipmentItem.recipient?.id,
                 donorId: shipmentItem.donorId,
                 container: ContainerSimpleDto.from(shipmentItem.container),
+                unitOfMeasure: shipmentItem.unitOfMeasure,
+                packSize: shipmentItem.packSize,
                 dateCreated: shipmentItem.dateCreated,
                 lastUpdated: shipmentItem.lastUpdated,
         )
@@ -45,6 +49,8 @@ class ShipmentItemDto implements ResponseBodyFormattable {
                 recipientId: recipientId,
                 donorId: donorId,
                 container: container?.asResponseBody(),
+                unitOfMeasure: unitOfMeasure,
+                packSize: packSize,
                 dateCreated: dateCreated,
                 lastUpdated: lastUpdated,
         ]

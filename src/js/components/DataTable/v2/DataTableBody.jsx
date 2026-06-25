@@ -36,6 +36,7 @@ const DataTableBody = ({
   loading,
   rowModel,
   dataLength,
+  tableWidth,
   tableWithPinnedColumns,
   isScreenWiderThanTable,
   virtualize,
@@ -72,12 +73,18 @@ const DataTableBody = ({
     ? rowVirtualizer.getVirtualItems()
     : rowModel.rows;
 
+  // Virtualized rows are absolutely positioned, so they don't expand a `fit-content` body and it
+  // collapses. Use the explicit table width in that case.
+  const horizontalScrollWidth = isVirtualizationEnabled ? `${tableWidth}px` : 'fit-content';
+
   return (
     <div
       ref={parentRef}
       className="rt-tbody-v2"
       style={{
-        width: (!isScreenWiderThanTable && tableWithPinnedColumns && dataLength && !loading) ? 'fit-content' : undefined,
+        width: (!isScreenWiderThanTable && tableWithPinnedColumns && dataLength && !loading)
+          ? horizontalScrollWidth
+          : undefined,
       }}
     >
       <DataTableStatus
@@ -138,7 +145,7 @@ const DataTableBody = ({
                   role="rowgroup"
                   {...rowProps}
                 >
-                  <TableRow key={rowData.id} className={`rt-tr ${isRowDisabled && 'bg-light'} ${isSeparator ? 'rt-tr-separator' : ''}`}>
+                  <TableRow key={rowData.id} className={`rt-tr ${isRowDisabled ? 'bg-light disabled' : ''} ${isSeparator ? 'rt-tr-separator' : ''}`}>
                     {rowData.getVisibleCells().map((cell) => {
                       const { hide, flexWidth, className } = useTableColumnMeta(cell.column);
                       if (hide) {
@@ -155,6 +162,7 @@ const DataTableBody = ({
                               isScreenWiderThanTable,
                               dataLength,
                               loading,
+                              isRowDisabled,
                             ),
                           }}
                           key={cell.id}
@@ -200,6 +208,7 @@ DataTableBody.propTypes = {
     ).isRequired,
   }).isRequired,
   dataLength: PropTypes.number.isRequired,
+  tableWidth: PropTypes.number.isRequired,
   tableWithPinnedColumns: PropTypes.bool,
   isScreenWiderThanTable: PropTypes.bool.isRequired,
   virtualize: PropTypes.shape({

@@ -24,7 +24,9 @@ import AutosaveIndicator from 'utils/AutosaveIndicator';
  * Filters bar rendered above the receiving table. The filter (search and
  * receipt status) are rendered through FilterForm from the FilterFields config.
  */
-const ReceivingFilters = ({ view, onViewChange }) => {
+const ReceivingFilters = ({
+  view, onViewChange, putawayEnabled, onPutawayChange,
+}) => {
   const translate = useTranslate();
   // Add loading for filters section. Loading will display before the translations are fetched.
   // It fixes the issue of untranslated labels in the filters.
@@ -59,6 +61,8 @@ const ReceivingFilters = ({ view, onViewChange }) => {
       <div className="receiving-filters__row receiving-filters__actions d-flex flex-wrap justify-content-end align-items-center">
         <Switch
           className="receiving-filters__switch"
+          value={putawayEnabled}
+          onChange={onPutawayChange}
           titles={{
             checked: {
               id: 'react.receiving.enablePutaway.label',
@@ -104,6 +108,8 @@ const ReceivingFilters = ({ view, onViewChange }) => {
 ReceivingFilters.propTypes = {
   view: PropTypes.string.isRequired,
   onViewChange: PropTypes.func.isRequired,
+  putawayEnabled: PropTypes.bool.isRequired,
+  onPutawayChange: PropTypes.func.isRequired,
 };
 
 export default ReceivingFilters;

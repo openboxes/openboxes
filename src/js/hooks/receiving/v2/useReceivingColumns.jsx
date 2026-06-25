@@ -2,28 +2,60 @@ import React, { useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import { useSelector } from 'react-redux';
-import { getCurrentLocale } from 'selectors';
+import { getCurrentLocale, getIsShipmentFromPurchaseOrder } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
+import LocationAutofillHeader from 'components/receivingV2/LocationAutofillHeader';
 import receivingColumns from 'consts/receivingColumns';
+import receivingLocationOptions from 'consts/receivingLocationOptions';
 import { ReceivingView } from 'consts/receivingViewOptions';
 import useTranslate from 'hooks/useTranslate';
+import ActionsCell from 'utils/cells/ActionsCell';
 import ExpirationDateCell from 'utils/cells/ExpirationDateCell';
 import MultilineCell from 'utils/cells/MultilineCell';
 import PackLevelCell from 'utils/cells/PackLevelCell';
 import QuantityInputCell from 'utils/cells/QuantityInputCell';
+import ShippedInPoCell from 'utils/cells/receiving/ShippedInPoCell';
+import SelectCell from 'utils/cells/SelectCell';
 import ValueCell from 'utils/cells/ValueCell';
+import getReceivingRowActions from 'utils/receiving/getReceivingRowActions';
 
-const useReceivingColumns = (view) => {
+const useReceivingColumns = ({
+  view,
+  putawayEnabled,
+} = {}) => {
   const translate = useTranslate();
   const columnHelper = createColumnHelper();
   const currentLocale = useSelector(getCurrentLocale);
+  const isShipmentFromPurchaseOrder = useSelector(getIsShipmentFromPurchaseOrder);
   const isPackingListView = view === ReceivingView.PACKING_LIST;
 
-  // Rows are line item ids; the entities live in the normalized state passed
-  // through the table `meta`, so each cell reads its item by id at render time.
-  const getItem = (row, table) => table.options.meta?.entities?.[row.original];
+  // Rows are { id, meta } objects; the entities live in the normalized state
+  // passed through the table `meta`, so each cell reads its item by id at render
+  // time. The row `meta` drives row-level greying/disabling of fully received lines.
+  const getItem = (row, table) => table.options.meta?.entities?.[row.original.id];
+
+  const getStatus = (quantityRemaining) => {
+    if (quantityRemaining < 0) {
+      return {
+        className: 'status-cell status-cell--over',
+        value: translate('react.receiving.status.over.label', `${quantityRemaining} over`, [quantityRemaining]),
+      };
+    }
+    if (quantityRemaining === 0) {
+      return {
+        className: 'status-cell status-cell--completed',
+        value: translate('react.receiving.status.completed.label', 'Complete'),
+      };
+    }
+    // TODO (OBPIH-7864): show the remaining status only once something has been
+    // entered in the input or already saved for the row.
+    return {
+      className: 'status-cell',
+      value: translate('react.receiving.status.remaining.label', `${quantityRemaining} remaining`, [quantityRemaining]),
+    };
+  };
 
   const columns = useMemo(() => {
     const packLevelHeader = () => (
@@ -52,7 +84,7 @@ const useReceivingColumns = (view) => {
           />
         );
       },
-      size: 100,
+      size: 120,
     });
 
     // Leftmost column in packing list view: the item's own pack level.
@@ -76,8 +108,14 @@ const useReceivingColumns = (view) => {
         // Light indent on item rows in packing list view.
         getCellContext: () => ({ className: 'receiving-table__pack-level-group' }),
         renderSeparator: ({ row }) => (
-          <TableCell className="rt-td receiving-table__separator">
-            <span className="receiving-table__separator-label">{row.original.name}</span>
+          <TableCell
+            className="rt-td receiving-table__separator"
+            customTooltip
+            tooltipLabel={row.original.name}
+          >
+            <span className={`receiving-table__separator-label ${putawayEnabled ? 'py-0' : ''}`}>
+              {row.original.name}
+            </span>
           </TableCell>
         ),
       },
@@ -110,7 +148,7 @@ const useReceivingColumns = (view) => {
             />
           );
         },
-        size: 60,
+        size: 85,
       }),
       columnHelper.display({
         id: receivingColumns.PRODUCT,
@@ -127,9 +165,10 @@ const useReceivingColumns = (view) => {
             value={getItem(row, table)?.product?.name}
             label="react.receiving.product.label"
             defaultLabel="Product"
+            maxLines={2}
           />
         ),
-        size: 300,
+        size: 280,
       }),
       // In the packing list view, the pack level column is not needed
       // because the parent group name is rendered on the separator rows.
@@ -156,7 +195,7 @@ const useReceivingColumns = (view) => {
             />
           );
         },
-        size: 100,
+        size: 120,
       }),
       columnHelper.display({
         id: receivingColumns.EXPIRATION_DATE,
@@ -174,6 +213,7 @@ const useReceivingColumns = (view) => {
             localeKey={currentLocale}
             label="react.receiving.expirationDate.short.label"
             defaultLabel="Exp Date"
+            showExpiryStatus
           />
         ),
         size: 100,
@@ -200,18 +240,51 @@ const useReceivingColumns = (view) => {
             />
           );
         },
-        size: 100,
+        size: 120,
       }),
+      // When receiving against a purchase order, an extra column shows the shipped
+      // quantity in the PO's unit of measure (packs) before the per-each quantity.
+      ...(isShipmentFromPurchaseOrder ? [
+        columnHelper.display({
+          id: receivingColumns.QUANTITY_SHIPPED_IN_PO,
+          header: () => (
+            <TableHeaderCell
+              tooltip
+              tooltipLabel={translate('react.receiving.shippedInPo.label', 'Shipped (in PO UoM)')}
+            >
+              {translate('react.receiving.shippedInPo.label', 'Shipped (in PO UoM)')}
+            </TableHeaderCell>
+          ),
+          cell: ({ row, table }) => {
+            const { quantityShipped, packSize, unitOfMeasure } = getItem(row, table) || {};
+            const packs = packSize
+              ? Math.round((quantityShipped / packSize) * 100) / 100
+              : quantityShipped;
+            return (
+              <ShippedInPoCell
+                packs={packs}
+                unitOfMeasure={unitOfMeasure}
+                label="react.receiving.shippedInPo.label"
+                defaultLabel="Shipped (in PO UoM)"
+              />
+            );
+          },
+          size: 120,
+        }),
+      ] : []),
       columnHelper.display({
         id: receivingColumns.QUANTITY_SHIPPED,
-        header: () => (
-          <TableHeaderCell
-            tooltip
-            tooltipLabel={translate('react.receiving.shipped.label', 'Shipped')}
-          >
-            {translate('react.receiving.shipped.label', 'Shipped')}
-          </TableHeaderCell>
-        ),
+        header: () => {
+          const labelKey = isShipmentFromPurchaseOrder
+            ? 'react.receiving.shippedEach.label'
+            : 'react.receiving.shipped.label';
+          const defaultLabel = isShipmentFromPurchaseOrder ? 'Shipped (each)' : 'Shipped';
+          return (
+            <TableHeaderCell tooltip tooltipLabel={translate(labelKey, defaultLabel)}>
+              {translate(labelKey, defaultLabel)}
+            </TableHeaderCell>
+          );
+        },
         cell: ({ row, table }) => {
           const value = getItem(row, table)?.quantityShipped;
           return (
@@ -223,7 +296,7 @@ const useReceivingColumns = (view) => {
             />
           );
         },
-        size: 80,
+        size: 100,
       }),
       columnHelper.display({
         id: receivingColumns.QUANTITY_RECEIVING,
@@ -235,38 +308,69 @@ const useReceivingColumns = (view) => {
             {translate('react.receiving.receivingNow.label', 'Receiving Now')}
           </TableHeaderCell>
         ),
-        cell: ({ row, table }) => (
-          <QuantityInputCell
-            defaultValue={getItem(row, table)?.quantityReceiving}
-            label="react.receiving.receivingNow.label"
-            defaultLabel="Receiving Now"
-          />
-        ),
-        size: 100,
-      }),
-      columnHelper.display({
-        id: receivingColumns.QUANTITY_REMAINING,
-        header: () => (
-          <TableHeaderCell
-            tooltip
-            tooltipLabel={translate('react.receiving.remaining.label', 'Remaining')}
-          >
-            {translate('react.receiving.remaining.label', 'Remaining')}
-          </TableHeaderCell>
-        ),
         cell: ({ row, table }) => {
-          const value = getItem(row, table)?.quantityRemaining;
+          const item = getItem(row, table);
           return (
-            <ValueCell
-              value={value}
-              tooltipLabel={value?.toString()}
-              label="react.receiving.remaining.label"
-              defaultLabel="Remaining"
+            <QuantityInputCell
+              defaultValue={item?.quantityReceiving}
+              disabled={item?.isFullyReceived}
+              label="react.receiving.receivingNow.label"
+              defaultLabel="Receiving Now"
             />
           );
         },
-        size: 80,
+        size: 110,
       }),
+      columnHelper.display({
+        id: receivingColumns.STATUS,
+        header: () => (
+          <TableHeaderCell
+            tooltip
+            tooltipLabel={translate('react.receiving.status.label', 'Status')}
+          >
+            {translate('react.receiving.status.label', 'Status')}
+          </TableHeaderCell>
+        ),
+        cell: ({ row, table }) => {
+          const { className, value } = getStatus(getItem(row, table)?.quantityRemaining);
+          return (
+            <ValueCell
+              value={value}
+              tooltipLabel={value}
+              className={className}
+              label="react.receiving.status.label"
+              defaultLabel="Status"
+            />
+          );
+        },
+        size: 120,
+      }),
+      // The Location (putaway bin) column is only shown when "Enable Putaway" is on.
+      ...(putawayEnabled ? [
+        columnHelper.display({
+          id: receivingColumns.LOCATION,
+          header: () => <LocationAutofillHeader />,
+          cell: ({ row, table }) => (
+            <SelectCell
+              options={receivingLocationOptions}
+              disabled={getItem(row, table)?.isFullyReceived}
+              label="react.receiving.location.label"
+              defaultLabel="Location"
+            />
+          ),
+          // Separator rows also get a select, used to autofill the location for the whole group.
+          meta: {
+            renderSeparator: () => (
+              <SelectCell
+                options={receivingLocationOptions}
+                label="react.receiving.location.label"
+                defaultLabel="Location"
+              />
+            ),
+          },
+          size: 165,
+        }),
+      ] : []),
       columnHelper.display({
         id: 'actions',
         header: () => (
@@ -274,11 +378,21 @@ const useReceivingColumns = (view) => {
             {translate('react.receiving.actions.label', 'Actions')}
           </TableHeaderCell>
         ),
-        cell: () => <TableCell className="rt-td" />,
-        size: 60,
+        cell: ({ row, table }) => (
+          <ActionsCell
+            actions={getReceivingRowActions({
+              itemId: row.original.id,
+              onOpenCommentModal: table.options.meta?.onOpenCommentModal,
+            })}
+            disabled={getItem(row, table)?.isFullyReceived}
+            label="react.receiving.actions.label"
+            defaultLabel="Actions"
+          />
+        ),
+        size: 80,
       }),
     ];
-  }, [translate, currentLocale, isPackingListView]);
+  }, [translate, currentLocale, isPackingListView, putawayEnabled, isShipmentFromPurchaseOrder]);
 
   return { columns };
 };

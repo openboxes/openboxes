@@ -39,6 +39,7 @@ const useReceivingActions = (view) => {
       currentReceiptItems = [],
       totalQuantityReceived = 0,
       totalQuantityCanceled = 0,
+      isFullyReceived = false,
     } = summary;
     const currentReceiptItem = currentReceiptItems[0];
     return {
@@ -58,9 +59,12 @@ const useReceivingActions = (view) => {
       recipient: currentReceiptItem?.recipient
         ?? (shipmentItem.recipientId ? usersById[shipmentItem.recipientId] : null),
       quantityShipped: shipmentItem.quantity,
+      packSize: shipmentItem.packSize,
+      unitOfMeasure: shipmentItem.unitOfMeasure,
       quantityReceiving: currentReceiptItem?.quantityReceived ?? null,
       quantityRemaining:
         shipmentItem.quantity - totalQuantityReceived - totalQuantityCanceled,
+      isFullyReceived,
     };
   };
 

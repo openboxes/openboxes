@@ -10,18 +10,27 @@ const ReceivingStep = () => {
   const {
     view,
     setView,
+    putawayEnabled,
+    setPutawayEnabled,
     table: { lineItemsState, columns },
     actions: { loading, updateLineItem },
+    commentModal,
   } = useReceivingForm();
 
   return (
     <div className="receiving-container">
-      <ReceivingFilters view={view} onViewChange={setView} />
+      <ReceivingFilters
+        view={view}
+        onViewChange={setView}
+        putawayEnabled={putawayEnabled}
+        onPutawayChange={setPutawayEnabled}
+      />
       <ReceivingTable
         lineItemsState={lineItemsState}
         columns={columns}
         loading={loading}
         updateLineItem={updateLineItem}
+        commentModal={commentModal}
       />
     </div>
   );

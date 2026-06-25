@@ -374,3 +374,11 @@ export const getCurrencyCode = (state) => state.session.currencyCode;
 export const getInboundHeaderInfo = (state) => state.inbound.headerInfo || [];
 
 export const getInboundHeaderStatus = (state) => state.inbound.headerStatus;
+
+/**
+ * PARTIAL RECEIVING
+ */
+export const getReceivingHeaderInfo = (state) => state.partialReceiving.headerInfo || [];
+
+export const getIsShipmentFromPurchaseOrder = (state) =>
+  state.partialReceiving.isShipmentFromPurchaseOrder;

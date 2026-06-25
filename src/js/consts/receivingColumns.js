@@ -6,9 +6,11 @@ const receivingColumns = {
   LOT_NUMBER: 'lotNumber',
   EXPIRATION_DATE: 'expirationDate',
   RECIPIENT: 'recipient',
+  LOCATION: 'location',
+  QUANTITY_SHIPPED_IN_PO: 'quantityShippedInPo',
   QUANTITY_SHIPPED: 'quantityShipped',
   QUANTITY_RECEIVING: 'quantityReceiving',
-  QUANTITY_REMAINING: 'quantityRemaining',
+  STATUS: 'status',
 };
 
 export default receivingColumns;
