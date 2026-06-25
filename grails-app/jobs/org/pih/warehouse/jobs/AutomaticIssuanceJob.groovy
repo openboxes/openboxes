@@ -1,5 +1,6 @@
 package org.pih.warehouse.jobs
 
+import grails.util.Holders
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.OrderTypeCode
@@ -30,7 +31,10 @@ class AutomaticIssuanceJob {
         String requisitionId = context.mergedJobDataMap.get('requisitionId')
         if (requisitionId) {
             issueRequisition(requisitionId)
-        } else {
+            return
+        }
+
+        if (Holders.config.openboxes.jobs.automaticIssuanceJob.bulkAutomaticIssuance) {
             List<String> requisitionIds = stockMovementService.findStagedRequisitionIds()
             log.info "Found ${requisitionIds.size()} outbound STAGED requisitions to automatic issue"
 
@@ -56,7 +60,7 @@ class AutomaticIssuanceJob {
             if (requisition.deliveryTypeCode in [DeliveryTypeCode.PICK_UP, DeliveryTypeCode.LOCAL_DELIVERY, DeliveryTypeCode.WILL_CALL, DeliveryTypeCode.SHIP_TO, DeliveryTypeCode.DEFAULT,
                                                  DeliveryTypeCode.STOCK_TRANSFER_IBT // this Delivery Type Code is a temporary solution until proper one is implemented
             ]
-                || requisition.orderTypeCode in [OrderTypeCode.SERVICE_ORDER, OrderTypeCode.TRANSFER_ORDER, OrderTypeCode.SALES_ORDER]) {
+                    || requisition.orderTypeCode in [OrderTypeCode.SERVICE_ORDER, OrderTypeCode.TRANSFER_ORDER, OrderTypeCode.SALES_ORDER]) {
                 log.info "Automatic issuing requisition ${requisition.requestNumber} (${requisition.deliveryTypeCode})"
                 stockMovementService.issueRequisition(requisition)
             }

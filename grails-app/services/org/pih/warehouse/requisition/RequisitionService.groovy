@@ -29,7 +29,7 @@ import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
-import org.pih.warehouse.core.SendRequisitionNotificationEvent
+import org.pih.warehouse.core.RequisitionEvent
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.importer.CSVUtils
@@ -885,7 +885,7 @@ class RequisitionService {
                 requisition.rejectedBy = currentUser
                 break
             case RequisitionStatus.ISSUED:
-                Holders.grailsApplication.mainContext.publishEvent(new SendRequisitionNotificationEvent(requisition.id, WebhookEventType.REQUISITION_ISSUED))
+                Holders.grailsApplication.mainContext.publishEvent(new RequisitionEvent(requisition.id, WebhookEventType.REQUISITION_ISSUED))
                 // no break
             default:
                 requisition.status = newStatus

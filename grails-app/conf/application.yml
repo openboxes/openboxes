@@ -566,6 +566,7 @@ openboxes:
         automaticIssuanceJob:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes
+            bulkAutomaticIssuance: true
 
         automaticAllocationJob:
             enabled: true

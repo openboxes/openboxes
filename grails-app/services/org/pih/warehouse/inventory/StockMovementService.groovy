@@ -3430,14 +3430,22 @@ class StockMovementService {
         shipmentService.sendShipment(shipment, "Sent on ${new Date()}", user, shipment.origin, stockMovement.dateShipped ?: new Date())
     }
 
+    // this should be moved to RequisitionService
     void issueRequisition(Requisition requisition) {
+        Shipment shipment
         if (!requisition.shipment) {
-            Shipment shipment = createShipment(requisition)
+            shipment = createShipment(requisition)
             createMissingShipmentItems(requisition, shipment)
         } else {
+            shipment = requisition.shipment
             createMissingShipmentItems(requisition, requisition.shipment)
         }
-        issueRequisitionBasedStockMovement(requisition.id, true)
+
+        requisitionService.validateRequisition(requisition)
+        User user = authService.currentUser
+        Date dateShipped = new Date()
+        shipmentService.sendShipment(shipment, null, user, requisition.origin, dateShipped)
+
         requisitionService.triggerRequisitionStatusTransition(
             requisition,
             AuthService.currentUser,

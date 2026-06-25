@@ -3,14 +3,15 @@ package org.pih.warehouse.core
 import grails.core.GrailsApplication
 import org.pih.warehouse.jobs.AutomaticIssuanceJob
 import org.pih.warehouse.requisition.Requisition
-import org.springframework.context.ApplicationListener
+import org.springframework.transaction.event.TransactionPhase
+import org.springframework.transaction.event.TransactionalEventListener
 
-class SendRequisitionNotificationEventService implements ApplicationListener<SendRequisitionNotificationEvent> {
+class RequisitionEventService {
     GrailsApplication grailsApplication
     WebhookPublisherService webhookPublisherService
 
-    @Override
-    void onApplicationEvent(SendRequisitionNotificationEvent event) {
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+    void onRequisitionEvent(RequisitionEvent event) {
         log.info "Application event $event with event type ${event?.eventType?.name} has been published! " + event.properties
         Requisition requisition = Requisition.get(event.source)
         if (!requisition) {
