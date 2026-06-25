@@ -135,34 +135,38 @@ class WebhookPublisherService {
             return
         }
 
+        boolean webhooksEnabled = facility.supports(ActivityCode.ENABLE_WEBHOOKS)
+        if (!webhooksEnabled) {
+            log.info "Location ${facility} does not support activity code ${ActivityCode.ENABLE_WEBHOOKS}"
+            return
+        }
+
         String eventId = UUID.randomUUID().toString()
         String webhookId = UUID.randomUUID().toString()
         Date dateTriggered = new Date()
 
         List<AvailableItem> baselineAvailableItems = []
+        Integer quantityOnHandFromAvailableItems = 0
         if (!baselineTransaction) {
             // This will be a case of a single row adjustment without baseline, and we need to find adjustment date
             Date baselineDate = JavaUtilDateParser
                     .asDate(InstantParser.asInstant(adjustmentTransaction.transactionDate).minusSeconds(1))
-            baselineAvailableItems = productAvailabilityService.getAvailableItemsAtDate(facility,
-                    adjustmentTransaction?.transactionEntries?.inventoryItem?.product?.unique(), baselineDate)
+            baselineAvailableItems = productAvailabilityService.getAvailableItemsAtDate(facility, [product], baselineDate)
+            quantityOnHandFromAvailableItems = (Integer) baselineAvailableItems?.sum { it.quantityOnHand } ?: 0
         }
 
         User adjustedBy = adjustmentTransaction?.createdBy ?: baselineTransaction?.createdBy
 
-        // Since we are sending a notification for single product, we need to filter the baseline and adjustment
-        // transaction entries for that product only
-        List<TransactionEntry> baselineEntries = baselineTransaction?.transactionEntries?.findAll {
-            it.inventoryItem?.product == product
-        } ?: []
-        List<TransactionEntry> adjustmentEntries = adjustmentTransaction?.transactionEntries?.findAll {
-            it.inventoryItem?.product == product
-        } ?: []
-
-        Integer quantityBeforeAdjustment = (Integer) (baselineTransaction ? baselineEntries?.sum { it.quantity } : baselineAvailableItems?.sum { it.quantityOnHand }) ?: 0
-        Integer quantityVariance = (Integer) adjustmentEntries?.sum { it.quantityVariance } ?: 0
+        Integer quantityBeforeAdjustment = (Integer) (
+                baselineTransaction ? baselineTransaction.calculateQuantityByProduct(product) : quantityOnHandFromAvailableItems
+        ) ?: 0
+        Integer quantityVariance = (Integer) adjustmentTransaction?.calculateQuantityVarianceByProduct(product)
         Integer quantityAfterAdjustment = quantityBeforeAdjustment + quantityVariance
 
+        // Since we are sending a notification for single product, we need to filter the baseline and adjustment
+        // transaction entries for that product only
+        List<TransactionEntry> baselineEntries = baselineTransaction?.getTransactionEntriesByProduct(product)
+        List<TransactionEntry> adjustmentEntries = adjustmentTransaction?.getTransactionEntriesByProduct(product)
         Map payload = [
                 eventId: eventId,
                 eventType: WebhookEventType.ADJUSTMENT_CREATED.name,
@@ -174,7 +178,7 @@ class WebhookPublisherService {
                         comments: adjustmentEntries?.comments?.findAll { it },
                         adjustedBy: adjustedBy?.name,
                         dateAdjusted: (adjustmentTransaction ?: baselineTransaction).transactionDate?.format(Constants.ISO_DATE_FORMAT),
-                        products: product.productCode,
+                        product: product.productCode,
                         totals: [
                                 quantityBeforeAdjustment: quantityBeforeAdjustment,
                                 quantityAfterAdjustment: quantityAfterAdjustment,

@@ -18,7 +18,7 @@ import org.joda.time.LocalDate
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.SendInventoryAdjustmentNotificationEvent
+import org.pih.warehouse.core.InventoryAdjustmentEvent
 import org.pih.warehouse.core.date.InstantParser
 import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.inventory.InventoryBaselineTransactionCommand
@@ -202,7 +202,7 @@ class InventoryImportDataService implements ImportDataService {
                 baselineTransaction.transactionSource,
                 command)
 
-        grailsApplication.mainContext.publishEvent(new SendInventoryAdjustmentNotificationEvent(
+        grailsApplication.mainContext.publishEvent(new InventoryAdjustmentEvent(
                 inventoryImportData.products.toList(),
                 command.location,
                 baselineTransaction,

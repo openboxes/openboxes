@@ -568,7 +568,6 @@ openboxes:
 
         sendInventoryAdjustmentNotificationJob:
             enabled: true
-            delayInMilliseconds: 1000
     # LDAP configuration
     ldap:
         enabled: false

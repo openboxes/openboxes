@@ -4,7 +4,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.Product
 import org.springframework.context.ApplicationEvent
 
-class SendInventoryAdjustmentNotificationEvent extends ApplicationEvent {
+class InventoryAdjustmentEvent extends ApplicationEvent {
     List<Product> products
     Location facility
 
@@ -13,8 +13,8 @@ class SendInventoryAdjustmentNotificationEvent extends ApplicationEvent {
     // If there is no adjustment transaction, then it is an inventory snapshot
     Transaction adjustmentTransaction
 
-    SendInventoryAdjustmentNotificationEvent(List<Product> products, Location facility,
-                                             Transaction baselineTransaction, Transaction adjustmentTransaction) {
+    InventoryAdjustmentEvent(List<Product> products, Location facility,
+                             Transaction baselineTransaction, Transaction adjustmentTransaction) {
         super(baselineTransaction?.id ?: adjustmentTransaction?.id)
         this.baselineTransaction = baselineTransaction
         this.adjustmentTransaction = adjustmentTransaction

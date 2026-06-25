@@ -7,7 +7,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.Product
 import org.quartz.JobExecutionContext
 
-class SendInventoryAdjustmentNotificationJob {
+class PublishInventoryAdjustmentEventJob {
 
     WebhookPublisherService webhookPublisherService
 
@@ -35,10 +35,10 @@ class SendInventoryAdjustmentNotificationJob {
 
         if (!product || !facility || !(baselineTransaction || adjustmentTransaction)) {
             log.warn "Invalid data for SendInventoryAdjustmentNotificationJob, " +
-                    "product: ${product?.id}, " +
-                    "facility: ${facility?.id}, " +
-                    "baselineTransaction: ${baselineTransaction?.id}, " +
-                    "adjustmentTransaction: ${adjustmentTransaction?.id}"
+                    "product: ${productId}, " +
+                    "facility: ${facilityId}, " +
+                    "baselineTransaction: ${baselineTransactionId}, " +
+                    "adjustmentTransaction: ${adjustmentTransactionId}"
             return
         }
 

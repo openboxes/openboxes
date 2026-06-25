@@ -14,6 +14,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
@@ -246,6 +247,18 @@ class Transaction implements Comparable, Serializable {
             return null;
         }
         return this.equals(localTransfer.sourceTransaction) ? localTransfer.destinationTransaction : localTransfer.sourceTransaction
+    }
+
+    List<TransactionEntry> getTransactionEntriesByProduct(Product product) {
+        return transactionEntries?.findAll { it.inventoryItem?.product == product } ?: []
+    }
+
+    Integer calculateQuantityByProduct(Product product) {
+        return (Integer) getTransactionEntriesByProduct(product).sum { it.quantity } ?: 0
+    }
+
+    Integer calculateQuantityVarianceByProduct(Product product) {
+        return (Integer) getTransactionEntriesByProduct(product).sum { it.quantityVariance } ?: 0
     }
 
     /**
