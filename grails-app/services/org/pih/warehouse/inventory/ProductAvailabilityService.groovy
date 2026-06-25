@@ -233,7 +233,7 @@ class ProductAvailabilityService {
      * Data is pulled from:
      *  1. Picklist items from pending requisitions (outbound stock movements) with origin being provided location
      *     that are *NOT* having RECALLED inventory item (inventoryItem.lotStatus) or bin location *WITHOUT*
-     *     HOLD_STOCK in the supported activity (location.supportedActivities).
+     *     HOLD_STOCK or LOST_AND_FOUND in the supported activity (location.supportedActivities).
      *  2. Picklist items from pending orders (outbound returns) with origin being provided location.
      *     (IMPORTANT: Outbound returns can have picked items with RECALLED lots and bins with HOLD_STOCK activity)
      * */
@@ -296,8 +296,8 @@ class ProductAvailabilityService {
                     ) lsa ON lsa.location_id = l.id
                 WHERE (r.origin_id = :locationId 
                     AND r.status IN (:pendingRequisitionStatuses))
-                  AND (ri.id IS NOT NULL AND (ii.lot_status IS NULL OR ii.lot_status != 'RECALLED') 
-                  AND (lsa.activities IS NULL OR lsa.activities NOT LIKE '%HOLD_STOCK%'))
+                  AND (ri.id IS NOT NULL AND (ii.lot_status IS NULL OR ii.lot_status != 'RECALLED')
+                  AND (lsa.activities IS NULL OR (lsa.activities NOT LIKE '%HOLD_STOCK%' AND lsa.activities NOT LIKE '%LOST_AND_FOUND%')))
                   AND (:productId = '' OR ri.product_id = :productId)
                   ${internalTransactionsWhereClause}
                 GROUP BY pli.bin_location_id, pli.inventory_item_id, pli.reason_code
@@ -424,7 +424,7 @@ class ProductAvailabilityService {
                 quantityAllocated: pickedItems
                         ? (pickedItemsGrouped[[it.inventoryItem?.id, it.binLocation?.id]]?.sum{ AllocatedItem  val -> val.quantityAllocated } ?: 0)
                         : 0,
-                quantityOnHold   : it?.isOnHold || it?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? it.quantity : 0
+                quantityOnHold   : it?.isOnHold || it?.isLostAndFound || it?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? it.quantity : 0
             ]
         }
         log.debug("Collecting inside transformBinLocations took: " + (System.currentTimeMillis() - startTime) + " ms")
@@ -1183,6 +1183,12 @@ class ProductAvailabilityService {
                 ]
         )
         log.info "Updated ${results} product availability records for product ${product.productCode}"
+    }
+
+    void updateProductAvailability(List<String> productIds) {
+        productIds?.unique()?.each { String productId ->
+            updateProductAvailability(Product.get(productId))
+        }
     }
 
 

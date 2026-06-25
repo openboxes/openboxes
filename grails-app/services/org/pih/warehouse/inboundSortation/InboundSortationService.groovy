@@ -58,7 +58,8 @@ class InboundSortationService {
                 expirationDate: task.inventoryItem.expirationDate,
                 currentBinLocation: task.location,
                 preferredBin: task.product.getInventoryLevel(task.facility.id)?.preferredBinLocation,
-                quantity: task.quantity.intValue()
+                quantity: task.quantity.intValue(),
+                deliveryTypeCode: task.deliveryTypeCode,
         )
 
         // 3. Execute strategy chain
@@ -87,6 +88,7 @@ class InboundSortationService {
                 quantity: receiptItem.quantityReceived,
                 backorderReference: receiptItem.shipmentItem.backorderReference,
                 backorderItem: receiptItem.shipmentItem.backorderItem,
+                deliveryTypeCode: receiptItem.shipmentItem?.backorderItem?.requisition?.deliveryTypeCode,
         )
     }
 

@@ -566,7 +566,9 @@ class PutawayTaskService {
                 product: task.product,
                 currentFacility: task.facility,
                 currentLocation: task.location,
-                containerLocation: task.container
+                containerLocation: task.container,
+                receiptItem: task.putawayOrderItem?.receiptItem,
+                receipt: task.putawayOrderItem?.receipt
         )
     }
 

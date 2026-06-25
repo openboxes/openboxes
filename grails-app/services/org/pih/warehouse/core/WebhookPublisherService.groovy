@@ -91,11 +91,10 @@ class WebhookPublisherService {
                 eventId: eventId,
                 eventType: eventType?.name,
                 eventDate: dateTriggered.toString(),
+                triggeredBy: triggeredBy?.name,
                 requisitionNumber: requisition.requestNumber,
                 requisitionType: requisition.type,
                 deliveryTypeCode: requisition.deliveryTypeCode.toString(),
-                comment: eventType?.name,
-                triggeredBy: triggeredBy?.name,
                 lines: requisition.shipment?.shipmentItems?.collect { ShipmentItem item ->
                     [
                             "productId": item.product.id,

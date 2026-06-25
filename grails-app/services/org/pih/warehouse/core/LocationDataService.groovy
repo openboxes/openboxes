@@ -2,7 +2,7 @@ package org.pih.warehouse.core
 
 import grails.gorm.services.Service
 
-@Service(value = User, name = "locationGormService")
+@Service(value = Location, name = "locationGormService")
 
 interface LocationDataService {
     void delete(String id)

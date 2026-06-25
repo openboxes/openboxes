@@ -399,7 +399,7 @@ class AvailableItem {
         if (recalled) {
             return AvailableItemStatus.RECALLED
         }
-        if (onHold) {
+        if (binLocation && !binLocation.pickable) {
             return AvailableItemStatus.HOLD
         }
         if (quantityOnHand <= 0 || quantityAvailable <= 0) {

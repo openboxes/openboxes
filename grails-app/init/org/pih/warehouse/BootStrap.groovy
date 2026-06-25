@@ -16,6 +16,7 @@ import org.pih.warehouse.inventory.CycleCountDetails
 import org.pih.warehouse.inventory.CycleCountItem
 import org.pih.warehouse.inventory.CycleCountSummary
 import org.pih.warehouse.inventory.InventoryAuditDetails
+import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryAuditSummary
 import org.pih.warehouse.inventory.InventoryTransactionsSummary
 import org.pih.warehouse.inventory.PendingCycleCountRequest
@@ -41,6 +42,7 @@ import util.LiquibaseUtil
 
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.EditPageItem
+import org.pih.warehouse.api.UpsertResult
 import org.pih.warehouse.api.PackPageItem
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
@@ -194,6 +196,14 @@ class BootStrap {
                 name          : category.name,
                 parentCategory: category?.parentCategory
             ]
+        }
+
+        JSON.registerObjectMarshaller(InventoryLevel) { InventoryLevel inventoryLevel ->
+            inventoryLevel.toJson()
+        }
+
+        JSON.registerObjectMarshaller(UpsertResult) { UpsertResult upsertResult ->
+            upsertResult.toJson()
         }
 
         JSON.registerObjectMarshaller(Container) { Container container ->

@@ -17,6 +17,7 @@ class DefaultSlottingStrategy implements PutawayStrategy {
                     inventoryItem: context.inventoryItem,
                     location: context.currentBinLocation,
                     destination: context.preferredBin,
+                    container: resolvePutawayContainer(context, locations, context.preferredBin),
                     quantity: quantityRemaining,
                     comment: "Default Location",
             )
@@ -27,6 +28,7 @@ class DefaultSlottingStrategy implements PutawayStrategy {
                     inventoryItem: context.inventoryItem,
                     location: context.currentBinLocation,
                     destination: context.internalLocation,
+                    container: resolvePutawayContainer(context, locations, context.internalLocation),
                     quantity: quantityRemaining,
                     comment: "Default Internal Location",
             )
