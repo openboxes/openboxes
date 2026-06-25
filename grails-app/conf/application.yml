@@ -572,7 +572,7 @@ openboxes:
         putawayLocationReslottingJob:
             enabled: true
 
-        sendInventoryAdjustmentNotificationJob:
+        publishInventoryAdjustmentEventJob:
             enabled: true
     # LDAP configuration
     ldap:

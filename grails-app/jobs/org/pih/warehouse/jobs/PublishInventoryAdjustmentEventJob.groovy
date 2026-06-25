@@ -1,6 +1,5 @@
 package org.pih.warehouse.jobs
 
-import grails.util.Holders
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.WebhookPublisherService
 import org.pih.warehouse.inventory.Transaction
@@ -18,8 +17,8 @@ class PublishInventoryAdjustmentEventJob {
     }
 
     def execute(JobExecutionContext context) {
-        if (!Holders.config.openboxes.jobs.sendInventoryAdjustmentNotificationJob.enabled) {
-            log.info"Sending inventory adjustment notification job is disabled"
+        if (!JobUtils.shouldExecute (PublishInventoryAdjustmentEventJob)) {
+            log.info"Publishing inventory adjustment event job is disabled"
             return
         }
 
