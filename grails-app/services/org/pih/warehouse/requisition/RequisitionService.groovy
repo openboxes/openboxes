@@ -215,6 +215,15 @@ class RequisitionService {
     }
 
     /**
+     * Get all requisitions eligible for auto allocation.
+     * @param origin
+     * @return requisition list
+     */
+    List<Requisition> getRequisitionsPendingAutoAllocation(Location origin) {
+        return Requisition.findAllByOriginAndStatusAndAutoAllocationEnabled(origin, RequisitionStatus.CREATED, true)
+    }
+
+    /**
      * Get all requisitions for the given query.
      * @param destination
      * @param query
