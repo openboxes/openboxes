@@ -174,7 +174,7 @@ class WebhookPublisherService {
                 adjustment: [
                         id: adjustmentTransaction?.id ?: baselineTransaction?.id,
                         reasonCodes: adjustmentEntries?.reasonCode?.findAll { it },
-                        comments: adjustmentEntries?.comments?.findAll { it },
+                        comments: adjustmentTransaction?.comment,
                         adjustedBy: adjustedBy?.name,
                         dateAdjusted: (adjustmentTransaction ?: baselineTransaction).transactionDate?.format(Constants.ISO_DATE_FORMAT),
                         product: product.productCode,
