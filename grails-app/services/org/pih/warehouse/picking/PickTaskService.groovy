@@ -357,8 +357,7 @@ class PickTaskService {
                 grailsApplication.mainContext.publishEvent(new SendRequisitionNotificationEvent(task.requisition.id, WebhookEventType.REQUISITION_STAGED))
 
                 if (!requisition.shipment) {
-                    StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
-                    Shipment shipment = stockMovementService.createShipment(stockMovement)
+                    Shipment shipment = stockMovementService.createShipment(requisition)
                     stockMovementService.createMissingShipmentItems(requisition, shipment)
                 }
             }

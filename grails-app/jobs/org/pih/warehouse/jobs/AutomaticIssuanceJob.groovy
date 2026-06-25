@@ -58,7 +58,7 @@ class AutomaticIssuanceJob {
             ]
                 || requisition.orderTypeCode in [OrderTypeCode.SERVICE_ORDER, OrderTypeCode.TRANSFER_ORDER, OrderTypeCode.SALES_ORDER]) {
                 log.info "Automatic issuing requisition ${requisition.requestNumber} (${requisition.deliveryTypeCode})"
-                stockMovementService.createShipment(requisition)
+                stockMovementService.issueRequisition(requisition)
             }
         }
     }

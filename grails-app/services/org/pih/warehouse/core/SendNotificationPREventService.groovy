@@ -24,7 +24,7 @@ class SendRequisitionNotificationEventService implements ApplicationListener<Sen
                 def delayInMilliseconds = Integer.valueOf(grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds) + 1000 ?: 0
                 Date runAt = new Date(System.currentTimeMillis() + delayInMilliseconds)
                 log.info "Triggering automaticIssuanceJob job with ${delayInMilliseconds} ms delay"
-                AutomaticIssuanceJob.schedule(runAt)
+                AutomaticIssuanceJob.schedule(runAt, [requisitionId: requisition.id])
                 // no break
             case WebhookEventType.REQUISITION_CREATED:
             case WebhookEventType.REQUISITION_ISSUED:
