@@ -563,6 +563,11 @@ openboxes:
             cronExpression: "0 */5 * * * ?" # every five minutes
             delayInMilliseconds: 10000
 
+        automaticIssuanceJob:
+            enabled: true
+            cronExpression: "0 */5 * * * ?"     # every five minutes
+            bulkAutomaticIssuance: true
+
         automaticAllocationJob:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes

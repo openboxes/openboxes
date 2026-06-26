@@ -12,6 +12,7 @@ package org.pih.warehouse.requisition
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
+import grails.util.Holders
 import grails.validation.ValidationException
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.joda.time.LocalDate
@@ -28,7 +29,9 @@ import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
+import org.pih.warehouse.core.RequisitionEvent
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
@@ -881,6 +884,9 @@ class RequisitionService {
                 requisition.dateRejected = new Date()
                 requisition.rejectedBy = currentUser
                 break
+            case RequisitionStatus.ISSUED:
+                Holders.grailsApplication.mainContext.publishEvent(new RequisitionEvent(requisition.id, WebhookEventType.REQUISITION_ISSUED))
+                // no break
             default:
                 requisition.status = newStatus
         }
@@ -1145,5 +1151,37 @@ class RequisitionService {
         }
 
         return numActiveStocklistItemsForProduct > 0
+    }
+
+    void validateRequisition(Requisition requisition) {
+
+        requisition.requisitionItems.each { requisitionItem ->
+            if (!requisition.origin.isSupplier() && requisition.origin.supports(ActivityCode.MANAGE_INVENTORY) && requisition.status > RequisitionStatus.CREATED) {
+                validateRequisitionItem(requisitionItem)
+            }
+        }
+    }
+
+    void validateRequisitionItem(RequisitionItem requisitionItem) {
+        // check if there is picklist created for each item that has status different than canceled, substituted or changed
+        if (!requisitionItem.picklistItems && !(requisitionItem.status in [RequisitionItemStatus.CANCELED, RequisitionItemStatus.SUBSTITUTED, RequisitionItemStatus.CHANGED])) {
+            throw new ValidationException("There is picklist missing for item " + requisitionItem.product.productCode + " " + requisitionItem.product.name, requisitionItem.errors)
+        } else if (requisitionItem.picklistItems) {
+            // if there is picklist created check if quantity picked is equal to quantity requested if there was no reason code given(items canceled during pick or picked partially have reason code)
+            if (requisitionItem.totalQuantityPicked() != requisitionItem.quantity && !requisitionItem.picklistItems.reasonCode) {
+                throw new ValidationException("Please change the pick qty for item " + requisitionItem.product.productCode + " " + requisitionItem.product.name + " or enter reason code.", requisitionItem.errors)
+            }
+        }
+    }
+
+    List<String> findStagedRequisitionIds() {
+        List<String> requisitions = Requisition.createCriteria().list {
+            projections {
+                property("id")
+            }
+            eq("isTemplate", Boolean.FALSE)
+            eq("status", RequisitionStatus.STAGED)
+        }
+        return requisitions
     }
 }

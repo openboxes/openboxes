@@ -7,11 +7,11 @@ import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.PickTaskStatus
-import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.picking.SearchPickTaskCommand
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.RequisitionEvent
 import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.WebhookPublisherService
@@ -353,10 +353,10 @@ class PickTaskService {
             boolean backordered = requisition.requisitionItems?.any { it.isBackordered() }
             if (allTasksStaged && (!partialAllocation || !backordered)) {
                 requisition.status = RequisitionStatus.STAGED
+                grailsApplication.mainContext.publishEvent(new RequisitionEvent(task.requisition.id, WebhookEventType.REQUISITION_STAGED))
 
                 if (!requisition.shipment) {
-                    StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
-                    Shipment shipment = stockMovementService.createShipment(stockMovement)
+                    Shipment shipment = stockMovementService.createShipment(requisition)
                     stockMovementService.createMissingShipmentItems(requisition, shipment)
                 }
             }

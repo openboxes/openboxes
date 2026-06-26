@@ -14,7 +14,7 @@ import org.pih.warehouse.allocation.AutomaticAllocationEvent
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.core.OrderTypeCode
-import org.pih.warehouse.core.SendRequisitionNotificationEvent
+import org.pih.warehouse.core.RequisitionEvent
 import org.pih.warehouse.inboundSortation.DemandTypeCode
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.shipping.Shipment
@@ -36,7 +36,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     }
 
     def sendRequisitionEvent(WebhookEventType eventType) {
-        Holders.grailsApplication.mainContext.publishEvent(new SendRequisitionNotificationEvent(this.id, eventType))
+        Holders.grailsApplication.mainContext.publishEvent(new RequisitionEvent(this.id, eventType))
     }
 
     def beforeInsert() {

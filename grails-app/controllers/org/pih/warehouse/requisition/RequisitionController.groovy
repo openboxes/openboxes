@@ -22,6 +22,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
@@ -37,7 +38,7 @@ class RequisitionController {
     RequisitionIdentifierService requisitionIdentifierService
     def inventoryService
     def productService
-    def stockMovementService
+    StockMovementService stockMovementService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -460,21 +461,9 @@ class RequisitionController {
     }
 
     def issue() {
-        def requisition = Requisition.get(params.id)
+        Requisition requisition = Requisition.get(params.id)
         try {
-            if (!requisition.shipment) {
-                StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
-                Shipment shipment = stockMovementService.createShipment(stockMovement)
-                stockMovementService.createMissingShipmentItems(requisition, shipment)
-            } else {
-                stockMovementService.createMissingShipmentItems(requisition, requisition?.shipment)
-            }
-            stockMovementService.issueRequisitionBasedStockMovement(params.id, true)
-            requisitionService.triggerRequisitionStatusTransition(
-                requisition,
-                AuthService.currentUser,
-                RequisitionStatus.ISSUED
-            )
+            stockMovementService.issueRequisition(requisition)
         } catch (ValidationException e) {
             requisition = Requisition.read(params.id)
             def picklist = Picklist.findByRequisition(requisition)
