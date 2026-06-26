@@ -169,14 +169,16 @@ class WebhookPublisherService {
         Map payload = [
                 eventId: eventId,
                 eventType: WebhookEventType.ADJUSTMENT_CREATED.name,
-                eventDate: dateTriggered.format(Constants.ISO_DATE_FORMAT),
+                eventDate: dateTriggered.format(Constants.ISO_DATE_TIME_WITH_TIMEZONE_OFFSET_FORMAT),
                 triggeredBy: adjustedBy?.name,
                 adjustment: [
                         id: adjustmentTransaction?.id ?: baselineTransaction?.id,
                         reasonCodes: adjustmentEntries?.reasonCode?.findAll { it },
                         comments: adjustmentTransaction?.comment,
                         adjustedBy: adjustedBy?.name,
-                        dateAdjusted: (adjustmentTransaction ?: baselineTransaction).transactionDate?.format(Constants.ISO_DATE_FORMAT),
+                        dateAdjusted: (adjustmentTransaction ?: baselineTransaction).transactionDate?.format(
+                                Constants.ISO_DATE_TIME_WITH_TIMEZONE_OFFSET_FORMAT
+                        ),
                         product: product.productCode,
                         totals: [
                                 quantityBeforeAdjustment: quantityBeforeAdjustment,
