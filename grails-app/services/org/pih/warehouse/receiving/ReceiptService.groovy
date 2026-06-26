@@ -28,7 +28,7 @@ import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationType
-import org.pih.warehouse.core.RequisitionEvent
+import org.pih.warehouse.core.ShipmentEvent
 import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
@@ -553,7 +553,7 @@ class ReceiptService {
         // Automatically complete the partial receipt
         saveAndCompletePartialReceipt(partialReceipt)
 
-        grailsApplication.mainContext.publishEvent(new RequisitionEvent(shipment?.requisition?.id, WebhookEventType.SHIPMENT_RECEIVED))
+        grailsApplication.mainContext.publishEvent(new ShipmentEvent(shipment.id, WebhookEventType.SHIPMENT_RECEIVED))
     }
 
     def reallocateBackorderedItems(String shipmentId) {

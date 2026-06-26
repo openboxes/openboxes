@@ -22,6 +22,7 @@ class WebhookPublisherService {
 
     def apiClientService
 
+    // @deprecated TODO: This is old version of shipment.shipped event publishing, this should be migrated into publishShipmentEvent
     def publishShippedEvent(Shipment shipment) {
 
         boolean webhooksEnabled = shipment.origin.supports(ActivityCode.ENABLE_WEBHOOKS)
