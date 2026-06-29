@@ -31,9 +31,11 @@ class ShipmentEventService {
                         inboundSortationService.createPutawayOrdersFromReceipt(shipment.receipt)
                     }
 
-                    if (shipment.requisition) {
-                        webhookPublisherService.publishRequisitionEvent(shipment.requisition, event.eventType)
-                    }
+                    // TODO: for now, we don't have to publish this. If needed in the future, just uncomment this block
+//                    if (shipment.requisition) {
+//                        webhookPublisherService.publishRequisitionEvent(shipment.requisition, event.eventType)
+//                    }
+
                     // TODO: Refactor publishShippedEvent into publishShipmentEvent
                     // webhookPublisherService.publishShipmentEvent(requisition, < >)
                     break
