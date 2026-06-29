@@ -12,6 +12,7 @@ package org.pih.warehouse.core
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.shipping.ShipmentItem
@@ -86,23 +87,38 @@ class WebhookPublisherService {
                 requisitionNumber: requisition.requestNumber,
                 requisitionType: requisition.type,
                 deliveryTypeCode: requisition.deliveryTypeCode.toString(),
-                lines: requisition.shipment?.shipmentItems?.collect { ShipmentItem item ->
+                lines: requisition.requisitionItems?.collect { RequisitionItem item ->
                     [
-                            "productId": item.product.id,
-                            "productCode": item.product.productCode,
-                            "inventoryItemId": item.inventoryItem.id,
-                            "quantityRequested": item.requisitionItem.calculateQuantityRequired(),
-                            "quantityIssued": item.quantity,
-                            "locationId": item.binLocation.id,
-                            "locationNumber": item.binLocation.locationNumber
+                            productId: item.product.id,
+                            productCode: item.product.productCode,
+                            requisitionItemType: item.requisitionItemType.name(),
+                            quantityRequested: item.quantity,
+                            quantityCanceled: item.quantityCanceled ?: 0,
+                            quantityIssued: item.quantityIssued,
+                            outboundContainers: item?.picklistItems?.outboundContainer?.findAll { it }?.unique()?.collect { it ->
+                                [
+                                        id: it.id,
+                                        locationNumber: it.locationNumber,
+                                        name: it.name
+                                ]
+                            } ?: [],
+                            stagingLocations: item?.picklistItems?.stagingLocation?.findAll { it }?.unique()?.collect { it ->
+                                [
+                                        id: it.id,
+                                        locationNumber: it.locationNumber,
+                                        name: it.name
+                                ]
+                            } ?: [],
+                            stagedBy: item?.picklistItems?.stagedBy?.findAll { it }?.unique()?.name ?: [],
+                            dateStaged: item?.picklistItems?.dateStaged?.findAll { it }?.unique() ?: []
                     ]
                 },
                 metadata: [
-                        "facilityId": facility.id,
-                        "facilityCode": facility.locationNumber,
-                        "facilityName": facility.name,
-                        "webhookId": webhookId,
-                        "attemptNumber": 1
+                        facilityId: facility.id,
+                        facilityCode: facility.locationNumber,
+                        facilityName: facility.name,
+                        webhookId: webhookId,
+                        attemptNumber: 1
                 ]
         ]
 
