@@ -28,7 +28,8 @@ import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationType
-import org.pih.warehouse.inboundSortation.InboundSortationService
+import org.pih.warehouse.core.ShipmentEvent
+import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.ProductAvailabilityService
@@ -59,7 +60,6 @@ class ReceiptService {
     TransactionIdentifierService transactionIdentifierService
     GrailsApplication grailsApplication
     ProductAvailabilityService productAvailabilityService
-    InboundSortationService inboundSortationService
     BackorderService backorderService
     MessageSource messageSource
 
@@ -553,12 +553,7 @@ class ReceiptService {
         // Automatically complete the partial receipt
         saveAndCompletePartialReceipt(partialReceipt)
 
-        // FIXME We should consider eventing (shipment.received) and have an event service determine whether
-        //  the shipment should be auto received
-        log.info "Creating putaway tasks for receipt ${shipment.receipt}"
-        if (shipment.destination?.supports(ActivityCode.AUTOMATED_PUTAWAY_CREATION)) {
-            inboundSortationService.createPutawayOrdersFromReceipt(shipment.receipt)
-        }
+        grailsApplication.mainContext.publishEvent(new ShipmentEvent(shipment.id, WebhookEventType.SHIPMENT_RECEIVED))
     }
 
     def reallocateBackorderedItems(String shipmentId) {

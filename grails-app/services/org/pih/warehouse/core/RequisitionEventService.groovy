@@ -12,7 +12,7 @@ class RequisitionEventService {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     void onRequisitionEvent(RequisitionEvent event) {
-        log.info "Application event $event with event type ${event?.eventType?.name} has been published! " + event.properties
+        log.info "Requisition event $event with event type ${event?.eventType?.name} has been published! " + event.properties
         Requisition requisition = Requisition.get(event.source)
         if (!requisition) {
             log.warn "Requisition with id ${event.source} not found, cannot send notification ${event.eventType?.name}"
@@ -26,9 +26,9 @@ class RequisitionEventService {
                 Date runAt = new Date(System.currentTimeMillis() + delayInMilliseconds)
                 log.info "Triggering automaticIssuanceJob job with ${delayInMilliseconds} ms delay"
                 AutomaticIssuanceJob.schedule(runAt, [requisitionId: requisition.id])
-                // no break
+                webhookPublisherService.publishRequisitionEvent(requisition, event.eventType)
+                break
             case WebhookEventType.REQUISITION_CREATED:
-            case WebhookEventType.REQUISITION_ISSUED:
                 webhookPublisherService.publishRequisitionEvent(requisition, event.eventType)
                 break
         }
