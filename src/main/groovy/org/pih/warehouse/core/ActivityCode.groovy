@@ -78,6 +78,9 @@ enum ActivityCode {
     // Auto receiving
     AUTO_RECEIVING('AUTO_RECEIVING'),
 
+    // Auto allocation
+    AUTOMATIC_ALLOCATION_ENABLED('AUTOMATIC_ALLOCATION_ENABLED'),
+
     // Accounting (Budget Code, GL Account)
     REQUIRE_ACCOUNTING('REQUIRE_ACCOUNTING'),
 
@@ -187,6 +190,7 @@ enum ActivityCode {
                 ENABLE_NOTIFICATIONS,
                 DYNAMIC_RECEIVING,
                 AUTO_RECEIVING,
+                AUTOMATIC_ALLOCATION_ENABLED,
                 DYNAMIC_SLOTTING,
                 STATIC_SLOTTING,
                 AUTOMATED_PUTAWAY_CREATION,

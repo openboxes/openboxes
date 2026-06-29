@@ -458,6 +458,22 @@ class Requisition implements Comparable<Requisition>, Serializable {
         return sourceType == RequisitionSourceType.ELECTRONIC
     }
 
+    boolean isEligibleForAutomaticAllocation() {
+        if (status != RequisitionStatus.CREATED) {
+            log.info "Requisition ${requestNumber} (${id}) not eligible for automatic allocation: status is ${status}, expected CREATED"
+            return false
+        }
+        if (!autoAllocationEnabled) {
+            log.info "Requisition ${requestNumber} (${id}) not eligible for automatic allocation: autoAllocationEnabled is not set"
+            return false
+        }
+        if (!origin?.supports(ActivityCode.AUTOMATIC_ALLOCATION_ENABLED)) {
+            log.info "Requisition ${requestNumber} (${id}) not eligible for automatic allocation: origin '${origin?.name}' does not support activity ${ActivityCode.AUTOMATIC_ALLOCATION_ENABLED}"
+            return false
+        }
+        return true
+    }
+
     DemandTypeCode getDemandTypeCode() {
         if (description.length() >= 2) {
             String codeFromDescription = description[0..1]
