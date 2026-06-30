@@ -123,6 +123,21 @@
       background-color: var(--blue-202);
       color: var(--blue-401);
     }
+
+    &--grey {
+      background-color: var(--gray-100);
+      color: var(--gray-600);
+    }
+
+    &--primary {
+      background-color: var(--blue-200);
+      color: var(--blue-primary);
+    }
+
+    &--green {
+      background-color: var(--green-100);
+      color: var(--green-600);
+    }
   }
 }
 
