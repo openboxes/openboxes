@@ -5,10 +5,11 @@ import { RiChat1Line, RiPencilLine } from 'react-icons/ri';
 /**
  * Builds the action descriptors for a receiving row, consumed by ActionsCell.
  */
-const getReceivingRowActions = ({ itemId, onOpenCommentModal }) => [
+const getReceivingRowActions = ({ itemId, onOpenCommentModal, onOpenEditModal }) => [
   {
     key: 'edit',
     icon: <RiPencilLine size={22} />,
+    onClick: () => onOpenEditModal?.(itemId),
     label: 'react.default.button.edit.label',
     defaultLabel: 'Edit',
   },

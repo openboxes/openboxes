@@ -75,6 +75,7 @@ const useReceivingActions = (view) => {
       recipient: currentReceiptItem?.recipient
         ?? (shipmentItem.recipientId ? usersById[shipmentItem.recipientId] : null),
       quantityShipped: shipmentItem.quantity,
+      quantityReceived: totalQuantityReceived,
       packSize: shipmentItem.packSize,
       unitOfMeasure: shipmentItem.unitOfMeasure,
       quantityReceiving: currentReceiptItem?.quantityReceived ?? null,

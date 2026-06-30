@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 
 import DataTable from 'components/DataTable/v2/DataTable';
 import CommentModal from 'components/modals/CommentModal';
+import EditLineItemModal from 'components/receivingV2/EditLineItemModal';
+import useEditLineItemModal from 'hooks/receiving/v2/useEditLineItemModal';
 
 import 'components/receivingV2/receiving.scss';
 
@@ -16,6 +18,13 @@ const ReceivingTable = ({
     closeModal: closeCommentModal,
   } = commentModal;
 
+  const {
+    isOpen: isEditModalOpen,
+    itemId: editedItemId,
+    openModal: openEditModal,
+    closeModal: closeEditModal,
+  } = useEditLineItemModal();
+
   // Keep `meta` stable so it only changes when the entities map or
   // the update function change. Combined with the memoized cells, a single line item update
   // re-renders just that row instead of the whole table.
@@ -24,8 +33,9 @@ const ReceivingTable = ({
       entities: lineItemsState.entities,
       updateLineItem,
       onOpenCommentModal: openCommentModal,
+      onOpenEditModal: openEditModal,
     }),
-    [lineItemsState.entities, updateLineItem, openCommentModal],
+    [lineItemsState.entities, updateLineItem, openCommentModal, openEditModal],
   );
 
   // Separators pass through without meta. Meta is only used to disable (grey out)
@@ -76,6 +86,12 @@ const ReceivingTable = ({
         }}
       />
       <CommentModal isOpen={isCommentModalOpen} onClose={closeCommentModal} />
+      {isEditModalOpen && (
+        <EditLineItemModal
+          onClose={closeEditModal}
+          lineItem={lineItemsState.entities[editedItemId]}
+        />
+      )}
     </div>
   );
 };
