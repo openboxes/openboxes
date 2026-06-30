@@ -26,7 +26,7 @@ import org.pih.warehouse.shipping.ShipmentItem
 import static groovy.json.JsonOutput.toJson
 import static groovy.json.JsonOutput.prettyPrint
 
-@Transactional
+@Transactional(readOnly = true)
 class WebhookPublisherService {
 
     ApiClientService apiClientService
@@ -159,7 +159,7 @@ class WebhookPublisherService {
         Integer quantityBeforeAdjustment = (Integer) (
                 baselineTransaction ? baselineTransaction.calculateQuantityByProduct(product) : quantityOnHandFromAvailableItems
         ) ?: 0
-        Integer quantityVariance = (Integer) adjustmentTransaction?.calculateQuantityVarianceByProduct(product)
+        Integer quantityVariance = (Integer) adjustmentTransaction?.calculateQuantityVarianceByProduct(product) ?: 0
         Integer quantityAfterAdjustment = quantityBeforeAdjustment + quantityVariance
 
         // Since we are sending a notification for single product, we need to filter the baseline and adjustment
@@ -173,8 +173,7 @@ class WebhookPublisherService {
                 triggeredBy: adjustedBy?.name,
                 adjustment: [
                         id: adjustmentTransaction?.id ?: baselineTransaction?.id,
-                        reasonCodes: adjustmentEntries?.reasonCode?.findAll { it },
-                        comments: adjustmentTransaction?.comment,
+                        comment: adjustmentTransaction?.comment,
                         adjustedBy: adjustedBy?.name,
                         dateAdjusted: (adjustmentTransaction ?: baselineTransaction).transactionDate?.format(
                                 Constants.ISO_DATE_TIME_WITH_TIMEZONE_OFFSET_FORMAT
