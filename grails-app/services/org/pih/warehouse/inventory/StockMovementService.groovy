@@ -3886,6 +3886,8 @@ class StockMovementService {
         if (requisition) {
             requisition.priority = params.priority as int
             requisition.deliveryTypeCode = params.deliveryTypeCode
+            // Order type is set from the Scheduling tab for outbound movements only;
+            requisition.orderTypeCode = params?.orderTypeCode ?: null
             requisition.requestedDeliveryDate = params.requestedDeliveryDate
             requisition.save()
         }

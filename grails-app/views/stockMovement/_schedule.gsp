@@ -32,6 +32,22 @@
 
                     </td>
                 </tr>
+                <g:if test="${stockMovement?.origin?.id == session.warehouse?.id}">
+                    <tr class="prop">
+                        <td valign="top" class="name"><label><warehouse:message
+                                code="requisition.orderTypeCode.label" default="Order Type"/></label>
+                        </td>
+                        <td valign="top"
+                            class="value ${hasErrors(bean: stockMovement, field: 'orderTypeCode', 'errors')}">
+                            <g:select name="orderTypeCode"
+                                      class="chzn-select-deselect"
+                                      noSelection="['': '']"
+                                      from="${org.pih.warehouse.core.OrderTypeCode.values()}"
+                                      value="${stockMovement.requisition?.orderTypeCode}"/>
+
+                        </td>
+                    </tr>
+                </g:if>
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message
 							code="requisition.requestedDeliveryDate.label" /></label>
