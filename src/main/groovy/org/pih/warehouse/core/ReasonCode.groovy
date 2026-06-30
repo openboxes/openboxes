@@ -277,12 +277,6 @@ enum ReasonCode {
         [
                 INSUFFICIENT_QUANTITY_AVAILABLE,
                 DIFFERENT_LOCATION,
-                DAMAGED
-        ]
-    }
-
-    static listShortageQtyUnderReceiptReasonCodes() {
-        [
                 DAMAGED,
                 DELIVERED_SHORT,
                 PUTAWAY_DISCREPANCY,

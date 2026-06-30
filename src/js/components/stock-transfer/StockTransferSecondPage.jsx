@@ -92,7 +92,7 @@ class StockTransferSecondPage extends Component {
     if (this.props.stockTransferTranslationsFetched) {
       this.dataFetched = true;
       this.fetchBins();
-      this.props.fetchReasonCodes(ActivityCode.ENABLE_STOCK_TRANSFER_NOTIFICATIONS);
+      this.props.fetchReasonCodes(ActivityCode.PICKING_SHORTAGE);
     }
     this.fetchStockTransfer();
   }
@@ -101,7 +101,7 @@ class StockTransferSecondPage extends Component {
     if (nextProps.stockTransferTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchBins();
-      this.props.fetchReasonCodes(ActivityCode.ENABLE_STOCK_TRANSFER_NOTIFICATIONS);
+      this.props.fetchReasonCodes(ActivityCode.PICKING_SHORTAGE);
     }
   }
 
