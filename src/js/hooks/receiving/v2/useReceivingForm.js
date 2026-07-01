@@ -12,6 +12,7 @@ const useReceivingForm = () => {
     loading,
     lineItemsState,
     updateLineItem,
+    onSaveAndExit,
   } = useReceivingActions(view);
   const { columns } = useReceivingColumns({ view, putawayEnabled });
   const commentModal = useCommentModal();
@@ -27,6 +28,7 @@ const useReceivingForm = () => {
     actions: {
       loading,
       updateLineItem,
+      onSaveAndExit,
     },
     commentModal,
   };

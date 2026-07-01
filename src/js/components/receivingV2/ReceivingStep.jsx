@@ -13,7 +13,9 @@ const ReceivingStep = () => {
     putawayEnabled,
     setPutawayEnabled,
     table: { lineItemsState, columns },
-    actions: { loading, updateLineItem },
+    actions: {
+      loading, updateLineItem, onSaveAndExit,
+    },
     commentModal,
   } = useReceivingForm();
 
@@ -24,6 +26,7 @@ const ReceivingStep = () => {
         onViewChange={setView}
         putawayEnabled={putawayEnabled}
         onPutawayChange={setPutawayEnabled}
+        onSaveAndExit={onSaveAndExit}
       />
       <ReceivingTable
         lineItemsState={lineItemsState}

@@ -312,7 +312,9 @@ const useReceivingColumns = ({
           const item = getItem(row, table);
           return (
             <QuantityInputCell
-              defaultValue={item?.quantityReceiving}
+              value={item?.quantityReceiving}
+              onCommit={(quantityReceiving) =>
+                table.options.meta?.updateLineItem(row.original.id, { quantityReceiving })}
               disabled={item?.isFullyReceived}
               label="react.receiving.receivingNow.label"
               defaultLabel="Receiving Now"
