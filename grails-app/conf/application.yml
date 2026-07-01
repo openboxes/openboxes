@@ -546,7 +546,6 @@ openboxes:
 
         automaticStateTransitionJob:
             enabled: true
-            delayInMilliseconds: 1000
 
         automaticStateTransitionPollingJob:
             enabled: true
