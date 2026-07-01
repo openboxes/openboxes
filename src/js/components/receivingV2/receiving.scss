@@ -217,6 +217,33 @@
     color: var(--blue-700);
     font-size: 14px;
   }
+
+  &__copy-to-receive {
+    color: var(--blue-primary);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  // The Received section reuses the Layout Subsection only for its collapse
+  // behaviour; inside the modal it sits flush - no section card, padding or
+  // title divider.
+  &__received.v2-section {
+    padding: 0;
+    background-color: transparent;
+
+    .v2-subsection {
+      padding: 0;
+    }
+
+    .subsection-title-wrapper {
+      padding: 0;
+      border-bottom: none;
+    }
+
+    .subsection-body {
+      margin-top: 16px;
+    }
+  }
 }
 
 .shipment-item-details {

@@ -2,31 +2,32 @@ import React, { useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import PropTypes from 'prop-types';
+import { Controller } from 'react-hook-form';
 import { RiArrowDownLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
-import { getCurrentLocale } from 'selectors';
+import { getCurrentLocationId } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
+import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
+import SelectField from 'components/form-elements/v2/SelectField';
+import TextInput from 'components/form-elements/v2/TextInput';
+import LocationAutofillHeader from 'components/receivingV2/LocationAutofillHeader';
 import receivingColumns from 'consts/receivingColumns';
+import { DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
-import ExpirationDateCell from 'utils/cells/ExpirationDateCell';
-import MultilineCell from 'utils/cells/MultilineCell';
-import ValueCell from 'utils/cells/ValueCell';
 
 /**
  * Columns for the read-only "Received" table inside the edit modal - the records
- * that have already been received for the line. The whole section is view-only,
- * so every cell is a plain display cell; the only interaction is the row action
- * that copies the record down into the editable "Receiving now" table.
- *
- * Kept separate from `useEditLineItemColumns` (the editable table) so the two
- * tables' configs don't share state.
+ * already received for the line. It mirrors the editable "Receiving now" table
+ * (`useReceivingLineItemColumns`), but every field is `disabled`; the only
+ * interaction is the row action that copies the record down into that table.
+ * Each cell is a react-hook-form `Controller` bound to `receivedItems.${index}.<field>`.
  */
-const useReceivedLineItemColumns = ({ copyToReceive }) => {
+const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
   const translate = useTranslate();
   const columnHelper = createColumnHelper();
-  const currentLocale = useSelector(getCurrentLocale);
+  const locationId = useSelector(getCurrentLocationId);
 
   const columns = useMemo(() => [
     columnHelper.accessor(receivingColumns.PRODUCT, {
@@ -36,12 +37,23 @@ const useReceivedLineItemColumns = ({ copyToReceive }) => {
         </TableHeaderCell>
       ),
       cell: ({ row }) => (
-        <MultilineCell
-          value={row.original.product?.name}
-          label="react.receiving.product.label"
-          defaultLabel="Product"
-          maxLines={2}
-        />
+        <TableCell className="rt-td">
+          <Controller
+            key={row.original.rowId}
+            name={`receivedItems.${row.index}.product`}
+            control={control}
+            render={({ field }) => (
+              <SelectField
+                {...field}
+                productSelect
+                locationId={locationId}
+                disabled
+                hideErrorMessageWrapper
+                ariaLabel={{ id: 'react.receiving.product.label', defaultMessage: 'Product' }}
+              />
+            )}
+          />
+        </TableCell>
       ),
       size: 220,
     }),
@@ -51,18 +63,24 @@ const useReceivedLineItemColumns = ({ copyToReceive }) => {
           {translate('react.receiving.lotSerialNo.short.label', 'Lot/SN')}
         </TableHeaderCell>
       ),
-      cell: ({ row }) => {
-        const value = row.original.lotNumber;
-        return (
-          <ValueCell
-            value={value}
-            tooltipLabel={value}
-            label="react.receiving.lotSerialNo.short.label"
-            defaultLabel="Lot/SN"
-            truncate
+      cell: ({ row }) => (
+        <TableCell className="rt-td">
+          <Controller
+            key={row.original.rowId}
+            name={`receivedItems.${row.index}.lotNumber`}
+            control={control}
+            render={({ field }) => (
+              <TextInput
+                {...field}
+                autoComplete="off"
+                disabled
+                hideErrorMessageWrapper
+                ariaLabel={{ id: 'react.receiving.lotSerialNo.short.label', defaultMessage: 'Lot/SN' }}
+              />
+            )}
           />
-        );
-      },
+        </TableCell>
+      ),
       size: 130,
     }),
     columnHelper.accessor(receivingColumns.EXPIRATION_DATE, {
@@ -72,13 +90,23 @@ const useReceivedLineItemColumns = ({ copyToReceive }) => {
         </TableHeaderCell>
       ),
       cell: ({ row }) => (
-        <ExpirationDateCell
-          value={row.original.expirationDate}
-          localeKey={currentLocale}
-          label="react.receiving.expirationDate.short.label"
-          defaultLabel="Exp. Date"
-          showExpiryStatus
-        />
+        <TableCell className="rt-td">
+          <Controller
+            key={row.original.rowId}
+            name={`receivedItems.${row.index}.expirationDate`}
+            control={control}
+            render={({ field }) => (
+              <DateFieldDateFns
+                {...field}
+                showCustomInput={false}
+                customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
+                disabled
+                hideErrorMessageWrapper
+                ariaLabel={{ id: 'react.receiving.expirationDate.short.label', defaultMessage: 'Exp. Date' }}
+              />
+            )}
+          />
+        </TableCell>
       ),
       size: 130,
     }),
@@ -88,58 +116,72 @@ const useReceivedLineItemColumns = ({ copyToReceive }) => {
           {translate('react.receiving.recipient.label', 'Recipient')}
         </TableHeaderCell>
       ),
-      cell: ({ row }) => {
-        const recipient = row.original.recipient;
-        return (
-          <ValueCell
-            value={recipient?.name}
-            tooltipLabel={recipient?.name}
-            label="react.receiving.recipient.label"
-            defaultLabel="Recipient"
-            truncate
+      cell: ({ row }) => (
+        <TableCell className="rt-td">
+          <Controller
+            key={row.original.rowId}
+            name={`receivedItems.${row.index}.recipient`}
+            control={control}
+            render={({ field }) => (
+              <SelectField
+                {...field}
+                disabled
+                hideErrorMessageWrapper
+                ariaLabel={{ id: 'react.receiving.recipient.label', defaultMessage: 'Recipient' }}
+              />
+            )}
           />
-        );
-      },
+        </TableCell>
+      ),
       size: 150,
     }),
     columnHelper.accessor(receivingColumns.QUANTITY_RECEIVED, {
       header: () => (
-        <TableHeaderCell className="justify-content-end">
+        <TableHeaderCell>
           {translate('react.receiving.received.label', 'Received')}
         </TableHeaderCell>
       ),
-      cell: ({ row }) => {
-        const value = row.original.quantityReceived;
-        return (
-          <ValueCell
-            value={value}
-            tooltipLabel={value?.toString()}
-            className="text-right w-100"
-            label="react.receiving.received.label"
-            defaultLabel="Received"
+      cell: ({ row }) => (
+        <TableCell className="rt-td">
+          <Controller
+            key={row.original.rowId}
+            name={`receivedItems.${row.index}.quantityReceived`}
+            control={control}
+            render={({ field }) => (
+              <TextInput
+                {...field}
+                type="number"
+                className="hide-arrows"
+                autoComplete="off"
+                disabled
+                hideErrorMessageWrapper
+                ariaLabel={{ id: 'react.receiving.received.label', defaultMessage: 'Received' }}
+              />
+            )}
           />
-        );
-      },
-      size: 120,
+        </TableCell>
+      ),
+      size: 90,
     }),
     columnHelper.accessor(receivingColumns.LOCATION, {
-      header: () => (
-        <TableHeaderCell>
-          {translate('react.receiving.location.label', 'Location')}
-        </TableHeaderCell>
-      ),
-      cell: ({ row }) => {
-        const location = row.original.location;
-        return (
-          <ValueCell
-            value={location?.name}
-            tooltipLabel={location?.name}
-            label="react.receiving.location.label"
-            defaultLabel="Location"
-            truncate
+      header: () => <LocationAutofillHeader />,
+      cell: ({ row }) => (
+        <TableCell className="rt-td">
+          <Controller
+            key={row.original.rowId}
+            name={`receivedItems.${row.index}.location`}
+            control={control}
+            render={({ field }) => (
+              <SelectField
+                {...field}
+                disabled
+                hideErrorMessageWrapper
+                ariaLabel={{ id: 'react.receiving.location.label', defaultMessage: 'Location' }}
+              />
+            )}
           />
-        );
-      },
+        </TableCell>
+      ),
       size: 150,
     }),
     columnHelper.display({
@@ -153,7 +195,7 @@ const useReceivedLineItemColumns = ({ copyToReceive }) => {
         <TableCell className="rt-td">
           <button
             type="button"
-            className="receiving-edit-modal__copy-to-receive d-flex align-items-center justify-content-end gap-8 w-100 h-100 p-0 border-0 bg-transparent cursor-pointer font-weight-500"
+            className="receiving-edit-modal__copy-to-receive d-flex align-items-center justify-content-end gap-8 w-100 h-100 p-0 border-0 bg-transparent cursor-pointer"
             onClick={() => copyToReceive(row.original.rowId)}
           >
             <RiArrowDownLine size={18} />
@@ -161,14 +203,18 @@ const useReceivedLineItemColumns = ({ copyToReceive }) => {
           </button>
         </TableCell>
       ),
-      size: 170,
+      // Matches the "Receiving now" actions column so both tables' columns align
+      // (v2 DataTable distributes width proportionally to each column's size).
+      // Wider than the editable table's icon-only action to fit "Copy to receive".
+      size: 100,
     }),
-  ], [translate, currentLocale, copyToReceive]);
+  ], [translate, control, locationId, copyToReceive]);
 
   return { columns };
 };
 
 useReceivedLineItemColumns.propTypes = {
+  control: PropTypes.shape({}).isRequired,
   copyToReceive: PropTypes.func.isRequired,
 };
 

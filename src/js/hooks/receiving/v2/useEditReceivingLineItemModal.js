@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 
 // TODO: for now this only opens/closes the modal. Real implementation will be done iteratively.
-const useEditLineItemModal = () => {
+const useEditReceivingLineItemModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [itemId, setItemId] = useState(null);
   const openModal = useCallback((id) => {
@@ -15,4 +15,4 @@ const useEditLineItemModal = () => {
   };
 };
 
-export default useEditLineItemModal;
+export default useEditReceivingLineItemModal;

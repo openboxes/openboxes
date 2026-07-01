@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 import { DateFormatDateFns } from 'consts/timeFormat';
-import useEditLineItemColumns from 'hooks/receiving/v2/useEditLineItemColumns';
+import useReceivingLineItemColumns from 'hooks/receiving/v2/useReceivingLineItemColumns';
 import { formatDateToString } from 'utils/dateUtils';
 
 const buildDefaultRow = (lineItem) => ({
@@ -27,7 +27,7 @@ const buildDefaultRow = (lineItem) => ({
  * so the modal must be mounted fresh per open (see ReceivingTable) for the seed
  * to reflect the line.
  */
-const useEditLineItemForm = (lineItem) => {
+const useReceivingLineItems = (lineItem) => {
   const { control, getValues, reset } = useForm({
     defaultValues: { lineItems: [buildDefaultRow(lineItem)] },
   });
@@ -47,17 +47,30 @@ const useEditLineItemForm = (lineItem) => {
     }
   }, [getValues, remove]);
 
-  const { columns } = useEditLineItemColumns({ control, removeRow });
+  const { columns } = useReceivingLineItemColumns({ control, removeRow });
 
   // `buildDefaultRow()` with no line item yields a blank row.
   const addRow = () => append(buildDefaultRow());
+
+  // Append a "Receiving now" row seeded from a received record (the "Copy to
+  // receive" action on the read-only Received table), with a blank quantity. The
+  // received fields are already shaped/formatted, so they're copied as-is.
+  const copyToReceiving = useCallback((receivedItem) => append({
+    rowId: _.uniqueId('row-'),
+    product: receivedItem.product ?? null,
+    lotNumber: receivedItem.lotNumber ?? '',
+    expirationDate: receivedItem.expirationDate ?? '',
+    recipient: receivedItem.recipient ?? null,
+    quantityReceiving: '',
+    location: receivedItem.location ?? null,
+  }), [append]);
 
   // Restore the form to the seed captured on mount (the original line item).
   const revertToOriginal = () => reset();
 
   return {
-    control, fields, columns, addRow, revertToOriginal,
+    control, fields, columns, addRow, copyToReceiving, revertToOriginal,
   };
 };
 
-export default useEditLineItemForm;
+export default useReceivingLineItems;

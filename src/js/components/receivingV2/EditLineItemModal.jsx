@@ -10,10 +10,12 @@ import { getCurrentLocale } from 'selectors';
 
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
+import Section from 'components/Layout/v2/Section';
 import Subsection from 'components/Layout/v2/Subsection';
 import ShipmentItemDetails from 'components/receivingV2/ShipmentItemDetails';
 import { DateFormatDateFns } from 'consts/timeFormat';
-import useEditLineItemForm from 'hooks/receiving/v2/useEditLineItemForm';
+import useReceivedLineItems from 'hooks/receiving/v2/useReceivedLineItems';
+import useReceivingLineItems from 'hooks/receiving/v2/useReceivingLineItems';
 import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
 import { formatDateToString } from 'utils/dateUtils';
@@ -23,8 +25,11 @@ const EditLineItemModal = ({ onClose, lineItem }) => {
   const translate = useTranslate();
   const currentLocale = useSelector(getCurrentLocale);
   const {
-    control, fields, columns, addRow, revertToOriginal,
-  } = useEditLineItemForm(lineItem);
+    control, fields, columns, addRow, copyToReceiving, revertToOriginal,
+  } = useReceivingLineItems(lineItem);
+  const { receivedItems, columns: receivedColumns } = useReceivedLineItems(lineItem, {
+    onCopyToReceive: copyToReceiving,
+  });
 
   // Sum of the "Receiving now" inputs across the table, kept live as the user edits.
   const watchedLineItems = useWatch({ control, name: 'lineItems' });
@@ -89,12 +94,29 @@ const EditLineItemModal = ({ onClose, lineItem }) => {
           />
         </div>
         <ShipmentItemDetails details={details} />
-        <div className="badge-container mt-4">
-          <Badge
-            label={translate('react.receiving.received.label', 'Received')}
-            variant="badge--green text-uppercase"
-          />
-        </div>
+        <Section showTitle={false} className="receiving-edit-modal__received mt-4">
+          <Subsection
+            title={(
+              <div className="badge-container">
+                <Badge
+                  label={translate('react.receiving.received.label', 'Received')}
+                  variant="badge--green text-uppercase"
+                />
+              </div>
+            )}
+          >
+            <DataTable
+              columns={receivedColumns}
+              data={receivedItems}
+              totalCount={receivedItems.length}
+              disablePagination
+              emptyTableMessage={{
+                id: 'react.receiving.emptyTable.label',
+                defaultMessage: 'No items to receive',
+              }}
+            />
+          </Subsection>
+        </Section>
         <div className="d-flex justify-content-between align-items-center mt-4">
           <div className="badge-container">
             <Badge
@@ -116,6 +138,8 @@ const EditLineItemModal = ({ onClose, lineItem }) => {
             data={fields}
             totalCount={fields.length}
             disablePagination
+            showFooter
+            meta={{ totalReceivingNow: receivingNow }}
             emptyTableMessage={{
               id: 'react.receiving.emptyTable.label',
               defaultMessage: 'No items to receive',

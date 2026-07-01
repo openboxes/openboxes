@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import DataTable from 'components/DataTable/v2/DataTable';
 import CommentModal from 'components/modals/CommentModal';
 import EditLineItemModal from 'components/receivingV2/EditLineItemModal';
-import useEditLineItemModal from 'hooks/receiving/v2/useEditLineItemModal';
+import useEditReceivingLineItemModal from 'hooks/receiving/v2/useEditReceivingLineItemModal';
 
 import 'components/receivingV2/receiving.scss';
 
@@ -23,7 +23,7 @@ const ReceivingTable = ({
     itemId: editedItemId,
     openModal: openEditModal,
     closeModal: closeEditModal,
-  } = useEditLineItemModal();
+  } = useEditReceivingLineItemModal();
 
   // Keep `meta` stable so it only changes when the entities map or
   // the update function change. Combined with the memoized cells, a single line item update

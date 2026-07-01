@@ -22,7 +22,7 @@ import useTranslate from 'hooks/useTranslate';
  * Each cell is a react-hook-form `Controller` bound to `lineItems.${index}.<field>`.
  * No data/handlers yet - this is the form scaffold.
  */
-const useEditLineItemColumns = ({ control, removeRow }) => {
+const useReceivingLineItemColumns = ({ control, removeRow }) => {
   const translate = useTranslate();
   const columnHelper = createColumnHelper();
   const locationId = useSelector(getCurrentLocationId);
@@ -52,6 +52,7 @@ const useEditLineItemColumns = ({ control, removeRow }) => {
           />
         </TableCell>
       ),
+      footer: () => translate('react.receiving.totalReceivingNow.label', 'Total Receiving Now'),
       size: 220,
     }),
     columnHelper.accessor(receivingColumns.LOT_NUMBER, {
@@ -154,7 +155,9 @@ const useEditLineItemColumns = ({ control, removeRow }) => {
           />
         </TableCell>
       ),
-      size: 120,
+      // Live sum of the "Receiving now" inputs, supplied via the table meta.
+      footer: ({ table }) => table.options.meta?.totalReceivingNow ?? 0,
+      size: 90,
     }),
     columnHelper.accessor(receivingColumns.LOCATION, {
       header: () => <LocationAutofillHeader />,
@@ -198,16 +201,17 @@ const useEditLineItemColumns = ({ control, removeRow }) => {
           </div>
         </TableCell>
       ),
-      size: 70,
+      // Kept in sync with the Received table's actions column so both align.
+      size: 100,
     }),
   ], [translate, control, locationId, removeRow]);
 
   return { columns };
 };
 
-useEditLineItemColumns.propTypes = {
+useReceivingLineItemColumns.propTypes = {
   control: PropTypes.shape({}).isRequired,
   removeRow: PropTypes.func.isRequired,
 };
 
-export default useEditLineItemColumns;
+export default useReceivingLineItemColumns;
