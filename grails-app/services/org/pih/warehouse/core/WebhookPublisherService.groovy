@@ -14,6 +14,8 @@ import grails.util.Holders
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.date.InstantParser
 import org.pih.warehouse.core.date.JavaUtilDateParser
+import org.pih.warehouse.inventory.CycleCount
+import org.pih.warehouse.inventory.CycleCountItem
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
@@ -234,6 +236,91 @@ class WebhookPublisherService {
         ]
 
         log.info("Publishing inventory adjustment webhook event for product ${product?.productCode} at facility ${facility?.name}")
+        log.debug(prettyPrint(toJson(payload).toString()))
+        publishEvent(payload, "openboxes.n8n")
+    }
+
+    /**
+     * Publishes a cycle count completed notification based on the baseline and/or adjustment transactions for the
+     * specific product and facility.
+     */
+    void publishCycleCountCompletedEvent(Product product, Location facility, Transaction baselineTransaction,
+                                         Transaction adjustmentTransaction) {
+        if (!product || !facility) {
+            log.warn("Missing required product and/or facility. Skipping sending the webhook notification.")
+            return
+        }
+
+        // Each cycle count has a baseline, it might not have an adjustment transaction
+        if (!baselineTransaction) {
+            log.warn("Missing required baseline transaction. Skipping sending the webhook notification.")
+            return
+        }
+
+        boolean webhooksEnabled = facility.supports(ActivityCode.ENABLE_WEBHOOKS)
+        if (!webhooksEnabled) {
+            log.info "Location ${facility} does not support activity code ${ActivityCode.ENABLE_WEBHOOKS}"
+            return
+        }
+
+        String eventId = UUID.randomUUID().toString()
+        String webhookId = UUID.randomUUID().toString()
+        Date dateTriggered = new Date()
+
+        User countedBy = adjustmentTransaction?.createdBy ?: baselineTransaction?.createdBy
+
+        Integer quantityBeforeAdjustment = (Integer) baselineTransaction.calculateQuantityByProduct(product) ?: 0
+        Integer quantityVariance = (Integer) adjustmentTransaction?.calculateQuantityVarianceByProduct(product) ?: 0
+        Integer quantityAfterAdjustment = quantityBeforeAdjustment + quantityVariance
+
+        // Since we are sending a notification for single product, we need to filter the baseline and adjustment
+        // transaction entries for that product only
+        List<TransactionEntry> baselineEntries = baselineTransaction?.getTransactionEntriesByProduct(product)
+        List<TransactionEntry> adjustmentEntries = adjustmentTransaction?.getTransactionEntriesByProduct(product)
+        Map payload = [
+                eventId: eventId,
+                eventType: WebhookEventType.CYCLE_COUNT_COMPLETED.name,
+                eventDate: dateTriggered.format(Constants.ISO_DATE_TIME_WITH_TIMEZONE_OFFSET_FORMAT),
+                triggeredBy: countedBy?.name,
+                count: [
+                        id: adjustmentTransaction?.id ?: baselineTransaction?.id,
+                        comment: adjustmentTransaction?.comment,
+                        countedBy: countedBy?.name,
+                        dateCounted: (adjustmentTransaction ?: baselineTransaction).transactionDate?.format(
+                                Constants.ISO_DATE_TIME_WITH_TIMEZONE_OFFSET_FORMAT
+                        ),
+                        product: product.productCode,
+                        totals: [
+                                quantityBeforeAdjustment: quantityBeforeAdjustment,
+                                quantityAfterAdjustment: quantityAfterAdjustment,
+                                quantityVariance: quantityVariance
+                        ],
+                        adjustments: adjustmentEntries?.collect { TransactionEntry entry ->
+                            Integer quantityBefore = baselineEntries?.find { TransactionEntry it ->
+                                it.inventoryItem?.id == entry.inventoryItem?.id && it.binLocation?.id == entry.binLocation?.id
+                            }?.quantity ?: 0
+
+                            [
+                                    location: entry.binLocation?.locationNumber,
+                                    inventoryItem: entry.inventoryItem?.id,
+                                    quantityBeforeAdjustment: quantityBefore,
+                                    quantityAfterAdjustment: quantityBefore + entry.quantityVariance,
+                                    quantityVariance: entry.quantityVariance,
+                                    reasonCode: entry.reasonCode,
+                                    comment: entry.comments,
+                            ]
+                        } ?: []
+                ],
+                metadata: [
+                        facilityId: facility.id,
+                        facilityCode: facility.locationNumber,
+                        facilityName: facility.name,
+                        webhookId: webhookId,
+                        attemptNumber: 1
+                ]
+        ]
+
+        log.info("Publishing cycle count event notification for product ${product?.productCode} at facility ${facility?.name}")
         log.debug(prettyPrint(toJson(payload).toString()))
         publishEvent(payload, "openboxes.n8n")
     }
