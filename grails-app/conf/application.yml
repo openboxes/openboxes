@@ -330,6 +330,14 @@ openboxes:
     ajaxRequest:
         timeout: 120000
 
+    # Async configuration passed to the registered ThreadPoolTaskExecutor bean
+    async:
+        executor:
+            corePoolSize: 2
+            maxPoolSize: 10
+            queueCapacity: 25
+            awaitTerminationSeconds: 30
+
     # The user that background/asynchronous jobs authenticate as when they run.
     # This user provides the current user context (e.g. for createdBy/updatedBy
     # audit stamping) while a job executes. It is allowed to be disabled
