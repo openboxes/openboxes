@@ -1,20 +1,17 @@
 package org.pih.warehouse.receiving
 
-import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import org.pih.warehouse.jobs.AutomaticReceiptJob
 import org.pih.warehouse.shipping.Shipment
-import org.springframework.context.ApplicationListener
+import org.springframework.transaction.event.TransactionPhase
+import org.springframework.transaction.event.TransactionalEventListener
 
 @Transactional
-class AutomaticReceiptEventService implements ApplicationListener<AutomaticReceiptEvent> {
+class AutomaticReceiptEventService {
 
-    GrailsApplication grailsApplication
-    def receiptService
-
-    @Override
-    void onApplicationEvent(AutomaticReceiptEvent event) {
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+    void onAutomaticReceiptEvent(AutomaticReceiptEvent event) {
         if (!Holders.config.openboxes.jobs.automaticReceiptJob.enabled) {
             log.info"Automatic receipt creation job is disabled"
             return
@@ -28,11 +25,8 @@ class AutomaticReceiptEventService implements ApplicationListener<AutomaticRecei
         }
 
         if (shipment.hasShipped() && !shipment.isFullyReceived()) {
-            def delayInMilliseconds =
-                    Integer.valueOf(grailsApplication.config.openboxes.jobs.automaticReceiptJob.delayInMilliseconds) ?: 0
-            Date runAt = new Date(System.currentTimeMillis() + delayInMilliseconds)
-            log.info "Triggering automatic receipt job with ${delayInMilliseconds} ms delay"
-            AutomaticReceiptJob.schedule(runAt, [shipmentId: event.source])
+            log.info "Triggering automatic receipt job"
+            AutomaticReceiptJob.triggerNow([shipmentId: event.source])
         }
     }
 }

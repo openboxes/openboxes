@@ -555,7 +555,6 @@ openboxes:
         automaticReceiptJob:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes
-            delayInMilliseconds: 1000
             bulkShipmentAutoReceipt: true
 
         automaticBackorderReallocationJob:
