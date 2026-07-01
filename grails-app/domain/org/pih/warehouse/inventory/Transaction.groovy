@@ -12,6 +12,7 @@ package org.pih.warehouse.inventory
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.TransactionCreatedEvent
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
@@ -51,6 +52,10 @@ class Transaction implements Comparable, Serializable {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(this, forceRefresh))
     }
 
+    def publishTransactionCreatedEvent() {
+        Holders.grailsApplication.mainContext.publishEvent(new TransactionCreatedEvent(this.id))
+    }
+
     void publishReportsEvents() {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshInventoryCountEvent(this))
         Holders.grailsApplication.mainContext.publishEvent(new RefreshInventoryTransactionsSummaryEvent(this))
@@ -65,6 +70,7 @@ class Transaction implements Comparable, Serializable {
     def afterInsert() {
         publishSaveEvent()
         publishReportsEvents()
+        publishTransactionCreatedEvent()
     }
 
     def afterUpdate() {
