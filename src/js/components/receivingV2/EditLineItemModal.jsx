@@ -116,6 +116,7 @@ const EditLineItemModal = ({ onClose, lineItem }) => {
               data={receivedItems}
               totalCount={receivedItems.length}
               disablePagination
+              disabled
               showFooter
               meta={{ totalReceived }}
               emptyTableMessage={{

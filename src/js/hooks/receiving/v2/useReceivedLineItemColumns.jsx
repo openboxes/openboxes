@@ -162,8 +162,7 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
           />
         </TableCell>
       ),
-      // Live sum of the "Received" quantities, supplied via the table meta.
-      footer: ({ table }) => <span style={{ paddingLeft: '20px' }}>{table.options.meta?.totalReceived ?? 0}</span>,
+      footer: ({ table }) => table.options.meta?.totalReceived ?? 0,
       size: 90,
     }),
     columnHelper.accessor(receivingColumns.LOCATION, {
@@ -198,7 +197,7 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
         <TableCell className="rt-td">
           <button
             type="button"
-            className="receiving-edit-modal__copy-to-receive d-flex align-items-center justify-content-end gap-8 w-100 h-100 p-0 border-0 bg-transparent cursor-pointer"
+            className="receiving-edit-modal__copy-to-receive d-flex align-items-center justify-content-end gap-8 w-100 h-100 p-0 border-0 bg-transparent cursor-pointer text-nowrap"
             onClick={() => copyToReceive(row.original.rowId)}
           >
             <RiArrowDownLine size={18} />
@@ -206,10 +205,14 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
           </button>
         </TableCell>
       ),
-      // Matches the "Receiving now" actions column so both tables' columns align
-      // (v2 DataTable distributes width proportionally to each column's size).
-      // Wider than the editable table's icon-only action to fit "Copy to receive".
-      size: 100,
+      // Wide enough to always fit the "Copy to receive" label + icon so it never
+      // clips. Columns don't shrink (see getCommonPinningStyles), so the table
+      // scrolls instead of squeezing this action on narrow screens. Kept in sync
+      // with the "Receiving now" actions column so both tables' columns align.
+      size: 160,
+      // Keep the "Copy to receive" action fully opaque and usable while the rest
+      // of the (read-only) table is faded via the DataTable `disabled` prop.
+      meta: { getCellContext: () => ({ className: 'data-table__interactive' }) },
     }),
   ], [translate, control, locationId, copyToReceive]);
 

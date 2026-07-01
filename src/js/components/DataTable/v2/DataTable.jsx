@@ -46,6 +46,7 @@ const DataTable = ({
   virtualize,
   overflowVisible,
   showFooter,
+  disabled,
 }) => {
   const {
     defaultEmptyTableMessage,
@@ -67,7 +68,7 @@ const DataTable = ({
 
   return (
     <div className="app-react-table-wrapper table-v2">
-      <div className="ReactTable app-react-table">
+      <div className={`ReactTable app-react-table ${disabled ? 'app-react-table--disabled' : ''}`}>
         <div className={`rt-table ${overflowVisible ? 'overflow-visible' : ''}`} role="grid">
           <DataTableHeader
             headerGroups={table.getHeaderGroups()}
@@ -143,6 +144,9 @@ DataTable.propTypes = {
   overflowVisible: PropTypes.bool,
   // Renders a column-aligned footer row from each column's `footer` definition.
   showFooter: PropTypes.bool,
+  // Mutes the table chrome (header/footer) to a disabled look. Field-level
+  // `disabled` still lives on each column's cell definition.
+  disabled: PropTypes.bool,
 };
 
 DataTable.defaultProps = {
@@ -165,4 +169,5 @@ DataTable.defaultProps = {
   // it allows tooltips to overflow outside the table
   overflowVisible: false,
   showFooter: false,
+  disabled: false,
 };

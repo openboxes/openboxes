@@ -155,8 +155,7 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
           />
         </TableCell>
       ),
-      // Live sum of the "Receiving now" inputs, supplied via the table meta.
-      footer: ({ table }) => <span style={{ paddingLeft: '20px' }}>{table.options.meta?.totalReceivingNow ?? 0}</span>,
+      footer: ({ table }) => table.options.meta?.totalReceivingNow ?? 0,
       size: 90,
     }),
     columnHelper.accessor(receivingColumns.LOCATION, {
@@ -201,8 +200,9 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
           </div>
         </TableCell>
       ),
-      // Kept in sync with the Received table's actions column so both align.
-      size: 100,
+      // Kept in sync with the Received table's actions column so both align
+      // (that table sizes this column to fit its "Copy to receive" label).
+      size: 160,
     }),
   ], [translate, control, locationId, removeRow]);
 
