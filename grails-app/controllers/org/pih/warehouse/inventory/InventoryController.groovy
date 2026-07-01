@@ -11,6 +11,7 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.Validateable
 import grails.validation.ValidationException
@@ -21,6 +22,7 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DefaultNullableCommand
+import org.pih.warehouse.core.InventoryAdjustmentEvent
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.CSVUtils
@@ -51,6 +53,7 @@ class InventoryController {
     TransactionIdentifierService transactionIdentifierService
     def forecastingService
     AdjustInventoryService adjustInventoryService
+    GrailsApplication grailsApplication
 
     static allowedMethods = [show: "GET", search: "POST", download: "GET"]
 
@@ -910,6 +913,12 @@ class InventoryController {
                     transaction.save(failOnError: true)
                     flash.message = "Successfully saved transaction"
                     def productId = command.transactionEntries.first()?.inventoryItem?.product?.id
+                    grailsApplication.mainContext.publishEvent(new InventoryAdjustmentEvent(
+                            transaction.transactionEntries?.inventoryItem?.product?.unique(),
+                            warehouseInstance,
+                            null,
+                            transaction
+                    ))
                     redirect(controller: "inventoryItem", action: "showStockCard", id: productId)
                 }
             } catch (ValidationException e) {
@@ -995,6 +1004,12 @@ class InventoryController {
                 if (!transaction?.hasErrors() && transaction?.validate()) {
                     transaction.save(failOnError: true)
                     flash.message = "Successfully saved transaction"
+                    grailsApplication.mainContext.publishEvent(new InventoryAdjustmentEvent(
+                            transaction.transactionEntries?.inventoryItem?.product?.unique(),
+                            warehouseInstance,
+                            null,
+                            transaction
+                    ))
                     redirect(controller: "inventoryItem", action: "showStockCard", id: productIds[0])
                     return
                 }
@@ -1092,6 +1107,12 @@ class InventoryController {
                     flash.message = "Successfully saved transaction"
 
                     // A transfer-in only operates on a single product so redirect to its stock card.
+                    grailsApplication.mainContext.publishEvent(new InventoryAdjustmentEvent(
+                            transactionInstance.transactionEntries?.inventoryItem?.product?.unique(),
+                            warehouseInstance,
+                            null,
+                            transactionInstance
+                    ))
                     String productId = transactionInstance.getAssociatedProducts().first()
                     redirect(controller: "inventoryItem", action: "showStockCard", id: productId)
                 }

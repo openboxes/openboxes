@@ -30,6 +30,7 @@ class TransactionEntry implements Comparable, Serializable {
     static mapping = {
         id generator: 'uuid'
     }
+
     static constraints = {
         product(nullable: true)
         inventoryItem(nullable: false)
@@ -38,6 +39,8 @@ class TransactionEntry implements Comparable, Serializable {
         reasonCode(nullable: true)
         comments(nullable: true, maxSize: 255)
     }
+
+    static transients = ['quantityVariance']
 
     static namedQueries = {
         countByTransactionTypes { Location facility, Product product, List<TransactionType> transactionTypes, Date startDate, Date endDate ->
@@ -65,6 +68,22 @@ class TransactionEntry implements Comparable, Serializable {
 
     }
 
+    /**
+     * Returns quantity variance related to the previous entries. If this is an INVENTORY or PRODUCT_INVENTORY
+     * transaction (baseline/snapshot), then the variance is 0. If this is a DEBIT transaction, then the variance
+     * is negative. Otherwise if it is CREDIT transaction type, then the variance is positive.
+     * */
+    Integer getQuantityVariance() {
+        if (transaction.transactionType?.transactionCode in [TransactionCode.INVENTORY, TransactionCode.PRODUCT_INVENTORY]) {
+            return 0
+        }
+
+        if (transaction.transactionType?.transactionCode == TransactionCode.DEBIT) {
+            return quantity * -1
+        }
+
+        return quantity
+    }
 
     /**
      * Sort by the sort parameters of the parent transaction

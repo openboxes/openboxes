@@ -577,6 +577,9 @@ openboxes:
         # should only be triggered by persistence event listener
         putawayLocationReslottingJob:
             enabled: true
+
+        publishInventoryAdjustmentEventJob:
+            enabled: true
     # LDAP configuration
     ldap:
         enabled: false

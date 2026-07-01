@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
 import grails.validation.ValidationException
@@ -22,6 +23,7 @@ import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
+import org.pih.warehouse.core.InventoryAdjustmentEvent
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.localization.MessageLocalizer
@@ -73,6 +75,7 @@ class InventoryService implements ApplicationContextAware {
     TransactionIdentifierService transactionIdentifierService
     def messageService
     def locationService
+    GrailsApplication grailsApplication
 
     ApplicationContext applicationContext
 
@@ -1525,6 +1528,8 @@ class InventoryService implements ApplicationContextAware {
 
             // 5. Check if there are any changes in quantity recorded. If there aren't, we're done.
             if (!adjustmentTransaction.transactionEntries) {
+                // Send a snapshot - count date if there are no adjustments made
+                grailsApplication.mainContext.publishEvent(new InventoryAdjustmentEvent([cmd.product], cmd.inventory.warehouse, baselineTransaction, null))
                 return cmd
             }
 
@@ -1542,6 +1547,8 @@ class InventoryService implements ApplicationContextAware {
                 }
                 return null
             }
+
+            grailsApplication.mainContext.publishEvent(new InventoryAdjustmentEvent([cmd.product],cmd.inventory.warehouse, baselineTransaction, adjustmentTransaction))
         } catch (Exception e) {
             cmd.errors.reject("Error saving an inventory record to the database: " + e.message)
         }
@@ -1938,6 +1945,8 @@ class InventoryService implements ApplicationContextAware {
         def inventory = command.location.inventory
         def inventoryItem = command.inventoryItem
         def binLocation = command.binLocation
+        def reasonCode = command.reasonCode
+        def comment = command.comment
         def availableQuantity = getQuantityFromBinLocation(location, binLocation, inventoryItem)
         def adjustedQuantity = newQuantity - availableQuantity
         Date transactionDate = new Date()
@@ -1967,12 +1976,16 @@ class InventoryService implements ApplicationContextAware {
             transactionEntry.quantity = adjustedQuantity
             transactionEntry.inventoryItem = inventoryItem
             transactionEntry.binLocation = binLocation
+            transactionEntry.reasonCode = reasonCode
+            transactionEntry.comments = comment
 
             transaction.addToTransactionEntries(transactionEntry)
 
             if (!transaction.save()) {
                 throw new ValidationException("Error saving transaction", transaction.errors)
             }
+
+            grailsApplication.mainContext.publishEvent(new InventoryAdjustmentEvent([inventoryItem.product], location, null, transaction))
         }
         return command
     }
