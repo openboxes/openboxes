@@ -53,6 +53,7 @@ enum ActivityCode {
     ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS('ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS'),
     // Approval notifications (if fulfiller should get the notification about submited requests)
     ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS('ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS'),
+    ENABLE_STOCK_TRANSFER_NOTIFICATIONS('ENABLE_STOCK_TRANSFER_NOTIFICATIONS'),
 
     // Packing
     PACK_SHIPMENT('PACK_SHIPMENT'),
@@ -197,6 +198,7 @@ enum ActivityCode {
                 ENABLE_WEBHOOKS,
                 ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS,
                 ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS,
+                ENABLE_STOCK_TRANSFER_NOTIFICATIONS,
                 PACK_SHIPMENT,
                 PARTIAL_RECEIVING,
                 REQUIRE_ACCOUNTING,
@@ -252,7 +254,7 @@ enum ActivityCode {
                 DELIVERY_TYPE_STOCK_TRANSFER_IBT,
 
                 TRACK_INTERNAL_TRANSACTIONS,
-                DISPLAY_STOCK
+                DISPLAY_STOCK,
         ]
     }
 

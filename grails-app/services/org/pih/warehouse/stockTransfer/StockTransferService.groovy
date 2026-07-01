@@ -337,6 +337,7 @@ class StockTransferService {
         orderItem.destinationBinLocation = stockTransferItem.destinationBinLocation
         orderItem.recipient = stockTransferItem.recipient
         orderItem.orderIndex = stockTransferItem.orderIndex
+        orderItem.discrepancyReasonCode = stockTransferItem.reasonCode
         return orderItem
     }
 
@@ -350,6 +351,8 @@ class StockTransferService {
         processSplitItems(stockTransfer)
 
         createStockTransferTransaction(stockTransfer, order)
+
+        grailsApplication.mainContext.publishEvent(new StockTransferEvent(stockTransfer.id))
 
         return order
     }

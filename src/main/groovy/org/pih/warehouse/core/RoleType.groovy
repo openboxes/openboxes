@@ -40,6 +40,7 @@ enum RoleType {
     ROLE_SHIPMENT_OUTBOUND_SHIPPED_NOTIFICATION('Shipment Outbound Shipped Notifications', 100),
     ROLE_SHIPMENT_INBOUND_RECEIVED_NOTIFICATION('Shipment Inbound Received Notifications', 100),
     ROLE_SHIPMENT_OUTBOUND_RECEIVED_NOTIFICATION('Shipment Outbound Received Notifications', 100),
+    ROLE_STOCK_TRANSFER_NOTIFICATION('Stock Transfer Notifications', 100),
 
     // Notification roles for stock alerts
             ROLE_ITEM_ALL_NOTIFICATION('All Stock Notifications', 100),

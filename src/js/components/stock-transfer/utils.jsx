@@ -4,7 +4,7 @@ const PENDING = 'PENDING';
 const CANCELED = 'CANCELED';
 
 function extractItem(item, status) {
-  const { destinationBinLocation, destinationZone } = item;
+  const { destinationBinLocation, destinationZone, reasonCode } = item;
 
   let destinationBin = {};
   if (status === PENDING) {
@@ -25,6 +25,7 @@ function extractItem(item, status) {
     ...item,
     destinationBinLocation: destinationBin,
     quantity: status === PENDING ? '' : item.quantity,
+    reasonCode: status === PENDING ? '' : reasonCode,
   };
 }
 
@@ -50,6 +51,7 @@ function extractSplitItem(item, splitItem, status) {
     quantity: status === PENDING ? '' : splitItem.quantity,
     quantityOnHand: item.quantityOnHand,
     referenceId: item.id, // set a referenceId from original item
+    reasonCode: status === PENDING ? '' : splitItem.reasonCode,
   };
 }
 
