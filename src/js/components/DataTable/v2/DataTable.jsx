@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 import DataTableBody from 'components/DataTable/v2/DataTableBody';
 import DataTableFooter from 'components/DataTable/v2/DataTableFooter';
+import DataTableFooterRow from 'components/DataTable/v2/DataTableFooterRow';
 import DataTableHeader from 'components/DataTable/v2/DataTableHeader';
 import useDataTable from 'hooks/useDataTable';
 import useWindowWidthCheck from 'hooks/useWindowWidthCheck';
@@ -44,6 +45,7 @@ const DataTable = ({
   tableWithPinnedColumns,
   virtualize,
   overflowVisible,
+  showFooter,
 }) => {
   const {
     defaultEmptyTableMessage,
@@ -87,6 +89,13 @@ const DataTable = ({
             isScreenWiderThanTable={isScreenWiderThanTable}
             overflowVisible={overflowVisible}
           />
+          {showFooter && (
+            <DataTableFooterRow
+              footerGroups={table.getFooterGroups()}
+              tableWithPinnedColumns={tableWithPinnedColumns}
+              isScreenWiderThanTable={isScreenWiderThanTable}
+            />
+          )}
         </div>
         {shouldDisplayPagination && (
           <DataTableFooter
@@ -132,6 +141,8 @@ DataTable.propTypes = {
     customRowsHeight: PropTypes.bool,
   }),
   overflowVisible: PropTypes.bool,
+  // Renders a column-aligned footer row from each column's `footer` definition.
+  showFooter: PropTypes.bool,
 };
 
 DataTable.defaultProps = {
@@ -153,4 +164,5 @@ DataTable.defaultProps = {
   },
   // it allows tooltips to overflow outside the table
   overflowVisible: false,
+  showFooter: false,
 };

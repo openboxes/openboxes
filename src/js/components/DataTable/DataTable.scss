@@ -269,6 +269,25 @@
     }
   }
 
+  // Column-aligned footer row (DataTableFooterRow)
+  .rt-tfoot {
+    box-shadow: none;
+
+    .rt-tr {
+      display: flex;
+    }
+
+    .footer-cell {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      background-color: var(--blue-100);
+      color: var(--gray-600);
+      font-weight: bold;
+      box-shadow: none;
+    }
+  }
+
   .table-pagination-bottom {
     padding: 0.75rem !important;
   }
