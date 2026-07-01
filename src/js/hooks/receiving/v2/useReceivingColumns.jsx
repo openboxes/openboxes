@@ -10,6 +10,7 @@ import LocationAutofillHeader from 'components/receivingV2/LocationAutofillHeade
 import receivingColumns from 'consts/receivingColumns';
 import receivingLocationOptions from 'consts/receivingLocationOptions';
 import { ReceivingView } from 'consts/receivingViewOptions';
+import useFormatNumber from 'hooks/useFormatNumber';
 import useTranslate from 'hooks/useTranslate';
 import ActionsCell from 'utils/cells/ActionsCell';
 import ExpirationDateCell from 'utils/cells/ExpirationDateCell';
@@ -26,6 +27,7 @@ const useReceivingColumns = ({
   putawayEnabled,
 } = {}) => {
   const translate = useTranslate();
+  const formatNumber = useFormatNumber();
   const columnHelper = createColumnHelper();
   const currentLocale = useSelector(getCurrentLocale);
   const isShipmentFromPurchaseOrder = useSelector(getIsShipmentFromPurchaseOrder);
@@ -44,7 +46,7 @@ const useReceivingColumns = ({
       };
     }
     if (quantityRemaining < 0) {
-      const quantityOver = Math.abs(quantityRemaining);
+      const quantityOver = formatNumber(Math.abs(quantityRemaining));
       return {
         className: 'status-cell status-cell--over',
         value: translate('react.receiving.status.over.label', `${quantityOver} over`, [quantityOver]),
@@ -58,9 +60,10 @@ const useReceivingColumns = ({
     }
     // TODO (OBPIH-7864): show the remaining status only once something has been
     // entered in the input or already saved for the row.
+    const quantityRemainingFormatted = formatNumber(quantityRemaining);
     return {
       className: 'status-cell',
-      value: translate('react.receiving.status.remaining.label', `${quantityRemaining} remaining`, [quantityRemaining]),
+      value: translate('react.receiving.status.remaining.label', `${quantityRemainingFormatted} remaining`, [quantityRemainingFormatted]),
     };
   };
 
@@ -300,11 +303,11 @@ const useReceivingColumns = ({
           );
         },
         cell: ({ row, table }) => {
-          const value = getItem(row, table)?.quantityShipped;
+          const value = formatNumber(getItem(row, table)?.quantityShipped);
           return (
             <ValueCell
               value={value}
-              tooltipLabel={value?.toString()}
+              tooltipLabel={value}
               label="react.receiving.shipped.label"
               defaultLabel="Shipped"
             />
@@ -357,6 +360,7 @@ const useReceivingColumns = ({
               className={className}
               label="react.receiving.status.label"
               defaultLabel="Status"
+              truncate
             />
           );
         },
