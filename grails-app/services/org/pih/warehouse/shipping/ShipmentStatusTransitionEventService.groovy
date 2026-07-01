@@ -60,7 +60,6 @@ class ShipmentStatusTransitionEventService implements ApplicationListener<Shipme
             notificationService.sendShipmentItemsShippedNotification(shipment)
             // Temporarily hard-code publishing webhook events for shipped events
             webhookPublisherService.publishShippedEvent(shipment)
-            webhookPublisherService.publishRequisitionEvent(shipment.requisition, WebhookEventType.PICK_COMPLETED)
         } else if (event.shipmentStatusCode in [ShipmentStatusCode.RECEIVED, ShipmentStatusCode.PARTIALLY_RECEIVED]) {
             if (originNotificationsEnabled) {
                 notificationService.sendShipmentReceiptNotification(shipment, shipment.origin, outboundReceivedRoleTypes)

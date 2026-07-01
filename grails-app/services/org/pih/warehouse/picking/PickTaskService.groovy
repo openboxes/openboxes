@@ -353,12 +353,13 @@ class PickTaskService {
             boolean backordered = requisition.requisitionItems?.any { it.isBackordered() }
             if (allTasksStaged && (!partialAllocation || !backordered)) {
                 requisition.status = RequisitionStatus.STAGED
-                grailsApplication.mainContext.publishEvent(new RequisitionEvent(task.requisition.id, WebhookEventType.REQUISITION_STAGED))
 
                 if (!requisition.shipment) {
                     Shipment shipment = stockMovementService.createShipment(requisition)
                     stockMovementService.createMissingShipmentItems(requisition, shipment)
                 }
+
+                grailsApplication.mainContext.publishEvent(new RequisitionEvent(task.requisition.id, WebhookEventType.REQUISITION_STAGED))
             }
         }
 
