@@ -36,17 +36,24 @@ const useReceivingColumns = ({
   // time. The row `meta` drives row-level greying/disabling of fully received lines.
   const getItem = (row, table) => table.options.meta?.entities?.[row.original.id];
 
-  const getStatus = (quantityRemaining) => {
+  const getStatus = (quantityRemaining, isCompleted) => {
+    if (isCompleted) {
+      return {
+        className: 'status-cell status-cell--completed',
+        value: translate('react.receiving.status.completed.label', 'Complete'),
+      };
+    }
     if (quantityRemaining < 0) {
+      const quantityOver = Math.abs(quantityRemaining);
       return {
         className: 'status-cell status-cell--over',
-        value: translate('react.receiving.status.over.label', `${quantityRemaining} over`, [quantityRemaining]),
+        value: translate('react.receiving.status.over.label', `${quantityOver} over`, [quantityOver]),
       };
     }
     if (quantityRemaining === 0) {
       return {
-        className: 'status-cell status-cell--completed',
-        value: translate('react.receiving.status.completed.label', 'Complete'),
+        className: 'status-cell status-cell--equal',
+        value: translate('react.receiving.status.equal.label', 'Equal'),
       };
     }
     // TODO (OBPIH-7864): show the remaining status only once something has been
@@ -84,7 +91,7 @@ const useReceivingColumns = ({
           />
         );
       },
-      size: 120,
+      size: 140,
     });
 
     // Leftmost column in packing list view: the item's own pack level.
@@ -105,6 +112,7 @@ const useReceivingColumns = ({
         );
       },
       meta: {
+        pinned: 'left',
         // Light indent on item rows in packing list view.
         getCellContext: () => ({ className: 'receiving-table__pack-level-group' }),
         renderSeparator: ({ row }) => (
@@ -119,7 +127,7 @@ const useReceivingColumns = ({
           </TableCell>
         ),
       },
-      size: 100,
+      size: 110,
     });
 
     return [
@@ -148,7 +156,10 @@ const useReceivingColumns = ({
             />
           );
         },
-        size: 85,
+        meta: {
+          pinned: 'left',
+        },
+        size: 90,
       }),
       columnHelper.display({
         id: receivingColumns.PRODUCT,
@@ -168,7 +179,10 @@ const useReceivingColumns = ({
             maxLines={2}
           />
         ),
-        size: 280,
+        meta: {
+          pinned: 'left',
+        },
+        size: 300,
       }),
       // In the packing list view, the pack level column is not needed
       // because the parent group name is rendered on the separator rows.
@@ -195,7 +209,7 @@ const useReceivingColumns = ({
             />
           );
         },
-        size: 120,
+        size: 125,
       }),
       columnHelper.display({
         id: receivingColumns.EXPIRATION_DATE,
@@ -216,7 +230,7 @@ const useReceivingColumns = ({
             showExpiryStatus
           />
         ),
-        size: 100,
+        size: 110,
       }),
       columnHelper.display({
         id: receivingColumns.RECIPIENT,
@@ -240,7 +254,7 @@ const useReceivingColumns = ({
             />
           );
         },
-        size: 120,
+        size: 125,
       }),
       // When receiving against a purchase order, an extra column shows the shipped
       // quantity in the PO's unit of measure (packs) before the per-each quantity.
@@ -269,7 +283,7 @@ const useReceivingColumns = ({
               />
             );
           },
-          size: 120,
+          size: 125,
         }),
       ] : []),
       columnHelper.display({
@@ -315,7 +329,7 @@ const useReceivingColumns = ({
               value={item?.quantityReceiving}
               onCommit={(quantityReceiving) =>
                 table.options.meta?.updateLineItem(row.original.id, { quantityReceiving })}
-              disabled={item?.isFullyReceived}
+              disabled={item?.isCompleted}
               label="react.receiving.receivingNow.label"
               defaultLabel="Receiving Now"
             />
@@ -334,7 +348,8 @@ const useReceivingColumns = ({
           </TableHeaderCell>
         ),
         cell: ({ row, table }) => {
-          const { className, value } = getStatus(getItem(row, table)?.quantityRemaining);
+          const item = getItem(row, table);
+          const { className, value } = getStatus(item?.quantityRemaining, item?.isCompleted);
           return (
             <ValueCell
               value={value}
@@ -345,7 +360,7 @@ const useReceivingColumns = ({
             />
           );
         },
-        size: 120,
+        size: 125,
       }),
       // The Location (putaway bin) column is only shown when "Enable Putaway" is on.
       ...(putawayEnabled ? [
@@ -355,7 +370,7 @@ const useReceivingColumns = ({
           cell: ({ row, table }) => (
             <SelectCell
               options={receivingLocationOptions}
-              disabled={getItem(row, table)?.isFullyReceived}
+              disabled={getItem(row, table)?.isCompleted}
               label="react.receiving.location.label"
               defaultLabel="Location"
             />
@@ -370,7 +385,7 @@ const useReceivingColumns = ({
               />
             ),
           },
-          size: 165,
+          size: 170,
         }),
       ] : []),
       columnHelper.display({
@@ -386,12 +401,12 @@ const useReceivingColumns = ({
               itemId: row.original.id,
               onOpenCommentModal: table.options.meta?.onOpenCommentModal,
             })}
-            disabled={getItem(row, table)?.isFullyReceived}
+            disabled={getItem(row, table)?.isCompleted}
             label="react.receiving.actions.label"
             defaultLabel="Actions"
           />
         ),
-        size: 80,
+        size: 90,
       }),
     ];
   }, [translate, currentLocale, isPackingListView, putawayEnabled, isShipmentFromPurchaseOrder]);

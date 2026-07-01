@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { getReceivingHeaderInfo } from 'selectors';
+import { getDefaultTranslationsFetched, getReceivingHeaderInfo } from 'selectors';
 
 import { updateReceivingHeader } from 'actions';
 import stockMovementApi from 'api/services/StockMovementApi';
@@ -19,6 +19,7 @@ const useReceivingHeader = () => {
   const translate = useTranslate();
   const dispatch = useDispatch();
   const info = useSelector(getReceivingHeaderInfo);
+  const translationsFetched = useSelector(getDefaultTranslationsFetched);
 
   const buildHeaderInfo = useMemo(() => (shipment) => [
     {
@@ -29,7 +30,8 @@ const useReceivingHeader = () => {
     {
       text: shipment.origin?.name,
       color: '#004d40',
-      delimeter: ` ${translate('react.default.to.label', 'to')} `,
+      // Guard against translate returning undefined before translations load.
+      delimeter: ` ${translate('react.default.to.label', 'to') || 'to'} `,
     },
     {
       text: shipment.destination?.name,
@@ -55,12 +57,12 @@ const useReceivingHeader = () => {
   };
 
   useEffect(() => {
-    if (!shipmentId) {
+    if (!shipmentId || !translationsFetched) {
       return;
     }
 
     loadShipment();
-  }, [shipmentId]);
+  }, [shipmentId, translationsFetched]);
 
   return { info };
 };
