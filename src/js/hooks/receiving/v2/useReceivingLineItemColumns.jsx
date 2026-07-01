@@ -156,7 +156,7 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
         </TableCell>
       ),
       // Live sum of the "Receiving now" inputs, supplied via the table meta.
-      footer: ({ table }) => table.options.meta?.totalReceivingNow ?? 0,
+      footer: ({ table }) => <span style={{ paddingLeft: '20px' }}>{table.options.meta?.totalReceivingNow ?? 0}</span>,
       size: 90,
     }),
     columnHelper.accessor(receivingColumns.LOCATION, {

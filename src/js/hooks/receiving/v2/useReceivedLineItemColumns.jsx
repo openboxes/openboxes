@@ -55,6 +55,7 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
           />
         </TableCell>
       ),
+      footer: () => translate('react.receiving.totalReceived.label', 'Total Received'),
       size: 220,
     }),
     columnHelper.accessor(receivingColumns.LOT_NUMBER, {
@@ -161,6 +162,8 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
           />
         </TableCell>
       ),
+      // Live sum of the "Received" quantities, supplied via the table meta.
+      footer: ({ table }) => <span style={{ paddingLeft: '20px' }}>{table.options.meta?.totalReceived ?? 0}</span>,
       size: 90,
     }),
     columnHelper.accessor(receivingColumns.LOCATION, {

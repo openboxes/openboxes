@@ -38,6 +38,12 @@ const EditLineItemModal = ({ onClose, lineItem }) => {
     0,
   );
 
+  // Sum of the already-received quantities shown in the read-only "Received" table.
+  const totalReceived = receivedItems.reduce(
+    (sum, item) => sum + (Number(item?.quantityReceived) || 0),
+    0,
+  );
+
   const quantityShipped = lineItem?.quantityShipped ?? 0;
   const received = lineItem?.quantityReceived ?? 0;
   const remainingToReceive = quantityShipped - received - receivingNow;
@@ -110,6 +116,8 @@ const EditLineItemModal = ({ onClose, lineItem }) => {
               data={receivedItems}
               totalCount={receivedItems.length}
               disablePagination
+              showFooter
+              meta={{ totalReceived }}
               emptyTableMessage={{
                 id: 'react.receiving.emptyTable.label',
                 defaultMessage: 'No items to receive',
