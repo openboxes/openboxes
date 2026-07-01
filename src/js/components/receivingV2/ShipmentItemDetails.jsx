@@ -8,6 +8,7 @@ import Badge from 'utils/Badge';
 /**
  * Read-only summary of the shipment line being edited: a status chip followed by
  * a light-blue box of product/shipment fields. Shown at the top of the edit modal.
+ * The status is always "Shipped" - the modal only opens for shipped lines.
  */
 const ShipmentItemDetails = ({ details }) => {
   const translate = useTranslate();
@@ -36,7 +37,7 @@ const ShipmentItemDetails = ({ details }) => {
     {
       key: 'location',
       label: translate('react.receiving.location.label', 'Location'),
-      value: details.location,
+      value: details.binLocation,
     },
     {
       key: 'shipped',
@@ -48,7 +49,10 @@ const ShipmentItemDetails = ({ details }) => {
   return (
     <div className="shipment-item-details">
       <div className="badge-container">
-        <Badge label={details.status} variant="badge--grey" />
+        <Badge
+          label={translate('react.receiving.status.shipped.label', 'Shipped')}
+          variant="badge--grey text-uppercase"
+        />
       </div>
       <div className="shipment-item-details__grid">
         {fields.map(({ key, label, value }) => (
@@ -64,12 +68,11 @@ const ShipmentItemDetails = ({ details }) => {
 
 ShipmentItemDetails.propTypes = {
   details: PropTypes.shape({
-    status: PropTypes.string,
     product: PropTypes.string,
     lotNumber: PropTypes.string,
     expirationDate: PropTypes.string,
     recipient: PropTypes.string,
-    location: PropTypes.string,
+    binLocation: PropTypes.string,
     quantityShipped: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   }).isRequired,
 };

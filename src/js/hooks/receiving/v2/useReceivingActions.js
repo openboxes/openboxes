@@ -9,6 +9,7 @@ import { fetchUsers } from 'actions';
 import receivingApi from 'api/services/ReceivingApi';
 import ReceiptGroup from 'consts/receiptGroup';
 import { ReceivingView } from 'consts/receivingViewOptions';
+import mapToFormSelectOption from 'utils/mapToFormSelectOption';
 import useReceivingSaveAction from 'hooks/receiving/v2/useReceivingSaveAction';
 import {
   createNormalizedState,
@@ -72,8 +73,9 @@ const useReceivingActions = (view) => {
         ?? shipmentItem.productLot?.lotNumber,
       expirationDate: currentReceiptItem?.productLot?.expirationDate
         ?? shipmentItem.productLot?.expirationDate,
-      recipient: currentReceiptItem?.recipient
+      recipient: mapToFormSelectOption(currentReceiptItem?.recipient)
         ?? (shipmentItem.recipientId ? usersById[shipmentItem.recipientId] : null),
+      binLocation: currentReceiptItem?.binLocation ?? shipmentItem.binLocation ?? null,
       quantityShipped: shipmentItem.quantity,
       quantityReceived: totalQuantityReceived,
       packSize: shipmentItem.packSize,

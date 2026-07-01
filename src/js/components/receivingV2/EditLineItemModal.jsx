@@ -49,9 +49,7 @@ const EditLineItemModal = ({ onClose, lineItem }) => {
   const remainingToReceive = quantityShipped - received - receivingNow;
 
   // The original shipped values for the line being edited.
-  // TODO: `status` and `location` are not yet exposed on the line item.
   const details = {
-    status: 'SHIPPED',
     product: lineItem?.product?.name,
     lotNumber: lineItem?.lotNumber,
     // Formatted like the read-only table's expiration cell.
@@ -61,7 +59,7 @@ const EditLineItemModal = ({ onClose, lineItem }) => {
       options: { locale: locales[currentLocale] },
     }),
     recipient: lineItem?.recipient?.name,
-    location: lineItem?.location?.name,
+    binLocation: lineItem?.binLocation?.name,
     quantityShipped: lineItem?.quantityShipped,
   };
 
@@ -87,7 +85,7 @@ const EditLineItemModal = ({ onClose, lineItem }) => {
   return (
     <Modal isOpen className="modal-content">
       <div className="receiving-edit-modal" data-testid="receiving-edit-line-item-modal">
-        <div className="d-flex justify-content-between align-items-center pb-2">
+        <div className="d-flex justify-content-between align-items-center pb-3">
           <h5 className="receiving-edit-modal__title m-0 font-weight-500">
             {translate('react.receiving.editModal.title.label', 'Edit Receiving Information')}
           </h5>
@@ -120,8 +118,8 @@ const EditLineItemModal = ({ onClose, lineItem }) => {
               showFooter
               meta={{ totalReceived }}
               emptyTableMessage={{
-                id: 'react.receiving.emptyTable.label',
-                defaultMessage: 'No items to receive',
+                id: 'react.receiving.emptyReceivedTable.label',
+                defaultMessage: 'No items received',
               }}
             />
           </Subsection>
@@ -192,7 +190,7 @@ EditLineItemModal.propTypes = {
     lotNumber: PropTypes.string,
     expirationDate: PropTypes.string,
     recipient: PropTypes.shape({ name: PropTypes.string }),
-    location: PropTypes.shape({ name: PropTypes.string }),
+    binLocation: PropTypes.shape({ name: PropTypes.string }),
     quantityShipped: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     quantityReceived: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   }),

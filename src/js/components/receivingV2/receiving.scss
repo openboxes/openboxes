@@ -186,7 +186,33 @@
   }
 }
 
+.modal-content:has(.receiving-edit-modal) {
+  top: 15%;
+}
+
 .receiving-edit-modal {
+  max-height: calc(80vh - 100px);
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 0.5em;
+    height: 0.5em;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--blue-200);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--blue-301);
+    border-radius: 4px;
+  }
+
+  // Match the empty table state to a single data-row height
+  .table-v2 .rt-tbody-v2 .rt-noData {
+    min-height: 60px;
+  }
+
   .badge-container .badge {
     border-radius: 4px;
   }

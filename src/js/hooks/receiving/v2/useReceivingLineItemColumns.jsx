@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
-import { getCurrentLocationId } from 'selectors';
+import { getCurrentLocationId, getDebounceTime, getMinSearchLength } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
@@ -16,6 +16,7 @@ import LocationAutofillHeader from 'components/receivingV2/LocationAutofillHeade
 import receivingColumns from 'consts/receivingColumns';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
+import { debouncePeopleFetch } from 'utils/option-utils';
 
 /**
  * Columns for the editable "Receiving now" table inside the edit modal.
@@ -26,6 +27,13 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
   const translate = useTranslate();
   const columnHelper = createColumnHelper();
   const locationId = useSelector(getCurrentLocationId);
+  const debounceTime = useSelector(getDebounceTime);
+  const minSearchLength = useSelector(getMinSearchLength);
+  // Async person lookup for the recipient select, mirroring cycle count / inbound.
+  const debouncedPeopleFetch = useCallback(
+    debouncePeopleFetch(debounceTime, minSearchLength),
+    [debounceTime, minSearchLength],
+  );
 
   const columns = useMemo(() => [
     columnHelper.accessor(receivingColumns.PRODUCT, {
@@ -121,6 +129,8 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
             render={({ field }) => (
               <SelectField
                 {...field}
+                async
+                loadOptions={debouncedPeopleFetch}
                 hideErrorMessageWrapper
                 ariaLabel={{ id: 'react.receiving.recipient.label', defaultMessage: 'Recipient' }}
               />
@@ -155,7 +165,7 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
           />
         </TableCell>
       ),
-      footer: ({ table }) => table.options.meta?.totalReceivingNow ?? 0,
+      footer: ({ table }) => <span style={{ paddingLeft: '14px' }}>{table.options.meta?.totalReceivingNow ?? 0}</span>,
       size: 90,
     }),
     columnHelper.accessor(receivingColumns.LOCATION, {
@@ -204,7 +214,7 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
       // (that table sizes this column to fit its "Copy to receive" label).
       size: 160,
     }),
-  ], [translate, control, locationId, removeRow]);
+  ], [translate, control, locationId, debouncedPeopleFetch, removeRow]);
 
   return { columns };
 };

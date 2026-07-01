@@ -162,7 +162,7 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
           />
         </TableCell>
       ),
-      footer: ({ table }) => table.options.meta?.totalReceived ?? 0,
+      footer: ({ table }) => <span style={{ paddingLeft: '14px' }}>{table.options.meta?.totalReceived ?? 0}</span>,
       size: 90,
     }),
     columnHelper.accessor(receivingColumns.LOCATION, {
