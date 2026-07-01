@@ -6,6 +6,6 @@ import org.springframework.context.ApplicationEvent
 class CycleCountCompletedEvent extends ApplicationEvent {
 
     CycleCountCompletedEvent(CycleCount cycleCount) {
-        super(cycleCount?.id)
+        super(cycleCount.id)
     }
 }

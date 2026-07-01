@@ -14,8 +14,6 @@ import grails.util.Holders
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.date.InstantParser
 import org.pih.warehouse.core.date.JavaUtilDateParser
-import org.pih.warehouse.inventory.CycleCount
-import org.pih.warehouse.inventory.CycleCountItem
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
@@ -24,7 +22,6 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.shipping.ShipmentItem
 
 import static groovy.json.JsonOutput.toJson
 import static groovy.json.JsonOutput.prettyPrint
@@ -138,18 +135,12 @@ class WebhookPublisherService {
     }
 
     /**
-     * Publishes an inventory adjustment notification based on the baseline and/or adjustment transactions
+     * Publishes an inventory adjustment notification based on the adjustment transactions
      * for a product after an inventory adjustment is made (or a product inventory record is created).
      */
-    void publishInventoryAdjustmentEvent(Product product, Location facility, Transaction baselineTransaction,
-                                         Transaction adjustmentTransaction) {
-        if (!product || !facility) {
-            log.warn("Missing required product and/or facility. Skipping sending the webhook notification.")
-            return
-        }
-
-        if (!baselineTransaction && !adjustmentTransaction) {
-            log.warn("Missing baseline and adjustment transaction. Skipping sending the webhook notification.")
+    void publishInventoryAdjustmentEvent(Product product, Location facility, Transaction adjustmentTransaction) {
+        if (!product || !facility || !adjustmentTransaction) {
+            log.warn("Missing required product, facility, adjustment transaction. Skipping sending the webhook notification.")
             return
         }
 
@@ -163,38 +154,28 @@ class WebhookPublisherService {
         String webhookId = UUID.randomUUID().toString()
         Date dateTriggered = new Date()
 
-        List<AvailableItem> baselineAvailableItems = []
-        Integer quantityOnHandFromAvailableItems = 0
-        if (!baselineTransaction) {
-            // This will be a case of a single row adjustment without baseline, and we need to find adjustment date
-            Date baselineDate = JavaUtilDateParser
-                    .asDate(InstantParser.asInstant(adjustmentTransaction.transactionDate).minusSeconds(1))
-            baselineAvailableItems = productAvailabilityService.getAvailableItemsAtDate(facility, [product], baselineDate)
-            quantityOnHandFromAvailableItems = (Integer) baselineAvailableItems?.sum { it.quantityOnHand } ?: 0
-        }
+        // Let's find baseline available items for this transaction (right before it was recorded)
+        Date baselineDate = JavaUtilDateParser
+                .asDate(InstantParser.asInstant(adjustmentTransaction.transactionDate).minusSeconds(1))
+        List<AvailableItem> baselineAvailableItems = productAvailabilityService.getAvailableItemsAtDate(facility, [product], baselineDate)
 
-        User adjustedBy = adjustmentTransaction?.createdBy ?: baselineTransaction?.createdBy
-
-        Integer quantityBeforeAdjustment = (Integer) (
-                baselineTransaction ? baselineTransaction.calculateQuantityByProduct(product) : quantityOnHandFromAvailableItems
-        ) ?: 0
+        Integer quantityBeforeAdjustment = (Integer) baselineAvailableItems?.sum { it.quantityOnHand } ?: 0
         Integer quantityVariance = (Integer) adjustmentTransaction?.calculateQuantityVarianceByProduct(product) ?: 0
         Integer quantityAfterAdjustment = quantityBeforeAdjustment + quantityVariance
 
-        // Since we are sending a notification for single product, we need to filter the baseline and adjustment
+        // Since we are sending a notification for single product, we need to filter the adjustment
         // transaction entries for that product only
-        List<TransactionEntry> baselineEntries = baselineTransaction?.getTransactionEntriesByProduct(product)
         List<TransactionEntry> adjustmentEntries = adjustmentTransaction?.getTransactionEntriesByProduct(product)
         Map payload = [
                 eventId: eventId,
                 eventType: WebhookEventType.ADJUSTMENT_CREATED.name,
                 eventDate: dateTriggered.format(Constants.ISO_DATE_TIME_WITH_TIMEZONE_OFFSET_FORMAT),
-                triggeredBy: adjustedBy?.name,
+                triggeredBy: adjustmentTransaction?.createdBy?.name,
                 adjustment: [
-                        id: adjustmentTransaction?.id ?: baselineTransaction?.id,
-                        comment: adjustmentTransaction?.comment,
-                        adjustedBy: adjustedBy?.name,
-                        dateAdjusted: (adjustmentTransaction ?: baselineTransaction).transactionDate?.format(
+                        id: adjustmentTransaction?.id,
+                        comment: adjustmentTransaction.comment,
+                        adjustedBy: adjustmentTransaction.createdBy?.name,
+                        dateAdjusted: adjustmentTransaction.transactionDate?.format(
                                 Constants.ISO_DATE_TIME_WITH_TIMEZONE_OFFSET_FORMAT
                         ),
                         product: product.productCode,
@@ -204,16 +185,9 @@ class WebhookPublisherService {
                                 quantityVariance: quantityVariance
                         ],
                         adjustments: adjustmentEntries?.collect { TransactionEntry entry ->
-                            Integer quantityBefore
-                            if (baselineTransaction) {
-                                quantityBefore = baselineEntries?.find { TransactionEntry it ->
-                                    it.inventoryItem?.id == entry.inventoryItem?.id && it.binLocation?.id == entry.binLocation?.id
-                                }?.quantity ?: 0
-                            } else {
-                                quantityBefore = baselineAvailableItems?.find { AvailableItem it ->
-                                    it.inventoryItem.id == entry.inventoryItem.id && it.binLocation?.id == entry.binLocation?.id
-                                }?.quantityOnHand ?: 0
-                            }
+                            Integer quantityBefore = baselineAvailableItems?.find { AvailableItem it ->
+                                it.inventoryItem.id == entry.inventoryItem.id && it.binLocation?.id == entry.binLocation?.id
+                            }?.quantityOnHand ?: 0
 
                             [
                                     location: entry.binLocation?.locationNumber,
