@@ -55,7 +55,11 @@ const DataTableBody = ({
 
   const rowVirtualizer = useVirtualizer({
     count: rowModel?.rows?.length,
-    getScrollElement: () => parentRef.current,
+    // With pinned columns the scroll for both axes lives on `.rt-table`, so the virtualizer must
+    // measure that element to work correctly. Otherwise, the body scrolls itself.
+    getScrollElement: () => (tableWithPinnedColumns
+      ? parentRef.current?.closest('.rt-table')
+      : parentRef.current),
     estimateSize: () => estimateSize,
     overscan,
     enabled: isVirtualizationEnabled,

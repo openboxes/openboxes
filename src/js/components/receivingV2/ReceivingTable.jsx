@@ -38,7 +38,7 @@ const ReceivingTable = ({
       return {
         id: entry,
         meta: {
-          isRowDisabled: lineItemsState.entities[entry]?.isFullyReceived,
+          isRowDisabled: lineItemsState.entities[entry]?.isCompleted,
           label: 'react.receiving.fullyReceived.label',
           defaultMessage: 'This line has been fully received',
         },
@@ -68,7 +68,7 @@ const ReceivingTable = ({
         virtualize={{
           enabled: true,
           minSize: 20,
-          estimateSize: 68,
+          estimateSize: 72,
           overscan: 10,
           // Rows vary in height (2-line product cell, separator rows), so let
           // the virtualizer measure each row instead of using a fixed height.

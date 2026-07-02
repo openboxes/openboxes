@@ -54,7 +54,6 @@
         display: flex;
         flex-direction: row;
         align-items: center;
-        height: 100%;
         padding: 12px;
         background-color: var(--blue-100);
         color: var(--gray-600);
@@ -145,6 +144,12 @@
 
         &.rt-tr-separator {
           background-color: var(--blue-200);
+
+          // Pinned cells have their own white background, so make them transparent here
+          // to keep the whole separator row blue.
+          > div {
+            background: transparent !important;
+          }
 
           &:hover, &:hover .rt-td {
             background-color: var(--blue-200);
@@ -396,6 +401,10 @@
 
     &:hover {
       color: var(--blue-primary);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
     }
   }
 }

@@ -39,11 +39,21 @@ const useReceivingActions = (view) => {
     const {
       shipmentItem,
       currentReceiptItems = [],
+      previousReceiptItems = [],
       totalQuantityReceived = 0,
       totalQuantityCanceled = 0,
-      isFullyReceived = false,
     } = summary;
     const currentReceiptItem = currentReceiptItems[0];
+    // Sum the quantity only from already received receipts. This total is later used
+    // to decide if the line can be blocked.
+    const quantityPreviouslyReceived = previousReceiptItems.reduce(
+      (sum, item) => sum + (item.quantityReceived ?? 0) + (item.quantityCanceled ?? 0),
+      0,
+    );
+    // A line is completed only when submitted receipts cover the shipped quantity and there is
+    // nothing left pending.
+    const isCompleted = quantityPreviouslyReceived >= shipmentItem.quantity
+      && currentReceiptItems.length === 0;
     return {
       // Unique per-row id (a shipment item may eventually map to several rows once line
       // splitting lands), used as the normalized state key and as the rowId correlation
@@ -73,7 +83,7 @@ const useReceivingActions = (view) => {
       initialQuantityReceiving: currentReceiptItem?.quantityReceived ?? null,
       quantityRemaining:
         shipmentItem.quantity - totalQuantityReceived - totalQuantityCanceled,
-      isFullyReceived,
+      isCompleted,
       // Local edit flag - only dirty rows (touched since load / last save) are sent on save.
       isDirty: false,
     };

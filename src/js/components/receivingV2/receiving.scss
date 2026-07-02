@@ -39,12 +39,25 @@
 }
 
 .receiving-table {
-  // The virtualizer measures `.rt-tbody-v2` (its scroll container) to decide
-  // how many rows to render. It must be height-bounded and scrollable, otherwise
-  // the body grows to full content height and every row gets rendered.
-  .rt-tbody-v2 {
+  // `.rt-table` is the only box that scrolls, both up/down (rows) and left/right (columns).
+  // Both scrolls must be on the same box, otherwise pinned columns stop sticking when you
+  // scroll sideways. Virtualization still works because the virtualizer uses this same box
+  // as its scroll element.
+  .rt-table {
     max-height: 600px;
     overflow-y: auto;
+  }
+
+  .rt-thead {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    height: 100%;
+    background-color: white;
+  }
+
+  .rt-th {
+    height: 100%;
   }
 
   .rt-td {
@@ -89,6 +102,12 @@
 
     &--completed {
       color: var(--color-green);
+    }
+
+    &--equal {
+      padding: 4px 8px;
+      background-color: var(--blue-200);
+      color: var(--blue-primary);
     }
 
     &--over {
