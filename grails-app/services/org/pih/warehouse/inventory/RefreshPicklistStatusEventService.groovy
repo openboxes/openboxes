@@ -24,7 +24,6 @@ class RefreshPicklistStatusEventService {
     void onRefreshPicklistStatusEvent(RefreshPicklistStatusEvent event) {
         log.info "Application event $event has been published! " + event.properties
 
-        // ??? Need to delay automatic state transition
         use(TimeCategory) {
             log.info "Schedule automatic state transition job for ${event.source}"
             AutomaticStateTransitionJob.scheduleNow([id: event.source])
