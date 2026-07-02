@@ -30,6 +30,7 @@ class InventoryLevel implements Comparable<InventoryLevel> {
     String id
 
     // Unique identifier (optional) for facility-level inventory level rules (used for integration with external systems)
+    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "identifier") })
     String identifier
 
     // Product assigned to inventory level rule
