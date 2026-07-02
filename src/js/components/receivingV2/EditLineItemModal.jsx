@@ -98,32 +98,34 @@ const EditLineItemModal = ({ onClose, lineItem }) => {
           />
         </div>
         <ShipmentItemDetails details={details} />
-        <Section showTitle={false} className="receiving-edit-modal__received mt-4">
-          <Subsection
-            title={(
-              <div className="badge-container">
-                <Badge
-                  label={translate('react.receiving.received.label', 'Received')}
-                  variant="badge--green text-uppercase"
-                />
-              </div>
-            )}
-          >
-            <DataTable
-              columns={receivedColumns}
-              data={receivedItems}
-              totalCount={receivedItems.length}
-              disablePagination
-              disabled
-              showFooter
-              meta={{ totalReceived }}
-              emptyTableMessage={{
-                id: 'react.receiving.emptyReceivedTable.label',
-                defaultMessage: 'No items received',
-              }}
-            />
-          </Subsection>
-        </Section>
+        {receivedItems.length > 0 && (
+          <Section showTitle={false} className="receiving-edit-modal__received mt-4">
+            <Subsection
+              title={(
+                <div className="badge-container">
+                  <Badge
+                    label={translate('react.receiving.received.label', 'Received')}
+                    variant="badge--green text-uppercase"
+                  />
+                </div>
+              )}
+            >
+              <DataTable
+                columns={receivedColumns}
+                data={receivedItems}
+                totalCount={receivedItems.length}
+                disablePagination
+                disabled
+                showFooter
+                meta={{ totalReceived }}
+                emptyTableMessage={{
+                  id: 'react.receiving.emptyReceivedTable.label',
+                  defaultMessage: 'No items received',
+                }}
+              />
+            </Subsection>
+          </Section>
+        )}
         <div className="d-flex justify-content-between align-items-center mt-4">
           <div className="badge-container">
             <Badge
