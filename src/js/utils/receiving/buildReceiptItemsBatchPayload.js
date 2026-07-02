@@ -16,15 +16,16 @@
  *  - binLocation: { id } putaway bin (nullable; not captured in state yet).
  *
  * Only rows the user actually touched are sent: a row is included when it is dirty (edited
- * since load or the last save). Untouched rows are skipped, so a row that already had a
- * quantity loaded from the server but was never edited is not re-sent.
+ * since load or the last save) AND its quantity actually differs from the baseline captured
+ * at load / last save (initialQuantityReceiving). Untouched rows are skipped, and so are no-op
+ * edits that end up back at the original value (e.g. 3 -> 4 -> 3), which merely flip isDirty.
  *
  * @param {Object} entities - normalized line items keyed by rowId
  * @returns {{ itemsToSave: Array, itemsToDelete: Array<string> }}
  */
 const buildReceiptItemsBatchPayload = (entities) => {
   const itemsToSave = Object.values(entities || {})
-    .filter((item) => item.isDirty)
+    .filter((item) => item.isDirty && item.quantityReceiving !== item.initialQuantityReceiving)
     .map((item) => ({
       rowId: item.rowId,
       shipmentItem: { id: item.shipmentItemId },

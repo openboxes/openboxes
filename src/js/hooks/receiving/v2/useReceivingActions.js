@@ -5,17 +5,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { getUsers } from 'selectors';
 
-import { fetchUsers, hideSpinner, showSpinner } from 'actions';
+import { fetchUsers } from 'actions';
 import receivingApi from 'api/services/ReceivingApi';
-import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import ReceiptGroup from 'consts/receiptGroup';
 import { ReceivingView } from 'consts/receivingViewOptions';
+import useReceivingSaveAction from 'hooks/receiving/v2/useReceivingSaveAction';
 import {
   createNormalizedState,
   normalizeData,
   updateNormalizedItem,
 } from 'utils/normalizationUtils';
-import buildReceiptItemsBatchPayload from 'utils/receiving/buildReceiptItemsBatchPayload';
 
 // In packing list view we ask the API to group items by pack level so that we can
 // render separator rows between groups
@@ -69,6 +68,9 @@ const useReceivingActions = (view) => {
       packSize: shipmentItem.packSize,
       unitOfMeasure: shipmentItem.unitOfMeasure,
       quantityReceiving: currentReceiptItem?.quantityReceived ?? null,
+      // Baseline quantity as of load / last successful save. A dirty row is only sent when its
+      // quantity actually differs from this, so no-op edits (e.g. 3 -> 4 -> 3) are skipped.
+      initialQuantityReceiving: currentReceiptItem?.quantityReceived ?? null,
       quantityRemaining:
         shipmentItem.quantity - totalQuantityReceived - totalQuantityCanceled,
       isFullyReceived,
@@ -148,42 +150,11 @@ const useReceivingActions = (view) => {
       isDirty: true,
     })), []);
 
-  // Builds the batch payload from the current line items and persists it through the receipt
-  // batch endpoint. Returns the server response, or null when there's nothing to save.
-  const saveItemsBatch = useCallback(async () => {
-    if (!receiptId) {
-      return null;
-    }
-
-    const payload = buildReceiptItemsBatchPayload(lineItemsState.entities);
-    if (!payload.itemsToSave.length && !payload.itemsToDelete.length) {
-      return null;
-    }
-
-    dispatch(showSpinner());
-    try {
-      const { data: { data } } = await receivingApi.updateItemsBatch(receiptId, payload);
-      // The response echoes our rowId and returns the persisted receipt item id, so we fold it
-      // back into state (matched by rowId). A subsequent save then updates the same receipt
-      // item instead of creating a duplicate.
-      setLineItemsState((state) => (data?.updatedLines || []).reduce(
-        (acc, line) => updateNormalizedItem(acc, line.rowId, {
-          receiptItemId: line.id,
-          quantityReceiving: line.quantityReceived,
-          isDirty: false,
-        }),
-        state,
-      ));
-      return data;
-    } finally {
-      dispatch(hideSpinner());
-    }
-  }, [receiptId, lineItemsState.entities, dispatch]);
-
-  const onSaveAndExit = useCallback(async () => {
-    await saveItemsBatch();
-    window.location = STOCK_MOVEMENT_URL.show(shipmentId);
-  }, [saveItemsBatch, shipmentId]);
+  const { onSaveAndExit } = useReceivingSaveAction({
+    receiptId,
+    lineItemsState,
+    setLineItemsState,
+  });
 
   useEffect(() => {
     if (!shipmentId) {
