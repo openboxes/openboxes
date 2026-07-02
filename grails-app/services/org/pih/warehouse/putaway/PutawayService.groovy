@@ -19,6 +19,7 @@ import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.inventory.ProductAvailabilityService
+import org.pih.warehouse.jobs.PutawayLocationReslottingJob
 import org.springframework.beans.factory.annotation.Value
 
 import org.pih.warehouse.api.Putaway
@@ -654,5 +655,9 @@ class PutawayService implements EventPublisher  {
             order.dateApproved = null
             order.save(flush:true)
         }
+    }
+
+    def triggerPutawayLocationReslotting(String inventoryLevelId) {
+        PutawayLocationReslottingJob.triggerNow([inventoryLevelId: inventoryLevelId])
     }
 }
