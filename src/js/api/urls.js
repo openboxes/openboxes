@@ -235,3 +235,4 @@ export const RECEIPT_API = `${API}/receipts/v2`;
 export const RECEIPT_BY_SHIPMENT = (shipmentId) => `${RECEIPT_API}/shipment/${shipmentId}`;
 export const RECEIPT_SUMMARY_BY_SHIPMENT = (shipmentId) => `${RECEIPT_BY_SHIPMENT(shipmentId)}/summary`;
 export const RECEIPT_START = (shipmentId) => `${RECEIPT_BY_SHIPMENT(shipmentId)}/start`;
+export const RECEIPT_ITEMS_BATCH = (receiptId) => `${RECEIPT_API}/${receiptId}/items/batch`;

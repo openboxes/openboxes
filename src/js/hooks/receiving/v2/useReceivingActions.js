@@ -9,6 +9,7 @@ import { fetchUsers } from 'actions';
 import receivingApi from 'api/services/ReceivingApi';
 import ReceiptGroup from 'consts/receiptGroup';
 import { ReceivingView } from 'consts/receivingViewOptions';
+import useReceivingSaveAction from 'hooks/receiving/v2/useReceivingSaveAction';
 import {
   createNormalizedState,
   normalizeData,
@@ -24,6 +25,7 @@ const buildSeparatorRow = (name) => ({ isSeparator: true, id: `separator-${name}
 
 const useReceivingActions = (view) => {
   const [loading, setLoading] = useState(false);
+  const [receiptId, setReceiptId] = useState(null);
   const [lineItemsState, setLineItemsState] = useState(createNormalizedState());
   const { shipmentId } = useParams();
   const dispatch = useDispatch();
@@ -43,6 +45,10 @@ const useReceivingActions = (view) => {
     } = summary;
     const currentReceiptItem = currentReceiptItems[0];
     return {
+      // Unique per-row id (a shipment item may eventually map to several rows once line
+      // splitting lands), used as the normalized state key and as the rowId correlation
+      // sent to / echoed back from the batch endpoint.
+      rowId: _.uniqueId('row-'),
       shipmentItemId: shipmentItem.id,
       receiptItemId: currentReceiptItem?.id ?? null,
       productCode: shipmentItem.productLot?.product?.productCode,
@@ -62,16 +68,21 @@ const useReceivingActions = (view) => {
       packSize: shipmentItem.packSize,
       unitOfMeasure: shipmentItem.unitOfMeasure,
       quantityReceiving: currentReceiptItem?.quantityReceived ?? null,
+      // Baseline quantity as of load / last successful save. A dirty row is only sent when its
+      // quantity actually differs from this, so no-op edits (e.g. 3 -> 4 -> 3) are skipped.
+      initialQuantityReceiving: currentReceiptItem?.quantityReceived ?? null,
       quantityRemaining:
         shipmentItem.quantity - totalQuantityReceived - totalQuantityCanceled,
       isFullyReceived,
+      // Local edit flag - only dirty rows (touched since load / last save) are sent on save.
+      isDirty: false,
     };
   };
 
   // Build state used for table view
   const buildTableViewState = (summaryById, grouped, usersById) => {
     const lineItems = (grouped?.order || []).map((id) => buildLineItem(summaryById[id], usersById));
-    return normalizeData(lineItems, 'shipmentItemId');
+    return normalizeData(lineItems, 'rowId');
   };
 
   // Build state used for packing list.
@@ -80,10 +91,10 @@ const useReceivingActions = (view) => {
   const buildPackingListViewState = (summaryById, grouped, usersById) => {
     const { order = [], groups = {} } = grouped || {};
 
-    const toLineItemRow = (id, packLevelGroup) => ({
-      rowId: id,
-      entity: { ...buildLineItem(summaryById[id], usersById), packLevelGroup },
-    });
+    const toLineItemRow = (id, packLevelGroup) => {
+      const entity = { ...buildLineItem(summaryById[id], usersById), packLevelGroup };
+      return { rowId: entity.rowId, entity };
+    };
 
     // Flatten the two-level grouping into a single ordered list of rows. Each parent group adds
     // a separator row followed by its line items.
@@ -120,9 +131,9 @@ const useReceivingActions = (view) => {
         group: receiptGroupForView(view),
       });
       // When there's no pending receipt yet, start one
-      if (!summary?.pendingReceiptId) {
-        await receivingApi.startReceipt(shipmentId);
-      }
+      const currentReceiptId = summary?.pendingReceiptId
+        ?? (await receivingApi.startReceipt(shipmentId)).data?.data?.id;
+      setReceiptId(currentReceiptId);
       setLineItemsState(transformSummary(summary, view));
     } finally {
       setLoading(false);
@@ -132,8 +143,18 @@ const useReceivingActions = (view) => {
   // Updates a single line item in the normalized state without rebuilding the whole
   // collection. Stable identity (useCallback) keeps the table `meta` referentially
   // stable, so the memoized cells only re-render the line item that actually changed.
-  const updateLineItem = useCallback((shipmentItemId, newData) =>
-    setLineItemsState((state) => updateNormalizedItem(state, shipmentItemId, newData)), []);
+  // Every edit marks the row dirty, which is what flags it for the next batch save.
+  const updateLineItem = useCallback((rowId, newData) =>
+    setLineItemsState((state) => updateNormalizedItem(state, rowId, {
+      ...newData,
+      isDirty: true,
+    })), []);
+
+  const { onSaveAndExit } = useReceivingSaveAction({
+    receiptId,
+    lineItemsState,
+    setLineItemsState,
+  });
 
   useEffect(() => {
     if (!shipmentId) {
@@ -150,6 +171,7 @@ const useReceivingActions = (view) => {
     loading,
     lineItemsState,
     updateLineItem,
+    onSaveAndExit,
   };
 };
 
