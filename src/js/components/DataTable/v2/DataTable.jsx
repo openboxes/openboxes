@@ -142,10 +142,9 @@ DataTable.propTypes = {
     customRowsHeight: PropTypes.bool,
   }),
   overflowVisible: PropTypes.bool,
-  // Renders a column-aligned footer row from each column's `footer` definition.
+  // Renders a footer row from each column's `footer` definition.
   showFooter: PropTypes.bool,
-  // Mutes the table chrome (header/footer) to a disabled look. Field-level
-  // `disabled` still lives on each column's cell definition.
+  // Add styles to the table to make it look disabled.
   disabled: PropTypes.bool,
 };
 

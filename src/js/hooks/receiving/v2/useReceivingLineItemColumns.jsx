@@ -19,9 +19,7 @@ import useTranslate from 'hooks/useTranslate';
 import { debouncePeopleFetch } from 'utils/option-utils';
 
 /**
- * Columns for the editable "Receiving now" table inside the edit modal.
- * Each cell is a react-hook-form `Controller` bound to `lineItems.${index}.<field>`.
- * No data/handlers yet - this is the form scaffold.
+ * Columns for the editable "Receiving now" table in the edit modal.
  */
 const useReceivingLineItemColumns = ({ control, removeRow }) => {
   const translate = useTranslate();
@@ -29,7 +27,7 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
   const locationId = useSelector(getCurrentLocationId);
   const debounceTime = useSelector(getDebounceTime);
   const minSearchLength = useSelector(getMinSearchLength);
-  // Async person lookup for the recipient select, mirroring cycle count / inbound.
+
   const debouncedPeopleFetch = useCallback(
     debouncePeopleFetch(debounceTime, minSearchLength),
     [debounceTime, minSearchLength],
@@ -210,8 +208,6 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
           </div>
         </TableCell>
       ),
-      // Kept in sync with the Received table's actions column so both align
-      // (that table sizes this column to fit its "Copy to receive" label).
       size: 160,
     }),
   ], [translate, control, locationId, debouncedPeopleFetch, removeRow]);

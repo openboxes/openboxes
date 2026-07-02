@@ -23,7 +23,6 @@ const Subsection = ({
     }
   };
 
-  // `title` is either a ready JSX node (e.g. a badge) or a translate descriptor.
   const renderTitle = () => {
     if (React.isValidElement(title)) {
       return title;
@@ -59,7 +58,6 @@ const Subsection = ({
 export default Subsection;
 
 Subsection.propTypes = {
-  // Either a translate descriptor or a ready node (e.g. a badge) rendered as-is.
   title: PropTypes.oneOfType([
     PropTypes.node,
     PropTypes.shape({

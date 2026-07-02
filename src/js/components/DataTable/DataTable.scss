@@ -269,11 +269,8 @@
     }
   }
 
-  // Disabled table: fade the table to a non-interactive look. Applied per cell
-  // (not on a shared ancestor) so a column can opt back out - `opacity` on a
-  // parent creates a stacking context that a child can't override. A column
-  // marks its cell with the `data-table__interactive` class (via column meta)
-  // to stay fully opaque and usable, e.g. a row action button.
+  // Opacity creates a stacking context a child can't override.
+  // A column opts out via `data-table__interactive`.
   .app-react-table--disabled {
     .rt-thead .rt-th,
     .rt-tbody-v2 .rt-td,
@@ -290,17 +287,10 @@
   .rt-tfoot {
     box-shadow: none;
 
-    .rt-tr {
-      display: flex;
-    }
-
     .footer-cell {
-      display: flex;
-      align-items: center;
       padding: 12px;
       background-color: var(--blue-100);
       color: var(--gray-600);
-      font-weight: bold;
       box-shadow: none;
     }
   }

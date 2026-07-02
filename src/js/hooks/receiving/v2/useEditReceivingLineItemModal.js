@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-// TODO: for now this only opens/closes the modal. Real implementation will be done iteratively.
+// TODO: only opens/closes the modal for now.
 const useEditReceivingLineItemModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [itemId, setItemId] = useState(null);

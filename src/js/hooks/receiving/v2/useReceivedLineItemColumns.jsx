@@ -18,11 +18,8 @@ import { DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
 
 /**
- * Columns for the read-only "Received" table inside the edit modal - the records
- * already received for the line. It mirrors the editable "Receiving now" table
- * (`useReceivingLineItemColumns`), but every field is `disabled`; the only
- * interaction is the row action that copies the record down into that table.
- * Each cell is a react-hook-form `Controller` bound to `receivedItems.${index}.<field>`.
+ * Columns for the read-only "Received" table in the edit modal. Mirrors the
+ * "Receiving now" columns, but disabled; the only action is "Copy to receive".
  */
 const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
   const translate = useTranslate();
@@ -197,7 +194,7 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
         <TableCell className="rt-td">
           <button
             type="button"
-            className="receiving-edit-modal__copy-to-receive d-flex align-items-center justify-content-end gap-8 w-100 h-100 p-0 border-0 bg-transparent cursor-pointer text-nowrap"
+            className="receiving-edit-modal__copy-to-receive d-flex align-items-center justify-content-end gap-8 w-100 h-100 p-0 border-0 bg-transparent cursor-pointer text-nowrap font-size-xs"
             onClick={() => copyToReceive(row.original.rowId)}
           >
             <RiArrowDownLine size={18} />
@@ -205,13 +202,7 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
           </button>
         </TableCell>
       ),
-      // Wide enough to always fit the "Copy to receive" label + icon so it never
-      // clips. Columns don't shrink (see getCommonPinningStyles), so the table
-      // scrolls instead of squeezing this action on narrow screens. Kept in sync
-      // with the "Receiving now" actions column so both tables' columns align.
       size: 160,
-      // Keep the "Copy to receive" action fully opaque and usable while the rest
-      // of the (read-only) table is faded via the DataTable `disabled` prop.
       meta: { getCellContext: () => ({ className: 'data-table__interactive' }) },
     }),
   ], [translate, control, locationId, copyToReceive]);

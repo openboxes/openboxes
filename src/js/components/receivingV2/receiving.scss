@@ -213,23 +213,11 @@
     min-height: 60px;
   }
 
-  .badge-container .badge {
-    border-radius: 4px;
-  }
-
-  .badge-container .badge--primary {
-    text-transform: uppercase;
-  }
-
-  // Layout/spacing live on the elements as Bootstrap utilities; only design
-  // tokens (colors, custom sizes) that have no utility stay here.
   &__title {
-    font-size: 20px;
     color: var(--blue-800);
   }
 
   // The per-field error wrapper is hidden, so add the row spacing back here.
-  // Scoped to body rows (.rt-tr-group) so the header row is unaffected.
   .rt-tr-group .rt-tr {
     padding-bottom: 5px;
   }
@@ -241,18 +229,13 @@
   &__add-record {
     margin-top: 12px;
     color: var(--blue-700);
-    font-size: 14px;
   }
 
   &__copy-to-receive {
     color: var(--blue-primary);
-    font-size: 14px;
     font-weight: 600;
   }
 
-  // The Received section reuses the Layout Subsection only for its collapse
-  // behaviour; inside the modal it sits flush - no section card, padding or
-  // title divider.
   &__received.v2-section {
     padding: 0;
     background-color: transparent;
@@ -269,37 +252,5 @@
     .subsection-body {
       margin-top: 16px;
     }
-  }
-}
-
-.shipment-item-details {
-  margin-top: 16px;
-
-  &__grid {
-    display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
-    gap: 12px 24px;
-    margin-top: 12px;
-    padding: 16px;
-    border-radius: 6px;
-    background-color: var(--blue-100);
-  }
-
-  &__field {
-    display: flex;
-    gap: 6px;
-    font-size: 14px;
-    min-width: 0;
-  }
-
-  &__label {
-    color: var(--gray-350);
-    font-weight: 400;
-    white-space: nowrap;
-  }
-
-  &__value {
-    color: var(--gray-600);
-    font-weight: 400;
   }
 }

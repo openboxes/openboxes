@@ -7,9 +7,8 @@ import useTableColumnMeta from 'hooks/useTableColumnMeta';
 import getCommonPinningStyles from 'utils/getCommonPinningStyles';
 
 /**
- * Column-aligned footer row, mirroring DataTableHeader but driven by each column's
- * `footer` definition. Reuses the header's width/pinning styles so footer cells
- * line up under their columns. Only rendered when `showFooter` is set on DataTable.
+ * Footer row  matching columns' placement.
+ * Each column can have description directly under it.
  */
 const DataTableFooterRow = ({
   footerGroups,
@@ -20,7 +19,7 @@ const DataTableFooterRow = ({
     className="rt-tfoot"
     style={{ width: (!isScreenWiderThanTable && tableWithPinnedColumns) ? 'fit-content' : undefined }}
   >
-    <div className="rt-tr">
+    <div className="rt-tr d-flex">
       {footerGroups.map((footerGroup) =>
         footerGroup.headers.map((header) => {
           const { hide, flexWidth, className } = useTableColumnMeta(header.column);
@@ -31,7 +30,7 @@ const DataTableFooterRow = ({
           return (
             <div
               key={header.id}
-              className={`footer-cell ${className}`}
+              className={`footer-cell d-flex align-items-center font-weight-bold ${className}`}
               style={{
                 ...getCommonPinningStyles(
                   header.column,

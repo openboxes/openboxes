@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import DataTable from 'components/DataTable/v2/DataTable';
 import CommentModal from 'components/modals/CommentModal';
-import EditLineItemModal from 'components/receivingV2/EditLineItemModal';
+import EditLineItemModal from 'components/receivingV2/editModal/EditLineItemModal';
 import useEditReceivingLineItemModal from 'hooks/receiving/v2/useEditReceivingLineItemModal';
 
 import 'components/receivingV2/receiving.scss';

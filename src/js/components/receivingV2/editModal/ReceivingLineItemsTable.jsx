@@ -1,0 +1,67 @@
+import React from 'react';
+
+import PropTypes from 'prop-types';
+import { RiAddCircleLine, RiArrowGoBackLine } from 'react-icons/ri';
+
+import DataTable from 'components/DataTable/v2/DataTable';
+import Button from 'components/form-elements/Button';
+import useTranslate from 'hooks/useTranslate';
+import Badge from 'utils/Badge';
+
+const ReceivingLineItemsTable = ({
+  fields, columns, receivingNow, revertToOriginal, addRow,
+}) => {
+  const translate = useTranslate();
+
+  return (
+    <>
+      <div className="d-flex justify-content-between align-items-center mt-4">
+        <div className="badge-container">
+          <Badge
+            label={translate('react.receiving.receivingNow.label', 'Receiving Now')}
+            variant="badge--primary text-uppercase rounded"
+          />
+        </div>
+        <Button
+          label="react.receiving.revertToOriginal.label"
+          defaultLabel="Revert to original"
+          variant="secondary"
+          EndIcon={<RiArrowGoBackLine size={18} />}
+          onClick={revertToOriginal}
+        />
+      </div>
+      <form className="mt-2">
+        <DataTable
+          columns={columns}
+          data={fields}
+          totalCount={fields.length}
+          disablePagination
+          showFooter
+          meta={{ totalReceivingNow: receivingNow }}
+          emptyTableMessage={{
+            id: 'react.receiving.emptyTable.label',
+            defaultMessage: 'No items to receive',
+          }}
+        />
+      </form>
+      <button
+        type="button"
+        className="receiving-edit-modal__add-record d-flex align-items-center gap-8 p-0 border-0 bg-transparent cursor-pointer font-weight-500 font-size-xs"
+        onClick={addRow}
+      >
+        <RiAddCircleLine size={18} />
+        {translate('react.receiving.addNewRecord.label', 'Add new record')}
+      </button>
+    </>
+  );
+};
+
+ReceivingLineItemsTable.propTypes = {
+  fields: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  columns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  receivingNow: PropTypes.number.isRequired,
+  revertToOriginal: PropTypes.func.isRequired,
+  addRow: PropTypes.func.isRequired,
+};
+
+export default ReceivingLineItemsTable;
