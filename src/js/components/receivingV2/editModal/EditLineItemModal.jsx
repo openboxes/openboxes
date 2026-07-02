@@ -42,8 +42,14 @@ const EditLineItemModal = ({ onClose, lineItem }) => {
   return (
     <Modal isOpen className="modal-content">
       <div className="receiving-edit-modal" data-testid="receiving-edit-line-item-modal">
-        <EditLineItemModalHeader onClose={onClose} />
-        <ItemDetails badge={badge} fields={detailsFields} className="mt-3" />
+        <EditLineItemModalHeader
+          onClose={onClose}
+        />
+        <ItemDetails
+          badge={badge}
+          fields={detailsFields}
+          className="mt-3"
+        />
         <ReceivedLineItemsTable
           receivedItems={receivedItems}
           columns={receivedColumns}
