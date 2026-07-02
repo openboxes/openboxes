@@ -5,15 +5,16 @@ import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import org.pih.warehouse.jobs.AutomaticBackorderReallocationJob
 import org.pih.warehouse.shipping.Shipment
-import org.springframework.context.ApplicationListener
+import org.springframework.transaction.event.TransactionPhase
+import org.springframework.transaction.event.TransactionalEventListener
 
 @Transactional
-class AutomaticBackorderAllocationEventService implements ApplicationListener<AutomaticBackorderReallocationEvent> {
+class AutomaticBackorderAllocationEventService {
 
     GrailsApplication grailsApplication
 
-    @Override
-    void onApplicationEvent(AutomaticBackorderReallocationEvent event) {
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+    void onAutomaticBackorderReallocationEvent(AutomaticBackorderReallocationEvent event) {
         if (!Holders.config.openboxes.jobs.automaticBackorderReallocationJob.enabled) {
             log.info"Backorder re-allocation job is disabled"
             return
@@ -27,11 +28,8 @@ class AutomaticBackorderAllocationEventService implements ApplicationListener<Au
         }
 
         if (shipment.isFullyReceived()) {
-            def delayInMilliseconds =
-                    Integer.valueOf(grailsApplication.config.openboxes.jobs.automaticBackorderReallocationJob.delayInMilliseconds) ?: 2000
-            Date runAt = new Date(System.currentTimeMillis() + delayInMilliseconds)
-            log.info "Triggering backorder re-allocation job with ${delayInMilliseconds} ms delay"
-            AutomaticBackorderReallocationJob.schedule(runAt, [shipmentId: event.source])
+            log.info "Triggering backorder re-allocation job"
+            AutomaticBackorderReallocationJob.triggerNow([shipmentId: event.source])
         }
     }
 }

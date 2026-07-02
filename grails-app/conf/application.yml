@@ -497,8 +497,6 @@ openboxes:
         refreshProductAvailabilityJob:
             enabled: true
             cronExpression: "0 0 0/2 * * ?" # every two hours
-            delayStart: true
-            delayInMilliseconds: 5000
 
         # Refresh transaction fact table
         refreshTransactionFactJob:
@@ -546,7 +544,6 @@ openboxes:
 
         automaticStateTransitionJob:
             enabled: true
-            delayInMilliseconds: 1000
 
         automaticStateTransitionPollingJob:
             enabled: true
@@ -555,13 +552,10 @@ openboxes:
         automaticReceiptJob:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes
-            delayInMilliseconds: 1000
             bulkShipmentAutoReceipt: true
 
         automaticBackorderReallocationJob:
             enabled: true
-            cronExpression: "0 */5 * * * ?" # every five minutes
-            delayInMilliseconds: 10000
 
         automaticIssuanceJob:
             enabled: true

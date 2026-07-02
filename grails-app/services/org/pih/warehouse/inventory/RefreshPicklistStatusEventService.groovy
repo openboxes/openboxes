@@ -13,20 +13,20 @@ import grails.core.GrailsApplication
 import groovy.time.TimeCategory
 import org.pih.warehouse.jobs.AutomaticStateTransitionJob
 import org.springframework.context.ApplicationListener
+import org.springframework.transaction.event.TransactionPhase
+import org.springframework.transaction.event.TransactionalEventListener
 
-class RefreshPicklistStatusEventService implements ApplicationListener<RefreshPicklistStatusEvent> {
+class RefreshPicklistStatusEventService {
 
     GrailsApplication grailsApplication
 
-    void onApplicationEvent(RefreshPicklistStatusEvent event) {
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+    void onRefreshPicklistStatusEvent(RefreshPicklistStatusEvent event) {
         log.info "Application event $event has been published! " + event.properties
 
-        // FIXME Need to delay automatic state transition
         use(TimeCategory) {
-            def delayInMilliseconds = grailsApplication.config.openboxes.jobs.automaticStateTransitionJob.delayInMilliseconds ?: 0
-            Date runAt = new Date() + delayInMilliseconds.milliseconds
-            log.info "Schedule automatic state transition job for ${event.source} at ${runAt}"
-            AutomaticStateTransitionJob.schedule(runAt, [id: event.source])
+            log.info "Schedule automatic state transition job for ${event.source}"
+            AutomaticStateTransitionJob.scheduleNow([id: event.source])
         }
     }
 }

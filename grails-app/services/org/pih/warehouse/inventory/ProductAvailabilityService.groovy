@@ -64,13 +64,8 @@ class ProductAvailabilityService {
     def sessionFactory
 
     def triggerRefreshProductAvailability(String locationId, List<String> productIds, Boolean forceRefresh) {
-        Boolean delayStart = grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayStart
-        def delayInMilliseconds = delayStart ?
-            Integer.valueOf(grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds) : 0
-        Date runAt = new Date(System.currentTimeMillis() + delayInMilliseconds)
-        log.info "Triggering refresh product availability with ${delayInMilliseconds} ms delay"
-        RefreshProductAvailabilityJob.schedule(runAt,
-            [locationId: locationId, productIds: productIds, forceRefresh: forceRefresh])
+        log.info "Triggering refresh product availability"
+        RefreshProductAvailabilityJob.triggerNow([locationId: locationId, productIds: productIds, forceRefresh: forceRefresh])
     }
 
     def triggerRefreshProductAvailability(List<String> facilityIds, Boolean forceRefresh) {
