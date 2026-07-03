@@ -110,7 +110,7 @@ class ReceiptV2Service {
         // InventoryItem.expirationDate is a (legacy) java.util.Date, so convert the request's date-only LocalDate at
         // the domain boundary. asDate resolves it to start-of-day in the system zone, so the stored Date and its
         // MM/dd/yyyy formatting (see the InventoryItem JSON marshaller) stay identical to before.
-        Date expirationDate = JavaUtilDateParser.asDate(item.expirationDate)
+        Date expirationDate = item.expirationDate ? JavaUtilDateParser.asDate(item.expirationDate) : null
         InventoryItem inventoryItem = inventoryItemManager.getOrCreateInventoryItem(
                 item.product, item.lotNumber, expirationDate)
 
