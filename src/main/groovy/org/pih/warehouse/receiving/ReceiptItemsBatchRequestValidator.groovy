@@ -12,10 +12,29 @@ class ReceiptItemsBatchRequestValidator implements ObjectValidator<ReceiptItemsB
     @Override
     ObjectValidationResult doValidate(ReceiptItemsBatchRequest request) {
         return new ObjectValidationResult(
+                validateReceiptIsPending(request),
                 validateItemsToSaveAreValid(request),
                 validateNoDuplicateItemsToSave(request),
                 validateItemsAreNotBothSavedAndDeleted(request),
         )
+    }
+
+    /**
+     * The receipt (bound from the URL) must be pending for its receipt items to be editable.
+     */
+    private ObjectError validateReceiptIsPending(ReceiptItemsBatchRequest request) {
+        // A missing receipt is already reported by the request's nullable constraint and the validator still runs
+        // after that failure (there is no short-circuit), so guard against NPE before checking the status.
+        if (!request.receipt) {
+            return null
+        }
+
+        if (request.receipt.receiptStatusCode != ReceiptStatusCode.PENDING) {
+            return rejectField("receipt", request.receipt, "receiptItemsBatchRequest.receipt.notPending",
+                    [request.receipt.receiptNumber])
+        }
+
+        return null
     }
 
     /**

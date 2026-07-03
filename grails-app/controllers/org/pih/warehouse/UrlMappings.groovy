@@ -465,6 +465,11 @@ class UrlMappings {
             action = [POST: "updateItemsBatch"]
         }
 
+        "/api/receiving/v2/$receiptId/shipmentItems/$shipmentItemId/receiptItems" {
+            controller = "receiptApi"
+            action = [POST: "editReceivingInfo"]
+        }
+
         // Internal Locations API
 
         "/api/internalLocations/receiving"(parseRequest: true) {
