@@ -5,13 +5,22 @@ import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.OrderedDataGroup
+import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.core.localization.MessageLocalizer
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryItemManager
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptDto
+import org.pih.warehouse.receiving.ReceiptEditReceivingInfoCommand
 import org.pih.warehouse.receiving.ReceiptGroup
 import org.pih.warehouse.receiving.ReceiptIdentifierService
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptItemDto
+import org.pih.warehouse.receiving.ReceiptItemEditReceivingInfoRequest
+import org.pih.warehouse.receiving.ReceiptItemUpsertRequest
+import org.pih.warehouse.receiving.ReceiptItemSaveDto
+import org.pih.warehouse.receiving.ReceiptItemsBatchRequest
+import org.pih.warehouse.receiving.ReceiptSaveResponseDto
 import org.pih.warehouse.receiving.ReceiptService
 import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.receiving.ShipmentItemReceivingSummaryDto
@@ -29,6 +38,7 @@ class ReceiptV2Service {
     ReceiptIdentifierService receiptIdentifierService
     ReceiptService receiptService  // Inject old receipt service to reuse bin creation logic
     MessageLocalizer messageLocalizer
+    InventoryItemManager inventoryItemManager
 
     @Transactional
     ReceiptDto startReceipt(String shipmentId) {
@@ -55,6 +65,123 @@ class ReceiptV2Service {
         }
 
         return ReceiptDto.from(receipt)
+    }
+
+    @Transactional
+    ReceiptSaveResponseDto updateItemsBatch(ReceiptItemsBatchRequest request) {
+        // The receipt is bound and validated (as existing and pending) by the request, so this assumes a validated
+        // request - see ReceiptItemsBatchRequestValidator.
+        Receipt receipt = request.receipt
+
+        request.itemsToDelete.each { String receiptItemId -> deleteReceiptItem(receipt, receiptItemId) }
+
+        List<ReceiptItemSaveDto> updatedLines = request.itemsToSave.collect { ReceiptItemUpsertRequest item ->
+            item.receiptItem ? updateReceiptItem(item) : createReceiptItem(receipt, item)
+        }
+
+        return new ReceiptSaveResponseDto(updatedLines: updatedLines)
+    }
+
+    /**
+     * Creates/updates the receipt items of a single shipment item, additionally allowing the product lot (lot number
+     * and expiration date) and recipient of each item to be edited. Behaves like {@link #updateItemsBatch} but scoped
+     * to the one shipment item identified in the URL, and without support for deletes.
+     *
+     * The receipt and shipment item are carried (and validated as existing/pending) by the command, so this assumes a
+     * validated command - see {@link ReceiptEditReceivingInfoCommandValidator}.
+     */
+    @Transactional
+    ReceiptSaveResponseDto editReceivingInfo(ReceiptEditReceivingInfoCommand command) {
+        List<ReceiptItemSaveDto> updatedLines =
+                command.itemsToSave.collect { ReceiptItemEditReceivingInfoRequest item ->
+                    upsertReceiptItem(command.receipt, command.shipmentItem, item)
+                }
+
+        return new ReceiptSaveResponseDto(updatedLines: updatedLines)
+    }
+
+    /**
+     * Creates or updates a single receipt item from an edit-receiving-info request. The inventory item is resolved
+     * (and created if necessary) from the requested product + lot number + expiration date and is potentially swapped
+     * onto the receipt item, which is what allows the lot to be edited.
+     */
+    private ReceiptItemSaveDto upsertReceiptItem(
+            Receipt receipt, ShipmentItem shipmentItem, ReceiptItemEditReceivingInfoRequest item) {
+        // InventoryItem.expirationDate is a (legacy) java.util.Date, so convert the request's date-only LocalDate at
+        // the domain boundary. asDate resolves it to start-of-day in the system zone, so the stored Date and its
+        // MM/dd/yyyy formatting (see the InventoryItem JSON marshaller) stay identical to before.
+        Date expirationDate = item.expirationDate ? JavaUtilDateParser.asDate(item.expirationDate) : null
+        InventoryItem inventoryItem = inventoryItemManager.getOrCreateInventoryItem(
+                item.product, item.lotNumber, expirationDate)
+
+        ReceiptItem receiptItem = item.receiptItem ?: new ReceiptItem(
+                quantityShipped: shipmentItem.quantity,
+                sortOrder: shipmentItem.receiptItems.size(),
+        )
+
+        // The bin location is intentionally not edited via this endpoint, so it is left untouched.
+        receiptItem.product = item.product
+        receiptItem.inventoryItem = inventoryItem
+        receiptItem.lotNumber = inventoryItem.lotNumber
+        receiptItem.expirationDate = inventoryItem.expirationDate
+        receiptItem.recipient = item.recipient
+        receiptItem.quantityReceived = item.quantityReceiving
+        receiptItem.isSplitItem = item.isSplitItem
+
+        if (!item.receiptItem) {
+            receipt.addToReceiptItems(receiptItem)
+            shipmentItem.addToReceiptItems(receiptItem)
+            if (!receiptItem.save()) {
+                throw new ValidationException("Receipt item is invalid", receiptItem.errors)
+            }
+        }
+
+        return ReceiptItemSaveDto.from(receiptItem, item.rowId)
+    }
+
+    private static ReceiptItemSaveDto createReceiptItem(Receipt receipt, ReceiptItemUpsertRequest item) {
+
+        ShipmentItem shipmentItem = item.shipmentItem
+
+        ReceiptItem receiptItem = new ReceiptItem(
+                product: shipmentItem.product,
+                inventoryItem: shipmentItem.inventoryItem,
+                lotNumber: shipmentItem.lotNumber,
+                expirationDate: shipmentItem.expirationDate,
+                recipient: shipmentItem.recipient,
+                quantityShipped: shipmentItem.quantity,
+                quantityReceived: item.quantityReceiving,
+                binLocation: item.binLocation,
+                sortOrder: shipmentItem.receiptItems.size(),
+        )
+
+        receipt.addToReceiptItems(receiptItem)
+        shipmentItem.addToReceiptItems(receiptItem)
+
+        if (!receiptItem.save()) {
+            throw new ValidationException("Receipt item is invalid", receiptItem.errors)
+        }
+
+        return ReceiptItemSaveDto.from(receiptItem, item.rowId)
+    }
+
+    private static ReceiptItemSaveDto updateReceiptItem(ReceiptItemUpsertRequest item) {
+        ReceiptItem receiptItem = item.receiptItem
+        receiptItem.quantityReceived = item.quantityReceiving
+        receiptItem.binLocation = item.binLocation
+
+        return ReceiptItemSaveDto.from(receiptItem, item.rowId)
+    }
+
+    private static void deleteReceiptItem(Receipt receipt, String receiptItemId) {
+        ReceiptItem receiptItem = ReceiptItem.get(receiptItemId)
+        if (!receiptItem) {
+            throw new ObjectNotFoundException(receiptItemId, ReceiptItem.class.toString())
+        }
+
+        receipt.removeFromReceiptItems(receiptItem)
+        receiptItem.shipmentItem?.removeFromReceiptItems(receiptItem)
+        receiptItem.delete()
     }
 
     private static void validateShipmentReceivable(Shipment shipment) {
@@ -105,6 +232,7 @@ class ReceiptV2Service {
 
         ShipmentReceivingSummaryDto shipmentSummary = new ShipmentReceivingSummaryDto(
                 shipmentId: shipment.id,
+                pendingReceiptId: currentReceiptId,
         )
 
         // Build the summary for each shipment item.

@@ -1,6 +1,11 @@
+export const ReceivingView = {
+  TABLE: 'table',
+  PACKING_LIST: 'packingList',
+};
+
 const receivingViewOptions = [
-  { value: 'table', label: 'react.receiving.tableView.label', defaultLabel: 'Table View' },
-  { value: 'packingList', label: 'react.receiving.packingListView.label', defaultLabel: 'Packing List View' },
+  { value: ReceivingView.TABLE, label: 'react.receiving.tableView.label', defaultLabel: 'Table View' },
+  { value: ReceivingView.PACKING_LIST, label: 'react.receiving.packingListView.label', defaultLabel: 'Packing List View' },
 ];
 
 export default receivingViewOptions;

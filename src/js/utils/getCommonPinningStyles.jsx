@@ -4,20 +4,30 @@ const getCommonPinningStyles = (
   isScreenWiderThanTable,
   dataLength,
   loading,
+  isRowDisabled = false,
 ) => {
   const isPinned = column.getIsPinned();
   const isLastLeftPinnedColumn = isPinned === 'left' && column.getIsLastColumn('left');
+  const isFirstRightPinnedColumn = isPinned === 'right' && column.getIsFirstColumn('right');
+  // Pinning is only active when the table is too narrow to fit on screen. When it fits, columns
+  // aren't sticky, so we skip the separating shadow (and its clip-path/margins) that marks them.
+  const isPinningActive = !isScreenWiderThanTable && dataLength && !loading;
 
   return {
-    boxShadow: isLastLeftPinnedColumn ? '0 0 15px #00000040' : undefined,
-    clipPath: isLastLeftPinnedColumn ? 'inset(0 -15px 0 0)' : undefined,
-    marginRight: isLastLeftPinnedColumn ? '5px' : undefined,
+    boxShadow: (isPinningActive && (isLastLeftPinnedColumn || isFirstRightPinnedColumn)) ? '0 0 15px #00000040' : undefined,
+    clipPath: (isPinningActive && isLastLeftPinnedColumn && 'inset(0 -15px 0 0)')
+      || (isPinningActive && isFirstRightPinnedColumn && 'inset(0 0 0 -15px)')
+      || undefined,
+    marginRight: (isPinningActive && isLastLeftPinnedColumn) ? '5px' : undefined,
+    marginLeft: (isPinningActive && isFirstRightPinnedColumn) ? '5px' : undefined,
     left: isPinned === 'left' ? `${column.getStart('left')}px` : undefined,
+    right: isPinned === 'right' ? `${column.getAfter('right')}px` : undefined,
     position: isPinned && !isScreenWiderThanTable && dataLength && !loading && 'sticky',
     flex: flexWidth || column.getSize(),
     width: flexWidth || column.getSize(),
     zIndex: isPinned ? 1 : 0,
-    background: isPinned && 'white',
+    // #f8f9fa matches the `bg-light` class applied to disabled rows
+    background: isPinned && (isRowDisabled ? '#f8f9fa' : 'white'),
   };
 };
 

@@ -72,6 +72,9 @@ export const SET_SCROLL_TO_BOTTOM = 'SET_SCROLL_TO_BOTTOM';
 // Inbound
 export const UPDATE_WORKFLOW_HEADER = 'UPDATE_WORKFLOW_HEADER';
 
+// Partial receiving
+export const UPDATE_RECEIVING_HEADER = 'UPDATE_RECEIVING_HEADER';
+
 // Cycle count
 export const START_COUNT = 'START_COUNT';
 export const START_RESOLUTION = 'START_RESOLUTION';

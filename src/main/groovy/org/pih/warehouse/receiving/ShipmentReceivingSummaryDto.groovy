@@ -11,6 +11,11 @@ class ShipmentReceivingSummaryDto {
     String shipmentId
 
     /**
+     * The id of the shipment's pending receipt, or null if no receipt is in progress.
+     */
+    String pendingReceiptId
+
+    /**
      * A map of shipment item receiving summaries, keyed on shipment item id.
      *
      * Is a Map to make it convenient for the client in case it wants to rely on the shipmentItemsGrouped ordering.

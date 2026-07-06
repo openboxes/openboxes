@@ -36,6 +36,7 @@ const DataTableBody = ({
   loading,
   rowModel,
   dataLength,
+  tableWidth,
   tableWithPinnedColumns,
   isScreenWiderThanTable,
   virtualize,
@@ -54,22 +55,40 @@ const DataTableBody = ({
 
   const rowVirtualizer = useVirtualizer({
     count: rowModel?.rows?.length,
-    getScrollElement: () => parentRef.current,
+    // With pinned columns the scroll for both axes lives on `.rt-table`, so the virtualizer must
+    // measure that element to work correctly. Otherwise, the body scrolls itself.
+    getScrollElement: () => (tableWithPinnedColumns
+      ? parentRef.current?.closest('.rt-table')
+      : parentRef.current),
     estimateSize: () => estimateSize,
     overscan,
     enabled: isVirtualizationEnabled,
   });
 
+  const getCellContent = (cell, isSeparator) => {
+    if (isSeparator) {
+      const { renderSeparator } = cell.column.columnDef.meta || {};
+      return renderSeparator ? flexRender(renderSeparator, cell.getContext()) : null;
+    }
+    return flexRender(cell.column.columnDef.cell, cell.getContext());
+  };
+
   const dataToMap = isVirtualizationEnabled
     ? rowVirtualizer.getVirtualItems()
     : rowModel.rows;
+
+  // Virtualized rows are absolutely positioned, so they don't expand a `fit-content` body and it
+  // collapses. Use the explicit table width in that case.
+  const horizontalScrollWidth = isVirtualizationEnabled ? `${tableWidth}px` : 'fit-content';
 
   return (
     <div
       ref={parentRef}
       className="rt-tbody-v2"
       style={{
-        width: (!isScreenWiderThanTable && tableWithPinnedColumns && dataLength && !loading) ? 'fit-content' : undefined,
+        width: (!isScreenWiderThanTable && tableWithPinnedColumns && dataLength && !loading)
+          ? horizontalScrollWidth
+          : undefined,
       }}
     >
       <DataTableStatus
@@ -115,6 +134,10 @@ const DataTableBody = ({
               label: '',
               defaultMessage: '',
             };
+            // Separator row: cells render column meta.renderSeparator instead of the normal cell.
+            const isSeparator = rowData.original?.isSeparator;
+            // Merge with the row below by removing the separating border.
+            const mergeWithNextRow = rowData.original?.mergeWithNextRow;
             return (
               <CustomTooltip
                 content={isRowDisabled && translate(label, defaultMessage)}
@@ -122,16 +145,17 @@ const DataTableBody = ({
               >
                 <div
                   key={rowData.id}
-                  className="rt-tr-group cell-wrapper"
+                  className={`rt-tr-group cell-wrapper ${mergeWithNextRow ? 'rt-tr-group-merged' : ''}`}
                   role="rowgroup"
                   {...rowProps}
                 >
-                  <TableRow key={rowData.id} className={`rt-tr ${isRowDisabled && 'bg-light'}`}>
+                  <TableRow key={rowData.id} className={`rt-tr ${isRowDisabled ? 'bg-light disabled' : ''} ${isSeparator ? 'rt-tr-separator' : ''}`}>
                     {rowData.getVisibleCells().map((cell) => {
                       const { hide, flexWidth, className } = useTableColumnMeta(cell.column);
                       if (hide) {
                         return null;
                       }
+                      const cellContent = getCellContent(cell, isSeparator);
                       return (
                         <div
                           className={`d-flex ${className} ${isRowDisabled && 'text-muted'}`}
@@ -142,11 +166,12 @@ const DataTableBody = ({
                               isScreenWiderThanTable,
                               dataLength,
                               loading,
+                              isRowDisabled,
                             ),
                           }}
                           key={cell.id}
                         >
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          {cellContent}
                         </div>
                       );
                     })}
@@ -187,6 +212,7 @@ DataTableBody.propTypes = {
     ).isRequired,
   }).isRequired,
   dataLength: PropTypes.number.isRequired,
+  tableWidth: PropTypes.number.isRequired,
   tableWithPinnedColumns: PropTypes.bool,
   isScreenWiderThanTable: PropTypes.bool.isRequired,
   virtualize: PropTypes.shape({

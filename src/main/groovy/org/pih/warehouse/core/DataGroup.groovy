@@ -106,7 +106,7 @@ class DataGroup implements ResponseBodyFormattable {
             group.put(key, values as LinkedHashSet)
             return
         }
-        (group.get(key) as LinkedHashSet).addAll(values)
+        group.get(key).addAll(values)
     }
 
     private void putDataGroup(String key, DataGroup childGroup) {
@@ -127,7 +127,7 @@ class DataGroup implements ResponseBodyFormattable {
 
     private void putSingleton(String key, Object object) {
         if (!group.containsKey(key)) {
-            group.put(key, [object])
+            group.put(key, [object] as LinkedHashSet)
             return
         }
         try {

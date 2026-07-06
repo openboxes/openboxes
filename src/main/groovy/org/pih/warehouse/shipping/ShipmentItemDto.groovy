@@ -13,6 +13,8 @@ class ShipmentItemDto {
     String recipientId
     String donorId
     ContainerSimpleDto container
+    String unitOfMeasure
+    BigDecimal packSize
     Date dateCreated
     Date lastUpdated
 
@@ -24,9 +26,11 @@ class ShipmentItemDto {
                 productLot: ProductLotDto.from(shipmentItem.inventoryItem),
                 binLocation: LocationSimpleDto.from(shipmentItem.binLocation),
                 quantity: shipmentItem.quantity,
-                recipientId: shipmentItem.recipientId,
+                recipientId: shipmentItem.recipient?.id,
                 donorId: shipmentItem.donorId,
                 container: ContainerSimpleDto.from(shipmentItem.container),
+                unitOfMeasure: shipmentItem.unitOfMeasure,
+                packSize: shipmentItem.packSize,
                 dateCreated: shipmentItem.dateCreated,
                 lastUpdated: shipmentItem.lastUpdated,
         )

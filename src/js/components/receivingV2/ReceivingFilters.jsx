@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 
+import PropTypes from 'prop-types';
 import {
   RiArrowDownSLine,
   RiLogoutBoxRLine,
@@ -23,7 +24,9 @@ import AutosaveIndicator from 'utils/AutosaveIndicator';
  * Filters bar rendered above the receiving table. The filter (search and
  * receipt status) are rendered through FilterForm from the FilterFields config.
  */
-const ReceivingFilters = () => {
+const ReceivingFilters = ({
+  view, onViewChange, putawayEnabled, onPutawayChange, onSaveAndExit,
+}) => {
   const translate = useTranslate();
   // Add loading for filters section. Loading will display before the translations are fetched.
   // It fixes the issue of untranslated labels in the filters.
@@ -35,7 +38,11 @@ const ReceivingFilters = () => {
   return (
     <div className="receiving-filters">
       <div className="receiving-filters__row d-flex justify-content-between align-items-center">
-        <SlidingButtonGroup options={receivingViewOptions} defaultOption="table" />
+        <SlidingButtonGroup
+          options={receivingViewOptions}
+          defaultOption={view}
+          onChange={onViewChange}
+        />
         <div className="receiving-filters__autosave-slot">
           <AutosaveIndicator status={AutosaveStatus.SAVED} />
         </div>
@@ -54,6 +61,8 @@ const ReceivingFilters = () => {
       <div className="receiving-filters__row receiving-filters__actions d-flex flex-wrap justify-content-end align-items-center">
         <Switch
           className="receiving-filters__switch"
+          value={putawayEnabled}
+          onChange={onPutawayChange}
           titles={{
             checked: {
               id: 'react.receiving.enablePutaway.label',
@@ -89,11 +98,20 @@ const ReceivingFilters = () => {
           label="react.receiving.saveAndExit.label"
           defaultLabel="Save & Exit"
           variant="secondary"
+          onClick={onSaveAndExit}
           EndIcon={<RiLogoutBoxRLine size={16} />}
         />
       </div>
     </div>
   );
+};
+
+ReceivingFilters.propTypes = {
+  view: PropTypes.string.isRequired,
+  onViewChange: PropTypes.func.isRequired,
+  putawayEnabled: PropTypes.bool.isRequired,
+  onPutawayChange: PropTypes.func.isRequired,
+  onSaveAndExit: PropTypes.func.isRequired,
 };
 
 export default ReceivingFilters;

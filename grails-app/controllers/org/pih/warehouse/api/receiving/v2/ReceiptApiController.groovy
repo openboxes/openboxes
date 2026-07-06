@@ -3,9 +3,13 @@ package org.pih.warehouse.api.receiving.v2
 import javax.validation.Valid
 
 import org.pih.warehouse.api.BaseApiController
+import org.pih.warehouse.core.dtos.BatchCommandUtils
 import org.pih.warehouse.receiving.ReceiptDto
+import org.pih.warehouse.receiving.ReceiptEditReceivingInfoCommand
+import org.pih.warehouse.receiving.ReceiptSaveResponseDto
 import org.pih.warehouse.receiving.ShipmentReceivingSummaryCommand
 import org.pih.warehouse.receiving.ShipmentReceivingSummaryDto
+import org.pih.warehouse.receiving.ReceiptItemsBatchRequest
 
 class ReceiptApiController extends BaseApiController {
 
@@ -35,5 +39,19 @@ class ReceiptApiController extends BaseApiController {
     def getShipmentReceivingSummary(@Valid ShipmentReceivingSummaryCommand command) {
         ShipmentReceivingSummaryDto summary = receiptV2Service.getShipmentReceivingSummary(command)
         renderResponse(summary)
+    }
+
+    def updateItemsBatch(ReceiptItemsBatchRequest request) {
+        BatchCommandUtils.validateBatch(request, "itemsToSave")
+
+        ReceiptSaveResponseDto response = receiptV2Service.updateItemsBatch(request)
+        renderResponse(response)
+    }
+
+    def editReceivingInfo(ReceiptEditReceivingInfoCommand command) {
+        BatchCommandUtils.validateBatch(command, "itemsToSave")
+
+        ReceiptSaveResponseDto response = receiptV2Service.editReceivingInfo(command)
+        renderResponse(response)
     }
 }
