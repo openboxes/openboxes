@@ -61,7 +61,7 @@ class ObjectMapperConfigurer {
  * Modifies the serialization process, wrapping it with the custom behaviour defined in OpenBoxesWrappingSerializer.
  *
  * Note that this flow will not impact primitives, Lists, Maps, or other types that have their own built-in serializers.
- * Those serializers are defined and handled explicitly by Jackson so we don't need to worry about them.
+ * Those serializers are defined and handled explicitly by Jackson.
  *
  * During serialization, when Jackson first encounters a type that it hasn't serialized before, Jackson's
  * BeanSerializerFactory builds a new serializer for that type and caches it for when it sees that type again.
@@ -81,7 +81,7 @@ class OpenBoxesBeanSerializerModifier extends BeanSerializerModifier {
                                        BeanDescription beanDesc,
                                        JsonSerializer<?> serializer) {
 
-        // Wraps the original serializer that Jackson generated with our OpenBoxesWrappingSerializer.
+        // Wraps the original Jackson serializer with our OpenBoxesWrappingSerializer.
         // The serializer will be cached after this point, so the overhead of wrapping the serializer should
         // only apply the first time a type is serialized (at least until the next application restart).
         return new OpenBoxesWrappingSerializer(mapperComponentResolver, serializer as JsonSerializer<Object>)
@@ -145,7 +145,7 @@ class OpenBoxesWrappingSerializer extends JsonSerializer<Object> implements Reso
 
         // If the set already contains the object it means we've seen it before in the hierarchy and so have
         // a circular reference and need to short circuit. Note that this still allows an object to appear multiple
-        // times in a single response. This check only applies to objects within a single branch of the JSON response.
+        // times in a single response. This check only applies to objects within a single *branch* of the response.
         // For example: Object X has a Y field, which has an X field, which has a Y field, ... looping forever!
         Set<Object> stack = ALREADY_SEEN_OBJECTS.get()
         if (!stack.add(value)) {
@@ -197,16 +197,24 @@ class OpenBoxesWrappingSerializer extends JsonSerializer<Object> implements Reso
     }
 
     private void handleCircularReference(Object value, JsonGenerator gen) {
-        // This exact object instance is already being serialized higher up in the call stack.
-        // Writing null breaks the cycle rather than overflowing the stack.
+        // This exact object instance is already being serialized higher up in the call stack. Break the cycle
+        // (writing the object's id if possible, otherwise stringifying it) rather than overflowing the stack.
         if (value.hasProperty("id")) {
             try {
                 gen.writeString(value.id as String)
                 return
             } catch (Exception ignore) {
-                // Do nothing. We'll just return null if the id field cannot be stringified for whatever reason.
+                // Fail silently if the id cannot be stringified for whatever reason.
             }
         }
+
+        try {
+            gen.writeString(value.toString())
+            return
+        } catch (Exception ignore) {
+            // Fail silently if the object cannot be stringified for whatever reason.
+        }
+
         gen.writeNull()
     }
 
