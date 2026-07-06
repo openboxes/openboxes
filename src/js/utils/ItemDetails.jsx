@@ -7,8 +7,7 @@ import Badge from 'utils/Badge';
 import 'utils/ItemDetails.scss';
 
 /**
- * Generic component for displaying item details: an optional status badge
- * followed by a box of label/value fields.
+ * Generic component for displaying item details
  */
 const ItemDetails = ({ badge, fields, className }) => (
   <div className={`item-details ${className}`}>
