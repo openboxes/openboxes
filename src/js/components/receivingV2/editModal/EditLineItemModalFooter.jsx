@@ -5,13 +5,12 @@ import PropTypes from 'prop-types';
 import Button from 'components/form-elements/Button';
 import SummaryInfo from 'utils/SummaryInfo';
 
-const EditLineItemModalFooter = ({ summaryData, onClose }) => (
+const EditLineItemModalFooter = ({ summaryData, onClose, onSave }) => (
   <>
     <div className="mt-4">
       <SummaryInfo data={summaryData} />
     </div>
     <div className="d-flex justify-content-end align-items-center gap-8 mt-4">
-      {/* TODO: Save is a no-op for now. */}
       <Button
         label="react.default.button.cancel.label"
         defaultLabel="Cancel"
@@ -22,6 +21,7 @@ const EditLineItemModalFooter = ({ summaryData, onClose }) => (
         label="react.default.button.save.label"
         defaultLabel="Save"
         variant="primary"
+        onClick={onSave}
       />
     </div>
   </>
@@ -33,6 +33,7 @@ EditLineItemModalFooter.propTypes = {
     data: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   })).isRequired,
   onClose: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
 };
 
 export default EditLineItemModalFooter;

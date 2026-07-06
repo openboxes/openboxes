@@ -7,12 +7,13 @@ import EditLineItemModalFooter from 'components/receivingV2/editModal/EditLineIt
 import EditLineItemModalHeader from 'components/receivingV2/editModal/EditLineItemModalHeader';
 import ReceivedLineItemsTable from 'components/receivingV2/editModal/ReceivedLineItemsTable';
 import ReceivingLineItemsTable from 'components/receivingV2/editModal/ReceivingLineItemsTable';
+import useEditLineItemSave from 'hooks/receiving/v2/useEditLineItemSave';
 import useReceivedLineItems from 'hooks/receiving/v2/useReceivedLineItems';
 import useReceivingLineItems from 'hooks/receiving/v2/useReceivingLineItems';
 import useShipmentItemDetails from 'hooks/receiving/v2/useShipmentItemDetails';
 import ItemDetails from 'utils/ItemDetails';
 
-const EditLineItemModal = ({ onClose, lineItem }) => {
+const EditLineItemModal = ({ onClose, lineItem, receiptId }) => {
   const {
     fields,
     columns,
@@ -21,7 +22,15 @@ const EditLineItemModal = ({ onClose, lineItem }) => {
     revertToOriginal,
     receivingNow,
     summaryData,
+    getLineItems,
   } = useReceivingLineItems(lineItem);
+
+  const { onSave } = useEditLineItemSave({
+    receiptId,
+    lineItem,
+    getLineItems,
+    onClose,
+  });
 
   const {
     receivedItems,
@@ -65,6 +74,7 @@ const EditLineItemModal = ({ onClose, lineItem }) => {
         <EditLineItemModalFooter
           summaryData={summaryData}
           onClose={onClose}
+          onSave={onSave}
         />
       </div>
     </Modal>
@@ -73,7 +83,10 @@ const EditLineItemModal = ({ onClose, lineItem }) => {
 
 EditLineItemModal.propTypes = {
   onClose: PropTypes.func.isRequired,
+  receiptId: PropTypes.string,
   lineItem: PropTypes.shape({
+    shipmentItemId: PropTypes.string,
+    receiptItemId: PropTypes.string,
     product: PropTypes.shape({ name: PropTypes.string }),
     lotNumber: PropTypes.string,
     expirationDate: PropTypes.string,
@@ -81,11 +94,18 @@ EditLineItemModal.propTypes = {
     binLocation: PropTypes.shape({ name: PropTypes.string }),
     quantityShipped: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     quantityReceived: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    previousReceiptItems: PropTypes.arrayOf(PropTypes.shape({
+      productLot: PropTypes.shape({}),
+      recipient: PropTypes.shape({}),
+      binLocation: PropTypes.shape({}),
+      quantityReceived: PropTypes.number,
+    })),
   }),
 };
 
 EditLineItemModal.defaultProps = {
   lineItem: undefined,
+  receiptId: null,
 };
 
 export default EditLineItemModal;

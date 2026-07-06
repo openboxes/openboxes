@@ -30,7 +30,7 @@ const ReceivingLineItemsTable = ({
           onClick={revertToOriginal}
         />
       </div>
-      <form className="mt-2">
+      <form className="receiving-table mt-2">
         <DataTable
           columns={columns}
           data={fields}

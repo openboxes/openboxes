@@ -9,8 +9,8 @@ import { fetchUsers } from 'actions';
 import receivingApi from 'api/services/ReceivingApi';
 import ReceiptGroup from 'consts/receiptGroup';
 import { ReceivingView } from 'consts/receivingViewOptions';
-import mapToFormSelectOption from 'utils/mapToFormSelectOption';
 import useReceivingSaveAction from 'hooks/receiving/v2/useReceivingSaveAction';
+import mapToFormSelectOption from 'utils/mapToFormSelectOption';
 import {
   createNormalizedState,
   normalizeData,
@@ -45,15 +45,20 @@ const useReceivingActions = (view) => {
       totalQuantityCanceled = 0,
     } = summary;
     const currentReceiptItem = currentReceiptItems[0];
-    // Sum the quantity only from already received receipts. This total is later used
-    // to decide if the line can be blocked.
+    // Items saved on the pending receipt (currentReceiptItems) are "receiving now", not
+    // received, so only submitted receipts (previousReceiptItems) count as received.
     const quantityPreviouslyReceived = previousReceiptItems.reduce(
-      (sum, item) => sum + (item.quantityReceived ?? 0) + (item.quantityCanceled ?? 0),
+      (sum, item) => sum + (item.quantityReceived ?? 0),
+      0,
+    );
+    const quantityPreviouslyCanceled = previousReceiptItems.reduce(
+      (sum, item) => sum + (item.quantityCanceled ?? 0),
       0,
     );
     // A line is completed only when submitted receipts cover the shipped quantity and there is
     // nothing left pending.
-    const isCompleted = quantityPreviouslyReceived >= shipmentItem.quantity
+    const isCompleted = quantityPreviouslyReceived + quantityPreviouslyCanceled
+      >= shipmentItem.quantity
       && currentReceiptItems.length === 0;
     return {
       // Unique per-row id (a shipment item may eventually map to several rows once line
@@ -77,7 +82,8 @@ const useReceivingActions = (view) => {
         ?? (shipmentItem.recipientId ? usersById[shipmentItem.recipientId] : null),
       binLocation: currentReceiptItem?.binLocation ?? shipmentItem.binLocation ?? null,
       quantityShipped: shipmentItem.quantity,
-      quantityReceived: totalQuantityReceived,
+      quantityReceived: quantityPreviouslyReceived,
+      previousReceiptItems,
       packSize: shipmentItem.packSize,
       unitOfMeasure: shipmentItem.unitOfMeasure,
       quantityReceiving: currentReceiptItem?.quantityReceived ?? null,
@@ -182,6 +188,7 @@ const useReceivingActions = (view) => {
 
   return {
     loading,
+    receiptId,
     lineItemsState,
     updateLineItem,
     onSaveAndExit,

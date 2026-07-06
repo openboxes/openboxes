@@ -10,6 +10,7 @@ const useReceivingForm = () => {
   const [putawayEnabled, setPutawayEnabled] = useState(false);
   const {
     loading,
+    receiptId,
     lineItemsState,
     updateLineItem,
     onSaveAndExit,
@@ -27,6 +28,7 @@ const useReceivingForm = () => {
     },
     actions: {
       loading,
+      receiptId,
       updateLineItem,
       onSaveAndExit,
     },

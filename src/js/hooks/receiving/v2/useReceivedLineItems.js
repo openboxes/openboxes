@@ -6,27 +6,32 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useReceivedLineItemColumns from 'hooks/receiving/v2/useReceivedLineItemColumns';
 import { formatDateToString } from 'utils/dateUtils';
+import mapToFormSelectOption from 'utils/mapToFormSelectOption';
 
 /**
- * Form state for the read-only "Received" table in the edit modal
+ * Form state for the read-only "Received" table in the edit modal.
+ * Rows are built from receipt items of already submitted receipts - items saved
+ * on the pending receipt are not received yet, so they never show up here.
  */
 const useReceivedLineItems = (lineItem, { onCopyToReceive } = {}) => {
   const buildReceivedRow = (item) => ({
     rowId: _.uniqueId('received-'),
-    product: item?.product ?? null,
-    lotNumber: item?.lotNumber ?? '',
+    product: item?.productLot?.product ?? lineItem?.product ?? null,
+    lotNumber: item?.productLot?.lotNumber ?? '',
     expirationDate: formatDateToString({
-      date: item?.expirationDate,
+      date: item?.productLot?.expirationDate,
       dateFormat: DateFormatDateFns.DD_MMM_YYYY,
     }) ?? '',
-    recipient: item?.recipient ?? null,
+    recipient: mapToFormSelectOption(item?.recipient),
     quantityReceived: item?.quantityReceived ?? '',
-    location: item?.location ?? null,
+    location: mapToFormSelectOption(item?.binLocation),
   });
 
   const { control } = useForm({
     defaultValues: {
-      receivedItems: Number(lineItem?.quantityReceived) > 0 ? [buildReceivedRow(lineItem)] : [],
+      receivedItems: (lineItem?.previousReceiptItems ?? [])
+        .filter((item) => Number(item?.quantityReceived) > 0)
+        .map(buildReceivedRow),
     },
   });
 

@@ -17,6 +17,8 @@ const useReceivingLineItems = (lineItem) => {
   const buildDefaultRow = (item) => ({
     // Stable id so rows can be removed by identity, not index.
     rowId: _.uniqueId('row-'),
+    // Existing receipt item backing this row - on save it is updated instead of created.
+    receiptItemId: item?.receiptItemId ?? null,
     product: item?.product ?? null,
     lotNumber: item?.lotNumber ?? '',
     expirationDate: formatDateToString({
@@ -26,6 +28,8 @@ const useReceivingLineItems = (lineItem) => {
     recipient: item?.recipient ?? null,
     quantityReceiving: item?.quantityReceiving ?? '',
     location: item?.location ?? null,
+    // Rows added in the modal (not the original shipment item line) are marked as split lines.
+    isSplitItem: false,
   });
 
   const { control, getValues, reset } = useForm({
@@ -46,19 +50,28 @@ const useReceivingLineItems = (lineItem) => {
 
   const { columns } = useReceivingLineItemColumns({ control, removeRow });
 
-  const addRow = () => append(buildDefaultRow());
+  // New rows split the same shipment item line, so they start with the line's product.
+  const addRow = () => append({
+    ...buildDefaultRow({ product: lineItem?.product }),
+    isSplitItem: true,
+  });
 
   const copyToReceiving = useCallback((receivedItem) => append({
     rowId: _.uniqueId('row-'),
+    receiptItemId: null,
     product: receivedItem.product ?? null,
     lotNumber: receivedItem.lotNumber ?? '',
     expirationDate: receivedItem.expirationDate ?? '',
     recipient: receivedItem.recipient ?? null,
-    quantityReceiving: '',
+    quantityReceiving: receivedItem.quantityReceived ?? '',
     location: receivedItem.location ?? null,
+    isSplitItem: true,
   }), [append]);
 
   const revertToOriginal = () => reset();
+
+  // Current form rows, read on demand (e.g. when building the save payload).
+  const getLineItems = useCallback(() => getValues('lineItems'), [getValues]);
 
   const watchedLineItems = useWatch({ control, name: 'lineItems' });
   const receivingNow = (watchedLineItems ?? []).reduce(
@@ -90,7 +103,14 @@ const useReceivingLineItems = (lineItem) => {
   ];
 
   return {
-    fields, columns, addRow, copyToReceiving, revertToOriginal, receivingNow, summaryData,
+    fields,
+    columns,
+    addRow,
+    copyToReceiving,
+    revertToOriginal,
+    receivingNow,
+    summaryData,
+    getLineItems,
   };
 };
 

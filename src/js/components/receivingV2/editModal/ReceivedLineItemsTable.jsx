@@ -27,19 +27,21 @@ const ReceivedLineItemsTable = ({ receivedItems, columns, totalReceived }) => {
           </div>
         )}
       >
-        <DataTable
-          columns={columns}
-          data={receivedItems}
-          totalCount={receivedItems.length}
-          disablePagination
-          disabled
-          showFooter
-          meta={{ totalReceived }}
-          emptyTableMessage={{
-            id: 'react.receiving.emptyReceivedTable.label',
-            defaultMessage: 'No items received',
-          }}
-        />
+        <div className="receiving-table">
+          <DataTable
+            columns={columns}
+            data={receivedItems}
+            totalCount={receivedItems.length}
+            disablePagination
+            disabled
+            showFooter
+            meta={{ totalReceived }}
+            emptyTableMessage={{
+              id: 'react.receiving.emptyReceivedTable.label',
+              defaultMessage: 'No items received',
+            }}
+          />
+        </div>
       </Subsection>
     </Section>
   );

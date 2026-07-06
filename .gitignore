@@ -49,3 +49,6 @@ docker/mysql
 docker/openboxes.war
 .gradle
 .~*#
+
+# Claude Code local settings
+.claude/settings.local.json

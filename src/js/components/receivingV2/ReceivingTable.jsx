@@ -10,7 +10,7 @@ import useEditReceivingLineItemModal from 'hooks/receiving/v2/useEditReceivingLi
 import 'components/receivingV2/receiving.scss';
 
 const ReceivingTable = ({
-  lineItemsState, columns, loading, updateLineItem, commentModal,
+  lineItemsState, columns, loading, receiptId, updateLineItem, commentModal,
 }) => {
   const {
     isOpen: isCommentModalOpen,
@@ -90,6 +90,7 @@ const ReceivingTable = ({
         <EditLineItemModal
           onClose={closeEditModal}
           lineItem={lineItemsState.entities[editedItemId]}
+          receiptId={receiptId}
         />
       )}
     </div>
@@ -108,12 +109,17 @@ ReceivingTable.propTypes = {
   }).isRequired,
   columns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   loading: PropTypes.bool.isRequired,
+  receiptId: PropTypes.string,
   updateLineItem: PropTypes.func.isRequired,
   commentModal: PropTypes.shape({
     isOpen: PropTypes.bool.isRequired,
     openModal: PropTypes.func.isRequired,
     closeModal: PropTypes.func.isRequired,
   }).isRequired,
+};
+
+ReceivingTable.defaultProps = {
+  receiptId: null,
 };
 
 export default ReceivingTable;
