@@ -1,6 +1,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.util.Holders
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.DocumentService
@@ -8,6 +9,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.importer.InventoryLevelImportDataService
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.InventoryLevelUpdatedEvent
 import org.springframework.http.HttpStatus
 
 class InventoryLevelApiController {
@@ -67,8 +69,7 @@ class InventoryLevelApiController {
 
         List<String> productIds = results.findAll { it.status == UpsertStatus.OK && it.productId }*.productId.unique()
         if (deferRefresh && productIds) {
-            productAvailabilityService.triggerRefreshProductAvailability(facility.id, productIds, true)
-            inventorySnapshotService.triggerRefreshInventorySnapshot(facility.id, productIds, true)
+            Holders.grailsApplication.mainContext.publishEvent(new InventoryLevelUpdatedEvent(facility, facility.id, productIds, true))
         }
 
         render([

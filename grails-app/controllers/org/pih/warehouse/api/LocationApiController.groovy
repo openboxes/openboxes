@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.util.Holders
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 import org.hibernate.Criteria
@@ -25,6 +26,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.product.ProductAvailability
 import grails.core.GrailsApplication
 import org.springframework.web.multipart.MultipartFile
@@ -240,7 +242,10 @@ class LocationApiController extends BaseDomainApiController {
 
         List<String> facilityIds = results.findAll { it.status == 'ok' && it.parentId }*.parentId.unique()
         if (deferRefresh && facilityIds) {
-            productAvailabilityService.triggerRefreshProductAvailability(facilityIds, true)
+            facilityIds?.each { String facilityId ->
+                Location facility = Location.get(facilityId)
+                Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(facility, facilityId, [], true))
+            }
         }
 
         // Reload saved locations from the request-scoped Hibernate session. Entities loaded inside

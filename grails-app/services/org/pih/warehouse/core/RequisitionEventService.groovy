@@ -21,8 +21,9 @@ class RequisitionEventService {
 
         switch (event.eventType) {
             case WebhookEventType.REQUISITION_STAGED:
-                // workaround to delay AutomaticIssuanceJob 1 second after RefreshProductAvailabilityJob; it needs product refresh to complete first
-                def delayInMilliseconds = 1000
+                // workaround to delay AutomaticIssuanceJob after RefreshProductAvailabilityJob; it needs product refresh to complete first
+                // RefreshProductAvailabilityJob is triggered with 0 ms delay and AutomaticIssuanceJob by default 5000 ms delay
+                def delayInMilliseconds = Integer.valueOf(grailsApplication.config.openboxes.jobs.automaticIssuanceJob.delayInMilliseconds)
                 Date runAt = new Date(System.currentTimeMillis() + delayInMilliseconds)
                 log.info "Triggering automaticIssuanceJob job with ${delayInMilliseconds} ms delay"
                 AutomaticIssuanceJob.schedule(runAt, [requisitionId: requisition.id])

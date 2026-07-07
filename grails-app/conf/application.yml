@@ -560,12 +560,12 @@ openboxes:
         automaticIssuanceJob:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes
+            delayInMilliseconds: 5000 # workaround to delay AutomaticIssuanceJob after RefreshProductAvailabilityJob; it needs product refresh to complete first
             bulkAutomaticIssuance: true
 
         automaticAllocationJob:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes
-            delayInMilliseconds: 1000
             bulkAutoAllocation: true
 
         # should only be triggered by persistence event listener
