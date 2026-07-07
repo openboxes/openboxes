@@ -1,4 +1,9 @@
-import { RECEIPT_ITEMS_BATCH, RECEIPT_START, RECEIPT_SUMMARY_BY_SHIPMENT } from 'api/urls';
+import {
+  RECEIPT_ITEMS_BATCH,
+  RECEIPT_ITEMS_BY_SHIPMENT_ITEM,
+  RECEIPT_START,
+  RECEIPT_SUMMARY_BY_SHIPMENT,
+} from 'api/urls';
 import apiClient from 'utils/apiClient';
 
 export default {
@@ -7,4 +12,6 @@ export default {
   startReceipt: (shipmentId) => apiClient.post(RECEIPT_START(shipmentId)),
   updateItemsBatch: (receiptId, payload) =>
     apiClient.post(RECEIPT_ITEMS_BATCH(receiptId), payload),
+  editReceivingInfo: (receiptId, shipmentItemId, payload) =>
+    apiClient.post(RECEIPT_ITEMS_BY_SHIPMENT_ITEM(receiptId, shipmentItemId), payload),
 };

@@ -4,17 +4,26 @@ import PropTypes from 'prop-types';
 
 import DataTable from 'components/DataTable/v2/DataTable';
 import CommentModal from 'components/modals/CommentModal';
+import EditLineItemModal from 'components/receivingV2/editModal/EditLineItemModal';
+import useEditReceivingLineItemModal from 'hooks/receiving/v2/useEditReceivingLineItemModal';
 
 import 'components/receivingV2/receiving.scss';
 
 const ReceivingTable = ({
-  lineItemsState, columns, loading, updateLineItem, commentModal,
+  lineItemsState, columns, loading, receiptId, updateLineItem, commentModal,
 }) => {
   const {
     isOpen: isCommentModalOpen,
     openModal: openCommentModal,
     closeModal: closeCommentModal,
   } = commentModal;
+
+  const {
+    isOpen: isEditModalOpen,
+    itemId: editedItemId,
+    openModal: openEditModal,
+    closeModal: closeEditModal,
+  } = useEditReceivingLineItemModal();
 
   // Keep `meta` stable so it only changes when the entities map or
   // the update function change. Combined with the memoized cells, a single line item update
@@ -24,8 +33,9 @@ const ReceivingTable = ({
       entities: lineItemsState.entities,
       updateLineItem,
       onOpenCommentModal: openCommentModal,
+      onOpenEditModal: openEditModal,
     }),
-    [lineItemsState.entities, updateLineItem, openCommentModal],
+    [lineItemsState.entities, updateLineItem, openCommentModal, openEditModal],
   );
 
   // Separators pass through without meta. Meta is only used to disable (grey out)
@@ -76,6 +86,13 @@ const ReceivingTable = ({
         }}
       />
       <CommentModal isOpen={isCommentModalOpen} onClose={closeCommentModal} />
+      {isEditModalOpen && (
+        <EditLineItemModal
+          onClose={closeEditModal}
+          lineItem={lineItemsState.entities[editedItemId]}
+          receiptId={receiptId}
+        />
+      )}
     </div>
   );
 };
@@ -92,12 +109,17 @@ ReceivingTable.propTypes = {
   }).isRequired,
   columns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   loading: PropTypes.bool.isRequired,
+  receiptId: PropTypes.string,
   updateLineItem: PropTypes.func.isRequired,
   commentModal: PropTypes.shape({
     isOpen: PropTypes.bool.isRequired,
     openModal: PropTypes.func.isRequired,
     closeModal: PropTypes.func.isRequired,
   }).isRequired,
+};
+
+ReceivingTable.defaultProps = {
+  receiptId: null,
 };
 
 export default ReceivingTable;

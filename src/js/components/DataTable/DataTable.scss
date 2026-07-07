@@ -269,6 +269,32 @@
     }
   }
 
+  // Opacity creates a stacking context a child can't override.
+  // A column opts out via `data-table__interactive`.
+  .app-react-table--disabled {
+    .rt-thead .rt-th,
+    .rt-tbody-v2 .rt-td,
+    .rt-tfoot .footer-cell {
+      opacity: 0.5;
+    }
+
+    .rt-tbody-v2 .data-table__interactive .rt-td {
+      opacity: 1;
+    }
+  }
+
+  // Column-aligned footer row (DataTableFooterRow)
+  .rt-tfoot {
+    box-shadow: none;
+
+    .footer-cell {
+      padding: 12px;
+      background-color: var(--blue-100);
+      color: var(--gray-600);
+      box-shadow: none;
+    }
+  }
+
   .table-pagination-bottom {
     padding: 0.75rem !important;
   }

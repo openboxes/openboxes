@@ -404,6 +404,7 @@ const useReceivingColumns = ({
             actions={getReceivingRowActions({
               itemId: row.original.id,
               onOpenCommentModal: table.options.meta?.onOpenCommentModal,
+              onOpenEditModal: table.options.meta?.onOpenEditModal,
             })}
             disabled={getItem(row, table)?.isCompleted}
             label="react.receiving.actions.label"

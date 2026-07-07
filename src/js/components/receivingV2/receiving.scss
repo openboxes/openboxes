@@ -185,3 +185,72 @@
     border-top-color: var(--blue-primary);
   }
 }
+
+.modal-content:has(.receiving-edit-modal) {
+  top: 15%;
+}
+
+.receiving-edit-modal {
+  max-height: calc(80vh - 100px);
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 0.5em;
+    height: 0.5em;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--blue-200);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--blue-301);
+    border-radius: 4px;
+  }
+
+  // Match the empty table state to a single data-row height
+  .table-v2 .rt-tbody-v2 .rt-noData {
+    min-height: 60px;
+  }
+
+  &__title {
+    color: var(--blue-800);
+  }
+
+  // The per-field error wrapper is hidden, so add the row spacing back here.
+  .rt-tr-group .rt-tr {
+    padding-bottom: 5px;
+  }
+
+  &__delete {
+    color: var(--color-red);
+  }
+
+  &__add-record {
+    margin-top: 12px;
+    color: var(--blue-700);
+  }
+
+  &__copy-to-receive {
+    color: var(--blue-primary);
+    font-weight: 600;
+  }
+
+  &__received.v2-section {
+    padding: 0;
+    background-color: transparent;
+
+    .v2-subsection {
+      padding: 0;
+    }
+
+    .subsection-title-wrapper {
+      padding: 0;
+      border-bottom: none;
+    }
+
+    .subsection-body {
+      margin-top: 16px;
+    }
+  }
+}
