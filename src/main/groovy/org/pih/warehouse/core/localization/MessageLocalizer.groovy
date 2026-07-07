@@ -41,7 +41,20 @@ class MessageLocalizer {
      * This includes validation errors (as FieldError and ObjectError instances).
      */
     String localize(DefaultMessageSourceResolvable error, Locale localeOverride=null) {
-        return localize(error.code, error.arguments, localeOverride)
+        // Field errors carry a chain of message codes ordered from most to least specific, for example:
+        // "preferredBinLocationsCommand.products.nullable" ... "nullable". Try each of them so that
+        // messages can be defined in messages.properties at any level of specificity.
+        for (String code in error.codes) {
+            String message = localize(code, error.arguments, localeOverride)
+            // localize() falls back to returning the code itself when it doesn't resolve to any
+            // message, so treat that as "not found" and try the next (more generic) code.
+            if (message != null && message != code) {
+                return message
+            }
+        }
+        // Keep the existing behaviour of returning the most generic code as-is when no message
+        // is configured, so that it's obvious that the code is missing a localization.
+        return error.code
     }
 
     /**
