@@ -152,6 +152,9 @@ class StockMovement implements Validateable, Historizable {
         sourceType(nullable: true)
         referenceDocument(nullable: true)
         deliveryTypeCode(nullable: true)
+        allocationStrategy(nullable: true)
+        autoIssuanceEnabled(nullable: true)
+        allowNegativeInventory(nullable: true)
 
         packingLocation(nullable: true)
         receivingLocation(nullable: true)
