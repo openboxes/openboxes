@@ -26,6 +26,34 @@ const receiptGroupForView = (view) =>
 
 const buildSeparatorRow = (name) => ({ isSeparator: true, id: `separator-${name}`, name });
 
+// A row qualifies for autofill only when it can still be received (not completed, something
+// remaining) and the user hasn't entered anything yet (0 counts as entered).
+const shouldAutofillQuantity = (row) => !row.isCompleted
+  && row.quantityReceiving == null
+  && row.quantityRemaining > 0;
+
+// Autofills the "receiving now" quantity with the remaining quantity for every line
+// that is still empty. Skipped rows keep their object identity so memoized cells don't re-render,
+// and when nothing changes the original state reference is returned.
+export const autofillReceivingQuantities = (state) => {
+  const { entities, ids } = state;
+  const { updatedEntities, changed } = ids.reduce((acc, id) => {
+    const row = entities[id];
+    // Separator entries (packing list view) have no entity - nothing to fill
+    if (!row) {
+      return acc;
+    }
+    const shouldFill = shouldAutofillQuantity(row);
+    acc.updatedEntities[id] = shouldFill
+      ? { ...row, quantityReceiving: row.quantityRemaining, isDirty: true }
+      : row;
+    acc.changed = acc.changed || shouldFill;
+    return acc;
+  }, { updatedEntities: {}, changed: false });
+
+  return changed ? { ids, entities: updatedEntities } : state;
+};
+
 const useReceivingActions = (view) => {
   const [loading, setLoading] = useState(false);
   const [receiptId, setReceiptId] = useState(null);
@@ -232,6 +260,11 @@ const useReceivingActions = (view) => {
       isDirty: true,
     })), []);
 
+  const autofillQuantities = useCallback(
+    () => setLineItemsState(autofillReceivingQuantities),
+    [],
+  );
+
   const { removeSplitItem } = useRemoveSplitItem({ receiptId, lineItemsState, setLineItemsState });
 
   const { onSaveAndExit } = useReceivingSaveAction({
@@ -256,6 +289,7 @@ const useReceivingActions = (view) => {
     receiptId,
     lineItemsState,
     updateLineItem,
+    autofillQuantities,
     removeSplitItem,
     loadReceipt,
     onSaveAndExit,

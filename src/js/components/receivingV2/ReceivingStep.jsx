@@ -17,6 +17,7 @@ const ReceivingStep = () => {
       loading,
       receiptId,
       updateLineItem,
+      autofillQuantities,
       onSaveAndExit,
       removeSplitItem,
       loadReceipt,
@@ -31,6 +32,7 @@ const ReceivingStep = () => {
         onViewChange={setView}
         putawayEnabled={putawayEnabled}
         onPutawayChange={setPutawayEnabled}
+        onAutofillQuantities={autofillQuantities}
         onSaveAndExit={onSaveAndExit}
       />
       <ReceivingTable
