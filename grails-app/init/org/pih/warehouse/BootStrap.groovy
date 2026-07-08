@@ -491,6 +491,9 @@ class BootStrap {
                 autoAllocationEnabled: requisition.autoAllocationEnabled,
                 partialAllocationAllowed: requisition.partialAllocationAllowed,
                 partialIssuanceAllowed: requisition.partialIssuanceAllowed,
+                allocationStrategy: requisition.allocationStrategy?.name(),
+                autoIssuanceEnabled: requisition.autoIssuanceEnabled,
+                allowNegativeInventory: requisition.allowNegativeInventory,
             ]
         }
 
