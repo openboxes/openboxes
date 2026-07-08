@@ -126,6 +126,75 @@
       color: var(--gray-350);
     }
   }
+
+  &__struck {
+    text-decoration: line-through;
+    color: var(--gray-350);
+  }
+
+  // Dashed separator under split item rows and under the expanded toggle right above them.
+  // The last split item keeps the default solid border closing the group.
+  // The gradient controls the dash/gap size (native `dashed` can't).
+  .rt-tr-group:has(.rt-tr-subrow):not(.rt-tr-group-last-subrow),
+  .rt-tr-group:has(.receiving-table__changes-toggle--expanded) {
+    border-image: repeating-linear-gradient(
+      to right,
+      var(--gray-200),
+      var(--gray-200) 8px,
+      transparent 8px,
+      transparent 16px
+    ) 1;
+  }
+
+  .rt-td.receiving-table__changes-toggle {
+    overflow: visible;
+    white-space: nowrap;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .rt-tr > div:has(.receiving-table__changes-toggle) {
+    z-index: 2 !important;
+  }
+
+  &__expand-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--gray-300);
+  }
+
+  &__changes-label {
+    font-family: 'Inter', sans-serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--gray-600);
+  }
+
+  &__split-item-code {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__split-item-arrow {
+    color: var(--color-green);
+  }
+
+  &__split-item-arrow-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__delete-icon {
+    color: var(--color-red);
+  }
 }
 
 .location-header {

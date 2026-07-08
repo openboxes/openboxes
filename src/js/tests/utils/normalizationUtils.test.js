@@ -3,7 +3,7 @@ import {
   denormalizeData,
   getNormalizedItem,
   normalizeData,
-  removeNormalizedItem,
+  removeNormalizedItems,
   resolveKey,
   updateNormalizedItem,
   upsertNormalizedItem,
@@ -183,19 +183,22 @@ describe('upsertNormalizedItem()', () => {
   });
 });
 
-describe('removeNormalizedItem()', () => {
-  it('should remove the entity and its id', () => {
-    const state = { entities: { a: { id: 'a' }, b: { id: 'b' } }, ids: ['a', 'b'] };
-    const result = removeNormalizedItem(state, 'a');
+describe('removeNormalizedItems()', () => {
+  it('should remove the entities and their ids', () => {
+    const state = {
+      entities: { a: { id: 'a' }, b: { id: 'b' }, c: { id: 'c' } },
+      ids: ['a', 'b', 'c'],
+    };
+    const result = removeNormalizedItems(state, ['a', 'c']);
     expect(result.ids)
       .toEqual(['b']);
     expect(result.entities)
       .toEqual({ b: { id: 'b' } });
   });
 
-  it('should return the same state reference when the id does not exist', () => {
+  it('should return the same state reference when none of the ids exist', () => {
     const state = { entities: { a: { id: 'a' } }, ids: ['a'] };
-    expect(removeNormalizedItem(state, 'b'))
+    expect(removeNormalizedItems(state, ['b', 'c']))
       .toBe(state);
   });
 });

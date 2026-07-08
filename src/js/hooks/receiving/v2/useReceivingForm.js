@@ -13,6 +13,9 @@ const useReceivingForm = () => {
     receiptId,
     lineItemsState,
     updateLineItem,
+    removeSplitItem,
+    getInitialLineItems,
+    loadReceipt,
     onSaveAndExit,
   } = useReceivingActions(view);
   const { columns } = useReceivingColumns({ view, putawayEnabled });
@@ -30,6 +33,9 @@ const useReceivingForm = () => {
       loading,
       receiptId,
       updateLineItem,
+      removeSplitItem,
+      getInitialLineItems,
+      loadReceipt,
       onSaveAndExit,
     },
     commentModal,

@@ -1,7 +1,7 @@
-import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import { getCoreRowModel, getExpandedRowModel, useReactTable } from '@tanstack/react-table';
 
 const useDataTable = ({
-  columns, data, defaultColumn, meta,
+  columns, data, defaultColumn, meta, getSubRows,
 }) => {
   const initialColumnPinning = {
     left: columns
@@ -17,6 +17,8 @@ const useDataTable = ({
     data,
     defaultColumn,
     getCoreRowModel: getCoreRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
+    getSubRows,
     manualFiltering: true,
     manualPagination: true,
     manualSorting: true,

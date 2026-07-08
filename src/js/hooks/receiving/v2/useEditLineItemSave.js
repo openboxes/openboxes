@@ -12,7 +12,9 @@ import buildEditReceivingInfoPayload from 'utils/receiving/buildEditReceivingInf
 const useEditLineItemSave = ({
   receiptId,
   lineItem,
+  initialLineItems,
   getLineItems,
+  loadReceipt,
   onClose,
 }) => {
   const dispatch = useDispatch();
@@ -23,30 +25,43 @@ const useEditLineItemSave = ({
     // The original row is the only one backed by an existing receipt item. When its id is no
     // longer among the form rows, the user removed it, so delete it through the batch endpoint
     // (the edit-receiving-info endpoint does not support deletes).
-    const isOriginalRowRemoved = lineItem.receiptItemId
-      && !lineItems.some((item) => item.receiptItemId === lineItem.receiptItemId);
+    const initialReceiptItemIds = initialLineItems
+      .map((item) => item.receiptItemId)
+      .filter(Boolean);
+    const itemsToDelete = initialReceiptItemIds.filter(
+      (id) => !lineItems.some((item) => item.receiptItemId === id),
+    );
 
-    if (!payload.itemsToSave.length && !isOriginalRowRemoved) {
+    if (!payload.itemsToSave.length && !itemsToDelete.length) {
       onClose();
       return;
     }
 
     dispatch(showSpinner());
     try {
-      if (isOriginalRowRemoved) {
+      if (itemsToDelete.length) {
         await receivingApi.updateItemsBatch(receiptId, {
           itemsToSave: [],
-          itemsToDelete: [lineItem.receiptItemId],
+          itemsToDelete,
         });
       }
       if (payload.itemsToSave.length) {
         await receivingApi.editReceivingInfo(receiptId, lineItem.shipmentItemId, payload);
       }
       onClose();
+      loadReceipt();
     } finally {
       dispatch(hideSpinner());
     }
-  }, [receiptId, lineItem.shipmentItemId, lineItem.receiptItemId, getLineItems, onClose, dispatch]);
+  }, [
+    receiptId,
+    lineItem.shipmentItemId,
+    initialLineItems,
+    getLineItems,
+    loadReceipt,
+    onClose,
+    dispatch,
+  ]);
 
   return { onSave };
 };
