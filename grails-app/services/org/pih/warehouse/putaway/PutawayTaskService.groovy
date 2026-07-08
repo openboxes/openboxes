@@ -426,7 +426,9 @@ class PutawayTaskService {
         PutawayItem itemToSplit = putaway.putawayItems.find { it.id == currentItem.id }
 
         PutawayItem completedSplitItem = createSplitPutawayItem(task, quantity, PutawayStatus.COMPLETED, alternativeDestination)
-        PutawayItem remainingSplitItem = createSplitPutawayItem(task, quantityRemaining, PutawayStatus.PENDING, alternativeDestination)
+
+        Location destinationForRemainingSplitItem = alternativeDestination.supports(ActivityCode.PUTAWAY_CART) ? alternativeDestination : currentItem.destinationBinLocation
+        PutawayItem remainingSplitItem = createSplitPutawayItem(task, quantityRemaining, PutawayStatus.PENDING, destinationForRemainingSplitItem)
 
         if (itemToSplit) {
             itemToSplit.splitItems = [completedSplitItem, remainingSplitItem]
