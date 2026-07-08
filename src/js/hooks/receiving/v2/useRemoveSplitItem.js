@@ -4,8 +4,8 @@ import { useDispatch } from 'react-redux';
 
 import { hideSpinner, showSpinner } from 'actions';
 import receivingApi from 'api/services/ReceivingApi';
-import ReceivingRowType from 'consts/receivingRowType';
 import {
+  removeNormalizedItem,
   removeNormalizedItems,
   updateNormalizedItem,
 } from 'utils/normalizationUtils';
@@ -25,13 +25,13 @@ const removeSplitItemRow = (state, rowId) => {
   // remaining split item back into a plain row.
   if (splitItemIds.length === 1) {
     return updateNormalizedItem(
-      removeNormalizedItems(state, [rowId, toggleRowId, toggle.originalRowId]),
+      removeNormalizedItems(state, [rowId, toggleRowId, toggle.replacedRowId]),
       splitItemIds[0],
-      { rowType: ReceivingRowType.DEFAULT },
+      { rowType: null },
     );
   }
   const updatedState = updateNormalizedItem(
-    removeNormalizedItems(state, [rowId]),
+    removeNormalizedItem(state, rowId),
     toggleRowId,
     { splitItemIds },
   );

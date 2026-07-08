@@ -18,9 +18,9 @@ import ExpirationDateCell from 'utils/cells/ExpirationDateCell';
 import MultilineCell from 'utils/cells/MultilineCell';
 import PackLevelCell from 'utils/cells/PackLevelCell';
 import QuantityInputCell from 'utils/cells/QuantityInputCell';
-import ChangesToggleCell from 'utils/cells/receiving/ChangesToggleCell';
+import PackLevelGroupCell from 'utils/cells/receiving/PackLevelGroupCell';
+import ProductCodeCell from 'utils/cells/receiving/ProductCodeCell';
 import ShippedInPoCell from 'utils/cells/receiving/ShippedInPoCell';
-import SplitItemCell from 'utils/cells/receiving/SplitItemCell';
 import SelectCell from 'utils/cells/SelectCell';
 import ValueCell from 'utils/cells/ValueCell';
 import getReceivingRowActions, { getReceivingSplitItemActions } from 'utils/receiving/getReceivingRowActions';
@@ -70,9 +70,9 @@ const useReceivingColumns = ({
     };
   };
 
-  // Original rows of a changed item show the original shipment values struck through
+  // Replaced rows of a changed item show the original shipment values struck through
   // (everything except quantities).
-  const struckIfOriginal = (rowType) => (rowType === ReceivingRowType.ORIGINAL ? 'receiving-table__struck' : '');
+  const struckIfReplaced = (rowType) => (rowType === ReceivingRowType.REPLACED ? 'receiving-table__struck' : '');
 
   // Shipment-level columns (quantities, status) don't apply to the rows of a changes group.
   const isSplitItemOrToggle = (item) => item?.rowType === ReceivingRowType.SPLIT_ITEM
@@ -113,39 +113,13 @@ const useReceivingColumns = ({
     const packLevelGroupColumn = columnHelper.display({
       id: receivingColumns.PACK_LEVEL_GROUP,
       header: packLevelHeader,
-      cell: ({ row, table }) => {
-        const item = getItem(row, table);
-        // In packing list view, the leftmost column hosts the changes toggle and the
-        // green arrow of split item rows.
-        if (item?.rowType === ReceivingRowType.TOGGLE) {
-          return (
-            <ChangesToggleCell
-              isExpanded={row.getIsExpanded()}
-              onToggle={row.getToggleExpandedHandler()}
-              changeCount={item.splitItemIds.length}
-            />
-          );
-        }
-        if (item?.rowType === ReceivingRowType.SPLIT_ITEM) {
-          return (
-            <SplitItemCell
-              isFirstSplitItem={item?.isFirstSplitItem}
-              withArrow
-              className="receiving-table__split-item-arrow-cell"
-            />
-          );
-        }
-        const value = item?.packLevelGroup;
-        return (
-          <ValueCell
-            value={value}
-            tooltipLabel={value}
-            label="react.receiving.packLevel.label"
-            defaultLabel="Pack Level"
-            truncate
-          />
-        );
-      },
+      cell: ({ row, table }) => (
+        <PackLevelGroupCell
+          item={getItem(row, table)}
+          isExpanded={row.getIsExpanded()}
+          onToggle={row.getToggleExpandedHandler()}
+        />
+      ),
       meta: {
         pinned: 'left',
         // Light indent on item rows in packing list view.
@@ -179,45 +153,14 @@ const useReceivingColumns = ({
             {translate('react.receiving.code.label', 'Code')}
           </TableHeaderCell>
         ),
-        cell: ({ row, table }) => {
-          const item = getItem(row, table);
-          // The changes toggle lives in the first pinned column: Code in table view,
-          // the pack level group column in packing list view.
-          if (item?.rowType === ReceivingRowType.TOGGLE) {
-            return isPackingListView
-              // An empty cell instead of null - the pinned cell wrapper has a white
-              // background, so without a .rt-td inside it would stay white on row hover.
-              ? <TableCell className="rt-td" />
-              : (
-                <ChangesToggleCell
-                  isExpanded={row.getIsExpanded()}
-                  onToggle={row.getToggleExpandedHandler()}
-                  changeCount={item.splitItemIds.length}
-                />
-              );
-          }
-          if (item?.rowType === ReceivingRowType.SPLIT_ITEM) {
-            return (
-              <SplitItemCell
-                isFirstSplitItem={item?.isFirstSplitItem}
-                productCode={item?.productCode}
-                withArrow={!isPackingListView}
-                className="receiving-table__split-item-code"
-              />
-            );
-          }
-          const value = item?.productCode;
-          return (
-            <ValueCell
-              value={value}
-              tooltipLabel={value}
-              className={struckIfOriginal(item?.rowType)}
-              label="react.receiving.code.label"
-              defaultLabel="Code"
-              truncate
-            />
-          );
-        },
+        cell: ({ row, table }) => (
+          <ProductCodeCell
+            item={getItem(row, table)}
+            isPackingListView={isPackingListView}
+            isExpanded={row.getIsExpanded()}
+            onToggle={row.getToggleExpandedHandler()}
+          />
+        ),
         meta: {
           pinned: 'left',
         },
@@ -243,7 +186,7 @@ const useReceivingColumns = ({
           return (
             <MultilineCell
               value={item?.product?.name}
-              className={struckIfOriginal(item?.rowType)}
+              className={struckIfReplaced(item?.rowType)}
               label="react.receiving.product.label"
               defaultLabel="Product"
               maxLines={2}
@@ -275,7 +218,7 @@ const useReceivingColumns = ({
             <ValueCell
               value={value}
               tooltipLabel={value}
-              className={struckIfOriginal(item?.rowType)}
+              className={struckIfReplaced(item?.rowType)}
               label="react.receiving.lotSerialNo.short.label"
               defaultLabel="Lot/SN"
               truncate
@@ -300,10 +243,10 @@ const useReceivingColumns = ({
             <ExpirationDateCell
               value={item?.expirationDate}
               localeKey={currentLocale}
-              className={struckIfOriginal(item?.rowType)}
+              className={struckIfReplaced(item?.rowType)}
               label="react.receiving.expirationDate.short.label"
               defaultLabel="Exp Date"
-              showExpiryStatus={item?.rowType !== ReceivingRowType.ORIGINAL}
+              showExpiryStatus={item?.rowType !== ReceivingRowType.REPLACED}
             />
           );
         },
@@ -326,7 +269,7 @@ const useReceivingColumns = ({
             <ValueCell
               value={recipient?.name}
               tooltipLabel={recipient?.name}
-              className={struckIfOriginal(item?.rowType)}
+              className={struckIfReplaced(item?.rowType)}
               label="react.receiving.recipient.label"
               defaultLabel="Recipient"
               truncate
@@ -411,7 +354,7 @@ const useReceivingColumns = ({
         ),
         cell: ({ row, table }) => {
           const item = getItem(row, table);
-          if (item?.rowType === ReceivingRowType.ORIGINAL
+          if (item?.rowType === ReceivingRowType.REPLACED
             || item?.rowType === ReceivingRowType.TOGGLE) {
             return null;
           }
@@ -470,8 +413,8 @@ const useReceivingColumns = ({
             return (
               <SelectCell
                 options={receivingLocationOptions}
-                // The original row of a changed item keeps its select visible but disabled.
-                disabled={item?.rowType === ReceivingRowType.ORIGINAL || item?.isCompleted}
+                // The replaced row of a changed item keeps its select visible but disabled.
+                disabled={item?.rowType === ReceivingRowType.REPLACED || item?.isCompleted}
                 label="react.receiving.location.label"
                 defaultLabel="Location"
               />

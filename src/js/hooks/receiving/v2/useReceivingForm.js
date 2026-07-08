@@ -14,7 +14,6 @@ const useReceivingForm = () => {
     lineItemsState,
     updateLineItem,
     removeSplitItem,
-    getInitialLineItems,
     loadReceipt,
     onSaveAndExit,
   } = useReceivingActions(view);
@@ -34,7 +33,6 @@ const useReceivingForm = () => {
       receiptId,
       updateLineItem,
       removeSplitItem,
-      getInitialLineItems,
       loadReceipt,
       onSaveAndExit,
     },

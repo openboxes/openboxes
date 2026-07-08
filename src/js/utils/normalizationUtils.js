@@ -124,19 +124,29 @@ export const upsertNormalizedItem = (state, item, keyField = 'id') => {
 };
 
 /**
+ * Removes an entity from normalized state.
+ * Returns the same state reference when the id does not exist.
+ * @param {{ entities: Object, ids: Array }} state - normalized state
+ * @param {string|number} id - id of the entity to remove
+ * @returns {{ entities: Object, ids: Array }}
+ */
+export const removeNormalizedItem = (state, id) => {
+  if (!state?.entities?.[id]) {
+    return state;
+  }
+
+  return {
+    ids: state.ids.filter((currentId) => currentId !== id),
+    entities: _.omit(state.entities, id),
+  };
+};
+
+/**
  * Removes multiple entities from normalized state.
  * Returns the same state reference when none of the ids exist.
  * @param {{ entities: Object, ids: Array }} state - normalized state
  * @param {Array<string|number>} idsToRemove - ids of the entities to remove
  * @returns {{ entities: Object, ids: Array }}
  */
-export const removeNormalizedItems = (state, idsToRemove) => {
-  if (!idsToRemove.some((id) => state?.entities?.[id])) {
-    return state;
-  }
-
-  return {
-    ids: state.ids.filter((id) => !idsToRemove.includes(id)),
-    entities: _.omit(state.entities, idsToRemove),
-  };
-};
+export const removeNormalizedItems = (state, idsToRemove) =>
+  idsToRemove.reduce(removeNormalizedItem, state);

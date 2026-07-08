@@ -1,7 +1,7 @@
 import { getCoreRowModel, getExpandedRowModel, useReactTable } from '@tanstack/react-table';
 
 const useDataTable = ({
-  columns, data, defaultColumn, meta, getSubRows,
+  columns, data, defaultColumn, meta, getSubRows, defaultExpandedSubRows,
 }) => {
   const initialColumnPinning = {
     left: columns
@@ -19,6 +19,8 @@ const useDataTable = ({
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
     getSubRows,
+    // `expanded: true` means all expandable rows start expanded (they can still be collapsed)
+    initialState: defaultExpandedSubRows ? { expanded: true } : {},
     manualFiltering: true,
     manualPagination: true,
     manualSorting: true,

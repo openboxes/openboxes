@@ -19,7 +19,6 @@ const ReceivingStep = () => {
       updateLineItem,
       onSaveAndExit,
       removeSplitItem,
-      getInitialLineItems,
       loadReceipt,
     },
     commentModal,
@@ -41,7 +40,6 @@ const ReceivingStep = () => {
         receiptId={receiptId}
         updateLineItem={updateLineItem}
         removeSplitItem={removeSplitItem}
-        getInitialLineItems={getInitialLineItems}
         loadReceipt={loadReceipt}
         commentModal={commentModal}
       />

@@ -11,7 +11,11 @@ import { TableCell } from 'components/DataTable';
 const SplitItemCell = React.memo(({
   isFirstSplitItem, productCode, withArrow, className,
 }) => (
-  <TableCell className={`rt-td ${className}`}>
+  <TableCell
+    className={`rt-td ${className}`}
+    customTooltip
+    tooltipLabel={isFirstSplitItem ? productCode : null}
+  >
     {isFirstSplitItem && (
       <>
         {withArrow && (

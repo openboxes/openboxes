@@ -35,7 +35,7 @@ const useReceivingActions = (view) => {
   const users = useSelector(getUsers);
   // Base builder of a line item row:
   // - a shipment item that was not split uses it directly as its only editable row,
-  // - the original and split item rows of a split item build on top of it
+  // - the replaced and split item rows of a split item build on top of it
   //   (see buildItemRows).
   const buildLineItem = ({ summary, receiptItem, usersById }) => {
     const {
@@ -59,15 +59,15 @@ const useReceivingActions = (view) => {
     const isCompleted = quantityPreviouslyReceived + quantityPreviouslyCanceled
       >= shipmentItem.quantity
       && !receiptItem;
-    // A receipt item carries its own product only when the product was changed while
-    // receiving, otherwise the row shows the original product of the shipment item.
+    // A receipt item always carries its own product. The shipment item product is used
+    // only for rows that have no receipt item yet.
     const product = receiptItem?.productLot?.product ?? shipmentItem.productLot?.product;
     return {
       // Unique per-row id (a shipment item may eventually map to several rows once line
       // splitting lands), used as the normalized state key and as the rowId correlation
       // sent to / echoed back from the batch endpoint.
       rowId: _.uniqueId('row-'),
-      rowType: ReceivingRowType.DEFAULT,
+      rowType: null,
       shipmentItemId: shipmentItem.id,
       receiptItemId: receiptItem?.id ?? null,
       productCode: product?.productCode,
@@ -101,12 +101,12 @@ const useReceivingActions = (view) => {
     };
   };
 
-  // The struck-through original row of a split shipment item - the split items below
+  // The struck-through row of a split shipment item - the split items below
   // replace it. Built without a receipt item, so it keeps the original shipment values
   // (product, lot, expiration, recipient, bin location).
-  const buildOriginalEntity = (summary, usersById) => ({
+  const buildReplacedEntity = (summary, usersById) => ({
     ...buildLineItem({ summary, usersById }),
-    rowType: ReceivingRowType.ORIGINAL,
+    rowType: ReceivingRowType.REPLACED,
     isCompleted: false,
   });
 
@@ -124,7 +124,7 @@ const useReceivingActions = (view) => {
   });
 
   // Rows for a single shipment item: a single editable row when it was not split,
-  // or an original row + toggle row + one split item row per pending receipt item.
+  // or a replaced row + toggle row + one split item row per pending receipt item.
   const buildItemRows = (summary, usersById) => {
     const { currentReceiptItems = [] } = summary;
 
@@ -132,7 +132,7 @@ const useReceivingActions = (view) => {
       return [buildLineItem({ summary, receiptItem: currentReceiptItems[0], usersById })];
     }
 
-    const originalRow = buildOriginalEntity(summary, usersById);
+    const replacedRow = buildReplacedEntity(summary, usersById);
 
     const splitItems = currentReceiptItems
       .map((receiptItem) => buildSplitItemEntity({ summary, receiptItem, usersById }));
@@ -150,11 +150,11 @@ const useReceivingActions = (view) => {
     const toggleRowId = _.uniqueId('row-');
 
     return [
-      { ...originalRow, toggleRowId },
+      { ...replacedRow, toggleRowId },
       {
         rowType: ReceivingRowType.TOGGLE,
         rowId: toggleRowId,
-        originalRowId: originalRow.rowId,
+        replacedRowId: replacedRow.rowId,
         splitItemIds: splitItemRows.map((splitItem) => splitItem.rowId),
       },
       ...splitItemRows,
@@ -234,18 +234,6 @@ const useReceivingActions = (view) => {
 
   const { removeSplitItem } = useRemoveSplitItem({ receiptId, lineItemsState, setLineItemsState });
 
-  // Line items prefilling the edit modal form: the split items of an item with saved
-  // changes (an original row), or the edited item itself.
-  const getInitialLineItems = useCallback((rowId) => {
-    const { entities } = lineItemsState;
-    if (entities[rowId]?.rowType !== ReceivingRowType.ORIGINAL) {
-      return [entities[rowId]];
-    }
-    // The toggle row of the group owns the split item ids.
-    const toggleRow = entities[entities[rowId].toggleRowId];
-    return toggleRow.splitItemIds.map((splitItemId) => entities[splitItemId]);
-  }, [lineItemsState]);
-
   const { onSaveAndExit } = useReceivingSaveAction({
     receiptId,
     lineItemsState,
@@ -269,7 +257,6 @@ const useReceivingActions = (view) => {
     lineItemsState,
     updateLineItem,
     removeSplitItem,
-    getInitialLineItems,
     loadReceipt,
     onSaveAndExit,
   };

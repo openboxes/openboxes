@@ -18,7 +18,6 @@ const ReceivingTable = ({
   updateLineItem,
   commentModal,
   removeSplitItem,
-  getInitialLineItems,
   loadReceipt,
 }) => {
   const {
@@ -32,7 +31,8 @@ const ReceivingTable = ({
     itemId: editedItemId,
     openModal: openEditModal,
     closeModal: closeEditModal,
-  } = useEditReceivingLineItemModal();
+    getInitialEditModalLineItems,
+  } = useEditReceivingLineItemModal(lineItemsState);
 
   // Keep `meta` stable so it only changes when the entities map or
   // the update function change. Combined with the memoized cells, a single line item update
@@ -84,8 +84,8 @@ const ReceivingTable = ({
           return {
             ...buildRow(entry),
             subRows: entities[entry]?.splitItemIds?.map(buildSubRow),
-            // An original row is always followed by its toggle row and merges with it.
-            mergeWithNextRow: entities[entry]?.rowType === ReceivingRowType.ORIGINAL,
+            // A replaced row is always followed by its toggle row and merges with it.
+            mergeWithNextRow: entities[entry]?.rowType === ReceivingRowType.REPLACED,
           };
         });
     },
@@ -120,13 +120,14 @@ const ReceivingTable = ({
           customRowsHeight: true,
         }}
         getSubRows={(row) => row.subRows}
+        defaultExpandedSubRows
       />
       <CommentModal isOpen={isCommentModalOpen} onClose={closeCommentModal} />
       {isEditModalOpen && (
         <EditLineItemModal
           onClose={closeEditModal}
           lineItem={lineItemsState.entities[editedItemId]}
-          initialLineItems={getInitialLineItems(editedItemId)}
+          initialLineItems={getInitialEditModalLineItems(editedItemId)}
           receiptId={receiptId}
           loadReceipt={loadReceipt}
         />
@@ -150,7 +151,6 @@ ReceivingTable.propTypes = {
   receiptId: PropTypes.string,
   updateLineItem: PropTypes.func.isRequired,
   removeSplitItem: PropTypes.func.isRequired,
-  getInitialLineItems: PropTypes.func.isRequired,
   loadReceipt: PropTypes.func.isRequired,
   commentModal: PropTypes.shape({
     isOpen: PropTypes.bool.isRequired,

@@ -179,7 +179,10 @@
   &__split-item-code {
     display: flex;
     align-items: center;
-    gap: 4px;
+  }
+
+  &__split-item-code &__split-item-arrow {
+    margin-right: 8px
   }
 
   &__split-item-arrow {
