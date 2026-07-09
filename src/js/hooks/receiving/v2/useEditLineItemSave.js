@@ -25,11 +25,10 @@ const useEditLineItemSave = ({
     const initialReceiptItemIds = initialLineItems
       .filter((item) => item.receiptItemId)
       .map((item) => item.receiptItemId);
+    const remainingLineItemsIds = new Set(lineItems.map((item) => item.receiptItemId));
     // Delete the receipt items that already existed (initialReceiptItemIds) but were
     // removed from the form
-    const itemsToDelete = initialReceiptItemIds.filter(
-      (id) => !lineItems.some((item) => item.receiptItemId === id),
-    );
+    const itemsToDelete = initialReceiptItemIds.filter((id) => !remainingLineItemsIds.has(id));
 
     if (!payload.itemsToSave.length && !itemsToDelete.length) {
       onClose();
