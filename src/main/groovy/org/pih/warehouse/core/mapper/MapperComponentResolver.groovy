@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 class MapperComponentResolver {
 
     private final Map<Class, ResponseMapper> responseMappersBySourceType = [:]
-    private final MultiKeyMap<Class, Mapper> mappersBySourceAndTargetType = [:]
+    private final MultiKeyMap<Class, Mapper> mappersBySourceAndTargetType = new MultiKeyMap<>()
 
     // Components are wrapped with optional to avoid an error when no implementations are defined.
     MapperComponentResolver(final Optional<List<ResponseMapper>> responseMappers,

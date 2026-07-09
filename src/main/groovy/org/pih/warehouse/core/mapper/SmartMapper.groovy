@@ -47,19 +47,10 @@ class SmartMapper {
         if (sourceCollection == null) {
             return null
         }
-        if (sourceCollection.isEmpty()) {
-            return []
-        }
-
-        Class sourceClass = sourceCollection[0].class
-        Mapper mapper = mapperComponentResolver.getMapper(sourceClass, targetClass)
-        if (mapper == null) {
-            throw new RuntimeException("No mapper was found between source ${sourceClass} and target ${targetClass}.")
-        }
 
         List<Target> mappedList = []
         for (source in sourceCollection) {
-            mappedList.add(mapper.map(source))
+            mappedList.add(map(source, targetClass))
         }
         return mappedList
     }

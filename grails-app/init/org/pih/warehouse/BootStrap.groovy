@@ -22,7 +22,6 @@ import org.pih.warehouse.inventory.CycleCountSummary
 import org.pih.warehouse.inventory.InventoryAuditDetails
 import org.pih.warehouse.inventory.InventoryAuditSummary
 import org.pih.warehouse.inventory.InventoryTransactionsSummary
-import org.pih.warehouse.inventory.PendingCycleCountRequest
 import org.pih.warehouse.reporting.CycleCountProductSummary
 
 import java.math.RoundingMode
@@ -109,6 +108,10 @@ import org.pih.warehouse.shipping.ShipmentType
 
 class BootStrap {
 
+    // If there are multiple marshallers for the same object, the one with the highest priority is used.
+    private static int RESPONSE_MAPPER_MARSHALLER_PRIORITY = 10
+    private static int RESPONSE_BODY_FORMATTABLE_MARSHALLER_PRIORITY = 20
+
     UploadService uploadService
     DataSource dataSource
     MapperComponentResolver mapperComponentResolver
@@ -161,7 +164,9 @@ class BootStrap {
         for (responseMapperBySource in mapperComponentResolver.allResponseMappers) {
             Class sourceType = responseMapperBySource.key
             ResponseMapper responseMapper = responseMapperBySource.value
-            JSON.registerObjectMarshaller(sourceType) { responseMapper.asResponseBody(it) }
+            JSON.registerObjectMarshaller(sourceType, RESPONSE_MAPPER_MARSHALLER_PRIORITY) {
+                return responseMapper.asResponseBody(it)
+            }
         }
 
         // And do the same for all ResponseBodyFormattable implementations.
@@ -170,7 +175,9 @@ class BootStrap {
         scanner.addIncludeFilter(new AssignableTypeFilter(ResponseBodyFormattable))
         for (beanDefinition in scanner.findCandidateComponents("org.pih.warehouse")) {
             Class clazz = Class.forName(beanDefinition.beanClassName)
-            JSON.registerObjectMarshaller(clazz) { it.asResponseBody() }
+            JSON.registerObjectMarshaller(clazz, RESPONSE_BODY_FORMATTABLE_MARSHALLER_PRIORITY) {
+                return it.asResponseBody()
+            }
         }
 
         // java.time types. With these marshallers we don't need to call toString() on the java.time fields in the

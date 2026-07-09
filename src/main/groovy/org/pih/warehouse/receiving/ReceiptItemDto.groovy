@@ -1,5 +1,7 @@
 package org.pih.warehouse.receiving
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import org.pih.warehouse.core.PersonDto
 import org.pih.warehouse.location.LocationSimpleDto
 import org.pih.warehouse.product.lot.ProductLotDto
@@ -19,6 +21,7 @@ class ReceiptItemDto {
      * If doing a direct putaway as a part of the receipt this will be a bin location.
      * If direct putaways are disabled, this will be an internal, temporary receiving location.
      */
+    @JsonProperty("binLocation")  // TODO: remove this and refactor the frontend to use "receivingLocation"
     LocationSimpleDto receivingLocation
 
     Integer quantityReceived = 0
