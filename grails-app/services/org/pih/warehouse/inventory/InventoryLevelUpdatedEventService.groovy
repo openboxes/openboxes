@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.putaway.PutawayService
+import org.pih.warehouse.jobs.PutawayLocationReslottingJob
 import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
 
@@ -17,17 +17,16 @@ class InventoryLevelUpdatedEventService {
 
     ProductAvailabilityService productAvailabilityService
     InventorySnapshotService inventorySnapshotService
-    PutawayService putawayService
 
     // AFTER_COMMIT: refresh runs once the upsert transaction has committed, so the data is guaranteed visible and
     // the refresh jobs don't need to be scheduled with a delay
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     void onInventoryLevelUpdated(InventoryLevelUpdatedEvent event) {
-        log.info "Inventory level updated; refreshing PA and inventory snapshot for facility=${event.facilityId}, product=${event.productId}"
         if (event.facilityId) {
+            log.info "Inventory level updated; refreshing PA and inventory snapshot for facility=${event.facilityId}, product=${event.productId}"
             productAvailabilityService.triggerRefreshProductAvailability(event.facilityId, [event.productId], event.forceRefresh)
             inventorySnapshotService.triggerRefreshInventorySnapshot(event.facilityId, [event.productId], event.forceRefresh)
         }
-        putawayService.triggerPutawayLocationReslotting(event.source?.id)
+        PutawayLocationReslottingJob.triggerNow([inventoryLevelId: event.source?.id])
     }
 }

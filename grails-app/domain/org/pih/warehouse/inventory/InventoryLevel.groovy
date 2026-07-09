@@ -20,8 +20,7 @@ import util.InventoryUtil
 class InventoryLevel implements Comparable<InventoryLevel> {
 
     def publishInventoryLevelUpdatedEvent() {
-        Holders.grailsApplication.mainContext.publishEvent(
-                new InventoryLevelUpdatedEvent(this, null, product.id, true))
+        Holders.grailsApplication.mainContext.publishEvent( new InventoryLevelUpdatedEvent(this))
     }
 
     def afterUpdate() {
