@@ -3112,7 +3112,8 @@ class StockMovementService {
         // Set default shipment type so we can save to the database without user input
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
 
-        shipment.name = StockMovementUtil.generateStockMovementName(requisition, null)
+        shipment.name = StockMovementUtil.generateStockMovementName(requisition.origin, requisition.destination,
+                requisition.dateRequested, requisition, null, requisition.description)
 
         if (shipment.hasErrors() || !shipment.save(flush: true)) {
             throw new ValidationException("Invalid shipment", shipment.errors)
