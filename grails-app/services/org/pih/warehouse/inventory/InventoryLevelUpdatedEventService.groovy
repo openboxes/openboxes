@@ -24,10 +24,10 @@ class InventoryLevelUpdatedEventService {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     void onInventoryLevelUpdated(InventoryLevelUpdatedEvent event) {
         log.info "Inventory level updated; refreshing PA and inventory snapshot for facility=${event.facilityId}, product=${event.productId}"
-        productAvailabilityService.triggerRefreshProductAvailability(event.facilityId, [event.productId], event.forceRefresh)
-        putawayService.triggerPutawayLocationReslotting(event.source?.id)
         if (event.facilityId) {
+            productAvailabilityService.triggerRefreshProductAvailability(event.facilityId, [event.productId], event.forceRefresh)
             inventorySnapshotService.triggerRefreshInventorySnapshot(event.facilityId, [event.productId], event.forceRefresh)
         }
+        putawayService.triggerPutawayLocationReslotting(event.source?.id)
     }
 }
