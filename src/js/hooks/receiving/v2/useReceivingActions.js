@@ -26,6 +26,39 @@ const receiptGroupForView = (view) =>
 
 const buildSeparatorRow = (name) => ({ isSeparator: true, id: `separator-${name}`, name });
 
+// Only rows with an editable quantity input can be autofilled: plain lines (no row type)
+// and split items.
+const AUTOFILL_EXCLUDED_ROW_TYPES = [ReceivingRowType.REPLACED, ReceivingRowType.TOGGLE];
+
+// A row qualifies for autofill only when it can still be received (not completed, something
+// left to receive) and the user hasn't entered anything yet (0 counts as entered).
+const shouldAutofillQuantity = (row) => !AUTOFILL_EXCLUDED_ROW_TYPES.includes(row.rowType)
+  && !row.isCompleted
+  && row.quantityReceiving == null
+  && row.quantityAvailableToReceive > 0;
+
+// Autofills the "receiving now" quantity with the remaining quantity for every line
+// that is still empty. Skipped rows keep their object identity so memoized cells don't re-render,
+// and when nothing changes the original state reference is returned.
+export const autofillReceivingQuantities = (state) => {
+  const { entities, ids } = state;
+  const { updatedEntities, changed } = ids.reduce((acc, id) => {
+    const row = entities[id];
+    // Separator entries (packing list view) have no entity - nothing to fill
+    if (!row) {
+      return acc;
+    }
+    const shouldFill = shouldAutofillQuantity(row);
+    acc.updatedEntities[id] = shouldFill
+      ? { ...row, quantityReceiving: row.quantityAvailableToReceive, isDirty: true }
+      : row;
+    acc.changed = acc.changed || shouldFill;
+    return acc;
+  }, { updatedEntities: {}, changed: false });
+
+  return changed ? { ids, entities: updatedEntities } : state;
+};
+
 const useReceivingActions = (view) => {
   const [loading, setLoading] = useState(false);
   const [receiptId, setReceiptId] = useState(null);
@@ -62,6 +95,7 @@ const useReceivingActions = (view) => {
     // A receipt item always carries its own product. The shipment item product is used
     // only for rows that have no receipt item yet.
     const product = receiptItem?.productLot?.product ?? shipmentItem.productLot?.product;
+    const quantityRemaining = shipmentItem.quantity - totalQuantityReceived - totalQuantityCanceled;
     return {
       // Unique per-row id (a shipment item may eventually map to several rows once line
       // splitting lands), used as the normalized state key and as the rowId correlation
@@ -93,8 +127,8 @@ const useReceivingActions = (view) => {
       // Baseline quantity as of load / last successful save. A dirty row is only sent when its
       // quantity actually differs from this, so no-op edits (e.g. 3 -> 4 -> 3) are skipped.
       initialQuantityReceiving: receiptItem?.quantityReceived ?? null,
-      quantityRemaining:
-        shipmentItem.quantity - totalQuantityReceived - totalQuantityCanceled,
+      quantityRemaining,
+      quantityAvailableToReceive: quantityRemaining + (receiptItem?.quantityReceived ?? 0),
       isCompleted,
       // Local edit flag - only dirty rows (touched since load / last save) are sent on save.
       isDirty: false,
@@ -232,6 +266,11 @@ const useReceivingActions = (view) => {
       isDirty: true,
     })), []);
 
+  const autofillQuantities = useCallback(
+    () => setLineItemsState(autofillReceivingQuantities),
+    [],
+  );
+
   const { removeSplitItem } = useRemoveSplitItem({ receiptId, lineItemsState, setLineItemsState });
 
   const { onSaveAndExit } = useReceivingSaveAction({
@@ -256,6 +295,7 @@ const useReceivingActions = (view) => {
     receiptId,
     lineItemsState,
     updateLineItem,
+    autofillQuantities,
     removeSplitItem,
     loadReceipt,
     onSaveAndExit,
