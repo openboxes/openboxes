@@ -13,7 +13,9 @@ import useReceivingLineItems from 'hooks/receiving/v2/useReceivingLineItems';
 import useShipmentItemDetails from 'hooks/receiving/v2/useShipmentItemDetails';
 import ItemDetails from 'utils/ItemDetails';
 
-const EditLineItemModal = ({ onClose, lineItem, receiptId }) => {
+const EditLineItemModal = ({
+  onClose, lineItem, initialLineItems, receiptId, loadReceipt,
+}) => {
   const {
     fields,
     columns,
@@ -23,12 +25,14 @@ const EditLineItemModal = ({ onClose, lineItem, receiptId }) => {
     receivingNow,
     summaryData,
     getLineItems,
-  } = useReceivingLineItems(lineItem);
+  } = useReceivingLineItems(lineItem, initialLineItems);
 
   const { onSave } = useEditLineItemSave({
     receiptId,
     lineItem,
+    initialLineItems,
     getLineItems,
+    loadReceipt,
     onClose,
   });
 
@@ -101,6 +105,8 @@ EditLineItemModal.propTypes = {
       quantityReceived: PropTypes.number,
     })),
   }),
+  initialLineItems: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  loadReceipt: PropTypes.func.isRequired,
 };
 
 EditLineItemModal.defaultProps = {

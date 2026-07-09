@@ -11,7 +11,7 @@ import { formatDateToString } from 'utils/dateUtils';
 /**
  * Form state for the editable "Receiving now" table in the edit modal
  */
-const useReceivingLineItems = (lineItem) => {
+const useReceivingLineItems = (lineItem, initialLineItems) => {
   const translate = useTranslate();
 
   const buildDefaultRow = (item) => ({
@@ -33,7 +33,7 @@ const useReceivingLineItems = (lineItem) => {
   });
 
   const { control, getValues, reset } = useForm({
-    defaultValues: { lineItems: [buildDefaultRow(lineItem)] },
+    defaultValues: { lineItems: initialLineItems.map(buildDefaultRow) },
   });
 
   const { fields, append, remove } = useFieldArray({

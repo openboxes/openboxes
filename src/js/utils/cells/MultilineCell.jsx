@@ -10,13 +10,13 @@ import useTranslate from 'hooks/useTranslate';
  * (two by default) with the full value displayed on a tooltip.
  */
 const MultilineCell = React.memo(({
-  value, label, defaultLabel, maxLines,
+  value, label, defaultLabel, maxLines, className,
 }) => {
   const translate = useTranslate();
 
   return (
     <TableCell className="rt-td multiline-cell" customTooltip tooltipLabel={value}>
-      <div className={`limit-lines-${maxLines}`} aria-label={translate(label, defaultLabel)}>
+      <div className={`limit-lines-${maxLines} ${className}`} aria-label={translate(label, defaultLabel)}>
         {value}
       </div>
     </TableCell>
@@ -30,11 +30,13 @@ MultilineCell.propTypes = {
   label: PropTypes.string.isRequired,
   defaultLabel: PropTypes.string.isRequired,
   maxLines: PropTypes.number,
+  className: PropTypes.string,
 };
 
 MultilineCell.defaultProps = {
   value: undefined,
   maxLines: 2,
+  className: '',
 };
 
 export default MultilineCell;
