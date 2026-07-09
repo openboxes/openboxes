@@ -28,7 +28,8 @@ trait ConfiguresBulkDataValidator<T extends Importable> {
                 continue
             }
             for (rowError in rowErrors) {
-                // Set the rowIndex here for convenience so that we don't need to provide it when calling reject*
+                // Set the rowIndex here entirely for convenience so that we don't need to provide it
+                // as a method arg when calling BulkDataErrors.add*Error(...) in customValidateRow(row)
                 rowError.row = rowIndex
 
                 errors.add(rowError)
@@ -41,7 +42,7 @@ trait ConfiguresBulkDataValidator<T extends Importable> {
      * Performs any custom validation on a row that was not already automatically handled by the data validator.
      * This method is designed to be overridden by child implementations (unless no custom validation is required).
      *
-     * Implementations can utilize the convenience methods on BulkDataErrors to raise validation errors.
+     * Implementations can utilize the add*Error(...) convenience methods on BulkDataErrors to raise validation errors.
      */
     BulkDataErrors customValidateRow(T row) {
         return null  // Do nothing by default
