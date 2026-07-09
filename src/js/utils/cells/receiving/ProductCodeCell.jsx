@@ -36,7 +36,6 @@ const ProductCodeCell = React.memo(({
         isFirstSplitItem={item?.isFirstSplitItem}
         productCode={item?.productCode}
         withArrow={!isPackingListView}
-        className="receiving-table__split-item-code"
       />
     );
   }

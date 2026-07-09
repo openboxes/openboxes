@@ -158,12 +158,7 @@
   }
 
   &__expand-button {
-    display: inline-flex;
-    align-items: center;
     gap: 4px;
-    padding: 0;
-    border: none;
-    background: transparent;
     cursor: pointer;
     color: var(--gray-300);
   }
@@ -176,23 +171,8 @@
     color: var(--gray-600);
   }
 
-  &__split-item-code {
-    display: flex;
-    align-items: center;
-  }
-
-  &__split-item-code &__split-item-arrow {
-    margin-right: 8px
-  }
-
   &__split-item-arrow {
     color: var(--color-green);
-  }
-
-  &__split-item-arrow-cell {
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   &__delete-icon {

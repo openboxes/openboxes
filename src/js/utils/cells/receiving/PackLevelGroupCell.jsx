@@ -26,7 +26,7 @@ const PackLevelGroupCell = React.memo(({ item, isExpanded, onToggle }) => {
       <SplitItemCell
         isFirstSplitItem={item?.isFirstSplitItem}
         withArrow
-        className="receiving-table__split-item-arrow-cell"
+        className="justify-content-center"
       />
     );
   }
