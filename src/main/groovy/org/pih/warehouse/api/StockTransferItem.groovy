@@ -3,6 +3,7 @@ package org.pih.warehouse.api
 import grails.validation.Validateable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
@@ -26,6 +27,7 @@ class StockTransferItem implements Validateable {
     Set<PicklistItem> picklistItems = []
     Boolean delete = Boolean.FALSE
     Person recipient
+    ReasonCode reasonCode
 
     Integer orderIndex = 0
 
@@ -43,6 +45,7 @@ class StockTransferItem implements Validateable {
         picklistItems(nullable: true)
         recipient(nullable: true)
         orderIndex(nullable: true)
+        reasonCode(nullable: true)
     }
 
     static StockTransferItem createFromOrderItem(OrderItem orderItem) {
@@ -60,6 +63,7 @@ class StockTransferItem implements Validateable {
         stockTransferItem.quantityNotPicked = orderItem.quantity
         stockTransferItem.status = getItemStatus(orderItem.orderItemStatusCode)
         stockTransferItem.orderIndex = orderItem.orderIndex
+        stockTransferItem.reasonCode = orderItem.discrepancyReasonCode
 
         orderItem.orderItems?.each { item ->
             stockTransferItem.splitItems.add(createFromOrderItem(item))
@@ -137,6 +141,7 @@ class StockTransferItem implements Validateable {
                 quantityNotPicked               : quantityNotPicked,
                 status                          : status.name(),
                 recipient                       : recipient,
+                reasonCode                      : reasonCode?.name(),
                 splitItems                      : splitItems.sort { a, b ->
                     a.destinationBinLocation?.name <=> b.destinationBinLocation?.name ?:
                         b.quantity <=> a.quantity

@@ -20,7 +20,10 @@ import grails.web.context.ServletContextHolder
 import org.grails.web.errors.GrailsWrappedRuntimeException
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptItem
+import org.pih.warehouse.api.StockTransfer
+import org.pih.warehouse.api.StockTransferItem
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Person
@@ -352,6 +355,34 @@ class NotificationService {
         if (requestor.email) {
             String body = renderTemplate(template, [requisition: requisition])
             mailService.sendHtmlMail(subject, body, requestor.email)
+        }
+    }
+
+    void sendStockTransferNotification(StockTransfer stockTransfer) {
+        try {
+            def recipientList = userService.findUsersByRoleType(RoleType.ROLE_STOCK_TRANSFER_NOTIFICATION).collect {
+                it.email
+            }
+            if (recipientList) {
+                def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
+                // try to find StockTransferItem with destinationBinLocation that supports ENABLE_STOCK_TRANSFER_NOTIFICATIONS activity
+                List<StockTransferItem> stockTransferItemWithSupportedLocations = stockTransfer?.stockTransferItems?.findAll { StockTransferItem it ->
+                    (it.destinationBinLocation?.supports(ActivityCode.ENABLE_STOCK_TRANSFER_NOTIFICATIONS)
+                            || it.originBinLocation?.supports(ActivityCode.ENABLE_STOCK_TRANSFER_NOTIFICATIONS))
+                }
+                // unique names of origin/destination bin locations that support stock transfer notifications
+                List<String> uniqueBinNames = stockTransfer?.stockTransferItems
+                        ?.collectMany { StockTransferItem it -> [it.originBinLocation, it.destinationBinLocation] }
+                        ?.findAll { it?.supports(ActivityCode.ENABLE_STOCK_TRANSFER_NOTIFICATIONS) }
+                        ?.collect { it.name }
+                        ?.unique()
+                String subject = g.message(code: 'email.stockTransfer.message.subject')
+                def body = "${g.render(template: '/email/stockTransfer', model: [stockTransfer: stockTransfer, stockTransferItems: stockTransferItemWithSupportedLocations, uniqueBinNames: uniqueBinNames])}"
+                mailService.sendHtmlMail(subject, body.toString(), recipientList)
+            }
+        }
+        catch (Exception e) {
+            log.error("Error sending stock transfer notification email: " + e.message, e)
         }
     }
 }

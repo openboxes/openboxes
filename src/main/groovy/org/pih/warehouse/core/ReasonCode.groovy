@@ -86,6 +86,8 @@ enum ReasonCode {
     LOCATION_MISMATCH(43),
     OVERAGE(44),
     WRONG_ITEM(45),
+    DELIVERED_SHORT(46),
+    PUTAWAY_DISCREPANCY(47),
     OTHER(100)
 
     final Integer sortOrder
@@ -123,6 +125,8 @@ enum ReasonCode {
                 NOT_NEEDED_BASED_ON_CONSUMPTION,
                 BACKORDER,
                 DUPLICATE_REQUEST,
+                DELIVERED_SHORT,
+                PUTAWAY_DISCREPANCY,
                 OTHER
         ]
     }
@@ -273,7 +277,9 @@ enum ReasonCode {
         [
                 INSUFFICIENT_QUANTITY_AVAILABLE,
                 DIFFERENT_LOCATION,
-                DAMAGED
+                DAMAGED,
+                DELIVERED_SHORT,
+                PUTAWAY_DISCREPANCY,
         ]
     }
 }
