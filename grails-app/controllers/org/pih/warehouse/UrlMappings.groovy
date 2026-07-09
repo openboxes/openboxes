@@ -170,6 +170,11 @@ class UrlMappings {
             action = [GET: "list"]
         }
 
+        "/api/facilities/$facilityId/inventory-levels/preferred-bin-locations" {
+            controller = "inventoryLevelApi"
+            action = [GET: "getPreferredBinLocations"]
+        }
+
         "/api/locations/locationTypes" {
             controller = { "locationApi" }
             action = [GET: "locationTypes"]
@@ -465,7 +470,7 @@ class UrlMappings {
             action = [POST: "updateItemsBatch"]
         }
 
-        "/api/receiving/v2/$receiptId/shipmentItems/$shipmentItemId/receiptItems" {
+        "/api/receipts/v2/$receiptId/shipmentItems/$shipmentItemId/receiptItems" {
             controller = "receiptApi"
             action = [POST: "editReceivingInfo"]
         }

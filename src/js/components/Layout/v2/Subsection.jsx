@@ -23,6 +23,16 @@ const Subsection = ({
     }
   };
 
+  const renderTitle = () => {
+    if (React.isValidElement(title)) {
+      return title;
+    }
+    if (title.label && title.defaultMessage) {
+      return <Translate id={title.label} defaultMessage={title.defaultMessage} />;
+    }
+    return null;
+  };
+
   return (
     <div className="v2-subsection">
       <div className="subsection-title-wrapper">
@@ -33,8 +43,7 @@ const Subsection = ({
           onKeyDown={collapsable ? () => triggerCollapse() : null}
           style={collapsable ? { cursor: 'pointer' } : { cursor: 'unset' }}
         >
-          {title.label && title.defaultMessage
-            && <Translate id={title.label} defaultMessage={title.defaultMessage} />}
+          {renderTitle()}
           {collapsable
             && <RiArrowDownSLine className={`arrow-up ${expanded ? 'arrow-up--expanded' : ''}`} />}
         </span>
@@ -49,10 +58,13 @@ const Subsection = ({
 export default Subsection;
 
 Subsection.propTypes = {
-  title: PropTypes.shape({
-    label: PropTypes.string.isRequired,
-    defaultMessage: PropTypes.string.isRequired,
-  }),
+  title: PropTypes.oneOfType([
+    PropTypes.node,
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      defaultMessage: PropTypes.string.isRequired,
+    }),
+  ]),
   collapsable: PropTypes.bool,
   expandedByDefault: PropTypes.bool,
   children: PropTypes.node.isRequired,

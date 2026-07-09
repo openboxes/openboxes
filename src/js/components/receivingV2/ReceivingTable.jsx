@@ -4,17 +4,35 @@ import PropTypes from 'prop-types';
 
 import DataTable from 'components/DataTable/v2/DataTable';
 import CommentModal from 'components/modals/CommentModal';
+import EditLineItemModal from 'components/receivingV2/editModal/EditLineItemModal';
+import ReceivingRowType from 'consts/receivingRowType';
+import useEditReceivingLineItemModal from 'hooks/receiving/v2/useEditReceivingLineItemModal';
 
 import 'components/receivingV2/receiving.scss';
 
 const ReceivingTable = ({
-  lineItemsState, columns, loading, updateLineItem, commentModal,
+  lineItemsState,
+  columns,
+  loading,
+  receiptId,
+  updateLineItem,
+  commentModal,
+  removeSplitItem,
+  loadReceipt,
 }) => {
   const {
     isOpen: isCommentModalOpen,
     openModal: openCommentModal,
     closeModal: closeCommentModal,
   } = commentModal;
+
+  const {
+    isOpen: isEditModalOpen,
+    itemId: editedItemId,
+    openModal: openEditModal,
+    closeModal: closeEditModal,
+    getInitialEditModalLineItems,
+  } = useEditReceivingLineItemModal(lineItemsState);
 
   // Keep `meta` stable so it only changes when the entities map or
   // the update function change. Combined with the memoized cells, a single line item update
@@ -23,27 +41,54 @@ const ReceivingTable = ({
     () => ({
       entities: lineItemsState.entities,
       updateLineItem,
+      removeSplitItem,
       onOpenCommentModal: openCommentModal,
+      onOpenEditModal: openEditModal,
     }),
-    [lineItemsState.entities, updateLineItem, openCommentModal],
+    [lineItemsState.entities, updateLineItem, openCommentModal, openEditModal, removeSplitItem],
   );
 
   // Separators pass through without meta. Meta is only used to disable (grey out)
   // fully received rows, and separators don't need disabling.
   const data = useMemo(
-    () => lineItemsState.ids.map((entry) => {
-      if (entry.isSeparator) {
-        return entry;
-      }
-      return {
-        id: entry,
+    () => {
+      const { entities, ids } = lineItemsState;
+
+      const buildRow = (rowId) => ({
+        id: rowId,
         meta: {
-          isRowDisabled: lineItemsState.entities[entry]?.isCompleted,
+          isRowDisabled: entities[rowId]?.isCompleted,
           label: 'react.receiving.fullyReceived.label',
           defaultMessage: 'This line has been fully received',
         },
+      });
+
+      // Split item rows, rendered by TanStack as subRows of their toggle row.
+      // Split items of the same product merge into one visual block.
+      const buildSubRow = (splitItemId, splitItemIndex, splitItemIds) => {
+        const nextSplitItem = entities[splitItemIds[splitItemIndex + 1]];
+        return {
+          id: splitItemId,
+          mergeWithNextRow: Boolean(nextSplitItem && !nextSplitItem.isFirstSplitItem),
+          isLastSubRow: splitItemIndex === splitItemIds.length - 1,
+        };
       };
-    }),
+
+      return ids
+        // Split item rows render as subRows of their toggle row, not at the top level.
+        .filter((entry) => entities[entry]?.rowType !== ReceivingRowType.SPLIT_ITEM)
+        .map((entry) => {
+          if (entry.isSeparator) {
+            return entry;
+          }
+          return {
+            ...buildRow(entry),
+            subRows: entities[entry]?.splitItemIds?.map(buildSubRow),
+            // A replaced row is always followed by its toggle row and merges with it.
+            mergeWithNextRow: entities[entry]?.rowType === ReceivingRowType.REPLACED,
+          };
+        });
+    },
     [lineItemsState],
   );
 
@@ -74,8 +119,19 @@ const ReceivingTable = ({
           // the virtualizer measure each row instead of using a fixed height.
           customRowsHeight: true,
         }}
+        getSubRows={(row) => row.subRows}
+        defaultExpandedSubRows
       />
       <CommentModal isOpen={isCommentModalOpen} onClose={closeCommentModal} />
+      {isEditModalOpen && (
+        <EditLineItemModal
+          onClose={closeEditModal}
+          lineItem={lineItemsState.entities[editedItemId]}
+          initialLineItems={getInitialEditModalLineItems(editedItemId)}
+          receiptId={receiptId}
+          loadReceipt={loadReceipt}
+        />
+      )}
     </div>
   );
 };
@@ -92,12 +148,19 @@ ReceivingTable.propTypes = {
   }).isRequired,
   columns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   loading: PropTypes.bool.isRequired,
+  receiptId: PropTypes.string,
   updateLineItem: PropTypes.func.isRequired,
+  removeSplitItem: PropTypes.func.isRequired,
+  loadReceipt: PropTypes.func.isRequired,
   commentModal: PropTypes.shape({
     isOpen: PropTypes.bool.isRequired,
     openModal: PropTypes.func.isRequired,
     closeModal: PropTypes.func.isRequired,
   }).isRequired,
+};
+
+ReceivingTable.defaultProps = {
+  receiptId: null,
 };
 
 export default ReceivingTable;

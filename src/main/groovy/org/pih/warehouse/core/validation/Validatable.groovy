@@ -139,13 +139,18 @@ trait Validatable<V extends Validator> {
             return false
         }
 
-        Method actionMethod = controllerClass.methods.find { it.name == webRequest.actionName }
-        if (!actionMethod) {
+        // Grails compiles every action with parameters into two methods: the original one and a generated
+        // no-arg wrapper. Class.getMethods() returns them in no particular order, so to reliably find the
+        // annotated parameter we need to check all of the same-named overloads, not just the first match.
+        List<Method> actionMethods = controllerClass.methods.findAll { it.name == webRequest.actionName }
+        if (!actionMethods) {
             return false
         }
 
-        return actionMethod.parameters.any { Parameter param ->
-            param.type.isAssignableFrom(this.class) && param.isAnnotationPresent(Valid)
+        return actionMethods.any { Method actionMethod ->
+            actionMethod.parameters.any { Parameter param ->
+                param.type.isAssignableFrom(this.class) && param.isAnnotationPresent(Valid)
+            }
         }
     }
 }

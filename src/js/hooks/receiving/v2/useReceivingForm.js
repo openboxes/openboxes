@@ -10,8 +10,12 @@ const useReceivingForm = () => {
   const [putawayEnabled, setPutawayEnabled] = useState(false);
   const {
     loading,
+    receiptId,
     lineItemsState,
     updateLineItem,
+    autofillQuantities,
+    removeSplitItem,
+    loadReceipt,
     onSaveAndExit,
   } = useReceivingActions(view);
   const { columns } = useReceivingColumns({ view, putawayEnabled });
@@ -27,7 +31,11 @@ const useReceivingForm = () => {
     },
     actions: {
       loading,
+      receiptId,
       updateLineItem,
+      autofillQuantities,
+      removeSplitItem,
+      loadReceipt,
       onSaveAndExit,
     },
     commentModal,

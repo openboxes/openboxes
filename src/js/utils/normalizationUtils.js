@@ -140,3 +140,13 @@ export const removeNormalizedItem = (state, id) => {
     entities: _.omit(state.entities, id),
   };
 };
+
+/**
+ * Removes multiple entities from normalized state.
+ * Returns the same state reference when none of the ids exist.
+ * @param {{ entities: Object, ids: Array }} state - normalized state
+ * @param {Array<string|number>} idsToRemove - ids of the entities to remove
+ * @returns {{ entities: Object, ids: Array }}
+ */
+export const removeNormalizedItems = (state, idsToRemove) =>
+  idsToRemove.reduce(removeNormalizedItem, state);

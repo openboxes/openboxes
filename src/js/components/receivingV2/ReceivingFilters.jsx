@@ -25,7 +25,7 @@ import AutosaveIndicator from 'utils/AutosaveIndicator';
  * receipt status) are rendered through FilterForm from the FilterFields config.
  */
 const ReceivingFilters = ({
-  view, onViewChange, putawayEnabled, onPutawayChange, onSaveAndExit,
+  view, onViewChange, putawayEnabled, onPutawayChange, onAutofillQuantities, onSaveAndExit,
 }) => {
   const translate = useTranslate();
   // Add loading for filters section. Loading will display before the translations are fetched.
@@ -84,6 +84,7 @@ const ReceivingFilters = ({
           label="react.receiving.autofillQuantities.label"
           defaultLabel="Autofill quantities"
           variant="secondary"
+          onClick={onAutofillQuantities}
           EndIcon={<RiMagicLine size={16} />}
         />
 
@@ -111,6 +112,7 @@ ReceivingFilters.propTypes = {
   onViewChange: PropTypes.func.isRequired,
   putawayEnabled: PropTypes.bool.isRequired,
   onPutawayChange: PropTypes.func.isRequired,
+  onAutofillQuantities: PropTypes.func.isRequired,
   onSaveAndExit: PropTypes.func.isRequired,
 };
 

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 import DataTableBody from 'components/DataTable/v2/DataTableBody';
 import DataTableFooter from 'components/DataTable/v2/DataTableFooter';
+import DataTableFooterRow from 'components/DataTable/v2/DataTableFooterRow';
 import DataTableHeader from 'components/DataTable/v2/DataTableHeader';
 import useDataTable from 'hooks/useDataTable';
 import useWindowWidthCheck from 'hooks/useWindowWidthCheck';
@@ -44,6 +45,10 @@ const DataTable = ({
   tableWithPinnedColumns,
   virtualize,
   overflowVisible,
+  showFooter,
+  disabled,
+  getSubRows,
+  defaultExpandedSubRows,
 }) => {
   const {
     defaultEmptyTableMessage,
@@ -56,6 +61,8 @@ const DataTable = ({
     data,
     totalCount,
     filterParams,
+    getSubRows,
+    defaultExpandedSubRows,
   });
 
   const shouldDisplayPagination = Boolean(data?.length && !loading) && !disablePagination;
@@ -65,7 +72,7 @@ const DataTable = ({
 
   return (
     <div className="app-react-table-wrapper table-v2">
-      <div className="ReactTable app-react-table">
+      <div className={`ReactTable app-react-table ${disabled ? 'app-react-table--disabled' : ''}`}>
         <div className={`rt-table ${overflowVisible ? 'overflow-visible' : ''}`} role="grid">
           <DataTableHeader
             headerGroups={table.getHeaderGroups()}
@@ -87,6 +94,13 @@ const DataTable = ({
             isScreenWiderThanTable={isScreenWiderThanTable}
             overflowVisible={overflowVisible}
           />
+          {showFooter && (
+            <DataTableFooterRow
+              footerGroups={table.getFooterGroups()}
+              tableWithPinnedColumns={tableWithPinnedColumns}
+              isScreenWiderThanTable={isScreenWiderThanTable}
+            />
+          )}
         </div>
         {shouldDisplayPagination && (
           <DataTableFooter
@@ -132,6 +146,14 @@ DataTable.propTypes = {
     customRowsHeight: PropTypes.bool,
   }),
   overflowVisible: PropTypes.bool,
+  // Renders a footer row from each column's `footer` definition.
+  showFooter: PropTypes.bool,
+  // Add styles to the table to make it look disabled.
+  disabled: PropTypes.bool,
+  // Returns the sub rows of a data row, enabling row expansion.
+  getSubRows: PropTypes.func,
+  // Expands all expandable rows by default.
+  defaultExpandedSubRows: PropTypes.bool,
 };
 
 DataTable.defaultProps = {
@@ -153,4 +175,8 @@ DataTable.defaultProps = {
   },
   // it allows tooltips to overflow outside the table
   overflowVisible: false,
+  showFooter: false,
+  disabled: false,
+  getSubRows: undefined,
+  defaultExpandedSubRows: false,
 };
