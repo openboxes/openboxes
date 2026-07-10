@@ -470,6 +470,11 @@ class UrlMappings {
             action = [POST: "updateItemsBatch"]
         }
 
+        "/api/receipts/v2/receiptItems/$receiptItemId/comments" {
+            controller = "receiptApi"
+            action = [POST: "createReceiptItemComment", PUT: "updateReceiptItemComment", DELETE: "deleteReceiptItemComment"]
+        }
+
         "/api/receipts/v2/$receiptId/shipmentItems/$shipmentItemId/receiptItems" {
             controller = "receiptApi"
             action = [POST: "editReceivingInfo"]
