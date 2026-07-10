@@ -14,7 +14,13 @@ const ReceivingStep = () => {
     setPutawayEnabled,
     table: { lineItemsState, columns },
     actions: {
-      loading, receiptId, updateLineItem, onSaveAndExit,
+      loading,
+      receiptId,
+      updateLineItem,
+      autofillQuantities,
+      onSaveAndExit,
+      removeSplitItem,
+      loadReceipt,
     },
     commentModal,
   } = useReceivingForm();
@@ -26,6 +32,7 @@ const ReceivingStep = () => {
         onViewChange={setView}
         putawayEnabled={putawayEnabled}
         onPutawayChange={setPutawayEnabled}
+        onAutofillQuantities={autofillQuantities}
         onSaveAndExit={onSaveAndExit}
       />
       <ReceivingTable
@@ -34,6 +41,8 @@ const ReceivingStep = () => {
         loading={loading}
         receiptId={receiptId}
         updateLineItem={updateLineItem}
+        removeSplitItem={removeSplitItem}
+        loadReceipt={loadReceipt}
         commentModal={commentModal}
       />
     </div>

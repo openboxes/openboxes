@@ -15,7 +15,7 @@ import getExpiryStatus from 'utils/expirationStatus';
  * it also highlights the date and shows an "expiring"/"expired" badge.
  */
 const ExpirationDateCell = React.memo(({
-  value, localeKey, label, defaultLabel, showExpiryStatus,
+  value, localeKey, label, defaultLabel, showExpiryStatus, className,
 }) => {
   const translate = useTranslate();
 
@@ -35,7 +35,7 @@ const ExpirationDateCell = React.memo(({
   return (
     <TableCell className="rt-td" customTooltip tooltipLabel={tooltipLabel}>
       <div
-        className={`expiration-cell ${status ? `expiration-cell--${status}` : ''}`}
+        className={`expiration-cell ${status ? `expiration-cell--${status}` : ''} ${className}`}
         aria-label={translate(label, defaultLabel)}
       >
         <div className="expiration-cell__date">{formatted}</div>
@@ -59,12 +59,14 @@ ExpirationDateCell.propTypes = {
   defaultLabel: PropTypes.string.isRequired,
   // When true, highlights the date and shows an expiring/expired badge.
   showExpiryStatus: PropTypes.bool,
+  className: PropTypes.string,
 };
 
 ExpirationDateCell.defaultProps = {
   value: undefined,
   localeKey: undefined,
   showExpiryStatus: false,
+  className: '',
 };
 
 export default ExpirationDateCell;

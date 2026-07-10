@@ -47,6 +47,8 @@ const DataTable = ({
   overflowVisible,
   showFooter,
   disabled,
+  getSubRows,
+  defaultExpandedSubRows,
 }) => {
   const {
     defaultEmptyTableMessage,
@@ -59,6 +61,8 @@ const DataTable = ({
     data,
     totalCount,
     filterParams,
+    getSubRows,
+    defaultExpandedSubRows,
   });
 
   const shouldDisplayPagination = Boolean(data?.length && !loading) && !disablePagination;
@@ -146,6 +150,10 @@ DataTable.propTypes = {
   showFooter: PropTypes.bool,
   // Add styles to the table to make it look disabled.
   disabled: PropTypes.bool,
+  // Returns the sub rows of a data row, enabling row expansion.
+  getSubRows: PropTypes.func,
+  // Expands all expandable rows by default.
+  defaultExpandedSubRows: PropTypes.bool,
 };
 
 DataTable.defaultProps = {
@@ -169,4 +177,6 @@ DataTable.defaultProps = {
   overflowVisible: false,
   showFooter: false,
   disabled: false,
+  getSubRows: undefined,
+  defaultExpandedSubRows: false,
 };

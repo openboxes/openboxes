@@ -138,6 +138,7 @@ const DataTableBody = ({
             const isSeparator = rowData.original?.isSeparator;
             // Merge with the row below by removing the separating border.
             const mergeWithNextRow = rowData.original?.mergeWithNextRow;
+            const isLastSubRow = rowData.original?.isLastSubRow;
             return (
               <CustomTooltip
                 content={isRowDisabled && translate(label, defaultMessage)}
@@ -145,11 +146,11 @@ const DataTableBody = ({
               >
                 <div
                   key={rowData.id}
-                  className={`rt-tr-group cell-wrapper ${mergeWithNextRow ? 'rt-tr-group-merged' : ''}`}
+                  className={`rt-tr-group cell-wrapper ${mergeWithNextRow ? 'rt-tr-group-merged' : ''} ${isLastSubRow ? 'rt-tr-group-last-subrow' : ''}`}
                   role="rowgroup"
                   {...rowProps}
                 >
-                  <TableRow key={rowData.id} className={`rt-tr ${isRowDisabled ? 'bg-light disabled' : ''} ${isSeparator ? 'rt-tr-separator' : ''}`}>
+                  <TableRow key={rowData.id} className={`rt-tr ${isRowDisabled ? 'bg-light disabled' : ''} ${isSeparator ? 'rt-tr-separator' : ''} ${rowData.depth > 0 ? 'rt-tr-subrow' : ''}`}>
                     {rowData.getVisibleCells().map((cell) => {
                       const { hide, flexWidth, className } = useTableColumnMeta(cell.column);
                       if (hide) {
