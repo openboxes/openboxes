@@ -7,7 +7,7 @@ import org.pih.warehouse.requisition.Requisition
 
 class StockMovementUtil {
     static String generateStockMovementName(Location origin, Location destination, Date dateRequested, Requisition stocklist,
-                                            String trackingNumber, String description) {
+                                            String description, String trackingNumber = null) {
         final String separator =
                 Holders.getConfig().getProperty("openboxes.generateName.separator") ?: Constants.DEFAULT_NAME_SEPARATOR
 

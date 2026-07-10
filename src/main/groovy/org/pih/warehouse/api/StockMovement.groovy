@@ -372,7 +372,7 @@ class StockMovement implements Validateable, Historizable {
      * @return
      */
     String generateName() {
-        return StockMovementUtil.generateStockMovementName(origin, destination, dateRequested, requisition, trackingNumber, description)
+        return StockMovementUtil.generateStockMovementName(origin, destination, dateRequested, requisition?.requisitionTemplate, description, trackingNumber)
     }
 
     static StockMovement createFromShipment(Shipment shipment) {

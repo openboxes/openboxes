@@ -3113,7 +3113,7 @@ class StockMovementService {
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
 
         shipment.name = StockMovementUtil.generateStockMovementName(requisition.origin, requisition.destination,
-                requisition.dateRequested, requisition, null, requisition.description)
+                requisition.dateRequested, requisition.requisitionTemplate, requisition.description)
 
         if (shipment.hasErrors() || !shipment.save(flush: true)) {
             throw new ValidationException("Invalid shipment", shipment.errors)
