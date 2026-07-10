@@ -9,7 +9,8 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.importer.InventoryLevelImportDataService
 import org.pih.warehouse.inventory.InventoryLevel
-import org.pih.warehouse.inventory.InventoryLevelUpdatedEvent
+import org.pih.warehouse.inventory.RefreshInventorySnapshotEvent
+import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.springframework.http.HttpStatus
 
 class InventoryLevelApiController {
@@ -18,8 +19,6 @@ class InventoryLevelApiController {
     DocumentService documentService
     InventoryLevelImportDataService inventoryLevelImportDataService
     def inventoryLevelService
-    def productAvailabilityService
-    def inventorySnapshotService
 
     def list() {
         Location facility = Location.get(params.facilityId)
@@ -69,7 +68,8 @@ class InventoryLevelApiController {
 
         List<String> productIds = results.findAll { it.status == UpsertStatus.OK && it.productId }*.productId.unique()
         if (deferRefresh && productIds) {
-            Holders.grailsApplication.mainContext.publishEvent(new InventoryLevelUpdatedEvent(facility, facility.id, productIds, true))
+            Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(facility, productIds, true))
+            Holders.grailsApplication.mainContext.publishEvent(new RefreshInventorySnapshotEvent(facility, productIds, true))
         }
 
         render([

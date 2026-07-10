@@ -9,17 +9,16 @@
  **/
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.core.Location
 import org.springframework.context.ApplicationEvent
 
-class InventoryLevelUpdatedEvent extends ApplicationEvent {
+class RefreshInventorySnapshotEvent extends ApplicationEvent {
 
-    String facilityId
     List<String> productIds
     Boolean forceRefresh
 
-    InventoryLevelUpdatedEvent(InventoryLevel source, String facilityId, List<String> productIds, Boolean forceRefresh) {
+    RefreshInventorySnapshotEvent(Location source, List<String> productIds, Boolean forceRefresh) {
         super(source)
-        this.facilityId = facilityId
         this.productIds = productIds
         this.forceRefresh = forceRefresh
     }

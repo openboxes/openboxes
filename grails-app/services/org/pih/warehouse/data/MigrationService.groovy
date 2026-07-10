@@ -529,7 +529,7 @@ class MigrationService {
             }
 
             // Refresh PA for all products that were migrated
-            Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(location, location.id, (List<String>) allProducts?.id, true))
+            Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(location, (List<String>) allProducts?.id, true))
 
             createCSVMigrationReportForResults(location, results)
         }

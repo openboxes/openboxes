@@ -242,10 +242,7 @@ class LocationApiController extends BaseDomainApiController {
 
         List<String> facilityIds = results.findAll { it.status == 'ok' && it.parentId }*.parentId.unique()
         if (deferRefresh && facilityIds) {
-            facilityIds?.each { String facilityId ->
-                Location facility = Location.get(facilityId)
-                Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(facility, facilityId, [], true))
-            }
+            productAvailabilityService.triggerRefreshProductAvailability(facilityIds, true)
         }
 
         // Reload saved locations from the request-scoped Hibernate session. Entities loaded inside
