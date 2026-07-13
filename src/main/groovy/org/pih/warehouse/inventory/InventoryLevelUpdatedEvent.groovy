@@ -23,4 +23,8 @@ class InventoryLevelUpdatedEvent extends ApplicationEvent {
         this.productId = productId
         this.forceRefresh = forceRefresh
     }
+
+    InventoryLevelUpdatedEvent(InventoryLevel source) {
+        super(source)
+    }
 }
