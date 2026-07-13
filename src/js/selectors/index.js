@@ -382,3 +382,5 @@ export const getReceivingHeaderInfo = (state) => state.partialReceiving.headerIn
 
 export const getIsShipmentFromPurchaseOrder = (state) =>
   state.partialReceiving.isShipmentFromPurchaseOrder;
+
+export const getReceivingShipmentNumber = (state) => state.partialReceiving.shipmentNumber;

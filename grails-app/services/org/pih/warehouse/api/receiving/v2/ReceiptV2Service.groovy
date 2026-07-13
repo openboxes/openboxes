@@ -119,13 +119,13 @@ class ReceiptV2Service {
                 sortOrder: shipmentItem.receiptItems.size(),
         )
 
-        // The bin location is intentionally not edited via this endpoint, so it is left untouched.
         receiptItem.product = item.product
         receiptItem.inventoryItem = inventoryItem
         receiptItem.lotNumber = inventoryItem.lotNumber
         receiptItem.expirationDate = inventoryItem.expirationDate
         receiptItem.recipient = item.recipient
         receiptItem.quantityReceived = item.quantityReceiving
+        receiptItem.binLocation = item.binLocation
         receiptItem.isSplitItem = item.isSplitItem
 
         if (!item.receiptItem) {

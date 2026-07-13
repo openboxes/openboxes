@@ -21,7 +21,12 @@ import { debouncePeopleFetch } from 'utils/option-utils';
 /**
  * Columns for the editable "Receiving now" table in the edit modal.
  */
-const useReceivingLineItemColumns = ({ control, removeRow }) => {
+const useReceivingLineItemColumns = ({
+  control,
+  removeRow,
+  binLocationOptions,
+  onLocationAutofill,
+}) => {
   const translate = useTranslate();
   const columnHelper = createColumnHelper();
   const locationId = useSelector(getCurrentLocationId);
@@ -167,7 +172,7 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
       size: 90,
     }),
     columnHelper.accessor(receivingColumns.LOCATION, {
-      header: () => <LocationAutofillHeader />,
+      header: () => <LocationAutofillHeader onSelect={onLocationAutofill} />,
       cell: ({ row }) => (
         <TableCell className="rt-td">
           <Controller
@@ -177,6 +182,7 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
             render={({ field }) => (
               <SelectField
                 {...field}
+                options={binLocationOptions}
                 hideErrorMessageWrapper
                 ariaLabel={{ id: 'react.receiving.location.label', defaultMessage: 'Location' }}
               />
@@ -210,7 +216,15 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
       ),
       size: 160,
     }),
-  ], [translate, control, locationId, debouncedPeopleFetch, removeRow]);
+  ], [
+    translate,
+    control,
+    locationId,
+    debouncedPeopleFetch,
+    removeRow,
+    binLocationOptions,
+    onLocationAutofill,
+  ]);
 
   return { columns };
 };
@@ -218,6 +232,8 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
 useReceivingLineItemColumns.propTypes = {
   control: PropTypes.shape({}).isRequired,
   removeRow: PropTypes.func.isRequired,
+  binLocationOptions: PropTypes.arrayOf(PropTypes.shape({})),
+  onLocationAutofill: PropTypes.func.isRequired,
 };
 
 export default useReceivingLineItemColumns;

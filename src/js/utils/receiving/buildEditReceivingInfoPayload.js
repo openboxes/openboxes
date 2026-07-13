@@ -34,6 +34,7 @@ const isEmptyNewRow = (item) => !item.receiptItemId
  *  - product + lotNumber + expirationDate: used to find or create the inventory item
  *  - recipient: { id } (nullable).
  *  - quantityReceiving: integer quantity.
+ *  - binLocation: { id } (nullable, null clears the bin).
  *  - isSplitItem: marks rows split off from the original shipment item line.
  *
  * @param {Array} lineItems - rows for saving
@@ -52,6 +53,7 @@ const buildEditReceivingInfoPayload = (lineItems) => ({
       quantityReceiving: item.quantityReceiving === '' || item.quantityReceiving == null
         ? null
         : Number(item.quantityReceiving),
+      binLocation: item.location?.id ? { id: item.location.id } : null,
       isSplitItem: Boolean(item.isSplitItem),
     })),
 });

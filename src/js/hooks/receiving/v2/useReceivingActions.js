@@ -17,6 +17,7 @@ import {
   createNormalizedState,
   normalizeData,
   updateNormalizedItem,
+  updateNormalizedItems,
 } from 'utils/normalizationUtils';
 
 // In packing list view we ask the API to group items by pack level so that we can
@@ -117,7 +118,10 @@ const useReceivingActions = (view) => {
         ?? shipmentItem.productLot?.expirationDate,
       recipient: mapToFormSelectOption(receiptItem?.recipient)
         ?? (shipmentItem.recipientId ? usersById[shipmentItem.recipientId] : null),
-      binLocation: receiptItem?.binLocation ?? shipmentItem.binLocation ?? null,
+      binLocation: mapToFormSelectOption(receiptItem?.binLocation ?? shipmentItem.binLocation),
+      // Baseline bin location as of load / last successful save, used (like
+      // initialQuantityReceiving) to skip no-op edits on save.
+      initialBinLocationId: (receiptItem?.binLocation ?? shipmentItem.binLocation)?.id ?? null,
       quantityShipped: shipmentItem.quantity,
       quantityReceived: quantityPreviouslyReceived,
       previousReceiptItems,
@@ -154,7 +158,8 @@ const useReceivingActions = (view) => {
     lotNumber: receiptItem.productLot?.lotNumber,
     expirationDate: receiptItem.productLot?.expirationDate,
     recipient: mapToFormSelectOption(receiptItem.recipient),
-    binLocation: receiptItem.binLocation,
+    binLocation: mapToFormSelectOption(receiptItem.binLocation),
+    initialBinLocationId: receiptItem.binLocation?.id ?? null,
   });
 
   // Rows for a single shipment item: a single editable row when it was not split,
@@ -208,17 +213,21 @@ const useReceivingActions = (view) => {
   const buildPackingListViewState = (summaryById, grouped, usersById) => {
     const { order = [], groups = {} } = grouped || {};
 
-    const toLineItemRow = (id, packLevelGroup) =>
+    // Each row also keeps the id of its group's separator, so group-scoped actions
+    // (e.g. the location autofill triggered from a separator) can find their rows.
+    const toLineItemRow = (id, packLevelGroup, separatorId) =>
       buildItemRows(summaryById[id], usersById).map((entity) => (
-        { rowId: entity.rowId, entity: { ...entity, packLevelGroup } }));
+        { rowId: entity.rowId, entity: { ...entity, packLevelGroup, separatorId } }));
 
     // Flatten the two-level grouping into a single ordered list of rows. Each parent group adds
     // a separator row followed by its line items.
     const rows = order.flatMap((parentName) => {
+      const separatorRow = buildSeparatorRow(parentName);
       const { order: childOrder = [], groups: childGroups = {} } = groups[parentName] || {};
       const lineItemRows = childOrder.flatMap((childName) =>
-        (childGroups[childName] || []).flatMap((id) => toLineItemRow(id, childName)));
-      return [{ rowId: buildSeparatorRow(parentName) }, ...lineItemRows];
+        (childGroups[childName] || [])
+          .flatMap((id) => toLineItemRow(id, childName, separatorRow.id)));
+      return [{ rowId: separatorRow }, ...lineItemRows];
     });
 
     return rows.reduce((state, { rowId, entity }) => ({
@@ -266,6 +275,15 @@ const useReceivingActions = (view) => {
       isDirty: true,
     })), []);
 
+  // Batch counterpart of updateLineItem: merges changes into many rows in a single
+  // state update. React 16 doesn't batch updates fired after an await, so updating
+  // rows one by one would re-render the whole table once per row.
+  const updateLineItems = useCallback((newDataByRowId) =>
+    setLineItemsState((state) => updateNormalizedItems(
+      state,
+      _.mapValues(newDataByRowId, (newData) => ({ ...newData, isDirty: true })),
+    )), []);
+
   const autofillQuantities = useCallback(
     () => setLineItemsState(autofillReceivingQuantities),
     [],
@@ -295,6 +313,7 @@ const useReceivingActions = (view) => {
     receiptId,
     lineItemsState,
     updateLineItem,
+    updateLineItems,
     autofillQuantities,
     removeSplitItem,
     loadReceipt,

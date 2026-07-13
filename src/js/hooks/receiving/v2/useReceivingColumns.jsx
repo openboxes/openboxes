@@ -28,6 +28,7 @@ import getReceivingRowActions, { getReceivingSplitItemActions } from 'utils/rece
 const useReceivingColumns = ({
   view,
   putawayEnabled,
+  binLocations,
 } = {}) => {
   const translate = useTranslate();
   const formatNumber = useFormatNumber();
@@ -404,7 +405,9 @@ const useReceivingColumns = ({
       ...(putawayEnabled ? [
         columnHelper.display({
           id: receivingColumns.LOCATION,
-          header: () => <LocationAutofillHeader />,
+          header: ({ table }) => (
+            <LocationAutofillHeader onSelect={table.options.meta?.onLocationAutofill} />
+          ),
           cell: ({ row, table }) => {
             const item = getItem(row, table);
             if (item?.rowType === ReceivingRowType.TOGGLE) {
@@ -412,7 +415,10 @@ const useReceivingColumns = ({
             }
             return (
               <SelectCell
-                options={receivingLocationOptions}
+                options={binLocations}
+                value={item?.binLocation}
+                onChange={(binLocation) =>
+                  table.options.meta?.updateLineItem(row.original.id, { binLocation })}
                 // The replaced row of a changed item keeps its select visible but disabled.
                 disabled={item?.rowType === ReceivingRowType.REPLACED || item?.isCompleted}
                 label="react.receiving.location.label"
@@ -422,9 +428,11 @@ const useReceivingColumns = ({
           },
           // Separator rows also get a select, used to autofill the location for the whole group.
           meta: {
-            renderSeparator: () => (
+            renderSeparator: ({ row, table }) => (
               <SelectCell
-                options={receivingLocationOptions}
+                options={receivingLocationOptions(translate)}
+                onChange={(option) =>
+                  option && table.options.meta?.onLocationAutofill(option.id, row.original.id)}
                 label="react.receiving.location.label"
                 defaultLabel="Location"
               />
@@ -469,7 +477,14 @@ const useReceivingColumns = ({
         size: 90,
       }),
     ];
-  }, [translate, currentLocale, isPackingListView, putawayEnabled, isShipmentFromPurchaseOrder]);
+  }, [
+    translate,
+    currentLocale,
+    isPackingListView,
+    putawayEnabled,
+    isShipmentFromPurchaseOrder,
+    binLocations,
+  ]);
 
   return { columns };
 };

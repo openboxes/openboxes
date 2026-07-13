@@ -3,15 +3,16 @@ package org.pih.warehouse.receiving
 import java.time.LocalDate
 
 import grails.validation.Validateable
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.product.Product
 
 /**
  * A single line of a {@link ReceiptEditReceivingInfoCommand}: the editable receiving info of one receipt item.
  *
- * Unlike {@link ReceiptItemUpsertRequest} this intentionally does NOT expose the bin location (which is not editable
- * through this endpoint) and instead carries the product lot fields. The product, lotNumber and expirationDate are
- * used to find or create the InventoryItem that the receipt item points at, which is how the lot can be swapped.
+ * Unlike {@link ReceiptItemUpsertRequest} this additionally carries the product lot fields. The product, lotNumber
+ * and expirationDate are used to find or create the InventoryItem that the receipt item points at, which is how the
+ * lot can be swapped.
  */
 class ReceiptItemEditReceivingInfoRequest implements Validateable {
 
@@ -37,6 +38,8 @@ class ReceiptItemEditReceivingInfoRequest implements Validateable {
 
     Integer quantityReceiving
 
+    Location binLocation
+
     // Marks a receipt line that was split off from the shipment item's line while receiving.
     Boolean isSplitItem = Boolean.FALSE
 
@@ -47,6 +50,7 @@ class ReceiptItemEditReceivingInfoRequest implements Validateable {
         expirationDate(nullable: true)
         recipient(nullable: true)
         quantityReceiving(nullable: true)
+        binLocation(nullable: true)
         isSplitItem(nullable: true)
     }
 }

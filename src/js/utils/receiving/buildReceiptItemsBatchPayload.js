@@ -13,19 +13,24 @@
  *  - shipmentItem: { id } - the line being received against (required).
  *  - receiptItem: { id } when updating an existing receipt item, null when creating a new one.
  *  - quantityReceiving: integer quantity (nullable on the backend).
- *  - binLocation: { id } putaway bin (nullable; not captured in state yet).
+ *  - binLocation: { id } putaway bin (nullable).
  *
  * Only rows the user actually touched are sent: a row is included when it is dirty (edited
- * since load or the last save) AND its quantity actually differs from the baseline captured
- * at load / last save (initialQuantityReceiving). Untouched rows are skipped, and so are no-op
- * edits that end up back at the original value (e.g. 3 -> 4 -> 3), which merely flip isDirty.
+ * since load or the last save) AND its quantity or bin location actually differs from the
+ * baseline captured at load / last save (initialQuantityReceiving / initialBinLocationId).
+ * Untouched rows are skipped, and so are no-op edits that end up back at the original value
+ * (e.g. 3 -> 4 -> 3), which merely flip isDirty.
  *
  * @param {Object} entities - normalized line items keyed by rowId
  * @returns {{ itemsToSave: Array, itemsToDelete: Array<string> }}
  */
 const buildReceiptItemsBatchPayload = (entities) => {
+  const hasQuantityChange = (item) => item.quantityReceiving !== item.initialQuantityReceiving;
+  const hasBinLocationChange = (item) =>
+    (item.binLocation?.id ?? null) !== (item.initialBinLocationId ?? null);
+
   const itemsToSave = Object.values(entities || {})
-    .filter((item) => item.isDirty && item.quantityReceiving !== item.initialQuantityReceiving)
+    .filter((item) => item.isDirty && (hasQuantityChange(item) || hasBinLocationChange(item)))
     .map((item) => ({
       rowId: item.rowId,
       shipmentItem: { id: item.shipmentItemId },

@@ -838,11 +838,16 @@ export const updateWorkflowHeader = (headerInfo, headerStatus) => ({
   },
 });
 
-export const updateReceivingHeader = (headerInfo, isShipmentFromPurchaseOrder) => ({
+export const updateReceivingHeader = ({
+  headerInfo,
+  isShipmentFromPurchaseOrder,
+  shipmentNumber,
+}) => ({
   type: UPDATE_RECEIVING_HEADER,
   payload: {
     headerInfo,
     isShipmentFromPurchaseOrder,
+    shipmentNumber,
   },
 });
 

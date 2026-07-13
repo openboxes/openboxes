@@ -19,6 +19,9 @@ const ReceivingTable = ({
   commentModal,
   removeSplitItem,
   loadReceipt,
+  binLocations,
+  receivingBin,
+  onLocationAutofill,
 }) => {
   const {
     isOpen: isCommentModalOpen,
@@ -44,8 +47,16 @@ const ReceivingTable = ({
       removeSplitItem,
       onOpenCommentModal: openCommentModal,
       onOpenEditModal: openEditModal,
+      onLocationAutofill,
     }),
-    [lineItemsState.entities, updateLineItem, openCommentModal, openEditModal, removeSplitItem],
+    [
+      lineItemsState.entities,
+      updateLineItem,
+      openCommentModal,
+      openEditModal,
+      removeSplitItem,
+      onLocationAutofill,
+    ],
   );
 
   // Separators pass through without meta. Meta is only used to disable (grey out)
@@ -130,6 +141,8 @@ const ReceivingTable = ({
           initialLineItems={getInitialEditModalLineItems(editedItemId)}
           receiptId={receiptId}
           loadReceipt={loadReceipt}
+          binLocations={binLocations}
+          receivingBin={receivingBin}
         />
       )}
     </div>
@@ -157,10 +170,14 @@ ReceivingTable.propTypes = {
     openModal: PropTypes.func.isRequired,
     closeModal: PropTypes.func.isRequired,
   }).isRequired,
+  binLocations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  receivingBin: PropTypes.shape({}),
+  onLocationAutofill: PropTypes.func.isRequired,
 };
 
 ReceivingTable.defaultProps = {
   receiptId: null,
+  receivingBin: null,
 };
 
 export default ReceivingTable;

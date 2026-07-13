@@ -190,6 +190,7 @@ export const HANDLING_REQUIREMENTS_OPTIONS = `${API}/handlingRequirementsOptions
 
 // INTERNAL LOCATIONS
 export const INTERNAL_LOCATIONS = `${API}/internalLocations`;
+export const INTERNAL_LOCATIONS_RECEIVING = `${INTERNAL_LOCATIONS}/receiving`;
 
 // CYCLE COUNT
 export const CYCLE_COUNT = (locationId) => `${API}/facilities/${locationId}/cycle-counts`;
@@ -229,6 +230,7 @@ export const INDICATORS_INVENTORY_ACCURACY = `${INDICATORS_REPORT}/inventoryAccu
 export const INVENTORY_API = (id) => `${API}/facilities/${id}/inventories`;
 export const REORDER_REPORT = (id) => `${INVENTORY_API(id)}/reorderReport`;
 export const EXPIRATION_HISTORY_REPORT = `${API}/inventories/expirationHistoryReport`;
+export const PREFERRED_BIN_LOCATIONS = (facilityId) => `${API}/facilities/${facilityId}/inventory-levels/preferred-bin-locations`;
 
 // RECEIVING
 export const RECEIPT_API = `${API}/receipts/v2`;
