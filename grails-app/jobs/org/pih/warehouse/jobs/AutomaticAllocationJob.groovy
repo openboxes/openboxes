@@ -32,21 +32,19 @@ class AutomaticAllocationJob {
             return
         }
 
-        authService.withSystemUser {
-            String requisitionId = context.mergedJobDataMap.get('requisitionId')
-            if (requisitionId) {
-                allocateRequisition(requisitionId)
-                return
-            }
+        String requisitionId = context.mergedJobDataMap.get('requisitionId')
+        if (requisitionId) {
+            allocateRequisition(requisitionId)
+            return
+        }
 
-            if (Holders.config.openboxes.jobs.automaticAllocationJob.bulkAutoAllocation) {
-                List<Location> facilities =
-                        locationService.getLocationsSupportingActivities([ActivityCode.AUTOMATIC_ALLOCATION_ENABLED])
-                log.info "Running automatic allocation job for all pending requisitions... "
-                facilities.each { Location facility ->
-                    requisitionService.getRequisitionsPendingAutoAllocation(facility).each { Requisition requisition ->
-                        allocateRequisition(requisition.id)
-                    }
+        if (Holders.config.openboxes.jobs.automaticAllocationJob.bulkAutoAllocation) {
+            List<Location> facilities =
+                    locationService.getLocationsSupportingActivities([ActivityCode.AUTOMATIC_ALLOCATION_ENABLED])
+            log.info "Running automatic allocation job for all pending requisitions... "
+            facilities.each { Location facility ->
+                requisitionService.getRequisitionsPendingAutoAllocation(facility).each { Requisition requisition ->
+                    allocateRequisition(requisition.id)
                 }
             }
         }
@@ -54,18 +52,25 @@ class AutomaticAllocationJob {
 
     private void allocateRequisition(String requisitionId) {
         try {
-            Requisition requisition = Requisition.get(requisitionId)
-            if (!requisition) {
-                log.warn("Requisition ${requisitionId} not found, skipping")
-                return
-            }
+            authService.withSystemUser {
+                Requisition requisition = Requisition.get(requisitionId)
+                if (!requisition) {
+                    log.warn("Requisition ${requisitionId} not found, skipping")
+                    return
+                }
 
-            if (!requisition.isEligibleForAutomaticAllocation()) {
-                return
+                if (!requisition.isEligibleForAutomaticAllocation()) {
+                    return
+                }
+
+                if (!requisition.requisitionItems) {
+                    return
+                }
+
+                log.info("Automatic allocation for requisition ${requisition.requestNumber} (${requisition.id}) ...")
+                allocationService.allocate(requisition, AllocationMode.AUTO, [AllocationStrategy.WAREHOUSE_FIRST])
+                stockMovementService.updateRequisitionStatus(requisitionId, RequisitionStatus.PICKING)
             }
-            log.info("Automatic allocation for requisition ${requisition.requestNumber} (${requisition.id}) ...")
-            allocationService.allocate(requisition, AllocationMode.AUTO, [AllocationStrategy.WAREHOUSE_FIRST])
-            stockMovementService.updateRequisitionStatus(requisitionId, RequisitionStatus.PICKING)
         } catch (Exception e) {
             log.error("Error processing requisition ${requisitionId}", e)
         }

@@ -512,16 +512,6 @@ class ReceiptService {
         return null
     }
 
-    void receiveInboundShipments(Location facility) {
-        log.info "Detecting candidates for auto receipt - inbound shipments in-transit to facility ${facility}"
-        List<Shipment> shippedShipments = shipmentService.getShippedShipmentsByDestination(facility)
-        shippedShipments.each { Shipment shipment ->
-            log.info "Creating automated receipt for shipment ${shipment}"
-            receiveInboundShipment(shipment)
-            reallocateBackorderedItems(shipment.id)
-        }
-    }
-
     void receiveInboundShipment(Shipment shipment, Boolean forceAutoReceipt = false) {
 
         log.info "Receive inbound shipment ${shipment}  forceAutoReceipt${forceAutoReceipt}"

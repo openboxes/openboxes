@@ -26,13 +26,13 @@ class AutomaticReceiptJob {
             return
         }
 
-        // Jobs run without a logged-in user. Authenticate as the system user so that audited records
-        // created during the receipt (e.g. EventLog, whose created_by_id/updated_by_id are NOT NULL) get
-        // a valid author.
-        authService.withSystemUser {
-            String shipmentId = context.mergedJobDataMap.get('shipmentId')
-            if (shipmentId) {
-                try {
+        String shipmentId = context.mergedJobDataMap.get('shipmentId')
+        if (shipmentId) {
+            try {
+                // Jobs run without a logged-in user. Authenticate as the system user so that audited records
+                // created during the receipt (e.g. EventLog, whose created_by_id/updated_by_id are NOT NULL) get
+                // a valid author.
+                authService.withSystemUser {
                     Shipment shipment = shipmentService.getShipmentInstance(shipmentId)
                     if (!shipment) {
                         log.warn("Shipment ${shipmentId} not found, skipping")
@@ -40,23 +40,38 @@ class AutomaticReceiptJob {
                     }
                     log.info("Creating automatic receipt for shipment ${shipmentId}")
                     receiptService.receiveInboundShipment(shipment)
-
-                } catch (Exception e) {
-                    log.error("Error processing shipment ${shipmentId}", e)
                 }
-                return
+            } catch (Exception e) {
+                log.error("Error processing shipment ${shipmentId}", e)
             }
-            // FIXME This probably shouldn't be run during the same execution as the above code as it has the potential
-            //  to create a race condition or duplicate receipts
-            // Fallback in case the auto receipt job was not triggered for a specific shipment
-            if (Holders.config.openboxes.jobs.automaticReceiptJob.bulkShipmentAutoReceipt) {
-                List<Location> autoReceiptFacilities = locationService.getLocationsSupportingActivities([ActivityCode.AUTO_RECEIVING]) as List<Location>
-                log.info "Running automatic receipt job for all shipped shipments... "
-                autoReceiptFacilities.each { Location facility ->
-                    receiptService.receiveInboundShipments(facility)
-                }
+            return
+        }
+
+        // FIXME This probably shouldn't be run during the same execution as the above code as it has the potential
+        //  to create a race condition or duplicate receipts
+        // Fallback in case the auto receipt job was not triggered for a specific shipment
+        if (Holders.config.openboxes.jobs.automaticReceiptJob.bulkShipmentAutoReceipt) {
+            List<Location> autoReceiptFacilities = locationService.getLocationsSupportingActivities([ActivityCode.AUTO_RECEIVING]) as List<Location>
+            log.info "Running automatic receipt job for all shipped shipments... "
+            autoReceiptFacilities.each { Location facility ->
+                receiveInboundShipments(facility)
             }
         }
     }
 
+    void receiveInboundShipments(Location facility) {
+        log.info "Detecting candidates for auto receipt - inbound shipments in-transit to facility ${facility}"
+        List<Shipment> shippedShipments = shipmentService.getShippedShipmentsByDestination(facility)
+        shippedShipments.each { Shipment shipment ->
+            try {
+                authService.withSystemUser {
+                    log.info "Creating automated receipt for shipment ${shipment}"
+                    receiptService.receiveInboundShipment(shipment)
+                    receiptService.reallocateBackorderedItems(shipment.id)
+                }
+            } catch (Exception e) {
+                log.error("Error processing requisition ${requisitionId}", e)
+            }
+        }
+    }
 }
