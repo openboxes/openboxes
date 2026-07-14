@@ -568,6 +568,10 @@ class CycleCountService {
 
         List<AvailableItem> itemsToSave = cycleCountProductAvailabilityService.getAvailableItems(
                 facility, request.cycleCountRequest.product)
+        if (!itemsToSave) {
+            throw new RuntimeException("You cannot start a cycle count on a product with no stock.")
+        }
+
         // 1:1 association between cycle count and cycle count request
         request.cycleCountRequest.cycleCount = newCycleCount
         request.cycleCountRequest.status = CycleCountRequestStatus.IN_PROGRESS
