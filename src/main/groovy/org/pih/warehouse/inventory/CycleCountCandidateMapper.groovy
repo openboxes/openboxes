@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component
 
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.mapper.ResponseMapper
+import org.pih.warehouse.product.ProductCatalogDto
 
 @Component
 class CycleCountCandidateMapper implements ResponseMapper<CycleCountCandidate> {
@@ -12,20 +13,20 @@ class CycleCountCandidateMapper implements ResponseMapper<CycleCountCandidate> {
     Map<String, Object> asResponseBody(CycleCountCandidate source) {
         return [
                 product: [
-                        id: source.product.id,
-                        name: source.product.name,
-                        productCode: source.product.productCode,
+                        id: source.product?.id,
+                        name: source.product?.name,
+                        productCode: source.product?.productCode,
                 ],
                 dateLastCount: source.dateLastCount,
                 dateNextCount: source.dateNextCount,
                 daysUntilNextCount: source.daysUntilNextCount,
                 category: [
-                        id: source.product.category?.id,
-                        name: source.product.category?.name,
+                        id: source.product?.category?.id,
+                        name: source.product?.category?.name,
                 ],
                 internalLocations: source.internalLocations,
-                tags: tagsAsResponseBody(source.product.tags),
-                productCatalogs: source.product.productCatalogs,
+                tags: tagsAsResponseBody(source.product?.tags),
+                productCatalogs: source.product?.productCatalogs?.collect { ProductCatalogDto.from(it) },
                 abcClass: source.abcClass,
                 quantityOnHand: source.quantityOnHand,
                 quantityAllocated: source.quantityAllocated,

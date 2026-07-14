@@ -4,7 +4,6 @@ import java.time.LocalDate
 
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.date.LocalDateParser
-import org.pih.warehouse.core.http.ResponseBodyFormattable
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.LotStatusCode
 import org.pih.warehouse.product.ProductSimpleDto

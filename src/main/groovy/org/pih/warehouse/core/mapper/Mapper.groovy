@@ -24,7 +24,8 @@ trait Mapper<Source, Target> {
      * Converts an instance of the source object into a new instance of the target object.
      *
      * @param source The object to be converted from.
+     * @param config The configuration to use when performing the mapping.
      * @return A new instance of the target object.
      */
-    abstract Target map(Source source)
+    abstract Target map(Source source, MapperConfig config=null)
 }

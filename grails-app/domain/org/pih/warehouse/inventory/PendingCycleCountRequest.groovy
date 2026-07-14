@@ -5,6 +5,7 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.http.ResponseBodyFormattable
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductCatalogDto
 
 class PendingCycleCountRequest implements ResponseBodyFormattable {
 
@@ -49,7 +50,7 @@ class PendingCycleCountRequest implements ResponseBodyFormattable {
     Map<String, Object> asResponseBody() {
         return [
                 id: id,
-                facility: facility.toBaseJson(),
+                facility: facility?.id,
                 cycleCountRequest: cycleCountRequest,
                 product: [
                         id: product.id,
@@ -62,7 +63,7 @@ class PendingCycleCountRequest implements ResponseBodyFormattable {
                 ],
                 internalLocations: internalLocations,
                 tags: tagsToJson(),
-                productCatalogs: product.productCatalogs,
+                productCatalogs: product.productCatalogs.collect { ProductCatalogDto.from(it) },
                 abcClass: abcClass,
                 quantityOnHand: quantityOnHand,
                 quantityAllocated: quantityAllocated,

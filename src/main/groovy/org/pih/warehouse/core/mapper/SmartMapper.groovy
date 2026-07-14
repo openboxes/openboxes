@@ -21,9 +21,10 @@ class SmartMapper {
      *
      * @param source The object to be converted from.
      * @param target The target class type to convert the source to.
+     * @param config The configuration to use when performing the mapping.
      * @return A new instance of the target object.
      */
-    def <Source, Target> Target map(Source source, Class<Target> targetClass) {
+    def <Source, Target> Target map(Source source, Class<Target> targetClass, MapperConfig config=null) {
         if (source == null) {
             return null
         }
@@ -32,7 +33,7 @@ class SmartMapper {
         if (mapper == null) {
             throw new RuntimeException("No mapper was found between source ${source.class} and target ${targetClass}.")
         }
-        return mapper.map(source)
+        return mapper.map(source, config)
     }
 
     /**
@@ -41,16 +42,18 @@ class SmartMapper {
      *
      * @param source The collection of object to be converted from.
      * @param target The target class type to convert each of the sources to.
+     * @param config The configuration to use when performing the mapping.
      * @return A new list of instances of the target object.
      */
-    def <Source, Target> List<Target> mapCollection(Collection<Source> sourceCollection, Class<Target> targetClass) {
+    def <Source, Target> List<Target> mapCollection(
+            Collection<Source> sourceCollection, Class<Target> targetClass, MapperConfig config=null) {
         if (sourceCollection == null) {
             return null
         }
 
         List<Target> mappedList = []
         for (source in sourceCollection) {
-            mappedList.add(map(source, targetClass))
+            mappedList.add(map(source, targetClass, config))
         }
         return mappedList
     }

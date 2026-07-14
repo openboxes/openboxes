@@ -15,7 +15,10 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier
 import com.fasterxml.jackson.databind.ser.ContextualSerializer
 import com.fasterxml.jackson.databind.ser.ResolvableSerializer
-import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import grails.artefact.DomainClass
+import grails.gorm.Entity
+import org.grails.datastore.gorm.GormEntity
 import org.springframework.stereotype.Component
 
 import org.pih.warehouse.core.mapper.MapperComponentResolver
@@ -46,9 +49,10 @@ class ObjectMapperConfigurer {
         // just ignore the object. This gracefully resolves Grails/GORM AST transformation weirdness.
         objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
 
-        // Add support for serializing Hibernate domain entities (though we should typically
-        // prefer converting an entity to a DTO and serializing the DTO instead).
-        objectMapper.registerModule(new Hibernate5Module())
+        // Support serializing java.util.Date and java.time classes (LocalDate, Instant, ZonedDateTime)
+        // as ISO strings (for example, "2025-01-21" or "2025-01-21T00:00Z")
+        objectMapper.registerModule(new JavaTimeModule())
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
         // Instruct the ObjectMapper to consult our custom module whenever it constructs a serializer.
         SimpleModule module = new SimpleModule("OpenBoxes")
@@ -156,8 +160,9 @@ class ObjectMapperConfigurer {
                 // Break after some JSON depth. It is very unlikely that a non-erroneous flow would reach this depth.
                 // This is primarily to avoid stack overflows if something is misconfigured.
                 if (stack.size() > MAX_JSON_DEPTH) {
-                    gen.writeNull()
-                    return
+                    throw new RuntimeException("Exceeded maximum JSON depth of ${MAX_JSON_DEPTH}. Erroring to avoid " +
+                            "a stack overflow. Check the DTO serialization logic for infinite loops or other " +
+                            "erroneous behaviour. The full serialization stack: [${stringifySerializationStack()}]")
                 }
 
                 Map mappedData = applyCustomMapping(value)
@@ -254,8 +259,27 @@ class ObjectMapperConfigurer {
                 return value.toJson()
             }
 
+            /*
+             * We intentionally do not support serializing Hibernate entities (unless they define one of the above
+             * methods). We require all of our domain entities to be mapped to a DTO before serialization.
+             *
+             * If we ever change our mind about this, we can support Hibernate by adding the following dependency:
+             * "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5:${jacksonVersion}" and then add the
+             * Hibernate module to the object mapper via: objectMapper.registerModule(new Hibernate5Module())
+             */
+            if (value instanceof DomainClass || value instanceof Entity || value instanceof GormEntity) {
+                throw new RuntimeException("We do not support serializing Hibernate entities. Please create a DTO " +
+                        "for domain ${valueClass}. The full serialization stack: [${stringifySerializationStack()}]")
+            }
+
             // We don't know how to serialize the object so we will rely on the framework to do it for us.
             return null
+        }
+
+        private String stringifySerializationStack() {
+            return ALREADY_SEEN_OBJECTS.get().toList().reverse().withIndex()
+                    .collect { it, index -> "${index}. (${it.class.simpleName}) ${it.toString()}" }
+                    .join(" -> ")
         }
     }
 }
