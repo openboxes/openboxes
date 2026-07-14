@@ -15,6 +15,8 @@ import org.pih.warehouse.receiving.ReceiptEditReceivingInfoCommand
 import org.pih.warehouse.receiving.ReceiptGroup
 import org.pih.warehouse.receiving.ReceiptIdentifierService
 import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.receiving.ReceiptItemCommentDto
+import org.pih.warehouse.receiving.ReceiptItemCommentSaveCommand
 import org.pih.warehouse.receiving.ReceiptItemDto
 import org.pih.warehouse.receiving.ReceiptItemEditReceivingInfoRequest
 import org.pih.warehouse.receiving.ReceiptItemUpsertRequest
@@ -302,5 +304,32 @@ class ReceiptV2Service {
             shipmentItemGroup.put(shipmentItem.id, shipmentItem.id)
         }
         return shipmentItemGroup
+    }
+
+    /**
+     * Sets (adds or edits) the comment of the given receipt item.
+     */
+    @Transactional
+    ReceiptItemCommentDto saveReceiptItemComment(ReceiptItemCommentSaveCommand command) {
+        ReceiptItem receiptItem = command.receiptItem
+
+        boolean addingNewComment = !receiptItem.comment
+        receiptItem.comment = command.comment
+
+        // Explicit .save is only needed for brand new entities
+        if (addingNewComment) {
+            receiptItem.save(failOnError: true)
+        }
+
+        return ReceiptItemCommentDto.from(receiptItem)
+    }
+
+    @Transactional
+    void deleteReceiptItemComment(String receiptItemId) {
+        ReceiptItem receiptItem = ReceiptItem.get(receiptItemId)
+        if (!receiptItem) {
+            throw new ObjectNotFoundException(receiptItemId, ReceiptItem.toString())
+        }
+        receiptItem.comment = null
     }
 }
