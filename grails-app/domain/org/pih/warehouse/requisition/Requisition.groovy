@@ -155,7 +155,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     Boolean partialAllocationAllowed
     Boolean partialIssuanceAllowed
     Boolean autoIssuanceEnabled
-    Boolean allowNegativeInventory
+    Boolean negativeInventoryAllowed
 
     AllocationStrategy allocationStrategy
 
@@ -254,7 +254,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         partialIssuanceAllowed(nullable: true)
         allocationStrategy(nullable: true)
         autoIssuanceEnabled(nullable: true)
-        allowNegativeInventory(nullable: true)
+        negativeInventoryAllowed(nullable: true)
     }
 
     Comment getRecentComment() {
@@ -522,7 +522,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
                 partialIssuanceAllowed  : partialIssuanceAllowed,
                 allocationStrategy      : allocationStrategy?.name(),
                 autoIssuanceEnabled     : autoIssuanceEnabled,
-                allowNegativeInventory  : allowNegativeInventory,
+                negativeInventoryAllowed  : negativeInventoryAllowed,
         ]
     }
 
@@ -547,7 +547,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
             partialIssuanceAllowed: partialIssuanceAllowed,
             allocationStrategy: allocationStrategy?.name(),
             autoIssuanceEnabled: autoIssuanceEnabled,
-            allowNegativeInventory: allowNegativeInventory,
+            negativeInventoryAllowed: negativeInventoryAllowed,
         ]
     }
 }
