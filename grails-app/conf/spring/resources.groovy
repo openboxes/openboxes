@@ -1,9 +1,8 @@
 package spring
 
-import org.pih.warehouse.inboundSortation.strategy.CrossDockingBackorderReferenceStrategy
-import org.pih.warehouse.inboundSortation.strategy.DefaultSlottingStrategy
-import org.pih.warehouse.inboundSortation.strategy.RandomSlottingStrategy
-import org.pih.warehouse.inboundSortation.SlottingService
+import org.pih.warehouse.inboundSortation.strategy.CrossDockingBackorderReferencePutawayStrategy
+import org.pih.warehouse.inboundSortation.strategy.DefaultLocationPutawayStrategy
+import org.pih.warehouse.inboundSortation.PutawayStrategyService
 import org.pih.warehouse.monitoring.SentryGrailsTracingFilter
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.core.Ordered
@@ -22,15 +21,15 @@ beans = {
     // See: https://grails.apache.org/guides/grails-transactional-events/8/guide/index.html (I know it is Grails Version: 8)
     transactionalEventListenerFactory(TransactionalEventListenerFactory)
 
-    // Slotting strategies
-    crossDockingBackorderReferenceStrategy(CrossDockingBackorderReferenceStrategy)
-    defaultSlottingStrategy(DefaultSlottingStrategy)
-    // randomSlottingStrategy(RandomSlottingStrategy)
-    slottingService(SlottingService) {
+    // Putaway strategies
+    crossDockingBackorderReferencePutawayStrategy(CrossDockingBackorderReferencePutawayStrategy)
+    defaultLocationPutawayStrategy(DefaultLocationPutawayStrategy)
+    // randomLocationPutawayStrategy(RandomLocationPutawayStrategy)
+    putawayStrategyService(PutawayStrategyService) {
         strategies = [
-                ref('crossDockingBackorderReferenceStrategy'), // fallback if none of the strategies worked, executed as the last one
-                ref('defaultSlottingStrategy'), // directed putaway to preferred bin
-                // ref('randomSlottingStrategy') // fallback if none of the strategies worked, executed as the last one
+                ref('crossDockingBackorderReferencePutawayStrategy'), // fallback if none of the strategies worked, executed as the last one
+                ref('defaultLocationPutawayStrategy'), // directed putaway to preferred bin
+                // ref('randomLocationPutawayStrategy') // fallback if none of the strategies worked, executed as the last one
         ]
     }
 

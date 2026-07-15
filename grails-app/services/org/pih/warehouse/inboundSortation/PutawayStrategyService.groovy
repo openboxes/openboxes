@@ -4,7 +4,7 @@ import grails.gorm.transactions.Transactional
 import org.pih.warehouse.inboundSortation.strategy.PutawayStrategy
 
 @Transactional
-class SlottingService {
+class PutawayStrategyService {
     List<PutawayStrategy> strategies
 
     List<PutawayResult> execute(PutawayContext context) {
