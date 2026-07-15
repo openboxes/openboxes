@@ -3112,7 +3112,8 @@ class StockMovementService {
         // Set default shipment type so we can save to the database without user input
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
 
-        shipment.name = StockMovementUtil.generateStockMovementName(requisition, null)
+        shipment.name = StockMovementUtil.generateStockMovementName(requisition.origin, requisition.destination,
+                requisition.dateRequested, requisition.requisitionTemplate, requisition.description)
 
         if (shipment.hasErrors() || !shipment.save(flush: true)) {
             throw new ValidationException("Invalid shipment", shipment.errors)
@@ -3886,6 +3887,8 @@ class StockMovementService {
         if (requisition) {
             requisition.priority = params.priority as int
             requisition.deliveryTypeCode = params.deliveryTypeCode
+            // Order type is set from the Scheduling tab for outbound movements only;
+            requisition.orderTypeCode = params?.orderTypeCode ?: null
             requisition.requestedDeliveryDate = params.requestedDeliveryDate
             requisition.save()
         }

@@ -7,13 +7,12 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
-package org.pih.warehouse.inventory
+package org.pih.warehouse.stockTransfer
 
 import org.springframework.context.ApplicationEvent
 
-class ReslottingEvent extends ApplicationEvent {
-
-    ReslottingEvent(String inventoryLevelId) {
-        super(inventoryLevelId)
+class StockTransferEvent extends ApplicationEvent {
+    StockTransferEvent(String orderId) {
+        super(orderId)
     }
 }

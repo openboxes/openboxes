@@ -6,15 +6,10 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.requisition.Requisition
 
 class StockMovementUtil {
-    static String generateStockMovementName(Requisition req, String trackingNumber) {
+    static String generateStockMovementName(Location origin, Location destination, Date dateRequested, Requisition stocklist,
+                                            String description, String trackingNumber = null) {
         final String separator =
                 Holders.getConfig().getProperty("openboxes.generateName.separator") ?: Constants.DEFAULT_NAME_SEPARATOR
-
-        Location origin = req?.origin
-        Location destination = req?.destination
-        Date dateRequested = req?.dateRequested
-        Requisition stocklist = req?.requisitionTemplate
-        String description = req?.destination
 
         String originIdentifier = origin?.locationNumber ?: origin?.name
         String destinationIdentifier = destination?.locationNumber ?: destination?.name

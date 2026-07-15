@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.jobs.PutawayLocationReslottingJob
 import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
 
@@ -21,8 +22,11 @@ class InventoryLevelUpdatedEventService {
     // the refresh jobs don't need to be scheduled with a delay
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     void onInventoryLevelUpdated(InventoryLevelUpdatedEvent event) {
-        log.info "Inventory level updated; refreshing PA and inventory snapshot for facility=${event.facilityId}, product=${event.productIds}"
-        productAvailabilityService.triggerRefreshProductAvailability(event.facilityId, event.productIds, event.forceRefresh)
-        inventorySnapshotService.triggerRefreshInventorySnapshot(event.facilityId, event.productIds, event.forceRefresh)
+        if (event.facilityId) {
+            log.info "Inventory level updated; refreshing PA and inventory snapshot for facility=${event.facilityId}, product=${event.productId}"
+            productAvailabilityService.triggerRefreshProductAvailability(event.facilityId, [event.productId], event.forceRefresh)
+            inventorySnapshotService.triggerRefreshInventorySnapshot(event.facilityId, [event.productId], event.forceRefresh)
+        }
+        PutawayLocationReslottingJob.triggerNow([inventoryLevelId: event.source?.id])
     }
 }

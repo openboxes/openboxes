@@ -19,17 +19,18 @@ import util.InventoryUtil
 
 class InventoryLevel implements Comparable<InventoryLevel> {
 
-    def publishReslottingEvent() {
-        Holders.grailsApplication.mainContext.publishEvent(new ReslottingEvent(this.id))
+    def publishInventoryLevelUpdatedEvent() {
+        Holders.grailsApplication.mainContext.publishEvent( new InventoryLevelUpdatedEvent(this))
     }
 
     def afterUpdate() {
-        publishReslottingEvent()
+        publishInventoryLevelUpdatedEvent()
     }
 
     String id
 
     // Unique identifier (optional) for facility-level inventory level rules (used for integration with external systems)
+    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "identifier") })
     String identifier
 
     // Product assigned to inventory level rule
