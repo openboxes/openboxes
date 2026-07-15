@@ -125,6 +125,7 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
                 {...field}
                 disabled
                 hideErrorMessageWrapper
+                showValueTooltip
                 ariaLabel={{ id: 'react.receiving.recipient.label', defaultMessage: 'Recipient' }}
               />
             )}
@@ -160,7 +161,7 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
         </TableCell>
       ),
       footer: ({ table }) => <span style={{ paddingLeft: '14px' }}>{table.options.meta?.totalReceived ?? 0}</span>,
-      size: 90,
+      size: 120,
     }),
     columnHelper.accessor(receivingColumns.LOCATION, {
       header: () => <LocationAutofillHeader />,
@@ -194,15 +195,15 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
         <TableCell className="rt-td">
           <button
             type="button"
-            className="receiving-edit-modal__copy-to-receive d-flex align-items-center justify-content-end gap-8 w-100 h-100 p-0 border-0 bg-transparent cursor-pointer text-nowrap font-size-xs"
+            className="receiving-edit-modal__copy-to-receive d-flex align-items-center justify-content-end gap-8 w-100 h-100 p-0 border-0 bg-transparent cursor-pointer text-nowrap"
             onClick={() => copyToReceive(row.original.rowId)}
           >
-            <RiArrowDownLine size={18} />
+            <RiArrowDownLine size={14} />
             {translate('react.receiving.copyToReceive.label', 'Copy To Receive')}
           </button>
         </TableCell>
       ),
-      size: 160,
+      size: 130,
       meta: { getCellContext: () => ({ className: 'data-table__interactive' }) },
     }),
   ], [translate, control, locationId, copyToReceive]);

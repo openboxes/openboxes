@@ -173,7 +173,7 @@ input, .date-field-input {
 
 .select-wrapper-container {
 
-  div:nth-child(2) > div:first-child {
+  > div:nth-child(2) > div:first-child {
     width: 100%;
   }
 

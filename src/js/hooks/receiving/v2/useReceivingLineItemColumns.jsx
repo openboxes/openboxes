@@ -130,6 +130,7 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
                 async
                 loadOptions={debouncedPeopleFetch}
                 hideErrorMessageWrapper
+                showValueTooltip
                 ariaLabel={{ id: 'react.receiving.recipient.label', defaultMessage: 'Recipient' }}
               />
             )}
@@ -164,7 +165,7 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
         </TableCell>
       ),
       footer: ({ table }) => <span style={{ paddingLeft: '14px' }}>{table.options.meta?.totalReceivingNow ?? 0}</span>,
-      size: 90,
+      size: 120,
     }),
     columnHelper.accessor(receivingColumns.LOCATION, {
       header: () => <LocationAutofillHeader />,
@@ -208,7 +209,7 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
           </div>
         </TableCell>
       ),
-      size: 160,
+      size: 130,
     }),
   ], [translate, control, locationId, debouncedPeopleFetch, removeRow]);
 

@@ -77,6 +77,11 @@
     min-height: unset !important;
   }
 
+  .react-select__single-value div {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   &__separator {
     align-items: center;
   }
@@ -240,6 +245,11 @@
 
 .modal-content:has(.receiving-edit-modal) {
   top: 15%;
+  width: 80%;
+
+  @media (max-width: 1500px) {
+    width: 90%;
+  }
 }
 
 .receiving-edit-modal {
@@ -265,8 +275,20 @@
     min-height: 60px;
   }
 
+  .app-react-table .rt-thead .rt-th {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .location-header .react-select__value-container .location-header__location,
+  .location-header .react-select__value-container .location-header__autofill {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
   &__title {
     color: var(--blue-800);
+    line-height: 32px;
   }
 
   // The per-field error wrapper is hidden, so add the row spacing back here.
@@ -286,6 +308,25 @@
   &__copy-to-receive {
     color: var(--blue-primary);
     font-weight: 600;
+    font-size: 12px;
+  }
+
+  .rt-tfoot .footer-cell {
+    font-size: 13px;
+    font-weight: 600 !important;
+    color: var(--gray-600);
+  }
+
+  .summary-info__title {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--gray-600);
+  }
+
+  .summary-info__data {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--blue-700);
   }
 
   &__received.v2-section {
