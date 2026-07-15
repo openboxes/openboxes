@@ -60,6 +60,7 @@ class AutomaticAllocationJob {
                 }
 
                 if (!requisition.isEligibleForAutomaticAllocation()) {
+                    log.debug("Requisition ${requisitionId} is not eligible for automatic allocation, skipping")
                     return
                 }
 
