@@ -25,12 +25,12 @@ beans = {
     // Slotting strategies
     crossDockingBackorderReferenceStrategy(CrossDockingBackorderReferenceStrategy)
     defaultSlottingStrategy(DefaultSlottingStrategy)
-    randomSlottingStrategy(RandomSlottingStrategy)
+    // randomSlottingStrategy(RandomSlottingStrategy)
     slottingService(SlottingService) {
         strategies = [
                 ref('crossDockingBackorderReferenceStrategy'), // fallback if none of the strategies worked, executed as the last one
                 ref('defaultSlottingStrategy'), // directed putaway to preferred bin
-                ref('randomSlottingStrategy') // fallback if none of the strategies worked, executed as the last one
+                // ref('randomSlottingStrategy') // fallback if none of the strategies worked, executed as the last one
         ]
     }
 
