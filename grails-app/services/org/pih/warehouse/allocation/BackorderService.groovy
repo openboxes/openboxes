@@ -9,6 +9,7 @@ import org.pih.warehouse.shipping.ShipmentItem
 @Transactional
 class BackorderService {
 
+    // UPDATE: now the inbound item has to be at least equal to the outbound demand, no longer an exact match
     // Special case: we only fulfill a backorder with an inbound item that exactly matches
     // the outbound demand. The general behaviour of backorder fulfillment is partial matching
     // (any inbound quantity reduces the demanded quantity, even if it only partially fulfills
@@ -33,7 +34,7 @@ class BackorderService {
             for (ShipmentItem inboundItem : inboundItems) {
                 def matchingBackorderItem = backorder.requisitionItems.find { RequisitionItem demand ->
                     demand.product == inboundItem.product &&
-                            demand.quantity == inboundItem.quantity &&
+                            demand.quantity <= inboundItem.quantity &&
                             !demand.isAllocated() &&
                             !consumedRequisitionItems.contains(demand)
                 }
