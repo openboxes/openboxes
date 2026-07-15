@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.jobs.PutawayLocationReslottingJob
+import org.pih.warehouse.jobs.PutawayLocationReassignJob
 import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
 
@@ -27,6 +27,6 @@ class InventoryLevelUpdatedEventService {
             productAvailabilityService.triggerRefreshProductAvailability(event.facilityId, [event.productId], event.forceRefresh)
             inventorySnapshotService.triggerRefreshInventorySnapshot(event.facilityId, [event.productId], event.forceRefresh)
         }
-        PutawayLocationReslottingJob.triggerNow([inventoryLevelId: event.source?.id])
+        PutawayLocationReassignJob.triggerNow([inventoryLevelId: event.source?.id])
     }
 }

@@ -5,7 +5,7 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.quartz.JobExecutionContext
 
-class AutomaticSlottingJob {
+class AutomaticPutawayJob {
 
     def putawayService
     def locationService
@@ -13,12 +13,12 @@ class AutomaticSlottingJob {
     def sessionRequired = false
 
     static triggers = {
-        cron name: JobUtils.getCronName(AutomaticSlottingJob),
-        cronExpression: JobUtils.getCronExpression(AutomaticSlottingJob)
+        cron name: JobUtils.getCronName(AutomaticPutawayJob),
+        cronExpression: JobUtils.getCronExpression(AutomaticPutawayJob)
     }
 
     def execute(JobExecutionContext context) {
-        if (!Holders.config.openboxes.jobs.automaticSlottingJob.enabled) {
+        if (!Holders.config.openboxes.jobs.automaticPutawayJob.enabled) {
             log.info"Automatic slotting job is disabled"
             return
         }
