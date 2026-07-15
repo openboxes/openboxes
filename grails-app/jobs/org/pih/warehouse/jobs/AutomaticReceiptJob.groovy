@@ -54,23 +54,7 @@ class AutomaticReceiptJob {
             List<Location> autoReceiptFacilities = locationService.getLocationsSupportingActivities([ActivityCode.AUTO_RECEIVING]) as List<Location>
             log.info "Running automatic receipt job for all shipped shipments... "
             autoReceiptFacilities.each { Location facility ->
-                receiveInboundShipments(facility)
-            }
-        }
-    }
-
-    void receiveInboundShipments(Location facility) {
-        log.info "Detecting candidates for auto receipt - inbound shipments in-transit to facility ${facility}"
-        List<Shipment> shippedShipments = shipmentService.getShippedShipmentsByDestination(facility)
-        shippedShipments.each { Shipment shipment ->
-            try {
-                authService.withSystemUser {
-                    log.info "Creating automated receipt for shipment ${shipment}"
-                    receiptService.receiveInboundShipment(shipment)
-                    receiptService.reallocateBackorderedItems(shipment.id)
-                }
-            } catch (Exception e) {
-                log.error("Error processing requisition ${requisitionId}", e)
+                receiptService.receiveInboundShipments(facility)
             }
         }
     }

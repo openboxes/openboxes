@@ -11,9 +11,7 @@ import org.quartz.JobExecutionContext
 
 class AutomaticAllocationJob {
 
-    def authService
     def allocationService
-    def stockMovementService
     def requisitionService
     def locationService
 
@@ -34,7 +32,7 @@ class AutomaticAllocationJob {
 
         String requisitionId = context.mergedJobDataMap.get('requisitionId')
         if (requisitionId) {
-            allocateRequisition(requisitionId)
+            allocationService.allocateRequisition(requisitionId)
             return
         }
 
@@ -44,36 +42,9 @@ class AutomaticAllocationJob {
             log.info "Running automatic allocation job for all pending requisitions... "
             facilities.each { Location facility ->
                 requisitionService.getRequisitionsPendingAutoAllocation(facility).each { Requisition requisition ->
-                    allocateRequisition(requisition.id)
+                    allocationService.allocateRequisition(requisition.id)
                 }
             }
-        }
-    }
-
-    private void allocateRequisition(String requisitionId) {
-        try {
-            authService.withSystemUser {
-                Requisition requisition = Requisition.get(requisitionId)
-                if (!requisition) {
-                    log.warn("Requisition ${requisitionId} not found, skipping")
-                    return
-                }
-
-                if (!requisition.isEligibleForAutomaticAllocation()) {
-                    log.debug("Requisition ${requisitionId} is not eligible for automatic allocation, skipping")
-                    return
-                }
-
-                if (!requisition.requisitionItems) {
-                    return
-                }
-
-                log.info("Automatic allocation for requisition ${requisition.requestNumber} (${requisition.id}) ...")
-                allocationService.allocate(requisition, AllocationMode.AUTO, [AllocationStrategy.WAREHOUSE_FIRST])
-                stockMovementService.updateRequisitionStatus(requisitionId, RequisitionStatus.PICKING)
-            }
-        } catch (Exception e) {
-            log.error("Error processing requisition ${requisitionId}", e)
         }
     }
 }

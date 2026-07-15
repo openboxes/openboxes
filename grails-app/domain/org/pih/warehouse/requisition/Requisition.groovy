@@ -471,6 +471,10 @@ class Requisition implements Comparable<Requisition>, Serializable {
             log.info "Requisition ${requestNumber} (${id}) not eligible for automatic allocation: origin '${origin?.name}' does not support activity ${ActivityCode.AUTOMATIC_ALLOCATION_ENABLED}"
             return false
         }
+        if (!requisitionItems) {
+            log.info "Requisition ${requestNumber} (${id}) not eligible for automatic allocation: no Requisition Items configured"
+            return false
+        }
         return true
     }
 
