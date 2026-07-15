@@ -32,12 +32,12 @@
     <changeSet author="druchniewicz" id="070720261200-2">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="requisition" columnName="allow_negative_inventory"/>
+                <columnExists tableName="requisition" columnName="negative_inventory_allowed"/>
             </not>
         </preConditions>
 
         <addColumn tableName="requisition">
-            <column name="allow_negative_inventory" type="BIT(1)"/>
+            <column name="negative_inventory_allowed" type="BIT(1)"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>

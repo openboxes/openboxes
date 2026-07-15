@@ -100,7 +100,7 @@ class StockMovement implements Validateable, Historizable {
     DeliveryTypeCode deliveryTypeCode
     AllocationStrategy allocationStrategy
     Boolean autoIssuanceEnabled
-    Boolean allowNegativeInventory
+    Boolean negativeInventoryAllowed
     Order order
     Shipment shipment
     List documents
@@ -154,7 +154,7 @@ class StockMovement implements Validateable, Historizable {
         deliveryTypeCode(nullable: true)
         allocationStrategy(nullable: true)
         autoIssuanceEnabled(nullable: true)
-        allowNegativeInventory(nullable: true)
+        negativeInventoryAllowed(nullable: true)
 
         packingLocation(nullable: true)
         receivingLocation(nullable: true)
@@ -269,7 +269,7 @@ class StockMovement implements Validateable, Historizable {
             partialIssuanceAllowed  : requisition?.partialIssuanceAllowed,
             allocationStrategy      : requisition?.allocationStrategy?.name(),
             autoIssuanceEnabled     : requisition?.autoIssuanceEnabled,
-            allowNegativeInventory  : requisition?.allowNegativeInventory,
+            negativeInventoryAllowed  : requisition?.negativeInventoryAllowed,
             priority                : requisition?.priority,
             priorityLevel           : PriorityLevel.fromPriority(requisition?.priority)?.name(),
         ]
@@ -496,7 +496,7 @@ class StockMovement implements Validateable, Historizable {
             requestType: requisition?.type,
             allocationStrategy: requisition?.allocationStrategy,
             autoIssuanceEnabled: requisition?.autoIssuanceEnabled,
-            allowNegativeInventory: requisition?.allowNegativeInventory,
+            negativeInventoryAllowed: requisition?.negativeInventoryAllowed,
             lineItemCount: requisition.requisitionItemCount,
             approvers: requisition.approvers?.toList()
         )
