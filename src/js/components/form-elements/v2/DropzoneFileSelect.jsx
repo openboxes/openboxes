@@ -28,12 +28,17 @@ const DropzoneFileSelect = ({
   isFormDisabled,
   showButtonOnly,
   throwErrorOnInvalidFiles,
+  // Pull onChange out of the rest props so it isn't spread onto the wrapper div.
+  // The react-dropzone input fallback (used in Firefox/Safari and over plain HTTP)
+  // fires a native change event that would otherwise bubble to the div and call
+  // onChange with a SyntheticEvent instead of the selected files.
+  onChange,
   ...fieldProps
 }) => {
   const maxFileSize = useSelector(getMaxUploadFileSize);
 
   const onDrop = useCallback((acceptedFiles) => {
-    fieldProps.onChange?.(multiple ? acceptedFiles : acceptedFiles[0]);
+    onChange?.(multiple ? acceptedFiles : acceptedFiles[0]);
   }, []);
 
   const translate = useTranslate();
@@ -212,6 +217,8 @@ DropzoneFileSelect.propTypes = {
   showButtonOnly: PropTypes.bool,
   // If true, will display errors for invalid files (useful when displaying only the button)
   throwErrorOnInvalidFiles: PropTypes.bool,
+  // Called with the selected file(s) when files are dropped or picked
+  onChange: PropTypes.func,
 };
 
 DropzoneFileSelect.defaultProps = {
@@ -234,4 +241,5 @@ DropzoneFileSelect.defaultProps = {
   isFormDisabled: false,
   showButtonOnly: false,
   throwErrorOnInvalidFiles: false,
+  onChange: undefined,
 };
