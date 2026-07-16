@@ -71,6 +71,7 @@ import {
   UPDATE_COUNTED_BY,
   UPDATE_DATE_COUNTED,
   UPDATE_FIELD_VALUE,
+  UPDATE_RECEIVING_BIN_LOCATIONS,
   UPDATE_RECEIVING_HEADER,
   UPDATE_WORKFLOW_HEADER,
 } from 'actions/types';
@@ -848,6 +849,13 @@ export const updateReceivingHeader = ({
     headerInfo,
     isShipmentFromPurchaseOrder,
     shipmentNumber,
+  },
+});
+
+export const updateReceivingBinLocations = (binLocations) => ({
+  type: UPDATE_RECEIVING_BIN_LOCATIONS,
+  payload: {
+    binLocations,
   },
 });
 

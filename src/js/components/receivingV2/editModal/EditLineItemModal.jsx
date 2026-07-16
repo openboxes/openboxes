@@ -14,7 +14,7 @@ import useShipmentItemDetails from 'hooks/receiving/v2/useShipmentItemDetails';
 import ItemDetails from 'utils/ItemDetails';
 
 const EditLineItemModal = ({
-  onClose, lineItem, initialLineItems, receiptId, loadReceipt, binLocations, receivingBin,
+  onClose, lineItem, initialLineItems, receiptId, loadReceipt,
 }) => {
   const {
     fields,
@@ -25,9 +25,7 @@ const EditLineItemModal = ({
     receivingNow,
     summaryData,
     getLineItems,
-  } = useReceivingLineItems({
-    lineItem, initialLineItems, binLocations, receivingBin,
-  });
+  } = useReceivingLineItems({ lineItem, initialLineItems });
 
   const { onSave } = useEditLineItemSave({
     receiptId,
@@ -109,14 +107,11 @@ EditLineItemModal.propTypes = {
   }),
   initialLineItems: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   loadReceipt: PropTypes.func.isRequired,
-  binLocations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  receivingBin: PropTypes.shape({}),
 };
 
 EditLineItemModal.defaultProps = {
   lineItem: undefined,
   receiptId: null,
-  receivingBin: null,
 };
 
 export default EditLineItemModal;

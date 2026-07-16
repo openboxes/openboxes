@@ -19,8 +19,6 @@ const ReceivingTable = ({
   commentModal,
   removeSplitItem,
   loadReceipt,
-  binLocations,
-  receivingBin,
   onLocationAutofill,
 }) => {
   const {
@@ -141,8 +139,6 @@ const ReceivingTable = ({
           initialLineItems={getInitialEditModalLineItems(editedItemId)}
           receiptId={receiptId}
           loadReceipt={loadReceipt}
-          binLocations={binLocations}
-          receivingBin={receivingBin}
         />
       )}
     </div>
@@ -170,14 +166,11 @@ ReceivingTable.propTypes = {
     openModal: PropTypes.func.isRequired,
     closeModal: PropTypes.func.isRequired,
   }).isRequired,
-  binLocations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  receivingBin: PropTypes.shape({}),
   onLocationAutofill: PropTypes.func.isRequired,
 };
 
 ReceivingTable.defaultProps = {
   receiptId: null,
-  receivingBin: null,
 };
 
 export default ReceivingTable;

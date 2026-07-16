@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import { useSelector } from 'react-redux';
-import { getCurrentLocale, getIsShipmentFromPurchaseOrder } from 'selectors';
+import { getCurrentLocale, getIsShipmentFromPurchaseOrder, getReceivingBinLocations } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
@@ -28,13 +28,13 @@ import getReceivingRowActions, { getReceivingSplitItemActions } from 'utils/rece
 const useReceivingColumns = ({
   view,
   putawayEnabled,
-  binLocations,
 } = {}) => {
   const translate = useTranslate();
   const formatNumber = useFormatNumber();
   const columnHelper = createColumnHelper();
   const currentLocale = useSelector(getCurrentLocale);
   const isShipmentFromPurchaseOrder = useSelector(getIsShipmentFromPurchaseOrder);
+  const binLocations = useSelector(getReceivingBinLocations);
   const isPackingListView = view === ReceivingView.PACKING_LIST;
 
   // Rows are { id, meta } objects; the entities live in the normalized state

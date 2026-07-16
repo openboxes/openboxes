@@ -15,8 +15,6 @@ import { formatDateToString } from 'utils/dateUtils';
 const useReceivingLineItems = ({
   lineItem,
   initialLineItems,
-  binLocations,
-  receivingBin,
 }) => {
   const translate = useTranslate();
 
@@ -33,7 +31,7 @@ const useReceivingLineItems = ({
     }) ?? '',
     recipient: item?.recipient ?? null,
     quantityReceiving: item?.quantityReceiving ?? '',
-    location: item?.binLocation ?? null,
+    binLocation: item?.binLocation ?? null,
     // Rows added in the modal (not the original shipment item line) are marked as split lines.
     isSplitItem: false,
   });
@@ -59,14 +57,11 @@ const useReceivingLineItems = ({
   const { onLocationAutofill } = useEditModalLocationAutofill({
     getValues,
     setValue,
-    binLocationOptions: binLocations,
-    receivingBin,
   });
 
   const { columns } = useReceivingLineItemColumns({
     control,
     removeRow,
-    binLocationOptions: binLocations,
     onLocationAutofill,
   });
 
@@ -84,7 +79,7 @@ const useReceivingLineItems = ({
     expirationDate: receivedItem.expirationDate ?? '',
     recipient: receivedItem.recipient ?? null,
     quantityReceiving: receivedItem.quantityReceived ?? '',
-    location: receivedItem.location ?? null,
+    binLocation: receivedItem.binLocation ?? null,
     isSplitItem: true,
   }), [append]);
 

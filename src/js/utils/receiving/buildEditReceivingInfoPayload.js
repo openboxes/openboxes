@@ -53,7 +53,7 @@ const buildEditReceivingInfoPayload = (lineItems) => ({
       quantityReceiving: item.quantityReceiving === '' || item.quantityReceiving == null
         ? null
         : Number(item.quantityReceiving),
-      binLocation: item.location?.id ? { id: item.location.id } : null,
+      binLocation: item.binLocation?.id ? { id: item.binLocation.id } : null,
       isSplitItem: Boolean(item.isSplitItem),
     })),
 });

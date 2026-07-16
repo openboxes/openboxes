@@ -13,8 +13,6 @@ const ReceivingStep = () => {
     putawayEnabled,
     setPutawayEnabled,
     table: { lineItemsState, columns },
-    binLocations,
-    receivingBin,
     actions: {
       loading,
       receiptId,
@@ -47,8 +45,6 @@ const ReceivingStep = () => {
         removeSplitItem={removeSplitItem}
         loadReceipt={loadReceipt}
         commentModal={commentModal}
-        binLocations={binLocations}
-        receivingBin={receivingBin}
         onLocationAutofill={onLocationAutofill}
       />
     </div>

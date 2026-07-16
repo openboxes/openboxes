@@ -12,12 +12,14 @@ class LocationSimpleDto implements ResponseBodyFormattable {
     String id
     String name
     String locationNumber
+    Boolean active
 
     static LocationSimpleDto from(Location location) {
         return !location ? null : new LocationSimpleDto(
                 id: location.id,
                 name: location.name,
                 locationNumber: location.locationNumber,
+                active: location.active,
         )
     }
 
@@ -27,6 +29,7 @@ class LocationSimpleDto implements ResponseBodyFormattable {
                 id: id,
                 name: name,
                 locationNumber: locationNumber,
+                active: active,
         ]
     }
 }

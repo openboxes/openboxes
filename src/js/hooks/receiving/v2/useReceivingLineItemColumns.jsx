@@ -5,7 +5,9 @@ import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
-import { getCurrentLocationId, getDebounceTime, getMinSearchLength } from 'selectors';
+import {
+  getCurrentLocationId, getDebounceTime, getMinSearchLength, getReceivingBinLocations,
+} from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
@@ -24,7 +26,6 @@ import { debouncePeopleFetch } from 'utils/option-utils';
 const useReceivingLineItemColumns = ({
   control,
   removeRow,
-  binLocationOptions,
   onLocationAutofill,
 }) => {
   const translate = useTranslate();
@@ -32,6 +33,7 @@ const useReceivingLineItemColumns = ({
   const locationId = useSelector(getCurrentLocationId);
   const debounceTime = useSelector(getDebounceTime);
   const minSearchLength = useSelector(getMinSearchLength);
+  const binLocationOptions = useSelector(getReceivingBinLocations);
 
   const debouncedPeopleFetch = useCallback(
     debouncePeopleFetch(debounceTime, minSearchLength),
@@ -177,7 +179,7 @@ const useReceivingLineItemColumns = ({
         <TableCell className="rt-td">
           <Controller
             key={row.original.rowId}
-            name={`lineItems.${row.index}.location`}
+            name={`lineItems.${row.index}.binLocation`}
             control={control}
             render={({ field }) => (
               <SelectField
@@ -232,7 +234,6 @@ const useReceivingLineItemColumns = ({
 useReceivingLineItemColumns.propTypes = {
   control: PropTypes.shape({}).isRequired,
   removeRow: PropTypes.func.isRequired,
-  binLocationOptions: PropTypes.arrayOf(PropTypes.shape({})),
   onLocationAutofill: PropTypes.func.isRequired,
 };
 

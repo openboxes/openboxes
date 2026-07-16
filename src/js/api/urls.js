@@ -190,7 +190,7 @@ export const HANDLING_REQUIREMENTS_OPTIONS = `${API}/handlingRequirementsOptions
 
 // INTERNAL LOCATIONS
 export const INTERNAL_LOCATIONS = `${API}/internalLocations`;
-export const INTERNAL_LOCATIONS_RECEIVING = `${INTERNAL_LOCATIONS}/receiving`;
+export const RECEIVING_INTERNAL_LOCATIONS = `${INTERNAL_LOCATIONS}/receiving`;
 
 // CYCLE COUNT
 export const CYCLE_COUNT = (locationId) => `${API}/facilities/${locationId}/cycle-counts`;

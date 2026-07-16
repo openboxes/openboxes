@@ -19,6 +19,6 @@ const receivingLocationOptions = (translate) => [
     id: LocationAutofillOption.RECEIVING_BIN,
     name: translate('react.receiving.autofillLocation.receivingBin.label', 'Receiving bin'),
   },
-].map((option) => mapToFormSelectOption(option));
+].map(mapToFormSelectOption);
 
 export default receivingLocationOptions;

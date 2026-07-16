@@ -1,10 +1,10 @@
 import queryString from 'query-string';
 
 import {
-  INTERNAL_LOCATIONS_RECEIVING,
   LOCATION,
   LOCATION_API,
   LOCATION_TYPES,
+  RECEIVING_INTERNAL_LOCATIONS,
 } from 'api/urls';
 import locationType from 'consts/locationType';
 import apiClient from 'utils/apiClient';
@@ -16,7 +16,7 @@ export default {
   updateLocationAddress: (locationId, address) =>
     apiClient.post(LOCATION(locationId), { address }),
   getReceivingInternalLocations: (facilityId, shipmentNumber) =>
-    apiClient.get(INTERNAL_LOCATIONS_RECEIVING, {
+    apiClient.get(RECEIVING_INTERNAL_LOCATIONS, {
       params: {
         'location.id': facilityId,
         shipmentNumber,

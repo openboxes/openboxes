@@ -1,91 +1,35 @@
 import { useCallback } from 'react';
 
-import _ from 'lodash';
-import { useSelector } from 'react-redux';
-import { getCurrentLocationId } from 'selectors';
+import useBinLocationAutofill from 'hooks/useBinLocationAutofill';
 
-import inventoryLevelApi from 'api/services/InventoryLevelApi';
-import { LocationAutofillOption } from 'consts/receivingLocationOptions';
-import confirmLocationAutofillOverwrite from 'utils/receiving/confirmLocationAutofillOverwrite';
-
+/**
+ * Location autofill of the "Receiving now" table in the edit modal, triggered from the
+ * Location column header dropdown. Adapts the shared autofill to the react-hook-form state:
+ * rows are read with getValues and the { rowId: { binLocation } } updates are written back
+ * with per-path setValue calls.
+ */
 const useEditModalLocationAutofill = ({
   getValues,
   setValue,
-  binLocationOptions,
-  receivingBin,
 }) => {
-  const facilityId = useSelector(getCurrentLocationId);
+  const getRowBinLocation = (item) => item.binLocation;
 
-  const setRowLocation = (index, location) => setValue(`lineItems.${index}.location`, location);
+  const getRows = useCallback(() => getValues('lineItems'), [getValues]);
 
-  const applyPreferredBins = async (rows) => {
-    const productIds = _.uniq(rows
-      .filter((row) => row.product?.id)
-      .map((row) => row.product.id));
-    if (!productIds.length) {
-      return;
-    }
-    const { data: { data } } = await inventoryLevelApi
-      .getPreferredBinLocations(facilityId, productIds);
-    const binsById = _.keyBy(binLocationOptions, 'id');
-    rows.forEach((row, index) => {
-      // A row keeps its value when its product has no preferred bin or the preferred bin
-      // is not among the facility's (active) bin options.
-      const preferredBinId = data?.[row.product?.id]?.id;
-      const preferredBin = binsById[preferredBinId];
-      if (preferredBin) {
-        setRowLocation(index, preferredBin);
+  const updateLineItems = useCallback((newDataByRowId) => {
+    getValues('lineItems').forEach((item, index) => {
+      const newData = newDataByRowId[item.rowId];
+      if (newData) {
+        setValue(`lineItems.${index}.binLocation`, newData.binLocation);
       }
     });
-  };
+  }, [getValues, setValue]);
 
-  const applyFillDownFromTopRow = (rows) => {
-    rows.forEach((row, index) => {
-      // The top row is the source of the fill down, so it keeps its own location.
-      if (index > 0) {
-        setRowLocation(index, rows[0].location ?? null);
-      }
-    });
-  };
-
-  const applyReceivingBin = (rows) => {
-    if (!receivingBin) {
-      return;
-    }
-    rows.forEach((row, index) => setRowLocation(index, receivingBin));
-  };
-
-  const applyAutofill = (optionId, rows) => {
-    switch (optionId) {
-      case LocationAutofillOption.PREFERRED_BIN:
-        applyPreferredBins(rows);
-        break;
-      case LocationAutofillOption.FILL_DOWN_FROM_TOP_ROW:
-        applyFillDownFromTopRow(rows);
-        break;
-      case LocationAutofillOption.RECEIVING_BIN:
-        applyReceivingBin(rows);
-        break;
-      default:
-        break;
-    }
-  };
-
-  const onLocationAutofill = useCallback((optionId) => {
-    const rows = getValues('lineItems');
-    if (!rows.length) {
-      return;
-    }
-    // Any row that already has a location would be overwritten by the autofill, so warn first.
-    const hasEditedLocations = rows.some((row) => row.location);
-    if (hasEditedLocations) {
-      confirmLocationAutofillOverwrite(() => applyAutofill(optionId, rows));
-      return;
-    }
-    applyAutofill(optionId, rows);
-  }, [getValues, setValue, facilityId, binLocationOptions, receivingBin]);
-
-  return { onLocationAutofill };
+  return useBinLocationAutofill({
+    getRows,
+    getRowBinLocation,
+    updateLineItems,
+  });
 };
 
 export default useEditModalLocationAutofill;
