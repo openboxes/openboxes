@@ -11,6 +11,7 @@ package org.pih.warehouse.jobs
 
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
+import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
@@ -56,11 +57,22 @@ class PutawayLocationReslottingJob {
             List<PutawayItem> putawayItems = putaway.putawayItems.findAll {
                 it.putawayLocation?.supports(ActivityCode.UNDEFINED_LOCATION)
             }
-            putawayItems?.each {
-                it.putawayLocation = inventoryLevel.preferredBinLocation ?: inventoryLevel.internalLocation
-                log.debug "Modified putawayLocation for ${it}"
+
+            Location newPutawayLocation = inventoryLevel.preferredBinLocation ?: inventoryLevel.internalLocation
+            putawayItems?.each {PutawayItem putawayItem ->
+                setPutawayLocation(putawayItem, newPutawayLocation)
+                putawayItem.splitItems?.each {PutawayItem splitItem ->
+                    setPutawayLocation(splitItem, newPutawayLocation)
+                }
             }
             putawayService.savePutaway(putaway)
+        }
+    }
+
+    private void setPutawayLocation(PutawayItem putawayItem, Location putawayLocation) {
+        if (putawayItem?.putawayStatus == PutawayStatus.PENDING) {
+            putawayItem.putawayLocation = putawayLocation
+            log.debug "Modified putawayLocation as ${putawayLocation} for ${putawayItem.id}"
         }
     }
 }
