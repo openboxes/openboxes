@@ -1,7 +1,7 @@
 package org.pih.warehouse.jobs
 
-import grails.util.Holders
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.OrderTypeCode
 import org.pih.warehouse.inventory.StockMovementService
@@ -36,11 +36,12 @@ class AutomaticIssuanceJob {
             return
         }
 
-        if (Holders.config.openboxes.jobs.automaticIssuanceJob.bulkAutomaticIssuance) {
-            List<String> requisitionIds = requisitionService.findStagedRequisitionIds()
-            log.info "Found ${requisitionIds.size()} outbound STAGED requisitions to automatic issue"
+        List<Requisition> stagedRequisitions = requisitionService.findStagedRequisitions()
+        List<String> allowedBulkRequisitionIds = stagedRequisitions.findAll {it.origin.supports(ActivityCode.AUTOMATIC_ISSUANCE_BULK)}*.id
+        if (allowedBulkRequisitionIds) {
+            log.info "Found ${allowedBulkRequisitionIds.size()} outbound STAGED requisitions to automatic issue"
 
-            requisitionIds.each { String id ->
+            allowedBulkRequisitionIds.each { String id ->
                 try {
                     issueRequisition(id)
                 } catch (Exception e) {
