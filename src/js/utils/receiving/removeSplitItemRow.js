@@ -21,9 +21,22 @@ const removeSplitItemRow = (state, rowId) => {
     .find((id) => state.entities[id]?.splitItemIds?.includes(rowId));
   const toggle = state.entities[toggleRowId];
   const splitItemIds = toggle.splitItemIds.filter((id) => id !== rowId);
+  // Removing the only split item dissolves the whole group - the replaced row turns
+  // back into the plain original shipment line.
+  if (splitItemIds.length === 0) {
+    return updateNormalizedItem(
+      removeNormalizedItems(state, [rowId, toggleRowId]),
+      toggle.replacedRowId,
+      { rowType: null },
+    );
+  }
+  const remainingSplitItem = state.entities[splitItemIds[0]];
+  const originalProduct = state.entities[toggle.replacedRowId]?.product;
   // A single change left is no longer a group - drop the group rows and turn the
-  // remaining split item back into a plain row.
-  if (splitItemIds.length === 1) {
+  // remaining split item back into a plain row. A split item with a changed product
+  // stays a group though, otherwise it would replace the original product instead
+  // of showing it struck through.
+  if (splitItemIds.length === 1 && remainingSplitItem?.product?.id === originalProduct?.id) {
     return updateNormalizedItem(
       removeNormalizedItems(state, [rowId, toggleRowId, toggle.replacedRowId]),
       splitItemIds[0],

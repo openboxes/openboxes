@@ -17,13 +17,15 @@ import ActionsCell from 'utils/cells/ActionsCell';
 import ExpirationDateCell from 'utils/cells/ExpirationDateCell';
 import MultilineCell from 'utils/cells/MultilineCell';
 import PackLevelCell from 'utils/cells/PackLevelCell';
-import QuantityInputCell from 'utils/cells/QuantityInputCell';
 import PackLevelGroupCell from 'utils/cells/receiving/PackLevelGroupCell';
 import ProductCodeCell from 'utils/cells/receiving/ProductCodeCell';
+import ReceivingQuantityInputCell from 'utils/cells/receiving/ReceivingQuantityInputCell';
 import ShippedInPoCell from 'utils/cells/receiving/ShippedInPoCell';
 import SelectCell from 'utils/cells/SelectCell';
 import ValueCell from 'utils/cells/ValueCell';
 import getReceivingRowActions, { getReceivingSplitItemActions } from 'utils/receiving/getReceivingRowActions';
+import hasRowSavedQuantity from 'utils/receiving/hasRowSavedQuantity';
+import VerticalStripeIndicator from 'utils/VerticalStripeIndicator';
 
 const useReceivingColumns = ({
   view,
@@ -135,13 +137,21 @@ const useReceivingColumns = ({
     const packLevelGroupColumn = columnHelper.display({
       id: receivingColumns.PACK_LEVEL_GROUP,
       header: packLevelHeader,
-      cell: ({ row, table }) => (
-        <PackLevelGroupCell
-          item={getItem(row, table)}
-          isExpanded={row.getIsExpanded()}
-          onToggle={row.getToggleExpandedHandler()}
-        />
-      ),
+      cell: ({ row, table }) => {
+        const item = getItem(row, table);
+        return (
+          <>
+            {/* The stripe marks rows whose quantity is saved. It lives in the first (pinned)
+                column so its absolutely positioned span anchors to the row's left edge. */}
+            <VerticalStripeIndicator display={hasRowSavedQuantity(item)} />
+            <PackLevelGroupCell
+              item={item}
+              isExpanded={row.getIsExpanded()}
+              onToggle={row.getToggleExpandedHandler()}
+            />
+          </>
+        );
+      },
       meta: {
         pinned: 'left',
         // Light indent on item rows in packing list view.
@@ -175,14 +185,23 @@ const useReceivingColumns = ({
             {translate('react.receiving.code.label', 'Code')}
           </TableHeaderCell>
         ),
-        cell: ({ row, table }) => (
-          <ProductCodeCell
-            item={getItem(row, table)}
-            isPackingListView={isPackingListView}
-            isExpanded={row.getIsExpanded()}
-            onToggle={row.getToggleExpandedHandler()}
-          />
-        ),
+        cell: ({ row, table }) => {
+          const item = getItem(row, table);
+          return (
+            <>
+              {/* In packing list view the saved stripe is rendered by the pack level group
+                  column, which is the leftmost one there. */}
+              {!isPackingListView
+                && <VerticalStripeIndicator display={hasRowSavedQuantity(item)} />}
+              <ProductCodeCell
+                item={item}
+                isPackingListView={isPackingListView}
+                isExpanded={row.getIsExpanded()}
+                onToggle={row.getToggleExpandedHandler()}
+              />
+            </>
+          );
+        },
         meta: {
           pinned: 'left',
         },
@@ -381,7 +400,7 @@ const useReceivingColumns = ({
             return null;
           }
           return (
-            <QuantityInputCell
+            <ReceivingQuantityInputCell
               value={item?.quantityReceiving}
               onCommit={(quantityReceiving) =>
                 table.options.meta?.updateLineItem(row.original.id, { quantityReceiving })}
@@ -496,7 +515,9 @@ const useReceivingColumns = ({
           return (
             <ActionsCell
               actions={actions}
-              disabled={item?.isCompleted}
+              // isDeleting disables the delete button of a split item while its request
+              // is in flight, so fast repeated clicks cannot fire multiple deletes.
+              disabled={item?.isCompleted || item?.isDeleting}
               label="react.receiving.actions.label"
               defaultLabel="Actions"
             />

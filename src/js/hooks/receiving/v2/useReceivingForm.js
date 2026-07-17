@@ -20,6 +20,7 @@ const useReceivingForm = () => {
     removeSplitItem,
     loadReceipt,
     onSaveAndExit,
+    autosaveStatus,
   } = useReceivingActions(view);
   useReceivingBinLocations();
   const { onLocationAutofill } = useTableLocationAutofill({
@@ -46,6 +47,7 @@ const useReceivingForm = () => {
       loadReceipt,
       onSaveAndExit,
       onLocationAutofill,
+      autosaveStatus,
     },
     commentModal,
   };

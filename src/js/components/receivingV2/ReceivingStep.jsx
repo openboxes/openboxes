@@ -22,6 +22,7 @@ const ReceivingStep = () => {
       removeSplitItem,
       loadReceipt,
       onLocationAutofill,
+      autosaveStatus,
     },
     commentModal,
   } = useReceivingForm();
@@ -35,6 +36,7 @@ const ReceivingStep = () => {
         onPutawayChange={setPutawayEnabled}
         onAutofillQuantities={autofillQuantities}
         onSaveAndExit={onSaveAndExit}
+        autosaveStatus={autosaveStatus}
       />
       <ReceivingTable
         lineItemsState={lineItemsState}
