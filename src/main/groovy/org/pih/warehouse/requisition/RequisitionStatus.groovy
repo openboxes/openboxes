@@ -73,12 +73,12 @@ enum RequisitionStatus {
 
     // Default options for outbound list, without supporting request approval
     static listOutboundOptions() {
-        [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, ISSUED, CANCELED]
+        [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, STAGED, ISSUED, CANCELED]
     }
 
     // Options for outbounds when current location is supporting request approval (Added approved)
     static listOutboundOptionsWhenApprovalRequired() {
-        [CREATED, VERIFYING, APPROVED, EDITING, PICKING, PICKED, CHECKING, ISSUED, CANCELED]
+        [CREATED, VERIFYING, APPROVED, EDITING, PICKING, PICKED, CHECKING, STAGED, ISSUED, CANCELED]
     }
 
     // Subset of listOutboundOptions() without ISSUED and CANCELED, as those are not in progress statuses
