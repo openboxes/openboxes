@@ -14,11 +14,11 @@ class AllocationController {
             def jsonBody = request.JSON ?: [:]
             AllocationMode mode = jsonBody.mode as AllocationMode
             Requisition requisition = Requisition.get(params.id)
-            List<AllocationStrategy> strategies = []
+            List<AllocationSourceStrategy> strategies = []
             if (jsonBody.strategies) {
                 strategies = jsonBody.strategies.collect { String strategy ->
                     try {
-                        return AllocationStrategy.valueOf(strategy)
+                        return AllocationSourceStrategy.valueOf(strategy)
                     } catch (IllegalArgumentException e) {
                         return null
                     }

@@ -14,11 +14,11 @@ import org.pih.warehouse.api.AvailableItem
 /**
  * Display first: display bins, then preferred warehouse bins, then remaining warehouse bins.
  */
-class DisplayFirstHandler extends AbstractAllocationStrategyHandler {
+class DisplayFirstHandler extends AbstractAllocationSourceStrategyHandler {
 
     @Override
-    AllocationStrategy getStrategy() {
-        return AllocationStrategy.DISPLAY_FIRST
+    AllocationSourceStrategy getStrategy() {
+        return AllocationSourceStrategy.DISPLAY_FIRST
     }
 
     @Override

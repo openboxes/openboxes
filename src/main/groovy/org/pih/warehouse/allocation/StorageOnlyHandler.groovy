@@ -10,15 +10,19 @@
 package org.pih.warehouse.allocation
 
 import org.pih.warehouse.api.AvailableItem
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.product.Product
 
 /**
- * Allocation strategy handler interface
+ * Warehouse only: preferred warehouse bins, then remaining warehouse bins. Display bins are excluded.
  */
-interface AllocationStrategyHandler {
+class StorageOnlyHandler extends AbstractAllocationSourceStrategyHandler {
 
-    AllocationStrategy getStrategy()
+    @Override
+    AllocationSourceStrategy getStrategy() {
+        return AllocationSourceStrategy.STORAGE_ONLY
+    }
 
-    List<AvailableItem> order(Location facility, Product product, List<AvailableItem> availableItems)
+    @Override
+    protected List<AvailableItem> orderGroups(AvailableItemGroups groups) {
+        return groups.preferredWarehouseItems + groups.remainingWarehouseItems
+    }
 }

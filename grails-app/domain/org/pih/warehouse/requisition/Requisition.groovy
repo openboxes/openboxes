@@ -10,7 +10,7 @@
 package org.pih.warehouse.requisition
 
 import grails.util.Holders
-import org.pih.warehouse.allocation.AllocationStrategy
+import org.pih.warehouse.allocation.AllocationSourceStrategy
 import org.pih.warehouse.allocation.AutomaticAllocationEvent
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.WebhookEventType
@@ -157,7 +157,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     Boolean autoIssuanceEnabled
     Boolean negativeInventoryAllowed
 
-    AllocationStrategy allocationStrategy
+    AllocationSourceStrategy allocationSourceStrategy
 
     // Removed comments, documents, events for the time being.
     static transients = [
@@ -190,7 +190,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         approvers joinTable: [name: "requisition_approvers", key: "requisition_id"]
         deliveryTypeCode enumType: "string"
         orderTypeCode enumType: "string"
-        allocationStrategy enumType: "string"
+        allocationSourceStrategy enumType: "string"
     }
 
     static constraints = {
@@ -252,7 +252,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         autoAllocationEnabled(nullable: true)
         partialAllocationAllowed(nullable: true)
         partialIssuanceAllowed(nullable: true)
-        allocationStrategy(nullable: true)
+        allocationSourceStrategy(nullable: true)
         autoIssuanceEnabled(nullable: true)
         negativeInventoryAllowed(nullable: true)
     }
@@ -520,7 +520,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
                 autoAllocationEnabled   : autoAllocationEnabled,
                 partialAllocationAllowed: partialAllocationAllowed,
                 partialIssuanceAllowed  : partialIssuanceAllowed,
-                allocationStrategy      : allocationStrategy?.name(),
+                allocationSourceStrategy      : allocationSourceStrategy?.name(),
                 autoIssuanceEnabled     : autoIssuanceEnabled,
                 negativeInventoryAllowed  : negativeInventoryAllowed,
         ]
@@ -545,7 +545,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
             autoAllocationEnabled: autoAllocationEnabled,
             partialAllocationAllowed: partialAllocationAllowed,
             partialIssuanceAllowed: partialIssuanceAllowed,
-            allocationStrategy: allocationStrategy?.name(),
+            allocationSourceStrategy: allocationSourceStrategy?.name(),
             autoIssuanceEnabled: autoIssuanceEnabled,
             negativeInventoryAllowed: negativeInventoryAllowed,
         ]

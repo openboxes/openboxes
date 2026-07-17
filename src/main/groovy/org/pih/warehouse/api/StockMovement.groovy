@@ -15,7 +15,7 @@ import grails.util.Holders
 import grails.validation.Validateable
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.allocation.AllocationStrategy
+import org.pih.warehouse.allocation.AllocationSourceStrategy
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
@@ -98,7 +98,7 @@ class StockMovement implements Validateable, Historizable {
     RequisitionType requestType
     RequisitionSourceType sourceType // temporary sourceType field for ELECTRONIC and PAPER types
     DeliveryTypeCode deliveryTypeCode
-    AllocationStrategy allocationStrategy
+    AllocationSourceStrategy allocationSourceStrategy
     Boolean autoIssuanceEnabled
     Boolean negativeInventoryAllowed
     Order order
@@ -152,7 +152,7 @@ class StockMovement implements Validateable, Historizable {
         sourceType(nullable: true)
         referenceDocument(nullable: true)
         deliveryTypeCode(nullable: true)
-        allocationStrategy(nullable: true)
+        allocationSourceStrategy(nullable: true)
         autoIssuanceEnabled(nullable: true)
         negativeInventoryAllowed(nullable: true)
 
@@ -267,7 +267,7 @@ class StockMovement implements Validateable, Historizable {
             autoAllocationEnabled   : requisition?.autoAllocationEnabled,
             partialAllocationAllowed: requisition?.partialAllocationAllowed,
             partialIssuanceAllowed  : requisition?.partialIssuanceAllowed,
-            allocationStrategy      : requisition?.allocationStrategy?.name(),
+            allocationSourceStrategy      : requisition?.allocationSourceStrategy?.name(),
             autoIssuanceEnabled     : requisition?.autoIssuanceEnabled,
             negativeInventoryAllowed  : requisition?.negativeInventoryAllowed,
             priority                : requisition?.priority,
@@ -494,7 +494,7 @@ class StockMovement implements Validateable, Historizable {
             isShipped: shipment?.status?.code >= ShipmentStatusCode.SHIPPED,
             isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED,
             requestType: requisition?.type,
-            allocationStrategy: requisition?.allocationStrategy,
+            allocationSourceStrategy: requisition?.allocationSourceStrategy,
             autoIssuanceEnabled: requisition?.autoIssuanceEnabled,
             negativeInventoryAllowed: requisition?.negativeInventoryAllowed,
             lineItemCount: requisition.requisitionItemCount,

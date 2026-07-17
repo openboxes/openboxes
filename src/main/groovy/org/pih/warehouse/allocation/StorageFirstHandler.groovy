@@ -10,19 +10,19 @@
 package org.pih.warehouse.allocation
 
 import org.pih.warehouse.api.AvailableItem
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.product.Product
 
 /**
- * Splits the available items into groups once and lets each concrete handler declare
- * only the order in which those groups are concatenated.
+ * Warehouse first: preferred warehouse bins, then remaining warehouse bins, then display bins.
  */
-abstract class AbstractAllocationStrategyHandler implements AllocationStrategyHandler {
+class StorageFirstHandler extends AbstractAllocationSourceStrategyHandler {
 
     @Override
-    List<AvailableItem> order(Location facility, Product product, List<AvailableItem> availableItems) {
-        return orderGroups(new AvailableItemGroups(facility, product, availableItems))
+    AllocationSourceStrategy getStrategy() {
+        return AllocationSourceStrategy.STORAGE_FIRST
     }
 
-    protected abstract List<AvailableItem> orderGroups(AvailableItemGroups groups)
+    @Override
+    protected List<AvailableItem> orderGroups(AvailableItemGroups groups) {
+        return groups.preferredWarehouseItems + groups.remainingWarehouseItems + groups.displayItems
+    }
 }

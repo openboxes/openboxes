@@ -33,7 +33,7 @@ class AllocationService {
     GrailsApplication grailsApplication
     AuthService authService
 
-    AllocationStrategyHandlerResolver allocationStrategyHandlerResolver = new AllocationStrategyHandlerResolver()
+    AllocationSourceStrategyHandlerResolver allocationSourceStrategyHandlerResolver = new AllocationSourceStrategyHandlerResolver()
 
     @Transactional(readOnly = true)
     StockMovement getOutboundOrder(String id) {
@@ -64,7 +64,7 @@ class AllocationService {
         return outboundOrder
     }
 
-    AllocationDetailsDto allocate(String requisitionItemId, AllocationMode mode, List<AllocationDto> allocations, List<AllocationStrategy> strategies = []) {
+    AllocationDetailsDto allocate(String requisitionItemId, AllocationMode mode, List<AllocationDto> allocations, List<AllocationSourceStrategy> strategies = []) {
         RequisitionItem requisitionItem = RequisitionItem.get(requisitionItemId)
         if (!requisitionItem) {
             throw new IllegalArgumentException("Requisition item not found")
@@ -192,8 +192,8 @@ class AllocationService {
     AllocationResult allocate(RequisitionItem requisitionItem, Integer quantityRequired, AllocationMode allocationMode, List list) {
         AllocationRequest request
         if (allocationMode == AllocationMode.AUTO) {
-            List<AllocationStrategy> allocationStrategyList = list
-            request = new AllocationRequest(quantityRequired: quantityRequired, requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationStrategyList)
+            List<AllocationSourceStrategy> allocationSourceStrategyList = list
+            request = new AllocationRequest(quantityRequired: quantityRequired, requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationSourceStrategyList)
         } else if (allocationMode == AllocationMode.MANUAL) {
             List<AvailableItem> allocationItemList = list
             request = new AllocationRequest(quantityRequired: quantityRequired, requisitionItem: requisitionItem, allocationMode: allocationMode, availableItems: allocationItemList)
@@ -203,10 +203,10 @@ class AllocationService {
         return allocate(request)
     }
 
-    List<AllocationResult> allocate(Requisition requisition, AllocationMode allocationMode, List<AllocationStrategy> allocationStrategyList) {
+    List<AllocationResult> allocate(Requisition requisition, AllocationMode allocationMode, List<AllocationSourceStrategy> allocationSourceStrategyList) {
         List<AllocationResult> results = []
         requisition?.requisitionItems?.each { requisitionItem ->
-            AllocationRequest allocationRequest = new AllocationRequest(requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationStrategyList)
+            AllocationRequest allocationRequest = new AllocationRequest(requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationSourceStrategyList)
             AllocationResult singleResult = allocate(allocationRequest)
             results.add(singleResult)
         }
@@ -241,7 +241,7 @@ class AllocationService {
         }
     }
 
-    private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationStrategy> strategies, List<AvailableItem> excludeList = []) {
+    private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationSourceStrategy> strategies, List<AvailableItem> excludeList = []) {
         Location facility = requisitionItem.requisition.origin
         Product product = requisitionItem.product
         List<AvailableItem> allAvailableItems = stockMovementService.getAvailableItems(facility, requisitionItem, false)
@@ -251,11 +251,12 @@ class AllocationService {
             quantityRequired = requisitionItem.quantityBackordered
         }
 
-        List<AllocationStrategy> resolvedStrategies = resolveStrategies(requisitionItem.requisition, strategies)
+        List<AllocationSourceStrategy> resolvedStrategies = resolveStrategies(requisitionItem.requisition, strategies)
+        RotationRule rotationRule = getConfiguredRotationRule()
 
         Integer bestQuantityAvailable = 0
-        for (AllocationStrategy strategy : resolvedStrategies) {
-            List<AvailableItem> ordered = orderByStrategy(strategy, facility, product, allAvailableItems)
+        for (AllocationSourceStrategy strategy : resolvedStrategies) {
+            List<AvailableItem> ordered = applyRotation(rotationRule, orderByStrategy(strategy, facility, product, allAvailableItems))
             List<AvailableItem> includedItems = ordered.findAll { !excludeList.contains(it) }
             Integer quantityAvailable = includedItems.sum { it.quantityAvailable } ?: 0
             bestQuantityAvailable = Math.max(bestQuantityAvailable, quantityAvailable)
@@ -274,28 +275,53 @@ class AllocationService {
         throw new IllegalArgumentException("Insufficient stock. Required: ${quantityRequired}, Available: ${bestQuantityAvailable}")
     }
 
-    private List<AllocationStrategy> resolveStrategies(Requisition requisition, List<AllocationStrategy> explicit) {
+    private List<AllocationSourceStrategy> resolveStrategies(Requisition requisition, List<AllocationSourceStrategy> explicit) {
         if (explicit) {
             return explicit
         }
-        if (requisition?.allocationStrategy) {
-            return [requisition.allocationStrategy]
+        if (requisition?.allocationSourceStrategy) {
+            return [requisition.allocationSourceStrategy]
         }
-        return getConfiguredStrategies()
+        // Source is a preference, not a gate: always resolve to at least the configured default so
+        // available stock is still allocated rather than failing with "Available: 0".
+        return [getConfiguredSourceStrategy()]
     }
 
-    private List<AllocationStrategy> getConfiguredStrategies() {
-        return grailsApplication.config.openboxes.order.allocation.strategies ?: []
+    private AllocationSourceStrategy getConfiguredSourceStrategy() {
+        return (grailsApplication.config.openboxes.order.allocation.source ?: AllocationSourceStrategy.STORAGE_FIRST) as AllocationSourceStrategy
     }
 
-    private List<AvailableItem> orderByStrategy(AllocationStrategy strategy, Location facility, Product product, List<AvailableItem> availableItems) {
-        AllocationStrategyHandler handler = allocationStrategyHandlerResolver.handlerFor(strategy)
+    private RotationRule getConfiguredRotationRule() {
+        return (grailsApplication.config.openboxes.order.allocation.rotation ?: RotationRule.FEFO) as RotationRule
+    }
+
+    private List<AvailableItem> orderByStrategy(AllocationSourceStrategy strategy, Location facility, Product product, List<AvailableItem> availableItems) {
+        AllocationSourceStrategyHandler handler = allocationSourceStrategyHandlerResolver.handlerFor(strategy)
         if (handler) {
             return handler.order(facility, product, availableItems)
         }
 
-        log.warn("No allocation strategy handler registered for ${strategy}, using natural order")
+        log.warn("No allocation source strategy handler registered for ${strategy}, using natural order")
         return availableItems
+    }
+
+    /**
+     * Applies the stock rotation rule on top of the source ordering. Source (which bins, what zone
+     * order) is produced first; rotation then sorts within it. The sort is stable, so the source
+     * order survives as the tiebreaker and RotationRule.NONE leaves the source order untouched —
+     * i.e. ORDER BY <rotation>, <source bin priority>.
+     *
+     * Rotation is resolved from config today (openboxes.order.allocation.rotation) and is NOT stored
+     * on the requisition. FIFO/LIFO are declared but not yet implemented; they fall back to source
+     * order. When more rules are added this should move to a RotationStrategy + resolver, parallel to
+     * AllocationSourceStrategyHandler.
+     */
+    private static List<AvailableItem> applyRotation(RotationRule rotationRule, List<AvailableItem> sourceOrdered) {
+        if (!sourceOrdered || rotationRule == RotationRule.FEFO) {
+            return sourceOrdered ? sourceOrdered.sort(false, AvailableItemComparators.BY_EXPIRATION_NULLS_LAST) : []
+        }
+        // NONE (and, for now, unimplemented FIFO/LIFO) preserve the source order.
+        return sourceOrdered
     }
 
     private static boolean canSatisfy(List<AvailableItem> orderedItems, Integer quantityRequired) {

@@ -25,11 +25,11 @@ class OutboundOrderApiController {
         AllocationMode mode = jsonBody.mode as AllocationMode
         List<AllocationDto> allocations = jsonBody.allocations as List<AllocationDto>
         try {
-            List<AllocationStrategy> strategies = []
+            List<AllocationSourceStrategy> strategies = []
             if (jsonBody.strategies) {
                 strategies = jsonBody.strategies.collect { String strategy ->
                     try {
-                        return AllocationStrategy.valueOf(strategy)
+                        return AllocationSourceStrategy.valueOf(strategy)
                     } catch (IllegalArgumentException e) {
                         return null
                     }

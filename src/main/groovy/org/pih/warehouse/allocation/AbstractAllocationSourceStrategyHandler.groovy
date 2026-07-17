@@ -14,24 +14,15 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
 /**
- * First expired, first out: earliest expiration date first, items without an expiration date last.
+ * Splits the available items into groups once and lets each concrete handler declare
+ * only the order in which those groups are concatenated.
  */
-class FefoHandler implements AllocationStrategyHandler {
-
-    @Override
-    AllocationStrategy getStrategy() {
-        return AllocationStrategy.FEFO
-    }
+abstract class AbstractAllocationSourceStrategyHandler implements AllocationSourceStrategyHandler {
 
     @Override
     List<AvailableItem> order(Location facility, Product product, List<AvailableItem> availableItems) {
-        // The items most likely already arrive sorted by expiration date, but we sort it again to make sure
-        // they are sorted by expiration date
-        return availableItems?.sort(false) { a, b ->
-            !a?.inventoryItem?.expirationDate ?
-                    !b?.inventoryItem?.expirationDate ? 0 : 1 :
-                    !b?.inventoryItem?.expirationDate ? -1 :
-                            a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate
-        }
+        return orderGroups(new AvailableItemGroups(facility, product, availableItems))
     }
+
+    protected abstract List<AvailableItem> orderGroups(AvailableItemGroups groups)
 }

@@ -16,7 +16,7 @@ import grails.plugins.csv.CSVWriter
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.allocation.AllocationMode
 import org.pih.warehouse.allocation.AllocationService
-import org.pih.warehouse.allocation.AllocationStrategy
+import org.pih.warehouse.allocation.AllocationSourceStrategy
 import org.pih.warehouse.api.InboundWorkflowState
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementDirection
@@ -725,7 +725,7 @@ class StockMovementController {
         try {
             Requisition requisition = Requisition.get(params.id)
 
-            List<AllocationStrategy> strategyList = [AllocationStrategy.WAREHOUSE_FIRST]
+            List<AllocationSourceStrategy> strategyList = [AllocationSourceStrategy.STORAGE_FIRST]
             allocationService.allocate(requisition, AllocationMode.AUTO, strategyList)
             stockMovementService.updateRequisitionStatus(params.id, RequisitionStatus.PICKING)
 
