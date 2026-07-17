@@ -81,6 +81,11 @@ openboxes.client.notification.autohide.delay = 8000
 
 // Autosave configuration (OBPIH-5493)
 openboxes.client.autosave.enabled = false
+openboxes.client.autosave.batchSize = 4
+openboxes.client.autosave.debounceTime = 2000
+openboxes.client.autosave.maxRetries = 3
+openboxes.client.autosave.retryDelay = 5000
+openboxes.client.autosave.maxRetryDelay = 40000
 
 // Backdata configuration (OBPIH-6332)
 openboxes.dashboard.backdatedShipments.daysOffset = 1
