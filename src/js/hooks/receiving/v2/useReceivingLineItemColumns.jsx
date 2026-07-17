@@ -16,6 +16,7 @@ import LocationAutofillHeader from 'components/receivingV2/LocationAutofillHeade
 import receivingColumns from 'consts/receivingColumns';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
+import QuantityInputCell from 'utils/cells/QuantityInputCell';
 import { debouncePeopleFetch } from 'utils/option-utils';
 
 /**
@@ -146,23 +147,19 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
         </TableHeaderCell>
       ),
       cell: ({ row }) => (
-        <TableCell className="rt-td">
-          <Controller
-            key={row.original.rowId}
-            name={`lineItems.${row.index}.quantityReceiving`}
-            control={control}
-            render={({ field }) => (
-              <TextInput
-                {...field}
-                type="number"
-                className="hide-arrows"
-                autoComplete="off"
-                hideErrorMessageWrapper
-                ariaLabel={{ id: 'react.receiving.receivingNow.label', defaultMessage: 'Receiving Now' }}
-              />
-            )}
-          />
-        </TableCell>
+        <Controller
+          key={row.original.rowId}
+          name={`lineItems.${row.index}.quantityReceiving`}
+          control={control}
+          render={({ field }) => (
+            <QuantityInputCell
+              value={field.value}
+              onCommit={(quantityReceiving) => field.onChange(quantityReceiving ?? '')}
+              label="react.receiving.receivingNow.label"
+              defaultLabel="Receiving Now"
+            />
+          )}
+        />
       ),
       footer: ({ table }) => <span style={{ paddingLeft: '14px' }}>{table.options.meta?.totalReceivingNow ?? 0}</span>,
       size: 120,

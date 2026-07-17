@@ -69,6 +69,27 @@ const useReceivingColumns = ({
       value: translate('react.receiving.status.remaining.label', `${quantityRemainingFormatted} remaining`, [quantityRemainingFormatted]),
     };
   };
+  // Quantity entered in the row since the last save (the stored quantityRemaining
+  // already accounts for the saved baseline).
+  const getQuantityReceivingChange = (item) =>
+    (item?.quantityReceiving ?? 0) - (item?.initialQuantityReceiving ?? 0);
+
+  // Remaining quantity kept live while editing: the saved quantityRemaining minus the
+  // unsaved quantities entered in the row.
+  const getCurrentQuantityRemaining = (item, entities) => {
+    if (!item) {
+      return null;
+    }
+    // A replaced row shows the status of the whole group, so it subtracts the unsaved
+    // quantities of all its split items.
+    if (item.rowType === ReceivingRowType.REPLACED) {
+      const splitItemIds = entities?.[item.toggleRowId]?.splitItemIds ?? [];
+      const unsavedQuantity = splitItemIds
+        .reduce((sum, splitItemId) => sum + getQuantityReceivingChange(entities?.[splitItemId]), 0);
+      return item.quantityRemaining - unsavedQuantity;
+    }
+    return item.quantityRemaining - getQuantityReceivingChange(item);
+  };
 
   // Replaced rows of a changed item show the original shipment values struck through
   // (everything except quantities).
@@ -386,7 +407,8 @@ const useReceivingColumns = ({
           if (isSplitItemOrToggle(item)) {
             return null;
           }
-          const { className, value } = getStatus(item?.quantityRemaining, item?.isCompleted);
+          const quantityRemaining = getCurrentQuantityRemaining(item, table.options.meta?.entities);
+          const { className, value } = getStatus(quantityRemaining, item?.isCompleted);
           return (
             <ValueCell
               value={value}

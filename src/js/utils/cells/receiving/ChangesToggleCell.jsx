@@ -21,7 +21,7 @@ const ChangesToggleCell = React.memo(({ isExpanded, onToggle, changeCount }) => 
     <TableCell className={`rt-td receiving-table__changes-toggle ${isExpanded ? 'receiving-table__changes-toggle--expanded' : ''}`}>
       <button
         type="button"
-        className="receiving-table__expand-button d-inline-flex align-items-center p-0 border-0 bg-transparent"
+        className="receiving-table__expand-button"
         onClick={onToggle}
       >
         {isExpanded
