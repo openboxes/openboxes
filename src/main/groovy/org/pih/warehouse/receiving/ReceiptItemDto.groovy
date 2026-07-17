@@ -22,7 +22,7 @@ class ReceiptItemDto implements ResponseBodyFormattable {
      */
     LocationSimpleDto receivingLocation
 
-    Integer quantityReceived = 0
+    Integer quantityReceived
     Integer quantityCanceled = 0
     String comment
     Boolean isSplitItem
@@ -47,7 +47,7 @@ class ReceiptItemDto implements ResponseBodyFormattable {
         recipient = PersonDto.from(receiptItem.recipient)
         productLot = ProductLotDto.from(receiptItem.inventoryItem)
         receivingLocation = LocationSimpleDto.from(receiptItem.binLocation)
-        quantityReceived = receiptItem.quantityReceived ?: 0
+        quantityReceived = receiptItem.quantityReceived
         quantityCanceled = receiptItem.quantityCanceled ?: 0
         comment = receiptItem.comment
         isSplitItem = receiptItem.isSplitItem
