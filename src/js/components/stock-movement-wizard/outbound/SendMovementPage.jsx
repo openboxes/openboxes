@@ -867,8 +867,9 @@ class SendMovementPage extends Component {
                       onDrop={this.onDrop}
                       multiple
                     >
-                      {({ getRootProps }) => (
+                      {({ getRootProps, getInputProps }) => (
                         <div {...getRootProps()}>
+                          <input {...getInputProps()} />
                           <span>
                             <i className="fa fa-upload pr-2" />
                             <Translate id="react.stockMovement.uploadDocuments.label" defaultMessage="Upload Documents" />
