@@ -516,9 +516,15 @@ class ReceiptService {
         log.info "Detecting candidates for auto receipt - inbound shipments in-transit to facility ${facility}"
         List<Shipment> shippedShipments = shipmentService.getShippedShipmentsByDestination(facility)
         shippedShipments.each { Shipment shipment ->
-            log.info "Creating automated receipt for shipment ${shipment}"
-            receiveInboundShipment(shipment)
-            reallocateBackorderedItems(shipment.id)
+            try {
+                authService.withSystemUser {
+                    log.info "Creating automated receipt for shipment ${shipment}"
+                    receiveInboundShipment(shipment)
+                    reallocateBackorderedItems(shipment.id)
+                }
+            } catch (Exception e) {
+                log.error("Error processing requisition ${requisitionId}", e)
+            }
         }
     }
 

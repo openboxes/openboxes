@@ -11,9 +11,7 @@ import org.quartz.JobExecutionContext
 
 class AutomaticAllocationJob {
 
-    def authService
     def allocationService
-    def stockMovementService
     def requisitionService
     def locationService
 
@@ -32,42 +30,21 @@ class AutomaticAllocationJob {
             return
         }
 
-        authService.withSystemUser {
-            String requisitionId = context.mergedJobDataMap.get('requisitionId')
-            if (requisitionId) {
-                allocateRequisition(requisitionId)
-                return
-            }
+        String requisitionId = context.mergedJobDataMap.get('requisitionId')
+        if (requisitionId) {
+            allocationService.allocateRequisition(requisitionId)
+            return
+        }
 
-            if (Holders.config.openboxes.jobs.automaticAllocationJob.bulkAutoAllocation) {
-                List<Location> facilities =
-                        locationService.getLocationsSupportingActivities([ActivityCode.AUTOMATIC_ALLOCATION_ENABLED])
-                log.info "Running automatic allocation job for all pending requisitions... "
-                facilities.each { Location facility ->
-                    requisitionService.getRequisitionsPendingAutoAllocation(facility).each { Requisition requisition ->
-                        allocateRequisition(requisition.id)
-                    }
+        if (Holders.config.openboxes.jobs.automaticAllocationJob.bulkAutoAllocation) {
+            List<Location> facilities =
+                    locationService.getLocationsSupportingActivities([ActivityCode.AUTOMATIC_ALLOCATION_ENABLED])
+            log.info "Running automatic allocation job for all pending requisitions... "
+            facilities.each { Location facility ->
+                requisitionService.getRequisitionsPendingAutoAllocation(facility).each { Requisition requisition ->
+                    allocationService.allocateRequisition(requisition.id)
                 }
             }
-        }
-    }
-
-    private void allocateRequisition(String requisitionId) {
-        try {
-            Requisition requisition = Requisition.get(requisitionId)
-            if (!requisition) {
-                log.warn("Requisition ${requisitionId} not found, skipping")
-                return
-            }
-
-            if (!requisition.isEligibleForAutomaticAllocation()) {
-                return
-            }
-            log.info("Automatic allocation for requisition ${requisition.requestNumber} (${requisition.id}) ...")
-            allocationService.allocate(requisition, AllocationMode.AUTO, [AllocationStrategy.WAREHOUSE_FIRST])
-            stockMovementService.updateRequisitionStatus(requisitionId, RequisitionStatus.PICKING)
-        } catch (Exception e) {
-            log.error("Error processing requisition ${requisitionId}", e)
         }
     }
 }

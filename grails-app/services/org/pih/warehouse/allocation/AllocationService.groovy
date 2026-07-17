@@ -7,6 +7,7 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SuggestedItem
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
@@ -22,6 +23,7 @@ class AllocationService {
 
     StockMovementService stockMovementService
     GrailsApplication grailsApplication
+    AuthService authService
 
     @Transactional(readOnly = true)
     StockMovement getOutboundOrder(String id) {
@@ -199,6 +201,29 @@ class AllocationService {
             results.add(singleResult)
         }
         return results
+    }
+
+    void allocateRequisition(String requisitionId) {
+        try {
+            authService.withSystemUser {
+                Requisition requisition = Requisition.get(requisitionId)
+                if (!requisition) {
+                    log.warn("Requisition ${requisitionId} not found, skipping")
+                    return
+                }
+
+                if (!requisition.isEligibleForAutomaticAllocation()) {
+                    log.debug("Requisition ${requisitionId} is not eligible for automatic allocation, skipping")
+                    return
+                }
+
+                log.info("Automatic allocation for requisition ${requisition.requestNumber} (${requisition.id}) ...")
+                allocate(requisition, AllocationMode.AUTO, [AllocationStrategy.WAREHOUSE_FIRST])
+                stockMovementService.updateRequisitionStatus(requisitionId, RequisitionStatus.PICKING)
+            }
+        } catch (Exception e) {
+            log.error("Error processing requisition ${requisitionId}", e)
+        }
     }
 
     private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationStrategy> strategies, List<AvailableItem> excludeList = []) {
