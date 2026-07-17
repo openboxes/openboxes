@@ -169,7 +169,7 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
         <TableCell className="rt-td">
           <Controller
             key={row.original.rowId}
-            name={`receivedItems.${row.index}.location`}
+            name={`receivedItems.${row.index}.binLocation`}
             control={control}
             render={({ field }) => (
               <SelectField

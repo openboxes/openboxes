@@ -21,6 +21,7 @@ const ReceivingStep = () => {
       onSaveAndExit,
       removeSplitItem,
       loadReceipt,
+      onLocationAutofill,
     },
     commentModal,
   } = useReceivingForm();
@@ -44,6 +45,7 @@ const ReceivingStep = () => {
         removeSplitItem={removeSplitItem}
         loadReceipt={loadReceipt}
         commentModal={commentModal}
+        onLocationAutofill={onLocationAutofill}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 
 import { DateFormatDateFns } from 'consts/timeFormat';
+import useEditModalLocationAutofill from 'hooks/receiving/v2/useEditModalLocationAutofill';
 import useReceivingLineItemColumns from 'hooks/receiving/v2/useReceivingLineItemColumns';
 import useTranslate from 'hooks/useTranslate';
 import { formatDateToString } from 'utils/dateUtils';
@@ -11,7 +12,10 @@ import { formatDateToString } from 'utils/dateUtils';
 /**
  * Form state for the editable "Receiving now" table in the edit modal
  */
-const useReceivingLineItems = (lineItem, initialLineItems) => {
+const useReceivingLineItems = ({
+  lineItem,
+  initialLineItems,
+}) => {
   const translate = useTranslate();
 
   const buildDefaultRow = (item) => ({
@@ -27,12 +31,14 @@ const useReceivingLineItems = (lineItem, initialLineItems) => {
     }) ?? '',
     recipient: item?.recipient ?? null,
     quantityReceiving: item?.quantityReceiving ?? '',
-    location: item?.location ?? null,
+    binLocation: item?.binLocation ?? null,
     // Rows added in the modal (not the original shipment item line) are marked as split lines.
     isSplitItem: false,
   });
 
-  const { control, getValues, reset } = useForm({
+  const {
+    control, getValues, setValue, reset,
+  } = useForm({
     defaultValues: { lineItems: initialLineItems.map(buildDefaultRow) },
   });
 
@@ -48,7 +54,16 @@ const useReceivingLineItems = (lineItem, initialLineItems) => {
     }
   }, [getValues, remove]);
 
-  const { columns } = useReceivingLineItemColumns({ control, removeRow });
+  const { onLocationAutofill } = useEditModalLocationAutofill({
+    getValues,
+    setValue,
+  });
+
+  const { columns } = useReceivingLineItemColumns({
+    control,
+    removeRow,
+    onLocationAutofill,
+  });
 
   // New rows split the same shipment item line, so they start with the line's product.
   const addRow = () => append({
@@ -64,7 +79,7 @@ const useReceivingLineItems = (lineItem, initialLineItems) => {
     expirationDate: receivedItem.expirationDate ?? '',
     recipient: receivedItem.recipient ?? null,
     quantityReceiving: receivedItem.quantityReceived ?? '',
-    location: receivedItem.location ?? null,
+    binLocation: receivedItem.binLocation ?? null,
     isSplitItem: true,
   }), [append]);
 

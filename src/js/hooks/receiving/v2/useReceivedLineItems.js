@@ -24,7 +24,7 @@ const useReceivedLineItems = (lineItem, { onCopyToReceive } = {}) => {
     }) ?? '',
     recipient: mapToFormSelectOption(item?.recipient),
     quantityReceived: item?.quantityReceived ?? '',
-    location: mapToFormSelectOption(item?.binLocation),
+    binLocation: mapToFormSelectOption(item?.binLocation),
   });
 
   const { control } = useForm({
