@@ -10,6 +10,7 @@
 package org.pih.warehouse.requisition
 
 import grails.util.Holders
+import org.pih.warehouse.allocation.AllocationStrategy
 import org.pih.warehouse.allocation.AutomaticAllocationEvent
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.WebhookEventType
@@ -153,6 +154,10 @@ class Requisition implements Comparable<Requisition>, Serializable {
     Boolean autoAllocationEnabled
     Boolean partialAllocationAllowed
     Boolean partialIssuanceAllowed
+    Boolean autoIssuanceEnabled
+    Boolean allowNegativeInventory
+
+    AllocationStrategy allocationStrategy
 
     // Removed comments, documents, events for the time being.
     static transients = [
@@ -185,6 +190,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         approvers joinTable: [name: "requisition_approvers", key: "requisition_id"]
         deliveryTypeCode enumType: "string"
         orderTypeCode enumType: "string"
+        allocationStrategy enumType: "string"
     }
 
     static constraints = {
@@ -246,6 +252,9 @@ class Requisition implements Comparable<Requisition>, Serializable {
         autoAllocationEnabled(nullable: true)
         partialAllocationAllowed(nullable: true)
         partialIssuanceAllowed(nullable: true)
+        allocationStrategy(nullable: true)
+        autoIssuanceEnabled(nullable: true)
+        allowNegativeInventory(nullable: true)
     }
 
     Comment getRecentComment() {
@@ -511,6 +520,9 @@ class Requisition implements Comparable<Requisition>, Serializable {
                 autoAllocationEnabled   : autoAllocationEnabled,
                 partialAllocationAllowed: partialAllocationAllowed,
                 partialIssuanceAllowed  : partialIssuanceAllowed,
+                allocationStrategy      : allocationStrategy?.name(),
+                autoIssuanceEnabled     : autoIssuanceEnabled,
+                allowNegativeInventory  : allowNegativeInventory,
         ]
     }
 
@@ -533,6 +545,9 @@ class Requisition implements Comparable<Requisition>, Serializable {
             autoAllocationEnabled: autoAllocationEnabled,
             partialAllocationAllowed: partialAllocationAllowed,
             partialIssuanceAllowed: partialIssuanceAllowed,
+            allocationStrategy: allocationStrategy?.name(),
+            autoIssuanceEnabled: autoIssuanceEnabled,
+            allowNegativeInventory: allowNegativeInventory,
         ]
     }
 }

@@ -163,7 +163,7 @@ class NotificationService {
     def sendShipmentItemsShippedNotification(Shipment shipmentInstance) {
         def emailValidator = EmailValidator.getInstance()
         def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
-        def recipientItems = shipmentInstance.shipmentItems.groupBy {it.recipient }
+        def recipientItems = shipmentInstance.shipmentItems?.groupBy {it.recipient } ?: [:]
         recipientItems.each { Person recipient, items ->
             if (emailValidator.isValid(recipient?.email)) {
                 def subject = g.message(code: "email.yourItemShipped.message", args: [shipmentInstance.origin.name, shipmentInstance.destination.name, shipmentInstance.shipmentNumber])
