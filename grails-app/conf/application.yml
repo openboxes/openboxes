@@ -578,7 +578,6 @@ openboxes:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes
             delayInMilliseconds: 1000
-            bulkShipmentAutoReceipt: true
 
         automaticBackorderReallocationJob:
             enabled: true
@@ -588,7 +587,6 @@ openboxes:
         automaticIssuanceJob:
             enabled: false
             cronExpression: "0 */5 * * * ?"     # every five minutes
-            bulkAutomaticIssuance: true
 
         automaticAllocationJob:
             enabled: true
