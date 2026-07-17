@@ -228,8 +228,13 @@ class AllocationService {
                 }
 
                 log.info("Automatic allocation for requisition ${requisition.requestNumber} (${requisition.id}) ...")
-                allocate(requisition, AllocationMode.AUTO, [AllocationStrategy.WAREHOUSE_FIRST])
-                stockMovementService.updateRequisitionStatus(requisitionId, RequisitionStatus.PICKING)
+                allocate(requisition, AllocationMode.AUTO, [])
+
+                if (requisition.autoIssuanceEnabled) {
+                    stockMovementService.issueRequisition(requisition)
+                } else {
+                    stockMovementService.updateRequisitionStatus(requisitionId, RequisitionStatus.PICKING)
+                }
             }
         } catch (Exception e) {
             log.error("Error processing requisition ${requisitionId}", e)
