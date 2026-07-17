@@ -1183,7 +1183,15 @@ class RequisitionService {
         }
     }
 
-    List<Requisition> findStagedRequisitions() {
-        return Requisition.findAllByStatusAndIsTemplate(RequisitionStatus.STAGED, false)
+    List<String> findStagedRequisitionIds(List<Location> facilities) {
+        List<String> requisitions = Requisition.createCriteria().list {
+            projections {
+                property("id")
+            }
+            eq("isTemplate", Boolean.FALSE)
+            eq("status", RequisitionStatus.STAGED)
+            'in'("origin", facilities)
+        }
+        return requisitions
     }
 }

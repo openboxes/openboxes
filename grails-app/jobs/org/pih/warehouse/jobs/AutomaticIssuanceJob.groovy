@@ -3,6 +3,8 @@ package org.pih.warehouse.jobs
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.DeliveryTypeCode
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.OrderTypeCode
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.requisition.Requisition
@@ -14,6 +16,7 @@ class AutomaticIssuanceJob {
     StockMovementService stockMovementService
     RequisitionService requisitionService
     AuthService authService
+    LocationService locationService
 
     def sessionRequired = false
 
@@ -36,12 +39,12 @@ class AutomaticIssuanceJob {
             return
         }
 
-        List<Requisition> stagedRequisitions = requisitionService.findStagedRequisitions()
-        List<String> allowedBulkRequisitionIds = stagedRequisitions.findAll {it.origin.supports(ActivityCode.AUTOMATIC_ISSUANCE_BULK)}*.id
-        if (allowedBulkRequisitionIds) {
-            log.info "Found ${allowedBulkRequisitionIds.size()} outbound STAGED requisitions to automatic issue"
+        List<Location> facilities = locationService.getLocationsSupportingActivities([ActivityCode.AUTOMATIC_ISSUANCE_BULK])
+        if (facilities) {
+            List<String> requisitionIds = requisitionService.findStagedRequisitionIds(facilities)
+            log.info "Found ${requisitionIds.size()} outbound STAGED requisitions to automatic issue"
 
-            allowedBulkRequisitionIds.each { String id ->
+            requisitionIds.each { String id ->
                 try {
                     issueRequisition(id)
                 } catch (Exception e) {
