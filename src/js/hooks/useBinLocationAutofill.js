@@ -86,12 +86,11 @@ const useBinLocationAutofill = ({
       && !getRowBinLocation(items[0])) {
       return;
     }
-    // Any row with a location other than the default receiving bin would lose an entered
-    // value on autofill, so warn first.
-    const hasEditedBinLocations = items.some((item) => {
-      const binLocation = getRowBinLocation(item);
-      return binLocation && binLocation.id !== receivingBin?.id;
-    });
+    // Any row with a location other than the default receiving bin (including a location
+    // deliberately cleared by the user) would lose an entered value on autofill, so warn first.
+    const hasEditedBinLocations = items.some(
+      (item) => getRowBinLocation(item)?.id !== receivingBin?.id,
+    );
     if (hasEditedBinLocations) {
       confirmLocationAutofillOverwrite(() => applyAutofill(optionId, items));
       return;
