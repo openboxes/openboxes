@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="druchniewicz" id="070720261200-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="requisition" columnName="allocation_strategy"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="requisition">
+            <column name="allocation_strategy" type="VARCHAR(50)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="druchniewicz" id="070720261200-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="requisition" columnName="auto_issuance_enabled"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="requisition">
+            <column name="auto_issuance_enabled" type="BIT(1)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="druchniewicz" id="070720261200-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="requisition" columnName="allow_negative_inventory"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="requisition">
+            <column name="allow_negative_inventory" type="BIT(1)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

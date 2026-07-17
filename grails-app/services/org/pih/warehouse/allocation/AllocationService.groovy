@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.allocation
 
 import grails.core.GrailsApplication
@@ -10,7 +19,6 @@ import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
@@ -24,6 +32,8 @@ class AllocationService {
     StockMovementService stockMovementService
     GrailsApplication grailsApplication
     AuthService authService
+
+    AllocationStrategyHandlerResolver allocationStrategyHandlerResolver = new AllocationStrategyHandlerResolver()
 
     @Transactional(readOnly = true)
     StockMovement getOutboundOrder(String id) {
@@ -227,78 +237,65 @@ class AllocationService {
     }
 
     private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationStrategy> strategies, List<AvailableItem> excludeList = []) {
-        Location location = requisitionItem.requisition.origin
-        List<AvailableItem> allAvailableItems = stockMovementService.getAvailableItems(location, requisitionItem, false)
-        List<AvailableItem> filteredItems = applyStrategies(location, allAvailableItems, strategies)
-        List<AvailableItem> includedItems = filteredItems.findAll { !excludeList.contains(it) }
+        Location facility = requisitionItem.requisition.origin
+        Product product = requisitionItem.product
+        List<AvailableItem> allAvailableItems = stockMovementService.getAvailableItems(facility, requisitionItem, false)
 
         boolean isBackordered = requisitionItem.isBackordered()
         if (isBackordered) {
             quantityRequired = requisitionItem.quantityBackordered
         }
-        Integer quantityAvailable = includedItems.sum { it.quantityAvailable } ?: 0
-        if (quantityAvailable < quantityRequired) {
-            boolean partialAllocationAllowed = requisitionItem.requisition.partialAllocationAllowed
-            if (isBackordered && partialAllocationAllowed) {
-                return []
-            }
-            throw new IllegalArgumentException("Insufficient stock. Required: ${quantityRequired}, Available: ${quantityAvailable}")
-        }
 
-        return stockMovementService.getSuggestedItems(includedItems, quantityRequired)
-    }
+        List<AllocationStrategy> resolvedStrategies = resolveStrategies(requisitionItem.requisition, strategies)
 
-    private List<AvailableItem> applyStrategies(Location facility, List<AvailableItem> availableItems, List<AllocationStrategy> strategies) {
-        if (!strategies || strategies.isEmpty()) {
-            strategies = grailsApplication.config.openboxes.order.allocation.strategies
-        }
-        if (!strategies || strategies.isEmpty()) {
-            return availableItems
-        }
-
-        List<AvailableItem> displayItems = availableItems.findAll { it.binLocation?.isDisplay() }
-        List<AvailableItem> warehouseItems = availableItems.findAll { !it.binLocation?.isDisplay() }
-        Set<Location> preferredBinLocations = getPreferredBinLocations(facility, warehouseItems?.find()?.inventoryItem?.product)
-        List<AvailableItem> preferredItems = warehouseItems?.findAll {preferredBinLocations.contains(it.binLocation) }
-        List<AvailableItem> remainingItems = (warehouseItems?: []) - (preferredItems?: [])
-        List<AvailableItem> result = []
-
-        strategies.each { strategy ->
-            switch (strategy) {
-                case AllocationStrategy.DISPLAY_FIRST:
-                    result.addAll(displayItems)
-                    result.addAll(preferredItems)
-                    result.addAll(remainingItems)
-                    break
-
-                case AllocationStrategy.WAREHOUSE_FIRST:
-                    result.addAll(preferredItems)
-                    result.addAll(remainingItems)
-                    result.addAll(displayItems)
-                    break
-
-                case AllocationStrategy.WAREHOUSE_ONLY:
-                    result.addAll(preferredItems)
-                    result.addAll(remainingItems)
-                    break
-
-                case AllocationStrategy.FEFO:
-                    // availableItems come already sorted by expiration dates
-                    result = availableItems
-                    break
+        Integer bestQuantityAvailable = 0
+        for (AllocationStrategy strategy : resolvedStrategies) {
+            List<AvailableItem> ordered = orderByStrategy(strategy, facility, product, allAvailableItems)
+            List<AvailableItem> includedItems = ordered.findAll { !excludeList.contains(it) }
+            Integer quantityAvailable = includedItems.sum { it.quantityAvailable } ?: 0
+            bestQuantityAvailable = Math.max(bestQuantityAvailable, quantityAvailable)
+            if (canSatisfy(includedItems, quantityRequired)) {
+                return stockMovementService.getSuggestedItems(includedItems, quantityRequired)
             }
         }
 
-        return result
-    }
-
-    private Set<Location> getPreferredBinLocations(Location facility, Product product) {
-        if (!product) {
+        boolean partialAllocationAllowed = requisitionItem.requisition.partialAllocationAllowed
+        if (isBackordered && partialAllocationAllowed) {
             return []
         }
 
-        Set<InventoryLevel> inventoryLevels = facility?.inventory?.configuredProducts?.findAll { it.product == product && it.preferredBinLocation != null }
-        return inventoryLevels?.collect { it.preferredBinLocation }
+        // TODO fallback order when nothing can supply the quantity
+
+        throw new IllegalArgumentException("Insufficient stock. Required: ${quantityRequired}, Available: ${bestQuantityAvailable}")
+    }
+
+    private List<AllocationStrategy> resolveStrategies(Requisition requisition, List<AllocationStrategy> explicit) {
+        if (explicit) {
+            return explicit
+        }
+        if (requisition?.allocationStrategy) {
+            return [requisition.allocationStrategy]
+        }
+        return getConfiguredStrategies()
+    }
+
+    private List<AllocationStrategy> getConfiguredStrategies() {
+        return grailsApplication.config.openboxes.order.allocation.strategies ?: []
+    }
+
+    private List<AvailableItem> orderByStrategy(AllocationStrategy strategy, Location facility, Product product, List<AvailableItem> availableItems) {
+        AllocationStrategyHandler handler = allocationStrategyHandlerResolver.handlerFor(strategy)
+        if (handler) {
+            return handler.order(facility, product, availableItems)
+        }
+
+        log.warn("No allocation strategy handler registered for ${strategy}, using natural order")
+        return availableItems
+    }
+
+    private static boolean canSatisfy(List<AvailableItem> orderedItems, Integer quantityRequired) {
+        Integer quantityAvailable = orderedItems.sum { it.quantityAvailable } ?: 0
+        return quantityAvailable >= quantityRequired
     }
 
     private AllocationDetailsDto buildAllocationDetailsDto(RequisitionItem requisitionItem) {
