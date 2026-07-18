@@ -26,7 +26,7 @@
                         class="value ${hasErrors(bean: stockMovement, field: 'deliveryTypeCode', 'errors')}">
                         <g:select name="deliveryTypeCode"
                                   class="chzn-select-deselect"
-                                  noSelection="['null': '']"
+                                  noSelection="['': '']"
                                   from="${org.pih.warehouse.core.DeliveryTypeCode.values()}"
                                   value="${stockMovement.requisition.deliveryTypeCode}"/>
 
