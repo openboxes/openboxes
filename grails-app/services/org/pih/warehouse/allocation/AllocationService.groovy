@@ -36,6 +36,7 @@ class AllocationService {
     RequisitionService requisitionService
 
     AllocationSourceStrategyHandlerResolver allocationSourceStrategyHandlerResolver = new AllocationSourceStrategyHandlerResolver()
+    RotationStrategyResolver rotationStrategyResolver = new RotationStrategyResolver()
 
     @Transactional(readOnly = true)
     StockMovement getOutboundOrder(String id) {
@@ -267,7 +268,7 @@ class AllocationService {
 
         Integer bestQuantityAvailable = 0
         for (AllocationSourceStrategy strategy : resolvedStrategies) {
-            List<AvailableItem> ordered = applyRotation(rotationRule, orderByStrategy(strategy, facility, product, allAvailableItems))
+            List<AvailableItem> ordered = orderByStrategy(strategy, facility, product, applyRotation(rotationRule, allAvailableItems))
             List<AvailableItem> includedItems = ordered.findAll { !excludeList.contains(it) }
             Integer quantityAvailable = includedItems.sum { it.quantityAvailable } ?: 0
             bestQuantityAvailable = Math.max(bestQuantityAvailable, quantityAvailable)
@@ -293,8 +294,6 @@ class AllocationService {
         if (requisition?.allocationSourceStrategy) {
             return [requisition.allocationSourceStrategy]
         }
-        // Source is a preference, not a gate: always resolve to at least the configured default so
-        // available stock is still allocated rather than failing with "Available: 0".
         return [getConfiguredSourceStrategy()]
     }
 
@@ -316,23 +315,8 @@ class AllocationService {
         return availableItems
     }
 
-    /**
-     * Applies the stock rotation rule on top of the source ordering. Source (which bins, what zone
-     * order) is produced first; rotation then sorts within it. The sort is stable, so the source
-     * order survives as the tiebreaker and RotationRule.NONE leaves the source order untouched —
-     * i.e. ORDER BY <rotation>, <source bin priority>.
-     *
-     * Rotation is resolved from config today (openboxes.order.allocation.rotation) and is NOT stored
-     * on the requisition. FIFO/LIFO are declared but not yet implemented; they fall back to source
-     * order. When more rules are added this should move to a RotationStrategy + resolver, parallel to
-     * AllocationSourceStrategyHandler.
-     */
-    private static List<AvailableItem> applyRotation(RotationRule rotationRule, List<AvailableItem> sourceOrdered) {
-        if (!sourceOrdered || rotationRule == RotationRule.FEFO) {
-            return sourceOrdered ? sourceOrdered.sort(false, AvailableItemComparators.BY_EXPIRATION_NULLS_LAST) : []
-        }
-        // NONE (and, for now, unimplemented FIFO/LIFO) preserve the source order.
-        return sourceOrdered
+    private List<AvailableItem> applyRotation(RotationRule rotationRule, List<AvailableItem> sourceOrdered) {
+        return rotationStrategyResolver.forRule(rotationRule).sort(sourceOrdered)
     }
 
     private static boolean canSatisfy(List<AvailableItem> orderedItems, Integer quantityRequired) {

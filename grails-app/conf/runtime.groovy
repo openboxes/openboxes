@@ -95,9 +95,6 @@ openboxes.products.merge.enabled = false
 // Cycle Count configuration (OBPIH-7033)
 openboxes.cycleCount.products.maxAmount = 50
 
-// Default order allocation axes:
-//   source   = which bins / zone order (per-order value, overridden by requisition.allocationSourceStrategy)
-//   rotation = which lot within a bin (policy; not stored on the requisition)
 openboxes.order.allocation.source = AllocationSourceStrategy.STORAGE_FIRST
 openboxes.order.allocation.rotation = RotationRule.FEFO
 

@@ -11,15 +11,18 @@ package org.pih.warehouse.allocation
 
 import org.pih.warehouse.api.AvailableItem
 
-class AvailableItemComparators {
+/**
+ * First expired, first out: earliest expiration date first, items without an expiration date last.
+ */
+class FefoRotationStrategy implements RotationStrategy {
 
-    private AvailableItemComparators() { }
+    @Override
+    RotationRule getRule() {
+        return RotationRule.FEFO
+    }
 
-    /** Earliest expiration date first; items without an expiration date sort last. */
-    static final Comparator<AvailableItem> BY_EXPIRATION_NULLS_LAST = { AvailableItem a, AvailableItem b ->
-        !a?.inventoryItem?.expirationDate ?
-                !b?.inventoryItem?.expirationDate ? 0 : 1 :
-                !b?.inventoryItem?.expirationDate ? -1 :
-                        a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate
-    } as Comparator<AvailableItem>
+    @Override
+    List<AvailableItem> sort(List<AvailableItem> items) {
+        return items ? items.sort(false, AvailableItemComparators.BY_EXPIRATION_NULLS_LAST) : []
+    }
 }

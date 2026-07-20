@@ -11,15 +11,12 @@ package org.pih.warehouse.allocation
 
 import org.pih.warehouse.api.AvailableItem
 
-class AvailableItemComparators {
+/**
+ * Sorts the available items within the source ordering according to a {@link RotationRule}
+ */
+interface RotationStrategy {
 
-    private AvailableItemComparators() { }
+    RotationRule getRule()
 
-    /** Earliest expiration date first; items without an expiration date sort last. */
-    static final Comparator<AvailableItem> BY_EXPIRATION_NULLS_LAST = { AvailableItem a, AvailableItem b ->
-        !a?.inventoryItem?.expirationDate ?
-                !b?.inventoryItem?.expirationDate ? 0 : 1 :
-                !b?.inventoryItem?.expirationDate ? -1 :
-                        a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate
-    } as Comparator<AvailableItem>
+    List<AvailableItem> sort(List<AvailableItem> items)
 }
