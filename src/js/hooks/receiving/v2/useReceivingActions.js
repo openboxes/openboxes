@@ -19,8 +19,6 @@ import mapToFormSelectOption from 'utils/mapToFormSelectOption';
 import {
   createNormalizedState,
   normalizeData,
-  updateNormalizedItem,
-  updateNormalizedItems,
 } from 'utils/normalizationUtils';
 
 // In packing list view we ask the API to group items by pack level so that we can
@@ -270,6 +268,7 @@ const useReceivingActions = (view) => {
     rows,
     rowsById,
     updateRow,
+    updateRows,
     deleteRow,
     autosaveStatus,
     flush,
@@ -305,15 +304,6 @@ const useReceivingActions = (view) => {
 
   const { onSaveAndExit } = useReceivingSaveAction({ flush });
 
-  // Batch counterpart of updateLineItem: merges changes into many rows in a single
-  // state update. React 16 doesn't batch updates fired after an await, so updating
-  // rows one by one would re-render the whole table once per row.
-  const updateLineItems = useCallback((newDataByRowId) =>
-    setLineItemsState((state) => updateNormalizedItems(
-      state,
-      _.mapValues(newDataByRowId, (newData) => ({ ...newData, isDirty: true })),
-    )), []);
-
   useEffect(() => {
     if (!shipmentId) {
       return;
@@ -330,13 +320,14 @@ const useReceivingActions = (view) => {
     receiptId,
     lineItemsState,
     updateLineItem: updateRow,
-    updateLineItems,
+    updateLineItems: updateRows,
     autofillQuantities,
     // Deletes the receipt item through the autosave queue and, only on success, drops the
     // row from the local state (with grouping fix-ups).
     removeSplitItem: deleteRow,
     loadReceipt,
     onSaveAndExit,
+    flush,
     autosaveStatus,
   };
 };

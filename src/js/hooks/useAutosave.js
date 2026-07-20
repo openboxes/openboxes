@@ -14,6 +14,7 @@ import useAutosaveRows from 'hooks/useAutosaveRows';
 import {
   removeNormalizedItem,
   updateNormalizedItem,
+  updateNormalizedItems,
   upsertNormalizedItem,
 } from 'utils/normalizationUtils';
 
@@ -91,6 +92,7 @@ import {
  *   rows: Object,
  *   rowsById: Array,
  *   updateRow: Function,
+ *   updateRows: Function,
  *   addRow: Function,
  *   deleteRow: Function,
  *   isSavePending: boolean,
@@ -98,7 +100,8 @@ import {
  *   autosaveStatus: string,
  *   flush: Function,
  * }} `rows`/`rowsById` - the current rows, kept up to date by the hook.
- *   `updateRow`/`addRow`/`deleteRow` - row operations that also handle saving.
+ *   `updateRow`/`updateRows`/`addRow`/`deleteRow` - row operations that also handle saving;
+ *   `updateRows({ rowId: newData })` edits many rows in one state update.
  *   `isSavePending` - true while anything is still unsaved.
  *   `isRowSaving(rowId)` - true while the row has a running request.
  *   `autosaveStatus` - one of AutosaveStatus, drives the indicator for all rows.
@@ -318,6 +321,29 @@ const useAutosave = ({
     scheduleFlush();
   }, [setRows, recomputePending, scheduleFlush]);
 
+  // Batch counterpart of updateRow: applies edits to many rows in one state update.
+  // React 16 doesn't batch updates fired after an await (e.g. the location autofill),
+  // so per-row updates would re-render the whole table once per row.
+  const updateRows = useCallback((newDataByRowId) => {
+    const updates = _.pickBy(newDataByRowId, (newData, rowId) => {
+      const row = stateRef.current.entities[rowId];
+      return row && !row.isDeleting;
+    });
+    if (_.isEmpty(updates)) {
+      return;
+    }
+    Object.keys(updates).forEach((rowId) => {
+      versionsRef.current.set(rowId, (versionsRef.current.get(rowId) ?? 0) + 1);
+      dirtyRef.current.set(rowId, { attempts: 0, backoffLevel: 0 });
+    });
+    setRows((state) => updateNormalizedItems(
+      state,
+      _.mapValues(updates, (newData) => ({ ...newData, saveStatus: RowSaveStatus.PENDING })),
+    ));
+    recomputePending();
+    scheduleFlush();
+  }, [setRows, recomputePending, scheduleFlush]);
+
   // Adds a new row to the state and queues it for saving like an edit.
   const addRow = useCallback((rowData) => {
     const rowId = rowData[optionsRef.current.keyField] ?? optionsRef.current.generateRowId();
@@ -436,6 +462,7 @@ const useAutosave = ({
     rows: rowsState.entities,
     rowsById: rowsState.ids,
     updateRow,
+    updateRows,
     addRow,
     deleteRow,
     isSavePending,

@@ -3,17 +3,19 @@ import useAutosave from 'hooks/useAutosave';
 import buildReceiptItemsBatchPayload from 'utils/receiving/buildReceiptItemsBatchPayload';
 import removeSplitItemRow from 'utils/receiving/removeSplitItemRow';
 
-// Only send rows whose quantity really differs from the baseline captured at
-// load / last save, so no-op edits (e.g. 3 -> 4 -> 3) are skipped.
-const shouldSaveRow = (row) => row.quantityReceiving !== row.initialQuantityReceiving;
+// Only send rows whose quantity or bin location really differs from the baseline captured
+// at load / last save, so no-op edits (e.g. 3 -> 4 -> 3) are skipped.
+const shouldSaveRow = (row) => row.quantityReceiving !== row.initialQuantityReceiving
+  || (row.binLocation?.id ?? null) !== (row.initialBinLocationId ?? null);
 
 // The response echoes our rowId and returns the saved receipt item id, so the next save
-// updates the same receipt item instead of creating a duplicate. The baseline moves to
-// the saved quantity.
+// updates the same receipt item instead of creating a duplicate. The baselines move to
+// the saved quantity and bin location.
 const reconcileRow = (row, line) => ({
   receiptItemId: line.id,
   quantityReceiving: line.quantityReceived,
   initialQuantityReceiving: line.quantityReceived,
+  initialBinLocationId: line.binLocation?.id ?? null,
 });
 
 // A row edited while its request was running keeps the local quantity - only the
