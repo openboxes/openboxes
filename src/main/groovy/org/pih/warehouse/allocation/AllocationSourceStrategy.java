@@ -1,13 +1,14 @@
+/**
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.allocation;
 
-/**
- * Identifier for the allocation SOURCE strategy — which bins are eligible and in what zone order.
- * Per-order value, persisted on the requisition and set by the integration. Carries no behavior;
- * the ordering logic lives in the {@link AllocationSourceStrategyHandler} implementations.
- * Rotation (FEFO/FIFO/...) is a separate axis, see {@link RotationRule}.
- *
- * Named to leave room for a future {@code ReplenishmentSourceStrategy}, etc.
- */
 public enum AllocationSourceStrategy {
     STORAGE_FIRST, DISPLAY_FIRST, STORAGE_ONLY
 }

@@ -9,9 +9,6 @@
  **/
 package org.pih.warehouse.allocation
 
-/**
- * Collects the available {@link AllocationSourceStrategyHandler}s and keys them by {@link AllocationSourceStrategyHandler#getStrategy()}.
- */
 class AllocationSourceStrategyHandlerResolver {
 
     private final Map<AllocationSourceStrategy, AllocationSourceStrategyHandler> handlersByStrategy
