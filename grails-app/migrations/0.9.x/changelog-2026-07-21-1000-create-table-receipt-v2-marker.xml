@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <!-- Marks receipts created by the v2 receiving workflow - see the ReceiptV2Marker domain class -->
+
+    <changeSet author="kchelstowski" id="210720261000-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="receipt_v2_marker"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="receipt_v2_marker">
+            <column name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="receipt_id" type="CHAR(38)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="receipt_v2_marker_receipt_uniq" />
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="kchelstowski" id="210720261000-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_receipt_v2_marker_receipt"/>
+            </not>
+        </preConditions>
+
+        <!-- Receipts are deleted by the receiving rollback flows; cascading the delete lets those legacy flows
+             stay unaware of the marker table -->
+        <addForeignKeyConstraint
+                baseColumnNames="receipt_id"
+                baseTableName="receipt_v2_marker"
+                constraintName="fk_receipt_v2_marker_receipt"
+                deferrable="false"
+                initiallyDeferred="false"
+                onDelete="CASCADE"
+                referencedColumnNames="id"
+                referencedTableName="receipt"
+        />
+    </changeSet>
+</databaseChangeLog>

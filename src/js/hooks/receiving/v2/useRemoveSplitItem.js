@@ -67,8 +67,11 @@ const useRemoveSplitItem = ({ receiptId, lineItemsState, setLineItemsState }) =>
   const dispatch = useDispatch();
 
   const removeSplitItem = useCallback(async (rowId) => {
-    const receiptItemId = lineItemsState.entities[rowId]?.receiptItemId;
-    if (!receiptItemId) {
+    const entity = lineItemsState.entities[rowId];
+    const receiptItemId = entity?.receiptItemId;
+    // Only split lines can be deleted - the backend rejects deleting the original line
+    // (its table row offers no remove action anyway).
+    if (!receiptItemId || !entity?.isSplitItem) {
       return;
     }
     dispatch(showSpinner());

@@ -475,6 +475,12 @@ const useReceivingColumns = ({
           if (item?.rowType === ReceivingRowType.TOGGLE) {
             return null;
           }
+          // The original line rendered among split rows cannot be removed (it backs the
+          // cancel-remaining flow on completion), so it offers no actions here - it can only
+          // be zeroed by removing it in the edit modal.
+          if (item?.rowType === ReceivingRowType.SPLIT_ITEM && !item?.isSplitItem) {
+            return null;
+          }
           // A split item row offers its own actions (removing the single change);
           // all other rows carry the standard row actions.
           const actions = item?.rowType === ReceivingRowType.SPLIT_ITEM
