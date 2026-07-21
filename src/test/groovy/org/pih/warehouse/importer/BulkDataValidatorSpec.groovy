@@ -40,10 +40,12 @@ class BulkDataValidatorSpec extends Specification {
         ]
 
         when: "validate is called"
-        List<BulkDataError> errors = bulkDataValidator.validate(bulkDataType, data)
+        BulkDataErrors errors = bulkDataValidator.validate(bulkDataType, data).validationErrors
 
         then:
-        assert errors.size() == 0
+        assert !errors.hasErrors()
+        assert errors.highestSeverity == null
+        assert errors.allErrors.size() == 0
     }
 
     void "validate should return an error when the object's constraint validation is triggered"() {
@@ -55,11 +57,16 @@ class BulkDataValidatorSpec extends Specification {
         ]
 
         when: "validate is called"
-        List<BulkDataError> errors = bulkDataValidator.validate(bulkDataType, data)
+        BulkDataErrors bulkDataErrors = bulkDataValidator.validate(bulkDataType, data).validationErrors
 
         then:
+        assert bulkDataErrors.hasErrors()
+        assert bulkDataErrors.highestSeverity == BulkDataErrorSeverity.ERROR
+
+        List<BulkDataError> errors = bulkDataErrors.allErrors
         assert errors.size() == 1
         assert errors[0].row == 1
+        assert errors[0].column == "0"
         assert errors[0].fieldName == "stringField"
         assert errors[0].severity == BulkDataErrorSeverity.ERROR
         assert errors[0].localizedMessage == "LOCALIZED MESSAGE - CONSTRAINT VIOLATION"
@@ -74,11 +81,16 @@ class BulkDataValidatorSpec extends Specification {
         ]
 
         when: "validate is called"
-        List<BulkDataError> errors = bulkDataValidator.validate(bulkDataType, data)
+        BulkDataErrors bulkDataErrors = bulkDataValidator.validate(bulkDataType, data).validationErrors
 
         then:
+        assert bulkDataErrors.hasErrors()
+        assert bulkDataErrors.highestSeverity == BulkDataErrorSeverity.WARNING
+
+        List<BulkDataError> errors = bulkDataErrors.allErrors
         assert errors.size() == 1
         assert errors[0].row == 1
+        assert errors[0].column == "1"
         assert errors[0].fieldName == "integerField"
         assert errors[0].severity == BulkDataErrorSeverity.WARNING
         assert errors[0].localizedMessage == "LOCALIZED MESSAGE - CUSTOM VIOLATION"
@@ -92,20 +104,26 @@ class BulkDataValidatorSpec extends Specification {
         ]
 
         when: "validate is called"
-        List<BulkDataError> errors = bulkDataValidator.validate(bulkDataType, data)
+        BulkDataErrors bulkDataErrors = bulkDataValidator.validate(bulkDataType, data).validationErrors
 
         then:
+        assert bulkDataErrors.hasErrors()
+        assert bulkDataErrors.highestSeverity == BulkDataErrorSeverity.ERROR
+
+        List<BulkDataError> errors = bulkDataErrors.allErrors
         assert errors.size() == 2
 
         BulkDataError stringFieldError = errors.find { it.fieldName == "stringField" }
         assert stringFieldError != null
         assert stringFieldError.row == 0
+        assert stringFieldError.column == "0"
         assert stringFieldError.severity == BulkDataErrorSeverity.ERROR
         assert stringFieldError.localizedMessage == "LOCALIZED MESSAGE - CUSTOM VIOLATION"
 
         BulkDataError integerFieldError = errors.find { it.fieldName == "integerField" }
         assert integerFieldError != null
         assert integerFieldError.row == 0
+        assert integerFieldError.column == "1"
         assert integerFieldError.severity == BulkDataErrorSeverity.ERROR
         assert integerFieldError.localizedMessage == "LOCALIZED MESSAGE - CONSTRAINT VIOLATION"
     }
@@ -113,15 +131,10 @@ class BulkDataValidatorSpec extends Specification {
     /**
      * A simple importable, validatable object to use in tests.
      */
-    class ImportableForTest implements Importable, Validateable {
-
+    static class ImportableForTest implements Importable, Validateable {
+        // We use the default constraints, meaning neither field is nullable.
         String stringField
         Integer integerField
-
-        static constraints = {
-            stringField(nullable: false)
-            integerField(nullable: false)
-        }
     }
 
     /**
@@ -136,13 +149,23 @@ class BulkDataValidatorSpec extends Specification {
         }
 
         @Override
+        BulkDataValidatorConfig getBulkDataValidatorConfig() {
+            return new BulkDataValidatorConfig(
+                    columnByFieldName: [
+                            "stringField": "0",
+                            "integerField": "1",
+                    ]
+            )
+        }
+
+        @Override
         BulkDataErrors customValidateRow(ImportableForTest row) {
             BulkDataErrors errors = new BulkDataErrors()
             if (row.stringField == VALUE_THAT_FAILS_VALIDATION) {
-                errors.addFieldError("stringField", BulkDataErrorSeverity.ERROR, "some.code")
+                errors.addFieldError("stringField", "some.code")
             }
             if (row.integerField != null && row.integerField < 0) {
-                errors.addFieldError("integerField", BulkDataErrorSeverity.WARNING, "some.other.code")
+                errors.addFieldError("integerField", "some.other.code", null, BulkDataErrorSeverity.WARNING)
             }
             return errors
         }

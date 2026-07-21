@@ -12,6 +12,11 @@ trait ConfiguresBulkDataValidator<T extends Importable> {
     abstract BulkDataType getBulkDataType()
 
     /**
+     * @return the configuration to use when validating the data.
+     */
+    abstract BulkDataValidatorConfig getBulkDataValidatorConfig()
+
+    /**
      * Performs any custom data validation that was not already automatically handled by the data validator.
      *
      * To provide custom validation logic, a feature will typically override customValidateRow. However, if you need

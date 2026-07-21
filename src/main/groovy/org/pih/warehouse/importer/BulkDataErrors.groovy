@@ -12,6 +12,9 @@ class BulkDataErrors {
         return errors
     }
 
+    /**
+     * @return true if any errors have occurred.
+     */
     boolean hasErrors() {
         return !errors.empty
     }
@@ -23,22 +26,36 @@ class BulkDataErrors {
         return errors.severity.max()
     }
 
+    void addError(BulkDataError error) {
+        errors.add(error)
+    }
+
+    void addErrors(Collection<BulkDataError> errors) {
+        this.errors.addAll(errors)
+    }
+
+    void addErrors(BulkDataErrors errors) {
+        this.errors.addAll(errors.allErrors)
+    }
+
     /**
      * Mark a field of the object being validated as invalid.
      *
+     * To be used during the custom validate flow.
+     *
      * @param fieldName The name of the field that failed validation
-     * @param severity The severity of the error.
      * @param errorCode The message key to use when localizing the message.
      * @param errorArgs Arguments for the errorCode.
+     * @param severity The severity of the error.
      */
     void addFieldError(String fieldName,
-                       BulkDataErrorSeverity severity,
                        String errorCode,
-                       Object[] errorArgs=null) {
+                       Object[] errorArgs=null,
+                       BulkDataErrorSeverity severity=BulkDataErrorSeverity.ERROR) {
 
         errors.add(new BulkDataError(
                 row: null,  // We rely on customValidate to set this later
-                column: null,  // TODO: we can get this from the config using fieldName!
+                column: null,  // We rely on customValidate to set this later
                 fieldName: fieldName,
                 severity: severity,
                 localizableMessage: new LocalizableMessage(
@@ -52,13 +69,15 @@ class BulkDataErrors {
     /**
      * Mark the object itself as invalid. For use when not validating a specific field.
      *
-     * @param severity The severity of the error.
+     * To be used during the custom validate flow.
+     *
      * @param errorCode The message key to use when localizing the message.
      * @param errorArgs Arguments for the errorCode.
+     * @param severity The severity of the error.
      */
-    void addObjectError(BulkDataErrorSeverity severity,
-                        String errorCode,
-                        Object[] errorArgs=null) {
+    void addObjectError(String errorCode,
+                        Object[] errorArgs=null,
+                        BulkDataErrorSeverity severity=BulkDataErrorSeverity.ERROR) {
 
         errors.add(new BulkDataError(
                 row: null,  // We rely on customValidate to set this later

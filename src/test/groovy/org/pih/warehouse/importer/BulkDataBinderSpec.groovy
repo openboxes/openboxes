@@ -157,7 +157,7 @@ class BulkDataBinderSpec extends Specification {
 
         assert result.errors.size() == 1
         assert result.errors[0].row == 0
-        assert result.errors[0].column == 1
+        assert result.errors[0].column == "1"
         assert result.errors[0].severity == BulkDataErrorSeverity.ERROR
         assert result.errors[0].localizedMessage == "LOCALIZED MESSAGE"
         assert result.errors[0].exception.message == "PARSER ERROR"
@@ -238,7 +238,7 @@ class BulkDataBinderSpec extends Specification {
 
         assert result.errors.size() == 1
         assert result.errors[0].row == 0
-        assert result.errors[0].column == 0
+        assert result.errors[0].column == "0"
         assert result.errors[0].localizedMessage == "CUSTOM BINDING ERROR"
     }
 

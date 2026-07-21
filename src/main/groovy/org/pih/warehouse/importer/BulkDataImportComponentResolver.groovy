@@ -25,7 +25,9 @@ class BulkDataImportComponentResolver {
         for (bulkDataBinderConfigurer in bulkDataBinderConfigurers) {
             BulkDataType bulkDataType = bulkDataBinderConfigurer.bulkDataType
             if (bulkDataBinderConfigurersByDataType.containsKey(bulkDataType)) {
-                throw new RuntimeException("Found multiple bulk data binder configurers for data type ${bulkDataType}. Only one is allowed.")
+                throw new RuntimeException("Found multiple bulk data binder configurers for data type " +
+                        "[${bulkDataType}]: [${bulkDataBinderConfigurer.class}, " +
+                        "${bulkDataBinderConfigurersByDataType.get(bulkDataType).class}]. Only one is allowed.")
             }
             bulkDataBinderConfigurersByDataType.put(bulkDataType, bulkDataBinderConfigurer)
         }
@@ -35,14 +37,16 @@ class BulkDataImportComponentResolver {
      * @return the bulk data binder configurer associated with the given data type.
      */
     ConfiguresBulkDataBinder getBulkDataBinderConfigurer(BulkDataType dataImportType) {
-        return dataImportType ? bulkDataBinderConfigurersByDataType.get(dataImportType) : null
+        return bulkDataBinderConfigurersByDataType.get(dataImportType)
     }
 
     private void populateBulkDataValidatorConfigMap(List<ConfiguresBulkDataValidator> bulkDataValidatorConfigurers) {
         for (bulkDataValidatorConfigurer in bulkDataValidatorConfigurers) {
             BulkDataType bulkDataType = bulkDataValidatorConfigurer.bulkDataType
             if (bulkDataValidatorConfigurersByDataType.containsKey(bulkDataType)) {
-                throw new RuntimeException("Found multiple bulk data validator configurers for data type ${bulkDataType}. Only one is allowed.")
+                throw new RuntimeException("Found multiple bulk data validator configurers for data type " +
+                        "[${bulkDataType}]: [${bulkDataValidatorConfigurer.class}, " +
+                        "${bulkDataValidatorConfigurersByDataType.get(bulkDataType).class}]. Only one is allowed.")
             }
             bulkDataValidatorConfigurersByDataType.put(bulkDataType, bulkDataValidatorConfigurer)
         }
@@ -52,6 +56,6 @@ class BulkDataImportComponentResolver {
      * @return the bulk data validator configurer associated with the given data type.
      */
     ConfiguresBulkDataValidator getBulkDataValidatorConfigurer(BulkDataType dataImportType) {
-        return dataImportType ? bulkDataValidatorConfigurersByDataType.get(dataImportType) : null
+        return bulkDataValidatorConfigurersByDataType.get(dataImportType)
     }
 }

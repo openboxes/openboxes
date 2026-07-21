@@ -14,10 +14,10 @@ class BulkDataError {
     Integer row
 
     /**
-     * The zero-indexed column that the error occurred in.
+     * Either the zero-indexed column, or an Excel column letter that the error occurred in.
      * Will be null if the error is not directly associated with a particular column.
      */
-    Integer column
+    String column
 
     /**
      * The name of the field that the error occurred for.
