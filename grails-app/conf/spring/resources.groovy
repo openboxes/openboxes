@@ -1,8 +1,8 @@
 package spring
 
-import org.pih.warehouse.inboundSortation.strategy.CrossDockingBackorderReferencePutawayStrategy
-import org.pih.warehouse.inboundSortation.strategy.DefaultLocationPutawayStrategy
 import org.pih.warehouse.inboundSortation.PutawayStrategyService
+import org.pih.warehouse.inboundSortation.strategy.CrossDockPutawayStrategy
+import org.pih.warehouse.inboundSortation.strategy.DirectedPutawayStrategy
 import org.pih.warehouse.monitoring.SentryGrailsTracingFilter
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.core.Ordered
@@ -22,14 +22,14 @@ beans = {
     transactionalEventListenerFactory(TransactionalEventListenerFactory)
 
     // Putaway strategies
-    crossDockingBackorderReferencePutawayStrategy(CrossDockingBackorderReferencePutawayStrategy)
-    defaultLocationPutawayStrategy(DefaultLocationPutawayStrategy)
-    // randomLocationPutawayStrategy(RandomLocationPutawayStrategy)
+    crossDockPutawayStrategy(CrossDockPutawayStrategy)
+    directedPutawayStrategy(DirectedPutawayStrategy)
+    // randomPutawayStrategy(RandomPutawayStrategy)
     putawayStrategyService(PutawayStrategyService) {
         strategies = [
-                ref('crossDockingBackorderReferencePutawayStrategy'), // fallback if none of the strategies worked, executed as the last one
-                ref('defaultLocationPutawayStrategy'), // directed putaway to preferred bin
-                // ref('randomLocationPutawayStrategy') // fallback if none of the strategies worked, executed as the last one
+                ref('crossDockPutawayStrategy'), // fallback if none of the strategies worked, executed as the last one
+                ref('directedPutawayStrategy'), // directed putaway to preferred bin
+                // ref('randomPutawayStrategy') // (disabled) fallback if none of the strategies worked, executed as the last one
         ]
     }
 

@@ -9,7 +9,7 @@ import org.pih.warehouse.requisition.RequisitionItem
 
 import javax.xml.bind.ValidationException
 
-class CrossDockingBackorderReferencePutawayStrategy implements PutawayStrategy {
+class CrossDockPutawayStrategy implements PutawayStrategy {
 
     @Override
     List<PutawayResult> execute(PutawayContext context, List<Location> locations, Integer quantityRemaining, List<PutawayResult> putawayResults) {
