@@ -2596,7 +2596,7 @@ class StockMovementService {
 
         requisition.type = stockMovement.requestType
         requisition.sourceType = stockMovement.sourceType
-        requisition.allocationStrategy = stockMovement.allocationStrategy
+        requisition.allocationSourceStrategy = stockMovement.allocationSourceStrategy
         requisition.autoIssuanceEnabled = stockMovement.autoIssuanceEnabled
         requisition.negativeInventoryAllowed = stockMovement.negativeInventoryAllowed
         requisition.requisitionTemplate = stockMovement.stocklist

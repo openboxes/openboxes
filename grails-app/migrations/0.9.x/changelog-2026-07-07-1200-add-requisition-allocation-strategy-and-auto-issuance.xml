@@ -6,12 +6,12 @@
     <changeSet author="druchniewicz" id="070720261200-0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="requisition" columnName="allocation_strategy"/>
+                <columnExists tableName="requisition" columnName="allocation_source_strategy"/>
             </not>
         </preConditions>
 
         <addColumn tableName="requisition">
-            <column name="allocation_strategy" type="VARCHAR(50)">
+            <column name="allocation_source_strategy" type="VARCHAR(50)">
                 <constraints nullable="true"/>
             </column>
         </addColumn>

@@ -10,26 +10,25 @@
 package org.pih.warehouse.allocation
 
 /**
- * Collects the available {@link AllocationStrategyHandler}s and keys them by {@link AllocationStrategyHandler#getStrategy()}.
+ * Collects the available {@link AllocationSourceStrategyHandler}s and keys them by {@link AllocationSourceStrategyHandler#getStrategy()}.
  */
-class AllocationStrategyHandlerResolver {
+class AllocationSourceStrategyHandlerResolver {
 
-    private final Map<AllocationStrategy, AllocationStrategyHandler> handlersByStrategy
+    private final Map<AllocationSourceStrategy, AllocationSourceStrategyHandler> handlersByStrategy
 
-    AllocationStrategyHandlerResolver() {
+    AllocationSourceStrategyHandlerResolver() {
         this([
-                new WarehouseFirstHandler(),
+                new StorageFirstHandler(),
                 new DisplayFirstHandler(),
-                new WarehouseOnlyHandler(),
-                new FefoHandler(),
+                new StorageOnlyHandler(),
         ])
     }
 
-    AllocationStrategyHandlerResolver(List<AllocationStrategyHandler> handlers) {
+    AllocationSourceStrategyHandlerResolver(List<AllocationSourceStrategyHandler> handlers) {
         handlersByStrategy = handlers.collectEntries { [(it.strategy): it] }
     }
 
-    AllocationStrategyHandler handlerFor(AllocationStrategy strategy) {
+    AllocationSourceStrategyHandler handlerFor(AllocationSourceStrategy strategy) {
         return handlersByStrategy[strategy]
     }
 }

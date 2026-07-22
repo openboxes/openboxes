@@ -8,5 +8,5 @@ class AllocationRequest {
     RequisitionItem requisitionItem
     AllocationMode allocationMode
     List<AvailableItem> availableItems
-    List<AllocationStrategy> allocationStrategies
+    List<AllocationSourceStrategy> allocationStrategies
 }
