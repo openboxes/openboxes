@@ -163,6 +163,11 @@
   }
 
   &__expand-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
     gap: 4px;
     cursor: pointer;
     color: var(--gray-300);

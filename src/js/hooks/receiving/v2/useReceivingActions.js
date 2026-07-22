@@ -165,9 +165,17 @@ const useReceivingActions = (view) => {
   // Rows for a single shipment item: a single editable row when it was not split,
   // or a replaced row + toggle row + one split item row per pending receipt item.
   const buildItemRows = (summary, usersById) => {
-    const { currentReceiptItems = [] } = summary;
+    const { shipmentItem, currentReceiptItems = [] } = summary;
 
-    if (currentReceiptItems.length < 2) {
+    // A receipt item with a changed product always stays a changes group - as a plain
+    // line it would replace the original product instead of showing it struck through.
+    const hasChangedProduct = (receiptItem) => {
+      const receiptItemProductId = receiptItem?.productLot?.product?.id;
+      return receiptItemProductId != null
+        && receiptItemProductId !== shipmentItem.productLot?.product?.id;
+    };
+
+    if (currentReceiptItems.length < 2 && !hasChangedProduct(currentReceiptItems[0])) {
       return [buildLineItem({ summary, receiptItem: currentReceiptItems[0], usersById })];
     }
 
