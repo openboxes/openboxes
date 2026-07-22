@@ -690,7 +690,9 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         assert receiptItem.quantityCanceled == 30
 
         and: 'the shipment event is created and the inbound transaction is recorded'
-        1 * shipmentService.createShipmentEvent(shipment, receipt.actualDeliveryDate, EventCode.RECEIVED, shipment.destination)
+        // Interaction arguments are evaluated before when: runs, so match on the date the command carries instead
+        // of receipt.actualDeliveryDate, which completeReceipt overwrites with that very value (asserted above).
+        1 * shipmentService.createShipmentEvent(shipment, Date.from(dateDelivered), EventCode.RECEIVED, shipment.destination)
         assert Transaction.list().size() == 1
 
         and: 'the status transition event carries the completed receipt'

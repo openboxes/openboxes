@@ -80,7 +80,7 @@ class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
     }
 
     String toString() {
-        return "${id}:${product.name}:${inventoryItem.lotNumber}:${quantityShipped}:${quantityReceived}:${comment}"
+        return "${id}:${product?.name}:${inventoryItem?.lotNumber}:${quantityShipped}:${quantityReceived}:${comment}"
     }
 
 }
