@@ -23,6 +23,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.CommentType
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventType
@@ -40,6 +41,7 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
+import org.springframework.transaction.annotation.Propagation
 
 import java.text.SimpleDateFormat
 
@@ -936,6 +938,24 @@ class RequisitionService {
     void addCommentToRequisition(Comment comment, Requisition requisition) {
         requisition.addToComments(comment)
         requisition.save()
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    void logRequisitionEvent(String requisitionId, String message) {
+        Requisition requisition = Requisition.get(requisitionId)
+        if (!requisition) {
+            log.warn("Unable to log requisition event - requisition ${requisitionId} not found: ${message}")
+            return
+        }
+
+        boolean alreadyLogged = requisition.comments.any {
+            it.type == CommentType.SYSTEM && it.comment == message
+        }
+        if (!alreadyLogged) {
+            requisition.addToComments(new Comment(comment: message, sender: null))
+            requisition.save(failOnError: true)
+        }
+        log.warn("Requisition ${requisition.id}: ${message}")
     }
 
     RequisitionItem buildRequisitionItem(Map params) {
