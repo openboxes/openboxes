@@ -96,23 +96,12 @@ class ReceiptItemsBatchRequestValidator implements ObjectValidator<ReceiptItemsB
 
         // A single projection query instead of a per-id ReceiptItem.get(): one round trip for the whole batch, and
         // the items stay out of the Hibernate session - the service is about to delete these very entities.
-        List<Object> receiptItemRows = ReceiptItem.createCriteria().list {
+        List<String> originalItemIds = ReceiptItem.createCriteria().list {
             projections {
                 property("id")
-                property("isSplitItem")
             }
             inList("id", request.itemsToDelete)
-        }
-
-        Map<String, Boolean> isSplitItemByReceiptItemId = receiptItemRows.collectEntries { Object row ->
-            [(row[0]): row[1]]
-        }
-
-        List<String> originalItemIds = request.itemsToDelete.findAll { String receiptItemId ->
-            // containsKey() distinguishes ids that don't resolve to an item (skipped) from legacy items whose flag
-            // is null (originals).
-            return isSplitItemByReceiptItemId.containsKey(receiptItemId) &&
-                    !isSplitItemByReceiptItemId[receiptItemId]
+            eq("isSplitItem", false)
         }
 
         return originalItemIds ?

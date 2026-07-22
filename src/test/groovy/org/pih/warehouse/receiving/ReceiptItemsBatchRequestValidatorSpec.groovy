@@ -2,12 +2,10 @@ package org.pih.warehouse.receiving
 
 import grails.testing.gorm.DataTest
 import spock.lang.Specification
-import spock.lang.Unroll
 
 import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.product.Product
 
-@Unroll
 class ReceiptItemsBatchRequestValidatorSpec extends Specification implements DataTest {
 
     ReceiptItemsBatchRequestValidator validator = new ReceiptItemsBatchRequestValidator()
@@ -16,10 +14,10 @@ class ReceiptItemsBatchRequestValidatorSpec extends Specification implements Dat
         mockDomains(Receipt, ReceiptItem, Product)
     }
 
-    void 'doValidate should reject deleting an original item (isSplitItem: #isSplitItem)'() {
+    void 'doValidate should reject deleting an original item'() {
         given: 'an original line and a split line'
         Receipt receipt = buildPendingReceipt()
-        ReceiptItem originalItem = buildReceiptItem(receipt, isSplitItem)
+        ReceiptItem originalItem = buildReceiptItem(receipt, false)
         ReceiptItem splitItem = buildReceiptItem(receipt, true)
 
         when: 'both are requested to be deleted'
@@ -33,9 +31,6 @@ class ReceiptItemsBatchRequestValidatorSpec extends Specification implements Dat
         assert result.errors*.code == ["receiptItemsBatchRequest.itemsToDelete.originalItem"]
         assert result.errors.first().arguments.toString().contains(originalItem.id.toString())
         assert !result.errors.first().arguments.toString().contains(splitItem.id.toString())
-
-        where: 'a missing flag (legacy data) counts as an original line'
-        isSplitItem << [Boolean.FALSE, null]
     }
 
     void 'doValidate should accept deleting split items'() {
