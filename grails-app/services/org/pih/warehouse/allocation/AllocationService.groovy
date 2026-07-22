@@ -242,7 +242,8 @@ class AllocationService {
             if (isBackordered && partialAllocationAllowed) {
                 return []
             }
-            throw new IllegalArgumentException("Insufficient stock. Required: ${quantityRequired}, Available: ${quantityAvailable}")
+            Product product = requisitionItem.product
+            throw new IllegalArgumentException("Insufficient stock for product ${product?.productCode} - ${product?.name} in order ${requisitionItem.requisition?.requestNumber}. Required quantity: ${quantityRequired}, Available quantity: ${quantityAvailable}")
         }
 
         return stockMovementService.getSuggestedItems(includedItems, quantityRequired)
