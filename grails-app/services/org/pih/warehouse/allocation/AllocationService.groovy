@@ -197,11 +197,15 @@ class AllocationService {
 
     List<AllocationResult> allocate(Requisition requisition, AllocationMode allocationMode, List<AllocationStrategy> allocationStrategyList) {
         try {
-            List<AllocationResult> results = []
-            requisition?.requisitionItems?.each { requisitionItem ->
+            List<AllocationResult> results = requisition?.requisitionItems?.collect { requisitionItem ->
                 AllocationRequest allocationRequest = new AllocationRequest(requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationStrategyList)
-                AllocationResult singleResult = allocate(allocationRequest)
-                results.add(singleResult)
+                allocate(allocationRequest, false)
+            } ?: []
+
+            results.each { AllocationResult result ->
+                RequisitionItem requisitionItem = result.allocationRequest.requisitionItem
+                stockMovementService.clearPicklist(requisitionItem)
+                stockMovementService.allocateSuggestedItems(requisitionItem, result.suggestedItems, allocationMode == AllocationMode.AUTO)
             }
             return results
         } catch (Exception e) {
