@@ -3,8 +3,11 @@ package org.pih.warehouse.inboundSortation
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.inboundSortation.strategy.PutawayStrategy
 
+// FIXME: This should be called InboundRoutingStrategyServiceand all of the other classes should follow suit
+//  (PutawayStrategy -> RoutingStrategy, PutawayResult -> RoutingResult).
+//  see: https://github.com/openboxes/openboxes/pull/6030/changes#r3609848674
 @Transactional
-class SlottingService {
+class PutawayStrategyService {
     List<PutawayStrategy> strategies
 
     List<PutawayResult> execute(PutawayContext context) {

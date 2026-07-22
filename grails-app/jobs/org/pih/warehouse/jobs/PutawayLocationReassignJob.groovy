@@ -19,7 +19,7 @@ import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.putaway.PutawayService
 import org.quartz.JobExecutionContext
 
-class PutawayLocationReslottingJob {
+class PutawayLocationReassignmentJob {
 
     PutawayService putawayService
     LocationService locationService
@@ -27,32 +27,32 @@ class PutawayLocationReslottingJob {
     def sessionRequired = false
 
     void execute(JobExecutionContext context) {
-        if (!JobUtils.shouldExecute(PutawayLocationReslottingJob)) {
-            log.info("Reslotting Putaway location job is disabled")
+        if (!JobUtils.shouldExecute(PutawayLocationReassignmentJob)) {
+            log.info("Reassign Putaway location job is disabled")
             return
         }
-        log.info "Executing PutawayLocationReslotting job"
+        log.info "Executing PutawayLocationReassign job"
 
         String inventoryLevelId = context.mergedJobDataMap.get('inventoryLevelId')
         InventoryLevel inventoryLevel = InventoryLevel.read(inventoryLevelId)
         if (!inventoryLevel) {
-            log.warn "InventoryLevel with id ${inventoryLevelId} not found, cannot trigger reslotting"
+            log.warn "InventoryLevel with id ${inventoryLevelId} not found, cannot trigger reassigning"
             return
         }
         if (inventoryLevel.preferredBinLocation?.supports(ActivityCode.UNDEFINED_LOCATION)) {
-            // the update hasn't changed preferredBinLocation type from UNDEFINED; no reslotting
+            // the update hasn't changed preferredBinLocation type from UNDEFINED; no reassigning
             log.debug "InventoryLevel with ${ActivityCode.UNDEFINED_LOCATION} preferredBinLocation. Skip."
             return
         }
         if (inventoryLevel.internalLocation?.supports(ActivityCode.UNDEFINED_LOCATION)) {
-            // the update hasn't changed internalLocation type from UNDEFINED; no reslotting
+            // the update hasn't changed internalLocation type from UNDEFINED; no reassigning
             log.debug "InventoryLevel with ${ActivityCode.UNDEFINED_LOCATION} internalLocation. Skip."
             return
         }
 
         List<Location> binLocations = locationService.getLocationsSupportingActivity(ActivityCode.UNDEFINED_LOCATION)
         List<Putaway> pendingPutaways = putawayService.getPendingPutawayOrders(inventoryLevel.product, binLocations, inventoryLevel.inventory.warehouse)
-        log.info("Reslotting Putaway location for product ${inventoryLevel.product}, found ${pendingPutaways?.size()} putaways")
+        log.info("Reassigning Putaway location for product ${inventoryLevel.product}, found ${pendingPutaways?.size()} putaways")
         pendingPutaways?.each { Putaway putaway ->
             List<PutawayItem> putawayItems = putaway.putawayItems.findAll {
                 it.putawayLocation?.supports(ActivityCode.UNDEFINED_LOCATION)
