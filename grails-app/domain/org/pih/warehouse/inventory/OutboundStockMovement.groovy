@@ -193,12 +193,11 @@ class OutboundStockMovement implements Serializable, Validateable, Historizable 
                 received            : isReceived,
                 requestType         : requestType,
                 sourceType          : sourceType?.name,
-                autoAllocationEnabled   : requisition?.autoAllocationEnabled,
+                autoAllocationRequested   : requisition?.autoAllocationRequested,
                 partialAllocationAllowed: requisition?.partialAllocationAllowed,
                 partialIssuanceAllowed  : requisition?.partialIssuanceAllowed,
                 allocationSourceStrategy      : requisition?.allocationSourceStrategy?.name(),
-                autoIssuanceEnabled     : requisition?.autoIssuanceEnabled,
-                negativeInventoryAllowed  : requisition?.negativeInventoryAllowed,
+                autoIssuanceRequested     : requisition?.autoIssuanceRequested,
         ]
     }
 

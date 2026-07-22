@@ -242,7 +242,7 @@ class AllocationService {
                 log.info("Automatic allocation for requisition ${requisition.requestNumber} (${requisition.id}) ...")
                 allocate(requisition, AllocationMode.AUTO, [])
 
-                if (requisition.autoIssuanceEnabled) {
+                if (requisition.autoIssuanceRequested) {
                     stockMovementService.issueRequisition(requisition)
                 } else {
                     stockMovementService.updateRequisitionStatus(requisitionId, RequisitionStatus.PICKING)

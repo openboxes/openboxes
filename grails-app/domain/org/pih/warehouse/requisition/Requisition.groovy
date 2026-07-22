@@ -151,11 +151,10 @@ class Requisition implements Comparable<Requisition>, Serializable {
     DeliveryTypeCode deliveryTypeCode = DeliveryTypeCode.DEFAULT
 
     // for controlling partial allocation and issuance
-    Boolean autoAllocationEnabled
+    Boolean autoAllocationRequested
     Boolean partialAllocationAllowed
     Boolean partialIssuanceAllowed
-    Boolean autoIssuanceEnabled
-    Boolean negativeInventoryAllowed
+    Boolean autoIssuanceRequested
 
     AllocationSourceStrategy allocationSourceStrategy
 
@@ -249,12 +248,11 @@ class Requisition implements Comparable<Requisition>, Serializable {
         deliveryTypeCode(nullable: true)
         orderTypeCode(nullable: true)
         priority(nullable: true)
-        autoAllocationEnabled(nullable: true)
+        autoAllocationRequested(nullable: true)
         partialAllocationAllowed(nullable: true)
         partialIssuanceAllowed(nullable: true)
         allocationSourceStrategy(nullable: true)
-        autoIssuanceEnabled(nullable: true)
-        negativeInventoryAllowed(nullable: true)
+        autoIssuanceRequested(nullable: true)
     }
 
     Comment getRecentComment() {
@@ -472,8 +470,8 @@ class Requisition implements Comparable<Requisition>, Serializable {
             log.info "Requisition ${requestNumber} (${id}) not eligible for automatic allocation: status is ${status}, expected CREATED"
             return false
         }
-        if (!autoAllocationEnabled) {
-            log.info "Requisition ${requestNumber} (${id}) not eligible for automatic allocation: autoAllocationEnabled is not set"
+        if (!autoAllocationRequested) {
+            log.info "Requisition ${requestNumber} (${id}) not eligible for automatic allocation: autoAllocationRequested is not set"
             return false
         }
         if (!origin?.supports(ActivityCode.AUTOMATIC_ALLOCATION_ENABLED)) {
@@ -517,12 +515,11 @@ class Requisition implements Comparable<Requisition>, Serializable {
                 recipientProgram     : recipientProgram,
                 requisitionTemplate  : requisitionTemplate?.toJson(),
                 requisitionItems     : requisitionItems?.sort()?.collect { it?.toJson() },
-                autoAllocationEnabled   : autoAllocationEnabled,
+                autoAllocationRequested   : autoAllocationRequested,
                 partialAllocationAllowed: partialAllocationAllowed,
                 partialIssuanceAllowed  : partialIssuanceAllowed,
                 allocationSourceStrategy      : allocationSourceStrategy?.name(),
-                autoIssuanceEnabled     : autoIssuanceEnabled,
-                negativeInventoryAllowed  : negativeInventoryAllowed,
+                autoIssuanceRequested     : autoIssuanceRequested,
         ]
     }
 
@@ -542,12 +539,11 @@ class Requisition implements Comparable<Requisition>, Serializable {
             dateCreated: dateCreated?.format("MMM dd, yyyy"),
             lastUpdated: lastUpdated?.format("MMM dd, yyyy"),
             isPublished: isPublished,
-            autoAllocationEnabled: autoAllocationEnabled,
+            autoAllocationRequested: autoAllocationRequested,
             partialAllocationAllowed: partialAllocationAllowed,
             partialIssuanceAllowed: partialIssuanceAllowed,
             allocationSourceStrategy: allocationSourceStrategy?.name(),
-            autoIssuanceEnabled: autoIssuanceEnabled,
-            negativeInventoryAllowed: negativeInventoryAllowed,
+            autoIssuanceRequested: autoIssuanceRequested,
         ]
     }
 }

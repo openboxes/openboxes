@@ -55,7 +55,7 @@ class AutomaticBackorderReallocationJob {
                     }
 
                     backorders.forEach { Requisition requisition ->
-                        if (requisition.autoAllocationEnabled) {
+                        if (requisition.autoAllocationRequested) {
                             List<AllocationResult> result = []
                             requisition?.requisitionItems?.each { requisitionItem ->
                                 def picklistItems = requisitionItem.picklistItems

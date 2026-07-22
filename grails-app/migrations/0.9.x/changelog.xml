@@ -61,4 +61,5 @@
     <include file="0.9.x/changelog-2026-06-16-1500-drop-not-null-constraint-on-audit-columns-in-event-log.xml" />
     <include file="0.9.x/changelog-2026-06-17-1200-add-unique-constraint-inventory-level-identifier.xml" />
     <include file="0.9.x/changelog-2026-07-07-1200-add-requisition-allocation-strategy-and-auto-issuance.xml" />
+    <include file="0.9.x/changelog-2026-07-22-1200-rename-requisition-auto-allocation-enabled-to-requested.xml" />
 </databaseChangeLog>

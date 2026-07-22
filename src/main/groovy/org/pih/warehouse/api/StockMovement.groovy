@@ -99,8 +99,7 @@ class StockMovement implements Validateable, Historizable {
     RequisitionSourceType sourceType // temporary sourceType field for ELECTRONIC and PAPER types
     DeliveryTypeCode deliveryTypeCode
     AllocationSourceStrategy allocationSourceStrategy
-    Boolean autoIssuanceEnabled
-    Boolean negativeInventoryAllowed
+    Boolean autoIssuanceRequested
     Order order
     Shipment shipment
     List documents
@@ -153,8 +152,7 @@ class StockMovement implements Validateable, Historizable {
         referenceDocument(nullable: true)
         deliveryTypeCode(nullable: true)
         allocationSourceStrategy(nullable: true)
-        autoIssuanceEnabled(nullable: true)
-        negativeInventoryAllowed(nullable: true)
+        autoIssuanceRequested(nullable: true)
 
         packingLocation(nullable: true)
         receivingLocation(nullable: true)
@@ -264,12 +262,11 @@ class StockMovement implements Validateable, Historizable {
             receivingLocation: receivingLocation?.toJson(LocationTypeCode.INTERNAL),
             packingLocation  : packingLocation?.toJson(LocationTypeCode.INTERNAL),
             loadingLocation  : loadingLocation?.toJson(LocationTypeCode.INTERNAL),
-            autoAllocationEnabled   : requisition?.autoAllocationEnabled,
+            autoAllocationRequested   : requisition?.autoAllocationRequested,
             partialAllocationAllowed: requisition?.partialAllocationAllowed,
             partialIssuanceAllowed  : requisition?.partialIssuanceAllowed,
             allocationSourceStrategy      : requisition?.allocationSourceStrategy?.name(),
-            autoIssuanceEnabled     : requisition?.autoIssuanceEnabled,
-            negativeInventoryAllowed  : requisition?.negativeInventoryAllowed,
+            autoIssuanceRequested     : requisition?.autoIssuanceRequested,
             priority                : requisition?.priority,
             priorityLevel           : PriorityLevel.fromPriority(requisition?.priority)?.name(),
         ]
@@ -495,8 +492,7 @@ class StockMovement implements Validateable, Historizable {
             isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED,
             requestType: requisition?.type,
             allocationSourceStrategy: requisition?.allocationSourceStrategy,
-            autoIssuanceEnabled: requisition?.autoIssuanceEnabled,
-            negativeInventoryAllowed: requisition?.negativeInventoryAllowed,
+            autoIssuanceRequested: requisition?.autoIssuanceRequested,
             lineItemCount: requisition.requisitionItemCount,
             approvers: requisition.approvers?.toList()
         )

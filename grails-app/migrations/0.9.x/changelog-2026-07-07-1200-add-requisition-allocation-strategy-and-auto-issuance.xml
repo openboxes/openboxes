@@ -20,24 +20,12 @@
     <changeSet author="druchniewicz" id="070720261200-1">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="requisition" columnName="auto_issuance_enabled"/>
+                <columnExists tableName="requisition" columnName="auto_issuance_requested"/>
             </not>
         </preConditions>
 
         <addColumn tableName="requisition">
-            <column name="auto_issuance_enabled" type="BIT(1)"/>
-        </addColumn>
-    </changeSet>
-
-    <changeSet author="druchniewicz" id="070720261200-2">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="requisition" columnName="negative_inventory_allowed"/>
-            </not>
-        </preConditions>
-
-        <addColumn tableName="requisition">
-            <column name="negative_inventory_allowed" type="BIT(1)"/>
+            <column name="auto_issuance_requested" type="BIT(1)"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>
