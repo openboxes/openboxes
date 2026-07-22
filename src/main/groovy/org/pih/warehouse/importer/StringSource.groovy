@@ -16,4 +16,8 @@ class StringSource implements BulkDataSource<String> {
     InputStream asInputStream(){
         return new ByteArrayInputStream(source.getBytes(StandardCharsets.UTF_8))
     }
+
+    static constraints = {
+
+    }
 }

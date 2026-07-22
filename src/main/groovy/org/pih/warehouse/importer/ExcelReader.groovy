@@ -12,6 +12,7 @@ import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.apache.poi.ss.util.CellReference
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 
 import org.pih.warehouse.core.date.EpochDate
@@ -22,6 +23,10 @@ import org.pih.warehouse.core.http.ContentType
  */
 @Component
 class ExcelReader extends BulkDataReader<ExcelReaderConfig> {
+
+    ExcelReader(@Lazy final BulkDataImportComponentResolver componentResolver) {
+        super(componentResolver)
+    }
 
     @Override
     List<ContentType> getSupportedContentTypes() {

@@ -59,6 +59,13 @@ class MessageLocalizer {
 
     /**
      * Translates a given code/label into the locale of the requesting user.
+     */
+    String localize(String code, List args, Locale localeOverride=null) {
+        return localize(code, args as Object[], localeOverride)
+    }
+
+    /**
+     * Translates a given code/label into the locale of the requesting user.
      *
      * If the code does not resolve to a localization label, we return the code itself.
      * We do this so that it's very obvious when a code has been misconfigured. Otherwise

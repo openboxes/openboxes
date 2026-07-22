@@ -3,8 +3,8 @@ package org.pih.warehouse.importer
 import org.springframework.context.ApplicationContext
 import spock.lang.Specification
 import spock.lang.Unroll
+import testutil.MessageLocalizerStub
 
-import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.core.parser.DefaultTypeParser
 import org.pih.warehouse.core.parser.Parser
 import org.pih.warehouse.core.parser.ParserContext
@@ -21,7 +21,6 @@ class BulkDataBinderSpec extends Specification {
 
     DefaultTypeParser defaultTypeParserStub
     ConfiguresBulkDataBinder bulkDataBinderConfigurerStub
-    MessageLocalizer messageLocalizerStub
     Parser parserStub
 
     void setup() {
@@ -40,12 +39,12 @@ class BulkDataBinderSpec extends Specification {
             getBulkDataBinderConfigurer(UNKNOWN_BULK_DATA_TYPE) >> null
         }
 
-        messageLocalizerStub = Stub(MessageLocalizer) {
-            localize(_ as String, _ as Object[]) >> "LOCALIZED MESSAGE"
-        }
-
         bulkDataBinder = new BulkDataBinder(
-                componentResolverStub, defaultTypeParserStub, messageLocalizerStub, contextStub)
+                componentResolverStub,
+                defaultTypeParserStub,
+                MessageLocalizerStub.MESSAGE_LOCALIZER_STUB,
+                contextStub,
+        )
     }
 
     void "bindData should successfully bind data to a strongly-typed object"() {
@@ -81,7 +80,7 @@ class BulkDataBinderSpec extends Specification {
         assert rows[0].stringField == "Hi"
         assert rows[0].integerField == 1
 
-        assert result.errors.size() == 0
+        assert !result.bindErrors.hasErrors()
     }
 
     void "bindData should ignore fields that are not specified in the config"() {
@@ -117,7 +116,7 @@ class BulkDataBinderSpec extends Specification {
         assert rows[0].stringField == "Hi"   // Should parse normally
         assert rows[0].integerField == null  // Should be ignored
 
-        assert result.errors.size() == 0
+        assert !result.bindErrors.hasErrors()
     }
 
     void "bindData should capture parser errors"() {
@@ -155,12 +154,14 @@ class BulkDataBinderSpec extends Specification {
         assert rows[0].stringField == "Hi"
         assert rows[0].integerField == null
 
-        assert result.errors.size() == 1
-        assert result.errors[0].row == 0
-        assert result.errors[0].column == "1"
-        assert result.errors[0].severity == BulkDataErrorSeverity.ERROR
-        assert result.errors[0].localizedMessage == "LOCALIZED MESSAGE"
-        assert result.errors[0].exception.message == "PARSER ERROR"
+        List<BulkDataError> errors = result.bindErrors.allErrors
+        assert errors.size() == 1
+        assert errors[0].row == 0
+        assert errors[0].column == "1"
+        assert errors[0].fieldName == "integerField"
+        assert errors[0].severity == BulkDataErrorSeverity.ERROR
+        assert errors[0].localizedMessage == "import.binder.error"
+        assert errors[0].exception.message == "PARSER ERROR"
     }
 
     void "bindData should successfully custom bind data"() {
@@ -196,7 +197,7 @@ class BulkDataBinderSpec extends Specification {
         assert rows.size() == 1
         assert rows[0].stringField == "CUSTOM VALUE"
 
-        assert result.errors.size() == 0
+        assert !result.bindErrors.hasErrors()
     }
 
     void "bindData should handle errors when custom bind data"() {
@@ -221,10 +222,11 @@ class BulkDataBinderSpec extends Specification {
         bulkDataBinderConfigurerStub.customBindData(_ as List, _ as BulkDataBinderResult) >> {
             List rawRowsList, BulkDataBinderResult<ImportableStub> result ->
 
-                result.addError(new BulkDataError(
+                result.bindErrors.addError(new BulkDataError(
                         row: 0,
                         column: 0,
-                        localizedMessage: "CUSTOM BINDING ERROR"
+                        fieldName: "stringField",
+                        localizedMessage: "CUSTOM BINDING ERROR",
                 ))
         }
 
@@ -236,10 +238,12 @@ class BulkDataBinderSpec extends Specification {
         assert rows.size() == 1
         assert rows[0].stringField == null
 
-        assert result.errors.size() == 1
-        assert result.errors[0].row == 0
-        assert result.errors[0].column == "0"
-        assert result.errors[0].localizedMessage == "CUSTOM BINDING ERROR"
+        List<BulkDataError> errors = result.bindErrors.allErrors
+        assert errors.size() == 1
+        assert errors[0].row == 0
+        assert errors[0].column == "0"
+        assert errors[0].fieldName == "stringField"
+        assert errors[0].localizedMessage == "CUSTOM BINDING ERROR"
     }
 
     void "bindData should fail if there is no configurer associated with the given bulk data type"() {

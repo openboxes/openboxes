@@ -3,16 +3,26 @@ package org.pih.warehouse.importer
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVRecord
 import org.apache.commons.lang3.StringUtils
+import org.apache.poi.ss.util.CellReference
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 
-import org.pih.warehouse.core.date.EpochDate
 import org.pih.warehouse.core.http.ContentType
+import org.pih.warehouse.core.localization.MessageLocalizer
 
 /**
  * Reads in CSV a source object, capturing it as a List of Map rows.
  */
 @Component
 class CsvReader extends BulkDataReader<CsvReaderConfig> {
+
+    final private MessageLocalizer messageLocalizer
+
+    CsvReader(@Lazy final BulkDataImportComponentResolver componentResolver,
+              final MessageLocalizer messageLocalizer) {
+        super(componentResolver)
+        this.messageLocalizer = messageLocalizer
+    }
 
     @Override
     List<ContentType> getSupportedContentTypes() {
@@ -23,6 +33,8 @@ class CsvReader extends BulkDataReader<CsvReaderConfig> {
     protected BulkDataReaderResult doRead(BulkDataSource source, CsvReaderConfig config) {
         InputStreamReader reader = null
         try {
+            BulkDataReaderResult result = new BulkDataReaderResult()
+
             reader = new InputStreamReader(source.asInputStream(), config.charset)
             Iterable<CSVRecord> csvRows = CSVFormat.DEFAULT.builder()
                     .setDelimiter(config.delimiter)
@@ -36,24 +48,29 @@ class CsvReader extends BulkDataReader<CsvReaderConfig> {
                     continue
                 }
 
+                int rowIndex = (int) (csvRow.recordNumber - 1)  // recordNumber is 1-indexed
+
                 // If a row has fewer columns than we expect, error.
-                // TODO: Instead of throwing an exception, simply add a new BulkDataError and continue processing.
-                //       This requires adding a List<BulkDataError> field to BulkDataReaderResult.
                 if (csvRow.size() < columnToFieldMap.size()) {
-                    throw new RuntimeException("Row at index ${csvRow.recordNumber - 1} contains an unexpected number of cells. Expected at least ${columnToFieldMap.size()} but got ${csvRow.size()}")
+                    result.readErrors.addError(new BulkDataError(
+                            row: rowIndex,
+                            severity: BulkDataErrorSeverity.ERROR,
+                            localizedMessage: messageLocalizer.localize(
+                                    "import.reader.unexpectedNumberCells", [columnToFieldMap.size(), csvRow.size()]),
+                    ))
                 }
 
                 Map<String, BulkDataCell> readRow = [:]
                 for (int i = 0; i < csvRow.size(); i++) {
                     // Only bother importing cells whose columns are specified in the config
-                    String fieldName = columnToFieldMap.get(String.valueOf(i))
+                    String fieldName = getFieldName(i, columnToFieldMap)
                     if (StringUtils.isBlank(fieldName)) {
                         continue
                     }
 
                     // Read in the cell as a String. Sanitizing and type parsing will be done in the data binding step.
                     readRow.put(fieldName, new BulkDataCell(
-                            row: csvRow.recordNumber - 1,  // recordNumber is 1-indexed
+                            row: rowIndex,
                             column: i,
                             fieldName: fieldName,
                             value: csvRow.get(i)
@@ -61,16 +78,21 @@ class CsvReader extends BulkDataReader<CsvReaderConfig> {
                 }
                 readRows.add(readRow)
             }
-
-            return new BulkDataReaderResult(
-                    rows: readRows,
-                    // CSVs are unlikely to contain dates in the Double format that Excel uses, so the "epochDate"
-                    // is unlikely to matter for CSVs. Typically CSV exports contain the stringified version of
-                    // the date. For clarity, we set the value to the Unix epoch, but this probably won't be used.
-                    epochDate: EpochDate.UNIX_EPOCH,
-            )
+            result.rows = readRows
+            return result
         } finally {
             reader?.close()
         }
+    }
+
+    /**
+     * Extract the field name from the column mapping config for the given column index.
+     *
+     * We allow our columns in our mapping config to be represented as either zero-indexed numerical keys,
+     * or as letters (as they appear in Excel). Ex: The first column can be represented as "0" or "A".
+     */
+    private String getFieldName(int columnIndex, Map<String, String> columnMapping) {
+        return columnMapping.get(String.valueOf(columnIndex)) ?:
+                columnMapping.get(CellReference.convertNumToColString(columnIndex))
     }
 }
