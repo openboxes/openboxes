@@ -843,12 +843,14 @@ export const updateReceivingHeader = ({
   headerInfo,
   isShipmentFromPurchaseOrder,
   shipmentNumber,
+  shipmentDetails,
 }) => ({
   type: UPDATE_RECEIVING_HEADER,
   payload: {
     headerInfo,
     isShipmentFromPurchaseOrder,
     shipmentNumber,
+    shipmentDetails,
   },
 });
 

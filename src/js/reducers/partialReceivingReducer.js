@@ -4,6 +4,7 @@ const initialState = {
   headerInfo: [],
   isShipmentFromPurchaseOrder: false,
   shipmentNumber: null,
+  shipmentDetails: {},
   binLocations: [],
 };
 
@@ -19,6 +20,7 @@ export default function partialReceivingReducer(state = initialState, action) {
         headerInfo: action.payload.headerInfo,
         isShipmentFromPurchaseOrder: action.payload.isShipmentFromPurchaseOrder,
         shipmentNumber: action.payload.shipmentNumber,
+        shipmentDetails: action.payload.shipmentDetails,
       };
 
     case UPDATE_RECEIVING_BIN_LOCATIONS:

@@ -385,6 +385,9 @@ export const getIsShipmentFromPurchaseOrder = (state) =>
 
 export const getReceivingShipmentNumber = (state) => state.partialReceiving.shipmentNumber;
 
+export const getReceivingShipmentDetails = (state) =>
+  state.partialReceiving.shipmentDetails || {};
+
 export const getReceivingBinLocations = (state) => state.partialReceiving.binLocations || [];
 
 // The receiving bin generated for the shipment is named "<prefix>-<shipment number>",

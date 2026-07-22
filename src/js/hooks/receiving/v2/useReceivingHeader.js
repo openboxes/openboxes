@@ -57,6 +57,12 @@ const useReceivingHeader = () => {
       headerInfo: buildHeaderInfo(data),
       isShipmentFromPurchaseOrder: Boolean(data?.isFromOrder),
       shipmentNumber: data?.identifier,
+      shipmentDetails: {
+        origin: data?.origin?.name,
+        destination: data?.destination?.name,
+        dateShipped: data?.dateShipped,
+        shipmentStatus: data?.shipmentStatus,
+      },
     }));
   };
 
