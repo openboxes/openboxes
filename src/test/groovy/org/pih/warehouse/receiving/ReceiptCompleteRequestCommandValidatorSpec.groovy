@@ -1,6 +1,7 @@
 package org.pih.warehouse.receiving
 
 import grails.testing.gorm.DataTest
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -14,6 +15,13 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
 
     void setupSpec() {
         mockDomains(Receipt, ReceiptItem, ReceiptV2Marker, Product)
+
+        // ReceiptItemCompleteRequest implements ObjectValidatable, whose validate() performs javax validation
+        // through the "defaultValidator" bean. A running app gets that bean from Boot's autoconfiguration, but
+        // the DataTest context does not register it, so items could not be validated here without this.
+        defineBeans {
+            defaultValidator(LocalValidatorFactoryBean)
+        }
     }
 
     void 'doValidate should reject a receipt that was not created by the v2 workflow'() {
@@ -28,8 +36,8 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
         ))
 
         then:
-        !result.valid
-        result.errors*.code == ["receiptCompleteRequestCommand.receipt.notV2"]
+        assert !result.valid
+        assert result.errors*.code == ["receiptCompleteRequestCommand.receipt.notV2"]
     }
 
     void 'doValidate should reject the cancel-remaining flag on a split item'() {
@@ -42,16 +50,16 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
         ObjectValidationResult result = validator.doValidate(new ReceiptCompleteRequestCommand(
                 receipt: receipt,
                 itemsToComplete: [
-                        new ReceiptItemCompleteRequest(receiptItem: originalItem, cancelRemaining: true),
-                        new ReceiptItemCompleteRequest(receiptItem: splitItem, cancelRemaining: true),
+                        new ReceiptItemCompleteRequest(receiptItem: originalItem, cancelRemainingQuantity: true),
+                        new ReceiptItemCompleteRequest(receiptItem: splitItem, cancelRemainingQuantity: true),
                 ],
         ))
 
         then: 'only the split line is rejected'
-        !result.valid
-        result.errors*.code == ["receiptCompleteRequestCommand.itemsToComplete.cancelRemainingOnSplitItem"]
-        result.errors.first().arguments.toString().contains(splitItem.id.toString())
-        !result.errors.first().arguments.toString().contains(originalItem.id.toString())
+        assert !result.valid
+        assert result.errors*.code == ["receiptCompleteRequestCommand.itemsToComplete.cancelRemainingOnSplitItem"]
+        assert result.errors.first().arguments.toString().contains(splitItem.id.toString())
+        assert !result.errors.first().arguments.toString().contains(originalItem.id.toString())
     }
 
     void 'doValidate should accept the cancel-remaining flag on an original item (isSplitItem: #isSplitItem)'() {
@@ -62,11 +70,11 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
         when:
         ObjectValidationResult result = validator.doValidate(new ReceiptCompleteRequestCommand(
                 receipt: receipt,
-                itemsToComplete: [new ReceiptItemCompleteRequest(receiptItem: originalItem, cancelRemaining: true)],
+                itemsToComplete: [new ReceiptItemCompleteRequest(receiptItem: originalItem, cancelRemainingQuantity: true)],
         ))
 
         then:
-        result.valid
+        assert result.valid
 
         where: 'a missing flag (legacy data) counts as an original line'
         isSplitItem << [Boolean.FALSE, null]
@@ -80,11 +88,11 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
         when:
         ObjectValidationResult result = validator.doValidate(new ReceiptCompleteRequestCommand(
                 receipt: receipt,
-                itemsToComplete: [new ReceiptItemCompleteRequest(receiptItem: splitItem, cancelRemaining: false)],
+                itemsToComplete: [new ReceiptItemCompleteRequest(receiptItem: splitItem, cancelRemainingQuantity: false)],
         ))
 
         then:
-        result.valid
+        assert result.valid
     }
 
     // ----------------------------------------------------------------------------------------------------------

@@ -90,9 +90,29 @@ class ReceiptItemsBatchRequestValidator implements ObjectValidator<ReceiptItemsB
      * to an existing item are ignored here - the service reports them when it performs the delete.
      */
     private ObjectError validateItemsToDeleteAreNotOriginalItems(ReceiptItemsBatchRequest request) {
+        if (!request.itemsToDelete) {
+            return null
+        }
+
+        // A single projection query instead of a per-id ReceiptItem.get(): one round trip for the whole batch, and
+        // the items stay out of the Hibernate session - the service is about to delete these very entities.
+        List<Object> receiptItemRows = ReceiptItem.createCriteria().list {
+            projections {
+                property("id")
+                property("isSplitItem")
+            }
+            inList("id", request.itemsToDelete)
+        }
+
+        Map<String, Boolean> isSplitItemByReceiptItemId = receiptItemRows.collectEntries { Object row ->
+            [(row[0]): row[1]]
+        }
+
         List<String> originalItemIds = request.itemsToDelete.findAll { String receiptItemId ->
-            ReceiptItem receiptItem = ReceiptItem.get(receiptItemId)
-            return receiptItem && !receiptItem.isSplitItem
+            // containsKey() distinguishes ids that don't resolve to an item (skipped) from legacy items whose flag
+            // is null (originals).
+            return isSplitItemByReceiptItemId.containsKey(receiptItemId) &&
+                    !isSplitItemByReceiptItemId[receiptItemId]
         }
 
         return originalItemIds ?

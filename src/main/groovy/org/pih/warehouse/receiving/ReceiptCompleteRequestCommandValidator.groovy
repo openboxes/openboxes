@@ -115,7 +115,7 @@ class ReceiptCompleteRequestCommandValidator implements ObjectValidator<ReceiptC
      */
     private ObjectError validateCancelRemainingOnlyOnOriginalItems(ReceiptCompleteRequestCommand command) {
         List<String> flaggedSplitItemIds = command.itemsToComplete
-                .findAll { it.cancelRemaining && it.receiptItem?.isSplitItem }
+                .findAll { it.cancelRemainingQuantity && it.receiptItem?.isSplitItem }
                 .collect { it.receiptItem.id }
 
         return flaggedSplitItemIds ?

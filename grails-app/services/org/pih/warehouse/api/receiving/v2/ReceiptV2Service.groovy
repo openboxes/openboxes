@@ -86,10 +86,10 @@ class ReceiptV2Service {
 
         markReceiptAsV2(receipt)
 
-        shipment.shipmentItems.each { ShipmentItem shipmentItem ->
-            // Create initial ("original") receipt items only for items that have yet remaining qty to receive
+        for (ShipmentItem shipmentItem : shipment.shipmentItems) {
+            // In the case of partial receipts, we only want to create receipt items for shipment items that have not yet been fully received
             if (getShipmentItemQuantityRemaining(shipmentItem) > 0) {
-                createOriginalReceiptItem(receipt, shipmentItem)
+                createReceiptItemFromShipmentItem(receipt, shipmentItem)
             }
         }
 
@@ -107,7 +107,7 @@ class ReceiptV2Service {
      * Lines added while receiving are split lines instead: they are flagged with isSplitItem and carry a quantity
      * shipped of zero, so they never factor into the cancel-remaining math.
      */
-    private static ReceiptItem createOriginalReceiptItem(Receipt receipt, ShipmentItem shipmentItem) {
+    private static ReceiptItem createReceiptItemFromShipmentItem(Receipt receipt, ShipmentItem shipmentItem) {
         ReceiptItem receiptItem = new ReceiptItem(
                 product: shipmentItem.product,
                 inventoryItem: shipmentItem.inventoryItem,
@@ -311,7 +311,7 @@ class ReceiptV2Service {
     }
 
     /**
-     * Cancels the quantity still left to receive on every line flagged with cancelRemaining: the shipment item's
+     * Cancels the quantity still left to receive on every line flagged with cancelRemainingQuantity: the shipment item's
      * remaining quantity ({@link #getShipmentItemQuantityRemaining}) is written to the flagged line as its canceled
      * quantity. Lines missing from the request (or sent with the flag disabled) cancel nothing, so their shipment
      * item's remainder stays open for future receipts.
@@ -332,7 +332,7 @@ class ReceiptV2Service {
      */
     private static void cancelRemainingQuantities(List<ReceiptItemCompleteRequest> itemsToComplete) {
         for (ReceiptItemCompleteRequest item : itemsToComplete) {
-            if (!item.cancelRemaining) {
+            if (!item.cancelRemainingQuantity) {
                 continue
             }
 

@@ -108,27 +108,27 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         1 * receiptService.createTemporaryReceivingBin(shipment)
 
         and: 'a pending receipt is created with one line per shipment item'
-        shipment.receipts.size() == 1
+        assert shipment.receipts.size() == 1
         Receipt receipt = shipment.receipts.first()
-        receipt.receiptStatusCode == ReceiptStatusCode.PENDING
-        receipt.receiptNumber == "RCPT-001"
-        receipt.receiptItems.size() == 2
+        assert receipt.receiptStatusCode == ReceiptStatusCode.PENDING
+        assert receipt.receiptNumber == "RCPT-001"
+        assert receipt.receiptItems.size() == 2
 
         and: 'each line is an empty original mirroring its shipment item'
         ReceiptItem originalItem = receipt.receiptItems.find { it.shipmentItem == firstShipmentItem }
-        originalItem.quantityReceived == 0
-        originalItem.isSplitItem == Boolean.FALSE
-        originalItem.quantityShipped == 100
-        originalItem.product == firstShipmentItem.product
-        originalItem.inventoryItem == firstShipmentItem.inventoryItem
-        originalItem.sortOrder == 0
-        firstShipmentItem.receiptItems.contains(originalItem)
-        receipt.receiptItems.find { it.shipmentItem == secondShipmentItem }.quantityShipped == 50
+        assert originalItem.quantityReceived == 0
+        assert originalItem.isSplitItem == Boolean.FALSE
+        assert originalItem.quantityShipped == 100
+        assert originalItem.product == firstShipmentItem.product
+        assert originalItem.inventoryItem == firstShipmentItem.inventoryItem
+        assert originalItem.sortOrder == 0
+        assert firstShipmentItem.receiptItems.contains(originalItem)
+        assert receipt.receiptItems.find { it.shipmentItem == secondShipmentItem }.quantityShipped == 50
 
         and: 'the response carries the created lines'
-        result.receiptStatus == ReceiptStatusCode.PENDING
-        result.receiptItems.size() == 2
-        result.receiptItems.every { it.quantityReceived == 0 && !it.isSplitItem }
+        assert result.receiptStatus == ReceiptStatusCode.PENDING
+        assert result.receiptItems.size() == 2
+        assert result.receiptItems.every { it.quantityReceived == 0 && !it.isSplitItem }
     }
 
     void 'startReceipt should skip shipment items already fully consumed by previous receipts'() {
@@ -144,17 +144,17 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         ReceiptDto result = service.startReceipt(shipment.id)
 
         then: 'the new receipt only carries an original line for the item that still has a remainder'
-        result.receiptItems.size() == 1
+        assert result.receiptItems.size() == 1
         Receipt receipt = shipment.receipts.find { it.receiptStatusCode == ReceiptStatusCode.PENDING }
-        receipt.receiptItems.size() == 1
+        assert receipt.receiptItems.size() == 1
         ReceiptItem newOriginalItem = receipt.receiptItems.first()
-        newOriginalItem.shipmentItem == openItem
-        newOriginalItem.quantityReceived == 0
-        newOriginalItem.isSplitItem == Boolean.FALSE
-        newOriginalItem.quantityShipped == 50
+        assert newOriginalItem.shipmentItem == openItem
+        assert newOriginalItem.quantityReceived == 0
+        assert newOriginalItem.isSplitItem == Boolean.FALSE
+        assert newOriginalItem.quantityShipped == 50
 
         and: 'the consumed item keeps only its previous line'
-        consumedItem.receiptItems.size() == 1
+        assert consumedItem.receiptItems.size() == 1
     }
 
     void 'startReceipt should mark the created receipt as a v2 receipt'() {
@@ -165,8 +165,8 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         service.startReceipt(shipment.id)
 
         then: 'a marker row ties the pending receipt to the v2 workflow'
-        ReceiptV2Marker.count() == 1
-        ReceiptV2Marker.list().first().receipt == shipment.receipts.first()
+        assert ReceiptV2Marker.count() == 1
+        assert ReceiptV2Marker.list().first().receipt == shipment.receipts.first()
     }
 
     void 'startReceipt should reject a shipment that already has a pending receipt'() {
@@ -180,7 +180,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
 
         then:
         IllegalStateException e = thrown()
-        e.message.contains("pending receipt already exists")
+        assert e.message.contains("pending receipt already exists")
     }
 
     void 'startReceipt should reject a shipment that has not been shipped yet'() {
@@ -195,7 +195,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
 
         then:
         IllegalStateException e = thrown()
-        e.message.contains("has not been shipped yet")
+        assert e.message.contains("has not been shipped yet")
     }
 
     void 'startReceipt should reject a shipment already fully consumed by lines received against an edited product'() {
@@ -213,7 +213,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
 
         then: 'the legacy product-filtered check would still see 60 to receive - the v2 math rejects the start'
         IllegalStateException e = thrown()
-        e.message.contains("fully received")
+        assert e.message.contains("fully received")
     }
 
     // ----------------------------------------------------------------------------------------------------------
@@ -234,7 +234,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         Map<String, ShipmentItemReceivedQuantitiesDto> result = service.getReceivedQuantitiesByShipmentItemId(shipment)
 
         then: 'the edited-product line counts towards the totals, so the item reports fully received'
-        result.size() == 1
+        assert result.size() == 1
         with(result[shipmentItem.id]) {
             quantityReceived == 90
             quantityCanceled == 10
@@ -338,11 +338,11 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
 
         and: 'the new line is flagged as a split server-side and carries no quantity shipped of its own'
         ReceiptItem splitItem = receipt.receiptItems.find { it.isSplitItem }
-        splitItem.quantityShipped == 0
-        splitItem.quantityReceived == 30
-        splitItem.inventoryItem == splitLot
-        shipmentItem.receiptItems.contains(splitItem)
-        originalItem.quantityShipped == 100
+        assert splitItem.quantityShipped == 0
+        assert splitItem.quantityReceived == 30
+        assert splitItem.inventoryItem == splitLot
+        assert shipmentItem.receiptItems.contains(splitItem)
+        assert originalItem.quantityShipped == 100
     }
 
     void 'editReceivingInfo should not change the split flag or quantity shipped when updating an existing line'() {
@@ -371,9 +371,9 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
                 shipmentItem.inventoryItem
 
         and: 'only the receiving info changes - the line stays the original with its full quantity shipped'
-        originalItem.quantityReceived == 60
-        originalItem.isSplitItem == Boolean.FALSE
-        originalItem.quantityShipped == 100
+        assert originalItem.quantityReceived == 60
+        assert originalItem.isSplitItem == Boolean.FALSE
+        assert originalItem.quantityShipped == 100
     }
 
     // ----------------------------------------------------------------------------------------------------------
@@ -391,8 +391,8 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         service.cancelRemainingQuantities([completeRequest(receiptItem, true)])
 
         then:
-        receiptItem.quantityCanceled == 30
-        shipmentItem.quantityRemaining == 0
+        assert receiptItem.quantityCanceled == 30
+        assert shipmentItem.quantityRemaining == 0
     }
 
     void 'cancelRemainingQuantities should leave lines without the flag untouched'() {
@@ -407,8 +407,8 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         service.cancelRemainingQuantities([completeRequest(unflaggedItem, false)])
 
         then:
-        unflaggedItem.quantityCanceled == null
-        missingItem.quantityCanceled == null
+        assert unflaggedItem.quantityCanceled == null
+        assert missingItem.quantityCanceled == null
     }
 
     void 'cancelRemainingQuantities should account for quantities received by previous receipts'() {
@@ -425,7 +425,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         service.cancelRemainingQuantities([completeRequest(currentItem, true)])
 
         then: 'the cap limits the line remainder (80) to what the shipment item actually has left'
-        currentItem.quantityCanceled == 50
+        assert currentItem.quantityCanceled == 50
     }
 
     void 'cancelRemainingQuantities should cancel only on the original line when both lines are flagged'() {
@@ -440,9 +440,9 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
                 [completeRequest(originalItem, true), completeRequest(splitItem, true)])
 
         then: 'the split line is skipped and the original line cancels the shipment item remainder'
-        originalItem.quantityCanceled == 50
-        splitItem.quantityCanceled == null
-        shipmentItem.quantityRemaining == 0
+        assert originalItem.quantityCanceled == 50
+        assert splitItem.quantityCanceled == null
+        assert shipmentItem.quantityRemaining == 0
     }
 
     void 'cancelRemainingQuantities should not set a negative canceled quantity on an over-received line'() {
@@ -455,7 +455,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         service.cancelRemainingQuantities([completeRequest(receiptItem, true)])
 
         then:
-        receiptItem.quantityCanceled == 0
+        assert receiptItem.quantityCanceled == 0
     }
 
     void 'cancelRemainingQuantities should not cancel when an over-received sibling line already covered the shipment item'() {
@@ -469,7 +469,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         service.cancelRemainingQuantities([completeRequest(originalItem, true)])
 
         then: 'nothing is left to cancel on the shipment item'
-        originalItem.quantityCanceled == 0
+        assert originalItem.quantityCanceled == 0
     }
 
     void 'cancelRemainingQuantities should cancel the shipment item remainder on the original line when split lines received part of it'() {
@@ -483,9 +483,9 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         service.cancelRemainingQuantities([completeRequest(originalItem, true)])
 
         then: 'the original line cancels exactly what is left after both lines received their quantities'
-        originalItem.quantityCanceled == 50
-        splitItem.quantityCanceled == null
-        shipmentItem.quantityRemaining == 0
+        assert originalItem.quantityCanceled == 50
+        assert splitItem.quantityCanceled == null
+        assert shipmentItem.quantityRemaining == 0
     }
 
     void 'cancelRemainingQuantities should count split lines received against an edited product towards the shipment item remainder'() {
@@ -502,7 +502,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         service.cancelRemainingQuantities([completeRequest(originalItem, true)])
 
         then: 'the split quantities consume the remainder even though their product no longer matches the shipment item'
-        originalItem.quantityCanceled == 37
+        assert originalItem.quantityCanceled == 37
     }
 
     void 'cancelRemainingQuantities should skip a flagged split line'() {
@@ -516,9 +516,9 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         service.cancelRemainingQuantities([completeRequest(splitItem, true)])
 
         then: 'nothing is canceled and the shipment item keeps its remainder open'
-        splitItem.quantityCanceled == null
-        originalItem.quantityCanceled == null
-        shipmentItem.quantityRemaining == 50
+        assert splitItem.quantityCanceled == null
+        assert originalItem.quantityCanceled == null
+        assert shipmentItem.quantityRemaining == 50
     }
 
     // ----------------------------------------------------------------------------------------------------------
@@ -607,24 +607,24 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
 
         then: 'a transfer-in transaction is persisted and associated with the receipt and shipment'
         1 * transactionIdentifierService.generate(_ as Transaction) >> "TRX-002"
-        Transaction.list() == [transaction]
-        transaction.transactionType.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID
-        transaction.transactionNumber == "TRX-002"
-        transaction.receipt == receipt
-        transaction.incomingShipment == shipment
-        transaction.source == shipment.origin
-        transaction.destination == null
-        transaction.inventory == shipment.destination.inventory
-        transaction.transactionDate == receipt.actualDeliveryDate
-        shipment.incomingTransactions.contains(transaction)
+        assert Transaction.list() == [transaction]
+        assert transaction.transactionType.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID
+        assert transaction.transactionNumber == "TRX-002"
+        assert transaction.receipt == receipt
+        assert transaction.incomingShipment == shipment
+        assert transaction.source == shipment.origin
+        assert transaction.destination == null
+        assert transaction.inventory == shipment.destination.inventory
+        assert transaction.transactionDate == receipt.actualDeliveryDate
+        assert shipment.incomingTransactions.contains(transaction)
 
         and: 'each receipt item is credited with its received quantity (defaulting to zero)'
-        transaction.transactionEntries.size() == 2
+        assert transaction.transactionEntries.size() == 2
         TransactionEntry firstEntry = transaction.transactionEntries.find { it.inventoryItem == firstItem.inventoryItem }
-        firstEntry.quantity == 70
-        firstEntry.binLocation == firstItem.binLocation
+        assert firstEntry.quantity == 70
+        assert firstEntry.binLocation == firstItem.binLocation
         TransactionEntry secondEntry = transaction.transactionEntries.find { it.inventoryItem == secondItem.inventoryItem }
-        secondEntry.quantity == 0
+        assert secondEntry.quantity == 0
     }
 
     void 'createInboundTransaction should resolve a missing inventory item from the lot fields'() {
@@ -643,7 +643,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
 
         then:
         1 * inventoryItemManager.getOrCreateInventoryItem(receiptItem.product, "LOT-9", expirationDate) >> resolvedInventoryItem
-        transaction.transactionEntries.first().inventoryItem == resolvedInventoryItem
+        assert transaction.transactionEntries.first().inventoryItem == resolvedInventoryItem
     }
 
     void 'createInboundTransaction should fail when the destination has no inventory'() {
@@ -682,16 +682,16 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         ReceiptDto result = service.completeReceipt(command)
 
         then: 'the receipt is flagged as received with the delivery date from the command'
-        receipt.receiptStatusCode == ReceiptStatusCode.RECEIVED
-        receipt.actualDeliveryDate == Date.from(dateDelivered)
-        result.receiptStatus == ReceiptStatusCode.RECEIVED
+        assert receipt.receiptStatusCode == ReceiptStatusCode.RECEIVED
+        assert receipt.actualDeliveryDate == Date.from(dateDelivered)
+        assert result.receiptStatus == ReceiptStatusCode.RECEIVED
 
         and: 'the remaining quantity is canceled'
-        receiptItem.quantityCanceled == 30
+        assert receiptItem.quantityCanceled == 30
 
         and: 'the shipment event is created and the inbound transaction is recorded'
         1 * shipmentService.createShipmentEvent(shipment, receipt.actualDeliveryDate, EventCode.RECEIVED, shipment.destination)
-        Transaction.list().size() == 1
+        assert Transaction.list().size() == 1
 
         and: 'the status transition event carries the completed receipt'
         1 * mainContext.publishEvent({ Object event ->
@@ -715,7 +715,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         service.completeReceipt(new ReceiptCompleteRequestCommand(receipt: receipt))
 
         then:
-        receipt.actualDeliveryDate == originalDateDelivered
+        assert receipt.actualDeliveryDate == originalDateDelivered
     }
 
     void 'completeReceipt should apply the cancels only after flagging the receipt as received'() {
@@ -738,15 +738,15 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         service.completeReceipt(command)
 
         then: 'the current receipt quantities are already counted, so only the true remainder is canceled'
-        currentItem.quantityCanceled == 50
+        assert currentItem.quantityCanceled == 50
     }
 
     // ----------------------------------------------------------------------------------------------------------
     // Fixture helpers
     // ----------------------------------------------------------------------------------------------------------
 
-    private static ReceiptItemCompleteRequest completeRequest(ReceiptItem receiptItem, boolean cancelRemaining) {
-        return new ReceiptItemCompleteRequest(receiptItem: receiptItem, cancelRemaining: cancelRemaining)
+    private static ReceiptItemCompleteRequest completeRequest(ReceiptItem receiptItem, boolean cancelRemainingQuantity) {
+        return new ReceiptItemCompleteRequest(receiptItem: receiptItem, cancelRemainingQuantity: cancelRemainingQuantity)
     }
 
     /**

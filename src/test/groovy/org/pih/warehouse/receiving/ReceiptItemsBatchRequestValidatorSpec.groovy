@@ -29,10 +29,10 @@ class ReceiptItemsBatchRequestValidatorSpec extends Specification implements Dat
         ))
 
         then: 'only the original line is rejected'
-        !result.valid
-        result.errors*.code == ["receiptItemsBatchRequest.itemsToDelete.originalItem"]
-        result.errors.first().arguments.toString().contains(originalItem.id.toString())
-        !result.errors.first().arguments.toString().contains(splitItem.id.toString())
+        assert !result.valid
+        assert result.errors*.code == ["receiptItemsBatchRequest.itemsToDelete.originalItem"]
+        assert result.errors.first().arguments.toString().contains(originalItem.id.toString())
+        assert !result.errors.first().arguments.toString().contains(splitItem.id.toString())
 
         where: 'a missing flag (legacy data) counts as an original line'
         isSplitItem << [Boolean.FALSE, null]
@@ -50,7 +50,7 @@ class ReceiptItemsBatchRequestValidatorSpec extends Specification implements Dat
         ))
 
         then:
-        result.valid
+        assert result.valid
     }
 
     void 'doValidate should leave unknown item identifiers for the service to report'() {
@@ -64,7 +64,7 @@ class ReceiptItemsBatchRequestValidatorSpec extends Specification implements Dat
         ))
 
         then:
-        result.valid
+        assert result.valid
     }
 
     // ----------------------------------------------------------------------------------------------------------
