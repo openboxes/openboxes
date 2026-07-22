@@ -19,7 +19,7 @@ import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.putaway.PutawayService
 import org.quartz.JobExecutionContext
 
-class PutawayLocationReassignJob {
+class PutawayLocationReassignmentJob {
 
     PutawayService putawayService
     LocationService locationService
@@ -27,7 +27,7 @@ class PutawayLocationReassignJob {
     def sessionRequired = false
 
     void execute(JobExecutionContext context) {
-        if (!JobUtils.shouldExecute(PutawayLocationReassignJob)) {
+        if (!JobUtils.shouldExecute(PutawayLocationReassignmentJob)) {
             log.info("Reassign Putaway location job is disabled")
             return
         }

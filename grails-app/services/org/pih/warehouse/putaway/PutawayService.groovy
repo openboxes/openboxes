@@ -101,7 +101,7 @@ class PutawayService implements EventPublisher  {
     def getPutawayUsers(Location location) {
         List<User> users = userService.findUsersByRoleType(RoleType.ROLE_PUTAWAY)
         if (!users) {
-            String usernameOrId = grailsApplication.config.openboxes.jobs.automaticPutawayJob.defaultPutawayAssignee
+            String usernameOrId = grailsApplication.config.openboxes.jobs.automaticPutawayGenerationJob.defaultPutawayAssignee
             User user = User.findByIdOrUsername(usernameOrId, usernameOrId)
             users = [user]
         }
