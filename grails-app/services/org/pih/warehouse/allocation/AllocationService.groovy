@@ -16,6 +16,7 @@ import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionService
 import org.pih.warehouse.requisition.RequisitionStatus
 
 @Transactional
@@ -24,6 +25,7 @@ class AllocationService {
     StockMovementService stockMovementService
     GrailsApplication grailsApplication
     AuthService authService
+    RequisitionService requisitionService
 
     @Transactional(readOnly = true)
     StockMovement getOutboundOrder(String id) {
@@ -194,13 +196,18 @@ class AllocationService {
     }
 
     List<AllocationResult> allocate(Requisition requisition, AllocationMode allocationMode, List<AllocationStrategy> allocationStrategyList) {
-        List<AllocationResult> results = []
-        requisition?.requisitionItems?.each { requisitionItem ->
-            AllocationRequest allocationRequest = new AllocationRequest(requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationStrategyList)
-            AllocationResult singleResult = allocate(allocationRequest)
-            results.add(singleResult)
+        try {
+            List<AllocationResult> results = []
+            requisition?.requisitionItems?.each { requisitionItem ->
+                AllocationRequest allocationRequest = new AllocationRequest(requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationStrategyList)
+                AllocationResult singleResult = allocate(allocationRequest)
+                results.add(singleResult)
+            }
+            return results
+        } catch (Exception e) {
+            requisitionService.logRequisitionEvent(requisition?.id, "Allocation failed: ${e.message ?: 'Unknown error'}")
+            throw e
         }
-        return results
     }
 
     void allocateRequisition(String requisitionId) {
@@ -242,7 +249,8 @@ class AllocationService {
             if (isBackordered && partialAllocationAllowed) {
                 return []
             }
-            throw new IllegalArgumentException("Insufficient stock. Required: ${quantityRequired}, Available: ${quantityAvailable}")
+            Product product = requisitionItem.product
+            throw new IllegalArgumentException("Insufficient stock for product ${product?.productCode} - ${product?.name} in order ${requisitionItem.requisition?.requestNumber}. Required quantity: ${quantityRequired}, Available quantity: ${quantityAvailable}")
         }
 
         return stockMovementService.getSuggestedItems(includedItems, quantityRequired)
