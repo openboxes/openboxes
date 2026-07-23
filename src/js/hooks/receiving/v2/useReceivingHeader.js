@@ -53,7 +53,11 @@ const useReceivingHeader = () => {
 
   const loadShipment = async () => {
     const { data: { data } } = await stockMovementApi.getStockMovementById(shipmentId);
-    dispatch(updateReceivingHeader(buildHeaderInfo(data), Boolean(data?.isFromOrder)));
+    dispatch(updateReceivingHeader({
+      headerInfo: buildHeaderInfo(data),
+      isShipmentFromPurchaseOrder: Boolean(data?.isFromOrder),
+      shipmentNumber: data?.identifier,
+    }));
   };
 
   useEffect(() => {

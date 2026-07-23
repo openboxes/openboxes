@@ -10,7 +10,7 @@ import useTranslate from 'hooks/useTranslate';
  * Memoized cell rendering a dropdown.
  */
 const SelectCell = React.memo(({
-  options, label, defaultLabel, placeholder, disabled,
+  options, value, onChange, label, defaultLabel, placeholder, disabled,
 }) => {
   const translate = useTranslate();
 
@@ -19,6 +19,8 @@ const SelectCell = React.memo(({
       <div className="w-100" aria-label={translate(label, defaultLabel)}>
         <SelectField
           options={options}
+          value={value}
+          onChange={onChange}
           labelKey="name"
           placeholder={placeholder}
           disabled={disabled}
@@ -33,6 +35,8 @@ SelectCell.displayName = 'SelectCell';
 
 SelectCell.propTypes = {
   options: PropTypes.arrayOf(PropTypes.shape({})),
+  value: PropTypes.shape({}),
+  onChange: PropTypes.func,
   label: PropTypes.string.isRequired,
   defaultLabel: PropTypes.string.isRequired,
   placeholder: PropTypes.string,
@@ -41,6 +45,8 @@ SelectCell.propTypes = {
 
 SelectCell.defaultProps = {
   options: [],
+  value: null,
+  onChange: undefined,
   placeholder: '',
   disabled: false,
 };

@@ -7,6 +7,7 @@ import {
   removeNormalizedItems,
   resolveKey,
   updateNormalizedItem,
+  updateNormalizedItems,
   upsertNormalizedItem,
 } from 'utils/normalizationUtils';
 
@@ -130,6 +131,38 @@ describe('updateNormalizedItem()', () => {
   it('should return the same state reference when the id does not exist', () => {
     const state = { entities: { a: { id: 'a' } }, ids: ['a'] };
     expect(updateNormalizedItem(state, 'b', { qty: 5 }))
+      .toBe(state);
+  });
+});
+
+describe('updateNormalizedItems()', () => {
+  it('should shallow-merge new data into multiple entities', () => {
+    const state = {
+      entities: { a: { id: 'a', qty: 1 }, b: { id: 'b', qty: 2 }, c: { id: 'c', qty: 3 } },
+      ids: ['a', 'b', 'c'],
+    };
+    const updated = updateNormalizedItems(state, {
+      a: { qty: 10 },
+      c: { qty: 30 },
+    });
+    expect(updated.entities.a)
+      .toEqual({ id: 'a', qty: 10 });
+    expect(updated.entities.b)
+      .toEqual({ id: 'b', qty: 2 });
+    expect(updated.entities.c)
+      .toEqual({ id: 'c', qty: 30 });
+  });
+
+  it('should not mutate the original state', () => {
+    const state = { entities: { a: { id: 'a', qty: 1 } }, ids: ['a'] };
+    updateNormalizedItems(state, { a: { qty: 10 } });
+    expect(state.entities.a.qty)
+      .toBe(1);
+  });
+
+  it('should return the same state reference when none of the ids exist', () => {
+    const state = { entities: { a: { id: 'a' } }, ids: ['a'] };
+    expect(updateNormalizedItems(state, { b: { qty: 5 }, c: { qty: 6 } }))
       .toBe(state);
   });
 });

@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 import { hideSpinner, showSpinner } from 'actions';
 import receivingApi from 'api/services/ReceivingApi';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import mapToFormSelectOption from 'utils/mapToFormSelectOption';
 import { updateNormalizedItem } from 'utils/normalizationUtils';
 import buildReceiptItemsBatchPayload from 'utils/receiving/buildReceiptItemsBatchPayload';
 
@@ -35,9 +36,11 @@ const useReceivingSaveAction = ({ receiptId, lineItemsState, setLineItemsState }
         (acc, line) => updateNormalizedItem(acc, line.rowId, {
           receiptItemId: line.id,
           quantityReceiving: line.quantityReceived,
-          // Move the baseline forward to the persisted quantity so subsequent edits compare
+          binLocation: mapToFormSelectOption(line.binLocation),
+          // Move the baselines forward to the persisted values so subsequent edits compare
           // against what's actually saved on the server.
           initialQuantityReceiving: line.quantityReceived,
+          initialBinLocationId: line.binLocation?.id ?? null,
           isDirty: false,
         }),
         state,

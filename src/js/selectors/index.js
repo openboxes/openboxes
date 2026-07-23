@@ -382,3 +382,20 @@ export const getReceivingHeaderInfo = (state) => state.partialReceiving.headerIn
 
 export const getIsShipmentFromPurchaseOrder = (state) =>
   state.partialReceiving.isShipmentFromPurchaseOrder;
+
+export const getReceivingShipmentNumber = (state) => state.partialReceiving.shipmentNumber;
+
+export const getReceivingBinLocations = (state) => state.partialReceiving.binLocations || [];
+
+// The receiving bin generated for the shipment is named "<prefix>-<shipment number>",
+// where the prefix is configurable ("R" by default).
+export const getReceivingBin = createSelector(
+  getReceivingBinLocations,
+  getReceivingShipmentNumber,
+  (binLocations, shipmentNumber) => {
+    if (!shipmentNumber) {
+      return null;
+    }
+    return binLocations.find((bin) => bin.name.endsWith(`-${shipmentNumber}`)) ?? null;
+  },
+);

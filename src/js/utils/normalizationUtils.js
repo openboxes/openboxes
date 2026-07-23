@@ -103,6 +103,19 @@ export const updateNormalizedItem = (state, id, newData) => {
 };
 
 /**
+ * Shallow-merges new data into multiple normalized entities.
+ * Returns the same state reference when none of the ids exist.
+ * @param {{ entities: Object, ids: Array }} state - normalized state
+ * @param {Object} newDataById - map of entity id to the data merged into that entity
+ * @returns {{ entities: Object, ids: Array }}
+ */
+export const updateNormalizedItems = (state, newDataById) =>
+  Object.entries(newDataById).reduce(
+    (updatedState, [id, newData]) => updateNormalizedItem(updatedState, id, newData),
+    state,
+  );
+
+/**
  * Inserts a new entity or shallow-merges it into an existing one.
  * @param {{ entities: Object, ids: Array }} state - normalized state
  * @param {Object} item - entity to insert or merge

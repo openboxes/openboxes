@@ -5,7 +5,9 @@ import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
-import { getCurrentLocationId, getDebounceTime, getMinSearchLength } from 'selectors';
+import {
+  getCurrentLocationId, getDebounceTime, getMinSearchLength, getReceivingBinLocations,
+} from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
@@ -16,17 +18,23 @@ import LocationAutofillHeader from 'components/receivingV2/LocationAutofillHeade
 import receivingColumns from 'consts/receivingColumns';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
+import QuantityInputCell from 'utils/cells/QuantityInputCell';
 import { debouncePeopleFetch } from 'utils/option-utils';
 
 /**
  * Columns for the editable "Receiving now" table in the edit modal.
  */
-const useReceivingLineItemColumns = ({ control, removeRow }) => {
+const useReceivingLineItemColumns = ({
+  control,
+  removeRow,
+  onLocationAutofill,
+}) => {
   const translate = useTranslate();
   const columnHelper = createColumnHelper();
   const locationId = useSelector(getCurrentLocationId);
   const debounceTime = useSelector(getDebounceTime);
   const minSearchLength = useSelector(getMinSearchLength);
+  const binLocationOptions = useSelector(getReceivingBinLocations);
 
   const debouncedPeopleFetch = useCallback(
     debouncePeopleFetch(debounceTime, minSearchLength),
@@ -130,6 +138,7 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
                 async
                 loadOptions={debouncedPeopleFetch}
                 hideErrorMessageWrapper
+                showValueTooltip
                 ariaLabel={{ id: 'react.receiving.recipient.label', defaultMessage: 'Recipient' }}
               />
             )}
@@ -145,38 +154,35 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
         </TableHeaderCell>
       ),
       cell: ({ row }) => (
-        <TableCell className="rt-td">
-          <Controller
-            key={row.original.rowId}
-            name={`lineItems.${row.index}.quantityReceiving`}
-            control={control}
-            render={({ field }) => (
-              <TextInput
-                {...field}
-                type="number"
-                className="hide-arrows"
-                autoComplete="off"
-                hideErrorMessageWrapper
-                ariaLabel={{ id: 'react.receiving.receivingNow.label', defaultMessage: 'Receiving Now' }}
-              />
-            )}
-          />
-        </TableCell>
+        <Controller
+          key={row.original.rowId}
+          name={`lineItems.${row.index}.quantityReceiving`}
+          control={control}
+          render={({ field }) => (
+            <QuantityInputCell
+              value={field.value}
+              onCommit={(quantityReceiving) => field.onChange(quantityReceiving ?? '')}
+              label="react.receiving.receivingNow.label"
+              defaultLabel="Receiving Now"
+            />
+          )}
+        />
       ),
       footer: ({ table }) => <span style={{ paddingLeft: '14px' }}>{table.options.meta?.totalReceivingNow ?? 0}</span>,
-      size: 90,
+      size: 120,
     }),
     columnHelper.accessor(receivingColumns.LOCATION, {
-      header: () => <LocationAutofillHeader />,
+      header: () => <LocationAutofillHeader onSelect={onLocationAutofill} />,
       cell: ({ row }) => (
         <TableCell className="rt-td">
           <Controller
             key={row.original.rowId}
-            name={`lineItems.${row.index}.location`}
+            name={`lineItems.${row.index}.binLocation`}
             control={control}
             render={({ field }) => (
               <SelectField
                 {...field}
+                options={binLocationOptions}
                 hideErrorMessageWrapper
                 ariaLabel={{ id: 'react.receiving.location.label', defaultMessage: 'Location' }}
               />
@@ -208,9 +214,17 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
           </div>
         </TableCell>
       ),
-      size: 160,
+      size: 130,
     }),
-  ], [translate, control, locationId, debouncedPeopleFetch, removeRow]);
+  ], [
+    translate,
+    control,
+    locationId,
+    debouncedPeopleFetch,
+    removeRow,
+    binLocationOptions,
+    onLocationAutofill,
+  ]);
 
   return { columns };
 };
@@ -218,6 +232,7 @@ const useReceivingLineItemColumns = ({ control, removeRow }) => {
 useReceivingLineItemColumns.propTypes = {
   control: PropTypes.shape({}).isRequired,
   removeRow: PropTypes.func.isRequired,
+  onLocationAutofill: PropTypes.func.isRequired,
 };
 
 export default useReceivingLineItemColumns;
