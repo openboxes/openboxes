@@ -26,7 +26,7 @@ import {
  * How autosaving works:
  * - every `updateRow`/`addRow` marks the row as dirty (saveStatus PENDING) and schedules a
  *   flush: when `batchSize` dirty rows are waiting, or after `debounceTime`
- *   with no edits. A flush sends all dirty rows in one `patchFn` call.
+ *   with no edits. A flush sends all dirty rows in one `updateFn` call.
  * - requests are sent using a queue (one at a time), so two saves can never race each
  *   other, and a delete request queued after the save that created its row always
  *   sees the server-assigned id.
@@ -49,7 +49,7 @@ import {
  *   the consumer
  *
  * @param {Object} options.requests
- * @param {Function} options.requests.patchFn - saves a batch of dirty rows on the backend:
+ * @param {Function} options.requests.updateFn - saves a batch of dirty rows on the backend:
  *   async (dirtyRows) => updatedRows. Called on every flush with all rows to save. Each row
  *   in the response must include the client row id (`keyField`), so the hook can match it
  *   with the local row.
@@ -58,7 +58,7 @@ import {
  *
  * @param {Object} [options.rowOptions]
  * @param {string} [options.rowOptions.keyField] - row id field, used to key added rows and to
- *   match `patchFn` response rows back to local rows
+ *   match `updateFn` response rows back to local rows
  * @param {Function} [options.rowOptions.generateRowId] - () => id for added rows
  * @param {Function} [options.rowOptions.shouldSaveRow] - decides whether a dirty row really
  *   needs a request: (row) => boolean. Checked at flush time; when it returns false, the row
@@ -110,7 +110,7 @@ import {
 const useAutosave = ({
   initialRows,
   requests: {
-    patchFn,
+    updateFn,
     deleteFn,
   } = {},
   rowOptions: {
@@ -158,7 +158,7 @@ const useAutosave = ({
   // See latest ref pattern: https://www.epicreact.dev/the-latest-ref-pattern-in-react
   const optionsRef = useRef({});
   optionsRef.current = {
-    patchFn,
+    updateFn,
     deleteFn,
     shouldSaveRow,
     reconcileRow,
@@ -216,7 +216,7 @@ const useAutosave = ({
   }, [setRowStatus]);
 
   // Merges a successful batch response into the rows
-  const applyPatchResponse = useCallback((batchIds, sentVersions, updatedRows) => {
+  const applyUpdateResponse = useCallback((batchIds, sentVersions, updatedRows) => {
     const responseByRowId = _.keyBy(updatedRows ?? [], optionsRef.current.keyField);
     setRows((state) => batchIds.reduce((acc, rowId) => {
       const row = acc.entities[rowId];
@@ -242,7 +242,9 @@ const useAutosave = ({
 
   // Handles a failed batch: marks its rows as ERROR, puts them back into the dirty map
   // with updated retry counters and schedules the next retry.
-  const handlePatchError = useCallback((batchIds, sentVersions, dirtyStateByRow, error) => {
+  const handleUpdateError = useCallback(({
+    batchIds, sentVersions, dirtyStateByRow, error,
+  }) => {
     // A network failure (no server response) doesn't use up the retry budget - the row keeps
     // retrying until the connection is back
     const isNetworkFailure = optionsRef.current.isNetworkError(error) && !isFlushingRef.current;
@@ -267,7 +269,7 @@ const useAutosave = ({
     }
   }, [setRowStatus, scheduleRetry]);
 
-  // Sends one batch: collects the dirty rows, marks them SAVING and runs `patchFn` through
+  // Sends one batch: collects the dirty rows, marks them SAVING and runs `updateFn` through
   // the queue. Assigned to the ref on every render, so timers, the retry hook and
   // flush() always call the newest version.
   flushDirtyRef.current = () => {
@@ -294,32 +296,39 @@ const useAutosave = ({
       const dirtyRows = batchIds
         .map((rowId) => stateRef.current.entities[rowId])
         .filter(Boolean);
-      const updatedRows = await optionsRef.current.patchFn(dirtyRows);
-      applyPatchResponse(batchIds, sentVersions, updatedRows);
+      const updatedRows = await optionsRef.current.updateFn(dirtyRows);
+      applyUpdateResponse(batchIds, sentVersions, updatedRows);
     }, {
-      onError: (error) => handlePatchError(batchIds, sentVersions, dirtyStateByRow, error),
+      onError: (error) => handleUpdateError({
+        batchIds, sentVersions, dirtyStateByRow, error,
+      }),
       onSettled: recomputePending,
     });
     recomputePending();
     return task;
   };
 
+  // Bumps the row's version and puts it into the dirty map with a fresh retry budget.
+  const markRowDirty = useCallback((rowId) => {
+    versionsRef.current.set(rowId, (versionsRef.current.get(rowId) ?? 0) + 1);
+    dirtyRef.current.set(rowId, { attempts: 0, backoffLevel: 0 });
+  }, []);
+
   // Applies an edit to a row: bumps its version, marks it dirty (PENDING) and schedules
   // a flush.
   const updateRow = useCallback((rowId, newData) => {
     const row = stateRef.current.entities[rowId];
-    if (!row || row.isDeleting) {
+    if (!row || row.isDeleteInProgress) {
       return;
     }
-    versionsRef.current.set(rowId, (versionsRef.current.get(rowId) ?? 0) + 1);
-    dirtyRef.current.set(rowId, { attempts: 0, backoffLevel: 0 });
+    markRowDirty(rowId);
     setRows((state) => updateNormalizedItem(state, rowId, {
       ...newData,
       saveStatus: RowSaveStatus.PENDING,
     }));
     recomputePending();
     scheduleFlush();
-  }, [setRows, recomputePending, scheduleFlush]);
+  }, [markRowDirty, setRows, recomputePending, scheduleFlush]);
 
   // Batch counterpart of updateRow: applies edits to many rows in one state update.
   // React 16 doesn't batch updates fired after an await (e.g. the location autofill),
@@ -327,28 +336,24 @@ const useAutosave = ({
   const updateRows = useCallback((newDataByRowId) => {
     const updates = _.pickBy(newDataByRowId, (newData, rowId) => {
       const row = stateRef.current.entities[rowId];
-      return row && !row.isDeleting;
+      return row && !row.isDeleteInProgress;
     });
     if (_.isEmpty(updates)) {
       return;
     }
-    Object.keys(updates).forEach((rowId) => {
-      versionsRef.current.set(rowId, (versionsRef.current.get(rowId) ?? 0) + 1);
-      dirtyRef.current.set(rowId, { attempts: 0, backoffLevel: 0 });
-    });
+    Object.keys(updates).forEach((rowId) => markRowDirty(rowId));
     setRows((state) => updateNormalizedItems(
       state,
       _.mapValues(updates, (newData) => ({ ...newData, saveStatus: RowSaveStatus.PENDING })),
     ));
     recomputePending();
     scheduleFlush();
-  }, [setRows, recomputePending, scheduleFlush]);
+  }, [markRowDirty, setRows, recomputePending, scheduleFlush]);
 
   // Adds a new row to the state and queues it for saving like an edit.
   const addRow = useCallback((rowData) => {
     const rowId = rowData[optionsRef.current.keyField] ?? optionsRef.current.generateRowId();
-    versionsRef.current.set(rowId, 1);
-    dirtyRef.current.set(rowId, { attempts: 0, backoffLevel: 0 });
+    markRowDirty(rowId);
     setRows((state) => upsertNormalizedItem(state, {
       ...rowData,
       [optionsRef.current.keyField]: rowId,
@@ -357,21 +362,21 @@ const useAutosave = ({
     recomputePending();
     scheduleFlush();
     return rowId;
-  }, [setRows, recomputePending, scheduleFlush]);
+  }, [markRowDirty, setRows, recomputePending, scheduleFlush]);
 
   // Deletes a row: runs `deleteFn` through the queue (behind any pending save) and
   // removes the row locally only on success.
   const deleteRow = useCallback((rowId) => {
     const row = stateRef.current.entities[rowId];
-    // The isDeleting guard ignores repeated clicks so a row can never be deleted twice.
-    if (!row || row.isDeleting) {
+    // The isDeleteInProgress guard ignores repeated clicks so a row can never be deleted twice.
+    if (!row || row.isDeleteInProgress) {
       return Promise.resolve();
     }
     // Pending edits of a deleted row no longer matter.
     dirtyRef.current.delete(rowId);
     versionsRef.current.delete(rowId);
     setRows((state) => updateNormalizedItem(state, rowId, {
-      isDeleting: true,
+      isDeleteInProgress: true,
       saveStatus: RowSaveStatus.SAVING,
     }));
     const task = enqueueTask(async () => {
@@ -384,7 +389,7 @@ const useAutosave = ({
       setRows((state) => optionsRef.current.removeRowFromState(state, rowId));
     }, {
       onError: () => setRows((state) => updateNormalizedItem(state, rowId, {
-        isDeleting: false,
+        isDeleteInProgress: false,
         saveStatus: RowSaveStatus.ERROR,
       })),
       onSettled: recomputePending,
@@ -426,7 +431,7 @@ const useAutosave = ({
   // Whether the row has a save or delete request running.
   const isRowSaving = useCallback((rowId) => {
     const row = stateRef.current.entities[rowId];
-    return row?.saveStatus === RowSaveStatus.SAVING || Boolean(row?.isDeleting);
+    return row?.saveStatus === RowSaveStatus.SAVING || Boolean(row?.isDeleteInProgress);
   }, []);
 
   // General status for the autosave indicator

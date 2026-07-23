@@ -8,14 +8,14 @@ import TextInput from 'components/form-elements/v2/TextInput';
 const blurOnWheel = (e) => e.currentTarget.blur();
 
 /**
- * Memoized cell rendering the editable "receiving now" quantity input.
+ * Memoized cell rendering an editable quantity input for autosaved tables.
  *
  * Unlike the generic QuantityInputCell (which commits on blur), this cell reports every change
  * through `onCommit` as the user types - the committed integer value, or null when the field is
  * cleared. The autosave hook debounces the actual requests, so committing per keystroke only
  * marks the row dirty; nothing is sent until typing pauses or enough rows accumulate.
  */
-const ReceivingQuantityInputCell = React.memo(({
+const AutosaveQuantityInputCell = React.memo(({
   value, onCommit, label, defaultLabel, disabled,
 }) => {
   const [inputValue, setInputValue] = useState(value ?? '');
@@ -55,9 +55,9 @@ const ReceivingQuantityInputCell = React.memo(({
   );
 });
 
-ReceivingQuantityInputCell.displayName = 'ReceivingQuantityInputCell';
+AutosaveQuantityInputCell.displayName = 'AutosaveQuantityInputCell';
 
-ReceivingQuantityInputCell.propTypes = {
+AutosaveQuantityInputCell.propTypes = {
   // Committed value to display (null/undefined when nothing has been entered yet).
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   // Called on every change with the committed integer value, or null when the field is cleared.
@@ -67,9 +67,9 @@ ReceivingQuantityInputCell.propTypes = {
   disabled: PropTypes.bool,
 };
 
-ReceivingQuantityInputCell.defaultProps = {
+AutosaveQuantityInputCell.defaultProps = {
   value: null,
   disabled: false,
 };
 
-export default ReceivingQuantityInputCell;
+export default AutosaveQuantityInputCell;

@@ -51,7 +51,7 @@ const flushPromises = async () => {
 
 describe('useAutosave', () => {
   let deferreds;
-  let patchFn;
+  let updateFn;
 
   const renderUseAutosave = ({
     requests, flushOptions, retryOptions, ...options
@@ -60,7 +60,7 @@ describe('useAutosave', () => {
     {
       initialProps: {
         initialRows: buildInitialRows([buildRow('row-1'), buildRow('row-2'), buildRow('row-3')]),
-        requests: { patchFn, ...requests },
+        requests: { updateFn, ...requests },
         flushOptions: { debounceTime: DEBOUNCE_TIME, ...flushOptions },
         retryOptions: { retryDelay: RETRY_DELAY, ...retryOptions },
         ...options,
@@ -80,7 +80,7 @@ describe('useAutosave', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     deferreds = [];
-    patchFn = jest.fn(() => {
+    updateFn = jest.fn(() => {
       const deferred = createDeferred();
       deferreds.push(deferred);
       return deferred.promise;
@@ -101,11 +101,11 @@ describe('useAutosave', () => {
     expect(result.current.autosaveStatus).toBe(AutosaveStatus.SAVING);
 
     act(() => jest.advanceTimersByTime(DEBOUNCE_TIME - 1));
-    expect(patchFn).not.toHaveBeenCalled();
+    expect(updateFn).not.toHaveBeenCalled();
 
     act(() => jest.advanceTimersByTime(1));
-    expect(patchFn).toHaveBeenCalledTimes(1);
-    expect(patchFn).toHaveBeenCalledWith([
+    expect(updateFn).toHaveBeenCalledTimes(1);
+    expect(updateFn).toHaveBeenCalledWith([
       expect.objectContaining({ rowId: 'row-1', quantityReceiving: 5 }),
     ]);
     expect(result.current.rows['row-1'].saveStatus).toBe(RowSaveStatus.SAVING);
@@ -126,14 +126,14 @@ describe('useAutosave', () => {
       result.current.updateRow('row-1', { quantityReceiving: 1 });
       result.current.updateRow('row-2', { quantityReceiving: 2 });
     });
-    expect(patchFn).not.toHaveBeenCalled();
+    expect(updateFn).not.toHaveBeenCalled();
 
     // Zero delay instead of a synchronous call, so a burst of edits ends up
     // in one batch request.
     act(() => jest.advanceTimersByTime(0));
 
-    expect(patchFn).toHaveBeenCalledTimes(1);
-    expect(patchFn).toHaveBeenCalledWith([
+    expect(updateFn).toHaveBeenCalledTimes(1);
+    expect(updateFn).toHaveBeenCalledWith([
       expect.objectContaining({ rowId: 'row-1', quantityReceiving: 1 }),
       expect.objectContaining({ rowId: 'row-2', quantityReceiving: 2 }),
     ]);
@@ -145,7 +145,7 @@ describe('useAutosave', () => {
     // Edit 1
     act(() => result.current.updateRow('row-1', { quantityReceiving: 5 }));
     act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
-    expect(patchFn).toHaveBeenCalledTimes(1);
+    expect(updateFn).toHaveBeenCalledTimes(1);
 
     // Edit 2 happens while the request is still running...
     act(() => result.current.updateRow('row-1', { quantityReceiving: 7 }));
@@ -161,8 +161,8 @@ describe('useAutosave', () => {
 
     // The next flush sends the newest value against the saved receipt item.
     act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
-    expect(patchFn).toHaveBeenCalledTimes(2);
-    expect(patchFn).toHaveBeenLastCalledWith([
+    expect(updateFn).toHaveBeenCalledTimes(2);
+    expect(updateFn).toHaveBeenLastCalledWith([
       expect.objectContaining({
         rowId: 'row-1',
         quantityReceiving: 7,
@@ -186,8 +186,8 @@ describe('useAutosave', () => {
     act(() => result.current.updateRow('row-1', { quantityReceiving: 8 }));
     act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
 
-    expect(patchFn).toHaveBeenCalledTimes(2);
-    expect(patchFn).toHaveBeenLastCalledWith([
+    expect(updateFn).toHaveBeenCalledTimes(2);
+    expect(updateFn).toHaveBeenLastCalledWith([
       expect.objectContaining({ rowId: 'row-1', quantityReceiving: 8 }),
     ]);
 
@@ -203,23 +203,23 @@ describe('useAutosave', () => {
     act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
     deferreds[0].reject(new Error('server error'));
     await flushPromises();
-    expect(patchFn).toHaveBeenCalledTimes(1);
+    expect(updateFn).toHaveBeenCalledTimes(1);
 
     // First retry
     act(() => jest.advanceTimersByTime(RETRY_DELAY));
-    expect(patchFn).toHaveBeenCalledTimes(2);
+    expect(updateFn).toHaveBeenCalledTimes(2);
     deferreds[1].reject(new Error('server error'));
     await flushPromises();
 
     // After exhausting maxRetries the row is left in ERROR, no more requests.
     act(() => jest.advanceTimersByTime(RETRY_DELAY * 10));
-    expect(patchFn).toHaveBeenCalledTimes(2);
+    expect(updateFn).toHaveBeenCalledTimes(2);
     expect(result.current.rows['row-1'].saveStatus).toBe(RowSaveStatus.ERROR);
 
     // A new edit resets the retry budget and saving works again.
     act(() => result.current.updateRow('row-1', { quantityReceiving: 6 }));
     act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
-    expect(patchFn).toHaveBeenCalledTimes(3);
+    expect(updateFn).toHaveBeenCalledTimes(3);
   });
 
   describe('network failures', () => {
@@ -238,17 +238,17 @@ describe('useAutosave', () => {
       expect(result.current.rows['row-1'].saveStatus).toBe(RowSaveStatus.ERROR);
 
       act(() => jest.advanceTimersByTime(RETRY_DELAY));
-      expect(patchFn).toHaveBeenCalledTimes(2);
+      expect(updateFn).toHaveBeenCalledTimes(2);
       deferreds[1].reject(networkError());
       await flushPromises();
 
       act(() => jest.advanceTimersByTime(RETRY_DELAY * 2));
-      expect(patchFn).toHaveBeenCalledTimes(3);
+      expect(updateFn).toHaveBeenCalledTimes(3);
       deferreds[2].reject(networkError());
       await flushPromises();
 
       act(() => jest.advanceTimersByTime(RETRY_DELAY * 2));
-      expect(patchFn).toHaveBeenCalledTimes(4);
+      expect(updateFn).toHaveBeenCalledTimes(4);
 
       deferreds[3].resolve([{ rowId: 'row-1' }]);
       await flushPromises();
@@ -262,11 +262,11 @@ describe('useAutosave', () => {
       act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
       deferreds[0].reject(networkError());
       await flushPromises();
-      expect(patchFn).toHaveBeenCalledTimes(1);
+      expect(updateFn).toHaveBeenCalledTimes(1);
 
       // The browser reports the connection back
       act(() => window.dispatchEvent(new Event('online')));
-      expect(patchFn).toHaveBeenCalledTimes(2);
+      expect(updateFn).toHaveBeenCalledTimes(2);
 
       deferreds[1].resolve([{ rowId: 'row-1' }]);
       await flushPromises();
@@ -274,9 +274,9 @@ describe('useAutosave', () => {
     });
 
     it('flush() gives up on a persistent network failure instead of looping forever', async () => {
-      const failingPatchFn = jest.fn(() => Promise.reject(networkError()));
+      const failingUpdateFn = jest.fn(() => Promise.reject(networkError()));
       const { result } = renderUseAutosave({
-        requests: { patchFn: failingPatchFn },
+        requests: { updateFn: failingUpdateFn },
         retryOptions: { maxRetries: 0 },
       });
 
@@ -305,7 +305,7 @@ describe('useAutosave', () => {
     expect(result.current.rows[rowId].saveStatus).toBe(RowSaveStatus.PENDING);
 
     act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
-    expect(patchFn).toHaveBeenCalledWith([
+    expect(updateFn).toHaveBeenCalledWith([
       expect.objectContaining({ rowId, quantityReceiving: 2 }),
     ]);
 
@@ -331,7 +331,7 @@ describe('useAutosave', () => {
       });
 
       expect(deleteFn).toHaveBeenCalledTimes(1);
-      expect(result.current.rows['row-1'].isDeleting).toBe(true);
+      expect(result.current.rows['row-1'].isDeleteInProgress).toBe(true);
       expect(result.current.isRowSaving('row-1')).toBe(true);
 
       deleteDeferred.resolve();
@@ -350,7 +350,7 @@ describe('useAutosave', () => {
       await flushPromises();
 
       expect(result.current.rows['row-1']).toEqual(expect.objectContaining({
-        isDeleting: false,
+        isDeleteInProgress: false,
         saveStatus: RowSaveStatus.ERROR,
       }));
       expect(result.current.rowsById).toContain('row-1');
@@ -367,7 +367,7 @@ describe('useAutosave', () => {
       act(() => {
         flushPromise = result.current.flush();
       });
-      expect(patchFn).toHaveBeenCalledTimes(1);
+      expect(updateFn).toHaveBeenCalledTimes(1);
 
       deferreds[0].resolve([{ rowId: 'row-1' }]);
       await flushPromise;
@@ -378,9 +378,9 @@ describe('useAutosave', () => {
     });
 
     it('rejects when a row still cannot be saved', async () => {
-      const failingPatchFn = jest.fn(() => Promise.reject(new Error('server error')));
+      const failingUpdateFn = jest.fn(() => Promise.reject(new Error('server error')));
       const { result } = renderUseAutosave({
-        requests: { patchFn: failingPatchFn },
+        requests: { updateFn: failingUpdateFn },
         retryOptions: { maxRetries: 0 },
       });
 

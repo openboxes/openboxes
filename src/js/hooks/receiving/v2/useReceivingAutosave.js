@@ -27,7 +27,7 @@ const reconcileStaleRow = (row, line) => ({ receiptItemId: line.id });
  * receipt and deletes split item rows through the same serial queue.
  */
 const useReceivingAutosave = ({ initialRows, receiptId }) => {
-  const patchFn = async (dirtyRows) => {
+  const updateFn = async (dirtyRows) => {
     const payload = buildReceiptItemsBatchPayload(dirtyRows);
     const { data: { data } } = await receivingApi.updateItemsBatch(receiptId, payload);
     return data?.updatedLines ?? [];
@@ -46,7 +46,7 @@ const useReceivingAutosave = ({ initialRows, receiptId }) => {
 
   return useAutosave({
     initialRows,
-    requests: { patchFn, deleteFn },
+    requests: { updateFn, deleteFn },
     rowOptions: {
       shouldSaveRow,
       reconcileRow,

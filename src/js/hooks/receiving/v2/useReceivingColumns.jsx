@@ -14,12 +14,12 @@ import { ReceivingView } from 'consts/receivingViewOptions';
 import useFormatNumber from 'hooks/useFormatNumber';
 import useTranslate from 'hooks/useTranslate';
 import ActionsCell from 'utils/cells/ActionsCell';
+import AutosaveQuantityInputCell from 'utils/cells/AutosaveQuantityInputCell';
 import ExpirationDateCell from 'utils/cells/ExpirationDateCell';
 import MultilineCell from 'utils/cells/MultilineCell';
 import PackLevelCell from 'utils/cells/PackLevelCell';
 import PackLevelGroupCell from 'utils/cells/receiving/PackLevelGroupCell';
 import ProductCodeCell from 'utils/cells/receiving/ProductCodeCell';
-import ReceivingQuantityInputCell from 'utils/cells/receiving/ReceivingQuantityInputCell';
 import ShippedInPoCell from 'utils/cells/receiving/ShippedInPoCell';
 import SelectCell from 'utils/cells/SelectCell';
 import ValueCell from 'utils/cells/ValueCell';
@@ -400,7 +400,7 @@ const useReceivingColumns = ({
             return null;
           }
           return (
-            <ReceivingQuantityInputCell
+            <AutosaveQuantityInputCell
               value={item?.quantityReceiving}
               onCommit={(quantityReceiving) =>
                 table.options.meta?.updateLineItem(row.original.id, { quantityReceiving })}
@@ -515,9 +515,9 @@ const useReceivingColumns = ({
           return (
             <ActionsCell
               actions={actions}
-              // isDeleting disables the delete button of a split item while its request
+              // isDeleteInProgress disables the delete button of a split item while its request
               // is in flight, so fast repeated clicks cannot fire multiple deletes.
-              disabled={item?.isCompleted || item?.isDeleting}
+              disabled={item?.isCompleted || item?.isDeleteInProgress}
               label="react.receiving.actions.label"
               defaultLabel="Actions"
             />
