@@ -28,15 +28,10 @@ const WizardPageLayout = ({
     currentStepKey,
   },
   buttons: {
-    onNext,
-    onPrevious,
-    isNextDisabled = false,
-    isPreviousDisabled = false,
-    nextLabel = 'react.default.button.next.label',
-    nextDefaultLabel = 'Next',
-    previousLabel = 'react.default.button.previous.label',
-    previousDefaultLabel = 'Previous',
+    previous,
+    next,
   } = {},
+  topSection,
   className,
   children,
 }) => (
@@ -47,27 +42,28 @@ const WizardPageLayout = ({
     <div className="mb-4 mt-2">
       <WizardStepsV2 steps={steps} currentStepKey={currentStepKey} />
     </div>
+    {topSection}
     <Section showTitle={false} className="wizard-page-section">
       {children}
     </Section>
-    {(onNext || onPrevious) && (
+    {(previous || next) && (
       <div className="submit-buttons d-flex justify-content-between mt-3">
-        {onPrevious && (
+        {previous && (
           <Button
-            label={previousLabel}
-            defaultLabel={previousDefaultLabel}
-            variant="primary"
-            onClick={onPrevious}
-            disabled={isPreviousDisabled}
+            label={previous.label ?? 'react.default.button.previous.label'}
+            defaultLabel={previous.defaultLabel ?? 'Previous'}
+            variant={previous.variant ?? 'primary'}
+            onClick={previous.onClick}
+            disabled={previous.disabled}
           />
         )}
-        {onNext && (
+        {next && (
           <Button
-            label={nextLabel}
-            defaultLabel={nextDefaultLabel}
-            variant="primary"
-            onClick={onNext}
-            disabled={isNextDisabled}
+            label={next.label ?? 'react.default.button.next.label'}
+            defaultLabel={next.defaultLabel ?? 'Next'}
+            variant={next.variant ?? 'primary'}
+            onClick={next.onClick}
+            disabled={next.disabled}
             className="ml-auto"
           />
         )}
@@ -113,21 +109,27 @@ WizardPageLayout.propTypes = {
       PropTypes.string,
     ]).isRequired,
   }).isRequired,
-  /** Previous/Next navigation buttons configuration */
+  /** Previous/Next navigation buttons configuration, each button is hidden when omitted */
   buttons: PropTypes.shape({
-    /** Next button handler, the button is hidden when omitted */
-    onNext: PropTypes.func,
-    /** Previous button handler, the button is hidden when omitted */
-    onPrevious: PropTypes.func,
-    isNextDisabled: PropTypes.bool,
-    isPreviousDisabled: PropTypes.bool,
-    /** Translation id for the next button label */
-    nextLabel: PropTypes.string,
-    nextDefaultLabel: PropTypes.string,
-    /** Translation id for the previous button label */
-    previousLabel: PropTypes.string,
-    previousDefaultLabel: PropTypes.string,
+    previous: PropTypes.shape({
+      onClick: PropTypes.func,
+      disabled: PropTypes.bool,
+      /** Translation id for the button label */
+      label: PropTypes.string,
+      defaultLabel: PropTypes.string,
+      variant: PropTypes.string,
+    }),
+    next: PropTypes.shape({
+      onClick: PropTypes.func,
+      disabled: PropTypes.bool,
+      /** Translation id for the button label */
+      label: PropTypes.string,
+      defaultLabel: PropTypes.string,
+      variant: PropTypes.string,
+    }),
   }),
+  /** Content rendered between the steps bar and the main content section */
+  topSection: PropTypes.node,
   /** Additional class passed to the page wrapper */
   className: PropTypes.string,
   /** Main page content */
@@ -137,6 +139,7 @@ WizardPageLayout.propTypes = {
 WizardPageLayout.defaultProps = {
   title: {},
   buttons: {},
+  topSection: null,
   className: '',
   children: null,
 };

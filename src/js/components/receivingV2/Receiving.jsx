@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 
 import CheckStep from 'components/receivingV2/CheckStep';
+import ConfirmReceiptHeader from 'components/receivingV2/ConfirmReceiptHeader';
 import ReceivingStep from 'components/receivingV2/ReceivingStep';
 import WizardPageLayout from 'components/wizard/v2/WizardPageLayout';
 import useReceivingHeader from 'hooks/receiving/v2/useReceivingHeader';
@@ -50,10 +51,23 @@ const Receiving = () => {
     <WizardPageLayout
       title={title}
       wizard={{ steps: stepsTitles, currentStepKey: Step.key }}
-      buttons={{
-        onPrevious: is(ReceivingStepKey.RECEIVING) ? undefined : previous,
-        onNext: is(ReceivingStepKey.CHECK) ? undefined : next,
-      }}
+      topSection={is(ReceivingStepKey.CHECK) ? <ConfirmReceiptHeader /> : undefined}
+      buttons={is(ReceivingStepKey.CHECK)
+        ? {
+          previous: {
+            onClick: previous,
+            label: 'react.receiving.backToReceive.label',
+            defaultLabel: 'Back to Receive',
+            variant: 'primary-outline',
+          },
+          next: {
+            // Completing the receipt is out of scope of OBPIH-7900 (UI only)
+            onClick: () => {},
+            label: 'react.receiving.completeReceipt.label',
+            defaultLabel: 'Complete Receipt',
+          },
+        }
+        : { next: { onClick: next } }}
     >
       <Step.Component />
     </WizardPageLayout>
