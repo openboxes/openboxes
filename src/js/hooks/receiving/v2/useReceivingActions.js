@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
 
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,14 +12,13 @@ import receivingApi from 'api/services/ReceivingApi';
 import ReceiptGroup from 'consts/receiptGroup';
 import ReceivingRowType from 'consts/receivingRowType';
 import { ReceivingView } from 'consts/receivingViewOptions';
+import RowSaveStatus from 'consts/rowSaveStatus';
+import useReceivingAutosave from 'hooks/receiving/v2/useReceivingAutosave';
 import useReceivingSaveAction from 'hooks/receiving/v2/useReceivingSaveAction';
-import useRemoveSplitItem from 'hooks/receiving/v2/useRemoveSplitItem';
 import mapToFormSelectOption from 'utils/mapToFormSelectOption';
 import {
   createNormalizedState,
   normalizeData,
-  updateNormalizedItem,
-  updateNormalizedItems,
 } from 'utils/normalizationUtils';
 
 // In packing list view we ask the API to group items by pack level so that we can
@@ -38,32 +39,21 @@ const shouldAutofillQuantity = (row) => !AUTOFILL_EXCLUDED_ROW_TYPES.includes(ro
   && row.quantityReceiving == null
   && row.quantityAvailableToReceive > 0;
 
-// Autofills the "receiving now" quantity with the remaining quantity for every line
-// that is still empty. Skipped rows keep their object identity so memoized cells don't re-render,
-// and when nothing changes the original state reference is returned.
-export const autofillReceivingQuantities = (state) => {
-  const { entities, ids } = state;
-  const { updatedEntities, changed } = ids.reduce((acc, id) => {
-    const row = entities[id];
-    // Separator entries (packing list view) have no entity - nothing to fill
-    if (!row) {
-      return acc;
-    }
-    const shouldFill = shouldAutofillQuantity(row);
-    acc.updatedEntities[id] = shouldFill
-      ? { ...row, quantityReceiving: row.quantityAvailableToReceive, isDirty: true }
-      : row;
-    acc.changed = acc.changed || shouldFill;
-    return acc;
-  }, { updatedEntities: {}, changed: false });
-
-  return changed ? { ids, entities: updatedEntities } : state;
-};
+// Collects the "receiving now" autofill updates: one { rowId, quantityReceiving } entry per
+// line that is still empty, filled with its remaining quantity. Applied through the autosave
+// updateRow, so autofilled rows get queued for saving like manual edits.
+export const getAutofillQuantityUpdates = (state) => (state?.ids || [])
+  .map((id) => state.entities[id])
+  // Separator entries (packing list view) have no entity - nothing to fill
+  .filter((row) => row && shouldAutofillQuantity(row))
+  .map((row) => ({ rowId: row.rowId, quantityReceiving: row.quantityAvailableToReceive }));
 
 const useReceivingActions = (view) => {
   const [loading, setLoading] = useState(false);
   const [receiptId, setReceiptId] = useState(null);
-  const [lineItemsState, setLineItemsState] = useState(createNormalizedState());
+  // Rows as of load / last refetch. The autosave hook owns the continuously updated rows;
+  // this state only seeds it (a new reference resets the hook).
+  const [initialRows, setInitialRows] = useState(createNormalizedState());
   const { shipmentId } = useParams();
   const dispatch = useDispatch();
   const users = useSelector(getUsers);
@@ -138,8 +128,9 @@ const useReceivingActions = (view) => {
       quantityRemaining,
       quantityAvailableToReceive: quantityRemaining + (receiptItem?.quantityReceived ?? 0),
       isCompleted,
-      // Local edit flag - only dirty rows (touched since load / last save) are sent on save.
-      isDirty: false,
+      // Autosave status of the row (see consts/rowSaveStatus) - PENDING when edited,
+      // SAVING while its batch request is in flight, ERROR when saving failed.
+      saveStatus: RowSaveStatus.SAVED,
     };
   };
 
@@ -273,9 +264,22 @@ const useReceivingActions = (view) => {
     return buildTableViewState(summaryById, grouped, usersById);
   };
 
+  const {
+    rows,
+    rowsById,
+    updateRow,
+    updateRows,
+    deleteRow,
+    autosaveStatus,
+    flush,
+  } = useReceivingAutosave({ initialRows, receiptId });
+
   const loadReceipt = async () => {
     setLoading(true);
     try {
+      // Push pending edits out before refetching (view switch, modal reload), so the
+      // summary reflects them and nothing is lost when the autosave state resets.
+      await flush();
       const { data: { data: summary } } = await receivingApi.getReceiptSummary(shipmentId, {
         group: receiptGroupForView(view),
       });
@@ -283,43 +287,22 @@ const useReceivingActions = (view) => {
       const currentReceiptId = summary?.pendingReceiptId
         ?? (await receivingApi.startReceipt(shipmentId)).data?.data?.id;
       setReceiptId(currentReceiptId);
-      setLineItemsState(transformSummary(summary, view));
+      setInitialRows(transformSummary(summary, view));
     } finally {
       setLoading(false);
     }
   };
 
-  // Updates a single line item in the normalized state without rebuilding the whole
-  // collection. Stable identity (useCallback) keeps the table `meta` referentially
-  // stable, so the memoized cells only re-render the line item that actually changed.
-  // Every edit marks the row dirty, which is what flags it for the next batch save.
-  const updateLineItem = useCallback((rowId, newData) =>
-    setLineItemsState((state) => updateNormalizedItem(state, rowId, {
-      ...newData,
-      isDirty: true,
-    })), []);
+  // Same `{ entities, ids }` shape the table and columns consumed before autosave, now
+  // continuously reconciled by the hook.
+  const lineItemsState = useMemo(() => ({ entities: rows, ids: rowsById }), [rows, rowsById]);
 
-  // Batch counterpart of updateLineItem: merges changes into many rows in a single
-  // state update. React 16 doesn't batch updates fired after an await, so updating
-  // rows one by one would re-render the whole table once per row.
-  const updateLineItems = useCallback((newDataByRowId) =>
-    setLineItemsState((state) => updateNormalizedItems(
-      state,
-      _.mapValues(newDataByRowId, (newData) => ({ ...newData, isDirty: true })),
-    )), []);
+  const autofillQuantities = useCallback(() => {
+    getAutofillQuantityUpdates({ entities: rows, ids: rowsById })
+      .forEach(({ rowId, quantityReceiving }) => updateRow(rowId, { quantityReceiving }));
+  }, [rows, rowsById, updateRow]);
 
-  const autofillQuantities = useCallback(
-    () => setLineItemsState(autofillReceivingQuantities),
-    [],
-  );
-
-  const { removeSplitItem } = useRemoveSplitItem({ receiptId, lineItemsState, setLineItemsState });
-
-  const { onSaveAndExit } = useReceivingSaveAction({
-    receiptId,
-    lineItemsState,
-    setLineItemsState,
-  });
+  const { onSaveAndExit } = useReceivingSaveAction({ flush });
 
   useEffect(() => {
     if (!shipmentId) {
@@ -336,12 +319,16 @@ const useReceivingActions = (view) => {
     loading,
     receiptId,
     lineItemsState,
-    updateLineItem,
-    updateLineItems,
+    updateLineItem: updateRow,
+    updateLineItems: updateRows,
     autofillQuantities,
-    removeSplitItem,
+    // Deletes the receipt item through the autosave queue and, only on success, drops the
+    // row from the local state (with grouping fix-ups).
+    removeSplitItem: deleteRow,
     loadReceipt,
     onSaveAndExit,
+    flush,
+    autosaveStatus,
   };
 };
 

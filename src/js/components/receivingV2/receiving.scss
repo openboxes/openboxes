@@ -69,6 +69,11 @@
     }
   }
 
+  // Parent for the absolutely positioned saved-row stripe.
+  .rt-tr-group {
+    position: relative;
+  }
+
   .input-wrapper-title {
     display: none;
   }

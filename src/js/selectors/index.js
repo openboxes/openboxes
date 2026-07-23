@@ -109,6 +109,31 @@ export const getCycleCountMaxSelectedProducts = createSelector(
   (session) => session.cycleCountMaxSelectedProducts,
 );
 
+export const getAutosaveBatchSize = createSelector(
+  [getSession],
+  (session) => session.autosaveBatchSize,
+);
+
+export const getAutosaveDebounceTime = createSelector(
+  [getSession],
+  (session) => session.autosaveDebounceTime,
+);
+
+export const getAutosaveMaxRetries = createSelector(
+  [getSession],
+  (session) => session.autosaveMaxRetries,
+);
+
+export const getAutosaveRetryDelay = createSelector(
+  [getSession],
+  (session) => session.autosaveRetryDelay,
+);
+
+export const getAutosaveMaxRetryDelay = createSelector(
+  [getSession],
+  (session) => session.autosaveMaxRetryDelay,
+);
+
 /**
  * LOCALIZE & TRANSLATION
  */
