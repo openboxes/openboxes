@@ -25,6 +25,7 @@ class ReceiptItemDto implements ResponseBodyFormattable {
     Integer quantityReceived = 0
     Integer quantityCanceled = 0
     String comment
+    Boolean isSplitItem
 
     static ReceiptItemDto from(ReceiptItem receiptItem) {
         if (!receiptItem) {
@@ -49,6 +50,7 @@ class ReceiptItemDto implements ResponseBodyFormattable {
         quantityReceived = receiptItem.quantityReceived ?: 0
         quantityCanceled = receiptItem.quantityCanceled ?: 0
         comment = receiptItem.comment
+        isSplitItem = receiptItem.isSplitItem
     }
 
     @Override
@@ -63,6 +65,7 @@ class ReceiptItemDto implements ResponseBodyFormattable {
                 quantityReceived: quantityReceived,
                 quantityCanceled: quantityCanceled,
                 comment: comment,
+                isSplitItem: isSplitItem,
         ]
     }
 }

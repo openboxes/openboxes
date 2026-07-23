@@ -105,6 +105,10 @@ const useReceivingActions = (view) => {
       rowType: null,
       shipmentItemId: shipmentItem.id,
       receiptItemId: receiptItem?.id ?? null,
+      // Backend flag distinguishing the original line of a shipment item (false, created when
+      // the receipt was started) from the lines split off it while receiving (true). Unlike
+      // rowType (a UI grouping concept), this stays accurate across saves and reloads.
+      isSplitItem: receiptItem?.isSplitItem ?? false,
       productCode: product?.productCode,
       product,
       parentContainer: shipmentItem.container?.parentContainer,
@@ -175,13 +179,25 @@ const useReceivingActions = (view) => {
         && receiptItemProductId !== shipmentItem.productLot?.product?.id;
     };
 
-    if (currentReceiptItems.length < 2 && !hasChangedProduct(currentReceiptItems[0])) {
-      return [buildLineItem({ summary, receiptItem: currentReceiptItems[0], usersById })];
+    // The original line always exists in the database (it backs the cancel-remaining flow on
+    // completion) but is only displayed while it carries a received quantity or is the only
+    // line - an untouched or zeroed original stays hidden behind its split lines.
+    const visibleReceiptItems = currentReceiptItems.filter(
+      (receiptItem, index, items) => receiptItem.isSplitItem
+        || (receiptItem.quantityReceived ?? 0) > 0
+        || items.length === 1,
+    );
+
+    if (visibleReceiptItems.length < 2 && !hasChangedProduct(visibleReceiptItems[0])) {
+      const receiptItem = visibleReceiptItems[0];
+      return receiptItem?.isSplitItem
+        ? [{ ...buildSplitItemEntity({ summary, receiptItem, usersById }), rowType: null }]
+        : [buildLineItem({ summary, receiptItem, usersById })];
     }
 
     const replacedRow = buildReplacedEntity(summary, usersById);
 
-    const splitItems = currentReceiptItems
+    const splitItems = visibleReceiptItems
       .map((receiptItem) => buildSplitItemEntity({ summary, receiptItem, usersById }));
 
     // The API does not sort receipt items, so group split items by product to keep

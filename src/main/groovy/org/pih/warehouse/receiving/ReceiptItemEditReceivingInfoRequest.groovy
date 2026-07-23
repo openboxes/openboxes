@@ -40,9 +40,6 @@ class ReceiptItemEditReceivingInfoRequest implements Validateable {
 
     Location binLocation
 
-    // Marks a receipt line that was split off from the shipment item's line while receiving.
-    Boolean isSplitItem = Boolean.FALSE
-
     static constraints = {
         receiptItem(nullable: true)
         rowId(nullable: true)
@@ -51,6 +48,5 @@ class ReceiptItemEditReceivingInfoRequest implements Validateable {
         recipient(nullable: true)
         quantityReceiving(nullable: true)
         binLocation(nullable: true)
-        isSplitItem(nullable: true)
     }
 }

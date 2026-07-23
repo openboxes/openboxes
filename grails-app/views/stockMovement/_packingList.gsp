@@ -50,6 +50,9 @@
             <g:each var="shipmentItem" in="${shipmentInstance.sortShipmentItemsBySortOrder()}" status="i">
                 <g:set var="rowspan" value="${shipmentItemsByContainer[shipmentItem?.container]?.size() }"/>
                 <g:set var="newContainer" value="${previousContainer != shipmentItem?.container }"/>
+                %{-- Workflow-aware received/canceled totals - the ShipmentItem getters undercount v2 receipts
+                     whose lines were received against an edited product --}%
+                <g:set var="receivedQuantities" value="${receivedQuantitiesByShipmentItemId?.get(shipmentItem?.id)}"/>
                 <tr class="prop ${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'new-container':''} ${shipmentItem?.hasRecalledLot?'recalled':''} shipmentItem">
                     <td aria-label="Recalled" data-testid="recalled">
                         <g:if test="${shipmentItem?.hasRecalledLot}">
@@ -164,11 +167,11 @@
                         <g:formatNumber number="${shipmentItem?.quantity}" format="###,##0" />
                     </td>
                     <g:if test="${shipmentInstance?.wasReceived()||shipmentInstance?.wasPartiallyReceived()}">
-                        <td aria-label="Quantity Received" class="center" style="white-space:nowrap;${shipmentItem?.quantityReceived() != shipmentItem?.quantity ? ' color:red;' : ''}" data-testid="quantity-received">
-                            <g:formatNumber number="${shipmentItem?.quantityReceived()}" format="###,##0"/>
+                        <td aria-label="Quantity Received" class="center" style="white-space:nowrap;${receivedQuantities?.quantityReceived != shipmentItem?.quantity ? ' color:red;' : ''}" data-testid="quantity-received">
+                            <g:formatNumber number="${receivedQuantities?.quantityReceived}" format="###,##0"/>
                         </td>
-                        <td aria-label="Quantity Canceled" class="center" style="white-space:nowrap;${shipmentItem?.quantityReceived() != shipmentItem?.quantity ? ' color:red;' : ''}" data-testid="quantity-canceled">
-                            <g:formatNumber number="${shipmentItem?.quantityCanceled()}" format="###,##0"/>
+                        <td aria-label="Quantity Canceled" class="center" style="white-space:nowrap;${receivedQuantities?.quantityReceived != shipmentItem?.quantity ? ' color:red;' : ''}" data-testid="quantity-canceled">
+                            <g:formatNumber number="${receivedQuantities?.quantityCanceled}" format="###,##0"/>
                         </td>
                     </g:if>
                     <td aria-label="Unit Of Measure" data-testid="uom">
@@ -200,7 +203,7 @@
                         </g:else>
                     </td>
                     <td aria-label="Is Fully Received" data-testid="is-fully-received">
-                        <g:message code="default.boolean.${shipmentItem?.isFullyReceived()}"/>
+                        <g:message code="default.boolean.${receivedQuantities?.fullyReceived ?: false}"/>
                     </td>
                 </tr>
                 <g:set var="previousContainer" value="${shipmentItem.container }"/>
