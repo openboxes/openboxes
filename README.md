@@ -2,7 +2,7 @@
   <a href="https://www.openboxes.com">
     <img src="/docs/assets/img/logo-full-rounded.png" alt="OpenBoxes logo">
   </a>
-  <h4>An accessible, open-source inventory and supply chain management system.</h4>
+  <h4>An accessible, open-source warehouse and inventory management system.</h4>
 
   [![status of develop branch](https://github.com/openboxes/openboxes/actions/workflows/on-change.yml/badge.svg)](https://github.com/openboxes/openboxes/actions/workflows/on-change.yml)
   [![status of documentation build](https://readthedocs.org/projects/openboxes/badge/?version=develop)](https://readthedocs.org/projects/openboxes/?badge=develop)
