@@ -449,6 +449,10 @@ openboxes:
         delay: 300
         minLength: 3
 
+    # The amount of time (in milliseconds) to display Notify.js notification popups before hiding them
+    notify:
+        autoHideDelay: 10000
+
     refreshAnalyticsDataOnStartup:
         enabled: true
 
