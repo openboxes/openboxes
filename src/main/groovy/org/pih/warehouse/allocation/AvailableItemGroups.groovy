@@ -29,18 +29,8 @@ class AvailableItemGroups {
         displayItems = availableItems?.findAll { it.binLocation?.isDisplay() } ?: []
 
         List<AvailableItem> warehouseItems = availableItems?.findAll { !it.binLocation?.isDisplay() } ?: []
-        Set<Location> preferredBinLocations = getPreferredBinLocations(facility, product)
-        preferredWarehouseItems = warehouseItems.findAll { preferredBinLocations.contains(it.binLocation) }
+        Location preferredBinLocation = InventoryLevel.findPreferredBinLocation(facility, product)
+        preferredWarehouseItems = preferredBinLocation ? warehouseItems.findAll { it.binLocation == preferredBinLocation } : []
         remainingWarehouseItems = warehouseItems - preferredWarehouseItems
-    }
-
-    private static Set<Location> getPreferredBinLocations(Location facility, Product product) {
-        if (!product) {
-            return []
-        }
-        Set<InventoryLevel> inventoryLevels = facility?.inventory?.configuredProducts?.findAll {
-            it.product == product && it.preferredBinLocation != null
-        }
-        return inventoryLevels?.collect { it.preferredBinLocation } ?: []
     }
 }
