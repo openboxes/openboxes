@@ -1,8 +1,10 @@
 package org.pih.warehouse.jobs
 
-import grails.util.Holders
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.DeliveryTypeCode
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.OrderTypeCode
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.requisition.Requisition
@@ -14,6 +16,7 @@ class AutomaticIssuanceJob {
     StockMovementService stockMovementService
     RequisitionService requisitionService
     AuthService authService
+    LocationService locationService
 
     def sessionRequired = false
 
@@ -36,8 +39,9 @@ class AutomaticIssuanceJob {
             return
         }
 
-        if (Holders.config.openboxes.jobs.automaticIssuanceJob.bulkAutomaticIssuance) {
-            List<String> requisitionIds = requisitionService.findStagedRequisitionIds()
+        List<Location> facilities = locationService.getLocationsSupportingActivities([ActivityCode.AUTOMATIC_ISSUANCE_BULK])
+        if (facilities) {
+            List<String> requisitionIds = requisitionService.findStagedRequisitionIds(facilities)
             log.info "Found ${requisitionIds.size()} outbound STAGED requisitions to automatic issue"
 
             requisitionIds.each { String id ->

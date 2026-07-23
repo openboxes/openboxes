@@ -564,7 +564,6 @@ openboxes:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes
             delayInMilliseconds: 1000
-            bulkShipmentAutoReceipt: true
 
         automaticBackorderReallocationJob:
             enabled: true
@@ -574,13 +573,11 @@ openboxes:
         automaticIssuanceJob:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes
-            bulkAutomaticIssuance: true
 
         automaticAllocationJob:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes
             delayInMilliseconds: 1000
-            bulkAutoAllocation: true
 
         # should only be triggered by persistence event listener
         putawayLocationReassignmentJob:
