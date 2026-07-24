@@ -18,9 +18,4 @@ class ReceiptItemSaveDto extends ReceiptItemDto {
         dto.rowId = rowId
         return dto
     }
-
-    @Override
-    Map<String, Object> asResponseBody() {
-        return super.asResponseBody() + [rowId: rowId]
-    }
 }

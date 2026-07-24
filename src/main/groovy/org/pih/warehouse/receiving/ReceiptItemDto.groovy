@@ -1,14 +1,15 @@
 package org.pih.warehouse.receiving
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import org.pih.warehouse.core.PersonDto
-import org.pih.warehouse.core.http.ResponseBodyFormattable
 import org.pih.warehouse.location.LocationSimpleDto
 import org.pih.warehouse.product.lot.ProductLotDto
 
 /**
  * A simple, general purpose DTO representing a single item of a receipt.
  */
-class ReceiptItemDto implements ResponseBodyFormattable {
+class ReceiptItemDto {
 
     String id
     String receiptId
@@ -17,9 +18,10 @@ class ReceiptItemDto implements ResponseBodyFormattable {
     ProductLotDto productLot
 
     /**
-     * If doing a direct putaway as a part of the receipt this will be a a bin location.
+     * If doing a direct putaway as a part of the receipt this will be a bin location.
      * If direct putaways are disabled, this will be an internal, temporary receiving location.
      */
+    @JsonProperty("binLocation")  // TODO: remove this and refactor the frontend to use "receivingLocation"
     LocationSimpleDto receivingLocation
 
     Integer quantityReceived
@@ -51,21 +53,5 @@ class ReceiptItemDto implements ResponseBodyFormattable {
         quantityCanceled = receiptItem.quantityCanceled ?: 0
         comment = receiptItem.comment
         isSplitItem = receiptItem.isSplitItem
-    }
-
-    @Override
-    Map<String, Object> asResponseBody() {
-        return [
-                id: id,
-                receiptId: receiptId,
-                shipmentItemId: shipmentItemId,
-                recipient: recipient,
-                productLot: productLot?.asResponseBody(),
-                binLocation: receivingLocation?.asResponseBody(),
-                quantityReceived: quantityReceived,
-                quantityCanceled: quantityCanceled,
-                comment: comment,
-                isSplitItem: isSplitItem,
-        ]
     }
 }
