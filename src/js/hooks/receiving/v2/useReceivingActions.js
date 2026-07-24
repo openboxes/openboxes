@@ -137,11 +137,23 @@ const useReceivingActions = (view) => {
   // The struck-through row of a split shipment item - the split items below
   // replace it. Built without a receipt item, so it keeps the original shipment values
   // (product, lot, expiration, recipient, bin location).
-  const buildReplacedEntity = (summary, usersById) => ({
-    ...buildLineItem({ summary, usersById }),
-    rowType: ReceivingRowType.REPLACED,
-    isCompleted: false,
-  });
+  const buildReplacedEntity = (summary, usersById) => {
+    const lineItem = buildLineItem({ summary, usersById });
+    // The pending quantities of the split items, already subtracted from quantityRemaining.
+    const quantityPendingReceipt = (summary.currentReceiptItems ?? []).reduce(
+      (sum, receiptItem) => sum + (receiptItem.quantityReceived ?? 0),
+      0,
+    );
+    return {
+      ...lineItem,
+      rowType: ReceivingRowType.REPLACED,
+      isCompleted: false,
+      // The replaced row shows the status of the whole group, so its available quantity
+      // covers all its split items (buildLineItem only adds back the own receipt item,
+      // which a replaced row doesn't have).
+      quantityAvailableToReceive: lineItem.quantityRemaining + quantityPendingReceipt,
+    };
+  };
 
   // A split item row - one editable row per receipt item of a split shipment item.
   // A split item always comes from the edit modal, so the receipt item is the only
