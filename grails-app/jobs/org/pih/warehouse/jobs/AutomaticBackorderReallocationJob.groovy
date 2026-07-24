@@ -19,11 +19,6 @@ class AutomaticBackorderReallocationJob {
 
     def sessionRequired = false
 
-    static triggers = {
-        cron name: JobUtils.getCronName(AutomaticBackorderReallocationJob),
-        cronExpression: JobUtils.getCronExpression(AutomaticBackorderReallocationJob)
-    }
-
     def execute(JobExecutionContext context) {
         if (!Holders.config.openboxes.jobs.automaticBackorderReallocationJob.enabled) {
             log.info"Backorder re-allocation job is disabled"

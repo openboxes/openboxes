@@ -64,7 +64,13 @@ class RefreshProductAvailabilityEvent extends ApplicationEvent {
         super(source)
         this.locationId = locationId
         this.productIds = productIds
-        this.disableRefresh = disableRefresh
+        this.forceRefresh = forceRefresh
+    }
+
+    RefreshProductAvailabilityEvent(Location source,List<String> productIds, Boolean forceRefresh) {
+        super(source)
+        this.locationId = source.id
+        this.productIds = productIds
         this.forceRefresh = forceRefresh
     }
 }

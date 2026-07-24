@@ -9,20 +9,16 @@
  **/
 package org.pih.warehouse.inventory
 
-import groovy.time.TimeCategory
-import org.pih.warehouse.jobs.AutomaticStateTransitionJob
 import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
 
-class RefreshPicklistStatusEventService {
+class RefreshInventorySnapshotEventService {
+
+    InventorySnapshotService inventorySnapshotService
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
-    void onRefreshPicklistStatusEvent(RefreshPicklistStatusEvent event) {
-        log.info "Application event $event has been published! " + event.properties
-
-        use(TimeCategory) {
-            log.info "Trigger automatic state transition job for ${event.source}"
-            AutomaticStateTransitionJob.triggerNow([id: event.source])
-        }
+    void onInventoryLevelUpdated(RefreshInventorySnapshotEvent event) {
+        log.info "Refreshing inventory snapshot for facility=${event.source.id}, product=${event.productIds}"
+        inventorySnapshotService.triggerRefreshInventorySnapshot(event.source.id, event.productIds, event.forceRefresh)
     }
 }
