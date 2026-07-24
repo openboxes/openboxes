@@ -258,7 +258,7 @@ class CsvReaderSpec extends Specification {
         assert rows[1]["field2"].value == "GHI"
 
         and: "An error should be thrown indicating the incorrect number of columns"
-        List<BulkDataError> errors = result.readErrors.allErrors
+        List<BulkDataError> errors = result.readErrors
         assert errors.size() == 1
         assert errors[0].row == 0
         assert errors[0].severity == BulkDataErrorSeverity.ERROR

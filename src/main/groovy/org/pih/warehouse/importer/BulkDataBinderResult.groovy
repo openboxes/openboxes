@@ -13,5 +13,5 @@ class BulkDataBinderResult<T extends Importable> {
     /**
      * The collection of errors that occurred during the bulk data binding process.
      */
-    BulkDataErrors bindErrors = new BulkDataErrors()
+    List<BulkDataError> bindErrors = []
 }

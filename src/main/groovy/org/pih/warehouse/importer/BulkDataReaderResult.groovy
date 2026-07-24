@@ -27,5 +27,5 @@ class BulkDataReaderResult {
     /**
      * The collection of errors that occurred during the bulk data reader process.
      */
-    BulkDataErrors readErrors = new BulkDataErrors()
+    List<BulkDataError> readErrors = []
 }

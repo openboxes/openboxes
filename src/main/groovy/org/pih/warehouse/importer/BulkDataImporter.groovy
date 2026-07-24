@@ -32,8 +32,8 @@ class BulkDataImporter {
         // STEP 1: Read in the source object
         BulkDataReaderResult readerResult = readFile(request)
 
-        BulkDataErrors readErrors = readerResult.readErrors
-        importResult.importErrors.addErrors(readErrors)
+        List<BulkDataError> readErrors = readerResult.readErrors
+        importResult.importErrors.addAll(readErrors)
         if (shouldStopProcessing(readErrors, stopProcessingOn)) {
             return importResult
         }
@@ -42,8 +42,8 @@ class BulkDataImporter {
         BulkDataBinderResult binderResult = bindData(request, readerResult)
         importResult.boundRows = binderResult.boundRows
 
-        BulkDataErrors bindErrors = binderResult.bindErrors
-        importResult.importErrors.addErrors(bindErrors)
+        List<BulkDataError> bindErrors = binderResult.bindErrors
+        importResult.importErrors.addAll(bindErrors)
         if (shouldStopProcessing(bindErrors, stopProcessingOn)) {
             return importResult
         }
@@ -51,8 +51,8 @@ class BulkDataImporter {
         // STEP 3: Validate each row
         BulkDataValidatorResult validatorResult = validate(request, binderResult)
 
-        BulkDataErrors validationErrors = validatorResult.validationErrors
-        importResult.importErrors.addErrors(validationErrors)
+        List<BulkDataError> validationErrors = validatorResult.validationErrors
+        importResult.importErrors.addAll(validationErrors)
         if (shouldStopProcessing(validationErrors, stopProcessingOn)) {
             return importResult
         }
@@ -112,8 +112,8 @@ class BulkDataImporter {
         return bulkDataValidator.validate(request.dataImportType, binderResult.boundRows)
     }
 
-    private boolean shouldStopProcessing(BulkDataErrors errors, BulkDataErrorSeverity stopProcessingOn) {
-        BulkDataErrorSeverity highestSeverity = errors.highestSeverity
+    private boolean shouldStopProcessing(List<BulkDataError> errors, BulkDataErrorSeverity stopProcessingOn) {
+        BulkDataErrorSeverity highestSeverity = errors.severity.max()
         return highestSeverity ? highestSeverity.isSameSeverityOrHigher(stopProcessingOn) : false
     }
 }

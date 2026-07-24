@@ -89,7 +89,7 @@ class BulkDataBinder {
                             cell.value, fieldNameToTypeMap.get(columnName), fieldConfig, epochDate)
                     boundRow.setProperty(columnName, parsedValue)
                 } catch (Exception e) {
-                    result.bindErrors.addError(new BulkDataError(
+                    result.bindErrors.add(new BulkDataError(
                             row: cell.row,
                             column: cell.column,
                             fieldName: columnName,

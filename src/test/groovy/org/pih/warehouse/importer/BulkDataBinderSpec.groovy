@@ -80,7 +80,7 @@ class BulkDataBinderSpec extends Specification {
         assert rows[0].stringField == "Hi"
         assert rows[0].integerField == 1
 
-        assert !result.bindErrors.hasErrors()
+        assert result.bindErrors.size() == 0
     }
 
     void "bindData should ignore fields that are not specified in the config"() {
@@ -116,7 +116,7 @@ class BulkDataBinderSpec extends Specification {
         assert rows[0].stringField == "Hi"   // Should parse normally
         assert rows[0].integerField == null  // Should be ignored
 
-        assert !result.bindErrors.hasErrors()
+        assert result.bindErrors.size() == 0
     }
 
     void "bindData should capture parser errors"() {
@@ -154,7 +154,7 @@ class BulkDataBinderSpec extends Specification {
         assert rows[0].stringField == "Hi"
         assert rows[0].integerField == null
 
-        List<BulkDataError> errors = result.bindErrors.allErrors
+        List<BulkDataError> errors = result.bindErrors
         assert errors.size() == 1
         assert errors[0].row == 0
         assert errors[0].column == "1"
@@ -197,7 +197,7 @@ class BulkDataBinderSpec extends Specification {
         assert rows.size() == 1
         assert rows[0].stringField == "CUSTOM VALUE"
 
-        assert !result.bindErrors.hasErrors()
+        assert result.bindErrors.size() == 0
     }
 
     void "bindData should handle errors when custom bind data"() {
@@ -222,7 +222,7 @@ class BulkDataBinderSpec extends Specification {
         bulkDataBinderConfigurerStub.customBindData(_ as List, _ as BulkDataBinderResult) >> {
             List rawRowsList, BulkDataBinderResult<ImportableStub> result ->
 
-                result.bindErrors.addError(new BulkDataError(
+                result.bindErrors.add(new BulkDataError(
                         row: 0,
                         column: 0,
                         fieldName: "stringField",
@@ -238,7 +238,7 @@ class BulkDataBinderSpec extends Specification {
         assert rows.size() == 1
         assert rows[0].stringField == null
 
-        List<BulkDataError> errors = result.bindErrors.allErrors
+        List<BulkDataError> errors = result.bindErrors
         assert errors.size() == 1
         assert errors[0].row == 0
         assert errors[0].column == "0"

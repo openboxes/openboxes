@@ -56,20 +56,20 @@ class BulkDataImporterSpec extends Specification {
                         "stringField": new BulkDataCell(row: 1, column: 0, fieldName: "stringField", value: "ABC"),
                         "integerField": new BulkDataCell(row: 1, column: 1, fieldName: "integerField", value: "0"),
                 ]],
-                readErrors: new BulkDataErrors(errors: []),
+                readErrors: [],
         )
         readerStub.read(csvString, BULK_DATA_TYPE) >> readerResult
 
         and: "The stubbed data binder result containing no errors/warnings"
         BulkDataBinderResult binderResult = new BulkDataBinderResult(
                 boundRows: [new ImportableForTest(stringField: "ABC", integerField: 0)],
-                bindErrors: new BulkDataErrors(errors: []),
+                bindErrors: [],
         )
         dataBinderStub.bindData(BULK_DATA_TYPE, readerResult) >> binderResult
 
         and: "The stubbed validator result containing no errors/warnings"
         BulkDataValidatorResult validatorResult = new BulkDataValidatorResult(
-                validationErrors: new BulkDataErrors(errors: []),
+                validationErrors: [],
         )
         validatorStub.validate(BULK_DATA_TYPE, binderResult.boundRows) >> validatorResult
 
@@ -82,7 +82,7 @@ class BulkDataImporterSpec extends Specification {
         assert rows[0]["integerField"] == 0
 
         and: "No errors are returned"
-        assert !result.importErrors.hasErrors()
+        assert result.importErrors.size() == 0
     }
 
     void "importBulkDataSource should error when a read error is thrown"() {
@@ -105,10 +105,10 @@ class BulkDataImporterSpec extends Specification {
                         "stringField": new BulkDataCell(row: 1, column: 0, fieldName: "stringField", value: "ABC"),
                         "integerField": new BulkDataCell(row: 1, column: 1, fieldName: "integerField", value: "0"),
                 ]],
-                readErrors: new BulkDataErrors(errors: [
+                readErrors: [
                         new BulkDataError(
                                 row: 1, column: 0, fieldName: "stringField", severity: BulkDataErrorSeverity.ERROR),
-                ]),
+                ],
         )
         readerStub.read(csvString, BULK_DATA_TYPE) >> readerResult
 
@@ -119,7 +119,7 @@ class BulkDataImporterSpec extends Specification {
         assert result.boundRows.empty
 
         and: "The reader error is returned"
-        List<BulkDataError> errors = result.importErrors.allErrors
+        List<BulkDataError> errors = result.importErrors
         assert errors[0].row == 1
         assert errors[0].column == "0"
         assert errors[0].fieldName == "stringField"
@@ -147,10 +147,10 @@ class BulkDataImporterSpec extends Specification {
                         "stringField": new BulkDataCell(row: 1, column: 0, fieldName: "stringField", value: "ABC"),
                         "integerField": new BulkDataCell(row: 1, column: 1, fieldName: "integerField", value: "0"),
                 ]],
-                readErrors: new BulkDataErrors(errors: [
+                readErrors: [
                         new BulkDataError(
                                 row: 1, column: 0, fieldName: "stringField", severity: BulkDataErrorSeverity.WARNING),
-                ])
+                ],
         )
         readerStub.read(csvString, BULK_DATA_TYPE) >> readerResult
 
@@ -161,7 +161,7 @@ class BulkDataImporterSpec extends Specification {
         assert result.boundRows.empty
 
         and: "The reader warning is returned"
-        List<BulkDataError> errors = result.importErrors.allErrors
+        List<BulkDataError> errors = result.importErrors
         assert errors[0].row == 1
         assert errors[0].column == "0"
         assert errors[0].fieldName == "stringField"
@@ -194,10 +194,10 @@ class BulkDataImporterSpec extends Specification {
         and: "The stubbed data binder result containing an error"
         BulkDataBinderResult binderResult = new BulkDataBinderResult(
                 boundRows: [new ImportableForTest(stringField: "ABC", integerField: 0)],
-                bindErrors: new BulkDataErrors(errors: [
+                bindErrors: [
                         new BulkDataError(
                                 row: 1, column: 0, fieldName: "stringField", severity: BulkDataErrorSeverity.ERROR),
-                ]),
+                ],
         )
         dataBinderStub.bindData(BULK_DATA_TYPE, readerResult) >> binderResult
 
@@ -210,7 +210,7 @@ class BulkDataImporterSpec extends Specification {
         assert boundRows[0].integerField == 0
 
         and: "The data binder error is returned"
-        List<BulkDataError> errors = result.importErrors.allErrors
+        List<BulkDataError> errors = result.importErrors
         assert errors[0].row == 1
         assert errors[0].column == "0"
         assert errors[0].fieldName == "stringField"
@@ -244,10 +244,10 @@ class BulkDataImporterSpec extends Specification {
         and: "The stubbed data binder result containing a warning"
         BulkDataBinderResult binderResult = new BulkDataBinderResult(
                 boundRows: [new ImportableForTest(stringField: "ABC", integerField: 0)],
-                bindErrors: new BulkDataErrors(errors: [
+                bindErrors: [
                         new BulkDataError(
                                 row: 1, column: 0, fieldName: "stringField", severity: BulkDataErrorSeverity.WARNING),
-                ]),
+                ],
         )
         dataBinderStub.bindData(BULK_DATA_TYPE, readerResult) >> binderResult
 
@@ -260,7 +260,7 @@ class BulkDataImporterSpec extends Specification {
         assert boundRows[0].integerField == 0
 
         and: "The data binder warning is returned"
-        List<BulkDataError> errors = result.importErrors.allErrors
+        List<BulkDataError> errors = result.importErrors
         assert errors[0].row == 1
         assert errors[0].column == "0"
         assert errors[0].fieldName == "stringField"
@@ -298,10 +298,10 @@ class BulkDataImporterSpec extends Specification {
 
         and: "The stubbed validator result containing an error"
         BulkDataValidatorResult validatorResult = new BulkDataValidatorResult(
-                validationErrors: new BulkDataErrors(errors: [
+                validationErrors: [
                         new BulkDataError(
                                 row: 1, column: 0, fieldName: "stringField", severity: BulkDataErrorSeverity.ERROR),
-                ]),
+                ],
         )
         validatorStub.validate(BULK_DATA_TYPE, binderResult.boundRows) >> validatorResult
 
@@ -314,7 +314,7 @@ class BulkDataImporterSpec extends Specification {
         assert boundRows[0].integerField == 0
 
         and: "The validator error is returned"
-        List<BulkDataError> errors = result.importErrors.allErrors
+        List<BulkDataError> errors = result.importErrors
         assert errors[0].row == 1
         assert errors[0].column == "0"
         assert errors[0].fieldName == "stringField"
@@ -353,10 +353,10 @@ class BulkDataImporterSpec extends Specification {
 
         and: "The stubbed validator result containing a warning"
         BulkDataValidatorResult validatorResult = new BulkDataValidatorResult(
-                validationErrors: new BulkDataErrors(errors: [
+                validationErrors: [
                         new BulkDataError(
                                 row: 1, column: 0, fieldName: "stringField", severity: BulkDataErrorSeverity.WARNING),
-                ]),
+                ],
         )
         validatorStub.validate(BULK_DATA_TYPE, binderResult.boundRows) >> validatorResult
 
@@ -369,7 +369,7 @@ class BulkDataImporterSpec extends Specification {
         assert boundRows[0].integerField == 0
 
         and: "The validator warning is returned"
-        List<BulkDataError> errors = result.importErrors.allErrors
+        List<BulkDataError> errors = result.importErrors
         assert errors[0].row == 1
         assert errors[0].column == "0"
         assert errors[0].fieldName == "stringField"
@@ -396,26 +396,26 @@ class BulkDataImporterSpec extends Specification {
                         "stringField": new BulkDataCell(row: 1, column: 0, fieldName: "stringField", value: "ABC"),
                         "integerField": new BulkDataCell(row: 1, column: 1, fieldName: "integerField", value: "0"),
                 ]],
-                readErrors: new BulkDataErrors(errors: [
+                readErrors: [
                         new BulkDataError(severity: BulkDataErrorSeverity.WARNING, localizedMessage: "READ"),
-                ]),
+                ],
         )
         readerStub.read(csvString, BULK_DATA_TYPE) >> readerResult
 
         and: "The stubbed data binder result containing a warning"
         BulkDataBinderResult binderResult = new BulkDataBinderResult(
                 boundRows: [new ImportableForTest(stringField: "ABC", integerField: 0)],
-                bindErrors: new BulkDataErrors(errors: [
+                bindErrors: [
                         new BulkDataError(severity: BulkDataErrorSeverity.WARNING, localizedMessage: "BIND"),
-                ]),
+                ],
         )
         dataBinderStub.bindData(BULK_DATA_TYPE, readerResult) >> binderResult
 
         and: "The stubbed validator result containing a warning"
         BulkDataValidatorResult validatorResult = new BulkDataValidatorResult(
-                validationErrors: new BulkDataErrors(errors: [
+                validationErrors: [
                         new BulkDataError(severity: BulkDataErrorSeverity.WARNING, localizedMessage: "VALIDATE"),
-                ]),
+                ],
         )
         validatorStub.validate(BULK_DATA_TYPE, binderResult.boundRows) >> validatorResult
 
@@ -428,7 +428,7 @@ class BulkDataImporterSpec extends Specification {
         assert boundRows[0].integerField == 0
 
         and: "all warnings are present"
-        List<BulkDataError> errors = result.importErrors.allErrors
+        List<BulkDataError> errors = result.importErrors
         assert errors.size() == 3
         assert errors.any { it.localizedMessage == "READ" }
         assert errors.any { it.localizedMessage == "BIND" }

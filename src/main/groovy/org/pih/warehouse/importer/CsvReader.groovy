@@ -52,7 +52,7 @@ class CsvReader extends BulkDataReader<CsvReaderConfig> {
 
                 // If a row has fewer columns than we expect, error.
                 if (csvRow.size() < columnToFieldMap.size()) {
-                    result.readErrors.addError(new BulkDataError(
+                    result.readErrors.add(new BulkDataError(
                             row: rowIndex,
                             severity: BulkDataErrorSeverity.ERROR,
                             localizedMessage: messageLocalizer.localize(
