@@ -1,11 +1,9 @@
 package org.pih.warehouse.core
 
-import org.pih.warehouse.core.http.ResponseBodyFormattable
-
 /**
  * Wraps a {@link DataGroup}, adding an order field that suggests how the groups should be sorted.
  */
-class OrderedDataGroup implements ResponseBodyFormattable {
+class OrderedDataGroup {
 
     private DataGroup groups = [:]
     private LinkedHashSet<String> order = []
@@ -40,13 +38,5 @@ class OrderedDataGroup implements ResponseBodyFormattable {
     void merge(OrderedDataGroup otherGroup) {
         groups.merge(otherGroup.groups)
         order.addAll(otherGroup.order)
-    }
-
-    @Override
-    Map<String, Object> asResponseBody() {
-        return [
-                groups: groups,
-                order: order,
-        ]
     }
 }

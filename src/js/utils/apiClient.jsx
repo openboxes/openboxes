@@ -64,7 +64,7 @@ export const handleSuccess = (response) => response;
 export const handleError = (error) => {
   const errorMessage = _.get(error, 'response.data.errorMessage', '');
   const errorMessages = _.get(error, 'response.data.errorMessages', []).join(', ');
-  switch (error.response.status) {
+  switch (error.response?.status) {
     case 400: {
       notification(NotificationType.ERROR_OUTLINED)({
         message: 'Bad request',
@@ -130,7 +130,7 @@ export const urlInterceptor = (config) => {
 };
 
 export const handleValidationErrors = (setState) => (error) => {
-  if (error.response.status === 400) {
+  if (error.response?.status === 400) {
     const alertMessage = _.join(_.get(error, 'response.data.errorMessages', ''), ' ');
     setState({ alertMessage, showAlert: true });
 

@@ -84,8 +84,8 @@ class CycleCountApiControllerSpec extends ApiControllerSpec<CycleCountApiControl
         given:
         CycleCountCandidateFilterCommand filterParams = new CycleCountCandidateFilterCommand(format: JSON_FORMAT)
         Query mockQuery = Stub(Query) {
-            list() >> [Mock(CycleCountCandidate),
-                       Mock(CycleCountCandidate),]
+            list() >> [new CycleCountCandidate(),
+                       new CycleCountCandidate(),]
         }
         List<CycleCountCandidate> mockedCandidates = Spy(PagedResultList, constructorArgs: [mockQuery]) {
             getTotalCount() >> mockQuery.list().size()

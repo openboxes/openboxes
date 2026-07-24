@@ -1,0 +1,285 @@
+package org.pih.warehouse.core.http
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect
+import com.fasterxml.jackson.annotation.PropertyAccessor
+import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.databind.BeanDescription
+import com.fasterxml.jackson.databind.BeanProperty
+import com.fasterxml.jackson.databind.JsonMappingException
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationConfig
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.databind.SerializerProvider
+import com.fasterxml.jackson.databind.module.SimpleModule
+import com.fasterxml.jackson.databind.ser.BeanSerializerModifier
+import com.fasterxml.jackson.databind.ser.ContextualSerializer
+import com.fasterxml.jackson.databind.ser.ResolvableSerializer
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import grails.artefact.DomainClass
+import grails.gorm.Entity
+import org.grails.datastore.gorm.GormEntity
+import org.springframework.stereotype.Component
+
+import org.pih.warehouse.core.mapper.MapperComponentResolver
+import org.pih.warehouse.core.mapper.ResponseMapper
+
+/**
+ * Configures Jackson's ObjectMapper, which handles API serialization.
+ *
+ * Note that by default Grails does not use the ObjectMapper (it uses {@link grails.converters.JSON} instead).
+ * As such, this serialization will only be triggered on Controllers if opted in to, which is the case for
+ * any controller that implements {@link org.pih.warehouse.core.BaseController}.
+ */
+@Component
+class ObjectMapperConfigurer {
+
+    ObjectMapperConfigurer(final ObjectMapper objectMapper, final MapperComponentResolver mapperComponentResolver) {
+
+        // Prevent getter and boolean is* methods from being automatically serialized as fields.
+        // You can still serialize individual getters by annotating them with @JsonProperty.
+        objectMapper.setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE)
+        objectMapper.setVisibility(PropertyAccessor.IS_GETTER, JsonAutoDetect.Visibility.NONE)
+
+        // Groovy makes the fields themselves "private" (because it auto-generates getters) so
+        // we need to set field visibility to ANY to be able to auto-serialize fields.
+        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
+
+        // If an object being serialized has no fields to serialize, don't throw an error,
+        // just ignore the object. This gracefully resolves Grails/GORM AST transformation weirdness.
+        objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+
+        // Support serializing java.util.Date and java.time classes (LocalDate, Instant, ZonedDateTime)
+        // as ISO strings (for example, "2025-01-21" or "2025-01-21T00:00Z")
+        objectMapper.registerModule(new JavaTimeModule())
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+
+        // Instruct the ObjectMapper to consult our custom module whenever it constructs a serializer.
+        SimpleModule module = new SimpleModule("OpenBoxes")
+        module.setSerializerModifier(new OpenBoxesBeanSerializerModifier(mapperComponentResolver))
+        objectMapper.registerModule(module)
+    }
+
+    /**
+     * Modifies the serialization process, wrapping it with the custom behaviour defined in OpenBoxesWrappingSerializer.
+     *
+     * Note that this flow will not impact primitives, Lists, Maps, or other types that have their own built-in
+     * serializers. Those serializers are defined and handled explicitly by Jackson.
+     *
+     * During serialization, when Jackson first encounters a type that it hasn't serialized before, Jackson's
+     * BeanSerializerFactory builds a new serializer for that type and caches it for when it sees that type again.
+     * At the end of that process, the BeanSerializerFactory iterates over each BeanSerializerModifier, calling
+     * modifySerializer to extend/wrap it with the specified behaviour.
+     */
+    class OpenBoxesBeanSerializerModifier extends BeanSerializerModifier {
+
+        private final MapperComponentResolver mapperComponentResolver
+
+        OpenBoxesBeanSerializerModifier(final MapperComponentResolver mapperComponentResolver) {
+            this.mapperComponentResolver = mapperComponentResolver
+        }
+
+        @Override
+        JsonSerializer<?> modifySerializer(SerializationConfig config,
+                                           BeanDescription beanDesc,
+                                           JsonSerializer<?> serializer) {
+
+            // Wraps the original Jackson serializer with our OpenBoxesWrappingSerializer.
+            // The serializer will be cached after this point, so the overhead of wrapping the serializer should
+            // only apply the first time a type is serialized (at least until the next application restart).
+            return new OpenBoxesWrappingSerializer(mapperComponentResolver, serializer as JsonSerializer<Object>)
+        }
+    }
+
+    /**
+     * Wraps the default serialization process to check for our custom defined behaviours.
+     *
+     * These include (in priority order):
+     *
+     * 1) defining a ResponseMapper for the object
+     * 2) implementing ResponseBodyFormattable
+     * 3) implementing a toJson() method (supported for backwards compatability with existing DTOs)
+     *
+     * If any object being serialized has one of the above, it will be serialized via that method, otherwise it
+     * will serialize via Jackson's default behaviour.
+     *
+     * Any object being serialized via one of the above methods will ignore any Jackson annotations on the object.
+     *
+     * This works at any level in the object hierarchy. If a DTO contains a field that implements one of the above
+     * custom serialization methods, that field will be serialized via that method.
+     */
+    class OpenBoxesWrappingSerializer extends JsonSerializer<Object> implements ResolvableSerializer,
+                                                                                ContextualSerializer {
+
+        /**
+         * How many layers deep into a JSON object we allow before short circuiting and returning null.
+         */
+        private static final int MAX_JSON_DEPTH = 25
+
+        private final MapperComponentResolver mapperComponentResolver
+
+        /**
+         * The BeanSerializer holding the default serialization behaviour that Jackson would perform.
+         */
+        private final JsonSerializer<Object> delegate
+
+        /**
+         * A thread-safe set of object identities used to check for circular references when serializing.
+         */
+        private static final ThreadLocal<Set<Object>> ALREADY_SEEN_OBJECTS = new ThreadLocal<Set<Object>>() {
+            @Override
+            protected Set<Object> initialValue() {
+                return Collections.newSetFromMap(new IdentityHashMap<>())
+            }
+        }
+
+        OpenBoxesWrappingSerializer(final MapperComponentResolver mapperComponentResolver,
+                                    final JsonSerializer<Object> delegate) {
+            this.mapperComponentResolver = mapperComponentResolver
+            this.delegate = delegate
+        }
+
+        @Override
+        void serialize(Object value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+            if (value == null) {
+                provider.defaultSerializeNull(gen)
+                return
+            }
+
+            // If the set already contains the object it means we've seen it before in the hierarchy and so have
+            // a circular reference and need to short circuit. Note that this still allows an object to appear multiple
+            // times in a single response. This check only applies to objects within a single *branch* of the response.
+            // For example: Object X has a Y field, which has an X field, which has a Y field, ... looping forever!
+            Set<Object> stack = ALREADY_SEEN_OBJECTS.get()
+            if (!stack.add(value)) {
+                handleCircularReference(value, gen)
+                return
+            }
+
+            try {
+                // Break after some JSON depth. It is very unlikely that a non-erroneous flow would reach this depth.
+                // This is primarily to avoid stack overflows if something is misconfigured.
+                if (stack.size() > MAX_JSON_DEPTH) {
+                    throw new RuntimeException("Exceeded maximum JSON depth of ${MAX_JSON_DEPTH}. Erroring to avoid " +
+                            "a stack overflow. Check the DTO serialization logic for infinite loops or other " +
+                            "erroneous behaviour. The full serialization stack: [${stringifySerializationStack()}]")
+                }
+
+                Map mappedData = applyCustomMapping(value)
+                if (mappedData != null) {
+                    provider.defaultSerializeValue(mappedData, gen)
+                } else {
+                    // If our custom serializing did nothing, let Jackson serialize the object.
+                    delegate.serialize(value, gen, provider)
+                }
+            } finally {
+                // We've serialized all of the object's fields, so remove it from the stack as we bubble back up
+                // to the object's parent.
+                stack.remove(value)
+            }
+        }
+
+        @Override
+        void resolve(SerializerProvider provider) throws JsonMappingException {
+            // Preserves default behaviour for non-custom serialized objects.
+            // Allows BeanSerializer to lazily resolve its property serializers.
+            if (delegate instanceof ResolvableSerializer) {
+                (delegate as ResolvableSerializer).resolve(provider)
+            }
+        }
+
+        @Override
+        JsonSerializer<?> createContextual(SerializerProvider provider,
+                                           BeanProperty property) throws JsonMappingException {
+            // Allows context-dependent features (such as @JsonView, @JsonFilter) to work.
+            if (delegate instanceof ContextualSerializer) {
+                JsonSerializer<?> contextual = (delegate as ContextualSerializer).createContextual(provider, property)
+                if (!contextual.is(delegate)) {
+                    return new OpenBoxesWrappingSerializer(
+                            mapperComponentResolver, contextual as JsonSerializer<Object>)
+                }
+            }
+            return this
+        }
+
+        private void handleCircularReference(Object value, JsonGenerator gen) {
+            // This exact object instance is already being serialized higher up in the call stack. Break the cycle
+            // (writing the object's id if possible, otherwise stringifying it) rather than overflowing the stack.
+            if (value.hasProperty("id")) {
+                try {
+                    gen.writeString(value.id as String)
+                    return
+                } catch (Exception ignore) {
+                    // Fail silently if the id cannot be stringified for whatever reason.
+                }
+            }
+
+            try {
+                gen.writeString(value.toString())
+                return
+            } catch (Exception ignore) {
+                // Fail silently if the object cannot be stringified for whatever reason.
+            }
+
+            gen.writeNull()
+        }
+
+        /**
+         * Performs our custom serialization on the given object if one of the following (in priority order) is true:
+         *
+         * 1) A ResponseMapper is defined for the object
+         * 2) The object implements ResponseBodyFormattable
+         * 3) The object defines a toJson() method (supported for backwards compatability with existing DTOs)
+         */
+        private Map applyCustomMapping(Object value) {
+            if (value == null) {
+                return null
+            }
+
+            // Gracefully handle proxy objects (ex: Spock test mocks) that may not accurately return their class type.
+            if (!(value.class instanceof Class)) {
+                return null
+            }
+
+            // Our custom mapping should only ever be applied to classes that we've written, so return early otherwise.
+            Class valueClass = value.class
+            if (valueClass?.package?.name == null || !(valueClass.package.name.startsWith("org.pih.warehouse"))) {
+                return null
+            }
+
+            ResponseMapper responseMapper = mapperComponentResolver.getResponseMapper(valueClass)
+            if (responseMapper) {
+                return responseMapper.asResponseBody(value)
+            }
+            if (value instanceof ResponseBodyFormattable) {
+                return value.asResponseBody()
+            }
+            // toJson() is supported for compatability with existing DTOs. Prefer extending ResponseBodyFormattable.
+            if (value.metaClass.respondsTo(value, "toJson")) {
+                return value.toJson()
+            }
+
+            /*
+             * We intentionally do not support serializing Hibernate entities (unless they define one of the above
+             * methods). We require all of our domain entities to be mapped to a DTO before serialization.
+             *
+             * If we ever change our mind about this, we can support Hibernate by adding the following dependency:
+             * "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5:${jacksonVersion}" and then add the
+             * Hibernate module to the object mapper via: objectMapper.registerModule(new Hibernate5Module())
+             */
+            if (value instanceof DomainClass || value instanceof Entity || value instanceof GormEntity) {
+                throw new RuntimeException("We do not support serializing Hibernate entities. Please create a DTO " +
+                        "for domain ${valueClass}. The full serialization stack: [${stringifySerializationStack()}]")
+            }
+
+            // We don't know how to serialize the object so we will rely on the framework to do it for us.
+            return null
+        }
+
+        private String stringifySerializationStack() {
+            return ALREADY_SEEN_OBJECTS.get().toList().reverse().withIndex()
+                    .collect { it, index -> "${index}. (${it.class.simpleName}) ${it.toString()}" }
+                    .join(" -> ")
+        }
+    }
+}

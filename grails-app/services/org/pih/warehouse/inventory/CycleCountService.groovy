@@ -1,6 +1,5 @@
 package org.pih.warehouse.inventory
 
-import grails.converters.JSON
 import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
@@ -12,7 +11,6 @@ import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
-import org.pih.warehouse.DateUtil
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
@@ -22,8 +20,6 @@ import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.report.CycleCountReportCommand
-
-import java.time.LocalDate
 
 @Transactional
 class CycleCountService {
@@ -831,7 +827,7 @@ class CycleCountService {
         // We've updated the status of a cycle count item so we need to also update the status of the count.
         cycleCountItem.cycleCount.status = cycleCountItem.cycleCount.recomputeStatus()
 
-        return cycleCountItem.toDto()
+        return CycleCountItemDto.from(cycleCountItem)
     }
 
     List<CycleCountItemDto> createCycleCountItems(List<CycleCountItemCommand> items) {
@@ -889,7 +885,7 @@ class CycleCountService {
         cycleCount.addToCycleCountItems(cycleCountItem)
         cycleCount.status = cycleCount.recomputeStatus()
 
-        return cycleCountItem.toDto()
+        return CycleCountItemDto.from(cycleCountItem)
     }
 
     void deleteCycleCountItem(String cycleCountItemId) {

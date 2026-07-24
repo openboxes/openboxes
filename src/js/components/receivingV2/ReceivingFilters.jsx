@@ -25,7 +25,13 @@ import AutosaveIndicator from 'utils/AutosaveIndicator';
  * receipt status) are rendered through FilterForm from the FilterFields config.
  */
 const ReceivingFilters = ({
-  view, onViewChange, putawayEnabled, onPutawayChange, onAutofillQuantities, onSaveAndExit,
+  view,
+  onViewChange,
+  putawayEnabled,
+  onPutawayChange,
+  onAutofillQuantities,
+  onSaveAndExit,
+  autosaveStatus,
 }) => {
   const translate = useTranslate();
   // Add loading for filters section. Loading will display before the translations are fetched.
@@ -44,7 +50,7 @@ const ReceivingFilters = ({
           onChange={onViewChange}
         />
         <div className="receiving-filters__autosave-slot">
-          <AutosaveIndicator status={AutosaveStatus.SAVED} />
+          <AutosaveIndicator status={autosaveStatus} />
         </div>
       </div>
       <FilterForm
@@ -114,6 +120,7 @@ ReceivingFilters.propTypes = {
   onPutawayChange: PropTypes.func.isRequired,
   onAutofillQuantities: PropTypes.func.isRequired,
   onSaveAndExit: PropTypes.func.isRequired,
+  autosaveStatus: PropTypes.oneOf(Object.values(AutosaveStatus)).isRequired,
 };
 
 export default ReceivingFilters;

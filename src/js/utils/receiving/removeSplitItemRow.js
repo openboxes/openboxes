@@ -1,9 +1,3 @@
-import { useCallback } from 'react';
-
-import { useDispatch } from 'react-redux';
-
-import { hideSpinner, showSpinner } from 'actions';
-import receivingApi from 'api/services/ReceivingApi';
 import {
   removeNormalizedItem,
   removeNormalizedItems,
@@ -15,6 +9,12 @@ const getNextSplitItemId = (splitItemIds, removedRowId) => {
   return splitItemIds[removedIndex + 1];
 };
 
+/**
+ * Removes a split item row from the normalized receiving state, fixing up the split-item
+ * grouping: the owning toggle row drops the id, a group reduced to a single split item
+ * collapses back into a plain row, and the group lead passes on when the first split
+ * item is removed.
+ */
 const removeSplitItemRow = (state, rowId) => {
   // The toggle row owning the removed split item in its splitItemIds.
   const toggleRowId = state.ids
@@ -59,31 +59,4 @@ const removeSplitItemRow = (state, rowId) => {
   );
 };
 
-/**
- * Removes a single split item row - deletes its receipt item through the batch
- * endpoint and, only on success, drops the row from the local state.
- */
-const useRemoveSplitItem = ({ receiptId, lineItemsState, setLineItemsState }) => {
-  const dispatch = useDispatch();
-
-  const removeSplitItem = useCallback(async (rowId) => {
-    const receiptItemId = lineItemsState.entities[rowId]?.receiptItemId;
-    if (!receiptItemId) {
-      return;
-    }
-    dispatch(showSpinner());
-    try {
-      await receivingApi.updateItemsBatch(receiptId, {
-        itemsToSave: [],
-        itemsToDelete: [receiptItemId],
-      });
-    } finally {
-      dispatch(hideSpinner());
-    }
-    setLineItemsState((state) => removeSplitItemRow(state, rowId));
-  }, [lineItemsState.entities, receiptId]);
-
-  return { removeSplitItem };
-};
-
-export default useRemoveSplitItem;
+export default removeSplitItemRow;

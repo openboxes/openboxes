@@ -1,14 +1,15 @@
 package org.pih.warehouse.receiving
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import org.pih.warehouse.core.PersonDto
-import org.pih.warehouse.core.http.ResponseBodyFormattable
 import org.pih.warehouse.location.LocationSimpleDto
 import org.pih.warehouse.product.lot.ProductLotDto
 
 /**
  * A simple, general purpose DTO representing a single item of a receipt.
  */
-class ReceiptItemDto implements ResponseBodyFormattable {
+class ReceiptItemDto {
 
     String id
     String receiptId
@@ -17,14 +18,16 @@ class ReceiptItemDto implements ResponseBodyFormattable {
     ProductLotDto productLot
 
     /**
-     * If doing a direct putaway as a part of the receipt this will be a a bin location.
+     * If doing a direct putaway as a part of the receipt this will be a bin location.
      * If direct putaways are disabled, this will be an internal, temporary receiving location.
      */
+    @JsonProperty("binLocation")  // TODO: remove this and refactor the frontend to use "receivingLocation"
     LocationSimpleDto receivingLocation
 
-    Integer quantityReceived = 0
+    Integer quantityReceived
     Integer quantityCanceled = 0
     String comment
+    Boolean isSplitItem
 
     static ReceiptItemDto from(ReceiptItem receiptItem) {
         if (!receiptItem) {
@@ -46,23 +49,9 @@ class ReceiptItemDto implements ResponseBodyFormattable {
         recipient = PersonDto.from(receiptItem.recipient)
         productLot = ProductLotDto.from(receiptItem.inventoryItem)
         receivingLocation = LocationSimpleDto.from(receiptItem.binLocation)
-        quantityReceived = receiptItem.quantityReceived ?: 0
+        quantityReceived = receiptItem.quantityReceived
         quantityCanceled = receiptItem.quantityCanceled ?: 0
         comment = receiptItem.comment
-    }
-
-    @Override
-    Map<String, Object> asResponseBody() {
-        return [
-                id: id,
-                receiptId: receiptId,
-                shipmentItemId: shipmentItemId,
-                recipient: recipient,
-                productLot: productLot?.asResponseBody(),
-                binLocation: receivingLocation?.asResponseBody(),
-                quantityReceived: quantityReceived,
-                quantityCanceled: quantityCanceled,
-                comment: comment,
-        ]
+        isSplitItem = receiptItem.isSplitItem
     }
 }
