@@ -16,6 +16,7 @@ class ReceiptItemsBatchRequestValidator implements ObjectValidator<ReceiptItemsB
                 validateItemsToSaveAreValid(request),
                 validateNoDuplicateItemsToSave(request),
                 validateItemsAreNotBothSavedAndDeleted(request),
+                validateItemsToDeleteAreNotOriginalItems(request),
         )
     }
 
@@ -79,6 +80,33 @@ class ReceiptItemsBatchRequestValidator implements ObjectValidator<ReceiptItemsB
         return overlappingIds ?
                 rejectField("itemsToDelete", request.itemsToDelete,
                         "receiptItemsBatchRequest.itemsToDelete.savedAndDeleted", [overlappingIds.toString()]) :
+                null
+    }
+
+    /**
+     * Original receipt items (the per-shipment-item lines created when the receipt was started, flagged
+     * isSplitItem: false) must never be deleted - they are what the cancel-remaining logic runs against when the
+     * receipt is completed. Only split lines added while receiving can be deleted. Identifiers that don't resolve
+     * to an existing item are ignored here - the service reports them when it performs the delete.
+     */
+    private ObjectError validateItemsToDeleteAreNotOriginalItems(ReceiptItemsBatchRequest request) {
+        if (!request.itemsToDelete) {
+            return null
+        }
+
+        // A single projection query instead of a per-id ReceiptItem.get(): one round trip for the whole batch, and
+        // the items stay out of the Hibernate session - the service is about to delete these very entities.
+        List<String> originalItemIds = ReceiptItem.createCriteria().list {
+            projections {
+                property("id")
+            }
+            inList("id", request.itemsToDelete)
+            eq("isSplitItem", false)
+        }
+
+        return originalItemIds ?
+                rejectField("itemsToDelete", request.itemsToDelete,
+                        "receiptItemsBatchRequest.itemsToDelete.originalItem", [originalItemIds.toString()]) :
                 null
     }
 }

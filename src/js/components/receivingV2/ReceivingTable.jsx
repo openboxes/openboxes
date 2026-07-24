@@ -19,6 +19,7 @@ const ReceivingTable = ({
   commentModal,
   removeSplitItem,
   loadReceipt,
+  onLocationAutofill,
 }) => {
   const {
     isOpen: isCommentModalOpen,
@@ -44,8 +45,16 @@ const ReceivingTable = ({
       removeSplitItem,
       onOpenCommentModal: openCommentModal,
       onOpenEditModal: openEditModal,
+      onLocationAutofill,
     }),
-    [lineItemsState.entities, updateLineItem, openCommentModal, openEditModal, removeSplitItem],
+    [
+      lineItemsState.entities,
+      updateLineItem,
+      openCommentModal,
+      openEditModal,
+      removeSplitItem,
+      onLocationAutofill,
+    ],
   );
 
   // Separators pass through without meta. Meta is only used to disable (grey out)
@@ -157,6 +166,7 @@ ReceivingTable.propTypes = {
     openModal: PropTypes.func.isRequired,
     closeModal: PropTypes.func.isRequired,
   }).isRequired,
+  onLocationAutofill: PropTypes.func.isRequired,
 };
 
 ReceivingTable.defaultProps = {

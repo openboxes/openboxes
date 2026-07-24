@@ -29,15 +29,15 @@ class BulkDataValidator {
      * For use when we want to rely on the default validation configuration for a given bulk data type.
      *
      * @param bulkDataType Determines which configurer to use when validating the data.
-     * @param toValidateList The objects to be validated.
+     * @param rows The objects to be validated.
      * @return The result of validating the Importable data.
      */
-    BulkDataValidatorResult validate(BulkDataType bulkDataType, List<Importable> toValidateList) {
+    BulkDataValidatorResult validate(BulkDataType bulkDataType, List<Importable> rows) {
         ConfiguresBulkDataValidator validateConfigurer = componentResolver.getBulkDataValidatorConfigurer(bulkDataType)
         if (!validateConfigurer) {
             throw new RuntimeException("No bulk data validator configurer was found for type ${bulkDataType}")
         }
-        return validate(bulkDataType, validateConfigurer.bulkDataValidatorConfig, toValidateList)
+        return validate(bulkDataType, validateConfigurer.bulkDataValidatorConfig, rows)
     }
 
     /**
@@ -47,20 +47,20 @@ class BulkDataValidator {
      *
      * @param bulkDataType Determines which configurer to use when validating the data.
      * @param config Configuration for validating the data.
-     * @param toValidateList The objects to be validated.
+     * @param rows The objects to be validated.
      * @return The result of validating the Importable data.
      */
     BulkDataValidatorResult validate(
-            BulkDataType bulkDataType, BulkDataValidatorConfig config, List<Importable> toValidateList) {
+            BulkDataType bulkDataType, BulkDataValidatorConfig config, List<Importable> rows) {
 
         Map<String, String> columnByFieldName = config.columnByFieldName
 
         BulkDataValidatorResult result = new BulkDataValidatorResult()
-        for (int rowIndex = 0; rowIndex < toValidateList.size(); rowIndex++) {
-            List<ObjectError> errors = validateRow(toValidateList.get(rowIndex))
-            result.validationErrors.addErrors(convertObjectErrorsToBulkDataErrors(errors, rowIndex, columnByFieldName))
+        for (int rowIndex = 0; rowIndex < rows.size(); rowIndex++) {
+            List<ObjectError> errors = validateRow(rows.get(rowIndex))
+            result.validationErrors.addAll(convertObjectErrorsToBulkDataErrors(errors, rowIndex, columnByFieldName))
         }
-        result.validationErrors.addErrors(customValidate(bulkDataType, columnByFieldName, toValidateList))
+        result.validationErrors.addAll(customValidate(bulkDataType, columnByFieldName, rows))
 
         return result
     }
@@ -105,27 +105,52 @@ class BulkDataValidator {
      * Perform any custom validation as declared by the configurer for the given bulk data type.
      */
     private List<BulkDataError> customValidate(
-            BulkDataType bulkDataType, Map<String, String> columnByFieldName, List<Importable> toValidateList) {
+            BulkDataType bulkDataType, Map<String, String> columnByFieldName, List<Importable> rows) {
 
         ConfiguresBulkDataValidator configuresValidator = componentResolver.getBulkDataValidatorConfigurer(bulkDataType)
         if (!configuresValidator) {
             return []
         }
 
-        List<BulkDataError> customErrors = configuresValidator.customValidate(toValidateList)
+        // We provide two hook-ins for configuring custom validation. One for validating across rows...
+        List<BulkDataError> errors = configuresValidator.customValidateAcrossRows(rows)?.allErrors ?: []
 
-        // For the sake of convenience during custom validation, set some of the fields on the error automatically.
-        for (customError in customErrors) {
-            if (customError.column == null) {
+        // And one for validating rows individually.
+        errors.addAll(customValidateEachRow(configuresValidator, rows))
+
+        for (customError in errors) {
+            // To make it simpler to implement custom validation for a feature, we set the column index on the errors
+            // here instead of requiring the custom configuration to know how to set the field itself.
+            if (customError.column == null && customError.fieldName != null) {
                 customError.column = columnByFieldName.get(customError.fieldName)
             }
 
-            // We may not have performed localization on custom errors yet, so make sure to do so.
+            // We may not have performed localization on custom errors yet, so make sure to do so. Again, this is
+            // so that the custom configuration doesn't need to remember to do this.
             if (customError.localizedMessage == null && customError.localizableMessage != null) {
                 customError.localizedMessage = messageLocalizer.localize(customError.localizableMessage)
             }
         }
 
-        return customErrors
+        return errors
+    }
+
+    private List<BulkDataError> customValidateEachRow(ConfiguresBulkDataValidator configuresValidator,
+                                                      List<Importable> rows) {
+        List<BulkDataError> errors = []
+        for (int rowIndex = 0; rowIndex < rows.size(); rowIndex++) {
+            List<BulkDataError> rowErrors = configuresValidator.customValidateRow(rows.get(rowIndex)).allErrors
+            if (!rowErrors) {
+                continue
+            }
+            for (rowError in rowErrors) {
+                // To make it simpler to implement custom validation for a feature, we set the row index on the errors
+                // here instead of requiring the custom configuration to know how to set the field itself.
+                rowError.row = rowIndex
+
+                errors.add(rowError)
+            }
+        }
+        return errors
     }
 }

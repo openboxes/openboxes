@@ -40,12 +40,10 @@ class BulkDataValidatorSpec extends Specification {
         ]
 
         when: "validate is called"
-        BulkDataErrors errors = bulkDataValidator.validate(bulkDataType, data).validationErrors
+        List<BulkDataError> errors = bulkDataValidator.validate(bulkDataType, data).validationErrors
 
         then:
-        assert !errors.hasErrors()
-        assert errors.highestSeverity == null
-        assert errors.allErrors.size() == 0
+        assert errors.size() == 0
     }
 
     void "validate should return an error when the object's constraint validation is triggered"() {
@@ -57,13 +55,9 @@ class BulkDataValidatorSpec extends Specification {
         ]
 
         when: "validate is called"
-        BulkDataErrors bulkDataErrors = bulkDataValidator.validate(bulkDataType, data).validationErrors
+        List<BulkDataError> errors = bulkDataValidator.validate(bulkDataType, data).validationErrors
 
         then:
-        assert bulkDataErrors.hasErrors()
-        assert bulkDataErrors.highestSeverity == BulkDataErrorSeverity.ERROR
-
-        List<BulkDataError> errors = bulkDataErrors.allErrors
         assert errors.size() == 1
         assert errors[0].row == 1
         assert errors[0].column == "0"
@@ -81,13 +75,9 @@ class BulkDataValidatorSpec extends Specification {
         ]
 
         when: "validate is called"
-        BulkDataErrors bulkDataErrors = bulkDataValidator.validate(bulkDataType, data).validationErrors
+        List<BulkDataError> errors = bulkDataValidator.validate(bulkDataType, data).validationErrors
 
         then:
-        assert bulkDataErrors.hasErrors()
-        assert bulkDataErrors.highestSeverity == BulkDataErrorSeverity.WARNING
-
-        List<BulkDataError> errors = bulkDataErrors.allErrors
         assert errors.size() == 1
         assert errors[0].row == 1
         assert errors[0].column == "1"
@@ -104,13 +94,9 @@ class BulkDataValidatorSpec extends Specification {
         ]
 
         when: "validate is called"
-        BulkDataErrors bulkDataErrors = bulkDataValidator.validate(bulkDataType, data).validationErrors
+        List<BulkDataError> errors = bulkDataValidator.validate(bulkDataType, data).validationErrors
 
         then:
-        assert bulkDataErrors.hasErrors()
-        assert bulkDataErrors.highestSeverity == BulkDataErrorSeverity.ERROR
-
-        List<BulkDataError> errors = bulkDataErrors.allErrors
         assert errors.size() == 2
 
         BulkDataError stringFieldError = errors.find { it.fieldName == "stringField" }
@@ -159,8 +145,8 @@ class BulkDataValidatorSpec extends Specification {
         }
 
         @Override
-        BulkDataErrors customValidateRow(ImportableForTest row) {
-            BulkDataErrors errors = new BulkDataErrors()
+        BulkDataValidationErrors customValidateRow(ImportableForTest row) {
+            BulkDataValidationErrors errors = new BulkDataValidationErrors()
             if (row.stringField == VALUE_THAT_FAILS_VALIDATION) {
                 errors.addFieldError("stringField", "some.code")
             }

@@ -69,12 +69,22 @@
     }
   }
 
+  // Parent for the absolutely positioned saved-row stripe.
+  .rt-tr-group {
+    position: relative;
+  }
+
   .input-wrapper-title {
     display: none;
   }
 
   .input-wrapper-error-message {
     min-height: unset !important;
+  }
+
+  .react-select__single-value div {
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   &__separator {
@@ -158,6 +168,11 @@
   }
 
   &__expand-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
     gap: 4px;
     cursor: pointer;
     color: var(--gray-300);
@@ -240,6 +255,11 @@
 
 .modal-content:has(.receiving-edit-modal) {
   top: 15%;
+  width: 80%;
+
+  @media (max-width: 1500px) {
+    width: 90%;
+  }
 }
 
 .receiving-edit-modal {
@@ -265,8 +285,20 @@
     min-height: 60px;
   }
 
+  .app-react-table .rt-thead .rt-th {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .location-header .react-select__value-container .location-header__location,
+  .location-header .react-select__value-container .location-header__autofill {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
   &__title {
     color: var(--blue-800);
+    line-height: 32px;
   }
 
   // The per-field error wrapper is hidden, so add the row spacing back here.
@@ -286,6 +318,25 @@
   &__copy-to-receive {
     color: var(--blue-primary);
     font-weight: 600;
+    font-size: 12px;
+  }
+
+  .rt-tfoot .footer-cell {
+    font-size: 13px;
+    font-weight: 600 !important;
+    color: var(--gray-600);
+  }
+
+  .summary-info__title {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--gray-600);
+  }
+
+  .summary-info__data {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--blue-700);
   }
 
   &__received.v2-section {
@@ -303,6 +354,54 @@
 
     .subsection-body {
       margin-top: 16px;
+    }
+  }
+}
+
+.confirm-receipt {
+  &__details {
+    position: relative;
+
+    .badge-container {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+    }
+
+    .item-details__grid {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      margin-top: 0;
+    }
+
+    .item-details__field {
+      align-items: center;
+      font-size: 14px;
+      line-height: 20px;
+    }
+  }
+
+  &__delivered-on {
+    max-width: 300px;
+
+    .input-wrapper-title {
+      font-weight: 600;
+      font-size: 12px;
+      line-height: 14px;
+    }
+  }
+
+  &__action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+
+    &-filters {
+      flex-grow: 1;
+    }
+
+    .filter-select .filter-select__control {
+      min-height: 36px;
     }
   }
 }

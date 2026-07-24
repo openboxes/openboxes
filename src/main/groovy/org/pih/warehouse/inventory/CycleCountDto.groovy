@@ -1,5 +1,7 @@
 package org.pih.warehouse.inventory
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import org.pih.warehouse.core.Person
 
 import java.time.LocalDate
@@ -33,13 +35,14 @@ class CycleCountDto {
                         deadline: cycleCountRequest?.recountDeadline
                 ),
                 status: cycleCount.status.toString(),
-                cycleCountItems: cycleCount.cycleCountItems.collect { it.toDto() }
+                cycleCountItems: cycleCount.cycleCountItems.collect { CycleCountItemDto.from(it) }
         )
     }
 
     /**
      * @return The largest count index of all the cycle count items. Helps determine what count we're on.
      */
+    @JsonProperty("maxCountIndex")
     Integer getMaxCountIndex() {
         return cycleCountItems.max{ it.countIndex }?.countIndex
     }

@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 
 import { DateFormatDateFns } from 'consts/timeFormat';
+import useEditModalLocationAutofill from 'hooks/receiving/v2/useEditModalLocationAutofill';
 import useReceivingLineItemColumns from 'hooks/receiving/v2/useReceivingLineItemColumns';
 import useTranslate from 'hooks/useTranslate';
 import { formatDateToString } from 'utils/dateUtils';
@@ -11,7 +12,10 @@ import { formatDateToString } from 'utils/dateUtils';
 /**
  * Form state for the editable "Receiving now" table in the edit modal
  */
-const useReceivingLineItems = (lineItem, initialLineItems) => {
+const useReceivingLineItems = ({
+  lineItem,
+  initialLineItems,
+}) => {
   const translate = useTranslate();
 
   const buildDefaultRow = (item) => ({
@@ -28,11 +32,16 @@ const useReceivingLineItems = (lineItem, initialLineItems) => {
     recipient: item?.recipient ?? null,
     quantityReceiving: item?.quantityReceiving ?? '',
     location: item?.location ?? null,
-    // Rows added in the modal (not the original shipment item line) are marked as split lines.
-    isSplitItem: false,
+    // Persisted flag distinguishing the original line (false) from split lines (true) - it must
+    // come from the backing item, not from whether the row existed when the modal opened.
+    // Rows added in the modal are always split lines: addRow/copyToReceiving override this to true.
+    isSplitItem: item?.isSplitItem ?? false,
+    binLocation: item?.binLocation ?? null,
   });
 
-  const { control, getValues, reset } = useForm({
+  const {
+    control, getValues, setValue, reset,
+  } = useForm({
     defaultValues: { lineItems: initialLineItems.map(buildDefaultRow) },
   });
 
@@ -48,7 +57,16 @@ const useReceivingLineItems = (lineItem, initialLineItems) => {
     }
   }, [getValues, remove]);
 
-  const { columns } = useReceivingLineItemColumns({ control, removeRow });
+  const { onLocationAutofill } = useEditModalLocationAutofill({
+    getValues,
+    setValue,
+  });
+
+  const { columns } = useReceivingLineItemColumns({
+    control,
+    removeRow,
+    onLocationAutofill,
+  });
 
   // New rows split the same shipment item line, so they start with the line's product.
   const addRow = () => append({
@@ -64,7 +82,7 @@ const useReceivingLineItems = (lineItem, initialLineItems) => {
     expirationDate: receivedItem.expirationDate ?? '',
     recipient: receivedItem.recipient ?? null,
     quantityReceiving: receivedItem.quantityReceived ?? '',
-    location: receivedItem.location ?? null,
+    binLocation: receivedItem.binLocation ?? null,
     isSplitItem: true,
   }), [append]);
 

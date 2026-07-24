@@ -4,8 +4,12 @@ import javax.validation.Valid
 
 import org.pih.warehouse.api.BaseApiController
 import org.pih.warehouse.core.dtos.BatchCommandUtils
+import org.pih.warehouse.receiving.ReceiptCompleteRequestCommand
 import org.pih.warehouse.receiving.ReceiptDto
 import org.pih.warehouse.receiving.ReceiptEditReceivingInfoCommand
+import org.pih.warehouse.receiving.ReceiptItemCommentCreateCommand
+import org.pih.warehouse.receiving.ReceiptItemCommentDto
+import org.pih.warehouse.receiving.ReceiptItemCommentUpdateCommand
 import org.pih.warehouse.receiving.ReceiptSaveResponseDto
 import org.pih.warehouse.receiving.ShipmentReceivingSummaryCommand
 import org.pih.warehouse.receiving.ShipmentReceivingSummaryDto
@@ -48,10 +52,44 @@ class ReceiptApiController extends BaseApiController {
         renderResponse(response)
     }
 
+    /**
+     * Completes a pending receipt, optionally canceling the quantities that are still left to receive.
+     */
+    def completeReceipt(ReceiptCompleteRequestCommand command) {
+        BatchCommandUtils.validateBatch(command, "itemsToComplete")
+
+        ReceiptDto receipt = receiptV2Service.completeReceipt(command)
+        renderResponse(receipt)
+    }
+
     def editReceivingInfo(ReceiptEditReceivingInfoCommand command) {
         BatchCommandUtils.validateBatch(command, "itemsToSave")
 
         ReceiptSaveResponseDto response = receiptV2Service.editReceivingInfo(command)
         renderResponse(response)
+    }
+
+    /**
+     * Adds a comment to a single receipt item. Fails if the receipt item already has a comment.
+     */
+    def createReceiptItemComment(@Valid ReceiptItemCommentCreateCommand command) {
+        ReceiptItemCommentDto comment = receiptV2Service.saveReceiptItemComment(command)
+        renderResponse(data: comment, status: 201)
+    }
+
+    /**
+     * Edits the existing comment of a single receipt item. Fails if the receipt item has no comment yet.
+     */
+    def updateReceiptItemComment(@Valid ReceiptItemCommentUpdateCommand command) {
+        ReceiptItemCommentDto comment = receiptV2Service.saveReceiptItemComment(command)
+        renderResponse(comment)
+    }
+
+    /**
+     * Deletes the comment of a single receipt item.
+     */
+    def deleteReceiptItemComment() {
+        receiptV2Service.deleteReceiptItemComment(params.receiptItemId)
+        renderNoContentResponse()
     }
 }

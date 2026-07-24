@@ -21,14 +21,21 @@ const useEditLineItemSave = ({
 
   const onSave = useCallback(async () => {
     const lineItems = getLineItems();
-    const payload = buildEditReceivingInfoPayload(lineItems);
-    const initialReceiptItemIds = initialLineItems
-      .filter((item) => item.receiptItemId)
-      .map((item) => item.receiptItemId);
     const remainingLineItemsIds = new Set(lineItems.map((item) => item.receiptItemId));
-    // Delete the receipt items that already existed (initialReceiptItemIds) but were
-    // removed from the form
-    const itemsToDelete = initialReceiptItemIds.filter((id) => !remainingLineItemsIds.has(id));
+    // Receipt items that already existed when the modal opened but were removed from the form.
+    const removedItems = initialLineItems
+      .filter((item) => item.receiptItemId && !remainingLineItemsIds.has(item.receiptItemId));
+    // Only split lines are ever deleted - the original line backs the cancel-remaining flow
+    // on completion, so the backend refuses to delete it.
+    const itemsToDelete = removedItems
+      .filter((item) => item.isSplitItem)
+      .map((item) => item.receiptItemId);
+
+    // If an original receipt item is marked to be deleted, and it had quantityReceived > 0,
+    // instead of removing it (backend would refuse that), update its quantity to 0.
+    const originalItemsToZero = removedItems
+      .filter((item) => !item.isSplitItem && item.quantityReceiving > 0);
+    const payload = buildEditReceivingInfoPayload(lineItems, originalItemsToZero);
 
     if (!payload.itemsToSave.length && !itemsToDelete.length) {
       onClose();

@@ -14,8 +14,10 @@ const useShipmentItemDetails = (lineItem) => {
   const currentLocale = useSelector(getCurrentLocale);
 
   const badge = {
-    label: translate('react.receiving.status.shipped.label', 'Shipped'),
-    variant: 'badge--grey text-uppercase rounded',
+    current: {
+      label: translate('react.receiving.status.shipped.label', 'Shipped'),
+      variant: 'badge--grey text-uppercase rounded',
+    },
   };
 
   const fields = [

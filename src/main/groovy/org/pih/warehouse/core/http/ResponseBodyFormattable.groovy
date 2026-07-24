@@ -24,12 +24,4 @@ trait ResponseBodyFormattable {
      * @return a Map of values keyed on field name
      */
     abstract Map<String, Object> asResponseBody()
-
-    /**
-     * Converts a collection of formattable objects to a List of Map for use in an API response body,
-     * such as for JSON or XML.
-     */
-    static List<Map<String, Object>> asResponseBody(Collection<ResponseBodyFormattable> formattableCollection) {
-        return formattableCollection.collect { it.asResponseBody() }
-    }
 }

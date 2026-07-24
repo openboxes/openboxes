@@ -1,8 +1,11 @@
-import { UPDATE_RECEIVING_HEADER } from 'actions/types';
+import { UPDATE_RECEIVING_BIN_LOCATIONS, UPDATE_RECEIVING_HEADER } from 'actions/types';
 
 const initialState = {
   headerInfo: [],
   isShipmentFromPurchaseOrder: false,
+  shipmentNumber: null,
+  shipmentDetails: {},
+  binLocations: [],
 };
 
 export default function partialReceivingReducer(state = initialState, action) {
@@ -16,6 +19,14 @@ export default function partialReceivingReducer(state = initialState, action) {
         ...state,
         headerInfo: action.payload.headerInfo,
         isShipmentFromPurchaseOrder: action.payload.isShipmentFromPurchaseOrder,
+        shipmentNumber: action.payload.shipmentNumber,
+        shipmentDetails: action.payload.shipmentDetails,
+      };
+
+    case UPDATE_RECEIVING_BIN_LOCATIONS:
+      return {
+        ...state,
+        binLocations: action.payload.binLocations,
       };
 
     default:
