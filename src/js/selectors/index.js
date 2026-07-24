@@ -109,6 +109,31 @@ export const getCycleCountMaxSelectedProducts = createSelector(
   (session) => session.cycleCountMaxSelectedProducts,
 );
 
+export const getAutosaveBatchSize = createSelector(
+  [getSession],
+  (session) => session.autosaveBatchSize,
+);
+
+export const getAutosaveDebounceTime = createSelector(
+  [getSession],
+  (session) => session.autosaveDebounceTime,
+);
+
+export const getAutosaveMaxRetries = createSelector(
+  [getSession],
+  (session) => session.autosaveMaxRetries,
+);
+
+export const getAutosaveRetryDelay = createSelector(
+  [getSession],
+  (session) => session.autosaveRetryDelay,
+);
+
+export const getAutosaveMaxRetryDelay = createSelector(
+  [getSession],
+  (session) => session.autosaveMaxRetryDelay,
+);
+
 /**
  * LOCALIZE & TRANSLATION
  */
@@ -382,3 +407,23 @@ export const getReceivingHeaderInfo = (state) => state.partialReceiving.headerIn
 
 export const getIsShipmentFromPurchaseOrder = (state) =>
   state.partialReceiving.isShipmentFromPurchaseOrder;
+
+export const getReceivingShipmentNumber = (state) => state.partialReceiving.shipmentNumber;
+
+export const getReceivingShipmentDetails = (state) =>
+  state.partialReceiving.shipmentDetails || {};
+
+export const getReceivingBinLocations = (state) => state.partialReceiving.binLocations || [];
+
+// The receiving bin generated for the shipment is named "<prefix>-<shipment number>",
+// where the prefix is configurable ("R" by default).
+export const getReceivingBin = createSelector(
+  getReceivingBinLocations,
+  getReceivingShipmentNumber,
+  (binLocations, shipmentNumber) => {
+    if (!shipmentNumber) {
+      return null;
+    }
+    return binLocations.find((bin) => bin.name.endsWith(`-${shipmentNumber}`)) ?? null;
+  },
+);

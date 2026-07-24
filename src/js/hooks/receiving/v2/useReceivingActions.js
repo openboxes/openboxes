@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
 
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,13 +12,13 @@ import receivingApi from 'api/services/ReceivingApi';
 import ReceiptGroup from 'consts/receiptGroup';
 import ReceivingRowType from 'consts/receivingRowType';
 import { ReceivingView } from 'consts/receivingViewOptions';
+import RowSaveStatus from 'consts/rowSaveStatus';
+import useReceivingAutosave from 'hooks/receiving/v2/useReceivingAutosave';
 import useReceivingSaveAction from 'hooks/receiving/v2/useReceivingSaveAction';
-import useRemoveSplitItem from 'hooks/receiving/v2/useRemoveSplitItem';
 import mapToFormSelectOption from 'utils/mapToFormSelectOption';
 import {
   createNormalizedState,
   normalizeData,
-  updateNormalizedItem,
 } from 'utils/normalizationUtils';
 
 // In packing list view we ask the API to group items by pack level so that we can
@@ -37,32 +39,21 @@ const shouldAutofillQuantity = (row) => !AUTOFILL_EXCLUDED_ROW_TYPES.includes(ro
   && row.quantityReceiving == null
   && row.quantityAvailableToReceive > 0;
 
-// Autofills the "receiving now" quantity with the remaining quantity for every line
-// that is still empty. Skipped rows keep their object identity so memoized cells don't re-render,
-// and when nothing changes the original state reference is returned.
-export const autofillReceivingQuantities = (state) => {
-  const { entities, ids } = state;
-  const { updatedEntities, changed } = ids.reduce((acc, id) => {
-    const row = entities[id];
-    // Separator entries (packing list view) have no entity - nothing to fill
-    if (!row) {
-      return acc;
-    }
-    const shouldFill = shouldAutofillQuantity(row);
-    acc.updatedEntities[id] = shouldFill
-      ? { ...row, quantityReceiving: row.quantityAvailableToReceive, isDirty: true }
-      : row;
-    acc.changed = acc.changed || shouldFill;
-    return acc;
-  }, { updatedEntities: {}, changed: false });
-
-  return changed ? { ids, entities: updatedEntities } : state;
-};
+// Collects the "receiving now" autofill updates: one { rowId, quantityReceiving } entry per
+// line that is still empty, filled with its remaining quantity. Applied through the autosave
+// updateRow, so autofilled rows get queued for saving like manual edits.
+export const getAutofillQuantityUpdates = (state) => (state?.ids || [])
+  .map((id) => state.entities[id])
+  // Separator entries (packing list view) have no entity - nothing to fill
+  .filter((row) => row && shouldAutofillQuantity(row))
+  .map((row) => ({ rowId: row.rowId, quantityReceiving: row.quantityAvailableToReceive }));
 
 const useReceivingActions = (view) => {
   const [loading, setLoading] = useState(false);
   const [receiptId, setReceiptId] = useState(null);
-  const [lineItemsState, setLineItemsState] = useState(createNormalizedState());
+  // Rows as of load / last refetch. The autosave hook owns the continuously updated rows;
+  // this state only seeds it (a new reference resets the hook).
+  const [initialRows, setInitialRows] = useState(createNormalizedState());
   const { shipmentId } = useParams();
   const dispatch = useDispatch();
   const users = useSelector(getUsers);
@@ -104,6 +95,10 @@ const useReceivingActions = (view) => {
       rowType: null,
       shipmentItemId: shipmentItem.id,
       receiptItemId: receiptItem?.id ?? null,
+      // Backend flag distinguishing the original line of a shipment item (false, created when
+      // the receipt was started) from the lines split off it while receiving (true). Unlike
+      // rowType (a UI grouping concept), this stays accurate across saves and reloads.
+      isSplitItem: receiptItem?.isSplitItem ?? false,
       productCode: product?.productCode,
       product,
       parentContainer: shipmentItem.container?.parentContainer,
@@ -117,7 +112,10 @@ const useReceivingActions = (view) => {
         ?? shipmentItem.productLot?.expirationDate,
       recipient: mapToFormSelectOption(receiptItem?.recipient)
         ?? (shipmentItem.recipientId ? usersById[shipmentItem.recipientId] : null),
-      binLocation: receiptItem?.binLocation ?? shipmentItem.binLocation ?? null,
+      binLocation: mapToFormSelectOption(receiptItem?.binLocation ?? shipmentItem.binLocation),
+      // Baseline bin location as of load / last successful save, used (like
+      // initialQuantityReceiving) to skip no-op edits on save.
+      initialBinLocationId: (receiptItem?.binLocation ?? shipmentItem.binLocation)?.id ?? null,
       quantityShipped: shipmentItem.quantity,
       quantityReceived: quantityPreviouslyReceived,
       previousReceiptItems,
@@ -130,8 +128,9 @@ const useReceivingActions = (view) => {
       quantityRemaining,
       quantityAvailableToReceive: quantityRemaining + (receiptItem?.quantityReceived ?? 0),
       isCompleted,
-      // Local edit flag - only dirty rows (touched since load / last save) are sent on save.
-      isDirty: false,
+      // Autosave status of the row (see consts/rowSaveStatus) - PENDING when edited,
+      // SAVING while its batch request is in flight, ERROR when saving failed.
+      saveStatus: RowSaveStatus.SAVED,
     };
   };
 
@@ -154,21 +153,42 @@ const useReceivingActions = (view) => {
     lotNumber: receiptItem.productLot?.lotNumber,
     expirationDate: receiptItem.productLot?.expirationDate,
     recipient: mapToFormSelectOption(receiptItem.recipient),
-    binLocation: receiptItem.binLocation,
+    binLocation: mapToFormSelectOption(receiptItem.binLocation),
+    initialBinLocationId: receiptItem.binLocation?.id ?? null,
   });
 
   // Rows for a single shipment item: a single editable row when it was not split,
   // or a replaced row + toggle row + one split item row per pending receipt item.
   const buildItemRows = (summary, usersById) => {
-    const { currentReceiptItems = [] } = summary;
+    const { shipmentItem, currentReceiptItems = [] } = summary;
 
-    if (currentReceiptItems.length < 2) {
-      return [buildLineItem({ summary, receiptItem: currentReceiptItems[0], usersById })];
+    // A receipt item with a changed product always stays a changes group - as a plain
+    // line it would replace the original product instead of showing it struck through.
+    const hasChangedProduct = (receiptItem) => {
+      const receiptItemProductId = receiptItem?.productLot?.product?.id;
+      return receiptItemProductId != null
+        && receiptItemProductId !== shipmentItem.productLot?.product?.id;
+    };
+
+    // The original line always exists in the database (it backs the cancel-remaining flow on
+    // completion) but is only displayed while it carries a received quantity or is the only
+    // line - an untouched or zeroed original stays hidden behind its split lines.
+    const visibleReceiptItems = currentReceiptItems.filter(
+      (receiptItem, index, items) => receiptItem.isSplitItem
+        || (receiptItem.quantityReceived ?? 0) > 0
+        || items.length === 1,
+    );
+
+    if (visibleReceiptItems.length < 2 && !hasChangedProduct(visibleReceiptItems[0])) {
+      const receiptItem = visibleReceiptItems[0];
+      return receiptItem?.isSplitItem
+        ? [{ ...buildSplitItemEntity({ summary, receiptItem, usersById }), rowType: null }]
+        : [buildLineItem({ summary, receiptItem, usersById })];
     }
 
     const replacedRow = buildReplacedEntity(summary, usersById);
 
-    const splitItems = currentReceiptItems
+    const splitItems = visibleReceiptItems
       .map((receiptItem) => buildSplitItemEntity({ summary, receiptItem, usersById }));
 
     // The API does not sort receipt items, so group split items by product to keep
@@ -208,17 +228,21 @@ const useReceivingActions = (view) => {
   const buildPackingListViewState = (summaryById, grouped, usersById) => {
     const { order = [], groups = {} } = grouped || {};
 
-    const toLineItemRow = (id, packLevelGroup) =>
+    // Each row also keeps the id of its group's separator, so group-scoped actions
+    // (e.g. the location autofill triggered from a separator) can find their rows.
+    const toLineItemRow = (id, packLevelGroup, separatorId) =>
       buildItemRows(summaryById[id], usersById).map((entity) => (
-        { rowId: entity.rowId, entity: { ...entity, packLevelGroup } }));
+        { rowId: entity.rowId, entity: { ...entity, packLevelGroup, separatorId } }));
 
     // Flatten the two-level grouping into a single ordered list of rows. Each parent group adds
     // a separator row followed by its line items.
     const rows = order.flatMap((parentName) => {
+      const separatorRow = buildSeparatorRow(parentName);
       const { order: childOrder = [], groups: childGroups = {} } = groups[parentName] || {};
       const lineItemRows = childOrder.flatMap((childName) =>
-        (childGroups[childName] || []).flatMap((id) => toLineItemRow(id, childName)));
-      return [{ rowId: buildSeparatorRow(parentName) }, ...lineItemRows];
+        (childGroups[childName] || [])
+          .flatMap((id) => toLineItemRow(id, childName, separatorRow.id)));
+      return [{ rowId: separatorRow }, ...lineItemRows];
     });
 
     return rows.reduce((state, { rowId, entity }) => ({
@@ -240,9 +264,22 @@ const useReceivingActions = (view) => {
     return buildTableViewState(summaryById, grouped, usersById);
   };
 
+  const {
+    rows,
+    rowsById,
+    updateRow,
+    updateRows,
+    deleteRow,
+    autosaveStatus,
+    flush,
+  } = useReceivingAutosave({ initialRows, receiptId });
+
   const loadReceipt = async () => {
     setLoading(true);
     try {
+      // Push pending edits out before refetching (view switch, modal reload), so the
+      // summary reflects them and nothing is lost when the autosave state resets.
+      await flush();
       const { data: { data: summary } } = await receivingApi.getReceiptSummary(shipmentId, {
         group: receiptGroupForView(view),
       });
@@ -250,34 +287,22 @@ const useReceivingActions = (view) => {
       const currentReceiptId = summary?.pendingReceiptId
         ?? (await receivingApi.startReceipt(shipmentId)).data?.data?.id;
       setReceiptId(currentReceiptId);
-      setLineItemsState(transformSummary(summary, view));
+      setInitialRows(transformSummary(summary, view));
     } finally {
       setLoading(false);
     }
   };
 
-  // Updates a single line item in the normalized state without rebuilding the whole
-  // collection. Stable identity (useCallback) keeps the table `meta` referentially
-  // stable, so the memoized cells only re-render the line item that actually changed.
-  // Every edit marks the row dirty, which is what flags it for the next batch save.
-  const updateLineItem = useCallback((rowId, newData) =>
-    setLineItemsState((state) => updateNormalizedItem(state, rowId, {
-      ...newData,
-      isDirty: true,
-    })), []);
+  // Same `{ entities, ids }` shape the table and columns consumed before autosave, now
+  // continuously reconciled by the hook.
+  const lineItemsState = useMemo(() => ({ entities: rows, ids: rowsById }), [rows, rowsById]);
 
-  const autofillQuantities = useCallback(
-    () => setLineItemsState(autofillReceivingQuantities),
-    [],
-  );
+  const autofillQuantities = useCallback(() => {
+    getAutofillQuantityUpdates({ entities: rows, ids: rowsById })
+      .forEach(({ rowId, quantityReceiving }) => updateRow(rowId, { quantityReceiving }));
+  }, [rows, rowsById, updateRow]);
 
-  const { removeSplitItem } = useRemoveSplitItem({ receiptId, lineItemsState, setLineItemsState });
-
-  const { onSaveAndExit } = useReceivingSaveAction({
-    receiptId,
-    lineItemsState,
-    setLineItemsState,
-  });
+  const { onSaveAndExit } = useReceivingSaveAction({ flush });
 
   useEffect(() => {
     if (!shipmentId) {
@@ -294,11 +319,16 @@ const useReceivingActions = (view) => {
     loading,
     receiptId,
     lineItemsState,
-    updateLineItem,
+    updateLineItem: updateRow,
+    updateLineItems: updateRows,
     autofillQuantities,
-    removeSplitItem,
+    // Deletes the receipt item through the autosave queue and, only on success, drops the
+    // row from the local state (with grouping fix-ups).
+    removeSplitItem: deleteRow,
     loadReceipt,
     onSaveAndExit,
+    flush,
+    autosaveStatus,
   };
 };
 

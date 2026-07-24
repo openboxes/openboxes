@@ -25,7 +25,7 @@ const EditLineItemModal = ({
     receivingNow,
     summaryData,
     getLineItems,
-  } = useReceivingLineItems(lineItem, initialLineItems);
+  } = useReceivingLineItems({ lineItem, initialLineItems });
 
   const { onSave } = useEditLineItemSave({
     receiptId,

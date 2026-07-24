@@ -124,6 +124,25 @@
       color: var(--blue-401);
     }
 
+    &--blue-outline {
+      background-color: var(--blue-203);
+      color: var(--blue-primary);
+      border: 1px solid var(--blue-primary);
+    }
+
+    &--no-ellipsis {
+      max-width: none;
+      overflow: visible;
+      text-overflow: clip;
+      white-space: nowrap;
+    }
+
+    &--green-outline {
+      background-color: var(--green-100);
+      color: var(--green-600);
+      border: 1px solid var(--green-600);
+    }
+
     &--grey {
       background-color: var(--gray-100);
       color: var(--gray-600);
@@ -138,6 +157,17 @@
       background-color: var(--green-100);
       color: var(--green-600);
     }
+  }
+}
+
+.badge-transition {
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 8px;
+
+  &__arrow {
+    flex-shrink: 0;
+    color: var(--gray-600);
   }
 }
 

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import { useSelector } from 'react-redux';
-import { getCurrentLocale, getIsShipmentFromPurchaseOrder } from 'selectors';
+import { getCurrentLocale, getIsShipmentFromPurchaseOrder, getReceivingBinLocations } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
@@ -14,16 +14,18 @@ import { ReceivingView } from 'consts/receivingViewOptions';
 import useFormatNumber from 'hooks/useFormatNumber';
 import useTranslate from 'hooks/useTranslate';
 import ActionsCell from 'utils/cells/ActionsCell';
+import AutosaveQuantityInputCell from 'utils/cells/AutosaveQuantityInputCell';
 import ExpirationDateCell from 'utils/cells/ExpirationDateCell';
 import MultilineCell from 'utils/cells/MultilineCell';
 import PackLevelCell from 'utils/cells/PackLevelCell';
-import QuantityInputCell from 'utils/cells/QuantityInputCell';
 import PackLevelGroupCell from 'utils/cells/receiving/PackLevelGroupCell';
 import ProductCodeCell from 'utils/cells/receiving/ProductCodeCell';
 import ShippedInPoCell from 'utils/cells/receiving/ShippedInPoCell';
 import SelectCell from 'utils/cells/SelectCell';
 import ValueCell from 'utils/cells/ValueCell';
 import getReceivingRowActions, { getReceivingSplitItemActions } from 'utils/receiving/getReceivingRowActions';
+import hasRowSavedQuantity from 'utils/receiving/hasRowSavedQuantity';
+import VerticalStripeIndicator from 'utils/VerticalStripeIndicator';
 
 const useReceivingColumns = ({
   view,
@@ -34,6 +36,7 @@ const useReceivingColumns = ({
   const columnHelper = createColumnHelper();
   const currentLocale = useSelector(getCurrentLocale);
   const isShipmentFromPurchaseOrder = useSelector(getIsShipmentFromPurchaseOrder);
+  const binLocations = useSelector(getReceivingBinLocations);
   const isPackingListView = view === ReceivingView.PACKING_LIST;
 
   // Rows are { id, meta } objects; the entities live in the normalized state
@@ -68,6 +71,27 @@ const useReceivingColumns = ({
       className: 'status-cell',
       value: translate('react.receiving.status.remaining.label', `${quantityRemainingFormatted} remaining`, [quantityRemainingFormatted]),
     };
+  };
+  // Quantity entered in the row since the last save (the stored quantityRemaining
+  // already accounts for the saved baseline).
+  const getQuantityReceivingChange = (item) =>
+    (item?.quantityReceiving ?? 0) - (item?.initialQuantityReceiving ?? 0);
+
+  // Remaining quantity kept live while editing: the saved quantityRemaining minus the
+  // unsaved quantities entered in the row.
+  const getCurrentQuantityRemaining = (item, entities) => {
+    if (!item) {
+      return null;
+    }
+    // A replaced row shows the status of the whole group, so it subtracts the unsaved
+    // quantities of all its split items.
+    if (item.rowType === ReceivingRowType.REPLACED) {
+      const splitItemIds = entities?.[item.toggleRowId]?.splitItemIds ?? [];
+      const unsavedQuantity = splitItemIds
+        .reduce((sum, splitItemId) => sum + getQuantityReceivingChange(entities?.[splitItemId]), 0);
+      return item.quantityRemaining - unsavedQuantity;
+    }
+    return item.quantityRemaining - getQuantityReceivingChange(item);
   };
 
   // Replaced rows of a changed item show the original shipment values struck through
@@ -113,13 +137,21 @@ const useReceivingColumns = ({
     const packLevelGroupColumn = columnHelper.display({
       id: receivingColumns.PACK_LEVEL_GROUP,
       header: packLevelHeader,
-      cell: ({ row, table }) => (
-        <PackLevelGroupCell
-          item={getItem(row, table)}
-          isExpanded={row.getIsExpanded()}
-          onToggle={row.getToggleExpandedHandler()}
-        />
-      ),
+      cell: ({ row, table }) => {
+        const item = getItem(row, table);
+        return (
+          <>
+            {/* The stripe marks rows whose quantity is saved. It lives in the first (pinned)
+                column so its absolutely positioned span anchors to the row's left edge. */}
+            <VerticalStripeIndicator display={hasRowSavedQuantity(item)} />
+            <PackLevelGroupCell
+              item={item}
+              isExpanded={row.getIsExpanded()}
+              onToggle={row.getToggleExpandedHandler()}
+            />
+          </>
+        );
+      },
       meta: {
         pinned: 'left',
         // Light indent on item rows in packing list view.
@@ -153,14 +185,23 @@ const useReceivingColumns = ({
             {translate('react.receiving.code.label', 'Code')}
           </TableHeaderCell>
         ),
-        cell: ({ row, table }) => (
-          <ProductCodeCell
-            item={getItem(row, table)}
-            isPackingListView={isPackingListView}
-            isExpanded={row.getIsExpanded()}
-            onToggle={row.getToggleExpandedHandler()}
-          />
-        ),
+        cell: ({ row, table }) => {
+          const item = getItem(row, table);
+          return (
+            <>
+              {/* In packing list view the saved stripe is rendered by the pack level group
+                  column, which is the leftmost one there. */}
+              {!isPackingListView
+                && <VerticalStripeIndicator display={hasRowSavedQuantity(item)} />}
+              <ProductCodeCell
+                item={item}
+                isPackingListView={isPackingListView}
+                isExpanded={row.getIsExpanded()}
+                onToggle={row.getToggleExpandedHandler()}
+              />
+            </>
+          );
+        },
         meta: {
           pinned: 'left',
         },
@@ -359,7 +400,7 @@ const useReceivingColumns = ({
             return null;
           }
           return (
-            <QuantityInputCell
+            <AutosaveQuantityInputCell
               value={item?.quantityReceiving}
               onCommit={(quantityReceiving) =>
                 table.options.meta?.updateLineItem(row.original.id, { quantityReceiving })}
@@ -386,7 +427,8 @@ const useReceivingColumns = ({
           if (isSplitItemOrToggle(item)) {
             return null;
           }
-          const { className, value } = getStatus(item?.quantityRemaining, item?.isCompleted);
+          const quantityRemaining = getCurrentQuantityRemaining(item, table.options.meta?.entities);
+          const { className, value } = getStatus(quantityRemaining, item?.isCompleted);
           return (
             <ValueCell
               value={value}
@@ -404,7 +446,9 @@ const useReceivingColumns = ({
       ...(putawayEnabled ? [
         columnHelper.display({
           id: receivingColumns.LOCATION,
-          header: () => <LocationAutofillHeader />,
+          header: ({ table }) => (
+            <LocationAutofillHeader onSelect={table.options.meta?.onLocationAutofill} />
+          ),
           cell: ({ row, table }) => {
             const item = getItem(row, table);
             if (item?.rowType === ReceivingRowType.TOGGLE) {
@@ -412,7 +456,10 @@ const useReceivingColumns = ({
             }
             return (
               <SelectCell
-                options={receivingLocationOptions}
+                options={binLocations}
+                value={item?.binLocation}
+                onChange={(binLocation) =>
+                  table.options.meta?.updateLineItem(row.original.id, { binLocation })}
                 // The replaced row of a changed item keeps its select visible but disabled.
                 disabled={item?.rowType === ReceivingRowType.REPLACED || item?.isCompleted}
                 label="react.receiving.location.label"
@@ -422,9 +469,11 @@ const useReceivingColumns = ({
           },
           // Separator rows also get a select, used to autofill the location for the whole group.
           meta: {
-            renderSeparator: () => (
+            renderSeparator: ({ row, table }) => (
               <SelectCell
-                options={receivingLocationOptions}
+                options={receivingLocationOptions(translate)}
+                onChange={(option) =>
+                  option && table.options.meta?.onLocationAutofill(option.id, row.original.id)}
                 label="react.receiving.location.label"
                 defaultLabel="Location"
               />
@@ -445,6 +494,12 @@ const useReceivingColumns = ({
           if (item?.rowType === ReceivingRowType.TOGGLE) {
             return null;
           }
+          // The original line rendered among split rows cannot be removed (it backs the
+          // cancel-remaining flow on completion), so it offers no actions here - it can only
+          // be zeroed by removing it in the edit modal.
+          if (item?.rowType === ReceivingRowType.SPLIT_ITEM && !item?.isSplitItem) {
+            return null;
+          }
           // A split item row offers its own actions (removing the single change);
           // all other rows carry the standard row actions.
           const actions = item?.rowType === ReceivingRowType.SPLIT_ITEM
@@ -460,7 +515,9 @@ const useReceivingColumns = ({
           return (
             <ActionsCell
               actions={actions}
-              disabled={item?.isCompleted}
+              // isDeleteInProgress disables the delete button of a split item while its request
+              // is in flight, so fast repeated clicks cannot fire multiple deletes.
+              disabled={item?.isCompleted || item?.isDeleteInProgress}
               label="react.receiving.actions.label"
               defaultLabel="Actions"
             />
@@ -469,7 +526,14 @@ const useReceivingColumns = ({
         size: 90,
       }),
     ];
-  }, [translate, currentLocale, isPackingListView, putawayEnabled, isShipmentFromPurchaseOrder]);
+  }, [
+    translate,
+    currentLocale,
+    isPackingListView,
+    putawayEnabled,
+    isShipmentFromPurchaseOrder,
+    binLocations,
+  ]);
 
   return { columns };
 };

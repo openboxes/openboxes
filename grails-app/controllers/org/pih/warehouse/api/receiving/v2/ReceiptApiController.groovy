@@ -4,6 +4,7 @@ import javax.validation.Valid
 
 import org.pih.warehouse.api.BaseApiController
 import org.pih.warehouse.core.dtos.BatchCommandUtils
+import org.pih.warehouse.receiving.ReceiptCompleteRequestCommand
 import org.pih.warehouse.receiving.ReceiptDto
 import org.pih.warehouse.receiving.ReceiptEditReceivingInfoCommand
 import org.pih.warehouse.receiving.ReceiptItemCommentCreateCommand
@@ -49,6 +50,16 @@ class ReceiptApiController extends BaseApiController {
 
         ReceiptSaveResponseDto response = receiptV2Service.updateItemsBatch(request)
         renderResponse(response)
+    }
+
+    /**
+     * Completes a pending receipt, optionally canceling the quantities that are still left to receive.
+     */
+    def completeReceipt(ReceiptCompleteRequestCommand command) {
+        BatchCommandUtils.validateBatch(command, "itemsToComplete")
+
+        ReceiptDto receipt = receiptV2Service.completeReceipt(command)
+        renderResponse(receipt)
     }
 
     def editReceivingInfo(ReceiptEditReceivingInfoCommand command) {

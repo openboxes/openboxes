@@ -24,9 +24,10 @@ class ReceiptItemDto {
     @JsonProperty("binLocation")  // TODO: remove this and refactor the frontend to use "receivingLocation"
     LocationSimpleDto receivingLocation
 
-    Integer quantityReceived = 0
+    Integer quantityReceived
     Integer quantityCanceled = 0
     String comment
+    Boolean isSplitItem
 
     static ReceiptItemDto from(ReceiptItem receiptItem) {
         if (!receiptItem) {
@@ -48,8 +49,9 @@ class ReceiptItemDto {
         recipient = PersonDto.from(receiptItem.recipient)
         productLot = ProductLotDto.from(receiptItem.inventoryItem)
         receivingLocation = LocationSimpleDto.from(receiptItem.binLocation)
-        quantityReceived = receiptItem.quantityReceived ?: 0
+        quantityReceived = receiptItem.quantityReceived
         quantityCanceled = receiptItem.quantityCanceled ?: 0
         comment = receiptItem.comment
+        isSplitItem = receiptItem.isSplitItem
     }
 }
