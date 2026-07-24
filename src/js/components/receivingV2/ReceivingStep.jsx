@@ -27,6 +27,8 @@ const ReceivingStep = ({ flushRef }) => {
       flush,
       onLocationAutofill,
       autosaveStatus,
+      resetSort,
+      updateFilterParams,
     },
   } = useReceivingForm();
 
@@ -44,6 +46,8 @@ const ReceivingStep = ({ flushRef }) => {
         onAutofillQuantities={autofillQuantities}
         onSaveAndExit={onSaveAndExit}
         autosaveStatus={autosaveStatus}
+        onResetSort={resetSort}
+        updateFilterParams={updateFilterParams}
       />
       <ReceivingTable
         lineItemsState={lineItemsState}

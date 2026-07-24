@@ -1,11 +1,11 @@
 const receiptStatusOptions = (translate) => [
   {
-    value: 'QUANTITY_REMAINING',
-    label: translate('react.receiving.filters.receiptStatus.quantityRemaining.label', 'Quantity remaining'),
+    value: 'RECEIVED_MORE_THAN_SHIPPED',
+    label: translate('react.receiving.filters.receiptStatus.receivedMoreThanShipped.label', 'Received more than shipped'),
   },
   {
-    value: 'OVER_RECEIVED',
-    label: translate('react.receiving.filters.receiptStatus.overReceived.label', 'Over received'),
+    value: 'RECEIVED_LESS_THAN_SHIPPED',
+    label: translate('react.receiving.filters.receiptStatus.receivedLessThanShipped.label', 'Received less than shipped'),
   },
   {
     value: 'NO_QUANTITY_ENTERED',
@@ -13,7 +13,7 @@ const receiptStatusOptions = (translate) => [
   },
   {
     value: 'COMPLETE',
-    label: translate('react.receiving.filters.receiptStatus.complete.label', 'Complete / Fully Received'),
+    label: translate('react.receiving.filters.receiptStatus.complete.label', 'Complete'),
   },
 ];
 

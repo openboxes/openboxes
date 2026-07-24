@@ -4,6 +4,7 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
@@ -37,6 +38,7 @@ import org.pih.warehouse.receiving.ReceiptSaveResponseDto
 import org.pih.warehouse.receiving.ReceiptService
 import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.receiving.ReceiptV2Marker
+import org.pih.warehouse.receiving.ShipmentItemReceiptStatus
 import org.pih.warehouse.receiving.ShipmentItemReceivedQuantitiesDto
 import org.pih.warehouse.receiving.ShipmentItemReceivingSummaryDto
 import org.pih.warehouse.receiving.ShipmentReceivingSummaryCommand
@@ -504,10 +506,11 @@ class ReceiptV2Service {
         String currentReceiptId = Receipt.findByShipmentAndReceiptStatusCode(shipment, ReceiptStatusCode.PENDING)?.id
 
         // This summary centers on the relationship between a shipment item and its receipt items, so don't bother
-        // with the receipts themselves. Instead, fetch the shipment items (sorted) and then collect the receipt
-        // items grouped by their shipment item so that we can easily loop both of them together.
-        List<ShipmentItem> shipmentItems = shipment.shipmentItems.sort()
-        Map<String, List<ReceiptItem>> receiptItemsByShipmentItemId =
+        // with the receipts themselves. Instead, fetch the shipment items (already searched and sorted per the
+        // requested params) and then collect the receipt items grouped by their shipment item so that we can easily
+        // loop both of them together.
+        List<ShipmentItem> shipmentItems = findShipmentItems(shipment, command)
+        Map<String, List<ReceiptItem>> receiptItemsByShipmentItemId = !shipmentItems ? [:] :
                 ReceiptItem.findAllByShipmentItemInList(shipmentItems)
                         .groupBy { it.shipmentItemId.toString() }
 
@@ -516,7 +519,8 @@ class ReceiptV2Service {
                 pendingReceiptId: currentReceiptId,
         )
 
-        // Build the summary for each shipment item.
+        // Build the summary for each shipment item and drop the ones that don't match the requested receipt
+        // status.
         for (shipmentItem in shipmentItems) {
             String shipmentItemId = shipmentItem.id
 
@@ -533,22 +537,104 @@ class ReceiptV2Service {
                     shipmentItemSummary.previousReceiptItems.add(receiptItemDto)
                 }
             }
-            shipmentSummary.shipmentItemSummaryById.put(shipmentItemId, shipmentItemSummary)
+
+            if (matchesReceiptStatus(shipmentItemSummary, command.receiptStatusCode)) {
+                shipmentSummary.shipmentItemSummaryById.put(shipmentItemId, shipmentItemSummary)
+            }
+        }
+
+        // Items that survived the receipt-status filter.
+        List<ShipmentItem> filteredShipmentItems = shipmentItems.findAll {
+            shipmentSummary.shipmentItemSummaryById.containsKey(it.id)
         }
 
         // Populate the shipment item group map for the client if they requested us to do so.
         OrderedDataGroup shipmentItemsGrouped
         switch(group) {
             case ReceiptGroup.PACK_LEVEL:
-                shipmentItemsGrouped = buildPackLevelGroup(shipmentItems)
+                shipmentItemsGrouped = buildPackLevelGroup(filteredShipmentItems)
                 break
             case ReceiptGroup.SHIPMENT_ITEM:
-                shipmentItemsGrouped = buildShipmentItemGroup(shipmentItems)
+                shipmentItemsGrouped = buildShipmentItemGroup(filteredShipmentItems)
                 break
         }
         shipmentSummary.setShipmentItemsGrouped(shipmentItemsGrouped)
 
         return shipmentSummary
+    }
+
+    // Search filters in SQL. Sort runs in-memory because lotNumber/expirationDate are shadow getters and quantityShippedInPo is derived.
+    private static List<ShipmentItem> findShipmentItems(Shipment shipment, ShipmentReceivingSummaryCommand command) {
+        List<ShipmentItem> shipmentItems = ShipmentItem.createCriteria().list {
+            createAlias("product", "product", JoinType.LEFT_OUTER_JOIN)
+            createAlias("recipient", "recipient", JoinType.LEFT_OUTER_JOIN)
+            eq("shipment", shipment)
+            if (command.searchTerm) {
+                or {
+                    ilike("product.productCode", "%${command.searchTerm}%")
+                    ilike("product.name", "%${command.searchTerm}%")
+                }
+            }
+        } as List<ShipmentItem>
+
+        return sortShipmentItems(shipmentItems, command.sort, command.order)
+    }
+
+    private static List<ShipmentItem> sortShipmentItems(List<ShipmentItem> items, String sortBy, String order) {
+        switch (sortBy) {
+            case "productCode":
+                return sortByKey(items, order) { ShipmentItem it -> it.product?.productCode?.toLowerCase() }
+            case "product":
+                return sortByKey(items, order) { ShipmentItem it -> it.product?.name?.toLowerCase() }
+            case "lotNumber":
+                return sortByKey(items, order) { ShipmentItem it -> it.lotNumber?.toLowerCase() }
+            case "expirationDate":
+                return sortByKey(items, order) { ShipmentItem it -> it.expirationDate }
+            case "recipient":
+                return sortByKey(items, order) { ShipmentItem it -> it.recipient?.name?.toLowerCase() }
+            case "quantityShipped":
+                return sortByKey(items, order) { ShipmentItem it -> it.quantity }
+            case "quantityShippedInPo":
+                // The client displays this as the number of packs (quantity / packSize).
+                return sortByKey(items, order) { ShipmentItem it -> it.packSize ? (it.quantity as BigDecimal) / it.packSize : it.quantity }
+            default:
+                return items.sort()
+        }
+    }
+
+    private static List<ShipmentItem> sortByKey(List<ShipmentItem> items, String order, Closure sortKey) {
+        List<ShipmentItem> sorted = items.sort { ShipmentItem a, ShipmentItem b -> sortKey(a) <=> sortKey(b) }
+        return order == "desc" ? sorted.reverse() : sorted
+    }
+
+    /**
+     * The ShipmentItemReceiptStatus values mirror the row states computed by the receiving table on the
+     * frontend. They are derived from aggregates over the receipt items (no matching column exists in the
+     * database), so filtering happens in memory after the summary is built, not in the SQL query.
+     */
+    private static Boolean matchesReceiptStatus(ShipmentItemReceivingSummaryDto summary, List<ShipmentItemReceiptStatus> statusCodes) {
+        if (!statusCodes) {
+            return true
+        }
+        Integer quantityPreviouslyReceived = (summary.previousReceiptItems.sum { it.quantityReceived ?: 0 } ?: 0) as Integer
+        Integer quantityPreviouslyCanceled = (summary.previousReceiptItems.sum { it.quantityCanceled ?: 0 } ?: 0) as Integer
+        // Complete = fully received by already submitted receipts, with nothing pending on the current one
+        Boolean complete = quantityPreviouslyReceived + quantityPreviouslyCanceled >= summary.shipmentItem.quantity && !summary.currentReceiptItems
+        Integer quantityRemaining = summary.shipmentItem.quantity - summary.totalQuantityReceived - summary.totalQuantityCanceled
+        return statusCodes.any { ShipmentItemReceiptStatus status ->
+            switch (status) {
+                case ShipmentItemReceiptStatus.COMPLETE:
+                    return complete
+                case ShipmentItemReceiptStatus.RECEIVED_MORE_THAN_SHIPPED:
+                    return quantityRemaining < 0
+                case ShipmentItemReceiptStatus.RECEIVED_LESS_THAN_SHIPPED:
+                    return !complete && quantityRemaining > 0
+                case ShipmentItemReceiptStatus.NO_QUANTITY_ENTERED:
+                    return !complete && summary.currentReceiptItems.every { (it.quantityReceived ?: 0) == 0 }
+                default:
+                    return false
+            }
+        }
     }
 
     private OrderedDataGroup buildPackLevelGroup(List<ShipmentItem> shipmentItems) {

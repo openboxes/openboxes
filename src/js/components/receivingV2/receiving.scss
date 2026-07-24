@@ -68,6 +68,10 @@
 
   .rt-th {
     height: 100%;
+
+    .sorting-arrows {
+      display: flex !important;
+    }
   }
 
   .rt-td {

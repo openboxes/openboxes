@@ -16,7 +16,7 @@ import SlidingButtonGroup from 'components/form-elements/v2/SlidingButtonGroup';
 import Switch from 'components/form-elements/v2/Switch';
 import filterFields from 'components/receivingV2/FilterFields';
 import { AutosaveStatus } from 'consts/autosaveStatuses';
-import receivingViewOptions from 'consts/receivingViewOptions';
+import receivingViewOptions, { ReceivingView } from 'consts/receivingViewOptions';
 import useTranslate from 'hooks/useTranslate';
 import AutosaveIndicator from 'utils/AutosaveIndicator';
 
@@ -32,6 +32,8 @@ const ReceivingFilters = ({
   onAutofillQuantities,
   onSaveAndExit,
   autosaveStatus,
+  onResetSort,
+  updateFilterParams,
 }) => {
   const translate = useTranslate();
   // Add loading for filters section. Loading will display before the translations are fetched.
@@ -58,7 +60,9 @@ const ReceivingFilters = ({
         searchFieldPlaceholder="react.receiving.search.placeholder.label"
         searchFieldDefaultPlaceholder="Search..."
         filterFields={fields}
-        updateFilterParams={() => {}}
+        updateFilterParams={updateFilterParams}
+        disableAutoUpdateFilterParams
+        allowEmptySubmit
         hidden={false}
         showFilterVisibilityToggler={false}
         alignButtonsToFilters
@@ -80,12 +84,15 @@ const ReceivingFilters = ({
             },
           }}
         />
-        <Button
-          label="react.receiving.resetSorting.label"
-          defaultLabel="Reset sorting"
-          variant="secondary"
-          EndIcon={<RiRefreshLine size={16} />}
-        />
+        {view !== ReceivingView.PACKING_LIST && (
+          <Button
+            label="react.receiving.resetSorting.label"
+            defaultLabel="Reset sorting"
+            variant="secondary"
+            onClick={onResetSort}
+            EndIcon={<RiRefreshLine size={16} />}
+          />
+        )}
         <Button
           label="react.receiving.autofillQuantities.label"
           defaultLabel="Autofill quantities"
@@ -121,6 +128,8 @@ ReceivingFilters.propTypes = {
   onAutofillQuantities: PropTypes.func.isRequired,
   onSaveAndExit: PropTypes.func.isRequired,
   autosaveStatus: PropTypes.oneOf(Object.values(AutosaveStatus)).isRequired,
+  onResetSort: PropTypes.func.isRequired,
+  updateFilterParams: PropTypes.func.isRequired,
 };
 
 export default ReceivingFilters;

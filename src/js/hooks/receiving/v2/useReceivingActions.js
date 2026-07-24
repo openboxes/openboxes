@@ -48,15 +48,22 @@ export const getAutofillQuantityUpdates = (state) => (state?.ids || [])
   .filter((row) => row && shouldAutofillQuantity(row))
   .map((row) => ({ rowId: row.rowId, quantityReceiving: row.quantityAvailableToReceive }));
 
-const useReceivingActions = (view) => {
+const useReceivingActions = ({ view, sort, sortOrder } = {}) => {
   const [loading, setLoading] = useState(false);
   const [receiptId, setReceiptId] = useState(null);
   // Rows as of load / last refetch. The autosave hook owns the continuously updated rows;
   // this state only seeds it (a new reference resets the hook).
   const [initialRows, setInitialRows] = useState(createNormalizedState());
+  const [filterParams, setFilterParams] = useState({});
+  const { receiptStatusCodes, searchTerm } = filterParams;
   const { shipmentId } = useParams();
   const dispatch = useDispatch();
   const users = useSelector(getUsers);
+
+  const updateFilterParams = useCallback((values) => setFilterParams({
+    receiptStatusCodes: (values.receiptStatusCode ?? []).map(({ value }) => value),
+    searchTerm: values.q,
+  }), []);
   // Base builder of a line item row:
   // - a shipment item that was not split uses it directly as its only editable row,
   // - the replaced and split item rows of a split item build on top of it
@@ -348,12 +355,19 @@ const useReceivingActions = (view) => {
   const loadReceipt = async () => {
     setLoading(true);
     try {
-      // Push pending edits out before refetching (view switch, modal reload), so the
-      // summary reflects them and nothing is lost when the autosave state resets.
+      // Push pending edits out before refetching (view switch, modal reload, filter change),
+      // so the summary reflects them and nothing is lost when the autosave state resets.
       await flush();
-      const { data: { data: summary } } = await receivingApi.getReceiptSummary(shipmentId, {
-        group: receiptGroupForView(view),
-      });
+      const { data: { data: summary } } = await receivingApi.getReceiptSummary(
+        shipmentId,
+        _.omitBy({
+          group: receiptGroupForView(view),
+          receiptStatusCode: receiptStatusCodes,
+          searchTerm,
+          sort,
+          order: sortOrder,
+        }, _.isEmpty),
+      );
       // When there's no pending receipt yet, start one
       const currentReceiptId = summary?.pendingReceiptId
         ?? (await receivingApi.startReceipt(shipmentId)).data?.data?.id;
@@ -386,7 +400,7 @@ const useReceivingActions = (view) => {
       return;
     }
     loadReceipt();
-  }, [shipmentId, view]);
+  }, [shipmentId, view, sort, sortOrder, receiptStatusCodes, searchTerm]);
 
   useEffect(() => {
     dispatch(fetchUsers());
@@ -407,6 +421,7 @@ const useReceivingActions = (view) => {
     onSaveAndExit,
     flush,
     autosaveStatus,
+    updateFilterParams,
   };
 };
 

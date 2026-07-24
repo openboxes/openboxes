@@ -13,6 +13,10 @@ class ShipmentReceivingSummaryCommand implements ObjectValidatable {
 
     Shipment shipment
     ReceiptGroup group = ReceiptGroup.SHIPMENT_ITEM
+    List<ShipmentItemReceiptStatus> receiptStatusCode
+    String searchTerm
+    String sort
+    String order
 
     def beforeValidate() {
         String shipmentId = RequestContextHolder.getRequestAttributes().params?.shipmentId
@@ -21,5 +25,9 @@ class ShipmentReceivingSummaryCommand implements ObjectValidatable {
 
     static constraints = {
         group(nullable: true)
+        receiptStatusCode(nullable: true)
+        searchTerm(nullable: true)
+        sort(nullable: true)
+        order(nullable: true)
     }
 }
