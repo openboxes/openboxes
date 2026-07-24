@@ -17,39 +17,22 @@ trait ConfiguresBulkDataValidator<T extends Importable> {
     abstract BulkDataValidatorConfig getBulkDataValidatorConfig()
 
     /**
-     * Performs any custom data validation that was not already automatically handled by the data validator.
+     * Performs any cross-row validation that was not already automatically handled by the data validator.
+     * Implementations can utilize the add*Error(...) methods on BulkDataValidationErrors to raise validation errors.
      *
-     * To provide custom validation logic, a feature will typically override customValidateRow. However, if you need
-     * the custom logic to be more complex, such as comparing data across rows, this method can also be overridden.
-     *
-     * If you do override this method, you'll likely still want to call super.customValidate(rows) to preserve
-     * the below behaviour.
+     * This method is designed to be overridden when you need to perform validation that spans across multiple rows.
      */
-    List<BulkDataError> customValidate(List<T> rows) {
-        List<BulkDataError> errors = []
-        for (int rowIndex = 0; rowIndex < rows.size(); rowIndex++) {
-            List<BulkDataError> rowErrors = customValidateRow(rows.get(rowIndex))?.allErrors
-            if (!rowErrors) {
-                continue
-            }
-            for (rowError in rowErrors) {
-                // Set the rowIndex here entirely for convenience so that we don't need to provide it
-                // as a method arg when calling BulkDataErrors.add*Error(...) in customValidateRow(row)
-                rowError.row = rowIndex
-
-                errors.add(rowError)
-            }
-        }
-        return errors
+    BulkDataValidationErrors customValidateAcrossRows(List<T> rows) {
+        return null  // Do nothing by default
     }
 
     /**
      * Performs any custom validation on a row that was not already automatically handled by the data validator.
-     * This method is designed to be overridden by child implementations (unless no custom validation is required).
+     * Implementations can utilize the add*Error(...) methods on BulkDataValidationErrors to raise validation errors.
      *
-     * Implementations can utilize the add*Error(...) convenience methods on BulkDataErrors to raise validation errors.
+     * This method is designed to be overridden when you need to perform per row validation.
      */
-    BulkDataErrors customValidateRow(T row) {
+    BulkDataValidationErrors customValidateRow(T row) {
         return null  // Do nothing by default
     }
 }

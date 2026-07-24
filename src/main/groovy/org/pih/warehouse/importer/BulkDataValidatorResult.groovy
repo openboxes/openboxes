@@ -8,5 +8,5 @@ class BulkDataValidatorResult {
     /**
      * The collection of errors that occurred during the bulk data validation process.
      */
-    BulkDataErrors validationErrors = new BulkDataErrors()
+    List<BulkDataError> validationErrors = []
 }
