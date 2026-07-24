@@ -1,10 +1,10 @@
 package org.pih.warehouse.inventory
 
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.http.ResponseBodyMapped
+import org.pih.warehouse.core.http.HasResponseMapper
 import org.pih.warehouse.product.Product
 
-class CycleCountCandidate implements ResponseBodyMapped<CycleCountCandidateMapper> {
+class CycleCountCandidate implements HasResponseMapper<CycleCountCandidateMapper> {
 
     String id
 
