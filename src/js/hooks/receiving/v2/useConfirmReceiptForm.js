@@ -26,8 +26,7 @@ const useConfirmReceiptForm = () => {
   );
   const { columns } = useConfirmReceiptColumns({ view, putawayEnabled });
   const commentModal = useCommentModal({ updateLineItemComment });
-  // Rows ticked for cancel remaining. Only the selection lives here for now - acting on
-  // it is out of scope of OBPIH-7899.
+  // TODO: Add logic for cancellation in OBPIH-7901
   const [cancelRemainingIds, setCancelRemainingIds] = useState(() => new Set());
   const toggleCancelRemaining = useCallback((rowId) => {
     setCancelRemainingIds((prev) => {
@@ -36,8 +35,7 @@ const useConfirmReceiptForm = () => {
     });
   }, []);
 
-  // Completing the receipt itself (API call) is out of scope for now; the per-receipt
-  // state kept in redux is cleaned up here.
+  // TODO: Add logic for receipt completion in OBPIH-7901
   const onCompleteReceipt = useCallback(() => {
     const receiptId = receiptIdRef.current;
     if (!receiptId) {

@@ -440,8 +440,6 @@ const useReceivingColumns = ({
             return null;
           }
           const quantityRemaining = getCurrentQuantityRemaining(item, table.options.meta?.entities);
-          // TODO (OBPIH-7864): show the remaining status only once something has been
-          // entered in the input or already saved for the row.
           const { className, value } = getReceivingRowStatus({
             quantityRemaining,
             isCompleted: item?.isCompleted,
