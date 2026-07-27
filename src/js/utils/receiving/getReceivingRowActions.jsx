@@ -2,6 +2,18 @@ import React from 'react';
 
 import { RiChat1Line, RiDeleteBinLine, RiPencilLine } from 'react-icons/ri';
 
+// The click event is forwarded so the popover can anchor itself under the icon that opened it.
+const buildCommentAction = ({ itemId, hasComment, onOpenCommentModal }) => ({
+  key: 'comment',
+  icon: <RiChat1Line size={22} />,
+  // A receipt item holds at most one comment, so the counter next to the icon only ever
+  // marks that the row has one.
+  badge: hasComment ? <span className="actions-cell__badge">1</span> : null,
+  onClick: (event) => onOpenCommentModal?.(itemId, event),
+  label: 'react.receiving.comment.label',
+  defaultLabel: 'Comment',
+});
+
 /**
  * Builds the action descriptors for a receiving row, consumed by ActionsCell.
  */
@@ -16,18 +28,15 @@ const getReceivingRowActions = ({
     defaultLabel: 'Edit',
   },
   // The comment lives on a receipt item, so rows that don't back one (e.g. a line already
-  // received in full) don't offer it. The click event is forwarded so the popover can
-  // anchor itself under the icon that opened it.
-  ...(canComment ? [{
-    key: 'comment',
-    icon: <RiChat1Line size={22} />,
-    // A receipt item holds at most one comment, so the counter next to the icon only ever
-    // marks that the row has one.
-    badge: hasComment ? <span className="actions-cell__badge">1</span> : null,
-    onClick: (event) => onOpenCommentModal?.(itemId, event),
-    label: 'react.receiving.comment.label',
-    defaultLabel: 'Comment',
-  }] : []),
+  // received in full) don't offer it.
+  ...(canComment ? [buildCommentAction({ itemId, hasComment, onOpenCommentModal })] : []),
+];
+
+/**
+ * Builds the action descriptors for a check step row, consumed by ActionsCell.
+ */
+export const getConfirmReceiptRowActions = ({ itemId, hasComment, onOpenCommentModal }) => [
+  buildCommentAction({ itemId, hasComment, onOpenCommentModal }),
 ];
 
 /**

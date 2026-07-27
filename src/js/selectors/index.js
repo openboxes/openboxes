@@ -415,6 +415,11 @@ export const getReceivingShipmentDetails = (state) =>
 
 export const getReceivingBinLocations = (state) => state.partialReceiving.binLocations || [];
 
+export const getReceivingView = (state) => state.partialReceiving.view;
+
+export const getReceivingPutawayEnabled = (state, receiptId) =>
+  state.partialReceiving.putawayEnabledByReceipt?.[receiptId] ?? false;
+
 // The receiving bin generated for the shipment is named "<prefix>-<shipment number>",
 // where the prefix is configurable ("R" by default).
 export const getReceivingBin = createSelector(

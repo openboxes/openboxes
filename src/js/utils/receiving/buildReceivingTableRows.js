@@ -1,8 +1,8 @@
 import ReceivingRowType from 'consts/receivingRowType';
 
-// Maps the normalized line items state into the rows consumed by DataTable.
-// Separators pass through without meta. Meta is only used to disable (grey out)
-// fully received rows, and separators don't need disabling.
+// Maps the normalized line items state into the rows consumed by DataTable, shared by
+// the receiving and check step tables. Separators pass through without meta. Meta is
+// only used to disable (grey out) fully received rows, and separators don't need disabling.
 const buildReceivingTableRows = (lineItemsState) => {
   const { entities, ids } = lineItemsState;
 

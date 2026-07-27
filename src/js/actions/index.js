@@ -48,6 +48,7 @@ import {
   MARK_ALL_AS_UPDATED,
   REBUILD_FILTER_FORM_PARAMS,
   REMOVE_FROM_INDICATORS,
+  REMOVE_RECEIVING_PUTAWAY_ENABLED,
   REMOVE_ROW,
   REMOVE_STOCK_MOVEMENT_DRAFT,
   REORDER_INDICATORS,
@@ -73,6 +74,8 @@ import {
   UPDATE_FIELD_VALUE,
   UPDATE_RECEIVING_BIN_LOCATIONS,
   UPDATE_RECEIVING_HEADER,
+  UPDATE_RECEIVING_PUTAWAY_ENABLED,
+  UPDATE_RECEIVING_VIEW,
   UPDATE_WORKFLOW_HEADER,
 } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
@@ -858,6 +861,28 @@ export const updateReceivingBinLocations = (binLocations) => ({
   type: UPDATE_RECEIVING_BIN_LOCATIONS,
   payload: {
     binLocations,
+  },
+});
+
+export const updateReceivingView = (view) => ({
+  type: UPDATE_RECEIVING_VIEW,
+  payload: {
+    view,
+  },
+});
+
+export const updateReceivingPutawayEnabled = (receiptId, putawayEnabled) => ({
+  type: UPDATE_RECEIVING_PUTAWAY_ENABLED,
+  payload: {
+    receiptId,
+    putawayEnabled,
+  },
+});
+
+export const removeReceivingPutawayEnabled = (receiptId) => ({
+  type: REMOVE_RECEIVING_PUTAWAY_ENABLED,
+  payload: {
+    receiptId,
   },
 });
 
