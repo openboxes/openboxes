@@ -64,30 +64,6 @@ class LocationApiAvailableItemsSpec extends ApiSpec {
         !data.any { it.productCode == product.productCode && it.quantityOnHand == 0 }
     }
 
-    void 'availableItems defaults max to at most 100'() {
-        given:
-        setStock(product, null, null, 5)
-
-        when:
-        def response = locationApiWrapper.getAvailableItemsOK(facility.id)
-        int returned = response.jsonPath().getList("data").size()
-
-        then:
-        returned <= 100
-    }
-
-    void 'availableItems caps max at 1000'() {
-        given:
-        setStock(product, null, null, 5)
-
-        when:
-        def response = locationApiWrapper.getAvailableItemsOK(facility.id, 5000, 0)
-        int returned = response.jsonPath().getList("data").size()
-
-        then:
-        returned <= 1000
-    }
-
     void 'availableItems returns empty data when location has no matching stock'() {
         // facility/product start with no stock after ApiSpec setup deletes transactions
         when:

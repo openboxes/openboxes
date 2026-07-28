@@ -47,7 +47,7 @@ class LocationApiController extends BaseDomainApiController {
             throw new ObjectNotFoundException(params.id, Location.class.toString())
         }
 
-        Integer max = Math.min(params.max != null ? params.int("max") : 100, 1000)
+        Integer max = Math.min(params.max ? params.int("max") : 10, 100)
         Integer offset = params.offset != null ? params.int("offset") : 0
 
         Map result = productAvailabilityService.getAvailableItemsByLocation(location, max, offset)

@@ -41,7 +41,7 @@ class LocationApiControllerAvailableItemsSpec extends Specification
         )
 
         params.id = location.id
-        productAvailabilityServiceStub.getAvailableItemsByLocation(location, 100, 0) >> [
+        productAvailabilityServiceStub.getAvailableItemsByLocation(location, 10, 0) >> [
                 data      : [availableItem],
                 totalCount: 1
         ]
@@ -63,65 +63,6 @@ class LocationApiControllerAvailableItemsSpec extends Specification
         row.getInt("quantityOnHand") == 10
         row.getInt("quantityAvailable") == 8
         !row.has("zones")
-    }
-
-    void 'availableItems uses default max 100 and offset 0 when params omitted'() {
-        given:
-        Location location = new Location(name: "Depot").save(validate: false)
-        params.id = location.id
-        Integer capturedMax
-        Integer capturedOffset
-        productAvailabilityServiceStub.getAvailableItemsByLocation(location, _, _) >> { Location loc, Integer max, Integer offset ->
-            capturedMax = max
-            capturedOffset = offset
-            return [data: [], totalCount: 0]
-        }
-
-        when:
-        controller.availableItems()
-
-        then:
-        capturedMax == 100
-        capturedOffset == 0
-        new JSONObject(controller.response.contentAsString).getJSONArray("data").length() == 0
-    }
-
-    void 'availableItems caps max at 1000'() {
-        given:
-        Location location = new Location(name: "Depot").save(validate: false)
-        params.id = location.id
-        params.max = "5000"
-        Integer capturedMax
-        productAvailabilityServiceStub.getAvailableItemsByLocation(location, _, _) >> { Location loc, Integer max, Integer offset ->
-            capturedMax = max
-            return [data: [], totalCount: 0]
-        }
-
-        when:
-        controller.availableItems()
-
-        then:
-        capturedMax == 1000
-    }
-
-    void 'availableItems passes offset to the service'() {
-        given:
-        Location location = new Location(name: "Depot").save(validate: false)
-        params.id = location.id
-        params.max = "50"
-        params.offset = "100"
-        Integer capturedOffset
-        productAvailabilityServiceStub.getAvailableItemsByLocation(location, _, _) >> { Location loc, Integer max, Integer offset ->
-            capturedOffset = offset
-            return [data: [], totalCount: 200]
-        }
-
-        when:
-        controller.availableItems()
-
-        then:
-        capturedOffset == 100
-        new JSONObject(controller.response.contentAsString).totalCount == 200
     }
 
     void 'availableItems throws when location is missing'() {

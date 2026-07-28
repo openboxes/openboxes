@@ -192,8 +192,9 @@ Date: Sun, 24 Jun 2018 04:44:57 GMT
 
 ### Available Items 
 
-NOTE: Rows with quantity on hand equal to zero are excluded. If pagination 
-parameters are not provided, max defaults to 100. Max cannot exceed 1000.
+NOTE: Rows with quantity on hand equal to zero are excluded. Pagination
+follows the usual OpenBoxes list pattern: if max is omitted it defaults to 10,
+and max cannot exceed 100.
 
 ```
 $ curl -X GET -b cookies.txt \
