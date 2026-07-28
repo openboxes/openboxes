@@ -22,6 +22,7 @@ import groovy.text.Template
 import org.grails.gsp.GroovyPagesTemplateEngine
 import org.jxls.common.Context
 import org.jxls.util.JxlsHelper
+import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
@@ -29,6 +30,7 @@ import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemStatus
+import org.pih.warehouse.requisition.RequisitionService
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.util.PdfUtil
 
@@ -36,8 +38,9 @@ import org.pih.warehouse.util.PdfUtil
 class DocumentTemplateService {
 
     GroovyPagesTemplateEngine groovyPagesTemplateEngine
-    def forecastingService
-    def requisitionService
+    ForecastingService forecastingService
+    RequisitionService requisitionService
+    UserService userService
 
     def renderGroovyServerPageDocumentTemplate(Document documentTemplate, Map model) {
         StringWriter output = new StringWriter()
@@ -66,9 +69,9 @@ class DocumentTemplateService {
     def renderShipmentXlsTemplate(Document documentTemplate, Shipment shipmentInstance, ByteArrayOutputStream outputStream) {
         InputStream inputStream = new ByteArrayInputStream(documentTemplate.fileContents)
         Context context = new Context()
-        List shipmentItems = shipmentInstance?.sortShipmentItemsBySortOrder()
         context.putVar("shipment", shipmentInstance)
-        context.putVar("shipmentItems", shipmentItems)
+        context.putVar("shipmentItems", shipmentInstance?.sortShipmentItemsBySortOrder())
+        context.putVar("hasRoleFinance", userService.hasRoleFinance())
         JxlsHelper.getInstance().processTemplateAtCell(inputStream, outputStream, context, "Sheet1!A1")
     }
 
