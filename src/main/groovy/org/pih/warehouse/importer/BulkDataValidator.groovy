@@ -139,7 +139,7 @@ class BulkDataValidator {
                                                       List<Importable> rows) {
         List<BulkDataError> errors = []
         for (int rowIndex = 0; rowIndex < rows.size(); rowIndex++) {
-            List<BulkDataError> rowErrors = configuresValidator.customValidateRow(rows.get(rowIndex)).allErrors
+            List<BulkDataError> rowErrors = configuresValidator.customValidateRow(rows.get(rowIndex))?.allErrors
             if (!rowErrors) {
                 continue
             }
