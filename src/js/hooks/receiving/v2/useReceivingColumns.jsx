@@ -348,7 +348,6 @@ const useReceivingColumns = ({
           id: receivingColumns.QUANTITY_SHIPPED_IN_PO,
           header: () => (
             <TableHeaderCell
-              {...sortHeaderProps(receivingColumns.QUANTITY_SHIPPED_IN_PO)}
               tooltip
               tooltipLabel={translate('react.receiving.shippedInPo.label', 'Shipped (in PO UoM)')}
             >

@@ -54,16 +54,10 @@ const useReceivingActions = ({ view, sort, sortOrder } = {}) => {
   // Rows as of load / last refetch. The autosave hook owns the continuously updated rows;
   // this state only seeds it (a new reference resets the hook).
   const [initialRows, setInitialRows] = useState(createNormalizedState());
-  const [filterParams, setFilterParams] = useState({});
-  const { receiptStatusCodes, searchTerm } = filterParams;
   const { shipmentId } = useParams();
   const dispatch = useDispatch();
   const users = useSelector(getUsers);
 
-  const updateFilterParams = useCallback((values) => setFilterParams({
-    receiptStatusCodes: (values.receiptStatusCode ?? []).map(({ value }) => value),
-    searchTerm: values.q,
-  }), []);
   // Base builder of a line item row:
   // - a shipment item that was not split uses it directly as its only editable row,
   // - the replaced and split item rows of a split item build on top of it
@@ -237,8 +231,8 @@ const useReceivingActions = ({ view, sort, sortOrder } = {}) => {
         return false;
       }
       const changes = getReceiptItemChanges(receiptItem, shipmentItem);
-      return changes.productChanged || changes.lotChanged
-        || changes.expirationChanged || changes.recipientChanged;
+      return changes.product || changes.lotNumber
+        || changes.expirationDate || changes.recipient;
     };
 
     // The original line always exists in the database (it backs the cancel-remaining flow on
@@ -285,6 +279,8 @@ const useReceivingActions = ({ view, sort, sortOrder } = {}) => {
       {
         rowType: ReceivingRowType.TOGGLE,
         rowId: toggleRowId,
+        // Needed by the receiving filter.
+        shipmentItemId: shipmentItem.id,
         replacedRowId: replacedRow.rowId,
         splitItemIds: splitItemRows.map((splitItem) => splitItem.rowId),
       },
@@ -355,17 +351,15 @@ const useReceivingActions = ({ view, sort, sortOrder } = {}) => {
   const loadReceipt = async () => {
     setLoading(true);
     try {
-      // Push pending edits out before refetching (view switch, modal reload, filter change),
+      // Push pending edits out before refetching (view switch, modal reload, sort change),
       // so the summary reflects them and nothing is lost when the autosave state resets.
       await flush();
       const { data: { data: summary } } = await receivingApi.getReceiptSummary(
         shipmentId,
         _.omitBy({
           group: receiptGroupForView(view),
-          receiptStatusCode: receiptStatusCodes,
-          searchTerm,
-          sort,
-          order: sortOrder,
+          // Backend binds `sort` as a SortParamList: "field" for ascending, "-field" for descending
+          sort: sort && `${sortOrder === 'desc' ? '-' : ''}${sort}`,
         }, _.isEmpty),
       );
       // When there's no pending receipt yet, start one
@@ -382,10 +376,10 @@ const useReceivingActions = ({ view, sort, sortOrder } = {}) => {
   // continuously reconciled by the hook.
   const lineItemsState = useMemo(() => ({ entities: rows, ids: rowsById }), [rows, rowsById]);
 
-  const autofillQuantities = useCallback(() => {
-    getAutofillQuantityUpdates({ entities: rows, ids: rowsById })
+  const autofillQuantities = useCallback((state = lineItemsState) => {
+    getAutofillQuantityUpdates(state)
       .forEach(({ rowId, quantityReceiving }) => updateRow(rowId, { quantityReceiving }));
-  }, [rows, rowsById, updateRow]);
+  }, [lineItemsState, updateRow]);
 
   // Comments are persisted on their own endpoint, so unlike updateLineItem this does not mark the
   // row dirty - it only mirrors the already-saved comment so the popover prefills and the
@@ -400,7 +394,7 @@ const useReceivingActions = ({ view, sort, sortOrder } = {}) => {
       return;
     }
     loadReceipt();
-  }, [shipmentId, view, sort, sortOrder, receiptStatusCodes, searchTerm]);
+  }, [shipmentId, view, sort, sortOrder]);
 
   useEffect(() => {
     dispatch(fetchUsers());
@@ -421,7 +415,6 @@ const useReceivingActions = ({ view, sort, sortOrder } = {}) => {
     onSaveAndExit,
     flush,
     autosaveStatus,
-    updateFilterParams,
   };
 };
 

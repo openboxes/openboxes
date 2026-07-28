@@ -4,6 +4,7 @@ import org.springframework.web.context.request.RequestContextHolder
 
 import org.pih.warehouse.core.validation.ObjectValidatable
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.sort.SortParamList
 
 /**
  * Pulls together all the receipt items (including pending ones) associated with a specific shipment item
@@ -13,10 +14,7 @@ class ShipmentReceivingSummaryCommand implements ObjectValidatable {
 
     Shipment shipment
     ReceiptGroup group = ReceiptGroup.SHIPMENT_ITEM
-    List<ShipmentItemReceiptStatus> receiptStatusCode
-    String searchTerm
-    String sort
-    String order
+    SortParamList sort
 
     def beforeValidate() {
         String shipmentId = RequestContextHolder.getRequestAttributes().params?.shipmentId
@@ -25,9 +23,6 @@ class ShipmentReceivingSummaryCommand implements ObjectValidatable {
 
     static constraints = {
         group(nullable: true)
-        receiptStatusCode(nullable: true)
-        searchTerm(nullable: true)
         sort(nullable: true)
-        order(nullable: true)
     }
 }

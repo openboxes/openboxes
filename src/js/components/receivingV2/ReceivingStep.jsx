@@ -14,7 +14,9 @@ const ReceivingStep = ({ flushRef }) => {
     setView,
     putawayEnabled,
     setPutawayEnabled,
-    table: { lineItemsState, columns },
+    table: {
+      lineItemsState, columns, sort, order,
+    },
     actions: {
       loading,
       receiptId,
@@ -59,6 +61,8 @@ const ReceivingStep = ({ flushRef }) => {
         removeSplitItem={removeSplitItem}
         loadReceipt={loadReceipt}
         onLocationAutofill={onLocationAutofill}
+        sort={sort}
+        order={order}
       />
     </div>
   );

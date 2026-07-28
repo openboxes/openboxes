@@ -1,5 +1,3 @@
-import queryString from 'query-string';
-
 import {
   RECEIPT_ITEM_COMMENTS,
   RECEIPT_ITEMS_BATCH,
@@ -11,10 +9,7 @@ import apiClient from 'utils/apiClient';
 
 export default {
   getReceiptSummary: (shipmentId, params) =>
-    apiClient.get(RECEIPT_SUMMARY_BY_SHIPMENT(shipmentId), {
-      params,
-      paramsSerializer: (parameters) => queryString.stringify(parameters),
-    }),
+    apiClient.get(RECEIPT_SUMMARY_BY_SHIPMENT(shipmentId), { params }),
   startReceipt: (shipmentId) => apiClient.post(RECEIPT_START(shipmentId)),
   updateItemsBatch: (receiptId, payload) =>
     apiClient.post(RECEIPT_ITEMS_BATCH(receiptId), payload),
