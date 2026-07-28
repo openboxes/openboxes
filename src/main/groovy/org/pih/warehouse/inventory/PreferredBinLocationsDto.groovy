@@ -22,7 +22,7 @@ class PreferredBinLocationsDto implements ResponseBodyFormattable {
     @Override
     Map<String, Object> asResponseBody() {
         return preferredBinLocationsByProductId.collectEntries { String productId, LocationSimpleDto preferredBinLocation ->
-            [(productId): preferredBinLocation.asResponseBody()]
+            [(productId): preferredBinLocation]
         } as Map<String, Object>
     }
 }
