@@ -63,6 +63,15 @@ class DocumentTemplateService {
         JxlsHelper.getInstance().processTemplateAtCell(inputStream, outputStream, context, "Sheet1!A1")
     }
 
+    def renderShipmentXlsTemplate(Document documentTemplate, Shipment shipmentInstance, ByteArrayOutputStream outputStream) {
+        InputStream inputStream = new ByteArrayInputStream(documentTemplate.fileContents)
+        Context context = new Context()
+        List shipmentItems = shipmentInstance?.sortShipmentItemsBySortOrder()
+        context.putVar("shipment", shipmentInstance)
+        context.putVar("shipmentItems", shipmentItems)
+        JxlsHelper.getInstance().processTemplateAtCell(inputStream, outputStream, context, "Sheet1!A1")
+    }
+
     def renderOrderDocumentTemplate(Document documentTemplate, Order orderInstance, ConverterTypeTo targetDocumentType, OutputStream outputStream) {
         try {
             Boolean isVelocityTemplate = documentTemplate.filename.contains(".vm") || documentTemplate.filename.contains(".vtl")

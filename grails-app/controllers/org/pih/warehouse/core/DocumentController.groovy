@@ -442,6 +442,37 @@ class DocumentController {
         }
     }
 
+    /**
+     * Render shipment based XLS template. For now only used for custom Certificate of Donation spreadsheet document.
+     * */
+    def renderShipmentXlsTemplate() {
+        Shipment shipmentInstance = Shipment.get(params.shipmentId)
+        if (!shipmentInstance) {
+            throw new IllegalArgumentException("Unable to locate shipment with ID ${params.shipmentId}")
+        }
+
+        Document documentInstance = params.id ? Document.get(params.id) : null
+        if (!documentInstance) {
+            throw new IllegalArgumentException("Unable to locate document with id ${params.id}")
+        }
+        if (!DocumentCode.shipmentXlsTemplateList().contains(documentInstance.documentType?.documentCode)) {
+            throw new IllegalArgumentException("Render shipment xls template action only supports documents with document codes ${DocumentCode.shipmentXlsTemplateList()}")
+        }
+
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+            documentTemplateService.renderShipmentXlsTemplate(documentInstance, shipmentInstance, outputStream)
+            response.setHeader("Content-disposition",
+                "attachment; filename=\"${stripFilenameExtension(documentInstance.filename)}-${shipmentInstance.shipmentNumber}.${documentInstance.extension}\"")
+            response.setContentType(documentInstance.contentType)
+            outputStream.writeTo(response.outputStream)
+            response.outputStream.flush()
+        } catch (Exception e) {
+            log.error("Unable to render document template ${documentInstance.name} for shipment ${shipmentInstance?.id}", e)
+            throw e
+        }
+    }
+
     def renderRequisitionTemplate = {
         def requisitionInstance = Requisition.get(params.id)
         if (!requisitionInstance) {

@@ -22,6 +22,7 @@ enum DocumentCode {
     DATA_EXPORT,
     INVOICE_TEMPLATE,
     REQUISITION_TEMPLATE,
+    CERTIFICATE_OF_DONATION_TEMPLATE,
 
     static list() {
         [
@@ -35,6 +36,7 @@ enum DocumentCode {
                 DATA_EXPORT,
                 INVOICE_TEMPLATE,
                 REQUISITION_TEMPLATE,
+                CERTIFICATE_OF_DONATION_TEMPLATE,
         ]
     }
 
@@ -46,8 +48,21 @@ enum DocumentCode {
                 EMAIL_TEMPLATE,
                 INVOICE_TEMPLATE,
                 REQUISITION_TEMPLATE,
+                CERTIFICATE_OF_DONATION_TEMPLATE,
         ]
     }
 
-}
+    static shipmentWorkflowTemplateList() {
+        [
+                SHIPPING_TEMPLATE,
+                INVOICE_TEMPLATE,
+                CERTIFICATE_OF_DONATION_TEMPLATE
+        ]
+    }
 
+    static shipmentXlsTemplateList() {
+        [
+                CERTIFICATE_OF_DONATION_TEMPLATE
+        ]
+    }
+}
