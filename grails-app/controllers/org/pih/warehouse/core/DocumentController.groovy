@@ -443,8 +443,8 @@ class DocumentController {
     }
 
     /**
-     * Render shipment based XLS template. For now only used for custom Certificate of Donation spreadsheet document.
-     * */
+     * Render shipment-based XLS template. For now only used for custom Certificate of Donation spreadsheet document.
+     */
     def renderShipmentXlsTemplate() {
         Shipment shipmentInstance = Shipment.get(params.shipmentId)
         if (!shipmentInstance) {

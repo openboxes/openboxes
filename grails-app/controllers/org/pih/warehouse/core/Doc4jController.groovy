@@ -40,9 +40,9 @@ class Doc4jController {
     }
 
     /**
-     * TODO: This could be removed, and CoD could be generated using the documentTemplateService.renderShipmentXlsTemplate
-     *  for now this is left in place since it is using some role based logic
-     * */
+     * TODO: This could be removed, and CoD could be generated using documentTemplateService.renderShipmentXlsTemplate.
+     * For now, this is left in place since it is using some role-based logic.
+     */
     def downloadCertificateOfDonation() {
 
         def shipmentInstance = Shipment.get(params.id)
