@@ -509,42 +509,29 @@ class PickTaskService {
 
     private List<String> findRequisitionIdsForPicking(SearchPickTaskCommand command) {
         Integer ordersCount = command.ordersCount
-        DeliveryTypeCode deliveryTypeCode = command.deliveryTypeCode
-        if (ordersCount) {
-            boolean searchForAllOrders = deliveryTypeCode == null
-
-            def criteria = Requisition.createCriteria()
-            List<Requisition> allCandidates = criteria.list() {
-                eq("origin", command.facility)
-                eq("status", RequisitionStatus.PICKING)
-
-                if (!searchForAllOrders) {
-                    eq("deliveryTypeCode", deliveryTypeCode)
-                    order("dateCreated", "asc")
-                }
-            }
-
-            if (!allCandidates) {
-                return []
-            }
-
-            List<Requisition> selectedRequisitions
-            if (searchForAllOrders) {
-                def sortedCandidates = allCandidates.sort { a, b ->
-                    Integer p1 = a.deliveryTypeCode?.priority ?: 99
-                    Integer p2 = b.deliveryTypeCode?.priority ?: 99
-
-                    return p1 <=> p2 ?: a.dateCreated <=> b.dateCreated
-                }
-                selectedRequisitions = sortedCandidates.take(ordersCount)
-            } else {
-                selectedRequisitions = allCandidates.take(ordersCount)
-            }
-
-            return selectedRequisitions.collect { it.id }
+        if (!ordersCount) {
+            return []
         }
 
-        return []
+        List<Requisition> candidates = PickTask.createCriteria().list {
+            projections {
+                distinct("requisition")
+            }
+            eq("facility", command.facility)
+            eq("requisitionStatus", RequisitionStatus.PICKING)
+            'in'("status", command.status ?: [PickTaskStatus.PENDING, PickTaskStatus.PICKING])
+
+            if (command.deliveryTypeCode) {
+                eq("deliveryTypeCode", command.deliveryTypeCode)
+            }
+        }
+
+        return candidates.sort { a, b ->
+            Integer p1 = a.deliveryTypeCode?.priority ?: 99
+            Integer p2 = b.deliveryTypeCode?.priority ?: 99
+
+            return p1 <=> p2 ?: a.dateCreated <=> b.dateCreated
+        }.take(ordersCount)*.id
     }
 
     private void validateOutboundContainer(Location outboundContainer, PickTask pickTask) {
