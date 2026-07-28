@@ -190,4 +190,63 @@ Server: Apache-Coyote/1.1
 Date: Sun, 24 Jun 2018 04:44:57 GMT
 ```
 
+### Available Items 
+
+NOTE: Rows with quantity on hand equal to zero are excluded. If pagination 
+parameters are not provided, max defaults to 100. Max cannot exceed 1000.
+
+```
+$ curl -X GET -b cookies.txt \
+-H "Content-Type: application/json" \
+"https://openboxes.ngrok.io/openboxes/api/locations/1/availableItems?max=1&offset=0" | jsonlint
+{
+  "data": [
+    {
+      "inventoryItem.id": "ff80818155df9de40155df9e3356000e",
+      "product.name": "General Pain Reliever",
+      "productCode": "00004",
+      "lotNumber": "lot57",
+      "expirationDate": "01/28/2017",
+      "binLocation.id": "ff808181646d3ec101646d5e7d480001",
+      "binLocation.name": "Bin 1",
+      "zone": null,
+      "quantityAvailable": 10000,
+      "quantityOnHand": 10000,
+      "location": {
+        "id": "1",
+        "name": "Boston Headquarters"
+      }
+    }
+  ],
+  "totalCount": 1
+}
+```
+
+### Export Available Items 
+
+```
+$ curl -X GET -b cookies.txt \
+-H "Content-Type: application/json" \
+"https://openboxes.ngrok.io/openboxes/api/locations/1/availableItems/export" | jsonlint
+{
+  "data": [
+    {
+      "inventoryItem.id": "ff80818155df9de40155df9e3356000e",
+      "product.name": "General Pain Reliever",
+      "productCode": "00004",
+      "lotNumber": "lot57",
+      "expirationDate": "01/28/2017",
+      "binLocation.id": "ff808181646d3ec101646d5e7d480001",
+      "binLocation.name": "Bin 1",
+      "zone": null,
+      "quantityAvailable": 10000,
+      "quantityOnHand": 10000,
+      "location": {
+        "id": "1",
+        "name": "Boston Headquarters"
+      }
+    }
+  ]
+}
+```
 

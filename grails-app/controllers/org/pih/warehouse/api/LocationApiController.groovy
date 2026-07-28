@@ -12,6 +12,7 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import org.grails.web.json.JSONObject
 import org.hibernate.Criteria
+import org.hibernate.ObjectNotFoundException
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
@@ -38,6 +39,41 @@ class LocationApiController extends BaseDomainApiController {
     def inventoryService
     def documentService
     LocationDataService locationGormService
+    def productAvailabilityService
+
+    def availableItems() {
+        Location location = Location.get(params.id)
+        if (!location) {
+            throw new ObjectNotFoundException(params.id, Location.class.toString())
+        }
+
+        Integer max = Math.min(params.max != null ? params.int("max") : 100, 1000)
+        Integer offset = params.offset != null ? params.int("offset") : 0
+
+        Map result = productAvailabilityService.getAvailableItemsByLocation(location, max, offset)
+        render([data: toAvailableItemsJson(location, result.data), totalCount: result.totalCount] as JSON)
+    }
+
+    def exportAvailableItems() {
+        Location location = Location.get(params.id)
+        if (!location) {
+            throw new ObjectNotFoundException(params.id, Location.class.toString())
+        }
+
+        Map result = productAvailabilityService.getAvailableItemsByLocation(location, null, null)
+        render([data: toAvailableItemsJson(location, result.data)] as JSON)
+    }
+
+    private List toAvailableItemsJson(Location location, List availableItems) {
+        return availableItems.collect { AvailableItem availableItem ->
+            Map json = availableItem.toJson()
+            json.location = [
+                    id  : location.id,
+                    name: location.name
+            ]
+            return json
+        }
+    }
 
     def read() {
         Location location = Location.get(params.id)

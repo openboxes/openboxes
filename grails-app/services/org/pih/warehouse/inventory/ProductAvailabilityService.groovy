@@ -871,6 +871,36 @@ class ProductAvailabilityService {
         return data
     }
 
+    Map getAvailableItemsByLocation(Location location, Integer max = null, Integer offset = null) {
+        if (!location) {
+            return [data: [], totalCount: 0]
+        }
+
+        Map listArgs = [:]
+        if (max != null) {
+            listArgs.max = max
+            listArgs.offset = offset ?: 0
+        }
+
+        List<ProductAvailability> rows = ProductAvailability.createCriteria().list(listArgs) {
+            eq("location", location)
+            // Filter out any items where QoH == 0 because we have no need to operate on items with no quantity.
+            ne("quantityOnHand", 0)
+            order("id", "asc")
+        }
+
+        int totalCount = (rows instanceof PagedResultList) ? rows.totalCount : rows.size()
+        List<AvailableItem> data = rows.collect { ProductAvailability pa ->
+            new AvailableItem(
+                    inventoryItem: pa.inventoryItem,
+                    binLocation: pa.binLocation,
+                    quantityOnHand: pa.quantityOnHand,
+                    quantityAvailable: pa.quantityAvailableToPromise
+            )
+        }
+        return [data: data, totalCount: totalCount]
+    }
+
     Map<InventoryItem, Integer> getQuantityOnHandByInventoryItem(Location location, List<InventoryItem> inventoryItems = []) {
         if (!location) {
             return [:]
