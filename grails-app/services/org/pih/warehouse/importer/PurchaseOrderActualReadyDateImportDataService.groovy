@@ -90,12 +90,6 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
                 command.errors.reject("Row ${index + 1}: Product code '${params["productCode"]}' is incorrect for order item ${orderItem.id}")
             }
 
-
-            // Actual Ready Date validation
-            if (!params["actualReadyDate"]) {
-                command.errors.reject("Row ${index + 1}: 'Actual Ready Date' is required. Expected date format: ${Constants.EXPIRATION_DATE_FORMAT}")
-            }
-
             String recipientValue = params["recipient"]
             if (!StringUtils.isBlank(recipientValue)) {
                 Person recipient = personService.getActivePerson(recipientValue)
@@ -122,7 +116,11 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
                 throw new IllegalArgumentException("Order Item is not found")
             }
 
-            orderItem.actualReadyDate = params["actualReadyDate"] as Date
+            Date actualReadyDate = params["actualReadyDate"] as Date
+            if (actualReadyDate) {
+                orderItem.actualReadyDate = actualReadyDate
+            }
+
             String recipientValue = params["recipient"]
             if (!StringUtils.isBlank(recipientValue)) {
                 Person recipient = personService.getActivePerson(recipientValue)
