@@ -560,14 +560,16 @@ class ReceiptV2Service {
         // The client only ever sends a single sort field, so we take the first entry from the
         // SortParamList and ignore the rest.
         SortParam sortParam = command.sort?.get(0)
+        if (!sortParam) {
+            return shipment.shipmentItems.sort()
+        }
+        
         return ShipmentItem.createCriteria().list {
             createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
             createAlias("recipient", "r", JoinType.LEFT_OUTER_JOIN)
             createAlias("inventoryItem", "ii", JoinType.LEFT_OUTER_JOIN)
             eq("shipment", shipment)
-            if (sortParam) {
-                applySortOrder(sortParam, delegate)
-            }
+            applySortOrder(sortParam, delegate)
         } as List<ShipmentItem>
     }
 
