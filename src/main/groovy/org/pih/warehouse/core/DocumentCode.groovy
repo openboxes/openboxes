@@ -17,12 +17,12 @@ enum DocumentCode {
     PURCHASE_ORDER_TEMPLATE,
     SHIPPING_DOCUMENT,
     SHIPPING_TEMPLATE,
+    SHIPPING_XLS_TEMPLATE,
     ZEBRA_TEMPLATE,
     EMAIL_TEMPLATE,
     DATA_EXPORT,
     INVOICE_TEMPLATE,
     REQUISITION_TEMPLATE,
-    CERTIFICATE_OF_DONATION_TEMPLATE,
 
     static list() {
         [
@@ -31,12 +31,12 @@ enum DocumentCode {
                 PURCHASE_ORDER_TEMPLATE,
                 SHIPPING_DOCUMENT,
                 SHIPPING_TEMPLATE,
+                SHIPPING_XLS_TEMPLATE,
                 ZEBRA_TEMPLATE,
                 EMAIL_TEMPLATE,
                 DATA_EXPORT,
                 INVOICE_TEMPLATE,
                 REQUISITION_TEMPLATE,
-                CERTIFICATE_OF_DONATION_TEMPLATE,
         ]
     }
 
@@ -44,25 +44,19 @@ enum DocumentCode {
         [
                 PURCHASE_ORDER_TEMPLATE,
                 SHIPPING_TEMPLATE,
+                SHIPPING_XLS_TEMPLATE,
                 ZEBRA_TEMPLATE,
                 EMAIL_TEMPLATE,
                 INVOICE_TEMPLATE,
                 REQUISITION_TEMPLATE,
-                CERTIFICATE_OF_DONATION_TEMPLATE,
         ]
     }
 
     static shipmentWorkflowTemplateList() {
         [
                 SHIPPING_TEMPLATE,
+                SHIPPING_XLS_TEMPLATE,
                 INVOICE_TEMPLATE,
-                CERTIFICATE_OF_DONATION_TEMPLATE
-        ]
-    }
-
-    static shipmentXlsTemplateList() {
-        [
-                CERTIFICATE_OF_DONATION_TEMPLATE
         ]
     }
 }

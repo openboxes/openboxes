@@ -455,8 +455,8 @@ class DocumentController {
         if (!documentInstance) {
             throw new IllegalArgumentException("Unable to locate document with id ${params.id}")
         }
-        if (!DocumentCode.shipmentXlsTemplateList().contains(documentInstance.documentType?.documentCode)) {
-            throw new IllegalArgumentException("Render shipment xls template action only supports documents with document codes ${DocumentCode.shipmentXlsTemplateList()}")
+        if (documentInstance.documentType?.documentCode != DocumentCode.SHIPPING_XLS_TEMPLATE) {
+            throw new IllegalArgumentException("Render shipment xls template action only supports documents with document codes ${DocumentCode.SHIPPING_XLS_TEMPLATE}")
         }
 
         try {

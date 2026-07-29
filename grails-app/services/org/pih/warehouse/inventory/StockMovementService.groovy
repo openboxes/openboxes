@@ -3623,7 +3623,7 @@ class StockMovementService {
             case DocumentCode.INVOICE_TEMPLATE:
                 action = "renderInvoiceTemplate"
                 break
-            case DocumentCode.CERTIFICATE_OF_DONATION_TEMPLATE:
+            case DocumentCode.SHIPPING_XLS_TEMPLATE:
                 action = "renderShipmentXlsTemplate"
                 break
             case DocumentCode.SHIPPING_TEMPLATE:

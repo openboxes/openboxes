@@ -7,15 +7,15 @@
             <sqlCheck expectedResult="0">
                 SELECT count(*)
                 FROM document_type
-                WHERE id = "CERTIFICATE_OF_DONATION_TEMPLATE"
+                WHERE id = "SHIPPING_XLS_TEMPLATE"
             </sqlCheck>
         </preConditions>
         <insert tableName="document_type">
-            <column name="id" value="CERTIFICATE_OF_DONATION_TEMPLATE"/>
+            <column name="id" value="SHIPPING_XLS_TEMPLATE"/>
             <column name="version" valueNumeric="0"/>
-            <column name="name" value="Certificate of Donation Template"/>
+            <column name="name" value="Shipping XLS Template"/>
             <column name="description"/>
-            <column name="document_code" value="CERTIFICATE_OF_DONATION_TEMPLATE"/>
+            <column name="document_code" value="SHIPPING_XLS_TEMPLATE"/>
             <column name="date_created" valueDate="${now}"/>
             <column name="last_updated" valueDate="${now}"/>
             <column name="sort_order" valueNumeric="0"/>
