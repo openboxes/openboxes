@@ -116,6 +116,10 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
                 throw new IllegalArgumentException("Order Item is not found")
             }
 
+            // Normally leaving a blank in a cell would would result in that field being set to null on the object.
+            // However, this import does not have a "download data" option (at PIH we source the data from an external
+            // PowerBI report). Because of this, it is more user friendly for blank cells to simply do nothing.
+
             Date actualReadyDate = params["actualReadyDate"] as Date
             if (actualReadyDate) {
                 orderItem.actualReadyDate = actualReadyDate
