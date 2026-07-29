@@ -135,20 +135,65 @@ const useReceivingActions = (view) => {
     };
   };
 
+  // Two field values match when both are null/undefined or when they are strictly equal.
+  // A value being present on one side but not the other (cleared or added) counts as a difference.
+  const differsFromShipment = (receiptValue, shipmentValue) => {
+    const bothEmpty = receiptValue == null && shipmentValue == null;
+    return !bothEmpty && receiptValue !== shipmentValue;
+  };
+
+  // Detects which shipment-item field(s) a receipt item overrides. Used both to decide when
+  // to enter split flow (any change triggers it) and to know which cells to strike through
+  // on the replaced row.
+  const getReceiptItemChanges = (receiptItem, shipmentItem) => ({
+    productChanged: differsFromShipment(
+      receiptItem?.productLot?.product?.id,
+      shipmentItem.productLot?.product?.id,
+    ),
+    lotChanged: differsFromShipment(
+      receiptItem?.productLot?.lotNumber,
+      shipmentItem.productLot?.lotNumber,
+    ),
+    expirationChanged: differsFromShipment(
+      receiptItem?.productLot?.expirationDate,
+      shipmentItem.productLot?.expirationDate,
+    ),
+    recipientChanged: differsFromShipment(
+      receiptItem?.recipient?.id,
+      shipmentItem.recipientId,
+    ),
+  });
+
   // The struck-through row of a split shipment item - the split items below
   // replace it. Built without a receipt item, so it keeps the original shipment values
   // (product, lot, expiration, recipient, bin location).
   const buildReplacedEntity = (summary, usersById) => {
     const lineItem = buildLineItem({ summary, usersById });
+    const currentReceiptItems = summary.currentReceiptItems ?? [];
     // The pending quantities of the split items, already subtracted from quantityRemaining.
-    const quantityPendingReceipt = (summary.currentReceiptItems ?? []).reduce(
+    const quantityPendingReceipt = currentReceiptItems.reduce(
       (sum, receiptItem) => sum + (receiptItem.quantityReceived ?? 0),
       0,
     );
+    // A field is struck through if any of the current receipt items overrides it. A product
+    // change also strikes lot and expiration, because a new product implies a new productLot.
+    // Lot and expiration are assumed to be tied together, so a change in either one strikes
+    // both.
+    const changesPerItem = currentReceiptItems.map(
+      (item) => getReceiptItemChanges(item, summary.shipmentItem),
+    );
+    const anyItemHasChange = (changeType) =>
+      changesPerItem.some((itemChanges) => itemChanges[changeType]);
+    const anyLotOrExpirationChange = anyItemHasChange('lotChanged')
+      || anyItemHasChange('expirationChanged');
     return {
       ...lineItem,
       rowType: ReceivingRowType.REPLACED,
       isCompleted: false,
+      productChanged: anyItemHasChange('productChanged'),
+      lotChanged: anyItemHasChange('productChanged') || anyLotOrExpirationChange,
+      expirationChanged: anyItemHasChange('productChanged') || anyLotOrExpirationChange,
+      recipientChanged: anyItemHasChange('recipientChanged'),
       // The replaced row shows the status of the whole group, so its available quantity
       // covers all its split items (buildLineItem only adds back the own receipt item,
       // which a replaced row doesn't have).
@@ -175,12 +220,16 @@ const useReceivingActions = (view) => {
   const buildItemRows = (summary, usersById) => {
     const { shipmentItem, currentReceiptItems = [] } = summary;
 
-    // A receipt item with a changed product always stays a changes group - as a plain
-    // line it would replace the original product instead of showing it struck through.
-    const hasChangedProduct = (receiptItem) => {
-      const receiptItemProductId = receiptItem?.productLot?.product?.id;
-      return receiptItemProductId != null
-        && receiptItemProductId !== shipmentItem.productLot?.product?.id;
+    // Any of product / lot / expiration / recipient differing from the shipment item enters
+    // the changes group - as a plain line it would silently replace the shipment item's
+    // value in the table instead of showing the original struck through above the new one.
+    const hasReceiptItemChanges = (receiptItem) => {
+      if (!receiptItem) {
+        return false;
+      }
+      const changes = getReceiptItemChanges(receiptItem, shipmentItem);
+      return changes.productChanged || changes.lotChanged
+        || changes.expirationChanged || changes.recipientChanged;
     };
 
     // The original line always exists in the database (it backs the cancel-remaining flow on
@@ -192,7 +241,7 @@ const useReceivingActions = (view) => {
         || items.length === 1,
     );
 
-    if (visibleReceiptItems.length < 2 && !hasChangedProduct(visibleReceiptItems[0])) {
+    if (visibleReceiptItems.length < 2 && !hasReceiptItemChanges(visibleReceiptItems[0])) {
       const receiptItem = visibleReceiptItems[0];
       return receiptItem?.isSplitItem
         ? [{ ...buildSplitItemEntity({ summary, receiptItem, usersById }), rowType: null }]
@@ -204,14 +253,20 @@ const useReceivingActions = (view) => {
     const splitItems = visibleReceiptItems
       .map((receiptItem) => buildSplitItemEntity({ summary, receiptItem, usersById }));
 
+    // True when any split item changes product. Gates the arrow + product code on the
+    // first row of each product group.
+    const anyProductChanged = visibleReceiptItems.some((receiptItem) => differsFromShipment(
+      receiptItem?.productLot?.product?.id,
+      shipmentItem.productLot?.product?.id,
+    ));
+
     // The API does not sort receipt items, so group split items by product to keep
-    // each product together. Only the first split item of a product shows the arrow,
-    // code and product cells.
+    // each product together, then flag only the first row of each group.
     const splitItemRows = Object.values(
       _.groupBy(splitItems, (splitItem) => splitItem.product?.id),
     ).flatMap((productSplitItems) => productSplitItems.map((splitItem, index) => ({
       ...splitItem,
-      isFirstSplitItem: index === 0,
+      isFirstSplitItem: index === 0 && anyProductChanged,
     })));
 
     const toggleRowId = _.uniqueId('row-');

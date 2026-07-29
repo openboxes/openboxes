@@ -92,26 +92,52 @@ const ReceivingTable = ({
         };
       };
 
-      return ids
+      const isReplaced = (id) => entities[id]?.rowType === ReceivingRowType.REPLACED;
+
+      // A "block" = shipment item row + its toggle row + split-item sub-rows. All rows in a
+      // block share a class so they get the same alternating background. REPLACED merges into
+      // the next row (its toggle), so both stay in the same block.
+      const { rows } = ids
         // Split item rows render as subRows of their toggle row, not at the top level.
         .filter((entry) => entities[entry]?.rowType !== ReceivingRowType.SPLIT_ITEM)
-        .map((entry) => {
+        .reduce((acc, entry, index, entries) => {
+          // Separators (pack-level headers) don't belong to any block - blockIndex stays.
           if (entry.isSeparator) {
-            return entry;
+            acc.rows.push(entry);
+            return acc;
           }
-          return {
+          // A row starts a new block unless the previous top-level row is a REPLACED row
+          // (which merges with its next row - this one - forming one block). First row,
+          // row after a separator, or row after a non-REPLACED all start a new block.
+          const previous = entries[index - 1];
+          const startsNewBlock = !previous || previous.isSeparator || !isReplaced(previous);
+          if (startsNewBlock) {
+            acc.blockIndex += 1;
+          }
+          const className = acc.blockIndex % 2 === 0
+            ? 'receiving-table__block--even'
+            : 'receiving-table__block--odd';
+          acc.rows.push({
             ...buildRow(entry),
-            subRows: entities[entry]?.splitItemIds?.map(buildSubRow),
+            className,
+            // Sub-rows inherit the parent's class so the whole block shares one background.
+            subRows: entities[entry]?.splitItemIds?.map((splitItemId, i, splitItemIds) => ({
+              ...buildSubRow(splitItemId, i, splitItemIds),
+              className,
+            })),
             // A replaced row is always followed by its toggle row and merges with it.
-            mergeWithNextRow: entities[entry]?.rowType === ReceivingRowType.REPLACED,
-          };
-        });
+            mergeWithNextRow: isReplaced(entry),
+          });
+          return acc;
+        }, { rows: [], blockIndex: 0 });
+
+      return rows;
     },
     [lineItemsState],
   );
 
   return (
-    <div className="receiving-table">
+    <div className="receiving-table receiving-table--striped">
       <DataTable
         columns={columns}
         data={data}
