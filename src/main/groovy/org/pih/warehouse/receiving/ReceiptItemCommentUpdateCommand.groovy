@@ -7,4 +7,8 @@ import org.pih.warehouse.core.validation.ObjectValidatable
  */
 class ReceiptItemCommentUpdateCommand extends ReceiptItemCommentSaveCommand
         implements ObjectValidatable<ReceiptItemCommentUpdateCommandValidator> {
+
+    static constraints = {
+        comment(blank: true, maxSize: 255)
+    }
 }

@@ -19,6 +19,7 @@ const ReceivingStep = ({ flushRef }) => {
       loading,
       receiptId,
       updateLineItem,
+      updateLineItemComment,
       autofillQuantities,
       onSaveAndExit,
       removeSplitItem,
@@ -27,7 +28,6 @@ const ReceivingStep = ({ flushRef }) => {
       onLocationAutofill,
       autosaveStatus,
     },
-    commentModal,
   } = useReceivingForm();
 
   // Handed up to the wizard, whose Next button awaits it before the step transition.
@@ -51,9 +51,9 @@ const ReceivingStep = ({ flushRef }) => {
         loading={loading}
         receiptId={receiptId}
         updateLineItem={updateLineItem}
+        updateLineItemComment={updateLineItemComment}
         removeSplitItem={removeSplitItem}
         loadReceipt={loadReceipt}
-        commentModal={commentModal}
         onLocationAutofill={onLocationAutofill}
       />
     </div>

@@ -505,6 +505,9 @@ const useReceivingColumns = ({
             })
             : getReceivingRowActions({
               itemId: row.original.id,
+              // Only rows backed by a receipt item can carry a comment (the struck-through
+              // header of a split group is not one).
+              canComment: Boolean(item?.receiptItemId),
               onOpenCommentModal: table.options.meta?.onOpenCommentModal,
               onOpenEditModal: table.options.meta?.onOpenEditModal,
             });

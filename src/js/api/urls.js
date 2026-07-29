@@ -240,3 +240,4 @@ export const RECEIPT_SUMMARY_BY_SHIPMENT = (shipmentId) => `${RECEIPT_BY_SHIPMEN
 export const RECEIPT_START = (shipmentId) => `${RECEIPT_BY_SHIPMENT(shipmentId)}/start`;
 export const RECEIPT_ITEMS_BATCH = (receiptId) => `${RECEIPT_BY_ID(receiptId)}/items/batch`;
 export const RECEIPT_ITEMS_BY_SHIPMENT_ITEM = (receiptId, shipmentItemId) => `${RECEIPT_BY_ID(receiptId)}/shipmentItems/${shipmentItemId}/receiptItems`;
+export const RECEIPT_ITEM_COMMENTS = (receiptItemId) => `${RECEIPT_API}/receiptItems/${receiptItemId}/comments`;

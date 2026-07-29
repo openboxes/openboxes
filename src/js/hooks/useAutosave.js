@@ -133,7 +133,13 @@ const useAutosave = ({
 
   // The rows hook owns the rows: stateRef is the synchronous source of truth
   const {
-    rowsState, stateRef, setRows, setRowStatus, resetRows, isMounted,
+    rowsState,
+    stateRef,
+    setRows,
+    setRowStatus,
+    resetRows,
+    isMounted,
+    updateRowManually,
   } = useAutosaveRows(initialRows);
   // Dirty rows waiting for a save: rowId -> { attempts, backoffLevel }. Being in the map
   // means dirty.
@@ -474,6 +480,7 @@ const useAutosave = ({
     isRowSaving,
     autosaveStatus,
     flush,
+    updateRowManually,
   };
 };
 

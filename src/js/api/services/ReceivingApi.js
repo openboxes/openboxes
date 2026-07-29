@@ -1,4 +1,5 @@
 import {
+  RECEIPT_ITEM_COMMENTS,
   RECEIPT_ITEMS_BATCH,
   RECEIPT_ITEMS_BY_SHIPMENT_ITEM,
   RECEIPT_START,
@@ -14,4 +15,8 @@ export default {
     apiClient.post(RECEIPT_ITEMS_BATCH(receiptId), payload),
   editReceivingInfo: (receiptId, shipmentItemId, payload) =>
     apiClient.post(RECEIPT_ITEMS_BY_SHIPMENT_ITEM(receiptId, shipmentItemId), payload),
+  createReceiptItemComment: (receiptItemId, payload) =>
+    apiClient.post(RECEIPT_ITEM_COMMENTS(receiptItemId), payload),
+  updateReceiptItemComment: (receiptItemId, payload) =>
+    apiClient.put(RECEIPT_ITEM_COMMENTS(receiptItemId), payload),
 };

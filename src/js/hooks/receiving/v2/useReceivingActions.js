@@ -119,6 +119,7 @@ const useReceivingActions = (view) => {
       quantityShipped: shipmentItem.quantity,
       quantityReceived: quantityPreviouslyReceived,
       previousReceiptItems,
+      comment: receiptItem?.comment ?? null,
       packSize: shipmentItem.packSize,
       unitOfMeasure: shipmentItem.unitOfMeasure,
       quantityReceiving: receiptItem?.quantityReceived ?? null,
@@ -284,6 +285,7 @@ const useReceivingActions = (view) => {
     deleteRow,
     autosaveStatus,
     flush,
+    updateRowManually,
   } = useReceivingAutosave({ initialRows, receiptId });
 
   const loadReceipt = async () => {
@@ -314,6 +316,12 @@ const useReceivingActions = (view) => {
       .forEach(({ rowId, quantityReceiving }) => updateRow(rowId, { quantityReceiving }));
   }, [rows, rowsById, updateRow]);
 
+  // Comments are persisted on their own endpoint, so unlike updateLineItem this does not mark the
+  // row dirty - it only mirrors the already-saved comment so the popover prefills and the
+  // create-vs-update choice stay correct without reloading the whole receipt.
+  const updateLineItemComment = useCallback((rowId, comment) =>
+    updateRowManually(rowId, { comment }), [updateRowManually]);
+
   const { onSaveAndExit } = useReceivingSaveAction({ flush });
 
   useEffect(() => {
@@ -333,6 +341,7 @@ const useReceivingActions = (view) => {
     lineItemsState,
     updateLineItem: updateRow,
     updateLineItems: updateRows,
+    updateLineItemComment,
     autofillQuantities,
     // Deletes the receipt item through the autosave queue and, only on success, drops the
     // row from the local state (with grouping fix-ups).

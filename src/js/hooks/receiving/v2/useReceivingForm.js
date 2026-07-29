@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import { ReceivingView } from 'consts/receivingViewOptions';
-import useCommentModal from 'hooks/receiving/v2/useCommentModal';
 import useReceivingActions from 'hooks/receiving/v2/useReceivingActions';
 import useReceivingBinLocations from 'hooks/receiving/v2/useReceivingBinLocations';
 import useReceivingColumns from 'hooks/receiving/v2/useReceivingColumns';
@@ -16,6 +15,7 @@ const useReceivingForm = () => {
     lineItemsState,
     updateLineItem,
     updateLineItems,
+    updateLineItemComment,
     autofillQuantities,
     removeSplitItem,
     loadReceipt,
@@ -29,7 +29,7 @@ const useReceivingForm = () => {
     updateLineItems,
   });
   const { columns } = useReceivingColumns({ view, putawayEnabled });
-  const commentModal = useCommentModal();
+
   return {
     view,
     setView,
@@ -43,6 +43,7 @@ const useReceivingForm = () => {
       loading,
       receiptId,
       updateLineItem,
+      updateLineItemComment,
       autofillQuantities,
       removeSplitItem,
       loadReceipt,
@@ -51,7 +52,6 @@ const useReceivingForm = () => {
       onLocationAutofill,
       autosaveStatus,
     },
-    commentModal,
   };
 };
 
