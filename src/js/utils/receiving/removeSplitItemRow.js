@@ -40,7 +40,12 @@ const removeSplitItemRow = (state, rowId) => {
     return updateNormalizedItem(
       removeNormalizedItems(state, [rowId, toggleRowId, toggle.replacedRowId]),
       splitItemIds[0],
-      { rowType: null },
+      {
+        rowType: null,
+        quantityAvailableToReceive:
+          state.entities[toggle.replacedRowId]?.quantityAvailableToReceive
+          ?? remainingSplitItem.quantityAvailableToReceive,
+      },
     );
   }
   const updatedState = updateNormalizedItem(

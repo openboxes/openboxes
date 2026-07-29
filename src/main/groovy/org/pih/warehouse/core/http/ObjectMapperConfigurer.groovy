@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.SerializationConfig
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.fasterxml.jackson.databind.ser.BeanPropertyWriter
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier
 import com.fasterxml.jackson.databind.ser.ContextualSerializer
 import com.fasterxml.jackson.databind.ser.ResolvableSerializer
@@ -44,10 +45,6 @@ class ObjectMapperConfigurer {
         // Groovy makes the fields themselves "private" (because it auto-generates getters) so
         // we need to set field visibility to ANY to be able to auto-serialize fields.
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
-
-        // If an object being serialized has no fields to serialize, don't throw an error,
-        // just ignore the object. This gracefully resolves Grails/GORM AST transformation weirdness.
-        objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
 
         // Support serializing java.util.Date and java.time classes (LocalDate, Instant, ZonedDateTime)
         // as ISO strings (for example, "2025-01-21" or "2025-01-21T00:00Z")
@@ -89,6 +86,18 @@ class ObjectMapperConfigurer {
             // only apply the first time a type is serialized (at least until the next application restart).
             return new OpenBoxesWrappingSerializer(mapperComponentResolver, serializer as JsonSerializer<Object>)
         }
+
+        @Override
+        List<BeanPropertyWriter> changeProperties(SerializationConfig config,
+                                                  BeanDescription beanDesc,
+                                                  List<BeanPropertyWriter> beanProperties) {
+
+            // Grails AST Transforms sometimes inject additional fields into objects. For example, objects that
+            // extend the Validateable trait will have an "errors" field added to them, which gets serialized as
+            // "grails_validation_Validateable__errors". We filter out any field that starts with "grails_" here
+            // to exclude all framework state from API responses.
+            return beanProperties.findAll { BeanPropertyWriter writer -> !writer.name.startsWith("grails_") }
+        }
     }
 
     /**
@@ -112,7 +121,7 @@ class ObjectMapperConfigurer {
                                                                                 ContextualSerializer {
 
         /**
-         * How many layers deep into a JSON object we allow before short circuiting and returning null.
+         * How many layers deep into a JSON object we allow before short circuiting and throwing an exception.
          */
         private static final int MAX_JSON_DEPTH = 25
 

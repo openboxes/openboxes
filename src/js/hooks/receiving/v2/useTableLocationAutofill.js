@@ -12,7 +12,7 @@ const useTableLocationAutofill = ({
   lineItemsState,
   updateLineItems,
 }) => {
-  const getRowBinLocation = (item) => item.binLocation;
+  const getRowBinLocation = useCallback((item) => item.binLocation, []);
   // Rows the autofill applies to, in display order: editable line items only
   // (separator, replaced and toggle rows plus fully received lines are skipped).
   // A separator id narrows the autofill down to the rows of its pack level group.

@@ -12,7 +12,7 @@ const useEditModalLocationAutofill = ({
   getValues,
   setValue,
 }) => {
-  const getRowBinLocation = (item) => item.binLocation;
+  const getRowBinLocation = useCallback((item) => item.binLocation, []);
 
   const getRows = useCallback(() => getValues('lineItems'), [getValues]);
 
