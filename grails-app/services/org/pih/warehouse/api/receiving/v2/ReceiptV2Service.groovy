@@ -5,7 +5,6 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.ObjectNotFoundException
-import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
@@ -52,6 +51,7 @@ import org.pih.warehouse.shipping.ShipmentService
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
 import org.pih.warehouse.sort.SortParam
+import org.pih.warehouse.sort.SortUtil
 
 @Transactional(readOnly = true)
 class ReceiptV2Service {
@@ -574,37 +574,29 @@ class ReceiptV2Service {
     }
 
     private static void applySortOrder(SortParam sortParam, Criteria criteria) {
-        String orderDirection = sortParam.ascending ? "asc" : "desc"
         switch (sortParam.fieldName) {
             case "productCode":
-                criteria.addOrder(getOrderDirection("p.productCode", orderDirection))
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "p.productCode"))
                 break
             case "product":
-                criteria.addOrder(getOrderDirection("p.name", orderDirection))
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "p.name"))
                 break
             case "lotNumber":
-                criteria.addOrder(getOrderDirection("ii.lotNumber", orderDirection))
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "ii.lotNumber"))
                 break
             case "expirationDate":
-                criteria.addOrder(getOrderDirection("ii.expirationDate", orderDirection))
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "ii.expirationDate"))
                 break
             case "recipient":
-                criteria.addOrder(getOrderDirection("r.lastName", orderDirection))
-                criteria.addOrder(getOrderDirection("r.firstName", orderDirection))
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "r.lastName"))
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "r.firstName"))
                 break
             case "quantityShipped":
-                criteria.addOrder(getOrderDirection("quantity", orderDirection))
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "quantity"))
                 break
             default:
                 break
         }
-    }
-
-    private static Order getOrderDirection(String sort, String order) {
-        if (order == "desc") {
-            return Order.desc(sort)
-        }
-        return Order.asc(sort)
     }
 
     private OrderedDataGroup buildPackLevelGroup(List<ShipmentItem> shipmentItems) {
