@@ -92,6 +92,7 @@ class BulkDataBinder {
                     result.addError(new BulkDataError(
                             row: cell.row,
                             column: cell.column,
+                            fieldName: columnName,
                             localizedMessage: messageLocalizer.localize(
                                     "bulkData.binder.error", [columnName, cell.value, boundRow.class.simpleName]),
                             exception: e,
