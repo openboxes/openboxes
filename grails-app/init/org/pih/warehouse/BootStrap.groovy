@@ -488,9 +488,11 @@ class BootStrap {
                 receivedBy       : requisition.receivedBy,
                 recipient        : requisition.recipient,
                 requisitionItems : requisition.requisitionItems,
-                autoAllocationEnabled: requisition.autoAllocationEnabled,
+                autoAllocationRequested: requisition.autoAllocationRequested,
                 partialAllocationAllowed: requisition.partialAllocationAllowed,
                 partialIssuanceAllowed: requisition.partialIssuanceAllowed,
+                allocationSourceStrategy: requisition.allocationSourceStrategy?.name(),
+                autoIssuanceRequested: requisition.autoIssuanceRequested,
             ]
         }
 

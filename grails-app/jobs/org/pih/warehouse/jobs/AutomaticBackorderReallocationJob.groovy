@@ -4,7 +4,7 @@ import grails.util.Holders
 import org.pih.warehouse.allocation.AllocationMode
 import org.pih.warehouse.allocation.AllocationRequest
 import org.pih.warehouse.allocation.AllocationResult
-import org.pih.warehouse.allocation.AllocationStrategy
+import org.pih.warehouse.allocation.AllocationSourceStrategy
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
@@ -42,7 +42,7 @@ class AutomaticBackorderReallocationJob {
                     log.info("Handle backorder re-allocation for shipment ${shipmentId}")
                     def backorderItems = shipment.shipmentItems?.findAll { it.backorderReference || it.backorderItem }
 
-                    List<AllocationStrategy> strategies = [AllocationStrategy.WAREHOUSE_FIRST]
+                    List<AllocationSourceStrategy> strategies = [AllocationSourceStrategy.STORAGE_FIRST]
                     Set<Requisition> backorders = []
                     backorderItems.forEach { ShipmentItem it ->
                         def backorderedRequisition = it.backorderItem?.requisition
@@ -55,7 +55,7 @@ class AutomaticBackorderReallocationJob {
                     }
 
                     backorders.forEach { Requisition requisition ->
-                        if (requisition.autoAllocationEnabled) {
+                        if (requisition.autoAllocationRequested) {
                             List<AllocationResult> result = []
                             requisition?.requisitionItems?.each { requisitionItem ->
                                 def picklistItems = requisitionItem.picklistItems

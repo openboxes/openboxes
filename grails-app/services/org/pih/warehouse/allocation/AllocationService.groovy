@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.allocation
 
 import grails.core.GrailsApplication
@@ -10,7 +19,6 @@ import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
@@ -26,6 +34,9 @@ class AllocationService {
     GrailsApplication grailsApplication
     AuthService authService
     RequisitionService requisitionService
+
+    AllocationSourceStrategyHandlerResolver allocationSourceStrategyHandlerResolver = new AllocationSourceStrategyHandlerResolver()
+    RotationStrategyResolver rotationStrategyResolver = new RotationStrategyResolver()
 
     @Transactional(readOnly = true)
     StockMovement getOutboundOrder(String id) {
@@ -56,7 +67,7 @@ class AllocationService {
         return outboundOrder
     }
 
-    AllocationDetailsDto allocate(String requisitionItemId, AllocationMode mode, List<AllocationDto> allocations, List<AllocationStrategy> strategies = []) {
+    AllocationDetailsDto allocate(String requisitionItemId, AllocationMode mode, List<AllocationDto> allocations, List<AllocationSourceStrategy> strategies = []) {
         RequisitionItem requisitionItem = RequisitionItem.get(requisitionItemId)
         if (!requisitionItem) {
             throw new IllegalArgumentException("Requisition item not found")
@@ -184,8 +195,8 @@ class AllocationService {
     AllocationResult allocate(RequisitionItem requisitionItem, Integer quantityRequired, AllocationMode allocationMode, List list) {
         AllocationRequest request
         if (allocationMode == AllocationMode.AUTO) {
-            List<AllocationStrategy> allocationStrategyList = list
-            request = new AllocationRequest(quantityRequired: quantityRequired, requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationStrategyList)
+            List<AllocationSourceStrategy> allocationSourceStrategyList = list
+            request = new AllocationRequest(quantityRequired: quantityRequired, requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationSourceStrategyList)
         } else if (allocationMode == AllocationMode.MANUAL) {
             List<AvailableItem> allocationItemList = list
             request = new AllocationRequest(quantityRequired: quantityRequired, requisitionItem: requisitionItem, allocationMode: allocationMode, availableItems: allocationItemList)
@@ -195,10 +206,10 @@ class AllocationService {
         return allocate(request)
     }
 
-    List<AllocationResult> allocate(Requisition requisition, AllocationMode allocationMode, List<AllocationStrategy> allocationStrategyList) {
+    List<AllocationResult> allocate(Requisition requisition, AllocationMode allocationMode, List<AllocationSourceStrategy> allocationSourceStrategyList) {
         try {
             List<AllocationResult> results = requisition?.requisitionItems?.collect { requisitionItem ->
-                AllocationRequest allocationRequest = new AllocationRequest(requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationStrategyList)
+                AllocationRequest allocationRequest = new AllocationRequest(requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationSourceStrategyList)
                 allocate(allocationRequest, false)
             } ?: []
 
@@ -229,88 +240,88 @@ class AllocationService {
                 }
 
                 log.info("Automatic allocation for requisition ${requisition.requestNumber} (${requisition.id}) ...")
-                allocate(requisition, AllocationMode.AUTO, [AllocationStrategy.WAREHOUSE_FIRST])
-                stockMovementService.updateRequisitionStatus(requisitionId, RequisitionStatus.PICKING)
+                allocate(requisition, AllocationMode.AUTO, [])
+
+                if (requisition.autoIssuanceRequested) {
+                    stockMovementService.issueRequisition(requisition)
+                } else {
+                    stockMovementService.updateRequisitionStatus(requisitionId, RequisitionStatus.PICKING)
+                }
             }
         } catch (Exception e) {
             log.error("Error processing requisition ${requisitionId}", e)
         }
     }
 
-    private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationStrategy> strategies, List<AvailableItem> excludeList = []) {
-        Location location = requisitionItem.requisition.origin
-        List<AvailableItem> allAvailableItems = stockMovementService.getAvailableItems(location, requisitionItem, false)
-        List<AvailableItem> filteredItems = applyStrategies(location, allAvailableItems, strategies)
-        List<AvailableItem> includedItems = filteredItems.findAll { !excludeList.contains(it) }
+    private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationSourceStrategy> strategies, List<AvailableItem> excludeList = []) {
+        Location facility = requisitionItem.requisition.origin
+        Product product = requisitionItem.product
+        List<AvailableItem> allAvailableItems = stockMovementService.getAvailableItems(facility, requisitionItem, false)
 
         boolean isBackordered = requisitionItem.isBackordered()
         if (isBackordered) {
             quantityRequired = requisitionItem.quantityBackordered
         }
-        Integer quantityAvailable = includedItems.sum { it.quantityAvailable } ?: 0
-        if (quantityAvailable < quantityRequired) {
-            boolean partialAllocationAllowed = requisitionItem.requisition.partialAllocationAllowed
-            if (isBackordered && partialAllocationAllowed) {
-                return []
-            }
-            Product product = requisitionItem.product
-            throw new IllegalArgumentException("Insufficient stock for product ${product?.productCode} - ${product?.name} in order ${requisitionItem.requisition?.requestNumber}. Required quantity: ${quantityRequired}, Available quantity: ${quantityAvailable}")
-        }
 
-        return stockMovementService.getSuggestedItems(includedItems, quantityRequired)
-    }
+        List<AllocationSourceStrategy> resolvedStrategies = resolveStrategies(requisitionItem.requisition, strategies)
+        RotationRule rotationRule = getConfiguredRotationRule()
 
-    private List<AvailableItem> applyStrategies(Location facility, List<AvailableItem> availableItems, List<AllocationStrategy> strategies) {
-        if (!strategies || strategies.isEmpty()) {
-            strategies = grailsApplication.config.openboxes.order.allocation.strategies
-        }
-        if (!strategies || strategies.isEmpty()) {
-            return availableItems
-        }
-
-        List<AvailableItem> displayItems = availableItems.findAll { it.binLocation?.isDisplay() }
-        List<AvailableItem> warehouseItems = availableItems.findAll { !it.binLocation?.isDisplay() }
-        Set<Location> preferredBinLocations = getPreferredBinLocations(facility, warehouseItems?.find()?.inventoryItem?.product)
-        List<AvailableItem> preferredItems = warehouseItems?.findAll {preferredBinLocations.contains(it.binLocation) }
-        List<AvailableItem> remainingItems = (warehouseItems?: []) - (preferredItems?: [])
-        List<AvailableItem> result = []
-
-        strategies.each { strategy ->
-            switch (strategy) {
-                case AllocationStrategy.DISPLAY_FIRST:
-                    result.addAll(displayItems)
-                    result.addAll(preferredItems)
-                    result.addAll(remainingItems)
-                    break
-
-                case AllocationStrategy.WAREHOUSE_FIRST:
-                    result.addAll(preferredItems)
-                    result.addAll(remainingItems)
-                    result.addAll(displayItems)
-                    break
-
-                case AllocationStrategy.WAREHOUSE_ONLY:
-                    result.addAll(preferredItems)
-                    result.addAll(remainingItems)
-                    break
-
-                case AllocationStrategy.FEFO:
-                    // availableItems come already sorted by expiration dates
-                    result = availableItems
-                    break
+        Integer bestQuantityAvailable = 0
+        for (AllocationSourceStrategy strategy : resolvedStrategies) {
+            List<AvailableItem> ordered = orderByStrategy(strategy, facility, product, applyRotation(rotationRule, allAvailableItems))
+            List<AvailableItem> includedItems = ordered.findAll { !excludeList.contains(it) }
+            Integer quantityAvailable = includedItems.sum { it.quantityAvailable } ?: 0
+            bestQuantityAvailable = Math.max(bestQuantityAvailable, quantityAvailable)
+            if (canSatisfy(includedItems, quantityRequired)) {
+                return stockMovementService.getSuggestedItems(includedItems, quantityRequired)
             }
         }
 
-        return result
-    }
-
-    private Set<Location> getPreferredBinLocations(Location facility, Product product) {
-        if (!product) {
+        boolean partialAllocationAllowed = requisitionItem.requisition.partialAllocationAllowed
+        if (isBackordered && partialAllocationAllowed) {
             return []
         }
 
-        Set<InventoryLevel> inventoryLevels = facility?.inventory?.configuredProducts?.findAll { it.product == product && it.preferredBinLocation != null }
-        return inventoryLevels?.collect { it.preferredBinLocation }
+        // TODO fallback order when nothing can supply the quantity
+
+        throw new IllegalArgumentException("Insufficient stock for product ${product?.productCode} - ${product?.name} in order ${requisitionItem.requisition?.requestNumber}. Required quantity: ${quantityRequired}, Available quantity: ${bestQuantityAvailable}")
+    }
+
+    private List<AllocationSourceStrategy> resolveStrategies(Requisition requisition, List<AllocationSourceStrategy> explicit) {
+        if (explicit) {
+            return explicit
+        }
+        if (requisition?.allocationSourceStrategy) {
+            return [requisition.allocationSourceStrategy]
+        }
+        return [getConfiguredSourceStrategy()]
+    }
+
+    private AllocationSourceStrategy getConfiguredSourceStrategy() {
+        return (grailsApplication.config.openboxes.order.allocation.source ?: AllocationSourceStrategy.STORAGE_FIRST) as AllocationSourceStrategy
+    }
+
+    private RotationRule getConfiguredRotationRule() {
+        return (grailsApplication.config.openboxes.order.allocation.rotation ?: RotationRule.FEFO) as RotationRule
+    }
+
+    private List<AvailableItem> orderByStrategy(AllocationSourceStrategy strategy, Location facility, Product product, List<AvailableItem> availableItems) {
+        AllocationSourceStrategyHandler handler = allocationSourceStrategyHandlerResolver.handlerFor(strategy)
+        if (handler) {
+            return handler.order(facility, product, availableItems)
+        }
+
+        log.warn("No allocation source strategy handler registered for ${strategy}, using natural order")
+        return availableItems
+    }
+
+    private List<AvailableItem> applyRotation(RotationRule rotationRule, List<AvailableItem> sourceOrdered) {
+        return rotationStrategyResolver.forRule(rotationRule).sort(sourceOrdered)
+    }
+
+    private static boolean canSatisfy(List<AvailableItem> orderedItems, Integer quantityRequired) {
+        Integer quantityAvailable = orderedItems.sum { it.quantityAvailable } ?: 0
+        return quantityAvailable >= quantityRequired
     }
 
     private AllocationDetailsDto buildAllocationDetailsDto(RequisitionItem requisitionItem) {

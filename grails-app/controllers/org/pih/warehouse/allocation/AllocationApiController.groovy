@@ -24,7 +24,7 @@ class AllocationApiController {
         try {
             def jsonBody = request.JSON ?: [:]
             AllocationMode mode = (jsonBody.mode as AllocationMode) ?: AllocationMode.AUTO
-            List<AllocationStrategy> strategies = parseStrategies(jsonBody.strategies)
+            List<AllocationSourceStrategy> strategies = parseStrategies(jsonBody.strategies)
 
             List<AllocationResult> results = allocationService.allocate(requisition, mode, strategies)
             if (results && !results.empty) {
@@ -55,13 +55,13 @@ class AllocationApiController {
         }
     }
 
-    private static List<AllocationStrategy> parseStrategies(def strategies) {
+    private static List<AllocationSourceStrategy> parseStrategies(def strategies) {
         if (!strategies) {
             return []
         }
         return strategies.collect { String strategy ->
             try {
-                return AllocationStrategy.valueOf(strategy)
+                return AllocationSourceStrategy.valueOf(strategy)
             } catch (IllegalArgumentException e) {
                 return null
             }

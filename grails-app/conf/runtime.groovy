@@ -3,7 +3,8 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.IdentifierGeneratorTypeCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.identification.RandomCondition
-import org.pih.warehouse.allocation.AllocationStrategy
+import org.pih.warehouse.allocation.AllocationSourceStrategy
+import org.pih.warehouse.allocation.RotationRule
 
 // OpenBoxes identifier config
 openboxes.identifier.attempts.max = 10
@@ -94,8 +95,8 @@ openboxes.products.merge.enabled = false
 // Cycle Count configuration (OBPIH-7033)
 openboxes.cycleCount.products.maxAmount = 50
 
-// Default order allocation strategies
-openboxes.order.allocation.strategies = [AllocationStrategy.FEFO]
+openboxes.order.allocation.source = AllocationSourceStrategy.STORAGE_FIRST
+openboxes.order.allocation.rotation = RotationRule.FEFO
 
 openboxes.security.rbac.rules = [
     [controller: '*', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],

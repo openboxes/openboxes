@@ -10,6 +10,7 @@
 package org.pih.warehouse.requisition
 
 import grails.util.Holders
+import org.pih.warehouse.allocation.AllocationSourceStrategy
 import org.pih.warehouse.allocation.AutomaticAllocationEvent
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.WebhookEventType
@@ -150,9 +151,12 @@ class Requisition implements Comparable<Requisition>, Serializable {
     DeliveryTypeCode deliveryTypeCode = DeliveryTypeCode.DEFAULT
 
     // for controlling partial allocation and issuance
-    Boolean autoAllocationEnabled
+    Boolean autoAllocationRequested
     Boolean partialAllocationAllowed
     Boolean partialIssuanceAllowed
+    Boolean autoIssuanceRequested
+
+    AllocationSourceStrategy allocationSourceStrategy
 
     // Removed comments, documents, events for the time being.
     static transients = [
@@ -185,6 +189,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         approvers joinTable: [name: "requisition_approvers", key: "requisition_id"]
         deliveryTypeCode enumType: "string"
         orderTypeCode enumType: "string"
+        allocationSourceStrategy enumType: "string"
     }
 
     static constraints = {
@@ -243,9 +248,11 @@ class Requisition implements Comparable<Requisition>, Serializable {
         deliveryTypeCode(nullable: true)
         orderTypeCode(nullable: true)
         priority(nullable: true)
-        autoAllocationEnabled(nullable: true)
+        autoAllocationRequested(nullable: true)
         partialAllocationAllowed(nullable: true)
         partialIssuanceAllowed(nullable: true)
+        allocationSourceStrategy(nullable: true)
+        autoIssuanceRequested(nullable: true)
     }
 
     Comment getRecentComment() {
@@ -463,8 +470,8 @@ class Requisition implements Comparable<Requisition>, Serializable {
             log.info "Requisition ${requestNumber} (${id}) not eligible for automatic allocation: status is ${status}, expected CREATED"
             return false
         }
-        if (!autoAllocationEnabled) {
-            log.info "Requisition ${requestNumber} (${id}) not eligible for automatic allocation: autoAllocationEnabled is not set"
+        if (!autoAllocationRequested) {
+            log.info "Requisition ${requestNumber} (${id}) not eligible for automatic allocation: autoAllocationRequested is not set"
             return false
         }
         if (!origin?.supports(ActivityCode.AUTOMATIC_ALLOCATION_ENABLED)) {
@@ -508,9 +515,11 @@ class Requisition implements Comparable<Requisition>, Serializable {
                 recipientProgram     : recipientProgram,
                 requisitionTemplate  : requisitionTemplate?.toJson(),
                 requisitionItems     : requisitionItems?.sort()?.collect { it?.toJson() },
-                autoAllocationEnabled   : autoAllocationEnabled,
+                autoAllocationRequested   : autoAllocationRequested,
                 partialAllocationAllowed: partialAllocationAllowed,
                 partialIssuanceAllowed  : partialIssuanceAllowed,
+                allocationSourceStrategy      : allocationSourceStrategy?.name(),
+                autoIssuanceRequested     : autoIssuanceRequested,
         ]
     }
 
@@ -530,9 +539,11 @@ class Requisition implements Comparable<Requisition>, Serializable {
             dateCreated: dateCreated?.format("MMM dd, yyyy"),
             lastUpdated: lastUpdated?.format("MMM dd, yyyy"),
             isPublished: isPublished,
-            autoAllocationEnabled: autoAllocationEnabled,
+            autoAllocationRequested: autoAllocationRequested,
             partialAllocationAllowed: partialAllocationAllowed,
             partialIssuanceAllowed: partialIssuanceAllowed,
+            allocationSourceStrategy: allocationSourceStrategy?.name(),
+            autoIssuanceRequested: autoIssuanceRequested,
         ]
     }
 }

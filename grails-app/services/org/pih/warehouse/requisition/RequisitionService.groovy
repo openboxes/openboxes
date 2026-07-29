@@ -225,7 +225,7 @@ class RequisitionService {
      * @return requisition list
      */
     List<Requisition> getRequisitionsPendingAutoAllocation(Location origin) {
-        return Requisition.findAllByOriginAndStatusAndAutoAllocationEnabled(origin, RequisitionStatus.CREATED, true)
+        return Requisition.findAllByOriginAndStatusAndAutoAllocationRequested(origin, RequisitionStatus.CREATED, true)
     }
 
     /**

@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.api
 
 import org.apache.commons.collections.FactoryUtils
@@ -6,6 +15,7 @@ import grails.util.Holders
 import grails.validation.Validateable
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.allocation.AllocationSourceStrategy
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
@@ -88,6 +98,8 @@ class StockMovement implements Validateable, Historizable {
     RequisitionType requestType
     RequisitionSourceType sourceType // temporary sourceType field for ELECTRONIC and PAPER types
     DeliveryTypeCode deliveryTypeCode
+    AllocationSourceStrategy allocationSourceStrategy
+    Boolean autoIssuanceRequested
     Order order
     Shipment shipment
     List documents
@@ -139,6 +151,8 @@ class StockMovement implements Validateable, Historizable {
         sourceType(nullable: true)
         referenceDocument(nullable: true)
         deliveryTypeCode(nullable: true)
+        allocationSourceStrategy(nullable: true)
+        autoIssuanceRequested(nullable: true)
 
         packingLocation(nullable: true)
         receivingLocation(nullable: true)
@@ -248,9 +262,11 @@ class StockMovement implements Validateable, Historizable {
             receivingLocation: receivingLocation?.toJson(LocationTypeCode.INTERNAL),
             packingLocation  : packingLocation?.toJson(LocationTypeCode.INTERNAL),
             loadingLocation  : loadingLocation?.toJson(LocationTypeCode.INTERNAL),
-            autoAllocationEnabled   : requisition?.autoAllocationEnabled,
+            autoAllocationRequested   : requisition?.autoAllocationRequested,
             partialAllocationAllowed: requisition?.partialAllocationAllowed,
             partialIssuanceAllowed  : requisition?.partialIssuanceAllowed,
+            allocationSourceStrategy      : requisition?.allocationSourceStrategy?.name(),
+            autoIssuanceRequested     : requisition?.autoIssuanceRequested,
             priority                : requisition?.priority,
             priorityLevel           : PriorityLevel.fromPriority(requisition?.priority)?.name(),
         ]
@@ -475,6 +491,8 @@ class StockMovement implements Validateable, Historizable {
             isShipped: shipment?.status?.code >= ShipmentStatusCode.SHIPPED,
             isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED,
             requestType: requisition?.type,
+            allocationSourceStrategy: requisition?.allocationSourceStrategy,
+            autoIssuanceRequested: requisition?.autoIssuanceRequested,
             lineItemCount: requisition.requisitionItemCount,
             approvers: requisition.approvers?.toList()
         )

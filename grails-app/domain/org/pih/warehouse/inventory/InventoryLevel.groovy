@@ -154,14 +154,14 @@ class InventoryLevel implements Comparable<InventoryLevel> {
             property "internalLocation"
         }.list() as List<Location>
 
-        Location defaultPutawayLocation = getDefaultPutawayLocation(facility, product)
+        Location defaultPutawayLocation = findPreferredBinLocation(facility, product)
         if (defaultPutawayLocation) {
             putawayLocations.add(0, defaultPutawayLocation)
         }
         return putawayLocations
     }
 
-    static Location getDefaultPutawayLocation(Location facility, Product product) {
+    static Location findPreferredBinLocation(Location facility, Product product) {
         return where {
             product == product && inventory == facility.inventory &&
                     internalLocation == null
