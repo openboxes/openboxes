@@ -15,10 +15,7 @@ import org.pih.warehouse.api.client.base.AuthenticatedApi
 class LocationApi extends AuthenticatedApi {
 
     Response getAvailableItems(String locationId, ResponseSpecification responseSpec) {
-        RequestSpecification requestSpec = new RequestSpecBuilder()
-                .addPathParam("id", locationId)
-                .build()
-        return request(requestSpec, responseSpec, Method.GET, "/locations/{id}/availableItems")
+        return getAvailableItems(locationId, null, null, responseSpec)
     }
 
     Response getAvailableItems(String locationId, Integer max, Integer offset, ResponseSpecification responseSpec) {
