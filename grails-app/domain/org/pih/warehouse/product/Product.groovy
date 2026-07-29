@@ -471,6 +471,16 @@ class Product implements Comparable, Serializable, DomainValidatable<ProductVali
         }
     }
 
+    /**
+     * Whether this product has more than one facility-level inventory level within the same facility.
+     */
+    boolean hasDuplicateFacilityInventoryLevels() {
+        return (inventoryLevels ?: [])
+                .findAll { !it.internalLocation }
+                .countBy { it.inventory?.id }
+                .any { inventoryId, count -> count > 1 }
+    }
+
     InventoryItem getDefaultInventoryItem() {
         return getInventoryItem(Constants.DEFAULT_LOT_NUMBER)
     }

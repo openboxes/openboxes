@@ -20,6 +20,7 @@
                     <warehouse:message code="inventoryLevel.facility.label"/> &rsaquo;
                     <warehouse:message code="inventoryLevel.location.label"/>
                 </th>
+                <th class="center"><warehouse:message code="inventoryLevel.identifier.label" default="Identifier"/></th>
                 <th class="center"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Class"/></th>
                 <th class="center"><warehouse:message code="inventoryLevel.preferredBinLocation.label" default="Putaway Location"/></th>
                 <th class="center border-right"><warehouse:message code="inventoryLevel.replenishmentLocation.label" default="Replenishment Location"/></th>
@@ -65,6 +66,9 @@
                             </span>
 
                         </g:if>
+                    </td>
+                    <td class="center middle">
+                        ${inventoryLevelInstance?.identifier}
                     </td>
                     <td class="center middle">
                         ${inventoryLevelInstance?.abcClass}
