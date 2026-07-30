@@ -55,8 +55,6 @@ class ProductAvailabilityApiControllerSpec extends Specification
         JSONArray data = json.getJSONArray("data")
         data.length() == 1
         JSONObject row = data.getJSONObject(0)
-        row.getJSONObject("location").getString("id") == location.id
-        row.getJSONObject("location").getString("name") == "Depot A"
         row.getString("productCode") == "ASA"
         row.getString("product.name") == "Aspirin"
         row.getString("lotNumber") == "LOT1"

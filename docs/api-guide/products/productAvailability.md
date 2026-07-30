@@ -26,11 +26,7 @@ $ curl -X GET -b cookies.txt \
       "binLocation.name": "Bin 1",
       "zone": null,
       "quantityAvailable": 10000,
-      "quantityOnHand": 10000,
-      "location": {
-        "id": "1",
-        "name": "Boston Headquarters"
-      }
+      "quantityOnHand": 10000
     }
   ],
   "totalCount": 1

@@ -39,8 +39,6 @@ class ProductAvailabilityApiSpec extends ApiSpec {
         data.size() >= 1
         def row = data.find { it.productCode == product.productCode }
         row != null
-        row.location.id == facility.id
-        row.location.name == facility.name
         row["product.name"] == product.name
         row.productCode == product.productCode
         row.quantityOnHand == 10

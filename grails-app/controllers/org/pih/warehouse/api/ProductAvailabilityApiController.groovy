@@ -27,17 +27,6 @@ class ProductAvailabilityApiController {
 
         List availableItems = productAvailabilityService.getAvailableItems(
                 location, null, false, true, command.paginationParams)
-        render([data: toAvailableItemsJson(location, availableItems), totalCount: availableItems.totalCount] as JSON)
-    }
-
-    private List toAvailableItemsJson(Location location, List availableItems) {
-        return availableItems.collect { AvailableItem availableItem ->
-            Map json = availableItem.toJson()
-            json.location = [
-                    id  : location.id,
-                    name: location.name
-            ]
-            return json
-        }
+        render([data: availableItems, totalCount: availableItems.totalCount] as JSON)
     }
 }
