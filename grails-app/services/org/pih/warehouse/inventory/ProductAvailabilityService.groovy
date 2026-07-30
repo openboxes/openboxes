@@ -825,11 +825,11 @@ class ProductAvailabilityService {
         return inventoryService.getQuantityAsAvailableItems(transactionEntries).findAll{ it.quantityOnHand != 0 }
     }
 
-    List getAvailableItems(Location location, List<String> productsIds, boolean excludeNegativeQuantity = false, boolean excludeZeroQuantity = false) {
+    List getAvailableItems(Location location, List<String> productsIds, boolean excludeNegativeQuantity = false, boolean excludeZeroQuantity = false, Map listArgs = null) {
         log.info("getQuantityOnHandByBinLocation: location=${location} product=${productsIds}")
 
         if (!location) {
-            return []
+            return listArgs?.max != null ? new PaginatedList([], 0) : []
         }
 
         String quantityCondition = ((excludeNegativeQuantity && excludeZeroQuantity) || excludeZeroQuantity) ? "and pa.quantityOnHand <> 0"
@@ -849,11 +849,16 @@ class ProductAvailabilityService {
                     pa.location = :location
                     ${quantityCondition}
                     ${productsIds ? "AND pa.product.id IN (:products)" : ""}
+                ${listArgs?.max != null ? "ORDER BY pa.id ASC" : ""}
         """
-        def results = ProductAvailability.executeQuery(sql, GormUtil.sanitizeExecuteQueryArgs(sql, [
-                location: location,
-                products: productsIds,
-        ]))
+        def results = ProductAvailability.executeQuery(
+                sql,
+                GormUtil.sanitizeExecuteQueryArgs(sql, [
+                        location: location,
+                        products: productsIds,
+                ]),
+                listArgs ?: [:]
+        )
 
         List<AvailableItem> data = results.collect {
             InventoryItem inventoryItem = it[0]
@@ -868,37 +873,23 @@ class ProductAvailabilityService {
                     quantityAvailable : quantityAvailableToPromise
             )
         }
+
+        if (listArgs?.max != null) {
+            String countSql = """
+                    SELECT count(*)
+                    FROM ProductAvailability pa
+                    WHERE pa.location = :location
+                    ${quantityCondition}
+                    ${productsIds ? "AND pa.product.id IN (:products)" : ""}
+            """
+            int totalCount = ProductAvailability.executeQuery(countSql, GormUtil.sanitizeExecuteQueryArgs(countSql, [
+                    location: location,
+                    products: productsIds,
+            ]))[0] as int
+            return new PaginatedList(data, totalCount)
+        }
+
         return data
-    }
-
-    Map getAvailableItemsByLocation(Location location, Integer max = null, Integer offset = null) {
-        if (!location) {
-            return [data: [], totalCount: 0]
-        }
-
-        Map listArgs = [:]
-        if (max != null) {
-            listArgs.max = max
-            listArgs.offset = offset ?: 0
-        }
-
-        List<ProductAvailability> rows = ProductAvailability.createCriteria().list(listArgs) {
-            eq("location", location)
-            // Filter out any items where QoH == 0 because we have no need to operate on items with no quantity.
-            ne("quantityOnHand", 0)
-            order("id", "asc")
-        }
-
-        int totalCount = (rows instanceof PagedResultList) ? rows.totalCount : rows.size()
-        List<AvailableItem> data = rows.collect { ProductAvailability pa ->
-            new AvailableItem(
-                    inventoryItem: pa.inventoryItem,
-                    binLocation: pa.binLocation,
-                    quantityOnHand: pa.quantityOnHand,
-                    quantityAvailable: pa.quantityAvailableToPromise
-            )
-        }
-        return [data: data, totalCount: totalCount]
     }
 
     Map<InventoryItem, Integer> getQuantityOnHandByInventoryItem(Location location, List<InventoryItem> inventoryItems = []) {

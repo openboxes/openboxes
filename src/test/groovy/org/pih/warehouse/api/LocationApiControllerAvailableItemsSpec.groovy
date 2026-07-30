@@ -7,6 +7,7 @@ import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import spock.lang.Specification
 
+import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.ProductAvailabilityService
@@ -41,10 +42,8 @@ class LocationApiControllerAvailableItemsSpec extends Specification
         )
 
         params.id = location.id
-        productAvailabilityServiceStub.getAvailableItemsByLocation(location, 10, 0) >> [
-                data      : [availableItem],
-                totalCount: 1
-        ]
+        productAvailabilityServiceStub.getAvailableItems(location, null, false, true, [max: 10, offset: 0]) >>
+                new PaginatedList([availableItem], 1)
 
         when:
         controller.availableItems()
@@ -88,17 +87,17 @@ class LocationApiControllerAvailableItemsSpec extends Specification
                 quantityAvailable: 5
         )
         params.id = location.id
-        Integer capturedMax = -1
-        productAvailabilityServiceStub.getAvailableItemsByLocation(location, _, _) >> { Location loc, Integer max, Integer offset ->
-            capturedMax = max
-            return [data: [availableItem], totalCount: 1]
+        boolean calledWithoutPagination = false
+        productAvailabilityServiceStub.getAvailableItems(location, null, false, true) >> {
+            calledWithoutPagination = true
+            return [availableItem]
         }
 
         when:
         controller.exportAvailableItems()
 
         then:
-        capturedMax == null
+        calledWithoutPagination
         JSONObject json = new JSONObject(controller.response.contentAsString)
         !json.has("totalCount")
         json.getJSONArray("data").length() == 1

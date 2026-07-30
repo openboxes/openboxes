@@ -51,8 +51,9 @@ class LocationApiController extends BaseDomainApiController {
         Integer max = Math.min(params.max ? params.int("max") : 10, 100)
         Integer offset = params.offset != null ? params.int("offset") : 0
 
-        Map result = productAvailabilityService.getAvailableItemsByLocation(location, max, offset)
-        render([data: toAvailableItemsJson(location, result.data), totalCount: result.totalCount] as JSON)
+        List availableItems = productAvailabilityService.getAvailableItems(
+                location, null, false, true, [max: max, offset: offset])
+        render([data: toAvailableItemsJson(location, availableItems), totalCount: availableItems.totalCount] as JSON)
     }
 
     def exportAvailableItems() {
@@ -61,8 +62,8 @@ class LocationApiController extends BaseDomainApiController {
             throw new ObjectNotFoundException(params.id, Location.class.toString())
         }
 
-        Map result = productAvailabilityService.getAvailableItemsByLocation(location, null, null)
-        render([data: toAvailableItemsJson(location, result.data)] as JSON)
+        List availableItems = productAvailabilityService.getAvailableItems(location, null, false, true)
+        render([data: toAvailableItemsJson(location, availableItems)] as JSON)
     }
 
     private List toAvailableItemsJson(Location location, List availableItems) {
