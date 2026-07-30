@@ -41,7 +41,7 @@
 .receiving-table {
   &--striped {
     .receiving-table__block--even {
-      --row-background: var(--blue-050);
+      --row-background: var(--blue-100);
 
       .rt-tr:not(.rt-tr-separator) {
         background-color: var(--row-background);

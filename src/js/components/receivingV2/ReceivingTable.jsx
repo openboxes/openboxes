@@ -109,14 +109,16 @@ const ReceivingTable = ({
           // A row starts a new block unless the previous top-level row is a REPLACED row
           // (which merges with its next row - this one - forming one block). First row,
           // row after a separator, or row after a non-REPLACED all start a new block.
-          const previous = entries[index - 1];
-          const startsNewBlock = !previous || previous.isSeparator || !isReplaced(previous);
+          const previousEntry = entries[index - 1];
+          const startsNewBlock = !previousEntry
+            || previousEntry.isSeparator
+            || !isReplaced(previousEntry);
           if (startsNewBlock) {
             acc.blockIndex += 1;
           }
           const className = acc.blockIndex % 2 === 0
             ? 'receiving-table__block--even'
-            : 'receiving-table__block--odd';
+            : '';
           acc.rows.push({
             ...buildRow(entry),
             className,

@@ -63,7 +63,7 @@ describe('getCommonPinningStyles', () => {
       flex: 100,
       width: 100,
       zIndex: 1,
-      background: 'white',
+      background: 'var(--row-background, white)',
     });
   });
 
