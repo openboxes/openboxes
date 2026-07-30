@@ -2,6 +2,7 @@ import {
   useCallback, useEffect, useRef, useState,
 } from 'react';
 
+import { AutosaveStatus } from 'consts/autosaveStatuses';
 import { updateNormalizedItem } from 'utils/normalizationUtils';
 
 /**
@@ -39,6 +40,11 @@ const useAutosaveRows = (initialRows) => {
   const setRowStatus = useCallback((rowId, saveStatus) =>
     setRows((state) => updateNormalizedItem(state, rowId, { saveStatus })), [setRows]);
 
+  const updateRowManually = useCallback((rowId, newData) =>
+    setRows((state) =>
+      updateNormalizedItem(state, rowId, { ...newData, saveStatus: AutosaveStatus.SAVED })),
+  [setRows]);
+
   const resetRows = useCallback((rows) => {
     stateRef.current = rows;
     setRowsState(rows);
@@ -57,6 +63,7 @@ const useAutosaveRows = (initialRows) => {
     setRowStatus,
     resetRows,
     isMounted,
+    updateRowManually,
   };
 };
 

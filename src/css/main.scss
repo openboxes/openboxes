@@ -1915,3 +1915,64 @@ input.hide-arrows::-webkit-inner-spin-button {
 input.hide-arrows[type=number] {
   -moz-appearance: textfield;
 }
+
+
+// Comment editor rendered as a popover anchored under the row's comment icon. The overlay stays
+// transparent (page remains visible) but still captures the outside click that closes it; the
+// content position (top/right) is applied inline from the measured icon rect.
+.ReactModal__Overlay.comment-modal__overlay {
+  background-color: transparent !important;
+}
+
+.comment-modal__overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: transparent;
+  z-index: 1050;
+  overflow-y: auto;
+}
+
+.comment-modal {
+  position: absolute;
+  width: 460px;
+  max-width: calc(100vw - 24px);
+  padding: 16px;
+  background-color: #fff;
+  border: 1px solid var(--blue-200);
+  border-radius: 8px;
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.25);
+  outline: none;
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__title {
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-600);
+  }
+
+  textarea {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+
+    &:focus {
+      border-color: var(--blue-primary);
+      box-shadow: 0 0 0 4px #0052CC26;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+  }
+}

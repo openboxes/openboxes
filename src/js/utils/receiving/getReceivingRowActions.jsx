@@ -5,7 +5,9 @@ import { RiChat1Line, RiDeleteBinLine, RiPencilLine } from 'react-icons/ri';
 /**
  * Builds the action descriptors for a receiving row, consumed by ActionsCell.
  */
-const getReceivingRowActions = ({ itemId, onOpenCommentModal, onOpenEditModal }) => [
+const getReceivingRowActions = ({
+  itemId, canComment, onOpenCommentModal, onOpenEditModal,
+}) => [
   {
     key: 'edit',
     icon: <RiPencilLine size={22} />,
@@ -13,13 +15,16 @@ const getReceivingRowActions = ({ itemId, onOpenCommentModal, onOpenEditModal })
     label: 'react.default.button.edit.label',
     defaultLabel: 'Edit',
   },
-  {
+  // The comment lives on a receipt item, so rows that don't back one (e.g. the struck-through
+  // header of a split group) don't offer it. The click event is forwarded so the popover can
+  // anchor itself under the icon that opened it.
+  ...(canComment ? [{
     key: 'comment',
     icon: <RiChat1Line size={22} />,
-    onClick: () => onOpenCommentModal?.(itemId),
+    onClick: (event) => onOpenCommentModal?.(itemId, event),
     label: 'react.receiving.comment.label',
     defaultLabel: 'Comment',
-  },
+  }] : []),
 ];
 
 /**

@@ -6,6 +6,7 @@ import DataTable from 'components/DataTable/v2/DataTable';
 import CommentModal from 'components/modals/CommentModal';
 import EditLineItemModal from 'components/receivingV2/editModal/EditLineItemModal';
 import ReceivingRowType from 'consts/receivingRowType';
+import useCommentModal from 'hooks/receiving/v2/useCommentModal';
 import useEditReceivingLineItemModal from 'hooks/receiving/v2/useEditReceivingLineItemModal';
 
 import 'components/receivingV2/receiving.scss';
@@ -16,16 +17,24 @@ const ReceivingTable = ({
   loading,
   receiptId,
   updateLineItem,
-  commentModal,
+  updateLineItemComment,
   removeSplitItem,
   loadReceipt,
   onLocationAutofill,
 }) => {
+  const commentModal = useCommentModal({ updateLineItemComment });
   const {
     isOpen: isCommentModalOpen,
-    openModal: openCommentModal,
+    itemId: commentItemId,
+    anchor: commentAnchor,
+    onOpenCommentModal,
     closeModal: closeCommentModal,
+    saveComment,
   } = commentModal;
+
+  // The comment is edited on the row's receipt item; the entity carries its id (to target the
+  // endpoint) and the saved comment (to prefill the form and choose create vs update).
+  const commentItem = commentItemId ? lineItemsState.entities[commentItemId] : null;
 
   const {
     isOpen: isEditModalOpen,
@@ -43,14 +52,14 @@ const ReceivingTable = ({
       entities: lineItemsState.entities,
       updateLineItem,
       removeSplitItem,
-      onOpenCommentModal: openCommentModal,
+      onOpenCommentModal,
       onOpenEditModal: openEditModal,
       onLocationAutofill,
     }),
     [
       lineItemsState.entities,
       updateLineItem,
-      openCommentModal,
+      onOpenCommentModal,
       openEditModal,
       removeSplitItem,
       onLocationAutofill,
@@ -131,7 +140,19 @@ const ReceivingTable = ({
         getSubRows={(row) => row.subRows}
         defaultExpandedSubRows
       />
-      <CommentModal isOpen={isCommentModalOpen} onClose={closeCommentModal} />
+      {isCommentModalOpen && commentItem && (
+        <CommentModal
+          onClose={closeCommentModal}
+          anchor={commentAnchor}
+          initialValue={commentItem.comment ?? ''}
+          onSave={(comment) => saveComment({
+            receiptItemId: commentItem.receiptItemId,
+            rowId: commentItemId,
+            comment,
+            isUpdate: commentItem.comment !== null,
+          })}
+        />
+      )}
       {isEditModalOpen && (
         <EditLineItemModal
           onClose={closeEditModal}
@@ -159,13 +180,9 @@ ReceivingTable.propTypes = {
   loading: PropTypes.bool.isRequired,
   receiptId: PropTypes.string,
   updateLineItem: PropTypes.func.isRequired,
+  updateLineItemComment: PropTypes.func.isRequired,
   removeSplitItem: PropTypes.func.isRequired,
   loadReceipt: PropTypes.func.isRequired,
-  commentModal: PropTypes.shape({
-    isOpen: PropTypes.bool.isRequired,
-    openModal: PropTypes.func.isRequired,
-    closeModal: PropTypes.func.isRequired,
-  }).isRequired,
   onLocationAutofill: PropTypes.func.isRequired,
 };
 

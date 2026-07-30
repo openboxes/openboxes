@@ -1,34 +1,83 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import PropTypes from 'prop-types';
 import Modal from 'react-modal';
 
 import Button from 'components/form-elements/Button';
+import useTranslate from 'hooks/useTranslate';
+import Textarea from 'utils/Textarea';
+import Translate from 'utils/Translate';
 
-// TODO: for now this only opens the modal. Real implementation will be done in OBPIH-7849.
-const CommentModal = ({ isOpen, onClose }) => {
-  if (!isOpen) {
-    return null;
-  }
+// Mirrors the ReceiptItem.comment domain constraint (maxSize: 255).
+const COMMENT_MAX_LENGTH = 255;
+
+/**
+ * A single-field comment editor rendered as a popover anchored under the element that opened it
+ * (see `anchor`). The caller mounts it only while open, so the draft is seeded from `initialValue`
+ * on each open. Presentational only: saving is delegated to `onSave`, which also closes it.
+ */
+const CommentModal = ({
+  onClose, anchor, initialValue, onSave,
+}) => {
+  const translate = useTranslate();
+  const [value, setValue] = useState(initialValue);
+
+  // `className`/`overlayClassName` drop react-modal's default inline styles, so the popover is
+  // fully styled in main.scss - only the anchor coordinates need to be applied inline.
+  const contentStyle = anchor ? { top: anchor.top, right: anchor.right } : {};
 
   return (
-    <Modal isOpen={isOpen} className="modal-content">
-      <div data-testid="receiving-comment-modal">
-        {/* Comment dialog content (editable/deletable comments) - OBPIH-7849 */}
-        <Button
-          label="react.default.button.close.label"
-          defaultLabel="Close"
-          variant="secondary"
-          onClick={onClose}
+    <Modal
+      isOpen
+      onRequestClose={onClose}
+      className="comment-modal"
+      overlayClassName="comment-modal__overlay"
+      style={{ content: contentStyle, overlay: { backgroundColor: 'red' } }}
+    >
+      <div className="comment-modal__body" data-testid="comment-modal">
+        <span className="comment-modal__title">
+          <Translate id="react.default.comment.label" defaultMessage="Comment" />
+        </span>
+        <Textarea
+          value={value}
+          onChange={setValue}
+          rows={4}
+          maxLength={COMMENT_MAX_LENGTH}
+          isResizable={false}
+          placeholder={translate('react.default.comment.placeholder.label', 'Add a comment...')}
         />
+        <div className="comment-modal__actions">
+          <Button
+            label="react.default.button.cancel.label"
+            defaultLabel="Cancel"
+            variant="transparent"
+            onClick={onClose}
+          />
+          <Button
+            label="react.default.button.save.label"
+            defaultLabel="Save"
+            variant="primary"
+            onClick={() => onSave(value.trim())}
+          />
+        </div>
       </div>
     </Modal>
   );
 };
 
 CommentModal.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
+  anchor: PropTypes.shape({
+    top: PropTypes.number,
+    right: PropTypes.number,
+  }),
+  initialValue: PropTypes.string,
+  onSave: PropTypes.func.isRequired,
+};
+
+CommentModal.defaultProps = {
+  anchor: null,
+  initialValue: '',
 };
 
 export default CommentModal;
