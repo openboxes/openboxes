@@ -1,0 +1,80 @@
+/**
+ * openboxes-theme.css — uniform design theme for legacy (GSP) pages.
+ *
+ * Restyles pages using layouts/custom.gsp to match the newer React pages
+ * (reference: /product/list). Specs are derived from the React stack's SCSS:
+ * src/css/colors.scss, src/css/main.scss, DataTable.scss, Layout/v2/styles.scss,
+ * form-elements/v2/style.scss.
+ *
+ * Loaded from custom.gsp AFTER <g:layoutHead/> (so it takes precedence over
+ * page-specific stylesheets) and BEFORE /common/_customCss.gsp (so per-warehouse
+ * header colors keep working).
+ *
+ * CSS only — no markup changes. Keep selectors as low-specificity as source
+ * order allows; prefer position over !important.
+ */
+
+/* ============================================================
+   1. DESIGN TOKENS
+   Authoritative copy of src/css/colors.scss :root for legacy pages.
+   (openboxes.css carries an older partial copy; this one wins by order.)
+   ============================================================ */
+:root {
+  --page-background: #F0F1F4;
+  --color-red: #C71610;
+  --color-green: #13AD60;
+  --color-yellow: #F3A157;
+
+  --red-100: #FFF1F0;
+  --red-200: #F36D5F;
+  --red-500: #E43B35;
+  --red-800: #C7161033;
+
+  --blue-primary: #0052CC;
+  --blue-100: #F7F9FD;
+  --blue-200: #F0F6FF;
+  --blue-201: #F4F7FE;
+  --blue-202: #E4F0FA;
+  --blue-300: #E9EDF4;
+  --blue-301: #D0DAED;
+  --blue-400: #7AA3F3;
+  --blue-401: #2192EE;
+  --blue-500: #2264E5;
+  --blue-700: #2B3674;
+  --blue-800: #202750;
+
+  --gray-100: #EAEAEA;
+  --gray-101: #F6F6F6;
+  --gray-102: #DFE4ED;
+  --gray-103: #EDEDED;
+  --gray-200: #D6D8DC;
+  --gray-250: #D0DAED;
+  --gray-300: #CED4DA;
+  --gray-301: #BFC3CB;
+  --gray-350: #9299A6;
+  --gray-400: #636D81;
+  --gray-401: #747C93;
+  --gray-500: #636D81;
+  --gray-600: #464F60;
+
+  --purple-100: #EFEDFD;
+  --purple-600: #644FFF;
+
+  --green-500: #30a64a;
+  --green-800: #13AD6033;
+
+  /* Shared effects (theme-local additions) */
+  --focus-ring: 0 1px 2px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(104, 113, 130, 0.16), 0 0 0 4px rgba(34, 100, 229, 0.15);
+  --card-radius: 4px;
+}
+
+/* Sections below are added phase by phase:
+   2. FOUNDATIONS (body, typography, links)
+   3a. BUTTONS
+   3b. FORMS (inputs, selects, chosen/select2)
+   3c. TABLES (.list, DataTables, footable)
+   3d. JQUERY UI (tabs, dialog, datepicker, autocomplete)
+   3e. PANELS & MESSAGES
+   3f. WIZARDS & TABS
+   4. PER-PAGE FIXES
+*/

@@ -49,6 +49,10 @@
     <!-- Grails Layout : write head element for page-->
     <g:layoutHead />
 
+    <%-- Uniform design theme: must load after layoutHead (overrides page-specific CSS)
+         and before customCss (per-warehouse colors keep precedence) --%>
+    <link rel="stylesheet" href="${resource(dir:'css',file:'openboxes-theme.css')}?v=${g.meta(name: 'app.version')}" type="text/css" media="all" />
+
     <g:render template="/common/customCss"/>
     <g:render template="/common/fullstory"/>
     <g:render template="/common/hotjar"/>
