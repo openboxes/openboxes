@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import useSaveComment from 'hooks/receiving/v2/useSaveComment';
 
@@ -7,12 +7,12 @@ const COMMENT_MODAL_GAP = 4;
 
 const useCommentModal = ({ updateLineItemComment }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [itemId, setItemId] = useState(null);
-  const [anchor, setAnchor] = useState(null);
+  const itemId = useRef(null);
+  const anchor = useRef(null);
 
   const openModal = useCallback((id, anchorPosition) => {
-    setItemId(id);
-    setAnchor(anchorPosition ?? null);
+    itemId.current = id;
+    anchor.current = anchorPosition ?? null;
     setIsOpen(true);
   }, []);
 
@@ -35,8 +35,8 @@ const useCommentModal = ({ updateLineItemComment }) => {
 
   return {
     isOpen,
-    itemId,
-    anchor,
+    itemId: itemId.current,
+    anchor: anchor.current,
     openModal,
     closeModal,
     onOpenCommentModal,

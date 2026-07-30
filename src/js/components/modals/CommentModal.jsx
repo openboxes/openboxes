@@ -23,7 +23,7 @@ const CommentModal = ({
   const [value, setValue] = useState(initialValue);
 
   // `className`/`overlayClassName` drop react-modal's default inline styles, so the popover is
-  // fully styled in receiving.scss - only the anchor coordinates need to be applied inline.
+  // fully styled in main.scss - only the anchor coordinates need to be applied inline.
   const contentStyle = anchor ? { top: anchor.top, right: anchor.right } : {};
 
   return (
@@ -34,9 +34,9 @@ const CommentModal = ({
       overlayClassName="comment-modal__overlay"
       style={{ content: contentStyle, overlay: { backgroundColor: 'red' } }}
     >
-      <div className="comment-modal__body" data-testid="receiving-comment-modal">
+      <div className="comment-modal__body" data-testid="comment-modal">
         <span className="comment-modal__title">
-          <Translate id="react.receiving.comment.label" defaultMessage="Comment" />
+          <Translate id="react.default.comment.label" defaultMessage="Comment" />
         </span>
         <Textarea
           value={value}
@@ -44,7 +44,7 @@ const CommentModal = ({
           rows={4}
           maxLength={COMMENT_MAX_LENGTH}
           isResizable={false}
-          placeholder={translate('react.receiving.comment.placeholder.label', 'Add a comment...')}
+          placeholder={translate('react.default.comment.placeholder.label', 'Add a comment...')}
         />
         <div className="comment-modal__actions">
           <Button
