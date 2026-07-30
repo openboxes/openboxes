@@ -91,6 +91,7 @@ h2 {
   height: auto;
   line-height: 24px;
   background: transparent;
+  border: none; /* legacy h2 carries a full 1px #D5D5D5 border */
   color: var(--blue-primary);
   font-size: 18px;
   font-weight: 600;
