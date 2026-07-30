@@ -464,6 +464,13 @@ class EditItemsPage extends Component {
       }, () => {
         if (!this.props.isPaginated || forceFetch) {
           this.fetchItems();
+          return;
+        }
+        if (totalCount === 0) {
+          // loadMoreRows does not fetch anything when the list is empty,
+          // so no other code path will hide the spinner or mark items as loaded.
+          this.setState({ hasItemsLoaded: true });
+          this.props.hideSpinner();
         }
       });
     }).catch(() => {
@@ -977,7 +984,7 @@ class EditItemsPage extends Component {
                 </button>
                 <button
                   type="submit"
-                  disabled={!this.state.hasItemsLoaded || showOnly}
+                  disabled={!this.state.hasItemsLoaded || showOnly || !this.state.totalCount}
                   onClick={() => {
                     if (!invalid) {
                       this.nextPage(values);
