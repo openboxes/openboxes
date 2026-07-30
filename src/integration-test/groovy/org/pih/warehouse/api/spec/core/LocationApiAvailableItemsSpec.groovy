@@ -4,9 +4,10 @@ import org.apache.http.HttpStatus
 import org.springframework.beans.factory.annotation.Autowired
 
 import org.pih.warehouse.api.client.core.LocationApiWrapper
-import org.pih.warehouse.api.client.core.UnauthenticatedLocationApi
 import org.pih.warehouse.api.spec.base.ApiSpec
 import org.pih.warehouse.api.util.ResponseSpecUtil
+
+import static io.restassured.RestAssured.given
 
 class LocationApiAvailableItemsSpec extends ApiSpec {
 
@@ -14,17 +15,16 @@ class LocationApiAvailableItemsSpec extends ApiSpec {
     LocationApiWrapper locationApiWrapper
 
     @Autowired
-    UnauthenticatedLocationApi unauthenticatedLocationApi
-
-    @Autowired
     ResponseSpecUtil responseSpecUtil
 
     void 'availableItems rejects unauthenticated requests'() {
         expect:
-        unauthenticatedLocationApi.getAvailableItems(
-                facility.id,
-                responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_UNAUTHORIZED)
-        )
+        given(unauthenticatedApiContext.baseRequestSpec)
+                .pathParam("id", facility.id)
+                .when()
+                    .get("/locations/{id}/availableItems")
+                .then()
+                    .spec(responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_UNAUTHORIZED))
     }
 
     void 'availableItems returns stock for the location with required fields'() {
