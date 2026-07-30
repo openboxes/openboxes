@@ -871,6 +871,13 @@ th a:hover {
   padding: 16px;
 }
 
-/* Section still to come:
+/* ============================================================
    4. PER-PAGE FIXES
-*/
+   ============================================================ */
+
+/* Login: #loginFormBox drew its own gray border inside the themed
+   .box card — drop it so the card reads as one surface */
+#loginFormBox {
+  border: none;
+  padding: 24px;
+}
