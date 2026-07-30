@@ -405,7 +405,7 @@ const useToCountTab = ({
         flexWidth: 150,
       },
     }),
-  ], [currentLocale, sort, order, translate]);
+  ], [currentLocale, sort, order, translationsFetched]);
 
   const emptyTableMessage = {
     id: 'react.cycleCount.table.emptyTable.label',

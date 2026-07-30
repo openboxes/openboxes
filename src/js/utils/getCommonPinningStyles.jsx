@@ -27,7 +27,7 @@ const getCommonPinningStyles = (
     width: flexWidth || column.getSize(),
     zIndex: isPinned ? 1 : 0,
     // #f8f9fa matches the `bg-light` class applied to disabled rows
-    background: isPinned && (isRowDisabled ? '#f8f9fa' : 'white'),
+    background: isPinned && (isRowDisabled ? '#f8f9fa' : 'var(--row-background, white)'),
   };
 };
 

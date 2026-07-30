@@ -72,6 +72,16 @@ const useReceivingColumns = ({
       value: translate('react.receiving.status.remaining.label', `${quantityRemainingFormatted} remaining`, [quantityRemainingFormatted]),
     };
   };
+  // Sum of split items quantityReceiving for a replaced row, read live from the entities
+  // map so editing a child updates the parent value.
+  const getSplitItemsQuantityReceivingSum = (item, entities) => {
+    const splitItemIds = entities?.[item.toggleRowId]?.splitItemIds ?? [];
+    return splitItemIds.reduce(
+      (sum, splitItemId) => sum + (Number(entities?.[splitItemId]?.quantityReceiving) || 0),
+      0,
+    );
+  };
+
   // Remaining quantity kept live while editing: the quantity the row can still take
   // (quantityAvailableToReceive, fixed at load) minus the quantity entered in the input.
   const getCurrentQuantityRemaining = (item, entities) => {
@@ -81,18 +91,19 @@ const useReceivingColumns = ({
     // A replaced row shows the status of the whole group, so it subtracts the quantities
     // of all its split items.
     if (item.rowType === ReceivingRowType.REPLACED) {
-      const splitItemIds = entities?.[item.toggleRowId]?.splitItemIds ?? [];
-      const quantityReceivingNow = splitItemIds
-        .reduce((sum, splitItemId) =>
-          sum + (Number(entities?.[splitItemId]?.quantityReceiving) || 0), 0);
-      return item.quantityAvailableToReceive - quantityReceivingNow;
+      return item.quantityAvailableToReceive - getSplitItemsQuantityReceivingSum(item, entities);
     }
     return item.quantityAvailableToReceive - (Number(item.quantityReceiving) || 0);
   };
 
-  // Replaced rows of a changed item show the original shipment values struck through
-  // (everything except quantities).
-  const struckIfReplaced = (rowType) => (rowType === ReceivingRowType.REPLACED ? 'receiving-table__struck' : '');
+  // Cross out a cell on the replaced row when its change flag (set by buildReplacedEntity)
+  // is true. `changeType` is one of 'productChanged' / 'lotChanged' / 'expirationChanged' /
+  // 'recipientChanged'.
+  const struckIfChanged = (item, changeType) => (
+    item?.rowType === ReceivingRowType.REPLACED && item?.[changeType]
+      ? 'receiving-table__struck'
+      : ''
+  );
 
   // Shipment-level columns (quantities, status) don't apply to the rows of a changes group.
   const isSplitItemOrToggle = (item) => item?.rowType === ReceivingRowType.SPLIT_ITEM
@@ -194,6 +205,7 @@ const useReceivingColumns = ({
                 isPackingListView={isPackingListView}
                 isExpanded={row.getIsExpanded()}
                 onToggle={row.getToggleExpandedHandler()}
+                className={struckIfChanged(item, 'productChanged')}
               />
             </>
           );
@@ -223,7 +235,7 @@ const useReceivingColumns = ({
           return (
             <MultilineCell
               value={item?.product?.name}
-              className={struckIfReplaced(item?.rowType)}
+              className={struckIfChanged(item, 'productChanged')}
               label="react.receiving.product.label"
               defaultLabel="Product"
               maxLines={2}
@@ -255,7 +267,7 @@ const useReceivingColumns = ({
             <ValueCell
               value={value}
               tooltipLabel={value}
-              className={struckIfReplaced(item?.rowType)}
+              className={struckIfChanged(item, 'lotChanged')}
               label="react.receiving.lotSerialNo.short.label"
               defaultLabel="Lot/SN"
               truncate
@@ -280,7 +292,7 @@ const useReceivingColumns = ({
             <ExpirationDateCell
               value={item?.expirationDate}
               localeKey={currentLocale}
-              className={struckIfReplaced(item?.rowType)}
+              className={struckIfChanged(item, 'expirationChanged')}
               label="react.receiving.expirationDate.short.label"
               defaultLabel="Exp Date"
               showExpiryStatus={item?.rowType !== ReceivingRowType.REPLACED}
@@ -306,7 +318,7 @@ const useReceivingColumns = ({
             <ValueCell
               value={recipient?.name}
               tooltipLabel={recipient?.name}
-              className={struckIfReplaced(item?.rowType)}
+              className={struckIfChanged(item, 'recipientChanged')}
               label="react.receiving.recipient.label"
               defaultLabel="Recipient"
               truncate
@@ -391,9 +403,22 @@ const useReceivingColumns = ({
         ),
         cell: ({ row, table }) => {
           const item = getItem(row, table);
-          if (item?.rowType === ReceivingRowType.REPLACED
-            || item?.rowType === ReceivingRowType.TOGGLE) {
+          if (item?.rowType === ReceivingRowType.TOGGLE) {
             return null;
+          }
+          // The replaced row shows the sum of its split items' receiving-now quantities
+          // as a read-only value (no input) so it stays out of the editing flow.
+          if (item?.rowType === ReceivingRowType.REPLACED) {
+            const sum = getSplitItemsQuantityReceivingSum(item, table.options.meta?.entities);
+            const value = formatNumber(sum);
+            return (
+              <ValueCell
+                value={value}
+                tooltipLabel={value}
+                label="react.receiving.receivingNow.label"
+                defaultLabel="Receiving Now"
+              />
+            );
           }
           return (
             <AutosaveQuantityInputCell

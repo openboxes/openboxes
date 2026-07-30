@@ -5,9 +5,9 @@ import PropTypes from 'prop-types';
 import DataTable from 'components/DataTable/v2/DataTable';
 import CommentModal from 'components/modals/CommentModal';
 import EditLineItemModal from 'components/receivingV2/editModal/EditLineItemModal';
-import ReceivingRowType from 'consts/receivingRowType';
 import useCommentModal from 'hooks/receiving/v2/useCommentModal';
 import useEditReceivingLineItemModal from 'hooks/receiving/v2/useEditReceivingLineItemModal';
+import buildReceivingTableRows from 'utils/receiving/buildReceivingTableRows';
 
 import 'components/receivingV2/receiving.scss';
 
@@ -66,52 +66,13 @@ const ReceivingTable = ({
     ],
   );
 
-  // Separators pass through without meta. Meta is only used to disable (grey out)
-  // fully received rows, and separators don't need disabling.
   const data = useMemo(
-    () => {
-      const { entities, ids } = lineItemsState;
-
-      const buildRow = (rowId) => ({
-        id: rowId,
-        meta: {
-          isRowDisabled: entities[rowId]?.isCompleted,
-          label: 'react.receiving.fullyReceived.label',
-          defaultMessage: 'This line has been fully received',
-        },
-      });
-
-      // Split item rows, rendered by TanStack as subRows of their toggle row.
-      // Split items of the same product merge into one visual block.
-      const buildSubRow = (splitItemId, splitItemIndex, splitItemIds) => {
-        const nextSplitItem = entities[splitItemIds[splitItemIndex + 1]];
-        return {
-          id: splitItemId,
-          mergeWithNextRow: Boolean(nextSplitItem && !nextSplitItem.isFirstSplitItem),
-          isLastSubRow: splitItemIndex === splitItemIds.length - 1,
-        };
-      };
-
-      return ids
-        // Split item rows render as subRows of their toggle row, not at the top level.
-        .filter((entry) => entities[entry]?.rowType !== ReceivingRowType.SPLIT_ITEM)
-        .map((entry) => {
-          if (entry.isSeparator) {
-            return entry;
-          }
-          return {
-            ...buildRow(entry),
-            subRows: entities[entry]?.splitItemIds?.map(buildSubRow),
-            // A replaced row is always followed by its toggle row and merges with it.
-            mergeWithNextRow: entities[entry]?.rowType === ReceivingRowType.REPLACED,
-          };
-        });
-    },
+    () => buildReceivingTableRows(lineItemsState),
     [lineItemsState],
   );
 
   return (
-    <div className="receiving-table">
+    <div className="receiving-table receiving-table--striped">
       <DataTable
         columns={columns}
         data={data}

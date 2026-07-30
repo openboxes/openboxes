@@ -39,6 +39,16 @@
 }
 
 .receiving-table {
+  &--striped {
+    .receiving-table__block--even {
+      --row-background: var(--blue-100);
+
+      .rt-tr:not(.rt-tr-separator) {
+        background-color: var(--row-background);
+      }
+    }
+  }
+
   // `.rt-table` is the only box that scrolls, both up/down (rows) and left/right (columns).
   // Both scrolls must be on the same box, otherwise pinned columns stop sticking when you
   // scroll sideways. Virtualization still works because the virtualizer uses this same box

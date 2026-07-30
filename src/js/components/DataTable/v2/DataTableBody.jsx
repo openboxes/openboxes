@@ -146,7 +146,7 @@ const DataTableBody = ({
               >
                 <div
                   key={rowData.id}
-                  className={`rt-tr-group cell-wrapper ${mergeWithNextRow ? 'rt-tr-group-merged' : ''} ${isLastSubRow ? 'rt-tr-group-last-subrow' : ''}`}
+                  className={`rt-tr-group cell-wrapper ${rowData.original?.className || ''} ${mergeWithNextRow ? 'rt-tr-group-merged' : ''} ${isLastSubRow ? 'rt-tr-group-last-subrow' : ''}`}
                   role="rowgroup"
                   {...rowProps}
                 >
