@@ -12,7 +12,6 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import org.grails.web.json.JSONObject
 import org.hibernate.Criteria
-import org.hibernate.ObjectNotFoundException
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
@@ -26,7 +25,6 @@ import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.product.ProductAvailability
-import org.pih.warehouse.inventory.ProductAvailabilityService
 import grails.core.GrailsApplication
 import org.springframework.web.multipart.MultipartFile
 import org.pih.warehouse.core.LocationStatus
@@ -40,37 +38,6 @@ class LocationApiController extends BaseDomainApiController {
     def inventoryService
     def documentService
     LocationDataService locationGormService
-    ProductAvailabilityService productAvailabilityService
-
-    /**
-     * Available items for a location (paginated). Excludes zero quantity-on-hand rows.
-     * No unbounded full-dump endpoint — large facilities make that a worst-case footgun;
-     * clients that need everything can page through this API.
-     */
-    def availableItems() {
-        Location location = Location.get(params.id)
-        if (!location) {
-            throw new ObjectNotFoundException(params.id, Location.class.toString())
-        }
-
-        Integer max = Math.min(params.max ? params.int("max") : 10, 100)
-        Integer offset = params.offset != null ? params.int("offset") : 0
-
-        List availableItems = productAvailabilityService.getAvailableItems(
-                location, null, false, true, [max: max, offset: offset])
-        render([data: toAvailableItemsJson(location, availableItems), totalCount: availableItems.totalCount] as JSON)
-    }
-
-    private List toAvailableItemsJson(Location location, List availableItems) {
-        return availableItems.collect { AvailableItem availableItem ->
-            Map json = availableItem.toJson()
-            json.location = [
-                    id  : location.id,
-                    name: location.name
-            ]
-            return json
-        }
-    }
 
     def read() {
         Location location = Location.get(params.id)

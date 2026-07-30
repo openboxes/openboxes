@@ -13,8 +13,8 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.product.Product
 
-class LocationApiControllerAvailableItemsSpec extends Specification
-        implements DataTest, ControllerUnitTest<LocationApiController> {
+class ProductAvailabilityApiControllerSpec extends Specification
+        implements DataTest, ControllerUnitTest<ProductAvailabilityApiController> {
 
     ProductAvailabilityService productAvailabilityServiceStub
 
@@ -27,7 +27,7 @@ class LocationApiControllerAvailableItemsSpec extends Specification
         controller.productAvailabilityService = productAvailabilityServiceStub
     }
 
-    void 'availableItems returns flat rows with required fields for a valid location'() {
+    void 'list returns flat rows with required fields for a valid facility'() {
         given:
         Location location = new Location(name: "Depot A").save(validate: false)
         Product product = new Product(name: "Aspirin", productCode: "ASA").save(validate: false)
@@ -41,12 +41,12 @@ class LocationApiControllerAvailableItemsSpec extends Specification
                 quantityAvailable: 8
         )
 
-        params.id = location.id
+        params.facilityId = location.id
         productAvailabilityServiceStub.getAvailableItems(location, null, false, true, [max: 10, offset: 0]) >>
                 new PaginatedList([availableItem], 1)
 
         when:
-        controller.availableItems()
+        controller.list()
 
         then:
         JSONObject json = new JSONObject(controller.response.contentAsString)
@@ -64,12 +64,12 @@ class LocationApiControllerAvailableItemsSpec extends Specification
         !row.has("zones")
     }
 
-    void 'availableItems throws when location is missing'() {
+    void 'list throws when facility is missing'() {
         given:
-        params.id = "missing-id"
+        params.facilityId = "missing-id"
 
         when:
-        controller.availableItems()
+        controller.list()
 
         then:
         thrown(ObjectNotFoundException)

@@ -1,4 +1,4 @@
-package org.pih.warehouse.api.client.core
+package org.pih.warehouse.api.client.inventory
 
 import groovy.transform.InheritConstructors
 import io.restassured.builder.RequestSpecBuilder
@@ -11,21 +11,21 @@ import org.pih.warehouse.api.client.base.AuthenticatedApi
 
 @TestComponent
 @InheritConstructors
-class LocationApi extends AuthenticatedApi {
+class ProductAvailabilityApi extends AuthenticatedApi {
 
-    Response getAvailableItems(String locationId, ResponseSpecification responseSpec) {
-        return getAvailableItems(locationId, null, null, responseSpec)
+    Response list(String facilityId, ResponseSpecification responseSpec) {
+        return list(facilityId, null, null, responseSpec)
     }
 
-    Response getAvailableItems(String locationId, Integer max, Integer offset, ResponseSpecification responseSpec) {
+    Response list(String facilityId, Integer max, Integer offset, ResponseSpecification responseSpec) {
         RequestSpecBuilder builder = new RequestSpecBuilder()
-                .addPathParam("id", locationId)
+                .addPathParam("facilityId", facilityId)
         if (max != null) {
             builder.addQueryParam("max", max)
         }
         if (offset != null) {
             builder.addQueryParam("offset", offset)
         }
-        return request(builder.build(), responseSpec, Method.GET, "/locations/{id}/availableItems")
+        return request(builder.build(), responseSpec, Method.GET, "/facilities/{facilityId}/availableItems")
     }
 }

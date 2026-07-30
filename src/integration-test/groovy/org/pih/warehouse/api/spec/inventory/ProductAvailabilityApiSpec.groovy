@@ -1,38 +1,38 @@
-package org.pih.warehouse.api.spec.core
+package org.pih.warehouse.api.spec.inventory
 
 import org.apache.http.HttpStatus
 import org.springframework.beans.factory.annotation.Autowired
 
-import org.pih.warehouse.api.client.core.LocationApiWrapper
+import org.pih.warehouse.api.client.inventory.ProductAvailabilityApiWrapper
 import org.pih.warehouse.api.spec.base.ApiSpec
 import org.pih.warehouse.api.util.ResponseSpecUtil
 
 import static io.restassured.RestAssured.given
 
-class LocationApiAvailableItemsSpec extends ApiSpec {
+class ProductAvailabilityApiSpec extends ApiSpec {
 
     @Autowired
-    LocationApiWrapper locationApiWrapper
+    ProductAvailabilityApiWrapper productAvailabilityApiWrapper
 
     @Autowired
     ResponseSpecUtil responseSpecUtil
 
-    void 'availableItems rejects unauthenticated requests'() {
+    void 'list rejects unauthenticated requests'() {
         expect:
         given(unauthenticatedApiContext.baseRequestSpec)
-                .pathParam("id", facility.id)
+                .pathParam("facilityId", facility.id)
                 .when()
-                    .get("/locations/{id}/availableItems")
+                    .get("/facilities/{facilityId}/availableItems")
                 .then()
                     .spec(responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_UNAUTHORIZED))
     }
 
-    void 'availableItems returns stock for the location with required fields'() {
+    void 'list returns stock for the facility with required fields'() {
         given:
         setStock(product, null, null, 10)
 
         when:
-        def response = locationApiWrapper.getAvailableItemsOK(facility.id)
+        def response = productAvailabilityApiWrapper.listOK(facility.id)
         List data = response.jsonPath().getList("data")
 
         then:
@@ -52,30 +52,30 @@ class LocationApiAvailableItemsSpec extends ApiSpec {
         !row.containsKey("zones")
     }
 
-    void 'availableItems excludes zero quantity on hand rows'() {
+    void 'list excludes zero quantity on hand rows'() {
         given:
         setStock(product, null, null, 0)
 
         when:
-        def response = locationApiWrapper.getAvailableItemsOK(facility.id)
+        def response = productAvailabilityApiWrapper.listOK(facility.id)
         List data = response.jsonPath().getList("data")
 
         then:
         !data.any { it.productCode == product.productCode && it.quantityOnHand == 0 }
     }
 
-    void 'availableItems returns empty data when location has no matching stock'() {
+    void 'list returns empty data when facility has no matching stock'() {
         // facility/product start with no stock after ApiSpec setup deletes transactions
         when:
-        def response = locationApiWrapper.getAvailableItemsOK(facility.id)
+        def response = productAvailabilityApiWrapper.listOK(facility.id)
         List data = response.jsonPath().getList("data")
 
         then:
         data.findAll { it.productCode == product.productCode }.isEmpty()
     }
 
-    void 'availableItems returns error for unknown location id'() {
+    void 'list returns error for unknown facility id'() {
         expect:
-        locationApiWrapper.getAvailableItemsExpectingStatus(INVALID_ID, HttpStatus.SC_NOT_FOUND)
+        productAvailabilityApiWrapper.listExpectingStatus(INVALID_ID, HttpStatus.SC_NOT_FOUND)
     }
 }
