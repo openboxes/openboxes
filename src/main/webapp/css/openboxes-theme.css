@@ -107,6 +107,26 @@ h1 {
 }
 
 /* ============================================================
+   2b. PAGE RHYTHM
+   React list pages use a 32px page gutter (.list-page-main) with
+   content in cards. Give legacy pages the same gutter and a
+   consistent vertical rhythm.
+   ============================================================ */
+
+#content > .body {
+  padding: 0 32px 24px;
+}
+
+h1 {
+  margin: 16px 0 8px;
+}
+
+.buttonBar,
+.button-bar {
+  padding: 16px 0 8px;
+}
+
+/* ============================================================
    3e. PANELS & MESSAGES (early: boxes frame everything else)
    ============================================================ */
 
@@ -116,7 +136,7 @@ h1 {
   background-color: #ffffff;
   border: none;
   border-radius: var(--card-radius);
-  margin: 8px 0;
+  margin: 16px 0;
 }
 
 .box > h2 {
@@ -484,6 +504,10 @@ th a:hover {
 /* Row separators + hover, scoped to data tables */
 .list table tbody td {
   border-bottom: 1px solid var(--gray-100);
+}
+
+.list td {
+  vertical-align: middle;
 }
 
 .list tbody tr:hover {
@@ -870,6 +894,74 @@ th a:hover {
   border: none;
   border-radius: 0 0 4px 4px;
   padding: 16px;
+}
+
+/* ============================================================
+   3g. BADGES & FOOTER (consistency pass)
+   Legacy .tag chips (statuses + product tags) wore the 2010 lime
+   green; map the family to the token badge formula used by the
+   React value-indicator (tinted bg + saturated text, radius 4).
+   ============================================================ */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  float: none;
+  border: none;
+  border-radius: 4px;
+  padding: 2px 8px;
+  background: var(--green-800);
+  color: var(--color-green);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+.tag a {
+  color: inherit;
+  font-size: 12px;
+}
+
+.tag-success,
+.tag-alert {
+  background: var(--green-800);
+  color: var(--color-green);
+  border: none;
+}
+
+.tag-danger {
+  background: var(--red-100);
+  color: var(--red-500);
+  border: none;
+}
+
+.tag-info {
+  background: var(--blue-200);
+  color: var(--blue-700);
+  border: none;
+}
+
+.tag-warning {
+  background: #F3A15733; /* --color-yellow @ 20% */
+  color: #A16207;        /* readable amber derived from --color-yellow */
+  border: none;
+}
+
+/* Legacy footer (#ft) → React .footer spec: white, quiet top border, 12px */
+#ft {
+  background: #ffffff;
+  border-top: 1px solid var(--gray-200);
+  color: var(--gray-401);
+  font-size: 12px;
+  padding: 12px 32px;
+  margin-top: 24px;
+}
+
+#ft a {
+  color: var(--gray-401);
 }
 
 /* ============================================================

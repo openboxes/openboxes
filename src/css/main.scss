@@ -25,7 +25,7 @@ body {
   font-size: 1.5em !important;
   font-weight: bold;
   color: $gray-zeta !important;
-  font-family: "Trebuchet MS", Trebuchet, Calibri, Tahoma, Segoe;
+  font-family: inherit;
   text-transform: lowercase;
 }
 
@@ -141,7 +141,7 @@ body {
 .footer {
   bottom: 0;
   vertical-align: middle;
-  border-top: 1px solid #aaa;
+  border-top: 1px solid var(--gray-200);
   width: 100%;
   text-align: center;
   font-size: 12px;
@@ -254,7 +254,8 @@ body {
 }
 
 .create-form {
-  border: 1px solid $gray-alpha;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
   padding-top: 50px;
   padding-bottom: 30px;
 
@@ -269,7 +270,8 @@ body {
 }
 
 .create-form {
-  border: 1px solid $gray-alpha;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
   padding-top: 50px;
   padding-bottom: 30px;
 
@@ -492,12 +494,14 @@ body {
   padding: 15px 15px;
 
   .shipment-status {
-    border: 1px solid #a5d24a;
-    border-radius: 2px;
-    padding: 5px;
-    background: #cde69c;
-    color: #638421;
-    font-size: 15px;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 8px;
+    background: var(--green-800);
+    color: var(--color-green);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
     margin-right: 20px;
     margin-top: 4px;
   }
@@ -585,7 +589,8 @@ a.disabled {
   left: 50%;
   right: auto;
   bottom: auto;
-  border: 1px solid $gray-alpha;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
   background: white;
   overflow: auto;
   border-radius: 4px;
@@ -832,7 +837,8 @@ div.crossed-out .table-inner-row:before {
   left: 50%;
   right: auto;
   bottom: auto;
-  border: 1px solid $gray-alpha;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
   background: white;
   overflow: auto;
   border-radius: 4px;
