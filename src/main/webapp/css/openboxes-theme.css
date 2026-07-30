@@ -488,6 +488,14 @@ th {
   font-weight: 700;
   font-size: 14px;
   border-top: none;
+  /* Headers never soft-wrap into word stacks; intentional <br>s still break */
+  white-space: nowrap;
+}
+
+/* Wide tables scroll inside their card instead of stretching the page
+   (matches the React DataTable behavior) */
+.box {
+  overflow-x: auto;
 }
 
 th a:link,
@@ -508,6 +516,22 @@ th a:hover {
 
 .list td {
   vertical-align: middle;
+}
+
+/* Stop columns collapsing into word stacks: data tables size to their
+   content (columns get natural width, icon columns stay narrow), fill
+   the card at minimum, and the card's horizontal scroll absorbs any
+   excess. Very long text still wraps via the per-cell cap. */
+.box > table,
+.list > table,
+.list table {
+  width: max-content;
+  min-width: 100%;
+}
+
+.box table td,
+.list table td {
+  max-width: 340px;
 }
 
 .list tbody tr:hover {
@@ -894,6 +918,24 @@ th a:hover {
   border: none;
   border-radius: 0 0 4px 4px;
   padding: 16px;
+}
+
+/* In-table action menus (.actions, jQuery-positioned) → dropdown spec */
+.actions {
+  background-color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.15);
+  padding: 4px;
+}
+
+.actions a {
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.actions a:hover {
+  background-color: var(--blue-200);
 }
 
 /* ============================================================
