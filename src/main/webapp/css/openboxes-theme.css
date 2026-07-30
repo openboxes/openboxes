@@ -68,13 +68,756 @@
   --card-radius: 4px;
 }
 
-/* Sections below are added phase by phase:
-   2. FOUNDATIONS (body, typography, links)
+/* ============================================================
+   2. FOUNDATIONS
+   Page sits on --page-background; content in white radius-4 cards.
+   Base UI text: Inter 14px, --gray-600 on data surfaces.
+   ============================================================ */
+
+body {
+  background: var(--page-background);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #333;
+}
+
+a {
+  color: var(--blue-primary);
+}
+
+/* Page/section headings — React section-title spec (v2/styles.scss).
+   The legacy global h2 is a 40px gray bar (openboxes.css:1529); flatten it. */
+h2 {
+  height: auto;
+  line-height: 24px;
+  background: transparent;
+  color: var(--blue-primary);
+  font-size: 18px;
+  font-weight: 600;
+  text-shadow: none;
+  padding: 16px;
+  margin: 0;
+}
+
+h1 {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--blue-800);
+}
+
+/* ============================================================
+   3e. PANELS & MESSAGES (early: boxes frame everything else)
+   ============================================================ */
+
+/* .box — the universal legacy panel → white card, radius 4, no border */
+.box,
+.box-white {
+  background-color: #ffffff;
+  border: none;
+  border-radius: var(--card-radius);
+  margin: 8px 0;
+}
+
+.box > h2 {
+  border-bottom: 1px solid var(--gray-250);
+}
+
+/* Breathing room for non-table box content (tables stay flush like the
+   React list card; forms/filter stacks get the card's 16px inset) */
+.box > form,
+.box > fieldset,
+.box > p,
+.box > .filter-list {
+  display: block;
+  padding: 8px 16px 16px;
+}
+
+/* Legacy definition-style form rows (tr.prop > td.name/td.value):
+   kill the gray label column and dotted row separators */
+.prop {
+  border-top: none;
+}
+
+.prop .name,
+.prop td.name {
+  background-color: transparent;
+  color: var(--gray-600);
+  font-weight: 500;
+  text-align: right;
+  padding-right: 16px;
+}
+
+.prop .value,
+.prop td.value {
+  background-color: transparent;
+}
+
+/* Flash/info/error/warning boxes → React alert spec: white card,
+   1px severity border, radius 4. Keep the silk icons for now. */
+.message {
+  background-color: #ffffff;
+  border: 1px solid var(--gray-500);
+  border-radius: 4px;
+  color: var(--gray-600);
+  font-size: 14px;
+  padding: 12px 16px 12px 32px;
+  background-position: 10px 50%;
+  background-repeat: no-repeat;
+}
+
+.warning {
+  background-color: #ffffff;
+  border: 1px solid var(--color-yellow);
+  border-radius: 4px;
+  color: var(--gray-600);
+  font-size: 14px;
+  padding: 12px 16px 12px 32px;
+  background-position: 10px 50%;
+  background-repeat: no-repeat;
+}
+
+div.errors {
+  background-color: #ffffff;
+  border: 1px solid var(--color-red);
+  border-radius: 4px;
+  color: var(--red-500);
+  font-size: 14px;
+  padding: 12px 16px;
+}
+
+/* ============================================================
    3a. BUTTONS
-   3b. FORMS (inputs, selects, chosen/select2)
-   3c. TABLES (.list, DataTables, footable)
-   3d. JQUERY UI (tabs, dialog, datepicker, autocomplete)
-   3e. PANELS & MESSAGES
-   3f. WIZARDS & TABS
+   Legacy .button is CSS3-GitHub-Buttons (gray gradient, blue-gradient
+   hover) — openboxes.css:2724. Default maps to the React SECONDARY
+   variant; explicit submits map to PRIMARY.
+   ============================================================ */
+
+.button,
+.buttons input,
+input[type="submit"],
+button {
+  background-color: var(--blue-100);
+  background-image: none;
+  color: var(--gray-600);
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.02em;
+  text-shadow: none;
+  cursor: pointer;
+}
+
+.button:hover,
+.button:focus,
+.buttons input:hover,
+input[type="submit"]:hover,
+button:hover {
+  background-color: var(--blue-100);
+  background-image: none;
+  border: none;
+  color: var(--blue-500);
+  text-shadow: none;
+  text-decoration: none;
+}
+
+.button:active,
+.button.active {
+  background-color: var(--blue-100);
+  background-image: none;
+  border: none;
+  color: var(--blue-500);
+  outline: 1px solid var(--blue-primary);
+}
+
+/* Form submit actions are the "primary" of their page */
+input[type="submit"],
+.buttons input.save {
+  background-color: var(--blue-primary);
+  color: #ffffff;
+}
+
+input[type="submit"]:hover,
+.buttons input.save:hover {
+  background-color: var(--blue-500);
+  color: #ffffff;
+}
+
+/* Delete stays a danger action */
+.buttons input.delete {
+  background-color: #ffffff;
+  color: var(--color-red);
+  border: 1px solid var(--color-red);
+}
+
+.buttons input.delete:hover {
+  background: var(--red-100);
+  color: var(--color-red);
+}
+
+/* Icon images inside legacy buttons */
+.button img {
+  vertical-align: text-bottom;
+}
+
+/* Legacy affirmative/destructive semantics → React primary / danger-outline */
+button.positive,
+.button.positive,
+input.positive,
+.button.primary {
+  background-color: var(--blue-primary);
+  background-image: none;
+  color: #ffffff;
+  border: none;
+}
+
+button.positive:hover,
+.button.positive:hover,
+input.positive:hover,
+.button.primary:hover {
+  background-color: var(--blue-500);
+  background-image: none;
+  color: #ffffff;
+}
+
+button.negative,
+.button.negative,
+input.negative,
+.button.danger {
+  background-color: #ffffff;
+  background-image: none;
+  color: var(--color-red);
+  border: 1px solid var(--color-red);
+}
+
+button.negative:hover,
+.button.negative:hover,
+input.negative:hover,
+.button.danger:hover,
+.button.danger:focus,
+.button.danger:active {
+  background: var(--red-100);
+  background-image: none;
+  color: var(--color-red);
+  border-color: var(--color-red);
+}
+
+/* Legacy .button carries margin: 5px — tighten to the React 8px gap rhythm */
+.button {
+  margin: 2px 8px 2px 0;
+}
+
+/* buttonBar action links (span.linkButton > a with silk-icon classes)
+   → secondary buttons; keep the icon, inset it like button text */
+.linkButton a {
+  display: inline-block;
+  background-color: var(--blue-100);
+  background-position: 12px 50%;
+  background-repeat: no-repeat;
+  color: var(--gray-600);
+  border-radius: 4px;
+  padding: 8px 16px 8px 34px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  text-decoration: none;
+  margin-right: 8px;
+}
+
+.linkButton a:hover {
+  color: var(--blue-500);
+  text-decoration: none;
+}
+
+/* ============================================================
+   3b. FORMS
+   React v2 input spec: 36px, radius 4, 1px --gray-200, Inter 14,
+   --gray-600 text, blue border + layered focus ring on focus.
+   ============================================================ */
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input.text,
+input.large,
+textarea,
+select {
+  background-color: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--gray-600);
+}
+
+select {
+  padding: 6px 4px;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input.text:focus,
+input.large:focus,
+textarea:focus,
+select:focus {
+  outline: 0;
+  border: 1px solid var(--blue-primary);
+  box-shadow: var(--focus-ring);
+}
+
+input[type="checkbox"],
+input[type="radio"],
+input.checkbox,
+input.radio {
+  accent-color: var(--blue-primary);
+  width: 16px;
+  height: 16px;
+}
+
+input[readonly="readonly"],
+input[readonly] {
+  background-color: var(--gray-101);
+  color: var(--gray-400);
+}
+
+label {
+  font-size: 14px;
+}
+
+/* ============================================================
+   3c. TABLES
+   React table spec (DataTable.scss): header bg --blue-100, bold,
+   --gray-600, 12px padding, no column borders; body rows white with
+   1px --gray-100 bottom border; hover #F8FAFF; no zebra striping.
+   NOTE: legacy GSPs also use <table> for form layout — row borders are
+   scoped to list-ish tables only.
+   ============================================================ */
+
+td, th {
+  font: 400 14px/20px 'Inter', sans-serif;
+  color: var(--gray-600);
+  padding: 8px 12px;
+}
+
+th {
+  background-color: var(--blue-100);
+  color: var(--gray-600);
+  font-weight: 700;
+  font-size: 14px;
+  border-top: none;
+}
+
+th a:link,
+th a:visited,
+th a:hover {
+  color: var(--gray-600);
+  font-size: 14px;
+}
+
+th a:hover {
+  color: var(--blue-primary);
+}
+
+/* Row separators + hover, scoped to data tables */
+.list table tbody td {
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.list tbody tr:hover {
+  background: #F8FAFF;
+}
+
+/* Kill zebra striping (React reference has none) */
+.odd {
+  background: transparent;
+}
+
+.even {
+  background: transparent;
+}
+
+/* Pagination → React pagination spec (#FBFCFC bar, 12px, quiet controls) */
+.paginateButtons {
+  background: #FBFCFC;
+  border: none;
+  color: var(--gray-600);
+  font-size: 12px;
+  padding: 12px;
+}
+
+.paginateButtons a {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: 2px;
+  color: var(--gray-600);
+  padding: 4px 8px;
+}
+
+.paginateButtons a:hover {
+  color: var(--blue-primary);
+  border-color: var(--blue-primary);
+}
+
+.paginateButtons span.currentStep {
+  color: var(--blue-primary);
+  font-weight: 600;
+}
+
+/* ============================================================
+   3d. JQUERY UI (smoothness theme overrides) + CHOSEN + SELECT2
+   Widget chrome: white surfaces, --gray-200 borders, radius 4;
+   active/selected states use --blue-primary / --blue-200;
+   pickers' headers use --blue-100 like table headers.
+   ============================================================ */
+
+.ui-widget {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+}
+
+.ui-widget input,
+.ui-widget select,
+.ui-widget textarea,
+.ui-widget button {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+}
+
+.ui-widget-content {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  color: var(--gray-600);
+}
+
+.ui-corner-all,
+.ui-corner-top,
+.ui-corner-bottom {
+  border-radius: 4px;
+}
+
+.ui-widget-header {
+  background: var(--blue-100);
+  border: none;
+  color: var(--gray-600);
+  font-weight: 600;
+}
+
+.ui-state-default,
+.ui-widget-content .ui-state-default,
+.ui-widget-header .ui-state-default {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+.ui-state-hover,
+.ui-widget-content .ui-state-hover,
+.ui-state-focus,
+.ui-widget-content .ui-state-focus {
+  background: var(--blue-100);
+  border: 1px solid var(--gray-200);
+  color: var(--blue-primary);
+}
+
+.ui-state-active,
+.ui-widget-content .ui-state-active {
+  background: var(--blue-200);
+  border: 1px solid var(--blue-primary);
+  color: var(--blue-primary);
+}
+
+.ui-state-highlight,
+.ui-widget-content .ui-state-highlight {
+  background: var(--blue-200);
+  border: 1px solid var(--blue-301);
+  color: var(--gray-600);
+}
+
+.ui-state-error,
+.ui-widget-content .ui-state-error {
+  background: var(--red-100);
+  border: 1px solid var(--color-red);
+  color: var(--red-500);
+}
+
+/* Dialogs */
+.ui-dialog {
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.15);
+  padding: 0;
+}
+
+.ui-dialog .ui-dialog-titlebar {
+  background: #ffffff;
+  border-bottom: 1px solid var(--gray-250);
+  border-radius: 4px 4px 0 0;
+  color: var(--blue-primary);
+  font-size: 18px;
+  font-weight: 600;
+  padding: 16px;
+}
+
+/* Datepicker */
+.ui-datepicker {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+}
+
+.ui-datepicker .ui-datepicker-header {
+  background: var(--blue-100);
+  border: none;
+}
+
+.ui-datepicker td a,
+.ui-datepicker td span {
+  text-align: center;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+.ui-datepicker td a.ui-state-default {
+  background: transparent;
+  border: none;
+}
+
+.ui-datepicker td a.ui-state-hover {
+  background: var(--blue-200);
+  border: none;
+  color: var(--blue-primary);
+}
+
+.ui-datepicker td a.ui-state-active {
+  background: var(--blue-primary);
+  border: none;
+  color: #ffffff;
+}
+
+/* Autocomplete / menus */
+.ui-autocomplete.ui-menu,
+.ui-menu {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.15);
+}
+
+.ui-menu .ui-menu-item a {
+  color: var(--gray-600);
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+.ui-menu .ui-menu-item a.ui-state-hover,
+.ui-menu .ui-menu-item a.ui-state-focus {
+  background: var(--blue-200);
+  border: none;
+  color: var(--gray-600);
+  margin: 0;
+}
+
+/* Progressbar */
+.ui-progressbar .ui-progressbar-value {
+  background: var(--blue-primary);
+  border: none;
+}
+
+/* CHOSEN single/multi selects → input spec */
+.chzn-container-single .chzn-single {
+  height: 36px;
+  line-height: 34px;
+  background: #ffffff;
+  background-image: none;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  box-shadow: none;
+  color: var(--gray-600);
+  font-size: 14px;
+  padding: 0 12px;
+}
+
+.chzn-container-single .chzn-single div {
+  width: 24px;
+}
+
+.chzn-container-single .chzn-single div b {
+  background: none;
+}
+
+.chzn-container-single .chzn-single div b::before {
+  content: '';
+  display: block;
+  margin: 15px auto 0;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid var(--gray-400);
+}
+
+.chzn-container .chzn-drop {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.15);
+}
+
+.chzn-container-single .chzn-search input {
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  background-image: none;
+  padding: 6px 8px;
+  font-family: 'Inter', sans-serif;
+}
+
+.chzn-container .chzn-results .highlighted {
+  background: var(--blue-200);
+  background-image: none;
+  color: var(--gray-600);
+}
+
+.chzn-container-active .chzn-single,
+.chzn-container-active .chzn-single-with-drop {
+  border: 1px solid var(--blue-primary);
+  box-shadow: var(--focus-ring);
+  background-image: none;
+}
+
+.chzn-container-multi .chzn-choices {
+  background-image: none;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.chzn-container-multi .chzn-choices .search-choice {
+  background: var(--blue-100);
+  background-image: none;
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+  color: var(--gray-600);
+  padding: 4px 20px 4px 8px;
+}
+
+/* SELECT2 (v4) → input spec */
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+  height: 36px;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: 34px;
+  color: var(--gray-600);
+  font-size: 14px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 34px;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--single {
+  border: 1px solid var(--blue-primary);
+  box-shadow: var(--focus-ring);
+}
+
+.select2-dropdown {
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.15);
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background-color: var(--blue-200);
+  color: var(--gray-600);
+}
+
+.select2-container--default .select2-results__option[aria-selected=true] {
+  background-color: var(--blue-100);
+}
+
+/* ============================================================
+   3f. TABS & WIZARDS
+   Tab strips → quiet underline tabs (matches the app navbar's
+   active-link treatment): no boxes, active = blue text + 2px bar.
+   ============================================================ */
+
+.ui-tabs {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.ui-tabs .ui-tabs-nav,
+.tabs > ul {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--gray-200);
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.ui-tabs .ui-tabs-nav li,
+.tabs > ul > li {
+  background: transparent;
+  border: none;
+  margin: 0;
+  border-radius: 0;
+}
+
+.ui-tabs .ui-tabs-nav li a,
+.tabs > ul > li > a {
+  color: var(--gray-400);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 16px;
+  border: none;
+  border-bottom: 2px solid transparent;
+}
+
+.ui-tabs .ui-tabs-nav li a:hover,
+.tabs > ul > li > a:hover {
+  color: var(--blue-primary);
+  text-decoration: none;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected,
+.ui-tabs .ui-tabs-nav li.ui-state-active {
+  background: transparent;
+  border: none;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a,
+.ui-tabs .ui-tabs-nav li.ui-state-active a,
+.tabs > ul > li.ui-tabs-selected > a,
+.tabs > ul > li.ui-state-active > a {
+  color: var(--blue-primary);
+  border-bottom: 2px solid var(--blue-primary);
+}
+
+.ui-tabs .ui-tabs-panel {
+  background: #ffffff;
+  border: none;
+  border-radius: 0 0 4px 4px;
+  padding: 16px;
+}
+
+/* Section still to come:
    4. PER-PAGE FIXES
 */
