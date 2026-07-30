@@ -146,19 +146,19 @@ const useReceivingActions = (view) => {
   // to enter split flow (any change triggers it) and to know which cells to strike through
   // on the replaced row.
   const getReceiptItemChanges = (receiptItem, shipmentItem) => ({
-    productChanged: differsFromShipment(
+    product: differsFromShipment(
       receiptItem?.productLot?.product?.id,
       shipmentItem.productLot?.product?.id,
     ),
-    lotChanged: differsFromShipment(
+    lotNumber: differsFromShipment(
       receiptItem?.productLot?.lotNumber,
       shipmentItem.productLot?.lotNumber,
     ),
-    expirationChanged: differsFromShipment(
+    expirationDate: differsFromShipment(
       receiptItem?.productLot?.expirationDate,
       shipmentItem.productLot?.expirationDate,
     ),
-    recipientChanged: differsFromShipment(
+    recipient: differsFromShipment(
       receiptItem?.recipient?.id,
       shipmentItem.recipientId,
     ),
@@ -182,18 +182,20 @@ const useReceivingActions = (view) => {
     const changesPerItem = currentReceiptItems.map(
       (item) => getReceiptItemChanges(item, summary.shipmentItem),
     );
-    const anyItemHasChange = (changeType) =>
-      changesPerItem.some((itemChanges) => itemChanges[changeType]);
-    const anyLotOrExpirationChange = anyItemHasChange('lotChanged')
-      || anyItemHasChange('expirationChanged');
+    // Checks whether any receipt item of the shipment item has the given field dirty.
+    const isAnyReceiptItemOfShipmentItemDirty = (dirtyField) =>
+      changesPerItem.some((itemChanges) => itemChanges[dirtyField]);
+    const anyLotOrExpirationChange = isAnyReceiptItemOfShipmentItemDirty('lotNumber')
+      || isAnyReceiptItemOfShipmentItemDirty('expirationDate');
     return {
       ...lineItem,
       rowType: ReceivingRowType.REPLACED,
       isCompleted: false,
-      productChanged: anyItemHasChange('productChanged'),
-      lotChanged: anyItemHasChange('productChanged') || anyLotOrExpirationChange,
-      expirationChanged: anyItemHasChange('productChanged') || anyLotOrExpirationChange,
-      recipientChanged: anyItemHasChange('recipientChanged'),
+      productChanged: isAnyReceiptItemOfShipmentItemDirty('product'),
+      lotChanged: isAnyReceiptItemOfShipmentItemDirty('product') || anyLotOrExpirationChange,
+      expirationChanged:
+        isAnyReceiptItemOfShipmentItemDirty('product') || anyLotOrExpirationChange,
+      recipientChanged: isAnyReceiptItemOfShipmentItemDirty('recipient'),
       // The replaced row shows the status of the whole group, so its available quantity
       // covers all its split items (buildLineItem only adds back the own receipt item,
       // which a replaced row doesn't have).
