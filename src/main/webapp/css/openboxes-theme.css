@@ -310,6 +310,57 @@ input.negative:hover,
   margin: 2px 8px 2px 0;
 }
 
+/* GH-buttons semantic icons: approve (Save, 43 uses) is the page's
+   primary action; trash/remove are destructive. The rest sprite-shifts
+   to the white icon variant so it reads on the blue background. */
+.button.icon.approve {
+  background-color: var(--blue-primary);
+  background-image: none;
+  color: #ffffff;
+  border: none;
+}
+
+.button.icon.approve:hover,
+.button.icon.approve:focus,
+.button.icon.approve:active {
+  background-color: var(--blue-500);
+  background-image: none;
+  color: #ffffff;
+}
+
+.button.approve.icon:before {
+  background-position: -12px -48px; /* white check at rest (blue bg) */
+}
+
+.button.icon.trash,
+.button.icon.remove {
+  background-color: #ffffff;
+  background-image: none;
+  color: var(--color-red);
+  border: 1px solid var(--color-red);
+}
+
+.button.icon.trash:hover,
+.button.icon.trash:focus,
+.button.icon.trash:active,
+.button.icon.remove:hover,
+.button.icon.remove:focus,
+.button.icon.remove:active {
+  background: var(--red-100);
+  background-image: none;
+  color: var(--color-red);
+  border-color: var(--color-red);
+}
+
+/* Their sprites must stay dark on the light danger background */
+.button.trash.icon:hover:before,
+.button.trash.icon:focus:before,
+.button.trash.icon:active:before { background-position: 0 -336px; }
+
+.button.remove.icon:hover:before,
+.button.remove.icon:focus:before,
+.button.remove.icon:active:before { background-position: 0 -60px; }
+
 /* buttonBar action links (span.linkButton > a with silk-icon classes)
    → secondary buttons; keep the icon, inset it like button text */
 .linkButton a {
