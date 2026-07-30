@@ -78,25 +78,4 @@ class LocationApiAvailableItemsSpec extends ApiSpec {
         expect:
         locationApiWrapper.getAvailableItemsExpectingStatus(INVALID_ID, HttpStatus.SC_NOT_FOUND)
     }
-
-    void 'exportAvailableItems returns JSON for the location'() {
-        given:
-        setStock(product, null, null, 7)
-
-        when:
-        def response = locationApiWrapper.exportAvailableItemsOK(facility.id)
-        List data = response.jsonPath().getList("data")
-
-        then:
-        def row = data.find { it.productCode == product.productCode }
-        row != null
-        row.location.id == facility.id
-        row.quantityOnHand == 7
-        !row.containsKey("zones")
-    }
-
-    void 'exportAvailableItems returns error for unknown location id'() {
-        expect:
-        locationApiWrapper.exportAvailableItemsExpectingStatus(INVALID_ID, HttpStatus.SC_NOT_FOUND)
-    }
 }

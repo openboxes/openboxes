@@ -42,6 +42,11 @@ class LocationApiController extends BaseDomainApiController {
     LocationDataService locationGormService
     ProductAvailabilityService productAvailabilityService
 
+    /**
+     * Available items for a location (paginated). Excludes zero quantity-on-hand rows.
+     * No unbounded full-dump endpoint — large facilities make that a worst-case footgun;
+     * clients that need everything can page through this API.
+     */
     def availableItems() {
         Location location = Location.get(params.id)
         if (!location) {
@@ -54,16 +59,6 @@ class LocationApiController extends BaseDomainApiController {
         List availableItems = productAvailabilityService.getAvailableItems(
                 location, null, false, true, [max: max, offset: offset])
         render([data: toAvailableItemsJson(location, availableItems), totalCount: availableItems.totalCount] as JSON)
-    }
-
-    def exportAvailableItems() {
-        Location location = Location.get(params.id)
-        if (!location) {
-            throw new ObjectNotFoundException(params.id, Location.class.toString())
-        }
-
-        List availableItems = productAvailabilityService.getAvailableItems(location, null, false, true)
-        render([data: toAvailableItemsJson(location, availableItems)] as JSON)
     }
 
     private List toAvailableItemsJson(Location location, List availableItems) {

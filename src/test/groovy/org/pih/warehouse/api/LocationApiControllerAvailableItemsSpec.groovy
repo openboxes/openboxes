@@ -74,44 +74,4 @@ class LocationApiControllerAvailableItemsSpec extends Specification
         then:
         thrown(ObjectNotFoundException)
     }
-
-    void 'exportAvailableItems returns flat JSON without pagination args'() {
-        given:
-        Location location = new Location(name: "Depot").save(validate: false)
-        Product product = new Product(name: "Ibuprofen", productCode: "IBU").save(validate: false)
-        InventoryItem inventoryItem = new InventoryItem(product: product, lotNumber: "L2").save(validate: false)
-        AvailableItem availableItem = new AvailableItem(
-                inventoryItem: inventoryItem,
-                binLocation: null,
-                quantityOnHand: 5,
-                quantityAvailable: 5
-        )
-        params.id = location.id
-        boolean calledWithoutPagination = false
-        productAvailabilityServiceStub.getAvailableItems(location, null, false, true) >> {
-            calledWithoutPagination = true
-            return [availableItem]
-        }
-
-        when:
-        controller.exportAvailableItems()
-
-        then:
-        calledWithoutPagination
-        JSONObject json = new JSONObject(controller.response.contentAsString)
-        !json.has("totalCount")
-        json.getJSONArray("data").length() == 1
-        json.getJSONArray("data").getJSONObject(0).getJSONObject("location").getString("id") == location.id
-    }
-
-    void 'exportAvailableItems throws when location is missing'() {
-        given:
-        params.id = "missing-id"
-
-        when:
-        controller.exportAvailableItems()
-
-        then:
-        thrown(ObjectNotFoundException)
-    }
 }

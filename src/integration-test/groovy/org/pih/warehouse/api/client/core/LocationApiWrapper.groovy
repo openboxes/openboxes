@@ -18,15 +18,7 @@ class LocationApiWrapper extends ApiWrapper<LocationApi> {
         return api.getAvailableItems(locationId, max, offset, responseSpecUtil.OK_RESPONSE_SPEC)
     }
 
-    Response exportAvailableItemsOK(String locationId) {
-        return api.exportAvailableItems(locationId, responseSpecUtil.OK_RESPONSE_SPEC)
-    }
-
     Response getAvailableItemsExpectingStatus(String locationId, int statusCode) {
         return api.getAvailableItems(locationId, responseSpecUtil.buildStatusCodeResponseSpec(statusCode))
-    }
-
-    Response exportAvailableItemsExpectingStatus(String locationId, int statusCode) {
-        return api.exportAvailableItems(locationId, responseSpecUtil.buildStatusCodeResponseSpec(statusCode))
     }
 }
