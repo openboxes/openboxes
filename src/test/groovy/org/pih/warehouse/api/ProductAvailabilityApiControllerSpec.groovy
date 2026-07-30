@@ -9,6 +9,7 @@ import spock.lang.Specification
 
 import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.AvailableItemsListCommand
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.product.Product
@@ -41,12 +42,12 @@ class ProductAvailabilityApiControllerSpec extends Specification
                 quantityAvailable: 8
         )
 
-        params.facilityId = location.id
+        AvailableItemsListCommand command = new AvailableItemsListCommand(facilityId: location.id)
         productAvailabilityServiceStub.getAvailableItems(location, null, false, true, [max: 10, offset: 0]) >>
                 new PaginatedList([availableItem], 1)
 
         when:
-        controller.list()
+        controller.list(command)
 
         then:
         JSONObject json = new JSONObject(controller.response.contentAsString)
@@ -66,10 +67,10 @@ class ProductAvailabilityApiControllerSpec extends Specification
 
     void 'list throws when facility is missing'() {
         given:
-        params.facilityId = "missing-id"
+        AvailableItemsListCommand command = new AvailableItemsListCommand(facilityId: "missing-id")
 
         when:
-        controller.list()
+        controller.list(command)
 
         then:
         thrown(ObjectNotFoundException)

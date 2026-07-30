@@ -4,6 +4,7 @@ import grails.converters.JSON
 import org.hibernate.ObjectNotFoundException
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.AvailableItemsListCommand
 import org.pih.warehouse.inventory.ProductAvailabilityService
 
 /**
@@ -18,17 +19,14 @@ class ProductAvailabilityApiController {
      * No unbounded full-dump endpoint — large facilities make that a worst-case footgun;
      * clients that need everything can page through this API.
      */
-    def list() {
-        Location location = Location.get(params.facilityId)
+    def list(AvailableItemsListCommand command) {
+        Location location = Location.get(command.facilityId)
         if (!location) {
-            throw new ObjectNotFoundException(params.facilityId, Location.class.toString())
+            throw new ObjectNotFoundException(command.facilityId, Location.class.toString())
         }
 
-        Integer max = Math.min(params.max ? params.int("max") : 10, 100)
-        Integer offset = params.offset != null ? params.int("offset") : 0
-
         List availableItems = productAvailabilityService.getAvailableItems(
-                location, null, false, true, [max: max, offset: offset])
+                location, null, false, true, command.paginationParams)
         render([data: toAvailableItemsJson(location, availableItems), totalCount: availableItems.totalCount] as JSON)
     }
 
