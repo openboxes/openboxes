@@ -456,7 +456,9 @@ label {
 td, th {
   font: 400 14px/20px 'Inter', sans-serif;
   color: var(--gray-600);
-  padding: 8px 12px;
+  /* React spec is 12px; 8px horizontal keeps dense legacy 15-column
+     lists from overflowing the viewport at 1440 */
+  padding: 8px;
 }
 
 th {
