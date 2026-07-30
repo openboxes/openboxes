@@ -26,7 +26,7 @@ const useSaveComment = ({ updateLineItemComment, onClose }) => {
       const { data: { data } } = isUpdate
         ? await receivingApi.updateReceiptItemComment(receiptItemId, { comment })
         : await receivingApi.createReceiptItemComment(receiptItemId, { comment });
-      updateLineItemComment(rowId, data?.comment ?? comment);
+      updateLineItemComment(rowId, data?.comment);
       onClose();
     } finally {
       dispatch(hideSpinner());

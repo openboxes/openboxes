@@ -149,7 +149,7 @@ const ReceivingTable = ({
             receiptItemId: commentItem.receiptItemId,
             rowId: commentItemId,
             comment,
-            isUpdate: Boolean(commentItem.comment),
+            isUpdate: commentItem.comment !== null,
           })}
         />
       )}

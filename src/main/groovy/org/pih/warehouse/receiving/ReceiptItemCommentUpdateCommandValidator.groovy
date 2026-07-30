@@ -27,7 +27,7 @@ class ReceiptItemCommentUpdateCommandValidator implements ObjectValidator<Receip
             return null
         }
 
-        if (!command.receiptItem.comment) {
+        if (command.receiptItem.comment == null) {
             return rejectField("receiptItem", command.receiptItem,
                     "receiptItemCommentUpdateCommand.receiptItem.commentNotFound",
                     [command.receiptItem.id])

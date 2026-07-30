@@ -27,7 +27,6 @@ const useAutosaveRows = (initialRows) => {
   const [rowsState, setRowsState] = useState(initialRows);
   const stateRef = useRef(initialRows);
   const mountedRef = useRef(true);
-  console.log(rowsState);
 
   const setRows = useCallback((updater) => {
     stateRef.current = updater(stateRef.current);
