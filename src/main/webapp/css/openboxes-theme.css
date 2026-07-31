@@ -1953,6 +1953,32 @@ th a:hover {
   min-height: 0;
 }
 
+/* stockCard.gsp caps zone names at 50px and bin names at 100px, which
+   ellipsizes any real bin ("Cold Chain Room B / Rack 14 …") down to a few
+   characters. Let them wrap as ordinary text — the cell's own max-width
+   still bounds the column. Two classes deep so it outranks that layout. */
+/* stockCard.gsp caps zone names at 50px and bin names at 100px, so a real
+   bin ("Cold Chain Room B / Rack 14 / Shelf 3 …") ellipsises down to about a
+   dozen characters. Wrap within a bounded column instead: the stock card's
+   table then fits its panel outright, and the two wide tables that use this
+   markup (stock history, record inventory) already scroll horizontally, so
+   they simply carry the full name. Two classes deep to outrank that layout. */
+.box table .line {
+  display: block;
+  min-width: 0;
+  max-width: 200px;
+}
+
+.box table .line .line-base,
+.box table .line .line-extension {
+  display: inline;
+  max-width: none;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+}
+
 .summary .title,
 div.title {
   font-size: 18px;
