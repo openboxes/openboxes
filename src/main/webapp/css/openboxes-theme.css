@@ -1838,8 +1838,11 @@ div.title {
   flex-direction: column;
   align-items: stretch;
   text-align: left;
-  margin: 10px 10px 16px;
-  padding: 8px 5px 0 0;
+  margin: 10px 10px 0;
+  /* bottom spacing as padding, not margin: a bottom margin collapses
+     straight out of the card and leaves the last button flush with
+     the card's edge */
+  padding: 8px 5px 20px 0;
   /* the markup separates buttons with &nbsp;, which is not collapsible
      and would otherwise become a phantom flex item between them. It is
      zero-height with font-size 0, but it would still consume `gap`
@@ -2076,8 +2079,9 @@ table.dataTable thead th.sorting_desc {
   position: sticky;
   left: 0;
   background-color: #ffffff;
-  /* below the navbar's z-index 4 so it tucks under, not over */
-  z-index: 1;
+  /* above positioned form controls (select2/Chosen wrappers) that
+     would otherwise slide over the header, but below the navbar's 4 */
+  z-index: 3;
 }
 
 .dataTables_wrapper .dataTables_filter input,
