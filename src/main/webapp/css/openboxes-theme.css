@@ -961,6 +961,19 @@ th {
   scrollbar-width: thin;
 }
 
+/* ...but only data panels should scroll. Setting overflow-x: auto also
+   forces overflow-y to auto, which gives form panels a pointless
+   vertical scrollbar and clips their select dropdowns. Form layouts
+   (tr.prop), filter panels and anything with a Chosen dropdown opt out. */
+.box:has(tr.prop),
+.box:has(.filters),
+.box:has(.filter-list),
+.box:has(.chosen-container),
+.box:has(.chzn-container) {
+  overflow: visible;
+  background-image: none;
+}
+
 th a:link,
 th a:visited,
 th a:hover {
@@ -1773,7 +1786,11 @@ div.title {
   margin: 10px 10px 16px;
 }
 
-/* ...and their action rows are a .center div rather than .buttons */
+/* Action rows come in three flavours across the filter panels:
+   .buttons, a .center div inside .prop, and .filter-list-item.center.
+   All of them stack full width, inset with their fields. */
+.filter-list-item.center:has(> .button),
+.filter-list-item.center:has(> button),
 .filters .prop > .center {
   display: flex;
   flex-direction: column;
@@ -1784,13 +1801,17 @@ div.title {
 
 .filters .prop > .center > .button,
 .filters .prop > .center > button,
-.filters .prop > .center > .action-menu {
+.filters .prop > .center > .action-menu,
+.filter-list-item.center > .button,
+.filter-list-item.center > button,
+.filter-list-item.center > .action-menu {
   width: 100%;
   margin: 0 0 16px !important;
   font-size: 14px;
 }
 
-.filters .prop > .center > *:last-child {
+.filters .prop > .center > *:last-child,
+.filter-list-item.center > *:last-child {
   margin-bottom: 0 !important;
 }
 
