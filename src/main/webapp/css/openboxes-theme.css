@@ -565,17 +565,53 @@ input.negative:hover,
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3'/%3E%3C/svg%3E");
 }
 
-/* Colorful silk PNGs inside buttons: mute to a uniform monochrome so
-   they sit quietly next to the line icons (CSS cannot swap img src) */
-.button img,
-.buttons img,
-.linkButton a img,
-.actions img {
+/* Colorful silk PNGs ANYWHERE: mute to a uniform monochrome 14px so
+   they sit quietly next to the line icons (CSS cannot swap img src).
+   Catch-all by src path — buttons, headers, tabs, cells, links alike. */
+img[src*="/icons/silk/"] {
   width: 14px;
   height: 14px;
   object-fit: contain;
   filter: grayscale(1) contrast(0.85);
   opacity: 0.75;
+}
+
+/* Non-silk pictographs under images/icons/ (truck, handtruck,
+   ShipmentType*, …): same monochrome treatment, natural size capped */
+img[src*="/icons/"]:not([src*="/icons/silk/"]) {
+  max-height: 20px;
+  filter: grayscale(1) contrast(0.85);
+  opacity: 0.75;
+}
+
+/* Exception: document-type glyphs keep their color in content areas
+   (PDF red / Excel green is information, not chrome) — any path */
+img[src*="acrobat"],
+img[src*="excel"],
+img[src*="/icons/pdf"],
+img[src*="_word"] {
+  filter: none;
+  opacity: 1;
+}
+
+/* ...but stay muted when used inside buttons (there they are chrome) */
+.button img[src*="/icons/silk/"],
+.buttons img[src*="/icons/silk/"] {
+  filter: grayscale(1) contrast(0.85);
+  opacity: 0.75;
+}
+
+/* Silk icons inside headings (login lock, card-header glyphs like
+   shipment Details / Lead Time) get the same monochrome treatment */
+h2 img,
+h3 img,
+.box > h2 img {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+  filter: grayscale(1) contrast(0.85);
+  opacity: 0.7;
+  vertical-align: -2px;
 }
 
 /* ...and flip them white inside primary (blue) buttons */
@@ -586,6 +622,52 @@ button[value="run"] img,
 .button.icon.approve img {
   filter: brightness(0) invert(1);
   opacity: 0.9;
+}
+
+/* buttonBar links: silk background icons exist for ~30 classes (home,
+   status bullets, clock, lorry, cog, …) — strip all to clean text
+   links; only the two core actions below keep a line icon */
+.linkButton a:not(.list):not(.new):not(.create) {
+  background-image: none;
+  padding-left: 16px;
+}
+
+/* Sortable-column arrows (skin/sorted_*.gif) → line chevrons */
+th.asc a {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23636D81' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 14l6-6 6 6'/%3E%3C/svg%3E");
+  background-size: 12px 12px;
+  background-position: right center;
+  background-repeat: no-repeat;
+  padding-right: 16px;
+}
+
+th.desc a {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23636D81' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 10l6 6 6-6'/%3E%3C/svg%3E");
+  background-size: 12px 12px;
+  background-position: right center;
+  background-repeat: no-repeat;
+  padding-right: 16px;
+}
+
+/* Error-list exclamation (skin png) → plain list inside the bordered box */
+div.errors li {
+  background-image: none;
+  padding-left: 16px;
+}
+
+/* Legacy .buttons rows: drop the shadow.jpg gradient strip */
+.buttons {
+  background: none;
+  border: none;
+}
+
+/* Autocomplete inputs: silk magnifier (inline template CSS) → line icon.
+   input.autocomplete out-ranks the template's .autocomplete class. */
+input.autocomplete {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239299A6' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15.5 15.5L20.5 20.5'/%3E%3C/svg%3E");
+  background-size: 14px 14px;
+  background-position: right 10px center;
+  background-repeat: no-repeat;
 }
 
 /* buttonBar link icons (background silk on a.list / a.new) → SVG */
@@ -1283,6 +1365,21 @@ th a:hover {
 #loginBox input.text {
   text-align: left;
   padding: 6px 12px;
+}
+
+/* The header's silk padlock PNG → line-style lock in the title blue */
+#loginBox h2 img {
+  display: none;
+}
+
+#loginBox h2::before {
+  content: "";
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  vertical-align: -3px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230052CC' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4.5' y='10.5' width='15' height='9.5' rx='2'/%3E%3Cpath d='M8 10.5V7.5a4 4 0 0 1 8 0v3M12 14.5v2'/%3E%3C/svg%3E") center / 18px no-repeat;
 }
 
 #loginBox button[type="submit"] {
