@@ -143,9 +143,14 @@ select:not([multiple]):not([size]) {
   position: absolute;
 }
 
+// Non-clickable menu section headers: small-caps label, clearly
+// distinct from the clickable items beneath them
 .subsection-title {
-  color: $gray-zeta;
-  font-size: 1.1em;
+  color: var(--gray-350);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   vertical-align: middle;
   padding: 5px 0 7px 0;
   white-space: pre;

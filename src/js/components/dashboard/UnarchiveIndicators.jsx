@@ -1,6 +1,10 @@
 import React from 'react';
 
 import _ from 'lodash';
+import {
+  RiArchiveLine, RiBarChartHorizontalLine, RiBarChartLine, RiLineChartLine,
+  RiPieChartLine, RiRefreshLine, RiTableLine,
+} from 'react-icons/ri';
 import PropTypes from 'prop-types';
 import ReactLoading from 'react-loading';
 import { getTranslate } from 'react-localize-redux';
@@ -65,19 +69,16 @@ const ArchivedGraph = (props) => {
   let graph;
 
   if (props.type === 'line') {
-    graph = <i className="fa fa-line-chart" style={{ color: getRandomColor() }} />;
+    graph = <RiLineChartLine style={{ color: getRandomColor() }} />;
   } else if (props.type === 'bar') {
-    graph = <i className="fa fa-bar-chart" style={{ color: getRandomColor() }} />;
+    graph = <RiBarChartLine style={{ color: getRandomColor() }} />;
   } else if (props.type === 'numbersCustomColors') {
-    graph = <i className="fa fa-bar-chart" style={{ color: getRandomColor() }} />;
+    graph = <RiBarChartLine style={{ color: getRandomColor() }} />;
   } else if (props.type === 'doughnut') {
-    graph = <i className="fa fa-pie-chart" style={{ color: getRandomColor() }} />;
+    graph = <RiPieChartLine style={{ color: getRandomColor() }} />;
   } else if (props.type === 'horizontalBar') {
     graph = (
-      <i
-        className="fa fa-bar-chart horizontal-bar"
-        style={{ color: getRandomColor() }}
-      />
+      <RiBarChartHorizontalLine style={{ color: getRandomColor() }} />
     );
   } else if (props.type === 'numbers') {
     graph = <Numbers />;
@@ -91,9 +92,9 @@ const ArchivedGraph = (props) => {
       />
     );
   } else if (props.type === 'error') {
-    graph = <i className="fa fa-repeat" />;
+    graph = <RiRefreshLine />;
   } else if (props.type === 'table' || props.type === 'numberTable') {
-    graph = <i className="fa fa-table" style={{ color: getRandomColor() }} />;
+    graph = <RiTableLine style={{ color: getRandomColor() }} />;
   }
 
   return (
@@ -164,7 +165,7 @@ const UnarchiveIndicators = (props) => {
           {size}
           )
           {' '}
-          <i className="fa fa-archive" />
+          <RiArchiveLine />
         </span>
       </div>
       <div className="unarchive-popover">

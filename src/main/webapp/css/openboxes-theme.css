@@ -239,6 +239,9 @@ button {
   cursor: pointer;
 }
 
+/* No border changes on hover/active: the rest-state rule already
+   zeroes borders, and stripping them here shifts layout on bordered
+   buttons (e.g. the nav location chooser) */
 .button:hover,
 .button:focus,
 .buttons input:hover,
@@ -246,7 +249,6 @@ input[type="submit"]:hover,
 button:hover {
   background-color: var(--blue-100);
   background-image: none;
-  border: none;
   color: var(--blue-500);
   text-shadow: none;
   text-decoration: none;
@@ -256,7 +258,6 @@ button:hover {
 .button.active {
   background-color: var(--blue-100);
   background-image: none;
-  border: none;
   color: var(--blue-500);
   outline: 1px solid var(--blue-primary);
 }
@@ -1167,6 +1168,94 @@ th a:hover {
   padding: 4px 20px 4px 8px;
 }
 
+/* CHOSEN v1.x (chosen-* class generation, e.g. inventory browse) —
+   same input spec as the older chzn-* generation */
+.chosen-container-single .chosen-single {
+  height: 36px;
+  line-height: 34px;
+  background: #ffffff;
+  background-image: none;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  box-shadow: none;
+  color: var(--gray-600);
+  font-size: 14px;
+  padding: 0 12px;
+}
+
+.chosen-container-single .chosen-single div {
+  width: 24px;
+}
+
+.chosen-container-single .chosen-single div b {
+  background: none;
+}
+
+.chosen-container-single .chosen-single div b::before {
+  content: '';
+  display: block;
+  margin: 15px auto 0;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid var(--gray-400);
+}
+
+.chosen-container .chosen-drop {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.15);
+}
+
+.chosen-container-single .chosen-search input[type="text"],
+.chosen-container .chosen-search-input {
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  background-image: none;
+  padding: 6px 8px;
+  height: 32px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+}
+
+.chosen-container .chosen-results li.highlighted {
+  background: var(--blue-200);
+  background-image: none;
+  color: var(--gray-600);
+}
+
+.chosen-container-active .chosen-single,
+.chosen-container-active.chosen-with-drop .chosen-single {
+  border: 1px solid var(--blue-primary);
+  box-shadow: var(--focus-ring);
+  background-image: none;
+}
+
+.chosen-container-multi .chosen-choices {
+  background-image: none;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  padding: 4px;
+  min-height: 36px;
+}
+
+.chosen-container-multi .chosen-choices li.search-choice {
+  background: var(--blue-100);
+  background-image: none;
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+  color: var(--gray-600);
+  padding: 4px 20px 4px 8px;
+}
+
+.chosen-container .chosen-results li {
+  font-size: 14px;
+  color: var(--gray-600);
+}
+
 /* SELECT2 (v4) → input spec */
 .select2-container--default .select2-selection--single,
 .select2-container--default .select2-selection--multiple {
@@ -1357,6 +1446,34 @@ th a:hover {
 
 #ft a {
   color: var(--gray-401);
+}
+
+/* Page-summary bands (.summary — browse, order/requisition headers):
+   titles sit directly on the page background like the React
+   list-page header, not in their own gray bordered strip */
+.summary {
+  background-color: transparent;
+  border-bottom: none;
+  padding: 16px 0 8px;
+}
+
+.summary .title,
+div.title {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+  color: var(--blue-800);
+}
+
+/* Megamenu section headers (non-clickable): small-caps label, clearly
+   distinct from the clickable menu items beneath them */
+.dropdown-menu-content .subsection-title,
+.dropdown-menu-wrapper .subsection-title {
+  color: var(--gray-350);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 /* Both focus cards share the same shadow */

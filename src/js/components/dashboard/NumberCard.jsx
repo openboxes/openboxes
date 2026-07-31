@@ -1,6 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
+import { RiInformationLine } from 'react-icons/ri';
 import { Line } from 'react-chartjs-2';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
@@ -85,7 +86,7 @@ const NumberSparklineCard = ({
         content={translate(cardInfo, cardInfoDefaultValue || cardInfo)}
         show={cardInfo}
       >
-        <i className="fa fa-info-circle" />
+        <RiInformationLine />
       </CustomTooltip>
     </div>
     <DragHandle />
@@ -157,7 +158,7 @@ const NumberCard = SortableElement(({
                   theme="transparent"
                   arrow="true"
                 >
-                  {infoIcon || <i className="fa fa-info-circle" />}
+                  {infoIcon || <RiInformationLine />}
                 </CustomTooltip>
               </div>
             )

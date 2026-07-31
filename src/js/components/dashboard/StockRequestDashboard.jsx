@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 
 import PropTypes from 'prop-types';
-import { RiStickyNoteFill } from 'react-icons/ri';
+import {
+  RiAddLine, RiArrowLeftSLine, RiArrowRightSLine, RiStickyNoteFill,
+} from 'react-icons/ri';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import ReactTable from 'react-table';
@@ -153,7 +155,7 @@ class StockRequestDashboard extends Component {
             to={STOCK_MOVEMENT_URL.createRequest()}
             className="btn btn-primary d-flex justify-content-center align-items-center font-weight-bold"
           >
-            <i className="fa fa-plus mr-1" />
+            <RiAddLine className="mr-1" />
             <Translate
               id="react.stockMovement.createNewRequest.label"
               defaultMessage="Create New Request"
@@ -170,8 +172,8 @@ class StockRequestDashboard extends Component {
           manual
           resizable={false}
           className="-striped -highlight stock-request-table "
-          previousText={<i className="fa fa-chevron-left" aria-hidden="true" />}
-          nextText={<i className="fa fa-chevron-right" aria-hidden="true" />}
+          previousText={<RiArrowLeftSLine aria-hidden="true" />}
+          nextText={<RiArrowRightSLine aria-hidden="true" />}
           pageText=""
           onFetchData={(tableState) => {
             this.fetchStockMovementItems(tableState.page, tableState.pageSize);

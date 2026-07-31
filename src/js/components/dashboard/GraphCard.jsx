@@ -3,6 +3,7 @@
 import React, { Component } from 'react';
 
 import PropTypes from 'prop-types';
+import { RiInformationLine, RiRefreshLine } from 'react-icons/ri';
 import {
   Bar, Doughnut, HorizontalBar, Line,
 } from 'react-chartjs-2';
@@ -262,7 +263,7 @@ const GraphCard = SortableElement(({
   } else if (cardType === 'error') {
     graph = (
       <button type="button" onClick={() => loadIndicator(widgetId)}>
-        <i className="fa fa-repeat" />
+        <RiRefreshLine />
       </button>
     );
   }
@@ -287,7 +288,7 @@ const GraphCard = SortableElement(({
             ? (
               <div className="graph-infos">
                 <CustomTooltip content={translate(cardInfo, cardInfo)}>
-                  <i className="fa fa-info-circle" />
+                  <RiInformationLine />
                 </CustomTooltip>
               </div>
             )

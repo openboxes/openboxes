@@ -131,7 +131,7 @@
 
 .configs-left-nav {
   position: sticky;
-  background-color: #ededed;
+  background-color: var(--blue-100);
   display: flex;
   flex-direction: column;
   width: 200px;
@@ -203,12 +203,21 @@
     padding: 0;
 
     .configs-list-item {
-      margin: 16px 0;
-      padding: 8px 16px;
-      color: #878787;
+      margin: 4px 0;
+      padding: 10px 16px;
+      color: var(--gray-600);
+      cursor: pointer;
+
+      &:hover {
+        background-color: var(--blue-200);
+        color: var(--blue-primary);
+      }
 
       &.active {
-        background-color: #d9d9d9;
+        background-color: #ffffff;
+        color: var(--blue-primary);
+        font-weight: 600;
+        box-shadow: inset 4px 0 0 0 var(--blue-primary);
       }
 
       button {
@@ -342,8 +351,8 @@
     top: 15px;
     right: 32px;
 
-    i {
-      color:#999;
+    i, svg {
+      color: var(--gray-350);
     }
   }
 
@@ -412,8 +421,8 @@
     top: 24px;
     right: 42px;
 
-    i {
-      color:#999;
+    i, svg {
+      color: var(--gray-350);
     }
   }
 
