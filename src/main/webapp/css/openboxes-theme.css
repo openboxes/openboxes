@@ -1239,8 +1239,32 @@ th a:hover {
   background-image: none;
   border: 1px solid var(--gray-200);
   border-radius: 4px;
-  padding: 4px;
+  padding: 0 8px;
   min-height: 36px;
+  height: auto;
+  box-sizing: border-box;
+  font-size: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+/* The inner search field fills the 36px box instead of its own 25px */
+.chosen-container-multi .chosen-choices li.search-field,
+.chosen-container-multi .chosen-choices li.search-field input[type="text"] {
+  height: 34px;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--gray-600);
+}
+
+/* Multi-select focus matches every other control */
+.chosen-container-active .chosen-choices {
+  border: 1px solid var(--blue-primary);
+  box-shadow: var(--focus-ring);
 }
 
 .chosen-container-multi .chosen-choices li.search-choice {
@@ -1256,6 +1280,52 @@ th a:hover {
 .chosen-container .chosen-results li {
   font-size: 14px;
   color: var(--gray-600);
+}
+
+/* Chosen ships a retina media query that re-applies its sprite sheet
+   with !important (chosen.css:482) — invisible at 1x, visible as
+   stray glyphs on every hi-dpi screen. Kill it wherever it lands. */
+.chosen-container-single .chosen-single abbr,
+.chosen-container-single .chosen-single div b,
+.chosen-container-single .chosen-search input[type="text"],
+.chosen-container-multi .chosen-choices .search-choice .search-choice-close,
+.chosen-container .chosen-results-scroll-down span,
+.chosen-container .chosen-results-scroll-up span {
+  background-image: none !important;
+}
+
+/* Clear (X) affordance → line icon, vertically centered, clear of the
+   chevron; replaces the sprite's off-center 12px glyph */
+.chosen-container-single .chosen-single abbr {
+  top: 50%;
+  right: 32px;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23636D81' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: 12px 12px !important;
+}
+
+.chosen-container-single .chosen-single abbr:hover {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C71610' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E") !important;
+}
+
+/* Dropdown search field: same focus treatment as every other input */
+.chosen-container-single .chosen-search input[type="text"]:focus,
+.chosen-container .chosen-search-input:focus {
+  outline: 0;
+  border: 1px solid var(--blue-primary);
+  box-shadow: var(--focus-ring);
+}
+
+/* Multi-select chips' close affordance → line icon */
+.chosen-container-multi .chosen-choices .search-choice .search-choice-close {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23636D81' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: 10px 10px !important;
 }
 
 /* SELECT2 (v4) → input spec */
@@ -1453,10 +1523,14 @@ th a:hover {
 /* Page-summary bands (.summary — browse, order/requisition headers):
    titles sit directly on the page background like the React
    list-page header, not in their own gray bordered strip */
+/* Vertical rhythm matches the React .list-page-header: title sits
+   ~39px below the navbar and the band runs ~100px before content */
 .summary {
   background-color: transparent;
   border-bottom: none;
-  padding: 16px 0 8px;
+  padding: 32px 0 24px;
+  min-height: 92px;
+  box-sizing: border-box;
 }
 
 .summary .title,
