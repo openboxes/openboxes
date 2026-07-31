@@ -350,30 +350,9 @@ a.button {
 
 /* Filter sidebars: action buttons stack full-width with an 8px gap
    instead of a centered ragged pile */
-.filter-list-item.buttons {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 8px;
-  padding-top: 8px;
-}
-
-.filter-list-item.buttons > .button,
-.filter-list-item.buttons > .action-menu,
-.filter-list-item.buttons > .action-menu > .button,
-.filter-list-item.buttons > input,
-.filter-list-item.buttons > button {
-  width: 100%;
-  margin: 0;
-}
-
-.filter-list-item.buttons .action-menu,
-.filter-list-item.buttons .button {
-  /* !important: order/_filters.gsp carries style="margin-left: 15px" inline */
-  margin: 0 !important;
-  padding-left: 0;
-  padding-right: 0;
-}
+/* .filter-list-item.buttons is handled with the other action-row
+   flavours further down — a `gap` here would stack on top of the
+   16px child margins used there and double the spacing. */
 
 /* Legacy affirmative/destructive semantics → React primary / danger-outline */
 button.positive,
@@ -514,10 +493,13 @@ input.negative:hover,
   background-size: 15px 15px;
 }
 
-/* ...and the legacy :hover/:focus/:active sprite shifts */
-.button.icon:is(:hover, :focus, :active):before {
-  background-position: center;
-  background-size: 15px 15px;
+/* ...and the legacy :hover/:focus/:active sprite shifts, which are
+   written per icon (.button.reload.icon:hover:before = 3 classes) and
+   would otherwise shove the SVG out of its box on hover, making the
+   icon vanish. The repeated .icon lifts this above them. */
+.button.icon.icon:is(:hover, :focus, :active):before {
+  background-position: center !important;
+  background-size: 15px 15px !important;
 }
 
 .button.approve.icon:before,
@@ -1850,6 +1832,7 @@ div.title {
    inset as .filter-list-item, so they line up with the inputs rather
    than running to the card edge, and the same 36px control height */
 .filters .buttons,
+.filter-list-item.buttons,
 .yui-u.first .box .buttons {
   display: flex;
   flex-direction: column;
@@ -1872,6 +1855,9 @@ div.title {
 .filters .buttons > .button,
 .filters .buttons > button,
 .filters .buttons > .action-menu,
+.filter-list-item.buttons > .button,
+.filter-list-item.buttons > button,
+.filter-list-item.buttons > .action-menu,
 .yui-u.first .box .buttons > .button,
 .yui-u.first .box .buttons > button,
 .yui-u.first .box .buttons > .action-menu {
@@ -1881,6 +1867,7 @@ div.title {
 }
 
 .filters .buttons > *:last-child,
+.filter-list-item.buttons > *:last-child,
 .yui-u.first .box .buttons > *:last-child {
   margin-bottom: 0 !important;
 }
@@ -2080,9 +2067,17 @@ table.dataTable thead th.sorting_desc {
   text-align: left;
 }
 
+/* Card headers pin both ways: left, so they survive the table's
+   horizontal scroll, and top — the legacy h2 rule sets `top: 0`, which
+   sticky honours — so they stay put as the page scrolls. That makes an
+   opaque surface necessary, or content shows through them. Safe
+   everywhere: every .box is already white behind its header. */
 .box > h2 {
   position: sticky;
   left: 0;
+  background-color: #ffffff;
+  /* below the navbar's z-index 4 so it tucks under, not over */
+  z-index: 1;
 }
 
 .dataTables_wrapper .dataTables_filter input,
