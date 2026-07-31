@@ -282,17 +282,24 @@ button[type="submit"].icon:before {
   filter: brightness(0) invert(1);
 }
 
-/* Report pages' "Run report" buttons submit implicitly via value=run —
-   they are their form's primary action */
-button[value="run"] {
+/* Implicit-submit primary conventions: report "Run" buttons and
+   filter "Search" buttons are their form's primary action */
+button[value="run"],
+button[name="search"] {
   background-color: var(--blue-primary);
   color: #ffffff;
 }
 
 button[value="run"]:hover,
-button[value="run"]:focus {
+button[value="run"]:focus,
+button[name="search"]:hover,
+button[name="search"]:focus {
   background-color: var(--blue-500);
   color: #ffffff;
+}
+
+button[name="search"].icon:before {
+  filter: brightness(0) invert(1);
 }
 
 /* Delete stays a danger action */
