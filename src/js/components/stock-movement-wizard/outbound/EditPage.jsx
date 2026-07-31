@@ -464,16 +464,9 @@ class EditItemsPage extends Component {
       }, () => {
         if (!this.props.isPaginated || forceFetch) {
           this.fetchItems();
-          return;
-        }
-        if (totalCount === 0) {
-          // loadMoreRows does not fetch anything when the list is empty,
-          // so no other code path will hide the spinner or mark items as loaded.
-          this.setState({ hasItemsLoaded: true });
-          this.props.hideSpinner();
         }
       });
-    }).catch(() => {
+    }).finally(() => {
       this.props.hideSpinner();
     });
   }
