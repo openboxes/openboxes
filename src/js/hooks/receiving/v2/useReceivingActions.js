@@ -230,8 +230,8 @@ const useReceivingActions = (view) => {
         return false;
       }
       const changes = getReceiptItemChanges(receiptItem, shipmentItem);
-      return changes.productChanged || changes.lotChanged
-        || changes.expirationChanged || changes.recipientChanged;
+      return changes.product || changes.lotNumber
+        || changes.expirationDate || changes.recipient;
     };
 
     // The original line always exists in the database (it backs the cancel-remaining flow on
