@@ -52,7 +52,9 @@
 				<g:render template="summary" model="[productInstance:productInstance]"/>
 			</g:if>
             <g:hiddenField id="isAccountingRequired" name="isAccountingRequired" value="${locationInstance?.isAccountingRequired()}"/>
-            <div class="tabs tabs-ui">
+            %{-- The tabs below Details only exist once the product does, so on
+                 creation there is a single tab: flag it for the theme to hide. --}%
+            <div class="tabs tabs-ui ${productInstance?.id ? '' : 'single-tab'}">
                 <ul>
                     <li>
                         <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productDetails&renderNotFoundError=false&${request.queryString}">

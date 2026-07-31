@@ -1712,6 +1712,13 @@ div.title {
   box-shadow: var(--focus-card-shadow);
 }
 
+/* A lone tab offers no choice, so the strip is just noise — the view
+   flags it with .single-tab (see product/edit.gsp) */
+.tabs.single-tab > ul,
+.tabs.single-tab > .ui-tabs-nav {
+  display: none;
+}
+
 /* Vertical tab rails (.tabs-left, e.g. the location chooser) keep
    their left accent bar only — no horizontal underline, whether the
    rules arrive via .tabs or runtime ui-tabs classes */
