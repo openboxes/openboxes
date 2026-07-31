@@ -649,6 +649,40 @@ img[src$="/clock.png"] {
 img[src*="/icons/silk/html.png"],
 img[src*="/icons/silk/page_code.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6.5 3h8l4 4v14h-12z'/%3E%3Cpath d='M14 3v4.5h4.5M9.5 13l-1.5 2 1.5 2M14.5 13l1.5 2-1.5 2'/%3E%3C/svg%3E"); }
 
+/* Prefix patterns so icon FAMILIES are covered, not one file at a
+   time (package_in/_go/_green/_delete, lorry_add, link_add, ...) */
+img[src*="/icons/silk/package"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l8 4.5v9L12 21l-8-4.5v-9z'/%3E%3Cpath d='M4 7.5l8 4.5 8-4.5M12 12v9'/%3E%3C/svg%3E") !important; }
+img[src*="/icons/silk/lorry"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 6.5h10v10h-10zM12.5 10h4l3 3v3.5h-7z'/%3E%3Ccircle cx='6.5' cy='18.5' r='1.8'/%3E%3Ccircle cx='16.5' cy='18.5' r='1.8'/%3E%3C/svg%3E") !important; }
+img[src*="/icons/silk/link"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13.5a4 4 0 0 0 5.7 0l3-3a4 4 0 1 0-5.7-5.7L11.5 6.3'/%3E%3Cpath d='M14 10.5a4 4 0 0 0-5.7 0l-3 3a4 4 0 1 0 5.7 5.7l1.5-1.5'/%3E%3C/svg%3E") !important; }
+img[src*="/icons/silk/calendar"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.5' y='5' width='17' height='15.5' rx='2'/%3E%3Cpath d='M3.5 9.5h17M8 3v4M16 3v4'/%3E%3C/svg%3E") !important; }
+img[src*="/icons/silk/book"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4.5h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4z'/%3E%3Cpath d='M20 4.5h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H20z'/%3E%3C/svg%3E") !important; }
+
+img[src*="/icons/silk/package"],
+img[src*="/icons/silk/lorry"],
+img[src*="/icons/silk/link"],
+img[src*="/icons/silk/calendar"],
+img[src*="/icons/silk/book"] {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+img[src$="/clipboard.png"],
+img[src*="/icons/silk/clipboard"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 4.5H7a1.5 1.5 0 0 0-1.5 1.5v13A1.5 1.5 0 0 0 7 20.5h10a1.5 1.5 0 0 0 1.5-1.5V6A1.5 1.5 0 0 0 17 4.5h-2'/%3E%3Crect x='9' y='2.5' width='6' height='4' rx='1'/%3E%3Cpath d='M8.5 11h7M8.5 15h7'/%3E%3C/svg%3E") !important; }
+img[src$="/calculator.png"],
+img[src*="/icons/silk/calculator"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='3' width='14' height='18' rx='2'/%3E%3Cpath d='M8.5 7h7M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M15.5 14.5h.01M8.5 18h.01M12 18h.01M15.5 18h.01'/%3E%3C/svg%3E") !important; }
+img[src$="/barcode.png"],
+img[src*="/icons/silk/barcode"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3.5 5v14M7 5v14M10.5 5v10M14 5v14M17.5 5v10M20.5 5v14'/%3E%3C/svg%3E") !important; }
+
+img[src$="/clipboard.png"],
+img[src$="/calculator.png"],
+img[src$="/barcode.png"],
+img[src*="/icons/silk/clipboard"],
+img[src*="/icons/silk/calculator"],
+img[src*="/icons/silk/barcode"] {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
 img[src*="/icons/silk/comment_add.png"],
 img[src*="/icons/silk/comment.png"],
 img[src*="/icons/silk/comment_edit.png"],
@@ -1133,6 +1167,10 @@ th a:hover {
 .box table td,
 .list table td {
   max-width: 340px;
+  /* `anywhere` breaks ONLY when a string would otherwise overflow —
+     unlike break-all, which chops every word. Keeps long lot numbers
+     and codes inside their panel. */
+  overflow-wrap: anywhere;
 }
 
 .list tbody tr:hover {
@@ -1905,6 +1943,14 @@ th a:hover {
   padding: 32px 0 24px;
   min-height: 92px;
   box-sizing: border-box;
+}
+
+/* A rich header (product thumbnail, status chip — e.g. the stock card)
+   brings its own height; the page-title rhythm above would stack ~56px
+   of dead space on top of it. */
+.summary:has(img) {
+  padding: 16px 0 8px;
+  min-height: 0;
 }
 
 .summary .title,
