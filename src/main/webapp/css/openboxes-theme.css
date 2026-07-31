@@ -254,15 +254,39 @@ button:hover {
   outline: 1px solid var(--blue-primary);
 }
 
-/* Form submit actions are the "primary" of their page */
+/* Form submit actions are the "primary" of their form — explicit
+   type="submit" only (implicitly-submitting <button>s without a type,
+   like the Download action-menu triggers, stay secondary) */
 input[type="submit"],
+button[type="submit"],
 .buttons input.save {
   background-color: var(--blue-primary);
   color: #ffffff;
 }
 
 input[type="submit"]:hover,
+button[type="submit"]:hover,
+button[type="submit"]:focus,
 .buttons input.save:hover {
+  background-color: var(--blue-500);
+  background-image: none;
+  color: #ffffff;
+}
+
+/* GH-sprite icons are dark — flip them white on the blue background */
+button[type="submit"].icon:before {
+  filter: brightness(0) invert(1);
+}
+
+/* Report pages' "Run report" buttons submit implicitly via value=run —
+   they are their form's primary action */
+button[value="run"] {
+  background-color: var(--blue-primary);
+  color: #ffffff;
+}
+
+button[value="run"]:hover,
+button[value="run"]:focus {
   background-color: var(--blue-500);
   color: #ffffff;
 }
@@ -288,6 +312,8 @@ a.button {
   align-items: center;
   justify-content: center;
   gap: 6px;
+  min-height: 36px;
+  box-sizing: border-box;
 }
 
 .button img {
@@ -464,6 +490,19 @@ select {
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   color: var(--gray-600);
+}
+
+/* Uniform 36px control height for all single-line inputs (matches
+   selects, chosen, select2, react-select and %button-base) */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input.text,
+input.large {
+  height: 36px;
+  box-sizing: border-box;
 }
 
 /* Native selects match the select2/chosen skin: no OS chrome, token
@@ -1079,8 +1118,19 @@ th a:hover {
    ============================================================ */
 
 /* Login: #loginFormBox drew its own gray border inside the themed
-   .box card — drop it so the card reads as one surface */
+   .box card — drop it so the card reads as one surface. The page's
+   inline stylesheet also centers input text and inflates padding;
+   normalize to the standard control look. */
 #loginFormBox {
   border: none;
   padding: 24px;
+}
+
+#loginBox input.text {
+  text-align: left;
+  padding: 6px 12px;
+}
+
+#loginBox button[type="submit"] {
+  padding: 8px 16px;
 }
