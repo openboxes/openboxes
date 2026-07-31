@@ -1754,6 +1754,19 @@ div.title {
   line-height: 1.6;
 }
 
+/* Filter panels nest their fields deeper than the browse page does
+   (form > .filters > .prop > .filter-list-item), stacking an extra
+   16px + 5px of inset. Drop both so every filter panel shares the
+   single 10px inset that .filter-list-item already provides. */
+.yui-u.first .box > form,
+.box > form:has(.filters) {
+  padding: 0;
+}
+
+.filters .prop {
+  padding: 0;
+}
+
 /* Filter fields: label needs room to breathe above its control */
 .filter-list-item > label,
 .filters .prop > label {
