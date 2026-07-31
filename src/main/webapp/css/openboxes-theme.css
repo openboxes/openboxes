@@ -116,8 +116,15 @@ h1 {
    consistent vertical rhythm.
    ============================================================ */
 
-#content > .body {
+/* The gutter lives on #content, not on .body: several pages (e.g.
+   productComponent, the scaffolded views) have no .body wrapper and
+   were rendering flush against the viewport edge. */
+#content {
   padding: 0 32px 24px;
+}
+
+#content > .body {
+  padding: 0;
 }
 
 h1 {
@@ -592,6 +599,8 @@ img[src*="/icons/silk/printer.png"] { content: url("data:image/svg+xml,%3Csvg xm
 img[src*="/icons/silk/error.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C71610' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7.5v5.5M12 16.5h.01'/%3E%3C/svg%3E"); }
 img[src*="/icons/silk/email.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5.5' width='18' height='13' rx='2'/%3E%3Cpath d='M3.5 7l8.5 6 8.5-6'/%3E%3C/svg%3E"); }
 img[src*="/icons/silk/play_green.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M7.5 4.8l12 7.2-12 7.2z'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/arrow_nsew.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23747C93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v18M3 12h18M12 3l-2.5 2.5M12 3l2.5 2.5M12 21l-2.5-2.5M12 21l2.5-2.5M3 12l2.5-2.5M3 12l2.5 2.5M21 12l-2.5-2.5M21 12l2.5 2.5' /%3E%3C/svg%3E"); }
+
 img[src*="/icons/silk/arrow_refresh.png"],
 img[src*="/icons/silk/reload.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 12a8 8 0 1 1-2.34-5.66'/%3E%3Cpath d='M20 4v5h-5'/%3E%3C/svg%3E"); }
 img[src*="/icons/silk/hourglass.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 3.5h10M7 20.5h10M8 3.5v4l4 4 4-4v-4M8 20.5v-4l4-4 4 4v4'/%3E%3C/svg%3E"); }
@@ -618,6 +627,7 @@ img[src*="/icons/silk/email.png"],
 img[src*="/icons/silk/play_green.png"],
 img[src*="/icons/silk/arrow_refresh.png"],
 img[src*="/icons/silk/reload.png"],
+img[src*="/icons/silk/arrow_nsew.png"],
 img[src*="/icons/silk/hourglass.png"] {
   filter: none !important;
   opacity: 1 !important;
@@ -2235,6 +2245,55 @@ input[type="file"] {
   padding: 0;
   display: inline-flex;
   align-items: center;
+}
+
+/* Category tree — tree.gsp ships an inline <style> (gray fill, dashed
+   borders) that loads after this file, so these need !important. */
+.category-tree {
+  list-style: none;
+  padding-left: 0;
+}
+
+/* Only the outermost tree becomes a card — the template nests
+   .category-tree recursively inside each li */
+fieldset > div > .category-tree {
+  background: #ffffff;
+  border-radius: var(--card-radius);
+  padding: 8px;
+}
+
+.category-tree ul {
+  margin-left: 24px !important;
+  list-style: none;
+  padding-left: 0;
+}
+
+.category-tree li {
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 4px;
+  padding: 6px 12px !important;
+  margin: 2px 0 !important;
+}
+
+.category-tree li:hover {
+  background-color: var(--blue-200) !important;
+}
+
+.category-tree li > p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+/* Push the row actions to the trailing edge without float hacks */
+.category-tree li > p > span[style*="float"] {
+  float: none !important;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
 }
 
 /* ============================================================
