@@ -307,7 +307,9 @@ button[type="submit"].icon:before {
 /* Implicit-submit primary conventions: report "Run" buttons and
    filter "Search" buttons are their form's primary action */
 button[value="run"],
-button[name="search"] {
+button[name="search"],
+button[name="save"],
+button[name="create"] {
   background-color: var(--blue-primary);
   color: #ffffff;
 }
@@ -315,12 +317,18 @@ button[name="search"] {
 button[value="run"]:hover,
 button[value="run"]:focus,
 button[name="search"]:hover,
-button[name="search"]:focus {
+button[name="search"]:focus,
+button[name="save"]:hover,
+button[name="save"]:focus,
+button[name="create"]:hover,
+button[name="create"]:focus {
   background-color: var(--blue-500);
   color: #ffffff;
 }
 
-button[name="search"].icon:before {
+button[name="search"].icon:before,
+button[name="save"].icon:before,
+button[name="create"].icon:before {
   filter: brightness(0) invert(1);
 }
 
@@ -599,6 +607,32 @@ img[src*="/icons/silk/printer.png"] { content: url("data:image/svg+xml,%3Csvg xm
 img[src*="/icons/silk/error.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C71610' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7.5v5.5M12 16.5h.01'/%3E%3C/svg%3E"); }
 img[src*="/icons/silk/email.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5.5' width='18' height='13' rx='2'/%3E%3Cpath d='M3.5 7l8.5 6 8.5-6'/%3E%3C/svg%3E"); }
 img[src*="/icons/silk/play_green.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M7.5 4.8l12 7.2-12 7.2z'/%3E%3C/svg%3E"); }
+/* Some pictographs live outside the silk folder — match by filename */
+img[src$="/truck.png"],
+img[src$="/lorry_stop.png"],
+img[src$="/handtruck.png"],
+img[src$="/ShipmentTypeLand.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 6.5h10v10h-10zM12.5 10h4l3 3v3.5h-7z'/%3E%3Ccircle cx='6.5' cy='18.5' r='1.8'/%3E%3Ccircle cx='16.5' cy='18.5' r='1.8'/%3E%3C/svg%3E") !important; }
+img[src$="/map.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 4.5L3.5 6.8v12.7L9 17.2l6 2.3 5.5-2.3V4.5L15 6.8z'/%3E%3Cpath d='M9 4.5v12.7M15 6.8v12.7'/%3E%3C/svg%3E") !important; }
+img[src$="/package_add.png"],
+img[src$="/basket_put.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l8 4.5v9L12 21l-8-4.5v-9z'/%3E%3Cpath d='M4 7.5l8 4.5 8-4.5M12 12v9'/%3E%3C/svg%3E") !important; }
+img[src$="/text_list_numbers.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6h11M9 12h11M9 18h11M4 5.5h1.5V9M4 17h2.5v3H4zM4 14h2.5'/%3E%3C/svg%3E") !important; }
+img[src$="/page_break.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 3.5h7l4 4V10M7 21h11v-3M3 14h18'/%3E%3C/svg%3E") !important; }
+img[src$="/clock.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 7v5.2l3.2 2'/%3E%3C/svg%3E") !important; }
+
+img[src$="/truck.png"],
+img[src$="/lorry_stop.png"],
+img[src$="/handtruck.png"],
+img[src$="/ShipmentTypeLand.png"],
+img[src$="/map.png"],
+img[src$="/package_add.png"],
+img[src$="/basket_put.png"],
+img[src$="/text_list_numbers.png"],
+img[src$="/page_break.png"],
+img[src$="/clock.png"] {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
 img[src*="/icons/silk/comment_add.png"],
 img[src*="/icons/silk/comment.png"],
 img[src*="/icons/silk/comment_edit.png"],
@@ -750,6 +784,8 @@ input[type="submit"] img,
 button[type="submit"] img,
 button[value="run"] img,
 button[name="search"] img,
+button[name="save"] img,
+button[name="create"] img,
 .button.positive img,
 .button.icon.approve img {
   filter: brightness(0) invert(1) !important;
