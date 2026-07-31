@@ -633,6 +633,9 @@ img[src$="/clock.png"] {
   opacity: 1 !important;
 }
 
+img[src*="/icons/silk/html.png"],
+img[src*="/icons/silk/page_code.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6.5 3h8l4 4v14h-12z'/%3E%3Cpath d='M14 3v4.5h4.5M9.5 13l-1.5 2 1.5 2M14.5 13l1.5 2-1.5 2'/%3E%3C/svg%3E"); }
+
 img[src*="/icons/silk/comment_add.png"],
 img[src*="/icons/silk/comment.png"],
 img[src*="/icons/silk/comment_edit.png"],
@@ -722,6 +725,8 @@ img[src*="/icons/silk/comments.png"],
 img[src*="/icons/silk/cart_go.png"],
 img[src*="/icons/silk/cart_add.png"],
 img[src*="/icons/silk/cart_delete.png"],
+img[src*="/icons/silk/html.png"],
+img[src*="/icons/silk/page_code.png"],
 img[src*="/icons/silk/hourglass.png"] {
   filter: none !important;
   opacity: 1 !important;
@@ -1735,6 +1740,28 @@ th a:hover {
   background-color: var(--blue-200);
   color: var(--blue-primary);
   text-decoration: none;
+  /* the legacy rules re-declare display/padding on :hover, which
+     relaid out the item under the cursor — restate them so hovering
+     changes nothing but colour */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  padding: 6px 10px;
+}
+
+/* Menu glyphs are chrome, so file-type icons become a plain document
+   mark here even though they keep their colour in content areas */
+.actions img[src*="excel"],
+.actions img[src*="acrobat"],
+.actions img[src*="/pdf"],
+.actions img[src*="_word"],
+.actions img[src*="html"],
+.actions img[src*="page_code"],
+.actions img[src*="page_white"] {
+  content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3.5v11M7.5 10l4.5 4.5 4.5-4.5M4.5 19.5h15'/%3E%3C/svg%3E") !important;
+  filter: none !important;
+  opacity: 1 !important;
 }
 
 /* ============================================================
