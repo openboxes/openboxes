@@ -904,7 +904,9 @@ td, th {
 }
 
 th {
-  background-color: var(--blue-100);
+  /* blue-200 at 55% over white reads as blue-100 but lets the card's
+     scroll shadow show through instead of masking it */
+  background-color: rgba(240, 246, 255, 0.55);
   color: var(--gray-600);
   font-weight: 700;
   font-size: 14px;
@@ -924,11 +926,11 @@ th {
   background-image:
     linear-gradient(to right, #ffffff 20%, rgba(255, 255, 255, 0)),
     linear-gradient(to left, #ffffff 20%, rgba(255, 255, 255, 0)),
-    radial-gradient(farthest-side at 0 50%, rgba(32, 39, 80, 0.3), rgba(32, 39, 80, 0)),
-    radial-gradient(farthest-side at 100% 50%, rgba(32, 39, 80, 0.3), rgba(32, 39, 80, 0));
+    radial-gradient(farthest-side at 0 50%, rgba(32, 39, 80, 0.18), rgba(32, 39, 80, 0)),
+    radial-gradient(farthest-side at 100% 50%, rgba(32, 39, 80, 0.18), rgba(32, 39, 80, 0));
   background-position: 0 0, 100% 0, 0 0, 100% 0;
   background-repeat: no-repeat;
-  background-size: 32px 100%, 32px 100%, 24px 100%, 24px 100%;
+  background-size: 32px 100%, 32px 100%, 20px 100%, 20px 100%;
   background-attachment: local, local, scroll, scroll;
 }
 
@@ -994,7 +996,7 @@ th a:hover {
 }
 
 .list tbody tr:hover {
-  background: #F8FAFF;
+  background: rgba(240, 246, 255, 0.5);
 }
 
 /* Kill zebra striping (React reference has none) */
@@ -1806,7 +1808,7 @@ table.dataTable tfoot td {
 }
 
 table.dataTable thead th {
-  background-color: var(--blue-100);
+  background-color: rgba(240, 246, 255, 0.55);
   color: var(--gray-600);
   font-weight: 700;
   border-bottom: none;
@@ -1822,7 +1824,7 @@ table.dataTable tbody tr {
 table.dataTable tbody tr:hover,
 table.dataTable tbody tr.odd:hover,
 table.dataTable tbody tr.even:hover {
-  background-color: #F8FAFF;
+  background-color: rgba(240, 246, 255, 0.5);
 }
 
 table.dataTable tbody tr.odd,
@@ -1880,11 +1882,11 @@ table.dataTable thead th.sorting_desc {
   background-image:
     linear-gradient(to right, #ffffff 20%, rgba(255, 255, 255, 0)),
     linear-gradient(to left, #ffffff 20%, rgba(255, 255, 255, 0)),
-    radial-gradient(farthest-side at 0 50%, rgba(32, 39, 80, 0.3), rgba(32, 39, 80, 0)),
-    radial-gradient(farthest-side at 100% 50%, rgba(32, 39, 80, 0.3), rgba(32, 39, 80, 0));
+    radial-gradient(farthest-side at 0 50%, rgba(32, 39, 80, 0.18), rgba(32, 39, 80, 0)),
+    radial-gradient(farthest-side at 100% 50%, rgba(32, 39, 80, 0.18), rgba(32, 39, 80, 0));
   background-position: 0 0, 100% 0, 0 0, 100% 0;
   background-repeat: no-repeat;
-  background-size: 32px 100%, 32px 100%, 24px 100%, 24px 100%;
+  background-size: 32px 100%, 32px 100%, 20px 100%, 20px 100%;
   background-attachment: local, local, scroll, scroll;
   scrollbar-color: var(--blue-301) var(--blue-200);
   scrollbar-width: thin;
@@ -1901,6 +1903,20 @@ table.dataTable thead th.sorting_desc {
 .dataTables_wrapper .dataTables_scrollBody::-webkit-scrollbar-thumb {
   background-color: var(--blue-301);
   border-radius: 4px;
+}
+
+/* These wrappers painted opaque white/tint over the shadow — the card
+   underneath already provides the surface */
+.dataTables_wrapper .dataTables_scrollHead,
+.dataTables_wrapper .dataTables_scrollFoot,
+.dataTables_wrapper .dataTables_processing,
+.dataTables_wrapper .fg-toolbar,
+.dataTables_wrapper .ui-toolbar {
+  background-color: transparent;
+}
+
+.paginateButtons {
+  background-color: rgba(251, 252, 252, 0.6);
 }
 
 /* Wrapper chrome: search field, length menu, info line, pagination.
