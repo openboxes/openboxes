@@ -2020,10 +2020,11 @@ th a:hover {
    control inherited 10px of cell padding on the left and 12px top and
    bottom — which pushed the menu button out of line with the Status card
    and stacked dead space above the grid. Lay the row out as flex on the
-   grid's own edges: left flush with the Status card (the page gutter),
-   right inset 16px to meet the Current stock card. */
+   page gutter itself — left flush with the Status card, right flush with
+   the tab panel, which is the white edge the eye actually reads (the
+   .box inside it is inset a further 16px). */
 .summary-actions {
-  padding: 0 16px 0 0;
+  padding: 0;
 }
 
 .summary-actions > table,
@@ -2095,9 +2096,14 @@ th a:hover {
 }
 
 /* The status chip sits in the header table above and has to land on the
-   same right edge as the bar and the Current stock card */
+   same right edge as the bar and the tab panel below */
 #product-summary-table > tbody > tr > td:last-child {
-  padding-right: 16px;
+  padding-right: 0;
+}
+
+/* Breathing room between the action bar and the tab strip */
+#transactionLogTabs {
+  padding-top: 1em;
 }
 
 /* stockCard.gsp caps zone names at 50px and bin names at 100px, which
