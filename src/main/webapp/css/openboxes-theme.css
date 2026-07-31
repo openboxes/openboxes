@@ -242,8 +242,14 @@ button {
 /* No border changes on hover/active: the rest-state rule already
    zeroes borders, and stripping them here shifts layout on bordered
    buttons (e.g. the nav location chooser) */
+/* a.button:hover in openboxes.css sets white text (invisible on the
+   light secondary background) and outranks a bare .button:hover */
 .button:hover,
 .button:focus,
+a.button:hover,
+a.button:focus,
+a.button:link,
+a.button:visited,
 .buttons input:hover,
 input[type="submit"]:hover,
 button:hover {
@@ -252,6 +258,11 @@ button:hover {
   color: var(--blue-500);
   text-shadow: none;
   text-decoration: none;
+}
+
+a.button:link,
+a.button:visited {
+  color: var(--gray-600);
 }
 
 .button:active,
@@ -577,8 +588,59 @@ input.negative:hover,
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3'/%3E%3C/svg%3E");
 }
 
-/* Colorful silk PNGs ANYWHERE: mute to a uniform monochrome 14px so
-   they sit quietly next to the line icons (CSS cannot swap img src).
+/* The most-used silk PNGs are swapped outright for line icons via the
+   `content` property — the one way CSS can replace an <img>'s pixels
+   without touching markup. Ranked by usage across the GSP views. */
+img[src*="/icons/silk/add.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M12 4.5v15M4.5 12h15'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/pencil.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20l1-4L16.5 4.5l3 3L8 19l-4 1z'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/delete.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16M10 3.5h4M6.5 7l1 13.5h9l1-13.5M10 11v6M14 11v6'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/accept.png"],
+img[src*="/icons/silk/tick.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 12.8l5 5L19.5 6.5'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/bullet_arrow_down.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9.5l6 6 6-6'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/application_view_list.png"],
+img[src*="/icons/silk/application_side_list.png"],
+img[src*="/icons/silk/application.png"],
+img[src*="/icons/silk/table.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round'%3E%3Crect x='3.5' y='4.5' width='17' height='15' rx='2'/%3E%3Cpath d='M3.5 9.5h17M9 9.5v10'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/zoom.png"],
+img[src*="/icons/silk/magnifier.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15.5 15.5L20.5 20.5'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/decline.png"],
+img[src*="/icons/silk/cross.png"],
+img[src*="/icons/silk/cancel.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/printer.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 9V4h10v5M7 18H5a1.5 1.5 0 0 1-1.5-1.5v-5A1.5 1.5 0 0 1 5 10h14a1.5 1.5 0 0 1 1.5 1.5v5A1.5 1.5 0 0 1 19 18h-2'/%3E%3Cpath d='M7 15h10v5.5H7z'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/error.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C71610' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7.5v5.5M12 16.5h.01'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/email.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5.5' width='18' height='13' rx='2'/%3E%3Cpath d='M3.5 7l8.5 6 8.5-6'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/play_green.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M7.5 4.8l12 7.2-12 7.2z'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/arrow_refresh.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 12a8 8 0 1 1-2.34-5.66'/%3E%3Cpath d='M20 4v5h-5'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/hourglass.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 3.5h10M7 20.5h10M8 3.5v4l4 4 4-4v-4M8 20.5v-4l4-4 4 4v4'/%3E%3C/svg%3E"); }
+
+/* Swapped icons are already the right colour — skip the muting filter */
+img[src*="/icons/silk/add.png"],
+img[src*="/icons/silk/pencil.png"],
+img[src*="/icons/silk/delete.png"],
+img[src*="/icons/silk/accept.png"],
+img[src*="/icons/silk/tick.png"],
+img[src*="/icons/silk/bullet_arrow_down.png"],
+img[src*="/icons/silk/application_view_list.png"],
+img[src*="/icons/silk/application_side_list.png"],
+img[src*="/icons/silk/application.png"],
+img[src*="/icons/silk/table.png"],
+img[src*="/icons/silk/zoom.png"],
+img[src*="/icons/silk/magnifier.png"],
+img[src*="/icons/silk/decline.png"],
+img[src*="/icons/silk/cross.png"],
+img[src*="/icons/silk/cancel.png"],
+img[src*="/icons/silk/printer.png"],
+img[src*="/icons/silk/error.png"],
+img[src*="/icons/silk/email.png"],
+img[src*="/icons/silk/play_green.png"],
+img[src*="/icons/silk/arrow_refresh.png"],
+img[src*="/icons/silk/hourglass.png"] {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+/* Remaining colorful silk PNGs: mute to a uniform monochrome 14px so
+   they sit quietly next to the line icons.
    Catch-all by src path — buttons, headers, tabs, cells, links alike. */
 img[src*="/icons/silk/"] {
   width: 14px;
@@ -627,14 +689,17 @@ h3 img,
   margin-right: 8px; /* same icon-to-text gap as buttons and nav items */
 }
 
-/* ...and flip them white inside primary (blue) buttons */
+/* ...and flip them white inside primary (blue) buttons. Needs
+   !important to beat the swapped-icon `filter: none !important`
+   above, which would otherwise leave a dark glyph on dark blue. */
 input[type="submit"] img,
 button[type="submit"] img,
 button[value="run"] img,
+button[name="search"] img,
 .button.positive img,
 .button.icon.approve img {
-  filter: brightness(0) invert(1);
-  opacity: 0.9;
+  filter: brightness(0) invert(1) !important;
+  opacity: 0.95 !important;
 }
 
 /* buttonBar links: silk background icons exist for ~30 classes (home,
@@ -833,9 +898,9 @@ label {
 td, th {
   font: 400 14px/20px 'Inter', sans-serif;
   color: var(--gray-600);
-  /* React spec is 12px; 8px horizontal keeps dense legacy 15-column
-     lists from overflowing the viewport at 1440 */
-  padding: 8px;
+  /* 12px vertical matches the React DataTable spec; 10px horizontal
+     keeps dense legacy tables reasonable (they scroll in-card now) */
+  padding: 12px 10px;
 }
 
 th {
@@ -849,9 +914,47 @@ th {
 }
 
 /* Wide tables scroll inside their card instead of stretching the page
-   (matches the React DataTable behavior) */
+   (matches the React DataTable behavior). The layered backgrounds are
+   the classic CSS-only scroll affordance: the white "cover" panes are
+   attached to the content, the shadow panes to the viewport, so a
+   soft edge-shadow appears only on the side that has more to reveal
+   and fades away once you reach that end. */
 .box {
   overflow-x: auto;
+  background-image:
+    linear-gradient(to right, #ffffff 30%, rgba(255, 255, 255, 0)),
+    linear-gradient(to left, #ffffff 30%, rgba(255, 255, 255, 0)),
+    radial-gradient(farthest-side at 0 50%, rgba(32, 39, 80, 0.16), rgba(32, 39, 80, 0)),
+    radial-gradient(farthest-side at 100% 50%, rgba(32, 39, 80, 0.16), rgba(32, 39, 80, 0));
+  background-position: 0 0, 100% 0, 0 0, 100% 0;
+  background-repeat: no-repeat;
+  background-size: 48px 100%, 48px 100%, 16px 100%, 16px 100%;
+  background-attachment: local, local, scroll, scroll;
+}
+
+/* Visible, on-brand scrollbar so the overflow is discoverable before
+   you scroll — same treatment as the React DataTable */
+.box::-webkit-scrollbar {
+  height: 10px;
+}
+
+.box::-webkit-scrollbar-track {
+  background: var(--blue-200);
+  border-radius: 0 0 4px 4px;
+}
+
+.box::-webkit-scrollbar-thumb {
+  background-color: var(--blue-301);
+  border-radius: 4px;
+}
+
+.box::-webkit-scrollbar-thumb:hover {
+  background-color: var(--gray-350);
+}
+
+.box {
+  scrollbar-color: var(--blue-301) var(--blue-200);
+  scrollbar-width: thin;
 }
 
 th a:link,
@@ -1635,6 +1738,241 @@ div.title {
   padding: 8px 12px;
   word-break: normal;
   overflow-wrap: anywhere;
+}
+
+/* Full-width hint/instruction blocks (e.g. the inventory summary
+   explainer) read as prose on the page, not as a white card */
+.yui-gf > .box.p-2 {
+  background: transparent;
+  padding: 0 0 16px !important;
+  margin: 0 0 8px;
+  color: var(--gray-500);
+  line-height: 1.6;
+}
+
+/* Filter fields: label needs room to breathe above its control */
+.filter-list-item > label,
+.filters .prop > label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: var(--gray-600);
+}
+
+.filter-list-item {
+  margin-bottom: 16px;
+}
+
+/* Stacked action groups in narrow filter columns share one width —
+   a ragged pile of different-width buttons reads as unfinished */
+.filters .buttons,
+.yui-u.first .box .buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  text-align: left;
+  padding: 8px 0 0;
+}
+
+.filters .buttons > .button,
+.filters .buttons > button,
+.yui-u.first .box .buttons > .button,
+.yui-u.first .box .buttons > button {
+  width: 100%;
+  margin: 0 !important;
+}
+
+/* ============================================================
+   3h. DATATABLES 1.9.4
+   Its CDN stylesheet out-ranks the generic td/th rules and brings its
+   own scroll container, sort sprites and chrome. Bring all of it onto
+   the table spec.
+   ============================================================ */
+
+/* DataTables' own rules are thead th / tbody td (0,1,3) — match that
+   specificity or the 3px padding wins */
+table.dataTable thead th,
+table.dataTable thead td,
+table.dataTable tbody th,
+table.dataTable tbody td,
+table.dataTable tfoot th,
+table.dataTable tfoot td {
+  padding: 12px 10px;
+  font: 400 14px/20px 'Inter', sans-serif;
+  color: var(--gray-600);
+  border-right: none;
+  border-left: none;
+}
+
+table.dataTable thead th {
+  background-color: var(--blue-100);
+  color: var(--gray-600);
+  font-weight: 700;
+  border-bottom: none;
+  white-space: nowrap;
+}
+
+table.dataTable tbody tr {
+  background-color: #ffffff;
+}
+
+table.dataTable tbody tr:hover,
+table.dataTable tbody tr.odd:hover,
+table.dataTable tbody tr.even:hover {
+  background-color: #F8FAFF;
+}
+
+table.dataTable tbody tr.odd,
+table.dataTable tbody tr.even {
+  background-color: #ffffff;
+}
+
+table.dataTable tbody td {
+  border-bottom: 1px solid var(--gray-100);
+}
+
+/* DataTables draws 1px black rules under thead and over tfoot */
+table.dataTable,
+table.dataTable tfoot th,
+table.dataTable tfoot td,
+.dataTables_wrapper .dataTables_scrollHead,
+.dataTables_wrapper .dataTables_scrollBody,
+.dataTables_wrapper .dataTables_scrollFoot,
+.dataTables_wrapper .dataTables_scrollFootInner,
+.dataTables_wrapper .dataTables_scrollFootInner table {
+  border: none;
+}
+
+table.dataTable tfoot th,
+table.dataTable tfoot td {
+  border-top: 1px solid var(--gray-100);
+}
+
+/* Sort indicators → line chevrons instead of the DataTables sprites */
+table.dataTable thead th.sorting,
+table.dataTable thead th.sorting_asc,
+table.dataTable thead th.sorting_desc {
+  background-repeat: no-repeat;
+  background-position: center right 6px;
+  background-size: 11px 11px;
+  padding: 12px 24px 12px 10px;
+  cursor: pointer;
+}
+
+table.dataTable thead th.sorting {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23CED4DA' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 10l5-5 5 5M7 14l5 5 5-5'/%3E%3C/svg%3E");
+}
+
+table.dataTable thead th.sorting_asc {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 15l6-6 6 6'/%3E%3C/svg%3E");
+}
+
+table.dataTable thead th.sorting_desc {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* DataTables scrolls in its own element — give it the same scroll
+   affordance and visible scrollbar as the .box containers */
+.dataTables_wrapper .dataTables_scrollBody {
+  background-image:
+    linear-gradient(to right, #ffffff 30%, rgba(255, 255, 255, 0)),
+    linear-gradient(to left, #ffffff 30%, rgba(255, 255, 255, 0)),
+    radial-gradient(farthest-side at 0 50%, rgba(32, 39, 80, 0.16), rgba(32, 39, 80, 0)),
+    radial-gradient(farthest-side at 100% 50%, rgba(32, 39, 80, 0.16), rgba(32, 39, 80, 0));
+  background-position: 0 0, 100% 0, 0 0, 100% 0;
+  background-repeat: no-repeat;
+  background-size: 48px 100%, 48px 100%, 16px 100%, 16px 100%;
+  background-attachment: local, local, scroll, scroll;
+  scrollbar-color: var(--blue-301) var(--blue-200);
+  scrollbar-width: thin;
+}
+
+.dataTables_wrapper .dataTables_scrollBody::-webkit-scrollbar {
+  height: 10px;
+}
+
+.dataTables_wrapper .dataTables_scrollBody::-webkit-scrollbar-track {
+  background: var(--blue-200);
+}
+
+.dataTables_wrapper .dataTables_scrollBody::-webkit-scrollbar-thumb {
+  background-color: var(--blue-301);
+  border-radius: 4px;
+}
+
+/* Wrapper chrome: search field, length menu, info line, pagination.
+   These are block children of the horizontally scrolling card, so by
+   default they are only as wide as the visible area and slide away
+   (background and all) when the table is scrolled. Pinning them to
+   the left keeps the chrome — and the card header — in place. */
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+  font-size: 12px;
+  color: var(--gray-600);
+  padding: 12px 16px;
+  position: sticky;
+  left: 0;
+}
+
+.box > h2 {
+  position: sticky;
+  left: 0;
+}
+
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+  height: 36px;
+  box-sizing: border-box;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin-left: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--gray-600);
+}
+
+.dataTables_wrapper .dataTables_filter input:focus,
+.dataTables_wrapper .dataTables_length select:focus {
+  outline: 0;
+  border: 1px solid var(--blue-primary);
+  box-shadow: var(--focus-ring);
+}
+
+.dataTables_wrapper .paginate_button,
+.dataTables_wrapper .paginate_active,
+.dataTables_wrapper .paginate_disabled_previous,
+.dataTables_wrapper .paginate_enabled_previous,
+.dataTables_wrapper .paginate_disabled_next,
+.dataTables_wrapper .paginate_enabled_next {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  color: var(--gray-600);
+  padding: 4px 10px;
+  margin: 0 2px;
+  cursor: pointer;
+}
+
+.dataTables_wrapper .paginate_active {
+  background: var(--blue-200);
+  border-color: var(--blue-primary);
+  color: var(--blue-primary);
+  font-weight: 600;
+}
+
+/* Download/export buttons carry an Excel PNG — inside a button it is
+   chrome, so it becomes the download line icon (document lists keep
+   their colored file-type glyphs) */
+.button img[src*="excel"],
+.buttons img[src*="excel"],
+button img[src*="excel"] {
+  content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3.5v11M7.5 10l4.5 4.5 4.5-4.5M4.5 19.5h15'/%3E%3C/svg%3E");
+  filter: none !important;
+  opacity: 1 !important;
 }
 
 /* ============================================================
