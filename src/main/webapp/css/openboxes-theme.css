@@ -1831,6 +1831,18 @@ div.title {
   margin-bottom: 0 !important;
 }
 
+/* Dropdown actions are a .action-menu span wrapping the real button —
+   stretching the wrapper alone leaves the button at content width */
+.filters .buttons > .action-menu > .button,
+.filters .buttons > .action-menu > button,
+.yui-u.first .box .buttons > .action-menu > .button,
+.yui-u.first .box .buttons > .action-menu > button,
+.filter-list-item.buttons > .action-menu > .button,
+.filter-list-item.buttons > .action-menu > button {
+  width: 100%;
+  margin: 0 !important;
+}
+
 /* ============================================================
    3h. DATATABLES 1.9.4
    Its CDN stylesheet out-ranks the generic td/th rules and brings its
@@ -1869,7 +1881,14 @@ table.dataTable thead th {
   color: var(--gray-600);
   font-weight: 700;
   border-bottom: none;
-  white-space: nowrap;
+  /* DataTables fixes column widths in JS, so nowrap headers spill into
+     the next column. Wrap at word boundaries instead — never mid-word,
+     which is what produced letter-stacked columns before. */
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: none;
+  vertical-align: middle;
 }
 
 /* Transparent, not white: the card's scroll shadow is painted on the
