@@ -66,6 +66,9 @@
   /* Shared effects (theme-local additions) */
   --focus-ring: 0 1px 2px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(104, 113, 130, 0.16), 0 0 0 4px rgba(34, 100, 229, 0.15);
   --card-radius: 4px;
+  /* One shadow for centered "focus cards" (login, location chooser);
+     in-app content cards stay flat like the React reference */
+  --focus-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.07);
 }
 
 /* ============================================================
@@ -1216,7 +1219,7 @@ th a:hover {
 }
 
 .ui-tabs .ui-tabs-nav,
-.tabs > ul {
+.tabs:not(.tabs-left) > ul {
   background: transparent;
   border: none;
   border-bottom: 1px solid var(--gray-200);
@@ -1226,7 +1229,7 @@ th a:hover {
 }
 
 .ui-tabs .ui-tabs-nav li,
-.tabs > ul > li {
+.tabs:not(.tabs-left) > ul > li {
   background: transparent;
   border: none;
   margin: 0;
@@ -1234,7 +1237,7 @@ th a:hover {
 }
 
 .ui-tabs .ui-tabs-nav li a,
-.tabs > ul > li > a {
+.tabs:not(.tabs-left) > ul > li > a {
   color: var(--gray-400);
   font-size: 14px;
   font-weight: 500;
@@ -1244,7 +1247,7 @@ th a:hover {
 }
 
 .ui-tabs .ui-tabs-nav li a:hover,
-.tabs > ul > li > a:hover {
+.tabs:not(.tabs-left) > ul > li > a:hover {
   color: var(--blue-primary);
   text-decoration: none;
 }
@@ -1257,8 +1260,8 @@ th a:hover {
 
 .ui-tabs .ui-tabs-nav li.ui-tabs-selected a,
 .ui-tabs .ui-tabs-nav li.ui-state-active a,
-.tabs > ul > li.ui-tabs-selected > a,
-.tabs > ul > li.ui-state-active > a {
+.tabs:not(.tabs-left) > ul > li.ui-tabs-selected > a,
+.tabs:not(.tabs-left) > ul > li.ui-state-active > a {
   color: var(--blue-primary);
   border-bottom: 2px solid var(--blue-primary);
 }
@@ -1354,6 +1357,42 @@ th a:hover {
 
 #ft a {
   color: var(--gray-401);
+}
+
+/* Both focus cards share the same shadow */
+.location-chooser {
+  box-shadow: var(--focus-card-shadow);
+}
+
+#loginBox {
+  box-shadow: var(--focus-card-shadow);
+}
+
+/* Vertical tab rails (.tabs-left, e.g. the location chooser) keep
+   their left accent bar only — no horizontal underline, whether the
+   rules arrive via .tabs or runtime ui-tabs classes */
+.tabs.tabs-left > ul,
+.tabs.tabs-left .ui-tabs-nav {
+  border-bottom: none;
+}
+
+.tabs.tabs-left > ul > li > a,
+.tabs.tabs-left .ui-tabs-nav li a,
+.tabs.tabs-left .ui-tabs-nav li.ui-state-active a,
+.tabs.tabs-left .ui-tabs-nav li.ui-tabs-selected a {
+  border-bottom: none;
+}
+
+/* Location-chooser tiles (chooseLocation page + nav dropdown): keep
+   their identity — they carry the per-warehouse tint via
+   --location-color — but align metrics to the 36px control system
+   and ban mid-word breaking */
+.location-chooser .tabs .location-group .element {
+  min-height: 36px;
+  align-items: center;
+  padding: 8px 12px;
+  word-break: normal;
+  overflow-wrap: anywhere;
 }
 
 /* ============================================================

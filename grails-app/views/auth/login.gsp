@@ -31,7 +31,6 @@
 
 					<div class="login-brand">
 						<img src="${request.contextPath}/static/images/logo/logo-blue.png" alt="OpenBoxes logo"/>
-						<span class="login-brand-name">openboxes</span>
 					</div>
 
 					<div id="loginBox" class="box">
