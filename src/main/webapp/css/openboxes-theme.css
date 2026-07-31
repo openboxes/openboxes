@@ -1374,6 +1374,27 @@ th a:hover {
   padding: 6px 12px;
 }
 
+/* Brand header above the login card (the overhaul's one markup addition) */
+.login-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding-bottom: 20px;
+}
+
+.login-brand img {
+  width: 40px;
+  height: 40px;
+}
+
+.login-brand-name {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--blue-800);
+  letter-spacing: -0.02em;
+}
+
 /* The header's silk padlock PNG → line-style lock in the title blue */
 #loginBox h2 img {
   display: none;

@@ -29,6 +29,11 @@
 					   </div>
 					</g:hasErrors>
 
+					<div class="login-brand">
+						<img src="${resource(dir:'images/logo', file:'logo_100.png')}" alt="OpenBoxes logo"/>
+						<span class="login-brand-name">openboxes</span>
+					</div>
+
 					<div id="loginBox" class="box">
                         <h2>
                             <img src="${resource(dir:'images/icons/silk',file:'lock.png')}" class="middle"/>
