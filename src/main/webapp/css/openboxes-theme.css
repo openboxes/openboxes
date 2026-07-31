@@ -610,7 +610,8 @@ img[src*="/icons/silk/printer.png"] { content: url("data:image/svg+xml,%3Csvg xm
 img[src*="/icons/silk/error.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C71610' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7.5v5.5M12 16.5h.01'/%3E%3C/svg%3E"); }
 img[src*="/icons/silk/email.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5.5' width='18' height='13' rx='2'/%3E%3Cpath d='M3.5 7l8.5 6 8.5-6'/%3E%3C/svg%3E"); }
 img[src*="/icons/silk/play_green.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M7.5 4.8l12 7.2-12 7.2z'/%3E%3C/svg%3E"); }
-img[src*="/icons/silk/arrow_refresh.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 12a8 8 0 1 1-2.34-5.66'/%3E%3Cpath d='M20 4v5h-5'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/arrow_refresh.png"],
+img[src*="/icons/silk/reload.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 12a8 8 0 1 1-2.34-5.66'/%3E%3Cpath d='M20 4v5h-5'/%3E%3C/svg%3E"); }
 img[src*="/icons/silk/hourglass.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 3.5h10M7 20.5h10M8 3.5v4l4 4 4-4v-4M8 20.5v-4l4-4 4 4v4'/%3E%3C/svg%3E"); }
 
 /* Swapped icons are already the right colour — skip the muting filter */
@@ -634,6 +635,7 @@ img[src*="/icons/silk/error.png"],
 img[src*="/icons/silk/email.png"],
 img[src*="/icons/silk/play_green.png"],
 img[src*="/icons/silk/arrow_refresh.png"],
+img[src*="/icons/silk/reload.png"],
 img[src*="/icons/silk/hourglass.png"] {
   filter: none !important;
   opacity: 1 !important;
@@ -1765,24 +1767,55 @@ div.title {
   margin-bottom: 16px;
 }
 
+/* ...but a label paired with a checkbox belongs beside it, not under */
+.filter-list-item > input[type="checkbox"] + label,
+.filter-list-item > input[type="radio"] + label,
+.filters .prop > input[type="checkbox"] + label {
+  display: inline;
+  margin-bottom: 0;
+  margin-left: 6px;
+  font-weight: 400;
+}
+
 /* Stacked action groups in narrow filter columns share one width —
    a ragged pile of different-width buttons reads as unfinished */
+/* Filter actions stack like the fields above them: same 10px/5px
+   inset as .filter-list-item, so they line up with the inputs rather
+   than running to the card edge, and the same 36px control height */
 .filters .buttons,
 .yui-u.first .box .buttons {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 8px;
   text-align: left;
-  padding: 8px 0 0;
+  margin: 10px 10px 16px;
+  padding: 8px 5px 0 0;
+  /* the markup separates buttons with &nbsp;, which is not collapsible
+     and would otherwise become a phantom flex item between them. It is
+     zero-height with font-size 0, but it would still consume `gap`
+     twice — so the 16px rhythm comes from child margins instead. */
+  font-size: 0;
+}
+
+.filters .buttons > *,
+.yui-u.first .box .buttons > * {
+  font-size: 14px;
 }
 
 .filters .buttons > .button,
 .filters .buttons > button,
+.filters .buttons > .action-menu,
 .yui-u.first .box .buttons > .button,
-.yui-u.first .box .buttons > button {
+.yui-u.first .box .buttons > button,
+.yui-u.first .box .buttons > .action-menu {
   width: 100%;
-  margin: 0 !important;
+  /* 16px matches the gap between the fields above */
+  margin: 0 0 16px !important;
+}
+
+.filters .buttons > *:last-child,
+.yui-u.first .box .buttons > *:last-child {
+  margin-bottom: 0 !important;
 }
 
 /* ============================================================
@@ -1805,6 +1838,17 @@ table.dataTable tfoot td {
   color: var(--gray-600);
   border-right: none;
   border-left: none;
+}
+
+/* Table cells also carry jQuery UI's .ui-state-default, whose opaque
+   white (a class) out-ranks the element-level th rule and blanked the
+   scroll shadow behind footer/total rows */
+table th.ui-state-default,
+table td.ui-state-default,
+table.dataTable th.ui-state-default,
+table.dataTable td.ui-state-default {
+  background: rgba(240, 246, 255, 0.55);
+  border-color: var(--gray-100);
 }
 
 table.dataTable thead th {
