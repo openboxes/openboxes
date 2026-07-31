@@ -8,7 +8,7 @@
     <g:render template="/localization/crowdin"/>
     <g:googleSiteTag />
     <g:render template="/common/hotjar"/>
-    <asset:link rel="icon" href="favicon.ico" type="image/x-ico"/>
+    <link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}?v=blue" type="image/x-icon" />
 
     <g:layoutHead/>
 </head>
