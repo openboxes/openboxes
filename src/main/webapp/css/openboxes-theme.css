@@ -181,9 +181,11 @@ h1 {
   border-radius: 4px;
   color: var(--gray-600);
   font-size: 14px;
-  padding: 12px 16px 12px 32px;
-  background-position: 10px 50%;
+  padding: 12px 16px 12px 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23636D81' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 11v5M12 7.5h.01'/%3E%3C/svg%3E");
+  background-position: 12px 50%;
   background-repeat: no-repeat;
+  background-size: 16px 16px;
 }
 
 .warning {
@@ -192,9 +194,11 @@ h1 {
   border-radius: 4px;
   color: var(--gray-600);
   font-size: 14px;
-  padding: 12px 16px 12px 32px;
-  background-position: 10px 50%;
+  padding: 12px 16px 12px 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F3A157' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3.5L22 20H2z'/%3E%3Cpath d='M12 10v4.5M12 17.5h.01'/%3E%3C/svg%3E");
+  background-position: 12px 50%;
   background-repeat: no-repeat;
+  background-size: 16px 16px;
 }
 
 div.errors {
@@ -414,7 +418,7 @@ input.negative:hover,
 }
 
 .button.approve.icon:before {
-  background-position: -12px -48px; /* white check at rest (blue bg) */
+  filter: brightness(0) invert(1); /* white check at rest (blue bg) */
 }
 
 .button.icon.trash,
@@ -437,14 +441,164 @@ input.negative:hover,
   border-color: var(--color-red);
 }
 
-/* Their sprites must stay dark on the light danger background */
-.button.trash.icon:hover:before,
-.button.trash.icon:focus:before,
-.button.trash.icon:active:before { background-position: 0 -336px; }
+/* ============================================================
+   ICONS — unify on line-style SVG glyphs (Remixicon look: 24-grid,
+   2px stroke, round caps). Replaces the dark gh-icons.png sprite for
+   every icon class in use; markup untouched. Default color is
+   --gray-600; primary/blue contexts flip white via the invert filter.
+   ============================================================ */
 
-.button.remove.icon:hover:before,
-.button.remove.icon:focus:before,
-.button.remove.icon:active:before { background-position: 0 -60px; }
+.button.icon:before {
+  content: "";
+  float: none;
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  top: 0;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 15px 15px;
+  background-image: none;
+  flex-shrink: 0;
+}
+
+/* The legacy sprite rules set per-icon background-positions at higher
+   specificity (.button.X.icon:before) — pin the SVGs back to center
+   at the same specificity for every icon class in use */
+.button.approve.icon:before,
+.button.accept.icon:before,
+.button.trash.icon:before,
+.button.delete.icon:before,
+.button.add.icon:before,
+.button.search.icon:before,
+.button.reload.icon:before,
+.button.loop.icon:before,
+.button.remove.icon:before,
+.button.log.icon:before,
+.button.edit.icon:before,
+.button.mail.icon:before,
+.button.email.icon:before,
+.button.arrowright.icon:before,
+.button.arrowleft.icon:before,
+.button.arrowdown.icon:before,
+.button.arrowup.icon:before,
+.button.user.icon:before,
+.button.tag.icon:before,
+.button.move.icon:before {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 15px 15px;
+}
+
+/* ...and the legacy :hover/:focus/:active sprite shifts */
+.button.icon:is(:hover, :focus, :active):before {
+  background-position: center;
+  background-size: 15px 15px;
+}
+
+.button.approve.icon:before,
+.button.accept.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 12.8l5 5L19.5 6.5'/%3E%3C/svg%3E");
+}
+
+.button.trash.icon:before,
+.button.delete.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16M10 3.5h4M6.5 7l1 13.5h9l1-13.5M10 11v6M14 11v6'/%3E%3C/svg%3E");
+}
+
+.button.add.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M12 4.5v15M4.5 12h15'/%3E%3C/svg%3E");
+}
+
+.button.search.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15.5 15.5L20.5 20.5'/%3E%3C/svg%3E");
+}
+
+.button.reload.icon:before,
+.button.loop.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 12a8 8 0 1 1-2.34-5.66'/%3E%3Cpath d='M20 4v5h-5'/%3E%3C/svg%3E");
+}
+
+.button.remove.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M5.5 5.5l13 13M18.5 5.5l-13 13'/%3E%3C/svg%3E");
+}
+
+.button.log.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6.5 3h8l4 4v14h-12z'/%3E%3Cpath d='M14 3v4.5h4.5M9.5 12.5h5M9.5 16h5'/%3E%3C/svg%3E");
+}
+
+.button.edit.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20l1-4L16.5 4.5l3 3L8 19l-4 1z'/%3E%3C/svg%3E");
+}
+
+.button.mail.icon:before,
+.button.email.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5.5' width='18' height='13' rx='2'/%3E%3Cpath d='M3.5 7l8.5 6 8.5-6'/%3E%3C/svg%3E");
+}
+
+.button.arrowright.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 12h15M13.5 6l6 6-6 6'/%3E%3C/svg%3E");
+}
+
+.button.arrowleft.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19.5 12h-15M10.5 6l-6 6 6 6'/%3E%3C/svg%3E");
+}
+
+.button.arrowdown.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.5v15M6 13.5l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+.button.arrowup.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 19.5v-15M6 10.5l6-6 6 6'/%3E%3C/svg%3E");
+}
+
+.button.user.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4.5 20.5c1.5-3.5 4.2-5 7.5-5s6 1.5 7.5 5'/%3E%3C/svg%3E");
+}
+
+.button.tag.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M3.5 3.5h8l9 9-8 8-9-9z'/%3E%3Ccircle cx='8' cy='8' r='1.4' fill='%23464F60'/%3E%3C/svg%3E");
+}
+
+.button.move.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3'/%3E%3C/svg%3E");
+}
+
+/* Colorful silk PNGs inside buttons: mute to a uniform monochrome so
+   they sit quietly next to the line icons (CSS cannot swap img src) */
+.button img,
+.buttons img,
+.linkButton a img,
+.actions img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  filter: grayscale(1) contrast(0.85);
+  opacity: 0.75;
+}
+
+/* ...and flip them white inside primary (blue) buttons */
+input[type="submit"] img,
+button[type="submit"] img,
+button[value="run"] img,
+.button.positive img,
+.button.icon.approve img {
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+}
+
+/* buttonBar link icons (background silk on a.list / a.new) → SVG */
+.linkButton a.list {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M8.5 6h11M8.5 12h11M8.5 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01'/%3E%3C/svg%3E");
+  background-size: 15px 15px;
+}
+
+.linkButton a.new,
+.linkButton a.create {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M12 4.5v15M4.5 12h15'/%3E%3C/svg%3E");
+  background-size: 15px 15px;
+}
 
 /* buttonBar action links (span.linkButton > a with silk-icon classes)
    → secondary buttons; keep the icon, inset it like button text */
