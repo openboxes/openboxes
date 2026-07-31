@@ -1767,6 +1767,33 @@ div.title {
   padding: 0;
 }
 
+/* Some panels (report parameters) put fields straight into .prop with
+   no .filter-list-item, so they never picked up its 10px inset */
+.filters .prop:not(:has(.filter-list-item)) {
+  margin: 10px 10px 16px;
+}
+
+/* ...and their action rows are a .center div rather than .buttons */
+.filters .prop > .center {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: left;
+  font-size: 0;
+}
+
+.filters .prop > .center > .button,
+.filters .prop > .center > button,
+.filters .prop > .center > .action-menu {
+  width: 100%;
+  margin: 0 0 16px !important;
+  font-size: 14px;
+}
+
+.filters .prop > .center > *:last-child {
+  margin-bottom: 0 !important;
+}
+
 /* Filter fields: label needs room to breathe above its control */
 .filter-list-item > label,
 .filters .prop > label {
@@ -1774,6 +1801,12 @@ div.title {
   margin-bottom: 6px;
   font-weight: 500;
   color: var(--gray-600);
+}
+
+/* Panels that stack several fields in one .prop get the same rhythm
+   between fields that separate .filter-list-item blocks provide */
+.filters .prop > label:not(:first-child) {
+  margin-top: 14px;
 }
 
 .filter-list-item {
@@ -2049,6 +2082,58 @@ table.dataTable thead th.sorting_desc {
   outline: 0;
   border: 1px solid var(--blue-primary);
   box-shadow: var(--focus-ring);
+}
+
+/* DataTables' jQuery-UI pagination renders .fg-button anchors whose
+   line boxes overflowed the 24px-tall row, so the card clipped them.
+   Lay the row out as flex and give the controls real button metrics. */
+.dataTables_wrapper .dataTables_paginate,
+.dataTables_wrapper .dataTables_paginate.paging_full_numbers {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 16px 16px;
+  /* DataTables pins .paging_full_numbers to a 22px line box, which
+     cropped the taller controls at the bottom of the card */
+  height: auto;
+  line-height: normal;
+}
+
+.dataTables_wrapper .dataTables_paginate .fg-button,
+.dataTables_wrapper .dataTables_paginate .ui-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 6px 12px;
+  margin: 0;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  background: #ffffff;
+  color: var(--gray-600);
+  font-size: 12px;
+  line-height: 16px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.dataTables_wrapper .dataTables_paginate .fg-button:hover:not(.ui-state-disabled) {
+  background: var(--blue-100);
+  border-color: var(--blue-primary);
+  color: var(--blue-primary);
+}
+
+.dataTables_wrapper .dataTables_paginate .ui-state-disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.dataTables_wrapper .dataTables_paginate .fg-button.ui-state-active,
+.dataTables_wrapper .dataTables_paginate .ui-state-highlight {
+  background: var(--blue-200);
+  border-color: var(--blue-primary);
+  color: var(--blue-primary);
+  font-weight: 600;
 }
 
 .dataTables_wrapper .paginate_button,
