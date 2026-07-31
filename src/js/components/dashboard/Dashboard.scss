@@ -14,7 +14,9 @@
       flex-direction: row;
       width: 100%;
       flex-wrap: wrap;
-      margin: 10px 6%;
+      // 3% lines the row up with the cards beneath it: .card-component
+      // contributes 2% and each card another 1% of its own margin.
+      margin: 10px 3%;
       // Reads as a secondary button rather than another filter chip.
       // Qualified with .category-item so it outranks that rule's
       // !important widths inside the media queries below.
