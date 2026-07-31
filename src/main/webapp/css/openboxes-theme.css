@@ -2215,9 +2215,66 @@ button img[src*="excel"] {
   opacity: 1 !important;
 }
 
+/* Property-table forms are top-aligned, so a one-line label sat above
+   the middle of its 36px control. Centre them; rows with a textarea
+   keep top alignment, where centring would look adrift. */
+tr.prop > td,
+tr.prop > td.name,
+tr.prop > td.value {
+  vertical-align: middle;
+}
+
+tr.prop:has(textarea) > td {
+  vertical-align: top;
+}
+
+/* Native file inputs match the control height */
+input[type="file"] {
+  height: 36px;
+  box-sizing: border-box;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+}
+
 /* ============================================================
    4. PER-PAGE FIXES
    ============================================================ */
+
+/* CSV import — "Upload data file". The two download buttons and their
+   "-- OR --" separator are inline with no spacing, and Cancel is a bare
+   link beside a primary button. */
+#upload-form td.value > div {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+#upload-form td.value > div > b {
+  color: var(--gray-400);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+#upload-form td > a:not(.button) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 8px 16px;
+  margin-left: 8px;
+  border-radius: 4px;
+  background-color: var(--blue-100);
+  color: var(--gray-600);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+#upload-form td > a:not(.button):hover {
+  color: var(--blue-500);
+}
 
 /* Login: #loginFormBox drew its own gray border inside the themed
    .box card — drop it so the card reads as one surface. The page's
