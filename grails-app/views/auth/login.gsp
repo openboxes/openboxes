@@ -82,8 +82,10 @@
 
 			var timezone = jzTimezoneDetector.determine_timezone().timezone; // Now you have an instance of the TimeZone object.
 			$("#browserTimezone").val(timezone.olson_tz); // Set the user timezone offset as a hidden input
-            $("#username").watermark("${warehouse.message(code:'login.username.label')}");
-		    $("#password").watermark("${warehouse.message(code:'login.password.label')}");
+            %{-- capitalize() lifts only the first letter, so the placeholder
+                 reads as a sentence in whichever locale supplied it --}%
+            $("#username").watermark("${warehouse.message(code:'login.username.label')?.capitalize()}");
+		    $("#password").watermark("${warehouse.message(code:'login.password.label')?.capitalize()}");
 			$("#username").focus();
 
             openboxes.expireFromLocal();
