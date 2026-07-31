@@ -726,6 +726,36 @@ tr.crossed-out td:before {
   height: 5% !important;
 }
 
+// react-table's own rules have the same specificity as these and the
+// bundle's CSS order is not guaranteed, so qualify with the element
+// name to win regardless of order.
+.ReactTable {
+  // The default empty state is an absolutely positioned, translucent
+  // white box floating over the cells. Give it its own row instead.
+  div.rt-noData {
+    position: relative;
+    left: unset;
+    top: unset;
+    transform: unset;
+    -webkit-transform: unset;
+    width: 100%;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 24px;
+    background-color: #ffffff;
+    color: var(--gray-400);
+    order: 1;
+  }
+
+  // Headers align with the filter inputs beneath them
+  .rt-thead div.rt-th {
+    text-align: left;
+  }
+}
+
 .even-row {
   background-color: $white-alpha;
 }
