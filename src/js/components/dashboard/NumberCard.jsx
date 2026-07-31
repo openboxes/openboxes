@@ -1,8 +1,8 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { RiInformationLine } from 'react-icons/ri';
 import { Line } from 'react-chartjs-2';
+import { RiInformationLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { SortableElement } from 'react-sortable-hoc';

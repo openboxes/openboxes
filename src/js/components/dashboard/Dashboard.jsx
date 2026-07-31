@@ -3,12 +3,12 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { defaults } from 'react-chartjs-2';
-import { connect } from 'react-redux';
-import { SortableContainer } from 'react-sortable-hoc';
 import {
   RiArchiveLine, RiArrowLeftSLine, RiArrowRightSLine, RiBarChartLine,
   RiInformationLine, RiSaveLine,
 } from 'react-icons/ri';
+import { connect } from 'react-redux';
+import { SortableContainer } from 'react-sortable-hoc';
 
 import {
   addToIndicators,

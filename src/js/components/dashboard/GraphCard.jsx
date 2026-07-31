@@ -3,10 +3,10 @@
 import React, { Component } from 'react';
 
 import PropTypes from 'prop-types';
-import { RiInformationLine, RiRefreshLine } from 'react-icons/ri';
 import {
   Bar, Doughnut, HorizontalBar, Line,
 } from 'react-chartjs-2';
+import { RiInformationLine, RiRefreshLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { SortableElement } from 'react-sortable-hoc';

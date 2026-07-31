@@ -156,14 +156,59 @@ select:not([multiple]):not([size]) {
   white-space: pre;
 }
 
+// Footer sits directly on the page background — no card, no borders.
+// Build/debug info hides behind a CSS-only disclosure whose toggle is
+// the info icon (checkbox + label in Footer.jsx; no JavaScript).
+.footer-toggle {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.footer-summary {
+  gap: 8px;
+  line-height: 2em;
+}
+
+.footer-toggle-icon {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  cursor: pointer;
+  opacity: 0.65;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23747C93' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 11v5M12 7.5h.01'/%3E%3C/svg%3E") center / 15px 15px no-repeat;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.footer-details {
+  display: none;
+}
+
+.footer-toggle:checked ~ .footer-details {
+  display: block;
+}
+
+.footer-toggle:focus-visible ~ .footer-summary .footer-toggle-icon {
+  outline: 2px solid var(--blue-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+  opacity: 1;
+}
+
 .footer {
   bottom: 0;
   vertical-align: middle;
-  border-top: 1px solid var(--gray-200);
+  border-top: none;
   width: 100%;
   text-align: center;
   font-size: 12px;
-  background-color: white;
+  background-color: transparent;
   color: $gray-delta;
 
   div {

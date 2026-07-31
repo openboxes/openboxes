@@ -1,11 +1,11 @@
 import React from 'react';
 
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 import {
   RiArchiveLine, RiBarChartHorizontalLine, RiBarChartLine, RiLineChartLine,
   RiPieChartLine, RiRefreshLine, RiTableLine,
 } from 'react-icons/ri';
-import PropTypes from 'prop-types';
 import ReactLoading from 'react-loading';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';

@@ -4,9 +4,18 @@
 <%@ page import="util.ConfigHelper" %>
 
 <div id="footer">
+    %{-- CSS-only disclosure: the label toggles the checkbox, which reveals
+         .footer-details via a sibling selector. No JavaScript involved. --}%
+    <input type="checkbox" id="footer-details-toggle" class="footer-toggle"/>
+    <div class="footer-summary center middle">
+        &copy; <g:copyrightYear/>
+        <a href="https://openboxes.com"><warehouse:message code="default.poweredBy.label" default="Powered by OpenBoxes"/></a>
+        <label for="footer-details-toggle" class="footer-toggle-icon"
+               title="${g.message(code: 'application.buildInformation.label', default: 'Build information')}"
+               aria-label="${g.message(code: 'application.buildInformation.label', default: 'Build information')}"></label>
+    </div>
+    <div class="footer-details">
 	<div style="line-height: 2em;" class="center middle">
-		&copy; <g:copyrightYear/>
-        <a href="https://openboxes.com"><warehouse:message code="default.poweredBy.label" default="Powered by OpenBoxes"/></a> &nbsp;&nbsp; | &nbsp;&nbsp;
         <g:message code="application.grailsVersion.label"/>: &nbsp; <b><g:meta name="info.app.grailsVersion"></g:meta></b> &nbsp;&nbsp; | &nbsp;&nbsp;
         <g:message code="application.version.label"/>: &nbsp;<b><a href="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'info.app.version')}"><g:meta name="info.app.version"/></a></b>&nbsp;&nbsp; | &nbsp;&nbsp;
         <g:if test="${gitProperties}">
@@ -72,4 +81,5 @@
             </span>
         </g:if>
 	</div>
+    </div>
 </div>
