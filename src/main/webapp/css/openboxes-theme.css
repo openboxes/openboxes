@@ -320,13 +320,14 @@ button[name="search"].icon:before {
 
 /* Buttons lay out as centered flex rows: icon images and sprite icons
    align optically without baseline fiddling */
+/* 8px icon-to-text gap matches the React Button component (gap-8) */
 .button,
 button.button,
 a.button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   min-height: 36px;
   box-sizing: border-box;
 }
@@ -623,6 +624,7 @@ h3 img,
   filter: grayscale(1) contrast(0.85);
   opacity: 0.7;
   vertical-align: -2px;
+  margin-right: 8px; /* same icon-to-text gap as buttons and nav items */
 }
 
 /* ...and flip them white inside primary (blue) buttons */

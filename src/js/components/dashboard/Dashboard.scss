@@ -151,9 +151,12 @@
     font-size: 12px;
     color: #878787 !important;
 
-    i {
+    i, svg {
+      flex-shrink: 0;
       font-size: 14px;
-      margin-right: 6px;
+      width: 14px;
+      height: 14px;
+      margin-right: 8px;
     }
 
     .division-line {
@@ -228,9 +231,14 @@
         color: inherit;
         display: flex;
         align-items: center;
+        gap: 8px;
+        font-size: 14px;
 
-        i {
-          margin-right: 16px;
+        i, svg {
+          flex-shrink: 0;
+          width: 18px;
+          height: 18px;
+          font-size: 18px;
         }
       }
     }
