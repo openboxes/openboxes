@@ -922,13 +922,13 @@ th {
 .box {
   overflow-x: auto;
   background-image:
-    linear-gradient(to right, #ffffff 30%, rgba(255, 255, 255, 0)),
-    linear-gradient(to left, #ffffff 30%, rgba(255, 255, 255, 0)),
-    radial-gradient(farthest-side at 0 50%, rgba(32, 39, 80, 0.16), rgba(32, 39, 80, 0)),
-    radial-gradient(farthest-side at 100% 50%, rgba(32, 39, 80, 0.16), rgba(32, 39, 80, 0));
+    linear-gradient(to right, #ffffff 20%, rgba(255, 255, 255, 0)),
+    linear-gradient(to left, #ffffff 20%, rgba(255, 255, 255, 0)),
+    radial-gradient(farthest-side at 0 50%, rgba(32, 39, 80, 0.3), rgba(32, 39, 80, 0)),
+    radial-gradient(farthest-side at 100% 50%, rgba(32, 39, 80, 0.3), rgba(32, 39, 80, 0));
   background-position: 0 0, 100% 0, 0 0, 100% 0;
   background-repeat: no-repeat;
-  background-size: 48px 100%, 48px 100%, 16px 100%, 16px 100%;
+  background-size: 32px 100%, 32px 100%, 24px 100%, 24px 100%;
   background-attachment: local, local, scroll, scroll;
 }
 
@@ -1813,8 +1813,10 @@ table.dataTable thead th {
   white-space: nowrap;
 }
 
+/* Transparent, not white: the card's scroll shadow is painted on the
+   container background, so opaque rows would hide it */
 table.dataTable tbody tr {
-  background-color: #ffffff;
+  background-color: transparent;
 }
 
 table.dataTable tbody tr:hover,
@@ -1825,7 +1827,7 @@ table.dataTable tbody tr.even:hover {
 
 table.dataTable tbody tr.odd,
 table.dataTable tbody tr.even {
-  background-color: #ffffff;
+  background-color: transparent;
 }
 
 table.dataTable tbody td {
@@ -1876,13 +1878,13 @@ table.dataTable thead th.sorting_desc {
    affordance and visible scrollbar as the .box containers */
 .dataTables_wrapper .dataTables_scrollBody {
   background-image:
-    linear-gradient(to right, #ffffff 30%, rgba(255, 255, 255, 0)),
-    linear-gradient(to left, #ffffff 30%, rgba(255, 255, 255, 0)),
-    radial-gradient(farthest-side at 0 50%, rgba(32, 39, 80, 0.16), rgba(32, 39, 80, 0)),
-    radial-gradient(farthest-side at 100% 50%, rgba(32, 39, 80, 0.16), rgba(32, 39, 80, 0));
+    linear-gradient(to right, #ffffff 20%, rgba(255, 255, 255, 0)),
+    linear-gradient(to left, #ffffff 20%, rgba(255, 255, 255, 0)),
+    radial-gradient(farthest-side at 0 50%, rgba(32, 39, 80, 0.3), rgba(32, 39, 80, 0)),
+    radial-gradient(farthest-side at 100% 50%, rgba(32, 39, 80, 0.3), rgba(32, 39, 80, 0));
   background-position: 0 0, 100% 0, 0 0, 100% 0;
   background-repeat: no-repeat;
-  background-size: 48px 100%, 48px 100%, 16px 100%, 16px 100%;
+  background-size: 32px 100%, 32px 100%, 24px 100%, 24px 100%;
   background-attachment: local, local, scroll, scroll;
   scrollbar-color: var(--blue-301) var(--blue-200);
   scrollbar-width: thin;
@@ -1906,6 +1908,16 @@ table.dataTable thead th.sorting_desc {
    default they are only as wide as the visible area and slide away
    (background and all) when the table is scrolled. Pinning them to
    the left keeps the chrome — and the card header — in place. */
+/* A sticky child can only stay put while its containing block is still
+   under the scrollport. The wrapper is a block child of the scrolling
+   card, so it is only as wide as the visible area — it (and anything
+   sticky inside it) slid away. Letting the wrapper span the full
+   scroll width gives the sticky chrome something to hold onto. */
+.dataTables_wrapper {
+  width: max-content;
+  min-width: 100%;
+}
+
 .dataTables_wrapper .dataTables_filter,
 .dataTables_wrapper .dataTables_length,
 .dataTables_wrapper .dataTables_info,
@@ -1915,6 +1927,11 @@ table.dataTable thead th.sorting_desc {
   padding: 12px 16px;
   position: sticky;
   left: 0;
+  /* hug the content so the pinned row does not stretch to the full
+     scroll width (which would push right-floated chrome off-screen) */
+  width: fit-content;
+  float: none;
+  text-align: left;
 }
 
 .box > h2 {
