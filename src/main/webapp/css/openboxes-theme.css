@@ -2552,6 +2552,14 @@ fieldset > div > .category-tree {
   margin: 0 0 20px;
 }
 
+/* The login placeholders come from message bundles in lower case.
+   Scoped here rather than applied globally: `capitalize` title-cases
+   every word, which would mangle the longer placeholders elsewhere
+   ("Search by order number..." -> "Search By Order Number..."). */
+#loginBox input::placeholder {
+  text-transform: capitalize;
+}
+
 .login-brand-name {
   font-size: 34px;
   font-weight: 700;
