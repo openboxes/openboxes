@@ -151,6 +151,16 @@ h1 {
 
 .box > h2 {
   border-bottom: 1px solid var(--gray-250);
+  /* The legacy 16px inset left card titles sitting 6px right of the first
+     column below them and made the header band taller than it needed to
+     be. Match the table's 10px cell inset and centre the title in what is
+     left. */
+  /* 13/11 rather than 12/12: the cap-height sits high in an 18px/24px
+     line box, so equal padding reads 2px top-heavy */
+  padding: 13px 10px 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* Breathing room for non-table box content (tables stay flush like the
@@ -655,7 +665,10 @@ img[src*="/icons/silk/package"] { content: url("data:image/svg+xml,%3Csvg xmlns=
 img[src*="/icons/silk/lorry"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 6.5h10v10h-10zM12.5 10h4l3 3v3.5h-7z'/%3E%3Ccircle cx='6.5' cy='18.5' r='1.8'/%3E%3Ccircle cx='16.5' cy='18.5' r='1.8'/%3E%3C/svg%3E") !important; }
 img[src*="/icons/silk/link"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13.5a4 4 0 0 0 5.7 0l3-3a4 4 0 1 0-5.7-5.7L11.5 6.3'/%3E%3Cpath d='M14 10.5a4 4 0 0 0-5.7 0l-3 3a4 4 0 1 0 5.7 5.7l1.5-1.5'/%3E%3C/svg%3E") !important; }
 img[src*="/icons/silk/calendar"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.5' y='5' width='17' height='15.5' rx='2'/%3E%3Cpath d='M3.5 9.5h17M8 3v4M16 3v4'/%3E%3C/svg%3E") !important; }
-img[src*="/icons/silk/book"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4.5h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4z'/%3E%3Cpath d='M20 4.5h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H20z'/%3E%3C/svg%3E") !important; }
+/* The open-book outline collapsed into two ambiguous bars at 16px; a ruled
+   ledger with a spine holds up and suits both "Record stock" here and
+   "Show stock card" on the pages that use book.png. */
+img[src*="/icons/silk/book"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4.5' y='3' width='15' height='18' rx='2'/%3E%3Cpath d='M8.5 3v18M11.5 8h5M11.5 12h5'/%3E%3C/svg%3E") !important; }
 
 img[src*="/icons/silk/package"],
 img[src*="/icons/silk/lorry"],
@@ -665,6 +678,56 @@ img[src*="/icons/silk/book"] {
   filter: none !important;
   opacity: 1 !important;
 }
+
+/* The two prefix families above are too blunt for menus: every package_*
+   collapsed to one carton (which reads as the OpenBoxes cube) across five
+   unrelated actions, and every book_* to one book across four. Give each
+   file its own glyph. Same specificity as the family rules, so these must
+   stay AFTER them to win. Each is built from the shared 24px grid, 2px
+   round-joined stroke, so they sit in the same family as the rest. */
+
+/* Transfer in — arrow descending into an open tray */
+img[src*="/icons/silk/package_in.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v9M8.5 8.5l3.5 3.5 3.5-3.5'/%3E%3Cpath d='M4 14.5v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3'/%3E%3C/svg%3E") !important; }
+
+/* Transfer out — the same tray, arrow rising out of it */
+img[src*="/icons/silk/package_go.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 12V3M8.5 6.5L12 3l3.5 3.5'/%3E%3Cpath d='M4 14.5v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3'/%3E%3C/svg%3E") !important; }
+
+/* Add to stock — carton with a plus badge */
+img[src*="/icons/silk/package_add.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 12V7.5L12 3 4 7.5v9l8 4.5 2.5-1.4'/%3E%3Cpath d='M4 7.5l8 4.5v9'/%3E%3Cpath d='M18.5 15.5v6M15.5 18.5h6'/%3E%3C/svg%3E") !important; }
+
+/* Adjust inventory — sliders, the one action that changes a level rather
+   than moving goods */
+img[src*="/icons/silk/package_green.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16M4 17h16'/%3E%3Ccircle cx='9' cy='7' r='2.5'/%3E%3Ccircle cx='15' cy='17' r='2.5'/%3E%3C/svg%3E") !important; }
+
+/* Write-off — carton with a cross badge. Serves both "Create debit" and
+   "Mark as damaged": they share package_delete.png in the markup, so CSS
+   alone cannot tell them apart, and both remove stock. */
+img[src*="/icons/silk/package_delete.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 12V7.5L12 3 4 7.5v9l8 4.5 2.5-1.4'/%3E%3Cpath d='M4 7.5l8 4.5v9'/%3E%3Cpath d='M16.5 17l5 5M21.5 17l-5 5'/%3E%3C/svg%3E") !important; }
+
+/* On hold — carton with a barred badge */
+img[src*="/icons/silk/package_stop.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 12V7.5L12 3 4 7.5v9l8 4.5 2.5-1.4'/%3E%3Cpath d='M4 7.5l8 4.5v9'/%3E%3Ccircle cx='18.5' cy='18.5' r='3.5'/%3E%3Cpath d='M16 21l5-5'/%3E%3C/svg%3E") !important; }
+
+/* Adjust stock — deliberately the same sliders as "Adjust inventory"
+   above. These are the same operation surfaced in two different menus, so
+   matching them is the point; it is not the accidental collapsing the
+   per-file rules exist to undo. */
+img[src*="/icons/silk/book_open.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16M4 17h16'/%3E%3Ccircle cx='9' cy='7' r='2.5'/%3E%3Ccircle cx='15' cy='17' r='2.5'/%3E%3C/svg%3E") !important; }
+
+/* Transfer stock — goods moving both ways between locations */
+img[src*="/icons/silk/book_next.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 9h13M13.5 5.5L17 9l-3.5 3.5'/%3E%3Cpath d='M20 15H7M10.5 11.5L7 15l3.5 3.5'/%3E%3C/svg%3E") !important; }
+
+/* Return stock — and, on other pages, the transaction log: an arrow
+   doubling back reads as both "send back" and "what came before" */
+img[src*="/icons/silk/book_previous.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5.5L4.5 10 9 14.5'/%3E%3Cpath d='M4.5 10h9.5a5.5 5.5 0 0 1 5.5 5.5v3'/%3E%3C/svg%3E") !important; }
+
+/* Record inventory — a counted page being written on */
+img[src*="/icons/silk/book_edit.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 3.5H6.5A1.5 1.5 0 0 0 5 5v14a1.5 1.5 0 0 0 1.5 1.5h8a1.5 1.5 0 0 0 1.5-1.5v-5'/%3E%3Cpath d='M8.5 8h4M8.5 12h3'/%3E%3Cpath d='M15 13.5l5-5 2 2-5 5h-2z'/%3E%3C/svg%3E") !important; }
+
+/* "Show stock history" is the only menu use of calendar.png — everywhere
+   else (the record-inventory date pickers) it really is a calendar, so
+   scope the clock to menus rather than repointing the file globally. */
+.actions img[src*="/calendar.png"],
+.action-menu-item img[src*="/calendar.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 3v5h5'/%3E%3Cpath d='M3.05 13A9 9 0 1 0 6 5.3L3 8'/%3E%3Cpath d='M12 7v5l4 2'/%3E%3C/svg%3E") !important; }
 
 img[src$="/clipboard.png"],
 img[src*="/icons/silk/clipboard"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 4.5H7a1.5 1.5 0 0 0-1.5 1.5v13A1.5 1.5 0 0 0 7 20.5h10a1.5 1.5 0 0 0 1.5-1.5V6A1.5 1.5 0 0 0 17 4.5h-2'/%3E%3Crect x='9' y='2.5' width='6' height='4' rx='1'/%3E%3Cpath d='M8.5 11h7M8.5 15h7'/%3E%3C/svg%3E") !important; }
@@ -1951,6 +2014,90 @@ th a:hover {
 .summary:has(img) {
   padding: 16px 0 8px;
   min-height: 0;
+}
+
+/* The stock card's action bar is marked up as a two-cell table, so every
+   control inherited 10px of cell padding on the left and 12px top and
+   bottom — which pushed the menu button out of line with the Status card
+   and stacked dead space above the grid. Lay the row out as flex on the
+   grid's own edges: left flush with the Status card (the page gutter),
+   right inset 16px to meet the Current stock card. */
+.summary-actions {
+  padding: 0 16px 0 0;
+}
+
+.summary-actions > table,
+.summary-actions > table > tbody {
+  display: block;
+  width: 100%;
+}
+
+.summary-actions > table tr {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.summary-actions > table td {
+  display: flex;
+  align-items: center;
+  width: auto;
+  padding: 0;
+  border: 0;
+}
+
+/* the cell holding the button groups takes the remaining width, so the
+   right-hand group can be pushed to the far edge */
+.summary-actions > table td:last-child {
+  flex: 1;
+}
+
+.summary-actions .button-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0;
+}
+
+.summary-actions .button-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.summary-actions .button-group.right {
+  margin-left: auto;
+}
+
+/* One height for everything in the bar — the menu button was 30px against
+   the buttons' 36px */
+.summary-actions .action-btn,
+.summary-actions a.button,
+.summary-actions button.button {
+  height: 36px;
+  min-height: 36px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+}
+
+/* barcode.png is not a silk icon and came in at 20px against everyone
+   else's 14 — give every glyph in the bar the same box */
+.summary-actions .button img,
+.summary-actions .action-btn img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+/* The status chip sits in the header table above and has to land on the
+   same right edge as the bar and the Current stock card */
+#product-summary-table > tbody > tr > td:last-child {
+  padding-right: 16px;
 }
 
 /* stockCard.gsp caps zone names at 50px and bin names at 100px, which
