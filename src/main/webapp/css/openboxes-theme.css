@@ -2546,6 +2546,12 @@ fieldset > div > .category-tree {
   height: 84px;
 }
 
+/* Notices sit between the logo and the card, clear of both */
+#loginForm > .message,
+#loginForm > .errors {
+  margin: 0 0 20px;
+}
+
 .login-brand-name {
   font-size: 34px;
   font-weight: 700;

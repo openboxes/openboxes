@@ -19,6 +19,12 @@
 
 		    <div id="loginContainer" class="dialog">
 				<div id="loginForm">
+					%{-- Brand first: session-timeout and validation notices read
+					     as messages about the page below, not above, the logo. --}%
+					<div class="login-brand">
+						<img src="${request.contextPath}/static/images/logo/logo-blue.png" alt="OpenBoxes logo"/>
+					</div>
+
 					<g:if test="${flash.message}">
 					    <div class="message" role="status" aria-label="message">${flash.message}</div>
 					</g:if>
@@ -28,10 +34,6 @@
 					       <g:renderErrors bean="${userInstance}" as="list" />
 					   </div>
 					</g:hasErrors>
-
-					<div class="login-brand">
-						<img src="${request.contextPath}/static/images/logo/logo-blue.png" alt="OpenBoxes logo"/>
-					</div>
 
 					<div id="loginBox" class="box">
                         <h2>
