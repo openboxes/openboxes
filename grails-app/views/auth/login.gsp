@@ -30,7 +30,7 @@
 					</g:hasErrors>
 
 					<div class="login-brand">
-						<img src="${resource(dir:'images/logo', file:'logo_100.png')}" alt="OpenBoxes logo"/>
+						<img src="${request.contextPath}/static/images/logo/logo-blue.png" alt="OpenBoxes logo"/>
 						<span class="login-brand-name">openboxes</span>
 					</div>
 

@@ -17,7 +17,7 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
 
     <!-- Include Favicon -->
-    <link rel="shortcut icon" href="${request.contextPath}/static/images/favicon.ico?v=blue" type="image/x-icon" />
+    <link rel="shortcut icon" href="${request.contextPath}/static/images/favicon.ico?v=blue2" type="image/x-icon" />
 
     <!-- Include Main CSS -->
     <link rel="stylesheet" href="${resource(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="all" />

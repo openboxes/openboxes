@@ -1374,25 +1374,51 @@ th a:hover {
   padding: 6px 12px;
 }
 
-/* Brand header above the login card (the overhaul's one markup addition) */
+/* Brand header above the login card (the overhaul's one markup
+   addition): blue logo stacked over the wordmark, both primary blue */
 .login-brand {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding-bottom: 20px;
+  gap: 12px;
+  padding-bottom: 28px;
 }
 
 .login-brand img {
-  width: 40px;
-  height: 40px;
+  width: 84px;
+  height: 84px;
 }
 
 .login-brand-name {
-  font-size: 28px;
+  font-size: 34px;
   font-weight: 700;
-  color: var(--blue-800);
+  color: var(--blue-primary);
   letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* First-impression sizing: login controls run ~50% larger than the
+   app-wide 36px standard (deliberate exception, this page only) */
+#loginBox input.text {
+  height: 54px;
+  font-size: 17px;
+  padding: 12px 16px;
+}
+
+#loginBox button[type="submit"] {
+  min-height: 54px;
+  font-size: 17px;
+  font-weight: 600;
+  padding: 14px 16px;
+}
+
+#loginBox h2 {
+  font-size: 20px;
+}
+
+#loginBox td {
+  font-size: 16px;
 }
 
 /* The header's silk padlock PNG → line-style lock in the title blue */
