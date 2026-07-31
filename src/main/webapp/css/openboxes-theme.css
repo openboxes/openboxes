@@ -332,17 +332,8 @@ button[name="create"].icon:before {
   filter: brightness(0) invert(1);
 }
 
-/* Delete stays a danger action */
-.buttons input.delete {
-  background-color: #ffffff;
-  color: var(--color-red);
-  border: 1px solid var(--color-red);
-}
-
-.buttons input.delete:hover {
-  background: var(--red-100);
-  color: var(--color-red);
-}
+/* Delete's danger treatment lives with the other destructive
+   signals further down. */
 
 /* Buttons lay out as centered flex rows: icon images and sprite icons
    align optically without baseline fiddling */
@@ -438,24 +429,46 @@ input.negative:hover,
   filter: brightness(0) invert(1); /* white check at rest (blue bg) */
 }
 
-.button.icon.trash,
-.button.icon.remove {
+/* The .icon.trash / .icon.remove classes describe a GLYPH, not an
+   intent: across the views they label "Cancel" more often than
+   "Delete" (trash: 14 cancels vs 7 deletes). Styling them as danger
+   painted Cancel buttons red, so they stay secondary and the danger
+   treatment keys off signals that really do mean destruction. */
+a.button[href*="delete" i],
+button[name="delete" i],
+button[value="delete" i],
+input.delete,
+input[name*="_action_delete" i],
+button[name*="_action_delete" i],
+.button.negative,
+.button.danger {
   background-color: #ffffff;
   background-image: none;
   color: var(--color-red);
   border: 1px solid var(--color-red);
 }
 
-.button.icon.trash:hover,
-.button.icon.trash:focus,
-.button.icon.trash:active,
-.button.icon.remove:hover,
-.button.icon.remove:focus,
-.button.icon.remove:active {
+a.button[href*="delete" i]:hover,
+button[name="delete" i]:hover,
+button[value="delete" i]:hover,
+input.delete:hover,
+input[name*="_action_delete" i]:hover,
+button[name*="_action_delete" i]:hover,
+.button.negative:hover,
+.button.danger:hover {
   background: var(--red-100);
   background-image: none;
   color: var(--color-red);
   border-color: var(--color-red);
+}
+
+/* A danger button's icon matches its border and label */
+a.button[href*="delete" i].icon:before,
+button[name="delete" i].icon:before,
+button[value="delete" i].icon:before,
+.button.negative.icon:before,
+.button.danger.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C71610' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16M10 3.5h4M6.5 7l1 13.5h9l1-13.5M10 11v6M14 11v6'/%3E%3C/svg%3E") !important;
 }
 
 /* ============================================================
