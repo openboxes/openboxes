@@ -790,6 +790,25 @@ select {
   color: var(--gray-600);
 }
 
+/* Legacy fields carry hardcoded `size` attributes (and fixed widths),
+   which spill out of narrow panels — e.g. a 424px autocomplete in a
+   330px filter card. Never let a control exceed its container. */
+.box input[type="text"],
+.box input[type="password"],
+.box input[type="email"],
+.box input[type="number"],
+.box input[type="search"],
+.box input.text,
+.box input.large,
+.box textarea,
+.box select,
+.box .chzn-container,
+.box .chosen-container,
+.box .select2-container {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 /* Uniform 36px control height for all single-line inputs (matches
    selects, chosen, select2, react-select and %button-base) */
 input[type="text"],
