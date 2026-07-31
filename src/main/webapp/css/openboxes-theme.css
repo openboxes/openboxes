@@ -1661,22 +1661,80 @@ th a:hover {
   padding: 16px;
 }
 
-/* In-table action menus (.actions, jQuery-positioned) → dropdown spec */
+/* Pop-up menus (in-table .actions, download/action-menu dropdowns).
+   Legacy items are 11px with icons at whatever size the source PNG
+   happened to be, so rows are different heights and the labels do not
+   line up. One spec for all of them: 14px text, 16px icons, uniform
+   row height, blue hover. */
 .actions {
   background-color: #ffffff;
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.15);
   padding: 4px;
+  min-width: 200px;
 }
 
-.actions a {
+.actions .action-menu-item,
+.actions > div {
+  padding: 0;
+  margin: 0;
+}
+
+/* openboxes.css targets .actions .action-menu-item a (3 classes) and
+   .actions .download-subbuttons button — match that reach */
+.actions a,
+.actions button,
+.action-menu-item > a,
+.action-menu-item > button,
+.actions .action-menu-item a,
+.actions .action-menu-item button,
+.actions .download-subbuttons button,
+.actions .action-menu-info a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 34px;
+  padding: 6px 10px;
+  margin: 0;
+  border: none;
   border-radius: 4px;
+  background: transparent;
+  color: var(--gray-600);
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: left;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
-.actions a:hover {
+/* Every glyph occupies the same box, so the labels align */
+.actions a img,
+.actions button img,
+.action-menu-item img,
+.actions .action-menu-item a img,
+.actions .download-subbuttons button img {
+  width: 16px !important;
+  height: 16px !important;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.actions a:hover,
+.actions button:hover,
+.action-menu-item > a:hover,
+.action-menu-item > button:hover,
+.actions .action-menu-item a:hover,
+.actions .action-menu-item button:hover,
+.actions .download-subbuttons button:hover,
+.actions .download-subbuttons:hover {
   background-color: var(--blue-200);
+  color: var(--blue-primary);
+  text-decoration: none;
 }
 
 /* ============================================================
