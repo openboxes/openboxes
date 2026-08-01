@@ -122,6 +122,17 @@ body > .row > [class*=" col-"] {
   width: auto;
 }
 
+/* Logged in, the nav shows openboxes.logo.url — a black-cube JPG — while
+   the logged-out pages now show the blue mark, so the brand changed colour
+   the moment you signed in. Match them.
+
+   Keyed to the default filename on purpose: displayLogo swaps in a
+   location's own logo when one is configured, and a blanket .navbar img
+   rule would paint over a customer's branding. */
+.navbar img[src*="openboxes_logo"] {
+  content: url("../images/logo/logo-blue.png");
+}
+
 /* the logo links home, so it needs a finger-sized target rather than the
    17px the bare image gave it */
 .navbar-brand,
