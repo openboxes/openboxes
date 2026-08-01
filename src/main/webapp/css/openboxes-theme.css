@@ -2147,6 +2147,26 @@ th a:hover {
   overflow-wrap: anywhere;
 }
 
+/* The product code rides inside the page title as a bare <small>, only a
+   few points smaller and in the same colour, so it read as part of the
+   product name. Set it on its own white chip — the header sits on the
+   grey page background, so white reads as a distinct token — and drop it
+   to a metadata colour so the name keeps the emphasis. */
+#product-title small {
+  display: inline-block;
+  vertical-align: 2px;
+  margin-right: 6px;
+  padding: 2px 8px;
+  background-color: #ffffff;
+  border-radius: var(--card-radius);
+  font-size: 12px;
+  font-weight: 600;
+  /* fixed, so the chip does not stretch the title's line box */
+  line-height: 16px;
+  letter-spacing: 0.02em;
+  color: var(--gray-500);
+}
+
 .summary .title,
 div.title {
   font-size: 18px;
