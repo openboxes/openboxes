@@ -307,6 +307,54 @@ h1 {
   white-space: normal;
 }
 
+/* The same failure, the same cause, in the other definition markup:
+   tr.prop > td.name is the Grails scaffolding pattern, and its <label> is
+   nowrap too. shipment/showDetails already shows it — a 364px table in a
+   330px card, twelve cells over the edge — and order/show sits at exactly
+   330, one long value away from the same thing.
+
+   Scoped to .yui-gf's quarter-width first column rather than applied by
+   markup alone: td.name appears in ~212 views, most of them full width,
+   where a 55% label column would be far too wide. This is the structural
+   proxy for "narrow", since CSS cannot ask how much room a card has. */
+.yui-gf > .yui-u.first .box table:has(tr.prop > td.name) {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* 50% here, not the 55% used opposite: these labels are right-aligned, so
+   they read as hugging their values and can afford the tighter column. */
+.yui-gf > .yui-u.first .box table:has(tr.prop > td.name) tr.prop > td.name {
+  width: 50%;
+}
+
+.yui-gf > .yui-u.first .box table:has(tr.prop > td.name) tr.prop > td.name label {
+  white-space: normal;
+}
+
+/* Fixing the outer table is not enough on its own: shipment/showDetails
+   nests a whole table of document links inside one value cell, and that
+   inner table keeps its own auto layout, so it grew 50px past the card
+   even once the outer one was contained.
+
+   The cause is the same `label { white-space: nowrap }` a third time —
+   "Goods Receipt Note (Excel)" as one unbreakable run sets a 248px
+   min-content, which width:100% cannot shrink past. Rather than chase it
+   selector by selector, no label in this narrow column stays nowrap:
+   there is no room for one anywhere in 330px. */
+.yui-gf > .yui-u.first .box label {
+  white-space: normal;
+}
+
+.yui-gf > .yui-u.first .box td table {
+  width: 100%;
+  max-width: 100%;
+}
+
+.yui-gf > .yui-u.first .box td table td {
+  overflow-wrap: anywhere;
+}
+
 /* Flash/info/error/warning boxes → React alert spec: white card,
    1px severity border, radius 4. Keep the silk icons for now. */
 .message {
