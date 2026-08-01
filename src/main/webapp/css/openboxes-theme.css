@@ -188,7 +188,12 @@ h1 {
   margin: 16px 0;
 }
 
-.box > h2 {
+/* Most cards put their <h2> straight inside .box, but a few wrap it in a
+   plain div (product/batchEdit's results card), which left those headers
+   with none of the card treatment at all — legacy 16px padding, no rule
+   beneath, not a flex row. Match one level of wrapping too. */
+.box > h2,
+.box > div > h2 {
   border-bottom: 1px solid var(--gray-250);
   /* The legacy 16px inset left card titles sitting 6px right of the first
      column below them and made the header band taller than it needed to
@@ -200,6 +205,46 @@ h1 {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+/* A <label> used as the card title (rather than for a form field) has to
+   read as the title, not as a field label — "Results" was rendering at
+   the form-label's 14px/700 grey inside an 18px blue heading. */
+.box > h2 > label,
+.box > div > h2 > label {
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  margin: 0;
+}
+
+/* Actions that live in a card header (batchEdit's Reset) sit to the far
+   right as a secondary button. They were inheriting the heading's
+   18px/600 and rendering as grey heading text, which read as a broken
+   title rather than something you could click. */
+.box > h2 > a:not(.button),
+.box > div > h2 > a:not(.button) {
+  margin-left: auto;
+  flex: 0 0 auto;
+  background-color: var(--blue-100);
+  color: var(--gray-600);
+  border-radius: var(--card-radius);
+  /* 2px vertical, so the control is exactly as tall as the title's line
+     box and the header band stays 49px — batchEdit sits this card beside
+     the Filters card, where an 8px taller header would show */
+  padding: 2px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+
+.box > h2 > a:not(.button):hover,
+.box > div > h2 > a:not(.button):hover {
+  background-color: var(--blue-200);
+  color: var(--blue-primary);
+  text-decoration: none;
 }
 
 /* Breathing room for non-table box content (tables stay flush like the
@@ -2625,7 +2670,8 @@ table.dataTable thead th.sorting_desc {
    sticky honours — so they stay put as the page scrolls. That makes an
    opaque surface necessary, or content shows through them. Safe
    everywhere: every .box is already white behind its header. */
-.box > h2 {
+.box > h2,
+.box > div > h2 {
   position: sticky;
   left: 0;
   background-color: #ffffff;
