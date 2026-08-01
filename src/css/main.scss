@@ -1,4 +1,7 @@
 @import "src/css/colors";
+// Repaints the raw Bootstrap buttons on the wizard pages onto the app's
+// palette. index.jsx imports this file after bootstrap.css, so it wins.
+@import "src/css/bootstrap-buttons";
 
 @mixin
 limit-lines($lines-number) {
