@@ -277,6 +277,36 @@ h1 {
   background-color: transparent;
 }
 
+/* Definition cards (Status / Details / Auditing) cannot widen, so their
+   table must never be allowed to outgrow them. The legacy <label> is
+   `white-space: nowrap`, which pinned the label column at its longest
+   string — 220px of a 330px card — and an auto-layout table answers that
+   by growing rather than squeezing, so a value like a bin location
+   "RM1-RACK2-SHELF1" hung past the card edge.
+
+   Fixed layout caps the columns at a share of the card instead of the
+   content, so containment holds for any value. Both cells wrap, so
+   nothing is truncated and nothing needs a tooltip to be read — a bin
+   location is an instruction someone acts on, so it has to stay visible.
+
+   Matched via :has(tr.prop > td.label) to hit only these definition
+   lists. DataTables also carry tr.prop on their header rows, and fixing
+   their layout would wreck columns sized to real data. */
+.box table:has(tr.prop > td.label) {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* 55%: enough that a typical value still fits on one line, while the
+   longer labels wrap to two. */
+.box table:has(tr.prop > td.label) tr.prop > td.label {
+  width: 55%;
+}
+
+.box table:has(tr.prop > td.label) tr.prop > td.label label {
+  white-space: normal;
+}
+
 /* Flash/info/error/warning boxes → React alert spec: white card,
    1px severity border, radius 4. Keep the silk icons for now. */
 .message {
