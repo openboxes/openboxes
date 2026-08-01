@@ -1,0 +1,774 @@
+/* =========================================================================
+   OpenBoxes mobile theme
+   -------------------------------------------------------------------------
+   Layered over Bootstrap 5 (CDN) for the /mobile/* pages, the same way
+   openboxes-theme.css layers over the legacy stylesheet on desktop. Same
+   tokens, same button/card/form language, same icon set — re-proportioned
+   for a ~390px phone held at arm's length:
+
+     - gutter 16px, not the desktop 32
+     - page title 20px, not the 28px Bootstrap h1 (and not desktop's 18px:
+       it is the only title on screen, so it carries more weight)
+     - controls 44px, not 36 — a fingertip is ~9mm, a mouse pointer is 1px
+     - input text 16px, below which iOS zooms the viewport on focus
+     - tables that cannot fit become stacked label/value cards
+
+   Everything here is additive; no Bootstrap file is modified.
+   ========================================================================= */
+
+:root {
+  --page-background: #F0F1F4;
+  --blue-primary: #0052CC;
+  --blue-100: #F7F9FD;
+  --blue-200: #F0F6FF;
+  --blue-300: #E9EDF4;
+  --blue-400: #7AA3F3;
+  --blue-500: #2264E5;
+  --blue-700: #2B3674;
+  --blue-800: #202750;
+  --gray-100: #EAEAEA;
+  --gray-102: #DFE4ED;
+  --gray-200: #D6D8DC;
+  --gray-250: #D0DAED;
+  --gray-300: #CED4DA;
+  --gray-350: #9299A6;
+  --gray-400: #636D81;
+  --gray-600: #464F60;
+  --color-red: #C71610;
+  --red-100: #FFF1F0;
+  --color-green: #13AD60;
+  --color-yellow: #F3A157;
+
+  --card-radius: 4px;
+  --gutter: 16px;
+  --touch-target: 44px;
+  --focus-ring:
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(104, 113, 130, 0.16),
+    0 0 0 4px rgba(34, 100, 229, 0.15);
+
+  /* Bootstrap's own custom properties, repointed so components we do not
+     restyle by hand still land on the OpenBoxes palette */
+  --bs-primary: #0052CC;
+  --bs-link-color: #0052CC;
+  --bs-link-hover-color: #2264E5;
+  --bs-body-color: #464F60;
+  --bs-body-bg: #F0F1F4;
+  --bs-border-radius: 4px;
+}
+
+/* ---------------------------------------------------------------- shell */
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--gray-600);
+  background-color: var(--page-background);
+  /* room for the home indicator on notched phones */
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  -webkit-text-size-adjust: 100%;
+}
+
+/* The layout emits an unwrapped <h1> and bare page bodies, so nothing had
+   a gutter — text ran flush into the screen edge. Give the title and the
+   direct children of body the same 16px inset. */
+body > h1 {
+  margin: 16px 0 12px;
+  padding: 0 var(--gutter);
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 26px;
+  letter-spacing: -0.01em;
+  color: var(--blue-800);
+}
+
+body > .row,
+body > div:not(.container):not(.navbar) {
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+  margin-left: 0;
+  margin-right: 0;
+}
+
+body > .container,
+body > .container-fluid {
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+}
+
+/* Bootstrap's grid negative margins fight the gutter above */
+body > .row > [class^="col-"],
+body > .row > [class*=" col-"] {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* --------------------------------------------------------------- navbar */
+
+.navbar {
+  min-height: 56px;
+  padding: 8px var(--gutter);
+  background-color: #ffffff !important;
+  border-bottom: 1px solid var(--gray-250);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.navbar img {
+  height: 28px;
+  width: auto;
+}
+
+/* the logo links home, so it needs a finger-sized target rather than the
+   17px the bare image gave it */
+.navbar-brand,
+.navbar a {
+  padding: 0;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target);
+  min-width: var(--touch-target);
+}
+
+/* ---------------------------------------------------------------- cards */
+
+.card {
+  background-color: #ffffff;
+  border: 1px solid var(--gray-250);
+  border-radius: var(--card-radius);
+  margin-bottom: 12px;
+  box-shadow: none;
+}
+
+.card-body {
+  padding: var(--gutter);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--gray-600);
+}
+
+/* The dashboard tiles lead with the count, so it gets the visual weight
+   rather than Bootstrap's h2 default */
+.card-text {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 34px;
+  color: var(--blue-800);
+}
+
+.card-text a {
+  color: var(--blue-primary);
+  text-decoration: none;
+}
+
+/* Stack the tile's label and count on one line: a phone is short of
+   vertical space, not horizontal, and the count stranded on its own row
+   left most of each tile empty. */
+.card:has(.card-text) .card-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.card:has(.card-text) .card-title {
+  margin-bottom: 0;
+}
+
+/* A dashboard tile is a link target end to end, not just its number.
+   Only the count is wrapped in an anchor, so on a phone the tile looked
+   tappable while a 34px-tall numeral was the sole hit area — the overlay
+   promotes the whole card without touching the markup. */
+.card:has(.card-text a) {
+  position: relative;
+  transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+
+.card .card-text a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.card:has(.card-text a):active {
+  border-color: var(--blue-primary);
+  background-color: var(--blue-100);
+}
+
+/* -------------------------------------------------------------- buttons */
+
+.btn {
+  min-height: var(--touch-target);
+  padding: 10px 16px;
+  border-radius: var(--card-radius);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary,
+/* the login submit ships as an outline button; it is the page's only and
+   primary action, so it reads as primary here as it does on desktop */
+form[action*="handleLogin"] .btn-outline-primary {
+  background-color: var(--blue-primary);
+  border: 1px solid var(--blue-primary);
+  color: #ffffff;
+}
+
+.btn-primary:active,
+.btn-primary:focus,
+form[action*="handleLogin"] .btn-outline-primary:active,
+form[action*="handleLogin"] .btn-outline-primary:focus {
+  background-color: var(--blue-500);
+  border-color: var(--blue-500);
+  color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(1, 178, 237, 0.36);
+}
+
+.btn-primary:disabled {
+  background-color: var(--blue-400);
+  border-color: var(--blue-400);
+}
+
+.btn-outline-primary {
+  background-color: #ffffff;
+  border: 1px solid var(--blue-primary);
+  color: var(--blue-primary);
+}
+
+.btn-outline-primary:active {
+  background-color: var(--blue-100);
+  color: var(--blue-primary);
+}
+
+.btn-secondary {
+  background-color: var(--blue-100);
+  border: 1px solid var(--blue-100);
+  color: var(--gray-600);
+}
+
+.btn-danger {
+  background-color: var(--color-red);
+  border-color: var(--color-red);
+}
+
+/* .btn-link is used as a bare chevron affordance in the lists */
+.btn-link {
+  color: var(--blue-primary);
+  text-decoration: none;
+  padding: 10px;
+  min-width: var(--touch-target);
+}
+
+/* ---------------------------------------------------------------- forms */
+
+.form-label {
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--gray-600);
+}
+
+.form-control,
+.form-select {
+  min-height: var(--touch-target);
+  padding: 10px 12px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--card-radius);
+  /* 16px exactly: iOS zooms the viewport when a focused input is smaller */
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--gray-600);
+  background-color: #ffffff;
+}
+
+.form-control::placeholder {
+  color: var(--gray-350);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--blue-primary);
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.mb-3 {
+  margin-bottom: 16px !important;
+}
+
+/* ----------------------------------------------------------- list group */
+
+.list-group {
+  border-radius: var(--card-radius);
+  overflow: hidden;
+}
+
+.list-group-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 12px var(--gutter);
+  border: none;
+  border-bottom: 1px solid var(--gray-100);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--gray-600);
+  background-color: #ffffff;
+}
+
+.list-group-item:last-child {
+  border-bottom: none;
+}
+
+/* The location list wraps each label in a link; make the whole row the
+   tap target rather than the few characters of text */
+.list-group-item > a {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-height: 24px;
+  color: var(--gray-600);
+  text-decoration: none;
+}
+
+.list-group-item-action:active {
+  background-color: var(--blue-200);
+}
+
+/* ------------------------------------------------------------ accordion */
+
+.accordion {
+  border-radius: var(--card-radius);
+  overflow: hidden;
+}
+
+.accordion-item {
+  border: 1px solid var(--gray-250);
+  border-radius: var(--card-radius) !important;
+  margin-bottom: 8px;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+.accordion-button {
+  min-height: var(--touch-target);
+  padding: 12px var(--gutter);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--blue-800);
+  background-color: #ffffff;
+  box-shadow: none;
+}
+
+.accordion-button:not(.collapsed) {
+  color: var(--blue-primary);
+  background-color: var(--blue-100);
+  box-shadow: none;
+}
+
+.accordion-button:focus {
+  border-color: var(--blue-primary);
+  box-shadow: var(--focus-ring);
+}
+
+.accordion-button::after {
+  width: 14px;
+  height: 14px;
+  background-size: 14px;
+  /* Bootstrap's chevron, repainted in the token blue */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+.accordion-button:not(.collapsed)::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230052CC' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+.accordion-body {
+  padding: 0;
+}
+
+/* --------------------------------------------------------------- tables */
+
+.table {
+  margin-bottom: 0;
+  color: var(--gray-600);
+  font-size: 14px;
+  background-color: #ffffff;
+  border-radius: var(--card-radius);
+  overflow: hidden;
+}
+
+.table > thead th {
+  padding: 12px 10px;
+  background-color: var(--blue-100);
+  color: var(--gray-600);
+  font-weight: 600;
+  font-size: 13px;
+  border-bottom: 1px solid var(--gray-250);
+}
+
+.table > tbody td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--gray-100);
+  vertical-align: middle;
+}
+
+/* The product list reads as a row of thumbnail / name / qty / chevron and
+   fits a phone, so it keeps its table shape — it just needs card framing
+   and a thumbnail that cannot squeeze the name out. */
+.table-borderless {
+  border: 1px solid var(--gray-250);
+}
+
+.table-borderless td {
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.table-borderless img.img-fluid {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+/* unit-of-measure suffix — secondary, but 12px is below comfortable
+   reading size on a phone */
+.table-borderless small {
+  font-size: 13px;
+  color: var(--gray-400);
+}
+
+.table-borderless h5 {
+  margin: 0 0 2px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 19px;
+  color: var(--blue-800);
+}
+
+/* Stacked label/value cards for tables too wide to fit — driven by
+   data-label on each cell. Five columns of text cannot be a grid on a
+   390px screen, so each row becomes its own card. */
+.table-stack,
+.table-stack > tbody,
+.table-stack > tbody > tr,
+.table-stack > tbody > tr > td {
+  display: block;
+  width: auto;
+}
+
+/* The labels move into the rows, so the header row is redundant — hidden
+   accessibly rather than removed. display:block is load-bearing: position
+   is ignored on a table-header-group, so without it the header stays in
+   flow and its widest cell still pushes the page sideways. */
+.table-stack > thead {
+  display: block;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.table-stack {
+  border: none;
+  background-color: transparent;
+  /* display:block drops the table's own full-width sizing, and the .row
+     wrapper is a flex container, so without this the cards shrink to their
+     content and leave a ragged gap down the right of the screen */
+  width: 100%;
+}
+
+.table-stack > tbody > tr {
+  background-color: #ffffff;
+  border: 1px solid var(--gray-250);
+  border-radius: var(--card-radius);
+  margin-bottom: 12px;
+  padding: 4px var(--gutter);
+}
+
+.table-stack > tbody > tr > td {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--gray-100);
+  text-align: right;
+}
+
+/* Where the value is itself a link it was a 20px-tall target, under even
+   the 24px WCAG minimum. Let it fill the value side of the row. */
+.table-stack > tbody > tr > td a:not(.btn) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
+  min-height: 24px;
+}
+
+.table-stack > tbody > tr > td:last-child {
+  border-bottom: none;
+}
+
+.table-stack > tbody > tr > td::before {
+  content: attr(data-label);
+  flex: 0 0 auto;
+  margin-right: auto;
+  font-weight: 500;
+  color: var(--gray-400);
+  text-align: left;
+}
+
+/* an action cell is a full-width button, not a label/value pair */
+.table-stack > tbody > tr > td.cell-action {
+  padding-top: 12px;
+}
+
+.table-stack > tbody > tr > td.cell-action::before {
+  content: none;
+}
+
+.table-stack > tbody > tr > td.cell-action .btn {
+  width: 100%;
+}
+
+/* :not(.btn) matters — a bare `.table-stack a` outranks `.btn-primary` on
+   specificity and repainted the View button's label grey on blue */
+.table-stack a:not(.btn) {
+  color: var(--gray-600);
+  text-decoration: none;
+}
+
+/* ----------------------------------------------------- product details */
+
+/* display-3/display-5 were used for section headings and the product
+   name, which rendered "Description" larger than the product it
+   describes. Re-rank them: name first, sections beneath it. */
+.card .display-5 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+  color: var(--blue-800);
+  margin: 0 0 12px;
+}
+
+.card .display-5 small,
+.card .display-5 .text-small {
+  display: inline-block;
+  margin-right: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-350);
+}
+
+.card .display-3 {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  margin: 20px 0 8px;
+}
+
+.card picture img.img-fluid {
+  display: block;
+  max-width: 120px;
+  height: auto;
+  margin: 0 0 4px;
+}
+
+.badge {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-600);
+}
+
+.text-success {
+  color: var(--color-green) !important;
+}
+
+.text-danger {
+  color: var(--color-red) !important;
+}
+
+/* the back link is a navigation control, so it gets a real tap target */
+a.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch-target);
+  padding: 10px 0;
+  color: var(--blue-primary);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* ------------------------------------------------------- alerts / flash */
+
+.message,
+.errors {
+  padding: 12px var(--gutter);
+  margin-bottom: 12px;
+  border-radius: var(--card-radius);
+  border: 1px solid var(--gray-250);
+  background-color: #ffffff;
+  font-size: 14px;
+  color: var(--gray-600);
+}
+
+.errors {
+  border-color: var(--color-red);
+  background-color: var(--red-100);
+  color: var(--color-red);
+}
+
+.errors ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+/* ----------------------------------------------------------- pagination */
+
+.paginateButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  padding: 16px 0 8px;
+}
+
+.paginateButtons a,
+.paginateButtons span {
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
+  padding: 10px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--gray-250);
+  border-radius: var(--card-radius);
+  background-color: #ffffff;
+  color: var(--blue-primary);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.paginateButtons .currentStep {
+  background-color: var(--blue-primary);
+  border-color: var(--blue-primary);
+  color: #ffffff;
+}
+
+/* ----------------------------------------------------------------- icons
+
+   FontAwesome is loaded in JS mode, so each <i> has been replaced by an
+   inline <svg> whose paths we cannot reach with a content: swap the way
+   the desktop theme does. Paint over them instead: hide the FA geometry
+   and draw the matching OpenBoxes glyph as a background.
+
+   The handling icons (snowflake / hazard / controlled / reconditioned)
+   are deliberately left on FontAwesome — they are colour-coded status
+   markers rendered by the same taglib the desktop uses, so leaving them
+   keeps the two UIs consistent rather than breaking them apart.        */
+
+.svg-inline--fa {
+  width: 18px;
+  height: 18px;
+  vertical-align: -0.15em;
+}
+
+.svg-inline--fa.fa-box > path,
+.svg-inline--fa.fa-shopping-cart > path,
+.svg-inline--fa.fa-truck > path,
+.svg-inline--fa.fa-chevron-right > path,
+.svg-inline--fa.fa-chevron-left > path {
+  display: none;
+}
+
+.svg-inline--fa.fa-box,
+.svg-inline--fa.fa-shopping-cart,
+.svg-inline--fa.fa-truck,
+.svg-inline--fa.fa-chevron-right,
+.svg-inline--fa.fa-chevron-left {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.svg-inline--fa.fa-box {
+  width: 20px;
+  height: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l8 4.5v9L12 21l-8-4.5v-9z'/%3E%3Cpath d='M4 7.5l8 4.5 8-4.5M12 12v9'/%3E%3C/svg%3E");
+}
+
+.svg-inline--fa.fa-shopping-cart {
+  width: 20px;
+  height: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4h2.5l2.2 10.5h9.6L19.5 7H6'/%3E%3Ccircle cx='9' cy='19' r='1.6'/%3E%3Ccircle cx='17' cy='19' r='1.6'/%3E%3C/svg%3E");
+}
+
+.svg-inline--fa.fa-truck {
+  width: 20px;
+  height: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 6.5h10v10h-10zM12.5 10h4l3 3v3.5h-7z'/%3E%3Ccircle cx='6.5' cy='18.5' r='1.8'/%3E%3Ccircle cx='16.5' cy='18.5' r='1.8'/%3E%3C/svg%3E");
+}
+
+.svg-inline--fa.fa-chevron-right {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230052CC' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E");
+}
+
+.svg-inline--fa.fa-chevron-left {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230052CC' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 5l-7 7 7 7'/%3E%3C/svg%3E");
+}
+
+/* a chevron sitting inside a filled button has to invert */
+.btn-primary .svg-inline--fa.fa-chevron-right {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E");
+}
+
+/* handling icons: keep FontAwesome's glyph and its semantic colour, just
+   settle the size so they sit on the text baseline consistently */
+.svg-inline--fa.fa-snowflake,
+.svg-inline--fa.fa-exclamation-circle,
+.svg-inline--fa.fa-exclamation-triangle,
+.svg-inline--fa.fa-prescription-bottle {
+  width: 15px;
+  height: 15px;
+}
+
+/* --------------------------------------------------------- error page */
+
+.container-fluid code pre {
+  font-size: 12px;
+  overflow-x: auto;
+  background-color: #ffffff;
+  border: 1px solid var(--gray-250);
+  border-radius: var(--card-radius);
+  padding: 12px;
+}

@@ -9,7 +9,11 @@
 <body>
 
     <div class="row g-0">
-        <table class="table table-bordered">
+        %{-- table-stack turns each row into a label/value card: five columns
+             of text cannot be a grid on a phone. The labels come from
+             data-label on each cell, so the header row is hidden but the
+             column names still travel with the data. --}%
+        <table class="table table-stack">
             <thead>
                 <tr>
                     <th><g:message code="stockMovement.status.label"/></th>
@@ -22,27 +26,28 @@
             <tbody>
             <g:each var="stockMovement" in="${stockMovements}">
                 <tr>
-                    <td>
+                    <td data-label="${g.message(code: 'stockMovement.status.label')}">
                         <a href="${createLink(controller: 'stockMovement', action: 'show', id: stockMovement?.id)}" class="text-decoration-none text-reset">
                             ${stockMovement?.status}
                         </a>
                     </td>
-                    <td>
+                    <td data-label="${g.message(code: 'stockMovement.identifier.label')}">
                         <a href="${createLink(controller: 'mobile', action: 'stockMovementDetails', id: stockMovement?.id)}" class="text-decoration-none text-reset">
                             ${stockMovement.identifier}
                         </a>
                     </td>
-                    <td>
+                    <td data-label="${g.message(code: 'stockMovement.destination.label')}">
                         ${stockMovement?.destination?.name} ${stockMovement?.destination?.locationNumber}
                     </td>
-                    <td>
+                    <td data-label="${g.message(code: 'stockMovement.requestedDeliveryDate.label', default: 'Requested Delivery Date')}">
                         <g:formatDate date="${stockMovement?.requisition?.requestedDeliveryDate}" format="dd MMM yyyy"/>
                     </td>
-                    <td>
-                        <a href="${createLink(controller: 'stockMovement', action: 'show', id: stockMovement?.id)}" class="btn btn-link">
-
-                            <button class="btn btn-primary">View <i class="fa fa-chevron-right"></i></button>
-
+                    %{-- was a <button> nested inside an <a>, which is invalid
+                         and made the whole cell an ambiguous tap target --}%
+                    <td class="cell-action">
+                        <a href="${createLink(controller: 'stockMovement', action: 'show', id: stockMovement?.id)}" class="btn btn-primary">
+                            <g:message code="default.button.view.label" default="View"/>
+                            <i class="fa fa-chevron-right"></i>
                         </a>
                     </td>
                 </tr>

@@ -32,8 +32,10 @@
                 </g:else>
             </picture>
 
-            <h3 class="display-3">Description</h3>
+            %{-- heading moved inside the test: it rendered a "Description"
+                 section header above nothing whenever a product had none --}%
             <g:if test="${product.description}">
+                <h3 class="display-3"><g:message code="default.description.label" default="Description"/></h3>
                 <p>
                     ${product.description}
                 </p>

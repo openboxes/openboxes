@@ -13,6 +13,12 @@
           crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
           rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+          rel="stylesheet"/>
+    %{-- Last, so it layers over Bootstrap the way openboxes-theme.css
+         layers over the legacy stylesheet on the desktop pages. --}%
+    <link rel="stylesheet" type="text/css" media="all"
+          href="${resource(dir: 'css', file: 'openboxes-mobile.css')}?v=${g.meta(name: 'app.version')}"/>
 </head>
 
 <body>
