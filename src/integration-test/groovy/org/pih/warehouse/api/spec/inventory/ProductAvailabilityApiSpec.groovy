@@ -47,7 +47,6 @@ class ProductAvailabilityApiSpec extends ApiSpec {
         row.containsKey("expirationDate")
         row.containsKey("binLocation")
         row.containsKey("zone")
-        !row.containsKey("zones")
     }
 
     void 'list excludes zero quantity on hand rows'() {

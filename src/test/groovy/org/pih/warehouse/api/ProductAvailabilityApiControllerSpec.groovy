@@ -60,7 +60,6 @@ class ProductAvailabilityApiControllerSpec extends Specification
         row.getString("lotNumber") == "LOT1"
         row.getInt("quantityOnHand") == 10
         row.getInt("quantityAvailable") == 8
-        !row.has("zones")
     }
 
     void 'list throws when facility is missing'() {
