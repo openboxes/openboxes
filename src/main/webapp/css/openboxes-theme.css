@@ -106,6 +106,16 @@
    Base UI text: Inter 14px, --gray-600 on data surfaces.
    ============================================================ */
 
+/* html carries the background as well as body. #loginContainer has a
+   legacy `margin: 50px auto`, and with nothing between it and <body> to
+   stop the collapse, that margin propagates out and shifts the body box
+   down — so the canvas showed through as a white strip above the login
+   card. Painting the root the same colour makes the gap part of the
+   page rather than a seam. */
+html {
+  background-color: var(--page-background);
+}
+
 body {
   background: var(--page-background);
   font-family: 'Inter', sans-serif;
@@ -1215,8 +1225,12 @@ th {
 /* ...but only data panels should scroll. Setting overflow-x: auto also
    forces overflow-y to auto, which gives form panels a pointless
    vertical scrollbar and clips their select dropdowns. Form layouts
-   (tr.prop), filter panels and anything with a Chosen dropdown opt out. */
-.box:has(tr.prop),
+   (tr.prop), filter panels and anything with a Chosen dropdown opt out.
+
+   tr.prop is qualified: it marks definition-style form rows, but some
+   DataTables put it on their header row too, and those are data panels
+   that must scroll rather than spill off the page. */
+.box:has(tr.prop):not(:has(table.dataTable)),
 .box:has(.filters),
 .box:has(.filter-list),
 .box:has(.chosen-container),
