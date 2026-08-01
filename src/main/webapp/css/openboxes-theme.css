@@ -66,9 +66,38 @@
   /* Shared effects (theme-local additions) */
   --focus-ring: 0 1px 2px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(104, 113, 130, 0.16), 0 0 0 4px rgba(34, 100, 229, 0.15);
   --card-radius: 4px;
-  /* One shadow for centered "focus cards" (login, location chooser);
-     in-app content cards stay flat like the React reference */
-  --focus-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.07);
+
+  /* ---- Elevation -------------------------------------------------
+     Three levels, and everything else is flat. The app had collected
+     seven unrelated shadows (5px 5px 5px #ccc on every input, a near
+     black 0 0 2px rgba(0,0,0,.8) halo on wizard steps, three different
+     0 4px 4px blurs at .15 and .25 alpha), so nothing read as a
+     consistent height.
+
+     All three share one soft, low-alpha, two-layer recipe — a tight
+     contact shadow plus a wider ambient one — so surfaces differ by how
+     far they float, not by how the shadow is drawn.
+
+     The rule for which level applies is what the surface DOES:
+       overlay - transient, sits above the page and can be dismissed
+                 (menus, dialogs, date pickers, autocomplete, tooltips)
+       raised  - a card the page is centred on, with nothing behind it
+                 to compete (login, location chooser)
+       sticky  - chrome pinned over content that scrolls beneath it
+                 (the top banner) — downward only, since the lift is
+                 what it needs to show, not the depth
+
+     Everything else stays FLAT, in particular in-app content cards
+     (.box). They sit on the grey page background with a 1px border,
+     which is what the React reference does; giving each one a shadow
+     turns a dense page into noise. Form controls are flat too — depth
+     there competes with the focus ring for the same signal. */
+  --shadow-overlay: 0 2px 6px rgba(0, 0, 0, 0.06), 0 6px 16px rgba(0, 0, 0, 0.08);
+  --shadow-raised: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.07);
+  --shadow-sticky: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 6px rgba(0, 0, 0, 0.06);
+
+  /* kept as an alias so existing references stay valid */
+  --focus-card-shadow: var(--shadow-raised);
 }
 
 /* ============================================================
@@ -1358,7 +1387,7 @@ th a:hover {
 .ui-dialog {
   border: none;
   border-radius: 4px;
-  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-overlay);
   padding: 0;
 }
 
@@ -1376,7 +1405,7 @@ th a:hover {
 .ui-datepicker {
   background: #ffffff;
   border: 1px solid var(--gray-200);
-  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-overlay);
   padding: 8px;
 }
 
@@ -1415,7 +1444,7 @@ th a:hover {
   background: #ffffff;
   border: 1px solid var(--gray-200);
   border-radius: 4px;
-  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-overlay);
 }
 
 .ui-menu .ui-menu-item a {
@@ -1475,7 +1504,7 @@ th a:hover {
   background: #ffffff;
   border: 1px solid var(--gray-200);
   border-radius: 0 0 4px 4px;
-  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-overlay);
 }
 
 .chzn-container-single .chzn-search input {
@@ -1554,7 +1583,7 @@ th a:hover {
   background: #ffffff;
   border: 1px solid var(--gray-200);
   border-radius: 0 0 4px 4px;
-  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-overlay);
 }
 
 .chosen-container-single .chosen-search input[type="text"],
@@ -1701,7 +1730,7 @@ th a:hover {
 .select2-dropdown {
   border: 1px solid var(--gray-200);
   border-radius: 4px;
-  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-overlay);
 }
 
 .select2-container--default .select2-results__option--highlighted[aria-selected] {
@@ -1789,7 +1818,7 @@ th a:hover {
   background-color: #ffffff;
   border: none;
   border-radius: 4px;
-  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-overlay);
   padding: 4px;
   min-width: 200px;
 }
@@ -2248,6 +2277,16 @@ div.title {
   padding: 0;
 }
 
+/* With the form's padding at 0, the last row's bottom margin had nothing
+   to push against and collapsed straight out through .filters and the
+   form, so every filter panel ended flush with its final control — the
+   Download and Search buttons sat on the card's bottom edge. flow-root
+   gives .filters its own formatting context, which contains the margin
+   instead of letting it escape. */
+.filters {
+  display: flow-root;
+}
+
 .filters .prop {
   padding: 0;
 }
@@ -2256,6 +2295,13 @@ div.title {
    no .filter-list-item, so they never picked up its 10px inset */
 .filters .prop:not(:has(.filter-list-item)) {
   margin: 10px 10px 16px;
+}
+
+/* The panels built from .buttons close with 20px of padding under their
+   last control; match that here so the two kinds of filter panel end on
+   the same gap rather than 16 against 20. */
+.filters .prop:not(:has(.filter-list-item)):last-child {
+  margin-bottom: 20px;
 }
 
 /* Action rows come in three flavours across the filter panels:
@@ -2873,4 +2919,61 @@ fieldset > div > .category-tree {
 
 #loginBox button[type="submit"] {
   padding: 8px 16px;
+}
+
+/* ============================================================
+   ELEVATION — bringing the legacy shadows onto the scale
+   ============================================================
+
+   The rules below re-point the shadows that live in openboxes.css.
+   Each one is listed with what it was, because the old values are the
+   argument for the new ones: they ranged from a 5px hard grey offset to
+   a near-black halo, none of them related to each other. */
+
+/* The top banner floats over content that scrolls under it. Was
+   `0 4px 4px rgba(0,0,0,.15)` — a hard 4px blur with no ambient layer,
+   which read as a drawn line rather than a lift. */
+#main-wrapper {
+  box-shadow: var(--shadow-sticky);
+}
+
+/* Megamenu panels. Was `0 4px 4px rgba(0,0,0,.25)` — the heaviest
+   shadow in the app, on one of its most frequently opened surfaces. */
+.dropdown-menu-content,
+.dropdown-menu-wrapper .dropdown-menu-content {
+  box-shadow: var(--shadow-overlay);
+}
+
+/* Global search results and tooltips are overlays like any other menu;
+   they carried two more one-off values (a doubled .15 blur, and a
+   1px 1px offset at .098). */
+.global-search-results,
+.tooltip {
+  box-shadow: var(--shadow-overlay);
+}
+
+/* Form controls: `select, input, textarea` carried `5px 5px 5px #ccc`,
+   a hard offset grey shadow on every field in the app. Depth here
+   fights the focus ring, which is the real state signal — so they are
+   flat, and only the ring moves. */
+select,
+input,
+textarea,
+.form-control {
+  box-shadow: none;
+}
+
+select:focus,
+input:focus,
+textarea:focus {
+  box-shadow: var(--focus-ring);
+}
+
+/* Wizard step markers carried `0 0 2px rgba(0,0,0,0.8)` — 80% black,
+   by far the darkest value in the stylesheet, and on a small element
+   where it read as a smudge. The active step is already marked by
+   colour. */
+.wizard-steps .active-step span,
+.wizard-steps .active-step a:after {
+  box-shadow: none;
 }
