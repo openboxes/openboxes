@@ -2106,6 +2106,21 @@ th a:hover {
   padding-top: 1em;
 }
 
+/* A card dropped into a tab panel sits on the panel's own white surface,
+   so the panel's top padding and the card's top margin stack as plain
+   white above the header — 46px above the title against 14px below. Both
+   are redundant here: the header's own padding should define the band, as
+   it already does in the left-hand column, where that same margin falls on
+   grey page background and reads as separation. Panels that open with
+   something other than a card keep their padding. */
+.ui-tabs-panel:has(> .box:first-child) {
+  padding-top: 0;
+}
+
+.ui-tabs-panel > .box:first-child {
+  margin-top: 0;
+}
+
 /* stockCard.gsp caps zone names at 50px and bin names at 100px, which
    ellipsizes any real bin ("Cold Chain Room B / Rack 14 …") down to a few
    characters. Let them wrap as ordinary text — the cell's own max-width
