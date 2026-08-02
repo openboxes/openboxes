@@ -3319,3 +3319,127 @@ textarea:focus {
 .box.is-empty {
   display: none;
 }
+
+/* ============================================================
+   CATEGORY TREE — put the three bands on one edge
+   ============================================================
+
+   category/tree stacks a button bar, a tree panel and a footer action,
+   and each landed on a different left edge: 32px (the page gutter), 42
+   (the tree sits inside a layout <td> carrying the table cell padding)
+   and 56 (Bootstrap's p-4 on the footer wrapper). */
+
+/* The tree's table is layout scaffolding, not data, so its cells should
+   not inset the content the way a real table's do. */
+.body:has(.category-tree) > .yui-ga td,
+.body:has(.category-tree) > .yui-ga fieldset {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* The footer action sits OUTSIDE .body, as a sibling inside the content
+   column, so it has to be matched from there. Bootstrap's spacing
+   utilities are !important, so this has to be too. */
+.yui-b:has(.category-tree) > .p-4 {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* `.button + .button` adds 15px on top of the 8px every button already
+   carries as margin-right, so adjacent buttons in a legacy button bar sat
+   23px apart against the 8px used everywhere else. */
+.buttonBar .button + .button,
+.button-bar .button + .button {
+  margin-left: 0;
+}
+
+
+/* ============================================================
+   MORE LEGACY ICONS — found by widening the audit to the list
+   and admin pages (see .tools/shots/iconaudit.js)
+   ============================================================ */
+
+/* Import product associations — a data store being loaded */
+img[src$="/database_refresh.png"],
+img[src*="/icons/silk/database_refresh.png"],
+img[src*="/icons/silk/database_"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cellipse cx='12' cy='5.5' rx='7' ry='2.8'/%3E%3Cpath d='M5 5.5v13c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8v-13'/%3E%3Cpath d='M5 12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8'/%3E%3C/svg%3E") !important; }
+
+/* Tree node marker */
+img[src$="/bullet_white.png"],
+img[src*="/icons/silk/bullet_white.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3.5'/%3E%3C/svg%3E") !important; }
+
+/* Find */
+img[src$="/find.png"],
+img[src*="/icons/silk/find.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='6.5'/%3E%3Cpath d='M15.8 15.8l4.7 4.7'/%3E%3C/svg%3E") !important; }
+
+/* Upload an image */
+img[src$="/photo_add.png"],
+img[src*="/icons/silk/photo_add.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='13' height='11' rx='2'/%3E%3Ccircle cx='7' cy='9' r='1.5'/%3E%3Cpath d='M3.5 13.5l3.5-3 4 3.5'/%3E%3Cpath d='M18.5 14.5v6M15.5 17.5h6'/%3E%3C/svg%3E") !important; }
+
+/* Create user */
+img[src$="/user_add.png"],
+img[src*="/icons/silk/user_add.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='7.5' r='3.5'/%3E%3Cpath d='M2.5 20a6.5 6.5 0 0 1 13 0'/%3E%3Cpath d='M18.5 8.5v6M15.5 11.5h6'/%3E%3C/svg%3E") !important; }
+
+/* Settings */
+img[src$="/cog.png"],
+img[src*="/icons/silk/cog.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M12 2.5v3M12 18.5v3M21.5 12h-3M5.5 12h-3M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1M18.7 18.7l-2.1-2.1M7.4 7.4L5.3 5.3'/%3E%3C/svg%3E") !important; }
+
+/* Verify — inspect closely */
+img[src$="/zoom_in.png"],
+img[src*="/icons/silk/zoom_in.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='6.5'/%3E%3Cpath d='M15.8 15.8l4.7 4.7M8.5 11h5M11 8.5v5'/%3E%3C/svg%3E") !important; }
+
+/* Pick items — basket with a plus */
+img[src$="/basket_add.png"],
+img[src*="/icons/silk/basket_add.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 9h14l-1.3 8.6a2 2 0 0 1-2 1.7H6.8a2 2 0 0 1-2-1.7z'/%3E%3Cpath d='M7.5 9l2.2-4.5M13.5 9l-2.2-4.5'/%3E%3Cpath d='M18.5 15.5v5M16 18h5'/%3E%3C/svg%3E") !important; }
+
+/* Check items — basket with a tick */
+img[src$="/basket_edit.png"],
+img[src*="/icons/silk/basket_edit.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 9h14l-1.3 8.6a2 2 0 0 1-2 1.7H6.8a2 2 0 0 1-2-1.7z'/%3E%3Cpath d='M7.5 9l2.2-4.5M13.5 9l-2.2-4.5'/%3E%3Cpath d='M16 18l2 2 4-4'/%3E%3C/svg%3E") !important; }
+
+/* Issue stock — basket going out */
+img[src$="/basket_go.png"],
+img[src*="/icons/silk/basket_go.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 9h14l-1.3 8.6a2 2 0 0 1-2 1.7H6.8a2 2 0 0 1-2-1.7z'/%3E%3Cpath d='M7.5 9l2.2-4.5M13.5 9l-2.2-4.5'/%3E%3Cpath d='M15.5 18h6M19 15.5l2.5 2.5-2.5 2.5'/%3E%3C/svg%3E") !important; }
+
+/* Dashboard / home */
+img[src$="/house.png"],
+img[src*="/icons/silk/house.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 10.5L12 3.5l8.5 7'/%3E%3Cpath d='M5.5 9.5V20h13V9.5'/%3E%3C/svg%3E") !important; }
+
+/* Browse inventory — a record being searched */
+img[src$="/application_form_magnify.png"],
+img[src*="/icons/silk/application_form_magnify.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13.5 3.5h-7A1.5 1.5 0 0 0 5 5v14a1.5 1.5 0 0 0 1.5 1.5h5'/%3E%3Cpath d='M8 8h5M8 12h3'/%3E%3Ccircle cx='16.5' cy='15.5' r='3.5'/%3E%3Cpath d='M19 18l2.5 2.5'/%3E%3C/svg%3E") !important; }
+
+/* Download — same mark the file-type icons use in chrome */
+img[src$="/disk.png"],
+img[src*="/icons/silk/disk.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3.5v11M7.5 10l4.5 4.5 4.5-4.5M4.5 19.5h15'/%3E%3C/svg%3E") !important; }
+
+/* these are chrome, so they take the flat monochrome treatment */
+img[src$="/database_refresh.png"],
+img[src*="/icons/silk/database_refresh.png"],
+img[src*="/icons/silk/database_"],
+img[src$="/bullet_white.png"],
+img[src*="/icons/silk/bullet_white.png"],
+img[src$="/find.png"],
+img[src*="/icons/silk/find.png"],
+img[src$="/photo_add.png"],
+img[src*="/icons/silk/photo_add.png"],
+img[src$="/user_add.png"],
+img[src*="/icons/silk/user_add.png"],
+img[src$="/cog.png"],
+img[src*="/icons/silk/cog.png"],
+img[src$="/zoom_in.png"],
+img[src*="/icons/silk/zoom_in.png"],
+img[src$="/basket_add.png"],
+img[src*="/icons/silk/basket_add.png"],
+img[src$="/basket_edit.png"],
+img[src*="/icons/silk/basket_edit.png"],
+img[src$="/basket_go.png"],
+img[src*="/icons/silk/basket_go.png"],
+img[src$="/house.png"],
+img[src*="/icons/silk/house.png"],
+img[src$="/application_form_magnify.png"],
+img[src*="/icons/silk/application_form_magnify.png"],
+img[src$="/disk.png"],
+img[src*="/icons/silk/disk.png"] {
+  filter: none !important;
+  opacity: 1 !important;
+}
