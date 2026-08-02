@@ -3264,3 +3264,18 @@ textarea:focus {
   margin-left: 0;
   margin-right: 0;
 }
+
+/* Right-aligned definition labels wrap raggedly because the markup leaves
+   a newline between </label> and </td>. That whitespace collapses to a
+   real space at the end of the label's LAST line, and text-align: right
+   aligns the line including it — so the visible text stops 10px short
+   while the first line lands flush against the cell's content edge.
+
+   Making the label its own block takes it out of that shared line box:
+   its lines align to its own right edge, and the stray space after it
+   forms a whitespace-only anonymous block, which generates no line box
+   and so adds no height. */
+.prop td.name label,
+.prop td.label label {
+  display: block;
+}
