@@ -3311,3 +3311,11 @@ textarea:focus {
 .prop td.label label {
   display: block;
 }
+
+/* A card the page marked as having nothing to render. Sections driven by
+   configurable data (product attributes, for one) otherwise appear as a
+   heading over an empty table. The GSP sets the class; hiding it is the
+   theme's job. */
+.box.is-empty {
+  display: none;
+}
