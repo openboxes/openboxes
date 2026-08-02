@@ -3233,3 +3233,34 @@ textarea:focus {
 .wizard-steps .active-step a:after {
   box-shadow: none;
 }
+
+/* ============================================================
+   MEGAMENU — fit the sections without scrolling
+   ============================================================ */
+
+/* The Reporting menu has four sections totalling ~982px, but the panel is
+   capped at max-width: 50vw — 720px on a 1440 screen, and 960px on a 1920,
+   which is 22px short of fitting. So the fourth section wrapped to a second
+   row every time, and because the wrap put one of the two TALLEST sections
+   (Data Exports, 8 links) below the other (Inventory Reports, 7 links), the
+   panel exceeded its own max-height: 60vh and had to scroll.
+
+   Widening is the fix rather than reordering: flex-wrap gives no control
+   over which items pair up, so "stack the two short ones instead" cannot be
+   expressed reliably — and with room for all four in one row, nothing needs
+   to stack at all. Still bounded by the viewport, so narrow screens keep
+   the old wrapping behaviour. */
+.dropdown-menu-subsections {
+  max-width: min(1040px, 94vw);
+}
+
+/* showTransactionReport puts its "Reload Data" button inside the card
+   header's <th>, not in a .filter-list-item, so it kept the 10px side
+   margin every .buttons row carries and came out 290px against the 310px
+   the other panels use. Three classes plus the element, to outrank
+   `.yui-u.first .box .buttons`. */
+.yui-u.first .box th > .buttons,
+.yui-u.first .box td > .buttons {
+  margin-left: 0;
+  margin-right: 0;
+}

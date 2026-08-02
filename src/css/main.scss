@@ -2005,3 +2005,46 @@ div.search-input:focus-within {
     flex-direction: column;
   }
 }
+
+/* The filter header holds the search field on the left and the action
+   buttons on the right, and claims a full-width row of its own. On reports
+   that hide both the search field and the visibility toggler — the reorder
+   and expiration-history reports — that left slot renders empty, so the
+   header became a row containing nothing but Clear / Load table, stranded
+   above a filters row with ~350px of unused space beside it.
+   Where the slot is empty, the two share a line: filters first, buttons
+   pushed to the end. */
+.classic-form:has(> .filter-header > .min-w-50:empty) {
+  // display first: .classic-form carries Bootstrap's flex-wrap and
+  // align-items utility classes but is itself display:block, so every
+  // flex property on it and its children was inert.
+  display: flex !important;
+  // !important throughout: the w-100 and flex-wrap utilities in the markup
+  // are themselves !important and would otherwise win on the cascade.
+  flex-wrap: nowrap !important;
+  align-items: center;
+  gap: 8px;
+
+  > .filters-row {
+    order: 1;
+    flex: 1 1 auto;
+  }
+
+  > .filter-header {
+    order: 2;
+    width: auto !important;
+    flex: 0 0 auto;
+
+    // the empty search slot would still reserve min-width: 50%
+    > .min-w-50 {
+      display: none !important;
+    }
+
+    // ...and with the slot gone the button group stretched to fill the
+    // header, which then sized itself to that. Hold it to its content.
+    > .buttons {
+      flex: 0 0 auto;
+      width: auto !important;
+    }
+  }
+}
