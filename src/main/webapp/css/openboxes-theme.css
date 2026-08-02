@@ -891,6 +891,40 @@ img[src*="/icons/silk/book_edit.png"] { content: url("data:image/svg+xml,%3Csvg 
 .actions img[src*="/calendar.png"],
 .action-menu-item img[src*="/calendar.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 3v5h5'/%3E%3Cpath d='M3.05 13A9 9 0 1 0 6 5.3L3 8'/%3E%3Cpath d='M12 7v5l4 2'/%3E%3C/svg%3E") !important; }
 
+/* Report-page icons the earlier sweeps missed — found by auditing every
+   <img> whose computed content is still 'normal', i.e. still rendering the
+   original raster. Same 24px grid and 2px round-joined stroke as the rest. */
+
+/* "Run Report" — two different legacy files for one action, so one glyph */
+img[src*="/icons/silk/cog_go.png"],
+img[src$="/play_blue.png"],
+img[src*="/icons/silk/play_blue.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7.5 4.5l11 7.5-11 7.5z'/%3E%3C/svg%3E") !important; }
+
+/* "Show report" — a page of figures */
+img[src$="/report.png"],
+img[src*="/icons/silk/report.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4.5' y='3' width='15' height='18' rx='2'/%3E%3Cpath d='M8.5 14.5v3M12 10.5v7M15.5 12.5v5'/%3E%3C/svg%3E") !important; }
+
+/* "Edit report" — the same page, with a pencil */
+img[src$="/report_edit.png"],
+img[src*="/icons/silk/report_edit.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 3.5H6.5A1.5 1.5 0 0 0 5 5v14a1.5 1.5 0 0 0 1.5 1.5h8a1.5 1.5 0 0 0 1.5-1.5v-5'/%3E%3Cpath d='M8.5 9h4M8.5 13h3'/%3E%3Cpath d='M15 13.5l5-5 2 2-5 5h-2z'/%3E%3C/svg%3E") !important; }
+
+/* "Refresh data" and "Clear" both mean re-run: a closed refresh cycle */
+img[src$="/table_refresh.png"],
+img[src*="/icons/silk/table_refresh.png"],
+img[src$="/arrow_refresh_small.png"],
+img[src*="/icons/silk/arrow_refresh_small.png"],
+img[src*="/icons/silk/arrow_refresh.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20.5 11a8.5 8.5 0 0 0-14.6-4.4L3 9.5'/%3E%3Cpath d='M3 4.5V10h5.5'/%3E%3Cpath d='M3.5 13a8.5 8.5 0 0 0 14.6 4.4L21 14.5'/%3E%3Cpath d='M21 19.5V14h-5.5'/%3E%3C/svg%3E") !important; }
+
+img[src*="/icons/silk/cog_go.png"],
+img[src$="/play_blue.png"],
+img[src$="/report.png"],
+img[src$="/report_edit.png"],
+img[src$="/table_refresh.png"],
+img[src$="/arrow_refresh_small.png"] {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
 img[src$="/clipboard.png"],
 img[src*="/icons/silk/clipboard"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 4.5H7a1.5 1.5 0 0 0-1.5 1.5v13A1.5 1.5 0 0 0 7 20.5h10a1.5 1.5 0 0 0 1.5-1.5V6A1.5 1.5 0 0 0 17 4.5h-2'/%3E%3Crect x='9' y='2.5' width='6' height='4' rx='1'/%3E%3Cpath d='M8.5 11h7M8.5 15h7'/%3E%3C/svg%3E") !important; }
 img[src$="/calculator.png"],
@@ -1858,6 +1892,51 @@ th a:hover {
   height: 34px;
 }
 
+/* The single select got a line-height above, but the multi-select carries
+   its placeholder on an inline search field that had none — so "Select
+   Options" sat at the top of a 36px box while every other control in the
+   panel centred its text. Same 34px inner height as the single variant. */
+.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 34px;
+  margin: 0;
+  padding: 0 6px;
+  line-height: 20px;
+}
+
+.select2-container--default .select2-selection--multiple .select2-search--inline {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.select2-container--default .select2-selection--multiple .select2-search__field {
+  height: 32px;
+  line-height: 32px;
+  margin: 0;
+  padding: 0 2px;
+  font-size: 14px;
+  color: var(--gray-600);
+}
+
+/* the pills sit on the same centre line rather than riding the top edge */
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 2px 8px;
+  background-color: var(--blue-100);
+  border: 1px solid var(--gray-250);
+  border-radius: 4px;
+  color: var(--gray-600);
+  font-size: 13px;
+  line-height: 20px;
+}
+
 .select2-container--default.select2-container--focus .select2-selection--single,
 .select2-container--default.select2-container--open .select2-selection--single {
   border: 1px solid var(--blue-primary);
@@ -2446,6 +2525,12 @@ div.title {
    All of them stack full width, inset with their fields. */
 .filter-list-item.center:has(> .button),
 .filter-list-item.center:has(> button),
+/* A fifth flavour: inventory/listExpiredStock drops its Filter button
+   straight into .filter-list-item with no .center or .buttons wrapper, so
+   it stayed inline at its natural 90px against the ~305px every other
+   panel uses, and closed on a 2px gap instead of 20. */
+.filter-list-item:not(.center):not(.buttons):has(> .button),
+.filter-list-item:not(.center):not(.buttons):has(> button),
 .filters .prop > .center {
   display: flex;
   flex-direction: column;
@@ -2459,16 +2544,37 @@ div.title {
 .filters .prop > .center > .action-menu,
 .filter-list-item.center > .button,
 .filter-list-item.center > button,
-.filter-list-item.center > .action-menu {
+.filter-list-item.center > .action-menu,
+.filter-list-item:not(.center):not(.buttons) > .button,
+.filter-list-item:not(.center):not(.buttons) > button,
+.filter-list-item:not(.center):not(.buttons) > .action-menu {
   width: 100%;
   margin: 0 0 16px !important;
   font-size: 14px;
 }
 
 .filters .prop > .center > *:last-child,
-.filter-list-item.center > *:last-child {
+.filter-list-item.center > *:last-child,
+.filter-list-item:not(.center):not(.buttons) > *:last-child {
   margin-bottom: 0 !important;
 }
+
+/* ...and it needs the same 20px close the .buttons flavour has, since that
+   row is the last thing in the card. As padding, not margin: this item is
+   a direct child of .box, so a bottom margin collapses straight out and
+   leaves the button flush with the card edge. */
+.filter-list-item:not(.center):not(.buttons):has(> .button),
+.filter-list-item:not(.center):not(.buttons):has(> button) {
+  padding-bottom: 20px;
+}
+
+/* Every filter panel was inset 10px left but 15px right, from a stray 5px
+   of padding on the row. Symmetric now, so the controls sit centred in
+   the card rather than 5px off it. */
+.filter-list-item {
+  padding-right: 0;
+}
+
 
 /* Filter fields: label needs room to breathe above its control */
 .filter-list-item > label,
@@ -2514,13 +2620,25 @@ div.title {
   margin: 10px 10px 0;
   /* bottom spacing as padding, not margin: a bottom margin collapses
      straight out of the card and leaves the last button flush with
-     the card's edge */
-  padding: 8px 5px 20px 0;
+     the card's edge. Sides are 0 so the 10px inset comes from the margin
+     alone — the old 5px on the right made every action row sit 5px off
+     centre in its card. */
+  padding: 8px 0 20px;
   /* the markup separates buttons with &nbsp;, which is not collapsible
      and would otherwise become a phantom flex item between them. It is
      zero-height with font-size 0, but it would still consume `gap`
      twice — so the 16px rhythm comes from child margins instead. */
   font-size: 0;
+}
+
+/* consumption/show nests .buttons inside a .filter-list-item, so both
+   carried a 10px side margin and its action row sat twice as far in as
+   everyone else's. The row inside inherits the item's inset. */
+.filter-list-item > .buttons,
+/* four classes, to outrank .yui-u.first .box .buttons above */
+.yui-u.first .box .filter-list-item > .buttons {
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .filters .buttons > *,
