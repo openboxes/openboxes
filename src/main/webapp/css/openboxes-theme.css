@@ -3254,6 +3254,38 @@ textarea:focus {
   max-width: min(1040px, 94vw);
 }
 
+/* Fitting it on one row made it ~990px, and at that size it cannot sit
+   under its own trigger. In a 1440 viewport the Reporting button spans
+   x=660-745, so aligning the panel's left edge to it overflows the right
+   by 210px, and aligning its right edge overflows the LEFT by 245 — which
+   is what Bootstrap picks, so the first section was cut off.
+
+   Past a certain width the only workable anchor is the viewport, so the
+   panel stops tracking its trigger and pins to the right edge. Right
+   rather than left because this trigger sits right of centre: the pinned
+   panel still spans the trigger's x-range, so the pointer travels
+   straight down into it.
+
+   Keyed to a fifth section because that is what makes a menu too wide to
+   anchor — Inventory and Products have four but come in at 685px and
+   506px and anchor fine, so they are left alone. */
+/* Only where it is actually needed: past ~1700px the trigger has moved far
+   enough right that the panel anchors on screen by itself, and pinning it
+   there would drag it away from its own button — measured at 1920, the
+   pinned panel started 77px right of where the trigger ends, so the
+   pointer would have had to leave the menu to reach it. */
+@media (max-width: 1700px) {
+  .dropdown-menu-wrapper:has(.dropdown-menu-subsections > :nth-child(5)) {
+    position: fixed !important;
+    /* the navbar is sticky at the top and 56px tall */
+    top: 56px;
+    left: auto !important;
+    right: 12px !important;
+    transform: none !important;
+    max-width: calc(100vw - 24px);
+  }
+}
+
 /* showTransactionReport puts its "Reload Data" button inside the card
    header's <th>, not in a .filter-list-item, so it kept the 10px side
    margin every .buttons row carries and came out 290px against the 310px
