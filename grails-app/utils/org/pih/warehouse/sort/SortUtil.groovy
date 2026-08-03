@@ -1,6 +1,7 @@
 package org.pih.warehouse.sort
 
 import org.apache.commons.lang.StringUtils
+import org.hibernate.criterion.Order
 
 /**
  * Common utility methods relating to sorting entities.
@@ -38,6 +39,16 @@ class SortUtil {
             sortParams.add(new SortParam(fieldName, ascending))
         }
         return sortParams
+    }
+
+    /**
+     * Builds a Hibernate {@link Order} for a Criteria query with the direction from the sort param. Sorts by
+     * fieldNameInQuery when provided (for when the query name differs from sortParam.fieldName, e.g. an aliased
+     * column like "p.productCode"), otherwise falls back to sortParam.fieldName.
+     */
+    static Order getSortOrderForCriteria(SortParam sortParam, String fieldNameInQuery = null) {
+        String fieldNameToUse = StringUtils.isBlank(fieldNameInQuery) ? sortParam.fieldName : fieldNameInQuery
+        return sortParam.ascending ? Order.asc(fieldNameToUse) : Order.desc(fieldNameToUse)
     }
 
     /**

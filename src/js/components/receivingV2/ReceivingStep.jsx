@@ -14,7 +14,9 @@ const ReceivingStep = ({ flushRef }) => {
     setView,
     putawayEnabled,
     setPutawayEnabled,
-    table: { lineItemsState, columns },
+    table: {
+      lineItemsState, columns, sort, order,
+    },
     actions: {
       loading,
       receiptId,
@@ -27,6 +29,8 @@ const ReceivingStep = ({ flushRef }) => {
       flush,
       onLocationAutofill,
       autosaveStatus,
+      resetSort,
+      updateFilterParams,
     },
   } = useReceivingForm();
 
@@ -44,6 +48,8 @@ const ReceivingStep = ({ flushRef }) => {
         onAutofillQuantities={autofillQuantities}
         onSaveAndExit={onSaveAndExit}
         autosaveStatus={autosaveStatus}
+        onResetSort={resetSort}
+        updateFilterParams={updateFilterParams}
       />
       <ReceivingTable
         lineItemsState={lineItemsState}
@@ -55,6 +61,8 @@ const ReceivingStep = ({ flushRef }) => {
         removeSplitItem={removeSplitItem}
         loadReceipt={loadReceipt}
         onLocationAutofill={onLocationAutofill}
+        sort={sort}
+        order={order}
       />
     </div>
   );

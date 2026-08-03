@@ -6,6 +6,7 @@ import confirmationModal from 'utils/confirmationModalUtils';
  */
 const confirmLocationAutofillOverwrite = (onConfirm) => {
   confirmationModal({
+    closeOnClickOutside: false,
     title: {
       label: 'react.receiving.autofillLocation.confirm.title',
       default: 'Autofill location',

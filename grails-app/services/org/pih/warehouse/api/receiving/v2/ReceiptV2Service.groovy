@@ -3,7 +3,9 @@ package org.pih.warehouse.api.receiving.v2
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.ObjectNotFoundException
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
@@ -48,6 +50,8 @@ import org.pih.warehouse.shipping.ShipmentItemDto
 import org.pih.warehouse.shipping.ShipmentService
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
+import org.pih.warehouse.sort.SortParam
+import org.pih.warehouse.sort.SortUtil
 
 @Transactional(readOnly = true)
 class ReceiptV2Service {
@@ -504,10 +508,11 @@ class ReceiptV2Service {
         String currentReceiptId = Receipt.findByShipmentAndReceiptStatusCode(shipment, ReceiptStatusCode.PENDING)?.id
 
         // This summary centers on the relationship between a shipment item and its receipt items, so don't bother
-        // with the receipts themselves. Instead, fetch the shipment items (sorted) and then collect the receipt
-        // items grouped by their shipment item so that we can easily loop both of them together.
-        List<ShipmentItem> shipmentItems = shipment.shipmentItems.sort()
-        Map<String, List<ReceiptItem>> receiptItemsByShipmentItemId =
+        // with the receipts themselves. Instead, fetch the shipment items (already sorted per the requested params)
+        // and then collect the receipt items grouped by their shipment item so that we can easily loop both of them
+        // together.
+        List<ShipmentItem> shipmentItems = findShipmentItems(shipment, command)
+        Map<String, List<ReceiptItem>> receiptItemsByShipmentItemId = !shipmentItems ? [:] :
                 ReceiptItem.findAllByShipmentItemInList(shipmentItems)
                         .groupBy { it.shipmentItemId.toString() }
 
@@ -549,6 +554,49 @@ class ReceiptV2Service {
         shipmentSummary.setShipmentItemsGrouped(shipmentItemsGrouped)
 
         return shipmentSummary
+    }
+
+    private static List<ShipmentItem> findShipmentItems(Shipment shipment, ShipmentReceivingSummaryCommand command) {
+        // The client only ever sends a single sort field, so we take the first entry from the
+        // SortParamList and ignore the rest.
+        SortParam sortParam = command.sort?.get(0)
+        if (!sortParam) {
+            return shipment.shipmentItems.sort()
+        }
+        
+        return ShipmentItem.createCriteria().list {
+            createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
+            createAlias("recipient", "r", JoinType.LEFT_OUTER_JOIN)
+            createAlias("inventoryItem", "ii", JoinType.LEFT_OUTER_JOIN)
+            eq("shipment", shipment)
+            applySortOrder(sortParam, delegate)
+        } as List<ShipmentItem>
+    }
+
+    private static void applySortOrder(SortParam sortParam, Criteria criteria) {
+        switch (sortParam.fieldName) {
+            case "productCode":
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "p.productCode"))
+                break
+            case "product":
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "p.name"))
+                break
+            case "lotNumber":
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "ii.lotNumber"))
+                break
+            case "expirationDate":
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "ii.expirationDate"))
+                break
+            case "recipient":
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "r.lastName"))
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "r.firstName"))
+                break
+            case "quantityShipped":
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "quantity"))
+                break
+            default:
+                break
+        }
     }
 
     private OrderedDataGroup buildPackLevelGroup(List<ShipmentItem> shipmentItems) {

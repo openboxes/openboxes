@@ -1,19 +1,21 @@
+import ShipmentItemReceiptStatus from 'consts/shipmentItemReceiptStatus';
+
 const receiptStatusOptions = (translate) => [
   {
-    value: 'QUANTITY_REMAINING',
-    label: translate('react.receiving.filters.receiptStatus.quantityRemaining.label', 'Quantity remaining'),
+    value: ShipmentItemReceiptStatus.RECEIVED_MORE_THAN_SHIPPED,
+    label: translate('react.receiving.filters.receiptStatus.receivedMoreThanShipped.label', 'Received more than shipped'),
   },
   {
-    value: 'OVER_RECEIVED',
-    label: translate('react.receiving.filters.receiptStatus.overReceived.label', 'Over received'),
+    value: ShipmentItemReceiptStatus.RECEIVED_LESS_THAN_SHIPPED,
+    label: translate('react.receiving.filters.receiptStatus.receivedLessThanShipped.label', 'Received less than shipped'),
   },
   {
-    value: 'NO_QUANTITY_ENTERED',
+    value: ShipmentItemReceiptStatus.NO_QUANTITY_ENTERED,
     label: translate('react.receiving.filters.receiptStatus.noQuantityEntered.label', 'No quantity entered'),
   },
   {
-    value: 'COMPLETE',
-    label: translate('react.receiving.filters.receiptStatus.complete.label', 'Complete / Fully Received'),
+    value: ShipmentItemReceiptStatus.COMPLETE,
+    label: translate('react.receiving.filters.receiptStatus.complete.label', 'Complete'),
   },
 ];
 
