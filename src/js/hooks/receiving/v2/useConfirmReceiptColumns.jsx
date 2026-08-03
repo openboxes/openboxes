@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import { useSelector } from 'react-redux';
-import { getCurrentLocale } from 'selectors';
+import { getCurrentLocale, getHasPartialReceivingSupport } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
@@ -27,6 +27,7 @@ const useConfirmReceiptColumns = ({ view, putawayEnabled } = {}) => {
   const formatNumber = useFormatNumber();
   const columnHelper = createColumnHelper();
   const currentLocale = useSelector(getCurrentLocale);
+  const hasPartialReceivingSupport = useSelector(getHasPartialReceivingSupport);
   const isPackingListView = view === ReceivingView.PACKING_LIST;
 
   // Rows are { id, meta } objects; the entities live in the normalized state
@@ -389,36 +390,38 @@ const useConfirmReceiptColumns = ({ view, putawayEnabled } = {}) => {
         },
         size: 90,
       }),
-      columnHelper.display({
-        id: receivingColumns.CANCEL_REMAINING,
-        header: () => (
-          <TableHeaderCell
-            tooltip
-            tooltipLabel={translate('react.receiving.cancelRemaining.label', 'Cancel Remaining')}
-          >
-            {translate('react.receiving.cancelRemaining.label', 'Cancel Remaining')}
-          </TableHeaderCell>
-        ),
-        cell: ({ row, table }) => {
-          const item = getItem(row, table);
-          if (isSplitItemOrToggle(item)) {
-            return null;
-          }
-          return (
-            <TableCell className="rt-td confirm-receipt__cancel-remaining-cell">
-              <Checkbox
-                noWrapper
-                value={Boolean(table.options.meta?.cancelRemainingIds?.has(row.original.id))}
-                onChange={() => table.options.meta?.onToggleCancelRemaining?.(row.original.id)}
-                disabled={item?.isCompleted || (item?.quantityAvailableToReceive ?? 0) <= 0}
-              />
-            </TableCell>
-          );
-        },
-        size: 110,
-      }),
+      ...(hasPartialReceivingSupport ? [
+        columnHelper.display({
+          id: receivingColumns.CANCEL_REMAINING,
+          header: () => (
+            <TableHeaderCell
+              tooltip
+              tooltipLabel={translate('react.receiving.cancelRemaining.label', 'Cancel Remaining')}
+            >
+              {translate('react.receiving.cancelRemaining.label', 'Cancel Remaining')}
+            </TableHeaderCell>
+          ),
+          cell: ({ row, table }) => {
+            const item = getItem(row, table);
+            if (isSplitItemOrToggle(item)) {
+              return null;
+            }
+            return (
+              <TableCell className="rt-td d-flex justify-content-center align-items-center">
+                <Checkbox
+                  noWrapper
+                  value={Boolean(table.options.meta?.cancelRemainingIds?.has(row.original.id))}
+                  onChange={() => table.options.meta?.onToggleCancelRemaining?.(row.original.id)}
+                  disabled={item?.isCompleted || (item?.quantityAvailableToReceive ?? 0) <= 0}
+                />
+              </TableCell>
+            );
+          },
+          size: 110,
+        }),
+      ] : []),
     ];
-  }, [translate, currentLocale, isPackingListView, putawayEnabled]);
+  }, [translate, currentLocale, isPackingListView, putawayEnabled, hasPartialReceivingSupport]);
 
   return { columns };
 };

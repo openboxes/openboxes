@@ -54,6 +54,11 @@ export const getHasBinLocationSupport = createSelector(
   (location) => location?.hasBinLocationSupport,
 );
 
+export const getHasPartialReceivingSupport = createSelector(
+  [getCurrentLocation],
+  (location) => location?.hasPartialReceivingSupport,
+);
+
 export const getDefaultTranslationsFetched = createSelector(
   [getSession],
   (session) => session.fetchedTranslations.default,
