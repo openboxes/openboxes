@@ -1,9 +1,11 @@
 import { useCallback } from 'react';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import _ from 'lodash';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 
 import { DateFormatDateFns } from 'consts/timeFormat';
+import useEditLineItemValidation from 'hooks/receiving/v2/useEditLineItemValidation';
 import useEditModalLocationAutofill from 'hooks/receiving/v2/useEditModalLocationAutofill';
 import useReceivingLineItemColumns from 'hooks/receiving/v2/useReceivingLineItemColumns';
 import useTranslate from 'hooks/useTranslate';
@@ -39,11 +41,17 @@ const useReceivingLineItems = ({
     binLocation: item?.binLocation ?? null,
   });
 
+  const { validationSchema } = useEditLineItemValidation();
+
   const {
-    control, getValues, setValue, reset,
+    control, getValues, setValue, reset, handleSubmit, formState: { errors },
   } = useForm({
+    mode: 'onBlur',
     defaultValues: { lineItems: initialLineItems.map(buildDefaultRow) },
+    resolver: zodResolver(validationSchema),
   });
+
+  const hasErrors = Object.keys(errors).length > 0;
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -66,6 +74,7 @@ const useReceivingLineItems = ({
     control,
     removeRow,
     onLocationAutofill,
+    errors,
   });
 
   // New rows split the same shipment item line, so they start with the line's product.
@@ -92,14 +101,14 @@ const useReceivingLineItems = ({
   const getLineItems = useCallback(() => getValues('lineItems'), [getValues]);
 
   const watchedLineItems = useWatch({ control, name: 'lineItems' });
-  const receivingNow = (watchedLineItems ?? []).reduce(
+  const receivingNow = Number((watchedLineItems ?? []).reduce(
     (sum, item) => sum + (Number(item?.quantityReceiving) || 0),
     0,
-  );
+  ).toFixed(2));
 
   const quantityShipped = lineItem?.quantityShipped ?? 0;
   const received = lineItem?.quantityReceived ?? 0;
-  const remainingToReceive = quantityShipped - received - receivingNow;
+  const remainingToReceive = Number((quantityShipped - received - receivingNow).toFixed(2));
 
   const summaryData = [
     {
@@ -129,6 +138,8 @@ const useReceivingLineItems = ({
     receivingNow,
     summaryData,
     getLineItems,
+    handleSubmit,
+    hasErrors,
   };
 };
 

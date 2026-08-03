@@ -28,6 +28,7 @@ const useReceivingLineItemColumns = ({
   control,
   removeRow,
   onLocationAutofill,
+  errors,
 }) => {
   const translate = useTranslate();
   const columnHelper = createColumnHelper();
@@ -153,21 +154,28 @@ const useReceivingLineItemColumns = ({
           {translate('react.receiving.receivingNow.label', 'Receiving Now')}
         </TableHeaderCell>
       ),
-      cell: ({ row }) => (
-        <Controller
-          key={row.original.rowId}
-          name={`lineItems.${row.index}.quantityReceiving`}
-          control={control}
-          render={({ field }) => (
-            <QuantityInputCell
-              value={field.value}
-              onCommit={(quantityReceiving) => field.onChange(quantityReceiving ?? '')}
-              label="react.receiving.receivingNow.label"
-              defaultLabel="Receiving Now"
-            />
-          )}
-        />
-      ),
+      cell: ({ row }) => {
+        const errorMessage = errors?.lineItems?.[row.index]?.quantityReceiving?.message;
+        return (
+          <Controller
+            key={row.original.rowId}
+            name={`lineItems.${row.index}.quantityReceiving`}
+            control={control}
+            render={({ field }) => (
+              <QuantityInputCell
+                value={field.value}
+                onCommit={(quantityReceiving) => {
+                  field.onChange(quantityReceiving ?? '');
+                  field.onBlur();
+                }}
+                errorMessage={errorMessage}
+                label="react.receiving.receivingNow.label"
+                defaultLabel="Receiving Now"
+              />
+            )}
+          />
+        );
+      },
       footer: ({ table }) => <span style={{ paddingLeft: '14px' }}>{table.options.meta?.totalReceivingNow ?? 0}</span>,
       size: 120,
     }),
@@ -224,6 +232,7 @@ const useReceivingLineItemColumns = ({
     removeRow,
     binLocationOptions,
     onLocationAutofill,
+    errors,
   ]);
 
   return { columns };
@@ -233,6 +242,11 @@ useReceivingLineItemColumns.propTypes = {
   control: PropTypes.shape({}).isRequired,
   removeRow: PropTypes.func.isRequired,
   onLocationAutofill: PropTypes.func.isRequired,
+  errors: PropTypes.shape({}),
+};
+
+useReceivingLineItemColumns.defaultProps = {
+  errors: {},
 };
 
 export default useReceivingLineItemColumns;

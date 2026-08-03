@@ -25,6 +25,8 @@ const EditLineItemModal = ({
     receivingNow,
     summaryData,
     getLineItems,
+    handleSubmit,
+    hasErrors,
   } = useReceivingLineItems({ lineItem, initialLineItems });
 
   const { onSave } = useEditLineItemSave({
@@ -54,7 +56,11 @@ const EditLineItemModal = ({
 
   return (
     <Modal isOpen className="modal-content">
-      <div className="receiving-edit-modal" data-testid="receiving-edit-line-item-modal">
+      <form
+        className="receiving-edit-modal"
+        data-testid="receiving-edit-line-item-modal"
+        onSubmit={handleSubmit(onSave)}
+      >
         <EditLineItemModalHeader
           onClose={onClose}
         />
@@ -78,9 +84,9 @@ const EditLineItemModal = ({
         <EditLineItemModalFooter
           summaryData={summaryData}
           onClose={onClose}
-          onSave={onSave}
+          isSaveDisabled={hasErrors}
         />
-      </div>
+      </form>
     </Modal>
   );
 };
