@@ -12,6 +12,12 @@ const SEARCHABLE_PATHS = ['productCode', 'product.name', 'lotNumber', 'recipient
 const isCurrentRow = (row) =>
   row.rowType !== ReceivingRowType.REPLACED && row.rowType !== ReceivingRowType.TOGGLE;
 
+// The row that carries the shipment-item level values (product, lot, expiration, recipient).
+// A plain shipment item is its only row (rowType: null); a split shipment item exposes them
+// through the replaced (struck-through) row above the split items.
+const isOriginalRow = (row) =>
+  row.rowType === null || row.rowType === ReceivingRowType.REPLACED;
+
 // Predicate answering whether a shipment item matches any of the requested receipt status
 // codes. Status is derived from the row values as of the filter apply — edits are reflected
 // only on the next submit / reload.
@@ -55,8 +61,10 @@ const matchesReceiptStatus = ({ shipmentItemRows, statusCodes }) => {
   });
 };
 
+// Search matches only against the original (shipment-item level) row so a split item's own
+// product/lot/recipient does not make its parent shipment item pop up in unrelated searches.
 const matchesSearch = ({ shipmentItemRows, searchTerm }) =>
-  !searchTerm || shipmentItemRows.some((row) =>
+  !searchTerm || shipmentItemRows.filter(isOriginalRow).some((row) =>
     rowMatchesSearch({ row, search: searchTerm, paths: SEARCHABLE_PATHS }));
 
 const matchesFilter = ({ shipmentItemRows, receiptStatusCodes, searchTerm }) =>
