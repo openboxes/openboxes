@@ -548,9 +548,10 @@ const useReceivingColumns = ({
             })
             : getReceivingRowActions({
               itemId: row.original.id,
-              // Only rows backed by a receipt item can carry a comment (the struck-through
-              // header of a split group is not one).
+              // Only rows backed by a receipt item can carry a comment. The replaced row of a
+              // split group is backed by the original line of its shipment item.
               canComment: Boolean(item?.receiptItemId),
+              hasComment: Boolean(item?.comment),
               onOpenCommentModal: table.options.meta?.onOpenCommentModal,
               onOpenEditModal: table.options.meta?.onOpenEditModal,
             });

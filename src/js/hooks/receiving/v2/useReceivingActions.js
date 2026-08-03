@@ -165,6 +165,13 @@ const useReceivingActions = ({ view, sort, sortOrder } = {}) => {
     ),
   });
 
+  // The original line of a shipment item (isSplitItem: false), created when the receipt was
+  // started. Exactly one exists per receivable shipment item and it cannot be deleted, so it is
+  // always in the summary - even when it is filtered out of the displayed rows
+  // (see visibleReceiptItems).
+  const findOriginalReceiptItem = (currentReceiptItems) =>
+    currentReceiptItems.find((receiptItem) => !receiptItem.isSplitItem);
+
   // The struck-through row of a split shipment item - the split items below
   // replace it. Built without a receipt item, so it keeps the original shipment values
   // (product, lot, expiration, recipient, bin location).
@@ -188,9 +195,13 @@ const useReceivingActions = ({ view, sort, sortOrder } = {}) => {
       changesPerItem.some((itemChanges) => itemChanges[dirtyField]);
     const anyLotOrExpirationChange = isAnyReceiptItemOfShipmentItemDirty('lotNumber')
       || isAnyReceiptItemOfShipmentItemDirty('expirationDate');
+    const originalReceiptItem = findOriginalReceiptItem(currentReceiptItems);
     return {
       ...lineItem,
       rowType: ReceivingRowType.REPLACED,
+      // Return receipt item id of the original line to have the comments feature visible.
+      receiptItemId: originalReceiptItem?.id ?? null,
+      comment: originalReceiptItem?.comment ?? null,
       isCompleted: false,
       productChanged: isAnyReceiptItemOfShipmentItemDirty('product'),
       lotChanged: isAnyReceiptItemOfShipmentItemDirty('product') || anyLotOrExpirationChange,
