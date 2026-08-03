@@ -2,9 +2,10 @@ package spring
 
 import grails.config.Config
 import grails.util.Holders
-import org.pih.warehouse.inboundSortation.PutawayStrategyService
-import org.pih.warehouse.inboundSortation.strategy.CrossDockPutawayStrategy
-import org.pih.warehouse.inboundSortation.strategy.DirectedPutawayStrategy
+import org.pih.warehouse.inboundSortation.strategy.CrossDockingBackorderReferenceStrategy
+import org.pih.warehouse.inboundSortation.strategy.DefaultSlottingStrategy
+import org.pih.warehouse.inboundSortation.strategy.RandomSlottingStrategy
+import org.pih.warehouse.inboundSortation.SlottingService
 import org.pih.warehouse.monitoring.SentryGrailsTracingFilter
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.core.Ordered
@@ -37,15 +38,15 @@ beans = {
     // See: https://grails.apache.org/guides/grails-transactional-events/8/guide/index.html (I know it is Grails Version: 8)
     transactionalEventListenerFactory(TransactionalEventListenerFactory)
 
-    // Putaway strategies
-    crossDockPutawayStrategy(CrossDockPutawayStrategy)
-    directedPutawayStrategy(DirectedPutawayStrategy)
-    // randomPutawayStrategy(RandomPutawayStrategy)
-    putawayStrategyService(PutawayStrategyService) {
+    // Slotting strategies
+    crossDockingBackorderReferenceStrategy(CrossDockingBackorderReferenceStrategy)
+    defaultSlottingStrategy(DefaultSlottingStrategy)
+    randomSlottingStrategy(RandomSlottingStrategy)
+    slottingService(SlottingService) {
         strategies = [
-                ref('crossDockPutawayStrategy'), // fallback if none of the strategies worked, executed as the last one
-                ref('directedPutawayStrategy'), // directed putaway to preferred bin
-                // ref('randomPutawayStrategy') // (disabled) fallback if none of the strategies worked, executed as the last one
+                ref('crossDockingBackorderReferenceStrategy'), // fallback if none of the strategies worked, executed as the last one
+                ref('defaultSlottingStrategy'), // directed putaway to preferred bin
+                ref('randomSlottingStrategy') // fallback if none of the strategies worked, executed as the last one
         ]
     }
 

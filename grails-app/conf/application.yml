@@ -547,7 +547,7 @@ openboxes:
             enabled: false
             cronExpression: "0 0 * * * ?" # every hour
 
-        automaticPutawayGenerationJob:
+        automaticSlottingJob:
             enabled: false
             cronExpression: "0 */5 * * * ?"     # every five minutes
             defaultPutawayAssignee: "admin"
@@ -582,7 +582,7 @@ openboxes:
             delayInMilliseconds: 1000
 
         # should only be triggered by persistence event listener
-        putawayLocationReassignmentJob:
+        putawayLocationReslottingJob:
             enabled: true
     # LDAP configuration
     ldap:

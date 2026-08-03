@@ -18,7 +18,7 @@ class InboundSortationService {
 
     def orderIdentifierService
     def putawayService
-    PutawayStrategyService putawayStrategyService
+    def slottingService
 
     void createPutawayOrdersFromReceipt(Receipt receipt) {
         receipt.receiptItems.each { ReceiptItem receiptItem ->
@@ -29,7 +29,7 @@ class InboundSortationService {
             }
 
             PutawayContext putawayContext = createPutawayContext(receiptItem)
-            List<PutawayResult> results = putawayStrategyService.execute(putawayContext)
+            List<PutawayResult> results = slottingService.execute(putawayContext)
             results.each { PutawayResult result ->
                 if (result.quantity > 0) {
                     Putaway putaway = createPutaway(putawayContext, receipt.shipment?.createdBy)
@@ -63,7 +63,7 @@ class InboundSortationService {
         )
 
         // 3. Execute strategy chain
-        List<PutawayResult> results = putawayStrategyService.execute(context)
+        List<PutawayResult> results = slottingService.execute(context)
         PutawayResult result = results?.find { it.quantity > 0 }
 
         // 4. Update existing order item with new strategy results
