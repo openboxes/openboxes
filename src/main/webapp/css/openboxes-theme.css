@@ -2358,12 +2358,36 @@ th a:hover {
    it already does in the left-hand column, where that same margin falls on
    grey page background and reads as separation. Panels that open with
    something other than a card keep their padding. */
-.ui-tabs-panel:has(> .box:first-child) {
+.ui-tabs-panel:has(> .box:first-child),
+/* product/create and product/edit wrap their card in a <form>, so the
+   card is a grandchild and the original rule missed it — leaving 32px of
+   white above "Product details" on both. */
+.ui-tabs-panel:has(> form > .box:first-child) {
   padding-top: 0;
 }
 
-.ui-tabs-panel > .box:first-child {
+.ui-tabs-panel > .box:first-child,
+.ui-tabs-panel > form > .box:first-child {
   margin-top: 0;
+}
+
+/* product/create has a single tab, which the theme hides (see .single-tab
+   on product/edit.gsp). That leaves the panel's white surface running
+   straight into the navbar with no page background between them — the
+   page reads as though the card has no top margin at all.
+
+   With no tab strip above it the panel has nothing to be, so it stops
+   being a surface: the card then sits on the page background with its own
+   16px margin, exactly like a page that never had tabs. */
+.tabs.single-tab > .ui-tabs-panel {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+}
+
+.tabs.single-tab > .ui-tabs-panel > .box:first-child,
+.tabs.single-tab > .ui-tabs-panel > form > .box:first-child {
+  margin-top: 16px;
 }
 
 /* stockCard.gsp caps zone names at 50px and bin names at 100px, which
