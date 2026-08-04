@@ -1,0 +1,26 @@
+{
+  "_comment": "Example column-mapping config for CsvToInventoryImport.groovy. Copy this file, rename it (e.g. mapping.json), and edit the source column names to match YOUR CSV export. Run 'CsvToInventoryImport.groovy --input yourfile.csv --list-columns' to see the exact header names to use. The values below are illustrative source headers, not real data.",
+
+  "mapping": {
+    "productCode": "Part Number",
+    "quantity": "Quantity On Hand",
+    "productName": "Description",
+    "binLocation": "",
+    "lotNumber": "",
+    "comments": ""
+  },
+
+  "filter": {
+    "_comment": "Optional. Keep only rows where the given source column equals the given value (case-insensitive). Useful when one export covers multiple warehouses but you're importing into a single OpenBoxes facility. Remove this block to import every row.",
+    "column": "Warehouse",
+    "equals": "MAIN"
+  },
+
+  "options": {
+    "includeZero": false,
+    "defaultBin": "",
+    "comment": "Inventory reconciliation import",
+    "batchSize": 100,
+    "format": "both"
+  }
+}

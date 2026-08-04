@@ -10,11 +10,19 @@
  **/
 
 /*
- * PartsMasterToInventory.groovy  (OBLS-903)
+ * CsvToInventoryImport.groovy
  * ------------------------------------------------------------------------------
- * Transforms an Excede "Parts Master" CSV export into OpenBoxes inventory import
+ * A GENERIC, source-agnostic tool that transforms an arbitrary inventory CSV
+ * (whatever columns your source system exports) into OpenBoxes inventory import
  * files (quantity-on-hand baseline), split into batches, and optionally uploads
  * each batch to an OpenBoxes instance.
+ *
+ * There is NO source-specific logic in this script. All knowledge about the
+ * source file - which column is the product code, which is the quantity, how to
+ * filter rows - lives in an external JSON mapping config that you supply at
+ * runtime with --config (or inline with --mapping / --filter). The script itself
+ * only knows about OpenBoxes: its import columns, file formats, batching rules
+ * and quantity semantics. See mapping.example.json and README.md.
  *
  * Two output formats, both derived from the same canonical rows:
  *
@@ -22,39 +30,34 @@
  *          (grails-app/conf/templates/inventory.xls). Upload manually via
  *          "Record Inventory > Import Inventory". Columns are read BY POSITION
  *          (A..H) by InventoryExcelImporter, so column order matters, not the
- *          header text. The Parts Master quantity goes in column G (Physical QOH).
+ *          header text. The source quantity goes in column G (Physical QOH).
  *
  *   csv  - For the API path: POST {baseUrl}/api/facilities/{facilityId}/inventories/import
  *          with Content-Type: text/csv. Header cells are camel-cased by the server
  *          (CSVUtils.toCamelCase), so "Product Code" -> productCode, "Quantity" ->
  *          quantity. The API path only RAISES stock (never zeroes) and is the
- *          safest option for UAT reconciliation.
+ *          safest option for reconciliation.
  *
  * Why "Physical QOH" (not "OB QOH"): OpenBoxes treats the imported quantity as the
  * ABSOLUTE target on-hand. It reads the current QoH from the database and creates
  * an adjustment for the difference (target - current). So we always populate the
- * quantity as the Parts Master value and leave "OB QOH" blank.
+ * quantity as the source value and leave "OB QOH" blank.
  *
  * SAFETY NOTE (batching): for every product present in an import file, OpenBoxes
  * zeroes out any OTHER bin/lot of that product that is NOT in the same file. This
- * tool therefore never splits a single product's rows across two batches. Keep this
- * in mind if you edit the batches by hand.
+ * tool therefore never splits a single product's rows across two batches.
  *
  * Requirements: Groovy 2.5+ / 3.x with internet access on first run (Grape pulls
  * Apache POI). Everything else uses the JDK.
  *
  * Quick start:
- *   groovy PartsMasterToInventory.groovy --input partsmaster.csv --list-columns
- *   groovy PartsMasterToInventory.groovy --input partsmaster.csv --dry-run
- *   groovy PartsMasterToInventory.groovy --input partsmaster.csv --output-dir out
- *   groovy PartsMasterToInventory.groovy --input partsmaster.csv --format csv \
- *          --upload --url https://vvg.openboxes.com/openboxes \
- *          --facility-id <locationId> --session-cookie "JSESSIONID=..."
- *
- * See README.md for the full column-mapping guide.
+ *   groovy CsvToInventoryImport.groovy --input data.csv --list-columns
+ *   groovy CsvToInventoryImport.groovy --input data.csv --config mapping.json --dry-run
+ *   groovy CsvToInventoryImport.groovy --input data.csv --config mapping.json --output-dir out
  */
 
 @Grab(group = 'org.apache.poi', module = 'poi', version = '5.2.5')
+import groovy.json.JsonSlurper
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
@@ -63,9 +66,11 @@ import org.apache.poi.ss.usermodel.Workbook
 
 // ---------------------------------------------------------------------------
 // Canonical OpenBoxes inventory columns (order matters for the XLS template).
-// ---------------------------------------------------------------------------
+// This is the ONLY built-in schema - it describes OpenBoxes, not any source.
 // Each entry: [canonical field, XLS header, API CSV header]
-// The XLS is read by column position, the API CSV by camel-cased header name.
+//   - the XLS is read by column position (A..H)
+//   - the API CSV by camel-cased header name
+// ---------------------------------------------------------------------------
 final List<List<String>> OB_COLUMNS = [
         ['productCode', 'Product code', 'Product Code'],
         ['productName', 'Product name', 'Product'],
@@ -73,31 +78,14 @@ final List<List<String>> OB_COLUMNS = [
         ['expirationDate', 'Expiration date', 'Expiration Date'],
         ['binLocation', 'Bin location', 'Bin Location'],
         ['obQoh', 'OB QOH', 'Quantity On Hand'],   // always left blank; OB computes current
-        ['quantity', 'Physical QOH', 'Quantity'],   // <-- the Parts Master QoH (absolute target)
+        ['quantity', 'Physical QOH', 'Quantity'],   // <-- the source QoH (absolute target)
         ['comments', 'Comment', 'Comments'],
 ]
 
-// ---------------------------------------------------------------------------
-// Default auto-detection aliases (normalized: lowercased, non-alphanumerics
-// stripped). First matching source header wins for each canonical field.
-// Override any of these at runtime with --mapping field=Header,...
-// ---------------------------------------------------------------------------
-final Map<String, List<String>> DEFAULT_ALIASES = [
-        productCode : ['partnumber', 'partno', 'partid', 'part', 'sku', 'itemnumber',
-                       'itemno', 'itemid', 'item', 'productcode', 'product', 'stocknumber',
-                       'stockcode', 'materialnumber', 'matnr'],
-        productName : ['description', 'desc', 'partdescription', 'itemdescription',
-                       'productname', 'productdescription', 'name'],
-        quantity    : ['qtyonhand', 'quantityonhand', 'onhandqty', 'onhandquantity',
-                       'qoh', 'onhand', 'stockonhand', 'soh', 'availablequantity',
-                       'availableqty', 'qtyavailable', 'qty', 'quantity'],
-        binLocation : ['binlocation', 'binloc', 'bin', 'shelf', 'shelflocation', 'slot'],
-        lotNumber   : ['lotnumber', 'lot', 'batchnumber', 'batch', 'lotno'],
-        comments    : ['comment', 'comments', 'note', 'notes', 'remark', 'remarks'],
-        // Not an OB column - used only to filter source rows by warehouse/facility:
-        sourceFacility: ['warehouse', 'warehousecode', 'whse', 'facility', 'facilitycode',
-                         'site', 'branch', 'store', 'plant', 'depot', 'loc', 'location'],
-]
+// Canonical fields a mapping config may set (obQoh/expirationDate are managed by OB rules).
+final List<String> MAPPABLE_FIELDS =
+        ['productCode', 'productName', 'quantity', 'binLocation', 'lotNumber', 'comments']
+final List<String> REQUIRED_FIELDS = ['productCode', 'quantity']
 
 // ===========================================================================
 // Arg parsing
@@ -122,33 +110,55 @@ for (int i = 0; i < args.length; i++) {
     }
 }
 
-if ('help' in flags || !opts && !flags) {
+if ('help' in flags || (!opts && !flags)) {
     printUsage()
     return
 }
 
 String inputPath = opts['input']
 if (!inputPath) {
-    die("--input <partsMaster.csv> is required. Use --help for usage.")
+    die("--input <data.csv> is required. Use --help for usage.")
 }
 File inputFile = new File(inputPath)
 if (!inputFile.exists()) {
     die("Input file not found: ${inputFile.absolutePath}")
 }
 
-String outputDirPath = opts['output-dir'] ?: 'inventory-output'
-String format = (opts['format'] ?: 'both').toLowerCase()
-if (!(format in ['xls', 'csv', 'both'])) {
-    die("--format must be one of: xls, csv, both (got '${format}')")
-}
-int batchSize = (opts['batch-size'] ?: '100') as int
-boolean includeZero = 'include-zero' in flags
-boolean dryRun = 'dry-run' in flags
 boolean listColumns = 'list-columns' in flags
+boolean dryRun = 'dry-run' in flags
 boolean upload = 'upload' in flags
-String defaultBin = opts['default-bin']
-String sourceFacilityFilter = opts['source-facility']
-String comment = opts['comment'] ?: "Parts Master import ${new Date().format('yyyy-MM-dd')}"
+
+// ---------------------------------------------------------------------------
+// Load the mapping config (JSON). Everything source-specific comes from here.
+// CLI options override config values.
+// ---------------------------------------------------------------------------
+Map config = [:]
+if (opts['config']) {
+    File configFile = new File(opts['config'])
+    if (!configFile.exists()) {
+        die("Config file not found: ${configFile.absolutePath}")
+    }
+    try {
+        config = new JsonSlurper().parse(configFile) as Map
+    } catch (Exception e) {
+        die("Could not parse config JSON (${configFile.name}): ${e.message}")
+    }
+}
+Map configMapping = (config['mapping'] ?: [:]) as Map
+Map configFilter = (config['filter'] ?: [:]) as Map
+Map configOptions = (config['options'] ?: [:]) as Map
+
+// Resolve options (CLI wins over config wins over built-in default)
+String outputDirPath = opts['output-dir'] ?: (configOptions['outputDir'] ?: 'inventory-output')
+String format = (opts['format'] ?: (configOptions['format'] ?: 'both')).toString().toLowerCase()
+if (!(format in ['xls', 'csv', 'both'])) {
+    die("format must be one of: xls, csv, both (got '${format}')")
+}
+int batchSize = (opts['batch-size'] ?: (configOptions['batchSize'] ?: 100)) as int
+boolean includeZero = ('include-zero' in flags) || (configOptions['includeZero'] as boolean)
+String defaultBin = opts['default-bin'] ?: (configOptions['defaultBin'] ?: null)
+String comment = opts['comment'] ?: (configOptions['comment'] ?:
+        "Inventory import ${new Date().format('yyyy-MM-dd')}")
 
 // Validate upload arguments up front so we fail before doing any work.
 if (upload) {
@@ -162,7 +172,7 @@ if (upload) {
 }
 
 // ===========================================================================
-// Read the Parts Master CSV
+// Read the input CSV
 // ===========================================================================
 List<List<String>> rawRows = parseCsv(inputFile.getText('UTF-8'))
 if (rawRows.size() < 2) {
@@ -171,24 +181,36 @@ if (rawRows.size() < 2) {
 List<String> headers = rawRows[0]
 List<List<String>> dataRows = rawRows[1..-1]
 
-// ---------------------------------------------------------------------------
-// Build the mapping: canonical field -> source header. Auto-detect, then apply
-// explicit --mapping overrides (field=Header,field=Header,...).
-// ---------------------------------------------------------------------------
 Map<String, Integer> headerIndex = [:]
 headers.eachWithIndex { String h, int idx -> headerIndex[normalize(h)] = idx }
 
-Map<String, String> mapping = [:]           // canonical field -> actual source header
-DEFAULT_ALIASES.each { String field, List<String> aliases ->
-    for (String alias : aliases) {
-        if (headerIndex.containsKey(alias)) {
-            mapping[field] = headers[headerIndex[alias]]
-            break
-        }
-    }
+// ---------------------------------------------------------------------------
+// --list-columns: show the CSV headers so you can build a mapping config. This
+// makes no assumptions about the source - it just lists what's there.
+// ---------------------------------------------------------------------------
+if (listColumns) {
+    println "CSV columns detected in ${inputFile.name}:"
+    headers.eachWithIndex { String h, int idx -> println "  [${idx}] ${h}" }
+    println ""
+    println "Build a --config mapping.json (see mapping.example.json). Map at least:"
+    println "  productCode, quantity   (required)"
+    println "  productName, binLocation, lotNumber, comments   (optional)"
+    return
 }
 
-// Apply explicit overrides
+// ---------------------------------------------------------------------------
+// Build mapping: canonical field -> source header. From config, then inline
+// --mapping overrides. No auto-detection: mappings are always explicit.
+// ---------------------------------------------------------------------------
+Map<String, String> mapping = [:]
+configMapping.each { k, v ->
+    if (v != null && v.toString().trim()) {
+        if (!(k in MAPPABLE_FIELDS)) {
+            die("Config mapping has unknown field '${k}'. Valid fields: ${MAPPABLE_FIELDS.join(', ')}")
+        }
+        mapping[k as String] = v.toString()
+    }
+}
 if (opts['mapping']) {
     opts['mapping'].split(',').each { String pair ->
         List<String> kv = pair.split('=', 2) as List
@@ -196,51 +218,48 @@ if (opts['mapping']) {
             die("Bad --mapping entry '${pair}'. Expected field=Header.")
         }
         String field = kv[0].trim()
-        String header = kv[1].trim()
-        if (!headerIndex.containsKey(normalize(header))) {
-            die("--mapping references column '${header}' which is not in the CSV.\n" +
-                    "Available columns: ${headers.join(', ')}")
+        if (!(field in MAPPABLE_FIELDS)) {
+            die("--mapping has unknown field '${field}'. Valid fields: ${MAPPABLE_FIELDS.join(', ')}")
         }
-        mapping[field] = header
+        mapping[field] = kv[1].trim()
     }
-}
-if (opts['source-facility-col']) {
-    String header = opts['source-facility-col']
-    if (!headerIndex.containsKey(normalize(header))) {
-        die("--source-facility-col '${header}' is not a CSV column. Columns: ${headers.join(', ')}")
-    }
-    mapping['sourceFacility'] = header
 }
 
-// ---------------------------------------------------------------------------
-// --list-columns: show detected headers + guessed mapping and exit.
-// ---------------------------------------------------------------------------
-if (listColumns) {
-    println "CSV columns detected in ${inputFile.name}:"
-    headers.eachWithIndex { String h, int idx -> println "  [${idx}] ${h}" }
-    println ""
-    println "Guessed column mapping (override with --mapping field=Header,...):"
-    ['productCode', 'productName', 'quantity', 'binLocation', 'lotNumber', 'comments', 'sourceFacility'].each { String f ->
-        println "  ${f.padRight(16)} <- ${mapping[f] ?: '(not found)'}"
+// Row filter (optional): keep only rows where <column> == <value>.
+String filterColumn = configFilter['column'] ?: null
+String filterValue = configFilter['equals'] != null ? configFilter['equals'].toString() : null
+if (opts['filter']) {
+    List<String> kv = opts['filter'].split('=', 2) as List
+    if (kv.size() != 2) {
+        die("Bad --filter '${opts['filter']}'. Expected Column=Value.")
     }
-    println ""
-    println "Required: productCode, quantity. Everything else is optional."
-    return
+    filterColumn = kv[0].trim()
+    filterValue = kv[1].trim()
 }
 
-// Validate required mappings
-List<String> missing = ['productCode', 'quantity'].findAll { !mapping[it] }
+// Validate mappings resolve to real CSV columns
+if (!mapping) {
+    die("No column mapping provided. Pass --config <mapping.json> or --mapping field=Header,...\n" +
+            "Run with --list-columns to see the CSV's columns.")
+}
+List<String> missing = REQUIRED_FIELDS.findAll { !mapping[it] }
 if (missing) {
-    die("Could not auto-detect required column(s): ${missing.join(', ')}.\n" +
-            "CSV columns are: ${headers.join(', ')}\n" +
-            "Re-run with --list-columns to inspect, then set them explicitly, e.g.:\n" +
-            "  --mapping productCode=PartNo,quantity=QtyOnHand")
+    die("Mapping is missing required field(s): ${missing.join(', ')}.\n" +
+            "CSV columns are: ${headers.join(', ')}")
+}
+mapping.each { field, header ->
+    if (!headerIndex.containsKey(normalize(header))) {
+        die("Mapping for '${field}' points at column '${header}', which is not in the CSV.\n" +
+                "CSV columns are: ${headers.join(', ')}")
+    }
+}
+if (filterColumn && !headerIndex.containsKey(normalize(filterColumn))) {
+    die("Filter column '${filterColumn}' is not in the CSV. Columns: ${headers.join(', ')}")
 }
 
 println "Using column mapping:"
-['productCode', 'productName', 'quantity', 'binLocation', 'lotNumber', 'comments', 'sourceFacility'].each { String f ->
-    if (mapping[f]) println "  ${f.padRight(16)} <- ${mapping[f]}"
-}
+MAPPABLE_FIELDS.each { String f -> if (mapping[f]) println "  ${f.padRight(16)} <- ${mapping[f]}" }
+if (filterColumn) println "Filtering rows where '${filterColumn}' == '${filterValue}'"
 println ""
 
 // ===========================================================================
@@ -252,25 +271,17 @@ Integer idxProductName = mapping['productName'] ? headerIndex[normalize(mapping[
 Integer idxBin = mapping['binLocation'] ? headerIndex[normalize(mapping['binLocation'])] : null
 Integer idxLot = mapping['lotNumber'] ? headerIndex[normalize(mapping['lotNumber'])] : null
 Integer idxComment = mapping['comments'] ? headerIndex[normalize(mapping['comments'])] : null
-Integer idxSourceFacility = mapping['sourceFacility'] ? headerIndex[normalize(mapping['sourceFacility'])] : null
+Integer idxFilter = filterColumn ? headerIndex[normalize(filterColumn)] : null
 
 List<Map> canonicalRows = []
-List<Map> skipped = []       // [rowNumber, reason, raw]
+List<Map> skipped = []       // [row, reason, raw]
 
 dataRows.eachWithIndex { List<String> row, int i ->
     int rowNumber = i + 2   // 1-based, +1 for header
     def cell = { Integer idx -> idx != null && idx < row.size() ? (row[idx] ?: '').trim() : '' }
 
-    // Filter by source facility/warehouse if requested
-    if (sourceFacilityFilter != null) {
-        if (idxSourceFacility == null) {
-            die("--source-facility given but no warehouse/facility column detected. " +
-                    "Use --source-facility-col <Header> to point at it.")
-        }
-        String facVal = cell(idxSourceFacility)
-        if (!facVal.equalsIgnoreCase(sourceFacilityFilter)) {
-            return   // silently skip other facilities (not an error)
-        }
+    if (idxFilter != null && !cell(idxFilter).equalsIgnoreCase(filterValue)) {
+        return   // silently skip rows that don't match the filter (not an error)
     }
 
     String productCode = cell(idxProductCode)
@@ -285,12 +296,12 @@ dataRows.eachWithIndex { List<String> row, int i ->
         skipped << [row: rowNumber, reason: "non-numeric quantity '${qtyRaw}'", raw: row]
         return
     }
-    if (qty <= 0 && !includeZero) {
-        skipped << [row: rowNumber, reason: "quantity ${qty} <= 0 (use --include-zero to keep)", raw: row]
-        return
-    }
     if (qty < 0) {
         skipped << [row: rowNumber, reason: "negative quantity ${qty}", raw: row]
+        return
+    }
+    if (qty == 0 && !includeZero) {
+        skipped << [row: rowNumber, reason: "quantity 0 (use --include-zero to keep)", raw: row]
         return
     }
 
@@ -313,7 +324,6 @@ println "Parsed ${dataRows.size()} data row(s):"
 println "  ${canonicalRows.size()} row(s) to import"
 println "  ${skipped.size()} row(s) skipped"
 if (skipped) {
-    // Summarize skip reasons
     Map<String, Integer> reasonCounts = [:].withDefault { 0 }
     skipped.each { reasonCounts[shortReason(it.reason)] += 1 }
     reasonCounts.each { r, c -> println "      - ${c}x ${r}" }
@@ -333,7 +343,6 @@ println batchSize > 0 ?
         "Split into ${batches.size()} batch(es) of up to ${batchSize} row(s) each.\n" :
         "Batching disabled: writing a single file with ${canonicalRows.size()} row(s).\n"
 
-// Write skipped-records report so nothing is silently dropped
 File outputDir = new File(outputDirPath)
 
 if (dryRun) {
@@ -346,7 +355,7 @@ if (dryRun) {
 
 outputDir.mkdirs()
 
-// Skipped report
+// Skipped report - nothing is silently dropped.
 if (skipped) {
     File skipFile = new File(outputDir, 'skipped-records.csv')
     skipFile.withWriter('UTF-8') { w ->
@@ -362,13 +371,11 @@ if (skipped) {
 // Write batch files
 // ---------------------------------------------------------------------------
 List<File> csvBatchFiles = []
-List<File> xlsBatchFiles = []
 batches.eachWithIndex { List<Map> batch, int i ->
     String base = "inventory_batch_${String.format('%03d', i + 1)}"
     if (format in ['xls', 'both']) {
         File f = new File(outputDir, "${base}.xls")
         writeXls(f, batch, OB_COLUMNS)
-        xlsBatchFiles << f
         println "Wrote ${f.name} (${batch.size()} row(s))"
     }
     if (format in ['csv', 'both']) {
@@ -384,27 +391,18 @@ println ""
 // Optional upload via the OpenBoxes inventory import API
 // ===========================================================================
 if (upload) {
-    String baseUrl = opts['url']
+    String baseUrl = opts['url'].replaceAll('/+$', '')
     String facilityId = opts['facility-id']
-    if (!baseUrl || !facilityId) {
-        die("--upload requires --url <baseUrl> and --facility-id <locationId>.")
-    }
-    baseUrl = baseUrl.replaceAll('/+$', '')
 
     String cookie = opts['session-cookie']
     if (!cookie) {
-        if (opts['username'] && opts['password']) {
-            println "Logging in as ${opts['username']} ..."
-            cookie = login(baseUrl, opts['username'], opts['password'])
-            println "Obtained session cookie."
-        } else {
-            die("--upload needs auth: pass --session-cookie \"JSESSIONID=...\" " +
-                    "or --username and --password.")
-        }
+        println "Logging in as ${opts['username']} ..."
+        cookie = login(baseUrl, opts['username'], opts['password'])
+        println "Obtained session cookie."
     }
 
+    // We upload CSV; if the user chose --format xls, build CSVs on the fly.
     if (!csvBatchFiles) {
-        // We upload CSV; if the user chose --format xls, build CSVs on the fly.
         batches.eachWithIndex { List<Map> batch, int i ->
             File f = new File(outputDir, "inventory_batch_${String.format('%03d', i + 1)}.csv")
             writeApiCsv(f, batch, OB_COLUMNS)
@@ -439,7 +437,6 @@ static List<List<Map>> batchRows(List<Map> rows, int batchSize) {
     if (batchSize <= 0) {
         return [rows]
     }
-    // Preserve first-seen order of products; keep all rows for a product together.
     Map<String, List<Map>> byProduct = [:]
     rows.each { Map r -> byProduct.computeIfAbsent(r.productCode as String, { [] }) << r }
 
@@ -565,12 +562,10 @@ static List<List<String>> parseCsv(String text) {
             }
         }
     }
-    // last field/row
     if (sb.length() > 0 || !current.isEmpty()) {
         current << sb.toString()
         rows << current
     }
-    // Drop fully-empty trailing rows
     return rows.findAll { !(it.size() == 1 && it[0].trim().isEmpty()) }
 }
 
@@ -588,8 +583,9 @@ static String normalize(String header) {
 
 static String shortReason(String reason) {
     if (reason.startsWith('non-numeric')) return 'non-numeric quantity'
-    if (reason.startsWith('quantity') && reason.contains('<= 0')) return 'quantity <= 0'
+    if (reason.startsWith('quantity 0')) return 'quantity 0'
     if (reason.startsWith('negative')) return 'negative quantity'
+    if (reason.startsWith('blank')) return 'blank product code'
     return reason
 }
 
@@ -642,44 +638,38 @@ static void die(String message) {
 
 static void printUsage() {
     println '''\
-PartsMasterToInventory.groovy (OBLS-903)
-Transform an Excede Parts Master CSV into OpenBoxes inventory import batches.
+CsvToInventoryImport.groovy
+Transform an arbitrary inventory CSV into OpenBoxes inventory import batches,
+driven by an external column-mapping config (no source-specific logic baked in).
 
 USAGE:
-  groovy PartsMasterToInventory.groovy --input <partsMaster.csv> [options]
+  groovy CsvToInventoryImport.groovy --input <data.csv> --config <mapping.json> [options]
 
 INSPECT / DRY RUN:
-  --list-columns            Print CSV headers + guessed column mapping, then exit
+  --list-columns            Print the CSV's headers (to help build a config), then exit
   --dry-run                 Parse, filter and batch; report counts but write nothing
 
 INPUT / MAPPING:
-  --input <file>            Parts Master CSV (required)
-  --mapping <k=v,...>       Override column mapping, e.g.
-                            --mapping productCode=PartNo,quantity=QtyOnHand
-  --source-facility-col <h> Header of the warehouse/facility column (for filtering)
-  --source-facility <val>   Keep only source rows whose facility column == val
+  --input <file>            Source inventory CSV (required)
+  --config <mapping.json>   JSON column-mapping config (see mapping.example.json)
+  --mapping <k=v,...>       Inline mapping/override, e.g. productCode=PartNo,quantity=QtyOnHand
+  --filter <Column=Value>   Keep only source rows where Column == Value
 
 OUTPUT:
   --output-dir <dir>        Output directory (default: inventory-output)
   --format <xls|csv|both>   xls = manual UI import, csv = API import (default: both)
   --batch-size <n>          Rows per batch, products never split (default: 100; 0 = one file)
-  --include-zero            Keep rows with quantity <= 0 (default: skip them)
+  --include-zero            Keep rows with quantity 0 (default: skip them)
   --default-bin <name>      Force a bin location for every row (default: blank)
   --comment <text>          Comment applied to rows without their own comment
 
 UPLOAD (optional, uses the CSV/API path which only raises stock, never zeroes):
   --upload                  Upload each batch after generating
-  --url <baseUrl>           e.g. https://vvg.openboxes.com/openboxes
+  --url <baseUrl>           e.g. https://your-openboxes-host/openboxes
   --facility-id <id>        OpenBoxes location id to import into
   --session-cookie <c>      "JSESSIONID=..." from a logged-in browser session
   --username <u> --password <p>   Alternative: form-login to obtain the session
 
-EXAMPLES:
-  groovy PartsMasterToInventory.groovy --input pm.csv --list-columns
-  groovy PartsMasterToInventory.groovy --input pm.csv --dry-run
-  groovy PartsMasterToInventory.groovy --input pm.csv --output-dir out --batch-size 100
-  groovy PartsMasterToInventory.groovy --input pm.csv --format csv --upload \\
-         --url https://vvg.openboxes.com/openboxes --facility-id ff8080... \\
-         --session-cookie "JSESSIONID=abc123"
+Config values are overridden by the equivalent command-line options.
 '''
 }
