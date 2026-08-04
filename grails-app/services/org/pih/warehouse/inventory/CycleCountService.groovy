@@ -939,6 +939,29 @@ class CycleCountService {
         cycleCountRequest.delete()
     }
 
+    /**
+     * Deletes the cycle count that the given transaction source was created for, together with the cycle count
+     * request and every transaction that the same cycle count has created (an inventory baseline transaction and,
+     * if the count had any discrepancies, an adjustment transaction).
+     *
+     * The given transaction source must be a {@link TransactionAction#CYCLE_COUNT} source.
+     */
+    void deleteCycleCountWithAssociatedTransactions(TransactionSource transactionSource) {
+        CycleCount cycleCount = transactionSource.cycleCount
+
+        transactionSource.associatedTransactions.each { it.delete() }
+
+        // The transaction source has to be deleted before the cycle count that it references
+        transactionSource.delete()
+
+        // Has to be fetched before the cycle count is deleted, because that clears the association
+        CycleCountRequest cycleCountRequest = cycleCount.cycleCountRequest
+
+        deleteCycleCount(cycleCount)
+
+        cycleCountRequest?.delete()
+    }
+
     private void deleteCycleCount(CycleCount cycleCount) {
         if (!cycleCount) {
             return

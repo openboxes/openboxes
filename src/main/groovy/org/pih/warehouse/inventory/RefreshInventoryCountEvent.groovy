@@ -10,6 +10,8 @@ class RefreshInventoryCountEvent extends ApplicationEvent {
     String transactionId
     String transactionTypeId
 
+    Boolean isDelete
+
     RefreshInventoryCountEvent(Transaction source) {
         super(source)
         this.inventory = source.inventory
@@ -22,5 +24,7 @@ class RefreshInventoryCountEvent extends ApplicationEvent {
     RefreshInventoryCountEvent(Transaction source, boolean isDelete) {
         super(source)
         this.transactionId = source.id
+        this.transactionTypeId = source.transactionType?.id
+        this.isDelete = isDelete
     }
 }

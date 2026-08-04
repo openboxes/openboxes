@@ -92,6 +92,58 @@ class InventoryCountService {
         }
     }
 
+    /**
+     * @param transactionId
+     * The adjustment_candidate table is maintained incrementally, so the rows of a deleted adjustment transaction
+     * have to be removed from it, otherwise it keeps reporting the transaction as an inventory count.
+     */
+    void deleteAdjustmentCandidates(String transactionId) {
+        Sql sql = new Sql(dataSource)
+        Map<String, Object> params = [
+                transactionId: transactionId
+        ]
+        String query = """
+            DELETE FROM adjustment_candidate
+            WHERE transaction_id = :transactionId
+        """
+        sql.executeUpdate(params, query)
+    }
+
+    /**
+     * @param transactionId
+     * The inventory_baseline_candidate table is maintained incrementally, so the rows of a deleted baseline
+     * transaction have to be removed from it, otherwise it keeps reporting the transaction as an inventory count.
+     */
+    void deleteInventoryBaselineCandidates(String transactionId) {
+        Sql sql = new Sql(dataSource)
+        Map<String, Object> params = [
+                transactionId: transactionId
+        ]
+        String query = """
+            DELETE FROM inventory_baseline_candidate
+            WHERE transaction_id = :transactionId
+        """
+        sql.executeUpdate(params, query)
+    }
+
+    /**
+     * @param transactionId
+     * Product inventory transactions are deprecated, so no rows are ever added to the product_inventory_candidate
+     * table anymore, but the legacy rows of a deleted transaction still have to be removed from it, otherwise it
+     * keeps reporting the transaction as an inventory count.
+     */
+    void deleteProductInventoryCandidates(String transactionId) {
+        Sql sql = new Sql(dataSource)
+        Map<String, Object> params = [
+                transactionId: transactionId
+        ]
+        String query = """
+            DELETE FROM product_inventory_candidate
+            WHERE transaction_id = :transactionId
+        """
+        sql.executeUpdate(params, query)
+    }
+
     void refreshInventoryBaselineCandidatesView(Inventory inventory, List<String> productIds, String transactionId, Date transactionDate) {
         productIds.each {
             String dateString = transactionDate.format(Constants.ISO_DATE_TIME_FORMAT)

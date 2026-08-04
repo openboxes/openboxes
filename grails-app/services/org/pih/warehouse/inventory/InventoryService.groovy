@@ -90,6 +90,13 @@ class InventoryService implements ApplicationContextAware {
         return applicationContext.getBean("orderService")
     }
 
+    /**
+     * @return cycle count service. Has to be injected via getter to avoid circular dependency
+     */
+    CycleCountService getCycleCountService() {
+        return applicationContext.getBean(CycleCountService)
+    }
+
 
     /**
      * Saves the specified warehouse
@@ -2124,9 +2131,18 @@ class InventoryService implements ApplicationContextAware {
     void deleteTransaction(Transaction transactionInstance) {
         if (isLocalTransfer(transactionInstance)) {
             deleteLocalTransfer(transactionInstance)
-        } else {
-            transactionInstance.delete(flush: true)
+            return
         }
+
+        // A cycle count is only considered to have happened because of the transactions it created, so deleting any
+        // of them has to delete the whole cycle count along with the rest of its transactions.
+        TransactionSource transactionSource = transactionInstance.transactionSource
+        if (transactionSource?.transactionAction == TransactionAction.CYCLE_COUNT) {
+            cycleCountService.deleteCycleCountWithAssociatedTransactions(transactionSource)
+            return
+        }
+
+        transactionInstance.delete(flush: true)
     }
 
 

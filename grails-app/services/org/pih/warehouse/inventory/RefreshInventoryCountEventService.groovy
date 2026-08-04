@@ -11,12 +11,32 @@ class RefreshInventoryCountEventService implements ApplicationListener<RefreshIn
 
     @Override
     void onApplicationEvent(RefreshInventoryCountEvent event) {
+        if (event.isDelete) {
+            deleteInventoryCountCandidates(event)
+            return
+        }
         if (event.transactionTypeId == Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID) {
             inventoryCountService.refreshAdjustmentCandidatesView(event.inventory, event.productIds, event.transactionId, event.transactionDate)
         }
         if (event.transactionTypeId == Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID) {
             inventoryCountService.refreshInventoryBaselineCandidatesView(event.inventory, event.productIds, event.transactionId, event.transactionDate)
         }
-        // TODO: Implement an event action to delete from the helper tables. For now, not having it, doesn't break anything, but would be good to have
+    }
+
+    /**
+     * The helper tables are maintained incrementally, so the rows of a deleted transaction have to be removed from
+     * them, otherwise they keep reporting the transaction as the latest inventory count of its products.
+     */
+    private void deleteInventoryCountCandidates(RefreshInventoryCountEvent event) {
+        if (event.transactionTypeId == Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID) {
+            inventoryCountService.deleteAdjustmentCandidates(event.transactionId)
+        }
+        if (event.transactionTypeId == Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID) {
+            inventoryCountService.deleteInventoryBaselineCandidates(event.transactionId)
+        }
+        // Product inventory transactions are deprecated, so their helper table is delete only
+        if (event.transactionTypeId == Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID) {
+            inventoryCountService.deleteProductInventoryCandidates(event.transactionId)
+        }
     }
 }
