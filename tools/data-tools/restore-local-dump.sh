@@ -44,10 +44,15 @@ mysql -e "DROP DATABASE IF EXISTS \`${TARGET_DB}\`;
 
 echo "Importing (start: $(date +%T))..."
 START=$(date +%s)
+# MySQL 8 dumps carry the utf8mb4_0900_* collations, which MariaDB
+# rejects with "ERROR 1273 (HY000): Unknown collation". Rewrite them
+# to utf8mb4_unicode_ci on the fly so a MySQL-8 -> MariaDB restore
+# just works.
+COLLATION_FIX='s/utf8mb4_0900_[a-z_]+/utf8mb4_unicode_ci/g'
 if [[ "${DUMP_FILE}" == *.gz ]]; then
-  gunzip -c "${DUMP_FILE}" | mysql "${TARGET_DB}"
+  gunzip -c "${DUMP_FILE}" | sed -E "${COLLATION_FIX}" | mysql "${TARGET_DB}"
 else
-  mysql "${TARGET_DB}" < "${DUMP_FILE}"
+  sed -E "${COLLATION_FIX}" "${DUMP_FILE}" | mysql "${TARGET_DB}"
 fi
 ELAPSED=$(( $(date +%s) - START ))
 
