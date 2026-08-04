@@ -14,8 +14,11 @@
  * ------------------------------------------------------------------------------
  * A GENERIC, source-agnostic tool that transforms an arbitrary inventory CSV
  * (whatever columns your source system exports) into OpenBoxes inventory import
- * files (quantity-on-hand baseline), split into batches, and optionally uploads
- * each batch to an OpenBoxes instance.
+ * files (quantity-on-hand baseline), split into batches.
+ *
+ * This is stage 1 (TRANSFORM) of a two-step flow. It only writes files so you can
+ * review exactly what will be imported. Stage 2 (IMPORT) is a separate script,
+ * ImportInventoryBatches.groovy, which uploads the reviewed .csv batches to OpenBoxes.
  *
  * There is NO source-specific logic in this script. All knowledge about the
  * source file - which column is the product code, which is the quantity, how to
@@ -99,7 +102,7 @@ final List<String> REQUIRED_FIELDS = ['productCode', 'quantity']
 // ===========================================================================
 Map<String, String> opts = [:]
 Set<String> flags = [] as Set
-final Set<String> FLAG_NAMES = ['include-zero', 'dry-run', 'upload', 'list-columns', 'continue-on-error', 'help'] as Set
+final Set<String> FLAG_NAMES = ['include-zero', 'dry-run', 'list-columns', 'help'] as Set
 
 for (int i = 0; i < args.length; i++) {
     String a = args[i]
@@ -133,7 +136,6 @@ if (!inputFile.exists()) {
 
 boolean listColumns = 'list-columns' in flags
 boolean dryRun = 'dry-run' in flags
-boolean upload = 'upload' in flags
 
 // ---------------------------------------------------------------------------
 // Load the mapping config (JSON). Everything source-specific comes from here.
@@ -166,17 +168,6 @@ boolean includeZero = ('include-zero' in flags) || (configOptions['includeZero']
 String defaultBin = opts['default-bin'] ?: (configOptions['defaultBin'] ?: null)
 String comment = opts['comment'] ?: (configOptions['comment'] ?:
         "Inventory import ${new Date().format('yyyy-MM-dd')}")
-
-// Validate upload arguments up front so we fail before doing any work.
-if (upload) {
-    if (!opts['url'] || !opts['facility-id']) {
-        die("--upload requires --url <baseUrl> and --facility-id <locationId>.")
-    }
-    if (!opts['session-cookie'] && !(opts['username'] && opts['password'])) {
-        die("--upload needs auth: pass --session-cookie \"JSESSIONID=...\" " +
-                "or --username and --password.")
-    }
-}
 
 // ===========================================================================
 // Read the input CSV
@@ -375,9 +366,10 @@ if (skipped) {
 }
 
 // ---------------------------------------------------------------------------
-// Write batch files
+// Write batch files. Review these before importing. The .csv batches are the
+// canonical / API-ready form consumed by ImportInventoryBatches.groovy; the
+// .xls batches are for the manual "Record Inventory > Import Inventory" UI.
 // ---------------------------------------------------------------------------
-List<File> csvBatchFiles = []
 batches.eachWithIndex { List<Map> batch, int i ->
     String base = "inventory_batch_${String.format('%03d', i + 1)}"
     if (format in ['xls', 'both']) {
@@ -388,62 +380,13 @@ batches.eachWithIndex { List<Map> batch, int i ->
     if (format in ['csv', 'both']) {
         File f = new File(outputDir, "${base}.csv")
         writeApiCsv(f, batch, OB_COLUMNS)
-        csvBatchFiles << f
         println "Wrote ${f.name} (${batch.size()} row(s))"
     }
 }
-println ""
 
-// ===========================================================================
-// Optional upload via the OpenBoxes inventory import API
-// ===========================================================================
-if (upload) {
-    String baseUrl = opts['url'].replaceAll('/+$', '')
-    String facilityId = opts['facility-id']
-
-    String cookie = opts['session-cookie']
-    if (!cookie) {
-        println "Logging in as ${opts['username']} ..."
-        cookie = login(baseUrl, opts['username'], opts['password'])
-        println "Obtained session cookie."
-    }
-
-    // We upload CSV; if the user chose --format xls, build CSVs on the fly.
-    if (!csvBatchFiles) {
-        batches.eachWithIndex { List<Map> batch, int i ->
-            File f = new File(outputDir, "inventory_batch_${String.format('%03d', i + 1)}.csv")
-            writeApiCsv(f, batch, OB_COLUMNS)
-            csvBatchFiles << f
-        }
-    }
-
-    boolean continueOnError = 'continue-on-error' in flags
-    String importUrl = "${baseUrl}/api/facilities/${facilityId}/inventories/import"
-    println "Uploading ${csvBatchFiles.size()} batch(es) to ${importUrl}\n"
-    int ok = 0
-    for (int i = 0; i < csvBatchFiles.size(); i++) {
-        File f = csvBatchFiles[i]
-        try {
-            uploadCsv(importUrl, f, cookie)
-            ok++
-            println "  [${i + 1}/${csvBatchFiles.size()}] ${f.name} -> OK"
-        } catch (Exception e) {
-            println "  [${i + 1}/${csvBatchFiles.size()}] ${f.name} -> FAILED: ${e.message}"
-            if (!continueOnError) {
-                // Fail fast. The import endpoint rejects a whole batch (and rolls it back) if any
-                // row is invalid - most commonly a product code that does not exist in OpenBoxes.
-                die("Aborting: batch ${f.name} was rejected by OpenBoxes.\n" +
-                        "  ${ok} batch(es) before it were already imported.\n" +
-                        "  This usually means a row references a product code that does not exist.\n" +
-                        "  Fix the data (or the productCode mapping) and re-run, or pass " +
-                        "--continue-on-error to push the remaining batches anyway.")
-            }
-        }
-    }
-    println "\nUpload complete: ${ok}/${csvBatchFiles.size()} succeeded."
-}
-
-println "\nDone. Output in ${outputDir.absolutePath}"
+println "\nDone. Review the output in ${outputDir.absolutePath}"
+println "To import the .csv batches via the API:"
+println "  groovy ImportInventoryBatches.groovy --input-dir ${outputDir.path} --url <baseUrl> --facility-id <id> --username <u> --password <p>"
 
 // ===========================================================================
 // Helper methods
@@ -737,48 +680,6 @@ static String shortReason(String reason) {
     return reason
 }
 
-/** Form-login to OpenBoxes and return the "JSESSIONID=..." cookie header value. */
-static String login(String baseUrl, String username, String password) {
-    String body = "username=${URLEncoder.encode(username, 'UTF-8')}&password=${URLEncoder.encode(password, 'UTF-8')}"
-    HttpURLConnection conn = (HttpURLConnection) new URL("${baseUrl}/auth/handleLogin").openConnection()
-    conn.setInstanceFollowRedirects(false)
-    conn.setRequestMethod('POST')
-    conn.setDoOutput(true)
-    conn.setRequestProperty('Content-Type', 'application/x-www-form-urlencoded')
-    conn.outputStream.withWriter('UTF-8') { it.write(body) }
-    conn.connect()
-    int code = conn.responseCode
-    List<String> cookies = conn.getHeaderFields().get('Set-Cookie')
-    conn.disconnect()
-    if (!cookies) {
-        throw new RuntimeException("Login did not return a session cookie (HTTP ${code}). " +
-                "Check the URL/credentials, or pass --session-cookie manually.")
-    }
-    String jsession = cookies.collect { it.split(';')[0] }.find { it.startsWith('JSESSIONID=') }
-    if (!jsession) {
-        throw new RuntimeException("No JSESSIONID in login response. Pass --session-cookie manually.")
-    }
-    return jsession
-}
-
-/** POST a CSV batch to the inventory import API. Throws on non-2xx. */
-static void uploadCsv(String importUrl, File csvFile, String cookie) {
-    HttpURLConnection conn = (HttpURLConnection) new URL(importUrl).openConnection()
-    conn.setRequestMethod('POST')
-    conn.setDoOutput(true)
-    conn.setRequestProperty('Content-Type', 'text/csv')
-    conn.setRequestProperty('Cookie', cookie)
-    conn.outputStream.withStream { os -> os.write(csvFile.getBytes()) }
-    conn.connect()
-    int code = conn.responseCode
-    if (code < 200 || code >= 300) {
-        String err
-        try { err = conn.errorStream?.text } catch (Exception ignored) { err = '' }
-        throw new RuntimeException("HTTP ${code}${err ? ': ' + err.take(500) : ''}")
-    }
-    conn.disconnect()
-}
-
 static void die(String message) {
     System.err.println("ERROR: ${message}")
     System.exit(1)
@@ -811,15 +712,11 @@ OUTPUT:
   --default-bin <name>      Force a bin location for every row (default: blank)
   --comment <text>          Comment applied to rows without their own comment
 
-UPLOAD (optional, uses the CSV/API path which only raises stock, never zeroes):
-  --upload                  Upload each batch after generating
-  --url <baseUrl>           e.g. https://your-openboxes-host/openboxes
-  --facility-id <id>        OpenBoxes location id to import into
-  --session-cookie <c>      "JSESSIONID=..." from a logged-in browser session
-  --username <u> --password <p>   Alternative: form-login to obtain the session
-  --continue-on-error       Keep uploading after a rejected batch (default: abort on
-                            the first failure, e.g. a product code that does not exist)
-
 Config values are overridden by the equivalent command-line options.
+
+This script only TRANSFORMS. Review the generated .csv batches, then import them with
+the companion script:
+  groovy ImportInventoryBatches.groovy --input-dir <output-dir> --url <baseUrl> \\
+         --facility-id <id> --username <u> --password <p>
 '''
 }
