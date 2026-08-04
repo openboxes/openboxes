@@ -226,7 +226,7 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js" type="text/javascript" ></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/notify.js" type="text/javascript"></script>
 <script type="text/javascript">
-    $.notify.defaults({ autoHideDelay: ${grailsApplication.config.openboxes.notify.autoHideDelay ?: 5000} });
+    $.notify.defaults({ autoHideDelay: ${grailsApplication.config.openboxes.notify.autoHideDelay ?: 10000} });
 </script>
 
 <!-- JIRA Issue Collector -->
