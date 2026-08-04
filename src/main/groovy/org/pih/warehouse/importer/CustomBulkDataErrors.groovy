@@ -10,10 +10,17 @@ import org.pih.warehouse.core.localization.LocalizableMessage
  * we're only exposing a small number of methods here for constructing errors.
  */
 class CustomBulkDataErrors {
+
+    /**
+     * Represents the state where no bulk data errors occurred.
+     */
+    static final CustomBulkDataErrors NO_ERRORS = new CustomBulkDataErrors(errors: [])
+
     private List<BulkDataError> errors = []
 
     List<BulkDataError> getAllErrors() {
-        return errors
+        // We make this immutable to control the behaviour. If you want to add an error, do it via an add*Error method.
+        return errors.asImmutable()
     }
 
     /**

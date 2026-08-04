@@ -23,7 +23,7 @@ trait ConfiguresBulkDataValidator<T extends Importable> {
      * Note that this validation will be executed after the default validation is executed.
      */
     CustomBulkDataErrors customValidateAcrossRows(List<T> rows) {
-        return null  // Do nothing by default
+        return CustomBulkDataErrors.NO_ERRORS  // Do nothing by default
     }
 
     /**
@@ -33,6 +33,6 @@ trait ConfiguresBulkDataValidator<T extends Importable> {
      * Note that this validation will be executed after the default validation is executed.
      */
     CustomBulkDataErrors customValidateRow(T row) {
-        return null  // Do nothing by default
+        return CustomBulkDataErrors.NO_ERRORS  // Do nothing by default
     }
 }

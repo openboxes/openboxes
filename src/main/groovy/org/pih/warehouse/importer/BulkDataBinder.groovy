@@ -127,8 +127,10 @@ class BulkDataBinder {
             return []
         }
 
+        List<BulkDataError> errors = []
+
         // We provide two hook-ins for configuring custom data binding. One for binding across rows...
-        List<BulkDataError> errors = configuresDataBinder.customBindDataAcrossRows(rawRows, boundRows)?.allErrors ?: []
+        errors.addAll(configuresDataBinder.customBindDataAcrossRows(rawRows, boundRows)?.allErrors ?: [])
 
         // And one for binding rows individually.
         errors.addAll(customBindEachRow(configuresDataBinder, rawRows, boundRows))

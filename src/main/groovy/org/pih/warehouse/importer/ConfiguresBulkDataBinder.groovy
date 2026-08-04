@@ -30,7 +30,7 @@ trait ConfiguresBulkDataBinder<T extends Importable> {
      * @return The list of errors that occurred when custom binding the rows.
      */
     CustomBulkDataErrors customBindDataAcrossRows(List<Map<String, BulkDataCell>> rawRows, List<T> boundRows) {
-        return null  // Do nothing by default
+        return CustomBulkDataErrors.NO_ERRORS  // Do nothing by default
     }
 
     /**
@@ -47,6 +47,6 @@ trait ConfiguresBulkDataBinder<T extends Importable> {
      * @return The list of errors that occurred when custom binding the fields of the row.
      */
     CustomBulkDataErrors customBindDataRow(Map<String, BulkDataCell> rawRow, T boundRow) {
-        return null  // Do nothing by default
+        return CustomBulkDataErrors.NO_ERRORS  // Do nothing by default
     }
 }
