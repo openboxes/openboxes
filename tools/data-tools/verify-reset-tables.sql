@@ -52,7 +52,7 @@ FROM (
     SELECT 'picklist_item'                    UNION ALL
     SELECT 'invoice_item'                     UNION ALL
     SELECT 'cycle_count_item'                 UNION ALL
-    SELECT 'putaway_task'                     UNION ALL
+    -- putaway_task is a VIEW over order_item (PUTAWAY_ORDER), not a table to reset.
     SELECT 'transaction_entry'                UNION ALL
     -- Parent / root records
     SELECT 'receipt'                          UNION ALL

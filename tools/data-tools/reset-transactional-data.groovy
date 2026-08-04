@@ -67,7 +67,9 @@ def tablesToClear = [
     // line / child tables
     'order_adjustment', 'order_item', 'receipt_item', 'shipment_item', 'container',
     'requisition_item', 'fulfillment_item', 'picklist_item', 'invoice_item',
-    'cycle_count_item', 'putaway_task', 'transaction_entry',
+    // NOTE: putaway_task is a VIEW over order_item (PUTAWAY_ORDER), not a table;
+    // it clears automatically when order_item is deleted below.
+    'cycle_count_item', 'transaction_entry',
     // parent / root records
     'receipt', 'shipment', '`order`', 'requisition', 'fulfillment', 'picklist',
     'invoice', 'cycle_count', 'cycle_count_request', 'transaction_source',

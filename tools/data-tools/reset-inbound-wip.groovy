@@ -99,6 +99,12 @@ def putawayTaskIds = session.createSQLQuery("""
       AND status IN (:openPutawayStates)
 """).setParameter('fid', facility.id).setParameterList('openPutawayStates', openPutawayStates).list() as List
 
+// Parent PUTAWAY_ORDER ids backing those tasks (task.id == order_item.id). Captured
+// now so we can drop any order header left empty after the task items are deleted.
+def putawayOrderIds = putawayTaskIds ? session.createSQLQuery("""
+    SELECT DISTINCT order_id FROM order_item WHERE id IN (:ids)
+""").setParameterList('ids', putawayTaskIds).list() as List : []
+
 // ---- Report --------------------------------------------------------------
 println "\n=== Inbound WIP at ${facility.name} ==="
 println "  Orders (POs, putaways, inbound returns/transfers): ${orderIds.size()}"
@@ -147,8 +153,8 @@ Transaction.withTransaction { status ->
                     run "DELETE FROM order_comment  WHERE order_comments_id  IN (${oIds})"
                     run "DELETE FROM order_document WHERE order_documents_id IN (${oIds})"
                     run "DELETE FROM order_event    WHERE order_events_id    IN (${oIds})"
-                    // Putaway tasks tied to a putaway order (belt-and-braces: also filter by facility)
-                    run "DELETE FROM putaway_task WHERE putaway_order_id IN (${oIds})"
+                    // NOTE: putaway_task is a VIEW over order_item (PUTAWAY_ORDER);
+                    // its rows for these orders are removed by the order_item delete below.
                     // Picklists rooted at these orders
                     run "DELETE pi FROM picklist_item pi JOIN picklist p ON p.id = pi.picklist_id WHERE p.order_id IN (${oIds})"
                     run "DELETE FROM picklist WHERE order_id IN (${oIds})"
@@ -201,9 +207,38 @@ Transaction.withTransaction { status ->
                 }
 
                 // ---- Standalone open putaway tasks at this facility ----
+                // putaway_task is a VIEW: task.id == order_item.id (of a PUTAWAY_ORDER).
+                // Delete the backing order_item rows (and their children) to clear the
+                // task. These may belong to a putaway order not captured in orderIds
+                // (e.g. order-level status not "open" but item-level status is).
                 if (putawayTaskIds) {
                     String pIds = toInList(putawayTaskIds)
-                    run "DELETE FROM putaway_task WHERE id IN (${pIds})"
+                    run "DELETE oi_inv FROM order_invoice oi_inv WHERE oi_inv.order_item_id IN (${pIds})"
+                    run "DELETE os     FROM order_shipment os    WHERE os.order_item_id       IN (${pIds})"
+                    run "DELETE oic    FROM order_item_comment oic WHERE oic.order_item_comments_id IN (${pIds})"
+                    run "DELETE FROM order_item WHERE id IN (${pIds})"
+
+                    // Remove any parent putaway order header that no longer has items.
+                    // (The order may retain non-WIP items, so only delete truly empty ones.)
+                    if (putawayOrderIds) {
+                        String poIds = toInList(putawayOrderIds)
+                        def emptyOrderIds = []
+                        def rs = stmt.executeQuery(
+                            "SELECT o.id FROM `order` o WHERE o.id IN (${poIds}) " +
+                            "AND NOT EXISTS (SELECT 1 FROM order_item oi WHERE oi.order_id = o.id)")
+                        try { while (rs.next()) { emptyOrderIds << rs.getString(1) } } finally { rs.close() }
+                        if (emptyOrderIds) {
+                            String eIds = toInList(emptyOrderIds)
+                            run "DELETE oai FROM order_adjustment_invoice oai JOIN order_adjustment oa ON oa.id = oai.order_adjustment_id WHERE oa.order_id IN (${eIds})"
+                            run "DELETE FROM order_adjustment WHERE order_id IN (${eIds})"
+                            run "DELETE FROM order_comment  WHERE order_comments_id  IN (${eIds})"
+                            run "DELETE FROM order_document WHERE order_documents_id IN (${eIds})"
+                            run "DELETE FROM order_event    WHERE order_events_id    IN (${eIds})"
+                            run "DELETE pi FROM picklist_item pi JOIN picklist p ON p.id = pi.picklist_id WHERE p.order_id IN (${eIds})"
+                            run "DELETE FROM picklist WHERE order_id IN (${eIds})"
+                            run "DELETE FROM `order` WHERE id IN (${eIds})"
+                        }
+                    }
                 }
 
                 stmt.execute("SET FOREIGN_KEY_CHECKS = 1")

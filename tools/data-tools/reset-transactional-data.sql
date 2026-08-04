@@ -123,7 +123,8 @@ DELETE FROM fulfillment_item;
 DELETE FROM picklist_item;
 DELETE FROM invoice_item;
 DELETE FROM cycle_count_item;
-DELETE FROM putaway_task;
+-- putaway_task is a VIEW over order_item (PUTAWAY_ORDER); it empties when
+-- order_item is cleared above. Do NOT DELETE from it (view is not updatable).
 DELETE FROM transaction_entry;
 
 -- -----------------------------------------------------------------------------
