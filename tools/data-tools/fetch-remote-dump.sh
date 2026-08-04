@@ -1,32 +1,40 @@
 #!/usr/bin/env bash
 #
-# Stream a mysqldump of the vvg openboxes database over SSH to a
-# timestamped, gzipped file on the local machine.
+# Stream a mysqldump of a remote database over SSH to a timestamped,
+# gzipped file on the local machine. Server-agnostic: pass the host
+# and database explicitly.
+#
+# Views are excluded (OpenBoxes recreates them at boot). MySQL-8-safe
+# dump flags are applied so the output imports cleanly into MariaDB
+# via restore-local-dump.sh.
 #
 # Assumes:
 #   * SSH access to the remote host (key-based, no password prompt).
-#   * ~/.my.cnf on the REMOTE host holds credentials for `mysqldump`.
+#   * ~/.my.cnf on the REMOTE host holds credentials for `mysql` and
+#     `mysqldump`.
 #
 # Usage:
-#   fetch-vvg-dump.sh [-h remote-host] [-d remote-db] [-o output-dir]
+#   fetch-remote-dump.sh <remote-host> <remote-db> [-o output-dir]
 #
-# Defaults:
-#   -h vvg.openboxes.com
-#   -d openboxes
-#   -o current directory
+# Example:
+#   fetch-remote-dump.sh vvg.openboxes.com openboxes -o ~/dumps
 
 set -euo pipefail
 
-REMOTE_HOST="vvg.openboxes.com"
-REMOTE_DB="openboxes"
-OUTPUT_DIR="."
+if [[ $# -lt 2 ]]; then
+  echo "Usage: $0 <remote-host> <remote-db> [-o output-dir]" >&2
+  exit 2
+fi
 
-while getopts ":h:d:o:" opt; do
+REMOTE_HOST="$1"
+REMOTE_DB="$2"
+shift 2
+
+OUTPUT_DIR="."
+while getopts ":o:" opt; do
   case "${opt}" in
-    h) REMOTE_HOST="${OPTARG}" ;;
-    d) REMOTE_DB="${OPTARG}" ;;
     o) OUTPUT_DIR="${OPTARG}" ;;
-    *) echo "Usage: $0 [-h remote-host] [-d remote-db] [-o output-dir]" >&2; exit 2 ;;
+    *) echo "Usage: $0 <remote-host> <remote-db> [-o output-dir]" >&2; exit 2 ;;
   esac
 done
 
