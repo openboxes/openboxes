@@ -92,7 +92,7 @@ final List<String> REQUIRED_FIELDS = ['productCode', 'quantity']
 // ===========================================================================
 Map<String, String> opts = [:]
 Set<String> flags = [] as Set
-final Set<String> FLAG_NAMES = ['include-zero', 'dry-run', 'upload', 'list-columns', 'help'] as Set
+final Set<String> FLAG_NAMES = ['include-zero', 'dry-run', 'upload', 'list-columns', 'continue-on-error', 'help'] as Set
 
 for (int i = 0; i < args.length; i++) {
     String a = args[i]
@@ -410,20 +410,30 @@ if (upload) {
         }
     }
 
+    boolean continueOnError = 'continue-on-error' in flags
     String importUrl = "${baseUrl}/api/facilities/${facilityId}/inventories/import"
     println "Uploading ${csvBatchFiles.size()} batch(es) to ${importUrl}\n"
-    int ok = 0, failed = 0
-    csvBatchFiles.eachWithIndex { File f, int i ->
+    int ok = 0
+    for (int i = 0; i < csvBatchFiles.size(); i++) {
+        File f = csvBatchFiles[i]
         try {
             uploadCsv(importUrl, f, cookie)
             ok++
             println "  [${i + 1}/${csvBatchFiles.size()}] ${f.name} -> OK"
         } catch (Exception e) {
-            failed++
             println "  [${i + 1}/${csvBatchFiles.size()}] ${f.name} -> FAILED: ${e.message}"
+            if (!continueOnError) {
+                // Fail fast. The import endpoint rejects a whole batch (and rolls it back) if any
+                // row is invalid - most commonly a product code that does not exist in OpenBoxes.
+                die("Aborting: batch ${f.name} was rejected by OpenBoxes.\n" +
+                        "  ${ok} batch(es) before it were already imported.\n" +
+                        "  This usually means a row references a product code that does not exist.\n" +
+                        "  Fix the data (or the productCode mapping) and re-run, or pass " +
+                        "--continue-on-error to push the remaining batches anyway.")
+            }
         }
     }
-    println "\nUpload complete: ${ok} succeeded, ${failed} failed."
+    println "\nUpload complete: ${ok}/${csvBatchFiles.size()} succeeded."
 }
 
 println "\nDone. Output in ${outputDir.absolutePath}"
@@ -669,6 +679,8 @@ UPLOAD (optional, uses the CSV/API path which only raises stock, never zeroes):
   --facility-id <id>        OpenBoxes location id to import into
   --session-cookie <c>      "JSESSIONID=..." from a logged-in browser session
   --username <u> --password <p>   Alternative: form-login to obtain the session
+  --continue-on-error       Keep uploading after a rejected batch (default: abort on
+                            the first failure, e.g. a product code that does not exist)
 
 Config values are overridden by the equivalent command-line options.
 '''

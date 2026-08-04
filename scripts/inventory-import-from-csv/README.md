@@ -143,6 +143,27 @@ Authentication is session-cookie based (OpenBoxes has no API-key mechanism). Pro
 
 `--facility-id` is the OpenBoxes **location id** of the depot whose inventory you're setting.
 
+**Fail-fast on rejected batches.** If a batch is rejected — most commonly because a row
+references a **product code that does not exist** in OpenBoxes — the import endpoint errors
+and rolls that batch back. By default the script then **aborts** so you notice, rather than
+plowing through the remaining batches. Batches that already succeeded stay applied. Pass
+`--continue-on-error` to push the rest anyway. Because each batch is small and atomic, a good
+habit is a small first run (e.g. `--batch-size 20` against one facility) before the full load.
+
+### Testing against a local instance
+
+Point `--url` at your local OpenBoxes and use the seeded credentials (or a browser cookie):
+
+```bash
+groovy CsvToInventoryImport.groovy --input data.csv --config mapping.json \
+       --format csv --batch-size 20 \
+       --upload --url http://localhost:8080/openboxes \
+       --facility-id <localLocationId> --username admin --password password
+```
+
+Do a `--dry-run` first to sanity-check counts, then a single small batch, and confirm the
+quantities land where you expect (Record Inventory → transactions) before running the full file.
+
 ## All options
 
 ```
@@ -166,6 +187,7 @@ Authentication is session-cookie based (OpenBoxes has no API-key mechanism). Pro
 --facility-id <id>        OpenBoxes location id to import into
 --session-cookie <c>      "JSESSIONID=..." from a logged-in browser
 --username <u> / --password <p>   Alternative form-login
+--continue-on-error       Keep uploading after a rejected batch (default: abort on first)
 ```
 
 ## Notes / limitations
@@ -175,3 +197,6 @@ Authentication is session-cookie based (OpenBoxes has no API-key mechanism). Pro
   reported.
 - `productName` is informational; OpenBoxes matches on `productCode`. A mismatch only
   produces a Levenshtein-distance warning during import.
+- Large source files are fine — the tool batches into small files, so no single output file
+  is large. Note the legacy `.xls` format caps at 65,535 rows per sheet; keep `--batch-size`
+  well under that (the default 100 is far below it), or use `--format csv` for the API path.
