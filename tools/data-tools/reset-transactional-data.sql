@@ -67,6 +67,25 @@ DELIMITER ;
 CALL _ob_reset_guard();
 DROP PROCEDURE _ob_reset_guard;
 
+-- -----------------------------------------------------------------------------
+-- Helper: DELETE from a table only when it exists in this schema. Some optional
+-- features (e.g. fulfillment) are not installed on every instance, so a plain
+-- DELETE would abort the whole script with "table doesn't exist".
+-- -----------------------------------------------------------------------------
+DROP PROCEDURE IF EXISTS _ob_delete_if_exists;
+DELIMITER //
+CREATE PROCEDURE _ob_delete_if_exists(IN tbl VARCHAR(64))
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables
+               WHERE table_schema = DATABASE() AND table_name = tbl) THEN
+        SET @_ob_del := CONCAT('DELETE FROM `', tbl, '`');
+        PREPARE _ob_stmt FROM @_ob_del;
+        EXECUTE _ob_stmt;
+        DEALLOCATE PREPARE _ob_stmt;
+    END IF;
+END //
+DELIMITER ;
+
 SET FOREIGN_KEY_CHECKS = 0;
 SET autocommit = 0;
 START TRANSACTION;
@@ -90,7 +109,7 @@ DELETE FROM order_adjustment_invoice;
 DELETE FROM order_invoice;
 DELETE FROM order_shipment;
 DELETE FROM shipment_invoice;
-DELETE FROM fulfillment_item_shipment_item;
+CALL _ob_delete_if_exists('fulfillment_item_shipment_item');
 
 DELETE FROM order_item_comment;
 DELETE FROM order_comment;
@@ -119,7 +138,7 @@ DELETE FROM receipt_item;
 DELETE FROM shipment_item;
 DELETE FROM container;
 DELETE FROM requisition_item;
-DELETE FROM fulfillment_item;
+CALL _ob_delete_if_exists('fulfillment_item');
 DELETE FROM picklist_item;
 DELETE FROM invoice_item;
 DELETE FROM cycle_count_item;
@@ -134,7 +153,7 @@ DELETE FROM receipt;
 DELETE FROM shipment;
 DELETE FROM `order`;
 DELETE FROM requisition;
-DELETE FROM fulfillment;
+CALL _ob_delete_if_exists('fulfillment');
 DELETE FROM picklist;
 DELETE FROM invoice;
 DELETE FROM cycle_count;
@@ -180,5 +199,6 @@ DELETE FROM order_summary_mv;
 
 COMMIT;
 
+DROP PROCEDURE IF EXISTS _ob_delete_if_exists;
 SET FOREIGN_KEY_CHECKS = 1;
 SET autocommit = 1;

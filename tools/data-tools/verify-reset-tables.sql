@@ -27,7 +27,6 @@ FROM (
     SELECT 'order_invoice'                    UNION ALL
     SELECT 'order_shipment'                   UNION ALL
     SELECT 'shipment_invoice'                 UNION ALL
-    SELECT 'fulfillment_item_shipment_item'   UNION ALL
     SELECT 'order_item_comment'               UNION ALL
     SELECT 'order_comment'                    UNION ALL
     SELECT 'shipment_comment'                 UNION ALL
@@ -48,7 +47,6 @@ FROM (
     SELECT 'shipment_item'                    UNION ALL
     SELECT 'container'                        UNION ALL
     SELECT 'requisition_item'                 UNION ALL
-    SELECT 'fulfillment_item'                 UNION ALL
     SELECT 'picklist_item'                    UNION ALL
     SELECT 'invoice_item'                     UNION ALL
     SELECT 'cycle_count_item'                 UNION ALL
@@ -59,7 +57,6 @@ FROM (
     SELECT 'shipment'                         UNION ALL
     SELECT 'order'                            UNION ALL
     SELECT 'requisition'                      UNION ALL
-    SELECT 'fulfillment'                      UNION ALL
     SELECT 'picklist'                         UNION ALL
     SELECT 'invoice'                          UNION ALL
     SELECT 'cycle_count'                      UNION ALL

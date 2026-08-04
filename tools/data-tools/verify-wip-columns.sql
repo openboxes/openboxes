@@ -59,15 +59,12 @@ FROM (
     SELECT 'requisition_comment',      'requisition_id'                           UNION ALL
     SELECT 'requisition_event',        'requisition_id'                           UNION ALL
     SELECT 'requisition_item',         'requisition_id'                           UNION ALL
-    SELECT 'fulfillment',              'requisition_id'                           UNION ALL
-    SELECT 'fulfillment_item',         'fulfillment_id'                           UNION ALL
     -- shipment
     SELECT 'shipment',                 'destination_id'                           UNION ALL
     SELECT 'shipment',                 'origin_id'                                UNION ALL
     SELECT 'shipment',                 'current_status'                           UNION ALL
     SELECT 'shipment_invoice',         'shipment_item_id'                         UNION ALL
     SELECT 'shipment_item',            'shipment_id'                              UNION ALL
-    SELECT 'fulfillment_item_shipment_item', 'shipment_item_id'                   UNION ALL
     SELECT 'receipt',                  'shipment_id'                              UNION ALL
     SELECT 'receipt_item',             'receipt_id'                               UNION ALL
     SELECT 'shipment_comment',         'shipment_comments_id'                     UNION ALL

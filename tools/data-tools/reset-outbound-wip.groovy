@@ -121,6 +121,18 @@ Transaction.withTransaction { status ->
                     total += n
                 }
 
+                // Guarded delete: skip statements whose table/column is absent from
+                // this schema (e.g. the optional, legacy fulfillment tables whose
+                // structure differs from the current domain model) so the run
+                // doesn't error out.
+                def columnExists = { String table, String column ->
+                    def rs = stmt.executeQuery(
+                        "SELECT COUNT(*) FROM information_schema.columns " +
+                        "WHERE table_schema = DATABASE() AND table_name = '${table}' AND column_name = '${column}'")
+                    try { rs.next(); rs.getInt(1) > 0 } finally { rs.close() }
+                }
+                def runIfColumn = { String table, String column, String sql -> if (columnExists(table, column)) run(sql) }
+
                 // ---- Orders (outbound returns / outbound transfers) ----
                 if (orderIds) {
                     String oIds = toInList(orderIds)
@@ -142,7 +154,7 @@ Transaction.withTransaction { status ->
                 if (shipmentIds) {
                     String sIds = toInList(shipmentIds)
                     run "DELETE si_inv FROM shipment_invoice si_inv JOIN shipment_item si ON si.id = si_inv.shipment_item_id WHERE si.shipment_id IN (${sIds})"
-                    run "DELETE fs     FROM fulfillment_item_shipment_item fs JOIN shipment_item si ON si.id = fs.shipment_item_id WHERE si.shipment_id IN (${sIds})"
+                    runIfColumn 'fulfillment_item_shipment_item', 'shipment_item_id', "DELETE fs FROM fulfillment_item_shipment_item fs JOIN shipment_item si ON si.id = fs.shipment_item_id WHERE si.shipment_id IN (${sIds})"
                     run "DELETE os     FROM order_shipment os JOIN shipment_item si ON si.id = os.shipment_item_id WHERE si.shipment_id IN (${sIds})"
                     run "DELETE ri FROM receipt_item ri JOIN receipt r ON r.id = ri.receipt_id WHERE r.shipment_id IN (${sIds})"
                     run "DELETE FROM receipt WHERE shipment_id IN (${sIds})"
@@ -161,8 +173,11 @@ Transaction.withTransaction { status ->
                     run "DELETE FROM requisition_approvers WHERE requisition_id IN (${rIds})"
                     run "DELETE FROM requisition_comment   WHERE requisition_id IN (${rIds})"
                     run "DELETE FROM requisition_event     WHERE requisition_id IN (${rIds})"
-                    run "DELETE fi FROM fulfillment_item fi JOIN fulfillment f ON f.id = fi.fulfillment_id WHERE f.requisition_id IN (${rIds})"
-                    run "DELETE FROM fulfillment WHERE requisition_id IN (${rIds})"
+                    // Fulfillments and their items. The legacy fulfillment table may
+                    // exist without a requisition_id column (feature unused / not
+                    // migrated), so guard on the column, not just the table.
+                    runIfColumn 'fulfillment', 'requisition_id', "DELETE fi FROM fulfillment_item fi JOIN fulfillment f ON f.id = fi.fulfillment_id WHERE f.requisition_id IN (${rIds})"
+                    runIfColumn 'fulfillment', 'requisition_id', "DELETE FROM fulfillment WHERE requisition_id IN (${rIds})"
                     run "DELETE pi FROM picklist_item pi JOIN picklist p ON p.id = pi.picklist_id WHERE p.requisition_id IN (${rIds})"
                     run "DELETE FROM picklist WHERE requisition_id IN (${rIds})"
                     run "DELETE pi FROM picklist_item pi JOIN requisition_item ri ON ri.id = pi.requisition_item_id WHERE ri.requisition_id IN (${rIds})"

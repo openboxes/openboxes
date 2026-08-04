@@ -87,6 +87,19 @@ def tablesToClear = [
 def sessionFactory = ctx.sessionFactory
 def session = sessionFactory.currentSession
 
+// Drop tables that don't exist in this schema (e.g. the optional fulfillment
+// feature, or view-backed names). Keeps the reset robust across schema variants
+// so a missing table doesn't abort the whole run.
+def tableExists = { String table ->
+    String bare = table.replace('`', '')
+    (session.createSQLQuery(
+        "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = :t")
+        .setParameter('t', bare).uniqueResult() as Long) > 0
+}
+def absentTables = tablesToClear.findAll { !tableExists(it) }
+if (absentTables) println "Skipping tables not present in this schema: ${absentTables.join(', ')}"
+tablesToClear = tablesToClear.findAll { !absentTables.contains(it) }
+
 def countRows = { String table ->
     session.createSQLQuery("SELECT COUNT(*) FROM ${table}".toString()).uniqueResult() as Long
 }
