@@ -32,6 +32,11 @@ Which files appear depends on `--format` (`xls`, `csv`, or `both` — the defaul
 
 - Java + Groovy 2.5 / 3.x (`groovy` on your `PATH`).
 - Internet access on first run — [Grape](https://groovy-lang.org/grape.html) downloads Apache POI.
+  The script pins Maven Central via `@GrabResolver`, so it works regardless of your local Grape
+  config. If you previously hit `unresolved dependency: org.apache.poi#poi ... not found` (older
+  Groovy defaults to the shut-down JCenter), that cached failure can linger — clear it and retry:
+  `rm -rf ~/.groovy/grapes/org.apache.poi` (add `groovy -Dgroovy.grape.report.downloads=true ...`
+  to see download progress). Behind a proxy, set `-Dhttp.proxyHost`/`-Dhttps.proxyHost`.
 
 ## Quick start
 

@@ -56,6 +56,10 @@
  *   groovy CsvToInventoryImport.groovy --input data.csv --config mapping.json --output-dir out
  */
 
+// Resolve from Maven Central explicitly. Older Groovy defaults to JCenter (shut down), which
+// causes "unresolved dependency: org.apache.poi#poi ... not found". Grape pulls POI's transitive
+// dependencies automatically. On first run this downloads to ~/.groovy/grapes.
+@GrabResolver(name = 'central', root = 'https://repo1.maven.org/maven2/', m2compatible = true)
 @Grab(group = 'org.apache.poi', module = 'poi', version = '5.2.5')
 import groovy.json.JsonSlurper
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
