@@ -3,12 +3,13 @@ package org.pih.warehouse.importer
 import org.pih.warehouse.core.localization.LocalizableMessage
 
 /**
- * Wraps the errors that occur when custom validating bulk data.
+ * Wraps the errors that occur when performing custom, feature-specific bulk data operations such as
+ * in {@link ConfiguresBulkDataBinder} and {@link ConfiguresBulkDataValidator}.
  *
- * Exists solely for the purpose of making it more intuitive to implement {@link ConfiguresBulkDataValidator}
- * since we're only exposing a small number of methods here for constructing errors.
+ * The purpose of this object is to make it more intuitive to raise new bulk data errors since
+ * we're only exposing a small number of methods here for constructing errors.
  */
-class BulkDataValidationErrors {
+class CustomBulkDataErrors {
     private List<BulkDataError> errors = []
 
     List<BulkDataError> getAllErrors() {
@@ -29,11 +30,11 @@ class BulkDataValidationErrors {
                        BulkDataErrorSeverity severity=BulkDataErrorSeverity.ERROR) {
 
         errors.add(new BulkDataError(
-                row: null,  // We rely on the BulkDataValidator to set this later
-                column: null,  // We rely on the BulkDataValidator to set this later
+                row: null,  // We rely on the caller to set this later
+                column: null,  // We rely on the caller to set this later
                 fieldName: fieldName,
                 severity: severity,
-                // We rely on the BulkDataValidator to localize this message later
+                // We rely on the caller to localize this message later
                 localizableMessage: new LocalizableMessage(
                         code: errorCode,
                         args: errorArgs,
@@ -54,9 +55,9 @@ class BulkDataValidationErrors {
                         BulkDataErrorSeverity severity=BulkDataErrorSeverity.ERROR) {
 
         errors.add(new BulkDataError(
-                row: null,  // We rely on the BulkDataValidator to set this later
+                row: null,  // We rely on the caller to set this later
                 severity: severity,
-                // We rely on the BulkDataValidator to localize this message later
+                // We rely on the caller to localize this message later
                 localizableMessage: new LocalizableMessage(
                         code: errorCode,
                         args: errorArgs,

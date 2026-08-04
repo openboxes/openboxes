@@ -62,6 +62,8 @@ class BulkDataBinder {
     BulkDataBinderResult bindData(BulkDataBinderConfig config, BulkDataReaderResult readerResult) {
         Map<String, BulkDataBinderFieldConfig> fieldConfigs = config.fields
         Class<Importable> bindTo = config.bindTo
+        BulkDataType bulkDataType = config.bulkDataType
+        Map<String, String> columnByFieldName = config.columnByFieldName
         EpochDate epochDate = readerResult.epochDate
         List<Map<String, BulkDataCell>> rawRows = readerResult.rows
 
@@ -85,8 +87,7 @@ class BulkDataBinder {
                 }
 
                 try {
-                    def parsedValue = parseField(
-                            cell.value, fieldNameToTypeMap.get(columnName), fieldConfig, epochDate)
+                    def parsedValue = parseField(cell.value, fieldNameToTypeMap.get(columnName), fieldConfig, epochDate)
                     boundRow.setProperty(columnName, parsedValue)
                 } catch (Exception e) {
                     result.bindErrors.add(new BulkDataError(
@@ -108,15 +109,68 @@ class BulkDataBinder {
             throw new RuntimeException("Something went wrong during the data binding process. Processed ${rawRows.size()} raw rows but ended up with ${result.boundRows.size()} bound rows.")
         }
 
-        // Now that the automatic data binding has completed, we can perform any custom data binding. If no bulk data
-        // type was specified (which can be true if a custom config is specified), no custom binding is required.
-        ConfiguresBulkDataBinder importConfigurer = componentResolver.getBulkDataBinderConfigurer(config.bulkDataType)
-        if (importConfigurer) {
-            // We rely on customBindData to modify the result object itself with any data changes and errors.
-            importConfigurer.customBindData(rawRows, result)
-        }
+        // The custom data binding directly modifies the rows, so the only thing left do is collect the errors.
+        result.bindErrors.addAll(customBindData(bulkDataType, columnByFieldName, rawRows, result.boundRows))
 
         return result
+    }
+
+    /**
+     * Perform any custom data binding as declared by the configurer for the given bulk data type.
+     */
+    private List<BulkDataError> customBindData(BulkDataType bulkDataType,
+                                               Map<String, String> columnByFieldName,
+                                               List<Map<String, BulkDataCell>> rawRows,
+                                               List<Importable> boundRows) {
+        ConfiguresBulkDataBinder configuresDataBinder = componentResolver.getBulkDataBinderConfigurer(bulkDataType)
+        if (!configuresDataBinder) {
+            return []
+        }
+
+        // We provide two hook-ins for configuring custom data binding. One for binding across rows...
+        List<BulkDataError> errors = configuresDataBinder.customBindDataAcrossRows(rawRows, boundRows)?.allErrors ?: []
+
+        // And one for binding rows individually.
+        errors.addAll(customBindEachRow(configuresDataBinder, rawRows, boundRows))
+
+        for (customError in errors) {
+            // To make it simpler to implement custom data binding for a feature, we set the column index on the errors
+            // here instead of requiring the custom configuration to know how to set the field itself.
+            if (customError.column == null && customError.fieldName != null) {
+                customError.column = columnByFieldName.get(customError.fieldName)
+            }
+
+            // We may not have performed localization on custom errors yet, so make sure to do so. Again, this is
+            // so that the custom configuration doesn't need to remember to do this.
+            if (customError.localizedMessage == null && customError.localizableMessage != null) {
+                customError.localizedMessage = messageLocalizer.localize(customError.localizableMessage)
+            }
+        }
+
+        return errors
+    }
+
+    private List<BulkDataError> customBindEachRow(ConfiguresBulkDataBinder configuresDataBinder,
+                                                  List<Map<String, BulkDataCell>> rawRows,
+                                                  List<Importable> boundRows) {
+        List<BulkDataError> errors = []
+        for (int rowIndex = 0; rowIndex < rawRows.size(); rowIndex++) {
+            // We assume that we are given the same number of raw rows and bound rows. There's a check for this
+            // earlier in the data binder so we don't bother checking again here.
+            Map<String, BulkDataCell> rawRow = rawRows.get(rowIndex)
+            Importable boundRow = boundRows.get(rowIndex)
+
+            List<BulkDataError> rowErrors = configuresDataBinder.customBindDataRow(rawRow, boundRow)?.allErrors
+            if (!rowErrors) {
+                continue
+            }
+
+            // To make it simpler to implement custom data binding for a feature, we set the row index on the errors
+            // here instead of requiring the custom configuration to know how to set the field itself.
+            rowErrors.each { it.row = rowIndex }
+            errors.addAll(rowErrors)
+        }
+        return errors
     }
 
     /**

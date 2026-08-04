@@ -145,8 +145,8 @@ class BulkDataValidatorSpec extends Specification {
         }
 
         @Override
-        BulkDataValidationErrors customValidateRow(ImportableForTest row) {
-            BulkDataValidationErrors errors = new BulkDataValidationErrors()
+        CustomBulkDataErrors customValidateRow(ImportableForTest row) {
+            CustomBulkDataErrors errors = new CustomBulkDataErrors()
             if (row.stringField == VALUE_THAT_FAILS_VALIDATION) {
                 errors.addFieldError("stringField", "some.code")
             }
