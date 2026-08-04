@@ -454,8 +454,18 @@ static List<List<Map>> batchRows(List<Map> rows, int batchSize) {
     if (batchSize <= 0) {
         return [rows]
     }
+    // Group by product, preserving first-seen order. (Avoid Map.computeIfAbsent with a closure:
+    // older Groovy does not coerce the closure to a java.util.function.Function.)
     Map<String, List<Map>> byProduct = [:]
-    rows.each { Map r -> byProduct.computeIfAbsent(r.productCode as String, { [] }) << r }
+    rows.each { Map r ->
+        String key = r.productCode as String
+        List<Map> group = byProduct.get(key)
+        if (group == null) {
+            group = []
+            byProduct.put(key, group)
+        }
+        group << r
+    }
 
     List<List<Map>> batches = []
     List<Map> current = []
