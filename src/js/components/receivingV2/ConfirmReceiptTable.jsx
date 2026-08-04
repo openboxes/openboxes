@@ -49,7 +49,7 @@ const ConfirmReceiptTable = ({
   const data = useMemo(() => buildReceivingTableRows(lineItemsState), [lineItemsState]);
 
   return (
-    <div className="receiving-table">
+    <div className="receiving-table receiving-table--striped">
       <DataTable
         columns={columns}
         data={data}

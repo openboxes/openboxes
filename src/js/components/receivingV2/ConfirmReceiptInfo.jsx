@@ -15,7 +15,7 @@ const ConfirmReceiptInfo = ({ control, lineItemsState }) => {
 
   return (
     <ItemDetails
-      badge={badge && { ...badge, next: nextBadge }}
+      badge={badge && { current: badge.current, next: nextBadge }}
       fields={fields}
       className="confirm-receipt__details"
     >
