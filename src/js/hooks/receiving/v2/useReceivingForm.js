@@ -1,8 +1,11 @@
 import {
-  useCallback, useEffect, useRef, useState,
+  useCallback, useEffect, useRef,
 } from 'react';
 
-import { ReceivingView } from 'consts/receivingViewOptions';
+import { useDispatch, useSelector } from 'react-redux';
+import { getReceivingPutawayEnabled, getReceivingView } from 'selectors';
+
+import { updateReceivingPutawayEnabled, updateReceivingView } from 'actions';
 import useReceivingActions from 'hooks/receiving/v2/useReceivingActions';
 import useReceivingBinLocations from 'hooks/receiving/v2/useReceivingBinLocations';
 import useReceivingColumns from 'hooks/receiving/v2/useReceivingColumns';
@@ -11,8 +14,11 @@ import useTableLocationAutofill from 'hooks/receiving/v2/useTableLocationAutofil
 import useTableSorting from 'hooks/useTableSorting';
 
 const useReceivingForm = () => {
-  const [view, setView] = useState(ReceivingView.TABLE);
-  const [putawayEnabled, setPutawayEnabled] = useState(false);
+  const dispatch = useDispatch();
+  // The selected view is shared through redux, so the check step renders in the
+  // view chosen here.
+  const view = useSelector(getReceivingView);
+  const setView = useCallback((newView) => dispatch(updateReceivingView(newView)), [dispatch]);
   const {
     sortableProps, sort, order, resetSort,
   } = useTableSorting();
@@ -30,6 +36,14 @@ const useReceivingForm = () => {
     flush,
     autosaveStatus,
   } = useReceivingActions({ view, sort, sortOrder: order });
+  // The putaway toggle is remembered per receiving in redux, keyed by receipt id.
+  const putawayEnabled = useSelector((state) => getReceivingPutawayEnabled(state, receiptId));
+  const setPutawayEnabled = useCallback((enabled) => {
+    if (!receiptId) {
+      return;
+    }
+    dispatch(updateReceivingPutawayEnabled(receiptId, enabled));
+  }, [dispatch, receiptId]);
   useReceivingBinLocations();
   const { visibleLineItemsState, updateFilterParams } = useReceivingFilters({ lineItemsState });
   const { onLocationAutofill } = useTableLocationAutofill({

@@ -6,14 +6,16 @@ import { Controller } from 'react-hook-form';
 import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useConfirmReceiptDetails from 'hooks/receiving/v2/useConfirmReceiptDetails';
+import useConfirmReceiptStatusTransition from 'hooks/receiving/v2/useConfirmReceiptStatusTransition';
 import ItemDetails from 'utils/ItemDetails';
 
-const ConfirmReceiptInfo = ({ control }) => {
+const ConfirmReceiptInfo = ({ control, lineItemsState }) => {
   const { badge, fields } = useConfirmReceiptDetails();
+  const { nextBadge } = useConfirmReceiptStatusTransition({ lineItemsState });
 
   return (
     <ItemDetails
-      badge={badge}
+      badge={badge && { current: badge.current, next: nextBadge }}
       fields={fields}
       className="confirm-receipt__details"
     >
@@ -38,6 +40,15 @@ const ConfirmReceiptInfo = ({ control }) => {
 
 ConfirmReceiptInfo.propTypes = {
   control: PropTypes.shape({}).isRequired,
+  lineItemsState: PropTypes.shape({
+    entities: PropTypes.shape({}),
+    ids: PropTypes.arrayOf(PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+      // Type for separator rows ({ isSeparator, name })
+      PropTypes.shape({}),
+    ])),
+  }).isRequired,
 };
 
 export default ConfirmReceiptInfo;

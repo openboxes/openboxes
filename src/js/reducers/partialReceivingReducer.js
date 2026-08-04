@@ -1,4 +1,11 @@
-import { UPDATE_RECEIVING_BIN_LOCATIONS, UPDATE_RECEIVING_HEADER } from 'actions/types';
+import {
+  REMOVE_RECEIVING_PUTAWAY_ENABLED,
+  UPDATE_RECEIVING_BIN_LOCATIONS,
+  UPDATE_RECEIVING_HEADER,
+  UPDATE_RECEIVING_PUTAWAY_ENABLED,
+  UPDATE_RECEIVING_VIEW,
+} from 'actions/types';
+import { ReceivingView } from 'consts/receivingViewOptions';
 
 const initialState = {
   headerInfo: [],
@@ -6,6 +13,9 @@ const initialState = {
   shipmentNumber: null,
   shipmentDetails: {},
   binLocations: [],
+  view: ReceivingView.TABLE,
+  // The putaway toggle is remembered per receiving, keyed by receipt id.
+  putawayEnabledByReceipt: {},
 };
 
 export default function partialReceivingReducer(state = initialState, action) {
@@ -28,6 +38,32 @@ export default function partialReceivingReducer(state = initialState, action) {
         ...state,
         binLocations: action.payload.binLocations,
       };
+
+    case UPDATE_RECEIVING_VIEW:
+      return {
+        ...state,
+        view: action.payload.view,
+      };
+
+    case UPDATE_RECEIVING_PUTAWAY_ENABLED:
+      return {
+        ...state,
+        putawayEnabledByReceipt: {
+          ...state.putawayEnabledByReceipt,
+          [action.payload.receiptId]: action.payload.putawayEnabled,
+        },
+      };
+
+    case REMOVE_RECEIVING_PUTAWAY_ENABLED: {
+      const {
+        [action.payload.receiptId]: removed,
+        ...putawayEnabledByReceipt
+      } = state.putawayEnabledByReceipt;
+      return {
+        ...state,
+        putawayEnabledByReceipt,
+      };
+    }
 
     default:
       return state;

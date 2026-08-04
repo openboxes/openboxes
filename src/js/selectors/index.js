@@ -54,6 +54,11 @@ export const getHasBinLocationSupport = createSelector(
   (location) => location?.hasBinLocationSupport,
 );
 
+export const getHasPartialReceivingSupport = createSelector(
+  [getCurrentLocation],
+  (location) => location?.hasPartialReceivingSupport,
+);
+
 export const getDefaultTranslationsFetched = createSelector(
   [getSession],
   (session) => session.fetchedTranslations.default,
@@ -414,6 +419,11 @@ export const getReceivingShipmentDetails = (state) =>
   state.partialReceiving.shipmentDetails || {};
 
 export const getReceivingBinLocations = (state) => state.partialReceiving.binLocations || [];
+
+export const getReceivingView = (state) => state.partialReceiving.view;
+
+export const getReceivingPutawayEnabled = (state, receiptId) =>
+  state.partialReceiving.putawayEnabledByReceipt?.[receiptId] ?? false;
 
 // The receiving bin generated for the shipment is named "<prefix>-<shipment number>",
 // where the prefix is configurable ("R" by default).

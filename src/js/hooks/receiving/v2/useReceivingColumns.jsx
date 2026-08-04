@@ -24,6 +24,7 @@ import ShippedInPoCell from 'utils/cells/receiving/ShippedInPoCell';
 import SelectCell from 'utils/cells/SelectCell';
 import ValueCell from 'utils/cells/ValueCell';
 import getReceivingRowActions, { getReceivingSplitItemActions } from 'utils/receiving/getReceivingRowActions';
+import getReceivingRowStatus from 'utils/receiving/getReceivingRowStatus';
 import hasRowSavedQuantity from 'utils/receiving/hasRowSavedQuantity';
 import VerticalStripeIndicator from 'utils/VerticalStripeIndicator';
 
@@ -53,34 +54,6 @@ const useReceivingColumns = ({
   // time. The row `meta` drives row-level greying/disabling of fully received lines.
   const getItem = (row, table) => table.options.meta?.entities?.[row.original.id];
 
-  const getStatus = (quantityRemaining, isCompleted) => {
-    if (isCompleted) {
-      return {
-        className: 'status-cell status-cell--completed',
-        value: translate('react.receiving.status.completed.label', 'Complete'),
-      };
-    }
-    if (quantityRemaining < 0) {
-      const quantityOver = formatNumber(Math.abs(quantityRemaining));
-      return {
-        className: 'status-cell status-cell--over',
-        value: translate('react.receiving.status.over.label', `${quantityOver} over`, [quantityOver]),
-      };
-    }
-    if (quantityRemaining === 0) {
-      return {
-        className: 'status-cell status-cell--equal',
-        value: translate('react.receiving.status.equal.label', 'Equal'),
-      };
-    }
-    // TODO (OBPIH-7864): show the remaining status only once something has been
-    // entered in the input or already saved for the row.
-    const quantityRemainingFormatted = formatNumber(quantityRemaining);
-    return {
-      className: 'status-cell',
-      value: translate('react.receiving.status.remaining.label', `${quantityRemainingFormatted} remaining`, [quantityRemainingFormatted]),
-    };
-  };
   // Sum of split items quantityReceiving for a replaced row, read live from the entities
   // map so editing a child updates the parent value.
   const getSplitItemsQuantityReceivingSum = (item, entities) => {
@@ -467,7 +440,12 @@ const useReceivingColumns = ({
             return null;
           }
           const quantityRemaining = getCurrentQuantityRemaining(item, table.options.meta?.entities);
-          const { className, value } = getStatus(quantityRemaining, item?.isCompleted);
+          const { className, value } = getReceivingRowStatus({
+            quantityRemaining,
+            isCompleted: item?.isCompleted,
+            translate,
+            formatNumber,
+          });
           return (
             <ValueCell
               value={value}

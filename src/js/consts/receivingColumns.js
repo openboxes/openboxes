@@ -11,6 +11,8 @@ const receivingColumns = {
   QUANTITY_SHIPPED: 'quantityShipped',
   QUANTITY_RECEIVING: 'quantityReceiving',
   QUANTITY_RECEIVED: 'quantityReceived',
+  QUANTITY_TO_RECEIVE: 'quantityToReceive',
+  CANCEL_REMAINING: 'cancelRemaining',
   STATUS: 'status',
 };
 

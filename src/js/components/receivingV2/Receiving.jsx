@@ -12,7 +12,14 @@ const Receiving = () => {
   const translate = useTranslate();
   const { info } = useReceivingHeader();
   const {
-    Step, stepsTitles, flushRef, isCheckStep, previous, onNext,
+    Step,
+    stepsTitles,
+    flushRef,
+    completeReceiptRef,
+    isCheckStep,
+    previous,
+    onNext,
+    onCompleteReceipt,
   } = useReceivingSteps();
 
   const title = {
@@ -34,15 +41,15 @@ const Receiving = () => {
             variant: 'primary-outline',
           },
           next: {
-            // Completing the receipt is out of scope of OBPIH-7900 (UI only)
-            onClick: () => {},
+            // TODO: Add logic for receipt completion in OBPIH-7901
+            onClick: onCompleteReceipt,
             label: 'react.receiving.completeReceipt.label',
             defaultLabel: 'Complete Receipt',
           },
         }
         : { next: { onClick: onNext } }}
     >
-      <Step.Component flushRef={flushRef} />
+      <Step.Component flushRef={flushRef} completeReceiptRef={completeReceiptRef} />
     </WizardPageLayout>
   );
 };
