@@ -61,12 +61,15 @@
 // dependencies automatically. On first run this downloads to ~/.groovy/grapes.
 @GrabResolver(name = 'central', root = 'https://repo1.maven.org/maven2/', m2compatible = true)
 @Grab(group = 'org.apache.poi', module = 'poi', version = '5.2.5')
-import groovy.json.JsonSlurper
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
+
+// NOTE: the JSON mapping config is parsed by the small built-in parseJson() below rather than
+// groovy.json.JsonSlurper, so the script depends only on POI - some minimal Groovy installs do
+// not bundle the groovy-json module.
 
 // ---------------------------------------------------------------------------
 // Canonical OpenBoxes inventory columns (order matters for the XLS template).
@@ -143,7 +146,7 @@ if (opts['config']) {
         die("Config file not found: ${configFile.absolutePath}")
     }
     try {
-        config = new JsonSlurper().parse(configFile) as Map
+        config = parseJson(configFile.getText('UTF-8')) as Map
     } catch (Exception e) {
         die("Could not parse config JSON (${configFile.name}): ${e.message}")
     }
@@ -581,6 +584,127 @@ static List<List<String>> parseCsv(String text) {
         rows << current
     }
     return rows.findAll { !(it.size() == 1 && it[0].trim().isEmpty()) }
+}
+
+// ---------------------------------------------------------------------------
+// Minimal dependency-free JSON parser (objects, arrays, strings, numbers,
+// booleans, null) - avoids needing the groovy-json module. Returns Map / List /
+// String / Number / Boolean / null.
+// ---------------------------------------------------------------------------
+static Object parseJson(String s) {
+    int[] p = [0]
+    Object v = jsonValue(s, p)
+    jsonWs(s, p)
+    if (p[0] != s.length()) {
+        throw new RuntimeException("Unexpected trailing content at position ${p[0]}")
+    }
+    return v
+}
+
+static void jsonWs(String s, int[] p) {
+    while (p[0] < s.length() && Character.isWhitespace(s.charAt(p[0]))) p[0]++
+}
+
+static Object jsonValue(String s, int[] p) {
+    jsonWs(s, p)
+    if (p[0] >= s.length()) throw new RuntimeException("Unexpected end of JSON")
+    char c = s.charAt(p[0])
+    if (c == '{') return jsonObject(s, p)
+    if (c == '[') return jsonArray(s, p)
+    if (c == '"') return jsonString(s, p)
+    if (c == 't') { jsonLiteral(s, p, 'true'); return Boolean.TRUE }
+    if (c == 'f') { jsonLiteral(s, p, 'false'); return Boolean.FALSE }
+    if (c == 'n') { jsonLiteral(s, p, 'null'); return null }
+    return jsonNumber(s, p)
+}
+
+static Map jsonObject(String s, int[] p) {
+    Map m = [:]
+    p[0]++ // consume {
+    jsonWs(s, p)
+    if (s.charAt(p[0]) == '}') { p[0]++; return m }
+    while (true) {
+        jsonWs(s, p)
+        String key = jsonString(s, p)
+        jsonWs(s, p)
+        if (s.charAt(p[0]) != ':') throw new RuntimeException("Expected ':' at position ${p[0]}")
+        p[0]++
+        m[key] = jsonValue(s, p)
+        jsonWs(s, p)
+        char c = s.charAt(p[0])
+        if (c == ',') { p[0]++; continue }
+        if (c == '}') { p[0]++; break }
+        throw new RuntimeException("Expected ',' or '}' at position ${p[0]}")
+    }
+    return m
+}
+
+static List jsonArray(String s, int[] p) {
+    List a = []
+    p[0]++ // consume [
+    jsonWs(s, p)
+    if (s.charAt(p[0]) == ']') { p[0]++; return a }
+    while (true) {
+        a << jsonValue(s, p)
+        jsonWs(s, p)
+        char c = s.charAt(p[0])
+        if (c == ',') { p[0]++; continue }
+        if (c == ']') { p[0]++; break }
+        throw new RuntimeException("Expected ',' or ']' at position ${p[0]}")
+    }
+    return a
+}
+
+static String jsonString(String s, int[] p) {
+    if (s.charAt(p[0]) != '"') throw new RuntimeException("Expected string at position ${p[0]}")
+    p[0]++
+    StringBuilder sb = new StringBuilder()
+    while (true) {
+        if (p[0] >= s.length()) throw new RuntimeException("Unterminated string")
+        char c = s.charAt(p[0]++)
+        if (c == '"') break
+        if (c == '\\') {
+            char e = s.charAt(p[0]++)
+            switch (e) {
+                case '"': sb.append('"' as char); break
+                case '\\': sb.append('\\' as char); break
+                case '/': sb.append('/' as char); break
+                case 'n': sb.append('\n' as char); break
+                case 't': sb.append('\t' as char); break
+                case 'r': sb.append('\r' as char); break
+                case 'b': sb.append('\b' as char); break
+                case 'f': sb.append('\f' as char); break
+                case 'u':
+                    String hex = s.substring(p[0], p[0] + 4); p[0] += 4
+                    sb.append((char) Integer.parseInt(hex, 16)); break
+                default: throw new RuntimeException("Invalid escape '\\${e}' at position ${p[0]}")
+            }
+        } else {
+            sb.append(c)
+        }
+    }
+    return sb.toString()
+}
+
+static void jsonLiteral(String s, int[] p, String lit) {
+    if (!s.startsWith(lit, p[0])) throw new RuntimeException("Expected '${lit}' at position ${p[0]}")
+    p[0] += lit.length()
+}
+
+static Object jsonNumber(String s, int[] p) {
+    int start = p[0]
+    while (p[0] < s.length()) {
+        char ch = s.charAt(p[0])
+        if (Character.isDigit(ch) || ch == '+' || ch == '-' || ch == '.' || ch == 'e' || ch == 'E') {
+            p[0]++
+        } else {
+            break
+        }
+    }
+    String num = s.substring(start, p[0])
+    if (num.isEmpty()) throw new RuntimeException("Invalid JSON value at position ${start}")
+    if (num.contains('.') || num.contains('e') || num.contains('E')) return new BigDecimal(num)
+    return Long.parseLong(num)
 }
 
 static String csvEscape(Object value) {
