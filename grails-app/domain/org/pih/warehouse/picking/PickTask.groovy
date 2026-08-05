@@ -91,6 +91,7 @@ class PickTask {
                 requisitionNumber : requisition?.requestNumber,
                 destination     : requisition?.destination?.name,
                 destinationLocationType : requisition?.destination?.locationType?.name,
+                destinationAddress : requisition?.destination?.address,
                 deliveryTypeCode: deliveryTypeCode?.name(),
                 orderTypeCode   : requisition?.orderTypeCode,
                 dateRequested   : dateRequested,
