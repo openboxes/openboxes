@@ -54,6 +54,19 @@ class LoggingInterceptor {
 
     void afterView() {
         try {
+            // Log the total request duration (controller action + view rendering). afterView() is the last phase in
+            // the request lifecycle, and _timeBeforeRequest is recorded by UtilInterceptor.before(), which runs first
+            // (HIGHEST_PRECEDENCE), so this covers essentially the entire request. We log before clearing the MDC
+            // below so that the duration line still carries the user/location/request context.
+            if (request?._timeBeforeRequest) {
+                long durationInMilliseconds = System.currentTimeMillis() - request._timeBeforeRequest
+                log.info("${request.requestURI} responded in ${durationInMilliseconds} ms")
+            }
+        } catch (Exception e) {
+            log.warn("Error occurred while logging request duration: ${e.message}", e)
+        }
+
+        try {
             MDC.remove('sessionId')
             MDC.remove('username')
             MDC.remove('location')
