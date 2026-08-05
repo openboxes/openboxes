@@ -353,11 +353,19 @@ dataRows.eachWithIndex { List<String> row, int i ->
     ]
 }
 
+// Optional cap on the number of import rows, for quick test runs (--max / options.max).
+int maxRows = (opts['max'] ?: configOptions['max'] ?: 0) as int
+boolean capped = false
+if (maxRows > 0 && canonicalRows.size() > maxRows) {
+    canonicalRows = canonicalRows[0..<maxRows]
+    capped = true
+}
+
 // ---------------------------------------------------------------------------
 // Report
 // ---------------------------------------------------------------------------
 println "Parsed ${dataRows.size()} data row(s):"
-println "  ${canonicalRows.size()} row(s) to import"
+println "  ${canonicalRows.size()} row(s) to import" + (capped ? " (capped at --max ${maxRows})" : "")
 println "  ${skipped.size()} row(s) skipped"
 if (skipped) {
     Map<String, Integer> reasonCounts = [:].withDefault { 0 }
@@ -768,6 +776,7 @@ OUTPUT:
                             import). e.g. --format csv or --format xls,csv. "both" = all.
                             Config may use a JSON list: "format": ["xls","csv"]. Default: all.
   --batch-size <n>          Rows per batch, products never split (default: 100; 0 = one file)
+  --max <n>                 Cap the number of import rows (for quick test runs; 0 = no cap)
   --include-zero            Keep rows with quantity 0 (default: skip them)
   --default-bin <name>      Force a bin location for every row (default: blank)
   --bin-blank-values <a,b>  Source bin values that truly mean "no bin" -> blank (e.g. NONE).

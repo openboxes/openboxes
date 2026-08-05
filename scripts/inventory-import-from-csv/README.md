@@ -140,6 +140,7 @@ Inline `--mapping` / `--filter` also override individual entries from a `--confi
 --format <list>           Output formats, comma-separated: xls (manual UI), csv (API). e.g.
                           xls,csv. Config accepts a JSON list ["xls","csv"]. "both"/omitted = all
 --batch-size <n>          Rows per batch; products never split (default: 100; 0 = one file)
+--max <n>                 Cap the number of import rows for a quick test run (0 = no cap)
 --include-zero            Keep rows with quantity 0 (default: skip)
 --default-bin <name>      Force a bin location for every row (default: blank)
 --bin-blank-values <a,b>  Source values that truly mean "no bin" -> blank (e.g. NONE)
