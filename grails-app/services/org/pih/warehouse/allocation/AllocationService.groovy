@@ -34,6 +34,7 @@ class AllocationService {
     GrailsApplication grailsApplication
     AuthService authService
     RequisitionService requisitionService
+    AllocationLockService allocationLockService
 
     AllocationSourceStrategyHandlerResolver allocationSourceStrategyHandlerResolver = new AllocationSourceStrategyHandlerResolver()
     RotationStrategyResolver rotationStrategyResolver = new RotationStrategyResolver()
@@ -208,6 +209,11 @@ class AllocationService {
 
     List<AllocationResult> allocate(Requisition requisition, AllocationMode allocationMode, List<AllocationSourceStrategy> allocationSourceStrategyList) {
         try {
+            // OBLS-919: lock every product this requisition touches up front, in a deterministic order, so two
+            // concurrent multi-line allocations sharing products cannot deadlock by locking them in opposite
+            // orders. Held for this transaction; the per-item lock in getAutoSuggestedItems is then a no-op.
+            allocationLockService.lockForAllocation(requisition?.origin, requisition?.requisitionItems*.product)
+
             List<AllocationResult> results = requisition?.requisitionItems?.collect { requisitionItem ->
                 AllocationRequest allocationRequest = new AllocationRequest(requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationSourceStrategyList)
                 allocate(allocationRequest, false)
@@ -256,7 +262,16 @@ class AllocationService {
     private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationSourceStrategy> strategies, List<AvailableItem> excludeList = []) {
         Location facility = requisitionItem.requisition.origin
         Product product = requisitionItem.product
-        List<AvailableItem> allAvailableItems = stockMovementService.getAvailableItems(facility, requisitionItem, false)
+
+        // OBLS-919: serialize the read-then-reserve for this facility/product so a concurrent allocation of the
+        // same product cannot slip between our availability read and picklist write. The lock is held for the
+        // life of this (transactional) allocation and released on commit.
+        allocationLockService.lockForAllocation(facility, product)
+
+        // OBLS-919: allocation decisions read availability live from transactions + pending picklist
+        // reservations, not the asynchronously-refreshed product_availability view, so two outbounds for the
+        // same product cannot both reserve the same stock while the view is stale.
+        List<AvailableItem> allAvailableItems = stockMovementService.getAvailableItemsFromTransactions(facility, requisitionItem)
 
         boolean isBackordered = requisitionItem.isBackordered()
         if (isBackordered) {

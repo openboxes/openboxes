@@ -20,6 +20,7 @@ import org.hibernate.ObjectNotFoundException
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.allocation.AllocationItemRequest
 import org.pih.warehouse.api.OutboundWorkflowState
+import org.pih.warehouse.api.AllocatedItem
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.AvailableItemStatus
 import org.pih.warehouse.api.DocumentGroupCode
@@ -2241,6 +2242,54 @@ class StockMovementService {
         if (calculateStatus) {
             return calculateAvailableItemsStatus(requisitionItem, availableItems)
         }
+
+        return productAvailabilityService.sortAvailableItems(availableItems)
+    }
+
+    /**
+     * OBLS-919: Compute available items for an allocation decision directly from transactions and live
+     * picklist reservations, rather than the asynchronously-refreshed product_availability materialized view.
+     *
+     * The stock movement feature originally derived availability this way (from transaction entries) until
+     * OBPIH-1843 (2019) moved it onto a snapshot/view for read performance. That view is refreshed out of band
+     * and can lag the transactions it is derived from, so back-to-back auto-allocations of the same product
+     * could both read a stale "available" figure and reserve the same stock (OBLS-919). For the allocation
+     * decision we therefore go back to the authoritative, in-transaction sources:
+     *
+     *   quantityOnHand  - folded live from transaction entries (InventoryService.getProductQuantityByBinLocation)
+     *   quantityAllocated - live pending picklist reservations (ProductAvailabilityService
+     *                       .getQuantityPickedByProductAndLocation, which queries picklist_item, not the view)
+     *
+     * This mirrors what saveProductAvailability persists, but computed synchronously at decision time. The
+     * requisition item's own reservations are added back so re-allocating it does not double-count stock it
+     * already holds (same treatment as the view path in {@link #calculateQuantityAvailableToPromise}).
+     */
+    List<AvailableItem> getAvailableItemsFromTransactions(Location location, RequisitionItem requisitionItem) {
+        Product product = requisitionItem.product
+
+        List<BinLocationItem> binLocationItems =
+                inventoryService.getProductQuantityByBinLocation(location, product, Boolean.TRUE)
+
+        List<AllocatedItem> allocatedItems =
+                productAvailabilityService.getQuantityPickedByProductAndLocation(location, product)
+        Map<List<String>, Integer> allocatedByKey = [:].withDefault { 0 }
+        allocatedItems.each {
+            allocatedByKey[[it.inventoryItem?.id, it.binLocation?.id]] += (it.quantityAllocated ?: 0)
+        }
+
+        List<AvailableItem> availableItems = binLocationItems.findAll { it.quantity > 0 }.collect { BinLocationItem item ->
+            Integer allocated = allocatedByKey[[item.inventoryItem?.id, item.binLocation?.id]] ?: 0
+            return new AvailableItem(
+                    inventoryItem: item.inventoryItem,
+                    binLocation: item.binLocation,
+                    quantityOnHand: item.quantity,
+                    quantityAvailable: item.quantity - allocated
+            )
+        }
+
+        // Add back this requisition item's own reservations so re-allocation does not net them out.
+        def ownPicklistItems = getPicklistItems(requisitionItem)
+        availableItems = calculateQuantityAvailableToPromise(availableItems, ownPicklistItems)
 
         return productAvailabilityService.sortAvailableItems(availableItems)
     }

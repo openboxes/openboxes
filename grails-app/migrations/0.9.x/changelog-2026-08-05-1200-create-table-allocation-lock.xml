@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <!-- OBLS-919: per-(location, product) anchor row used to serialize allocation via SELECT ... FOR UPDATE -->
+    <changeSet author="jmiranda" id="080520261200-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="allocation_lock"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="allocation_lock">
+            <column name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="location_id" type="CHAR(38)">
+                <constraints nullable="false" />
+            </column>
+            <column name="product_id" type="CHAR(38)">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="080520261200-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <uniqueConstraintExists constraintName="uc_allocation_lock_location_product"/>
+            </not>
+        </preConditions>
+        <addUniqueConstraint
+                tableName="allocation_lock"
+                columnNames="location_id, product_id"
+                constraintName="uc_allocation_lock_location_product"/>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="080520261200-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_allocation_lock_location"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseTableName="allocation_lock"
+                baseColumnNames="location_id"
+                constraintName="fk_allocation_lock_location"
+                referencedTableName="location"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet author="jmiranda" id="080520261200-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_allocation_lock_product"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseTableName="allocation_lock"
+                baseColumnNames="product_id"
+                constraintName="fk_allocation_lock_product"
+                referencedTableName="product"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>

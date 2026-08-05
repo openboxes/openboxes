@@ -253,22 +253,30 @@ class ProductAvailabilityService {
         """ : ''
 
         def quantityAllocatedCalculation = internalTransactionsEnabled ?
-        // If we track internal transaction (ie we move picked inventory to staging location or outbound container),
-        // we should only consider as quantity allocated only the part not moved to staging location or
-        // outbound container (as these locations should be unallocable)
+        // If we track internal transactions (ie we move picked inventory to a staging location or outbound
+        // container), stock that has physically left the source bin is already reflected in quantity_on_hand,
+        // so it must not be reserved a second time. A reservation stops counting as allocated only once it has
+        // actually moved out - signalled by outbound_container_id / staging_location_id being set - NOT merely
+        // because quantity_picked was set (auto-issuance sets quantity_picked = quantity without moving stock,
+        // which is what previously zeroed out the reservation and let a second outbound take the same stock).
         """
-            CASE
-                WHEN pli.reason_code IS NULL THEN sum(pli.quantity) - sum(pli.quantity_picked)
-                ELSE SUM(pli.quantity_picked)
-            END as quantity_allocated
+            SUM(
+                CASE
+                    WHEN pli.reason_code IS NOT NULL THEN COALESCE(pli.quantity_picked, 0)
+                    WHEN pli.outbound_container_id IS NULL AND pli.staging_location_id IS NULL
+                        THEN COALESCE(pli.quantity, 0)
+                    ELSE COALESCE(pli.quantity, 0) - COALESCE(pli.quantity_picked, 0)
+                END
+            ) as quantity_allocated
         """ :
-        // If we don't track internal transaction, we should consider the entire quantity as allocated
-        // until it is issued
+        // If we don't track internal transactions, the entire reserved quantity stays allocated until issued.
         """
-            CASE
-                WHEN pli.reason_code IS NULL THEN sum(pli.quantity)
-                ELSE SUM(pli.quantity_picked)
-            END as quantity_allocated
+            SUM(
+                CASE
+                    WHEN pli.reason_code IS NULL THEN COALESCE(pli.quantity, 0)
+                    ELSE COALESCE(pli.quantity_picked, 0)
+                END
+            ) as quantity_allocated
         """
 
         def query = """
@@ -300,8 +308,8 @@ class ProductAvailabilityService {
                   AND (lsa.activities IS NULL OR (lsa.activities NOT LIKE '%HOLD_STOCK%' AND lsa.activities NOT LIKE '%LOST_AND_FOUND%')))
                   AND (:productId = '' OR ri.product_id = :productId)
                   ${internalTransactionsWhereClause}
-                GROUP BY pli.bin_location_id, pli.inventory_item_id, pli.reason_code
-                UNION
+                GROUP BY pli.bin_location_id, pli.inventory_item_id
+                UNION ALL
                 SELECT
                     pli.bin_location_id as bin_location_id,
                     pli.inventory_item_id as inventory_item_id,
