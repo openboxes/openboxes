@@ -63,11 +63,11 @@ class UnifiedLayoutFinder extends GroovyPageLayoutFinder {
     @Override
     Decorator findLayout(HttpServletRequest request, Page page) {
         Decorator resolved = super.findLayout(request, page)
-        if (resolved == null || resolved.name != DECLARED_LAYOUT || !isEnabled()) {
-            return resolved
+        if (resolved == null) {
+            return null
         }
-        if (request.getAttribute(OVERRIDE_ATTRIBUTE) != null) {
-            // ?layout= asked for this by name; honour it in both directions.
+        boolean explicitOverride = request.getAttribute(OVERRIDE_ATTRIBUTE) != null
+        if (!shouldSubstitute(resolved.name, isEnabled(), explicitOverride)) {
             return resolved
         }
         Decorator unified = getNamedDecorator(request, UNIFIED_LAYOUT)
@@ -78,6 +78,16 @@ class UnifiedLayoutFinder extends GroovyPageLayoutFinder {
             return resolved
         }
         return unified
+    }
+
+    /**
+     * The whole policy, separated from the SiteMesh plumbing so it can be
+     * tested without a Spring context. Substitute only when the page asked for
+     * the legacy layout, the instance has opted in, and this request did not
+     * name a layout itself.
+     */
+    static boolean shouldSubstitute(String resolvedLayout, boolean enabled, boolean explicitOverride) {
+        return resolvedLayout == DECLARED_LAYOUT && enabled && !explicitOverride
     }
 
     /**

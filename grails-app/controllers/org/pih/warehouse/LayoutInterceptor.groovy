@@ -62,6 +62,14 @@ class LayoutInterceptor {
     private static final Set<String> SELECTABLE_LAYOUTS =
             Collections.unmodifiableSet(['custom', 'default'] as Set)
 
+    /**
+     * Whether a ?layout= value may be honoured. Separated out so the allowlist
+     * can be tested without standing up the interceptor.
+     */
+    static boolean isSelectable(String requested) {
+        return requested != null && SELECTABLE_LAYOUTS.contains(requested)
+    }
+
     LayoutInterceptor() {
         // Without an explicit match, an interceptor only applies to the
         // controller matching its own name — i.e. it would never run.
@@ -70,7 +78,7 @@ class LayoutInterceptor {
 
     boolean before() {
         String requested = params.layout
-        if (requested && SELECTABLE_LAYOUTS.contains(requested)) {
+        if (isSelectable(requested)) {
             request[LAYOUT_ATTRIBUTE] = requested
             request[OVERRIDE_ATTRIBUTE] = Boolean.TRUE
         }
