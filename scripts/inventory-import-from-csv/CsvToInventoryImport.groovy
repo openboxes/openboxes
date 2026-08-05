@@ -97,6 +97,10 @@ final List<String> MAPPABLE_FIELDS =
         ['productCode', 'productName', 'quantity', 'binLocation', 'lotNumber', 'comments']
 final List<String> REQUIRED_FIELDS = ['productCode', 'quantity']
 
+// Output formats this script can write. Add a new one here plus a branch in the write loop
+// (and, for API-importable formats, teach ImportInventoryBatches.groovy to read it).
+final List<String> SUPPORTED_FORMATS = ['xls', 'csv']
+
 // ===========================================================================
 // Arg parsing
 // ===========================================================================
@@ -159,9 +163,26 @@ Map configOptions = (config['options'] ?: [:]) as Map
 
 // Resolve options (CLI wins over config wins over built-in default)
 String outputDirPath = opts['output-dir'] ?: (configOptions['outputDir'] ?: 'inventory-output')
-String format = (opts['format'] ?: (configOptions['format'] ?: 'both')).toString().toLowerCase()
-if (!(format in ['xls', 'csv', 'both'])) {
-    die("format must be one of: xls, csv, both (got '${format}')")
+// Output formats. Accepts a JSON list (["xls","csv"]), a comma-separated string ("xls,csv"),
+// or a single value; "both" expands to every supported format. New writers (e.g. json, xml)
+// only need to be added to SUPPORTED_FORMATS and given a branch in the write loop below.
+def formatRaw = opts['format'] ?: configOptions['format'] ?: SUPPORTED_FORMATS
+List rawFormatTokens = (formatRaw instanceof List) ? (formatRaw as List) : formatRaw.toString().split(',').toList()
+List<String> formats = []
+rawFormatTokens.each { def token ->
+    String t = token.toString().trim().toLowerCase()
+    if (!t) {
+        return
+    }
+    List<String> toAdd = (t == 'both') ? SUPPORTED_FORMATS : [t]
+    toAdd.each { String f -> if (!formats.contains(f)) formats << f }
+}
+if (!formats) {
+    formats = new ArrayList<String>(SUPPORTED_FORMATS)
+}
+List<String> unsupportedFormats = formats.findAll { !(it in SUPPORTED_FORMATS) }
+if (unsupportedFormats) {
+    die("Unsupported output format(s): ${unsupportedFormats.join(', ')}. Supported: ${SUPPORTED_FORMATS.join(', ')}.")
 }
 int batchSize = (opts['batch-size'] ?: (configOptions['batchSize'] ?: 100)) as int
 boolean includeZero = ('include-zero' in flags) || (configOptions['includeZero'] as boolean)
@@ -407,12 +428,12 @@ if (skipped) {
 // ---------------------------------------------------------------------------
 batches.eachWithIndex { List<Map> batch, int i ->
     String base = "inventory_batch_${String.format('%03d', i + 1)}"
-    if (format in ['xls', 'both']) {
+    if ('xls' in formats) {
         File f = new File(outputDir, "${base}.xls")
         writeXls(f, batch, OB_COLUMNS)
         println "Wrote ${f.name} (${batch.size()} row(s))"
     }
-    if (format in ['csv', 'both']) {
+    if ('csv' in formats) {
         File f = new File(outputDir, "${base}.csv")
         writeApiCsv(f, batch, OB_COLUMNS)
         println "Wrote ${f.name} (${batch.size()} row(s))"
@@ -743,7 +764,9 @@ OUTPUT:
   --output-dir <dir>        Output directory (default: inventory-output)
   --clean                   Remove old inventory_batch_*/skipped-records files first (default:
                             warn if the output dir has leftovers from a previous run)
-  --format <xls|csv|both>   xls = manual UI import, csv = API import (default: both)
+  --format <list>           Comma-separated output formats: xls (manual UI import), csv (API
+                            import). e.g. --format csv or --format xls,csv. "both" = all.
+                            Config may use a JSON list: "format": ["xls","csv"]. Default: all.
   --batch-size <n>          Rows per batch, products never split (default: 100; 0 = one file)
   --include-zero            Keep rows with quantity 0 (default: skip them)
   --default-bin <name>      Force a bin location for every row (default: blank)

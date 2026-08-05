@@ -105,7 +105,7 @@ optional except the two required mapping fields:
     "defaultBin": "",
     "comment": "Inventory reconciliation import",
     "batchSize": 100,
-    "format": "both"
+    "format": ["xls", "csv"]
   }
 }
 ```
@@ -137,7 +137,8 @@ Inline `--mapping` / `--filter` also override individual entries from a `--confi
 --filter <Column=Value>   Keep only source rows where Column == Value
 --output-dir <dir>        Output directory (default: inventory-output)
 --clean                   Remove old batch/skipped files first (default: warn on leftovers)
---format <xls|csv|both>   xls = manual UI import, csv = API import (default: both)
+--format <list>           Output formats, comma-separated: xls (manual UI), csv (API). e.g.
+                          xls,csv. Config accepts a JSON list ["xls","csv"]. "both"/omitted = all
 --batch-size <n>          Rows per batch; products never split (default: 100; 0 = one file)
 --include-zero            Keep rows with quantity 0 (default: skip)
 --default-bin <name>      Force a bin location for every row (default: blank)

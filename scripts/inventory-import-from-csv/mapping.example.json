@@ -22,6 +22,6 @@
     "binBlankValues": [],
     "comment": "Inventory reconciliation import",
     "batchSize": 100,
-    "format": "both"
+    "format": ["xls", "csv"]
   }
 }
