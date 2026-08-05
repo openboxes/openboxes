@@ -6,7 +6,15 @@
     <title><warehouse:message code="openboxes.analytics.title" default="OpenBoxes Analytics"/> | <g:layoutTitle/></title>
 
     <!-- Include Favicon -->
-    <link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
+    %{-- The unified design ships a blue mark; keep the original for instances
+         that have not opted in, so the browser tab does not change under them.
+         default.gsp needs no such guard — it only renders when opted in. --}%
+    <g:if test="${grailsApplication.config.getProperty('openboxes.unifiedLayout.enabled', Boolean, false)}">
+        <link rel="shortcut icon" href="${request.contextPath}/static/images/favicon.ico?v=blue2" type="image/x-icon"/>
+    </g:if>
+    <g:else>
+        <link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
+    </g:else>
 
     <!-- CSS Stylesheets -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" type="text/css" media="all" />
