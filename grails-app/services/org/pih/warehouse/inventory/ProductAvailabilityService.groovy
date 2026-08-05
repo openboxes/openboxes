@@ -257,24 +257,18 @@ class ProductAvailabilityService {
         // we should only consider as quantity allocated only the part not moved to staging location or
         // outbound container (as these locations should be unallocable)
         """
-            SUM(
-                CASE
-                    WHEN pli.reason_code IS NOT NULL THEN COALESCE(pli.quantity_picked, 0)
-                    WHEN pli.outbound_container_id IS NULL AND pli.staging_location_id IS NULL
-                        THEN COALESCE(pli.quantity, 0)
-                    ELSE COALESCE(pli.quantity, 0) - COALESCE(pli.quantity_picked, 0)
-                END
-            ) as quantity_allocated
+            CASE
+                WHEN pli.reason_code IS NULL THEN sum(pli.quantity) - sum(pli.quantity_picked)
+                ELSE SUM(pli.quantity_picked)
+            END as quantity_allocated
         """ :
         // If we don't track internal transaction, we should consider the entire quantity as allocated
         // until it is issued
         """
-            SUM(
-                CASE
-                    WHEN pli.reason_code IS NULL THEN COALESCE(pli.quantity, 0)
-                    ELSE COALESCE(pli.quantity_picked, 0)
-                END
-            ) as quantity_allocated
+            CASE
+                WHEN pli.reason_code IS NULL THEN sum(pli.quantity)
+                ELSE SUM(pli.quantity_picked)
+            END as quantity_allocated
         """
 
         def query = """
@@ -306,8 +300,8 @@ class ProductAvailabilityService {
                   AND (lsa.activities IS NULL OR (lsa.activities NOT LIKE '%HOLD_STOCK%' AND lsa.activities NOT LIKE '%LOST_AND_FOUND%')))
                   AND (:productId = '' OR ri.product_id = :productId)
                   ${internalTransactionsWhereClause}
-                GROUP BY pli.bin_location_id, pli.inventory_item_id
-                UNION ALL
+                GROUP BY pli.bin_location_id, pli.inventory_item_id, pli.reason_code
+                UNION
                 SELECT
                     pli.bin_location_id as bin_location_id,
                     pli.inventory_item_id as inventory_item_id,
