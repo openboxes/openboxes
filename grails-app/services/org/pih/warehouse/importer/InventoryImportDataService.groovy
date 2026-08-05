@@ -78,7 +78,7 @@ class InventoryImportDataService implements ImportDataService {
                 if (row.binLocation == 'Default') {
                     row.binLocation = null
                 }
-                def binLocation = Location.findByParentLocationAndName(location, row.binLocation)
+                def binLocation = findBinLocation(row.binLocation as String, location)
                 if (!binLocation && row.binLocation) {
                     command.errors.reject("error.product.notExists", "Row ${rowIndex}: Bin location '${row.binLocation.trim()}' does not exist in this depot")
                     command.warnings[index] << "Bin location '${row.binLocation.trim()}' does not exist in this depot"
@@ -401,9 +401,24 @@ class InventoryImportDataService implements ImportDataService {
             return null
         }
 
-        Location binLocation = Location.findByNameAndParentLocation(binLocationName, parentLocation)
+        Location binLocation = findBinLocation(binLocationName, parentLocation)
         assert binLocation != null
         return binLocation
+    }
+
+    /**
+     * Resolve a bin location under the given parent by its name, falling back to its location number.
+     * This lets an import reference a bin by either value, which is useful when a source system's bin
+     * code was migrated into the OpenBoxes location number while the location name carries extra text
+     * (e.g. a zone suffix like "106AA - 1"). Matching is trimmed but otherwise exact.
+     */
+    private Location findBinLocation(String nameOrNumber, Location parentLocation) {
+        if (!nameOrNumber?.trim()) {
+            return null
+        }
+        String value = nameOrNumber.trim()
+        return Location.findByNameAndParentLocation(value, parentLocation) ?:
+                Location.findByLocationNumberAndParentLocation(value, parentLocation)
     }
 
     void calculateAndApplyInventoryDifferences(ImportDataCommand command) {
