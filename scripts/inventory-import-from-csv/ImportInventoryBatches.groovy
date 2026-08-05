@@ -214,22 +214,31 @@ static String login(String baseUrl, String username, String password) {
     return jsession
 }
 
-/** POST a CSV batch to the inventory import API. Throws on non-2xx. */
+/** POST a CSV batch to the inventory import API. Throws on non-2xx or an auth redirect. */
 static void uploadCsv(String importUrl, File csvFile, String cookie) {
     HttpURLConnection conn = (HttpURLConnection) new URL(importUrl).openConnection()
+    conn.setInstanceFollowRedirects(false)   // don't silently follow a redirect to the login page
     conn.setRequestMethod('POST')
     conn.setDoOutput(true)
     conn.setRequestProperty('Content-Type', 'text/csv')
     conn.setRequestProperty('Cookie', cookie)
+    conn.setRequestProperty('Accept', 'application/json')
     conn.outputStream.withStream { os -> os.write(csvFile.getBytes()) }
     conn.connect()
     int code = conn.responseCode
+    String location = conn.getHeaderField('Location')
+    conn.disconnect()
+
+    // A 3xx to the login/auth page means the session isn't authenticated - the import did NOT run.
+    if (code >= 300 && code < 400) {
+        throw new RuntimeException("HTTP ${code} redirect to ${location ?: 'another page'} - " +
+                "not authenticated (session invalid/expired). The import did not run.")
+    }
     if (code < 200 || code >= 300) {
         String err
         try { err = conn.errorStream?.text } catch (Exception ignored) { err = '' }
         throw new RuntimeException("HTTP ${code}${err ? ': ' + err.take(500) : ''}")
     }
-    conn.disconnect()
 }
 
 static void die(String message) {
