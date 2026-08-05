@@ -14,28 +14,36 @@
       flex-direction: row;
       width: 100%;
       flex-wrap: wrap;
-      // 3% lines the row up with the cards beneath it: .card-component
-      // contributes 2% and each card another 1% of its own margin.
-      margin: 10px 3%;
-      // Reads as a secondary button rather than another filter chip.
-      // Qualified with .category-item so it outranks that rule's
-      // !important widths inside the media queries below.
-      .add-category-btn.category-item {
-        width: auto !important;
-        height: 36px;
-        padding: 8px 16px;
-        gap: 8px;
-        background-color: var(--blue-100);
-        color: var(--gray-600);
-        border-radius: 4px;
-        box-shadow: none;
-        font-size: 14px;
-        font-weight: 500;
-        letter-spacing: 0.02em;
+      margin: 10px 6%;
+      .add-category-btn {
+        width: 100px !important;
         cursor: pointer;
+      }
 
-        &:hover {
-          color: var(--blue-500);
+      // Unified design: 3% lines the row up with the cards beneath it
+      // (.card-component contributes 2% and each card another 1%), and the
+      // add button reads as a secondary button rather than another filter
+      // chip. Qualified with .category-item so it outranks that rule's
+      // !important widths in the media queries below.
+      .unified-layout & {
+        margin: 10px 3%;
+
+        .add-category-btn.category-item {
+          width: auto !important;
+          height: 36px;
+          padding: 8px 16px;
+          gap: 8px;
+          background-color: var(--blue-100);
+          color: var(--gray-600);
+          border-radius: 4px;
+          box-shadow: none;
+          font-size: 14px;
+          font-weight: 500;
+          letter-spacing: 0.02em;
+
+          &:hover {
+            color: var(--blue-500);
+          }
         }
       }
 
@@ -150,7 +158,11 @@
 
 .configs-left-nav {
   position: sticky;
-  background-color: var(--blue-100);
+  background-color: #ededed;
+
+  .unified-layout & {
+    background-color: var(--blue-100);
+  }
   display: flex;
   flex-direction: column;
   width: 200px;
@@ -170,12 +182,21 @@
     font-size: 12px;
     color: #878787 !important;
 
-    i, svg {
-      flex-shrink: 0;
+    i {
       font-size: 14px;
-      width: 14px;
-      height: 14px;
-      margin-right: 8px;
+      margin-right: 6px;
+    }
+
+    // Unified design also sizes the react-icons <svg> the same as the
+    // legacy <i>, so the two icon families sit identically
+    .unified-layout & {
+      i, svg {
+        flex-shrink: 0;
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+        margin-right: 8px;
+      }
     }
 
     .division-line {
@@ -225,21 +246,31 @@
     padding: 0;
 
     .configs-list-item {
-      margin: 4px 0;
-      padding: 10px 16px;
-      color: var(--gray-600);
-      cursor: pointer;
-
-      &:hover {
-        background-color: var(--blue-200);
-        color: var(--blue-primary);
-      }
+      margin: 16px 0;
+      padding: 8px 16px;
+      color: #878787;
 
       &.active {
-        background-color: #ffffff;
-        color: var(--blue-primary);
-        font-weight: 600;
-        box-shadow: inset 4px 0 0 0 var(--blue-primary);
+        background-color: #d9d9d9;
+      }
+
+      .unified-layout & {
+        margin: 4px 0;
+        padding: 10px 16px;
+        color: var(--gray-600);
+        cursor: pointer;
+
+        &:hover {
+          background-color: var(--blue-200);
+          color: var(--blue-primary);
+        }
+
+        &.active {
+          background-color: #ffffff;
+          color: var(--blue-primary);
+          font-weight: 600;
+          box-shadow: inset 4px 0 0 0 var(--blue-primary);
+        }
       }
 
       button {
@@ -250,14 +281,22 @@
         color: inherit;
         display: flex;
         align-items: center;
-        gap: 8px;
-        font-size: 14px;
 
-        i, svg {
-          flex-shrink: 0;
-          width: 18px;
-          height: 18px;
-          font-size: 18px;
+        i {
+          margin-right: 16px;
+        }
+
+        .unified-layout & {
+          gap: 8px;
+          font-size: 14px;
+
+          i, svg {
+            flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+            font-size: 18px;
+            margin-right: 0;
+          }
         }
       }
     }
@@ -378,8 +417,14 @@
     top: 15px;
     right: 32px;
 
-    i, svg {
-      color: var(--gray-350);
+    i {
+      color:#999;
+    }
+
+    .unified-layout & {
+      i, svg {
+        color: var(--gray-350);
+      }
     }
   }
 
@@ -448,8 +493,14 @@
     top: 24px;
     right: 42px;
 
-    i, svg {
-      color: var(--gray-350);
+    i {
+      color:#999;
+    }
+
+    .unified-layout & {
+      i, svg {
+        color: var(--gray-350);
+      }
     }
   }
 

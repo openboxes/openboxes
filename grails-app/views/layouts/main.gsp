@@ -28,7 +28,7 @@
     <g:layoutHead/>
 </head>
 
-<body>
+<body class="${grailsApplication.config.getProperty('openboxes.unifiedLayout.enabled', Boolean, false) ? 'unified-layout' : ''}">
 
 <header>
     <nav class="navbar navbar-expand-md navbar-light" role="navigation">

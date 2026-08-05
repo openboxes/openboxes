@@ -20,7 +20,11 @@
 
     <g:layoutHead/>
 </head>
-<body class="d-flex flex-column">
+<body class="d-flex flex-column ${grailsApplication.config.getProperty('openboxes.unifiedLayout.enabled', Boolean, false) ? 'unified-layout' : ''}">
+    %{-- The React bundle is one file for both states, so the JSX reads this
+         rather than being built twice. Kept in the layout because
+         common/react.gsp carries a generated bundle hash. --}%
+    <script>window.UNIFIED_LAYOUT = ${grailsApplication.config.getProperty('openboxes.unifiedLayout.enabled', Boolean, false)};</script>
     <div style="flex: 1">
         <g:layoutBody />
     </div>

@@ -16,6 +16,7 @@ import apiClient from 'utils/apiClient';
 import { dateFnsLocale, formatDateToString } from 'utils/dateUtils';
 import { getCurrentEventComment } from 'utils/list-utils';
 import Translate from 'utils/Translate';
+import { isUnifiedLayout } from 'utils/unifiedLayout';
 
 import 'react-table/react-table.css';
 import './StockRequestDashboard.scss';
@@ -155,7 +156,7 @@ class StockRequestDashboard extends Component {
             to={STOCK_MOVEMENT_URL.createRequest()}
             className="btn btn-primary d-flex justify-content-center align-items-center font-weight-bold"
           >
-            <RiAddLine className="mr-1" />
+            {isUnifiedLayout() ? <RiAddLine className="mr-1" /> : <i className="fa fa-plus mr-1" />}
             <Translate
               id="react.stockMovement.createNewRequest.label"
               defaultMessage="Create New Request"
@@ -172,8 +173,8 @@ class StockRequestDashboard extends Component {
           manual
           resizable={false}
           className="-striped -highlight stock-request-table "
-          previousText={<RiArrowLeftSLine aria-hidden="true" />}
-          nextText={<RiArrowRightSLine aria-hidden="true" />}
+          previousText={isUnifiedLayout() ? <RiArrowLeftSLine aria-hidden="true" /> : <i className="fa fa-chevron-left" aria-hidden="true" />}
+          nextText={isUnifiedLayout() ? <RiArrowRightSLine aria-hidden="true" /> : <i className="fa fa-chevron-right" aria-hidden="true" />}
           pageText=""
           onFetchData={(tableState) => {
             this.fetchStockMovementItems(tableState.page, tableState.pageSize);

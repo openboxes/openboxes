@@ -18,6 +18,7 @@ import NumbersRAG from 'components/dashboard/NumbersRAG';
 import NumbersTableCard from 'components/dashboard/NumbersTableCard';
 import TableCard from 'components/dashboard/TableCard';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import { isUnifiedLayout } from 'utils/unifiedLayout';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
 // TODO: OBPIH-4384 Refactor FilterComponent to be more generic.
@@ -263,7 +264,7 @@ const GraphCard = SortableElement(({
   } else if (cardType === 'error') {
     graph = (
       <button type="button" onClick={() => loadIndicator(widgetId)}>
-        <RiRefreshLine />
+        {isUnifiedLayout() ? <RiRefreshLine /> : <i className="fa fa-repeat" />}
       </button>
     );
   }
@@ -288,7 +289,7 @@ const GraphCard = SortableElement(({
             ? (
               <div className="graph-infos">
                 <CustomTooltip content={translate(cardInfo, cardInfo)}>
-                  <RiInformationLine />
+                  {isUnifiedLayout() ? <RiInformationLine /> : <i className="fa fa-info-circle" />}
                 </CustomTooltip>
               </div>
             )

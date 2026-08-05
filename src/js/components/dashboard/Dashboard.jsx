@@ -26,6 +26,7 @@ import NumberCard from 'components/dashboard/NumberCard';
 import UnarchiveIndicators from 'components/dashboard/UnarchiveIndicators';
 import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
+import { isUnifiedLayout } from 'utils/unifiedLayout';
 
 import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -101,7 +102,7 @@ const ArchiveIndicator = ({ hideArchive }) => (
         id="react.dashboard.archive.label"
         defaultMessage="Archive indicator"
       />
-      <RiArchiveLine className="ml-2" />
+      {isUnifiedLayout() ? <RiArchiveLine className="ml-2" /> : <i className="fa fa-archive ml-2" />}
     </span>
   </div>
 );

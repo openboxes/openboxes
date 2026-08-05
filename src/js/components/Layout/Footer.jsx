@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import { changeCurrentLocale } from 'actions';
 import { DISABLE_LOCALIZATION, ENABLE_LOCALIZATION } from 'api/urls';
 import Translate from 'utils/Translate';
+import { isUnifiedLayout } from 'utils/unifiedLayout';
 
 const Footer = ({
   // eslint-disable-next-line no-shadow
@@ -26,32 +27,30 @@ const Footer = ({
   buildDate,
   localizationModeEnabled,
   localizationModeLocale,
-}) => (
-  <div className="align-self-end text-center py-2 w-100 footer">
-    {/* CSS-only disclosure: the label toggles the checkbox, which reveals
-        .footer-details via a sibling selector. No JavaScript involved. */}
-    <input type="checkbox" id="footer-details-toggle" className="footer-toggle" />
-    <div className="footer-summary d-flex flex-row justify-content-center align-items-center m-2">
-      <div className="mx-3">
-        ©
-        {(new Date().getFullYear())}
-        {' '}
-        <a
-          href="https://openboxes.com"
-          aria-label="Redirect to openboxes"
-        >
-          <Translate id="react.default.poweredBy.label" defaultMessage="Powered by OpenBoxes" />
-        </a>
-      </div>
-      <label
-        htmlFor="footer-details-toggle"
-        className="footer-toggle-icon"
-        title="Build information"
-        aria-label="Build information"
-      />
-    </div>
-    <div className="footer-details">
+}) => {
+  /*
+   * Two footers, chosen at render time. The unified one collapses the build
+   * and environment detail behind an info toggle — a checkbox and a label,
+   * revealed by a sibling selector, no JavaScript. The classic one is the
+   * upstream footer, unchanged, for instances that have not opted in.
+   */
+  const classic = (
+
+    <div className="border-top align-self-end text-center py-2 w-100 footer">
       <div className="d-flex flex-row justify-content-center m-2 flex-wrap">
+        <div className="mx-3">
+          ©
+          {(new Date().getFullYear())}
+          {' '}
+          <a
+            href="https://openboxes.com"
+            aria-label="Redirect to openboxes"
+          >
+            <Translate id="react.default.poweredBy.label" defaultMessage="Powered by OpenBoxes" />
+          </a>
+        </div>
+        {' '}
+        |
         <div className="mx-3">
           <Translate id="react.default.grailsVersion.label " defaultMessage="Grails Version" />
           :
@@ -108,7 +107,8 @@ const Footer = ({
           {' '}
           {' '}
           { _.map(languages, (language) => {
-          // When clicking on language that is a translation mode language, enable localization mode
+            // When clicking on a language that is a translation mode
+            // language, enable localization mode
             if (language.code === localizationModeLocale) {
               return (
                 <a
@@ -133,8 +133,8 @@ const Footer = ({
                 </a>
               );
             }
-            // If we are not in localization mode and the language is not
-            // a translation mode language, we just want to change the language
+            // If we are not in localization mode and the language is not a
+            // translation mode language, we just want to change the language
             return (
               <button
                 type="button"
@@ -181,9 +181,170 @@ const Footer = ({
         |
       </div>
     </div>
-  </div>
-);
+  );
 
+  const unified = (
+
+    <div className="align-self-end text-center py-2 w-100 footer">
+      {/* CSS-only disclosure: the label toggles the checkbox, which reveals
+          .footer-details via a sibling selector. No JavaScript involved. */}
+      <input type="checkbox" id="footer-details-toggle" className="footer-toggle" />
+      <div className="footer-summary d-flex flex-row justify-content-center align-items-center m-2">
+        <div className="mx-3">
+          ©
+          {(new Date().getFullYear())}
+          {' '}
+          <a
+            href="https://openboxes.com"
+            aria-label="Redirect to openboxes"
+          >
+            <Translate id="react.default.poweredBy.label" defaultMessage="Powered by OpenBoxes" />
+          </a>
+        </div>
+        <label
+          htmlFor="footer-details-toggle"
+          className="footer-toggle-icon"
+          title="Build information"
+          aria-label="Build information"
+        />
+      </div>
+      <div className="footer-details">
+        <div className="d-flex flex-row justify-content-center m-2 flex-wrap">
+          <div className="mx-3">
+            <Translate id="react.default.grailsVersion.label " defaultMessage="Grails Version" />
+            :
+            {' '}
+            <b>{grailsVersion}</b>
+          </div>
+          |
+          <div className="mx-3">
+            <Translate id="react.default.version.label " defaultMessage="Application version" />
+            :
+            {' '}
+            <b>{appVersion}</b>
+          </div>
+          {' '}
+          |
+          <div className="mx-3">
+            <Translate id="react.default.branch.label " defaultMessage="Branch" />
+            :
+            {' '}
+            <b>{branchName}</b>
+            {' '}
+          </div>
+          {' '}
+          |
+          <div className="mx-3">
+            {' '}
+            <Translate id="react.default.buildNumber.label " defaultMessage="Build Number" />
+            :
+            {' '}
+            <b>{buildNumber}</b>
+            {' '}
+          </div>
+          {' '}
+          |
+          <div className="mx-3">
+            <Translate id="react.default.environment.label " defaultMessage="Environment" />
+            :
+            {' '}
+            <b>{environment}</b>
+          </div>
+          {' '}
+          |
+          <div className="mx-3">
+            <Translate id="react.default.buildDate.label " defaultMessage="Build Date" />
+            :
+            {' '}
+            <b>{buildDate}</b>
+          </div>
+        </div>
+        <div className="d-flex flex-row justify-content-center mb-3 flex-wrap">
+          <div className="mx-3">
+            <Translate id="react.default.locale.label " defaultMessage="Locale" />
+            :
+            {' '}
+            {' '}
+            { _.map(languages, (language) => {
+            // When clicking on a language that is a translation mode
+            // language, enable localization mode
+              if (language.code === localizationModeLocale) {
+                return (
+                  <a
+                    className={`${locale === language.code ? 'selected' : ''}`}
+                    key={language.code}
+                    href={ENABLE_LOCALIZATION}
+                  >
+                    {language.name}
+                  </a>
+                );
+              }
+              // If we are in localization mode and we click on non-translation mode language,
+              // we want to disable the localization mode
+              if (localizationModeEnabled) {
+                return (
+                  <a
+                    className={`${locale === language.code ? 'selected' : ''}`}
+                    key={language.code}
+                    href={DISABLE_LOCALIZATION(language.code)}
+                  >
+                    {language.name}
+                  </a>
+                );
+              }
+              // If we are not in localization mode and the language is not
+              // a translation mode language, we just want to change the language
+              return (
+                <button
+                  type="button"
+                  className={`${locale === language.code ? 'selected' : ''}`}
+                  key={language.code}
+                  onClick={() => {
+                    changeLocale(language.code);
+                    setLanguage(language.code);
+                  }}
+                >
+                  {language.name}
+                </button>
+              );
+            })}
+          </div>
+          {' '}
+          |
+
+          <div className="mx-3">
+            <Translate id="react.default.ipAddress.label " defaultMessage="IP Address" />
+            :
+            {' '}
+            <b>{ipAddress}</b>
+          </div>
+          {' '}
+          |
+
+          <div className="mx-3">
+            {' '}
+            <Translate id="react.default.hostname.label " defaultMessage="Hostname" />
+            :
+            {' '}
+            <b>{hostname}</b>
+          </div>
+          {' '}
+          |
+          <div className="mx-3">
+            <Translate id="react.default.timezone.label " defaultMessage="Timezone" />
+            :
+            {' '}
+            <b>{timezone}</b>
+          </div>
+          {' '}
+          |
+        </div>
+      </div>
+    </div>
+  );
+
+  return isUnifiedLayout() ? unified : classic;
+};
 const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
   grailsVersion: state.session.grailsVersion,

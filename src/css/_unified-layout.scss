@@ -1,0 +1,190 @@
+/* =========================================================================
+   Unified design — React side
+   -------------------------------------------------------------------------
+   Everything here is scoped under .unified-layout, a class the layouts put
+   on <body> only when openboxes.unifiedLayout.enabled is true. One bundle
+   serves both states; an instance that has not opted in matches none of
+   these selectors and renders exactly as it did before.
+
+   The scoping also does the cascade work for free: .unified-layout .foo
+   outranks a bare .foo, so the rules that restyle existing components need
+   no !important beyond the places where Bootstrap's own utilities use it.
+   ========================================================================= */
+
+.unified-layout {
+
+  /* Bootstrap's stock button palette -> OpenBoxes tokens. Imported inside
+     the scope so every rule in it is gated too. */
+  @import "src/css/bootstrap-buttons";
+
+  // Native selects match the react-select skin (same treatment as the
+  // legacy theme): no OS chrome, token chevron, standard input box
+  select.form-control,
+  select:not([multiple]):not([size]) {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23636D81' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+
+  // The brand wordmark follows the app font rather than carrying its own
+  .brand-name {
+    font-family: inherit;
+  }
+
+  // Non-clickable menu section headers: small-caps label, clearly
+  // distinct from the clickable items beneath them
+  .subsection-title {
+    color: var(--gray-350);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  // Footer sits directly on the page background — no card, no borders.
+  // Build/debug info hides behind a CSS-only disclosure whose toggle is
+  // the info icon (checkbox + label in Footer.jsx; no JavaScript).
+  .footer {
+    border-top: none;
+    background-color: transparent;
+  }
+
+  .footer-toggle {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .footer-summary {
+    gap: 8px;
+    line-height: 2em;
+  }
+
+  .footer-toggle-icon {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    margin: 0;
+    cursor: pointer;
+    opacity: 0.65;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23747C93' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 11v5M12 7.5h.01'/%3E%3C/svg%3E") center / 15px 15px no-repeat;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  .footer-details {
+    display: none;
+  }
+
+  .footer-toggle:checked ~ .footer-details {
+    display: block;
+  }
+
+  .footer-toggle:focus-visible ~ .footer-summary .footer-toggle-icon {
+    outline: 2px solid var(--blue-primary);
+    outline-offset: 2px;
+    border-radius: 2px;
+    opacity: 1;
+  }
+
+  // Card-ish surfaces pick up the token border and the 4px radius
+  .create-form,
+  .modal-content-custom,
+  .location-modal {
+    border: 1px solid var(--gray-200);
+    border-radius: 4px;
+  }
+
+  // Status chip rather than the old outlined badge
+  .shipment-status {
+    border: none;
+    border-radius: 4px;
+    padding: 2px 8px;
+    background: var(--green-800);
+    color: var(--color-green);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  // react-table's own rules have the same specificity as these and the
+  // bundle's CSS order is not guaranteed, so qualify with the element
+  // name to win regardless of order.
+  .ReactTable {
+    // The default empty state is an absolutely positioned, translucent
+    // white box floating over the cells. Give it its own row instead.
+    div.rt-noData {
+      position: relative;
+      left: unset;
+      top: unset;
+      transform: unset;
+      -webkit-transform: unset;
+      width: 100%;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 24px;
+      background-color: #ffffff;
+      color: var(--gray-400);
+      order: 1;
+    }
+
+    // Headers align with the filter inputs beneath them
+    .rt-thead div.rt-th {
+      text-align: left;
+    }
+  }
+
+  /* The filter header holds the search field on the left and the action
+     buttons on the right, and claims a full-width row of its own. On reports
+     that hide both the search field and the visibility toggler — the reorder
+     and expiration-history reports — that left slot renders empty, so the
+     header became a row containing nothing but Clear / Load table, stranded
+     above a filters row with ~350px of unused space beside it.
+     Where the slot is empty, the two share a line: filters first, buttons
+     pushed to the end. */
+  .classic-form:has(> .filter-header > .min-w-50:empty) {
+    // display first: .classic-form carries Bootstrap's flex-wrap and
+    // align-items utility classes but is itself display:block, so every
+    // flex property on it and its children was inert.
+    display: flex !important;
+    // !important throughout: the w-100 and flex-wrap utilities in the markup
+    // are themselves !important and would otherwise win on the cascade.
+    flex-wrap: nowrap !important;
+    align-items: center;
+    gap: 8px;
+
+    > .filters-row {
+      order: 1;
+      flex: 1 1 auto;
+    }
+
+    > .filter-header {
+      order: 2;
+      width: auto !important;
+      flex: 0 0 auto;
+
+      // the empty search slot would still reserve min-width: 50%
+      > .min-w-50 {
+        display: none !important;
+      }
+
+      // ...and with the slot gone the button group stretched to fill the
+      // header, which then sized itself to that. Hold it to its content.
+      > .buttons {
+        flex: 0 0 auto;
+        width: auto !important;
+      }
+    }
+  }
+}

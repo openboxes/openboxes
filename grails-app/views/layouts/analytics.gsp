@@ -66,7 +66,7 @@
 
 
 </head>
-<body>
+<body class="${grailsApplication.config.getProperty('openboxes.unifiedLayout.enabled', Boolean, false) ? 'unified-layout' : ''}">
 
 
 
