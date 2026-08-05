@@ -579,7 +579,10 @@ openboxes:
         automaticAllocationJob:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes
-            delayInMilliseconds: 1000
+            # OBLS-919: stagger between successive per-requisition allocation passes. Must exceed the
+            # product-availability refresh delay below (5000ms) plus its run time, so the next requisition is
+            # evaluated against settled availability and cannot allocate stock a prior one already issued.
+            delayInMilliseconds: 7000
 
         # should only be triggered by persistence event listener
         putawayLocationReassignmentJob:
