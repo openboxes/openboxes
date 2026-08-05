@@ -169,9 +169,11 @@ String defaultBin = opts['default-bin'] ?: (configOptions['defaultBin'] ?: null)
 String comment = opts['comment'] ?: (configOptions['comment'] ?:
         "Inventory import ${new Date().format('yyyy-MM-dd')}")
 
-// Source bin values that mean "no location" and should become a blank bin (e.g. a "NOLOC"
-// placeholder). Kept generic: supply them per-source via config options.binBlankValues (a JSON
-// array) or --bin-blank-values a,b. Matched case-insensitively after trimming.
+// Source bin values that genuinely mean "no location" and should become a blank bin (e.g. a
+// "NONE"/"UNASSIGNED" sentinel). Off by default. Only for values that mean "no bin" - a real
+// staging/virtual bin should be mapped through as-is (and must exist in the depot). Supply per
+// source via config options.binBlankValues (a JSON array) or --bin-blank-values a,b.
+// Matched case-insensitively after trimming.
 Set<String> binBlankValues = [] as Set
 if (opts['bin-blank-values']) {
     opts['bin-blank-values'].split(',').each { binBlankValues << it.trim().toLowerCase() }
@@ -725,7 +727,8 @@ OUTPUT:
   --batch-size <n>          Rows per batch, products never split (default: 100; 0 = one file)
   --include-zero            Keep rows with quantity 0 (default: skip them)
   --default-bin <name>      Force a bin location for every row (default: blank)
-  --bin-blank-values <a,b>  Source bin values that mean "no location" -> blank (e.g. NOLOC)
+  --bin-blank-values <a,b>  Source bin values that truly mean "no bin" -> blank (e.g. NONE).
+                            Do NOT use for real staging/virtual bins; map those through as-is.
   --comment <text>          Comment applied to rows without their own comment
 
 Config values are overridden by the equivalent command-line options.
