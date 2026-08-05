@@ -60,9 +60,14 @@ cp mapping.example.json mapping.json && $EDITOR mapping.json
 # 3. Dry run: parse, filter, batch, report counts (writes nothing)
 groovy CsvToInventoryImport.groovy --input data.csv --config mapping.json --dry-run
 
-# 4. Generate the batch files
-groovy CsvToInventoryImport.groovy --input data.csv --config mapping.json --output-dir out
+# 4. Generate the batch files (--clean clears any leftovers from a previous run)
+groovy CsvToInventoryImport.groovy --input data.csv --config mapping.json --output-dir out --clean
 ```
+
+> **Re-running:** the output dir is not cleared automatically — same-named files are overwritten,
+> but a shorter run leaves stale higher-numbered `inventory_batch_*.csv` behind that stage 2 would
+> still upload. Use `--clean` (or a fresh `--output-dir`) when regenerating. Without `--clean` the
+> transform warns if it finds leftovers.
 
 ### What it produces
 
@@ -131,6 +136,7 @@ Inline `--mapping` / `--filter` also override individual entries from a `--confi
 --mapping <k=v,...>       Inline mapping/override, e.g. productCode=PartNo,quantity=QtyOnHand
 --filter <Column=Value>   Keep only source rows where Column == Value
 --output-dir <dir>        Output directory (default: inventory-output)
+--clean                   Remove old batch/skipped files first (default: warn on leftovers)
 --format <xls|csv|both>   xls = manual UI import, csv = API import (default: both)
 --batch-size <n>          Rows per batch; products never split (default: 100; 0 = one file)
 --include-zero            Keep rows with quantity 0 (default: skip)

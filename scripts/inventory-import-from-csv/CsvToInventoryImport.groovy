@@ -102,7 +102,7 @@ final List<String> REQUIRED_FIELDS = ['productCode', 'quantity']
 // ===========================================================================
 Map<String, String> opts = [:]
 Set<String> flags = [] as Set
-final Set<String> FLAG_NAMES = ['include-zero', 'dry-run', 'list-columns', 'help'] as Set
+final Set<String> FLAG_NAMES = ['include-zero', 'dry-run', 'list-columns', 'clean', 'help'] as Set
 
 for (int i = 0; i < args.length; i++) {
     String a = args[i]
@@ -369,6 +369,24 @@ if (dryRun) {
 }
 
 outputDir.mkdirs()
+
+// Clear (or warn about) batch/report files left by a previous run. Files are otherwise
+// overwritten by name, so a shorter run would leave stale higher-numbered batches behind
+// that the importer (--input-dir) would still pick up.
+List<File> stale = (outputDir.listFiles({ File f ->
+    f.isFile() && (f.name ==~ /inventory_batch_\d+\.(csv|xls)/ || f.name == 'skipped-records.csv')
+} as FileFilter) ?: []) as List<File>
+if (stale) {
+    if ('clean' in flags) {
+        stale.each { it.delete() }
+        println "Removed ${stale.size()} file(s) from a previous run in ${outputDir.name}/\n"
+    } else {
+        println "WARNING: ${outputDir.name}/ already contains ${stale.size()} batch/report file(s) from a"
+        println "         previous run. Same-named files are overwritten, but extras are NOT removed, so a"
+        println "         shorter run leaves stale inventory_batch_*.csv that the importer would still upload."
+        println "         Re-run with --clean, or use an empty --output-dir, to be safe.\n"
+    }
+}
 
 // Skipped report - nothing is silently dropped.
 if (skipped) {
@@ -723,6 +741,8 @@ INPUT / MAPPING:
 
 OUTPUT:
   --output-dir <dir>        Output directory (default: inventory-output)
+  --clean                   Remove old inventory_batch_*/skipped-records files first (default:
+                            warn if the output dir has leftovers from a previous run)
   --format <xls|csv|both>   xls = manual UI import, csv = API import (default: both)
   --batch-size <n>          Rows per batch, products never split (default: 100; 0 = one file)
   --include-zero            Keep rows with quantity 0 (default: skip them)
