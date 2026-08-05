@@ -144,8 +144,6 @@ Inline `--mapping` / `--filter` also override individual entries from a `--confi
 --include-zero            Keep rows with quantity 0 (default: skip)
 --default-bin <name>      Force a bin location for every row (default: blank)
 --bin-blank-values <a,b>  Source values that truly mean "no bin" -> blank (e.g. NONE)
---bin-location-format <t> Template for the OB bin name when it differs from the source code:
-                          {bin} = mapped bin value, {Column} = a source column. e.g. "{bin} - 1"
 --comment <text>          Comment for rows without their own comment
 ```
 

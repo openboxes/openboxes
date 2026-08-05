@@ -202,11 +202,6 @@ if (opts['bin-blank-values']) {
     (configOptions['binBlankValues'] as List).each { binBlankValues << it.toString().trim().toLowerCase() }
 }
 
-// Optional template to build the OpenBoxes bin NAME from the source bin value, for cases where the
-// migrated location name differs from the raw source code (e.g. OB "106AA - 1" from source "106AA").
-// {bin} is the mapped bin value; {AnyColumn} pulls that source column. Applied only to non-blank bins.
-String binLocationFormat = opts['bin-location-format'] ?: (configOptions['binLocationFormat'] ?: null)
-
 // ===========================================================================
 // Read the input CSV
 // ===========================================================================
@@ -292,14 +287,6 @@ mapping.each { field, header ->
 if (filterColumn && !headerIndex.containsKey(normalize(filterColumn))) {
     die("Filter column '${filterColumn}' is not in the CSV. Columns: ${headers.join(', ')}")
 }
-if (binLocationFormat) {
-    (binLocationFormat =~ /\{([^}]+)\}/).collect { it[1].trim() }.each { String tok ->
-        if (!tok.equalsIgnoreCase('bin') && !headerIndex.containsKey(normalize(tok))) {
-            die("binLocationFormat references unknown token '{${tok}}'. Use {bin} or a CSV column name.\n" +
-                    "CSV columns are: ${headers.join(', ')}")
-        }
-    }
-}
 
 println "Using column mapping:"
 MAPPABLE_FIELDS.each { String f -> if (mapping[f]) println "  ${f.padRight(16)} <- ${mapping[f]}" }
@@ -352,9 +339,6 @@ dataRows.eachWithIndex { List<String> row, int i ->
     String binValue = idxBin != null ? cell(idxBin) : ''
     if (binValue && binBlankValues.contains(binValue.toLowerCase())) {
         binValue = ''   // source "no location" placeholder -> blank bin
-    }
-    if (binLocationFormat && binValue) {
-        binValue = applyBinFormat(binLocationFormat, binValue, row, headerIndex)
     }
 
     canonicalRows << [
@@ -752,18 +736,6 @@ static String normalize(String header) {
     return header == null ? '' : header.toLowerCase().replaceAll(/[^a-z0-9]/, '')
 }
 
-/** Build an OB bin name from a template: {bin} -> the mapped bin value, {Column} -> a source cell. */
-static String applyBinFormat(String template, String binValue, List<String> row, Map<String, Integer> headerIndex) {
-    return template.replaceAll(/\{([^}]+)\}/) { List<String> m ->
-        String tok = m[1].trim()
-        if (tok.equalsIgnoreCase('bin')) {
-            return binValue
-        }
-        Integer idx = headerIndex[normalize(tok)]
-        return (idx != null && idx < row.size()) ? (row[idx] ?: '').trim() : m[0]
-    }
-}
-
 static String shortReason(String reason) {
     if (reason.startsWith('non-numeric')) return 'non-numeric quantity'
     if (reason.startsWith('quantity 0')) return 'quantity 0'
@@ -809,9 +781,6 @@ OUTPUT:
   --default-bin <name>      Force a bin location for every row (default: blank)
   --bin-blank-values <a,b>  Source bin values that truly mean "no bin" -> blank (e.g. NONE).
                             Do NOT use for real staging/virtual bins; map those through as-is.
-  --bin-location-format <t> Template to build the OB bin name when it differs from the source
-                            code. {bin} = mapped bin value, {Column} = a source column.
-                            e.g. --bin-location-format "{bin} - 1"
   --comment <text>          Comment applied to rows without their own comment
 
 Config values are overridden by the equivalent command-line options.
