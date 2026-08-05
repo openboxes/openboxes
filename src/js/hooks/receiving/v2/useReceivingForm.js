@@ -45,7 +45,11 @@ const useReceivingForm = () => {
     dispatch(updateReceivingPutawayEnabled(receiptId, enabled));
   }, [dispatch, receiptId]);
   useReceivingBinLocations();
-  const { visibleLineItemsState, updateFilterParams } = useReceivingFilters({ lineItemsState });
+  const {
+    visibleLineItemsState,
+    updateFilterParams,
+    clearFilterParams,
+  } = useReceivingFilters({ lineItemsState });
   const { onLocationAutofill } = useTableLocationAutofill({
     lineItemsState: visibleLineItemsState,
     updateLineItems,
@@ -99,6 +103,7 @@ const useReceivingForm = () => {
       autosaveStatus,
       resetSort,
       updateFilterParams,
+      clearFilterParams,
     },
   };
 };
