@@ -16,6 +16,9 @@ package org.pih.warehouse
  *     /inventory/browse?layout=default   the unified design, just this once
  *     /inventory/browse?layout=custom    the original, just this once
  *
+ * Those two names are the only ones accepted. Anything else is ignored and
+ * the request renders normally.
+ *
  * This exists so the two can be compared side by side on a running instance
  * without a redeploy or a config change. It overrides in both directions, so
  * an instance that has opted in can still pull up the original.
@@ -46,12 +49,18 @@ class LayoutInterceptor {
     static final String OVERRIDE_ATTRIBUTE = 'org.pih.warehouse.layout.override'
 
     /**
-     * A layout name resolves to a GSP path under /layouts, so refuse anything
-     * that is not a plain name — this keeps "../" and other path tricks out of
-     * the view resolver. An unknown-but-well-formed name simply renders the
-     * page undecorated.
+     * Only these two may be requested. An allowlist rather than a pattern:
+     * any other name that reached the view resolver would be honoured, and
+     * several of them strip the page's chrome entirely. SiteMesh reserves
+     * "_none_" for "render undecorated", and print/email/mobile are real
+     * layouts with no navigation — all of which passed a name-shaped regex
+     * and removed the navigation from any page, for anyone.
+     *
+     * This parameter exists so the two candidates can be compared on a
+     * running instance; it is not a general layout selector.
      */
-    private static final java.util.regex.Pattern SAFE_LAYOUT_NAME = ~/^[a-zA-Z0-9_-]{1,50}$/
+    private static final Set<String> SELECTABLE_LAYOUTS =
+            Collections.unmodifiableSet(['custom', 'default'] as Set)
 
     LayoutInterceptor() {
         // Without an explicit match, an interceptor only applies to the
@@ -61,7 +70,7 @@ class LayoutInterceptor {
 
     boolean before() {
         String requested = params.layout
-        if (requested && SAFE_LAYOUT_NAME.matcher(requested).matches()) {
+        if (requested && SELECTABLE_LAYOUTS.contains(requested)) {
             request[LAYOUT_ATTRIBUTE] = requested
             request[OVERRIDE_ATTRIBUTE] = Boolean.TRUE
         }

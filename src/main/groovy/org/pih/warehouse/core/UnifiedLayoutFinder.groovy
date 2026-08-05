@@ -36,11 +36,12 @@ import javax.servlet.http.HttpServletRequest
  * when the resolved one is "custom", and leave react, mobile, print,
  * analytics, email and the rest untouched.
  *
- * CompileStatic is load-bearing. GroovyPageLayoutFinder overloads findLayout
- * for both Page and Content, and under dynamic dispatch `super.findLayout(...)`
- * re-resolves at runtime and can land back on this class — an infinite
- * recursion that surfaces as a StackOverflowError on the first decorated
- * request. Static compilation binds the super call to the Page overload.
+ * CompileStatic is load-bearing, empirically: without it this recursed on the
+ * first decorated request. GroovyPageLayoutFinder overloads findLayout for both
+ * Page and Content, and the dynamic-dispatch super call re-resolved back into
+ * this class (the stack showed super$2$findLayout -> findLayout repeating)
+ * until the stack overflowed. Static compilation binds it to the Page overload.
+ * Worth a regression test rather than trusting the comment.
  */
 @Slf4j
 @CompileStatic
