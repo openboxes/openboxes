@@ -169,6 +169,16 @@ String defaultBin = opts['default-bin'] ?: (configOptions['defaultBin'] ?: null)
 String comment = opts['comment'] ?: (configOptions['comment'] ?:
         "Inventory import ${new Date().format('yyyy-MM-dd')}")
 
+// Source bin values that mean "no location" and should become a blank bin (e.g. a "NOLOC"
+// placeholder). Kept generic: supply them per-source via config options.binBlankValues (a JSON
+// array) or --bin-blank-values a,b. Matched case-insensitively after trimming.
+Set<String> binBlankValues = [] as Set
+if (opts['bin-blank-values']) {
+    opts['bin-blank-values'].split(',').each { binBlankValues << it.trim().toLowerCase() }
+} else if (configOptions['binBlankValues'] instanceof List) {
+    (configOptions['binBlankValues'] as List).each { binBlankValues << it.toString().trim().toLowerCase() }
+}
+
 // ===========================================================================
 // Read the input CSV
 // ===========================================================================
@@ -303,12 +313,17 @@ dataRows.eachWithIndex { List<String> row, int i ->
         return
     }
 
+    String binValue = idxBin != null ? cell(idxBin) : ''
+    if (binValue && binBlankValues.contains(binValue.toLowerCase())) {
+        binValue = ''   // source "no location" placeholder -> blank bin
+    }
+
     canonicalRows << [
             productCode   : productCode,
             productName   : idxProductName != null ? cell(idxProductName) : '',
             lotNumber     : idxLot != null ? cell(idxLot) : '',
             expirationDate: '',
-            binLocation   : defaultBin ?: (idxBin != null ? cell(idxBin) : ''),
+            binLocation   : defaultBin ?: binValue,
             obQoh         : '',
             quantity      : qty,
             comments      : idxComment != null && cell(idxComment) ? cell(idxComment) : comment,
@@ -710,6 +725,7 @@ OUTPUT:
   --batch-size <n>          Rows per batch, products never split (default: 100; 0 = one file)
   --include-zero            Keep rows with quantity 0 (default: skip them)
   --default-bin <name>      Force a bin location for every row (default: blank)
+  --bin-blank-values <a,b>  Source bin values that mean "no location" -> blank (e.g. NOLOC)
   --comment <text>          Comment applied to rows without their own comment
 
 Config values are overridden by the equivalent command-line options.

@@ -19,6 +19,7 @@
   "options": {
     "includeZero": false,
     "defaultBin": "",
+    "binBlankValues": ["NOLOC"],
     "comment": "Inventory reconciliation import",
     "batchSize": 100,
     "format": "both"

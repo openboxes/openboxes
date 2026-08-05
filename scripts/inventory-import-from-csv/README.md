@@ -135,6 +135,7 @@ Inline `--mapping` / `--filter` also override individual entries from a `--confi
 --batch-size <n>          Rows per batch; products never split (default: 100; 0 = one file)
 --include-zero            Keep rows with quantity 0 (default: skip)
 --default-bin <name>      Force a bin location for every row (default: blank)
+--bin-blank-values <a,b>  Source bin values that mean "no location" -> blank (e.g. NOLOC)
 --comment <text>          Comment for rows without their own comment
 ```
 
@@ -197,7 +198,9 @@ run against a local instance (e.g. `--batch-size 20` when transforming) before t
   products are rejected **at import time** (stage 2), which trips the fail-fast abort.
 - **Bin / lot are left blank by default.** A bin or lot that doesn't already exist in the target
   depot causes OpenBoxes to reject that row. Only map them (or use `--default-bin`) when you know
-  they exist.
+  they exist. If you map a bin column, use **`binBlankValues`** (config) / `--bin-blank-values`
+  to turn "no location" placeholders (e.g. `NOLOC`) into a blank bin instead of a literal bin
+  named `NOLOC`. Everything else in the bin column must be a real bin location in the depot.
 
 ### ⚠️ Batching and the per-product zero-out (XLS / UI path)
 
