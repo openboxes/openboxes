@@ -10,7 +10,7 @@
          that have not opted in, so the browser tab does not change under them.
          default.gsp needs no such guard — it only renders when opted in. --}%
     <g:if test="${grailsApplication.config.getProperty('openboxes.unifiedLayout.enabled', Boolean, false)}">
-        <link rel="shortcut icon" href="${request.contextPath}/static/images/favicon.ico?v=blue2" type="image/x-icon"/>
+        <link rel="shortcut icon" href="${request.contextPath}/static/images/favicon-unified.ico?v=1" type="image/x-icon"/>
     </g:if>
     <g:else>
         <link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
