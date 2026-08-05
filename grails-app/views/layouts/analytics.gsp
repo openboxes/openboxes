@@ -6,7 +6,7 @@
     <title><warehouse:message code="openboxes.analytics.title" default="OpenBoxes Analytics"/> | <g:layoutTitle/></title>
 
     <!-- Include Favicon -->
-    <link rel="shortcut icon" href="${request.contextPath}/static/images/favicon.ico?v=blue2" type="image/x-icon" />
+    <link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
 
     <!-- CSS Stylesheets -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" type="text/css" media="all" />

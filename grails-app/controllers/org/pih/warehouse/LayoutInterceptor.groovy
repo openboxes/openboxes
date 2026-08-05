@@ -10,27 +10,40 @@ package org.pih.warehouse
  **/
 
 /**
- * Allows the SiteMesh layout to be overridden per request with a ?layout=
- * parameter, so the unified design can be compared against the previous one
- * without a redeploy:
+ * Lets a single request pick its own SiteMesh layout:
  *
- *     /inventory/browse                  -> layouts/custom.gsp  (the page's own meta;
- *                                                                now the unified theme)
- *     /inventory/browse?layout=legacy    -> layouts/legacy.gsp  (the previous appearance)
+ *     /inventory/browse                  the instance's configured layout
+ *     /inventory/browse?layout=default   the unified design, just this once
+ *     /inventory/browse?layout=custom    the original, just this once
  *
- * This works because GroovyPageLayoutFinder reads the "org.grails.layout.name"
- * request attribute FIRST and only falls back to the page's <meta name="layout">
- * when that attribute is absent — so setting it here takes precedence.
+ * This exists so the two can be compared side by side on a running instance
+ * without a redeploy or a config change. It overrides in both directions, so
+ * an instance that has opted in can still pull up the original.
  *
- * The override is per-request: it is not carried across links, so append the
- * parameter to each URL being compared.
+ * Whether an instance uses the unified layout by default is a config setting
+ * (openboxes.unifiedLayout.enabled) applied by UnifiedLayoutFinder, not by
+ * this class — an interceptor runs before the view is chosen, so it cannot
+ * tell which layout a page declares, and forcing one on every request wraps
+ * React, mobile and print pages in the wrong chrome. UnifiedLayoutFinder
+ * carries the detail.
  *
- * Intended as a temporary aid while the unified layout is being reviewed.
+ * Mechanism: GroovyPageLayoutFinder reads the "org.grails.layout.name" request
+ * attribute FIRST and only falls back to the page's own meta tag when that
+ * attribute is absent, so setting it here takes precedence for this request.
  */
 class LayoutInterceptor {
 
     /** Grails' GroovyPageLayoutFinder.LAYOUT_ATTRIBUTE. */
     private static final String LAYOUT_ATTRIBUTE = 'org.grails.layout.name'
+
+    /**
+     * Marks the layout as deliberately chosen for this request, so
+     * UnifiedLayoutFinder leaves it alone. Without this, ?layout=custom on an
+     * opted-in instance would be resolved as "custom" and then substituted
+     * straight back to the unified layout — the override would do nothing in
+     * the one direction a reviewer most needs it.
+     */
+    static final String OVERRIDE_ATTRIBUTE = 'org.pih.warehouse.layout.override'
 
     /**
      * A layout name resolves to a GSP path under /layouts, so refuse anything
@@ -50,6 +63,7 @@ class LayoutInterceptor {
         String requested = params.layout
         if (requested && SAFE_LAYOUT_NAME.matcher(requested).matches()) {
             request[LAYOUT_ATTRIBUTE] = requested
+            request[OVERRIDE_ATTRIBUTE] = Boolean.TRUE
         }
         return true
     }

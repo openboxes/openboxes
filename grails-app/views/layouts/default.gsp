@@ -1,16 +1,4 @@
 <%@ page import="com.newrelic.api.agent.NewRelic; java.util.Locale" %>
-<%-- Legacy layout: the appearance of custom.gsp BEFORE the uniform design
-     theme, preserved verbatim for side-by-side comparison.
-
-     No page declares this layout. It is reached only by appending
-     ?layout=legacy to any URL, which LayoutInterceptor turns into a
-     per-request layout override:
-
-         /inventory/browse                 -> layouts/custom.gsp  (unified theme)
-         /inventory/browse?layout=legacy   -> this file
-
-     Keep this file frozen — editing it defeats its only purpose. It can be
-     deleted, along with LayoutInterceptor, once the theme is signed off. --%>
 <?xml version="1.0" encoding="UTF-8"?>
 <html lang="en">
 <head>
@@ -29,7 +17,7 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
 
     <!-- Include Favicon -->
-    <link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
+    <link rel="shortcut icon" href="${request.contextPath}/static/images/favicon.ico?v=blue2" type="image/x-icon" />
 
     <!-- Include Main CSS -->
     <link rel="stylesheet" href="${resource(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="all" />
@@ -60,6 +48,10 @@
 
     <!-- Grails Layout : write head element for page-->
     <g:layoutHead />
+
+    <%-- Uniform design theme: must load after layoutHead (overrides page-specific CSS)
+         and before customCss (per-warehouse colors keep precedence) --%>
+    <link rel="stylesheet" href="${resource(dir:'css',file:'openboxes-theme.css')}?v=${g.meta(name: 'app.version')}" type="text/css" media="all" />
 
     <g:render template="/common/customCss"/>
     <g:render template="/common/fullstory"/>

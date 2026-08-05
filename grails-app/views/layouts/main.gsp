@@ -13,7 +13,7 @@
     <g:render template="/localization/crowdin"/>
     <g:googleSiteTag />
     <g:render template="/common/hotjar"/>
-    <link rel="shortcut icon" href="${request.contextPath}/static/images/favicon.ico?v=blue2" type="image/x-icon" />
+    <asset:link rel="icon" href="favicon.ico" type="image/x-ico"/>
 
     <asset:stylesheet src="application.css"/>
 

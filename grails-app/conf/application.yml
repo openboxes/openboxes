@@ -385,6 +385,17 @@ openboxes:
     bom:
         enabled: false
 
+    # Unified design layout.
+    #
+    # The 252 legacy pages all declare `meta layout="custom"`. Left alone they
+    # render layouts/custom.gsp exactly as they always have. Turning this on
+    # makes LayoutInterceptor serve layouts/default.gsp for those same pages
+    # instead — same markup, restyled to match the React pages.
+    #
+    # Off by default, so upgrading changes nothing until an instance opts in.
+    unifiedLayout:
+        enabled: false
+
     # User signup
     signup:
         enabled: true
