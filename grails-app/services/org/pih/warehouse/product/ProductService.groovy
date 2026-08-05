@@ -1306,7 +1306,10 @@ class ProductService {
         def results = Product.createCriteria().list {
             if (returnIds) {
                 projections {
-                    property("id")
+                    // Use distinct so the LEFT JOINs against the productSuppliers,
+                    // inventoryItems and synonyms collections don't return the same
+                    // product id once per joined row (Cartesian product).
+                    distinct("id")
                 }
             }
             createAlias('productSuppliers', 'ps', JoinType.LEFT_OUTER_JOIN)

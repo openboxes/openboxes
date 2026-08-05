@@ -809,9 +809,14 @@ class JsonController {
         if (params.term) {
             def terms = params?.term ? params?.term?.split(" ") : []
 
-            // Get all products that match terms
-            products = productService.searchProducts(terms, [])
-            products = products.unique()
+            // Only fetch the distinct matching product ids first, then hydrate the
+            // products by id. Fetching full entities directly from searchProducts
+            // returns one (duplicate) Product per row of the Cartesian product
+            // produced by the LEFT JOINs against the productSuppliers, inventoryItems
+            // and synonyms collections - which is very expensive for products that
+            // have many inventory items.
+            def productIds = productService.searchProducts(terms, [], true)
+            products = productIds ? Product.findAllByIdInList(productIds) : []
 
             if (terms) {
                 products = products.sort() {
@@ -1044,9 +1049,12 @@ class JsonController {
             return
         }
 
-        // Get all products that match terms
-        def products = productService.searchProducts(terms, [])
-        products = products.unique()
+        // Only fetch the distinct matching product ids first, then hydrate the
+        // products by id. Fetching full entities directly returns one (duplicate)
+        // Product per row of the Cartesian product produced by the LEFT JOINs
+        // against the productSuppliers, inventoryItems and synonyms collections.
+        def productIds = productService.searchProducts(terms, [], true)
+        def products = productIds ? Product.findAllByIdInList(productIds) : []
 
         // Only calculate quantities if there are products - otherwise this will calculate quantities for all products in the system
         def location = Location.get(session.warehouse.id)
