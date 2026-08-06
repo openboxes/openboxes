@@ -48,6 +48,32 @@ genuine stock-outs rather than QoH drift between the two systems.
 
 ---
 
+## Where to keep import data
+
+The files for a specific import — its source CSV, its site-specific mapping config, and the
+generated batches — are operator/data-specific and should **not** be committed. Rather than
+`.gitignore`-ing each one, use the ignored **`instances/`** folder: put each import in its own
+subfolder there and it's excluded automatically (one rule, every instance):
+
+```
+instances/vipr/
+├── partsmaster.csv     # the source export
+├── mapping.json        # the site-specific column mapping
+└── out/                # generated batches + skipped-records.csv
+```
+
+```bash
+groovy CsvToInventoryImport.groovy \
+    --input instances/vipr/partsmaster.csv \
+    --config instances/vipr/mapping.json \
+    --output-dir instances/vipr/out --clean
+```
+
+Or keep it out of the repo entirely — the scripts take absolute paths, so a scratch dir anywhere
+on disk works just as well. Only the tool itself and the generic `mapping.example.json` are tracked.
+
+---
+
 ## Stage 1 — transform (`CsvToInventoryImport.groovy`)
 
 ```bash
