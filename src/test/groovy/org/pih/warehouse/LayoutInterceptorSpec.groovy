@@ -19,35 +19,35 @@ class LayoutInterceptorSpec extends Specification {
         LayoutInterceptor.isSelectable(requested) == (outcome == 'accepted')
 
         where:
-        requested  | outcome
+        requested     || outcome
         // the two the comparison feature exists for
-        'custom'   | 'accepted'
-        'default'  | 'accepted'
+        'custom'      || 'accepted'
+        'default'     || 'accepted'
 
         // SiteMesh's reserved name: renders the page with no decoration at all
-        '_none_'   | 'rejected'
+        '_none_'      || 'rejected'
 
         // real layouts that carry no navigation
-        'print'    | 'rejected'
-        'email'    | 'rejected'
-        'mobile'   | 'rejected'
-        'react'    | 'rejected'
-        'analytics' | 'rejected'
+        'print'       || 'rejected'
+        'email'       || 'rejected'
+        'mobile'      || 'rejected'
+        'react'       || 'rejected'
+        'analytics'   || 'rejected'
 
         // path traversal, which the old regex did catch
-        '../custom' | 'rejected'
-        '/etc/passwd' | 'rejected'
-        'a/b'      | 'rejected'
+        '../custom'   || 'rejected'
+        '/etc/passwd' || 'rejected'
+        'a/b'         || 'rejected'
 
         // exact match only — no case folding, no padding
-        'Custom'   | 'rejected'
-        'DEFAULT'  | 'rejected'
-        ' custom'  | 'rejected'
-        'custom '  | 'rejected'
-        'customx'  | 'rejected'
+        'Custom'      || 'rejected'
+        'DEFAULT'     || 'rejected'
+        ' custom'     || 'rejected'
+        'custom '     || 'rejected'
+        'customx'     || 'rejected'
 
         // absent or empty means "no opinion", not "pick something"
-        null       | 'rejected'
-        ''         | 'rejected'
+        null || 'rejected'
+        ''            || 'rejected'
     }
 }
