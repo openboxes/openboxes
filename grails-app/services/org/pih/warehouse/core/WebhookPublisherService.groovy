@@ -96,6 +96,8 @@ class WebhookPublisherService {
                 requisitionNumber: requisition.requestNumber,
                 requisitionType: requisition.type,
                 deliveryTypeCode: requisition.deliveryTypeCode.toString(),
+                requestedBy: requisition.requestedBy?.toJson(),
+                createdBy: requisition.createdBy?.toJson(),
                 lines: requisition.requisitionItems?.collect { RequisitionItem item ->
                     [
                             productId: item.product.id,
@@ -103,7 +105,10 @@ class WebhookPublisherService {
                             requisitionItemType: item.requisitionItemType.name(),
                             quantityRequested: item.quantity,
                             quantityCanceled: item.quantityCanceled ?: 0,
+                            quantityAllocated: item.calculateQuantityAllocated(),
+                            quantityPicked: item.calculateQuantityPicked(),
                             quantityIssued: item.quantityIssued,
+                            reasonCode: item.picklistItems?.reasonCode,
                             outboundContainers: item?.picklistItems?.outboundContainer?.findAll { it }?.unique()?.collect { it ->
                                 [
                                         id: it.id,
@@ -118,7 +123,7 @@ class WebhookPublisherService {
                                         name: it.name
                                 ]
                             } ?: [],
-                            stagedBy: item?.picklistItems?.stagedBy?.findAll { it }?.unique()?.name ?: [],
+                            stagedBy: item?.picklistItems?.stagedBy?.findAll { it }?.unique()?.collect { it.toJson()  } ?: [],
                             dateStaged: item?.picklistItems?.dateStaged?.findAll { it }?.unique() ?: []
                     ]
                 },
