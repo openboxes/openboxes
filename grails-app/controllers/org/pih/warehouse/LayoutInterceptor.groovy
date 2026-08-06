@@ -67,7 +67,7 @@ class LayoutInterceptor {
      * can be tested without standing up the interceptor.
      */
     static boolean isSelectable(String requested) {
-        return requested != null && SELECTABLE_LAYOUTS.contains(requested)
+        return SELECTABLE_LAYOUTS.contains(requested)
     }
 
     LayoutInterceptor() {
