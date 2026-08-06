@@ -131,6 +131,41 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         assert result.receiptItems.every { it.quantityReceived == 0 && !it.isSplitItem }
     }
 
+    void 'startReceipt should assign the receiving bin of the shipment to every line it creates'() {
+        given:
+        Shipment shipment = buildReceivableShipment([buildShipmentItem(100), buildShipmentItem(50)])
+        Location receivingBin = new Location(name: "R-TEST")
+
+        when:
+        service.startReceipt(shipment.id)
+
+        then:
+        1 * receiptIdentifierService.generate(_ as Receipt) >> "RCPT-001"
+        1 * receiptService.createTemporaryReceivingBin(shipment) >> receivingBin
+
+        and: 'every line starts out in the receiving bin, so it is received into it unless the user moves it'
+        Set<ReceiptItem> receiptItems = shipment.receipts.first().receiptItems
+        assert receiptItems.size() == 2
+        assert receiptItems.every { it.binLocation == receivingBin }
+    }
+
+    void 'startReceipt should leave its lines without a bin when the shipment has no receiving bin'() {
+        given:
+        Shipment shipment = buildReceivableShipment([buildShipmentItem(100)])
+
+        when:
+        service.startReceipt(shipment.id)
+
+        then:
+        1 * receiptIdentifierService.generate(_ as Receipt) >> "RCPT-001"
+        1 * receiptService.createTemporaryReceivingBin(shipment) >> null
+
+        and: 'the lines are created, just without a bin'
+        Set<ReceiptItem> receiptItems = shipment.receipts.first().receiptItems
+        assert receiptItems.size() == 1
+        assert receiptItems.every { it.binLocation == null }
+    }
+
     void 'startReceipt should skip shipment items already fully consumed by previous receipts'() {
         given: 'one shipment item fully received by a completed receipt and one still left to receive'
         ShipmentItem consumedItem = buildShipmentItem(30)
