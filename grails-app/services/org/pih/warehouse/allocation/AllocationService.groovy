@@ -19,6 +19,7 @@ import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
@@ -34,6 +35,7 @@ class AllocationService {
     GrailsApplication grailsApplication
     AuthService authService
     RequisitionService requisitionService
+    ProductAvailabilityService productAvailabilityService
 
     AllocationSourceStrategyHandlerResolver allocationSourceStrategyHandlerResolver = new AllocationSourceStrategyHandlerResolver()
     RotationStrategyResolver rotationStrategyResolver = new RotationStrategyResolver()
@@ -244,6 +246,10 @@ class AllocationService {
 
                 if (requisition.autoIssuanceRequested) {
                     stockMovementService.issueRequisition(requisition)
+                    // TODO this is sync refresh as a temporary workaround for async refresh after transaction creation
+                    //  it should be implemented in better way, ticket for it - OBLS-937
+                    productAvailabilityService.refreshProductsAvailability(
+                            requisition.origin?.id, requisition.requisitionItems*.product*.id, false)
                 } else {
                     stockMovementService.updateRequisitionStatus(requisitionId, RequisitionStatus.PICKING)
                 }
