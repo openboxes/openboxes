@@ -1,5 +1,6 @@
 package org.pih.warehouse.api
 
+import grails.converters.JSON
 import grails.testing.gorm.DataTest
 import grails.testing.web.controllers.ControllerUnitTest
 import org.grails.web.json.JSONArray
@@ -21,6 +22,7 @@ class ProductAvailabilityApiControllerSpec extends Specification
 
     void setupSpec() {
         mockDomains(Location, Product, InventoryItem)
+        JSON.registerObjectMarshaller(AvailableItem) { it.toJson() }
     }
 
     void setup() {
