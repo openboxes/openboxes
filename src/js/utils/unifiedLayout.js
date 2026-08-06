@@ -8,4 +8,4 @@
  */
 // eslint-disable-next-line import/prefer-default-export
 export const isUnifiedLayout = () =>
-  typeof window !== 'undefined' && window.UNIFIED_LAYOUT === true;
+  window?.UNIFIED_LAYOUT === true;
