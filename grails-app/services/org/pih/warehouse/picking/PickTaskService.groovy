@@ -198,8 +198,8 @@ class PickTaskService {
         Location outboundContainer = Location.findByLocationNumberOrId(outboundContainerId, outboundContainerId)
         validateOutboundContainer(outboundContainer, task)
 
-        executeStateTransition(task, PickTaskStatus.PICKED)
         transferToContainer(task, outboundContainer, task.quantityRequired.toInteger())
+        executeStateTransition(task, PickTaskStatus.PICKED)
 
         PicklistItem existingPickItem = PicklistItem.get(task.id)
         existingPickItem.pickedBy = Person.get(pickedById)
@@ -390,9 +390,9 @@ class PickTaskService {
             List<PickTask> tasks = PickTask.findAllByOutboundContainerAndInventoryItemAndStatus(
                     outboundContainer, item.inventoryItem, PickTaskStatus.PICKED)
             tasks.each { task ->
-                executeStateTransition(task, PickTaskStatus.STAGED)
                 transferToStaging(task, item, stagingLocation)
 
+                executeStateTransition(task, PickTaskStatus.STAGED)
                 PicklistItem existingPickItem = PicklistItem.get(task.id)
                 existingPickItem.stagingLocation = stagingLocation
                 existingPickItem.dateStaged = new Date()
@@ -431,7 +431,7 @@ class PickTaskService {
         command.location = item.binLocation?.parentLocation
         command.binLocation = item.binLocation
         command.inventoryItem = item.inventoryItem
-        command.quantity = item.quantityOnHand.toInteger()
+        command.quantity = task.quantityPicked.toInteger()
         command.otherLocation = item.binLocation?.parentLocation
         command.otherBinLocation = stagingLocation
         command.transferOut = Boolean.TRUE
@@ -443,6 +443,12 @@ class PickTaskService {
         task.discard()
 
         Transaction transaction = inventoryService.transferStock(command)
+        if (transaction.hasErrors()) {
+            String errorMessage = transaction.errors.allErrors.collect { it.defaultMessage ?: it.code }.join('; ')
+            throw new ValidationException(
+                    "Unable to transfer stock for pick task ${task.identifier} (order ${task.requisitionNumber}): ${errorMessage}",
+                    transaction.errors)
+        }
         transaction.transactionSource = createPickTaskTransactionSource(task)
 
         grailsApplication.mainContext.publishEvent(new PickTaskUpdateEvent(task))
