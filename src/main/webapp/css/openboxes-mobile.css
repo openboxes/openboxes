@@ -546,6 +546,18 @@ form[action*="handleLogin"] .btn-outline-primary:focus {
   border-bottom: none;
 }
 
+/* The markup keeps Bootstrap's table-bordered so the un-themed layout
+   still has its grid borders; in stack mode the card outline replaces
+   them, so strip the cell borders it would draw inside each card. */
+.table-stack.table-bordered > :not(caption) > * > * {
+  border-width: 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.table-stack.table-bordered > tbody > tr > td:last-child {
+  border-bottom: none;
+}
+
 .table-stack > tbody > tr > td::before {
   content: attr(data-label);
   flex: 0 0 auto;

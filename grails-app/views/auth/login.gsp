@@ -17,13 +17,18 @@
 			<g:hiddenField name="targetUri" value="${params?.targetUri}" />
 			<g:hiddenField id="browserTimezone" name="browserTimezone" />
 
+		    <g:set var="unifiedLayout" value="${grailsApplication.config.getProperty('openboxes.unifiedLayout.enabled', Boolean, false)}"/>
 		    <div id="loginContainer" class="dialog">
 				<div id="loginForm">
-					%{-- Brand first: session-timeout and validation notices read
+					%{-- Unified design only — openboxes-theme.css sizes this;
+					     without it the raw image renders at natural size.
+					     Brand first: session-timeout and validation notices read
 					     as messages about the page below, not above, the logo. --}%
-					<div class="login-brand">
-						<img src="${request.contextPath}/static/images/logo/logo-blue.png" alt="OpenBoxes logo"/>
-					</div>
+					<g:if test="${unifiedLayout}">
+						<div class="login-brand">
+							<img src="${request.contextPath}/static/images/logo/logo-blue.png" alt="OpenBoxes logo"/>
+						</div>
+					</g:if>
 
 					<g:if test="${flash.message}">
 					    <div class="message" role="status" aria-label="message">${flash.message}</div>
@@ -82,10 +87,11 @@
 
 			var timezone = jzTimezoneDetector.determine_timezone().timezone; // Now you have an instance of the TimeZone object.
 			$("#browserTimezone").val(timezone.olson_tz); // Set the user timezone offset as a hidden input
-            %{-- capitalize() lifts only the first letter, so the placeholder
-                 reads as a sentence in whichever locale supplied it --}%
-            $("#username").watermark("${warehouse.message(code:'login.username.label')?.capitalize()}");
-		    $("#password").watermark("${warehouse.message(code:'login.password.label')?.capitalize()}");
+            %{-- Unified design capitalizes the placeholders (first letter
+                 only, so it reads as a sentence in whichever locale supplied
+                 it); classic keeps the label verbatim. --}%
+            $("#username").watermark("${unifiedLayout ? warehouse.message(code:'login.username.label')?.capitalize() : warehouse.message(code:'login.username.label')}");
+		    $("#password").watermark("${unifiedLayout ? warehouse.message(code:'login.password.label')?.capitalize() : warehouse.message(code:'login.password.label')}");
 			$("#username").focus();
 
             openboxes.expireFromLocal();

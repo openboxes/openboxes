@@ -12,8 +12,10 @@
         %{-- table-stack turns each row into a label/value card: five columns
              of text cannot be a grid on a phone. The labels come from
              data-label on each cell, so the header row is hidden but the
-             column names still travel with the data. --}%
-        <table class="table table-stack">
+             column names still travel with the data. table-bordered stays so
+             the un-themed layout keeps its borders; the themed stylesheet
+             neutralizes it when stacking. --}%
+        <table class="table table-bordered table-stack">
             <thead>
                 <tr>
                     <th><g:message code="stockMovement.status.label"/></th>
