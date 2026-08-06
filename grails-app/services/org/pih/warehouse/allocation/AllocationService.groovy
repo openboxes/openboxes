@@ -246,6 +246,8 @@ class AllocationService {
 
                 if (requisition.autoIssuanceRequested) {
                     stockMovementService.issueRequisition(requisition)
+                    // TODO this is sync refresh as a temporary workaround for async refresh after transaction creation
+                    //  it should be implemented in better way, ticket for it - OBLS-937
                     productAvailabilityService.refreshProductsAvailability(
                             requisition.origin?.id, requisition.requisitionItems*.product*.id, false)
                 } else {
