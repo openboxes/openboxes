@@ -13,6 +13,7 @@ jest.mock('react-localize-redux', () => ({
     { code: 'en', name: 'English' },
     { code: 'fr', name: 'French' },
   ],
+  getTranslate: () => (id) => id,
   setActiveLanguage: (code) => ({ type: 'SET_ACTIVE_LANGUAGE', payload: code }),
 }));
 
@@ -25,6 +26,7 @@ jest.mock('utils/Translate', () => ({
   // Render the id so assertions can find labelled sections without pulling in
   // the real localization store.
   default: ({ id, defaultMessage }) => defaultMessage || id,
+  translateWithDefaultMessage: () => (id, defaultMessage) => defaultMessage || id,
 }));
 
 const mockStore = configureStore();
@@ -128,6 +130,9 @@ describe('Footer layout gating', () => {
 
       const label = container.querySelector('label[for="footer-details-toggle"]');
       expect(label).toBeInTheDocument();
+      // the accessible name goes through the localization layer, not a
+      // hard-coded string (the GSP footer uses the same message key)
+      expect(label).toHaveAttribute('aria-label', 'Build information');
     });
   });
 

@@ -2,12 +2,12 @@ import React from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { getLanguages, setActiveLanguage } from 'react-localize-redux';
+import { getLanguages, getTranslate, setActiveLanguage } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import { changeCurrentLocale } from 'actions';
 import { DISABLE_LOCALIZATION, ENABLE_LOCALIZATION } from 'api/urls';
-import Translate from 'utils/Translate';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { isUnifiedLayout } from 'utils/unifiedLayout';
 
 const Footer = ({
@@ -27,6 +27,7 @@ const Footer = ({
   buildDate,
   localizationModeEnabled,
   localizationModeLocale,
+  translate,
 }) => {
   /*
    * Two footers, chosen at render time. The unified one collapses the build
@@ -204,8 +205,8 @@ const Footer = ({
         <label
           htmlFor="footer-details-toggle"
           className="footer-toggle-icon"
-          title="Build information"
-          aria-label="Build information"
+          title={translate('react.default.buildInformation.label', 'Build information')}
+          aria-label={translate('react.default.buildInformation.label', 'Build information')}
         />
       </div>
       <div className="footer-details">
@@ -359,6 +360,7 @@ const mapStateToProps = (state) => ({
   languages: getLanguages(state.localize),
   localizationModeEnabled: state.session.localizationModeEnabled,
   localizationModeLocale: state.session.localizationModeLocale,
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 const mapDispatchToProps = {
@@ -369,6 +371,7 @@ const mapDispatchToProps = {
 export default connect(mapStateToProps, mapDispatchToProps)(Footer);
 
 Footer.propTypes = {
+  translate: PropTypes.func.isRequired,
   languages: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   setLanguage: PropTypes.func.isRequired,
   /** Function called to change the currently selected location */
