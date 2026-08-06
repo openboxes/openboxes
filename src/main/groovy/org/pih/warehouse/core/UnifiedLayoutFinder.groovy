@@ -2,10 +2,10 @@ package org.pih.warehouse.core
 
 import com.opensymphony.module.sitemesh.Decorator
 import com.opensymphony.module.sitemesh.Page
-import grails.util.Holders
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.grails.web.sitemesh.GroovyPageLayoutFinder
+import org.springframework.beans.factory.annotation.Value
 
 import javax.servlet.http.HttpServletRequest
 
@@ -70,6 +70,14 @@ class UnifiedLayoutFinder extends GroovyPageLayoutFinder {
     static final String OVERRIDE_ATTRIBUTE = 'org.pih.warehouse.layout.override'
 
     /**
+     * Bound once at startup. Cached rather than read per request (reviewer
+     * preference): changing the flag needs a restart either way, since the
+     * external config files are themselves only read at startup.
+     */
+    @Value('\${openboxes.unifiedLayout.enabled:false}')
+    boolean unifiedLayoutEnabled
+
+    /**
      * Only the Page overload is overridden; the Content overload in the
      * superclass delegates to this one.
      */
@@ -80,7 +88,7 @@ class UnifiedLayoutFinder extends GroovyPageLayoutFinder {
             return null
         }
         boolean explicitOverride = request.getAttribute(OVERRIDE_ATTRIBUTE) != null
-        if (!shouldSubstitute(resolved.name, isEnabled(), explicitOverride)) {
+        if (!shouldSubstitute(resolved.name, unifiedLayoutEnabled, explicitOverride)) {
             return resolved
         }
         Decorator unified = getNamedDecorator(request, UNIFIED_LAYOUT)
@@ -103,11 +111,4 @@ class UnifiedLayoutFinder extends GroovyPageLayoutFinder {
         return resolvedLayout == DECLARED_LAYOUT && enabled && !explicitOverride
     }
 
-    /**
-     * Read per request rather than cached: config can come from an external
-     * file, and a cached value would need a restart to pick up a change.
-     */
-    private static boolean isEnabled() {
-        return Holders.config?.getProperty('openboxes.unifiedLayout.enabled', Boolean, Boolean.FALSE)
-    }
 }

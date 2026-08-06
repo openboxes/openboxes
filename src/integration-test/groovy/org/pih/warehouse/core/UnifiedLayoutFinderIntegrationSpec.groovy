@@ -32,22 +32,29 @@ import spock.lang.Unroll
  */
 class UnifiedLayoutFinderIntegrationSpec extends IntegrationSpec {
 
-    private static final String CONFIG_KEY = 'openboxes.unifiedLayout.enabled'
-
     GroovyPageLayoutFinder groovyPageLayoutFinder
 
-    private Boolean originalSetting
+    private boolean originalSetting
 
     def setup() {
-        originalSetting = Holders.config.getProperty(CONFIG_KEY, Boolean, Boolean.FALSE)
+        originalSetting = finder.unifiedLayoutEnabled
     }
 
     def cleanup() {
         optIn(originalSetting)
     }
 
+    private UnifiedLayoutFinder getFinder() {
+        return (UnifiedLayoutFinder) groovyPageLayoutFinder
+    }
+
+    /**
+     * The flag is a @Value field bound once at startup, so the tests toggle
+     * the bean's own property — there is no runtime config path to it, by
+     * design (changing the flag on a real instance is a restart).
+     */
     private void optIn(boolean enabled) {
-        Holders.config.merge([openboxes: [unifiedLayout: [enabled: enabled]]])
+        finder.unifiedLayoutEnabled = enabled
     }
 
     /** A page as SiteMesh presents it, declaring the layout in its meta tag. */
@@ -94,6 +101,15 @@ class UnifiedLayoutFinderIntegrationSpec extends IntegrationSpec {
     void "the application's layout finder is the unified one"() {
         expect: 'the post-processor ran against the real context'
         groovyPageLayoutFinder instanceof UnifiedLayoutFinder
+    }
+
+    void "the flag field was bound from configuration at startup"() {
+        // compared against resolved config, not a literal — a developer
+        // machine may carry an external openboxes-config.properties that
+        // flips the flag for local demo runs
+        expect: 'the @Value binding agrees with resolved configuration'
+        finder.unifiedLayoutEnabled ==
+                Holders.config.getProperty('openboxes.unifiedLayout.enabled', Boolean, Boolean.FALSE)
     }
 
     void "the finder kept the wiring the GSP plugin gave it"() {
