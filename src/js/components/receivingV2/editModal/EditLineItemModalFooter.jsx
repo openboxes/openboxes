@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import Button from 'components/form-elements/Button';
 import SummaryInfo from 'utils/SummaryInfo';
 
-const EditLineItemModalFooter = ({ summaryData, onClose, onSave }) => (
+const EditLineItemModalFooter = ({ summaryData, onClose, isSaveDisabled }) => (
   <>
     <div className="mt-4">
       <SummaryInfo data={summaryData} />
@@ -21,7 +21,8 @@ const EditLineItemModalFooter = ({ summaryData, onClose, onSave }) => (
         label="react.default.button.save.label"
         defaultLabel="Save"
         variant="primary"
-        onClick={onSave}
+        type="submit"
+        disabled={isSaveDisabled}
       />
     </div>
   </>
@@ -33,7 +34,11 @@ EditLineItemModalFooter.propTypes = {
     data: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   })).isRequired,
   onClose: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired,
+  isSaveDisabled: PropTypes.bool,
+};
+
+EditLineItemModalFooter.defaultProps = {
+  isSaveDisabled: false,
 };
 
 export default EditLineItemModalFooter;

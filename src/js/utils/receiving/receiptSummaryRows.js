@@ -28,6 +28,7 @@ const buildLineItem = ({ summary, receiptItem, usersById }) => {
     totalQuantityReceived = 0,
     totalQuantityCanceled = 0,
   } = summary;
+
   // Items saved on the pending receipt (currentReceiptItems) are "receiving now", not
   // received, so only submitted receipts (previousReceiptItems) count as received.
   const quantityPreviouslyReceived = previousReceiptItems.reduce(

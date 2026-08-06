@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import PropTypes from 'prop-types';
 import {
@@ -34,6 +34,7 @@ const ReceivingFilters = ({
   autosaveStatus,
   onResetSort,
   updateFilterParams,
+  clearFilterParams,
 }) => {
   const translate = useTranslate();
   // Add loading for filters section. Loading will display before the translations are fetched.
@@ -42,6 +43,14 @@ const ReceivingFilters = ({
   // Recomputed whenever translations change, so that the field configs hold
   // already translated labels.
   const fields = useMemo(() => filterFields(translate), [translate]);
+
+  // Clearing the filters is not a submit, so the snapshot of matching rows has to be
+  // dropped here as well - otherwise the table would keep showing the previously
+  // filtered rows until the next search.
+  const onClear = useCallback((form) => {
+    form.reset({});
+    clearFilterParams();
+  }, [clearFilterParams]);
 
   return (
     <div className="receiving-filters">
@@ -61,6 +70,7 @@ const ReceivingFilters = ({
         searchFieldDefaultPlaceholder="Search..."
         filterFields={fields}
         updateFilterParams={updateFilterParams}
+        onClear={onClear}
         disableAutoUpdateFilterParams
         allowEmptySubmit
         hidden={false}
@@ -130,6 +140,7 @@ ReceivingFilters.propTypes = {
   autosaveStatus: PropTypes.oneOf(Object.values(AutosaveStatus)).isRequired,
   onResetSort: PropTypes.func.isRequired,
   updateFilterParams: PropTypes.func.isRequired,
+  clearFilterParams: PropTypes.func.isRequired,
 };
 
 export default ReceivingFilters;

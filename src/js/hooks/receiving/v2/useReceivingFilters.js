@@ -20,6 +20,8 @@ const useReceivingFilters = ({ lineItemsState }) => {
     setVisibleShipmentItemIds(computeVisibleShipmentItemIds(lineItemsState, params));
   }, [lineItemsState]);
 
+  const clearFilterParams = useCallback(() => setVisibleShipmentItemIds(null), []);
+
   // The same `lineItemsState`, but `ids` only has the rows that match the filter.
   // `entities` still has all rows, so callers can find any row by its rowId.
   const visibleLineItemsState = useMemo(
@@ -27,7 +29,7 @@ const useReceivingFilters = ({ lineItemsState }) => {
     [lineItemsState, visibleShipmentItemIds],
   );
 
-  return { visibleLineItemsState, updateFilterParams };
+  return { visibleLineItemsState, updateFilterParams, clearFilterParams };
 };
 
 export default useReceivingFilters;

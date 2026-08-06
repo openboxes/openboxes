@@ -31,6 +31,7 @@ const ReceivingStep = ({ flushRef }) => {
       autosaveStatus,
       resetSort,
       updateFilterParams,
+      clearFilterParams,
     },
   } = useReceivingForm();
 
@@ -50,6 +51,7 @@ const ReceivingStep = ({ flushRef }) => {
         autosaveStatus={autosaveStatus}
         onResetSort={resetSort}
         updateFilterParams={updateFilterParams}
+        clearFilterParams={clearFilterParams}
       />
       <ReceivingTable
         lineItemsState={lineItemsState}
