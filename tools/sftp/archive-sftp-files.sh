@@ -28,8 +28,8 @@
 #   the first run only prints what WOULD be archived.
 #
 #     SFTP_HOST=sftp.example.com \
-#     SFTP_USER=vvg \
-#     SFTP_KEY=~/.ssh/vvg_sftp \
+#     SFTP_USER=sftpuser \
+#     SFTP_KEY=~/.ssh/sftp_key \
 #     SFTP_DIRS="/data/integration" \
 #     DRY_RUN=true \
 #     ./archive-sftp-files.sh
