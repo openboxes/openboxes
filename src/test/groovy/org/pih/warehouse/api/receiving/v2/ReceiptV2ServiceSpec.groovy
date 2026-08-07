@@ -122,6 +122,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         assert originalItem.product == firstShipmentItem.product
         assert originalItem.inventoryItem == firstShipmentItem.inventoryItem
         assert originalItem.sortOrder == 0
+        assert originalItem.binLocation == null
         assert firstShipmentItem.receiptItems.contains(originalItem)
         assert receipt.receiptItems.find { it.shipmentItem == secondShipmentItem }.quantityShipped == 50
 
@@ -147,23 +148,6 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         Set<ReceiptItem> receiptItems = shipment.receipts.first().receiptItems
         assert receiptItems.size() == 2
         assert receiptItems.every { it.binLocation == receivingBin }
-    }
-
-    void 'startReceipt should leave its lines without a bin when the shipment has no receiving bin'() {
-        given:
-        Shipment shipment = buildReceivableShipment([buildShipmentItem(100)])
-
-        when:
-        service.startReceipt(shipment.id)
-
-        then:
-        1 * receiptIdentifierService.generate(_ as Receipt) >> "RCPT-001"
-        1 * receiptService.createTemporaryReceivingBin(shipment) >> null
-
-        and: 'the lines are created, just without a bin'
-        Set<ReceiptItem> receiptItems = shipment.receipts.first().receiptItems
-        assert receiptItems.size() == 1
-        assert receiptItems.every { it.binLocation == null }
     }
 
     void 'startReceipt should skip shipment items already fully consumed by previous receipts'() {

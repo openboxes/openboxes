@@ -56,6 +56,7 @@ const useReceivingHeader = () => {
     dispatch(updateReceivingHeader({
       headerInfo: buildHeaderInfo(data),
       isShipmentFromPurchaseOrder: Boolean(data?.isFromOrder),
+      shipmentId,
       shipmentNumber: data?.identifier,
       shipmentDetails: {
         origin: data?.origin?.name,

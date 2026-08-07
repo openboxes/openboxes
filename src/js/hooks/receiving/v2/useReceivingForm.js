@@ -3,7 +3,13 @@ import {
 } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { getReceivingBin, getReceivingPutawayEnabled, getReceivingView } from 'selectors';
+import { useParams } from 'react-router-dom';
+import {
+  getReceivingBin,
+  getReceivingBinLocationsFetchedForShipment,
+  getReceivingPutawayEnabled,
+  getReceivingView,
+} from 'selectors';
 
 import { updateReceivingPutawayEnabled, updateReceivingView } from 'actions';
 import useReceivingActions from 'hooks/receiving/v2/useReceivingActions';
@@ -12,15 +18,19 @@ import useReceivingColumns from 'hooks/receiving/v2/useReceivingColumns';
 import useReceivingFilters from 'hooks/receiving/v2/useReceivingFilters';
 import useTableLocationAutofill from 'hooks/receiving/v2/useTableLocationAutofill';
 import useTableSorting from 'hooks/useTableSorting';
-import isAnyBinLocationOtherThanDefault from 'utils/receiving/isAnyBinLocationOtherThanDefault';
+import anyLineHasOtherBin from 'utils/receiving/anyLineHasOtherBin';
 
 const useReceivingForm = () => {
   const dispatch = useDispatch();
+  const { shipmentId } = useParams();
   // The selected view is shared through redux, so the check step renders in the
   // view chosen here.
   const view = useSelector(getReceivingView);
   const setView = useCallback((newView) => dispatch(updateReceivingView(newView)), [dispatch]);
   const receivingBin = useSelector(getReceivingBin);
+  const binLocationsFetched = useSelector(
+    (state) => getReceivingBinLocationsFetchedForShipment(state, shipmentId),
+  );
   const {
     sortableProps, sort, order, resetSort,
   } = useTableSorting();
@@ -60,14 +70,14 @@ const useReceivingForm = () => {
   // visible: a bin other than the receiving bin, or any bin at all when there is no receiving bin.
   const putawayInitialized = useRef(false);
   useEffect(() => {
-    if (putawayInitialized.current || !lineItemsState?.ids?.length) {
+    if (putawayInitialized.current || !binLocationsFetched || !lineItemsState?.ids?.length) {
       return;
     }
     putawayInitialized.current = true;
-    if (isAnyBinLocationOtherThanDefault(lineItemsState, receivingBin)) {
+    if (anyLineHasOtherBin(lineItemsState, receivingBin)) {
       setPutawayEnabled(true);
     }
-  }, [lineItemsState, receivingBin]);
+  }, [lineItemsState, receivingBin, binLocationsFetched]);
   const { columns } = useReceivingColumns({
     view,
     putawayEnabled,

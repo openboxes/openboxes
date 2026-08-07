@@ -845,6 +845,7 @@ export const updateWorkflowHeader = (headerInfo, headerStatus) => ({
 export const updateReceivingHeader = ({
   headerInfo,
   isShipmentFromPurchaseOrder,
+  shipmentId,
   shipmentNumber,
   shipmentDetails,
 }) => ({
@@ -852,15 +853,17 @@ export const updateReceivingHeader = ({
   payload: {
     headerInfo,
     isShipmentFromPurchaseOrder,
+    shipmentId,
     shipmentNumber,
     shipmentDetails,
   },
 });
 
-export const updateReceivingBinLocations = (binLocations) => ({
+export const updateReceivingBinLocations = (binLocations, shipmentId) => ({
   type: UPDATE_RECEIVING_BIN_LOCATIONS,
   payload: {
     binLocations,
+    shipmentId,
   },
 });
 

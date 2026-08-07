@@ -10,9 +10,13 @@ import { ReceivingView } from 'consts/receivingViewOptions';
 const initialState = {
   headerInfo: [],
   isShipmentFromPurchaseOrder: false,
+  shipmentId: null,
   shipmentNumber: null,
   shipmentDetails: {},
   binLocations: [],
+  // Shipment the bin locations above were fetched for. The slice is persisted, so this tells
+  // whether they belong to the receiving being opened or to an earlier one.
+  binLocationsForShipmentId: null,
   view: ReceivingView.TABLE,
   // The putaway toggle is remembered per receiving, keyed by receipt id.
   putawayEnabledByReceipt: {},
@@ -29,6 +33,7 @@ export default function partialReceivingReducer(state = initialState, action) {
         ...state,
         headerInfo: action.payload.headerInfo,
         isShipmentFromPurchaseOrder: action.payload.isShipmentFromPurchaseOrder,
+        shipmentId: action.payload.shipmentId,
         shipmentNumber: action.payload.shipmentNumber,
         shipmentDetails: action.payload.shipmentDetails,
       };
@@ -37,6 +42,7 @@ export default function partialReceivingReducer(state = initialState, action) {
       return {
         ...state,
         binLocations: action.payload.binLocations,
+        binLocationsForShipmentId: action.payload.shipmentId,
       };
 
     case UPDATE_RECEIVING_VIEW:

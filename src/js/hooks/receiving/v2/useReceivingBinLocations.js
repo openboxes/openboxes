@@ -1,7 +1,12 @@
 import { useEffect } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { getCurrentLocationId, getReceivingShipmentNumber } from 'selectors';
+import { useParams } from 'react-router-dom';
+import {
+  getCurrentLocationId,
+  getReceivingShipmentId,
+  getReceivingShipmentNumber,
+} from 'selectors';
 
 import { updateReceivingBinLocations } from 'actions';
 import locationApi from 'api/services/LocationApi';
@@ -14,21 +19,29 @@ import mapToFormSelectOption from 'utils/mapToFormSelectOption';
  */
 const useReceivingBinLocations = () => {
   const dispatch = useDispatch();
+  const { shipmentId } = useParams();
   const facilityId = useSelector(getCurrentLocationId);
   const shipmentNumber = useSelector(getReceivingShipmentNumber);
+  // The shipmentId in the store which data was fetched for.
+  // If this doesn't match the shipmentId in the URL, we don't fetch bin locations,
+  // because then we would fetch the bin locations for the wrong shipment.
+  const storedShipmentId = useSelector(getReceivingShipmentId);
 
   const fetchBinLocations = async () => {
     const { data: { data } } = await locationApi
       .getReceivingInternalLocations(facilityId, shipmentNumber);
-    dispatch(updateReceivingBinLocations((data ?? []).map((bin) => mapToFormSelectOption(bin))));
+    dispatch(updateReceivingBinLocations(
+      (data ?? []).map((bin) => mapToFormSelectOption(bin)),
+      shipmentId,
+    ));
   };
 
   useEffect(() => {
-    if (!facilityId || !shipmentNumber) {
+    if (!facilityId || !shipmentNumber || storedShipmentId !== shipmentId) {
       return;
     }
     fetchBinLocations();
-  }, [facilityId, shipmentNumber]);
+  }, [facilityId, shipmentNumber, storedShipmentId, shipmentId]);
 };
 
 export default useReceivingBinLocations;

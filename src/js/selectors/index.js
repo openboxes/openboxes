@@ -413,12 +413,18 @@ export const getReceivingHeaderInfo = (state) => state.partialReceiving.headerIn
 export const getIsShipmentFromPurchaseOrder = (state) =>
   state.partialReceiving.isShipmentFromPurchaseOrder;
 
+export const getReceivingShipmentId = (state) => state.partialReceiving.shipmentId;
+
 export const getReceivingShipmentNumber = (state) => state.partialReceiving.shipmentNumber;
 
 export const getReceivingShipmentDetails = (state) =>
   state.partialReceiving.shipmentDetails || {};
 
 export const getReceivingBinLocations = (state) => state.partialReceiving.binLocations || [];
+
+// Whether the bin locations in the store belong to the current receiving.
+export const getReceivingBinLocationsFetchedForShipment = (state, shipmentId) =>
+  Boolean(shipmentId) && state.partialReceiving.binLocationsForShipmentId === shipmentId;
 
 export const getReceivingView = (state) => state.partialReceiving.view;
 
