@@ -9,7 +9,7 @@
 -- table from the scripts (or by pointing the scripts at the right branch).
 --
 -- USAGE
---   USE vvg_latest;   -- or whichever DB you plan to reset
+--   USE openboxes;   -- or whichever DB you plan to reset
 --   source verify-reset-tables.sql;
 --
 -- Expected result: every row has status = 'ok'.

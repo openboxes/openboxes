@@ -12,7 +12,7 @@
 -- focused specifically on column names.
 --
 -- USAGE
---   USE vvg_latest;   -- or whichever DB you plan to reset
+--   USE openboxes;   -- or whichever DB you plan to reset
 --   source verify-wip-columns.sql;
 --
 -- Expected result: every row has status = 'ok'.

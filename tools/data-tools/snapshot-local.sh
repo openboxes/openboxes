@@ -11,12 +11,12 @@
 #   snapshot-local.sh [source-db] [output-dir]
 #
 # Defaults:
-#   source-db  = vvg_latest
+#   source-db  = openboxes
 #   output-dir = current directory
 
 set -euo pipefail
 
-SOURCE_DB="${1:-vvg_latest}"
+SOURCE_DB="${1:-openboxes}"
 OUTPUT_DIR="${2:-.}"
 
 mkdir -p "${OUTPUT_DIR}"

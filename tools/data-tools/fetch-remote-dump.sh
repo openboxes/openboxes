@@ -17,7 +17,7 @@
 #   fetch-remote-dump.sh <remote-host> <remote-db> [-o output-dir]
 #
 # Example:
-#   fetch-remote-dump.sh vvg.openboxes.com openboxes -o ~/dumps
+#   fetch-remote-dump.sh db.example.com openboxes -o ~/dumps
 
 set -euo pipefail
 

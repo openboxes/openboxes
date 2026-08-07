@@ -11,7 +11,7 @@
 #   restore-local-dump.sh <dump-file> [target-db]
 #
 # Defaults:
-#   target-db = vvg_latest
+#   target-db = openboxes
 
 set -euo pipefail
 
@@ -21,7 +21,7 @@ if [[ $# -lt 1 ]]; then
 fi
 
 DUMP_FILE="$1"
-TARGET_DB="${2:-vvg_latest}"
+TARGET_DB="${2:-openboxes}"
 APP_USER="openboxes"
 APP_HOST="localhost"
 
