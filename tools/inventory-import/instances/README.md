@@ -6,19 +6,19 @@ subfolder and they'll never be committed:
 
 ```
 instances/
-└── vipr/
-    ├── partsmaster.csv     # the source export
-    ├── mapping.json        # the site-specific column mapping
-    └── out/                # generated batches + skipped-records.csv
+└── example/
+    ├── source.csv   # the source export
+    ├── mapping.json # the site-specific column mapping
+    └── out/         # generated batches + skipped-records.csv
 ```
 
 Run the tool against them with relative paths, e.g.:
 
 ```bash
 groovy ../CsvToInventoryImport.groovy \
-    --input instances/vipr/partsmaster.csv \
-    --config instances/vipr/mapping.json \
-    --output-dir instances/vipr/out --clean
+    --input instances/example/source.csv \
+    --config instances/example/mapping.json \
+    --output-dir instances/example/out --clean
 ```
 
 Prefer keeping site data out of the repo entirely? The scripts take absolute
