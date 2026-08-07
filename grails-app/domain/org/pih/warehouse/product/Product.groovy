@@ -31,6 +31,7 @@ import org.pih.warehouse.core.validation.DomainValidatable
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.InventoryLevelScope
 import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
@@ -459,15 +460,18 @@ class Product implements Comparable, Serializable, DomainValidatable<ProductVali
     }
 
     /**
-     * Get the inventory level by location id.
+     * Get the inventory level by location id, for the given scope.
      *
      * @param locationId
+     * @param scope
      * @return
      */
-    InventoryLevel getInventoryLevel(String locationId) {
+    InventoryLevel getInventoryLevel(String locationId, InventoryLevelScope scope = InventoryLevelScope.FACILITY) {
         if (id) {
             def location = Location.get(locationId)
-            return InventoryLevel.findByProductAndInventoryAndInternalLocationIsNull(this, location.inventory)
+            return scope == InventoryLevelScope.FACILITY ?
+                    InventoryLevel.findByProductAndInventoryAndInternalLocationIsNull(this, location.inventory) :
+                    InventoryLevel.findByProductAndInventoryAndInternalLocationIsNotNull(this, location.inventory)
         }
     }
 
