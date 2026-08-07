@@ -6,7 +6,11 @@ import { Controller } from 'react-hook-form';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import {
-  getCurrentLocationId, getDebounceTime, getMinSearchLength, getReceivingBinLocations,
+  getCurrentLocationId,
+  getDebounceTime,
+  getHasBinLocationSupport,
+  getMinSearchLength,
+  getReceivingBinLocations,
 } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
@@ -36,6 +40,7 @@ const useReceivingLineItemColumns = ({
   const debounceTime = useSelector(getDebounceTime);
   const minSearchLength = useSelector(getMinSearchLength);
   const binLocationOptions = useSelector(getReceivingBinLocations);
+  const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
 
   const debouncedPeopleFetch = useCallback(
     debouncePeopleFetch(debounceTime, minSearchLength),
@@ -179,27 +184,29 @@ const useReceivingLineItemColumns = ({
       footer: ({ table }) => <span style={{ paddingLeft: '14px' }}>{table.options.meta?.totalReceivingNow ?? 0}</span>,
       size: 120,
     }),
-    columnHelper.accessor(receivingColumns.LOCATION, {
-      header: () => <LocationAutofillHeader onSelect={onLocationAutofill} />,
-      cell: ({ row }) => (
-        <TableCell className="rt-td">
-          <Controller
-            key={row.original.rowId}
-            name={`lineItems.${row.index}.binLocation`}
-            control={control}
-            render={({ field }) => (
-              <SelectField
-                {...field}
-                options={binLocationOptions}
-                hideErrorMessageWrapper
-                ariaLabel={{ id: 'react.receiving.location.label', defaultMessage: 'Location' }}
-              />
-            )}
-          />
-        </TableCell>
-      ),
-      size: 150,
-    }),
+    ...(hasBinLocationSupport ? [
+      columnHelper.accessor(receivingColumns.LOCATION, {
+        header: () => <LocationAutofillHeader onSelect={onLocationAutofill} />,
+        cell: ({ row }) => (
+          <TableCell className="rt-td">
+            <Controller
+              key={row.original.rowId}
+              name={`lineItems.${row.index}.binLocation`}
+              control={control}
+              render={({ field }) => (
+                <SelectField
+                  {...field}
+                  options={binLocationOptions}
+                  hideErrorMessageWrapper
+                  ariaLabel={{ id: 'react.receiving.location.label', defaultMessage: 'Location' }}
+                />
+              )}
+            />
+          </TableCell>
+        ),
+        size: 150,
+      }),
+    ] : []),
     columnHelper.display({
       id: 'actions',
       header: () => (
@@ -222,7 +229,7 @@ const useReceivingLineItemColumns = ({
           </div>
         </TableCell>
       ),
-      size: 130,
+      size: hasBinLocationSupport ? 130 : 108,
     }),
   ], [
     translate,
@@ -231,6 +238,7 @@ const useReceivingLineItemColumns = ({
     debouncedPeopleFetch,
     removeRow,
     binLocationOptions,
+    hasBinLocationSupport,
     onLocationAutofill,
     errors,
   ]);

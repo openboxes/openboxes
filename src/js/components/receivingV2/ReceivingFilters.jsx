@@ -8,7 +8,7 @@ import {
   RiRefreshLine,
 } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
-import { getReceivingTranslationsFetched } from 'selectors';
+import { getHasBinLocationSupport, getReceivingTranslationsFetched } from 'selectors';
 
 import FilterForm from 'components/Filter/FilterForm';
 import Button from 'components/form-elements/Button';
@@ -40,6 +40,7 @@ const ReceivingFilters = ({
   // Add loading for filters section. Loading will display before the translations are fetched.
   // It fixes the issue of untranslated labels in the filters.
   const translationsFetched = useSelector(getReceivingTranslationsFetched);
+  const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
   // Recomputed whenever translations change, so that the field configs hold
   // already translated labels.
   const fields = useMemo(() => filterFields(translate), [translate]);
@@ -79,21 +80,23 @@ const ReceivingFilters = ({
         isLoading={!translationsFetched}
       />
       <div className="receiving-filters__row receiving-filters__actions d-flex flex-wrap justify-content-end align-items-center">
-        <Switch
-          className="receiving-filters__switch"
-          value={putawayEnabled}
-          onChange={onPutawayChange}
-          titles={{
-            checked: {
-              id: 'react.receiving.enablePutaway.label',
-              defaultMessage: 'Enable Putaway',
-            },
-            unchecked: {
-              id: 'react.receiving.enablePutaway.label',
-              defaultMessage: 'Enable Putaway',
-            },
-          }}
-        />
+        {hasBinLocationSupport && (
+          <Switch
+            className="receiving-filters__switch"
+            value={putawayEnabled}
+            onChange={onPutawayChange}
+            titles={{
+              checked: {
+                id: 'react.receiving.enablePutaway.label',
+                defaultMessage: 'Enable Putaway',
+              },
+              unchecked: {
+                id: 'react.receiving.enablePutaway.label',
+                defaultMessage: 'Enable Putaway',
+              },
+            }}
+          />
+        )}
         {view !== ReceivingView.PACKING_LIST && (
           <Button
             label="react.receiving.resetSorting.label"

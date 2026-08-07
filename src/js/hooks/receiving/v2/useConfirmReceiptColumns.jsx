@@ -2,7 +2,11 @@ import React, { useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import { useSelector } from 'react-redux';
-import { getCurrentLocale, getHasPartialReceivingSupport } from 'selectors';
+import {
+  getCurrentLocale,
+  getHasBinLocationSupport,
+  getHasPartialReceivingSupport,
+} from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
@@ -29,6 +33,7 @@ const useConfirmReceiptColumns = ({ view, putawayEnabled } = {}) => {
   const columnHelper = createColumnHelper();
   const currentLocale = useSelector(getCurrentLocale);
   const hasPartialReceivingSupport = useSelector(getHasPartialReceivingSupport);
+  const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
   const isPackingListView = view === ReceivingView.PACKING_LIST;
 
   // Rows are { id, meta } objects; the entities live in the normalized state
@@ -332,8 +337,9 @@ const useConfirmReceiptColumns = ({ view, putawayEnabled } = {}) => {
         },
         size: 125,
       }),
-      // The Location (putaway bin) column is only shown when "Enable Putaway" is on.
-      ...(putawayEnabled ? [
+      // The Location (putaway bin) column is only shown when "Enable Putaway" is on
+      // and a bin tracking location.
+      ...(putawayEnabled && hasBinLocationSupport ? [
         columnHelper.display({
           id: receivingColumns.LOCATION,
           header: () => (

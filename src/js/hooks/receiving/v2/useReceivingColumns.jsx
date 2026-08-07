@@ -2,7 +2,12 @@ import React, { useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import { useSelector } from 'react-redux';
-import { getCurrentLocale, getIsShipmentFromPurchaseOrder, getReceivingBinLocations } from 'selectors';
+import {
+  getCurrentLocale,
+  getHasBinLocationSupport,
+  getIsShipmentFromPurchaseOrder,
+  getReceivingBinLocations,
+} from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
@@ -41,6 +46,7 @@ const useReceivingColumns = ({
   const currentLocale = useSelector(getCurrentLocale);
   const isShipmentFromPurchaseOrder = useSelector(getIsShipmentFromPurchaseOrder);
   const binLocations = useSelector(getReceivingBinLocations);
+  const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
   const isPackingListView = view === ReceivingView.PACKING_LIST;
 
   const sortHeaderProps = (columnId) => (isPackingListView ? {} : {
@@ -459,8 +465,9 @@ const useReceivingColumns = ({
         },
         size: 125,
       }),
-      // The Location (putaway bin) column is only shown when "Enable Putaway" is on.
-      ...(putawayEnabled ? [
+      // The Location (putaway bin) column is only shown when "Enable Putaway" is on
+      // and a bin tracking location.
+      ...(putawayEnabled && hasBinLocationSupport ? [
         columnHelper.display({
           id: receivingColumns.LOCATION,
           header: ({ table }) => (
@@ -552,6 +559,7 @@ const useReceivingColumns = ({
     currentLocale,
     isPackingListView,
     putawayEnabled,
+    hasBinLocationSupport,
     isShipmentFromPurchaseOrder,
     binLocations,
     sort,
