@@ -490,11 +490,13 @@ class Product implements Comparable, Serializable, DomainValidatable<ProductVali
         if (preferredBin) {
             return preferredBin
         }
-        // Fall back to the internal location of the first location-scoped inventory level,
-        // ordered by sortOrder (then name) via InventoryLevel.compareTo.
-        return (inventoryLevels ?: [])
+        // Otherwise fall back to the internal location of the first location-scoped inventory
+        // level, ordered by sortOrder (then internal location name to break ties).
+        List<InventoryLevel> locationLevels = (inventoryLevels ?: [])
                 .findAll { it.inventory?.id == facility.inventory?.id && it.internalLocation }
-                .min()?.internalLocation
+                .sort { [it.sortOrder ?: 0, it.internalLocation.name] }
+
+        return locationLevels ? locationLevels.first().internalLocation : null
     }
 
     /**
