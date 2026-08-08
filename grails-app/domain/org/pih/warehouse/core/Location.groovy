@@ -440,7 +440,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
                 organizationName           : organization?.name,
                 organizationCode           : organization?.code,
                 backgroundColor            : bgColor,
-                inventory                  : inventory,
+                inventory                  : inventory?.toBaseJson(),
                 zoneName                   : zone?.name,
                 zoneId                     : zone?.id,
                 active                     : active,
