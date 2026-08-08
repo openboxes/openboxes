@@ -476,6 +476,28 @@ class Product implements Comparable, Serializable, DomainValidatable<ProductVali
     }
 
     /**
+     * Find the preferred bin location for the given facility.
+     *
+     * The preferred bin is the preferredBinLocation configured on the facility-scoped inventory
+     * level, falling back to the internal location of the first location-scoped inventory level
+     * when no preferred bin is configured.
+     *
+     * @param facility the facility to find the preferred bin for
+     * @return the preferred bin location, or null if none is configured
+     */
+    Location getPreferredBin(Location facility) {
+        Location preferredBin = getInventoryLevel(facility.id, InventoryLevelScope.FACILITY)?.preferredBinLocation
+        if (preferredBin) {
+            return preferredBin
+        }
+        // Fall back to the internal location of the first location-scoped inventory level,
+        // ordered by sortOrder (then name) via InventoryLevel.compareTo.
+        return (inventoryLevels ?: [])
+                .findAll { it.inventory?.id == facility.inventory?.id && it.internalLocation }
+                .min()?.internalLocation
+    }
+
+    /**
      * Whether this product has more than one facility-level inventory level within the same facility.
      */
     boolean hasDuplicateFacilityInventoryLevels() {
