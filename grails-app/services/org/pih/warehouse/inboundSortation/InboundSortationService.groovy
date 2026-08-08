@@ -7,7 +7,6 @@ import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.User
-import org.pih.warehouse.inventory.InventoryLevelScope
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.putaway.PutawayTask
@@ -84,8 +83,7 @@ class InboundSortationService {
                 lotNumber: receiptItem.inventoryItem.lotNumber,
                 expirationDate: receiptItem.inventoryItem.expirationDate,
                 currentBinLocation: receiptItem.binLocation,
-                preferredBin: receiptItem.product.getInventoryLevel(shipment.destination.id)?.preferredBinLocation,
-                internalLocation: receiptItem.product.getInventoryLevel(shipment.destination.id, InventoryLevelScope.LOCATION)?.internalLocation,
+                preferredBin: receiptItem.product.getPreferredBin(shipment.destination),
                 quantity: receiptItem.quantityReceived,
                 backorderReference: receiptItem.shipmentItem.backorderReference,
                 backorderItem: receiptItem.shipmentItem.backorderItem,
