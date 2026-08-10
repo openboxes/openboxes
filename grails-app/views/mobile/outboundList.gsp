@@ -9,12 +9,10 @@
 <body>
 
     <div class="row g-0">
-        %{-- table-stack turns each row into a label/value card: five columns
-             of text cannot be a grid on a phone. The labels come from
-             data-label on each cell, so the header row is hidden but the
-             column names still travel with the data. table-bordered stays so
-             the un-themed layout keeps its borders; the themed stylesheet
-             neutralizes it when stacking. --}%
+        %{-- With the unified stylesheet, table-stack renders each row as a
+             label/value card (labels come from data-label on each cell; the
+             header row is visually hidden). Without it, table-bordered
+             renders the normal grid. --}%
         <table class="table table-bordered table-stack">
             <thead>
                 <tr>
@@ -44,8 +42,6 @@
                     <td data-label="${g.message(code: 'stockMovement.requestedDeliveryDate.label', default: 'Requested Delivery Date')}">
                         <g:formatDate date="${stockMovement?.requisition?.requestedDeliveryDate}" format="dd MMM yyyy"/>
                     </td>
-                    %{-- was a <button> nested inside an <a>, which is invalid
-                         and made the whole cell an ambiguous tap target --}%
                     <td class="cell-action">
                         <a href="${createLink(controller: 'stockMovement', action: 'show', id: stockMovement?.id)}" class="btn btn-primary">
                             <g:message code="default.button.view.label" default="View"/>
