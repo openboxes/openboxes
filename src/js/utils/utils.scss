@@ -114,6 +114,10 @@
       max-width: 120px;
     }
 
+    &--not-clickable {
+      cursor: default;
+    }
+
     &--purple {
       background-color: var(--purple-100);
       color: var(--purple-600);

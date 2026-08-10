@@ -11,13 +11,13 @@ import 'utils/utils.scss';
  * Renders a status badge, optionally followed by an arrow and the badge of the
  * status it transitions into.
  */
-const BadgeTransition = ({ current, next }) => (
+const BadgeTransition = ({ current, next, clickable }) => (
   <div className="badge-container badge-transition">
-    <Badge label={current.label} variant={current.variant} />
+    <Badge label={current.label} variant={current.variant} clickable={clickable} />
     {next && (
       <>
         <RiArrowRightLine size={20} className="badge-transition__arrow" />
-        <Badge label={next.label} variant={next.variant} />
+        <Badge label={next.label} variant={next.variant} clickable={clickable} />
       </>
     )}
   </div>
@@ -31,10 +31,12 @@ const badgeShape = PropTypes.shape({
 BadgeTransition.propTypes = {
   current: badgeShape.isRequired,
   next: badgeShape,
+  clickable: PropTypes.bool,
 };
 
 BadgeTransition.defaultProps = {
   next: null,
+  clickable: true,
 };
 
 export default BadgeTransition;
