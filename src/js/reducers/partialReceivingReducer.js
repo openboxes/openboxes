@@ -13,10 +13,9 @@ const initialState = {
   shipmentId: null,
   shipmentNumber: null,
   shipmentDetails: {},
-  binLocations: [],
-  // Shipment the bin locations above were fetched for. The slice is persisted, so this tells
-  // whether they belong to the receiving being opened or to an earlier one.
-  binLocationsForShipmentId: null,
+  // Bin locations keyed by the shipment they were fetched for. The slice is persisted, so the
+  // key tells whether they belong to the receiving being opened or to an earlier one.
+  binLocationsByShipmentId: {},
   view: ReceivingView.TABLE,
   // The putaway toggle is remembered per receiving, keyed by receipt id.
   putawayEnabledByReceipt: {},
@@ -41,8 +40,11 @@ export default function partialReceivingReducer(state = initialState, action) {
     case UPDATE_RECEIVING_BIN_LOCATIONS:
       return {
         ...state,
-        binLocations: action.payload.binLocations,
-        binLocationsForShipmentId: action.payload.shipmentId,
+        // Only the current shipment keeps its bin locations and the
+        // state doesn't grow with every receiving opened.
+        binLocationsByShipmentId: {
+          [action.payload.shipmentId]: action.payload.binLocations,
+        },
       };
 
     case UPDATE_RECEIVING_VIEW:

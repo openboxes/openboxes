@@ -413,18 +413,23 @@ export const getReceivingHeaderInfo = (state) => state.partialReceiving.headerIn
 export const getIsShipmentFromPurchaseOrder = (state) =>
   state.partialReceiving.isShipmentFromPurchaseOrder;
 
-export const getReceivingShipmentId = (state) => state.partialReceiving.shipmentId;
+// Whether the shipment from the URL is the one loaded into the store. The slice is persisted,
+// so until useReceivingHeader fetches it, the store can still hold the previously received one.
+export const getIsReceivingShipmentLoaded = (state, shipmentId) =>
+  state.partialReceiving.shipmentId === shipmentId;
 
 export const getReceivingShipmentNumber = (state) => state.partialReceiving.shipmentNumber;
 
 export const getReceivingShipmentDetails = (state) =>
   state.partialReceiving.shipmentDetails || {};
 
-export const getReceivingBinLocations = (state) => state.partialReceiving.binLocations || [];
+export const getReceivingBinLocations = (state) =>
+  state.partialReceiving.binLocationsByShipmentId?.[state.partialReceiving.shipmentId] || [];
 
-// Whether the bin locations in the store belong to the current receiving.
+// Whether we already fetched the bin locations for the shipment from the url, so the
+// receiving bin we take from them belongs to that shipment.
 export const getReceivingBinLocationsFetchedForShipment = (state, shipmentId) =>
-  Boolean(shipmentId) && state.partialReceiving.binLocationsForShipmentId === shipmentId;
+  Boolean(state.partialReceiving.binLocationsByShipmentId?.[shipmentId]);
 
 export const getReceivingView = (state) => state.partialReceiving.view;
 

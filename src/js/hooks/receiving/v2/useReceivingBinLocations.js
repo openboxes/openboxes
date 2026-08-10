@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import {
   getCurrentLocationId,
-  getReceivingShipmentId,
+  getIsReceivingShipmentLoaded,
   getReceivingShipmentNumber,
 } from 'selectors';
 
@@ -22,10 +22,10 @@ const useReceivingBinLocations = () => {
   const { shipmentId } = useParams();
   const facilityId = useSelector(getCurrentLocationId);
   const shipmentNumber = useSelector(getReceivingShipmentNumber);
-  // The shipmentId in the store which data was fetched for.
-  // If this doesn't match the shipmentId in the URL, we don't fetch bin locations,
-  // because then we would fetch the bin locations for the wrong shipment.
-  const storedShipmentId = useSelector(getReceivingShipmentId);
+  // Guards fetchBinLocations below, so that it doesn't run for the wrong shipment.
+  const isCurrentShipmentLoaded = useSelector(
+    (state) => getIsReceivingShipmentLoaded(state, shipmentId),
+  );
 
   const fetchBinLocations = async () => {
     const { data: { data } } = await locationApi
@@ -37,11 +37,11 @@ const useReceivingBinLocations = () => {
   };
 
   useEffect(() => {
-    if (!facilityId || !shipmentNumber || storedShipmentId !== shipmentId) {
+    if (!facilityId || !shipmentNumber || !isCurrentShipmentLoaded) {
       return;
     }
     fetchBinLocations();
-  }, [facilityId, shipmentNumber, storedShipmentId, shipmentId]);
+  }, [facilityId, shipmentNumber, isCurrentShipmentLoaded, shipmentId]);
 };
 
 export default useReceivingBinLocations;
