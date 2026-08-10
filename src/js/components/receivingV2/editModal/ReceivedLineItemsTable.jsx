@@ -23,6 +23,7 @@ const ReceivedLineItemsTable = ({ receivedItems, columns, totalReceived }) => {
             <Badge
               label={translate('react.receiving.received.label', 'Received')}
               variant="badge--green text-uppercase rounded"
+              clickable={false}
             />
           </div>
         )}

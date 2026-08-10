@@ -1,21 +1,20 @@
-import { useCallback, useState } from 'react';
-
 import { useForm } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { getReceivingPutawayEnabled, getReceivingView } from 'selectors';
 
-import { removeReceivingPutawayEnabled } from 'actions';
+import useCancelRemaining from 'hooks/receiving/v2/useCancelRemaining';
 import useCommentModal from 'hooks/receiving/v2/useCommentModal';
 import useConfirmReceiptActions from 'hooks/receiving/v2/useConfirmReceiptActions';
 import useConfirmReceiptColumns from 'hooks/receiving/v2/useConfirmReceiptColumns';
+import useConfirmReceiptSaveActions from 'hooks/receiving/v2/useConfirmReceiptSaveActions';
+import useReceivingFilters from 'hooks/receiving/v2/useReceivingFilters';
 
 const useConfirmReceiptForm = () => {
-  const { control } = useForm({
+  const { control, handleSubmit } = useForm({
     defaultValues: {
       dateDelivered: null,
     },
   });
-  const dispatch = useDispatch();
   // The check step renders in the view selected on the receiving step.
   const view = useSelector(getReceivingView);
   const {
@@ -26,37 +25,36 @@ const useConfirmReceiptForm = () => {
   );
   const { columns } = useConfirmReceiptColumns({ view, putawayEnabled });
   const commentModal = useCommentModal({ updateLineItemComment });
-  // TODO: Add logic for cancellation in OBPIH-7901
-  const [cancelRemainingIds, setCancelRemainingIds] = useState(() => new Set());
-  const toggleCancelRemaining = useCallback((rowId) => {
-    setCancelRemainingIds((prev) => {
-      const next = new Set(prev);
-      return next.delete(rowId) ? next : next.add(rowId);
-    });
-  }, []);
-
-  // TODO: Add logic for receipt completion in OBPIH-7901
-  const onCompleteReceipt = useCallback(() => {
-    const receiptId = receiptIdRef.current;
-    if (!receiptId) {
-      return;
-    }
-    dispatch(removeReceivingPutawayEnabled(receiptId));
-  }, [dispatch]);
+  const {
+    visibleLineItemsState,
+    updateFilterParams,
+    clearFilterParams,
+  } = useReceivingFilters({ lineItemsState });
+  // Cancel all remaining only covers the rows the filter shows
+  const cancelRemaining = useCancelRemaining({ lineItemsState: visibleLineItemsState });
+  const { onSaveAndExit, onCompleteReceipt } = useConfirmReceiptSaveActions({
+    receiptIdRef,
+    itemsToComplete: cancelRemaining.itemsToComplete,
+  });
 
   return {
-    onCompleteReceipt,
+    // Submitting through the form runs the delivery date validation first, so an empty date
+    // blocks the completion instead of reaching the API.
+    onCompleteReceipt: handleSubmit(onCompleteReceipt),
+    onSaveAndExit,
     control,
     table: {
-      lineItemsState,
+      lineItemsState: visibleLineItemsState,
       columns,
+    },
+    lineItemsState,
+    filters: {
+      updateFilterParams,
+      clearFilterParams,
     },
     loading,
     commentModal,
-    cancelRemaining: {
-      ids: cancelRemainingIds,
-      toggle: toggleCancelRemaining,
-    },
+    cancelRemaining,
   };
 };
 

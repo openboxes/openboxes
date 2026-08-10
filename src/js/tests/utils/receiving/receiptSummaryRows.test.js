@@ -2,6 +2,7 @@ import ReceiptGroup from 'consts/receiptGroup';
 import ReceivingRowType from 'consts/receivingRowType';
 import { ReceivingView } from 'consts/receivingViewOptions';
 import {
+  mergeStartedReceipt,
   receiptGroupForView,
   transformReceiptSummary,
 } from 'utils/receiving/receiptSummaryRows';
@@ -40,6 +41,72 @@ describe('receiptGroupForView()', () => {
   it('should group by pack level in packing list view and by shipment item otherwise', () => {
     expect(receiptGroupForView(ReceivingView.PACKING_LIST)).toBe(ReceiptGroup.PACK_LEVEL);
     expect(receiptGroupForView(ReceivingView.TABLE)).toBe(ReceiptGroup.SHIPMENT_ITEM);
+  });
+});
+
+describe('mergeStartedReceipt()', () => {
+  const startedReceipt = {
+    id: 'receipt-1',
+    receiptItems: [
+      { id: 'item-a', shipmentItemId: 'a', isSplitItem: false },
+      { id: 'item-b', shipmentItemId: 'b', isSplitItem: false },
+    ],
+  };
+
+  it('should fill in the pending receipt id and the created lines of each shipment item', () => {
+    const data = buildData([buildSummary('a'), buildSummary('b')], { order: ['a', 'b'] });
+
+    const merged = mergeStartedReceipt(data, startedReceipt);
+
+    expect(merged.pendingReceiptId).toBe('receipt-1');
+    expect(merged.shipmentItemSummaryById.a.currentReceiptItems)
+      .toEqual([{ id: 'item-a', shipmentItemId: 'a', isSplitItem: false }]);
+    expect(merged.shipmentItemSummaryById.b.currentReceiptItems)
+      .toEqual([{ id: 'item-b', shipmentItemId: 'b', isSplitItem: false }]);
+  });
+
+  it('should leave shipment items without a created line empty', () => {
+    const data = buildData([buildSummary('a'), buildSummary('c')], { order: ['a', 'c'] });
+
+    const merged = mergeStartedReceipt(data, startedReceipt);
+
+    expect(merged.shipmentItemSummaryById.c.currentReceiptItems).toEqual([]);
+  });
+
+  it('should keep previously received lines and the rest of the summary untouched', () => {
+    const previousReceiptItems = [{ id: 'old-item', quantityReceived: 5 }];
+    const data = buildData(
+      [buildSummary('a', { previousReceiptItems, totalQuantityReceived: 5 })],
+      { order: ['a'] },
+    );
+
+    const merged = mergeStartedReceipt(data, startedReceipt);
+
+    expect(merged.shipmentItemSummaryById.a.previousReceiptItems).toEqual(previousReceiptItems);
+    expect(merged.shipmentItemSummaryById.a.totalQuantityReceived).toBe(5);
+    expect(merged.shipmentItemsGrouped).toEqual(data.shipmentItemsGrouped);
+  });
+
+  it('should return the summary as is when no receipt was started', () => {
+    const data = buildData([buildSummary('a')], { order: ['a'] });
+
+    expect(mergeStartedReceipt(data, null)).toBe(data);
+    expect(mergeStartedReceipt(data, {})).toBe(data);
+  });
+
+  it('should build rows carrying the created receipt item ids', () => {
+    const data = buildData([buildSummary('a')], { order: ['a'] });
+
+    const state = transformReceiptSummary(
+      mergeStartedReceipt(data, startedReceipt),
+      ReceivingView.TABLE,
+      {},
+    );
+
+    expect(entitiesInOrder(state)[0]).toMatchObject({
+      receiptItemId: 'item-a',
+      originalReceiptItemId: 'item-a',
+    });
   });
 });
 
