@@ -41,7 +41,6 @@ const Receiving = () => {
             variant: 'primary-outline',
           },
           next: {
-            // TODO: Add logic for receipt completion in OBPIH-7901
             onClick: onCompleteReceipt,
             label: 'react.receiving.completeReceipt.label',
             defaultLabel: 'Complete Receipt',
