@@ -87,11 +87,10 @@
 
 			var timezone = jzTimezoneDetector.determine_timezone().timezone; // Now you have an instance of the TimeZone object.
 			$("#browserTimezone").val(timezone.olson_tz); // Set the user timezone offset as a hidden input
-            %{-- Unified design capitalizes the placeholders (first letter
-                 only, so it reads as a sentence in whichever locale supplied
-                 it); classic keeps the label verbatim. --}%
-            $("#username").watermark("${unifiedLayout ? warehouse.message(code:'login.username.label')?.capitalize() : warehouse.message(code:'login.username.label')}");
-		    $("#password").watermark("${unifiedLayout ? warehouse.message(code:'login.password.label')?.capitalize() : warehouse.message(code:'login.password.label')}");
+            %{-- capitalize() lifts only the first letter, so the placeholder
+                 reads as a sentence in whichever locale supplied it --}%
+            $("#username").watermark("${warehouse.message(code:'login.username.label')?.capitalize()}");
+		    $("#password").watermark("${warehouse.message(code:'login.password.label')?.capitalize()}");
 			$("#username").focus();
 
             openboxes.expireFromLocal();
