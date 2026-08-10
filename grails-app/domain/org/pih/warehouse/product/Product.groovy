@@ -31,7 +31,6 @@ import org.pih.warehouse.core.validation.DomainValidatable
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
-import org.pih.warehouse.inventory.InventoryLevelScope
 import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
@@ -460,19 +459,37 @@ class Product implements Comparable, Serializable, DomainValidatable<ProductVali
     }
 
     /**
-     * Get the inventory level by location id, for the given scope.
+     * Get the inventory level by location id.
      *
      * @param locationId
-     * @param scope
      * @return
      */
-    InventoryLevel getInventoryLevel(String locationId, InventoryLevelScope scope = InventoryLevelScope.FACILITY) {
+    InventoryLevel getInventoryLevel(String locationId) {
         if (id) {
             def location = Location.get(locationId)
-            return scope == InventoryLevelScope.FACILITY ?
-                    InventoryLevel.findByProductAndInventoryAndInternalLocationIsNull(this, location.inventory) :
-                    InventoryLevel.findByProductAndInventoryAndInternalLocationIsNotNull(this, location.inventory)
+            return InventoryLevel.findByProductAndInventoryAndInternalLocationIsNull(this, location.inventory)
         }
+    }
+
+    /**
+     * Gets the default putaway location.
+     *
+     * A product can have several location-scoped rules within the same facility, so they are ordered by
+     * InventoryLevel.compareTo (sort order, then internal location name) and the first one wins.
+     *
+     * @param facility
+     * @return
+     */
+    Location getDefaultPutawayLocation(Location facility) {
+        if (!id || !facility?.inventory) {
+            return null
+        }
+
+        List<InventoryLevel> inventoryLevels = InventoryLevel
+                .findAllByProductAndInventoryAndInternalLocationIsNotNull(this, facility.inventory)
+                .toSorted()
+
+        return inventoryLevels ? inventoryLevels.first().internalLocation : null
     }
 
     /**
