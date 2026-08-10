@@ -4,7 +4,7 @@ import { isUnifiedLayout } from 'utils/unifiedLayout';
  * The React bundle is a single build serving both the original and the
  * unified design, so components that differ between them read this flag at
  * render time. layouts/react.gsp sets window.UNIFIED_LAYOUT from
- * openboxes.unifiedLayout.enabled.
+ * openboxes.layout.unified.enabled.
  */
 describe('isUnifiedLayout', () => {
   afterEach(() => {

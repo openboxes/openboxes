@@ -17,7 +17,7 @@
          not opted in sees no change here either. The mobile pages have no
          second layout to swap to — they are the only thing that uses this
          file — so the opt-in is the stylesheet rather than the layout. --}%
-    <g:if test="${grailsApplication.config.getProperty('openboxes.unifiedLayout.enabled', Boolean, false)}">
+    <g:if test="${grailsApplication.config.getProperty('openboxes.layout.unified.enabled', Boolean, false)}">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
               rel="stylesheet"/>
         %{-- Last, so it layers over Bootstrap the way openboxes-theme.css

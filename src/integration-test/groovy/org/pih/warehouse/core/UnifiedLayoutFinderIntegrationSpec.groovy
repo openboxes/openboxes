@@ -109,7 +109,7 @@ class UnifiedLayoutFinderIntegrationSpec extends IntegrationSpec {
         // flips the flag for local demo runs
         expect: 'the @Value binding agrees with resolved configuration'
         finder.unifiedLayoutEnabled ==
-                Holders.config.getProperty('openboxes.unifiedLayout.enabled', Boolean, Boolean.FALSE)
+                Holders.config.getProperty('openboxes.layout.unified.enabled', Boolean, Boolean.FALSE)
     }
 
     void "the finder kept the wiring the GSP plugin gave it"() {

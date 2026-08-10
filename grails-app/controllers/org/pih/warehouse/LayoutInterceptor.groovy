@@ -24,7 +24,7 @@ package org.pih.warehouse
  * an instance that has opted in can still pull up the original.
  *
  * Whether an instance uses the unified layout by default is a config setting
- * (openboxes.unifiedLayout.enabled) applied by UnifiedLayoutFinder, not by
+ * (openboxes.layout.unified.enabled) applied by UnifiedLayoutFinder, not by
  * this class — an interceptor runs before the view is chosen, so it cannot
  * tell which layout a page declares, and forcing one on every request wraps
  * React, mobile and print pages in the wrong chrome. UnifiedLayoutFinder

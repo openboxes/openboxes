@@ -2,7 +2,7 @@
    Unified design — React side
    -------------------------------------------------------------------------
    Everything here is scoped under .unified-layout, a class the layouts put
-   on <body> only when openboxes.unifiedLayout.enabled is true. One bundle
+   on <body> only when openboxes.layout.unified.enabled is true. One bundle
    serves both states; an instance that has not opted in matches none of
    these selectors and renders exactly as it did before.
 

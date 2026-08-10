@@ -17,7 +17,7 @@
 			<g:hiddenField name="targetUri" value="${params?.targetUri}" />
 			<g:hiddenField id="browserTimezone" name="browserTimezone" />
 
-		    <g:set var="unifiedLayout" value="${grailsApplication.config.getProperty('openboxes.unifiedLayout.enabled', Boolean, false)}"/>
+		    <g:set var="unifiedLayout" value="${grailsApplication.config.getProperty('openboxes.layout.unified.enabled', Boolean, false)}"/>
 		    <div id="loginContainer" class="dialog">
 				<div id="loginForm">
 					%{-- Unified design only — openboxes-theme.css sizes this;

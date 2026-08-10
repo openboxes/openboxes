@@ -4,7 +4,7 @@
 <%@ page import="util.ConfigHelper" %>
 
 <div id="footer">
-    <g:set var="unifiedLayout" value="${grailsApplication.config.getProperty('openboxes.unifiedLayout.enabled', Boolean, false)}"/>
+    <g:set var="unifiedLayout" value="${grailsApplication.config.getProperty('openboxes.layout.unified.enabled', Boolean, false)}"/>
     %{-- Unified design only: a CSS-only disclosure — the label toggles the
          checkbox, which reveals .footer-details via a sibling selector, all
          styled by openboxes-theme.css. Without that stylesheet the checkbox

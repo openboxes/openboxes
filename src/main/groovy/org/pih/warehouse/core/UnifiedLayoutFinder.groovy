@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest
  * Serves layouts/default.gsp — the unified design — in place of
  * layouts/custom.gsp, for instances that have opted in with
  *
- *     openboxes.unifiedLayout.enabled = true
+ *     openboxes.layout.unified.enabled = true
  *
  * The 252 legacy pages all declare `meta layout="custom"` and none of them
  * change; only which file that name resolves to changes.
@@ -74,7 +74,7 @@ class UnifiedLayoutFinder extends GroovyPageLayoutFinder {
      * preference): changing the flag needs a restart either way, since the
      * external config files are themselves only read at startup.
      */
-    @Value('\${openboxes.unifiedLayout.enabled:false}')
+    @Value('\${openboxes.layout.unified.enabled:false}')
     boolean unifiedLayoutEnabled
 
     /**
