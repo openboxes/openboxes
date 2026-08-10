@@ -925,6 +925,23 @@ class CycleCountService {
         }
     }
 
+    /**
+     * Deletes a single cycle count with everything that points at it: its items, the transactions (and the
+     * transaction source grouping them) that completing the count created, and the request that spawned it.
+     */
+    void deleteCycleCount(String cycleCountId) {
+        CycleCount cycleCount = CycleCount.get(cycleCountId)
+        if (!cycleCount) {
+            throw new ObjectNotFoundException(cycleCountId, CycleCount.class.toString())
+        }
+
+        CycleCountRequest cycleCountRequest = cycleCount.cycleCountRequest
+
+        deleteCycleCountWithAssociations(cycleCount)
+
+        cycleCountRequest?.delete()
+    }
+
     private void deleteCycleCountRequest(String cycleCountRequestId) {
         CycleCountRequest cycleCountRequest = CycleCountRequest.get(cycleCountRequestId)
         if (!cycleCountRequest) {
@@ -933,16 +950,18 @@ class CycleCountService {
 
         CycleCount cycleCount = cycleCountRequest.cycleCount
         if (cycleCount) {
-            deleteCycleCount(cycleCount)
+            deleteCycleCountWithAssociations(cycleCount)
         }
 
         cycleCountRequest.delete()
     }
 
-    private void deleteCycleCount(CycleCount cycleCount) {
+    private void deleteCycleCountWithAssociations(CycleCount cycleCount) {
         if (!cycleCount) {
             return
         }
+
+        deleteCycleCountTransactions(cycleCount)
 
         cycleCount.cycleCountItems.each { it.delete() }
         cycleCount.cycleCountItems.clear()
@@ -950,6 +969,20 @@ class CycleCountService {
         cycleCount.cycleCountRequest?.cycleCount = null
 
         cycleCount.delete()
+    }
+
+    /**
+     * Completing a count creates an inventory baseline transaction and, when the count had discrepancies, an
+     * adjustment transaction, both grouped under a single transaction source. The transactions and the source
+     * reference the cycle count, so they have to go before it does.
+     */
+    private void deleteCycleCountTransactions(CycleCount cycleCount) {
+        // The transactions reference the source, so they have to be gone from the database before it is deleted
+        List<Transaction> transactions = Transaction.findAllByCycleCount(cycleCount)
+        transactions.each { it.delete(flush: true) }
+
+        List<TransactionSource> transactionSources = TransactionSource.findAllByCycleCount(cycleCount)
+        transactionSources.each { it.delete() }
     }
 
 

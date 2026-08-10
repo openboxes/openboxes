@@ -81,6 +81,12 @@ class CycleCountApiController extends BaseApiController {
         renderNoContentResponse()
     }
 
+    def deleteCycleCount(String cycleCountId) {
+        cycleCountService.deleteCycleCount(cycleCountId)
+
+        render(status: 204)
+    }
+
     def startCycleCount(CycleCountStartBatchCommand command) {
         BatchCommandUtils.validateBatch(command, "requests")
         List<CycleCountDto> cycleCounts = cycleCountService.startCycleCount(command)
