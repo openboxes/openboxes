@@ -66,6 +66,23 @@
         .monthRow:hover {
             background: #f7f7f7;
         }
+
+        .stockHistoryFilterRow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .autoIssuedFilterContainer {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+        }
+
+        .autoIssuedFilterContainer label {
+            margin-right: 5px;
+            white-space: nowrap;
+        }
     </style>
     <script>
       $(document).ready(function() {
@@ -156,14 +173,15 @@
           event.stopPropagation();
         });
 
-        $("#stockHistoryFilter").keyup(function(event){
+        $("#stockHistoryFilter, #autoIssuedFilter").on("keyup change", function(event){
           var filterCell = 9 // serial lot number
           var filterValue = $("#stockHistoryFilter").val().toUpperCase();
-          filterTable(filterCell, filterValue)
+          var autoIssuedFilterValue = $("#autoIssuedFilter").val();
+          filterTable(filterCell, filterValue, autoIssuedFilterValue)
         });
 
       });
-      function filterTable(cellIndex, filterValue) {
+      function filterTable(cellIndex, filterValue, autoIssuedFilterValue) {
         var tableRows = $("#stockHistoryTable tr.dataRow");
 
         // Loop through all table rows, and hide those who don't match the search query
@@ -171,7 +189,12 @@
 
             // If filter matches text value then we display, otherwise hide
             var txtValue = $(currentRow).find("td").eq(cellIndex).text();
-            if (txtValue.toUpperCase().indexOf(filterValue) > -1) {
+            var matchesText = txtValue.toUpperCase().indexOf(filterValue) > -1;
+            var isAutoIssued = $(currentRow).hasClass("autoIssued");
+            var matchesAutoIssued = autoIssuedFilterValue === "all"
+                || (autoIssuedFilterValue === "autoIssued" && isAutoIssued)
+                || (autoIssuedFilterValue === "manuallyIssued" && !isAutoIssued);
+            if (matchesText && matchesAutoIssued) {
                 $(currentRow).show();
             } else {
                 $(currentRow).hide();
@@ -199,12 +222,22 @@
             </div>
         </div>
     </h2>
-    <input
-        type="text"
-        id="stockHistoryFilter"
-        class="text large"
-        placeholder="${g.message(code: 'inventory.stockHistory.search.label', default: 'Filter by serial number or lot number')}"
-    />
+    <div class="stockHistoryFilterRow">
+        <input
+            type="text"
+            id="stockHistoryFilter"
+            class="text large"
+            placeholder="${g.message(code: 'inventory.stockHistory.search.label', default: 'Filter by serial number or lot number')}"
+        />
+        <span class="autoIssuedFilterContainer">
+            <label for="autoIssuedFilter">${g.message(code: 'inventory.stockHistory.autoIssuedFilter.title.label', default: 'Filter by issuance type:')}</label>
+            <select id="autoIssuedFilter" class="text">
+                <option value="all">${g.message(code: 'inventory.stockHistory.autoIssuedFilter.all.label', default: 'Show all')}</option>
+                <option value="autoIssued">${g.message(code: 'inventory.stockHistory.autoIssuedFilter.autoIssued.label', default: 'Show Auto Issued')}</option>
+                <option value="manuallyIssued">${g.message(code: 'inventory.stockHistory.autoIssuedFilter.manuallyIssued.label', default: 'Show Manually Issued')}</option>
+            </select>
+        </span>
+    </div>
     <table id="stockHistoryTable" class="stockHistory">
         <thead>
             <tr class="odd">
@@ -290,7 +323,8 @@
                             <g:set var="rowClass" value="${(count%2==0)?'odd':'even' }"/>
                         </g:else>
 
-                        <tr class="${rowClass} monthRow dataRow ${isCurrentYear ? 'currentYear' : ''} ${stockHistoryEntry?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? 'recalled' : ''}"
+                        <g:set var="isAutoIssued" value="${stockHistoryEntry?.showDetails && requisitionDtoById?.get(stockHistoryEntry?.requisitionId)?.autoIssuanceRequested}"/>
+                        <tr class="${rowClass} monthRow dataRow ${isCurrentYear ? 'currentYear' : ''} ${stockHistoryEntry?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? 'recalled' : ''} ${isAutoIssued ? 'autoIssued' : ''}"
                             title="${stockHistoryEntry?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? warehouse.message(code: 'inventoryItem.recalledLot.label') : ''}">
                             <td  class="middle">
                                 <g:if test="${stockHistoryEntry?.showDetails}">
@@ -404,6 +438,10 @@
                                                     <g:message code="requisition.label"/>
                                                     &rsaquo;
                                                     ${requisitionDto.requestNumber}
+                                                    <g:if test="${requisitionDto?.autoIssuanceRequested}">
+                                                        <img src="${resource(dir: 'images/icons/requisitionStatus', file: 'requisition_status_issued.png' )}" title="${g.message(code: 'requisition.autoIssued.label')}"/>
+                                                        <g:message code="requisition.autoIssued.label"/>
+                                                    </g:if>
                                                 </div>
                                             </g:link>
                                         </g:elseif>

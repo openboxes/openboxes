@@ -5,4 +5,5 @@ class StockHistoryRequisitionDto {
     String id
     String requestNumber
     String name
+    Boolean autoIssuanceRequested
 }
