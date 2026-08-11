@@ -2,14 +2,12 @@ import { useCallback, useMemo, useState } from 'react';
 
 import ReceivingRowType from 'consts/receivingRowType';
 
-// Cancelling applies to shipment-item level rows only: a plain line (no row type) or the replaced
-// row of a split shipment item.
-const isShipmentItemRow = (row) =>
-  row?.rowType === null || row?.rowType === ReceivingRowType.REPLACED;
-
-// A row can be canceled when it still has something left to receive and its shipment item has an
-// original line to carry the cancel - the only line the backend accepts the flag on.
-export const isCancellableRow = (row) => isShipmentItemRow(row)
+// A row can be canceled when it is the only line that was not split or the replaced row standing
+// above its split lines, still has something left to receive, and its shipment item has an
+// original line (isSplitItem: false) to carry the cancel - the only line the backend accepts
+// the flag on.
+export const isCancellableRow = (row) =>
+  (row?.rowType === null || row?.rowType === ReceivingRowType.REPLACED)
   && Boolean(row.originalReceiptItemId)
   && !row.isCompleted
   && (row.quantityAvailableToReceive ?? 0) > 0;
@@ -36,10 +34,7 @@ const useCancelRemaining = ({ lineItemsState }) => {
   }, []);
 
   // Selects every line that still has something to cancel, limited to the rows the filter shows.
-  const selectAll = useCallback(
-    () => setIds(new Set(getCancellableReceiptItemIds(lineItemsState))),
-    [lineItemsState],
-  );
+  const selectAll = () => setIds(new Set(getCancellableReceiptItemIds(lineItemsState)));
 
   const itemsToComplete = useMemo(
     () => [...ids].map((receiptItemId) => ({
