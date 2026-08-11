@@ -977,9 +977,8 @@ class CycleCountService {
      * reference the cycle count, so they have to go before it does.
      */
     private void deleteCycleCountTransactions(CycleCount cycleCount) {
-        // The transactions reference the source, so they have to be gone from the database before it is deleted
         List<Transaction> transactions = Transaction.findAllByCycleCount(cycleCount)
-        transactions.each { it.delete(flush: true) }
+        transactions.each { it.delete() }
 
         List<TransactionSource> transactionSources = TransactionSource.findAllByCycleCount(cycleCount)
         transactionSources.each { it.delete() }
