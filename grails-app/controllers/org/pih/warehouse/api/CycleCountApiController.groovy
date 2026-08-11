@@ -81,7 +81,7 @@ class CycleCountApiController {
     }
 
     def deleteCycleCount(String cycleCountId) {
-        cycleCountService.deleteCycleCount(cycleCountId)
+        cycleCountService.deleteCycleCountWithAssociations(cycleCountId)
 
         render(status: 204)
     }
