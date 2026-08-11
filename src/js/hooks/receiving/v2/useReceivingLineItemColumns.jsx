@@ -24,6 +24,12 @@ import { DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
 import QuantityInputCell from 'utils/cells/QuantityInputCell';
 import { debouncePeopleFetch } from 'utils/option-utils';
+import CustomTooltip from 'wrappers/CustomTooltip';
+
+// The original line of the shipment item: its product and lot identify the line being received,
+// so they are read-only here, and it cannot be removed (it backs the cancel-remaining flow on
+// completion) - receiving a different product or lot is done on a split row.
+const isOriginalLine = (row) => !row.original?.isSplitItem;
 
 /**
  * Columns for the editable "Receiving now" table in the edit modal.
@@ -65,6 +71,7 @@ const useReceivingLineItemColumns = ({
                 {...field}
                 productSelect
                 locationId={locationId}
+                disabled={isOriginalLine(row)}
                 hideErrorMessageWrapper
                 ariaLabel={{ id: 'react.receiving.product.label', defaultMessage: 'Product' }}
               />
@@ -91,6 +98,7 @@ const useReceivingLineItemColumns = ({
               <TextInput
                 {...field}
                 autoComplete="off"
+                disabled={isOriginalLine(row)}
                 hideErrorMessageWrapper
                 ariaLabel={{ id: 'react.receiving.lotSerialNo.short.label', defaultMessage: 'Lot/SN' }}
               />
@@ -214,21 +222,33 @@ const useReceivingLineItemColumns = ({
           {translate('react.receiving.actions.label', 'Actions')}
         </TableHeaderCell>
       ),
-      cell: ({ row }) => (
-        <TableCell className="rt-td">
-          <div
-            className="receiving-edit-modal__delete d-flex align-items-center justify-content-end w-100 h-100"
-            role="button"
-            aria-label={translate('react.default.button.delete.label', 'Delete')}
-          >
-            <RiDeleteBinLine
-              size={20}
-              className="cursor-pointer"
-              onClick={() => removeRow(row.original.rowId)}
-            />
-          </div>
-        </TableCell>
-      ),
+      cell: ({ row }) => {
+        const isOriginal = isOriginalLine(row);
+        return (
+          <TableCell className="rt-td">
+            <div
+              className="receiving-edit-modal__delete d-flex align-items-center justify-content-end w-100 h-100"
+              role="button"
+              aria-disabled={isOriginal}
+              aria-label={translate('react.default.button.delete.label', 'Delete')}
+            >
+              <CustomTooltip
+                content={translate(
+                  'react.receiving.deleteOriginalLine.tooltip.label',
+                  'This line cannot be deleted because it represents the original product and lot entered by the shipper. If you did not receive this lot, enter zero in the receiving now field.',
+                )}
+                show={isOriginal}
+              >
+                <RiDeleteBinLine
+                  size={20}
+                  className={isOriginal ? 'disabled-icon' : 'cursor-pointer'}
+                  onClick={isOriginal ? undefined : () => removeRow(row.original.rowId)}
+                />
+              </CustomTooltip>
+            </div>
+          </TableCell>
+        );
+      },
       size: hasBinLocationSupport ? 130 : 108,
     }),
   ], [

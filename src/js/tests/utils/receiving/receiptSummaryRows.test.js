@@ -186,6 +186,71 @@ describe('transformReceiptSummary() - table view', () => {
       quantityRemaining: 92,
       quantityAvailableToReceive: 100,
     });
+    expect(toggleRow.originalLineItem).toBeNull();
+  });
+
+  it('should carry a zeroed original line on the toggle row of its group', () => {
+    const data = buildData([buildSummary('a', {
+      currentReceiptItems: [
+        {
+          id: 'original',
+          quantityReceived: 0,
+          productLot: { product: { id: 'product-a' }, lotNumber: 'lot-a' },
+        },
+        {
+          id: 'split',
+          isSplitItem: true,
+          quantityReceived: 3,
+          productLot: { product: { id: 'product-a' }, lotNumber: 'other-lot' },
+        },
+      ],
+      totalQuantityReceived: 3,
+    })], { order: ['a'] });
+
+    const rows = entitiesInOrder(transformReceiptSummary(data, ReceivingView.TABLE, {}));
+
+    // The zeroed original is hidden behind its split line, so it gets no row of its own.
+    expect(rows.map((row) => row.rowType)).toEqual([
+      ReceivingRowType.REPLACED,
+      ReceivingRowType.TOGGLE,
+      ReceivingRowType.SPLIT_ITEM,
+    ]);
+    const [, toggleRow] = rows;
+    expect(toggleRow.splitItemIds).toHaveLength(1);
+    expect(toggleRow.originalLineItem).toMatchObject({
+      receiptItemId: 'original',
+      lotNumber: 'lot-a',
+      quantityReceiving: 0,
+      isSplitItem: false,
+    });
+  });
+
+  it('should carry a zeroed original line on the single row left when its split matches the shipment', () => {
+    const data = buildData([buildSummary('a', {
+      currentReceiptItems: [
+        {
+          id: 'original',
+          quantityReceived: 0,
+          productLot: { product: { id: 'product-a' }, lotNumber: 'lot-a' },
+        },
+        {
+          id: 'split',
+          isSplitItem: true,
+          quantityReceived: 4,
+          productLot: { product: { id: 'product-a' }, lotNumber: 'lot-a' },
+        },
+      ],
+      totalQuantityReceived: 4,
+    })], { order: ['a'] });
+
+    const rows = entitiesInOrder(transformReceiptSummary(data, ReceivingView.TABLE, {}));
+
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ rowType: null, receiptItemId: 'split' });
+    expect(rows[0].originalLineItem).toMatchObject({
+      receiptItemId: 'original',
+      isSplitItem: false,
+    });
   });
 });
 

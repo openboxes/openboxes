@@ -46,6 +46,9 @@ const removeSplitItemRow = (state, rowId) => {
       splitItemIds[0],
       {
         rowType: null,
+        // Dissolving the group drops the toggle row, so a zeroed original (which has no row of
+        // its own) would lose its carrier - the remaining row takes it over for the edit modal.
+        originalLineItem: toggle.originalLineItem,
         quantityAvailableToReceive:
           replacedRow?.quantityAvailableToReceive
           ?? remainingSplitItem.quantityAvailableToReceive,

@@ -41,13 +41,24 @@ export const getConfirmReceiptRowActions = ({ itemId, hasComment, onOpenCommentM
 
 /**
  * Builds the action descriptors for a split item row (a single receipt item of a changed
- * shipment item), consumed by ActionsCell.
+ * shipment item), consumed by ActionsCell. The original line of the shipment item cannot be
+ * removed (it backs the cancel-remaining flow on completion), so it carries the delete action
+ * disabled, with a tooltip explaining why - the same treatment it gets in the edit modal.
  */
-export const getReceivingSplitItemActions = ({ rowId, onRemove }) => [
+export const getReceivingSplitItemActions = ({ rowId, onRemove, isOriginalLine }) => [
   {
     key: 'delete',
-    icon: <RiDeleteBinLine size={22} className="receiving-table__delete-icon" />,
+    icon: (
+      <RiDeleteBinLine
+        size={22}
+        className={`receiving-table__delete-icon ${isOriginalLine ? 'disabled-icon' : ''}`}
+      />
+    ),
     onClick: () => onRemove?.(rowId),
+    disabled: isOriginalLine,
+    // Only the line that cannot be deleted explains itself on hover.
+    tooltipLabel: isOriginalLine ? 'react.receiving.deleteOriginalLine.tooltip.label' : null,
+    defaultTooltipLabel: 'This line cannot be deleted because it represents the original product and lot entered by the shipper. If you did not receive this lot, enter zero in the receiving now field.',
     label: 'react.default.button.delete.label',
     defaultLabel: 'Delete',
   },

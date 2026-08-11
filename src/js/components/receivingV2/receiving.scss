@@ -322,6 +322,12 @@
 
   &__delete {
     color: var(--color-red);
+
+    // The disabled icon is pointer-events: none, so the cursor over it comes from this wrapper -
+    // without this rule Bootstrap's [role="button"] would keep showing a pointer.
+    &[aria-disabled="true"] {
+      cursor: not-allowed;
+    }
   }
 
   &__add-record {

@@ -220,10 +220,27 @@ const buildItemRows = (summary, usersById) => {
       || items.length === 1,
   );
 
+  // Zeroed original line is hidden in the table, but should be always visible in the modal
+  // To handle this, we store the data of originalReceiptItem either
+  // in the toggle row or in the "basic" row for the case where you have one split line,
+  // but with the same product as the original line product (no toggle then)
+  const originalReceiptItem = findOriginalReceiptItem(currentReceiptItems);
+  const hiddenOriginalLineItem = originalReceiptItem
+    && !visibleReceiptItems.includes(originalReceiptItem)
+    ? buildSplitItemEntity({ summary, receiptItem: originalReceiptItem, usersById })
+    : null;
+
   if (visibleReceiptItems.length < 2 && !hasReceiptItemChanges(visibleReceiptItems[0])) {
     const receiptItem = visibleReceiptItems[0];
+
+    // The only case where we would reach the isSplitItem=true is when you have only one split item
+    // with the splitItem.product = originalItem.product
     return receiptItem?.isSplitItem
-      ? [{ ...buildSplitItemEntity({ summary, receiptItem, usersById }), rowType: null }]
+      ? [{
+        ...buildSplitItemEntity({ summary, receiptItem, usersById }),
+        rowType: null,
+        originalLineItem: hiddenOriginalLineItem,
+      }]
       : [buildLineItem({ summary, receiptItem, usersById })];
   }
 
@@ -259,6 +276,7 @@ const buildItemRows = (summary, usersById) => {
       shipmentItemId: shipmentItem.id,
       replacedRowId: replacedRow.rowId,
       splitItemIds: splitItemRows.map((splitItem) => splitItem.rowId),
+      originalLineItem: hiddenOriginalLineItem,
     },
     ...splitItemRows,
   ];
