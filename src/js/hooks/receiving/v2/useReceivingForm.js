@@ -17,7 +17,7 @@ import useReceivingColumns from 'hooks/receiving/v2/useReceivingColumns';
 import useReceivingFilters from 'hooks/receiving/v2/useReceivingFilters';
 import useTableLocationAutofill from 'hooks/receiving/v2/useTableLocationAutofill';
 import useTableSorting from 'hooks/useTableSorting';
-import anyLineHasOtherBin from 'utils/receiving/anyLineHasOtherBin';
+import hasItemInDifferentBin from 'utils/receiving/hasItemInDifferentBin';
 
 const useReceivingForm = () => {
   const dispatch = useDispatch();
@@ -70,7 +70,7 @@ const useReceivingForm = () => {
       return;
     }
     putawayInitialized.current = true;
-    if (anyLineHasOtherBin(lineItemsState, receivingBin)) {
+    if (hasItemInDifferentBin(lineItemsState, receivingBin)) {
       setPutawayEnabled(true);
     }
   }, [lineItemsState, receivingBin, binLocations]);
