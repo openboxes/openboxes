@@ -57,6 +57,8 @@ class PickTaskService {
             statusesToSearch = [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
         }
 
+        List<String> requisitionIdsWithAssignee = findRequisitionIdsWithPickTaskAssignee(command.facility, statusesToSearch)
+
         List<PickTask> tasks = PickTask.createCriteria().list(max: max, offset: offset) {
             if (command.facility) {
                 eq("facility", command.facility)
@@ -100,6 +102,12 @@ class PickTaskService {
                 }
             }
 
+            if (requisitionIdsWithAssignee) {
+                not {
+                    'in'("requisition.id", requisitionIdsWithAssignee)
+                }
+            }
+
             order("priority", "asc")
             order("dateCreated", "asc")
             createAlias("location", "l", CriteriaSpecification.LEFT_JOIN)
@@ -127,6 +135,7 @@ class PickTaskService {
 
     private Map<DeliveryTypeCode, Integer> countDistinctRequisitionsByDeliveryType(
             Location facility, List<PickTaskStatus> statuses) {
+        List<String> requisitionIdsWithAssignee = findRequisitionIdsWithPickTaskAssignee(facility, statuses)
         List results = PickTask.createCriteria().list {
             projections {
                 groupProperty("deliveryTypeCode")
@@ -135,6 +144,12 @@ class PickTaskService {
             eq("facility", facility)
             if (statuses) {
                 'in'("status", statuses)
+            }
+
+            if (requisitionIdsWithAssignee) {
+                not {
+                    'in'("requisition.id", requisitionIdsWithAssignee)
+                }
             }
         }
         return results.collectEntries { row -> [(row[0]): (row[1] as Integer)] }
@@ -538,6 +553,23 @@ class PickTaskService {
 
             return p1 <=> p2 ?: a.dateCreated <=> b.dateCreated
         }.take(ordersCount)*.id
+    }
+
+    private List<String> findRequisitionIdsWithPickTaskAssignee(Location facility, List<PickTaskStatus> statusesToSearch) {
+        List<Requisition> requisitions = PickTask.createCriteria().list {
+            projections {
+                distinct("requisition")
+            }
+            isNotNull("assignee")
+            if (statusesToSearch) {
+                'in'("status", statusesToSearch)
+            }
+            if (facility) {
+                eq("facility", facility)
+            }
+        }
+
+        return requisitions*.id
     }
 
     private void validateOutboundContainer(Location outboundContainer, PickTask pickTask) {
