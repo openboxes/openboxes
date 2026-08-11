@@ -929,7 +929,7 @@ class CycleCountService {
      * Deletes a single cycle count with everything that points at it: its items, the transactions (and the
      * transaction source grouping them) that completing the count created, and the request that spawned it.
      */
-    void deleteCycleCount(String cycleCountId) {
+    void deleteCycleCountWithAssociations(String cycleCountId) {
         CycleCount cycleCount = CycleCount.get(cycleCountId)
         if (!cycleCount) {
             throw new ObjectNotFoundException(cycleCountId, CycleCount.class.toString())
@@ -937,7 +937,8 @@ class CycleCountService {
 
         CycleCountRequest cycleCountRequest = cycleCount.cycleCountRequest
 
-        deleteCycleCountWithAssociations(cycleCount)
+        deleteCycleCountTransactions(cycleCount)
+        deleteCycleCount(cycleCount)
 
         cycleCountRequest?.delete()
     }
@@ -950,18 +951,16 @@ class CycleCountService {
 
         CycleCount cycleCount = cycleCountRequest.cycleCount
         if (cycleCount) {
-            deleteCycleCountWithAssociations(cycleCount)
+            deleteCycleCount(cycleCount)
         }
 
         cycleCountRequest.delete()
     }
 
-    private void deleteCycleCountWithAssociations(CycleCount cycleCount) {
+    private void deleteCycleCount(CycleCount cycleCount) {
         if (!cycleCount) {
             return
         }
-
-        deleteCycleCountTransactions(cycleCount)
 
         cycleCount.cycleCountItems.each { it.delete() }
         cycleCount.cycleCountItems.clear()
@@ -977,10 +976,11 @@ class CycleCountService {
      * reference the cycle count, so they have to go before it does.
      */
     private void deleteCycleCountTransactions(CycleCount cycleCount) {
-        List<Transaction> transactions = Transaction.findAllByCycleCount(cycleCount)
+        List<TransactionSource> transactionSources = TransactionSource.findAllByCycleCount(cycleCount)
+
+        List<Transaction> transactions = transactionSources.collectMany { it.associatedTransactions }
         transactions.each { it.delete() }
 
-        List<TransactionSource> transactionSources = TransactionSource.findAllByCycleCount(cycleCount)
         transactionSources.each { it.delete() }
     }
 

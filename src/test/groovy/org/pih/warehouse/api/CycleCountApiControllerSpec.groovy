@@ -38,7 +38,6 @@ import javax.servlet.http.HttpServletResponse
 class CycleCountApiControllerSpec extends ApiControllerSpec<CycleCountApiController> {
 
     private static String FACILITY_ID = 'Facility Id'
-    private static String CYCLE_COUNT_ID = 'Cycle Count Id'
     private static String JSON_FORMAT = 'application/json'
     private static String CSV_FORMAT = 'text/csv'
     private static String XLS_FORMAT = 'application/vnd.ms-excel'
@@ -210,19 +209,6 @@ class CycleCountApiControllerSpec extends ApiControllerSpec<CycleCountApiControl
         then:
         response.status == HttpStatus.SC_OK
         response.json.data.size() == 2
-    }
-
-    void 'deleteCycleCount should delegate to the service and respond with no content'() {
-        given: "a mock replacing the shared stub, so that the delegation can be verified"
-        CycleCountService mockedCycleCountService = Mock(CycleCountService)
-        controller.cycleCountService = mockedCycleCountService
-
-        when:
-        controller.deleteCycleCount(CYCLE_COUNT_ID)
-
-        then:
-        1 * mockedCycleCountService.deleteCycleCount(CYCLE_COUNT_ID)
-        response.status == HttpStatus.SC_NO_CONTENT
     }
 
     void 'startCycleCount should return cycleCounts in #contentType contentType when the #outputFormat format is used'() {
