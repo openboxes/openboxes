@@ -2012,19 +2012,20 @@ class InventoryService implements ApplicationContextAware {
             Integer quantityOnHand = getQuantityFromBinLocation(location, binLocation, inventoryItem)
 
             if (!otherLocation?.inventory) {
-                transaction.errors.reject("Destination does not have an inventory")
+                transaction.errors.reject("Destination location '${otherLocation?.name}' does not have an inventory")
             }
 
             if (location == otherLocation && binLocation == otherBinLocation) {
-                transaction.errors.reject("Cannot transfer to the same location")
+                transaction.errors.reject("Cannot transfer to the same location: '${binLocation?.name}'")
             }
 
             if (quantityOnHand < quantity) {
-                transaction.errors.reject("Quantity cannot exceed quantity on hand")
+                transaction.errors.reject("Quantity to transfer (${quantity}) cannot exceed available quantity (${quantityOnHand}) " +
+                        "of product '${inventoryItem.product?.productCode}' in location '${binLocation?.name}'")
             }
 
             if (quantity <= 0) {
-                transaction.errors.reject("Quantity must be greater than 0")
+                transaction.errors.reject("Quantity to transfer must be greater than 0, but ${quantity} was provided")
             }
 
             // Create transaction to handle transfer in / out
