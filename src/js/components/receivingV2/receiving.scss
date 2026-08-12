@@ -156,6 +156,14 @@
     color: var(--gray-350);
   }
 
+  // Quantities are right aligned
+  &__quantity,
+  .rt-td:has(&__quantity) {
+    justify-content: flex-end;
+    // Right aligns the typed value of the quantity input, which fills its cell.
+    text-align: right;
+  }
+
   // Dashed separator under split item rows and under the expanded toggle right above them.
   // The last split item keeps the default solid border closing the group.
   // The gradient controls the dash/gap size (native `dashed` can't).

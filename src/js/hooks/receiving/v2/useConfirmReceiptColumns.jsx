@@ -27,7 +27,7 @@ import ValueCell from 'utils/cells/ValueCell';
 import { getConfirmReceiptRowActions } from 'utils/receiving/getReceivingRowActions';
 import getReceivingRowStatus from 'utils/receiving/getReceivingRowStatus';
 
-const useConfirmReceiptColumns = ({ view, putawayEnabled } = {}) => {
+const useConfirmReceiptColumns = ({ view } = {}) => {
   const translate = useTranslate();
   const formatNumber = useFormatNumber();
   const columnHelper = createColumnHelper();
@@ -54,13 +54,18 @@ const useConfirmReceiptColumns = ({ view, putawayEnabled } = {}) => {
     <ValueCell
       value={value}
       tooltipLabel={value}
+      className="receiving-table__quantity"
       label={label}
       defaultLabel={defaultLabel}
     />
   );
 
   const quantityHeader = (label, defaultLabel) => (
-    <TableHeaderCell tooltip tooltipLabel={translate(label, defaultLabel)}>
+    <TableHeaderCell
+      tooltip
+      tooltipLabel={translate(label, defaultLabel)}
+      className="receiving-table__quantity"
+    >
       {translate(label, defaultLabel)}
     </TableHeaderCell>
   );
@@ -337,9 +342,9 @@ const useConfirmReceiptColumns = ({ view, putawayEnabled } = {}) => {
         },
         size: 125,
       }),
-      // The Location (putaway bin) column is only shown when "Enable Putaway" is on
-      // and a bin tracking location.
-      ...(putawayEnabled && hasBinLocationSupport ? [
+      // The Location (putaway bin) column is shown even when "Enable Putaway" is off on the
+      // receiving step, so the user sees which bin the shipment is received into.
+      ...(hasBinLocationSupport ? [
         columnHelper.display({
           id: receivingColumns.LOCATION,
           header: () => (
@@ -430,7 +435,7 @@ const useConfirmReceiptColumns = ({ view, putawayEnabled } = {}) => {
         }),
       ] : []),
     ];
-  }, [translate, currentLocale, isPackingListView, putawayEnabled, hasPartialReceivingSupport]);
+  }, [translate, currentLocale, isPackingListView, hasPartialReceivingSupport]);
 
   return { columns };
 };

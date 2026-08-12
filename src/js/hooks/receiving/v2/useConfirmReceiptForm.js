@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
-import { getReceivingPutawayEnabled, getReceivingView } from 'selectors';
+import { getReceivingView } from 'selectors';
 
 import useCancelRemaining from 'hooks/receiving/v2/useCancelRemaining';
 import useCommentModal from 'hooks/receiving/v2/useCommentModal';
@@ -20,10 +20,7 @@ const useConfirmReceiptForm = () => {
   const {
     loading, receiptIdRef, lineItemsState, updateLineItemComment,
   } = useConfirmReceiptActions(view);
-  const putawayEnabled = useSelector(
-    (state) => getReceivingPutawayEnabled(state, receiptIdRef.current),
-  );
-  const { columns } = useConfirmReceiptColumns({ view, putawayEnabled });
+  const { columns } = useConfirmReceiptColumns({ view });
   const commentModal = useCommentModal({ updateLineItemComment });
   const {
     visibleLineItemsState,

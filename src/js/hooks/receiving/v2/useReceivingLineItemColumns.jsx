@@ -163,7 +163,7 @@ const useReceivingLineItemColumns = ({
     }),
     columnHelper.accessor(receivingColumns.QUANTITY_RECEIVING, {
       header: () => (
-        <TableHeaderCell>
+        <TableHeaderCell className="receiving-table__quantity">
           {translate('react.receiving.receivingNow.label', 'Receiving Now')}
         </TableHeaderCell>
       ),
@@ -182,6 +182,7 @@ const useReceivingLineItemColumns = ({
                   field.onBlur();
                 }}
                 errorMessage={errorMessage}
+                className="receiving-table__quantity"
                 label="react.receiving.receivingNow.label"
                 defaultLabel="Receiving Now"
               />
@@ -189,7 +190,11 @@ const useReceivingLineItemColumns = ({
           />
         );
       },
-      footer: ({ table }) => <span style={{ paddingLeft: '14px' }}>{table.options.meta?.totalReceivingNow ?? 0}</span>,
+      footer: ({ table }) => (
+        <span className="receiving-table__quantity w-100">
+          {table.options.meta?.totalReceivingNow ?? 0}
+        </span>
+      ),
       size: 120,
     }),
     ...(hasBinLocationSupport ? [
