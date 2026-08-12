@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
 import { RiArrowDownLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
-import { getCurrentLocationId } from 'selectors';
+import { getCurrentLocationId, getHasBinLocationSupport } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
@@ -25,6 +25,7 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
   const translate = useTranslate();
   const columnHelper = createColumnHelper();
   const locationId = useSelector(getCurrentLocationId);
+  const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
 
   const columns = useMemo(() => [
     columnHelper.accessor(receivingColumns.PRODUCT, {
@@ -163,27 +164,29 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
       footer: ({ table }) => <span style={{ paddingLeft: '14px' }}>{table.options.meta?.totalReceived ?? 0}</span>,
       size: 120,
     }),
-    columnHelper.accessor(receivingColumns.LOCATION, {
-      header: () => <LocationAutofillHeader />,
-      cell: ({ row }) => (
-        <TableCell className="rt-td">
-          <Controller
-            key={row.original.rowId}
-            name={`receivedItems.${row.index}.binLocation`}
-            control={control}
-            render={({ field }) => (
-              <SelectField
-                {...field}
-                disabled
-                hideErrorMessageWrapper
-                ariaLabel={{ id: 'react.receiving.location.label', defaultMessage: 'Location' }}
-              />
-            )}
-          />
-        </TableCell>
-      ),
-      size: 150,
-    }),
+    ...(hasBinLocationSupport ? [
+      columnHelper.accessor(receivingColumns.LOCATION, {
+        header: () => <LocationAutofillHeader />,
+        cell: ({ row }) => (
+          <TableCell className="rt-td">
+            <Controller
+              key={row.original.rowId}
+              name={`receivedItems.${row.index}.binLocation`}
+              control={control}
+              render={({ field }) => (
+                <SelectField
+                  {...field}
+                  disabled
+                  hideErrorMessageWrapper
+                  ariaLabel={{ id: 'react.receiving.location.label', defaultMessage: 'Location' }}
+                />
+              )}
+            />
+          </TableCell>
+        ),
+        size: 150,
+      }),
+    ] : []),
     columnHelper.display({
       id: 'actions',
       header: () => (
@@ -203,10 +206,10 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
           </button>
         </TableCell>
       ),
-      size: 130,
+      size: hasBinLocationSupport ? 130 : 108,
       meta: { getCellContext: () => ({ className: 'data-table__interactive' }) },
     }),
-  ], [translate, control, locationId, copyToReceive]);
+  ], [translate, control, locationId, hasBinLocationSupport, copyToReceive]);
 
   return { columns };
 };

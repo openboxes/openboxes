@@ -1,6 +1,6 @@
 import * as locales from 'date-fns/locale';
 import { useSelector } from 'react-redux';
-import { getCurrentLocale } from 'selectors';
+import { getCurrentLocale, getHasBinLocationSupport } from 'selectors';
 
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
@@ -12,6 +12,7 @@ import { formatDateToString } from 'utils/dateUtils';
 const useShipmentItemDetails = (lineItem) => {
   const translate = useTranslate();
   const currentLocale = useSelector(getCurrentLocale);
+  const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
 
   const badge = {
     current: {
@@ -42,10 +43,12 @@ const useShipmentItemDetails = (lineItem) => {
       label: translate('react.receiving.recipient.label', 'Recipient'),
       value: lineItem?.recipient?.name,
     },
-    {
-      label: translate('react.receiving.location.label', 'Location'),
-      value: lineItem?.binLocation?.name,
-    },
+    ...(hasBinLocationSupport ? [
+      {
+        label: translate('react.receiving.location.label', 'Location'),
+        value: lineItem?.binLocation?.name,
+      },
+    ] : []),
     {
       label: translate('react.receiving.shipped.label', 'Shipped'),
       value: lineItem?.quantityShipped,

@@ -4,6 +4,7 @@ import {
 
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  getHasBinLocationSupport,
   getReceivingBin,
   getReceivingBinLocations,
   getReceivingPutawayEnabled,
@@ -27,6 +28,7 @@ const useReceivingForm = () => {
   const setView = useCallback((newView) => dispatch(updateReceivingView(newView)), [dispatch]);
   const receivingBin = useSelector(getReceivingBin);
   const binLocations = useSelector(getReceivingBinLocations);
+  const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
   const {
     sortableProps, sort, order, resetSort,
   } = useTableSorting();
@@ -70,7 +72,10 @@ const useReceivingForm = () => {
   // visible: a bin other than the receiving bin, or any bin at all when there is no receiving bin.
   const putawayInitialized = useRef(false);
   useEffect(() => {
-    if (putawayInitialized.current || !binLocations.length || !lineItemsState?.ids?.length) {
+    if (putawayInitialized.current
+      || !binLocations.length
+      || !lineItemsState?.ids?.length
+      || !hasBinLocationSupport) {
       return;
     }
     putawayInitialized.current = true;
