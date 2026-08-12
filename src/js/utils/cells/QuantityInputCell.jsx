@@ -15,7 +15,7 @@ const blurOnWheel = (e) => e.currentTarget.blur();
  * caller decides where to store it; pass `value` to keep the input in sync with that store.
  */
 const QuantityInputCell = React.memo(({
-  value, onCommit, label, defaultLabel, disabled, errorMessage,
+  value, onCommit, label, defaultLabel, disabled, errorMessage, className,
 }) => {
   const [inputValue, setInputValue] = useState(value ?? '');
 
@@ -41,7 +41,7 @@ const QuantityInputCell = React.memo(({
     <TableCell className="rt-td" customTooltip={!!errorMessage} tooltipLabel={errorMessage}>
       <TextInput
         type="number"
-        className="hide-arrows input-xs"
+        className={`hide-arrows input-xs ${className}`}
         value={inputValue}
         onChange={onChange}
         onBlur={onBlur}
@@ -66,12 +66,14 @@ QuantityInputCell.propTypes = {
   defaultLabel: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   errorMessage: PropTypes.string,
+  className: PropTypes.string,
 };
 
 QuantityInputCell.defaultProps = {
   value: null,
   disabled: false,
   errorMessage: undefined,
+  className: '',
 };
 
 export default QuantityInputCell;

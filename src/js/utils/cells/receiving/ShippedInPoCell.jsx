@@ -10,7 +10,7 @@ import useTranslate from 'hooks/useTranslate';
  * e.g. "54" with a muted "BTL/4" suffix.
  */
 const ShippedInPoCell = React.memo(({
-  packs, unitOfMeasure, label, defaultLabel,
+  packs, unitOfMeasure, label, defaultLabel, className,
 }) => {
   const translate = useTranslate();
 
@@ -18,7 +18,7 @@ const ShippedInPoCell = React.memo(({
 
   return (
     <TableCell className="rt-td" customTooltip tooltipLabel={tooltipLabel}>
-      <div className="shipped-po" aria-label={translate(label, defaultLabel)}>
+      <div className={`shipped-po ${className}`} aria-label={translate(label, defaultLabel)}>
         {packs}
         {unitOfMeasure && <span className="shipped-po__uom">{unitOfMeasure}</span>}
       </div>
@@ -33,11 +33,13 @@ ShippedInPoCell.propTypes = {
   unitOfMeasure: PropTypes.string,
   label: PropTypes.string.isRequired,
   defaultLabel: PropTypes.string.isRequired,
+  className: PropTypes.string,
 };
 
 ShippedInPoCell.defaultProps = {
   packs: null,
   unitOfMeasure: undefined,
+  className: '',
 };
 
 export default ShippedInPoCell;

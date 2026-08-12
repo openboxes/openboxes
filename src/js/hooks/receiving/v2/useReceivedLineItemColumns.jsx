@@ -137,7 +137,7 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
     }),
     columnHelper.accessor(receivingColumns.QUANTITY_RECEIVED, {
       header: () => (
-        <TableHeaderCell>
+        <TableHeaderCell className="receiving-table__quantity">
           {translate('react.receiving.received.label', 'Received')}
         </TableHeaderCell>
       ),
@@ -151,7 +151,7 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
               <TextInput
                 {...field}
                 type="number"
-                className="hide-arrows"
+                className="hide-arrows receiving-table__quantity"
                 autoComplete="off"
                 disabled
                 hideErrorMessageWrapper
@@ -161,7 +161,11 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
           />
         </TableCell>
       ),
-      footer: ({ table }) => <span style={{ paddingLeft: '14px' }}>{table.options.meta?.totalReceived ?? 0}</span>,
+      footer: ({ table }) => (
+        <span className="receiving-table__quantity w-100" style={{ paddingRight: '14px' }}>
+          {table.options.meta?.totalReceived ?? 0}
+        </span>
+      ),
       size: 120,
     }),
     ...(hasBinLocationSupport ? [

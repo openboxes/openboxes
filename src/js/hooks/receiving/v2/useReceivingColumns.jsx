@@ -329,6 +329,7 @@ const useReceivingColumns = ({
             <TableHeaderCell
               tooltip
               tooltipLabel={translate('react.receiving.shippedInPo.label', 'Shipped (in PO UoM)')}
+              className="receiving-table__quantity"
             >
               {translate('react.receiving.shippedInPo.label', 'Shipped (in PO UoM)')}
             </TableHeaderCell>
@@ -346,6 +347,7 @@ const useReceivingColumns = ({
               <ShippedInPoCell
                 packs={packs}
                 unitOfMeasure={unitOfMeasure}
+                className="receiving-table__quantity"
                 label="react.receiving.shippedInPo.label"
                 defaultLabel="Shipped (in PO UoM)"
               />
@@ -366,6 +368,7 @@ const useReceivingColumns = ({
               {...sortHeaderProps(receivingColumns.QUANTITY_SHIPPED)}
               tooltip
               tooltipLabel={translate(labelKey, defaultLabel)}
+              className="receiving-table__quantity"
             >
               {translate(labelKey, defaultLabel)}
             </TableHeaderCell>
@@ -381,6 +384,7 @@ const useReceivingColumns = ({
             <ValueCell
               value={value}
               tooltipLabel={value}
+              className="receiving-table__quantity"
               label="react.receiving.shipped.label"
               defaultLabel="Shipped"
             />
@@ -394,6 +398,7 @@ const useReceivingColumns = ({
           <TableHeaderCell
             tooltip
             tooltipLabel={translate('react.receiving.receivingNow.label', 'Receiving now')}
+            className="receiving-table__quantity"
           >
             {translate('react.receiving.receivingNow.label', 'Receiving Now')}
           </TableHeaderCell>
@@ -412,6 +417,7 @@ const useReceivingColumns = ({
               <ValueCell
                 value={value}
                 tooltipLabel={value}
+                className="receiving-table__quantity"
                 label="react.receiving.receivingNow.label"
                 defaultLabel="Receiving Now"
               />
@@ -423,6 +429,7 @@ const useReceivingColumns = ({
               onCommit={(quantityReceiving) =>
                 table.options.meta?.updateLineItem(row.original.id, { quantityReceiving })}
               disabled={item?.isCompleted}
+              className="receiving-table__quantity"
               label="react.receiving.receivingNow.label"
               defaultLabel="Receiving Now"
             />

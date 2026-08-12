@@ -16,7 +16,7 @@ const blurOnWheel = (e) => e.currentTarget.blur();
  * marks the row dirty; nothing is sent until typing pauses or enough rows accumulate.
  */
 const AutosaveQuantityInputCell = React.memo(({
-  value, onCommit, label, defaultLabel, disabled,
+  value, onCommit, label, defaultLabel, disabled, className,
 }) => {
   const [inputValue, setInputValue] = useState(value ?? '');
   // Last value handed to onCommit. The `value` prop lags one render behind the store, so
@@ -43,7 +43,7 @@ const AutosaveQuantityInputCell = React.memo(({
     <TableCell className="rt-td">
       <TextInput
         type="number"
-        className="hide-arrows input-xs"
+        className={`hide-arrows input-xs ${className}`}
         value={inputValue}
         onChange={onChange}
         disabled={disabled}
@@ -65,11 +65,13 @@ AutosaveQuantityInputCell.propTypes = {
   label: PropTypes.string.isRequired,
   defaultLabel: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
+  className: PropTypes.string,
 };
 
 AutosaveQuantityInputCell.defaultProps = {
   value: null,
   disabled: false,
+  className: '',
 };
 
 export default AutosaveQuantityInputCell;
