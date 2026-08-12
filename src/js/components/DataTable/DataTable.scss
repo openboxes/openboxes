@@ -425,13 +425,17 @@
     color: var(--gray-600);
     cursor: pointer;
 
-    &:hover {
+    &:not([aria-disabled="true"]):hover {
       color: var(--blue-primary);
     }
+  }
 
-    &:disabled {
-      cursor: not-allowed;
-    }
+  // Disabled actions stay hoverable (so their tooltip opens), so the cursor is what marks them
+  // as inert. The action is only aria-disabled - a natively disabled button would swallow the
+  // hover its tooltip needs - which keeps Bootstrap's `[type="button"]:not(:disabled)` cursor
+  // rule matching, so this selector repeats the block class to outweigh it.
+  .actions-cell__button[aria-disabled="true"] {
+    cursor: not-allowed;
   }
 
   &__badge {

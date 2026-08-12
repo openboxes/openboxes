@@ -41,13 +41,29 @@ const useReceivingLineItems = ({
     binLocation: item?.binLocation ?? null,
   });
 
+  // The original line of the shipment item - the row every split line is split off from.
+  const originalLineItem = initialLineItems.find((item) => !item.isSplitItem);
+
+  // New rows split the same shipment item line, so they start with the line's product.
+  const buildSplitRow = () => ({
+    ...buildDefaultRow({ product: originalLineItem?.product ?? lineItem?.product }),
+    isSplitItem: true,
+  });
+
+  // If a line has already some persisted split items, we don't want to prefill a new split row
+  // We want to prefill a new split row with filled product row, only if a line doesn't
+  // have any persisted split items yet
+  const defaultLineItems = initialLineItems.some((item) => item.isSplitItem)
+    ? initialLineItems.map(buildDefaultRow)
+    : [...initialLineItems.map(buildDefaultRow), buildSplitRow()];
+
   const { validationSchema } = useEditLineItemValidation();
 
   const {
     control, getValues, setValue, reset, handleSubmit, formState: { errors },
   } = useForm({
     mode: 'onBlur',
-    defaultValues: { lineItems: initialLineItems.map(buildDefaultRow) },
+    defaultValues: { lineItems: defaultLineItems },
     resolver: zodResolver(validationSchema),
   });
 
@@ -77,11 +93,7 @@ const useReceivingLineItems = ({
     errors,
   });
 
-  // New rows split the same shipment item line, so they start with the line's product.
-  const addRow = () => append({
-    ...buildDefaultRow({ product: lineItem?.product }),
-    isSplitItem: true,
-  });
+  const addRow = () => append(buildSplitRow());
 
   const copyToReceiving = useCallback((receivedItem) => append({
     rowId: _.uniqueId('row-'),
