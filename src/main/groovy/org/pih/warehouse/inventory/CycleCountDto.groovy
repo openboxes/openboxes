@@ -6,9 +6,9 @@ import org.pih.warehouse.core.Person
 
 import java.time.LocalDate
 
-class CycleCountDto {
+import org.pih.warehouse.core.dtos.IdentifiableDto
 
-    String id
+class CycleCountDto implements IdentifiableDto {
 
     String status
 

@@ -1,14 +1,14 @@
 package org.pih.warehouse.location
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.dtos.IdentifiableDto
 
 /**
  * A simplified representation of a Location, containing only the fields that are required
  * to display the location in its most basic form.
  */
-class LocationSimpleDto {
+class LocationSimpleDto implements IdentifiableDto {
 
-    String id
     String name
     String locationNumber
     Boolean active

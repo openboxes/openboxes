@@ -51,6 +51,11 @@ class ObjectMapperConfigurer {
         objectMapper.registerModule(new JavaTimeModule())
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
+        // Cycle detection in Jackson's @JsonIdentityInfo defaults to comparing objects by JVM identity. Enabling this
+        // setting uses equals() instead, if it is defined, which is more accurate in our use case. This is especially
+        // true for DTOs that implement IdentifiableDto (which are based on Hibernate entities with a unique id field).
+        objectMapper.enable(SerializationFeature.USE_EQUALITY_FOR_OBJECT_ID)
+
         // Instruct the ObjectMapper to consult our custom module whenever it constructs a serializer.
         SimpleModule module = new SimpleModule("OpenBoxes")
         module.setSerializerModifier(new OpenBoxesBeanSerializerModifier(mapperComponentResolver))
@@ -120,27 +125,12 @@ class ObjectMapperConfigurer {
     class OpenBoxesWrappingSerializer extends JsonSerializer<Object> implements ResolvableSerializer,
                                                                                 ContextualSerializer {
 
-        /**
-         * How many layers deep into a JSON object we allow before short circuiting and throwing an exception.
-         */
-        private static final int MAX_JSON_DEPTH = 25
-
         private final MapperComponentResolver mapperComponentResolver
 
         /**
          * The BeanSerializer holding the default serialization behaviour that Jackson would perform.
          */
         private final JsonSerializer<Object> delegate
-
-        /**
-         * A thread-safe set of object identities used to check for circular references when serializing.
-         */
-        private static final ThreadLocal<Set<Object>> ALREADY_SEEN_OBJECTS = new ThreadLocal<Set<Object>>() {
-            @Override
-            protected Set<Object> initialValue() {
-                return Collections.newSetFromMap(new IdentityHashMap<>())
-            }
-        }
 
         OpenBoxesWrappingSerializer(final MapperComponentResolver mapperComponentResolver,
                                     final JsonSerializer<Object> delegate) {
@@ -155,36 +145,12 @@ class ObjectMapperConfigurer {
                 return
             }
 
-            // If the set already contains the object it means we've seen it before in the hierarchy and so have
-            // a circular reference and need to short circuit. Note that this still allows an object to appear multiple
-            // times in a single response. This check only applies to objects within a single *branch* of the response.
-            // For example: Object X has a Y field, which has an X field, which has a Y field, ... looping forever!
-            Set<Object> stack = ALREADY_SEEN_OBJECTS.get()
-            if (!stack.add(value)) {
-                handleCircularReference(value, gen)
-                return
-            }
-
-            try {
-                // Break after some JSON depth. It is very unlikely that a non-erroneous flow would reach this depth.
-                // This is primarily to avoid stack overflows if something is misconfigured.
-                if (stack.size() > MAX_JSON_DEPTH) {
-                    throw new RuntimeException("Exceeded maximum JSON depth of ${MAX_JSON_DEPTH}. Erroring to avoid " +
-                            "a stack overflow. Check the DTO serialization logic for infinite loops or other " +
-                            "erroneous behaviour. The full serialization stack: [${stringifySerializationStack()}]")
-                }
-
-                Map mappedData = applyCustomMapping(value)
-                if (mappedData != null) {
-                    provider.defaultSerializeValue(mappedData, gen)
-                } else {
-                    // If our custom serializing did nothing, let Jackson serialize the object.
-                    delegate.serialize(value, gen, provider)
-                }
-            } finally {
-                // We've serialized all of the object's fields, so remove it from the stack as we bubble back up
-                // to the object's parent.
-                stack.remove(value)
+            Map mappedData = applyCustomMapping(value)
+            if (mappedData != null) {
+                provider.defaultSerializeValue(mappedData, gen)
+            } else {
+                // If our custom serializing did nothing, let Jackson serialize the object.
+                delegate.serialize(value, gen, provider)
             }
         }
 
@@ -209,28 +175,6 @@ class ObjectMapperConfigurer {
                 }
             }
             return this
-        }
-
-        private void handleCircularReference(Object value, JsonGenerator gen) {
-            // This exact object instance is already being serialized higher up in the call stack. Break the cycle
-            // (writing the object's id if possible, otherwise stringifying it) rather than overflowing the stack.
-            if (value.hasProperty("id")) {
-                try {
-                    gen.writeString(value.id as String)
-                    return
-                } catch (Exception ignore) {
-                    // Fail silently if the id cannot be stringified for whatever reason.
-                }
-            }
-
-            try {
-                gen.writeString(value.toString())
-                return
-            } catch (Exception ignore) {
-                // Fail silently if the object cannot be stringified for whatever reason.
-            }
-
-            gen.writeNull()
         }
 
         /**
@@ -278,17 +222,11 @@ class ObjectMapperConfigurer {
              */
             if (value instanceof DomainClass || value instanceof Entity || value instanceof GormEntity) {
                 throw new RuntimeException("We do not support serializing Hibernate entities. Please create a DTO " +
-                        "for domain ${valueClass}. The full serialization stack: [${stringifySerializationStack()}]")
+                        "for domain ${valueClass}.")
             }
 
             // We don't know how to serialize the object so we will rely on the framework to do it for us.
             return null
-        }
-
-        private String stringifySerializationStack() {
-            return ALREADY_SEEN_OBJECTS.get().toList().reverse().withIndex()
-                    .collect { it, index -> "${index}. (${it.class.simpleName}) ${it.toString()}" }
-                    .join(" -> ")
         }
     }
 }

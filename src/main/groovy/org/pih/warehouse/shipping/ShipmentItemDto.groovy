@@ -1,10 +1,11 @@
 package org.pih.warehouse.shipping
 
+import org.pih.warehouse.core.dtos.IdentifiableDto
 import org.pih.warehouse.location.LocationSimpleDto
 import org.pih.warehouse.product.lot.ProductLotDto
 
-class ShipmentItemDto {
-    String id
+class ShipmentItemDto implements IdentifiableDto {
+
     String shipmentId
     String requisitionItemId
     ProductLotDto productLot
