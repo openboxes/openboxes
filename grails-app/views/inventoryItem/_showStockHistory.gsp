@@ -190,11 +190,9 @@
             // If filter matches text value then we display, otherwise hide
             var txtValue = $(currentRow).find("td").eq(cellIndex).text();
             var matchesText = txtValue.toUpperCase().indexOf(filterValue) > -1;
-            var isAutoIssued = $(currentRow).hasClass("autoIssued");
-            var matchesAutoIssued = autoIssuedFilterValue === "all"
-                || (autoIssuedFilterValue === "autoIssued" && isAutoIssued)
-                || (autoIssuedFilterValue === "manuallyIssued" && !isAutoIssued);
-            if (matchesText && matchesAutoIssued) {
+            var rowIssuanceType = $(currentRow).hasClass("autoIssued") ? "autoIssued" : "manuallyIssued";
+            var matchesIssuanceType = autoIssuedFilterValue === "all" || autoIssuedFilterValue === rowIssuanceType;
+            if (matchesText && matchesIssuanceType) {
                 $(currentRow).show();
             } else {
                 $(currentRow).hide();
