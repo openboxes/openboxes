@@ -925,6 +925,24 @@ class CycleCountService {
         }
     }
 
+    /**
+     * Deletes a single cycle count with everything that points at it: its items, the transactions (and the
+     * transaction source grouping them) that completing the count created, and the request that spawned it.
+     */
+    void deleteCycleCountWithAssociations(String cycleCountId) {
+        CycleCount cycleCount = CycleCount.get(cycleCountId)
+        if (!cycleCount) {
+            throw new ObjectNotFoundException(cycleCountId, CycleCount.class.toString())
+        }
+
+        CycleCountRequest cycleCountRequest = cycleCount.cycleCountRequest
+
+        deleteCycleCountTransactions(cycleCount)
+        deleteCycleCount(cycleCount)
+
+        cycleCountRequest?.delete()
+    }
+
     private void deleteCycleCountRequest(String cycleCountRequestId) {
         CycleCountRequest cycleCountRequest = CycleCountRequest.get(cycleCountRequestId)
         if (!cycleCountRequest) {
@@ -950,6 +968,20 @@ class CycleCountService {
         cycleCount.cycleCountRequest?.cycleCount = null
 
         cycleCount.delete()
+    }
+
+    /**
+     * Completing a count creates an inventory baseline transaction and, when the count had discrepancies, an
+     * adjustment transaction, both grouped under a single transaction source. The transactions and the source
+     * reference the cycle count, so they have to go before it does.
+     */
+    private void deleteCycleCountTransactions(CycleCount cycleCount) {
+        List<TransactionSource> transactionSources = TransactionSource.findAllByCycleCount(cycleCount)
+
+        List<Transaction> transactions = transactionSources.collectMany { it.associatedTransactions }
+        transactions.each { it.delete() }
+
+        transactionSources.each { it.delete() }
     }
 
 
