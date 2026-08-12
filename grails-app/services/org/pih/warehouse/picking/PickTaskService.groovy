@@ -49,6 +49,7 @@ class PickTaskService {
 
         Integer max = params.int('max') ?: 100
         Integer offset = params.int('offset') ?: 0
+        boolean showAssigned = params.boolean('showAssigned', false)
 
         List<String> requisitionIds = findRequisitionIdsForPicking(command)
 
@@ -57,7 +58,10 @@ class PickTaskService {
             statusesToSearch = [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
         }
 
-        List<String> requisitionIdsWithAssignee = findRequisitionIdsWithPickTaskAssignee(command.facility, statusesToSearch)
+        List<String> requisitionIdsWithAssignee
+        if (!showAssigned) {
+            requisitionIdsWithAssignee = findRequisitionIdsWithPickTaskAssignee(command.facility, statusesToSearch)
+        }
 
         List<PickTask> tasks = PickTask.createCriteria().list(max: max, offset: offset) {
             if (command.facility) {
@@ -100,9 +104,8 @@ class PickTaskService {
                     eq("r.id", command.requisitionId)
                     eq("r.requestNumber", command.requisitionId)
                 }
-            }
-
-            if (requisitionIdsWithAssignee) {
+            } else if (requisitionIdsWithAssignee) {
+                // apply requisitionIdsWithAssignee only when command.requisitionId is not given
                 not {
                     'in'("requisition.id", requisitionIdsWithAssignee)
                 }
