@@ -10,6 +10,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.OrderedDataGroup
 import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.core.localization.MessageLocalizer
@@ -80,8 +81,7 @@ class ReceiptV2Service {
         receipt.expectedDeliveryDate = shipment.expectedDeliveryDate
         receipt.actualDeliveryDate = shipment.actualDeliveryDate ?: new Date()
         receipt.disableRefresh = true
-
-        receiptService.createTemporaryReceivingBin(shipment)
+        Location receivingBin = receiptService.createTemporaryReceivingBin(shipment)
         shipment.addToReceipts(receipt)
 
         if (!receipt.save()) {
@@ -93,7 +93,7 @@ class ReceiptV2Service {
         for (ShipmentItem shipmentItem : shipment.shipmentItems) {
             // In the case of partial receipts, we only want to create receipt items for shipment items that have not yet been fully received
             if (getShipmentItemQuantityRemaining(shipmentItem) > 0) {
-                createReceiptItemFromShipmentItem(receipt, shipmentItem)
+                createReceiptItemFromShipmentItem(receipt, shipmentItem, receivingBin)
             }
         }
 
@@ -111,7 +111,8 @@ class ReceiptV2Service {
      * Lines added while receiving are split lines instead: they are flagged with isSplitItem and carry a quantity
      * shipped of zero, so they never factor into the cancel-remaining math.
      */
-    private static ReceiptItem createReceiptItemFromShipmentItem(Receipt receipt, ShipmentItem shipmentItem) {
+    private static ReceiptItem createReceiptItemFromShipmentItem(
+            Receipt receipt, ShipmentItem shipmentItem, Location receivingBin) {
         ReceiptItem receiptItem = new ReceiptItem(
                 product: shipmentItem.product,
                 inventoryItem: shipmentItem.inventoryItem,
@@ -121,6 +122,7 @@ class ReceiptV2Service {
                 quantityShipped: shipmentItem.quantity,
                 quantityReceived: 0,
                 isSplitItem: Boolean.FALSE,
+                binLocation: receivingBin,
                 sortOrder: shipmentItem.receiptItems?.size() ?: 0,
         )
 

@@ -3,7 +3,12 @@ import {
 } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { getReceivingPutawayEnabled, getReceivingView } from 'selectors';
+import {
+  getReceivingBin,
+  getReceivingBinLocations,
+  getReceivingPutawayEnabled,
+  getReceivingView,
+} from 'selectors';
 
 import { updateReceivingPutawayEnabled, updateReceivingView } from 'actions';
 import useReceivingActions from 'hooks/receiving/v2/useReceivingActions';
@@ -12,6 +17,7 @@ import useReceivingColumns from 'hooks/receiving/v2/useReceivingColumns';
 import useReceivingFilters from 'hooks/receiving/v2/useReceivingFilters';
 import useTableLocationAutofill from 'hooks/receiving/v2/useTableLocationAutofill';
 import useTableSorting from 'hooks/useTableSorting';
+import hasItemInDifferentBin from 'utils/receiving/hasItemInDifferentBin';
 
 const useReceivingForm = () => {
   const dispatch = useDispatch();
@@ -19,6 +25,8 @@ const useReceivingForm = () => {
   // view chosen here.
   const view = useSelector(getReceivingView);
   const setView = useCallback((newView) => dispatch(updateReceivingView(newView)), [dispatch]);
+  const receivingBin = useSelector(getReceivingBin);
+  const binLocations = useSelector(getReceivingBinLocations);
   const {
     sortableProps, sort, order, resetSort,
   } = useTableSorting();
@@ -58,18 +66,18 @@ const useReceivingForm = () => {
     () => autofillQuantities(visibleLineItemsState),
     [autofillQuantities, visibleLineItemsState],
   );
-  // Auto-enable once when a reopened receipt has at least one row with a saved bin location,
-  // so the column is visible.
+  // Auto-enable once when a line sits somewhere other than its default location, so the column is
+  // visible: a bin other than the receiving bin, or any bin at all when there is no receiving bin.
   const putawayInitialized = useRef(false);
   useEffect(() => {
-    if (putawayInitialized.current || !lineItemsState?.ids?.length) {
+    if (putawayInitialized.current || !binLocations.length || !lineItemsState?.ids?.length) {
       return;
     }
     putawayInitialized.current = true;
-    if (Object.values(lineItemsState.entities).some((item) => item?.binLocation)) {
+    if (hasItemInDifferentBin(lineItemsState, receivingBin)) {
       setPutawayEnabled(true);
     }
-  }, [lineItemsState]);
+  }, [lineItemsState, receivingBin, binLocations]);
   const { columns } = useReceivingColumns({
     view,
     putawayEnabled,
