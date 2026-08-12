@@ -14,6 +14,7 @@ import useReceivingAutosave from 'hooks/receiving/v2/useReceivingAutosave';
 import useReceivingSaveAction from 'hooks/receiving/v2/useReceivingSaveAction';
 import { createNormalizedState } from 'utils/normalizationUtils';
 import {
+  mergeStartedReceipt,
   receiptGroupForView,
   transformReceiptSummary,
 } from 'utils/receiving/receiptSummaryRows';
@@ -58,25 +59,37 @@ const useReceivingActions = ({ view, sort, sortOrder } = {}) => {
     updateRowManually,
   } = useReceivingAutosave({ initialRows, receiptId });
 
+  const fetchSummary = async () => {
+    const { data: { data: summary } } = await receivingApi.getReceiptSummary(
+      shipmentId,
+      _.omitBy({
+        group: receiptGroupForView(view),
+        // Backend binds `sort` as a SortParamList: "field" for ascending, "-field" for descending
+        sort: sort && `${sortOrder === 'desc' ? '-' : ''}${sort}`,
+      }, _.isEmpty),
+    );
+    return summary;
+  };
+
+  // The summary was read before the receipt was started, so its lines are folded in - otherwise
+  // the rows would carry no receipt item id until a reload.
+  const startReceiptIfNotCreated = async (summary) => {
+    if (summary?.pendingReceiptId) {
+      return summary;
+    }
+    const { data: { data: startedReceipt } } = await receivingApi.startReceipt(shipmentId);
+    return mergeStartedReceipt(summary, startedReceipt);
+  };
+
   const loadReceipt = async () => {
     setLoading(true);
     try {
       // Push pending edits out before refetching (view switch, modal reload, sort change),
       // so the summary reflects them and nothing is lost when the autosave state resets.
       await flush();
-      const { data: { data: summary } } = await receivingApi.getReceiptSummary(
-        shipmentId,
-        _.omitBy({
-          group: receiptGroupForView(view),
-          // Backend binds `sort` as a SortParamList: "field" for ascending, "-field" for descending
-          sort: sort && `${sortOrder === 'desc' ? '-' : ''}${sort}`,
-        }, _.isEmpty),
-      );
-      // When there's no pending receipt yet, start one
-      const currentReceiptId = summary?.pendingReceiptId
-        ?? (await receivingApi.startReceipt(shipmentId)).data?.data?.id;
-      setReceiptId(currentReceiptId);
-      setInitialRows(transformReceiptSummary(summary, view, _.keyBy(users, 'id')));
+      const receiptSummary = await startReceiptIfNotCreated(await fetchSummary());
+      setReceiptId(receiptSummary?.pendingReceiptId ?? null);
+      setInitialRows(transformReceiptSummary(receiptSummary, view, _.keyBy(users, 'id')));
     } finally {
       setLoading(false);
     }

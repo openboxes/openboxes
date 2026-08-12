@@ -6,7 +6,8 @@ import {
 } from 'utils/receiving/receivingRowFilter';
 
 // Receiving filter (search + receipt status), applied on the frontend against the full
-// line items state. The matching shipment items are snapshotted on submit and only refresh
+// line items state. Shared by the receiving and the check step, which build their rows the
+// same way. The matching shipment items are snapshotted on submit and only refresh
 // on the next submit (not on sort/view reloads), so the row the user is editing does not
 // disappear mid-edit.
 const useReceivingFilters = ({ lineItemsState }) => {

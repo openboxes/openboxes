@@ -132,6 +132,8 @@ bootRun {
     jvmArgs = [
         '-Dspring.output.ansi.enabled=never',
         '-Xdebug',
+        '-Xms1g',
+        '-Xmx4g',
         '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005'
     ]
     systemProperties System.properties

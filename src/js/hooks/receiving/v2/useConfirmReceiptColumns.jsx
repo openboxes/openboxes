@@ -10,6 +10,7 @@ import Checkbox from 'components/form-elements/v2/Checkbox';
 import receivingColumns from 'consts/receivingColumns';
 import ReceivingRowType from 'consts/receivingRowType';
 import { ReceivingView } from 'consts/receivingViewOptions';
+import { isCancellableRow } from 'hooks/receiving/v2/useCancelRemaining';
 import useFormatNumber from 'hooks/useFormatNumber';
 import useTranslate from 'hooks/useTranslate';
 import ActionsCell from 'utils/cells/ActionsCell';
@@ -406,13 +407,15 @@ const useConfirmReceiptColumns = ({ view, putawayEnabled } = {}) => {
             if (isSplitItemOrToggle(item)) {
               return null;
             }
+            const { originalReceiptItemId } = item ?? {};
+            const { cancelRemainingIds, onToggleCancelRemaining } = table.options.meta ?? {};
             return (
               <TableCell className="rt-td d-flex justify-content-center align-items-center">
                 <Checkbox
                   noWrapper
-                  value={Boolean(table.options.meta?.cancelRemainingIds?.has(row.original.id))}
-                  onChange={() => table.options.meta?.onToggleCancelRemaining?.(row.original.id)}
-                  disabled={item?.isCompleted || (item?.quantityAvailableToReceive ?? 0) <= 0}
+                  value={Boolean(cancelRemainingIds?.has(originalReceiptItemId))}
+                  onChange={() => onToggleCancelRemaining?.(originalReceiptItemId)}
+                  disabled={!isCancellableRow(item)}
                 />
               </TableCell>
             );

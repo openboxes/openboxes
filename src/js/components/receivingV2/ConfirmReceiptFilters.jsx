@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import PropTypes from 'prop-types';
 import { RiCloseCircleLine, RiLogoutBoxRLine } from 'react-icons/ri';
@@ -15,10 +15,23 @@ import useTranslate from 'hooks/useTranslate';
  * (rendered through FilterForm from the FilterFields config) and the action buttons
  * on the right.
  */
-const ConfirmReceiptFilters = ({ onCancelAllRemaining, onSaveAndExit }) => {
+const ConfirmReceiptFilters = ({
+  onCancelAllRemaining,
+  onSaveAndExit,
+  updateFilterParams,
+  clearFilterParams,
+}) => {
   const translate = useTranslate();
   const translationsFetched = useSelector(getReceivingTranslationsFetched);
   const fields = useMemo(() => filterFields(translate), [translate]);
+
+  // Clearing the filters is not a submit, so the snapshot of matching rows has to be
+  // dropped here as well - otherwise the table would keep showing the previously
+  // filtered rows until the next search.
+  const onClear = useCallback((form) => {
+    form.reset({});
+    clearFilterParams();
+  }, [clearFilterParams]);
 
   return (
     <div className="confirm-receipt__action-bar">
@@ -28,7 +41,10 @@ const ConfirmReceiptFilters = ({ onCancelAllRemaining, onSaveAndExit }) => {
           searchFieldPlaceholder="react.receiving.search.placeholder.label"
           searchFieldDefaultPlaceholder="Search..."
           filterFields={fields}
-          updateFilterParams={() => {}}
+          updateFilterParams={updateFilterParams}
+          onClear={onClear}
+          disableAutoUpdateFilterParams
+          allowEmptySubmit
           hidden={false}
           showFilterVisibilityToggler={false}
           alignButtonsToFilters
@@ -58,6 +74,8 @@ const ConfirmReceiptFilters = ({ onCancelAllRemaining, onSaveAndExit }) => {
 ConfirmReceiptFilters.propTypes = {
   onCancelAllRemaining: PropTypes.func,
   onSaveAndExit: PropTypes.func,
+  updateFilterParams: PropTypes.func.isRequired,
+  clearFilterParams: PropTypes.func.isRequired,
 };
 
 ConfirmReceiptFilters.defaultProps = {

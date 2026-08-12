@@ -14,7 +14,11 @@ const ItemDetails = ({
 }) => (
   <div className={`item-details ${className}`}>
     {badge && (
-      <BadgeTransition current={badge.current} next={badge.next} />
+      <BadgeTransition
+        current={badge.current}
+        next={badge.next}
+        clickable={badge.clickable}
+      />
     )}
     <div className="item-details__grid">
       {fields.map(({ label, value }) => (
@@ -41,6 +45,7 @@ ItemDetails.propTypes = {
       label: PropTypes.string.isRequired,
       variant: PropTypes.string.isRequired,
     }),
+    clickable: PropTypes.bool,
   }),
   fields: PropTypes.arrayOf(PropTypes.shape({
     label: PropTypes.node.isRequired,

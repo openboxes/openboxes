@@ -20,6 +20,7 @@ const ReceivingLineItemsTable = ({
           <Badge
             label={translate('react.receiving.receivingNow.label', 'Receiving Now')}
             variant="badge--primary text-uppercase rounded"
+            clickable={false}
           />
         </div>
         <Button

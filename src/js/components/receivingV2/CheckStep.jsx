@@ -12,8 +12,11 @@ import 'components/receivingV2/receiving.scss';
 const CheckStep = ({ completeReceiptRef }) => {
   const {
     onCompleteReceipt,
+    onSaveAndExit,
     control,
     table,
+    lineItemsState,
+    filters,
     loading,
     commentModal,
     cancelRemaining,
@@ -25,8 +28,13 @@ const CheckStep = ({ completeReceiptRef }) => {
 
   return (
     <div className="receiving-container confirm-receipt">
-      <ConfirmReceiptInfo control={control} lineItemsState={table.lineItemsState} />
-      <ConfirmReceiptFilters />
+      <ConfirmReceiptInfo control={control} lineItemsState={lineItemsState} />
+      <ConfirmReceiptFilters
+        updateFilterParams={filters.updateFilterParams}
+        clearFilterParams={filters.clearFilterParams}
+        onCancelAllRemaining={cancelRemaining.selectAll}
+        onSaveAndExit={onSaveAndExit}
+      />
       <ConfirmReceiptTable
         lineItemsState={table.lineItemsState}
         columns={table.columns}

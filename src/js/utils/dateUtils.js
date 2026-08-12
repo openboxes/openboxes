@@ -136,6 +136,21 @@ export const formatDateToZonedDateTimeString = (date) => formatDateToString({
 });
 
 /**
+ * A method for converting a date string held in a display format (the value of a date field) to
+ * an ISO instant, which is the format APIs binding a java.time.Instant expect.
+ * @param {String} date - date string to convert
+ * @param {String} providedDateFormat - format the given string is in
+ * @returns {String|null} ISO instant, or null when the value is empty or not a valid date
+ */
+export const formatStringToInstant = (date, providedDateFormat) => {
+  if (!date) {
+    return null;
+  }
+  const parsedDate = parse(date, providedDateFormat, new Date());
+  return isValid(parsedDate) ? parsedDate.toISOString() : null;
+};
+
+/**
  * A method for converting Date to a localized date string for display (shifted time by timezone
  * differences)
  */

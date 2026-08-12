@@ -17,6 +17,13 @@ export const receiptGroupForView = (view) =>
 
 const buildSeparatorRow = (name) => ({ isSeparator: true, id: `separator-${name}`, name });
 
+// The original line of a shipment item (isSplitItem: false), created when the receipt was
+// started. Exactly one exists per receivable shipment item and it cannot be deleted, so it is
+// always in the summary - even when it is filtered out of the displayed rows
+// (see visibleReceiptItems).
+const findOriginalReceiptItem = (currentReceiptItems) =>
+  currentReceiptItems.find((receiptItem) => !receiptItem.isSplitItem);
+
 // Base builder of a line item row:
 // - a shipment item that was not split uses it directly as its only editable row,
 // - the replaced and split item rows of a split item build on top of it
@@ -24,6 +31,7 @@ const buildSeparatorRow = (name) => ({ isSeparator: true, id: `separator-${name}
 const buildLineItem = ({ summary, receiptItem, usersById }) => {
   const {
     shipmentItem,
+    currentReceiptItems = [],
     previousReceiptItems = [],
     totalQuantityReceived = 0,
     totalQuantityCanceled = 0,
@@ -56,6 +64,10 @@ const buildLineItem = ({ summary, receiptItem, usersById }) => {
     rowType: null,
     shipmentItemId: shipmentItem.id,
     receiptItemId: receiptItem?.id ?? null,
+    // The original line of the shipment item, regardless of which line this row renders. The
+    // cancel-remaining flag of the check step may only land on it (the backend rejects the flag
+    // on a split line), and a row built from a split item carries the split line's own id.
+    originalReceiptItemId: findOriginalReceiptItem(currentReceiptItems)?.id ?? null,
     // Backend flag distinguishing the original line of a shipment item (false, created when
     // the receipt was started) from the lines split off it while receiving (true). Unlike
     // rowType (a UI grouping concept), this stays accurate across saves and reloads.
@@ -124,13 +136,6 @@ const getReceiptItemChanges = (receiptItem, shipmentItem) => ({
     shipmentItem.recipientId,
   ),
 });
-
-// The original line of a shipment item (isSplitItem: false), created when the receipt was
-// started. Exactly one exists per receivable shipment item and it cannot be deleted, so it is
-// always in the summary - even when it is filtered out of the displayed rows
-// (see visibleReceiptItems).
-const findOriginalReceiptItem = (currentReceiptItems) =>
-  currentReceiptItems.find((receiptItem) => !receiptItem.isSplitItem);
 
 // The struck-through row of a split shipment item - the split items below
 // replace it. Built without a receipt item, so it keeps the original shipment values
@@ -293,6 +298,30 @@ const buildPackingListViewState = (summaryById, grouped, usersById) => {
     entities: entity ? { ...state.entities, [rowId]: entity } : state.entities,
     ids: [...state.ids, rowId],
   }), createNormalizedState());
+};
+
+/**
+ * Merge the lines created by the start receipt endpoint into a summary that was read before the
+ * receipt existed, so the rows carry their receipt item ids right away instead of only after a
+ * reload.
+ */
+export const mergeStartedReceipt = (summary, startedReceipt) => {
+  if (!startedReceipt?.id) {
+    return summary;
+  }
+  const itemsByShipmentItemId = _.groupBy(startedReceipt.receiptItems ?? [], 'shipmentItemId');
+
+  return {
+    ...summary,
+    pendingReceiptId: startedReceipt.id,
+    shipmentItemSummaryById: _.mapValues(
+      summary?.shipmentItemSummaryById ?? {},
+      (shipmentItemSummary, shipmentItemId) => ({
+        ...shipmentItemSummary,
+        currentReceiptItems: itemsByShipmentItemId[shipmentItemId] ?? [],
+      }),
+    ),
+  };
 };
 
 // Transforms the receipt summary API response into the normalized `{ entities, ids }`

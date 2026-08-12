@@ -7,6 +7,7 @@ import {
   formatDateToDatetimeString,
   formatDateToString,
   formatDateToZonedDateTimeString,
+  formatStringToInstant,
   getFilenameDateString,
   parseStringToDate,
 } from 'utils/dateUtils';
@@ -185,6 +186,27 @@ describe('formatDateToZonedDateTimeString()', () => {
     // 09/19/2025 00:00 +02:00
     // 09/19/2025 00:00 -05:00
     expect(date).toBe(`09/19/2025 00:00 ${displayTimezoneOffset()}`);
+  });
+});
+
+describe('formatStringToInstant()', () => {
+  it('should convert a date string in the given format to an ISO instant', () => {
+    const instant = formatStringToInstant(
+      '19/Sep/2025 15:10:05',
+      DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS,
+    );
+    // The string holds a local time, so the instant is the same moment in UTC
+    expect(instant).toBe(DATE_WITH_SECONDS.toISOString());
+  });
+
+  it('should return null if date is empty', () => {
+    expect(formatStringToInstant(null, DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS)).toBe(null);
+    expect(formatStringToInstant('', DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS)).toBe(null);
+  });
+
+  it('should return null if the date does not match the given format', () => {
+    expect(formatStringToInstant('not a date', DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS)).toBe(null);
+    expect(formatStringToInstant('19/Sep/2025', DateFormatDateFns.YYYY_MM_DD)).toBe(null);
   });
 });
 

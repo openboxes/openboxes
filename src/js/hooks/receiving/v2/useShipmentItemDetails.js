@@ -18,6 +18,7 @@ const useShipmentItemDetails = (lineItem) => {
       label: translate('react.receiving.status.shipped.label', 'Shipped'),
       variant: 'badge--grey text-uppercase rounded',
     },
+    clickable: false,
   };
 
   const fields = [
