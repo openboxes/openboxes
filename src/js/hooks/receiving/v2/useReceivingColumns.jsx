@@ -25,7 +25,7 @@ import MultilineCell from 'utils/cells/MultilineCell';
 import PackLevelCell from 'utils/cells/PackLevelCell';
 import PackLevelGroupCell from 'utils/cells/receiving/PackLevelGroupCell';
 import ProductCodeCell from 'utils/cells/receiving/ProductCodeCell';
-import ShippedInPoCell from 'utils/cells/receiving/ShippedInPoCell';
+import ShippedQuantityCell from 'utils/cells/receiving/ShippedQuantityCell';
 import SelectCell from 'utils/cells/SelectCell';
 import ValueCell from 'utils/cells/ValueCell';
 import getReceivingRowActions, { getReceivingSplitItemActions } from 'utils/receiving/getReceivingRowActions';
@@ -237,6 +237,36 @@ const useReceivingColumns = ({
         },
         size: 300,
       }),
+      ...(isShipmentFromPurchaseOrder ? [
+        columnHelper.display({
+          id: receivingColumns.SUPPLIER_CODE,
+          header: () => (
+            <TableHeaderCell
+              {...sortHeaderProps(receivingColumns.SUPPLIER_CODE)}
+              tooltip
+              tooltipLabel={translate('react.receiving.supplierItemCode.label', 'Supplier Item Code')}
+            >
+              {translate('react.receiving.supplierItemCode.label', 'Supplier Item Code')}
+            </TableHeaderCell>
+          ),
+          cell: ({ row, table }) => {
+            const item = getItem(row, table);
+            if (isSplitItemOrToggle(item)) {
+              return null;
+            }
+            return (
+              <ValueCell
+                value={item?.supplierCode}
+                tooltipLabel={item?.supplierCode}
+                label="react.receiving.supplierItemCode.label"
+                defaultLabel="Supplier Item Code"
+                truncate
+              />
+            );
+          },
+          size: 125,
+        }),
+      ] : []),
       // In the packing list view, the pack level column is not needed
       // because the parent group name is rendered on the separator rows.
       ...(isPackingListView ? [] : [packLevelColumn]),
@@ -320,71 +350,27 @@ const useReceivingColumns = ({
         },
         size: 125,
       }),
-      // When receiving against a purchase order, an extra column shows the shipped
-      // quantity in the PO's unit of measure (packs) before the per-each quantity.
-      ...(isShipmentFromPurchaseOrder ? [
-        columnHelper.display({
-          id: receivingColumns.QUANTITY_SHIPPED_IN_PO,
-          header: () => (
-            <TableHeaderCell
-              tooltip
-              tooltipLabel={translate('react.receiving.shippedInPo.label', 'Shipped (in PO UoM)')}
-              className="receiving-table__quantity"
-            >
-              {translate('react.receiving.shippedInPo.label', 'Shipped (in PO UoM)')}
-            </TableHeaderCell>
-          ),
-          cell: ({ row, table }) => {
-            const item = getItem(row, table);
-            if (isSplitItemOrToggle(item)) {
-              return null;
-            }
-            const { quantityShipped, packSize, unitOfMeasure } = item || {};
-            const packs = packSize
-              ? Math.round((quantityShipped / packSize) * 100) / 100
-              : quantityShipped;
-            return (
-              <ShippedInPoCell
-                packs={packs}
-                unitOfMeasure={unitOfMeasure}
-                className="receiving-table__quantity"
-                label="react.receiving.shippedInPo.label"
-                defaultLabel="Shipped (in PO UoM)"
-              />
-            );
-          },
-          size: 125,
-        }),
-      ] : []),
       columnHelper.display({
         id: receivingColumns.QUANTITY_SHIPPED,
-        header: () => {
-          const labelKey = isShipmentFromPurchaseOrder
-            ? 'react.receiving.shippedEach.label'
-            : 'react.receiving.shipped.label';
-          const defaultLabel = isShipmentFromPurchaseOrder ? 'Shipped (each)' : 'Shipped';
-          return (
-            <TableHeaderCell
-              {...sortHeaderProps(receivingColumns.QUANTITY_SHIPPED)}
-              tooltip
-              tooltipLabel={translate(labelKey, defaultLabel)}
-              className="receiving-table__quantity"
-            >
-              {translate(labelKey, defaultLabel)}
-            </TableHeaderCell>
-          );
-        },
+        header: () => (
+          <TableHeaderCell
+            {...sortHeaderProps(receivingColumns.QUANTITY_SHIPPED)}
+            tooltip
+            tooltipLabel={translate('react.receiving.shipped.label', 'Shipped')}
+            className="receiving-table__quantity"
+          >
+            {translate('react.receiving.shipped.label', 'Shipped')}
+          </TableHeaderCell>
+        ),
         cell: ({ row, table }) => {
           const item = getItem(row, table);
           if (isSplitItemOrToggle(item)) {
             return null;
           }
-          const value = formatNumber(item?.quantityShipped);
           return (
-            <ValueCell
-              value={value}
-              tooltipLabel={value}
-              className="receiving-table__quantity"
+            <ShippedQuantityCell
+              item={item}
+              isShipmentFromPurchaseOrder={isShipmentFromPurchaseOrder}
               label="react.receiving.shipped.label"
               defaultLabel="Shipped"
             />

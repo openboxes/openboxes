@@ -15,6 +15,8 @@ class ShipmentItemDto {
     ContainerSimpleDto container
     String unitOfMeasure
     BigDecimal packSize
+    String supplierCode
+
     Date dateCreated
     Date lastUpdated
 
@@ -31,6 +33,7 @@ class ShipmentItemDto {
                 container: ContainerSimpleDto.from(shipmentItem.container),
                 unitOfMeasure: shipmentItem.unitOfMeasure,
                 packSize: shipmentItem.packSize,
+                supplierCode: shipmentItem.orderItem?.productSupplier?.supplierCode,
                 dateCreated: shipmentItem.dateCreated,
                 lastUpdated: shipmentItem.lastUpdated,
         )

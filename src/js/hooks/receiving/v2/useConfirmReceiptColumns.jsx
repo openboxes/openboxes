@@ -6,6 +6,7 @@ import {
   getCurrentLocale,
   getHasBinLocationSupport,
   getHasPartialReceivingSupport,
+  getIsShipmentFromPurchaseOrder,
 } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
@@ -23,6 +24,7 @@ import MultilineCell from 'utils/cells/MultilineCell';
 import PackLevelCell from 'utils/cells/PackLevelCell';
 import PackLevelGroupCell from 'utils/cells/receiving/PackLevelGroupCell';
 import ProductCodeCell from 'utils/cells/receiving/ProductCodeCell';
+import ShippedQuantityCell from 'utils/cells/receiving/ShippedQuantityCell';
 import ValueCell from 'utils/cells/ValueCell';
 import { getConfirmReceiptRowActions } from 'utils/receiving/getReceivingRowActions';
 import getReceivingRowStatus from 'utils/receiving/getReceivingRowStatus';
@@ -34,6 +36,7 @@ const useConfirmReceiptColumns = ({ view, hasPreviousReceipts } = {}) => {
   const currentLocale = useSelector(getCurrentLocale);
   const hasPartialReceivingSupport = useSelector(getHasPartialReceivingSupport);
   const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
+  const isShipmentFromPurchaseOrder = useSelector(getIsShipmentFromPurchaseOrder);
   const isPackingListView = view === ReceivingView.PACKING_LIST;
 
   // Rows are { id, meta } objects; the entities live in the normalized state
@@ -190,6 +193,35 @@ const useConfirmReceiptColumns = ({ view, hasPreviousReceipts } = {}) => {
         },
         size: 300,
       }),
+      ...(isShipmentFromPurchaseOrder ? [
+        columnHelper.display({
+          id: receivingColumns.SUPPLIER_CODE,
+          header: () => (
+            <TableHeaderCell
+              tooltip
+              tooltipLabel={translate('react.receiving.supplierItemCode.label', 'Supplier Item Code')}
+            >
+              {translate('react.receiving.supplierItemCode.label', 'Supplier Item Code')}
+            </TableHeaderCell>
+          ),
+          cell: ({ row, table }) => {
+            const item = getItem(row, table);
+            if (isSplitItemOrToggle(item)) {
+              return null;
+            }
+            return (
+              <ValueCell
+                value={item?.supplierCode}
+                tooltipLabel={item?.supplierCode}
+                label="react.receiving.supplierItemCode.label"
+                defaultLabel="Supplier Item Code"
+                truncate
+              />
+            );
+          },
+          size: 125,
+        }),
+      ] : []),
       // In the packing list view, the pack level column is not needed
       // because the parent group name is rendered on the separator rows.
       ...(isPackingListView ? [] : [packLevelColumn]),
@@ -252,10 +284,13 @@ const useConfirmReceiptColumns = ({ view, hasPreviousReceipts } = {}) => {
           if (isSplitItemOrToggle(item)) {
             return null;
           }
-          return quantityCell(
-            formatNumber(item?.quantityShipped),
-            'react.receiving.shipped.label',
-            'Shipped',
+          return (
+            <ShippedQuantityCell
+              item={item}
+              isShipmentFromPurchaseOrder={isShipmentFromPurchaseOrder}
+              label="react.receiving.shipped.label"
+              defaultLabel="Shipped"
+            />
           );
         },
         size: 100,
@@ -443,6 +478,7 @@ const useConfirmReceiptColumns = ({ view, hasPreviousReceipts } = {}) => {
     isPackingListView,
     hasPartialReceivingSupport,
     hasPreviousReceipts,
+    isShipmentFromPurchaseOrder,
   ]);
 
   return { columns };

@@ -7,7 +7,7 @@ const receivingColumns = {
   EXPIRATION_DATE: 'expirationDate',
   RECIPIENT: 'recipient',
   LOCATION: 'location',
-  QUANTITY_SHIPPED_IN_PO: 'quantityShippedInPo',
+  SUPPLIER_CODE: 'supplierCode',
   QUANTITY_SHIPPED: 'quantityShipped',
   QUANTITY_RECEIVING: 'quantityReceiving',
   QUANTITY_RECEIVED: 'quantityReceived',

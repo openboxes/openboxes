@@ -5,7 +5,7 @@ import ShipmentItemReceiptStatus from 'consts/shipmentItemReceiptStatus';
 import rowMatchesSearch from 'utils/searchRows';
 
 // Row fields the receiving search bar matches against
-const SEARCHABLE_PATHS = ['productCode', 'product.name', 'lotNumber', 'recipient.name'];
+const SEARCHABLE_PATHS = ['productCode', 'product.name', 'supplierCode', 'lotNumber', 'recipient.name'];
 
 // Rows carrying the "receiving now" quantity of a shipment item. Replaced (struck through)
 // and toggle (UI-only) rows are skipped.

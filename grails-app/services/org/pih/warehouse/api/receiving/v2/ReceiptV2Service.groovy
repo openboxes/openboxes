@@ -603,6 +603,11 @@ class ReceiptV2Service {
             case "quantityShipped":
                 criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "quantity"))
                 break
+            case "supplierCode":
+                criteria.createAlias("orderItems", "oi", JoinType.LEFT_OUTER_JOIN)
+                criteria.createAlias("oi.productSupplier", "ps", JoinType.LEFT_OUTER_JOIN)
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "ps.supplierCode"))
+                break
             default:
                 break
         }

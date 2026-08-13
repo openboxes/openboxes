@@ -1,18 +1,32 @@
 import * as locales from 'date-fns/locale';
 import { useSelector } from 'react-redux';
-import { getCurrentLocale, getHasBinLocationSupport } from 'selectors';
+import {
+  getCurrentLocale, getHasBinLocationSupport, getIsShipmentFromPurchaseOrder,
+} from 'selectors';
 
 import { DateFormatDateFns } from 'consts/timeFormat';
+import useFormatNumber from 'hooks/useFormatNumber';
 import useTranslate from 'hooks/useTranslate';
 import { formatDateToString } from 'utils/dateUtils';
+import getShippedQuantityInPoUom from 'utils/receiving/getShippedQuantityInPoUom';
 
 /**
  * Badge and fields of the edited line item for the ItemDetails box.
  */
 const useShipmentItemDetails = (lineItem) => {
   const translate = useTranslate();
+  const formatNumber = useFormatNumber();
   const currentLocale = useSelector(getCurrentLocale);
   const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
+  const isShipmentFromPurchaseOrder = useSelector(getIsShipmentFromPurchaseOrder);
+
+  // Only a purchase order has a unit of measure to convert the quantity into.
+  const quantityInPoUomLabel = isShipmentFromPurchaseOrder
+    ? getShippedQuantityInPoUom({ item: lineItem, formatNumber })
+    : null;
+  const quantityShipped = quantityInPoUomLabel
+    ? `${formatNumber(lineItem?.quantityShipped)} (${quantityInPoUomLabel})`
+    : formatNumber(lineItem?.quantityShipped);
 
   const badge = {
     current: {
@@ -27,6 +41,10 @@ const useShipmentItemDetails = (lineItem) => {
       label: translate('react.receiving.product.label', 'Product'),
       value: lineItem?.product?.name,
     },
+    ...(isShipmentFromPurchaseOrder ? [{
+      label: translate('react.receiving.supplierItemCode.label', 'Supplier Item Code'),
+      value: lineItem?.supplierCode,
+    }] : []),
     {
       label: translate('react.receiving.lotSerialNo.short.label', 'Lot/SN'),
       value: lineItem?.lotNumber,
@@ -51,7 +69,7 @@ const useShipmentItemDetails = (lineItem) => {
     ] : []),
     {
       label: translate('react.receiving.shipped.label', 'Shipped'),
-      value: lineItem?.quantityShipped,
+      value: quantityShipped,
     },
   ];
 
