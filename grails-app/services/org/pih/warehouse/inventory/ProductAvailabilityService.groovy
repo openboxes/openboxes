@@ -889,7 +889,9 @@ class ProductAvailabilityService {
             return new PaginatedList(data, totalCount)
         }
 
-        return data
+        return results instanceof PaginatedList ?
+                new PaginatedList(data, results.totalCount) :
+                data
     }
 
     Map<InventoryItem, Integer> getQuantityOnHandByInventoryItem(Location location, List<InventoryItem> inventoryItems = []) {
