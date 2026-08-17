@@ -54,7 +54,7 @@ const useReceivingForm = () => {
     }
     dispatch(updateReceivingPutawayEnabled(receiptId, enabled));
   }, [dispatch, receiptId]);
-  useReceivingBinLocations();
+  useReceivingBinLocations({ receiptId });
   const {
     visibleLineItemsState,
     updateFilterParams,
