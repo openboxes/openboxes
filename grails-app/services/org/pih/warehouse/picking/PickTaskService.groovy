@@ -58,9 +58,9 @@ class PickTaskService {
             statusesToSearch = [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
         }
 
-        List<String> requisitionIdAssigned
+        List<String> assignedRequisitions
         if (excludeAssignedRequisitions) {
-            requisitionIdAssigned = findRequisitionIdsWithPickTaskAssigned(command.facility)
+            assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(command.facility, statusesToSearch)
         }
 
         List<PickTask> tasks = PickTask.createCriteria().list(max: max, offset: offset) {
@@ -104,10 +104,10 @@ class PickTaskService {
                     eq("r.id", command.requisitionId)
                     eq("r.requestNumber", command.requisitionId)
                 }
-            } else if (requisitionIdAssigned) {
-                // apply requisitionIdAssigned only when command.requisitionId is not given
+            } else if (assignedRequisitions) {
+                // apply assignedRequisitions only when command.requisitionId is not given
                 not {
-                    'in'("requisition.id", requisitionIdAssigned)
+                    'in'("requisition.id", assignedRequisitions)
                 }
             }
 
@@ -138,9 +138,9 @@ class PickTaskService {
 
     private Map<DeliveryTypeCode, Integer> countDistinctRequisitionsByDeliveryType(
             Location facility, boolean excludeAssignedRequisitions, List<PickTaskStatus> statuses) {
-        List<String> requisitionIdsWithAssignee
+        List<String> assignedRequisitions
         if (excludeAssignedRequisitions) {
-            requisitionIdsWithAssignee = findRequisitionIdsWithPickTaskAssigned(facility)
+            assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(facility, statuses)
         }
         List results = PickTask.createCriteria().list {
             projections {
@@ -152,9 +152,9 @@ class PickTaskService {
                 'in'("status", statuses)
             }
 
-            if (requisitionIdsWithAssignee) {
+            if (assignedRequisitions) {
                 not {
-                    'in'("requisition.id", requisitionIdsWithAssignee)
+                    'in'("requisition.id", assignedRequisitions)
                 }
             }
         }
@@ -561,8 +561,22 @@ class PickTaskService {
         }.take(ordersCount)*.id
     }
 
-    private List<String> findRequisitionIdsWithPickTaskAssigned(Location facility) {
-        return PickTask.findAllByFacilityAndAssigneeIsNotNull(facility)?.requisition?.id?.unique() ?: []
+    private List<String> findRequisitionIdsWithPickTaskAssigned(Location facility, List<PickTaskStatus> statusesToSearch) {
+        List<Requisition> requisitions = PickTask.createCriteria().list {
+            projections {
+                distinct("requisition")
+            }
+            isNotNull("assignee")
+            if (statusesToSearch) {
+                'in'("status", statusesToSearch)
+            }
+            'in' ("requisitionStatus", RequisitionStatus.listPicking())
+            if (facility) {
+                eq("facility", facility)
+            }
+        }
+
+        return requisitions*.id
     }
 
     private void validateOutboundContainer(Location outboundContainer, PickTask pickTask) {
