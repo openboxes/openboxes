@@ -655,6 +655,10 @@ openboxes {
                         [
                             widgetId: "discrepancy",
                             order   : 6
+                        ],
+                        [
+                            widgetId: "readyToBeStaged",
+                            order   : 7
                         ]
                     ]
                 }
@@ -1045,6 +1049,14 @@ openboxes {
                 type = 'graph'
                 endpoint = "/api/dashboard/discrepancy"
                 timeFilter = true
+            }
+            readyToBeStaged {
+                enabled = true
+                title = "react.dashboard.readyToStage.title.label"
+                info = "react.dashboard.readyToStage.info.label"
+                graphType = "pickTaskTable"
+                type = 'graph'
+                endpoint = "/api/dashboard/readyToBeStaged"
             }
             delayedShipments {
                 enabled = true

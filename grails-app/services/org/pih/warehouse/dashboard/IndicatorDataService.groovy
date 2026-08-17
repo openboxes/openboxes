@@ -25,6 +25,10 @@ import org.pih.warehouse.inventory.OutboundStockMovementListItem
 import org.pih.warehouse.inventory.OutgoingStockMovementCounts
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.api.PickTaskStatus
+import org.pih.warehouse.api.picking.SearchPickTaskCommand
+import org.pih.warehouse.picking.PickTask
+import org.pih.warehouse.picking.PickTaskService
 import util.ConfigHelper
 
 @Transactional
@@ -38,6 +42,7 @@ class IndicatorDataService {
     def messageService
     ConfigService configService
     SessionFactory sessionFactory
+    PickTaskService pickTaskService
 
     ApplicationTagLib getApplicationTagLib() {
         return Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
@@ -733,6 +738,16 @@ class IndicatorDataService {
         GraphData graphData = new GraphData(tableData)
 
         return graphData;
+    }
+
+    // Not cached: this widget's purpose is recovering outstanding picking work in real time,
+    // so a stale count would defeat the point.
+    // Delegates to the same PickTaskService.search() used by GET /api/facilities/{facility}/pick-tasks;
+    // this dashboard-specific endpoint only exists because the generic widget fetch mechanism
+    // (see fetchGraphIndicator in actions/index.js) requires the facility as a query param, not a URL path segment.
+    List<PickTask> getReadyToBeStaged(Location location, Map params) {
+        SearchPickTaskCommand command = new SearchPickTaskCommand(facility: location, status: [PickTaskStatus.PICKED])
+        return pickTaskService.search(command, params)
     }
 
     @Cacheable(value = "dashboardCache", key = { "getDelayedShipments-${location?.id}" })

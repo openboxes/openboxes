@@ -15,6 +15,7 @@ import LoadingCard from 'components/dashboard/LoadingCard';
 import Numbers from 'components/dashboard/Numbers';
 import NumbersRAG from 'components/dashboard/NumbersRAG';
 import NumbersTableCard from 'components/dashboard/NumbersTableCard';
+import ReadyToStageCard from 'components/dashboard/ReadyToStageCard';
 import TableCard from 'components/dashboard/TableCard';
 import { translateWithDefaultMessage } from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
@@ -256,6 +257,8 @@ const GraphCard = SortableElement(({
     graph = <NumbersRAG data={data} />;
   } else if (cardType === 'table') {
     graph = <TableCard data={data} linkTarget={linkTarget} />;
+  } else if (cardType === 'pickTaskTable') {
+    graph = <ReadyToStageCard data={data} linkTarget={linkTarget} />;
   } else if (cardType === 'numberTable') {
     graph = <NumbersTableCard data={data} options={options} />;
   } else if (cardType === 'loading') {

@@ -171,6 +171,12 @@ class DashboardApiController {
         render(delayedShipments as JSON)
     }
 
+    def getReadyToBeStaged() {
+        Location location = Location.get(params.locationId)
+        def pickTasks = indicatorDataService.getReadyToBeStaged(location, params)
+        render([data: pickTasks] as JSON)
+    }
+
     def getProductWithNegativeInventory() {
         Location location = Location.get(params.locationId)
         def productsWithNegativeInventory = numberDataService.getProductWithNegativeInventory(location)
