@@ -31,7 +31,14 @@ const Receiving = () => {
     <WizardPageLayout
       title={title}
       wizard={{ steps: stepsTitles, currentStepKey: Step.key }}
-      topSection={isCheckStep ? <ConfirmReceiptHeader onBackToReceive={previous} /> : undefined}
+      topSection={isCheckStep
+        ? (
+          <ConfirmReceiptHeader
+            onBackToReceive={previous}
+            onCompleteReceipt={onCompleteReceipt}
+          />
+        )
+        : undefined}
       buttons={isCheckStep
         ? {
           previous: {
