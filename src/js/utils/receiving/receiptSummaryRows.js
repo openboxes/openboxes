@@ -85,8 +85,6 @@ const buildLineItem = ({ summary, receiptItem, usersById }) => {
       ?? shipmentItem.productLot?.expirationDate,
     recipient: mapToFormSelectOption(receiptItem?.recipient)
       ?? (shipmentItem.recipientId ? usersById[shipmentItem.recipientId] : null),
-    // The shipment item's bin is the origin bin the stock was picked from, so it is no
-    // fallback for a putaway location.
     binLocation: mapToFormSelectOption(receiptItem?.binLocation),
     // Baseline bin location as of load / last successful save, used (like
     // initialQuantityReceiving) to skip no-op edits on save.
