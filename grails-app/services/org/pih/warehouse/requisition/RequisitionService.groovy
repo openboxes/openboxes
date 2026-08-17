@@ -28,6 +28,8 @@ import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.history.EventLog
+import org.pih.warehouse.core.history.EventLogCode
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.RequisitionEvent
@@ -44,6 +46,7 @@ import org.pih.warehouse.product.Product
 import org.springframework.transaction.annotation.Propagation
 
 import java.text.SimpleDateFormat
+import java.time.Instant
 
 @Transactional
 class RequisitionService {
@@ -941,7 +944,7 @@ class RequisitionService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    void logRequisitionEvent(String requisitionId, String message) {
+    void logRequisitionComment(String requisitionId, String message) {
         Requisition requisition = Requisition.get(requisitionId)
         if (!requisition) {
             log.warn("Unable to log requisition event - requisition ${requisitionId} not found: ${message}")
@@ -955,6 +958,31 @@ class RequisitionService {
             requisition.addToComments(new Comment(comment: message, sender: null))
             requisition.save(failOnError: true)
         }
+        log.warn("Requisition ${requisition.id}: ${message}")
+    }
+
+    /**
+     * Records an ERROR_OCCURRED EventLog. Runs in its own transaction (REQUIRES_NEW) so the audit entry survives
+     * even though the caller is about to roll back and rethrow the triggering exception.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    void logRequisitionEvent(String requisitionId, String message) {
+        Requisition requisition = Requisition.get(requisitionId)
+        if (!requisition) {
+            log.warn("Unable to log requisition error - requisition ${requisitionId} not found: ${message}")
+            return
+        }
+
+        // TODO: event_log.message is a VARCHAR(255) column; expand the column (and remove this cap) if longer
+        //  messages are needed.
+        String truncatedMessage = message?.length() > 255 ? message.take(255) : message
+
+        requisition.addToEventLogs(new EventLog(
+                eventLogCode: EventLogCode.ERROR_OCCURRED,
+                eventDate: Instant.now(),
+                message: truncatedMessage,
+        ))
+        requisition.save(failOnError: true)
         log.warn("Requisition ${requisition.id}: ${message}")
     }
 
