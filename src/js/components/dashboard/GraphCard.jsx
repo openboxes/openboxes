@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import {
   Bar, Doughnut, HorizontalBar, Line,
 } from 'react-chartjs-2';
+import { RiInformationLine, RiRefreshLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { SortableElement } from 'react-sortable-hoc';
@@ -17,6 +18,7 @@ import NumbersRAG from 'components/dashboard/NumbersRAG';
 import NumbersTableCard from 'components/dashboard/NumbersTableCard';
 import TableCard from 'components/dashboard/TableCard';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import { isUnifiedLayout } from 'utils/unifiedLayout';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
 // TODO: OBPIH-4384 Refactor FilterComponent to be more generic.
@@ -262,7 +264,7 @@ const GraphCard = SortableElement(({
   } else if (cardType === 'error') {
     graph = (
       <button type="button" onClick={() => loadIndicator(widgetId)}>
-        <i className="fa fa-repeat" />
+        {isUnifiedLayout() ? <RiRefreshLine /> : <i className="fa fa-repeat" />}
       </button>
     );
   }
@@ -287,7 +289,7 @@ const GraphCard = SortableElement(({
             ? (
               <div className="graph-infos">
                 <CustomTooltip content={translate(cardInfo, cardInfo)}>
-                  <i className="fa fa-info-circle" />
+                  {isUnifiedLayout() ? <RiInformationLine /> : <i className="fa fa-info-circle" />}
                 </CustomTooltip>
               </div>
             )

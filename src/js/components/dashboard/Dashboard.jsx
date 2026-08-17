@@ -3,6 +3,10 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { defaults } from 'react-chartjs-2';
+import {
+  RiArchiveLine, RiArrowLeftSLine, RiArrowRightSLine, RiBarChartLine,
+  RiInformationLine, RiSaveLine,
+} from 'react-icons/ri';
 import { connect } from 'react-redux';
 import { SortableContainer } from 'react-sortable-hoc';
 
@@ -22,6 +26,7 @@ import NumberCard from 'components/dashboard/NumberCard';
 import UnarchiveIndicators from 'components/dashboard/UnarchiveIndicators';
 import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
+import { isUnifiedLayout } from 'utils/unifiedLayout';
 
 import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -97,7 +102,7 @@ const ArchiveIndicator = ({ hideArchive }) => (
         id="react.dashboard.archive.label"
         defaultMessage="Archive indicator"
       />
-      <i className="fa fa-archive ml-2" />
+      {isUnifiedLayout() ? <RiArchiveLine className="ml-2" /> : <i className="fa fa-archive ml-2" />}
     </span>
   </div>
 );
@@ -112,14 +117,14 @@ const ConfigurationsList = ({
     <div className={`configs-left-nav ${!showNav ? 'hidden' : ''}`}>
       <button type="button" className="toggle-nav" onClick={toggleNav}>
         {showNav
-          ? <i className="fa fa-chevron-left" aria-hidden="true" />
-          : <i className="fa fa-chevron-right" aria-hidden="true" />}
+          ? <RiArrowLeftSLine aria-hidden="true" />
+          : <RiArrowRightSLine aria-hidden="true" />}
       </button>
       <ul className="configs-list">
         {Object.entries(configs).map(([key, value]) => (
           <li className={`configs-list-item ${activeConfig === key ? 'active' : ''}`} key={key}>
             <button type="button" onClick={() => loadConfigData(key)}>
-              <i className="fa fa-bar-chart" aria-hidden="true" />
+              <RiBarChartLine aria-hidden="true" />
               <Translate id={`react.dashboard.${key}.label`} defaultMessage={value.name} />
             </button>
           </li>
@@ -131,14 +136,14 @@ const ConfigurationsList = ({
             <div className="update-section">
               <div className="division-line" />
               <span>
-                <i className="fa fa-info-circle" aria-hidden="true" />
+                <RiInformationLine aria-hidden="true" />
                 <Translate
                   id="react.dashboard.hasBeenEdited.message"
                   defaultMessage="The dashboard layout has been edited"
                 />
               </span>
               <button type="button" onClick={updateConfig}>
-                <i className="fa fa-floppy-o" aria-hidden="true" />
+                <RiSaveLine aria-hidden="true" />
                 <Translate
                   id="react.dashboard.saveConfiguration.label"
                   defaultMessage="Save configuration"
