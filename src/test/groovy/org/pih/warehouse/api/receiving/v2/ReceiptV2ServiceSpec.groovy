@@ -13,7 +13,6 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryItemManager
@@ -57,7 +56,6 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
     InventoryItemManager inventoryItemManager
     ReceiptIdentifierService receiptIdentifierService
     ReceiptService receiptService
-    MessageLocalizer messageLocalizer
     ApplicationContext mainContext
 
     void setupSpec() {
@@ -74,13 +72,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         receiptIdentifierService = Mock(ReceiptIdentifierService)
         receiptService = Mock(ReceiptService)
         mainContext = Mock(ApplicationContext)
-        // Resolves labels to their message code (the summary group names are the only localized strings here).
-        messageLocalizer = Stub(MessageLocalizer) {
-            localize(_ as String) >> { String code -> code }
-            localize(_ as String, _ as Object[]) >> { String code, Object[] args -> code }
-        }
 
-        service.messageLocalizer = messageLocalizer
         service.shipmentService = shipmentService
         service.transactionIdentifierService = transactionIdentifierService
         service.inventoryItemManager = inventoryItemManager
@@ -244,8 +236,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
     }
 
     // ----------------------------------------------------------------------------------------------------------
-    // validateShipmentReceivingState / validateShipmentDestination - the guards of the receiving page, which unlike
-    // startReceipt let a shipment with a pending receipt through (the page resumes it).
+    // validateShipmentReceivingState / validateShipmentDestination - the guards of the receiving page
     // ----------------------------------------------------------------------------------------------------------
 
     void 'validateShipmentReceivingState should pass for a shipped shipment with something left to receive'() {
@@ -303,8 +294,9 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
     }
 
     void 'validateShipmentDestination should pass at the destination of the shipment'() {
-        given:
+        given: 'a saved destination, so that the check compares persisted ids and not two nulls'
         Shipment shipment = buildReceivableShipment([buildShipmentItem(100)])
+        assert shipment.destination.id
 
         when:
         service.validateShipmentDestination(shipment, shipment.destination)

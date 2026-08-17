@@ -4,7 +4,6 @@ import javax.validation.Valid
 
 import org.pih.warehouse.api.BaseApiController
 import org.pih.warehouse.api.StockMovement
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.dtos.BatchCommandUtils
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.receiving.ReceiptCompleteRequestCommand
