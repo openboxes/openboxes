@@ -72,7 +72,8 @@ class ReceiptV2Service {
             throw new ObjectNotFoundException(shipmentId, Shipment.toString())
         }
 
-        validateShipmentReceivable(shipment)
+        validateShipmentHasNoPendingReceipt(shipment)
+        validateShipmentReceivingState(shipment)
 
         Receipt receipt = new Receipt()
         receipt.receiptNumber = receiptIdentifierService.generate(receipt)
@@ -478,20 +479,39 @@ class ReceiptV2Service {
         return transaction
     }
 
-    private static void validateShipmentReceivable(Shipment shipment) {
+    private static void validateShipmentHasNoPendingReceipt(Shipment shipment) {
         boolean hasPendingReceipt = shipment.receipts?.any { it.receiptStatusCode == ReceiptStatusCode.PENDING }
         if (hasPendingReceipt) {
             throw new IllegalStateException("A pending receipt already exists for shipment ${shipment.shipmentNumber}")
+        }
+    }
+
+    /**
+     * Whether there is anything to receive on the shipment at all.
+     */
+    static void validateShipmentReceivingState(Shipment shipment) {
+        if (!hasShipmentBeenShipped(shipment)) {
+            throw new IllegalStateException(
+                    "Cannot receive shipment ${shipment?.shipmentNumber} because it has not been shipped yet")
         }
 
         if (isShipmentFullyReceived(shipment)) {
             throw new IllegalStateException("Shipment ${shipment.shipmentNumber} has already been fully received")
         }
+    }
 
-        if (shipment.currentStatus in [ShipmentStatusCode.CREATED, ShipmentStatusCode.PENDING]) {
+    /**
+     * Whether the shipment is received where the user is logged in, receiving happens at the destination only.
+     */
+    static void validateShipmentDestination(Shipment shipment, Location currentLocation = AuthService.currentLocation) {
+        if (shipment?.destination?.id != currentLocation?.id) {
             throw new IllegalStateException(
-                    "Cannot receive shipment ${shipment.shipmentNumber} because it has not been shipped yet")
+                    "Shipment ${shipment?.shipmentNumber} can only be received at its destination")
         }
+    }
+
+    private static boolean hasShipmentBeenShipped(Shipment shipment) {
+        return shipment && !(shipment.currentStatus in [ShipmentStatusCode.CREATED, ShipmentStatusCode.PENDING])
     }
 
     /**
@@ -573,7 +593,7 @@ class ReceiptV2Service {
         if (!sortParam) {
             return shipment.shipmentItems.sort()
         }
-        
+
         return ShipmentItem.createCriteria().list {
             createAlias("recipient", "r", JoinType.LEFT_OUTER_JOIN)
             createAlias("inventoryItem", "ii", JoinType.LEFT_OUTER_JOIN)

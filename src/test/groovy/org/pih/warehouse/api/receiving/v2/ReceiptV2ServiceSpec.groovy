@@ -13,6 +13,7 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryItemManager
@@ -56,6 +57,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
     InventoryItemManager inventoryItemManager
     ReceiptIdentifierService receiptIdentifierService
     ReceiptService receiptService
+    MessageLocalizer messageLocalizer
     ApplicationContext mainContext
 
     void setupSpec() {
@@ -72,7 +74,13 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         receiptIdentifierService = Mock(ReceiptIdentifierService)
         receiptService = Mock(ReceiptService)
         mainContext = Mock(ApplicationContext)
+        // Resolves labels to their message code (the summary group names are the only localized strings here).
+        messageLocalizer = Stub(MessageLocalizer) {
+            localize(_ as String) >> { String code -> code }
+            localize(_ as String, _ as Object[]) >> { String code, Object[] args -> code }
+        }
 
+        service.messageLocalizer = messageLocalizer
         service.shipmentService = shipmentService
         service.transactionIdentifierService = transactionIdentifierService
         service.inventoryItemManager = inventoryItemManager
@@ -233,6 +241,90 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         then: 'the legacy product-filtered check would still see 60 to receive - the v2 math rejects the start'
         IllegalStateException e = thrown()
         assert e.message.contains("fully received")
+    }
+
+    // ----------------------------------------------------------------------------------------------------------
+    // validateShipmentReceivingState / validateShipmentDestination - the guards of the receiving page, which unlike
+    // startReceipt let a shipment with a pending receipt through (the page resumes it).
+    // ----------------------------------------------------------------------------------------------------------
+
+    void 'validateShipmentReceivingState should pass for a shipped shipment with something left to receive'() {
+        given:
+        Shipment shipment = buildReceivableShipment([buildShipmentItem(100)])
+
+        when:
+        service.validateShipmentReceivingState(shipment)
+
+        then:
+        notThrown(IllegalStateException)
+    }
+
+    void 'validateShipmentReceivingState should pass for a shipment that already has a pending receipt'() {
+        given: 'a receipt started by a previous visit to the receiving page'
+        ShipmentItem shipmentItem = buildShipmentItem(100)
+        Shipment shipment = buildReceivableShipment([shipmentItem])
+        createReceipt(shipment, [buildReceiptItem(shipmentItem, 0)], ReceiptStatusCode.PENDING)
+
+        when: 'unlike startReceipt, resuming it is allowed'
+        service.validateShipmentReceivingState(shipment)
+
+        then:
+        notThrown(IllegalStateException)
+    }
+
+    void 'validateShipmentReceivingState should reject a shipment that is #shipmentStatus'() {
+        given:
+        Shipment shipment = buildReceivableShipment([buildShipmentItem(100)])
+        shipment.currentStatus = shipmentStatus
+
+        when:
+        service.validateShipmentReceivingState(shipment)
+
+        then:
+        IllegalStateException e = thrown()
+        assert e.message.contains("has not been shipped yet")
+
+        where:
+        shipmentStatus << [ShipmentStatusCode.CREATED, ShipmentStatusCode.PENDING]
+    }
+
+    void 'validateShipmentReceivingState should reject a shipment that has nothing left to receive'() {
+        given:
+        ShipmentItem shipmentItem = buildShipmentItem(100)
+        Shipment shipment = buildReceivableShipment([shipmentItem])
+        createReceipt(shipment, [buildReceiptItem(shipmentItem, 100)], ReceiptStatusCode.RECEIVED)
+
+        when:
+        service.validateShipmentReceivingState(shipment)
+
+        then:
+        IllegalStateException e = thrown()
+        assert e.message.contains("fully received")
+    }
+
+    void 'validateShipmentDestination should pass at the destination of the shipment'() {
+        given:
+        Shipment shipment = buildReceivableShipment([buildShipmentItem(100)])
+
+        when:
+        service.validateShipmentDestination(shipment, shipment.destination)
+
+        then:
+        notThrown(IllegalStateException)
+    }
+
+    void 'validateShipmentDestination should reject a location other than the destination of the shipment'() {
+        given:
+        Shipment shipment = buildReceivableShipment([buildShipmentItem(100)])
+        Location otherLocation = new Location(name: "Other location")
+        otherLocation.id = "other-location-id"
+
+        when:
+        service.validateShipmentDestination(shipment, otherLocation)
+
+        then:
+        IllegalStateException e = thrown()
+        assert e.message.contains("can only be received at its destination")
     }
 
     // ----------------------------------------------------------------------------------------------------------
