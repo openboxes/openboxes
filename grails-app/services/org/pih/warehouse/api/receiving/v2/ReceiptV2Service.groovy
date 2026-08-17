@@ -290,7 +290,7 @@ class ReceiptV2Service {
             receipt.actualDeliveryDate = JavaUtilDateParser.asDate(command.dateDelivered)
         }
 
-        cancelRemainingQuantities(command.itemsToComplete)
+        cancelRemainingQuantities(receipt, command.itemsToComplete)
 
         // The order summary refresh is left suppressed here because it already rides on the shipment save at the
         // end of createInboundTransaction.
@@ -317,10 +317,16 @@ class ReceiptV2Service {
     }
 
     /**
-     * Cancels the quantity still left to receive on every line flagged with cancelRemainingQuantity: the shipment item's
-     * remaining quantity ({@link #getShipmentItemQuantityRemaining}) is written to the flagged line as its canceled
-     * quantity. Lines missing from the request (or sent with the flag disabled) cancel nothing, so their shipment
-     * item's remainder stays open for future receipts.
+     * Cancels the quantity still left to receive on every line the completion cancels: the shipment item's remaining
+     * quantity ({@link #getShipmentItemQuantityRemaining}) is written to the line as its canceled quantity.
+     *
+     * Which lines those are depends on the destination:
+     *  1. It supports partial receiving: the lines flagged with cancelRemainingQuantity. Lines missing from the
+     *     request (or sent with the flag disabled) cancel nothing, so their shipment item's remainder stays open for
+     *     future receipts.
+     *  2. It does not support partial receiving: every line of the receipt, whatever the request carries. Such a
+     *     receipt closes the shipment as received (see {@link #createShipmentReceivedEvent}), so no future receipt
+     *     can consume what is left of it.
      *
      * Only the original line of a shipment item (isSplitItem: false, created when the receipt was started) can
      * carry a cancel - the shipment item's canceled quantity is summed over all of its receipt items, so the
@@ -336,14 +342,15 @@ class ReceiptV2Service {
      * shipped, so the item remainder IS the original line's remainder. Old-workflow receipts, whose lines can carry
      * per-line quantity-shipped allocations, never reach this code.
      */
-    private static void cancelRemainingQuantities(List<ReceiptItemCompleteRequest> itemsToComplete) {
-        for (ReceiptItemCompleteRequest item : itemsToComplete) {
-            if (!item.cancelRemainingQuantity) {
-                continue
-            }
+    private static void cancelRemainingQuantities(Receipt receipt, List<ReceiptItemCompleteRequest> itemsToComplete) {
+        List<ReceiptItem> receiptItemsToCancel =
+                receipt.shipment.destination.supports(ActivityCode.PARTIAL_RECEIVING)
+                        ? itemsToComplete
+                                .findAll { ReceiptItemCompleteRequest item -> item.cancelRemainingQuantity }
+                                .collect { ReceiptItemCompleteRequest item -> item.receiptItem }
+                        : receipt.receiptItems as List<ReceiptItem>
 
-            ReceiptItem receiptItem = item.receiptItem
-
+        for (ReceiptItem receiptItem : receiptItemsToCancel) {
             // Only the original line can carry a cancel - split lines have no quantity shipped to compute one from.
             if (receiptItem.isSplitItem) {
                 continue

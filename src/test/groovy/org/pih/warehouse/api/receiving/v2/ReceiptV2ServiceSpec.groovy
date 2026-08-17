@@ -404,10 +404,10 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         given:
         ShipmentItem shipmentItem = buildShipmentItem(100)
         ReceiptItem receiptItem = buildReceiptItem(shipmentItem, 70)
-        buildReceipt([receiptItem], ReceiptStatusCode.RECEIVED)
+        Receipt receipt = buildReceivedReceipt([receiptItem])
 
         when:
-        service.cancelRemainingQuantities([completeRequest(receiptItem, true)])
+        service.cancelRemainingQuantities(receipt, [completeRequest(receiptItem, true)])
 
         then:
         assert receiptItem.quantityCanceled == 30
@@ -420,10 +420,10 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         ReceiptItem unflaggedItem = buildReceiptItem(firstShipmentItem, 70)
         ShipmentItem secondShipmentItem = buildShipmentItem(50)
         ReceiptItem missingItem = buildReceiptItem(secondShipmentItem, 20)
-        buildReceipt([unflaggedItem, missingItem], ReceiptStatusCode.RECEIVED)
+        Receipt receipt = buildReceivedReceipt([unflaggedItem, missingItem])
 
         when:
-        service.cancelRemainingQuantities([completeRequest(unflaggedItem, false)])
+        service.cancelRemainingQuantities(receipt, [completeRequest(unflaggedItem, false)])
 
         then:
         assert unflaggedItem.quantityCanceled == null
@@ -434,14 +434,14 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         given: 'a shipment item that already had 30 received by a previous receipt'
         ShipmentItem shipmentItem = buildShipmentItem(100)
         ReceiptItem previousItem = buildReceiptItem(shipmentItem, 30)
-        buildReceipt([previousItem], ReceiptStatusCode.RECEIVED)
+        buildReceivedReceipt([previousItem])
 
         and: 'a current receipt line receiving 20 more, still carrying the full quantity as its quantity shipped'
         ReceiptItem currentItem = buildReceiptItem(shipmentItem, 20)
-        buildReceipt([currentItem], ReceiptStatusCode.RECEIVED)
+        Receipt receipt = buildReceivedReceipt([currentItem])
 
         when:
-        service.cancelRemainingQuantities([completeRequest(currentItem, true)])
+        service.cancelRemainingQuantities(receipt, [completeRequest(currentItem, true)])
 
         then: 'the cap limits the line remainder (80) to what the shipment item actually has left'
         assert currentItem.quantityCanceled == 50
@@ -452,11 +452,11 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         ShipmentItem shipmentItem = buildShipmentItem(100)
         ReceiptItem originalItem = buildReceiptItem(shipmentItem, 20)
         ReceiptItem splitItem = buildReceiptItem(shipmentItem, 30, [quantityShipped: 0, isSplitItem: true])
-        buildReceipt([originalItem, splitItem], ReceiptStatusCode.RECEIVED)
+        Receipt receipt = buildReceivedReceipt([originalItem, splitItem])
 
         when: 'both lines are flagged'
         service.cancelRemainingQuantities(
-                [completeRequest(originalItem, true), completeRequest(splitItem, true)])
+                receipt, [completeRequest(originalItem, true), completeRequest(splitItem, true)])
 
         then: 'the split line is skipped and the original line cancels the shipment item remainder'
         assert originalItem.quantityCanceled == 50
@@ -468,10 +468,10 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         given:
         ShipmentItem shipmentItem = buildShipmentItem(100)
         ReceiptItem receiptItem = buildReceiptItem(shipmentItem, 120)
-        buildReceipt([receiptItem], ReceiptStatusCode.RECEIVED)
+        Receipt receipt = buildReceivedReceipt([receiptItem])
 
         when:
-        service.cancelRemainingQuantities([completeRequest(receiptItem, true)])
+        service.cancelRemainingQuantities(receipt, [completeRequest(receiptItem, true)])
 
         then:
         assert receiptItem.quantityCanceled == 0
@@ -482,10 +482,10 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         ShipmentItem shipmentItem = buildShipmentItem(500)
         ReceiptItem originalItem = buildReceiptItem(shipmentItem, 200)
         ReceiptItem overReceivedSplitItem = buildReceiptItem(shipmentItem, 350, [quantityShipped: 0, isSplitItem: true])
-        buildReceipt([originalItem, overReceivedSplitItem], ReceiptStatusCode.RECEIVED)
+        Receipt receipt = buildReceivedReceipt([originalItem, overReceivedSplitItem])
 
         when: 'only the original line is flagged'
-        service.cancelRemainingQuantities([completeRequest(originalItem, true)])
+        service.cancelRemainingQuantities(receipt, [completeRequest(originalItem, true)])
 
         then: 'nothing is left to cancel on the shipment item'
         assert originalItem.quantityCanceled == 0
@@ -496,10 +496,10 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         ShipmentItem shipmentItem = buildShipmentItem(100)
         ReceiptItem originalItem = buildReceiptItem(shipmentItem, 20)
         ReceiptItem splitItem = buildReceiptItem(shipmentItem, 30, [quantityShipped: 0, isSplitItem: true])
-        buildReceipt([originalItem, splitItem], ReceiptStatusCode.RECEIVED)
+        Receipt receipt = buildReceivedReceipt([originalItem, splitItem])
 
         when: 'only the original line is flagged'
-        service.cancelRemainingQuantities([completeRequest(originalItem, true)])
+        service.cancelRemainingQuantities(receipt, [completeRequest(originalItem, true)])
 
         then: 'the original line cancels exactly what is left after both lines received their quantities'
         assert originalItem.quantityCanceled == 50
@@ -515,10 +515,10 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         firstEditedItem.product = new Product(name: "Edited product")
         ReceiptItem secondEditedItem = buildReceiptItem(shipmentItem, 6, [quantityShipped: 0, isSplitItem: true])
         secondEditedItem.product = new Product(name: "Other edited product")
-        buildReceipt([originalItem, firstEditedItem, secondEditedItem], ReceiptStatusCode.RECEIVED)
+        Receipt receipt = buildReceivedReceipt([originalItem, firstEditedItem, secondEditedItem])
 
         when: 'only the original line is flagged'
-        service.cancelRemainingQuantities([completeRequest(originalItem, true)])
+        service.cancelRemainingQuantities(receipt, [completeRequest(originalItem, true)])
 
         then: 'the split quantities consume the remainder even though their product no longer matches the shipment item'
         assert originalItem.quantityCanceled == 37
@@ -529,15 +529,49 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         ShipmentItem shipmentItem = buildShipmentItem(100)
         ReceiptItem originalItem = buildReceiptItem(shipmentItem, 20)
         ReceiptItem splitItem = buildReceiptItem(shipmentItem, 30, [quantityShipped: 0, isSplitItem: true])
-        buildReceipt([originalItem, splitItem], ReceiptStatusCode.RECEIVED)
+        Receipt receipt = buildReceivedReceipt([originalItem, splitItem])
 
         when: 'only the split line is flagged (the request validator normally rejects this)'
-        service.cancelRemainingQuantities([completeRequest(splitItem, true)])
+        service.cancelRemainingQuantities(receipt, [completeRequest(splitItem, true)])
 
         then: 'nothing is canceled and the shipment item keeps its remainder open'
         assert splitItem.quantityCanceled == null
         assert originalItem.quantityCanceled == null
         assert shipmentItem.quantityRemaining == 50
+    }
+
+    void 'cancelRemainingQuantities should cancel every line of the receipt when the destination does not support partial receiving'() {
+        given: 'two under-received lines'
+        ShipmentItem firstShipmentItem = buildShipmentItem(100)
+        ReceiptItem firstItem = buildReceiptItem(firstShipmentItem, 70)
+        ShipmentItem secondShipmentItem = buildShipmentItem(50)
+        ReceiptItem secondItem = buildReceiptItem(secondShipmentItem, 20)
+        Receipt receipt = buildReceivedReceipt([firstItem, secondItem], false)
+
+        when: 'nothing is flagged in the request'
+        service.cancelRemainingQuantities(receipt, [])
+
+        then: 'both lines cancel their remainder, so the shipment has nothing left to receive'
+        assert firstItem.quantityCanceled == 30
+        assert secondItem.quantityCanceled == 30
+        assert firstShipmentItem.quantityRemaining == 0
+        assert secondShipmentItem.quantityRemaining == 0
+    }
+
+    void 'cancelRemainingQuantities should still cancel on the original line only when the destination does not support partial receiving'() {
+        given: 'an original line and a split line that received part of the quantity'
+        ShipmentItem shipmentItem = buildShipmentItem(100)
+        ReceiptItem originalItem = buildReceiptItem(shipmentItem, 20)
+        ReceiptItem splitItem = buildReceiptItem(shipmentItem, 30, [quantityShipped: 0, isSplitItem: true])
+        Receipt receipt = buildReceivedReceipt([originalItem, splitItem], false)
+
+        when:
+        service.cancelRemainingQuantities(receipt, [])
+
+        then: 'the split line is skipped and the original line cancels the shipment item remainder'
+        assert originalItem.quantityCanceled == 50
+        assert splitItem.quantityCanceled == null
+        assert shipmentItem.quantityRemaining == 0
     }
 
     // ----------------------------------------------------------------------------------------------------------
@@ -685,8 +719,10 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
 
     void 'completeReceipt should receive the receipt, apply cancels, record the transaction and publish the events'() {
         given: 'a pending receipt receiving 70 of 100 with cancel remaining requested'
-        Shipment shipment = buildShipment()
         ShipmentItem shipmentItem = buildShipmentItem(100)
+        // The item hangs off the shipment because the RECEIVED-vs-PARTIALLY_RECEIVED decision asserted below is
+        // computed from the shipment's items (see isShipmentFullyReceived).
+        Shipment shipment = buildReceivableShipment([shipmentItem])
         ReceiptItem receiptItem = buildReceiptItem(shipmentItem, 70)
         Receipt receipt = createReceipt(shipment, [receiptItem], ReceiptStatusCode.PENDING)
 
@@ -762,6 +798,21 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         assert currentItem.quantityCanceled == 50
     }
 
+    void 'completeReceipt should cancel every remainder when the destination does not support partial receiving'() {
+        given: 'a pending receipt of a destination that cannot receive in parts, receiving 70 of 100'
+        Shipment shipment = buildShipment(new Inventory(), false)
+        ShipmentItem shipmentItem = buildShipmentItem(100)
+        ReceiptItem receiptItem = buildReceiptItem(shipmentItem, 70)
+        Receipt receipt = createReceipt(shipment, [receiptItem], ReceiptStatusCode.PENDING)
+
+        when: 'the request carries no lines to cancel (the client hides the cancel controls)'
+        service.completeReceipt(new ReceiptCompleteRequestCommand(receipt: receipt))
+
+        then: 'the remainder is canceled anyway and the shipment is closed as received'
+        assert receiptItem.quantityCanceled == 30
+        1 * shipmentService.createShipmentEvent(shipment, _, EventCode.RECEIVED, shipment.destination)
+    }
+
     // ----------------------------------------------------------------------------------------------------------
     // Fixture helpers
     // ----------------------------------------------------------------------------------------------------------
@@ -774,11 +825,11 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
      * A minimal shipment that satisfies the Shipment constraints, so it survives the explicit save (and the
      * beforeInsert/beforeUpdate hooks) that the service performs while recording the inbound transaction.
      */
-    private static Shipment buildShipment(Inventory inventory = new Inventory()) {
+    private static Shipment buildShipment(Inventory inventory = new Inventory(), boolean supportsPartialReceiving = true) {
         Shipment shipment = new Shipment(
                 name: "Test shipment",
                 origin: new Location(name: "Origin"),
-                destination: new Location(name: "Destination", inventory: inventory),
+                destination: buildDestination(supportsPartialReceiving, inventory),
                 expectedShippingDate: new Date() - 7,
                 shipmentType: new ShipmentType(name: "Default"),
         )
@@ -826,11 +877,34 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
     }
 
     /**
+     * The receiving location, configured with or without the partial receiving activity.
+     */
+    private static Location buildDestination(boolean supportsPartialReceiving, Inventory inventory = null) {
+        return new Location(
+                name: "Destination",
+                inventory: inventory,
+                supportedActivities: [supportsPartialReceiving
+                        ? ActivityCode.PARTIAL_RECEIVING.id
+                        : ActivityCode.RECEIVE_STOCK.id] as Set,
+        )
+    }
+
+    /**
      * Builds an unsaved receipt for the tests that only exercise the in-memory object graph.
      */
     private static Receipt buildReceipt(List<ReceiptItem> receiptItems, ReceiptStatusCode statusCode) {
         Receipt receipt = new Receipt(receiptStatusCode: statusCode, actualDeliveryDate: new Date() - 1)
         receiptItems.each { ReceiptItem receiptItem -> receipt.addToReceiptItems(receiptItem) }
+        return receipt
+    }
+
+    /**
+     * An unsaved, already received receipt of an unsaved shipment carrying the only fact the cancel-remaining logic
+     * reads off it: whether the destination supports partial receiving.
+     */
+    private static Receipt buildReceivedReceipt(List<ReceiptItem> receiptItems, boolean supportsPartialReceiving = true) {
+        Receipt receipt = buildReceipt(receiptItems, ReceiptStatusCode.RECEIVED)
+        receipt.shipment = new Shipment(destination: buildDestination(supportsPartialReceiving))
         return receipt
     }
 

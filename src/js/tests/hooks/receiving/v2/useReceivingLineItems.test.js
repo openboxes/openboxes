@@ -1,7 +1,12 @@
 import { act, renderHook } from '@testing-library/react-hooks';
+import { useSelector } from 'react-redux';
 
 import useReceivingLineItems from 'hooks/receiving/v2/useReceivingLineItems';
 
+// The hook only reads the partial receiving activity code of the current location.
+jest.mock('react-redux', () => ({
+  useSelector: jest.fn(() => true),
+}));
 jest.mock('hooks/useTranslate', () => () => (id, defaultMessage) => defaultMessage);
 jest.mock('hooks/receiving/v2/useReceivingLineItemColumns', () => () => ({ columns: [] }));
 jest.mock('hooks/receiving/v2/useEditModalLocationAutofill', () => () => ({
@@ -31,12 +36,20 @@ const splitLine = {
   isSplitItem: true,
 };
 
-const renderLineItems = (initialLineItems) => renderHook(() => useReceivingLineItems({
-  lineItem: originalLine,
-  initialLineItems,
-}));
+const renderLineItems = (initialLineItems, hasPreviousReceipts = false) =>
+  renderHook(() => useReceivingLineItems({
+    lineItem: originalLine,
+    initialLineItems,
+    hasPreviousReceipts,
+  }));
+
+const summaryTitles = (result) => result.current.summaryData.map(({ title }) => title);
 
 describe('useReceivingLineItems', () => {
+  beforeEach(() => {
+    useSelector.mockImplementation(() => true);
+  });
+
   it('should open with the original line and an empty split row carrying its product', () => {
     const { result } = renderLineItems([originalLine]);
 
@@ -82,6 +95,44 @@ describe('useReceivingLineItems', () => {
     expect(result.current.fields[1]).toMatchObject({
       product,
       isSplitItem: true,
+    });
+  });
+
+  describe('the Received summary card', () => {
+    it('should be shown when the location supports partial receiving', () => {
+      const { result } = renderLineItems([originalLine]);
+
+      expect(summaryTitles(result)).toEqual([
+        'Quantity Shipped',
+        'Received',
+        'Receiving Now',
+        'Remaining to Receive',
+      ]);
+    });
+
+    it('should be hidden without partial receiving support and without a previous receipt', () => {
+      useSelector.mockImplementation(() => false);
+
+      const { result } = renderLineItems([originalLine]);
+
+      expect(summaryTitles(result)).toEqual([
+        'Quantity Shipped',
+        'Receiving Now',
+        'Remaining to Receive',
+      ]);
+    });
+
+    it('should be shown without partial receiving support when the shipment has a previous receipt', () => {
+      useSelector.mockImplementation(() => false);
+
+      const { result } = renderLineItems([originalLine], true);
+
+      expect(summaryTitles(result)).toEqual([
+        'Quantity Shipped',
+        'Received',
+        'Receiving Now',
+        'Remaining to Receive',
+      ]);
     });
   });
 });

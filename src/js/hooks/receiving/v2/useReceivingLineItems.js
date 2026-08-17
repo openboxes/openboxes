@@ -3,6 +3,8 @@ import { useCallback } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import _ from 'lodash';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { useSelector } from 'react-redux';
+import { getHasPartialReceivingSupport } from 'selectors';
 
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useEditLineItemValidation from 'hooks/receiving/v2/useEditLineItemValidation';
@@ -13,12 +15,16 @@ import { formatDateToString } from 'utils/dateUtils';
 
 /**
  * Form state for the editable "Receiving now" table in the edit modal
+ *
+ * @param hasPreviousReceipts Whether the shipment being received already has a submitted receipt.
  */
 const useReceivingLineItems = ({
   lineItem,
   initialLineItems,
+  hasPreviousReceipts,
 }) => {
   const translate = useTranslate();
+  const hasPartialReceivingSupport = useSelector(getHasPartialReceivingSupport);
 
   const buildDefaultRow = (item) => ({
     // Stable id so rows can be removed by identity, not index.
@@ -122,15 +128,21 @@ const useReceivingLineItems = ({
   const received = lineItem?.quantityReceived ?? 0;
   const remainingToReceive = Number((quantityShipped - received - receivingNow).toFixed(2));
 
+  // Received card should only be visible for a location with partial receiving or if there is
+  // any previous receipt for a shipment
+  const showReceived = Boolean(hasPartialReceivingSupport || hasPreviousReceipts);
+
   const summaryData = [
     {
       title: translate('react.receiving.quantityShipped.label', 'Quantity Shipped'),
       data: quantityShipped,
     },
-    {
-      title: translate('react.receiving.received.label', 'Received'),
-      data: received,
-    },
+    ...(showReceived ? [
+      {
+        title: translate('react.receiving.received.label', 'Received'),
+        data: received,
+      },
+    ] : []),
     {
       title: translate('react.receiving.receivingNow.label', 'Receiving Now'),
       data: receivingNow,

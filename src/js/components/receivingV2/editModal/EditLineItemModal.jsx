@@ -14,7 +14,7 @@ import useShipmentItemDetails from 'hooks/receiving/v2/useShipmentItemDetails';
 import ItemDetails from 'utils/ItemDetails';
 
 const EditLineItemModal = ({
-  onClose, lineItem, initialLineItems, receiptId, loadReceipt,
+  onClose, lineItem, initialLineItems, receiptId, loadReceipt, hasPreviousReceipts,
 }) => {
   const {
     fields,
@@ -27,7 +27,7 @@ const EditLineItemModal = ({
     getLineItems,
     handleSubmit,
     hasErrors,
-  } = useReceivingLineItems({ lineItem, initialLineItems });
+  } = useReceivingLineItems({ lineItem, initialLineItems, hasPreviousReceipts });
 
   const { onSave } = useEditLineItemSave({
     receiptId,
@@ -113,6 +113,9 @@ EditLineItemModal.propTypes = {
   }),
   initialLineItems: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   loadReceipt: PropTypes.func.isRequired,
+  /** Whether the shipment already has a submitted receipt - keeps the "Received" card visible
+   * at locations that do not support partial receiving */
+  hasPreviousReceipts: PropTypes.bool.isRequired,
 };
 
 EditLineItemModal.defaultProps = {

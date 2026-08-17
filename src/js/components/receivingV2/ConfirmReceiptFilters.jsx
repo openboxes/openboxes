@@ -3,7 +3,7 @@ import React, { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { RiCloseCircleLine, RiLogoutBoxRLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
-import { getReceivingTranslationsFetched } from 'selectors';
+import { getHasPartialReceivingSupport, getReceivingTranslationsFetched } from 'selectors';
 
 import FilterForm from 'components/Filter/FilterForm';
 import Button from 'components/form-elements/Button';
@@ -23,6 +23,7 @@ const ConfirmReceiptFilters = ({
 }) => {
   const translate = useTranslate();
   const translationsFetched = useSelector(getReceivingTranslationsFetched);
+  const hasPartialReceivingSupport = useSelector(getHasPartialReceivingSupport);
   const fields = useMemo(() => filterFields(translate), [translate]);
 
   // Clearing the filters is not a submit, so the snapshot of matching rows has to be
@@ -52,13 +53,15 @@ const ConfirmReceiptFilters = ({
         />
       </div>
       <div className="d-flex gap-8">
-        <Button
-          label="react.receiving.cancelAllRemaining.label"
-          defaultLabel="Cancel All Remaining"
-          variant="secondary"
-          onClick={onCancelAllRemaining}
-          EndIcon={<RiCloseCircleLine size={16} />}
-        />
+        {hasPartialReceivingSupport && (
+          <Button
+            label="react.receiving.cancelAllRemaining.label"
+            defaultLabel="Cancel All Remaining"
+            variant="secondary"
+            onClick={onCancelAllRemaining}
+            EndIcon={<RiCloseCircleLine size={16} />}
+          />
+        )}
         <Button
           label="react.receiving.saveAndExit.label"
           defaultLabel="Save & Exit"
