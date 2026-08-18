@@ -128,7 +128,7 @@ enum RequisitionStatus {
         [APPROVED, REJECTED, PENDING_APPROVAL]
     }
 
-    static listPicking() {
+    static listNotYetPicked() {
         [CREATED, EDITING, PENDING_APPROVAL, APPROVED, VERIFYING, PICKING]
     }
 

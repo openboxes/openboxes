@@ -570,7 +570,7 @@ class PickTaskService {
             if (statusesToSearch) {
                 'in'("status", statusesToSearch)
             }
-            'in' ("requisitionStatus", RequisitionStatus.listPicking())
+            'in' ("requisitionStatus", RequisitionStatus.listNotYetPicked())
             if (facility) {
                 eq("facility", facility)
             }
