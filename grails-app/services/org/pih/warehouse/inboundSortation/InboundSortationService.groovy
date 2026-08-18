@@ -58,6 +58,7 @@ class InboundSortationService {
                 expirationDate: task.inventoryItem.expirationDate,
                 currentBinLocation: task.location,
                 preferredBin: task.product.getInventoryLevel(task.facility.id)?.preferredBinLocation,
+                internalLocation: task.product.getDefaultPutawayLocation(task.facility),
                 quantity: task.quantity.intValue(),
                 deliveryTypeCode: task.deliveryTypeCode,
         )
@@ -84,7 +85,7 @@ class InboundSortationService {
                 expirationDate: receiptItem.inventoryItem.expirationDate,
                 currentBinLocation: receiptItem.binLocation,
                 preferredBin: receiptItem.product.getInventoryLevel(shipment.destination.id)?.preferredBinLocation,
-                internalLocation: receiptItem.product.getInventoryLevel(shipment.destination.id)?.internalLocation,
+                internalLocation: receiptItem.product.getDefaultPutawayLocation(shipment.destination),
                 quantity: receiptItem.quantityReceived,
                 backorderReference: receiptItem.shipmentItem.backorderReference,
                 backorderItem: receiptItem.shipmentItem.backorderItem,

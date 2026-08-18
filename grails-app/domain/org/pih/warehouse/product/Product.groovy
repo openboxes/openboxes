@@ -472,6 +472,27 @@ class Product implements Comparable, Serializable, DomainValidatable<ProductVali
     }
 
     /**
+     * Gets the default putaway location.
+     *
+     * A product can have several location-scoped rules within the same facility, so they are ordered by
+     * InventoryLevel.compareTo (sort order, then internal location name) and the first one wins.
+     *
+     * @param facility
+     * @return
+     */
+    Location getDefaultPutawayLocation(Location facility) {
+        if (!id || !facility?.inventory) {
+            return null
+        }
+
+        List<InventoryLevel> inventoryLevels = InventoryLevel
+                .findAllByProductAndInventoryAndInternalLocationIsNotNull(this, facility.inventory)
+                .toSorted()
+
+        return inventoryLevels ? inventoryLevels.first().internalLocation : null
+    }
+
+    /**
      * Whether this product has more than one facility-level inventory level within the same facility.
      */
     boolean hasDuplicateFacilityInventoryLevels() {
