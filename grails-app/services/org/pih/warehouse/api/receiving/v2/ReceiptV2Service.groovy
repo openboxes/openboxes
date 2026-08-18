@@ -524,6 +524,7 @@ class ReceiptV2Service {
         Map<String, List<ReceiptItem>> receiptItemsByShipmentItemId = !shipmentItems ? [:] :
                 ReceiptItem.findAllByShipmentItemInList(shipmentItems)
                         .groupBy { it.shipmentItemId.toString() }
+        Map<String, String> supplierCodeByShipmentItemId = getSupplierCodesByShipmentItemId(shipment)
 
         ShipmentReceivingSummaryDto shipmentSummary = new ShipmentReceivingSummaryDto(
                 shipmentId: shipment.id,
@@ -535,7 +536,7 @@ class ReceiptV2Service {
             String shipmentItemId = shipmentItem.id
 
             ShipmentItemReceivingSummaryDto shipmentItemSummary = new ShipmentItemReceivingSummaryDto(
-                    shipmentItem: ShipmentItemDto.from(shipmentItem),
+                    shipmentItem: ShipmentItemDto.from(shipmentItem, supplierCodeByShipmentItemId.get(shipmentItemId)),
             )
 
             // We split up the current and previous receipt items only because it is more convenient for the client.
@@ -574,9 +575,9 @@ class ReceiptV2Service {
         }
         
         return ShipmentItem.createCriteria().list {
-            createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
             createAlias("recipient", "r", JoinType.LEFT_OUTER_JOIN)
             createAlias("inventoryItem", "ii", JoinType.LEFT_OUTER_JOIN)
+            createAlias("ii.product", "p", JoinType.LEFT_OUTER_JOIN)
             eq("shipment", shipment)
             applySortOrder(sortParam, delegate)
         } as List<ShipmentItem>
@@ -604,13 +605,29 @@ class ReceiptV2Service {
                 criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "quantity"))
                 break
             case "supplierCode":
-                criteria.createAlias("orderItems", "oi", JoinType.LEFT_OUTER_JOIN)
+                criteria.createAlias("orderItems", "oi", JoinType.INNER_JOIN)
                 criteria.createAlias("oi.productSupplier", "ps", JoinType.LEFT_OUTER_JOIN)
                 criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "ps.supplierCode"))
                 break
             default:
                 break
         }
+    }
+
+    /**
+     * Fetches the supplier code of every shipment item of the given shipment, keyed by shipment item id.
+     */
+    private static Map<String, String> getSupplierCodesByShipmentItemId(Shipment shipment) {
+        List<Object[]> rows = ShipmentItem.createCriteria().list {
+            createAlias("orderItems", "oi", JoinType.INNER_JOIN)
+            createAlias("oi.productSupplier", "ps", JoinType.INNER_JOIN)
+            eq("shipment", shipment)
+            projections {
+                property("id")
+                property("ps.supplierCode")
+            }
+        } as List<Object[]>
+        return rows.collectEntries { [ (it[0]): it[1] ] }
     }
 
     private OrderedDataGroup buildPackLevelGroup(List<ShipmentItem> shipmentItems) {

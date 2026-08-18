@@ -8,21 +8,21 @@ describe('getShippedQuantityInPoUom', () => {
     expect(getShippedQuantityInPoUom({
       item: { quantityShipped: 7500, packSize: 100, unitOfMeasure: 'PK/100' },
       formatNumber,
-    })).toBe('75 PK/100');
+    })).toEqual({ quantity: '75', unitOfMeasure: 'PK/100', label: '75 PK/100' });
   });
 
   it('keeps the quantity as is for a unit of measure of each', () => {
     expect(getShippedQuantityInPoUom({
       item: { quantityShipped: 75, packSize: 1, unitOfMeasure: 'EA/1' },
       formatNumber,
-    })).toBe('75 EA/1');
+    })).toEqual({ quantity: '75', unitOfMeasure: 'EA/1', label: '75 EA/1' });
   });
 
-  it('formats the packs for the current locale', () => {
+  it('formats the quantity for the current locale', () => {
     expect(getShippedQuantityInPoUom({
       item: { quantityShipped: 7500, packSize: 1, unitOfMeasure: 'EA/1' },
       formatNumber,
-    })).toBe('7,500 EA/1');
+    })).toEqual({ quantity: '7,500', unitOfMeasure: 'EA/1', label: '7,500 EA/1' });
   });
 
   it('returns nothing for a line that does not come from a purchase order', () => {

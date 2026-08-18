@@ -23,7 +23,7 @@ const ShippedQuantityCell = React.memo(({
   const value = formatNumber(item?.quantityShipped);
   // Only a purchase order has a unit of measure to convert the quantity into.
   const quantityInPoUomLabel = isShipmentFromPurchaseOrder
-    ? getShippedQuantityInPoUom({ item, formatNumber })
+    ? getShippedQuantityInPoUom({ item, formatNumber })?.label
     : null;
 
   return (

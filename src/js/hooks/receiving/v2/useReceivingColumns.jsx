@@ -237,36 +237,38 @@ const useReceivingColumns = ({
         },
         size: 300,
       }),
-      ...(isShipmentFromPurchaseOrder ? [
-        columnHelper.display({
-          id: receivingColumns.SUPPLIER_CODE,
-          header: () => (
-            <TableHeaderCell
-              {...sortHeaderProps(receivingColumns.SUPPLIER_CODE)}
-              tooltip
-              tooltipLabel={translate('react.receiving.supplierItemCode.label', 'Supplier Item Code')}
-            >
-              {translate('react.receiving.supplierItemCode.label', 'Supplier Item Code')}
-            </TableHeaderCell>
-          ),
-          cell: ({ row, table }) => {
-            const item = getItem(row, table);
-            if (isSplitItemOrToggle(item)) {
-              return null;
-            }
-            return (
-              <ValueCell
-                value={item?.supplierCode}
-                tooltipLabel={item?.supplierCode}
-                label="react.receiving.supplierItemCode.label"
-                defaultLabel="Supplier Item Code"
-                truncate
-              />
-            );
-          },
-          size: 125,
-        }),
-      ] : []),
+      columnHelper.display({
+        id: receivingColumns.SUPPLIER_CODE,
+        header: () => (
+          <TableHeaderCell
+            {...sortHeaderProps(receivingColumns.SUPPLIER_CODE)}
+            tooltip
+            tooltipLabel={translate('react.receiving.supplierItemCode.label', 'Supplier Item Code')}
+            className="text-left"
+          >
+            {translate('react.receiving.supplierItemCode.label', 'Supplier Item Code')}
+          </TableHeaderCell>
+        ),
+        cell: ({ row, table }) => {
+          const item = getItem(row, table);
+          if (isSplitItemOrToggle(item)) {
+            return null;
+          }
+          return (
+            <ValueCell
+              value={item?.supplierCode}
+              tooltipLabel={item?.supplierCode}
+              label="react.receiving.supplierItemCode.label"
+              defaultLabel="Supplier Item Code"
+              truncate
+            />
+          );
+        },
+        meta: {
+          hide: !isShipmentFromPurchaseOrder,
+        },
+        size: 125,
+      }),
       // In the packing list view, the pack level column is not needed
       // because the parent group name is rendered on the separator rows.
       ...(isPackingListView ? [] : [packLevelColumn]),

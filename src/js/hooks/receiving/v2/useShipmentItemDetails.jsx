@@ -1,3 +1,5 @@
+import React from 'react';
+
 import * as locales from 'date-fns/locale';
 import { useSelector } from 'react-redux';
 import {
@@ -21,12 +23,20 @@ const useShipmentItemDetails = (lineItem) => {
   const isShipmentFromPurchaseOrder = useSelector(getIsShipmentFromPurchaseOrder);
 
   // Only a purchase order has a unit of measure to convert the quantity into.
-  const quantityInPoUomLabel = isShipmentFromPurchaseOrder
+  const quantityInPoUom = isShipmentFromPurchaseOrder
     ? getShippedQuantityInPoUom({ item: lineItem, formatNumber })
     : null;
-  const quantityShipped = quantityInPoUomLabel
-    ? `${formatNumber(lineItem?.quantityShipped)} (${quantityInPoUomLabel})`
-    : formatNumber(lineItem?.quantityShipped);
+  const quantityShipped = formatNumber(lineItem?.quantityShipped);
+  const shippedValue = quantityInPoUom ? (
+    <>
+      {quantityShipped}
+      <span className="item-details__value-secondary">
+        {` (${quantityInPoUom.quantity} `}
+        <span className="item-details__label">{quantityInPoUom.unitOfMeasure}</span>
+        )
+      </span>
+    </>
+  ) : quantityShipped;
 
   const badge = {
     current: {
@@ -69,7 +79,7 @@ const useShipmentItemDetails = (lineItem) => {
     ] : []),
     {
       label: translate('react.receiving.shipped.label', 'Shipped'),
-      value: quantityShipped,
+      value: shippedValue,
     },
   ];
 
