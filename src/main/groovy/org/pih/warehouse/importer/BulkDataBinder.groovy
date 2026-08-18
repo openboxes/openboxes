@@ -89,12 +89,12 @@ class BulkDataBinder {
                             cell.value, fieldNameToTypeMap.get(columnName), fieldConfig, epochDate)
                     boundRow.setProperty(columnName, parsedValue)
                 } catch (Exception e) {
-                    result.addError(new BulkDataError(
+                    result.bindErrors.add(new BulkDataError(
                             row: cell.row,
                             column: cell.column,
                             fieldName: columnName,
                             localizedMessage: messageLocalizer.localize(
-                                    "bulkData.binder.error", [columnName, cell.value, boundRow.class.simpleName]),
+                                    "import.binder.error", [columnName, cell.value, boundRow.class.simpleName]),
                             exception: e,
                             severity: BulkDataErrorSeverity.ERROR,
                     ))

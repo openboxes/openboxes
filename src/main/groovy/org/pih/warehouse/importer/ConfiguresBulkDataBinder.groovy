@@ -38,7 +38,9 @@ trait ConfiguresBulkDataBinder<T extends Importable> {
             // We expect customBindDataRow to directly write to the Importable object for each row so we don't need
             // to do any further data binding. All we do here is collect any errors that occurred when custom binding.
             List<BulkDataError> errors = customBindDataRow(rawRows.get(rowIndex), boundRows.get(rowIndex))
-            result.addErrors(errors)
+            if (errors) {
+                result.bindErrors.addAll(errors)
+            }
         }
     }
 

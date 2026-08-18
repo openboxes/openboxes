@@ -1190,6 +1190,11 @@ class UrlMappings {
             action = [GET: "getExpirationHistoryReport"]
         }
 
+        "/api/bulkData/import" {
+            controller = { "importApi" }
+            action = [POST: "importData"]
+        }
+
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")
