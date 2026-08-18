@@ -85,10 +85,10 @@ const buildLineItem = ({ summary, receiptItem, usersById }) => {
       ?? shipmentItem.productLot?.expirationDate,
     recipient: mapToFormSelectOption(receiptItem?.recipient)
       ?? (shipmentItem.recipientId ? usersById[shipmentItem.recipientId] : null),
-    binLocation: mapToFormSelectOption(receiptItem?.binLocation ?? shipmentItem.binLocation),
+    binLocation: mapToFormSelectOption(receiptItem?.binLocation),
     // Baseline bin location as of load / last successful save, used (like
     // initialQuantityReceiving) to skip no-op edits on save.
-    initialBinLocationId: (receiptItem?.binLocation ?? shipmentItem.binLocation)?.id ?? null,
+    initialBinLocationId: receiptItem?.binLocation?.id ?? null,
     quantityShipped: shipmentItem.quantity,
     quantityReceived: quantityPreviouslyReceived,
     previousReceiptItems,
@@ -139,7 +139,7 @@ const getReceiptItemChanges = (receiptItem, shipmentItem) => ({
 
 // The struck-through row of a split shipment item - the split items below
 // replace it. Built without a receipt item, so it keeps the original shipment values
-// (product, lot, expiration, recipient, bin location).
+// (product, lot, expiration, recipient).
 const buildReplacedEntity = (summary, usersById) => {
   const lineItem = buildLineItem({ summary, usersById });
   const currentReceiptItems = summary.currentReceiptItems ?? [];

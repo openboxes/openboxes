@@ -12,7 +12,7 @@ import mapToFormSelectOption from 'utils/mapToFormSelectOption';
  * the facility's bin locations plus the receiving bin generated for the shipment being
  * received. Read them with the getReceivingBinLocations / getReceivingBin selectors.
  */
-const useReceivingBinLocations = () => {
+const useReceivingBinLocations = ({ receiptId }) => {
   const dispatch = useDispatch();
   const facilityId = useSelector(getCurrentLocationId);
   const shipmentNumber = useSelector(getReceivingShipmentNumber);
@@ -24,11 +24,11 @@ const useReceivingBinLocations = () => {
   };
 
   useEffect(() => {
-    if (!facilityId || !shipmentNumber) {
+    if (!facilityId || !shipmentNumber || !receiptId) {
       return;
     }
     fetchBinLocations();
-  }, [facilityId, shipmentNumber]);
+  }, [facilityId, shipmentNumber, receiptId]);
 };
 
 export default useReceivingBinLocations;
