@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 
 import ReceivingRowType from 'consts/receivingRowType';
+import hasAnyPreviousReceipt from 'utils/receiving/hasAnyPreviousReceipt';
 
 const useEditReceivingLineItemModal = (lineItemsState) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -44,8 +45,15 @@ const useEditReceivingLineItemModal = (lineItemsState) => {
     ];
   }, [lineItemsState]);
 
+  const hasPreviousReceipts = hasAnyPreviousReceipt(lineItemsState);
+
   return {
-    isOpen, itemId, openModal, closeModal, getInitialEditModalLineItems,
+    isOpen,
+    itemId,
+    openModal,
+    closeModal,
+    getInitialEditModalLineItems,
+    hasPreviousReceipts,
   };
 };
 

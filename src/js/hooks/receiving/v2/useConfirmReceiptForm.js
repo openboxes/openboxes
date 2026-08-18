@@ -8,6 +8,7 @@ import useConfirmReceiptActions from 'hooks/receiving/v2/useConfirmReceiptAction
 import useConfirmReceiptColumns from 'hooks/receiving/v2/useConfirmReceiptColumns';
 import useConfirmReceiptSaveActions from 'hooks/receiving/v2/useConfirmReceiptSaveActions';
 import useReceivingFilters from 'hooks/receiving/v2/useReceivingFilters';
+import hasAnyPreviousReceipt from 'utils/receiving/hasAnyPreviousReceipt';
 
 const useConfirmReceiptForm = () => {
   const { control, handleSubmit } = useForm({
@@ -20,7 +21,8 @@ const useConfirmReceiptForm = () => {
   const {
     loading, receiptIdRef, lineItemsState, updateLineItemComment,
   } = useConfirmReceiptActions(view);
-  const { columns } = useConfirmReceiptColumns({ view });
+  const hasPreviousReceipts = hasAnyPreviousReceipt(lineItemsState);
+  const { columns } = useConfirmReceiptColumns({ view, hasPreviousReceipts });
   const commentModal = useCommentModal({ updateLineItemComment });
   const {
     visibleLineItemsState,

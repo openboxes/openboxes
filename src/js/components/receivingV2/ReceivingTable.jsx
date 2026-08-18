@@ -44,6 +44,7 @@ const ReceivingTable = ({
     openModal: openEditModal,
     closeModal: closeEditModal,
     getInitialEditModalLineItems,
+    hasPreviousReceipts,
   } = useEditReceivingLineItemModal(lineItemsState);
 
   // Keep `meta` stable so it only changes when the entities map or
@@ -126,6 +127,7 @@ const ReceivingTable = ({
           initialLineItems={getInitialEditModalLineItems(editedItemId)}
           receiptId={receiptId}
           loadReceipt={loadReceipt}
+          hasPreviousReceipts={hasPreviousReceipts}
         />
       )}
     </div>

@@ -27,7 +27,7 @@ import ValueCell from 'utils/cells/ValueCell';
 import { getConfirmReceiptRowActions } from 'utils/receiving/getReceivingRowActions';
 import getReceivingRowStatus from 'utils/receiving/getReceivingRowStatus';
 
-const useConfirmReceiptColumns = ({ view } = {}) => {
+const useConfirmReceiptColumns = ({ view, hasPreviousReceipts } = {}) => {
   const translate = useTranslate();
   const formatNumber = useFormatNumber();
   const columnHelper = createColumnHelper();
@@ -260,38 +260,40 @@ const useConfirmReceiptColumns = ({ view } = {}) => {
         },
         size: 100,
       }),
-      columnHelper.display({
-        id: receivingColumns.QUANTITY_RECEIVED,
-        header: () => quantityHeader('react.receiving.received.label', 'Received'),
-        cell: ({ row, table }) => {
-          const item = getItem(row, table);
-          if (isSplitItemOrToggle(item)) {
-            return null;
-          }
-          return quantityCell(
-            formatNumber(item?.quantityReceived),
-            'react.receiving.received.label',
-            'Received',
-          );
-        },
-        size: 100,
-      }),
-      columnHelper.display({
-        id: receivingColumns.QUANTITY_TO_RECEIVE,
-        header: () => quantityHeader('react.receiving.toReceive.label', 'To Receive'),
-        cell: ({ row, table }) => {
-          const item = getItem(row, table);
-          if (isSplitItemOrToggle(item)) {
-            return null;
-          }
-          return quantityCell(
-            formatNumber(item?.quantityAvailableToReceive),
-            'react.receiving.toReceive.label',
-            'To Receive',
-          );
-        },
-        size: 110,
-      }),
+      ...(hasPreviousReceipts ? [
+        columnHelper.display({
+          id: receivingColumns.QUANTITY_RECEIVED,
+          header: () => quantityHeader('react.receiving.received.label', 'Received'),
+          cell: ({ row, table }) => {
+            const item = getItem(row, table);
+            if (isSplitItemOrToggle(item)) {
+              return null;
+            }
+            return quantityCell(
+              formatNumber(item?.quantityReceived),
+              'react.receiving.received.label',
+              'Received',
+            );
+          },
+          size: 100,
+        }),
+        columnHelper.display({
+          id: receivingColumns.QUANTITY_TO_RECEIVE,
+          header: () => quantityHeader('react.receiving.toReceive.label', 'To Receive'),
+          cell: ({ row, table }) => {
+            const item = getItem(row, table);
+            if (isSplitItemOrToggle(item)) {
+              return null;
+            }
+            return quantityCell(
+              formatNumber(item?.quantityAvailableToReceive),
+              'react.receiving.toReceive.label',
+              'To Receive',
+            );
+          },
+          size: 110,
+        }),
+      ] : []),
       columnHelper.display({
         id: receivingColumns.QUANTITY_RECEIVING,
         header: () => quantityHeader('react.receiving.receivingNow.label', 'Receiving Now'),
@@ -435,7 +437,13 @@ const useConfirmReceiptColumns = ({ view } = {}) => {
         }),
       ] : []),
     ];
-  }, [translate, currentLocale, isPackingListView, hasPartialReceivingSupport]);
+  }, [
+    translate,
+    currentLocale,
+    isPackingListView,
+    hasPartialReceivingSupport,
+    hasPreviousReceipts,
+  ]);
 
   return { columns };
 };
