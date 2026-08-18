@@ -129,6 +129,9 @@ export const PUTAWAY_GENERATE_PDF = (id) => `/putaway/generatePdf/${id}`;
 // PUTAWAY TASK
 export const PUTAWAY_TASK_API = (facilityId) => `${API}/facilities/${facilityId}/putaway-tasks`;
 
+// PICK TASK
+export const PICK_TASK_API = (facilityId) => `${API}/facilities/${facilityId}/pick-tasks`;
+
 // SUPPORT LINKS
 export const SUPPORT_LINKS = `${CONTEXT_PATH}${API}/supportLinks`;
 

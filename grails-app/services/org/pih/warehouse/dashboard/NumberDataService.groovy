@@ -7,6 +7,8 @@ import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.joda.time.LocalDate
 import org.springframework.web.context.request.RequestContextHolder
 import org.pih.warehouse.DateUtil
+import org.pih.warehouse.api.PickTaskStatus
+import org.pih.warehouse.api.picking.SearchPickTaskCommand
 import org.pih.warehouse.api.putaway.SearchPutawayTaskCommand
 import org.pih.warehouse.api.StatusCategory
 import org.pih.warehouse.api.StockMovementDirection
@@ -23,6 +25,8 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
+import org.pih.warehouse.picking.PickTask
+import org.pih.warehouse.picking.PickTaskService
 import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.putaway.PutawayTaskService
 import org.pih.warehouse.requisition.Requisition
@@ -36,6 +40,7 @@ class NumberDataService {
     def dataService
     LocationService locationService
     PutawayTaskService putawayTaskService
+    PickTaskService pickTaskService
     GrailsApplication grailsApplication
     InventoryItemService inventoryItemService
 
@@ -356,6 +361,19 @@ class NumberDataService {
         return new NumberData(
                 count ?: 0,
                 "${urlContextPath}/putawayTask/list?statusCategory=OPEN"
+        )
+    }
+
+    @Cacheable(value = "dashboardCache", key = { "getReadyToBeStaged-${location?.id}" })
+    NumberData getReadyToBeStaged(Location location) {
+        def webRequest = RequestContextHolder.requestAttributes
+        def grailsParams = new GrailsParameterMap([:], webRequest.request)
+        SearchPickTaskCommand command = new SearchPickTaskCommand(facility: location, status: [PickTaskStatus.PICKED])
+        List<PickTask> pickTasks = pickTaskService.search(command, grailsParams)
+        String urlContextPath = ConfigHelper.contextPath
+        return new NumberData(
+                pickTasks.totalCount ?: 0,
+                "${urlContextPath}/pickTask/list?status=PICKED"
         )
     }
 

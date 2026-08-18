@@ -173,8 +173,8 @@ class DashboardApiController {
 
     def getReadyToBeStaged() {
         Location location = Location.get(params.locationId)
-        def pickTasks = indicatorDataService.getReadyToBeStaged(location, params)
-        render([data: pickTasks] as JSON)
+        NumberData numberData = numberDataService.getReadyToBeStaged(location)
+        render(numberData as JSON)
     }
 
     def getProductWithNegativeInventory() {
