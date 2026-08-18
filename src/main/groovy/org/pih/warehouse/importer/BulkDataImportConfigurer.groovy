@@ -73,15 +73,20 @@ abstract class BulkDataImportConfigurer<T extends Importable> implements
                 bindTo: getSourceType(),
                 bulkDataType: bulkDataType,
                 fields: dataBinderFieldConfig,
+                columnByFieldName: getColumnByFieldName(),
         )
     }
 
     @Override
     BulkDataValidatorConfig getBulkDataValidatorConfig() {
         return new BulkDataValidatorConfig(
-                // The validator needs the inverse of the column mapping that the readers use
-                columnByFieldName: columnMapping.collectEntries { k, v -> [v, k] } as Map<String, String>,
+                columnByFieldName: columnByFieldName,
         )
+    }
+
+    private Map<String, String> getColumnByFieldName() {
+        // Column index keyed on field name. The inverse of the column mapping that the readers use.
+        return columnMapping.collectEntries { k, v -> [v, k] } as Map<String, String>
     }
 
     private Class<T> getSourceType() {

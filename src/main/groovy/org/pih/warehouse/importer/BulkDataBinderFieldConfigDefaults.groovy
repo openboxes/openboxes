@@ -14,6 +14,13 @@ class BulkDataBinderFieldConfigDefaults {
     static final BulkDataBinderFieldConfig DEFAULT_CONFIG = new BulkDataBinderFieldConfig()
 
     /**
+     * The default configuration when we want to manually bind a field via custom data binding.
+     */
+    static final BulkDataBinderFieldConfig MANUALLY_BOUND = new BulkDataBinderFieldConfig(
+            dataBindingMethod: DataBindingMethod.MANUAL
+    )
+
+    /**
      * Builds a default configuration for binding Enum fields.
      */
     static BulkDataBinderFieldConfig buildDefaultEnumFieldConfig(Class enumClass) {
