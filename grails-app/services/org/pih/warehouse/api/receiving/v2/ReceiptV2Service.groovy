@@ -105,12 +105,15 @@ class ReceiptV2Service {
 
     /**
      * Creates the "original" receipt item of a shipment item: an empty (nothing received yet) line mirroring the
-     * shipment item and carrying its full quantity as the quantity shipped. Exactly one original line exists per
-     * still-receivable shipment item on a receipt - it is created when the receipt is started, cannot be deleted
-     * (the batch update endpoint rejects deleting it) and is the only line whose remainder can be canceled on
-     * completion. Shipment items already fully consumed by previous receipts get no line: it would only produce
-     * zero-quantity transaction entries on completion, and the receiving client marks an item as completed
-     * precisely by it having nothing pending on the current receipt.
+     * shipment item and carrying its full quantity as the quantity shipped. Its quantity received is left null
+     * rather than zero: null means "nothing entered yet" (the client renders an empty input, autofills it and
+     * filters on it) while a zero is a quantity the user deliberately entered. Nulls only ever live on a pending
+     * receipt - completing one writes them out as zeros (see {@link #zeroOutEmptyReceivedQuantities}).
+     * Exactly one original line exists per still-receivable shipment item on a receipt - it is created when the
+     * receipt is started, cannot be deleted (the batch update endpoint rejects deleting it) and is the only line
+     * whose remainder can be canceled on completion. Shipment items already fully consumed by previous receipts
+     * get no line: it would only produce zero-quantity transaction entries on completion, and the receiving client
+     * marks an item as completed precisely by it having nothing pending on the current receipt.
      * Lines added while receiving are split lines instead: they are flagged with isSplitItem and carry a quantity
      * shipped of zero, so they never factor into the cancel-remaining math.
      */
@@ -123,7 +126,7 @@ class ReceiptV2Service {
                 expirationDate: shipmentItem.expirationDate,
                 recipient: shipmentItem.recipient,
                 quantityShipped: shipmentItem.quantity,
-                quantityReceived: 0,
+                quantityReceived: null,
                 isSplitItem: Boolean.FALSE,
                 binLocation: receivingBin,
                 sortOrder: shipmentItem.receiptItems?.size() ?: 0,
@@ -294,6 +297,7 @@ class ReceiptV2Service {
         }
 
         cancelRemainingQuantities(receipt, command.itemsToComplete)
+        zeroOutEmptyReceivedQuantities(receipt)
 
         // The order summary refresh is left suppressed here because it already rides on the shipment save at the
         // end of createInboundTransaction.
@@ -317,6 +321,16 @@ class ReceiptV2Service {
                 transaction, transaction.associatedLocation, transaction.associatedProducts, false))
 
         return ReceiptDto.from(receipt)
+    }
+
+    /**
+     * Writes a zero over the quantity received of every line that was never given one. A null quantity received
+     * means "nothing entered yet" while the receipt is pending (see {@link #createReceiptItemFromShipmentItem})
+     */
+    private static void zeroOutEmptyReceivedQuantities(Receipt receipt) {
+        receipt.receiptItems.each { ReceiptItem receiptItem ->
+            receiptItem.quantityReceived = receiptItem.quantityReceived ?: 0
+        }
     }
 
     /**

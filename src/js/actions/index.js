@@ -73,6 +73,7 @@ import {
   UPDATE_DATE_COUNTED,
   UPDATE_FIELD_VALUE,
   UPDATE_RECEIVING_BIN_LOCATIONS,
+  UPDATE_RECEIVING_DATE_DELIVERED,
   UPDATE_RECEIVING_HEADER,
   UPDATE_RECEIVING_PUTAWAY_ENABLED,
   UPDATE_RECEIVING_VIEW,
@@ -868,6 +869,14 @@ export const updateReceivingView = (view) => ({
   type: UPDATE_RECEIVING_VIEW,
   payload: {
     view,
+  },
+});
+
+export const updateReceivingDateDelivered = (shipmentId, dateDelivered) => ({
+  type: UPDATE_RECEIVING_DATE_DELIVERED,
+  payload: {
+    shipmentId,
+    dateDelivered,
   },
 });
 

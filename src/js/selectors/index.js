@@ -422,6 +422,9 @@ export const getReceivingBinLocations = (state) => state.partialReceiving.binLoc
 
 export const getReceivingView = (state) => state.partialReceiving.view;
 
+export const getReceivingDateDelivered = (state, shipmentId) =>
+  state.partialReceiving.dateDeliveredByShipment?.[shipmentId] ?? null;
+
 export const getReceivingPutawayEnabled = (state, receiptId) =>
   state.partialReceiving.putawayEnabledByReceipt?.[receiptId] ?? false;
 
