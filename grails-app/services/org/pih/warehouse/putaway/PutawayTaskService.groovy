@@ -415,50 +415,6 @@ class PutawayTaskService {
         task.discard()
 
         OrderItem currentItem = OrderItem.get(task.putawayOrderItem.id)
-
-        OrderItem remainingOrderItem
-        if (currentItem.parentOrderItem) {
-            remainingOrderItem = partialCompleteExistingSplit(currentItem, task, quantity, alternativeDestination, quantityRemaining, isDirectPutaway)
-        } else {
-            remainingOrderItem = partialCompleteUnsplitItem(currentItem, task, quantity, alternativeDestination, quantityRemaining, isDirectPutaway)
-        }
-
-        return PutawayTaskAdapter.toPutawayTask(remainingOrderItem)
-    }
-
-    private OrderItem partialCompleteUnsplitItem(OrderItem currentItem, PutawayTask task, BigDecimal quantity, Location alternativeDestination, BigDecimal quantityRemaining, boolean isDirectPutaway) {
-        Order order = currentItem.order
-
-        Putaway putaway = Putaway.createFromOrder(order)
-        if (!putaway.orderedBy) {
-            putaway.orderedBy = AuthService.currentUser
-        }
-        PutawayItem itemToSplit = putaway.putawayItems.find { it.id == currentItem.id }
-
-        PutawayItem completedSplitItem = createSplitPutawayItem(task, quantity, PutawayStatus.COMPLETED, alternativeDestination)
-        PutawayItem remainingSplitItem = createSplitPutawayItem(task, quantityRemaining, PutawayStatus.PENDING, alternativeDestination)
-
-        if (itemToSplit) {
-            itemToSplit.splitItems = [completedSplitItem, remainingSplitItem]
-        }
-        putawayService.savePutaway(putaway)
-
-        def taskToTransfer = PutawayTaskAdapter.toPutawayTask(completedSplitItem, order)
-        transferToDestination(taskToTransfer, isDirectPutaway)
-        save(task)
-
-        currentItem.orderItemStatusCode = OrderItemStatusCode.CANCELED
-        currentItem.save(flush: true, failOnError: true)
-
-        OrderItem remainingOrderItem = order.orderItems.find {
-            it.parentOrderItem?.id == currentItem.id &&
-                    it.quantity == quantityRemaining &&
-                    it.orderItemStatusCode == OrderItemStatusCode.PENDING
-        } as OrderItem
-        return remainingOrderItem
-    }
-
-    private OrderItem partialCompleteExistingSplit(OrderItem currentItem, PutawayTask task, BigDecimal quantity, Location alternativeDestination, BigDecimal quantityRemaining, boolean isDirectPutaway) {
         def currentItemParent = currentItem.parentOrderItem
         currentItem.parentOrderItem = null
         Order order = currentItem.order
@@ -467,14 +423,12 @@ class PutawayTaskService {
         if (!putaway.orderedBy) {
             putaway.orderedBy = AuthService.currentUser
         }
-        PutawayItem rootPutawayItem = putaway.putawayItems.find { it.id == currentItemParent.id }
+        PutawayItem itemToSplit = putaway.putawayItems.find { it.id == (currentItemParent?.id ?: currentItem.id) }
 
         PutawayItem completedSplitItem = createSplitPutawayItem(task, quantity, PutawayStatus.COMPLETED, alternativeDestination)
         PutawayItem remainingSplitItem = createSplitPutawayItem(task, quantityRemaining, PutawayStatus.PENDING, alternativeDestination)
 
-        if (rootPutawayItem) {
-            rootPutawayItem.splitItems.addAll([completedSplitItem, remainingSplitItem])
-        }
+        itemToSplit?.splitItems?.addAll([completedSplitItem, remainingSplitItem])
         putawayService.savePutaway(putaway)
 
         def taskToTransfer = PutawayTaskAdapter.toPutawayTask(completedSplitItem, order)
@@ -486,12 +440,12 @@ class PutawayTaskService {
         currentItem.save(flush: true, failOnError: true)
 
         OrderItem remainingOrderItem = order.orderItems.find {
-            it.parentOrderItem?.id == currentItem.parentOrderItem?.id &&
+            it.parentOrderItem?.id == (currentItem.parentOrderItem?.id ?: currentItem.id) &&
                     it.quantity == quantityRemaining &&
                     it.orderItemStatusCode == OrderItemStatusCode.PENDING
         } as OrderItem
 
-        return remainingOrderItem
+        return PutawayTaskAdapter.toPutawayTask(remainingOrderItem)
     }
 
     void transferToContainer(PutawayTask task) {
