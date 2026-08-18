@@ -163,6 +163,12 @@ enum ActivityCode {
 
     DISPLAY_STOCK('DISPLAY_STOCK'),
 
+    // Must be enabled on both the facility and the bin location for a quantity to go below zero
+    ALLOW_NEGATIVE_INVENTORY('ALLOW_NEGATIVE_INVENTORY'),
+
+    // Marks the fallback location that accepts a stock movement when no other location can
+    INVENTORY_SHORTFALL('INVENTORY_SHORTFALL'),
+
     NONE('NONE')
 
     final String id
@@ -255,6 +261,8 @@ enum ActivityCode {
 
                 TRACK_INTERNAL_TRANSACTIONS,
                 DISPLAY_STOCK,
+                ALLOW_NEGATIVE_INVENTORY,
+                INVENTORY_SHORTFALL,
         ]
     }
 

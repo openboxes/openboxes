@@ -811,7 +811,46 @@ class LocationService {
         }
 
         location.save(flush: true)
+
+        if (location.isDepot()) {
+            findOrCreateInventoryShortfallLocation(location)
+        }
+
         return location
+    }
+
+    /**
+     * The fallback location that accepts a stock movement when no other location is able to.
+     */
+    Location getInventoryShortfallLocation(Location facility) {
+        if (!facility) {
+            return null
+        }
+        return Location.findByParentLocationAndLocationType(
+                facility, LocationType.load(Constants.INVENTORY_SHORTFALL_LOCATION_TYPE_ID))
+    }
+
+    Location findOrCreateInventoryShortfallLocation(Location facility) {
+        Location existing = getInventoryShortfallLocation(facility)
+        if (existing) {
+            return existing
+        }
+
+        String shortfallLocationNumber = "SHORTFALL-${facility.locationNumber ?: facility.id}"
+
+        Location shortfallLocation = new Location(
+                name: shortfallLocationNumber,
+                locationNumber: shortfallLocationNumber,
+                locationType: LocationType.load(Constants.INVENTORY_SHORTFALL_LOCATION_TYPE_ID),
+                parentLocation: facility,
+                active: Boolean.TRUE,
+                sortOrder: 9999)
+
+        if (!shortfallLocation.save(flush: true)) {
+            throw new ValidationException("Unable to create inventory shortfall location for ${facility.name}",
+                    shortfallLocation.errors)
+        }
+        return shortfallLocation
     }
 
     def getInternalLocation(String parentLocationId, String internalLocationId) {

@@ -541,6 +541,11 @@ class PutawayService implements EventPublisher  {
 
 
     void validatePutawayItem(PutawayItem putawayItem) {
+        if (putawayItem.putawayLocation?.isInventoryShortfallLocation()) {
+            throw new IllegalArgumentException("Cannot putaway into the inventory shortfall location " +
+                    "${putawayItem.putawayLocation?.name}. Assign the product a real bin instead.")
+        }
+
         // Mobile validation for scanned putaway location
         // TODO: add a config property around this part instead checking if the scannedPutawayLocation != null
         if (putawayItem.scannedPutawayLocation != null) {

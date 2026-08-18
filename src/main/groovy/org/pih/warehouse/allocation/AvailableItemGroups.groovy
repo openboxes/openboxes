@@ -33,4 +33,17 @@ class AvailableItemGroups {
         preferredWarehouseItems = preferredBinLocation ? warehouseItems.findAll { it.binLocation == preferredBinLocation } : []
         remainingWarehouseItems = warehouseItems - preferredWarehouseItems
     }
+
+    List<AvailableItem> itemsFor(AllocationSourceGroup group) {
+        switch (group) {
+            case AllocationSourceGroup.DISPLAY:
+                return displayItems
+            case AllocationSourceGroup.PREFERRED_STORAGE:
+                return preferredWarehouseItems
+            case AllocationSourceGroup.REMAINING_STORAGE:
+                return remainingWarehouseItems
+            default:
+                throw new IllegalArgumentException("Unsupported allocation source group: ${group}")
+        }
+    }
 }

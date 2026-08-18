@@ -18,8 +18,11 @@ import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.CycleCountService
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.picklist.PicklistItem
@@ -37,6 +40,9 @@ class AllocationService {
     AuthService authService
     RequisitionService requisitionService
     ProductAvailabilityService productAvailabilityService
+    AllocationFallbackService allocationFallbackService
+    CycleCountService cycleCountService
+    InventoryService inventoryService
 
     AllocationSourceStrategyHandlerResolver allocationSourceStrategyHandlerResolver = new AllocationSourceStrategyHandlerResolver()
     RotationStrategyResolver rotationStrategyResolver = new RotationStrategyResolver()
@@ -78,7 +84,7 @@ class AllocationService {
 
         if (mode == AllocationMode.AUTO) {
             Integer quantityRequired = requisitionItem.calculateQuantityRequired()
-            List<SuggestedItem> suggestedItems = getAutoSuggestedItems(requisitionItem, quantityRequired, strategies)
+            List<SuggestedItem> suggestedItems = getAutoSuggestedItems(requisitionItem, quantityRequired, strategies, [], mode)
 
             stockMovementService.clearPicklist(requisitionItem)
             stockMovementService.allocateSuggestedItems(requisitionItem, suggestedItems, true)
@@ -141,13 +147,13 @@ class AllocationService {
         Integer quantityRequired = request.quantityRequired ?: requisitionItem.calculateQuantityRequired()
         List<SuggestedItem> suggestedItems
         if (mode == AllocationMode.AUTO) {
-            suggestedItems = getAutoSuggestedItems(requisitionItem, quantityRequired, request.allocationStrategies)
+            suggestedItems = getAutoSuggestedItems(requisitionItem, quantityRequired, request.allocationStrategies, [], mode)
         } else if (mode == AllocationMode.MANUAL) {
             List<AvailableItem> manualItems = request.availableItems?.findAll { it.inventoryItem.product?.id == requisitionItem.product?.id }
             suggestedItems = stockMovementService.getSuggestedItems(manualItems, quantityRequired)
             Integer quantitySuggested = suggestedItems.sum { it.quantityAvailable } ?: 0
             if (quantitySuggested < quantityRequired) {
-                List<SuggestedItem> remainingItems = getAutoSuggestedItems(requisitionItem, quantityRequired - quantitySuggested, null, suggestedItems)
+                List<SuggestedItem> remainingItems = getAutoSuggestedItems(requisitionItem, quantityRequired - quantitySuggested, null, suggestedItems, mode)
                 suggestedItems.addAll(remainingItems)
             }
         } else {
@@ -268,10 +274,12 @@ class AllocationService {
         }
     }
 
-    private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationSourceStrategy> strategies, List<AvailableItem> excludeList = []) {
+    private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationSourceStrategy> strategies, List<AvailableItem> excludeList = [], AllocationMode allocationMode = null) {
         Location facility = requisitionItem.requisition.origin
         Product product = requisitionItem.product
         List<AvailableItem> allAvailableItems = stockMovementService.getAvailableItems(facility, requisitionItem, false)
+
+        allAvailableItems = allAvailableItems.findAll { !it.binLocation?.isInventoryShortfallLocation() }
 
         boolean isBackordered = requisitionItem.isBackordered()
         if (isBackordered) {
@@ -282,11 +290,17 @@ class AllocationService {
         RotationRule rotationRule = getConfiguredRotationRule()
 
         Integer bestQuantityAvailable = 0
+        List<AvailableItem> bestItems = []
+        AllocationSourceStrategy bestStrategy = null
         for (AllocationSourceStrategy strategy : resolvedStrategies) {
             List<AvailableItem> ordered = orderByStrategy(strategy, facility, product, applyRotation(rotationRule, allAvailableItems))
             List<AvailableItem> includedItems = ordered.findAll { !excludeList.contains(it) }
             Integer quantityAvailable = includedItems.sum { it.quantityAvailable } ?: 0
-            bestQuantityAvailable = Math.max(bestQuantityAvailable, quantityAvailable)
+            if (bestStrategy == null || quantityAvailable > bestQuantityAvailable) {
+                bestQuantityAvailable = quantityAvailable
+                bestItems = includedItems
+                bestStrategy = strategy
+            }
             if (canSatisfy(includedItems, quantityRequired)) {
                 return stockMovementService.getSuggestedItems(includedItems, quantityRequired)
             }
@@ -297,9 +311,60 @@ class AllocationService {
             return []
         }
 
-        // TODO fallback order when nothing can supply the quantity
+        if (!isFallbackApplicable(allocationMode, facility)) {
+            throw new IllegalArgumentException("Insufficient stock for product ${product?.productCode} - ${product?.name} in order ${requisitionItem.requisition?.requestNumber}. Required quantity: ${quantityRequired}, Available quantity: ${bestQuantityAvailable}")
+        }
 
-        throw new IllegalArgumentException("Insufficient stock for product ${product?.productCode} - ${product?.name} in order ${requisitionItem.requisition?.requestNumber}. Required quantity: ${quantityRequired}, Available quantity: ${bestQuantityAvailable}")
+        return getFallbackSuggestedItems(requisitionItem, quantityRequired, bestStrategy, bestItems)
+    }
+
+    private static boolean isFallbackApplicable(AllocationMode allocationMode, Location facility) {
+        if (allocationMode != AllocationMode.AUTO) {
+            return false
+        }
+
+        return facility?.supports(ActivityCode.ALLOW_NEGATIVE_INVENTORY)
+    }
+
+    private List<SuggestedItem> getFallbackSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired,
+                                                          AllocationSourceStrategy strategy,
+                                                          List<AvailableItem> bestItems) {
+        Location facility = requisitionItem.requisition.origin
+        Product product = requisitionItem.product
+
+        List<SuggestedItem> suggestedItemsFromStock = stockMovementService.getSuggestedItems(bestItems, quantityRequired)
+        Integer quantityFromStock = suggestedItemsFromStock.sum { it.quantityPicked } ?: 0
+        Integer quantityShortfall = quantityRequired - quantityFromStock
+
+        if (quantityShortfall <= 0) {
+            return suggestedItemsFromStock
+        }
+
+        AllocationFallbackResolution resolution = allocationFallbackService.resolve(facility, product, strategy)
+
+        log.warn("Allocation fallback for product ${product?.productCode} in order " +
+                "${requisitionItem.requisition?.requestNumber}: ${resolution}, quantity ${quantityShortfall}")
+
+        if (resolution.step == AllocationStep.NEGATIVE_INVENTORY) {
+            cycleCountService.createNegativeInventoryRequest(facility, product)
+        } else {
+            String message = "Inventory shortfall: no location at ${facility?.name} could supply quantity " +
+                    "${quantityShortfall} of product ${product?.productCode} - ${product?.name}. " +
+                    "Allocated to ${resolution.binLocation?.name}."
+            requisitionService.addSystemComment(requisitionItem.requisition, message)
+            requisitionService.addSystemEventLog(requisitionItem.requisition, message)
+        }
+
+        SuggestedItem shortfallItem = new SuggestedItem(
+                inventoryItem: inventoryService.findOrCreateDefaultInventoryItem(product),
+                binLocation: resolution.binLocation,
+                quantityAvailable: 0,
+                quantityOnHand: 0,
+                quantityRequested: quantityShortfall,
+                quantityPicked: quantityShortfall
+        )
+
+        return suggestedItemsFromStock + [shortfallItem]
     }
 
     private List<AllocationSourceStrategy> resolveStrategies(Requisition requisition, List<AllocationSourceStrategy> explicit) {
@@ -323,7 +388,7 @@ class AllocationService {
     private List<AvailableItem> orderByStrategy(AllocationSourceStrategy strategy, Location facility, Product product, List<AvailableItem> availableItems) {
         AllocationSourceStrategyHandler handler = allocationSourceStrategyHandlerResolver.handlerFor(strategy)
         if (handler) {
-            return handler.order(facility, product, availableItems)
+            return handler.orderAvailableItems(facility, product, availableItems)
         }
 
         log.warn("No allocation source strategy handler registered for ${strategy}, using natural order")

@@ -334,6 +334,34 @@ class CycleCountService {
     }
 
     /**
+     * Creates a cycle count request for a product whose quantity has fallen below zero.
+     */
+    CycleCountRequest createNegativeInventoryRequest(Location facility, Product product) {
+        CycleCountRequest existingRequest = CycleCountRequest.findByProductAndFacilityAndStatusNotInList(
+                product, facility, [CycleCountRequestStatus.COMPLETED, CycleCountRequestStatus.CANCELED])
+        if (existingRequest) {
+            return existingRequest
+        }
+
+        CycleCountRequest cycleCountRequest = new CycleCountRequest(
+                facility: facility,
+                product: product,
+                status: CycleCountRequestStatus.CREATED,
+                requestType: CycleCountRequestType.NEGATIVE_INVENTORY,
+                blindCount: false,
+                createdBy: AuthService.currentUser,
+                updatedBy: AuthService.currentUser
+        )
+
+        if (!cycleCountRequest.validate()) {
+            throw new ValidationException("Invalid cycle count request", cycleCountRequest.errors)
+        }
+
+        cycleCountRequest.save()
+        return cycleCountRequest
+    }
+
+    /**
      * Bulk updates a given list of cycle count requests.
      */
     List<CycleCountRequest> updateRequests(CycleCountRequestUpdateBulkCommand command) {

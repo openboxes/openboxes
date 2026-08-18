@@ -758,6 +758,11 @@ class ShipmentService {
         def origin = Location.get(shipmentItem?.shipment?.origin?.id)
         log.info("Validating shipment item at ${origin?.name} for product=${shipmentItem.product}, lotNumber=${shipmentItem.inventoryItem}, binLocation=${shipmentItem.binLocation}")
 
+        if (shipmentItem.binLocation?.isNegativeInventoryAllowed() ||
+                shipmentItem.binLocation?.isInventoryShortfallLocation()) {
+            return true
+        }
+
         // Location must be locally managed and
         if (origin.requiresOutboundQuantityValidation()) {
 

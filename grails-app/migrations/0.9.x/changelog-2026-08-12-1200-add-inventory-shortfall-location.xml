@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="druchniewicz" id="120820261200-0">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                select count(*) from location_type where id = "INVENTORY_SHORTFALL_LOCATION";
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="location_type">
+            <column name="id" value="INVENTORY_SHORTFALL_LOCATION"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="name" value="Inventory Shortfall"/>
+            <column name="description" value="Location type for shortfall locations"/>
+            <column name="location_type_code" value="INTERNAL"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="date_created" valueDate="2026-08-12T12:00:00"/>
+            <column name="last_updated" valueDate="2026-08-12T12:00:00"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="druchniewicz" id="120820261200-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*)
+                FROM location_type_supported_activities
+                WHERE location_type_id = 'INVENTORY_SHORTFALL_LOCATION'
+                AND supported_activities_string = 'INVENTORY_SHORTFALL';
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="location_type_supported_activities">
+            <column name="location_type_id" value="INVENTORY_SHORTFALL_LOCATION"/>
+            <column name="supported_activities_string" value="INVENTORY_SHORTFALL"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="druchniewicz" id="120820261200-2">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="location"/>
+        </preConditions>
+        <sql>
+            INSERT INTO location (id, version, name, location_number, location_type_id,
+                                  parent_location_id, active, sort_order, date_created, last_updated)
+            SELECT REPLACE(UUID(), '-', ''), 0,
+                   CONCAT('SHORTFALL-', COALESCE(f.location_number, f.id)),
+                   CONCAT('SHORTFALL-', COALESCE(f.location_number, f.id)),
+                   'INVENTORY_SHORTFALL_LOCATION', f.id, 1, 9999,
+                   '2026-08-12 12:00:00', '2026-08-12 12:00:00'
+            FROM location f
+            JOIN location_type lt ON f.location_type_id = lt.id
+            WHERE lt.location_type_code = 'DEPOT'
+              AND NOT EXISTS (SELECT 1 FROM location c
+                              WHERE c.parent_location_id = f.id
+                                AND c.location_type_id = 'INVENTORY_SHORTFALL_LOCATION');
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

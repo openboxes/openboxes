@@ -9,8 +9,6 @@
  **/
 package org.pih.warehouse.allocation
 
-import org.pih.warehouse.api.AvailableItem
-
 /**
  * Display first: display bins, then preferred warehouse bins, then remaining warehouse bins.
  */
@@ -22,7 +20,11 @@ class DisplayFirstHandler extends AbstractAllocationSourceStrategyHandler {
     }
 
     @Override
-    protected List<AvailableItem> orderGroups(AvailableItemGroups groups) {
-        return groups.displayItems + groups.preferredWarehouseItems + groups.remainingWarehouseItems
+    List<AllocationSourceGroup> getGroupOrder() {
+        return [
+                AllocationSourceGroup.DISPLAY,
+                AllocationSourceGroup.PREFERRED_STORAGE,
+                AllocationSourceGroup.REMAINING_STORAGE,
+        ]
     }
 }

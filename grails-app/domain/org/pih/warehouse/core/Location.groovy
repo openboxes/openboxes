@@ -387,6 +387,15 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return supports(ActivityCode.DISPLAY_STOCK)
     }
 
+    Boolean isNegativeInventoryAllowed() {
+        return supports(ActivityCode.ALLOW_NEGATIVE_INVENTORY) &&
+                parentLocation?.supports(ActivityCode.ALLOW_NEGATIVE_INVENTORY)
+    }
+
+    Boolean isInventoryShortfallLocation() {
+        return supports(ActivityCode.INVENTORY_SHORTFALL)
+    }
+
     LocationPurpose getLocationPurpose() {
         if (supports(ActivityCode.DISPLAY_STOCK)) {
             return LocationPurpose.DISPLAY

@@ -943,14 +943,55 @@ class RequisitionService {
         requisition.save()
     }
 
+    /**
+     * Writes a system comment in the caller's transaction. Use {@link #logRequisitionComment} instead when
+     * the caller is about to roll back and the comment still has to survive.
+     */
+    void addSystemComment(Requisition requisition, String message) {
+        writeSystemComment(requisition, message)
+    }
+
+    /**
+     * Writes an EventLog in the caller's transaction. Use {@link #logRequisitionEvent} instead when the
+     * caller is about to roll back and the entry still has to survive.
+     */
+    void addSystemEventLog(Requisition requisition, String message,
+                           EventLogCode eventLogCode = EventLogCode.ERROR_OCCURRED) {
+        writeEventLog(requisition, message, eventLogCode)
+    }
+
+    /**
+     * Records a system comment. Runs in its own transaction (REQUIRES_NEW) so the entry survives even
+     * though the caller is about to roll back and rethrow the triggering exception.
+     */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     void logRequisitionComment(String requisitionId, String message) {
         Requisition requisition = Requisition.get(requisitionId)
         if (!requisition) {
-            log.warn("Unable to log requisition event - requisition ${requisitionId} not found: ${message}")
+            log.warn("Unable to log requisition comment - requisition ${requisitionId} not found: ${message}")
             return
         }
 
+        writeSystemComment(requisition, message)
+    }
+
+    /**
+     * Records an EventLog. Runs in its own transaction (REQUIRES_NEW) so the audit entry survives even
+     * though the caller is about to roll back and rethrow the triggering exception.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    void logRequisitionEvent(String requisitionId, String message,
+                             EventLogCode eventLogCode = EventLogCode.ERROR_OCCURRED) {
+        Requisition requisition = Requisition.get(requisitionId)
+        if (!requisition) {
+            log.warn("Unable to log requisition error - requisition ${requisitionId} not found: ${message}")
+            return
+        }
+
+        writeEventLog(requisition, message, eventLogCode)
+    }
+
+    private void writeSystemComment(Requisition requisition, String message) {
         boolean alreadyLogged = requisition.comments.any {
             it.type == CommentType.SYSTEM && it.comment == message
         }
@@ -961,24 +1002,13 @@ class RequisitionService {
         log.warn("Requisition ${requisition.id}: ${message}")
     }
 
-    /**
-     * Records an ERROR_OCCURRED EventLog. Runs in its own transaction (REQUIRES_NEW) so the audit entry survives
-     * even though the caller is about to roll back and rethrow the triggering exception.
-     */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    void logRequisitionEvent(String requisitionId, String message) {
-        Requisition requisition = Requisition.get(requisitionId)
-        if (!requisition) {
-            log.warn("Unable to log requisition error - requisition ${requisitionId} not found: ${message}")
-            return
-        }
-
+    private void writeEventLog(Requisition requisition, String message, EventLogCode eventLogCode) {
         // TODO: event_log.message is a VARCHAR(255) column; expand the column (and remove this cap) if longer
         //  messages are needed.
         String truncatedMessage = message?.length() > 255 ? message.take(255) : message
 
         requisition.addToEventLogs(new EventLog(
-                eventLogCode: EventLogCode.ERROR_OCCURRED,
+                eventLogCode: eventLogCode,
                 eventDate: Instant.now(),
                 message: truncatedMessage,
         ))
