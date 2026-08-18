@@ -25,11 +25,9 @@ class ReceiptApiController extends BaseApiController {
     def view() {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
-        try {
-            receiptV2Service.validateShipmentReceivingState(stockMovement.shipment)
-            receiptV2Service.validateShipmentDestination(stockMovement.shipment)
-        } catch (IllegalStateException e) {
-            flash.error = e.message
+        String blockedReason = receiptV2Service.getReceivingBlockedReason(stockMovement.shipment)
+        if (blockedReason) {
+            flash.error = blockedReason
             redirect(controller: "stockMovement", action: "show",
                     id: stockMovement.requisition?.id ?: stockMovement.order?.id ?: params.id)
             return
