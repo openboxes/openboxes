@@ -1,5 +1,10 @@
 import ReceivingRowType from 'consts/receivingRowType';
+import { ReceivingView } from 'consts/receivingViewOptions';
 import { getAutofillQuantityUpdates } from 'hooks/receiving/v2/useReceivingActions';
+import {
+  mergeStartedReceipt,
+  transformReceiptSummary,
+} from 'utils/receiving/receiptSummaryRows';
 
 import '@testing-library/jest-dom';
 
@@ -81,6 +86,45 @@ describe('getAutofillQuantityUpdates()', () => {
 
     expect(getAutofillQuantityUpdates(state))
       .toEqual([{ rowId: 'row-1', quantityReceiving: 4 }]);
+  });
+
+  it('should fill the rows of a freshly started receipt', () => {
+    const summary = {
+      shipmentItemSummaryById: {
+        a: {
+          shipmentItem: {
+            id: 'a',
+            quantity: 12,
+            productLot: { product: { id: 'product-a' }, lotNumber: 'lot-a' },
+          },
+          currentReceiptItems: [],
+          previousReceiptItems: [],
+          totalQuantityReceived: 0,
+          totalQuantityCanceled: 0,
+        },
+      },
+      shipmentItemsGrouped: { order: ['a'] },
+    };
+    // The lines the start receipt endpoint creates carry no quantity received at all - a zero
+    // would count as entered and leave the whole receipt unfillable.
+    const startedReceipt = {
+      id: 'receipt-1',
+      receiptItems: [{
+        id: 'item-a',
+        shipmentItemId: 'a',
+        isSplitItem: false,
+        productLot: { product: { id: 'product-a' }, lotNumber: 'lot-a' },
+      }],
+    };
+
+    const state = transformReceiptSummary(
+      mergeStartedReceipt(summary, startedReceipt),
+      ReceivingView.TABLE,
+      {},
+    );
+
+    expect(getAutofillQuantityUpdates(state))
+      .toEqual([{ rowId: state.ids[0], quantityReceiving: 12 }]);
   });
 
   it('should ignore separator entries in ids (packing list view)', () => {

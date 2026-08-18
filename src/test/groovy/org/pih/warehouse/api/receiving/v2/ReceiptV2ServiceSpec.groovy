@@ -127,7 +127,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
 
         and: 'each line is an empty original mirroring its shipment item'
         ReceiptItem originalItem = receipt.receiptItems.find { it.shipmentItem == firstShipmentItem }
-        assert originalItem.quantityReceived == 0
+        assert originalItem.quantityReceived == null
         assert originalItem.isSplitItem == Boolean.FALSE
         assert originalItem.quantityShipped == 100
         assert originalItem.product == firstShipmentItem.product
@@ -140,7 +140,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         and: 'the response carries the created lines'
         assert result.receiptStatus == ReceiptStatusCode.PENDING
         assert result.receiptItems.size() == 2
-        assert result.receiptItems.every { it.quantityReceived == 0 && !it.isSplitItem }
+        assert result.receiptItems.every { it.quantityReceived == null && !it.isSplitItem }
     }
 
     void 'startReceipt should assign the receiving bin of the shipment to every line it creates'() {
@@ -179,7 +179,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         assert receipt.receiptItems.size() == 1
         ReceiptItem newOriginalItem = receipt.receiptItems.first()
         assert newOriginalItem.shipmentItem == openItem
-        assert newOriginalItem.quantityReceived == 0
+        assert newOriginalItem.quantityReceived == null
         assert newOriginalItem.isSplitItem == Boolean.FALSE
         assert newOriginalItem.quantityShipped == 50
 
@@ -865,6 +865,20 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         then: 'the remainder is canceled anyway and the shipment is closed as received'
         assert receiptItem.quantityCanceled == 30
         1 * shipmentService.createShipmentEvent(shipment, _, EventCode.RECEIVED, shipment.destination)
+    }
+
+    void 'completeReceipt should write out a zero on the lines that were never given a quantity'() {
+        given: 'a pending receipt whose original line was started but never received against'
+        Shipment shipment = buildShipment()
+        ShipmentItem shipmentItem = buildShipmentItem(100)
+        ReceiptItem receiptItem = buildReceiptItem(shipmentItem, null)
+        Receipt receipt = createReceipt(shipment, [receiptItem], ReceiptStatusCode.PENDING)
+
+        when:
+        service.completeReceipt(new ReceiptCompleteRequestCommand(receipt: receipt))
+
+        then: 'the "nothing entered yet" null does not outlive the pending receipt'
+        assert receiptItem.quantityReceived == 0
     }
 
     // ----------------------------------------------------------------------------------------------------------

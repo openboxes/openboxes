@@ -94,6 +94,23 @@ describe('mergeStartedReceipt()', () => {
     expect(mergeStartedReceipt(data, {})).toBe(data);
   });
 
+  it('should leave the quantity of the created lines empty rather than zero', () => {
+    const data = buildData([buildSummary('a')], { order: ['a'] });
+
+    const state = transformReceiptSummary(
+      mergeStartedReceipt(data, startedReceipt),
+      ReceivingView.TABLE,
+      {},
+    );
+
+    // A zero would read as a quantity the user entered, blocking the autofill and the
+    // "no quantity entered" filter.
+    expect(entitiesInOrder(state)[0]).toMatchObject({
+      quantityReceiving: null,
+      initialQuantityReceiving: null,
+    });
+  });
+
   it('should build rows carrying the created receipt item ids', () => {
     const data = buildData([buildSummary('a')], { order: ['a'] });
 
