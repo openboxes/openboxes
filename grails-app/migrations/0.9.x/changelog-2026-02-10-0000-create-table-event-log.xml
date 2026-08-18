@@ -50,6 +50,20 @@
         </createTable>
     </changeSet>
 
+    <changeSet author="christianallen" id="100220260000-1-align-event_id" dbms="mysql,mariadb">
+        <comment>Align event_log.event_id charset/collation to event.id before adding the FK; no-op when they already match or when the schema is not as expected.</comment>
+        <sql><![CDATA[
+SET @ref_charset = (SELECT c.CHARACTER_SET_NAME FROM information_schema.COLUMNS c JOIN information_schema.TABLES t ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME WHERE c.TABLE_SCHEMA = DATABASE() AND c.TABLE_NAME = 'event' AND c.COLUMN_NAME = 'id' AND t.TABLE_TYPE = 'BASE TABLE');
+SET @ref_collation = (SELECT c.COLLATION_NAME FROM information_schema.COLUMNS c JOIN information_schema.TABLES t ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME WHERE c.TABLE_SCHEMA = DATABASE() AND c.TABLE_NAME = 'event' AND c.COLUMN_NAME = 'id' AND t.TABLE_TYPE = 'BASE TABLE');
+SET @cur_collation = (SELECT c.COLLATION_NAME FROM information_schema.COLUMNS c JOIN information_schema.TABLES t ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME WHERE c.TABLE_SCHEMA = DATABASE() AND c.TABLE_NAME = 'event_log' AND c.COLUMN_NAME = 'event_id' AND t.TABLE_TYPE = 'BASE TABLE');
+SET @cur_shape = (SELECT CONCAT(c.DATA_TYPE, ':', c.CHARACTER_MAXIMUM_LENGTH, ':', c.IS_NULLABLE) FROM information_schema.COLUMNS c JOIN information_schema.TABLES t ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME WHERE c.TABLE_SCHEMA = DATABASE() AND c.TABLE_NAME = 'event_log' AND c.COLUMN_NAME = 'event_id' AND t.TABLE_TYPE = 'BASE TABLE');
+SET @align_ddl = IF(@ref_charset IS NULL OR @ref_collation IS NULL OR @cur_collation IS NULL OR @cur_shape IS NULL OR @cur_collation = @ref_collation OR @cur_shape <> 'char:38:YES', 'SELECT 1', CONCAT('ALTER TABLE `event_log` MODIFY `event_id` CHAR(38) CHARACTER SET ', @ref_charset, ' COLLATE ', @ref_collation, ' NULL'));
+PREPARE align_stmt FROM @align_ddl;
+EXECUTE align_stmt;
+DEALLOCATE PREPARE align_stmt;
+]]></sql>
+    </changeSet>
+
     <changeSet author="ewaterman" id="100220260000-1">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -65,6 +79,20 @@
                 referencedColumnNames="id"
                 referencedTableName="event"
         />
+    </changeSet>
+
+    <changeSet author="christianallen" id="100220260000-2-align-location_id" dbms="mysql,mariadb">
+        <comment>Align event_log.location_id charset/collation to location.id before adding the FK; no-op when they already match or when the schema is not as expected.</comment>
+        <sql><![CDATA[
+SET @ref_charset = (SELECT c.CHARACTER_SET_NAME FROM information_schema.COLUMNS c JOIN information_schema.TABLES t ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME WHERE c.TABLE_SCHEMA = DATABASE() AND c.TABLE_NAME = 'location' AND c.COLUMN_NAME = 'id' AND t.TABLE_TYPE = 'BASE TABLE');
+SET @ref_collation = (SELECT c.COLLATION_NAME FROM information_schema.COLUMNS c JOIN information_schema.TABLES t ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME WHERE c.TABLE_SCHEMA = DATABASE() AND c.TABLE_NAME = 'location' AND c.COLUMN_NAME = 'id' AND t.TABLE_TYPE = 'BASE TABLE');
+SET @cur_collation = (SELECT c.COLLATION_NAME FROM information_schema.COLUMNS c JOIN information_schema.TABLES t ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME WHERE c.TABLE_SCHEMA = DATABASE() AND c.TABLE_NAME = 'event_log' AND c.COLUMN_NAME = 'location_id' AND t.TABLE_TYPE = 'BASE TABLE');
+SET @cur_shape = (SELECT CONCAT(c.DATA_TYPE, ':', c.CHARACTER_MAXIMUM_LENGTH, ':', c.IS_NULLABLE) FROM information_schema.COLUMNS c JOIN information_schema.TABLES t ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME WHERE c.TABLE_SCHEMA = DATABASE() AND c.TABLE_NAME = 'event_log' AND c.COLUMN_NAME = 'location_id' AND t.TABLE_TYPE = 'BASE TABLE');
+SET @align_ddl = IF(@ref_charset IS NULL OR @ref_collation IS NULL OR @cur_collation IS NULL OR @cur_shape IS NULL OR @cur_collation = @ref_collation OR @cur_shape <> 'char:38:YES', 'SELECT 1', CONCAT('ALTER TABLE `event_log` MODIFY `location_id` CHAR(38) CHARACTER SET ', @ref_charset, ' COLLATE ', @ref_collation, ' NULL'));
+PREPARE align_stmt FROM @align_ddl;
+EXECUTE align_stmt;
+DEALLOCATE PREPARE align_stmt;
+]]></sql>
     </changeSet>
 
     <changeSet author="ewaterman" id="100220260000-2">
@@ -84,6 +112,20 @@
         />
     </changeSet>
 
+    <changeSet author="christianallen" id="100220260000-3-align-created_by_id" dbms="mysql,mariadb">
+        <comment>Align event_log.created_by_id charset/collation to user.id before adding the FK; no-op when they already match or when the schema is not as expected.</comment>
+        <sql><![CDATA[
+SET @ref_charset = (SELECT c.CHARACTER_SET_NAME FROM information_schema.COLUMNS c JOIN information_schema.TABLES t ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME WHERE c.TABLE_SCHEMA = DATABASE() AND c.TABLE_NAME = 'user' AND c.COLUMN_NAME = 'id' AND t.TABLE_TYPE = 'BASE TABLE');
+SET @ref_collation = (SELECT c.COLLATION_NAME FROM information_schema.COLUMNS c JOIN information_schema.TABLES t ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME WHERE c.TABLE_SCHEMA = DATABASE() AND c.TABLE_NAME = 'user' AND c.COLUMN_NAME = 'id' AND t.TABLE_TYPE = 'BASE TABLE');
+SET @cur_collation = (SELECT c.COLLATION_NAME FROM information_schema.COLUMNS c JOIN information_schema.TABLES t ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME WHERE c.TABLE_SCHEMA = DATABASE() AND c.TABLE_NAME = 'event_log' AND c.COLUMN_NAME = 'created_by_id' AND t.TABLE_TYPE = 'BASE TABLE');
+SET @cur_shape = (SELECT CONCAT(c.DATA_TYPE, ':', c.CHARACTER_MAXIMUM_LENGTH, ':', c.IS_NULLABLE) FROM information_schema.COLUMNS c JOIN information_schema.TABLES t ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME WHERE c.TABLE_SCHEMA = DATABASE() AND c.TABLE_NAME = 'event_log' AND c.COLUMN_NAME = 'created_by_id' AND t.TABLE_TYPE = 'BASE TABLE');
+SET @align_ddl = IF(@ref_charset IS NULL OR @ref_collation IS NULL OR @cur_collation IS NULL OR @cur_shape IS NULL OR @cur_collation = @ref_collation OR @cur_shape <> 'char:38:NO', 'SELECT 1', CONCAT('ALTER TABLE `event_log` MODIFY `created_by_id` CHAR(38) CHARACTER SET ', @ref_charset, ' COLLATE ', @ref_collation, ' NOT NULL'));
+PREPARE align_stmt FROM @align_ddl;
+EXECUTE align_stmt;
+DEALLOCATE PREPARE align_stmt;
+]]></sql>
+    </changeSet>
+
     <changeSet author="ewaterman" id="100220260000-3">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -99,6 +141,20 @@
                 referencedColumnNames="id"
                 referencedTableName="user"
         />
+    </changeSet>
+
+    <changeSet author="christianallen" id="100220260000-4-align-updated_by_id" dbms="mysql,mariadb">
+        <comment>Align event_log.updated_by_id charset/collation to user.id before adding the FK; no-op when they already match or when the schema is not as expected.</comment>
+        <sql><![CDATA[
+SET @ref_charset = (SELECT c.CHARACTER_SET_NAME FROM information_schema.COLUMNS c JOIN information_schema.TABLES t ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME WHERE c.TABLE_SCHEMA = DATABASE() AND c.TABLE_NAME = 'user' AND c.COLUMN_NAME = 'id' AND t.TABLE_TYPE = 'BASE TABLE');
+SET @ref_collation = (SELECT c.COLLATION_NAME FROM information_schema.COLUMNS c JOIN information_schema.TABLES t ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME WHERE c.TABLE_SCHEMA = DATABASE() AND c.TABLE_NAME = 'user' AND c.COLUMN_NAME = 'id' AND t.TABLE_TYPE = 'BASE TABLE');
+SET @cur_collation = (SELECT c.COLLATION_NAME FROM information_schema.COLUMNS c JOIN information_schema.TABLES t ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME WHERE c.TABLE_SCHEMA = DATABASE() AND c.TABLE_NAME = 'event_log' AND c.COLUMN_NAME = 'updated_by_id' AND t.TABLE_TYPE = 'BASE TABLE');
+SET @cur_shape = (SELECT CONCAT(c.DATA_TYPE, ':', c.CHARACTER_MAXIMUM_LENGTH, ':', c.IS_NULLABLE) FROM information_schema.COLUMNS c JOIN information_schema.TABLES t ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME WHERE c.TABLE_SCHEMA = DATABASE() AND c.TABLE_NAME = 'event_log' AND c.COLUMN_NAME = 'updated_by_id' AND t.TABLE_TYPE = 'BASE TABLE');
+SET @align_ddl = IF(@ref_charset IS NULL OR @ref_collation IS NULL OR @cur_collation IS NULL OR @cur_shape IS NULL OR @cur_collation = @ref_collation OR @cur_shape <> 'char:38:NO', 'SELECT 1', CONCAT('ALTER TABLE `event_log` MODIFY `updated_by_id` CHAR(38) CHARACTER SET ', @ref_charset, ' COLLATE ', @ref_collation, ' NOT NULL'));
+PREPARE align_stmt FROM @align_ddl;
+EXECUTE align_stmt;
+DEALLOCATE PREPARE align_stmt;
+]]></sql>
     </changeSet>
 
     <changeSet author="ewaterman" id="100220260000-4">
