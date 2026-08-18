@@ -212,4 +212,8 @@ class Constants {
 
     static final String SYSTEM_USER_USERNAME_CONFIG_KEY = "openboxes.system.username"
     static final String SYSTEM_USER_USERNAME_DEFAULT_VALUE = "admin"
+
+    // FIXME: stand-in for a proper classification subtype on EventLog (see EventLogCode#ERROR_OCCURRED).
+    static final String ALLOCATION_FAILED = "Allocation failed:"
+    static final String ISSUANCE_FAILED = "Issuance failed:"
 }

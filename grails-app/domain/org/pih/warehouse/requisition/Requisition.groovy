@@ -12,6 +12,7 @@ package org.pih.warehouse.requisition
 import grails.util.Holders
 import org.pih.warehouse.allocation.AllocationSourceStrategy
 import org.pih.warehouse.allocation.AutomaticAllocationEvent
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.core.OrderTypeCode
@@ -26,6 +27,8 @@ import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.history.EventLog
+import org.pih.warehouse.core.history.EventLogCode
 import org.pih.warehouse.fulfillment.Fulfillment
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.Product
@@ -167,7 +170,9 @@ class Requisition implements Comparable<Requisition>, Serializable {
             "shipment",
             "totalCost",
             "recentComment",
-            "mostRecentEvent"
+            "mostRecentEvent",
+            "allocationAttemptCount",
+            "mostRecentErrorMessage",
     ]
     static hasOne = [picklist: Picklist]
     static hasMany = [
@@ -177,6 +182,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
             comments: Comment,
             events: Event,
             approvers: Person,
+            eventLogs: EventLog,
     ]
     static mapping = {
         id generator: 'uuid'
@@ -187,6 +193,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         comments joinTable: [name: "requisition_comment", key: "requisition_id"], cascade: "all-delete-orphan"
         events joinTable: [name: "requisition_event", key: "requisition_id"]
         approvers joinTable: [name: "requisition_approvers", key: "requisition_id"]
+        eventLogs joinTable: [name: "requisition_event_log", key: "requisition_id", column: "event_log_id"], cascade: "all-delete-orphan"
         deliveryTypeCode enumType: "string"
         orderTypeCode enumType: "string"
         allocationSourceStrategy enumType: "string"
@@ -483,6 +490,28 @@ class Requisition implements Comparable<Requisition>, Serializable {
             return false
         }
         return true
+    }
+
+    /**
+     * Message based count of ERROR_OCCURRED event logs, used as the allocation-attempt count for the retry cap.
+     * FIXME: stand-in for a proper classification subtype on EventLog (see EventLogCode#ERROR_OCCURRED).
+     *  The intermediary improvement will be basing this on the Requisition's status and a state transition event
+     *  occurence date in comparison to the event log created date - windowed count (after implementing:
+     *  https://openboxes.atlassian.net/browse/OBLS-929).
+     */
+    Integer getAllocationAttemptCount() {
+        return eventLogs?.count {
+            it.eventLogCode == EventLogCode.ERROR_OCCURRED && it.message.startsWith(Constants.ALLOCATION_FAILED)
+        } ?: 0
+    }
+
+    /**
+     * The most recent ERROR_OCCURRED message, for display.
+     */
+    String getMostRecentErrorMessage() {
+        return eventLogs?.findAll { it.eventLogCode == EventLogCode.ERROR_OCCURRED }
+                ?.max { it.dateCreated }
+                ?.message
     }
 
     DemandTypeCode getDemandTypeCode() {

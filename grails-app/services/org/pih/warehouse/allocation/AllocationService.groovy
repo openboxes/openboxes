@@ -17,6 +17,7 @@ import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.ProductAvailabilityService
@@ -222,7 +223,10 @@ class AllocationService {
             }
             return results
         } catch (Exception e) {
-            requisitionService.logRequisitionEvent(requisition?.id, "Allocation failed: ${e.message ?: 'Unknown error'}")
+            String message = "${Constants.ALLOCATION_FAILED} ${e.message ?: 'Unknown error'}"
+            // TODO: For testing purposes leaving both Comment and EventLog in place.
+            requisitionService.logRequisitionComment(requisition?.id, message)
+            requisitionService.logRequisitionEvent(requisition?.id, message)
             throw e
         }
     }
@@ -245,11 +249,16 @@ class AllocationService {
                 allocate(requisition, AllocationMode.AUTO, [])
 
                 if (requisition.autoIssuanceRequested) {
-                    stockMovementService.issueRequisition(requisition)
-                    // TODO this is sync refresh as a temporary workaround for async refresh after transaction creation
-                    //  it should be implemented in better way, ticket for it - OBLS-937
-                    productAvailabilityService.refreshProductsAvailability(
-                            requisition.origin?.id, requisition.requisitionItems*.product*.id, false)
+                    try {
+                        stockMovementService.issueRequisition(requisition)
+                        // TODO this is sync refresh as a temporary workaround for async refresh after transaction creation
+                        //  it should be implemented in better way, ticket for it - OBLS-937
+                        productAvailabilityService.refreshProductsAvailability(
+                                requisition.origin?.id, requisition.requisitionItems*.product*.id, false)
+                    } catch (Exception e) {
+                        requisitionService.logRequisitionEvent(requisition.id, "${Constants.ISSUANCE_FAILED} ${e.message ?: 'Unknown error'}")
+                        throw e
+                    }
                 } else {
                     stockMovementService.updateRequisitionStatus(requisitionId, RequisitionStatus.PICKING)
                 }

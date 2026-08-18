@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <!-- Requisition has GORM's "hasMany" on EventLog, resulting in this mapping table from requisition to event log -->
+
+    <changeSet author="awalkowiak" id="130820261200-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="requisition_event_log"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="requisition_event_log">
+            <column name="requisition_id" type="CHAR(38)">
+                <constraints nullable="false" />
+            </column>
+            <column name="event_log_id" type="CHAR(38)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="awalkowiak" id="130820261200-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_requisition_event_log_requisition"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseColumnNames="requisition_id"
+                baseTableName="requisition_event_log"
+                constraintName="fk_requisition_event_log_requisition"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="requisition"
+        />
+    </changeSet>
+
+    <changeSet author="awalkowiak" id="130820261200-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_requisition_event_log_event_log"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseColumnNames="event_log_id"
+                baseTableName="requisition_event_log"
+                constraintName="fk_requisition_event_log_event_log"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="event_log"
+        />
+    </changeSet>
+</databaseChangeLog>
