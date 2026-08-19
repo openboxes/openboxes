@@ -369,6 +369,8 @@ class NumberDataService {
         def webRequest = RequestContextHolder.requestAttributes
         def grailsParams = new GrailsParameterMap([:], webRequest.request)
         SearchPickTaskCommand command = new SearchPickTaskCommand(facility: location, status: [PickTaskStatus.PICKED])
+        // FIXME: This should be a count instead of a search. 
+        //  Plus improve the params handling (pass from controller if needed)
         List<PickTask> pickTasks = pickTaskService.search(command, grailsParams)
         String urlContextPath = ConfigHelper.contextPath
         return new NumberData(
