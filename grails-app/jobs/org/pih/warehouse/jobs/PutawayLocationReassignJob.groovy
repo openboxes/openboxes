@@ -59,12 +59,7 @@ class PutawayLocationReassignmentJob {
             }
 
             Location newPutawayLocation = inventoryLevel.preferredBinLocation ?: inventoryLevel.internalLocation
-            putawayItems?.each {PutawayItem putawayItem ->
-                setPutawayLocation(putawayItem, newPutawayLocation)
-                putawayItem.splitItems?.each {PutawayItem splitItem ->
-                    setPutawayLocation(splitItem, newPutawayLocation)
-                }
-            }
+            putawayItems?.each { setPutawayLocation(it, newPutawayLocation) }
             putawayService.savePutaway(putaway)
         }
     }
@@ -73,6 +68,9 @@ class PutawayLocationReassignmentJob {
         if (putawayItem?.putawayStatus == PutawayStatus.PENDING) {
             putawayItem.putawayLocation = putawayLocation
             log.debug "Modified putawayLocation as ${putawayLocation} for ${putawayItem.id}"
+        }
+        putawayItem.splitItems?.each { PutawayItem splitItem ->
+            setPutawayLocation(splitItem, putawayLocation)
         }
     }
 }

@@ -423,14 +423,12 @@ class PutawayTaskService {
         if (!putaway.orderedBy) {
             putaway.orderedBy = AuthService.currentUser
         }
-        PutawayItem itemToSplit = putaway.putawayItems.find { it.id == currentItem.id }
+        PutawayItem itemToSplit = putaway.putawayItems.find { it.id == (currentItemParent?.id ?: currentItem.id) }
 
         PutawayItem completedSplitItem = createSplitPutawayItem(task, quantity, PutawayStatus.COMPLETED, alternativeDestination)
         PutawayItem remainingSplitItem = createSplitPutawayItem(task, quantityRemaining, PutawayStatus.PENDING, alternativeDestination)
 
-        if (itemToSplit) {
-            itemToSplit.splitItems = [completedSplitItem, remainingSplitItem]
-        }
+        itemToSplit?.splitItems?.addAll([completedSplitItem, remainingSplitItem])
         putawayService.savePutaway(putaway)
 
         def taskToTransfer = PutawayTaskAdapter.toPutawayTask(completedSplitItem, order)
@@ -442,7 +440,7 @@ class PutawayTaskService {
         currentItem.save(flush: true, failOnError: true)
 
         OrderItem remainingOrderItem = order.orderItems.find {
-            it.parentOrderItem?.id == currentItem.id &&
+            it.parentOrderItem?.id == (currentItem.parentOrderItem?.id ?: currentItem.id) &&
                     it.quantity == quantityRemaining &&
                     it.orderItemStatusCode == OrderItemStatusCode.PENDING
         } as OrderItem
