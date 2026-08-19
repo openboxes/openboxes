@@ -49,12 +49,18 @@ class PickTaskService {
 
         Integer max = params.int('max') ?: 100
         Integer offset = params.int('offset') ?: 0
+        boolean excludeAssignedRequisitions = command.excludeAssignedRequisitions ?: false
 
         List<String> requisitionIds = findRequisitionIdsForPicking(command)
 
         List<PickTaskStatus> statusesToSearch = command.status
         if (!statusesToSearch  && !command.outboundContainerId && !command.requisitionId) {
             statusesToSearch = [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
+        }
+
+        List<String> assignedRequisitions
+        if (excludeAssignedRequisitions) {
+            assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(command.facility, statusesToSearch)
         }
 
         List<PickTask> tasks = PickTask.createCriteria().list(max: max, offset: offset) {
@@ -98,6 +104,11 @@ class PickTaskService {
                     eq("r.id", command.requisitionId)
                     eq("r.requestNumber", command.requisitionId)
                 }
+            } else if (assignedRequisitions) {
+                // apply assignedRequisitions only when command.requisitionId is not given
+                not {
+                    'in'("requisition.id", assignedRequisitions)
+                }
             }
 
             order("priority", "asc")
@@ -110,11 +121,11 @@ class PickTaskService {
     }
 
     @Transactional(readOnly = true)
-    List<Map> countOrdersByDeliveryType(Location facility) {
+    List<Map> countOrdersByDeliveryType(Location facility, boolean excludeAssignedRequisitions = false) {
         Map<DeliveryTypeCode, Integer> available = countDistinctRequisitionsByDeliveryType(
-                facility, [PickTaskStatus.PENDING, PickTaskStatus.PICKING])
+                facility, excludeAssignedRequisitions, [PickTaskStatus.PENDING, PickTaskStatus.PICKING])
 
-        Map<DeliveryTypeCode, Integer> total = countDistinctRequisitionsByDeliveryType(facility, null)
+        Map<DeliveryTypeCode, Integer> total = countDistinctRequisitionsByDeliveryType(facility, excludeAssignedRequisitions, null)
 
         return DeliveryTypeCode.values().collect { DeliveryTypeCode code ->
             [
@@ -126,7 +137,11 @@ class PickTaskService {
     }
 
     private Map<DeliveryTypeCode, Integer> countDistinctRequisitionsByDeliveryType(
-            Location facility, List<PickTaskStatus> statuses) {
+            Location facility, boolean excludeAssignedRequisitions, List<PickTaskStatus> statuses) {
+        List<String> assignedRequisitions
+        if (excludeAssignedRequisitions) {
+            assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(facility, statuses)
+        }
         List results = PickTask.createCriteria().list {
             projections {
                 groupProperty("deliveryTypeCode")
@@ -135,6 +150,12 @@ class PickTaskService {
             eq("facility", facility)
             if (statuses) {
                 'in'("status", statuses)
+            }
+
+            if (assignedRequisitions) {
+                not {
+                    'in'("requisition.id", assignedRequisitions)
+                }
             }
         }
         return results.collectEntries { row -> [(row[0]): (row[1] as Integer)] }
@@ -538,6 +559,24 @@ class PickTaskService {
 
             return p1 <=> p2 ?: a.dateCreated <=> b.dateCreated
         }.take(ordersCount)*.id
+    }
+
+    private List<String> findRequisitionIdsWithPickTaskAssigned(Location facility, List<PickTaskStatus> statusesToSearch) {
+        List<Requisition> requisitions = PickTask.createCriteria().list {
+            projections {
+                distinct("requisition")
+            }
+            isNotNull("assignee")
+            if (statusesToSearch) {
+                'in'("status", statusesToSearch)
+            }
+            'in' ("requisitionStatus", RequisitionStatus.listNotYetPicked())
+            if (facility) {
+                eq("facility", facility)
+            }
+        }
+
+        return requisitions*.id
     }
 
     private void validateOutboundContainer(Location outboundContainer, PickTask pickTask) {
