@@ -881,6 +881,23 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         assert receiptItem.quantityReceived == 0
     }
 
+    void 'completeReceipt should cancel the whole quantity of a line left empty when the destination does not support partial receiving'() {
+        given: 'a pending receipt of a destination that cannot receive in parts, whose only line was never received against'
+        Shipment shipment = buildShipment(new Inventory(), false)
+        ShipmentItem shipmentItem = buildShipmentItem(100)
+        ReceiptItem receiptItem = buildReceiptItem(shipmentItem, null)
+        Receipt receipt = createReceipt(shipment, [receiptItem], ReceiptStatusCode.PENDING)
+
+        when: 'the request carries no lines to cancel'
+        service.completeReceipt(new ReceiptCompleteRequestCommand(receipt: receipt))
+
+        then: 'the empty line counts as nothing received, so the full shipped quantity is canceled'
+        assert receiptItem.quantityCanceled == 100
+
+        and: 'the "nothing entered yet" null is written out as a zero'
+        assert receiptItem.quantityReceived == 0
+    }
+
     // ----------------------------------------------------------------------------------------------------------
     // Fixture helpers
     // ----------------------------------------------------------------------------------------------------------
