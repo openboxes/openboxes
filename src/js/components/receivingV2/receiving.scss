@@ -144,11 +144,10 @@
     opacity: 0.5;
   }
 
-  .shipped-po {
-    &__uom {
-      margin-left: 4px;
-      color: var(--gray-350);
-    }
+  &__shipped-info {
+    color: var(--gray-400);
+    flex-shrink: 0;
+    cursor: pointer;
   }
 
   &__struck {

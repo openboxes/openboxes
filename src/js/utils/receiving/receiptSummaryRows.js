@@ -95,6 +95,7 @@ const buildLineItem = ({ summary, receiptItem, usersById }) => {
     comment: receiptItem?.comment ?? null,
     packSize: shipmentItem.packSize,
     unitOfMeasure: shipmentItem.unitOfMeasure,
+    supplierCode: shipmentItem.supplierCode,
     quantityReceiving: receiptItem?.quantityReceived ?? null,
     // Baseline quantity as of load / last successful save. A dirty row is only sent when its
     // quantity actually differs from this, so no-op edits (e.g. 3 -> 4 -> 3) are skipped.
