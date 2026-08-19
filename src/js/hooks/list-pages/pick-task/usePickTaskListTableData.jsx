@@ -5,7 +5,7 @@ import useTableData from 'hooks/list-pages/useTableData';
 
 // Fixed to status=PICKED: this page only shows outstanding staging work, so there's no filter UI.
 // Declared once at module scope so its reference is stable across renders - useTableData's
-// fetch effect depends on filterParams by reference, and a fresh object literal on every render
+// fetch effect depends on filterParams by reference. And a fresh object literal on every render
 // would re-trigger the fetch effect after every fetch's state update, looping forever.
 const FILTER_PARAMS = { status: 'PICKED' };
 
