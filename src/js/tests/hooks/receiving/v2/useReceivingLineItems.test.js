@@ -15,12 +15,18 @@ jest.mock('hooks/receiving/v2/useEditModalLocationAutofill', () => () => ({
 
 const product = { id: 'product-1', name: 'Ibuprofen 200mg' };
 const splitProduct = { id: 'product-2', name: 'Paracetamol 500mg' };
+const shipmentRecipient = { id: 'person-1', name: 'John Doe', label: 'John Doe' };
+const editedRecipient = { id: 'person-2', name: 'Jane Roe', label: 'Jane Roe' };
+const receivingBin = { id: 'bin-1', name: 'R-00001', label: 'R-00001' };
+const putawayBin = { id: 'bin-2', name: 'Zone A', label: 'Zone A' };
 
 const originalLine = {
   rowId: 'row-1',
   receiptItemId: 'receipt-item-1',
   product,
   lotNumber: 'LOT-1',
+  recipient: shipmentRecipient,
+  binLocation: receivingBin,
   quantityReceiving: 5,
   quantityShipped: 10,
   quantityReceived: 0,
@@ -50,7 +56,7 @@ describe('useReceivingLineItems', () => {
     useSelector.mockImplementation(() => true);
   });
 
-  it('should open with the original line and an empty split row carrying its product', () => {
+  it('should open with the original line and an empty split row carrying its autofilled values', () => {
     const { result } = renderLineItems([originalLine]);
 
     expect(result.current.fields).toHaveLength(2);
@@ -65,7 +71,8 @@ describe('useReceivingLineItems', () => {
       receiptItemId: null,
       product,
       lotNumber: '',
-      recipient: null,
+      recipient: shipmentRecipient,
+      binLocation: receivingBin,
       quantityReceiving: '',
       isSplitItem: true,
     });
@@ -95,6 +102,46 @@ describe('useReceivingLineItems', () => {
     expect(result.current.fields[1]).toMatchObject({
       product,
       isSplitItem: true,
+    });
+  });
+
+  describe('autofill of an added row', () => {
+    it('should carry the product, the recipient and the bin of the line', () => {
+      const { result } = renderLineItems([originalLine, splitLine]);
+
+      act(() => result.current.addRow());
+
+      expect(result.current.fields[2]).toMatchObject({
+        receiptItemId: null,
+        product,
+        lotNumber: '',
+        recipient: shipmentRecipient,
+        binLocation: receivingBin,
+        quantityReceiving: '',
+        isSplitItem: true,
+      });
+    });
+
+    it('should take the bin the original line sits in, not the receiving bin it started in', () => {
+      const { result } = renderLineItems([
+        { ...originalLine, binLocation: putawayBin },
+        splitLine,
+      ]);
+
+      act(() => result.current.addRow());
+
+      expect(result.current.fields[2]).toMatchObject({ binLocation: putawayBin });
+    });
+
+    it('should take the recipient of the shipment item, not the one entered on the line', () => {
+      const { result } = renderLineItems([
+        { ...originalLine, recipient: editedRecipient },
+        splitLine,
+      ]);
+
+      act(() => result.current.addRow());
+
+      expect(result.current.fields[2]).toMatchObject({ recipient: shipmentRecipient });
     });
   });
 
