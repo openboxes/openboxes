@@ -14,7 +14,7 @@ import org.pih.warehouse.shipping.ShipmentService
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
 @Component
-class ProductValidator implements DomainValidator<Product> {
+class ProductValidator extends DomainValidator<Product> {
 
     private static String ACTIVE_FIELD_NAME = "active"
 
@@ -28,7 +28,7 @@ class ProductValidator implements DomainValidator<Product> {
     ShipmentService shipmentService
 
     @Override
-    ObjectValidationResult doValidate(Product product) {
+    protected ObjectValidationResult doValidate(Product product) {
         return new ObjectValidationResult(
                 validateActive(product),
         )

@@ -7,10 +7,10 @@ import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.core.validation.ObjectValidator
 
 @Component
-class ReceiptItemCommentCreateCommandValidator implements ObjectValidator<ReceiptItemCommentCreateCommand> {
+class ReceiptItemCommentCreateCommandValidator extends ObjectValidator<ReceiptItemCommentCreateCommand> {
 
     @Override
-    ObjectValidationResult doValidate(ReceiptItemCommentCreateCommand command) {
+    protected ObjectValidationResult doValidate(ReceiptItemCommentCreateCommand command) {
         return new ObjectValidationResult(
                 validateReceiptItemHasNoComment(command),
         )

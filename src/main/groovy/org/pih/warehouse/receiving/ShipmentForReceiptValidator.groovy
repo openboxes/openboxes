@@ -5,8 +5,8 @@ import org.springframework.validation.ObjectError
 
 import org.pih.warehouse.api.receiving.v2.ReceiptV2Service
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.validation.DomainValidator
 import org.pih.warehouse.core.validation.ObjectValidationResult
+import org.pih.warehouse.core.validation.PlainObjectValidator
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
@@ -15,14 +15,14 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
  * while {@link #validateForReceivingAccess} answers whether the user may work on the receiving.
  */
 @Component
-class ShipmentForReceiptValidator implements DomainValidator<Shipment> {
+class ShipmentForReceiptValidator extends PlainObjectValidator<Shipment> {
 
     /**
      * Whether a new receipt can be opened on the shipment: it has to be shipped, have something left to receive,
      * and not already carry a pending receipt.
      */
     @Override
-    ObjectValidationResult doValidate(Shipment shipment) {
+    protected ObjectValidationResult doValidate(Shipment shipment) {
         return new ObjectValidationResult(
                 validateShipmentHasBeenShipped(shipment),
                 validateShipmentNotFullyReceived(shipment),

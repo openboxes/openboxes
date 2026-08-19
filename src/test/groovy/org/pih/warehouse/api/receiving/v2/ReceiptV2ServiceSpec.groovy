@@ -209,8 +209,8 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         service.startReceipt(shipment.id)
 
         then:
-        thrown(ValidationException)
-        assert shipment.errors.getFieldError("receipts").code == "shipment.pendingReceiptExists.message"
+        ValidationException e = thrown(ValidationException)
+        assert e.errors.getFieldError("receipts").code == "shipment.pendingReceiptExists.message"
     }
 
     void 'startReceipt should reject a shipment that has not been shipped yet'() {
@@ -224,8 +224,8 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         service.startReceipt(shipment.id)
 
         then:
-        thrown(ValidationException)
-        assert shipment.errors.getFieldError("currentStatus").code == "stockMovement.hasNotBeenShipped.message"
+        ValidationException e = thrown(ValidationException)
+        assert e.errors.getFieldError("currentStatus").code == "stockMovement.hasNotBeenShipped.message"
     }
 
     void 'startReceipt should reject a shipment already fully consumed by lines received against an edited product'() {
@@ -242,8 +242,8 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         service.startReceipt(shipment.id)
 
         then: 'the legacy product-filtered check would still see 60 to receive - the v2 math rejects the start'
-        thrown(ValidationException)
-        assert shipment.errors.getFieldError("shipmentItems").code == "stockMovement.hasAlreadyBeenReceived.message"
+        ValidationException e = thrown(ValidationException)
+        assert e.errors.getFieldError("shipmentItems").code == "stockMovement.hasAlreadyBeenReceived.message"
     }
 
     // ----------------------------------------------------------------------------------------------------------
