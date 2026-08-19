@@ -1,15 +1,16 @@
 package org.pih.warehouse.core.validation
 
-import org.grails.datastore.gorm.GormValidateable
 import org.springframework.validation.Errors
 
 /**
- * A validator for a Grails Domain class.
+ * A validator for a {@link DomainValidatable} Grails Domain entity.
+ *
+ * Will be triggered when calling x.validate() on an instance of the target domain.
  */
-trait DomainValidator<T extends GormValidateable> implements Validator<T> {
+abstract class DomainValidator<T extends DomainValidatable> extends Validator<T> {
 
     @Override
     Errors getErrors(T toValidate) {
-        return toValidate.errors
+        return toValidate?.errors
     }
 }

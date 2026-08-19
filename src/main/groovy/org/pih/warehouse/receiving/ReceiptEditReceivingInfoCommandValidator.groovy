@@ -7,10 +7,10 @@ import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.core.validation.ObjectValidator
 
 @Component
-class ReceiptEditReceivingInfoCommandValidator implements ObjectValidator<ReceiptEditReceivingInfoCommand> {
+class ReceiptEditReceivingInfoCommandValidator extends ObjectValidator<ReceiptEditReceivingInfoCommand> {
 
     @Override
-    ObjectValidationResult doValidate(ReceiptEditReceivingInfoCommand command) {
+    protected ObjectValidationResult doValidate(ReceiptEditReceivingInfoCommand command) {
         return new ObjectValidationResult(
                 validateReceiptIsPending(command),
                 validateItemsToSaveAreValid(command),

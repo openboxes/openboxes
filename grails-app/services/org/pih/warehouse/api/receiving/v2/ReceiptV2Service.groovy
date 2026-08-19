@@ -75,9 +75,7 @@ class ReceiptV2Service {
             throw new ObjectNotFoundException(shipmentId, Shipment.toString())
         }
 
-        if (!shipmentForReceiptValidator.validate(shipment)) {
-            throw new ValidationException("Shipment invalid for receipt", shipment.errors)
-        }
+        shipmentForReceiptValidator.validate(shipment)
 
         Receipt receipt = new Receipt()
         receipt.receiptNumber = receiptIdentifierService.generate(receipt)
