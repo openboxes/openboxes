@@ -633,6 +633,11 @@ openboxes {
                         ],
 
                         [
+                            widgetId: "readyToBeStaged",
+                            order   : 9
+                        ],
+
+                        [
                             widgetId: "inventorySummary",
                             order   : 1
                         ],
@@ -1227,6 +1232,15 @@ openboxes {
                 numberType = 'number'
                 type = 'number'
                 endpoint = "/api/dashboard/openPutawayTasks"
+            }
+            readyToBeStaged {
+                enabled = true
+                title = "react.dashboard.readyToStage.title.label"
+                info = "react.dashboard.readyToStage.info.label"
+                subtitle = "react.dashboard.subtitle.pickTasks.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/api/dashboard/readyToBeStaged"
             }
             inboundSortationItems {
                 enabled = true

@@ -829,6 +829,11 @@ class UrlMappings {
             action = [GET: "getDelayedShipments"]
         }
 
+        "/api/dashboard/readyToBeStaged"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getReadyToBeStaged"]
+        }
+
         "/api/dashboard/productWithNegativeInventory"(parseRequest: true) {
             controller = { "dashboardApi" }
             action = [GET: "getProductWithNegativeInventory"]
