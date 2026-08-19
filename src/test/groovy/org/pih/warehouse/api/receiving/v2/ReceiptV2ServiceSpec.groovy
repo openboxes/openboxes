@@ -4,8 +4,10 @@ import java.time.Instant
 
 import grails.core.GrailsApplication
 import grails.testing.gorm.DataTest
+import grails.validation.ValidationException
 import grails.testing.services.ServiceUnitTest
 import org.springframework.context.ApplicationContext
+import org.springframework.validation.ObjectError
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -13,6 +15,7 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryItemManager
@@ -34,6 +37,7 @@ import org.pih.warehouse.receiving.ReceiptItemEditReceivingInfoRequest
 import org.pih.warehouse.receiving.ReceiptService
 import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.receiving.ReceiptV2Marker
+import org.pih.warehouse.receiving.ShipmentForReceiptValidator
 import org.pih.warehouse.receiving.ShipmentItemReceivedQuantitiesDto
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
@@ -56,6 +60,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
     InventoryItemManager inventoryItemManager
     ReceiptIdentifierService receiptIdentifierService
     ReceiptService receiptService
+    MessageLocalizer messageLocalizer
     ApplicationContext mainContext
 
     void setupSpec() {
@@ -72,7 +77,13 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         receiptIdentifierService = Mock(ReceiptIdentifierService)
         receiptService = Mock(ReceiptService)
         mainContext = Mock(ApplicationContext)
+        // Resolves messages to their code
+        messageLocalizer = Stub(MessageLocalizer) {
+            localize(_ as ObjectError) >> { ObjectError error -> error.code }
+        }
 
+        service.messageLocalizer = messageLocalizer
+        service.shipmentForReceiptValidator = new ShipmentForReceiptValidator()
         service.shipmentService = shipmentService
         service.transactionIdentifierService = transactionIdentifierService
         service.inventoryItemManager = inventoryItemManager
@@ -198,8 +209,8 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         service.startReceipt(shipment.id)
 
         then:
-        IllegalStateException e = thrown()
-        assert e.message.contains("pending receipt already exists")
+        thrown(ValidationException)
+        assert shipment.errors.getFieldError("receipts").code == "shipment.pendingReceiptExists.message"
     }
 
     void 'startReceipt should reject a shipment that has not been shipped yet'() {
@@ -213,8 +224,8 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         service.startReceipt(shipment.id)
 
         then:
-        IllegalStateException e = thrown()
-        assert e.message.contains("has not been shipped yet")
+        thrown(ValidationException)
+        assert shipment.errors.getFieldError("currentStatus").code == "stockMovement.hasNotBeenShipped.message"
     }
 
     void 'startReceipt should reject a shipment already fully consumed by lines received against an edited product'() {
@@ -231,8 +242,51 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         service.startReceipt(shipment.id)
 
         then: 'the legacy product-filtered check would still see 60 to receive - the v2 math rejects the start'
-        IllegalStateException e = thrown()
-        assert e.message.contains("fully received")
+        thrown(ValidationException)
+        assert shipment.errors.getFieldError("shipmentItems").code == "stockMovement.hasAlreadyBeenReceived.message"
+    }
+
+    // ----------------------------------------------------------------------------------------------------------
+    // getReceivingBlockedReason - the guard of the receiving page
+    // ----------------------------------------------------------------------------------------------------------
+
+    void 'getReceivingBlockedReason should return no reason for a shipped shipment at its destination'() {
+        given:
+        Shipment shipment = buildReceivableShipment([buildShipmentItem(100)])
+
+        expect:
+        service.getReceivingBlockedReason(shipment, shipment.destination) == null
+    }
+
+    void 'getReceivingBlockedReason should return no reason for a shipment with a pending receipt'() {
+        given: 'a receipt started by a previous visit to the receiving page'
+        ShipmentItem shipmentItem = buildShipmentItem(100)
+        Shipment shipment = buildReceivableShipment([shipmentItem])
+        createReceipt(shipment, [buildReceiptItem(shipmentItem, 0)], ReceiptStatusCode.PENDING)
+
+        expect: 'unlike startReceipt, resuming it is allowed'
+        service.getReceivingBlockedReason(shipment, shipment.destination) == null
+    }
+
+    void 'getReceivingBlockedReason should report a shipment that has not been shipped'() {
+        given:
+        Shipment shipment = buildReceivableShipment([buildShipmentItem(100)])
+        shipment.currentStatus = ShipmentStatusCode.PENDING
+
+        expect:
+        service.getReceivingBlockedReason(shipment, shipment.destination) ==
+                "stockMovement.hasNotBeenShipped.message"
+    }
+
+    void 'getReceivingBlockedReason should report a location other than the destination of the shipment'() {
+        given:
+        Shipment shipment = buildReceivableShipment([buildShipmentItem(100)])
+        Location otherLocation = new Location(name: "Other location")
+        otherLocation.id = "other-location-id"
+
+        expect:
+        service.getReceivingBlockedReason(shipment, otherLocation) ==
+                "stockMovement.isDifferentLocation.message"
     }
 
     // ----------------------------------------------------------------------------------------------------------

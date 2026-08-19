@@ -14,6 +14,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.OrderedDataGroup
 import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.core.localization.MessageLocalizer
+import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryItemManager
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
@@ -40,6 +41,7 @@ import org.pih.warehouse.receiving.ReceiptSaveResponseDto
 import org.pih.warehouse.receiving.ReceiptService
 import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.receiving.ReceiptV2Marker
+import org.pih.warehouse.receiving.ShipmentForReceiptValidator
 import org.pih.warehouse.receiving.ShipmentItemReceivedQuantitiesDto
 import org.pih.warehouse.receiving.ShipmentItemReceivingSummaryDto
 import org.pih.warehouse.receiving.ShipmentReceivingSummaryCommand
@@ -59,6 +61,7 @@ class ReceiptV2Service {
 
     ReceiptIdentifierService receiptIdentifierService
     ReceiptService receiptService  // Inject old receipt service to reuse bin creation logic
+    ShipmentForReceiptValidator shipmentForReceiptValidator
     MessageLocalizer messageLocalizer
     InventoryItemManager inventoryItemManager
     ShipmentService shipmentService
@@ -72,7 +75,9 @@ class ReceiptV2Service {
             throw new ObjectNotFoundException(shipmentId, Shipment.toString())
         }
 
-        validateShipmentReceivable(shipment)
+        if (!shipmentForReceiptValidator.validate(shipment)) {
+            throw new ValidationException("Shipment invalid for receipt", shipment.errors)
+        }
 
         Receipt receipt = new Receipt()
         receipt.receiptNumber = receiptIdentifierService.generate(receipt)
@@ -387,7 +392,7 @@ class ReceiptV2Service {
      * product, so after the v2 flow consumed a shipment item's full quantity that way it would still report the
      * shipment as receivable (and only ever partially received).
      */
-    private static boolean isShipmentFullyReceived(Shipment shipment) {
+    static boolean isShipmentFullyReceived(Shipment shipment) {
         return shipment.shipmentItems?.every { ShipmentItem shipmentItem ->
             getShipmentItemQuantityRemaining(shipmentItem) <= 0
         }
@@ -478,20 +483,14 @@ class ReceiptV2Service {
         return transaction
     }
 
-    private static void validateShipmentReceivable(Shipment shipment) {
-        boolean hasPendingReceipt = shipment.receipts?.any { it.receiptStatusCode == ReceiptStatusCode.PENDING }
-        if (hasPendingReceipt) {
-            throw new IllegalStateException("A pending receipt already exists for shipment ${shipment.shipmentNumber}")
-        }
+    /**
+     * The reason the shipment cannot be received right now, through the view page
+     */
+    String getReceivingBlockedReason(Shipment shipment, Location currentLocation = AuthService.currentLocation) {
+        ObjectValidationResult result =
+                shipmentForReceiptValidator.validateForReceivingAccess(shipment, currentLocation)
 
-        if (isShipmentFullyReceived(shipment)) {
-            throw new IllegalStateException("Shipment ${shipment.shipmentNumber} has already been fully received")
-        }
-
-        if (shipment.currentStatus in [ShipmentStatusCode.CREATED, ShipmentStatusCode.PENDING]) {
-            throw new IllegalStateException(
-                    "Cannot receive shipment ${shipment.shipmentNumber} because it has not been shipped yet")
-        }
+        return result.valid ? null : result.errors.collect { messageLocalizer.localize(it) }.join(" ")
     }
 
     /**
@@ -573,7 +572,7 @@ class ReceiptV2Service {
         if (!sortParam) {
             return shipment.shipmentItems.sort()
         }
-        
+
         return ShipmentItem.createCriteria().list {
             createAlias("recipient", "r", JoinType.LEFT_OUTER_JOIN)
             createAlias("inventoryItem", "ii", JoinType.LEFT_OUTER_JOIN)
