@@ -575,11 +575,13 @@ openboxes:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes
             bulkAutomaticIssuance: true
+            maxAttempts: 3
 
         automaticAllocationJob:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes
             delayInMilliseconds: 1000
+            maxAttempts: 3
 
         # should only be triggered by persistence event listener
         putawayLocationReassignmentJob:

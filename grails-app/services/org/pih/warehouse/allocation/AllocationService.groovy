@@ -245,6 +245,16 @@ class AllocationService {
                     return
                 }
 
+                // FIXME: Temporary allocation attempt check until we have a better attempt count solution for
+                //  automatic allocation failures (a windowed count after https://openboxes.atlassian.net/browse/OBLS-929)
+                Integer maxAllocationAttempts = grailsApplication.config.openboxes.jobs.automaticAllocationJob.maxAttempts ?: 3
+                if (requisition.allocationAttemptCount >= maxAllocationAttempts) {
+                    requisitionService.logRequisitionComment(requisition.id,
+                            "Max attempts (${maxAllocationAttempts}) at automatic allocation for " +
+                                "requisition ${requisition.requestNumber} reached, skipping")
+                    return
+                }
+
                 log.info("Automatic allocation for requisition ${requisition.requestNumber} (${requisition.id}) ...")
                 allocate(requisition, AllocationMode.AUTO, [])
 
