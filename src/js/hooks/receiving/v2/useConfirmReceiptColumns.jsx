@@ -28,6 +28,7 @@ import ShippedQuantityCell from 'utils/cells/receiving/ShippedQuantityCell';
 import ValueCell from 'utils/cells/ValueCell';
 import { getConfirmReceiptRowActions } from 'utils/receiving/getReceivingRowActions';
 import getReceivingRowStatus from 'utils/receiving/getReceivingRowStatus';
+import struckIfChanged from 'utils/receiving/struckIfChanged';
 
 const useConfirmReceiptColumns = ({ view, hasPreviousReceipts } = {}) => {
   const translate = useTranslate();
@@ -43,10 +44,6 @@ const useConfirmReceiptColumns = ({ view, hasPreviousReceipts } = {}) => {
   // passed through the table `meta`, so each cell reads its item by id at render
   // time. The row `meta` drives row-level greying/disabling of fully received lines.
   const getItem = (row, table) => table.options.meta?.entities?.[row.original.id];
-
-  // Replaced rows of a changed item show the original shipment values struck through
-  // (everything except quantities).
-  const struckIfReplaced = (rowType) => (rowType === ReceivingRowType.REPLACED ? 'receiving-table__struck' : '');
 
   // Shipment-level columns (quantities, status, cancel remaining) don't apply to the rows
   // of a changes group.
@@ -148,14 +145,18 @@ const useConfirmReceiptColumns = ({ view, hasPreviousReceipts } = {}) => {
             {translate('react.receiving.code.label', 'Code')}
           </TableHeaderCell>
         ),
-        cell: ({ row, table }) => (
-          <ProductCodeCell
-            item={getItem(row, table)}
-            isPackingListView={isPackingListView}
-            isExpanded={row.getIsExpanded()}
-            onToggle={row.getToggleExpandedHandler()}
-          />
-        ),
+        cell: ({ row, table }) => {
+          const item = getItem(row, table);
+          return (
+            <ProductCodeCell
+              item={item}
+              isPackingListView={isPackingListView}
+              isExpanded={row.getIsExpanded()}
+              onToggle={row.getToggleExpandedHandler()}
+              className={struckIfChanged(item, 'productChanged')}
+            />
+          );
+        },
         meta: {
           pinned: 'left',
         },
@@ -181,7 +182,7 @@ const useConfirmReceiptColumns = ({ view, hasPreviousReceipts } = {}) => {
           return (
             <MultilineCell
               value={item?.product?.name}
-              className={struckIfReplaced(item?.rowType)}
+              className={struckIfChanged(item, 'productChanged')}
               label="react.receiving.product.label"
               defaultLabel="Product"
               maxLines={2}
@@ -244,7 +245,7 @@ const useConfirmReceiptColumns = ({ view, hasPreviousReceipts } = {}) => {
             <ValueCell
               value={value}
               tooltipLabel={value}
-              className={struckIfReplaced(item?.rowType)}
+              className={struckIfChanged(item, 'lotChanged')}
               label="react.receiving.lotSerialNo.short.label"
               defaultLabel="Lot/SN"
               truncate
@@ -269,7 +270,7 @@ const useConfirmReceiptColumns = ({ view, hasPreviousReceipts } = {}) => {
             <ExpirationDateCell
               value={item?.expirationDate}
               localeKey={currentLocale}
-              className={struckIfReplaced(item?.rowType)}
+              className={struckIfChanged(item, 'expirationChanged')}
               label="react.receiving.expirationDate.short.label"
               defaultLabel="Exp Date"
               showExpiryStatus={item?.rowType !== ReceivingRowType.REPLACED}
@@ -404,7 +405,6 @@ const useConfirmReceiptColumns = ({ view, hasPreviousReceipts } = {}) => {
               <ValueCell
                 value={value}
                 tooltipLabel={value}
-                className={struckIfReplaced(item?.rowType)}
                 label="react.receiving.location.label"
                 defaultLabel="Location"
                 truncate
