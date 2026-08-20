@@ -65,6 +65,10 @@ enum RequisitionStatus {
     static int compare(RequisitionStatus a, RequisitionStatus b) {
         return a.sortOrder <=> b.sortOrder
     }
+
+    Boolean isAtOrBeyond(RequisitionStatus other) {
+        return compare(this, other) >= 0
+    }
     /* remove OPEN, FULFILLED */
 
     static list() {

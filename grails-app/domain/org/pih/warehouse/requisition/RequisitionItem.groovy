@@ -436,6 +436,17 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             throw new ValidationException("Validation errors on requisition item", errors)
         }
 
+        quantityCanceled = quantity
+        cancelReasonCode = reasonCode
+        cancelComments = comments
+
+        if (!requisition.isEligibleForAutomaticCancellationRollback()) {
+            // Order has progressed past Allocated (picking already started) - the picklist/
+            // shipment items are intentionally left in place. Cancelled-but-still-allocated
+            // is the signal that this item needs manual reconciliation.
+            return
+        }
+
         // Remove all picklist items
         def picklistItems = getPicklistItems()
         picklistItems?.toArray()?.each {
@@ -443,10 +454,6 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             it.picklist.removeFromPicklistItems(it)
             it.delete()
         }
-
-        quantityCanceled = quantity
-        cancelReasonCode = reasonCode
-        cancelComments = comments
     }
 
 
