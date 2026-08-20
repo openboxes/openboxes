@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,6 +14,7 @@ import useConfirmReceiptColumns from 'hooks/receiving/v2/useConfirmReceiptColumn
 import useConfirmReceiptSaveActions from 'hooks/receiving/v2/useConfirmReceiptSaveActions';
 import useReceivingFilters from 'hooks/receiving/v2/useReceivingFilters';
 import { formatDateToString } from 'utils/dateUtils';
+import getOptionalColumnsVisibility from 'utils/receiving/getOptionalColumnsVisibility';
 import hasAnyPreviousReceipt from 'utils/receiving/hasAnyPreviousReceipt';
 
 const currentDateTime = () => formatDateToString({
@@ -45,7 +46,17 @@ const useConfirmReceiptForm = () => {
     loading, receiptIdRef, lineItemsState, updateLineItemComment,
   } = useConfirmReceiptActions(view);
   const hasPreviousReceipts = hasAnyPreviousReceipt(lineItemsState);
-  const { columns } = useConfirmReceiptColumns({ view, hasPreviousReceipts });
+  // Optional columns are read from the full state, so filtering the table down to rows
+  // without a lot or a recipient does not collapse their columns.
+  const columnsVisibility = useMemo(
+    () => getOptionalColumnsVisibility(lineItemsState),
+    [lineItemsState],
+  );
+  const { columns } = useConfirmReceiptColumns({
+    view,
+    hasPreviousReceipts,
+    ...columnsVisibility,
+  });
   const commentModal = useCommentModal({ updateLineItemComment });
   const {
     visibleLineItemsState,
