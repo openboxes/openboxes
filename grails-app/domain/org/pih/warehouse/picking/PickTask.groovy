@@ -1,5 +1,6 @@
 package org.pih.warehouse.picking
 
+import org.pih.warehouse.api.PickStatusCode
 import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
@@ -47,6 +48,13 @@ class PickTask {
 
     Date dateCreated
     Date lastUpdated
+
+    // Order level pick progress, populated by PickTaskService.search and never persisted.
+    Integer orderTotalTaskCount
+    Integer orderOpenTaskCount
+    PickStatusCode orderPickStatusCode
+
+    static transients = ['orderTotalTaskCount', 'orderOpenTaskCount', 'orderPickStatusCode']
 
     static constraints = {
         requisition nullable: false
@@ -116,6 +124,9 @@ class PickTask {
                 dateStaged      : dateStaged,
                 reasonCode      : reasonCode,
                 status          : status?.name(),
+                orderTotalTaskCount: orderTotalTaskCount,
+                orderOpenTaskCount : orderOpenTaskCount,
+                orderPickStatusCode: orderPickStatusCode?.name(),
                 dateCreated     : dateCreated,
                 lastUpdated     : lastUpdated,
         ]

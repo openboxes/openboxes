@@ -6,6 +6,7 @@ import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.api.PickStatusCode
 import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.api.picking.SearchPickTaskCommand
 import org.pih.warehouse.core.ActivityCode
@@ -117,7 +118,81 @@ class PickTaskService {
             order("l.name", "asc")
         }
 
+        applyOrderPickProgress(command.facility, tasks)
+
         return tasks
+    }
+
+    // Status filtered callers only see part of an order, so carry the whole order's progress along.
+    private void applyOrderPickProgress(Location facility, List<PickTask> tasks) {
+        List<String> requisitionIds = tasks.collect { it.requisition?.id }.findAll().unique()
+        if (!requisitionIds) {
+            return
+        }
+
+        Map<String, Map> progressByRequisition = calculateOrderPickProgress(facility, requisitionIds)
+
+        tasks.each { PickTask task ->
+            Map progress = progressByRequisition[task.requisition?.id]
+            if (progress) {
+                task.orderTotalTaskCount = progress.totalTaskCount as Integer
+                task.orderOpenTaskCount = progress.openTaskCount as Integer
+                task.orderPickStatusCode = progress.pickStatusCode as PickStatusCode
+            }
+        }
+    }
+
+    @Transactional(readOnly = true)
+    Map<String, Map> calculateOrderPickProgress(Location facility, List<String> requisitionIds) {
+        if (!requisitionIds) {
+            return [:]
+        }
+
+        List rows = PickTask.createCriteria().list {
+            createAlias("requisition", "r")
+            projections {
+                property("r.id")
+                property("status")
+                property("quantityPicked")
+            }
+            if (facility) {
+                eq("facility", facility)
+            }
+            'in'("r.id", requisitionIds)
+        }
+
+        return rows.groupBy { it[0] as String }.collectEntries { String requisitionId, List taskRows ->
+            [(requisitionId): summarizeOrderPickProgress(taskRows)]
+        }
+    }
+
+    private Map summarizeOrderPickProgress(List taskRows) {
+        // STAGED with nothing picked is a canceled line, not a line anybody has to pick.
+        List countedRows = taskRows.findAll { row ->
+            !(row[1] == PickTaskStatus.STAGED && !((row[2] ?: 0) > 0))
+        }
+
+        int openTaskCount = countedRows.count { row ->
+            row[1] == PickTaskStatus.PENDING || row[1] == PickTaskStatus.PICKING
+        }
+        boolean anythingPicked = countedRows.any { row ->
+            row[1] == PickTaskStatus.PICKING || row[1] == PickTaskStatus.PICKED || row[1] == PickTaskStatus.STAGED
+        }
+
+        PickStatusCode pickStatusCode
+        if (openTaskCount == 0) {
+            pickStatusCode = PickStatusCode.PICKED
+        } else if (anythingPicked) {
+            pickStatusCode = PickStatusCode.PARTIALLY_PICKED
+        } else {
+            pickStatusCode = PickStatusCode.NOT_PICKED
+        }
+
+        return [
+                totalTaskCount: countedRows.size(),
+                openTaskCount : openTaskCount,
+                pickStatusCode: pickStatusCode,
+        ]
     }
 
     @Transactional(readOnly = true)
