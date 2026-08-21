@@ -1,5 +1,5 @@
 import {
-  useCallback, useEffect, useRef,
+  useCallback, useEffect, useMemo, useRef,
 } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,6 +18,7 @@ import useReceivingColumns from 'hooks/receiving/v2/useReceivingColumns';
 import useReceivingFilters from 'hooks/receiving/v2/useReceivingFilters';
 import useTableLocationAutofill from 'hooks/receiving/v2/useTableLocationAutofill';
 import useTableSorting from 'hooks/useTableSorting';
+import getOptionalColumnsVisibility from 'utils/receiving/getOptionalColumnsVisibility';
 import hasItemInDifferentBin from 'utils/receiving/hasItemInDifferentBin';
 
 const useReceivingForm = () => {
@@ -83,12 +84,19 @@ const useReceivingForm = () => {
       setPutawayEnabled(true);
     }
   }, [lineItemsState, receivingBin, binLocations]);
+  // Optional columns are read from the full state, so filtering the table down to rows
+  // without a lot or a recipient does not collapse their columns.
+  const columnsVisibility = useMemo(
+    () => getOptionalColumnsVisibility(lineItemsState),
+    [lineItemsState],
+  );
   const { columns } = useReceivingColumns({
     view,
     putawayEnabled,
     sortableProps,
     sort,
     order,
+    ...columnsVisibility,
   });
 
   return {

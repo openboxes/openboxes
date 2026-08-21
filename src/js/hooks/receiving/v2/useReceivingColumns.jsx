@@ -40,6 +40,10 @@ const useReceivingColumns = ({
   sortableProps,
   sort,
   order,
+  showLotNumber,
+  showExpirationDate,
+  showRecipient,
+  showPackLevel,
 } = {}) => {
   const translate = useTranslate();
   const formatNumber = useFormatNumber();
@@ -115,6 +119,9 @@ const useReceivingColumns = ({
             defaultLabel="Pack Level"
           />
         );
+      },
+      meta: {
+        hide: !showPackLevel,
       },
       size: 140,
     });
@@ -289,6 +296,9 @@ const useReceivingColumns = ({
             />
           );
         },
+        meta: {
+          hide: !showLotNumber,
+        },
         size: 125,
       }),
       columnHelper.display({
@@ -314,6 +324,9 @@ const useReceivingColumns = ({
               showExpiryStatus={item?.rowType !== ReceivingRowType.REPLACED}
             />
           );
+        },
+        meta: {
+          hide: !showExpirationDate,
         },
         size: 110,
       }),
@@ -341,6 +354,9 @@ const useReceivingColumns = ({
               truncate
             />
           );
+        },
+        meta: {
+          hide: !showRecipient,
         },
         size: 125,
       }),
@@ -547,6 +563,10 @@ const useReceivingColumns = ({
     hasBinLocationSupport,
     isShipmentFromPurchaseOrder,
     binLocations,
+    showLotNumber,
+    showExpirationDate,
+    showRecipient,
+    showPackLevel,
     sort,
     order,
   ]);

@@ -30,7 +30,14 @@ import { getConfirmReceiptRowActions } from 'utils/receiving/getReceivingRowActi
 import getReceivingRowStatus from 'utils/receiving/getReceivingRowStatus';
 import struckIfChanged from 'utils/receiving/struckIfChanged';
 
-const useConfirmReceiptColumns = ({ view, hasPreviousReceipts } = {}) => {
+const useConfirmReceiptColumns = ({
+  view,
+  hasPreviousReceipts,
+  showLotNumber,
+  showExpirationDate,
+  showRecipient,
+  showPackLevel,
+} = {}) => {
   const translate = useTranslate();
   const formatNumber = useFormatNumber();
   const columnHelper = createColumnHelper();
@@ -96,6 +103,9 @@ const useConfirmReceiptColumns = ({ view, hasPreviousReceipts } = {}) => {
             defaultLabel="Pack Level"
           />
         );
+      },
+      meta: {
+        hide: !showPackLevel,
       },
       size: 140,
     });
@@ -252,6 +262,9 @@ const useConfirmReceiptColumns = ({ view, hasPreviousReceipts } = {}) => {
             />
           );
         },
+        meta: {
+          hide: !showLotNumber,
+        },
         size: 125,
       }),
       columnHelper.display({
@@ -277,7 +290,39 @@ const useConfirmReceiptColumns = ({ view, hasPreviousReceipts } = {}) => {
             />
           );
         },
+        meta: {
+          hide: !showExpirationDate,
+        },
         size: 110,
+      }),
+      columnHelper.display({
+        id: receivingColumns.RECIPIENT,
+        header: () => (
+          <TableHeaderCell
+            tooltip
+            tooltipLabel={translate('react.receiving.recipient.label', 'Recipient')}
+          >
+            {translate('react.receiving.recipient.label', 'Recipient')}
+          </TableHeaderCell>
+        ),
+        cell: ({ row, table }) => {
+          const item = getItem(row, table);
+          const recipient = item?.recipient;
+          return (
+            <ValueCell
+              value={recipient?.name}
+              tooltipLabel={recipient?.name}
+              className={struckIfChanged(item, 'recipientChanged')}
+              label="react.receiving.recipient.label"
+              defaultLabel="Recipient"
+              truncate
+            />
+          );
+        },
+        meta: {
+          hide: !showRecipient,
+        },
+        size: 125,
       }),
       columnHelper.display({
         id: receivingColumns.QUANTITY_SHIPPED,
@@ -481,6 +526,10 @@ const useConfirmReceiptColumns = ({ view, hasPreviousReceipts } = {}) => {
     hasPartialReceivingSupport,
     hasPreviousReceipts,
     isShipmentFromPurchaseOrder,
+    showLotNumber,
+    showExpirationDate,
+    showRecipient,
+    showPackLevel,
   ]);
 
   return { columns };
