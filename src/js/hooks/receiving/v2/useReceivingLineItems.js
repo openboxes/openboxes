@@ -50,9 +50,14 @@ const useReceivingLineItems = ({
   // The original line of the shipment item - the row every split line is split off from.
   const originalLineItem = initialLineItems.find((item) => !item.isSplitItem);
 
-  // New rows split the same shipment item line, so they start with the line's product.
+  // New rows are prefilled with the product and the recipient of the shipment item, and with the
+  // bin the original line has when the modal opens.
   const buildSplitRow = () => ({
-    ...buildDefaultRow({ product: originalLineItem?.product ?? lineItem?.product }),
+    ...buildDefaultRow({
+      product: lineItem?.product,
+      recipient: lineItem?.recipient,
+      binLocation: originalLineItem?.binLocation,
+    }),
     isSplitItem: true,
   });
 
