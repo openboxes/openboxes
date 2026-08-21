@@ -50,7 +50,7 @@ class PickTaskApiController extends RestfulController<PickTask> {
             throw new ValidationException("Validation errors", command.errors)
         }
 
-        def data = pickTaskService.countOrdersByDeliveryType(command.facility, command.excludeAssignedRequisitions ?: false)
+        def data = pickTaskService.countOrdersByDeliveryType(command.facility, command.excludeAssignedRequisitions )
 
         render([data: data] as JSON)
     }
