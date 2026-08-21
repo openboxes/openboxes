@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
+import org.pih.warehouse.api.PutawayTaskStatus
+import org.pih.warehouse.api.StatusCategory
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.EventCode
@@ -188,7 +190,7 @@ class PutawayService implements EventPublisher  {
     List<PutawayItem> getPutawayCandidates(Location location) {
         List binLocationEntries = productAvailabilityService.getAvailableQuantityOnHandByBinLocation(location)
 
-        List<PutawayItem> putawayItems = binLocationEntries.inject ([], { putawayItems,  binLocationEntry ->
+        List<PutawayItem> readyItems = binLocationEntries.inject ([], { putawayItems,  binLocationEntry ->
             if (binLocationEntry.binLocation?.supports(ActivityCode.RECEIVE_STOCK)) {
                 InventoryLevel inventoryLevel = InventoryLevel.findByProductAndInventory(binLocationEntry.product, location.inventory)
 
@@ -209,21 +211,39 @@ class PutawayService implements EventPublisher  {
             return putawayItems
         })
 
-        List<PutawayItem> pendingPutawayItems = getPendingItems(location)
+        return mergeCandidatesWithOpenTasks(readyItems, getOpenPutawayTasks(location))
+    }
 
-        putawayItems.removeAll { PutawayItem item ->
-            pendingPutawayItems.find {
-                item.currentLocation?.id == it.currentLocation?.id && item.inventoryItem?.id == it.inventoryItem?.id &&
-                        item.product?.id == it.product?.id
-            }
+    // Deliberately the same status set the sortation flow filters on, so the two features cannot disagree
+    List<PutawayTask> getOpenPutawayTasks(Location facility) {
+        return PutawayTask.createCriteria().list {
+            eq("facility", facility)
+            'in'("status", PutawayTaskStatus.toSet(StatusCategory.OPEN))
+        } as List<PutawayTask>
+    }
+
+    // Quantity already covered by an open task is subtracted, so a partially tasked bin still offers its remainder
+    List<PutawayItem> mergeCandidatesWithOpenTasks(List<PutawayItem> readyItems, List<PutawayTask> openTasks) {
+        Map<String, BigDecimal> taskedQuantityByKey = [:].withDefault { 0.0G }
+        openTasks.each { PutawayTask task ->
+            taskedQuantityByKey[candidateKey(task.location, task.inventoryItem, task.product)] += (task.quantity ?: 0.0G)
         }
 
-        putawayItems.addAll(pendingPutawayItems)
+        readyItems.each { PutawayItem item ->
+            item.quantity -= taskedQuantityByKey[candidateKey(item.currentLocation, item.inventoryItem, item.product)]
+        }
+
+        List<PutawayItem> putawayItems = readyItems.findAll { it.quantity > 0 }
+        putawayItems.addAll(openTasks.collect { PutawayItem.createFromOrderItem(it.putawayOrderItem) })
 
         return putawayItems.sort { a, b ->
             a.product?.category?.name <=> b.product?.category?.name ?:
                     a.product?.name <=> b.product?.name
         }
+    }
+
+    private static String candidateKey(Location binLocation, InventoryItem inventoryItem, Product product) {
+        return "${binLocation?.id}:${inventoryItem?.id}:${product?.id}"
     }
 
     List<PutawayItem> getPendingItems(Location location) {
