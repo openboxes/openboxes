@@ -204,6 +204,11 @@ class PickTaskService {
     }
 
     void start(PickTask task, String assigneeId) {
+        if (task.assignee && task.assignee.id != assigneeId) {
+            task.errors.reject("assignee", "Pick task ${task.id} is already assigned to another user")
+            throw new ValidationException("Pick task ${task.id} is already assigned to another user", task.errors)
+        }
+
         executeStateTransition(task, PickTaskStatus.PICKING)
         webhookPublisherService.publishRequisitionEvent(task.requisition, WebhookEventType.PICK_STARTED)
 
