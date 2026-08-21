@@ -36,7 +36,6 @@ import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
-import org.pih.warehouse.core.db.GormUtil
 import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.inventory.product.availability.InventoryByProduct
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
@@ -832,33 +831,32 @@ class ProductAvailabilityService {
             return listArgs?.max != null ? new PaginatedList([], 0) : []
         }
 
-        String quantityCondition = ((excludeNegativeQuantity && excludeZeroQuantity) || excludeZeroQuantity) ? "and pa.quantityOnHand <> 0"
-                : (excludeNegativeQuantity) ? "and pa.quantityOnHand > 0" : ""
+        def results = ProductAvailability.createCriteria().list(listArgs ?: [:]) {
+            createAlias("inventoryItem", "ii", JoinType.LEFT_OUTER_JOIN)
+            createAlias("binLocation", "bl", JoinType.LEFT_OUTER_JOIN)
 
-        String sql = """
-                SELECT
-                    ii,
-                    pa.binLocation,
-                    pa.quantityOnHand,
-                    pa.quantityAvailableToPromise
-                FROM
-                    ProductAvailability pa
-                    LEFT OUTER JOIN pa.inventoryItem ii
-                    LEFT OUTER JOIN pa.binLocation bl
-                WHERE
-                    pa.location = :location
-                    ${quantityCondition}
-                    ${productsIds ? "AND pa.product.id IN (:products)" : ""}
-                ${listArgs?.max != null ? "ORDER BY pa.id ASC" : ""}
-        """
-        def results = ProductAvailability.executeQuery(
-                sql,
-                GormUtil.sanitizeExecuteQueryArgs(sql, [
-                        location: location,
-                        products: productsIds,
-                ]),
-                listArgs ?: [:]
-        )
+            eq("location", location)
+            if (excludeZeroQuantity) {
+                ne("quantityOnHand", 0)
+            } else if (excludeNegativeQuantity) {
+                gt("quantityOnHand", 0)
+            }
+            if (productsIds) {
+                product {
+                    inList("id", productsIds)
+                }
+            }
+            if (listArgs?.max != null) {
+                order("id", "asc")
+            }
+
+            projections {
+                property("ii")
+                property("bl")
+                property("quantityOnHand")
+                property("quantityAvailableToPromise")
+            }
+        }
 
         List<AvailableItem> data = results.collect {
             InventoryItem inventoryItem = it[0]
@@ -874,22 +872,7 @@ class ProductAvailabilityService {
             )
         }
 
-        if (listArgs?.max != null) {
-            String countSql = """
-                    SELECT count(*)
-                    FROM ProductAvailability pa
-                    WHERE pa.location = :location
-                    ${quantityCondition}
-                    ${productsIds ? "AND pa.product.id IN (:products)" : ""}
-            """
-            int totalCount = ProductAvailability.executeQuery(countSql, GormUtil.sanitizeExecuteQueryArgs(countSql, [
-                    location: location,
-                    products: productsIds,
-            ]))[0] as int
-            return new PaginatedList(data, totalCount)
-        }
-
-        return results instanceof PaginatedList ?
+        return results instanceof PagedResultList ?
                 new PaginatedList(data, results.totalCount) :
                 data
     }
