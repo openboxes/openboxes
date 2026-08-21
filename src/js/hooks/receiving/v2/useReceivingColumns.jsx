@@ -31,6 +31,7 @@ import ValueCell from 'utils/cells/ValueCell';
 import getReceivingRowActions, { getReceivingSplitItemActions } from 'utils/receiving/getReceivingRowActions';
 import getReceivingRowStatus from 'utils/receiving/getReceivingRowStatus';
 import hasRowSavedQuantity from 'utils/receiving/hasRowSavedQuantity';
+import struckIfChanged from 'utils/receiving/struckIfChanged';
 import VerticalStripeIndicator from 'utils/VerticalStripeIndicator';
 
 const useReceivingColumns = ({
@@ -83,15 +84,6 @@ const useReceivingColumns = ({
     }
     return item.quantityAvailableToReceive - (Number(item.quantityReceiving) || 0);
   };
-
-  // Cross out a cell on the replaced row when its change flag (set by buildReplacedEntity)
-  // is true. `changeType` is one of 'productChanged' / 'lotChanged' / 'expirationChanged' /
-  // 'recipientChanged'.
-  const struckIfChanged = (item, changeType) => (
-    item?.rowType === ReceivingRowType.REPLACED && item?.[changeType]
-      ? 'receiving-table__struck'
-      : ''
-  );
 
   // Shipment-level columns (quantities, status) don't apply to the rows of a changes group.
   const isSplitItemOrToggle = (item) => item?.rowType === ReceivingRowType.SPLIT_ITEM
