@@ -85,6 +85,38 @@ class ShipmentForReceiptValidatorSpec extends Specification implements DataTest 
         null                       | 'without a status at all'
     }
 
+    void 'doValidate should only report that a #description shipment has not been shipped, and nothing else'() {
+        given: 'a shipment whose lines are not filled in yet, so the receiving quantities read as nothing to receive'
+        Shipment shipment = buildShipment([], shipmentStatus)
+
+        when:
+        ObjectValidationResult result = validator.doValidate(shipment)
+
+        then: 'it is not reported as already received on top of that'
+        assert result.errors.size() == 1
+        assert result.errors.first().code == "stockMovement.hasNotBeenShipped.message"
+
+        where:
+        shipmentStatus             | description
+        ShipmentStatusCode.CREATED | 'created'
+        ShipmentStatusCode.PENDING | 'pending'
+        null                       | 'statusless'
+    }
+
+    void 'validateForReceivingAccess should only report that a shipment has not been shipped, and nothing else'() {
+        given:
+        Shipment shipment = buildShipment([], ShipmentStatusCode.PENDING)
+        Location otherLocation = new Location(name: "Other location")
+        otherLocation.id = "other-location-id"
+
+        when: 'the user is not even at the destination, so a second rule would fail too'
+        ObjectValidationResult result = validator.validateForReceivingAccess(shipment, otherLocation)
+
+        then:
+        assert result.errors.size() == 1
+        assert result.errors.first().code == "stockMovement.hasNotBeenShipped.message"
+    }
+
     void 'doValidate should reject a shipment with nothing left to receive'() {
         given:
         ShipmentItem shipmentItem = buildShipmentItem(100)

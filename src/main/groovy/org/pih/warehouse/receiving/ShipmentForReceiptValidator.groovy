@@ -23,8 +23,12 @@ class ShipmentForReceiptValidator extends PlainObjectValidator<Shipment> {
      */
     @Override
     protected ObjectValidationResult doValidate(Shipment shipment) {
+        ObjectError hasBeenShippedError = validateShipmentHasBeenShipped(shipment)
+        if (hasBeenShippedError) {
+            return new ObjectValidationResult(hasBeenShippedError)
+        }
+
         return new ObjectValidationResult(
-                validateShipmentHasBeenShipped(shipment),
                 validateShipmentNotFullyReceived(shipment),
                 validateShipmentHasNoPendingReceipt(shipment),
         )
@@ -34,8 +38,12 @@ class ShipmentForReceiptValidator extends PlainObjectValidator<Shipment> {
      * Whether a receiving page can be accessed
      */
     ObjectValidationResult validateForReceivingAccess(Shipment shipment, Location currentLocation) {
+        ObjectError hasBeenShippedError = validateShipmentHasBeenShipped(shipment)
+        if (hasBeenShippedError) {
+            return new ObjectValidationResult(hasBeenShippedError)
+        }
+
         return new ObjectValidationResult(
-                validateShipmentHasBeenShipped(shipment),
                 validateShipmentNotFullyReceived(shipment),
                 validateShipmentDestination(shipment, currentLocation),
         )
