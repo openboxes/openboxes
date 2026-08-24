@@ -9,6 +9,19 @@ import org.pih.warehouse.shipping.ShipmentItem
 @Transactional
 class BackorderService {
 
+    // Batches the requisition lookup for a set of backorder reference numbers so that callers
+    // (e.g. views listing many shipment items or putaway tasks) can resolve references without
+    // issuing a query per row. A reference with no matching requisition is simply absent from the
+    // result map - that's an expected "not yet" state, not an error.
+    Map<String, Requisition> resolveRequisitionsByReference(Collection<String> requisitionNumbers) {
+        Set<String> uniqueRequisitionNumbers = (requisitionNumbers ?: []) as Set
+        if (!uniqueRequisitionNumbers) {
+            return [:]
+        }
+        return Requisition.findAllByRequestNumberInList(uniqueRequisitionNumbers as List)
+                .collectEntries { [(it.requestNumber): it] }
+    }
+
     // UPDATE: now the inbound item has to be at least equal to the outbound demand, no longer an exact match
     // Special case: we only fulfill a backorder with an inbound item that exactly matches
     // the outbound demand. The general behaviour of backorder fulfillment is partial matching

@@ -22,6 +22,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 
 
@@ -107,6 +108,16 @@ class ShipmentItem implements Comparable, Serializable {
 
     Boolean isFullyReceived() {
         return quantityReceivedAndCanceled >= quantity
+    }
+
+    // Returns null when the reference doesn't (yet) resolve to a requisition - expected, not an error.
+    // requisitionsByReference should be batch-loaded by the caller (BackorderService.resolveRequisitionsByReference)
+    // to avoid a query per shipment item.
+    Requisition resolveBackorderRequisition(Map<String, Requisition> requisitionsByReference = [:]) {
+        if (backorderItem) {
+            return backorderItem.requisition
+        }
+        return backorderReference ? requisitionsByReference[backorderReference] : null
     }
 
     /**

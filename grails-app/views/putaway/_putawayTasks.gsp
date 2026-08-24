@@ -1,5 +1,4 @@
 <%@ page import="org.pih.warehouse.api.PutawayTaskStatus" %>
-<%@ page import="org.pih.warehouse.requisition.Requisition" %>
 <div id="tab-content" class="box">
     <h2>
         <warehouse:message code="putaway.tasks.label" default="Putaway Tasks"/>
@@ -122,9 +121,13 @@
                 </td>
                 <td>
                     <g:if test="${task.backorderReferenceNumber}">
-                        <g:link controller="stockMovement" action="show" id="${Requisition.findByRequestNumber(task.backorderReferenceNumber)?.id}">
-                            ${task.backorderReferenceNumber}
-                        </g:link>
+                        <g:set var="backorderRequisition" value="${task.shipmentItem?.resolveBackorderRequisition(requisitionsByReference ?: [:])}"/>
+                        <g:if test="${backorderRequisition}">
+                            <g:link controller="stockMovement" action="show" id="${backorderRequisition.id}">
+                                ${task.backorderReferenceNumber}
+                            </g:link>
+                        </g:if>
+                        <g:else>${task.backorderReferenceNumber}</g:else>
                     </g:if>
                     <g:else>-</g:else>
                 </td>
