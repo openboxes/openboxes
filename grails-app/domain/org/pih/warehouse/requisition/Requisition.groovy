@@ -492,8 +492,8 @@ class Requisition implements Comparable<Requisition>, Serializable {
         return true
     }
 
-    boolean isEligibleForAutomaticCancellationRollback() {
-        return !status?.isAtOrBeyond(RequisitionStatus.PICKING)
+    boolean isEligibleForCancellation() {
+        return status < RequisitionStatus.PICKING
     }
 
     /**

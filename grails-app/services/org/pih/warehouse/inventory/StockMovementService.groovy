@@ -2863,11 +2863,10 @@ class StockMovementService {
                     throw new IllegalArgumentException("Could not find stock movement item with ID ${stockMovementItem.id}")
                 }
 
-                boolean isCancellation = stockMovementItem.quantityRevised != null &&
-                        stockMovementItem.quantityRevised.intValueExact() == 0 &&
-                        ReasonCode.BACKORDER.toString() != stockMovementItem.reasonCode
+                boolean isCancellation = stockMovementItem.quantityRevised?.intValueExact() == 0 &&
+                        stockMovementItem.reasonCode != ReasonCode.BACKORDER.toString()
 
-                if (isCancellation && !requisition.isEligibleForAutomaticCancellationRollback()) {
+                if (isCancellation && !requisition.isEligibleForCancellation()) {
                     logManualCancellationReviewNeeded(requisitionItem, stockMovementItem.reasonCode)
                 } else {
                     log.info 'Removing previous changes, picklists and shipments, if present'
@@ -2945,7 +2944,7 @@ class StockMovementService {
         RequisitionItem requisitionItem = stockMovementItem.requisitionItem
         Requisition requisition = requisitionItem.requisition
 
-        if (requisition.isEligibleForAutomaticCancellationRollback()) {
+        if (requisition.isEligibleForCancellation()) {
             removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
         } else {
             logManualCancellationReviewNeeded(requisitionItem, stockMovementItem.reasonCode)

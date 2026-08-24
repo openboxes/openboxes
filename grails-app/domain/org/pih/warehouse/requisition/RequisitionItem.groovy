@@ -440,7 +440,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         cancelReasonCode = reasonCode
         cancelComments = comments
 
-        if (!requisition.isEligibleForAutomaticCancellationRollback()) {
+        if (!requisition.isEligibleForCancellation()) {
             // Order has progressed past Allocated (picking already started) - the picklist/
             // shipment items are intentionally left in place. Cancelled-but-still-allocated
             // is the signal that this item needs manual reconciliation.
