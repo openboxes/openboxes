@@ -98,6 +98,22 @@ class InventoryItemManager {
         return InventoryItem.findByProductAndLotNumber(product, sanitizedLotNumber)
     }
 
+    /**
+     * Updates the expiration date of an existing inventory item, clearing it when none is given. An inventory item
+     * is a product lot shared by every depot, so the change reaches all of them.
+     */
+    InventoryItem updateExpirationDate(InventoryItem inventoryItem, Date expirationDate) {
+        if (inventoryItem.expirationDate == expirationDate) {
+            return inventoryItem
+        }
+
+        inventoryItem.expirationDate = expirationDate
+        if (!inventoryItem.save()) {
+            throw new ValidationException("Error saving inventory item", inventoryItem.errors)
+        }
+        return inventoryItem
+    }
+
     private InventoryItem createInventoryItem(Product product,
                                               String lotNumber,
                                               Date expirationDate,

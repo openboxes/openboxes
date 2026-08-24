@@ -1,6 +1,7 @@
 package org.pih.warehouse.api.receiving.v2
 
 import java.time.Instant
+import java.time.LocalDate
 
 import grails.core.GrailsApplication
 import grails.testing.gorm.DataTest
@@ -15,6 +16,7 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
@@ -447,6 +449,80 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         assert originalItem.quantityReceived == 60
         assert originalItem.isSplitItem == Boolean.FALSE
         assert originalItem.quantityShipped == 100
+    }
+
+    void 'editReceivingInfo should apply an edited expiration date to the lot being received against'() {
+        given: 'a pending receipt whose original line is received against an existing lot'
+        Shipment shipment = buildShipment()
+        ShipmentItem shipmentItem = buildShipmentItem(100)
+        ReceiptItem originalItem = buildReceiptItem(shipmentItem, 40)
+        Receipt receipt = createReceipt(shipment, [originalItem], ReceiptStatusCode.PENDING)
+
+        LocalDate newExpirationDate = LocalDate.of(2028, 3, 1)
+        Date expectedExpirationDate = JavaUtilDateParser.asDate(newExpirationDate)
+
+        ReceiptEditReceivingInfoCommand command = new ReceiptEditReceivingInfoCommand(
+                receipt: receipt,
+                shipmentItem: shipmentItem,
+                itemsToSave: [new ReceiptItemEditReceivingInfoRequest(
+                        receiptItem: originalItem,
+                        product: shipmentItem.product,
+                        lotNumber: "LOT-1",
+                        expirationDate: newExpirationDate,
+                        quantityReceiving: 40,
+                )],
+        )
+
+        when:
+        service.editReceivingInfo(command)
+
+        then: 'the date is pushed onto the existing lot, which getOrCreateInventoryItem alone would have left as is'
+        1 * inventoryItemManager.getOrCreateInventoryItem(shipmentItem.product, "LOT-1", expectedExpirationDate) >>
+                shipmentItem.inventoryItem
+        1 * inventoryItemManager.updateExpirationDate(shipmentItem.inventoryItem, expectedExpirationDate) >>
+                { InventoryItem inventoryItem, Date expirationDate ->
+                    inventoryItem.expirationDate = expirationDate
+                    return inventoryItem
+                }
+
+        and: 'the received line follows the lot'
+        assert originalItem.expirationDate == expectedExpirationDate
+    }
+
+    void 'editReceivingInfo should clear the expiration date of the lot when the date is emptied'() {
+        given: 'a pending receipt whose original line is received against a lot carrying a date'
+        Shipment shipment = buildShipment()
+        ShipmentItem shipmentItem = buildShipmentItem(100)
+        shipmentItem.inventoryItem.expirationDate = JavaUtilDateParser.asDate(LocalDate.of(2028, 3, 1))
+        ReceiptItem originalItem = buildReceiptItem(shipmentItem, 40)
+        Receipt receipt = createReceipt(shipment, [originalItem], ReceiptStatusCode.PENDING)
+
+        ReceiptEditReceivingInfoCommand command = new ReceiptEditReceivingInfoCommand(
+                receipt: receipt,
+                shipmentItem: shipmentItem,
+                itemsToSave: [new ReceiptItemEditReceivingInfoRequest(
+                        receiptItem: originalItem,
+                        product: shipmentItem.product,
+                        lotNumber: "LOT-1",
+                        expirationDate: null,
+                        quantityReceiving: 40,
+                )],
+        )
+
+        when:
+        service.editReceivingInfo(command)
+
+        then: 'the emptied date reaches the lot instead of being dropped on the way'
+        1 * inventoryItemManager.getOrCreateInventoryItem(shipmentItem.product, "LOT-1", null) >>
+                shipmentItem.inventoryItem
+        1 * inventoryItemManager.updateExpirationDate(shipmentItem.inventoryItem, null) >>
+                { InventoryItem inventoryItem, Date expirationDate ->
+                    inventoryItem.expirationDate = expirationDate
+                    return inventoryItem
+                }
+
+        and: 'the received line follows the lot'
+        assert originalItem.expirationDate == null
     }
 
     // ----------------------------------------------------------------------------------------------------------

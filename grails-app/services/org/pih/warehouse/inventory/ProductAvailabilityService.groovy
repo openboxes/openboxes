@@ -424,6 +424,30 @@ class ProductAvailabilityService {
         return quantityOnHand
     }
 
+    /**
+     * The given lot's expiration date and the depots holding it, sorted by name. Bin locations roll up into their
+     * depot and only positive holdings count.
+     */
+    LotAvailabilityDto getLotAvailabilityInAllDepots(InventoryItem inventoryItem) {
+        if (!inventoryItem) {
+            return new LotAvailabilityDto()
+        }
+
+        List<DepotAvailabilityDto> depots = ProductAvailability.createCriteria().list {
+            resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+            projections {
+                groupProperty("location", "location")
+                sum("quantityOnHand", "quantity")
+            }
+            eq("inventoryItem", inventoryItem)
+            gt("quantityOnHand", 0)
+        }.collect {
+            DepotAvailabilityDto.from(it.location as Location, it.quantity as Integer)
+        }.sort { it.depot.name }
+
+        return LotAvailabilityDto.from(inventoryItem, depots)
+    }
+
     Integer getQuantityOnHand(Product product, Location location) {
         def productAvailability = ProductAvailability.createCriteria().list {
             resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
