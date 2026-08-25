@@ -3,6 +3,7 @@ package org.pih.warehouse.requisition
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 
+import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
@@ -154,5 +155,74 @@ class RequisitionServiceSpec extends Specification implements ServiceUnitTest<Re
         jsonOfOriginalRequisition.remove('name')
         jsonOfCopiedRequisition.remove('name')
         jsonOfOriginalRequisition == jsonOfCopiedRequisition
+    }
+
+    void 'getRequisitionsPendingAutoAllocation should order requisitions by priority, then delivery type code priority, then date created'() {
+        given:
+        Location origin = new Location(id: 1)
+        Date now = new Date()
+
+        and: 'requisitions are registered out of order so the finder cannot rely on insertion order'
+        Requisition lowPriorityOlder = new Requisition(
+                id: "1",
+                origin: origin,
+                status: RequisitionStatus.CREATED,
+                autoAllocationRequested: true,
+                priority: 0,
+                deliveryTypeCode: DeliveryTypeCode.SHIP_TO,
+                dateCreated: now - 2,
+        )
+        Requisition highPriority = new Requisition(
+                id: "2",
+                origin: origin,
+                status: RequisitionStatus.CREATED,
+                autoAllocationRequested: true,
+                priority: 100,
+                deliveryTypeCode: DeliveryTypeCode.DEFAULT,
+                dateCreated: now,
+        )
+        Requisition samePriorityBetterDeliveryType = new Requisition(
+                id: "3",
+                origin: origin,
+                status: RequisitionStatus.CREATED,
+                autoAllocationRequested: true,
+                priority: 0,
+                deliveryTypeCode: DeliveryTypeCode.PICK_UP,
+                dateCreated: now - 1,
+        )
+        Requisition samePriorityNullDeliveryTypeOlder = new Requisition(
+                id: "4",
+                origin: origin,
+                status: RequisitionStatus.CREATED,
+                autoAllocationRequested: true,
+                priority: 0,
+                deliveryTypeCode: null,
+                dateCreated: now - 3,
+        )
+
+        and: 'a requisition that should not be included since it is not pending auto allocation'
+        Requisition notCreated = new Requisition(
+                id: "5",
+                origin: origin,
+                status: RequisitionStatus.PICKED,
+                autoAllocationRequested: true,
+                priority: 100,
+                dateCreated: now,
+        )
+
+        [lowPriorityOlder, highPriority, samePriorityBetterDeliveryType, samePriorityNullDeliveryTypeOlder, notCreated].each {
+            it.save(validate: false, flush: true)
+        }
+
+        when:
+        List<Requisition> requisitions = service.getRequisitionsPendingAutoAllocation(origin)
+
+        then: 'highest priority is first, then lowest delivery type priority, then oldest date created, with null delivery type sorted last'
+        requisitions == [
+                highPriority,
+                samePriorityBetterDeliveryType,
+                lowPriorityOlder,
+                samePriorityNullDeliveryTypeOlder,
+        ]
     }
 }
