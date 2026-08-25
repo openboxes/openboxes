@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read
+      pull-requests: write # Required to clear the "reviewer: claude" label after a run
       issues: read
       id-token: write
       actions: read # Required for Claude to read CI results on PRs
@@ -66,3 +66,16 @@ jobs:
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
           # claude_args: '--allowed-tools Bash(gh pr *)'
+
+      # The label is a one-shot request, not a subscription: clearing it here
+      # means its presence reads as "review queued" and re-requesting a review
+      # is a single click rather than a remove-then-re-add. Runs even if the
+      # review failed, so a failure cannot leave the label stuck on.
+      - name: Clear the review-request label
+        if: always() && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr edit "${{ github.event.pull_request.number }}" \
+            --repo "${{ github.repository }}" \
+            --remove-label 'reviewer: claude' || true
