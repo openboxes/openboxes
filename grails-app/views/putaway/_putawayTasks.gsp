@@ -121,9 +121,8 @@
                 </td>
                 <td>
                     <g:if test="${task.backorderReferenceNumber}">
-                        <g:set var="backorderRequisition" value="${task.shipmentItem?.resolveBackorderRequisition(requisitionsByReference ?: [:])}"/>
-                        <g:if test="${backorderRequisition}">
-                            <g:link controller="stockMovement" action="show" id="${backorderRequisition.id}">
+                        <g:if test="${task.backorderRequisition}">
+                            <g:link controller="stockMovement" action="show" id="${task.backorderRequisition.id}">
                                 ${task.backorderReferenceNumber}
                             </g:link>
                         </g:if>

@@ -14,6 +14,7 @@ import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.ShipmentItem
 
 class PutawayTask {
@@ -51,6 +52,14 @@ class PutawayTask {
     DeliveryTypeCode deliveryTypeCode
     String comment
 
+    // Backorder reference resolution, joined in directly by the putaway_task view so that no
+    // per-row lazy traversal (putawayOrderItem -> receiptItem -> shipmentItem) or lookup by
+    // request number is needed to render it. backorderRequisition is only safe to read via its
+    // id (a Hibernate proxy's identifier doesn't require initializing it) - the display label is
+    // resolved separately by the view into backorderReferenceNumber to avoid initializing it.
+    String backorderReferenceNumber
+    Requisition backorderRequisition
+
     // Auditing fields
     Date dateCreated
     Date lastUpdated
@@ -73,6 +82,8 @@ class PutawayTask {
         putawayOrderItem nullable: true
         discrepancyReasonCode nullable: true
         comment nullable: true
+        backorderReferenceNumber nullable: true
+        backorderRequisition nullable: true
     }
 
     static mapping = {
@@ -84,7 +95,6 @@ class PutawayTask {
     }
 
     static transients = [
-            'backorderReference',
             'shipmentItem'
     ]
 
@@ -97,14 +107,6 @@ class PutawayTask {
 
     ShipmentItem getShipmentItem() {
         return putawayOrderItem?.receiptItem?.shipmentItem
-    }
-
-    String getBackorderReferenceNumber() {
-        if (shipmentItem?.backorderReference) {
-            return shipmentItem?.backorderReference
-        }
-
-        return shipmentItem?.backorderItem?.requisition?.requestNumber
     }
 
     Map toJson() {

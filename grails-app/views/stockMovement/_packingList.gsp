@@ -204,16 +204,13 @@
                         <g:message code="default.boolean.${shipmentItem?.isFullyReceived()}"/>
                     </td>
                     <td aria-label="Backorder Reference" data-testid="backorder-reference">
-                        <g:if test="${shipmentItem?.backorderReference || shipmentItem?.backorderItem}">
-                            <g:set var="backorderRequisition" value="${shipmentItem.resolveBackorderRequisition(requisitionsByReference ?: [:])}"/>
-                            <g:if test="${backorderRequisition}">
-                                <g:link controller="stockMovement" action="show" id="${backorderRequisition.id}">
-                                    ${shipmentItem?.backorderReference?:shipmentItem?.backorderItem?.requisition?.requestNumber}
+                        <g:if test="${shipmentItem?.backorderReferenceNumber}">
+                            <g:if test="${shipmentItem?.backorderRequisitionId}">
+                                <g:link controller="stockMovement" action="show" id="${shipmentItem.backorderRequisitionId}">
+                                    ${shipmentItem.backorderReferenceNumber}
                                 </g:link>
                             </g:if>
-                            <g:else>
-                                ${shipmentItem?.backorderReference?:shipmentItem?.backorderItem?.requisition?.requestNumber}
-                            </g:else>
+                            <g:else>${shipmentItem.backorderReferenceNumber}</g:else>
                         </g:if>
                         <g:else>
                             <div class="fade"><warehouse:message code="default.empty.label"/></div>

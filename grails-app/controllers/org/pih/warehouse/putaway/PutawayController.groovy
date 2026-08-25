@@ -4,7 +4,6 @@ import com.google.zxing.BarcodeFormat
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import org.grails.web.json.JSONObject
-import org.pih.warehouse.allocation.BackorderService
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayTaskStatus
@@ -13,7 +12,6 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.order.Order
-import org.pih.warehouse.requisition.Requisition
 
 @Transactional
 class PutawayController {
@@ -22,7 +20,6 @@ class PutawayController {
     def productAvailabilityService
     PutawayService putawayService
     PutawayTaskService putawayTaskService
-    BackorderService backorderService
 
     def index() {
         redirect(action: "create")
@@ -58,14 +55,7 @@ class PutawayController {
         def command = new SearchPutawayTaskCommand(facility: order.destination, order: order)
         List<PutawayTask> tasks = putawayTaskService.search(command, params)
 
-        Set<String> backorderReferences = tasks.findAll {
-            it.shipmentItem?.backorderReference && !it.shipmentItem?.backorderItem
-        }.collect {
-            it.shipmentItem.backorderReference
-        } as Set
-        Map<String, Requisition> requisitionsByReference = backorderService.resolveRequisitionsByReference(backorderReferences)
-
-        render(template: "putawayTasks", model: [orderInstance: order, putawayTasks: tasks, requisitionsByReference: requisitionsByReference])
+        render(template: "putawayTasks", model: [orderInstance: order, putawayTasks: tasks])
     }
 
     def rollback(String id) {
