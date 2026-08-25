@@ -46,10 +46,15 @@ const useShipmentItemDetails = (lineItem) => {
     clickable: false,
   };
 
+  // The default grid fits six fields in two lines of three, but with both of the optional
+  // fields there is a seventh, so the second line has to fit four of them instead
+  const isFourColumnGrid = isShipmentFromPurchaseOrder && hasBinLocationSupport;
+
   const fields = [
     {
       label: translate('react.receiving.product.label', 'Product'),
       value: lineItem?.product?.name,
+      className: isFourColumnGrid ? 'item-details__field--span-2' : '',
     },
     ...(isShipmentFromPurchaseOrder ? [{
       label: translate('react.receiving.supplierItemCode.label', 'Supplier Item Code'),
@@ -70,6 +75,7 @@ const useShipmentItemDetails = (lineItem) => {
     {
       label: translate('react.receiving.recipient.label', 'Recipient'),
       value: lineItem?.recipient?.name,
+      className: !isShipmentFromPurchaseOrder && !hasBinLocationSupport ? 'item-details__field--span-2' : '',
     },
     ...(hasBinLocationSupport ? [
       {
@@ -83,7 +89,11 @@ const useShipmentItemDetails = (lineItem) => {
     },
   ];
 
-  return { badge, fields };
+  return {
+    badge,
+    fields,
+    className: isFourColumnGrid ? 'item-details--four-columns' : '',
+  };
 };
 
 export default useShipmentItemDetails;

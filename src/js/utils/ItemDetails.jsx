@@ -21,8 +21,8 @@ const ItemDetails = ({
       />
     )}
     <div className="item-details__grid">
-      {fields.map(({ label, value }) => (
-        <div key={label} className="item-details__field d-flex font-size-xs">
+      {fields.map(({ label, value, className: fieldClassName = '' }) => (
+        <div key={label} className={`item-details__field d-flex font-size-xs ${fieldClassName}`}>
           <span className="item-details__label font-weight-normal text-nowrap">{`${label}:`}</span>
           <span className="item-details__value font-weight-normal">{value}</span>
         </div>
@@ -50,6 +50,7 @@ ItemDetails.propTypes = {
   fields: PropTypes.arrayOf(PropTypes.shape({
     label: PropTypes.node.isRequired,
     value: PropTypes.node,
+    className: PropTypes.string,
   })).isRequired,
   className: PropTypes.string,
   /** Additional elements rendered as grid items after the fields */
