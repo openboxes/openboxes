@@ -944,20 +944,37 @@ class RequisitionService {
     }
 
     /**
-     * Writes a system comment in the caller's transaction. Use {@link #logRequisitionComment} instead when
-     * the caller is about to roll back and the comment still has to survive.
+     * Writes a system comment in the caller's transaction, so that the comment and the work it describes
+     * stand or fall together. Use {@link #logRequisitionComment} instead when the caller is about to roll
+     * back and the comment still has to survive.
      */
     void addSystemComment(Requisition requisition, String message) {
-        writeSystemComment(requisition, message)
+        boolean alreadyLogged = requisition.comments.any {
+            it.type == CommentType.SYSTEM && it.comment == message
+        }
+        if (!alreadyLogged) {
+            requisition.addToComments(new Comment(comment: message, sender: null))
+            requisition.save(failOnError: true)
+        }
+        log.warn("Requisition ${requisition.id}: ${message}")
     }
 
     /**
      * Writes an EventLog in the caller's transaction. Use {@link #logRequisitionEvent} instead when the
      * caller is about to roll back and the entry still has to survive.
      */
-    void addSystemEventLog(Requisition requisition, String message,
-                           EventLogCode eventLogCode = EventLogCode.ERROR_OCCURRED) {
-        writeEventLog(requisition, message, eventLogCode)
+    void addSystemEventLog(Requisition requisition, String message) {
+        // TODO: event_log.message is a VARCHAR(255) column; expand the column (and remove this cap) if longer
+        //  messages are needed.
+        String truncatedMessage = message?.length() > 255 ? message.take(255) : message
+
+        requisition.addToEventLogs(new EventLog(
+                eventLogCode: EventLogCode.ERROR_OCCURRED,
+                eventDate: Instant.now(),
+                message: truncatedMessage,
+        ))
+        requisition.save(failOnError: true)
+        log.warn("Requisition ${requisition.id}: ${message}")
     }
 
     /**
@@ -972,7 +989,7 @@ class RequisitionService {
             return
         }
 
-        writeSystemComment(requisition, message)
+        addSystemComment(requisition, message)
     }
 
     /**
@@ -980,40 +997,14 @@ class RequisitionService {
      * though the caller is about to roll back and rethrow the triggering exception.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    void logRequisitionEvent(String requisitionId, String message,
-                             EventLogCode eventLogCode = EventLogCode.ERROR_OCCURRED) {
+    void logRequisitionEvent(String requisitionId, String message) {
         Requisition requisition = Requisition.get(requisitionId)
         if (!requisition) {
             log.warn("Unable to log requisition error - requisition ${requisitionId} not found: ${message}")
             return
         }
 
-        writeEventLog(requisition, message, eventLogCode)
-    }
-
-    private void writeSystemComment(Requisition requisition, String message) {
-        boolean alreadyLogged = requisition.comments.any {
-            it.type == CommentType.SYSTEM && it.comment == message
-        }
-        if (!alreadyLogged) {
-            requisition.addToComments(new Comment(comment: message, sender: null))
-            requisition.save(failOnError: true)
-        }
-        log.warn("Requisition ${requisition.id}: ${message}")
-    }
-
-    private void writeEventLog(Requisition requisition, String message, EventLogCode eventLogCode) {
-        // TODO: event_log.message is a VARCHAR(255) column; expand the column (and remove this cap) if longer
-        //  messages are needed.
-        String truncatedMessage = message?.length() > 255 ? message.take(255) : message
-
-        requisition.addToEventLogs(new EventLog(
-                eventLogCode: eventLogCode,
-                eventDate: Instant.now(),
-                message: truncatedMessage,
-        ))
-        requisition.save(failOnError: true)
-        log.warn("Requisition ${requisition.id}: ${message}")
+        addSystemEventLog(requisition, message)
     }
 
     RequisitionItem buildRequisitionItem(Map params) {

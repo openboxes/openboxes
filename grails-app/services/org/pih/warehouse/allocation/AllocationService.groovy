@@ -294,7 +294,9 @@ class AllocationService {
         AllocationSourceStrategy bestStrategy = null
         for (AllocationSourceStrategy strategy : resolvedStrategies) {
             List<AvailableItem> ordered = orderByStrategy(strategy, facility, product, applyRotation(rotationRule, allAvailableItems))
-            List<AvailableItem> includedItems = ordered.findAll { !excludeList.contains(it) }
+            List<AvailableItem> includedItems = ordered.findAll {
+                !excludeList.contains(it) && it.quantityAvailable > 0 && it.pickable
+            }
             Integer quantityAvailable = includedItems.sum { it.quantityAvailable } ?: 0
             if (bestStrategy == null || quantityAvailable > bestQuantityAvailable) {
                 bestQuantityAvailable = quantityAvailable
@@ -311,11 +313,15 @@ class AllocationService {
             return []
         }
 
-        if (!isFallbackApplicable(allocationMode, facility)) {
-            throw new IllegalArgumentException("Insufficient stock for product ${product?.productCode} - ${product?.name} in order ${requisitionItem.requisition?.requestNumber}. Required quantity: ${quantityRequired}, Available quantity: ${bestQuantityAvailable}")
+        if (isFallbackApplicable(allocationMode, facility)) {
+            List<SuggestedItem> fallbackItems =
+                    getFallbackSuggestedItems(requisitionItem, quantityRequired, bestStrategy, bestItems)
+            if (fallbackItems != null) {
+                return fallbackItems
+            }
         }
 
-        return getFallbackSuggestedItems(requisitionItem, quantityRequired, bestStrategy, bestItems)
+        throw new IllegalArgumentException("Insufficient stock for product ${product?.productCode} - ${product?.name} in order ${requisitionItem.requisition?.requestNumber}. Required quantity: ${quantityRequired}, Available quantity: ${bestQuantityAvailable}")
     }
 
     private static boolean isFallbackApplicable(AllocationMode allocationMode, Location facility) {
@@ -341,19 +347,28 @@ class AllocationService {
         }
 
         AllocationFallbackResolution resolution = allocationFallbackService.resolve(facility, product, strategy)
+        if (!resolution) {
+            return null
+        }
 
         log.warn("Allocation fallback for product ${product?.productCode} in order " +
                 "${requisitionItem.requisition?.requestNumber}: ${resolution}, quantity ${quantityShortfall}")
 
+        String message
         if (resolution.step == AllocationStep.NEGATIVE_INVENTORY) {
-            cycleCountService.createNegativeInventoryRequest(facility, product)
+            cycleCountService.getOrCreateCycleCountRequest(facility, product)
+            message = "Negative inventory: allocated quantity ${quantityShortfall} of product " +
+                    "${product?.productCode} - ${product?.name} to ${resolution.binLocation?.name}, which is " +
+                    "permitted to hold a negative quantity. Cycle count requested."
         } else {
-            String message = "Inventory shortfall: no location at ${facility?.name} could supply quantity " +
+            message = "Inventory shortfall: no location at ${facility?.name} could supply quantity " +
                     "${quantityShortfall} of product ${product?.productCode} - ${product?.name}. " +
                     "Allocated to ${resolution.binLocation?.name}."
-            requisitionService.addSystemComment(requisitionItem.requisition, message)
-            requisitionService.addSystemEventLog(requisitionItem.requisition, message)
         }
+
+        // Requisition event logs are not visible on the UI yet, so we also add comments
+        requisitionService.addSystemComment(requisitionItem.requisition, message)
+        requisitionService.addSystemEventLog(requisitionItem.requisition, message)
 
         SuggestedItem shortfallItem = new SuggestedItem(
                 inventoryItem: inventoryService.findOrCreateDefaultInventoryItem(product),

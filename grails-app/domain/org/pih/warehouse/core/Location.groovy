@@ -387,11 +387,18 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return supports(ActivityCode.DISPLAY_STOCK)
     }
 
+    /**
+     * Whether this bin location may hold a negative quantity. The activity code has to be set on both the
+     * bin and the facility it belongs to.
+     */
     Boolean isNegativeInventoryAllowed() {
         return supports(ActivityCode.ALLOW_NEGATIVE_INVENTORY) &&
                 parentLocation?.supports(ActivityCode.ALLOW_NEGATIVE_INVENTORY)
     }
 
+    /**
+     * Whether this is the fallback location that accepts a stock movement when no other location is able to.
+     */
     Boolean isInventoryShortfallLocation() {
         return supports(ActivityCode.INVENTORY_SHORTFALL)
     }

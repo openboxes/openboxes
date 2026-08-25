@@ -14,6 +14,7 @@ import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.product.Product
 
 /**
@@ -24,9 +25,15 @@ import org.pih.warehouse.product.Product
 class AllocationFallbackService {
 
     LocationService locationService
+    ProductAvailabilityService productAvailabilityService
 
     AllocationSourceStrategyHandlerResolver allocationSourceStrategyHandlerResolver = new AllocationSourceStrategyHandlerResolver()
 
+    /**
+     * Chooses where the quantity nobody can supply is recorded, working through the allocation steps in
+     * order and stopping at the first that succeeds. Firstly it looks for a bin permitted to hold a negative quantity,
+     * secondly it falls back to the facility's shortfall location.
+     */
     AllocationFallbackResolution resolve(Location facility, Product product, AllocationSourceStrategy strategy) {
         Location negativeInventoryLocation = resolveNegativeInventoryLocation(facility, product, strategy)
         if (negativeInventoryLocation) {
@@ -35,15 +42,18 @@ class AllocationFallbackService {
 
         Location shortfallLocation = locationService.getInventoryShortfallLocation(facility)
         if (!shortfallLocation) {
-            throw new IllegalStateException(
-                    "No inventory shortfall location configured for facility ${facility?.name}")
+            log.warn("No inventory shortfall location configured for facility ${facility?.name}")
+            return null
         }
         return new AllocationFallbackResolution(shortfallLocation, AllocationStep.INVENTORY_SHORTFALL)
     }
 
     private Location resolveNegativeInventoryLocation(Location facility, Product product, AllocationSourceStrategy strategy) {
         List<Location> candidateLocations = getCandidateBinLocations(facility, product)
-                .findAll { !it.isInventoryShortfallLocation() && it.isNegativeInventoryAllowed() }
+                .findAll {
+                    it.active && it.isAllocable() &&
+                            !it.isInventoryShortfallLocation() && it.isNegativeInventoryAllowed()
+                }
 
         if (!candidateLocations) {
             return null
@@ -58,7 +68,16 @@ class AllocationFallbackService {
         return handler.orderLocations(facility, product, candidateLocations)?.find()
     }
 
-    private static List<Location> getCandidateBinLocations(Location facility, Product product) {
-        return InventoryLevel.getPutawayLocations(facility, product)?.unique() ?: []
+    /**
+     * The bins that may take the shortfall for this product.
+     */
+    private List<Location> getCandidateBinLocations(Location facility, Product product) {
+        List<Location> assignedLocations = InventoryLevel.getPutawayLocations(facility, product) ?: []
+        List<Location> stockedLocations = productAvailabilityService
+                .getAllAvailableBinLocations(facility, product?.id)
+                ?.collect { it.binLocation }
+                ?.findAll { it } ?: []
+
+        return (assignedLocations + stockedLocations).unique { it.id }
     }
 }
