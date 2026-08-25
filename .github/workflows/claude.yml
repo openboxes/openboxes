@@ -1,5 +1,18 @@
 name: Claude Code
 
+# HOW TO TURN THIS OFF
+#
+#   Kill switch (no code change, takes effect immediately):
+#     gh variable set CLAUDE_REVIEW_ENABLED --body false
+#   Turn it back on:
+#     gh variable set CLAUDE_REVIEW_ENABLED --body true   (or delete the variable)
+#   The variable is opt-out: when it is unset, Claude is enabled.
+#
+#   Full removal: delete this file. Then also revoke the credential
+#   (gh secret delete CLAUDE_CODE_OAUTH_TOKEN), uninstall the Claude GitHub App
+#   from the openboxes org, and delete the "reviewer: claude" label. Deleting
+#   only this file leaves the App installed and the token live.
+
 on:
   issue_comment:
     types: [created]
@@ -15,11 +28,12 @@ on:
 jobs:
   claude:
     if: |
+      vars.CLAUDE_REVIEW_ENABLED != 'false' && (
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude'))) ||
-      (github.event_name == 'pull_request' && github.event.label.name == 'reviewer: claude')
+      (github.event_name == 'pull_request' && github.event.label.name == 'reviewer: claude'))
     runs-on: ubuntu-latest
     permissions:
       contents: read
