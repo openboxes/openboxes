@@ -46,15 +46,13 @@ const useShipmentItemDetails = (lineItem) => {
     clickable: false,
   };
 
-  // The default grid fits six fields in two lines of three, but with both of the optional
-  // fields there is a seventh, so the second line has to fit four of them instead
-  const hasBothOptionalFields = isShipmentFromPurchaseOrder && hasBinLocationSupport;
-
   const fields = [
     {
       label: translate('react.receiving.product.label', 'Product'),
       value: lineItem?.product?.name,
-      className: hasBothOptionalFields ? 'item-details__field--span-2' : '',
+      // Each of these flags adds one optional field, the supplier item code and the bin
+      // location, so with both the grid has four columns and the product name spans two
+      className: isShipmentFromPurchaseOrder && hasBinLocationSupport ? 'item-details__field--span-2' : '',
     },
     ...(isShipmentFromPurchaseOrder ? [{
       label: translate('react.receiving.supplierItemCode.label', 'Supplier Item Code'),
@@ -92,7 +90,9 @@ const useShipmentItemDetails = (lineItem) => {
   return {
     badge,
     fields,
-    className: hasBothOptionalFields ? 'item-details--four-columns' : '',
+    // The default grid fits six fields in two lines of three, but with both of the optional
+    // fields there is a seventh, so the second line has to fit four of them instead
+    className: isShipmentFromPurchaseOrder && hasBinLocationSupport ? 'item-details--four-columns' : '',
   };
 };
 
