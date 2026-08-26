@@ -7,6 +7,7 @@ import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.history.EventLogCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.requisition.Requisition
@@ -63,6 +64,11 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
     Integer priority
     Integer statusSortOrder
 
+    // Latest EventLog on the requisition (joined in the underlying view), used to derive an error indicator
+    // without a per-row lookup. Null for non-requisition (return order) rows.
+    String latestEventLogCode
+    String latestEventLogMessage
+
     List<ShipmentStatusCode> receiptStatusCodes // For filtering
     List<RequisitionStatus> requisitionStatusCodes // For filtering
 
@@ -76,7 +82,9 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
             "pending",
             "electronicType",
             "lineItemCount",
-            "fromReturnOrder"
+            "fromReturnOrder",
+            "inErrorState",
+            "errorMessage",
     ]
 
     static mapping = {
@@ -113,6 +121,9 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
 
         priority(nullable: true)
         statusSortOrder(nullable: true)
+
+        latestEventLogCode(nullable: true)
+        latestEventLogMessage(nullable: true)
     }
 
     @Deprecated
@@ -188,6 +199,8 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
                 deliveryTypeCode    : deliveryTypeCode,
                 priority            : priority,
                 priorityLevel       : PriorityLevel.fromPriority(priority)?.name(),
+                hasError            : inErrorState,
+                errorMessage        : errorMessage,
 
                 // Required by mobile app
                 expectedShippingDate : shipment?.expectedShippingDate?.format("MM/dd/yyyy HH:mm XXX"),
@@ -238,5 +251,20 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
 
     Boolean hasBeenReceived() {
         return shipment?.currentStatus == ShipmentStatusCode.RECEIVED
+    }
+
+    /**
+     * Whether the requisition backing this row needs manual intervention: its latest EventLog is an
+     * ERROR_OCCURRED and it hasn't since reached a terminal success state (ISSUED) - in practice CREATED
+     * (allocation failed) or PICKING (issuance failed). Mirrors Requisition#isInErrorState(), computed here
+     * from the view's joined columns instead of lazy-loading requisition.eventLogs per row.
+     */
+    Boolean isInErrorState() {
+        return latestEventLogCode == EventLogCode.ERROR_OCCURRED.name() &&
+                status in [RequisitionStatus.CREATED, RequisitionStatus.PICKING]
+    }
+
+    String getErrorMessage() {
+        return isInErrorState() ? latestEventLogMessage : null
     }
 }

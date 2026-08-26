@@ -32,11 +32,22 @@ CREATE OR REPLACE VIEW stock_movement_list_item AS
         r.delivery_type_code AS delivery_type_code,
         r.priority AS priority,
         NULL AS order_id,
-        'STOCK_MOVEMENT' AS stock_movement_type
+        'STOCK_MOVEMENT' AS stock_movement_type,
+        latest_event_log.event_log_code AS latest_event_log_code,
+        latest_event_log.message AS latest_event_log_message
     FROM
         requisition r
             LEFT JOIN
         shipment s ON s.requisition_id = r.id
+            LEFT JOIN
+        event_log latest_event_log ON latest_event_log.id = (
+            SELECT rel.event_log_id
+            FROM requisition_event_log rel
+                INNER JOIN event_log el ON el.id = rel.event_log_id
+            WHERE rel.requisition_id = r.id
+            ORDER BY el.date_created DESC, el.id DESC
+            LIMIT 1
+        )
     WHERE
         r.is_template IS FALSE
     UNION ALL SELECT
@@ -93,7 +104,9 @@ CREATE OR REPLACE VIEW stock_movement_list_item AS
         NULL AS delivery_type_code,
         NULL AS priority,
         o.id AS order_id,
-        'RETURN_ORDER' AS stock_movement_type
+        'RETURN_ORDER' AS stock_movement_type,
+        NULL AS latest_event_log_code,
+        NULL AS latest_event_log_message
     FROM
         `order` o
             LEFT JOIN

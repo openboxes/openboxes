@@ -2361,6 +2361,42 @@ img.photo_tiny {
 .tag-info { color: #31708f; background-color: #d9edf7; border-color: #bce8f1; }
 .tag-warning { color: #8a6d3b; background-color: #fcf8e3; border-color: #faebcc; }
 
+/* Two-part pill built on the same look as .tag, for showing two related statuses (e.g. status + fulfillment status)
+   side by side as one combined indicator instead of two separate tags. TODO: Support other tag colors */
+.tag-pill {
+    display: flex;
+    border: 1px solid #a5d24a;
+    -moz-border-radius:2px;
+    -webkit-border-radius:2px;
+    border-radius: 2px;
+    font-size:13px;
+    cursor: help;
+}
+.tag-pill-segment {
+    padding: 5px 10px;
+    white-space: nowrap;
+    text-wrap:none;
+    background: #cde69c;
+    color: #638421;
+}
+.tag-pill-segment-secondary {
+    background: transparent;
+    color: #666;
+    border-left: 1px solid #a5d24a;
+}
+
+.status-tag-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.requisition-error-icon {
+    color: #f0ad4e;
+    font-size: 1.4em;
+    cursor: help;
+}
 
 
 /*span.lotNumber { 1px solid #a5d24a; -moz-border-radius:2px; -webkit-border-radius:2px; display: block; color: black; font-weight: bold; margin-right: 5px; margin-bottom:5px;font-family: helvetica;  font-size:13px; }*/

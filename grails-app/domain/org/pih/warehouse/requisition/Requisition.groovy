@@ -26,14 +26,16 @@ import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.ReferenceDocument
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.history.EventLog
 import org.pih.warehouse.core.history.EventLogCode
+import org.pih.warehouse.core.history.Historizable
 import org.pih.warehouse.fulfillment.Fulfillment
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.Product
 
-class Requisition implements Comparable<Requisition>, Serializable {
+class Requisition implements Comparable<Requisition>, Serializable, Historizable {
 
     def publishAutomaticAllocationEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new AutomaticAllocationEvent(this.id))
@@ -173,6 +175,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
             "mostRecentEvent",
             "allocationAttemptCount",
             "mostRecentErrorMessage",
+            "inErrorState",
     ]
     static hasOne = [picklist: Picklist]
     static hasMany = [
@@ -512,6 +515,32 @@ class Requisition implements Comparable<Requisition>, Serializable {
         return eventLogs?.findAll { it.eventLogCode == EventLogCode.ERROR_OCCURRED }
                 ?.max { it.dateCreated }
                 ?.message
+    }
+
+    /**
+     * Whether the requisition needs manual intervention: its most recent EventLog is an ERROR_OCCURRED and it
+     * hasn't since reached a terminal success state (ISSUED). In practice this rests at CREATED (allocation
+     * failed, will retry) or PICKING (issuance failed, awaiting a person) - status itself keeps reflecting
+     * lifecycle state only, so this is derived rather than stored.
+     */
+    Boolean isInErrorState() {
+        if (!(status in [RequisitionStatus.CREATED, RequisitionStatus.PICKING])) {
+            return false
+        }
+        EventLog mostRecentEventLog = eventLogs?.max { it.dateCreated }
+        return mostRecentEventLog?.eventLogCode == EventLogCode.ERROR_OCCURRED
+    }
+
+    @Override
+    ReferenceDocument getReferenceDocument() {
+        return new ReferenceDocument(
+                label: requestNumber,
+                url: "/openboxes/stockMovement/show/${id}",
+                id: id,
+                identifier: requestNumber,
+                description: description,
+                name: name,
+        )
     }
 
     DemandTypeCode getDemandTypeCode() {
