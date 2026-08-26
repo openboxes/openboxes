@@ -5,10 +5,11 @@ import {
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { getUsers } from 'selectors';
+import { getHasPartialReceivingSupport, getUsers } from 'selectors';
 
 import receivingApi from 'api/services/ReceivingApi';
 import { createNormalizedState } from 'utils/normalizationUtils';
+import omitBlankReceivingRows from 'utils/receiving/omitBlankReceivingRows';
 import {
   receiptGroupForView,
   transformReceiptSummary,
@@ -20,6 +21,7 @@ const useConfirmReceiptActions = (view) => {
   const [lineItemsState, setLineItemsState] = useState(createNormalizedState());
   const { shipmentId } = useParams();
   const users = useSelector(getUsers);
+  const hasPartialReceivingSupport = useSelector(getHasPartialReceivingSupport);
 
   const loadSummary = async () => {
     setLoading(true);
@@ -28,7 +30,10 @@ const useConfirmReceiptActions = (view) => {
         group: receiptGroupForView(view),
       });
       receiptIdRef.current = summary?.pendingReceiptId ?? null;
-      setLineItemsState(transformReceiptSummary(summary, view, _.keyBy(users, 'id')));
+      const rows = transformReceiptSummary(summary, view, _.keyBy(users, 'id'));
+      // With partial receiving the lines left blank are not part of this receipt, so they stay
+      // out of the review.
+      setLineItemsState(hasPartialReceivingSupport ? omitBlankReceivingRows(rows) : rows);
     } finally {
       setLoading(false);
     }

@@ -16,6 +16,7 @@ import useReceivingActions from 'hooks/receiving/v2/useReceivingActions';
 import useReceivingBinLocations from 'hooks/receiving/v2/useReceivingBinLocations';
 import useReceivingColumns from 'hooks/receiving/v2/useReceivingColumns';
 import useReceivingFilters from 'hooks/receiving/v2/useReceivingFilters';
+import useReceivingNextValidation from 'hooks/receiving/v2/useReceivingNextValidation';
 import useTableLocationAutofill from 'hooks/receiving/v2/useTableLocationAutofill';
 import useTableSorting from 'hooks/useTableSorting';
 import getOptionalColumnsVisibility from 'utils/receiving/getOptionalColumnsVisibility';
@@ -61,10 +62,14 @@ const useReceivingForm = () => {
     updateFilterParams,
     clearFilterParams,
   } = useReceivingFilters({ lineItemsState });
+
+  const { isNextDisabled, validateBeforeNext } = useReceivingNextValidation({ lineItemsState });
+
   const { onLocationAutofill } = useTableLocationAutofill({
     lineItemsState: visibleLineItemsState,
     updateLineItems,
   });
+
   const autofillVisibleQuantities = useCallback(
     () => autofillQuantities(visibleLineItemsState),
     [autofillQuantities, visibleLineItemsState],
@@ -109,6 +114,12 @@ const useReceivingForm = () => {
       columns,
       sort,
       order,
+    },
+    next: {
+      // Nothing is known about the lines until the receipt is loaded, so the transition waits
+      // for it - otherwise the validation would run on an empty table.
+      isNextDisabled: loading || isNextDisabled,
+      validateBeforeNext,
     },
     actions: {
       loading,
