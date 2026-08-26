@@ -17,7 +17,7 @@ const ConfirmExpiryChangeWithDepotsModal = ({
 }) => {
   useTranslation('confirmExpirationDate');
   const translate = useTranslate();
-  const { columns, formatDate } = useConfirmExpiryChangeWithDepotsModal();
+  const { columns, formatDate, formatLotNumber } = useConfirmExpiryChangeWithDepotsModal();
   const confirmationWarning = data.length > 1
     ? translate(
       'react.confirmExpirationDate.modal.multipleLotsWarning.label',
@@ -39,7 +39,7 @@ const ConfirmExpiryChangeWithDepotsModal = ({
     >
       <div className="expiry-change-modal" data-testid="confirm-expiry-change-with-depots-modal">
         {data.map((item) => (
-          <div className="expiry-change" key={`${item.product?.id}-${item.lotNumber}`}>
+          <div className="expiry-change" key={`${item.product?.id}-${item.lotNumber}-${item.newExpiry}`}>
             <p className="expiry-change__product">{`${item.code} ${item.product?.name}`}</p>
             <p className="expiry-change__title">
               {translate(
@@ -47,7 +47,7 @@ const ConfirmExpiryChangeWithDepotsModal = ({
                 // eslint-disable-next-line no-template-curly-in-string
                 'You have changed the expiration date for lot ${0} from ${1} to ${2}. This lot is in inventory in the following locations:',
                 [
-                  <strong key="lotNumber">{item.lotNumber}</strong>,
+                  <strong key="lotNumber">{formatLotNumber(item.lotNumber)}</strong>,
                   <strong key="previousExpiry">{formatDate(item.previousExpiry)}</strong>,
                   <strong key="newExpiry">{formatDate(item.newExpiry)}</strong>,
                 ],

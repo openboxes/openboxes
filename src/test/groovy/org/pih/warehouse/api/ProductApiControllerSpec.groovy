@@ -1,12 +1,10 @@
 package org.pih.warehouse.api
 
 import grails.orm.PagedResultList
-import grails.validation.ValidationException
 import grails.testing.gorm.DataTest
 import grails.testing.web.controllers.ControllerUnitTest
 import org.grails.plugins.testing.GrailsMockHttpServletResponse
 import org.grails.web.json.JSONElement
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
 import org.grails.web.json.JSONObject
 import org.hibernate.Criteria
 import org.json.JSONArray
@@ -16,12 +14,12 @@ import spock.lang.Unroll
 
 import org.pih.warehouse.api.ProductApiController
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventoryItemManager
+import org.pih.warehouse.inventory.AvailabilityCommand
 import org.pih.warehouse.inventory.DepotAvailabilityDto
 import org.pih.warehouse.inventory.LotAvailabilityDto
-import org.pih.warehouse.location.LocationSimpleDto
 import org.pih.warehouse.inventory.ProductAvailabilityService
+import org.pih.warehouse.inventory.ProductLotRequest
+import org.pih.warehouse.location.LocationSimpleDto
 import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductService
@@ -36,14 +34,7 @@ class ProductApiControllerSpec extends Specification implements DataTest, Contro
     private ProductService productServiceStub
 
     void setupSpec() {
-        mockDomains(Product, Location, InventoryItem)
-
-        // LotAvailabilityCommand implements ObjectValidatable, whose validate() performs javax validation
-        // through the "defaultValidator" bean. A running app gets that bean from Boot's autoconfiguration, but
-        // the DataTest context does not register it, so the action's @Valid check could not run here without this.
-        defineBeans {
-            defaultValidator(LocalValidatorFactoryBean)
-        }
+        mockDomains(Product, Location)
     }
 
     void setup() {
@@ -116,49 +107,64 @@ class ProductApiControllerSpec extends Specification implements DataTest, Contro
         numProductsInDB << [0, 1, 3]
     }
 
-    void 'getLotAvailabilityInAllDepots should render the availability of the lot named in the request path'() {
+    void 'getAvailabilityInAllDepots should render the availability of the given product lots'() {
         given: 'the following db data'
         Product product = new Product().save(validate: false)
 
-        and: 'the following params'
-        params.productId = product.id
-        params.lotNumber = 'LOT-1'
+        and: 'the following command'
+        AvailabilityCommand command = new AvailabilityCommand(productLots: [
+                new ProductLotRequest(product: product, lotNumber: 'LOT-1'),
+                new ProductLotRequest(product: product, lotNumber: 'LOT-2'),
+        ])
 
         and: 'the following mocks'
-        InventoryItem inventoryItem = new InventoryItem(product: product, lotNumber: 'LOT-1')
-        InventoryItemManager inventoryItemManager = Mock(InventoryItemManager)
         ProductAvailabilityService productAvailabilityService = Mock(ProductAvailabilityService)
-        controller.inventoryItemManager = inventoryItemManager
         controller.productAvailabilityService = productAvailabilityService
 
         when:
-        controller.getLotAvailabilityInAllDepots()
+        controller.getAvailabilityInAllDepots(command)
 
-        then: 'the product and lot number from the path are used to read the lot'
-        1 * inventoryItemManager.getInventoryItem(product, 'LOT-1') >> inventoryItem
-        1 * productAvailabilityService.getLotAvailabilityInAllDepots(inventoryItem) >>
-                new LotAvailabilityDto(quantityOnHand: 5, depots: [new DepotAvailabilityDto(
-                        depot: new LocationSimpleDto(id: 'depot-1', name: 'Belladere Depot'),
-                        quantityOnHand: 5)])
+        then: 'all of the product lots are read in a single call'
+        1 * productAvailabilityService.getAvailabilityInAllDepots(command) >> [
+                new LotAvailabilityDto(
+                        productId: product.id,
+                        lotNumber: 'LOT-1',
+                        quantityOnHand: 5,
+                        depots: [new DepotAvailabilityDto(
+                                depot: new LocationSimpleDto(id: 'depot-1', name: 'Belladere Depot'),
+                                quantityOnHand: 5)]),
+        ]
 
-        and: 'its availability is rendered'
-        response.json.data.quantityOnHand == 5
-        println "RENDERED: " + response.text
-        response.json.data.depots[0].depot.name == 'Belladere Depot'
+        and: 'their availability is rendered'
+        JSONObject json = getJsonObjectResponse(controller.response)
+        json.data.length() == 1
+        json.data[0].lotNumber == 'LOT-1'
+        json.data[0].quantityOnHand == 5
+        json.data[0].depots[0].depot.name == 'Belladere Depot'
     }
 
-    void 'getLotAvailabilityInAllDepots should reject an unknown product'() {
-        given: 'the following params'
-        params.productId = 'does-not-exist'
-        params.lotNumber = 'LOT-1'
+    void 'getAvailabilityInAllDepots should render nothing when the product lots are not in inventory'() {
+        given: 'the following db data'
+        Product product = new Product().save(validate: false)
+
+        and: 'the following command'
+        AvailabilityCommand command = new AvailabilityCommand(
+                productLots: [new ProductLotRequest(product: product, lotNumber: 'LOT-1')])
+
+        and: 'the following mocks'
+        ProductAvailabilityService productAvailabilityService = Mock(ProductAvailabilityService)
+        controller.productAvailabilityService = productAvailabilityService
 
         when:
-        controller.getLotAvailabilityInAllDepots()
+        controller.getAvailabilityInAllDepots(command)
 
-        then: 'the request is rejected before anything is read'
-        thrown(ValidationException)
+        then:
+        1 * productAvailabilityService.getAvailabilityInAllDepots(command) >> []
+
+        and: 'nothing is rendered for them'
+        JSONObject json = getJsonObjectResponse(controller.response)
+        json.data.length() == 0
     }
-
 
     private List<Product> generateTestProducts(int numToGenerate) {
         List<Product> products = []

@@ -2,10 +2,10 @@ import axios from 'axios';
 import queryString from 'query-string';
 
 import {
+  AVAILABILITY_IN_ALL_DEPOTS,
   AVAILABLE_ITEMS,
   GENERIC_API,
   INVENTORY_ITEM,
-  LOT_AVAILABILITY_IN_ALL_DEPOTS,
   LOT_NUMBERS_WITH_EXPIRATION_DATE,
   PRODUCT_API,
 } from 'api/urls';
@@ -14,8 +14,8 @@ import apiClient from 'utils/apiClient';
 export default {
   getProducts: (config) => apiClient.get(PRODUCT_API, config),
   getInventoryItem: (productId, lotNumber) => axios.get(INVENTORY_ITEM(productId, lotNumber)),
-  getLotAvailabilityInAllDepots: (productId, lotNumber) =>
-    axios.get(LOT_AVAILABILITY_IN_ALL_DEPOTS(productId, lotNumber)),
+  getAvailabilityInAllDepots: (productLots) =>
+    apiClient.post(AVAILABILITY_IN_ALL_DEPOTS, { productLots }),
   // TODO: tech debt: Replace by the product api call instead of generic
   getProduct: (id) => apiClient.get(`${GENERIC_API}/product/${id}`),
   getLatestInventoryCountDate: (productIds) => apiClient.get(`${PRODUCT_API}/getLatestInventoryCountDate`, {

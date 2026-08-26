@@ -19,6 +19,11 @@ const useConfirmExpiryChangeWithDepotsModal = () => {
   const formatDate = (date) => formatDateToDatetimeString(date, locales[currentLocale])
     ?? translate('react.confirmExpirationDate.modal.noDate.label', 'no date');
 
+  // A product's default lot is stored with no lot number, so it has to be named somehow.
+  // TODO: Remove this fallback once there can no longer be a default lot with an expiration date.
+  const formatLotNumber = (lotNumber) => lotNumber
+    || translate('react.confirmExpirationDate.modal.defaultLot.label', 'default');
+
   const columns = [
     columnHelper.accessor(depotAvailabilityColumn.DEPOT, {
       header: () => (
@@ -44,7 +49,7 @@ const useConfirmExpiryChangeWithDepotsModal = () => {
     }),
   ];
 
-  return { columns, formatDate };
+  return { columns, formatDate, formatLotNumber };
 };
 
 export default useConfirmExpiryChangeWithDepotsModal;

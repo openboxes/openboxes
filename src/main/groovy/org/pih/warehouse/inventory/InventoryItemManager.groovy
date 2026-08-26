@@ -99,6 +99,33 @@ class InventoryItemManager {
     }
 
     /**
+     * Finds the inventory items for the given product lots, matching each lot number as it is given.
+     */
+    List<InventoryItem> getInventoryItems(List<ProductLot> productLots) {
+        if (!productLots) {
+            return []
+        }
+
+        return InventoryItem.createCriteria().list {
+            or {
+                productLots.each { ProductLot productLot ->
+                    and {
+                        eq("product", productLot.product)
+                        if (productLot.lotNumber) {
+                            eq("lotNumber", productLot.lotNumber)
+                        } else {
+                            or {
+                                isNull("lotNumber")
+                                eq("lotNumber", "")
+                            }
+                        }
+                    }
+                }
+            }
+        } as List<InventoryItem>
+    }
+
+    /**
      * Updates the expiration date of an existing inventory item, clearing it when none is given. An inventory item
      * is a product lot shared by every depot, so the change reaches all of them.
      */
@@ -108,7 +135,8 @@ class InventoryItemManager {
         }
 
         inventoryItem.expirationDate = expirationDate
-        if (!inventoryItem.save()) {
+
+        if (!inventoryItem.validate()) {
             throw new ValidationException("Error saving inventory item", inventoryItem.errors)
         }
         return inventoryItem

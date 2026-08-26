@@ -19,13 +19,17 @@ const useConfirmExpirationDateChange = () => {
   } = useHandleModalAction();
   const spinner = useSpinner();
 
-  /** @returns the lot's expiration date change, or null when there is nothing to confirm. */
-  const getLotChange = async (lineItem) => {
-    const { data: { data: lot } } = await ProductApi.getLotAvailabilityInAllDepots(
-      lineItem.product.id,
-      lineItem.lotNumber,
-    );
+  const findLotAvailability = (lotAvailabilities, lineItem) => lotAvailabilities.find(
+    (lotAvailability) => lotAvailability.productId === lineItem.product.id
+      && (lotAvailability.lotNumber || '') === (lineItem.lotNumber || ''),
+  );
 
+  /**
+   * The row's entered date against the lot as the backend reports it.
+   *
+   * @returns the lot's expiration date change, or null when there is nothing to confirm.
+   */
+  const getLotChange = (lineItem, lotAvailability) => {
     const newExpiry = formatDateToString({
       date: parseStringToDate({
         date: lineItem.expirationDate,
@@ -35,7 +39,9 @@ const useConfirmExpirationDateChange = () => {
       dateFormat: DateFormatDateFns.YYYY_MM_DD,
     });
 
-    if (!lot.quantityOnHand || newExpiry === (lot.expirationDate ?? null)) {
+    // Only a lot that someone holds and whose date actually changes is worth confirming.
+    if (!lotAvailability?.quantityOnHand
+      || newExpiry === (lotAvailability.expirationDate ?? null)) {
       return null;
     }
 
@@ -43,25 +49,41 @@ const useConfirmExpirationDateChange = () => {
       code: lineItem.product.productCode,
       product: lineItem.product,
       lotNumber: lineItem.lotNumber,
-      previousExpiry: lot.expirationDate,
+      previousExpiry: lotAvailability.expirationDate,
       newExpiry,
-      depots: lot.depots,
+      depots: lotAvailability.depots,
     };
   };
 
-  const isSameLot = (item, otherItem) => item.product.id === otherItem.product.id
-    && item.lotNumber === otherItem.lotNumber
-    && item.expirationDate === otherItem.expirationDate;
+  const toProductLot = (lineItem) => ({
+    product: { id: lineItem.product.id },
+    lotNumber: lineItem.lotNumber || null,
+  });
+
+  const isSameChange = (change, otherChange) => change.product.id === otherChange.product.id
+    && change.lotNumber === otherChange.lotNumber
+    && change.newExpiry === otherChange.newExpiry;
 
   const findLotChangesToConfirm = async (lineItems) => {
-    const lotsToCheck = _.uniqWith(
-      lineItems.filter((item) => item.product?.id && item.lotNumber),
-      isSameLot,
-    );
+    // A row can come in without a product, since nothing validates that column yet.
+    const rows = lineItems.filter((item) => item.product?.id);
+
+    // The same lot can sit on several rows, so every lot is read only once.
+    const productLots = _.uniqWith(rows.map(toProductLot), _.isEqual);
+    if (!productLots.length) {
+      return [];
+    }
+
     try {
       spinner.show();
-      const changes = await Promise.all(lotsToCheck.map(getLotChange));
-      return changes.filter(Boolean);
+      const { data: { data: lotAvailabilities } } = await ProductApi
+        .getAvailabilityInAllDepots(productLots);
+
+      const lotChanges = rows
+        .map((row) => getLotChange(row, findLotAvailability(lotAvailabilities, row)))
+        .filter(Boolean);
+
+      return _.uniqWith(lotChanges, isSameChange);
     } finally {
       spinner.hide();
     }

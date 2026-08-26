@@ -135,11 +135,6 @@ class UrlMappings {
             controller = { "productApi" }
         }
 
-        "/api/products/$productId/inventoryItems/$lotNumber/availabilityInAllDepots" {
-            controller = { "productApi" }
-            action = [GET: "getLotAvailabilityInAllDepots"]
-        }
-
         "/api/products/$productId/inventoryItems/$lotNumber"(parseRequest: true) {
             controller = { "productApi" }
             action = [GET: "getInventoryItem"]
@@ -163,6 +158,11 @@ class UrlMappings {
         "/api/products/inventoryItems/lotNumbersWithExpirationDate" {
             controller = { "productApi" }
             action = [GET: "getLotNumbersWithExpirationDate"]
+        }
+
+        "/api/products/inventoryItems/getAvailabilityInAllDepots" {
+            controller = { "productApi" }
+            action = [POST: "getAvailabilityInAllDepots"]
         }
 
         "/api/facilities/$facilityId/products/classifications" {

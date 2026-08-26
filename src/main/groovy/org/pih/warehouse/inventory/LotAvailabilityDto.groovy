@@ -10,6 +10,10 @@ import org.pih.warehouse.core.date.LocalDateParser
  */
 class LotAvailabilityDto {
 
+    String productId
+
+    String lotNumber
+
     // A date-only LocalDate (not Date) so it serializes as e.g. "2028-03-01" instead of an instant that the server's
     // timezone offset can shift to the previous day (e.g. "2028-02-29T23:00:00Z"). See the LocalDate JSON marshaller.
     LocalDate expirationDate
@@ -21,6 +25,8 @@ class LotAvailabilityDto {
 
     static LotAvailabilityDto from(InventoryItem inventoryItem, List<DepotAvailabilityDto> depots) {
         return !inventoryItem ? null: new LotAvailabilityDto(
+                productId: inventoryItem.product?.id,
+                lotNumber: inventoryItem.lotNumber,
                 expirationDate: LocalDateParser.asLocalDate(inventoryItem.expirationDate, DateUtil.systemZoneId),
                 quantityOnHand: depots.sum(0) { it.quantityOnHand } as Integer,
                 depots: depots,

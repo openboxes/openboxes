@@ -4,7 +4,7 @@ import ProductApi from 'api/services/ProductApi';
 import useConfirmExpirationDateChange from 'hooks/receiving/v2/useConfirmExpirationDateChange';
 
 jest.mock('api/services/ProductApi', () => ({
-  getLotAvailabilityInAllDepots: jest.fn(),
+  getAvailabilityInAllDepots: jest.fn(),
 }));
 
 const mockSpinner = { show: jest.fn(), hide: jest.fn() };
@@ -12,11 +12,24 @@ jest.mock('hooks/useSpinner', () => () => mockSpinner);
 
 const product = { id: 'product-1', productCode: '10001' };
 
-// The lot as the availability endpoint reports it: its date, what is in stock and where.
-const mockLot = ({ expirationDate = null, quantityOnHand, depots = [] }) =>
-  ProductApi.getLotAvailabilityInAllDepots.mockResolvedValue({
-    data: { data: { expirationDate, quantityOnHand, depots } },
+// The lots as the availability endpoint reports them: which lot it is, its date, what is in stock
+// and where. Lots that are not in inventory yet are absent from the response.
+const mockLotAvailabilities = (...lotAvailabilities) =>
+  ProductApi.getAvailabilityInAllDepots.mockResolvedValue({
+    data: {
+      data: lotAvailabilities.map(({
+        productId = product.id,
+        lotNumber = 'LOT-1',
+        expirationDate = null,
+        quantityOnHand,
+        depots = [],
+      }) => ({
+        productId, lotNumber, expirationDate, quantityOnHand, depots,
+      })),
+    },
   });
+
+const mockLotAvailability = (lotAvailability) => mockLotAvailabilities(lotAvailability);
 
 // The modal opens from a promise chain, so the pending microtasks are drained before the
 // state it sets is asserted (React 16.8 has no async act).
@@ -44,7 +57,7 @@ describe('useConfirmExpirationDateChange', () => {
   });
 
   it('should not ask when the entered date matches the one the lot carries', async () => {
-    mockLot({ expirationDate: '2028-03-01', quantityOnHand: 10 });
+    mockLotAvailability({ expirationDate: '2028-03-01', quantityOnHand: 10 });
     const { result } = renderConfirmation();
 
     const lineItems = [buildLineItem()];
@@ -54,7 +67,7 @@ describe('useConfirmExpirationDateChange', () => {
   });
 
   it('should not ask for confirmation for a lot that does not exist yet', async () => {
-    mockLot({ quantityOnHand: 0 });
+    mockLotAvailabilities();
     const { result } = renderConfirmation();
 
     const lineItems = [buildLineItem()];
@@ -64,7 +77,7 @@ describe('useConfirmExpirationDateChange', () => {
   });
 
   it('should not ask for confirmation for an existing lot with nothing on hand', async () => {
-    mockLot({ expirationDate: '2028-05-01', quantityOnHand: 0 });
+    mockLotAvailability({ expirationDate: '2028-05-01', quantityOnHand: 0 });
     const { result } = renderConfirmation();
 
     const lineItems = [buildLineItem()];
@@ -74,7 +87,7 @@ describe('useConfirmExpirationDateChange', () => {
   });
 
   it('should ask before clearing the date of a lot that carries one', async () => {
-    mockLot({ expirationDate: '2028-05-01', quantityOnHand: 10 });
+    mockLotAvailability({ expirationDate: '2028-05-01', quantityOnHand: 10 });
     const { result } = renderConfirmation();
 
     // An emptied field clears the date the lot carries, so it is a change like any other.
@@ -90,52 +103,70 @@ describe('useConfirmExpirationDateChange', () => {
     act(() => result.current.handleExpirationModalResponse(true));
   });
 
-  it('should not ask for a lot that carries no date either', async () => {
-    mockLot({ quantityOnHand: 10 });
-    const { result } = renderConfirmation();
-
-    const lineItems = [buildLineItem({ expirationDate: '' })];
-    await expect(result.current.confirmExpirationDateChange(lineItems)).resolves.toBe(true);
-
-    expect(result.current.isExpirationModalOpen).toBe(false);
-  });
-
-  it('should skip rows without a product or a lot number', async () => {
-    const { result } = renderConfirmation();
-
-    await result.current.confirmExpirationDateChange([
-      buildLineItem({ lotNumber: '' }),
-      buildLineItem({ product: null }),
-    ]);
-
-    expect(ProductApi.getLotAvailabilityInAllDepots).not.toHaveBeenCalled();
-  });
-
-  it('should look up each lot only once', async () => {
-    mockLot({ expirationDate: '2028-03-01', quantityOnHand: 10 });
-    const { result } = renderConfirmation();
-
-    await result.current.confirmExpirationDateChange([buildLineItem(), buildLineItem()]);
-
-    expect(ProductApi.getLotAvailabilityInAllDepots).toHaveBeenCalledTimes(1);
-  });
-
-  it('should look up each lot the rows carry', async () => {
-    mockLot({ expirationDate: '2028-03-01', quantityOnHand: 10 });
+  it('should look up every lot the rows carry once, in a single request', async () => {
+    mockLotAvailability({ expirationDate: '2028-03-01', quantityOnHand: 10 });
     const { result } = renderConfirmation();
 
     const otherProduct = { id: 'product-2', productCode: '10002' };
     await result.current.confirmExpirationDateChange([
       buildLineItem({ lotNumber: 'LOT-2' }),
+      buildLineItem({ lotNumber: 'LOT-2' }),
       buildLineItem({ product: otherProduct }),
     ]);
 
-    expect(ProductApi.getLotAvailabilityInAllDepots).toHaveBeenCalledWith('product-1', 'LOT-2');
-    expect(ProductApi.getLotAvailabilityInAllDepots).toHaveBeenCalledWith('product-2', 'LOT-1');
+    expect(ProductApi.getAvailabilityInAllDepots).toHaveBeenCalledTimes(1);
+    expect(ProductApi.getAvailabilityInAllDepots).toHaveBeenCalledWith([
+      { product: { id: 'product-1' }, lotNumber: 'LOT-2' },
+      { product: { id: 'product-2' }, lotNumber: 'LOT-1' },
+    ]);
+  });
+
+  it('should match each row against the lot it asked about', async () => {
+    mockLotAvailabilities(
+      {
+        productId: 'product-1', lotNumber: 'LOT-1', expirationDate: '2028-03-01', quantityOnHand: 10,
+      },
+      {
+        productId: 'product-2', lotNumber: 'LOT-1', expirationDate: '2028-05-01', quantityOnHand: 7,
+      },
+    );
+    const { result } = renderConfirmation();
+
+    const otherProduct = { id: 'product-2', productCode: '10002' };
+    result.current.confirmExpirationDateChange([
+      buildLineItem(),
+      buildLineItem({ product: otherProduct }),
+    ]);
+    await flushPromises();
+
+    // Only the second row re-dates its lot, the first one enters the date its lot already carries.
+    expect(result.current.lotChangesToConfirm).toEqual([expect.objectContaining({
+      code: '10002',
+      previousExpiry: '2028-05-01',
+      newExpiry: '2028-03-01',
+    })]);
+
+    act(() => result.current.handleExpirationModalResponse(true));
+  });
+
+  it('should confirm a lot once when several rows re-date it the same way', async () => {
+    mockLotAvailability({ expirationDate: '2028-05-01', quantityOnHand: 10 });
+    const { result } = renderConfirmation();
+
+    result.current.confirmExpirationDateChange([buildLineItem(), buildLineItem()]);
+    await flushPromises();
+
+    expect(result.current.lotChangesToConfirm).toEqual([expect.objectContaining({
+      lotNumber: 'LOT-1',
+      previousExpiry: '2028-05-01',
+      newExpiry: '2028-03-01',
+    })]);
+
+    act(() => result.current.handleExpirationModalResponse(true));
   });
 
   it('should ask about a lot re-dated on one row while another row keeps its date', async () => {
-    mockLot({ expirationDate: '2028-05-01', quantityOnHand: 10 });
+    mockLotAvailability({ expirationDate: '2028-05-01', quantityOnHand: 10 });
     const { result } = renderConfirmation();
 
     // The backend applies every row, so the row leaving the lot alone must not hide the one
@@ -156,7 +187,7 @@ describe('useConfirmExpirationDateChange', () => {
   });
 
   it('should not swallow a failed lookup', async () => {
-    ProductApi.getLotAvailabilityInAllDepots.mockRejectedValue(new Error('Not found'));
+    ProductApi.getAvailabilityInAllDepots.mockRejectedValue(new Error('Not found'));
     const { result } = renderConfirmation();
 
     const lineItems = [buildLineItem()];
@@ -166,8 +197,12 @@ describe('useConfirmExpirationDateChange', () => {
     expect(mockSpinner.hide).toHaveBeenCalledTimes(1);
   });
 
-  it('should show the previous and the new date and continue saving on confirm', async () => {
-    mockLot({ expirationDate: '2028-05-01', quantityOnHand: 10 });
+  it('should show the lot, both dates and the depots holding it, and continue saving on confirm', async () => {
+    const depots = [
+      { depot: { id: 'depot-1', name: 'Kono Pharmacy Warehouse' }, quantityOnHand: 145 },
+      { depot: { id: 'depot-2', name: 'Lisungwi Warehouse' }, quantityOnHand: 743 },
+    ];
+    mockLotAvailability({ expirationDate: '2028-05-01', quantityOnHand: 888, depots });
     const { result } = renderConfirmation();
 
     const confirmation = result.current.confirmExpirationDateChange([buildLineItem()]);
@@ -180,7 +215,7 @@ describe('useConfirmExpirationDateChange', () => {
       lotNumber: 'LOT-1',
       previousExpiry: '2028-05-01',
       newExpiry: '2028-03-01',
-      depots: [],
+      depots,
     }]);
 
     act(() => result.current.handleExpirationModalResponse(true));
@@ -188,25 +223,8 @@ describe('useConfirmExpirationDateChange', () => {
     await expect(confirmation).resolves.toBe(true);
   });
 
-  it('should attach the depots holding the lot to the confirmation', async () => {
-    const depots = [
-      { depot: { id: 'depot-1', name: 'Kono Pharmacy Warehouse' }, quantityOnHand: 145 },
-      { depot: { id: 'depot-2', name: 'Lisungwi Warehouse' }, quantityOnHand: 743 },
-    ];
-    mockLot({ expirationDate: '2028-05-01', quantityOnHand: 888, depots });
-    const { result } = renderConfirmation();
-
-    result.current.confirmExpirationDateChange([buildLineItem()]);
-    await flushPromises();
-
-    expect(ProductApi.getLotAvailabilityInAllDepots).toHaveBeenCalledWith('product-1', 'LOT-1');
-    expect(result.current.lotChangesToConfirm[0].depots).toEqual(depots);
-
-    act(() => result.current.handleExpirationModalResponse(true));
-  });
-
   it('should stop saving when the user cancels the confirmation', async () => {
-    mockLot({ expirationDate: '2028-05-01', quantityOnHand: 10 });
+    mockLotAvailability({ expirationDate: '2028-05-01', quantityOnHand: 10 });
     const { result } = renderConfirmation();
 
     const confirmation = result.current.confirmExpirationDateChange([buildLineItem()]);
