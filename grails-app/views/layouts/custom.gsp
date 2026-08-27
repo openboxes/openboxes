@@ -49,6 +49,13 @@
     <!-- Grails Layout : write head element for page-->
     <g:layoutHead />
 
+    <%-- Uniform design theme: must load after layoutHead (so it overrides page-specific
+         CSS) and before customCss (so per-warehouse header colors keep precedence).
+         Set openboxes.layout.unified.enabled = false to keep the original design. --%>
+    <g:if test="${!(grailsApplication.config.openboxes.layout.unified.enabled in [false, 'false'])}">
+        <link rel="stylesheet" href="${resource(dir:'css',file:'openboxes-theme.css')}?v=${g.meta(name: 'app.version')}" type="text/css" media="all" />
+    </g:if>
+
     <g:render template="/common/customCss"/>
     <g:render template="/common/fullstory"/>
     <g:render template="/common/hotjar"/>

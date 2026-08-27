@@ -407,6 +407,12 @@ openboxes:
     bom:
         enabled: false
 
+    # Uniform design theme for the legacy (GSP) pages, so they match the React
+    # pages. On by default; set to false to keep the original legacy design.
+    layout:
+        unified:
+            enabled: true
+
     # User signup
     signup:
         enabled: true
