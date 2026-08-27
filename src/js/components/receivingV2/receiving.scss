@@ -137,6 +137,10 @@
     &--over {
       color: var(--color-yellow);
     }
+
+    &--canceled {
+      color: var(--color-red);
+    }
   }
 
   // Fade every value on disabled rows, keeping colours (e.g. status) just muted.

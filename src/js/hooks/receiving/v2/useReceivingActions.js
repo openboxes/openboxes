@@ -13,9 +13,9 @@ import ReceivingRowType from 'consts/receivingRowType';
 import useReceivingAutosave from 'hooks/receiving/v2/useReceivingAutosave';
 import useReceivingSaveAction from 'hooks/receiving/v2/useReceivingSaveAction';
 import { createNormalizedState } from 'utils/normalizationUtils';
+import getReceiptSummaryParams from 'utils/receiving/getReceiptSummaryParams';
 import {
   mergeStartedReceipt,
-  receiptGroupForView,
   transformReceiptSummary,
 } from 'utils/receiving/receiptSummaryRows';
 
@@ -62,11 +62,7 @@ const useReceivingActions = ({ view, sort, sortOrder } = {}) => {
   const fetchSummary = async () => {
     const { data: { data: summary } } = await receivingApi.getReceiptSummary(
       shipmentId,
-      _.omitBy({
-        group: receiptGroupForView(view),
-        // Backend binds `sort` as a SortParamList: "field" for ascending, "-field" for descending
-        sort: sort && `${sortOrder === 'desc' ? '-' : ''}${sort}`,
-      }, _.isEmpty),
+      getReceiptSummaryParams({ view, sort, sortOrder }),
     );
     return summary;
   };

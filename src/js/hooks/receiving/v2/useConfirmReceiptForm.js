@@ -13,6 +13,7 @@ import useConfirmReceiptActions from 'hooks/receiving/v2/useConfirmReceiptAction
 import useConfirmReceiptColumns from 'hooks/receiving/v2/useConfirmReceiptColumns';
 import useConfirmReceiptSaveActions from 'hooks/receiving/v2/useConfirmReceiptSaveActions';
 import useReceivingFilters from 'hooks/receiving/v2/useReceivingFilters';
+import useTableSorting from 'hooks/useTableSorting';
 import { formatDateToString } from 'utils/dateUtils';
 import getOptionalColumnsVisibility from 'utils/receiving/getOptionalColumnsVisibility';
 import hasAnyPreviousReceipt from 'utils/receiving/hasAnyPreviousReceipt';
@@ -42,9 +43,13 @@ const useConfirmReceiptForm = () => {
 
   // The check step renders in the view selected on the receiving step.
   const view = useSelector(getReceivingView);
+  // Sorting is done by the backend, so every header click reloads the summary.
+  const {
+    sortableProps, sort, order, resetSort,
+  } = useTableSorting();
   const {
     loading, receiptIdRef, lineItemsState, updateLineItemComment,
-  } = useConfirmReceiptActions(view);
+  } = useConfirmReceiptActions({ view, sort, sortOrder: order });
   const hasPreviousReceipts = hasAnyPreviousReceipt(lineItemsState);
   // Optional columns are read from the full state, so filtering the table down to rows
   // without a lot or a recipient does not collapse their columns.
@@ -55,6 +60,9 @@ const useConfirmReceiptForm = () => {
   const { columns } = useConfirmReceiptColumns({
     view,
     hasPreviousReceipts,
+    sortableProps,
+    sort,
+    order,
     ...columnsVisibility,
   });
   const commentModal = useCommentModal({ updateLineItemComment });
@@ -76,14 +84,18 @@ const useConfirmReceiptForm = () => {
     onCompleteReceipt: handleSubmit(onCompleteReceipt),
     onSaveAndExit,
     control,
+    view,
     table: {
       lineItemsState: visibleLineItemsState,
       columns,
+      sort,
+      order,
     },
     lineItemsState,
     filters: {
       updateFilterParams,
       clearFilterParams,
+      resetSort,
     },
     loading,
     commentModal,
