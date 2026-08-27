@@ -4204,3 +4204,34 @@ table.pvtTable tr th { background-color: #ddd; }
 .grayed {
     background-color: var(--gray-200) !important;
 }
+
+/* typography
+-------------------------------------------------------------*/
+/*
+ * body already carries 'Inter' (see the body rule above), but the selectors
+ * below set type with the `font:` shorthand, and a shorthand resets
+ * font-family along with everything else. That is what kept Inter from
+ * reaching tables, form controls and buttons. `font: inherit` hands them
+ * back to the body. Keep this block last so it lands after the YUI reset
+ * (reset-fonts-grids.css, linked earlier in custom.gsp).
+ */
+body {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+td, th {
+    font: inherit;
+    line-height: 1.45;
+}
+
+th {
+    /* `font: inherit` takes the body's weight too, so restore the emphasis */
+    font-weight: 600;
+}
+
+select, input, textarea, button,
+.button, .breadcrumb,
+.actions .action-menu-item a {
+    font: inherit;
+}
