@@ -1,11 +1,14 @@
 /**
  * openboxes-theme.css — uniform design theme for legacy (GSP) pages.
  *
- * Extracted verbatim from PR #6073 ("Add opt-in unified design for legacy and
- * mobile pages") by @christianallen. That PR gates this stylesheet behind a new
- * layout plus a SiteMesh decorator-resolution override; here it is linked
- * directly from custom.gsp behind the same config flag, which needs none of
- * that machinery. Mobile and React-side changes stay with #6073.
+ * Extracted from PR #6073 ("Add opt-in unified design for legacy and mobile
+ * pages") by @christianallen. That PR gates this stylesheet behind a new layout
+ * plus a SiteMesh decorator-resolution override; here it is linked directly
+ * from custom.gsp behind the same config flag, which needs none of that
+ * machinery. Mobile and React-side changes stay with #6073.
+ *
+ * One deviation from #6073: the .box scroll rule is wrapped in
+ * @supports selector(:has(*)) -- see the comment at that rule.
  *
  * Restyles pages using layouts/custom.gsp to match the newer React pages
  * (reference: /product/list). Specs are derived from the React stack's SCSS:
@@ -1347,17 +1350,25 @@ th {
    attached to the content, the shadow panes to the viewport, so a
    soft edge-shadow appears only on the side that has more to reveal
    and fades away once you reach that end. */
-.box {
-  overflow-x: auto;
-  background-image:
-    linear-gradient(to right, #ffffff 20%, rgba(255, 255, 255, 0)),
-    linear-gradient(to left, #ffffff 20%, rgba(255, 255, 255, 0)),
-    radial-gradient(farthest-side at 0 50%, rgba(32, 39, 80, 0.18), rgba(32, 39, 80, 0)),
-    radial-gradient(farthest-side at 100% 50%, rgba(32, 39, 80, 0.18), rgba(32, 39, 80, 0));
-  background-position: 0 0, 100% 0, 0 0, 100% 0;
-  background-repeat: no-repeat;
-  background-size: 32px 100%, 32px 100%, 20px 100%, 20px 100%;
-  background-attachment: local, local, scroll, scroll;
+/* Gated on :has() because the opt-out below is expressed entirely in :has()
+   selectors. An engine without :has() drops that whole rule -- a selector list
+   is invalidated by any unsupported selector in it -- which would leave every
+   .box scrolling, including form panels, whose Chosen/Select2 dropdowns would
+   then be clipped. Gating the cause means such an engine simply keeps the
+   pre-theme overflow behaviour instead. */
+@supports selector(:has(*)) {
+  .box {
+    overflow-x: auto;
+    background-image:
+      linear-gradient(to right, #ffffff 20%, rgba(255, 255, 255, 0)),
+      linear-gradient(to left, #ffffff 20%, rgba(255, 255, 255, 0)),
+      radial-gradient(farthest-side at 0 50%, rgba(32, 39, 80, 0.18), rgba(32, 39, 80, 0)),
+      radial-gradient(farthest-side at 100% 50%, rgba(32, 39, 80, 0.18), rgba(32, 39, 80, 0));
+    background-position: 0 0, 100% 0, 0 0, 100% 0;
+    background-repeat: no-repeat;
+    background-size: 32px 100%, 32px 100%, 20px 100%, 20px 100%;
+    background-attachment: local, local, scroll, scroll;
+  }
 }
 
 /* Visible, on-brand scrollbar so the overflow is discoverable before
