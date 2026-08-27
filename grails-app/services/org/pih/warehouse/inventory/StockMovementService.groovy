@@ -2867,13 +2867,17 @@ class StockMovementService {
                         stockMovementItem.reasonCode != ReasonCode.BACKORDER.toString()
 
                 if (isCancellation && !requisition.isEligibleForCancellation()) {
+                    // Order has progressed past Allocated (picking already started) - leave this
+                    // item entirely untouched. The picked/staged items must be manually rolled back
+                    // before it can be cancelled; flag it for review instead of attempting the change.
                     logManualCancellationReviewNeeded(requisitionItem, stockMovementItem.reasonCode)
-                } else {
-                    log.info 'Removing previous changes, picklists and shipments, if present'
-                    removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
-                    if (requisitionItem.isChanged() || requisitionItem.isCanceled() || requisitionItem.isBackordered()) {
-                        requisitionItem.undoChanges()
-                    }
+                    return
+                }
+
+                log.info 'Removing previous changes, picklists and shipments, if present'
+                removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
+                if (requisitionItem.isChanged() || requisitionItem.isCanceled() || requisitionItem.isBackordered()) {
+                    requisitionItem.undoChanges()
                 }
 
                 log.info "Revising quantity for ${requisitionItem.id}"
@@ -2944,11 +2948,15 @@ class StockMovementService {
         RequisitionItem requisitionItem = stockMovementItem.requisitionItem
         Requisition requisition = requisitionItem.requisition
 
-        if (requisition.isEligibleForCancellation()) {
-            removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
-        } else {
+        if (!requisition.isEligibleForCancellation()) {
+            // Order has progressed past Allocated (picking already started) - leave this item
+            // entirely untouched. The picked/staged items must be manually rolled back before it
+            // can be cancelled; flag it for review instead of attempting the cancellation.
             logManualCancellationReviewNeeded(requisitionItem, stockMovementItem.reasonCode)
+            return StockMovementItem.createFromRequisitionItem(requisitionItem)
         }
+
+        removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
 
         log.debug "Item canceled " + requisitionItem.id
         requisitionItem.cancelQuantity(stockMovementItem.reasonCode, stockMovementItem.comments)

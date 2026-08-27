@@ -432,6 +432,13 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         if (!reasonCode) {
             errors.rejectValue("cancelReasonCode", "requisitionItem.reasonCode.invalid")
         }
+        if (!requisition.isEligibleForCancellation()) {
+            // Order has progressed past Allocated (picking already started) - cancelling would
+            // require rolling back picklist/shipment items that may already be picked or staged.
+            // Refuse outright rather than cancelling the quantity while leaving the allocation in
+            // place; the picked items must be manually rolled back before this item can be cancelled.
+            errors.reject("requisitionItem.notEligibleForCancellation.message")
+        }
         if (hasErrors() || !validate()) {
             throw new ValidationException("Validation errors on requisition item", errors)
         }
@@ -439,13 +446,6 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         quantityCanceled = quantity
         cancelReasonCode = reasonCode
         cancelComments = comments
-
-        if (!requisition.isEligibleForCancellation()) {
-            // Order has progressed past Allocated (picking already started) - the picklist/
-            // shipment items are intentionally left in place. Cancelled-but-still-allocated
-            // is the signal that this item needs manual reconciliation.
-            return
-        }
 
         // Remove all picklist items
         def picklistItems = getPicklistItems()
@@ -635,7 +635,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
     def canCancelQuantity() {
         def startTime = System.currentTimeMillis()
-        def canCancelQuantity = !isChanged() && !isApproved() && !isCanceled()
+        def canCancelQuantity = !isChanged() && !isApproved() && !isCanceled() && requisition.isEligibleForCancellation()
 
         //println "canCancelQuantity: " + (System.currentTimeMillis() - startTime) + " ms"
         return canCancelQuantity
