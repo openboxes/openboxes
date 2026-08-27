@@ -19,6 +19,6 @@ export const getEditableReceivingRows = (lineItemsState) => (lineItemsState?.ids
  * quantity autofill skips rows by.
  */
 const getBlankReceivingRows = (lineItemsState) => getEditableReceivingRows(lineItemsState)
-  .filter((row) => row.quantityReceiving == null);
+  .filter((row) => row.quantityReceiving === null);
 
 export default getBlankReceivingRows;

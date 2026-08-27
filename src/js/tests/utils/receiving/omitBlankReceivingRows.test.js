@@ -48,7 +48,12 @@ describe('omitBlankReceivingRows()', () => {
   it('should drop a changes group where nothing was entered', () => {
     const state = buildState([
       buildRow('row-1', 'shipment-item-1', { rowType: ReceivingRowType.REPLACED }),
-      buildRow('row-2', 'shipment-item-1', { rowType: ReceivingRowType.TOGGLE }),
+      // The toggle row is built without a quantity field at all, not with an empty one.
+      {
+        rowId: 'row-2',
+        shipmentItemId: 'shipment-item-1',
+        rowType: ReceivingRowType.TOGGLE,
+      },
       buildRow('row-3', 'shipment-item-1', { rowType: ReceivingRowType.SPLIT_ITEM }),
       buildRow('row-4', 'shipment-item-2', { quantityReceiving: 1 }),
     ]);

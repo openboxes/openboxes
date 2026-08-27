@@ -2,7 +2,7 @@ import React from 'react';
 
 import { confirmAlert } from 'react-confirm-alert';
 
-import ZeroLinesConfirmModal from 'components/receivingV2/ZeroLinesConfirmModal';
+import ZeroLinesConfirmModal from 'components/receivingV2/zeroLinesModal/ZeroLinesConfirmModal';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 

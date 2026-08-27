@@ -385,7 +385,7 @@ const useConfirmReceiptColumns = ({
           // step warns about it.
           const quantityReceiving = item?.quantityReceiving
             ?? (hasPartialReceivingSupport ? null : 0);
-          const value = quantityReceiving == null ? null : formatNumber(quantityReceiving);
+          const value = quantityReceiving === null ? null : formatNumber(quantityReceiving);
           return quantityCell(value, 'react.receiving.receivingNow.label', 'Receiving Now');
         },
         size: 110,

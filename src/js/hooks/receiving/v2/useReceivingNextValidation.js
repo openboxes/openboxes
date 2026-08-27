@@ -23,7 +23,7 @@ const useReceivingNextValidation = ({ lineItemsState }) => {
   const editableRows = getEditableReceivingRows(lineItemsState);
 
   const isNextDisabled = editableRows.length > 0
-    && editableRows.every((row) => row.quantityReceiving == null);
+    && editableRows.every((row) => row.quantityReceiving === null);
 
   const validateBeforeNext = useCallback(async () => {
     const blankRows = getBlankReceivingRows(lineItemsState);

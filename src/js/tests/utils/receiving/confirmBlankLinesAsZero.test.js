@@ -6,8 +6,6 @@ import confirmBlankLinesAsZero from 'utils/receiving/confirmBlankLinesAsZero';
 import '@testing-library/jest-dom';
 
 jest.mock('react-confirm-alert', () => ({ confirmAlert: jest.fn() }));
-// react-icons ships untranspiled ES modules, which jest does not process.
-jest.mock('react-icons/all', () => ({ RiCloseFill: () => null }));
 
 const translate = (id, defaultMessage, data) => Object.entries(data ?? {}).reduce(
   (message, [key, value]) => message.replace(`\${${key}}`, value),
