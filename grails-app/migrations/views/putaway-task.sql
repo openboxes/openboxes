@@ -57,17 +57,8 @@ CREATE OR REPLACE VIEW putaway_task AS
         null as date_canceled,
         `order`.date_completed as date_completed,
         order_item.date_created,
-        order_item.last_updated,
-        COALESCE(shipment_item.backorder_reference, backorder_item_requisition.request_number) AS backorder_reference_number,
-        COALESCE(
-            backorder_item_requisition.id,
-            (SELECT r.id FROM requisition r WHERE r.request_number = shipment_item.backorder_reference LIMIT 1)
-        ) AS backorder_requisition_id
+        order_item.last_updated
     from order_item
              join `order` on `order`.id = order_item.order_id
              join order_type on order_type.id = `order`.order_type_id
-             left join receipt_item on receipt_item.id = order_item.receipt_item_id
-             left join shipment_item on shipment_item.id = receipt_item.shipment_item_id
-             left join requisition_item backorder_item on backorder_item.id = shipment_item.backorder_item_id
-             left join requisition backorder_item_requisition on backorder_item_requisition.id = backorder_item.requisition_id
     where order_type.code = 'PUTAWAY_ORDER';

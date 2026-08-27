@@ -121,12 +121,16 @@
                 </td>
                 <td>
                     <g:if test="${task.backorderReferenceNumber}">
-                        <g:if test="${task.backorderRequisition}">
-                            <g:link controller="stockMovement" action="show" id="${task.backorderRequisition.id}">
+                        <g:set var="backorderRequisitionId" value="${task.shipmentItem?.resolveBackorderReference()}"/>
+                        <g:if test="${backorderRequisitionId}">
+                            <g:link controller="stockMovement" action="show" id="${backorderRequisitionId}">
                                 ${task.backorderReferenceNumber}
                             </g:link>
                         </g:if>
-                        <g:else>${task.backorderReferenceNumber}</g:else>
+                        <g:else>
+                            ${task.backorderReferenceNumber}
+                            <small class="fade">(<warehouse:message code="default.pending.label"/>)</small>
+                        </g:else>
                     </g:if>
                     <g:else>-</g:else>
                 </td>

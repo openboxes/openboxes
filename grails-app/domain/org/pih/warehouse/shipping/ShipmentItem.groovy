@@ -22,6 +22,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 
 
@@ -51,15 +52,6 @@ class ShipmentItem implements Comparable, Serializable {
 
     String backorderReference
     RequisitionItem backorderItem
-
-    // Resolves the id of the outbound requisition named by backorderItem or backorderReference,
-    // computed in SQL (see mapping below) so that no per-row lookup by request number is needed
-    // to render it. This is a plain id, not a many-to-one association, because Grails' Hibernate
-    // domain binder doesn't support formula-mapped many-to-one properties (it casts the mapping
-    // value directly to Column, which fails for a Formula). Use backorderReferenceNumber (also
-    // SQL-computed) for the display label.
-    String backorderRequisitionId
-    String backorderReferenceNumber
 
     static belongsTo = [Shipment, OrderItem]
 
@@ -94,20 +86,6 @@ class ShipmentItem implements Comparable, Serializable {
         cache true
         orderItems joinTable: [name: 'order_shipment', key: 'shipment_item_id']
         invoiceItems joinTable: [name: 'shipment_invoice', key: 'shipment_item_id']
-        backorderRequisitionId formula: '''
-            (SELECT COALESCE(
-                (SELECT ri.requisition_id FROM requisition_item ri WHERE ri.id = backorder_item_id),
-                (SELECT r.id FROM requisition r WHERE r.request_number = backorder_reference LIMIT 1)
-            ))
-        '''
-        backorderReferenceNumber formula: '''
-            (SELECT COALESCE(
-                backorder_reference,
-                (SELECT r.request_number FROM requisition_item ri
-                 INNER JOIN requisition r ON r.id = ri.requisition_id
-                 WHERE ri.id = backorder_item_id)
-            ))
-        '''
     }
 
     static constraints = {
@@ -126,15 +104,25 @@ class ShipmentItem implements Comparable, Serializable {
         sortOrder(nullable: true)
         backorderReference(nullable: true)
         backorderItem(nullable: true)
-        // Derived/formula-mapped properties - not checked during validation, but Grails still
-        // requires a nullable constraint declared for them (see similar formula properties on
-        // Requisition.monthRequested and Shipment.shipmentItemCount).
-        backorderRequisitionId(nullable: true)
-        backorderReferenceNumber(nullable: true)
     }
 
     Boolean isFullyReceived() {
         return quantityReceivedAndCanceled >= quantity
+    }
+
+    // Resolves the id of the outbound requisition named by backorderItem or backorderReference.
+    // Returns null when the reference doesn't (yet) resolve to a requisition - expected, not an
+    // error, since the outbound demand may not exist in OpenBoxes yet.
+    String resolveBackorderReference() {
+        if (backorderItem) {
+            return backorderItem?.requisition?.id
+        }
+
+        if (backorderReference) {
+            return Requisition.findByRequestNumber(backorderReference)?.id
+        }
+
+        return null
     }
 
     /**
