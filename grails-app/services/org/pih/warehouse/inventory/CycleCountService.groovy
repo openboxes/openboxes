@@ -335,7 +335,7 @@ class CycleCountService {
 
     /**
      * Creates a cycle count request for a product whose quantity has fallen below zero, stamped with
-     * {@link CycleCountRequestType#NEGATIVE_INVENTORY} so that a request the system raised off a negative
+     * {@link CycleCountRequestType#SYSTEM_REQUEST} so that a request the system raised off a negative
      * quantity stays distinguishable from one a person scheduled.
      */
     CycleCountRequest getOrCreateCycleCountRequest(Location facility, Product product) {
@@ -349,7 +349,7 @@ class CycleCountService {
                 facility: facility,
                 product: product,
                 status: CycleCountRequestStatus.CREATED,
-                requestType: CycleCountRequestType.NEGATIVE_INVENTORY,
+                requestType: CycleCountRequestType.SYSTEM_REQUEST,
                 blindCount: false
         )
 

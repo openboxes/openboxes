@@ -5,7 +5,7 @@ enum CycleCountRequestType {
     MANUAL_REQUEST,
 
     /** Raised by the system when product quantity falls below zero. */
-    NEGATIVE_INVENTORY
+    SYSTEM_REQUEST
 
     @Override
     String toString() {

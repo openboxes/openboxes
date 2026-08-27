@@ -18,7 +18,7 @@ enum AllocationStep {
     NEGATIVE_INVENTORY(2),
 
     /** The fallback location, which always succeeds. No suitable location exists. */
-    INVENTORY_SHORTFALL(3)
+    FALLBACK_LOCATION(3)
 
     final Integer stepNumber
 

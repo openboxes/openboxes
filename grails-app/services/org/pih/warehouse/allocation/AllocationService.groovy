@@ -18,7 +18,6 @@ import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.CycleCountService
 import org.pih.warehouse.inventory.InventoryItem
@@ -279,7 +278,7 @@ class AllocationService {
         Product product = requisitionItem.product
         List<AvailableItem> allAvailableItems = stockMovementService.getAvailableItems(facility, requisitionItem, false)
 
-        allAvailableItems = allAvailableItems.findAll { !it.binLocation?.isInventoryShortfallLocation() }
+        allAvailableItems = allAvailableItems.findAll { !it.binLocation?.isNegativeInventoryFallbackLocation() }
 
         boolean isBackordered = requisitionItem.isBackordered()
         if (isBackordered) {
@@ -329,7 +328,7 @@ class AllocationService {
             return false
         }
 
-        return facility?.supports(ActivityCode.ALLOW_NEGATIVE_INVENTORY)
+        return facility?.isNegativeInventoryAllowed()
     }
 
     private List<SuggestedItem> getFallbackSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired,

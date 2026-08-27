@@ -167,7 +167,7 @@ enum ActivityCode {
     ALLOW_NEGATIVE_INVENTORY('ALLOW_NEGATIVE_INVENTORY'),
 
     // Marks the fallback location that accepts a stock movement when no other location can
-    INVENTORY_SHORTFALL('INVENTORY_SHORTFALL'),
+    NEGATIVE_INVENTORY_FALLBACK('NEGATIVE_INVENTORY_FALLBACK'),
 
     NONE('NONE')
 
@@ -262,7 +262,7 @@ enum ActivityCode {
                 TRACK_INTERNAL_TRANSACTIONS,
                 DISPLAY_STOCK,
                 ALLOW_NEGATIVE_INVENTORY,
-                INVENTORY_SHORTFALL,
+                NEGATIVE_INVENTORY_FALLBACK,
         ]
     }
 

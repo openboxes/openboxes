@@ -768,7 +768,7 @@ class ShipmentService {
             // Whether a bin is permitted to hold a negative quantity or is a shortfall location so it accepts
             // quantities below 0
             if (shipmentItem.binLocation?.isNegativeInventoryAllowed() ||
-                    shipmentItem.binLocation?.isInventoryShortfallLocation()) {
+                    shipmentItem.binLocation?.isNegativeInventoryFallbackLocation()) {
                 return true
             }
 

@@ -817,8 +817,8 @@ class LocationService {
     /**
      * The fallback location that accepts a stock movement when no other location is able to.
      */
-    Location getInventoryShortfallLocation(Location facility) {
-        return facility?.locations?.find { it.active && it.isInventoryShortfallLocation() }
+    Location getNegativeInventoryFallbackLocation(Location facility) {
+        return facility?.locations?.find { it.active && it.isNegativeInventoryFallbackLocation() }
     }
 
     def getInternalLocation(String parentLocationId, String internalLocationId) {

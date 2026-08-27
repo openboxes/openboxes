@@ -40,19 +40,19 @@ class AllocationFallbackService {
             return new AllocationFallbackResolution(negativeInventoryLocation, AllocationStep.NEGATIVE_INVENTORY)
         }
 
-        Location shortfallLocation = locationService.getInventoryShortfallLocation(facility)
+        Location shortfallLocation = locationService.getNegativeInventoryFallbackLocation(facility)
         if (!shortfallLocation) {
             log.warn("No inventory shortfall location configured for facility ${facility?.name}")
             return null
         }
-        return new AllocationFallbackResolution(shortfallLocation, AllocationStep.INVENTORY_SHORTFALL)
+        return new AllocationFallbackResolution(shortfallLocation, AllocationStep.FALLBACK_LOCATION)
     }
 
     private Location resolveNegativeInventoryLocation(Location facility, Product product, AllocationSourceStrategy strategy) {
         List<Location> candidateLocations = getCandidateBinLocations(facility, product)
                 .findAll {
                     it.active && it.isAllocable() &&
-                            !it.isInventoryShortfallLocation() && it.isNegativeInventoryAllowed()
+                            !it.isNegativeInventoryFallbackLocation() && it.isNegativeInventoryAllowed()
                 }
 
         if (!candidateLocations) {
