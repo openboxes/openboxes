@@ -431,9 +431,10 @@ class ProductAvailabilityService {
      * their depot and only positive holdings count. Lots that are not in inventory yet are left out of the result.
      */
     List<LotAvailabilityDto> getAvailabilityInAllDepots(AvailabilityCommand command) {
-        List<InventoryItem> inventoryItems = inventoryItemManager.getInventoryItems(command.productLots.collect {
+        List<ProductLot> productLots = command.productLots.collect {
             new ProductLot(product: it.product, lotNumber: it.lotNumber)
-        })
+        }
+        List<InventoryItem> inventoryItems = inventoryItemManager.getInventoryItems(productLots)
 
         if (!inventoryItems) {
             return []
@@ -441,12 +442,12 @@ class ProductAvailabilityService {
 
         // The query returns one row per lot and depot, with the quantities of the depot's bin locations summed up.
         // Those rows are then split per lot, since a single query covers all of the lots that were asked about.
-        Map<InventoryItem, List<DepotAvailabilityDto>> depotsByLot = ProductAvailability.createCriteria().list {
+        Map<InventoryItem, List<DepotAvailabilityDto>> productAvailabilitiesByDepotAndLot = ProductAvailability.createCriteria().list {
             resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
             projections {
                 groupProperty("inventoryItem", "inventoryItem")
                 groupProperty("location", "location")
-                sum("quantityOnHand", "quantity")
+                sum("quantityOnHand", "qoh")
             }
             'in'("inventoryItem", inventoryItems)
             gt("quantityOnHand", 0)
@@ -454,11 +455,11 @@ class ProductAvailabilityService {
             it.inventoryItem as InventoryItem
         }.collectEntries { InventoryItem inventoryItem, List<Map> depotRows ->
             [(inventoryItem): depotRows.collect {
-                DepotAvailabilityDto.from(it.location as Location, it.quantity as Integer)
+                DepotAvailabilityDto.from(it.location as Location, it.qoh as Integer)
             }.sort { it.depot.name }]
         }
 
-        return inventoryItems.collect { LotAvailabilityDto.from(it, depotsByLot[it] ?: []) }
+        return inventoryItems.collect { LotAvailabilityDto.from(it, productAvailabilitiesByDepotAndLot[it] ?: []) }
     }
 
     Integer getQuantityOnHand(Product product, Location location) {
