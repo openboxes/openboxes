@@ -223,12 +223,22 @@ class RequisitionService {
     }
 
     /**
-     * Get all requisitions eligible for auto allocation.
+     * Get all requisitions eligible for auto allocation, ordered by priority (highest first),
+     * then by delivery type code priority (lowest value first, e.g. PICK_UP before DEFAULT;
+     * a null delivery type code sorts last, see DeliveryTypeCode.getPriorityFormula()),
+     * then by date created (oldest first) as a final tiebreaker.
      * @param origin
      * @return requisition list
      */
     List<Requisition> getRequisitionsPendingAutoAllocation(Location origin) {
-        return Requisition.findAllByOriginAndStatusAndAutoAllocationRequested(origin, RequisitionStatus.CREATED, true)
+        return Requisition.createCriteria().list {
+            eq("origin", origin)
+            eq("status", RequisitionStatus.CREATED)
+            eq("autoAllocationRequested", true)
+            order("priority", "desc")
+            order("deliveryTypePriority", "asc")
+            order("dateCreated", "asc")
+        }
     }
 
     /**

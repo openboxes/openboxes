@@ -154,6 +154,7 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
     // Fulfillment properties
     Integer priority = 0
     DeliveryTypeCode deliveryTypeCode = DeliveryTypeCode.DEFAULT
+    Integer deliveryTypePriority
 
     // for controlling partial allocation and issuance
     Boolean autoAllocationRequested
@@ -198,6 +199,7 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
         approvers joinTable: [name: "requisition_approvers", key: "requisition_id"]
         eventLogs joinTable: [name: "requisition_event_log", key: "requisition_id", column: "event_log_id"], cascade: "all-delete-orphan"
         deliveryTypeCode enumType: "string"
+        deliveryTypePriority formula: DeliveryTypeCode.getPriorityFormula()
         orderTypeCode enumType: "string"
         allocationSourceStrategy enumType: "string"
     }
@@ -256,6 +258,7 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
         dateRejected(nullable: true)
         approvalRequired(nullable: true)
         deliveryTypeCode(nullable: true)
+        deliveryTypePriority(nullable: true)
         orderTypeCode(nullable: true)
         priority(nullable: true)
         autoAllocationRequested(nullable: true)
