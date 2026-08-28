@@ -162,7 +162,7 @@ class PutawayTaskService {
                 break
 
             case 'load':
-                load(task, data.quantity as BigDecimal, data.container as String, data.override as Boolean)
+                task = load(task, data.quantity as BigDecimal, data.container as String, data.override as Boolean)
                 break
 
             case 'complete':
@@ -288,15 +288,24 @@ class PutawayTaskService {
      * Load the putaway item into the assigned putaway container. Also, allows you to force the item into
      * a different putaway container (i.e. as long as it's not the destination location).
      *
+     * If the quantity being loaded is less than the task's full quantity, the order item is split the same
+     * way {@link #partialComplete} splits it: the loaded quantity becomes its own task moving into the
+     * container, and the un-sorted remainder is left behind as a new PENDING task at the origin location.
+     *
      * @param task
      * @param containerNumberOrId
      * @param override
+     * @return the putaway task representing the quantity that was actually loaded into the container
      */
-    void load(PutawayTask task, BigDecimal quantity, String containerNumberOrId, Boolean override = false) {
+    PutawayTask load(PutawayTask task, BigDecimal quantity, String containerNumberOrId, Boolean override = false) {
         log.info "Loading item into putaway container ${containerNumberOrId}"
 
         if (quantity > task.quantity) {
             throw new IllegalArgumentException("Quantity provided is more than requested. Please re-enter quantity")
+        }
+
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity provided must be greater than 0")
         }
 
         // Validate the container location exists
@@ -324,7 +333,13 @@ class PutawayTaskService {
             task.container = container
         }
 
-        task.quantity = quantity
+        // Split off the unsorted remainder (if any) into its own PENDING task before loading the rest,
+        // instead of just overwriting task.quantity and losing track of what wasn't actually sorted.
+        if (quantity < task.quantity) {
+            task = splitTaskForLoad(task, quantity)
+        } else {
+            task.quantity = quantity
+        }
 
         // Execute state transition
         executeStateTransition(task, PutawayTaskStatus.IN_PROGRESS)
@@ -334,6 +349,52 @@ class PutawayTaskService {
         transferToContainer(task)
 
         save(task)
+
+        return task
+    }
+
+    /**
+     * Splits the task's order item into the piece being loaded into the container (quantity) and a PENDING
+     * remainder left behind, unsorted, at the origin location. Mirrors the split performed by
+     * {@link #partialComplete}, except neither piece is COMPLETED here since loading into a container is
+     * not the end of the putaway.
+     */
+    private PutawayTask splitTaskForLoad(PutawayTask task, BigDecimal quantity) {
+        BigDecimal quantityRemaining = task.quantity - quantity
+
+        task.discard()
+
+        OrderItem currentItem = OrderItem.get(task.putawayOrderItem.id)
+        def currentItemParent = currentItem.parentOrderItem
+        currentItem.parentOrderItem = null
+        Order order = currentItem.order
+
+        Putaway putaway = Putaway.createFromOrder(order)
+        if (!putaway.orderedBy) {
+            putaway.orderedBy = AuthService.currentUser
+        }
+        PutawayItem itemToSplit = putaway.putawayItems.find { it.id == (currentItemParent?.id ?: currentItem.id) }
+
+        PutawayItem loadedSplitItem = createSplitPutawayItem(task, quantity, PutawayStatus.PENDING, task.destination)
+        PutawayItem remainingSplitItem = createSplitPutawayItem(task, quantityRemaining, PutawayStatus.PENDING, task.destination)
+        // The remainder hasn't been sorted into a container yet
+        remainingSplitItem.containerLocation = null
+
+        itemToSplit?.splitItems?.addAll([loadedSplitItem, remainingSplitItem])
+        putawayService.savePutaway(putaway)
+
+        currentItem.parentOrderItem = currentItemParent
+        currentItem.orderItemStatusCode = OrderItemStatusCode.CANCELED
+        currentItem.save(flush: true, failOnError: true)
+
+        OrderItem loadedOrderItem = order.orderItems.find {
+            it.parentOrderItem?.id == (currentItem.parentOrderItem?.id ?: currentItem.id) &&
+                    it.quantity == quantity &&
+                    it.containerLocation == task.container &&
+                    it.orderItemStatusCode == OrderItemStatusCode.PENDING
+        } as OrderItem
+
+        return PutawayTaskAdapter.toPutawayTask(loadedOrderItem)
     }
 
     void complete(PutawayTask task, String destinationId, String completedById, Boolean isCancelRemaining,
