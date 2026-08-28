@@ -34,10 +34,19 @@ class PutawayItemApiController {
     }
 
     def list() {
-        String locationId = params.id ?: params?.location?.id ?: session?.warehouse?.id
+        String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
         if (!location) {
             throw new IllegalArgumentException("Must provide location.id as request parameter")
+        }
+        List<PutawayItem> putawayItems = putawayService.getPutawayCandidates(location)
+        render([data: putawayItems.collect { it.toJson() }] as JSON)
+    }
+
+    def putawayCandidates() {
+        Location location = Location.get(params.id)
+        if (!location) {
+            throw new IllegalArgumentException("Must provide a valid location id in the request path")
         }
         List<PutawayItem> putawayItems = putawayService.getPutawayCandidatesExcludingOpenTasks(location)
         render([data: putawayItems.collect { it.toJson() }] as JSON)

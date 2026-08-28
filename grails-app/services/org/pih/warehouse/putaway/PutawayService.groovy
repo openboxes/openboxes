@@ -204,10 +204,7 @@ class PutawayService implements EventPublisher  {
         return sortByCategoryAndProduct(putawayItems)
     }
 
-    /**
-     * Mobile only. The web putaway workflow still uses {@link #getPutawayCandidates} so that adopting
-     * putaway tasks here cannot regress it.
-     */
+    // Mobile only, so adopting putaway tasks here cannot regress the web putaway workflow
     List<PutawayItem> getPutawayCandidatesExcludingOpenTasks(Location location) {
         return mergeCandidatesWithOpenTasks(getReadyPutawayItems(location), getOpenPutawayTasks(location))
     }
@@ -238,7 +235,7 @@ class PutawayService implements EventPublisher  {
     }
 
     // Deliberately the same status set the sortation flow filters on, so the two features cannot disagree
-    List<PutawayTask> getOpenPutawayTasks(Location facility) {
+    private List<PutawayTask> getOpenPutawayTasks(Location facility) {
         return PutawayTask.createCriteria().list {
             eq("facility", facility)
             'in'("status", PutawayTaskStatus.toSet(StatusCategory.OPEN))
@@ -246,7 +243,7 @@ class PutawayService implements EventPublisher  {
     }
 
     // Quantity already covered by an open task is subtracted, so a partially tasked bin still offers its remainder
-    List<PutawayItem> mergeCandidatesWithOpenTasks(List<PutawayItem> readyItems, List<PutawayTask> openTasks) {
+    private List<PutawayItem> mergeCandidatesWithOpenTasks(List<PutawayItem> readyItems, List<PutawayTask> openTasks) {
         Map<String, BigDecimal> taskedQuantityByKey = [:].withDefault { 0.0G }
         openTasks.each { PutawayTask task ->
             taskedQuantityByKey[candidateKey(task.location, task.inventoryItem, task.product)] += (task.quantity ?: 0.0G)
