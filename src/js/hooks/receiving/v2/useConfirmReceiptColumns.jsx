@@ -426,10 +426,16 @@ const useConfirmReceiptColumns = ({
             return null;
           }
           const { cancelRemainingIds } = table.options.meta ?? {};
+          // A location without partial receiving cancels whatever is left on every line of the
+          // receipt (ReceiptV2Service#cancelRemainingQuantities), so those leftovers read as
+          // canceled right away - there is no checkbox to flag them with.
+          const isRemainingCanceled = hasPartialReceivingSupport
+            ? Boolean(cancelRemainingIds?.has(item?.originalReceiptItemId))
+            : (item?.quantityRemaining ?? 0) > 0;
           const { className, value } = getReceivingRowStatus({
             quantityRemaining: item?.quantityRemaining,
             isCompleted: item?.isCompleted || item?.quantityRemaining === 0,
-            isRemainingCanceled: Boolean(cancelRemainingIds?.has(item?.originalReceiptItemId)),
+            isRemainingCanceled,
             translate,
             formatNumber,
           });
