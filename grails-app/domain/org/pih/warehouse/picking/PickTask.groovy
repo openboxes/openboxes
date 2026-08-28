@@ -49,12 +49,10 @@ class PickTask {
     Date dateCreated
     Date lastUpdated
 
-    // Order level pick progress, populated by PickTaskService.search and never persisted.
+    // Order level pick progress, aggregated across the whole requisition by the pick_task view.
     Integer orderTotalTaskCount
     Integer orderOpenTaskCount
     PickStatusCode orderPickStatusCode
-
-    static transients = ['orderTotalTaskCount', 'orderOpenTaskCount', 'orderPickStatusCode']
 
     static constraints = {
         requisition nullable: false
@@ -83,6 +81,9 @@ class PickTask {
         dateStaged nullable: true
         reasonCode nullable: true
         status nullable: false
+        orderTotalTaskCount nullable: true
+        orderOpenTaskCount nullable: true
+        orderPickStatusCode nullable: true
     }
 
     static mapping = {

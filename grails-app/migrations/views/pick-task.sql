@@ -70,9 +70,27 @@ SELECT
     END AS status,
 
     pli.date_created AS date_created,
-    pli.last_updated AS last_updated
+    pli.last_updated AS last_updated,
+
+    CAST(SUM(CASE WHEN NOT (COALESCE(pli.status, 'PENDING') = 'STAGED'
+                            AND COALESCE(pli.quantity_picked, 0) = 0)
+                  THEN 1 ELSE 0 END) OVER w AS SIGNED) AS order_total_task_count,
+    CAST(SUM(CASE WHEN COALESCE(pli.status, 'PENDING') NOT IN ('PICKED', 'STAGED')
+                  THEN 1 ELSE 0 END) OVER w AS SIGNED) AS order_open_task_count,
+    CASE
+        WHEN SUM(CASE WHEN COALESCE(pli.status, 'PENDING') NOT IN ('PICKED', 'STAGED')
+                      THEN 1 ELSE 0 END) OVER w = 0
+            THEN 'PICKED'
+        WHEN MAX(CASE WHEN COALESCE(pli.status, 'PENDING') IN ('PICKING', 'PICKED')
+                        OR (COALESCE(pli.status, 'PENDING') = 'STAGED'
+                            AND COALESCE(pli.quantity_picked, 0) > 0)
+                      THEN 1 ELSE 0 END) OVER w = 1
+            THEN 'PARTIALLY_PICKED'
+        ELSE 'NOT_PICKED'
+    END AS order_pick_status_code
 FROM picklist_item pli
          JOIN picklist pl ON pl.id = pli.picklist_id
          JOIN requisition r ON r.id = pl.requisition_id
          LEFT JOIN requisition_item ri ON ri.id = pli.requisition_item_id
-WHERE r.status IN ('PICKING', 'PICKED', 'STAGED');
+WHERE r.status IN ('PICKING', 'PICKED', 'STAGED')
+WINDOW w AS (PARTITION BY r.id);
