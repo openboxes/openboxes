@@ -495,6 +495,10 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
         return true
     }
 
+    boolean isEligibleForCancellation() {
+        return status < RequisitionStatus.PICKING
+    }
+
     /**
      * Message based count of ERROR_OCCURRED event logs, used as the allocation-attempt count for the retry cap.
      * FIXME: stand-in for a proper classification subtype on EventLog (see EventLogCode#ERROR_OCCURRED).
