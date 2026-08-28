@@ -517,7 +517,8 @@ class PutawayService implements EventPublisher  {
     OrderItem updateOrderItem(PutawayItem putawayItem, OrderItem orderItem) {
         OrderItemStatusCode orderItemStatusCode =
                 !putawayItem?.splitItems?.empty ? OrderItemStatusCode.CANCELED :
-                        putawayItem.putawayStatus == PutawayStatus.COMPLETED ? OrderItemStatusCode.COMPLETED : OrderItemStatusCode.PENDING
+                        putawayItem.putawayStatus == PutawayStatus.COMPLETED ? OrderItemStatusCode.COMPLETED :
+                                putawayItem.putawayStatus == PutawayStatus.CANCELED ? OrderItemStatusCode.CANCELED : OrderItemStatusCode.PENDING
 
         orderItem.orderItemStatusCode = orderItemStatusCode
         orderItem.product = putawayItem.product
