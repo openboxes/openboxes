@@ -39,7 +39,7 @@ class PutawayItemApiController {
         if (!location) {
             throw new IllegalArgumentException("Must provide location.id as request parameter")
         }
-        List<PutawayItem> putawayItems = putawayService.getPutawayCandidates(location)
+        List<PutawayItem> putawayItems = putawayService.getPutawayCandidatesExcludingOpenTasks(location)
         render([data: putawayItems.collect { it.toJson() }] as JSON)
     }
 

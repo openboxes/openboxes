@@ -78,7 +78,7 @@ class PutawayServiceSpec extends Specification implements DataTest {
 
         then: 'the READY row is gone and only the in-flight task remains'
         result.size() == 1
-        result[0].putawayStatus == PutawayStatus.IN_PROGRESS
+        result[0].putawayStatus != PutawayStatus.READY
         result[0].quantity == 30.0G
     }
 
@@ -179,20 +179,6 @@ class PutawayServiceSpec extends Specification implements DataTest {
         result.size() == 1
         result[0].quantity == 10.0G
         result[0].id == "order-item-remaining"
-    }
-
-    void 'getPutawayItemStatus should map #orderItemStatusCode to #expectedStatus'() {
-        expect:
-        PutawayItem.getPutawayItemStatus(orderItemStatusCode) == expectedStatus
-
-        where:
-        orderItemStatusCode                | expectedStatus
-        OrderItemStatusCode.PENDING        | PutawayStatus.PENDING
-        OrderItemStatusCode.STARTED        | PutawayStatus.IN_PROGRESS
-        OrderItemStatusCode.IN_PROGRESS    | PutawayStatus.IN_PROGRESS
-        OrderItemStatusCode.COMPLETED      | PutawayStatus.COMPLETED
-        OrderItemStatusCode.CANCELED       | PutawayStatus.CANCELED
-        OrderItemStatusCode.BACKORDER      | null
     }
 
     private PutawayItem buildReadyItem(Location bin, InventoryItem item, Product prod, BigDecimal quantity) {

@@ -188,9 +188,34 @@ class PutawayService implements EventPublisher  {
     }
 
     List<PutawayItem> getPutawayCandidates(Location location) {
+        List<PutawayItem> putawayItems = getReadyPutawayItems(location)
+
+        List<PutawayItem> pendingPutawayItems = getPendingItems(location)
+
+        putawayItems.removeAll { PutawayItem item ->
+            pendingPutawayItems.find {
+                item.currentLocation?.id == it.currentLocation?.id && item.inventoryItem?.id == it.inventoryItem?.id &&
+                        item.product?.id == it.product?.id
+            }
+        }
+
+        putawayItems.addAll(pendingPutawayItems)
+
+        return sortByCategoryAndProduct(putawayItems)
+    }
+
+    /**
+     * Mobile only. The web putaway workflow still uses {@link #getPutawayCandidates} so that adopting
+     * putaway tasks here cannot regress it.
+     */
+    List<PutawayItem> getPutawayCandidatesExcludingOpenTasks(Location location) {
+        return mergeCandidatesWithOpenTasks(getReadyPutawayItems(location), getOpenPutawayTasks(location))
+    }
+
+    private List<PutawayItem> getReadyPutawayItems(Location location) {
         List binLocationEntries = productAvailabilityService.getAvailableQuantityOnHandByBinLocation(location)
 
-        List<PutawayItem> readyItems = binLocationEntries.inject ([], { putawayItems,  binLocationEntry ->
+        return binLocationEntries.inject ([], { putawayItems,  binLocationEntry ->
             if (binLocationEntry.binLocation?.supports(ActivityCode.RECEIVE_STOCK)) {
                 InventoryLevel inventoryLevel = InventoryLevel.findByProductAndInventory(binLocationEntry.product, location.inventory)
 
@@ -209,9 +234,7 @@ class PutawayService implements EventPublisher  {
             }
 
             return putawayItems
-        })
-
-        return mergeCandidatesWithOpenTasks(readyItems, getOpenPutawayTasks(location))
+        }) as List<PutawayItem>
     }
 
     // Deliberately the same status set the sortation flow filters on, so the two features cannot disagree
@@ -236,6 +259,10 @@ class PutawayService implements EventPublisher  {
         List<PutawayItem> putawayItems = readyItems.findAll { it.quantity > 0 }
         putawayItems.addAll(openTasks.collect { PutawayItem.createFromOrderItem(it.putawayOrderItem) })
 
+        return sortByCategoryAndProduct(putawayItems)
+    }
+
+    private static List<PutawayItem> sortByCategoryAndProduct(List<PutawayItem> putawayItems) {
         return putawayItems.sort { a, b ->
             a.product?.category?.name <=> b.product?.category?.name ?:
                     a.product?.name <=> b.product?.name

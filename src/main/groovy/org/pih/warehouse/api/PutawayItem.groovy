@@ -96,9 +96,6 @@ class PutawayItem implements Validateable {
         switch (orderItemStatusCode) {
             case OrderItemStatusCode.PENDING:
                 return PutawayStatus.PENDING
-            case OrderItemStatusCode.STARTED:
-            case OrderItemStatusCode.IN_PROGRESS:
-                return PutawayStatus.IN_PROGRESS
             case OrderItemStatusCode.COMPLETED:
                 return PutawayStatus.COMPLETED
             case OrderItemStatusCode.CANCELED:
