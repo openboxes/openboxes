@@ -379,9 +379,13 @@ const useConfirmReceiptColumns = ({
             || item?.rowType === ReceivingRowType.TOGGLE) {
             return null;
           }
-          const value = item?.quantityReceiving == null
-            ? null
-            : formatNumber(item.quantityReceiving);
+          // A location without partial receiving receives every line of the shipment, so a line
+          // left blank is a line received as zero - the completion writes that zero over it
+          // (ReceiptV2Service#zeroOutEmptyReceivedQuantities), the confirmation on the receiving
+          // step warns about it.
+          const quantityReceiving = item?.quantityReceiving
+            ?? (hasPartialReceivingSupport ? null : 0);
+          const value = quantityReceiving === null ? null : formatNumber(quantityReceiving);
           return quantityCell(value, 'react.receiving.receivingNow.label', 'Receiving Now');
         },
         size: 110,
