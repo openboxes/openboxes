@@ -81,6 +81,7 @@ export const PREPAYMENT_INVOICE_ITEM_BY_ID = (id) => `${PREPAYMENT_INVOICE_ITEM_
 export const PRODUCT_API = `${API}/products`;
 export const INVENTORY_ITEM = (productCode, lotNumber) => `${CONTEXT_PATH}/${PRODUCT_API}/${productCode}/inventoryItems/${lotNumber}`;
 export const LOT_NUMBERS_WITH_EXPIRATION_DATE = `${PRODUCT_API}/inventoryItems/lotNumbersWithExpirationDate`;
+export const AVAILABILITY_IN_ALL_DEPOTS = `${PRODUCT_API}/inventoryItems/getAvailabilityInAllDepots`;
 export const AVAILABLE_ITEMS = `${PRODUCT_API}/availableItems`;
 
 // STOCK LIST

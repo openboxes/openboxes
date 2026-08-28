@@ -200,6 +200,7 @@ class ReceiptV2Service {
         Date expirationDate = item.expirationDate ? JavaUtilDateParser.asDate(item.expirationDate) : null
         InventoryItem inventoryItem = inventoryItemManager.getOrCreateInventoryItem(
                 item.product, item.lotNumber, expirationDate)
+        inventoryItemManager.updateExpirationDate(inventoryItem, expirationDate)
 
         // Lines created here are split lines - the original line always exists already (created when the receipt
         // was started), so the split flag is owned by the server: forced on creation, never rebound afterwards.

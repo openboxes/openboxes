@@ -29,7 +29,7 @@ class ReceiptItemEditReceivingInfoRequest implements Validateable {
     // find or create the inventory item that the receipt item points at.
     String lotNumber
 
-    // Expiration date of the lot. Only used when we need to create a new inventory item for the given lot number.
+    // Expiration date of the lot, applied to its inventory item whether that item is created here or already existed.
     // A date-only LocalDate (not Date) so that "03/01/2028" is unambiguous and never gets shifted by the server's
     // timezone offset when bound or serialized (see LocalDateValueConverter / the LocalDate JSON marshaller).
     LocalDate expirationDate

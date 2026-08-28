@@ -1694,6 +1694,35 @@ div.search-input:focus-within {
   background-color: rgba(0, 0, 0, 0.45) !important;
 }
 
+.modal-content:has(.expiry-change-modal) {
+  top: 15%;
+
+  .modal-content__main {
+    max-height: calc(75vh - 200px);
+  }
+}
+
+.expiry-change-modal {
+  &__warning {
+    margin-top: 16px;
+  }
+
+  .expiry-change {
+    &:not(:first-child) {
+      margin-top: 24px;
+    }
+
+    &__product {
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    &__title {
+      margin-bottom: 8px;
+    }
+  }
+}
+
 .modal-content {
   position: absolute;
   top: 20%;
