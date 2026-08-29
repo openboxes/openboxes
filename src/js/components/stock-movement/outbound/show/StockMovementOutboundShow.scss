@@ -1,0 +1,32 @@
+.stock-movement-show-content {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+}
+
+.stock-movement-show-details {
+  flex: 0 0 350px;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 16px;
+
+  .stock-movement-show-details-label {
+    font-weight: 600;
+    color: #6c757d;
+    padding: 6px 12px 6px 0;
+    white-space: nowrap;
+    vertical-align: top;
+    font-size: 0.85rem;
+  }
+
+  .stock-movement-show-details-value {
+    padding: 6px 0;
+    font-size: 0.85rem;
+  }
+}
+
+.stock-movement-show-line-items {
+  flex: 1;
+  min-width: 0;
+}
