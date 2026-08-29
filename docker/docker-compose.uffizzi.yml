@@ -1,0 +1,41 @@
+# Uffizzi preview-environment compose template.
+#
+# This is NOT used to run OpenBoxes locally (use docker-compose.yml for that). The Preview
+# Environment workflow substitutes the ${OB_IMAGE} placeholder with the freshly built ttl.sh
+# image and hands the rendered file to Uffizzi, which deploys it as an ephemeral preview and
+# exposes the app via the ingress below.
+x-uffizzi:
+  ingress:
+    service: app
+    port: 8080
+
+services:
+  app:
+    image: "${OB_IMAGE}"
+    # Uffizzi doesn't honor compose's depends_on healthcheck gating, so block until the db is
+    # accepting TCP connections before launching the app (which connects to the db at boot).
+    entrypoint:
+      - /bin/bash
+      - -c
+      - 'until (echo > /dev/tcp/db/3306) 2>/dev/null; do echo "waiting for db:3306..."; sleep 2; done; exec java -Dgrails.env=prod -jar /app/openboxes.war'
+    environment:
+      DATASOURCE_URL: "jdbc:mysql://db/openboxes?serverTimezone=UTC&useSSL=false"
+      DATASOURCE_USERNAME: openboxes
+      DATASOURCE_PASSWORD: openboxes
+      JAVA_TOOL_OPTIONS: "-Xms512m -Xmx1024m -XX:+UseParallelGC -Djava.awt.headless=true"
+    deploy:
+      resources:
+        limits:
+          memory: 1536M
+
+  db:
+    image: mariadb:10
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: openboxes
+      MYSQL_USER: openboxes
+      MYSQL_PASSWORD: openboxes
+    deploy:
+      resources:
+        limits:
+          memory: 512M
