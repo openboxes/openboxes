@@ -33,6 +33,9 @@ import struckIfChanged from 'utils/receiving/struckIfChanged';
 const useConfirmReceiptColumns = ({
   view,
   hasPreviousReceipts,
+  sortableProps,
+  sort,
+  order,
   showLotNumber,
   showExpirationDate,
   showRecipient,
@@ -46,6 +49,12 @@ const useConfirmReceiptColumns = ({
   const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
   const isShipmentFromPurchaseOrder = useSelector(getIsShipmentFromPurchaseOrder);
   const isPackingListView = view === ReceivingView.PACKING_LIST;
+
+  const sortHeaderProps = (columnId) => (isPackingListView ? {} : {
+    sortable: true,
+    columnId,
+    ...sortableProps,
+  });
 
   // Rows are { id, meta } objects; the entities live in the normalized state
   // passed through the table `meta`, so each cell reads its item by id at render
@@ -67,8 +76,9 @@ const useConfirmReceiptColumns = ({
     />
   );
 
-  const quantityHeader = (label, defaultLabel) => (
+  const quantityHeader = (label, defaultLabel, columnId) => (
     <TableHeaderCell
+      {...(columnId ? sortHeaderProps(columnId) : {})}
       tooltip
       tooltipLabel={translate(label, defaultLabel)}
       className="receiving-table__quantity"
@@ -146,6 +156,7 @@ const useConfirmReceiptColumns = ({
         id: receivingColumns.PRODUCT_CODE,
         header: () => (
           <TableHeaderCell
+            {...sortHeaderProps(receivingColumns.PRODUCT_CODE)}
             tooltip
             tooltipLabel={translate('react.receiving.code.label', 'Code')}
           >
@@ -173,6 +184,7 @@ const useConfirmReceiptColumns = ({
         id: receivingColumns.PRODUCT,
         header: () => (
           <TableHeaderCell
+            {...sortHeaderProps(receivingColumns.PRODUCT)}
             tooltip
             tooltipLabel={translate('react.receiving.product.label', 'Product')}
           >
@@ -206,6 +218,7 @@ const useConfirmReceiptColumns = ({
           id: receivingColumns.SUPPLIER_CODE,
           header: () => (
             <TableHeaderCell
+              {...sortHeaderProps(receivingColumns.SUPPLIER_CODE)}
               tooltip
               tooltipLabel={translate('react.receiving.supplierItemCode.label', 'Supplier Item Code')}
               className="text-left"
@@ -239,6 +252,7 @@ const useConfirmReceiptColumns = ({
           id: receivingColumns.LOT_NUMBER,
           header: () => (
             <TableHeaderCell
+              {...sortHeaderProps(receivingColumns.LOT_NUMBER)}
               tooltip
               tooltipLabel={translate('react.receiving.lotSerialNo.label', 'Lot/Serial No.')}
             >
@@ -267,6 +281,7 @@ const useConfirmReceiptColumns = ({
           id: receivingColumns.EXPIRATION_DATE,
           header: () => (
             <TableHeaderCell
+              {...sortHeaderProps(receivingColumns.EXPIRATION_DATE)}
               tooltip
               tooltipLabel={translate('react.receiving.expirationDate.label', 'Expiration date')}
             >
@@ -294,6 +309,7 @@ const useConfirmReceiptColumns = ({
           id: receivingColumns.RECIPIENT,
           header: () => (
             <TableHeaderCell
+              {...sortHeaderProps(receivingColumns.RECIPIENT)}
               tooltip
               tooltipLabel={translate('react.receiving.recipient.label', 'Recipient')}
             >
@@ -319,7 +335,11 @@ const useConfirmReceiptColumns = ({
       ] : []),
       columnHelper.display({
         id: receivingColumns.QUANTITY_SHIPPED,
-        header: () => quantityHeader('react.receiving.shipped.label', 'Shipped'),
+        header: () => quantityHeader(
+          'react.receiving.shipped.label',
+          'Shipped',
+          receivingColumns.QUANTITY_SHIPPED,
+        ),
         cell: ({ row, table }) => {
           const item = getItem(row, table);
           if (isSplitItemOrToggle(item)) {
@@ -405,9 +425,17 @@ const useConfirmReceiptColumns = ({
           if (isSplitItemOrToggle(item)) {
             return null;
           }
+          const { cancelRemainingIds } = table.options.meta ?? {};
+          // A location without partial receiving cancels whatever is left on every line of the
+          // receipt (ReceiptV2Service#cancelRemainingQuantities), so those leftovers read as
+          // canceled right away - there is no checkbox to flag them with.
+          const isRemainingCanceled = hasPartialReceivingSupport
+            ? Boolean(cancelRemainingIds?.has(item?.originalReceiptItemId))
+            : (item?.quantityRemaining ?? 0) > 0;
           const { className, value } = getReceivingRowStatus({
             quantityRemaining: item?.quantityRemaining,
             isCompleted: item?.isCompleted || item?.quantityRemaining === 0,
+            isRemainingCanceled,
             translate,
             formatNumber,
           });
@@ -496,10 +524,12 @@ const useConfirmReceiptColumns = ({
           ),
           cell: ({ row, table }) => {
             const item = getItem(row, table);
-            if (isSplitItemOrToggle(item)) {
+            // Only the lines that still have a quantity left to cancel get a checkbox - the
+            // predicate also covers the split item and toggle rows of a changes group.
+            if (!isCancellableRow(item)) {
               return null;
             }
-            const { originalReceiptItemId } = item ?? {};
+            const { originalReceiptItemId } = item;
             const { cancelRemainingIds, onToggleCancelRemaining } = table.options.meta ?? {};
             return (
               <TableCell className="rt-td d-flex justify-content-center align-items-center">
@@ -507,7 +537,6 @@ const useConfirmReceiptColumns = ({
                   noWrapper
                   value={Boolean(cancelRemainingIds?.has(originalReceiptItemId))}
                   onChange={() => onToggleCancelRemaining?.(originalReceiptItemId)}
-                  disabled={!isCancellableRow(item)}
                 />
               </TableCell>
             );
@@ -527,6 +556,8 @@ const useConfirmReceiptColumns = ({
     showExpirationDate,
     showRecipient,
     showPackLevel,
+    sort,
+    order,
   ]);
 
   return { columns };

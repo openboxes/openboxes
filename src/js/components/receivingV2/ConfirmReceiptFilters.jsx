@@ -1,13 +1,14 @@
 import React, { useCallback, useMemo } from 'react';
 
 import PropTypes from 'prop-types';
-import { RiCloseCircleLine, RiLogoutBoxRLine } from 'react-icons/ri';
+import { RiCloseCircleLine, RiLogoutBoxRLine, RiRefreshLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import { getHasPartialReceivingSupport, getReceivingTranslationsFetched } from 'selectors';
 
 import FilterForm from 'components/Filter/FilterForm';
 import Button from 'components/form-elements/Button';
 import filterFields from 'components/receivingV2/FilterFields';
+import { ReceivingView } from 'consts/receivingViewOptions';
 import useTranslate from 'hooks/useTranslate';
 
 /**
@@ -16,8 +17,10 @@ import useTranslate from 'hooks/useTranslate';
  * on the right.
  */
 const ConfirmReceiptFilters = ({
+  view,
   onCancelAllRemaining,
   onSaveAndExit,
+  onResetSort,
   updateFilterParams,
   clearFilterParams,
 }) => {
@@ -53,6 +56,15 @@ const ConfirmReceiptFilters = ({
         />
       </div>
       <div className="d-flex gap-8">
+        {view !== ReceivingView.PACKING_LIST && (
+          <Button
+            label="react.receiving.resetSorting.label"
+            defaultLabel="Reset sorting"
+            variant="secondary"
+            onClick={onResetSort}
+            EndIcon={<RiRefreshLine size={16} />}
+          />
+        )}
         {hasPartialReceivingSupport && (
           <Button
             label="react.receiving.cancelAllRemaining.label"
@@ -75,8 +87,10 @@ const ConfirmReceiptFilters = ({
 };
 
 ConfirmReceiptFilters.propTypes = {
+  view: PropTypes.string.isRequired,
   onCancelAllRemaining: PropTypes.func,
   onSaveAndExit: PropTypes.func,
+  onResetSort: PropTypes.func,
   updateFilterParams: PropTypes.func.isRequired,
   clearFilterParams: PropTypes.func.isRequired,
 };
@@ -84,6 +98,7 @@ ConfirmReceiptFilters.propTypes = {
 ConfirmReceiptFilters.defaultProps = {
   onCancelAllRemaining: () => {},
   onSaveAndExit: () => {},
+  onResetSort: () => {},
 };
 
 export default ConfirmReceiptFilters;

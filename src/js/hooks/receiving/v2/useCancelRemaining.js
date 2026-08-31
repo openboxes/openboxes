@@ -3,14 +3,14 @@ import { useCallback, useMemo, useState } from 'react';
 import ReceivingRowType from 'consts/receivingRowType';
 
 // A row can be canceled when it is the only line that was not split or the replaced row standing
-// above its split lines, still has something left to receive, and its shipment item has an
-// original line (isSplitItem: false) to carry the cancel - the only line the backend accepts
-// the flag on.
+// above its split lines, still has a quantity left over once this receipt is counted in (the same
+// quantity the status cell reads as "N remaining"), and its shipment item has an original line
+// (isSplitItem: false) to carry the cancel - the only line the backend accepts the flag on.
+// A line the pending receipt already covers has nothing to cancel, so it is not cancellable.
 export const isCancellableRow = (row) =>
   (row?.rowType === null || row?.rowType === ReceivingRowType.REPLACED)
   && Boolean(row.originalReceiptItemId)
-  && !row.isCompleted
-  && (row.quantityAvailableToReceive ?? 0) > 0;
+  && (row.quantityRemaining ?? 0) > 0;
 
 // Ids of the original lines the given rows cancel through. Keyed by the original line, not by the
 // row, because that is what the completion endpoint expects and row ids change on every reload.

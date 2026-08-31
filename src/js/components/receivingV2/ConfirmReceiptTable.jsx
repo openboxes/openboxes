@@ -14,6 +14,8 @@ const ConfirmReceiptTable = ({
   loading,
   commentModal,
   cancelRemaining,
+  sort,
+  order,
 }) => {
   const {
     isOpen: isCommentModalOpen,
@@ -51,6 +53,9 @@ const ConfirmReceiptTable = ({
   return (
     <div className="receiving-table receiving-table--striped">
       <DataTable
+        // Force TanStack table remount whenever the sort changes so the initialState
+        // (`expanded: true`) re-applies and every changes group is expanded again.
+        key={`${sort ?? ''}-${order ?? ''}`}
         columns={columns}
         data={data}
         totalCount={data.length}
@@ -120,6 +125,13 @@ ConfirmReceiptTable.propTypes = {
     ids: PropTypes.instanceOf(Set).isRequired,
     toggle: PropTypes.func.isRequired,
   }).isRequired,
+  sort: PropTypes.string,
+  order: PropTypes.string,
+};
+
+ConfirmReceiptTable.defaultProps = {
+  sort: null,
+  order: null,
 };
 
 export default ConfirmReceiptTable;

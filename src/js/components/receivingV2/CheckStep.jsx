@@ -14,6 +14,7 @@ const CheckStep = ({ completeReceiptRef }) => {
     onCompleteReceipt,
     onSaveAndExit,
     control,
+    view,
     table,
     lineItemsState,
     filters,
@@ -30,10 +31,12 @@ const CheckStep = ({ completeReceiptRef }) => {
     <div className="receiving-container confirm-receipt">
       <ConfirmReceiptInfo control={control} lineItemsState={lineItemsState} />
       <ConfirmReceiptFilters
+        view={view}
         updateFilterParams={filters.updateFilterParams}
         clearFilterParams={filters.clearFilterParams}
         onCancelAllRemaining={cancelRemaining.selectAll}
         onSaveAndExit={onSaveAndExit}
+        onResetSort={filters.resetSort}
       />
       <ConfirmReceiptTable
         lineItemsState={table.lineItemsState}
@@ -41,6 +44,8 @@ const CheckStep = ({ completeReceiptRef }) => {
         loading={loading}
         commentModal={commentModal}
         cancelRemaining={cancelRemaining}
+        sort={table.sort}
+        order={table.order}
       />
     </div>
   );
