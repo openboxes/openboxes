@@ -70,6 +70,20 @@ class RequisitionEventManager {
     }
 
     /**
+     * The inverse of toEventCode(RequisitionStatus) - the requisition status an Event's EventType represents,
+     * so callers can compare two requisition lifecycle positions directly instead of comparing an EventType's
+     * sortOrder against a RequisitionStatus's sortOrder (two different things that only happen to share the
+     * same numbering by convention). Returns null for an EventType with no matching RequisitionStatus.
+     */
+    RequisitionStatus toRequisitionStatus(EventType eventType) {
+        if (eventType?.eventCode == EventCode.CANCELLED) {
+            return RequisitionStatus.CANCELED
+        }
+
+        return RequisitionStatus.values().find { it.name() == eventType?.eventCode?.name() }
+    }
+
+    /**
      * Create a new Requisition Event representing a status transition, then logs the action.
      */
     Event createEvent(Requisition requisition, EventCode eventCode, Location location) {

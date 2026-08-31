@@ -25,8 +25,15 @@ class RequisitionSpec extends Specification implements DomainUnitTest<Requisitio
         // requisition.status = X now has a side effect (see Requisition#setStatus): it asks
         // RequisitionEventManager to record the transition. Stub it out by default so unrelated tests that merely
         // construct a Requisition with a status aren't affected; tests that care about this behavior install
-        // their own mock instead.
-        Requisition.metaClass.getRequisitionEventManager = { -> Stub(RequisitionEventManager) }
+        // their own mock instead. toRequisitionStatus is delegated to a real (collaborator-free, since it's a
+        // pure mapping) instance, since getAllocationAttemptCount/getIssuanceAttemptCount/getMostRecentErrorMessage
+        // rely on it even in tests that never touch setStatus.
+        RequisitionEventManager realManager = new RequisitionEventManager(null, null)
+        Requisition.metaClass.getRequisitionEventManager = { ->
+            Stub(RequisitionEventManager) {
+                toRequisitionStatus(_ as EventType) >> { EventType eventType -> realManager.toRequisitionStatus(eventType) }
+            }
+        }
     }
 
     void cleanup() {
@@ -99,6 +106,122 @@ class RequisitionSpec extends Specification implements DomainUnitTest<Requisitio
 
         expect:
         requisition.getMostRecentErrorMessage() == "Allocation failed: second"
+    }
+
+    void 'getMostRecentErrorMessage should return null once a real transition has happened since the error'() {
+        given:
+        Requisition requisition = new Requisition()
+
+        EventLog error = new EventLog(eventLogCode: EventLogCode.ERROR_OCCURRED, message: "Allocation failed: boom")
+        error.dateCreated = Instant.now().minusSeconds(60)
+        requisition.eventLogs = [error]
+
+        // The requisition went on to actually reach PICKING after the error was logged, e.g. a later retry
+        // succeeded - the error is no longer the current problem.
+        Date laterDate = new Date()
+        Event laterEvent = new Event(eventDate: laterDate, eventType: new EventType(eventCode: EventCode.PICKING, sortOrder: 7))
+        laterEvent.dateCreated = laterDate
+        requisition.events = [laterEvent]
+
+        expect:
+        requisition.getMostRecentErrorMessage() == null
+    }
+
+    void 'getMostRecentErrorMessage should still return the message when the error is the most recent thing that happened'() {
+        given:
+        Requisition requisition = new Requisition()
+
+        Date earlierDate = new Date() - 1
+        Event earlierEvent = new Event(eventDate: earlierDate, eventType: new EventType(eventCode: EventCode.CREATED, sortOrder: 1))
+        earlierEvent.dateCreated = earlierDate
+        requisition.events = [earlierEvent]
+
+        EventLog error = new EventLog(eventLogCode: EventLogCode.ERROR_OCCURRED, message: "Allocation failed: boom")
+        error.dateCreated = Instant.now()
+        requisition.eventLogs = [error]
+
+        expect:
+        requisition.getMostRecentErrorMessage() == "Allocation failed: boom"
+    }
+
+    void 'getAllocationAttemptCount should count all matching errors when there is no recorded event yet'() {
+        given:
+        Requisition requisition = new Requisition()
+        EventLog first = new EventLog(eventLogCode: EventLogCode.ERROR_OCCURRED, message: "Allocation failed: first")
+        first.dateCreated = Instant.now().minusSeconds(120)
+        EventLog second = new EventLog(eventLogCode: EventLogCode.ERROR_OCCURRED, message: "Allocation failed: second")
+        second.dateCreated = Instant.now()
+        requisition.eventLogs = [first, second]
+
+        expect:
+        requisition.getAllocationAttemptCount() == 2
+    }
+
+    void 'getAllocationAttemptCount should not count errors from an earlier cycle, before the most recent event'() {
+        given:
+        Requisition requisition = new Requisition()
+
+        Date recently = new Date()
+        Event mostRecentEvent = new Event(eventDate: recently, eventType: new EventType(eventCode: EventCode.CREATED, sortOrder: 1))
+        mostRecentEvent.dateCreated = recently
+        requisition.events = [mostRecentEvent]
+
+        EventLog oldError = new EventLog(eventLogCode: EventLogCode.ERROR_OCCURRED, message: "Allocation failed: from an earlier cycle")
+        oldError.dateCreated = Instant.EPOCH
+        EventLog newError = new EventLog(eventLogCode: EventLogCode.ERROR_OCCURRED, message: "Allocation failed: this cycle")
+        newError.dateCreated = Instant.now()
+        requisition.eventLogs = [oldError, newError]
+
+        expect:
+        requisition.getAllocationAttemptCount() == 1
+    }
+
+    void 'getAllocationAttemptCount should return 0 once the requisition has reached PICKING'() {
+        given:
+        Requisition requisition = new Requisition()
+        Date now = new Date()
+        Event pickingEvent = new Event(eventDate: now, eventType: new EventType(eventCode: EventCode.PICKING, sortOrder: 7))
+        pickingEvent.dateCreated = now
+        requisition.events = [pickingEvent]
+
+        EventLog error = new EventLog(eventLogCode: EventLogCode.ERROR_OCCURRED, message: "Allocation failed: boom")
+        error.dateCreated = Instant.now()
+        requisition.eventLogs = [error]
+
+        expect:
+        requisition.getAllocationAttemptCount() == 0
+    }
+
+    void 'getIssuanceAttemptCount should count Issuance failed errors recorded since the most recent event'() {
+        given:
+        Requisition requisition = new Requisition()
+        Date now = new Date()
+        Event pickingEvent = new Event(eventDate: now, eventType: new EventType(eventCode: EventCode.PICKING, sortOrder: 7))
+        pickingEvent.dateCreated = now
+        requisition.events = [pickingEvent]
+
+        EventLog error = new EventLog(eventLogCode: EventLogCode.ERROR_OCCURRED, message: "Issuance failed: boom")
+        error.dateCreated = Instant.now()
+        requisition.eventLogs = [error]
+
+        expect:
+        requisition.getIssuanceAttemptCount() == 1
+    }
+
+    void 'getIssuanceAttemptCount should return 0 once the requisition has reached ISSUED'() {
+        given:
+        Requisition requisition = new Requisition()
+        Date now = new Date()
+        Event issuedEvent = new Event(eventDate: now, eventType: new EventType(eventCode: EventCode.ISSUED, sortOrder: 12))
+        issuedEvent.dateCreated = now
+        requisition.events = [issuedEvent]
+
+        EventLog error = new EventLog(eventLogCode: EventLogCode.ERROR_OCCURRED, message: "Issuance failed: boom")
+        error.dateCreated = Instant.now()
+        requisition.eventLogs = [error]
+
+        expect:
+        requisition.getIssuanceAttemptCount() == 0
     }
 
     @Unroll

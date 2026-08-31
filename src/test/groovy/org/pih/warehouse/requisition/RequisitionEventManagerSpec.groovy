@@ -7,6 +7,7 @@ import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.event.EventTypeManager
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class RequisitionEventManagerSpec extends Specification implements DataTest {
 
@@ -131,5 +132,24 @@ class RequisitionEventManagerSpec extends Specification implements DataTest {
         0 * requisitionEventLogger.logEvent(*_)
         0 * requisitionEventLogger.logEventRollback(*_)
         0 * eventTypeManager.getOrCreateEventType(*_)
+    }
+
+    @Unroll
+    void 'toRequisitionStatus should be the inverse of toEventCode for #eventCode'() {
+        expect:
+        requisitionEventManager.toRequisitionStatus(new EventType(eventCode: eventCode)) == expectedStatus
+
+        where:
+        eventCode                  || expectedStatus
+        EventCode.CREATED          || RequisitionStatus.CREATED
+        EventCode.PICKING          || RequisitionStatus.PICKING
+        EventCode.ISSUED           || RequisitionStatus.ISSUED
+        EventCode.CANCELLED        || RequisitionStatus.CANCELED
+        EventCode.SHIPPED          || null
+    }
+
+    void 'toRequisitionStatus should return null for a null EventType'() {
+        expect:
+        requisitionEventManager.toRequisitionStatus(null) == null
     }
 }
