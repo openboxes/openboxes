@@ -38,7 +38,9 @@ beans = {
     transactionalEventListenerFactory(TransactionalEventListenerFactory)
 
     // Putaway strategies
-    crossDockPutawayStrategy(CrossDockPutawayStrategy)
+    crossDockPutawayStrategy(CrossDockPutawayStrategy) {
+        backorderMatchingService = ref('backorderMatchingService')
+    }
     directedPutawayStrategy(DirectedPutawayStrategy)
     // randomPutawayStrategy(RandomPutawayStrategy)
     putawayStrategyService(PutawayStrategyService) {
