@@ -270,6 +270,9 @@
                 <th class="border-right">
                     ${warehouse.message(code: 'inventoryItem.lotNumber.label')}
                 </th>
+                <th class="border-right">
+                    ${warehouse.message(code: 'default.reasonCode.label')}
+                </th>
 
                 <th class="border-right center" width="7%">
                     ${warehouse.message(code: 'default.count.label', default: 'Count')}
@@ -291,7 +294,7 @@
                 <g:set var="isCurrentYear" value="${(new Date().year + 1900 == year.key.toInteger())}"/>
                 <tr class="yearRow border-top">
                     <div>
-                    <td colspan="14" class="icon ${isCurrentYear ? 'active' : ''}">
+                    <td colspan="15" class="icon ${isCurrentYear ? 'active' : ''}">
                         ${year.key}
                         <button class="showYear button">
                             ${warehouse.message(code: 'default.showYear.label')}
@@ -301,7 +304,7 @@
                 </tr>
                 <g:each var="month" in="${year.value}">
                     <tr class="monthRow border-top ${isCurrentYear ? 'currentYear' : ''}">
-                        <td colspan="14" class="icon  ${isCurrentYear ? 'active' : ''}">
+                        <td colspan="15" class="icon  ${isCurrentYear ? 'active' : ''}">
                             <g:message
                                 code="month.${(month.key).toInteger() + 1}.label"
                                 default="${new java.text.DateFormatSymbols().months[(month.key).toInteger()]}"
@@ -541,6 +544,12 @@
                                 </span>
                             </td>
                             <td class="border-right center middle">
+                                <g:set var="discrepancyReasonCode" value="${discrepancyReasonCodeByOrderItemKey?.get(stockHistoryEntry?.orderId + '|' + stockHistoryEntry?.inventoryItem?.id)}"/>
+                                <g:if test="${discrepancyReasonCode}">
+                                    ${warehouse.message(code: 'enum.ReasonCode.' + discrepancyReasonCode)}
+                                </g:if>
+                            </td>
+                            <td class="border-right center middle">
                                 <g:if test="${stockHistoryEntry?.transactionCode in [TransactionCode.INVENTORY, TransactionCode.PRODUCT_INVENTORY] }">
                                     <span class="balance">
                                         <g:formatNumber number="${stockHistoryEntry?.quantity?:0 }" format="###,###.#" maxFractionDigits="1"/>
@@ -570,7 +579,7 @@
             </g:each>
             <g:unless test="${stockHistoryList }">
                 <tr>
-                    <td colspan="11" class="even center">
+                    <td colspan="12" class="even center">
                         <div class="empty fade">
                             <warehouse:message code="transaction.noTransactions.label"/>
                         </div>
@@ -590,6 +599,9 @@
 
                 </th>
                 <th></th>
+                <th class="center border-right">
+
+                </th>
                 <th class="center border-right">
                     <g:formatNumber number="${totalCount?:0}" format="#,###"/>
                 </th>

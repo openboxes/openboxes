@@ -4,7 +4,7 @@
     <table id="requisition-items" class="fs-repeat-header" border="0">
         <thead style="display: table-row-group">
             <tr class="">
-                <td colspan="10">
+                <td colspan="11">
                     <h4 class="title">${groupName}</h4>
                 </td>
             </tr>
@@ -17,13 +17,14 @@
                 <th class="center">${warehouse.message(code: 'orderItem.expiry.label')}</th>
                 <th class="center">${warehouse.message(code: 'orderItem.transferToBin.label')}</th>
                 <th class="center">${warehouse.message(code: 'orderItem.qtyToTransfer.label')}</th>
+                <th class="center" style="min-width: 100px">${warehouse.message(code: 'default.reasonCode.label')}</th>
                 <th class="center" style="min-width: 100px">${warehouse.message(code:'default.notes.label')}</th>
             </tr>
         </thead>
         <tbody>
             <g:unless test="${stockTransferItems}">
                 <tr>
-                    <td colspan="10" class="middle center">
+                    <td colspan="11" class="middle center">
                         <span class="fade">
                             <warehouse:message code="default.none.label"/>
                         </span>
@@ -76,6 +77,12 @@
                             <g:else>
                                 ${stockTransferItem?.quantity}
                             </g:else>
+                        </td>
+                        <td class="center" width="1%">
+                            <g:set var="itemReasonCode" value="${splitItems ? splitItems[j]?.discrepancyReasonCode : stockTransferItem?.discrepancyReasonCode}"/>
+                            <g:if test="${itemReasonCode}">
+                                ${warehouse.message(code: 'enum.ReasonCode.' + itemReasonCode)}
+                            </g:if>
                         </td>
                         <td class="middle" width=30%">
                             <!-- Notes -->

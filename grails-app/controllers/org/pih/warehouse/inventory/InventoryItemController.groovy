@@ -191,6 +191,7 @@ class InventoryItemController {
                     shipmentDtoById       : displayContext.shipmentDtoById,
                     requisitionDtoById    : displayContext.requisitionDtoById,
                     orderDtoById          : displayContext.orderDtoById,
+                    discrepancyReasonCodeByOrderItemKey : displayContext.discrepancyReasonCodeByOrderItemKey,
                     totalBalance          : stockHistory.totalBalance,
                     totalCount            : stockHistory.totalCount,
                     totalCredit           : stockHistory.totalCredit,
