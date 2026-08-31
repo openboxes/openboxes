@@ -312,6 +312,8 @@ class AllocationService {
             return []
         }
 
+        // No location holds enough, so rather than abandon the order we take whatever stock exists and record
+        // the rest against a location permitted to go negative or the facility's fallback location
         if (isFallbackApplicable(allocationMode, facility)) {
             List<SuggestedItem> fallbackItems =
                     getFallbackSuggestedItems(requisitionItem, quantityRequired, bestStrategy, bestItems)
@@ -323,14 +325,21 @@ class AllocationService {
         throw new IllegalArgumentException("Insufficient stock for product ${product?.productCode} - ${product?.name} in order ${requisitionItem.requisition?.requestNumber}. Required quantity: ${quantityRequired}, Available quantity: ${bestQuantityAvailable}")
     }
 
+    /**
+     * Checks if fallback allocation approach is allowed. It should be applicable for auto allocations and
+     * for facilities that allow it
+     */
     private static boolean isFallbackApplicable(AllocationMode allocationMode, Location facility) {
         if (allocationMode != AllocationMode.AUTO) {
             return false
         }
 
-        return facility?.isNegativeInventoryAllowed()
+        return facility?.isNegativeInventoryEnabled()
     }
 
+    /**
+     * Picks whatever real stock exists first and only sends the remainder to a fallback location
+     */
     private List<SuggestedItem> getFallbackSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired,
                                                           AllocationSourceStrategy strategy,
                                                           List<AvailableItem> bestItems) {
@@ -341,6 +350,7 @@ class AllocationService {
         Integer quantityFromStock = suggestedItemsFromStock.sum { it.quantityPicked } ?: 0
         Integer quantityShortfall = quantityRequired - quantityFromStock
 
+        // Defensive only: every strategy already failed canSatisfy, so the shortfall is always positive here.
         if (quantityShortfall <= 0) {
             return suggestedItemsFromStock
         }
@@ -353,24 +363,38 @@ class AllocationService {
         log.warn("Allocation fallback for product ${product?.productCode} in order " +
                 "${requisitionItem.requisition?.requestNumber}: ${resolution}, quantity ${quantityShortfall}")
 
+        // Below steps leave a balance that no longer matches the bin, and a count is the only thing that
+        // ever corrects it
+        cycleCountService.getOrCreateCycleCountRequest(facility, product)
+
         String message
         if (resolution.step == AllocationStep.NEGATIVE_INVENTORY) {
-            cycleCountService.getOrCreateCycleCountRequest(facility, product)
             message = "Negative inventory: allocated quantity ${quantityShortfall} of product " +
                     "${product?.productCode} - ${product?.name} to ${resolution.binLocation?.name}, which is " +
                     "permitted to hold a negative quantity. Cycle count requested."
         } else {
             message = "Inventory shortfall: no location at ${facility?.name} could supply quantity " +
                     "${quantityShortfall} of product ${product?.productCode} - ${product?.name}. " +
-                    "Allocated to ${resolution.binLocation?.name}."
+                    "Allocated to ${resolution.binLocation?.name}. Cycle count requested."
         }
 
-        // Requisition event logs are not visible on the UI yet, so we also add comments
         requisitionService.addSystemComment(requisitionItem.requisition, message)
         requisitionService.addSystemEventLog(requisitionItem.requisition, message)
 
+        InventoryItem inventoryItem = inventoryService.findOrCreateDefaultInventoryItem(product)
+
+        // Every suggested item becomes its own picklist row, so a line already picking the same lot from the
+        // same bin has to absorb the shortfall instead of gaining a duplicate alongside it.
+        SuggestedItem existingItem = suggestedItemsFromStock.find {
+            it.inventoryItem?.id == inventoryItem?.id && it.binLocation?.id == resolution.binLocation?.id
+        }
+        if (existingItem) {
+            existingItem.quantityPicked = (existingItem.quantityPicked ?: 0) + quantityShortfall
+            return suggestedItemsFromStock
+        }
+
         SuggestedItem shortfallItem = new SuggestedItem(
-                inventoryItem: inventoryService.findOrCreateDefaultInventoryItem(product),
+                inventoryItem: inventoryItem,
                 binLocation: resolution.binLocation,
                 quantityAvailable: 0,
                 quantityOnHand: 0,

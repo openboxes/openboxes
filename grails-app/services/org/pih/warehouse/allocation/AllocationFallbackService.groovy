@@ -51,7 +51,7 @@ class AllocationFallbackService {
     private Location resolveNegativeInventoryLocation(Location facility, Product product, AllocationSourceStrategy strategy) {
         List<Location> candidateLocations = getCandidateBinLocations(facility, product)
                 .findAll {
-                    it.active && it.isAllocable() &&
+                    it.active && it.isAllocable() && it.isPickable() &&
                             !it.isNegativeInventoryFallbackLocation() && it.isNegativeInventoryAllowed()
                 }
 
