@@ -547,6 +547,7 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
                 identifier: requestNumber,
                 description: description,
                 name: name,
+                className: this.class.simpleName,
         )
     }
 
@@ -557,6 +558,29 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
         }
 
         return null
+    }
+
+    RequisitionEventManager getRequisitionEventManager() {
+        if (!Holders.grailsApplication.mainContext.containsBean('requisitionEventManager')) {
+            return null
+        }
+        return Holders.grailsApplication.mainContext.getBean(RequisitionEventManager)
+    }
+
+    /**
+     * The single path through which requisition.status changes - every direct "requisition.status = X" assignment
+     * in the codebase (as well as map-constructors and data binding) is routed through here by Groovy's normal
+     * property-assignment semantics. Whenever the status actually changes, records the transition (see
+     * RequisitionEventManager#recordStatusChange) so requisition.events stays in sync with requisition.status
+     * and can never drift from it.
+     */
+    void setStatus(RequisitionStatus newStatus) {
+        RequisitionStatus oldStatus = this.@status
+        this.@status = newStatus
+
+        if (newStatus != oldStatus) {
+            requisitionEventManager?.recordStatusChange(this, oldStatus, newStatus, origin)
+        }
     }
 
     Map toJson() {
