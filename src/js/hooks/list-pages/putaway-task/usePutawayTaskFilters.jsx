@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import queryString from 'query-string';
 import { useSelector } from 'react-redux';
@@ -23,6 +23,12 @@ const usePutawayTaskFilters = () => {
   const statusCategoryOptions = filterFields.statusCategory
     .getDynamicAttr().options;
 
+  // statusCategory defaults to OPEN only for the very first load of the page (e.g.
+  // landing here from the dashboard tile with no statusCategory in the URL at all).
+  // Once that's happened, an absent statusCategory means the user explicitly cleared
+  // it (or switched facility) and wants every status, not that it should snap back.
+  const hasAppliedDefaultStatusCategoryRef = useRef(false);
+
   const clearFilterValues = () => {
     const { pathname } = history.location;
     history.replace({ pathname });
@@ -37,10 +43,11 @@ const usePutawayTaskFilters = () => {
     if (queryProps.statusCategory) {
       defaultValues.statusCategory = statusCategoryOptions
         .find(({ id }) => id === queryProps.statusCategory) || '';
-    } else {
+    } else if (!hasAppliedDefaultStatusCategoryRef.current) {
       defaultValues.statusCategory = statusCategoryOptions
         .find(({ id }) => id === 'OPEN') || '';
     }
+    hasAppliedDefaultStatusCategoryRef.current = true;
 
     if (queryProps.status) {
       const statusesFromParams = getParamList(queryProps.status);
