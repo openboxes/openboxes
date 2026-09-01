@@ -143,6 +143,9 @@ const PutawayTaskListTable = ({ filterParams }) => {
       accessor: 'assignee.name',
       className: 'd-flex align-items-center',
       headerClassName: 'header',
+      // assignee.name is a transient (non-persisted) property on the Person domain
+      // class, so the server can't sort by it - keep this column unsortable.
+      sortable: false,
     },
     {
       Header: <Translate id="react.putawayTask.column.strategy.label" defaultMessage="Strategy" />,
