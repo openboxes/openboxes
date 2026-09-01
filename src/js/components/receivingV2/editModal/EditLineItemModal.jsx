@@ -21,7 +21,6 @@ const EditLineItemModal = ({
   const {
     fields,
     columns,
-    addRow,
     copyToReceiving,
     revertToOriginal,
     receivingNow,
@@ -90,7 +89,6 @@ const EditLineItemModal = ({
           columns={columns}
           receivingNow={receivingNow}
           revertToOriginal={revertToOriginal}
-          addRow={addRow}
         />
         <EditLineItemModalFooter
           summaryData={summaryData}

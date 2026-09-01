@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { RiAddCircleLine, RiArrowGoBackLine } from 'react-icons/ri';
+import { RiArrowGoBackLine } from 'react-icons/ri';
 
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
@@ -9,7 +9,7 @@ import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
 
 const ReceivingLineItemsTable = ({
-  fields, columns, receivingNow, revertToOriginal, addRow,
+  fields, columns, receivingNow, revertToOriginal,
 }) => {
   const translate = useTranslate();
 
@@ -31,7 +31,7 @@ const ReceivingLineItemsTable = ({
           onClick={revertToOriginal}
         />
       </div>
-      <form className="receiving-table mt-2">
+      <form className="receiving-table receiving-edit-modal__receiving-table mt-2">
         <DataTable
           columns={columns}
           data={fields}
@@ -45,14 +45,6 @@ const ReceivingLineItemsTable = ({
           }}
         />
       </form>
-      <button
-        type="button"
-        className="receiving-edit-modal__add-record d-flex align-items-center gap-8 p-0 border-0 bg-transparent cursor-pointer font-weight-500 font-size-xs"
-        onClick={addRow}
-      >
-        <RiAddCircleLine size={18} />
-        {translate('react.receiving.addNewRecord.label', 'Add new record')}
-      </button>
     </>
   );
 };
@@ -62,7 +54,6 @@ ReceivingLineItemsTable.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   receivingNow: PropTypes.number.isRequired,
   revertToOriginal: PropTypes.func.isRequired,
-  addRow: PropTypes.func.isRequired,
 };
 
 export default ReceivingLineItemsTable;

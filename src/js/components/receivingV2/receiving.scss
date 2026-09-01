@@ -337,9 +337,19 @@
     }
   }
 
+  &__receiving-table .rt-tfoot {
+    position: relative;
+    margin-top: 42px;
+  }
+
   &__add-record {
-    margin-top: 12px;
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    padding: 12px;
     color: var(--blue-700);
+    font-weight: 500;
+    white-space: nowrap;
   }
 
   &__copy-to-receive {

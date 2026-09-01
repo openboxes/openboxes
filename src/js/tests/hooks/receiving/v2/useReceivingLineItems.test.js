@@ -56,10 +56,10 @@ describe('useReceivingLineItems', () => {
     useSelector.mockImplementation(() => true);
   });
 
-  it('should open with the original line and an empty split row carrying its autofilled values', () => {
+  it('should open with the persisted lines only, without an empty split row', () => {
     const { result } = renderLineItems([originalLine]);
 
-    expect(result.current.fields).toHaveLength(2);
+    expect(result.current.fields).toHaveLength(1);
     expect(result.current.fields[0]).toMatchObject({
       receiptItemId: 'receipt-item-1',
       product,
@@ -67,18 +67,9 @@ describe('useReceivingLineItems', () => {
       quantityReceiving: 5,
       isSplitItem: false,
     });
-    expect(result.current.fields[1]).toMatchObject({
-      receiptItemId: null,
-      product,
-      lotNumber: '',
-      recipient: shipmentRecipient,
-      binLocation: receivingBin,
-      quantityReceiving: '',
-      isSplitItem: true,
-    });
   });
 
-  it('should not add the empty split row to a line that already has a split item saved', () => {
+  it('should open with every persisted split item of the line', () => {
     const { result } = renderLineItems([originalLine, splitLine]);
 
     expect(result.current.fields).toHaveLength(2);
@@ -90,18 +81,18 @@ describe('useReceivingLineItems', () => {
     });
   });
 
-  it('should keep the empty split row when reverting to original', () => {
+  it('should drop the rows added in the modal when reverting to original', () => {
     const { result } = renderLineItems([originalLine]);
 
     act(() => result.current.addRow());
-    expect(result.current.fields).toHaveLength(3);
+    expect(result.current.fields).toHaveLength(2);
 
     act(() => result.current.revertToOriginal());
 
-    expect(result.current.fields).toHaveLength(2);
-    expect(result.current.fields[1]).toMatchObject({
-      product,
-      isSplitItem: true,
+    expect(result.current.fields).toHaveLength(1);
+    expect(result.current.fields[0]).toMatchObject({
+      receiptItemId: 'receipt-item-1',
+      isSplitItem: false,
     });
   });
 
@@ -112,6 +103,22 @@ describe('useReceivingLineItems', () => {
       act(() => result.current.addRow());
 
       expect(result.current.fields[2]).toMatchObject({
+        receiptItemId: null,
+        product,
+        lotNumber: '',
+        recipient: shipmentRecipient,
+        binLocation: receivingBin,
+        quantityReceiving: '',
+        isSplitItem: true,
+      });
+    });
+
+    it('should carry the same values for a line without any split item saved', () => {
+      const { result } = renderLineItems([originalLine]);
+
+      act(() => result.current.addRow());
+
+      expect(result.current.fields[1]).toMatchObject({
         receiptItemId: null,
         product,
         lotNumber: '',
