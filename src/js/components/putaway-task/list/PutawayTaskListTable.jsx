@@ -15,8 +15,8 @@ import Translate from 'utils/Translate';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const STATUS_VARIANT_MAP = {
-  PENDING: 'secondary',
-  STARTED: 'info',
+  PENDING: 'gray',
+  STARTED: 'primary',
   IN_PROGRESS: 'warning',
   COMPLETED: 'success',
   CANCELED: 'danger',
