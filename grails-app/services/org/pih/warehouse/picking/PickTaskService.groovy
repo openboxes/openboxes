@@ -68,8 +68,9 @@ class PickTaskService {
                 eq("facility", command.facility)
             }
 
-            if (!requisitionIds.isEmpty()) {
-                'in'("requisition.id", requisitionIds)
+            if (command.ordersCount) {
+                // an empty candidate list must yield no results rather than an unfiltered search
+                'in'("requisition.id", requisitionIds ?: [""])
             }
 
             if (command.deliveryTypeCode) {
@@ -545,16 +546,26 @@ class PickTaskService {
             return []
         }
 
+        List<PickTaskStatus> statusesToSearch = command.status ?: [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
+
+        List<String> assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(command.facility, statusesToSearch)
+
         List<Requisition> candidates = PickTask.createCriteria().list {
             projections {
                 distinct("requisition")
             }
             eq("facility", command.facility)
             eq("requisitionStatus", RequisitionStatus.PICKING)
-            'in'("status", command.status ?: [PickTaskStatus.PENDING, PickTaskStatus.PICKING])
+            'in'("status", statusesToSearch)
 
             if (command.deliveryTypeCode) {
                 eq("deliveryTypeCode", command.deliveryTypeCode)
+            }
+
+            if (assignedRequisitions) {
+                not {
+                    'in'("requisition.id", assignedRequisitions)
+                }
             }
         }
 
