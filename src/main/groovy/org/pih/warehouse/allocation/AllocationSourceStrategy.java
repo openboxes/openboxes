@@ -10,5 +10,5 @@
 package org.pih.warehouse.allocation;
 
 public enum AllocationSourceStrategy {
-    STORAGE_FIRST, DISPLAY_FIRST, STORAGE_ONLY
+    STORAGE_FIRST, DISPLAY_FIRST, STORAGE_ONLY, DISPLAY_ONLY
 }

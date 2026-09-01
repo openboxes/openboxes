@@ -334,6 +334,34 @@ class CycleCountService {
     }
 
     /**
+     * Creates a cycle count request for a product whose quantity has fallen below zero, stamped with
+     * {@link CycleCountRequestType#SYSTEM_REQUEST} so that a request the system raised off a negative
+     * quantity stays distinguishable from one a person scheduled.
+     */
+    CycleCountRequest getOrCreateCycleCountRequest(Location facility, Product product) {
+        CycleCountRequest existingRequest = CycleCountRequest.findByProductAndFacilityAndStatusNotInList(
+                product, facility, [CycleCountRequestStatus.COMPLETED, CycleCountRequestStatus.CANCELED])
+        if (existingRequest) {
+            return existingRequest
+        }
+
+        CycleCountRequest cycleCountRequest = new CycleCountRequest(
+                facility: facility,
+                product: product,
+                status: CycleCountRequestStatus.CREATED,
+                requestType: CycleCountRequestType.SYSTEM_REQUEST,
+                blindCount: false
+        )
+
+        if (!cycleCountRequest.validate()) {
+            throw new ValidationException("Invalid cycle count request", cycleCountRequest.errors)
+        }
+
+        cycleCountRequest.save(failOnError: true)
+        return cycleCountRequest
+    }
+
+    /**
      * Bulk updates a given list of cycle count requests.
      */
     List<CycleCountRequest> updateRequests(CycleCountRequestUpdateBulkCommand command) {

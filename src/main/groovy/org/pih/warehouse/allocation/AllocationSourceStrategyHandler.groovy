@@ -20,5 +20,9 @@ interface AllocationSourceStrategyHandler {
 
     AllocationSourceStrategy getStrategy()
 
-    List<AvailableItem> order(Location facility, Product product, List<AvailableItem> availableItems)
+    List<AllocationSourceGroup> getGroupOrder()
+
+    List<AvailableItem> orderAvailableItems(Location facility, Product product, List<AvailableItem> availableItems)
+
+    List<Location> orderLocations(Location facility, Product product, List<Location> candidateLocations)
 }

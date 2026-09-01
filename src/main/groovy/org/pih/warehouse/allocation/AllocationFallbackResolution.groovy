@@ -9,21 +9,23 @@
  **/
 package org.pih.warehouse.allocation
 
-/**
- * Warehouse only: preferred warehouse bins, then remaining warehouse bins. Display bins are excluded.
- */
-class StorageOnlyHandler extends AbstractAllocationSourceStrategyHandler {
+import org.pih.warehouse.core.Location
 
-    @Override
-    AllocationSourceStrategy getStrategy() {
-        return AllocationSourceStrategy.STORAGE_ONLY
+/**
+ * The location the fallback resolver chose, together with the allocation step that chose it.
+ */
+class AllocationFallbackResolution {
+
+    final Location binLocation
+
+    final AllocationStep step
+
+    AllocationFallbackResolution(Location binLocation, AllocationStep step) {
+        this.binLocation = binLocation
+        this.step = step
     }
 
-    @Override
-    List<AllocationSourceGroup> getGroupOrder() {
-        return [
-                AllocationSourceGroup.PREFERRED_STORAGE,
-                AllocationSourceGroup.REMAINING_STORAGE,
-        ]
+    String toString() {
+        return "step ${step?.stepNumber} (${step}) -> ${binLocation?.name}"
     }
 }
