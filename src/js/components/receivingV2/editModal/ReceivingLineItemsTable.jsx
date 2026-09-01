@@ -23,6 +23,10 @@ const ReceivingLineItemsTable = ({
             clickable={false}
           />
         </div>
+        {/* TODO: This button is hidden (instead of removed) since we are revising its behaviour.
+                  The revision is scheduled for 0.9.10, but if we decide the button isn't needed,
+                  it and its existing (broken) functionality should be removed entirely. */}
+        {false && (
         <Button
           label="react.receiving.revertToOriginal.label"
           defaultLabel="Revert to original"
@@ -30,6 +34,7 @@ const ReceivingLineItemsTable = ({
           EndIcon={<RiArrowGoBackLine size={18} />}
           onClick={revertToOriginal}
         />
+        )}
       </div>
       <form className="receiving-table mt-2">
         <DataTable
