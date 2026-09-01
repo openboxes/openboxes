@@ -729,7 +729,15 @@ class LocationService {
     }
 
     List<Location> searchInternalLocations(Map params, LocationTypeCode[] locationTypeCodes) {
-        List<Location> locations = Location.createCriteria().list(params) {
+        Integer max = params.max ? params.int('max') : 25
+
+        // When filtering by activity code below, the cap has to be applied after that
+        // in-memory filter runs - capping the base query here too could cut away rows
+        // that would otherwise have matched, and return fewer (or zero) results.
+        boolean requiresActivityCodeFilter = params.activityCodes as Boolean
+        Map criteriaParams = requiresActivityCodeFilter ? params : (params + [max: max])
+
+        List<Location> locations = Location.createCriteria().list(criteriaParams) {
             if (!params.includeInactive) {
                 eq("active", Boolean.TRUE)
             }
@@ -755,11 +763,29 @@ class LocationService {
             order("name", "asc")
         }
 
-        if (params.activityCodes) {
+        if (requiresActivityCodeFilter) {
             List<String> activityCodes = params.list("activityCodes")
-            locations = locations.findAll { Location loc ->
-                activityCodes.any { String code -> loc.supports(code) }
+
+            // Bulk-fetch each location's supported activities in a single query instead of
+            // lazily loading the (lazy hasMany) collection once per location below, which was
+            // triggering an N+1 query pattern on every debounced keystroke.
+            List<String> locationIds = locations*.id
+            Map<String, Set<String>> activitiesByLocationId = [:].withDefault { [] as Set }
+            if (locationIds) {
+                Location.executeQuery(
+                        'select l.id, s from Location l join l.supportedActivities s where l.id in (:locationIds)',
+                        [locationIds: locationIds]
+                ).each { row -> activitiesByLocationId[row[0] as String] << (row[1] as String) }
             }
+
+            locations = locations.findAll { Location loc ->
+                Set<String> ownActivities = activitiesByLocationId[loc.id]
+                // Mirrors Location#supports(): use the location's own supported activities
+                // if set, otherwise fall back to its location type's supported activities.
+                activityCodes.any { String code ->
+                    ownActivities ? code in ownActivities : loc.locationType?.supports(code)
+                }
+            }.take(max)
         }
 
         return locations
