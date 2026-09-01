@@ -27,7 +27,7 @@ const useStockListFilters = () => {
 
   const clearFilterValues = () => {
     const { pathname } = history.location;
-    history.push({ pathname });
+    history.replace({ pathname });
   };
 
   const initializeDefaultFilterValues = async () => {
@@ -68,7 +68,7 @@ const useStockListFilters = () => {
   // Custom hook for changing location/filters rebuilding logic
   useCommonFiltersCleaner({ clearFilterValues, initializeDefaultFilterValues, filtersInitialized });
 
-  const setFilterValues = (values) => {
+  const setFilterValues = (values, { replace = false } = {}) => {
     const filterAccessors = {
       destination: { name: 'destination', accessor: 'id' },
       origin: { name: 'origin', accessor: 'id' },
@@ -79,7 +79,7 @@ const useStockListFilters = () => {
     const queryFilterParams = queryString.stringify(transformedParams);
     const { pathname } = history.location;
     if (Object.keys(values).length) {
-      history.push({ pathname, search: queryFilterParams });
+      history[replace ? 'replace' : 'push']({ pathname, search: queryFilterParams });
     }
     setFilterParams(values);
   };

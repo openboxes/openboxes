@@ -47,7 +47,7 @@ const useInboundFilters = () => {
     const queryFilterParams = queryString.stringify(transformedParams);
     const { pathname } = history.location;
     if (queryFilterParams) {
-      history.push({ pathname, search: queryFilterParams });
+      history.replace({ pathname, search: queryFilterParams });
     }
   };
 
@@ -136,7 +136,7 @@ const useInboundFilters = () => {
     }));
   };
 
-  const setFilterValues = (values) => {
+  const setFilterValues = (values, { replace = false } = {}) => {
     const filterAccessors = {
       direction: { name: 'direction' },
       origin: { name: 'origin', accessor: 'id' },
@@ -153,7 +153,7 @@ const useInboundFilters = () => {
     const queryFilterParams = queryString.stringify(transformedParams);
     const { pathname } = history.location;
     if (queryFilterParams) {
-      history.push({ pathname, search: queryFilterParams });
+      history[replace ? 'replace' : 'push']({ pathname, search: queryFilterParams });
     }
     setFilterParams(values);
   };

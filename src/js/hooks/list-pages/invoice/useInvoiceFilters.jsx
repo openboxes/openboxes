@@ -38,7 +38,7 @@ const useInvoiceFilters = ({ setFilterParams }) => {
 
   const clearFilterValues = () => {
     const { pathname } = history.location;
-    history.push({ pathname });
+    history.replace({ pathname });
   };
 
   const initializeDefaultFilterValues = async () => {
@@ -99,7 +99,7 @@ const useInvoiceFilters = ({ setFilterParams }) => {
     dispatch(fetchSuppliers({ sort: 'name', order: 'asc' }));
   }, []);
 
-  const setFilterValues = useCallback((values) => {
+  const setFilterValues = useCallback((values, { replace = false } = {}) => {
     const filterAccessors = {
       buyerOrganization: { name: 'buyerOrganization', accessor: 'id' },
       status: { name: 'status', accessor: 'id' },
@@ -113,7 +113,7 @@ const useInvoiceFilters = ({ setFilterParams }) => {
       const transformedParams = transformFilterParams(values, filterAccessors);
       const queryFilterParams = queryString.stringify(transformedParams);
       const { pathname } = history.location;
-      history.push({ pathname, search: queryFilterParams });
+      history[replace ? 'replace' : 'push']({ pathname, search: queryFilterParams });
     }
     setFilterParams(values);
   }, []);
