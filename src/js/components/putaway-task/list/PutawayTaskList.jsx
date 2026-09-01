@@ -8,7 +8,9 @@ import usePutawayTaskFilters from 'hooks/list-pages/putaway-task/usePutawayTaskF
 import useTranslation from 'hooks/useTranslation';
 
 const PutawayTaskList = () => {
-  const { setFilterValues, defaultFilterValues, filterParams } = usePutawayTaskFilters();
+  const {
+    setFilterValues, filterByOrder, defaultFilterValues, filterParams,
+  } = usePutawayTaskFilters();
 
   useTranslation('putawayTask', 'reactTable');
 
@@ -20,7 +22,10 @@ const PutawayTaskList = () => {
         setFilterParams={setFilterValues}
         defaultValues={defaultFilterValues}
       />
-      <PutawayTaskListTable filterParams={filterParams} />
+      <PutawayTaskListTable
+        filterParams={filterParams}
+        onFilterByOrder={filterByOrder}
+      />
     </div>
   );
 };

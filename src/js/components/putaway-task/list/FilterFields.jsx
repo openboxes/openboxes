@@ -1,4 +1,5 @@
 import FilterSelectField from 'components/form-elements/FilterSelectField';
+import FilterTextField from 'components/form-elements/FilterTextField';
 
 const STATUS_CATEGORY_OPTIONS = [
   { id: 'OPEN', value: 'OPEN', label: 'Open' },
@@ -80,5 +81,13 @@ export default {
     getDynamicAttr: ({ debouncedDestinationFetch }) => ({
       loadOptions: debouncedDestinationFetch,
     }),
+  },
+  putawayOrder: {
+    type: FilterTextField,
+    attributes: {
+      filterElement: true,
+      placeholder: 'react.putawayTask.filters.order.placeholder.label',
+      defaultPlaceholder: 'Putaway #',
+    },
   },
 };

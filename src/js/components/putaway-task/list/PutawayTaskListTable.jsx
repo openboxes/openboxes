@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 
 import PropTypes from 'prop-types';
-import { RiInformationLine, RiRefreshLine } from 'react-icons/ri';
+import { RiInformationLine, RiRefreshLine, RiSearchLine } from 'react-icons/ri';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
@@ -34,7 +34,7 @@ TooltipHeader.propTypes = {
   defaultMessage: PropTypes.string.isRequired,
 };
 
-const PutawayTaskListTable = ({ filterParams }) => {
+const PutawayTaskListTable = ({ filterParams, onFilterByOrder }) => {
   const {
     onFetchHandler,
     rerunHandler,
@@ -58,6 +58,12 @@ const PutawayTaskListTable = ({ filterParams }) => {
       leftIcon: <RiRefreshLine />,
       statuses: ['PENDING'],
       onClick: (id) => rerunHandler(id),
+    },
+    {
+      label: 'react.putawayTask.filterByPutaway.label',
+      defaultLabel: 'Show All Tasks for This Putaway',
+      leftIcon: <RiSearchLine />,
+      onClick: () => onFilterByOrder(row?.putawayOrder?.orderNumber),
     },
   ];
 
@@ -179,7 +185,7 @@ const PutawayTaskListTable = ({ filterParams }) => {
       className: 'd-flex align-items-center',
       Cell: (row) => <DateCell {...row} tooltip />,
     },
-  ], [rerunHandler]);
+  ], [rerunHandler, onFilterByOrder]);
 
   return (
     <div className="list-page-list-section">
@@ -210,4 +216,5 @@ export default PutawayTaskListTable;
 
 PutawayTaskListTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
+  onFilterByOrder: PropTypes.func.isRequired,
 };

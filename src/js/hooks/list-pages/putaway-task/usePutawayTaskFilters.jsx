@@ -67,6 +67,10 @@ const usePutawayTaskFilters = () => {
       }
     }
 
+    if (queryProps.putawayOrder) {
+      defaultValues.putawayOrder = queryProps.putawayOrder;
+    }
+
     setDefaultFilterValues({ ...defaultValues });
     setFiltersInitialized(true);
   };
@@ -84,6 +88,7 @@ const usePutawayTaskFilters = () => {
       searchTerm: { name: 'searchTerm' },
       container: { name: 'container', accessor: 'id' },
       destination: { name: 'destination', accessor: 'id' },
+      putawayOrder: { name: 'putawayOrder' },
     };
 
     const transformedParams = transformFilterParams(values, filterAccessors);
@@ -95,7 +100,28 @@ const usePutawayTaskFilters = () => {
     setFilterParams({ ...values });
   };
 
-  return { setFilterValues, defaultFilterValues, filterParams };
+  // Resets all other filters and filters down to every task belonging to the given
+  // putaway order, regardless of status - used by the "Show All Tasks for This
+  // Putaway" row action.
+  const filterByOrder = (orderNumber) => {
+    // putawayOrder is itself one of filterFields' keys, so it has to be set after the
+    // blanking reduce below, not seeded as its initial accumulator - otherwise the
+    // reduce blanks it right back out while clearing every other field.
+    const clearedValues = {
+      ...Object.keys(filterFields).reduce((acc, key) => ({ ...acc, [key]: '' }), {}),
+      putawayOrder: orderNumber,
+    };
+
+    const { pathname } = history.location;
+    history.push({ pathname, search: queryString.stringify({ putawayOrder: orderNumber }) });
+
+    setDefaultFilterValues(clearedValues);
+    setFilterParams(clearedValues);
+  };
+
+  return {
+    setFilterValues, filterByOrder, defaultFilterValues, filterParams,
+  };
 };
 
 export default usePutawayTaskFilters;
