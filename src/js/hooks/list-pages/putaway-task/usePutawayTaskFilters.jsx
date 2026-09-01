@@ -71,6 +71,14 @@ const usePutawayTaskFilters = () => {
       defaultValues.putawayOrder = queryProps.putawayOrder;
     }
 
+    if (queryProps.createdAfter) {
+      defaultValues.createdAfter = queryProps.createdAfter;
+    }
+
+    if (queryProps.createdBefore) {
+      defaultValues.createdBefore = queryProps.createdBefore;
+    }
+
     setDefaultFilterValues({ ...defaultValues });
     setFiltersInitialized(true);
   };
@@ -89,6 +97,8 @@ const usePutawayTaskFilters = () => {
       container: { name: 'container', accessor: 'id' },
       destination: { name: 'destination', accessor: 'id' },
       putawayOrder: { name: 'putawayOrder' },
+      createdAfter: { name: 'createdAfter' },
+      createdBefore: { name: 'createdBefore' },
     };
 
     const transformedParams = transformFilterParams(values, filterAccessors);

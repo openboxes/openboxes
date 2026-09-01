@@ -1,5 +1,7 @@
+import DateFilter from 'components/form-elements/DateFilter/DateFilter';
 import FilterSelectField from 'components/form-elements/FilterSelectField';
 import FilterTextField from 'components/form-elements/FilterTextField';
+import DateFormat from 'consts/dateFormat';
 
 const STATUS_CATEGORY_OPTIONS = [
   { id: 'OPEN', value: 'OPEN', label: 'Open' },
@@ -88,6 +90,32 @@ export default {
       filterElement: true,
       placeholder: 'react.putawayTask.filters.order.placeholder.label',
       defaultPlaceholder: 'Putaway #',
+    },
+  },
+  createdAfter: {
+    type: DateFilter,
+    attributes: {
+      localizeDate: true,
+      localizedDateFormat: DateFormat.COMMON,
+      label: 'react.putawayTask.filters.createdAfter.label',
+      defaultMessage: 'Created after',
+      // date format in which the date will be sent to the API
+      dateFormat: 'MM/DD/YYYY',
+      ariaLabel: 'Created after',
+      filterElement: true,
+    },
+  },
+  createdBefore: {
+    type: DateFilter,
+    attributes: {
+      localizeDate: true,
+      localizedDateFormat: DateFormat.COMMON,
+      label: 'react.putawayTask.filters.createdBefore.label',
+      defaultMessage: 'Created before',
+      // date format in which the date will be sent to the API
+      dateFormat: 'MM/DD/YYYY',
+      ariaLabel: 'Created before',
+      filterElement: true,
     },
   },
 };
