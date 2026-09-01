@@ -455,7 +455,6 @@ const useReceivingColumns = ({
               className={className}
               label="react.receiving.status.label"
               defaultLabel="Status"
-              truncate
             />
           );
         },

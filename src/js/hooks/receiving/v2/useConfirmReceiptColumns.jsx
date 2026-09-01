@@ -446,7 +446,6 @@ const useConfirmReceiptColumns = ({
               className={className}
               label="react.receiving.status.label"
               defaultLabel="Status"
-              truncate
             />
           );
         },
