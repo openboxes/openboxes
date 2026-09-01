@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 
 import PropTypes from 'prop-types';
-import { RiInformationLine, RiRefreshLine } from 'react-icons/ri';
+import { RiInformationLine, RiRefreshLine, RiSearchLine } from 'react-icons/ri';
 import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
@@ -35,7 +35,7 @@ TooltipHeader.propTypes = {
   defaultMessage: PropTypes.string.isRequired,
 };
 
-const PutawayTaskListTable = ({ filterParams, highestRole }) => {
+const PutawayTaskListTable = ({ filterParams, highestRole, onFilterByOrder }) => {
   const {
     onFetchHandler,
     rerunHandler,
@@ -69,6 +69,12 @@ const PutawayTaskListTable = ({ filterParams, highestRole }) => {
       // restricted to superusers. The container it was already scanned into is unaffected.
       minimumRequiredRole: 'Superuser',
       onClick: (id) => rerunHandler(id, row.status),
+    },
+    {
+      label: 'react.putawayTask.filterByPutaway.label',
+      defaultLabel: 'Show All Tasks for This Putaway',
+      leftIcon: <RiSearchLine />,
+      onClick: () => onFilterByOrder(row?.putawayOrder?.orderNumber),
     },
   ];
 
@@ -190,7 +196,7 @@ const PutawayTaskListTable = ({ filterParams, highestRole }) => {
       className: 'd-flex align-items-center',
       Cell: (row) => <DateCell {...row} tooltip />,
     },
-  ], [rerunHandler, highestRole]);
+  ], [rerunHandler, highestRole, onFilterByOrder]);
 
   return (
     <div className="list-page-list-section">
@@ -226,4 +232,5 @@ export default connect(mapStateToProps)(PutawayTaskListTable);
 PutawayTaskListTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
   highestRole: PropTypes.string.isRequired,
+  onFilterByOrder: PropTypes.func.isRequired,
 };
