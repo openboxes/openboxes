@@ -122,7 +122,8 @@
 
   .status-cell {
     color: var(--blue-500);
-    font-weight: bold;
+    white-space: normal;
+    overflow-wrap: break-word;
 
     &--completed {
       color: var(--color-green);
