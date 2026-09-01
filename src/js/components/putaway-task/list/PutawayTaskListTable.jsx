@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
-import { PUTAWAY_URL } from 'consts/applicationUrls';
+import { INVENTORY_ITEM_URL, PUTAWAY_URL } from 'consts/applicationUrls';
 import usePutawayTaskListTableData from 'hooks/list-pages/putaway-task/usePutawayTaskListTableData';
 import ContextMenu from 'utils/ContextMenu';
 import { findActions } from 'utils/list-utils';
@@ -127,7 +127,16 @@ const PutawayTaskListTable = ({ filterParams, highestRole, onFilterByOrder }) =>
       className: 'd-flex align-items-center',
       headerClassName: 'header',
       maxWidth: 150,
-      Cell: (row) => <TableCell {...row} tooltip />,
+      Cell: (row) => (
+        <TableCell
+          {...row}
+          tooltip
+          openLinkInNewTab
+          link={row.original.inventoryItem?.product?.id
+            ? INVENTORY_ITEM_URL.showStockCard(row.original.inventoryItem.product.id)
+            : null}
+        />
+      ),
     },
     {
       Header: <TooltipHeader id="react.putawayTask.column.productName.label" defaultMessage="Product Name" />,
