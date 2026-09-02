@@ -17,7 +17,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 const webpack = require('webpack');
 
-module.exports = {
+module.exports = (env, argv) => {
+  const isProduction = argv.mode === 'production';
+
+  return {
     cache: {
       type: 'filesystem',
       buildDependencies: {
@@ -54,12 +57,14 @@ module.exports = {
     stats: {
       colors: false,
     },
-    /* We generate source maps so Sentry can map errors to lines of code, even when the code is minified */
-    devtool: 'source-map',
+    /*
+     * source-map: full quality, slowest — used in production for Sentry
+     * eval-cheap-module-source-map: fast rebuilds with original lines — used in dev
+     */
+    devtool: isProduction ? 'source-map' : 'eval-cheap-module-source-map',
     plugins: [
-      new ESLintPlugin({
-        extensions: ['js', 'jsx'],
-      }),
+      // ESLint only runs in production builds (CI); run `npm run eslint` separately in dev
+      ...(isProduction ? [new ESLintPlugin({ extensions: ['js', 'jsx'] })] : []),
       new FileManagerPlugin({
         events: {
           onStart: {
@@ -129,6 +134,7 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
+            cacheDirectory: true,
             presets: [
               '@babel/preset-env',
               '@babel/react',
@@ -194,6 +200,8 @@ module.exports = {
     ],
   },
   optimization: {
+    // Skip minification in dev for faster builds
+    minimize: isProduction,
     minimizer: [
       `...`,
       new CssMinimizerPlugin(),
@@ -221,4 +229,5 @@ module.exports = {
     },
     extensions: ['.js', '.jsx'],
   },
+};
 };
