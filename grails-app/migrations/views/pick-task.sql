@@ -72,25 +72,32 @@ SELECT
     pli.date_created AS date_created,
     pli.last_updated AS last_updated,
 
-    CAST(SUM(CASE WHEN NOT (COALESCE(pli.status, 'PENDING') = 'STAGED'
-                            AND COALESCE(pli.quantity_picked, 0) = 0)
-                  THEN 1 ELSE 0 END) OVER w AS SIGNED) AS order_total_task_count,
-    CAST(SUM(CASE WHEN COALESCE(pli.status, 'PENDING') NOT IN ('PICKED', 'STAGED')
-                  THEN 1 ELSE 0 END) OVER w AS SIGNED) AS order_open_task_count,
+    CAST(progress.order_total_task_count AS SIGNED) AS order_total_task_count,
+    CAST(progress.order_open_task_count AS SIGNED) AS order_open_task_count,
     CASE
-        WHEN SUM(CASE WHEN COALESCE(pli.status, 'PENDING') NOT IN ('PICKED', 'STAGED')
-                      THEN 1 ELSE 0 END) OVER w = 0
-            THEN 'PICKED'
-        WHEN MAX(CASE WHEN COALESCE(pli.status, 'PENDING') IN ('PICKING', 'PICKED')
-                        OR (COALESCE(pli.status, 'PENDING') = 'STAGED'
-                            AND COALESCE(pli.quantity_picked, 0) > 0)
-                      THEN 1 ELSE 0 END) OVER w = 1
-            THEN 'PARTIALLY_PICKED'
+        WHEN progress.order_open_task_count = 0 THEN 'PICKED'
+        WHEN progress.has_pick_progress = 1 THEN 'PARTIALLY_PICKED'
         ELSE 'NOT_PICKED'
     END AS order_pick_status_code
 FROM picklist_item pli
          JOIN picklist pl ON pl.id = pli.picklist_id
          JOIN requisition r ON r.id = pl.requisition_id
          LEFT JOIN requisition_item ri ON ri.id = pli.requisition_item_id
-WHERE r.status IN ('PICKING', 'PICKED', 'STAGED')
-WINDOW w AS (PARTITION BY r.id);
+         LEFT JOIN (
+             SELECT pl.requisition_id AS requisition_id,
+                    SUM(CASE WHEN NOT (COALESCE(pli.status, 'PENDING') = 'STAGED'
+                                       AND COALESCE(pli.quantity_picked, 0) = 0)
+                             THEN 1 ELSE 0 END) AS order_total_task_count,
+                    SUM(CASE WHEN COALESCE(pli.status, 'PENDING') NOT IN ('PICKED', 'STAGED')
+                             THEN 1 ELSE 0 END) AS order_open_task_count,
+                    MAX(CASE WHEN COALESCE(pli.status, 'PENDING') IN ('PICKING', 'PICKED')
+                               OR (COALESCE(pli.status, 'PENDING') = 'STAGED'
+                                   AND COALESCE(pli.quantity_picked, 0) > 0)
+                             THEN 1 ELSE 0 END) AS has_pick_progress
+             FROM picklist_item pli
+                      JOIN picklist pl ON pl.id = pli.picklist_id
+                      JOIN requisition r ON r.id = pl.requisition_id
+             WHERE r.status IN ('PICKING', 'PICKED', 'STAGED')
+             GROUP BY pl.requisition_id
+         ) progress ON progress.requisition_id = r.id
+WHERE r.status IN ('PICKING', 'PICKED', 'STAGED');
