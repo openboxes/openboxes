@@ -14,8 +14,9 @@ import java.time.Instant
  * the data lives forever. So the workflow is recorded explicitly when the receipt is started - as a standalone marker
  * row rather than a column, keeping the legacy {@link Receipt} domain untouched.
  *
- * Rows are insert-only and are removed by the database itself when their receipt is deleted (the foreign key
- * cascades on delete), so the legacy receipt-deletion flows (receiving rollbacks) stay unaware of this table.
+ * Rows are insert-only: they are never updated, and are deleted only together with their receipt. Their foreign key
+ * restricts deletes rather than cascading, so every flow that deletes a receipt (the receiving rollbacks) has to
+ * delete its marker first - see ReceiptV2Service.deleteMarkersForReceipts.
  */
 class ReceiptV2Marker {
 

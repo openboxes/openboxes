@@ -19,6 +19,7 @@ import org.apache.poi.ss.usermodel.Row
 import org.hibernate.FetchMode
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.StockTransfer
+import org.pih.warehouse.api.receiving.v2.ReceiptV2Service
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
@@ -58,6 +59,7 @@ class ShipmentService {
     def inventoryService
     TransactionIdentifierService transactionIdentifierService
     ShipmentIdentifierService shipmentIdentifierService
+    ReceiptV2Service receiptV2Service
     def documentService
     def personService
     def productAvailabilityService
@@ -1730,6 +1732,7 @@ class ShipmentService {
 
     void deleteReceipts(Shipment shipment) {
         if (shipment?.receipts) {
+            receiptV2Service.deleteMarkersForReceipts(shipment.receipts)
             shipment?.receipts.toArray().each { Receipt receipt ->
                 shipment.removeFromReceipts(receipt)
                 receipt.delete()
