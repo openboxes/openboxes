@@ -61,20 +61,13 @@ const useReceivingLineItems = ({
     isSplitItem: true,
   });
 
-  // If a line has already some persisted split items, we don't want to prefill a new split row
-  // We want to prefill a new split row with filled product row, only if a line doesn't
-  // have any persisted split items yet
-  const defaultLineItems = initialLineItems.some((item) => item.isSplitItem)
-    ? initialLineItems.map(buildDefaultRow)
-    : [...initialLineItems.map(buildDefaultRow), buildSplitRow()];
-
   const { validationSchema } = useEditLineItemValidation();
 
   const {
     control, getValues, setValue, reset, handleSubmit, formState: { errors },
   } = useForm({
     mode: 'onBlur',
-    defaultValues: { lineItems: defaultLineItems },
+    defaultValues: { lineItems: initialLineItems.map(buildDefaultRow) },
     resolver: zodResolver(validationSchema),
   });
 
@@ -97,14 +90,18 @@ const useReceivingLineItems = ({
     setValue,
   });
 
+  const addRow = useCallback(
+    () => append(buildSplitRow()),
+    [append, lineItem, originalLineItem],
+  );
+
   const { columns } = useReceivingLineItemColumns({
     control,
+    addRow,
     removeRow,
     onLocationAutofill,
     errors,
   });
-
-  const addRow = () => append(buildSplitRow());
 
   const copyToReceiving = useCallback((receivedItem) => append({
     rowId: _.uniqueId('row-'),

@@ -3,7 +3,7 @@ import React, { useCallback, useMemo } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
-import { RiDeleteBinLine } from 'react-icons/ri';
+import { RiAddCircleLine, RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import {
   getCurrentLocationId,
@@ -36,6 +36,7 @@ const isOriginalLine = (row) => !row.original?.isSplitItem;
  */
 const useReceivingLineItemColumns = ({
   control,
+  addRow,
   removeRow,
   onLocationAutofill,
   errors,
@@ -79,7 +80,20 @@ const useReceivingLineItemColumns = ({
           />
         </TableCell>
       ),
-      footer: () => translate('react.receiving.totalReceivingNow.label', 'Total Receiving Now'),
+      footer: () => (
+        <>
+          <button
+            type="button"
+            className="receiving-edit-modal__add-record d-flex align-items-center gap-8 border-0 bg-transparent cursor-pointer font-size-xs"
+            data-testid="add-new-record"
+            onClick={addRow}
+          >
+            <RiAddCircleLine size={18} />
+            {translate('react.receiving.addNewRecord.label', 'Add new record')}
+          </button>
+          {translate('react.receiving.totalReceivingNow.label', 'Total Receiving Now')}
+        </>
+      ),
       size: 220,
     }),
     columnHelper.accessor(receivingColumns.LOT_NUMBER, {
@@ -259,6 +273,7 @@ const useReceivingLineItemColumns = ({
   ], [
     translate,
     control,
+    addRow,
     locationId,
     debouncedPeopleFetch,
     removeRow,
@@ -273,6 +288,7 @@ const useReceivingLineItemColumns = ({
 
 useReceivingLineItemColumns.propTypes = {
   control: PropTypes.shape({}).isRequired,
+  addRow: PropTypes.func.isRequired,
   removeRow: PropTypes.func.isRequired,
   onLocationAutofill: PropTypes.func.isRequired,
   errors: PropTypes.shape({}),
