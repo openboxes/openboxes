@@ -22,6 +22,7 @@ const SelectCell = React.memo(({
           value={value}
           onChange={onChange}
           labelKey="name"
+          valueKey="id"
           placeholder={placeholder}
           disabled={disabled}
           hideErrorMessageWrapper
