@@ -41,8 +41,8 @@ describe('getReceivingRowStatus()', () => {
 
   it('should report a line the receipt covers exactly', () => {
     expect(getStatus({ quantityRemaining: 0 })).toEqual({
-      className: 'status-cell status-cell--equal',
-      value: 'Equal',
+      className: 'status-cell status-cell--completed',
+      value: 'Complete',
     });
   });
 
