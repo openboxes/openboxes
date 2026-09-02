@@ -35,6 +35,7 @@ const ReceivingFilters = ({
   onResetSort,
   updateFilterParams,
   clearFilterParams,
+  packingListViewEnabled,
 }) => {
   const translate = useTranslate();
   // Add loading for filters section. Loading will display before the translations are fetched.
@@ -44,6 +45,23 @@ const ReceivingFilters = ({
   // Recomputed whenever translations change, so that the field configs hold
   // already translated labels.
   const fields = useMemo(() => filterFields(translate), [translate]);
+
+  const viewOptions = useMemo(() => receivingViewOptions.map((option) => {
+    let disabled = false;
+    let disabledTooltip = null;
+
+    // If the shipment has no pack levels, disable the packing list view.
+    if (option.value === ReceivingView.PACKING_LIST && !packingListViewEnabled) {
+      disabled = true;
+      disabledTooltip = translate('react.receiving.packingListView.disabled.label', 'No packing information entered for this shipment.');
+    }
+
+    return {
+      ...option,
+      disabled,
+      disabledTooltip,
+    };
+  }), [packingListViewEnabled, translate]);
 
   // Clearing the filters is not a submit, so the snapshot of matching rows has to be
   // dropped here as well - otherwise the table would keep showing the previously
@@ -57,7 +75,7 @@ const ReceivingFilters = ({
     <div className="receiving-filters">
       <div className="receiving-filters__row d-flex justify-content-between align-items-center">
         <SlidingButtonGroup
-          options={receivingViewOptions}
+          options={viewOptions}
           defaultOption={view}
           onChange={onViewChange}
         />
@@ -144,6 +162,7 @@ ReceivingFilters.propTypes = {
   onResetSort: PropTypes.func.isRequired,
   updateFilterParams: PropTypes.func.isRequired,
   clearFilterParams: PropTypes.func.isRequired,
+  packingListViewEnabled: PropTypes.bool.isRequired,
 };
 
 export default ReceivingFilters;
