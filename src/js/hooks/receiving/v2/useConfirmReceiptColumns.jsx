@@ -434,7 +434,7 @@ const useConfirmReceiptColumns = ({
             : (item?.quantityRemaining ?? 0) > 0;
           const { className, value } = getReceivingRowStatus({
             quantityRemaining: item?.quantityRemaining,
-            isCompleted: item?.isCompleted || item?.quantityRemaining === 0,
+            isCompleted: item?.isCompleted,
             isRemainingCanceled,
             translate,
             formatNumber,
