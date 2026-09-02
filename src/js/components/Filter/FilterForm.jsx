@@ -148,8 +148,20 @@ const FilterForm = ({
     return allFiltersEmpty || requiredFiltersMissing;
   };
 
+  // No initial value on purpose: this makes the very first execution of the effect
+  // below always see a falsy previousLocationId and skip, whether currentLocation is
+  // already resolved by the time this component first mounts or not.
+  const previousLocationIdRef = useRef();
+
   useEffect(() => {
-    if (formRef.current) {
+    const previousLocationId = previousLocationIdRef.current;
+    previousLocationIdRef.current = currentLocation?.id;
+
+    // Only clear filters on a genuine facility switch - not the first time
+    // currentLocation resolves from its unset placeholder during session bootstrap,
+    // which isn't a user-driven change and shouldn't wipe defaults (e.g. the putaway
+    // list's default OPEN status filter) that were just correctly applied.
+    if (previousLocationId && formRef.current) {
       onClearHandler(formRef.current);
     }
   }, [currentLocation?.id]);
