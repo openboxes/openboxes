@@ -778,14 +778,28 @@ class LocationService {
                 ).each { row -> activitiesByLocationId[row[0] as String] << (row[1] as String) }
             }
 
+            // Location#supports() falls back to the location type's supported activities
+            // when a location has none of its own - bulk-fetch those too (keyed by the
+            // handful of distinct location types among the candidates, not per location),
+            // so that fallback doesn't lazily load each type's collection one at a time.
+            List<String> locationTypeIds = locations*.locationType*.id.findAll().unique()
+            Map<String, Set<String>> activitiesByLocationTypeId = [:].withDefault { [] as Set }
+            if (locationTypeIds) {
+                LocationType.executeQuery(
+                        'select lt.id, s from LocationType lt join lt.supportedActivities s where lt.id in (:locationTypeIds)',
+                        [locationTypeIds: locationTypeIds]
+                ).each { row -> activitiesByLocationTypeId[row[0] as String] << (row[1] as String) }
+            }
+
             locations = locations.findAll { Location loc ->
                 Set<String> ownActivities = activitiesByLocationId[loc.id]
+                Set<String> typeActivities = activitiesByLocationTypeId[loc.locationType?.id]
                 // Mirrors Location#supports(): use the location's own supported activities
                 // if set, otherwise fall back to its location type's supported activities.
                 activityCodes.any { String code ->
-                    ownActivities ? code in ownActivities : loc.locationType?.supports(code)
+                    ownActivities ? code in ownActivities : code in typeActivities
                 }
-            }.take(max)
+            }
         }
 
         return locations
