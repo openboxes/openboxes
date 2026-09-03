@@ -16,13 +16,13 @@ import {
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
-import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import LocationAutofillHeader from 'components/receivingV2/LocationAutofillHeader';
 import receivingColumns from 'consts/receivingColumns';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
 import QuantityInputCell from 'utils/cells/QuantityInputCell';
+import SelectCell from 'utils/cells/SelectCell';
 import { debouncePeopleFetch } from 'utils/option-utils';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
@@ -62,23 +62,21 @@ const useReceivingLineItemColumns = ({
         </TableHeaderCell>
       ),
       cell: ({ row }) => (
-        <TableCell className="rt-td">
-          <Controller
-            key={row.original.rowId}
-            name={`lineItems.${row.index}.product`}
-            control={control}
-            render={({ field }) => (
-              <SelectField
-                {...field}
-                productSelect
-                locationId={locationId}
-                disabled={isOriginalLine(row)}
-                hideErrorMessageWrapper
-                ariaLabel={{ id: 'react.receiving.product.label', defaultMessage: 'Product' }}
-              />
-            )}
-          />
-        </TableCell>
+        <Controller
+          key={row.original.rowId}
+          name={`lineItems.${row.index}.product`}
+          control={control}
+          render={({ field }) => (
+            <SelectCell
+              {...field}
+              productSelect
+              locationId={locationId}
+              disabled={isOriginalLine(row)}
+              label="react.receiving.product.label"
+              defaultLabel="Product"
+            />
+          )}
+        />
       ),
       footer: () => (
         <>
@@ -155,23 +153,21 @@ const useReceivingLineItemColumns = ({
         </TableHeaderCell>
       ),
       cell: ({ row }) => (
-        <TableCell className="rt-td">
-          <Controller
-            key={row.original.rowId}
-            name={`lineItems.${row.index}.recipient`}
-            control={control}
-            render={({ field }) => (
-              <SelectField
-                {...field}
-                async
-                loadOptions={debouncedPeopleFetch}
-                hideErrorMessageWrapper
-                showValueTooltip
-                ariaLabel={{ id: 'react.receiving.recipient.label', defaultMessage: 'Recipient' }}
-              />
-            )}
-          />
-        </TableCell>
+        <Controller
+          key={row.original.rowId}
+          name={`lineItems.${row.index}.recipient`}
+          control={control}
+          render={({ field }) => (
+            <SelectCell
+              {...field}
+              async
+              loadOptions={debouncedPeopleFetch}
+              showValueTooltip
+              label="react.receiving.recipient.label"
+              defaultLabel="Recipient"
+            />
+          )}
+        />
       ),
       size: 150,
     }),
@@ -215,21 +211,19 @@ const useReceivingLineItemColumns = ({
       columnHelper.accessor(receivingColumns.LOCATION, {
         header: () => <LocationAutofillHeader onSelect={onLocationAutofill} />,
         cell: ({ row }) => (
-          <TableCell className="rt-td">
-            <Controller
-              key={row.original.rowId}
-              name={`lineItems.${row.index}.binLocation`}
-              control={control}
-              render={({ field }) => (
-                <SelectField
-                  {...field}
-                  options={binLocationOptions}
-                  hideErrorMessageWrapper
-                  ariaLabel={{ id: 'react.receiving.location.label', defaultMessage: 'Location' }}
-                />
-              )}
-            />
-          </TableCell>
+          <Controller
+            key={row.original.rowId}
+            name={`lineItems.${row.index}.binLocation`}
+            control={control}
+            render={({ field }) => (
+              <SelectCell
+                {...field}
+                options={binLocationOptions}
+                label="react.receiving.location.label"
+                defaultLabel="Location"
+              />
+            )}
+          />
         ),
         size: 150,
       }),

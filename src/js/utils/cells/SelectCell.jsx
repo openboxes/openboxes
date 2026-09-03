@@ -10,7 +10,19 @@ import useTranslate from 'hooks/useTranslate';
  * Memoized cell rendering a dropdown.
  */
 const SelectCell = React.memo(({
-  options, value, onChange, label, defaultLabel, placeholder, disabled,
+  options,
+  value,
+  onChange,
+  label,
+  defaultLabel,
+  placeholder,
+  disabled,
+  productSelect,
+  locationId,
+  async,
+  loadOptions,
+  showValueTooltip,
+  onBlur,
 }) => {
   const translate = useTranslate();
 
@@ -22,10 +34,15 @@ const SelectCell = React.memo(({
           value={value}
           onChange={onChange}
           labelKey="name"
-          valueKey="id"
           placeholder={placeholder}
           disabled={disabled}
           hideErrorMessageWrapper
+          productSelect={productSelect}
+          locationId={locationId}
+          async={async}
+          loadOptions={loadOptions}
+          showValueTooltip={showValueTooltip}
+          onBlur={onBlur}
         />
       </div>
     </TableCell>
@@ -42,6 +59,12 @@ SelectCell.propTypes = {
   defaultLabel: PropTypes.string.isRequired,
   placeholder: PropTypes.string,
   disabled: PropTypes.bool,
+  productSelect: PropTypes.bool,
+  locationId: PropTypes.string,
+  async: PropTypes.bool,
+  loadOptions: PropTypes.func,
+  showValueTooltip: PropTypes.bool,
+  onBlur: PropTypes.func,
 };
 
 SelectCell.defaultProps = {
@@ -50,6 +73,12 @@ SelectCell.defaultProps = {
   onChange: undefined,
   placeholder: '',
   disabled: false,
+  productSelect: false,
+  locationId: null,
+  async: false,
+  loadOptions: () => [],
+  showValueTooltip: false,
+  onBlur: undefined,
 };
 
 export default SelectCell;

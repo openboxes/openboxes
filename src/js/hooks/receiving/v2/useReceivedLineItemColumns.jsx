@@ -10,12 +10,12 @@ import { getCurrentLocationId, getHasBinLocationSupport } from 'selectors';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
-import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import LocationAutofillHeader from 'components/receivingV2/LocationAutofillHeader';
 import receivingColumns from 'consts/receivingColumns';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
+import SelectCell from 'utils/cells/SelectCell';
 
 /**
  * Columns for the read-only "Received" table in the edit modal. Mirrors the
@@ -35,23 +35,21 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
         </TableHeaderCell>
       ),
       cell: ({ row }) => (
-        <TableCell className="rt-td">
-          <Controller
-            key={row.original.rowId}
-            name={`receivedItems.${row.index}.product`}
-            control={control}
-            render={({ field }) => (
-              <SelectField
-                {...field}
-                productSelect
-                locationId={locationId}
-                disabled
-                hideErrorMessageWrapper
-                ariaLabel={{ id: 'react.receiving.product.label', defaultMessage: 'Product' }}
-              />
-            )}
-          />
-        </TableCell>
+        <Controller
+          key={row.original.rowId}
+          name={`receivedItems.${row.index}.product`}
+          control={control}
+          render={({ field }) => (
+            <SelectCell
+              {...field}
+              productSelect
+              locationId={locationId}
+              disabled
+              label="react.receiving.product.label"
+              defaultLabel="Product"
+            />
+          )}
+        />
       ),
       footer: () => translate('react.receiving.totalReceived.label', 'Total Received'),
       size: 220,
@@ -116,22 +114,20 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
         </TableHeaderCell>
       ),
       cell: ({ row }) => (
-        <TableCell className="rt-td">
-          <Controller
-            key={row.original.rowId}
-            name={`receivedItems.${row.index}.recipient`}
-            control={control}
-            render={({ field }) => (
-              <SelectField
-                {...field}
-                disabled
-                hideErrorMessageWrapper
-                showValueTooltip
-                ariaLabel={{ id: 'react.receiving.recipient.label', defaultMessage: 'Recipient' }}
-              />
-            )}
-          />
-        </TableCell>
+        <Controller
+          key={row.original.rowId}
+          name={`receivedItems.${row.index}.recipient`}
+          control={control}
+          render={({ field }) => (
+            <SelectCell
+              {...field}
+              disabled
+              showValueTooltip
+              label="react.receiving.recipient.label"
+              defaultLabel="Recipient"
+            />
+          )}
+        />
       ),
       size: 150,
     }),
@@ -172,21 +168,19 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
       columnHelper.accessor(receivingColumns.LOCATION, {
         header: () => <LocationAutofillHeader />,
         cell: ({ row }) => (
-          <TableCell className="rt-td">
-            <Controller
-              key={row.original.rowId}
-              name={`receivedItems.${row.index}.binLocation`}
-              control={control}
-              render={({ field }) => (
-                <SelectField
-                  {...field}
-                  disabled
-                  hideErrorMessageWrapper
-                  ariaLabel={{ id: 'react.receiving.location.label', defaultMessage: 'Location' }}
-                />
-              )}
-            />
-          </TableCell>
+          <Controller
+            key={row.original.rowId}
+            name={`receivedItems.${row.index}.binLocation`}
+            control={control}
+            render={({ field }) => (
+              <SelectCell
+                {...field}
+                disabled
+                label="react.receiving.location.label"
+                defaultLabel="Location"
+              />
+            )}
+          />
         ),
         size: 150,
       }),
