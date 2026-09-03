@@ -34,12 +34,11 @@ const removeSplitItemRow = (state, rowId) => {
   const replacedRow = state.entities[toggle.replacedRowId];
   // A single change left is no longer a group - drop the group rows and turn the
   // remaining split item back into a plain row. Only dissolve when the remaining split
-  // item matches the original on all tracked fields; any diff (product, lot, expiration,
-  // recipient) keeps the group so the original line stays visible with its crosses.
+  // item matches the original on all tracked fields; any diff (product, lot, expiration)
+  // keeps the group so the original line stays visible with its crosses.
   const remainingMatchesOriginal = remainingSplitItem?.product?.id === replacedRow?.product?.id
     && remainingSplitItem?.lotNumber === replacedRow?.lotNumber
-    && remainingSplitItem?.expirationDate === replacedRow?.expirationDate
-    && remainingSplitItem?.recipient?.id === replacedRow?.recipient?.id;
+    && remainingSplitItem?.expirationDate === replacedRow?.expirationDate;
   if (splitItemIds.length === 1 && remainingMatchesOriginal) {
     return updateNormalizedItem(
       removeNormalizedItems(state, [rowId, toggleRowId, toggle.replacedRowId]),

@@ -141,7 +141,7 @@ const getReceiptItemChanges = (receiptItem, shipmentItem) => ({
 // The struck-through row of a split shipment item - the split items below
 // replace it. Built without a receipt item, so it keeps the original shipment values
 // (product, lot, expiration, recipient).
-const buildReplacedEntity = (summary, usersById) => {
+const buildReplacedEntity = (summary, usersById, visibleReceiptItems) => {
   const lineItem = buildLineItem({ summary, usersById });
   const currentReceiptItems = summary.currentReceiptItems ?? [];
   // The pending quantities of the split items, already subtracted from quantityRemaining.
@@ -152,8 +152,8 @@ const buildReplacedEntity = (summary, usersById) => {
   // A field is struck through if any of the current receipt items overrides it. A product
   // change also strikes lot and expiration, because a new product implies a new productLot.
   // Lot and expiration are assumed to be tied together, so a change in either one strikes
-  // both.
-  const changesPerItem = currentReceiptItems.map(
+  // both. Compares only the lines rendered below the row - a zeroed original has no row of its own.
+  const changesPerItem = visibleReceiptItems.map(
     (item) => getReceiptItemChanges(item, summary.shipmentItem),
   );
   // Checks whether any receipt item of the shipment item has the given field dirty.
@@ -200,7 +200,7 @@ const buildSplitItemEntity = ({ summary, receiptItem, usersById }) => ({
 const buildItemRows = (summary, usersById) => {
   const { shipmentItem, currentReceiptItems = [] } = summary;
 
-  // Any of product / lot / expiration / recipient differing from the shipment item enters
+  // Any of product / lot / expiration differing from the shipment item enters
   // the changes group - as a plain line it would silently replace the shipment item's
   // value in the table instead of showing the original struck through above the new one.
   const hasReceiptItemChanges = (receiptItem) => {
@@ -208,8 +208,7 @@ const buildItemRows = (summary, usersById) => {
       return false;
     }
     const changes = getReceiptItemChanges(receiptItem, shipmentItem);
-    return changes.product || changes.lotNumber
-      || changes.expirationDate || changes.recipient;
+    return changes.product || changes.lotNumber || changes.expirationDate;
   };
 
   // The original line always exists in the database (it backs the cancel-remaining flow on
@@ -245,7 +244,7 @@ const buildItemRows = (summary, usersById) => {
       : [buildLineItem({ summary, receiptItem, usersById })];
   }
 
-  const replacedRow = buildReplacedEntity(summary, usersById);
+  const replacedRow = buildReplacedEntity(summary, usersById, visibleReceiptItems);
 
   const splitItems = visibleReceiptItems
     .map((receiptItem) => buildSplitItemEntity({ summary, receiptItem, usersById }));
@@ -257,14 +256,15 @@ const buildItemRows = (summary, usersById) => {
     shipmentItem.productLot?.product?.id,
   ));
 
-  // The API does not sort receipt items, so group split items by product to keep
-  // each product together, then flag only the first row of each group.
-  const splitItemRows = Object.values(
-    _.groupBy(splitItems, (splitItem) => splitItem.product?.id),
-  ).flatMap((productSplitItems) => productSplitItems.map((splitItem, index) => ({
-    ...splitItem,
-    isFirstSplitItem: index === 0 && anyProductChanged,
-  })));
+  // Each product goes out as one block, in the order its first line arrives - the original line
+  // comes first, so its product leads. Only the first line of a block is flagged, and that flag
+  // carries the product code, the name and the arrow, and merges the block into one row band.
+  const splitItemsByProductId = _.groupBy(splitItems, (splitItem) => splitItem.product?.id);
+  const splitItemRows = _.uniq(splitItems.map((splitItem) => splitItem.product?.id))
+    .flatMap((productId) => splitItemsByProductId[productId].map((splitItem, index) => ({
+      ...splitItem,
+      isFirstSplitItem: index === 0 && anyProductChanged,
+    })));
 
   const toggleRowId = _.uniqueId('row-');
 
