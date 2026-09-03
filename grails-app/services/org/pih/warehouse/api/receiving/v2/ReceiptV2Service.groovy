@@ -5,6 +5,7 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.ObjectNotFoundException
+import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
@@ -582,17 +583,47 @@ class ReceiptV2Service {
         // The client only ever sends a single sort field, so we take the first entry from the
         // SortParamList and ignore the rest.
         SortParam sortParam = command.sort?.get(0)
-        if (!sortParam) {
-            return shipment.shipmentItems.sort()
-        }
 
-        return ShipmentItem.createCriteria().list {
+        List<ShipmentItem> shipmentItems = ShipmentItem.createCriteria().list {
             createAlias("recipient", "r", JoinType.LEFT_OUTER_JOIN)
             createAlias("inventoryItem", "ii", JoinType.LEFT_OUTER_JOIN)
             createAlias("ii.product", "p", JoinType.LEFT_OUTER_JOIN)
             eq("shipment", shipment)
-            applySortOrder(sortParam, delegate)
+            if (sortParam) {
+                applySortOrder(sortParam, delegate)
+            }
+            applyShipmentOrder(delegate)
         } as List<ShipmentItem>
+
+        // The packing list view renders the items grouped by pack level, so there the grouping has to drive the
+        // ordering, with whatever the query ordered by applying within a pack level.
+        return command.group == ReceiptGroup.PACK_LEVEL ? sortByPackLevel(shipmentItems) : shipmentItems
+    }
+
+    /**
+     * Orders the items by the order of the shipment: the order in which the items are listed on the shipment itself
+     */
+    private static void applyShipmentOrder(Criteria criteria) {
+        criteria.addOrder(Order.asc("sortOrder"))
+        criteria.addOrder(Order.asc("dateCreated"))
+        criteria.addOrder(Order.asc("id"))
+    }
+
+    /**
+     * Reorders the items into their pack level grouping: by pack level 1, then by pack level 2
+     */
+    private static List<ShipmentItem> sortByPackLevel(List<ShipmentItem> shipmentItems) {
+        return shipmentItems.toSorted { ShipmentItem a, ShipmentItem b ->
+            getPackLevel1(a) <=> getPackLevel1(b) ?: getPackLevel2(a) <=> getPackLevel2(b)
+        }
+    }
+
+    private static Container getPackLevel1(ShipmentItem shipmentItem) {
+        return shipmentItem.container?.parentContainer ?: shipmentItem.container
+    }
+
+    private static Container getPackLevel2(ShipmentItem shipmentItem) {
+        return shipmentItem.container?.parentContainer ? shipmentItem.container : null
     }
 
     private static void applySortOrder(SortParam sortParam, Criteria criteria) {
@@ -647,15 +678,10 @@ class ReceiptV2Service {
 
         OrderedDataGroup packLevel1Group = new OrderedDataGroup()
         for (shipmentItem in shipmentItems) {
-            // We (perhaps incorrectly) only group two levels deep. Any additional parent containers will be ignored.
-            Container packLevel2 = shipmentItem.container
-            Container packLevel1 = packLevel2?.parentContainer
-
-            // When the item's container has no parent, the container itself is the top pack level, so we group
-            // directly under it. Items with no container at all fall back to the "Unpacked" group. We avoid a null
-            // key both because it groups nothing and because the JSON serializer drops map entries keyed on null.
-            String packLevel1Name = packLevel1?.name ?: packLevel2?.name ?: unpackedGroupName
-            String packLevel2Name = packLevel1?.name ? (packLevel2?.name ?: unpackedGroupName) : unpackedGroupName
+            // Items not packed at a level fall back to the "Unpacked" group. We avoid a null key both because it
+            // groups nothing and because the JSON serializer drops map entries keyed on null.
+            String packLevel1Name = getPackLevel1(shipmentItem)?.name ?: unpackedGroupName
+            String packLevel2Name = getPackLevel2(shipmentItem)?.name ?: unpackedGroupName
 
             OrderedDataGroup packLevel2Group = new OrderedDataGroup()
             packLevel2Group.put(packLevel2Name, shipmentItem.id)
