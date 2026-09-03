@@ -53,6 +53,7 @@ import {
   REMOVE_STOCK_MOVEMENT_DRAFT,
   REORDER_INDICATORS,
   RESET_INDICATORS,
+  RESET_RECEIVING_SORT,
   SET_ACTIVE_CONFIG,
   SET_ERRORS,
   SET_ERRORS_BY_ID,
@@ -76,6 +77,7 @@ import {
   UPDATE_RECEIVING_DATE_DELIVERED,
   UPDATE_RECEIVING_HEADER,
   UPDATE_RECEIVING_PUTAWAY_ENABLED,
+  UPDATE_RECEIVING_SORT,
   UPDATE_RECEIVING_VIEW,
   UPDATE_WORKFLOW_HEADER,
 } from 'actions/types';
@@ -870,6 +872,18 @@ export const updateReceivingView = (view) => ({
   payload: {
     view,
   },
+});
+
+export const updateReceivingSort = (sort, order) => ({
+  type: UPDATE_RECEIVING_SORT,
+  payload: {
+    sort,
+    order,
+  },
+});
+
+export const resetReceivingSort = () => ({
+  type: RESET_RECEIVING_SORT,
 });
 
 export const updateReceivingDateDelivered = (shipmentId, dateDelivered) => ({
