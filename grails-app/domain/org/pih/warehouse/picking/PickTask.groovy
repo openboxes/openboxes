@@ -2,6 +2,7 @@ package org.pih.warehouse.picking
 
 import org.pih.warehouse.api.PickStatusCode
 import org.pih.warehouse.api.PickTaskStatus
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -108,6 +109,7 @@ class PickTask {
                 requestedBy     : requestedBy?.name,
                 requisitionStatus: requisitionStatus,
                 facility        : facility?.toBaseJson(),
+                internalTransactionsEnabled: facility?.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS),
                 requisitionType : requisitionType?.name(),
                 product         : product?.toJson(),
                 location        : location?.toJson(location?.locationType?.locationTypeCode),
