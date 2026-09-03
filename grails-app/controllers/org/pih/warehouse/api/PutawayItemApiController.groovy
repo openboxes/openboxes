@@ -43,6 +43,15 @@ class PutawayItemApiController {
         render([data: putawayItems.collect { it.toJson() }] as JSON)
     }
 
+    def putawayCandidates() {
+        Location location = Location.get(params.id)
+        if (!location) {
+            throw new IllegalArgumentException("Must provide a valid location id in the request path")
+        }
+        List<PutawayItem> putawayItems = putawayService.getPutawayCandidatesExcludingOpenTasks(location)
+        render([data: putawayItems.collect { it.toJson() }] as JSON)
+    }
+
     def update() {
         log.info "params " + params
         JSONObject jsonObject = request.JSON

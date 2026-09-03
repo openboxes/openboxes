@@ -1031,7 +1031,7 @@ class UrlMappings {
 
         "/api/locations/$id/putawayCandidates" {
             controller = { "putawayItemApi" }
-            action = [GET: "list"]
+            action = [GET: "putawayCandidates"]
         }
 
         "/api/containers/$id/details"(parseRequest: true) {
