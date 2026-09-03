@@ -43,6 +43,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.LocationTypeCode
+import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.StockMovementItemParamsCommand
 import org.pih.warehouse.core.StockMovementItemsParamsCommand
@@ -2862,6 +2863,17 @@ class StockMovementService {
                     throw new IllegalArgumentException("Could not find stock movement item with ID ${stockMovementItem.id}")
                 }
 
+                boolean isCancellation = stockMovementItem.quantityRevised?.intValueExact() == 0 &&
+                        stockMovementItem.reasonCode != ReasonCode.BACKORDER.toString()
+
+                if (isCancellation && !requisition.isEligibleForCancellation()) {
+                    // Order has progressed past Allocated (picking already started) - leave this
+                    // item entirely untouched. The picked/staged items must be manually rolled back
+                    // before it can be cancelled; flag it for review instead of attempting the change.
+                    logManualCancellationReviewNeeded(requisitionItem, stockMovementItem.reasonCode)
+                    return
+                }
+
                 log.info 'Removing previous changes, picklists and shipments, if present'
                 removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
                 if (requisitionItem.isChanged() || requisitionItem.isCanceled() || requisitionItem.isBackordered()) {
@@ -2933,9 +2945,18 @@ class StockMovementService {
     }
 
     def cancelItem(StockMovementItem stockMovementItem) {
-        removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
-
         RequisitionItem requisitionItem = stockMovementItem.requisitionItem
+        Requisition requisition = requisitionItem.requisition
+
+        if (!requisition.isEligibleForCancellation()) {
+            // Order has progressed past Allocated (picking already started) - leave this item
+            // entirely untouched. The picked/staged items must be manually rolled back before it
+            // can be cancelled; flag it for review instead of attempting the cancellation.
+            logManualCancellationReviewNeeded(requisitionItem, stockMovementItem.reasonCode)
+            return StockMovementItem.createFromRequisitionItem(requisitionItem)
+        }
+
+        removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
 
         log.debug "Item canceled " + requisitionItem.id
         requisitionItem.cancelQuantity(stockMovementItem.reasonCode, stockMovementItem.comments)
@@ -2944,6 +2965,15 @@ class StockMovementService {
         requisitionItem.save()
 
         return StockMovementItem.createFromRequisitionItem(requisitionItem)
+    }
+
+    private void logManualCancellationReviewNeeded(RequisitionItem requisitionItem, String reasonCode) {
+        String message = "Cancellation requested for item ${requisitionItem.id} " +
+                "(product: ${requisitionItem.product?.productCode}, qty: ${requisitionItem.quantity}, " +
+                "reason: ${reasonCode}) while order status is ${requisitionItem.requisition.status} - " +
+                "allocation was not automatically rolled back and requires manual review."
+        requisitionService.logRequisitionComment(requisitionItem.requisition.id, message)
+        requisitionService.logRequisitionEvent(requisitionItem.requisition.id, message)
     }
 
     /**

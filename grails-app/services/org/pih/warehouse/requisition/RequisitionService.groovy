@@ -223,12 +223,22 @@ class RequisitionService {
     }
 
     /**
-     * Get all requisitions eligible for auto allocation.
+     * Get all requisitions eligible for auto allocation, ordered by priority (highest first),
+     * then by delivery type code priority (lowest value first, e.g. PICK_UP before DEFAULT;
+     * a null delivery type code sorts last, see DeliveryTypeCode.getPriorityFormula()),
+     * then by date created (oldest first) as a final tiebreaker.
      * @param origin
      * @return requisition list
      */
     List<Requisition> getRequisitionsPendingAutoAllocation(Location origin) {
-        return Requisition.findAllByOriginAndStatusAndAutoAllocationRequested(origin, RequisitionStatus.CREATED, true)
+        return Requisition.createCriteria().list {
+            eq("origin", origin)
+            eq("status", RequisitionStatus.CREATED)
+            eq("autoAllocationRequested", true)
+            order("priority", "desc")
+            order("deliveryTypePriority", "asc")
+            order("dateCreated", "asc")
+        }
     }
 
     /**
@@ -943,14 +953,12 @@ class RequisitionService {
         requisition.save()
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    void logRequisitionComment(String requisitionId, String message) {
-        Requisition requisition = Requisition.get(requisitionId)
-        if (!requisition) {
-            log.warn("Unable to log requisition event - requisition ${requisitionId} not found: ${message}")
-            return
-        }
-
+    /**
+     * Writes a system comment in the caller's transaction, so that the comment and the work it describes
+     * stand or fall together. Use {@link #logRequisitionComment} instead when the caller is about to roll
+     * back and the comment still has to survive.
+     */
+    void addSystemComment(Requisition requisition, String message) {
         boolean alreadyLogged = requisition.comments.any {
             it.type == CommentType.SYSTEM && it.comment == message
         }
@@ -962,17 +970,10 @@ class RequisitionService {
     }
 
     /**
-     * Records an ERROR_OCCURRED EventLog. Runs in its own transaction (REQUIRES_NEW) so the audit entry survives
-     * even though the caller is about to roll back and rethrow the triggering exception.
+     * Writes an EventLog in the caller's transaction. Use {@link #logRequisitionEvent} instead when the
+     * caller is about to roll back and the entry still has to survive.
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    void logRequisitionEvent(String requisitionId, String message) {
-        Requisition requisition = Requisition.get(requisitionId)
-        if (!requisition) {
-            log.warn("Unable to log requisition error - requisition ${requisitionId} not found: ${message}")
-            return
-        }
-
+    void addSystemEventLog(Requisition requisition, String message) {
         // TODO: event_log.message is a VARCHAR(255) column; expand the column (and remove this cap) if longer
         //  messages are needed.
         String truncatedMessage = message?.length() > 255 ? message.take(255) : message
@@ -984,6 +985,36 @@ class RequisitionService {
         ))
         requisition.save(failOnError: true)
         log.warn("Requisition ${requisition.id}: ${message}")
+    }
+
+    /**
+     * Records a system comment. Runs in its own transaction (REQUIRES_NEW) so the entry survives even
+     * though the caller is about to roll back and rethrow the triggering exception.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    void logRequisitionComment(String requisitionId, String message) {
+        Requisition requisition = Requisition.get(requisitionId)
+        if (!requisition) {
+            log.warn("Unable to log requisition comment - requisition ${requisitionId} not found: ${message}")
+            return
+        }
+
+        addSystemComment(requisition, message)
+    }
+
+    /**
+     * Records an EventLog. Runs in its own transaction (REQUIRES_NEW) so the audit entry survives even
+     * though the caller is about to roll back and rethrow the triggering exception.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    void logRequisitionEvent(String requisitionId, String message) {
+        Requisition requisition = Requisition.get(requisitionId)
+        if (!requisition) {
+            log.warn("Unable to log requisition error - requisition ${requisitionId} not found: ${message}")
+            return
+        }
+
+        addSystemEventLog(requisition, message)
     }
 
     RequisitionItem buildRequisitionItem(Map params) {

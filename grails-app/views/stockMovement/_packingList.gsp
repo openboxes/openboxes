@@ -205,7 +205,16 @@
                     </td>
                     <td aria-label="Backorder Reference" data-testid="backorder-reference">
                         <g:if test="${shipmentItem?.backorderReference || shipmentItem?.backorderItem}">
-                            ${shipmentItem?.backorderReference?:shipmentItem?.backorderItem?.requisition?.requestNumber}
+                            <g:set var="backorderRequisitionId" value="${shipmentItem.resolveBackorderReference()}"/>
+                            <g:if test="${backorderRequisitionId}">
+                                <g:link controller="stockMovement" action="show" id="${backorderRequisitionId}">
+                                    ${shipmentItem?.backorderReference?:shipmentItem?.backorderItem?.requisition?.requestNumber}
+                                </g:link>
+                            </g:if>
+                            <g:else>
+                                ${shipmentItem?.backorderReference?:shipmentItem?.backorderItem?.requisition?.requestNumber}
+                                <small class="fade">(<warehouse:message code="default.pending.label"/>)</small>
+                            </g:else>
                         </g:if>
                         <g:else>
                             <div class="fade"><warehouse:message code="default.empty.label"/></div>

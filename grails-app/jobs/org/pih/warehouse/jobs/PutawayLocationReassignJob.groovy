@@ -65,7 +65,7 @@ class PutawayLocationReassignmentJob {
     }
 
     private void setPutawayLocation(PutawayItem putawayItem, Location putawayLocation) {
-        if (putawayItem?.putawayStatus == PutawayStatus.PENDING) {
+        if (putawayItem?.putawayStatus != PutawayStatus.COMPLETED && putawayItem?.putawayStatus != PutawayStatus.CANCELED) {
             putawayItem.putawayLocation = putawayLocation
             log.debug "Modified putawayLocation as ${putawayLocation} for ${putawayItem.id}"
         }

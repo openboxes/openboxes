@@ -1,5 +1,6 @@
 package org.pih.warehouse.picking
 
+import org.pih.warehouse.api.PickStatusCode
 import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
@@ -48,6 +49,11 @@ class PickTask {
     Date dateCreated
     Date lastUpdated
 
+    // Order level pick progress, aggregated across the whole requisition by the pick_task view.
+    Integer orderTotalTaskCount
+    Integer orderOpenTaskCount
+    PickStatusCode orderPickStatusCode
+
     static constraints = {
         requisition nullable: false
         requisitionNumber nullable: true
@@ -75,6 +81,9 @@ class PickTask {
         dateStaged nullable: true
         reasonCode nullable: true
         status nullable: false
+        orderTotalTaskCount nullable: true
+        orderOpenTaskCount nullable: true
+        orderPickStatusCode nullable: true
     }
 
     static mapping = {
@@ -116,6 +125,9 @@ class PickTask {
                 dateStaged      : dateStaged,
                 reasonCode      : reasonCode,
                 status          : status?.name(),
+                orderTotalTaskCount: orderTotalTaskCount,
+                orderOpenTaskCount : orderOpenTaskCount,
+                orderPickStatusCode: orderPickStatusCode?.name(),
                 dateCreated     : dateCreated,
                 lastUpdated     : lastUpdated,
         ]

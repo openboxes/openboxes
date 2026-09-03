@@ -561,7 +561,8 @@ class PutawayService implements EventPublisher  {
     OrderItem updateOrderItem(PutawayItem putawayItem, OrderItem orderItem) {
         OrderItemStatusCode orderItemStatusCode =
                 !putawayItem?.splitItems?.empty ? OrderItemStatusCode.CANCELED :
-                        putawayItem.putawayStatus == PutawayStatus.COMPLETED ? OrderItemStatusCode.COMPLETED : OrderItemStatusCode.PENDING
+                        putawayItem.putawayStatus == PutawayStatus.COMPLETED ? OrderItemStatusCode.COMPLETED :
+                                putawayItem.putawayStatus == PutawayStatus.CANCELED ? OrderItemStatusCode.CANCELED : OrderItemStatusCode.PENDING
 
         orderItem.orderItemStatusCode = orderItemStatusCode
         orderItem.product = putawayItem.product
@@ -585,6 +586,11 @@ class PutawayService implements EventPublisher  {
 
 
     void validatePutawayItem(PutawayItem putawayItem) {
+        if (putawayItem.putawayLocation?.isNegativeInventoryFallbackLocation()) {
+            throw new IllegalArgumentException("Cannot putaway into the inventory shortfall location " +
+                    "${putawayItem.putawayLocation?.name}. Assign the product a real bin instead.")
+        }
+
         // Mobile validation for scanned putaway location
         // TODO: add a config property around this part instead checking if the scannedPutawayLocation != null
         if (putawayItem.scannedPutawayLocation != null) {
