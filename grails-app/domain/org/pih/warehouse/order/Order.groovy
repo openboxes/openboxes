@@ -626,6 +626,7 @@ class Order implements Serializable, Historizable {
                 identifier: orderNumber,
                 description: description,
                 name: name,
+                className: this.class.simpleName
         )
     }
 

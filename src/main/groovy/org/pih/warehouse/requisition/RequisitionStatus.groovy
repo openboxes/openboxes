@@ -58,6 +58,7 @@ enum RequisitionStatus {
         this.displayStatusCode = displayStatusCode
         this.variant = variant
     }
+
     RequisitionStatus getDisplayStatus() {
         return this.displayStatusCode?:this
     }

@@ -32,9 +32,12 @@ class ReferenceDocument implements Validateable {
 
     String name
 
+    String className
+
     static constraints = {
         url(nullable: true)
         description(nullable: true)
         name(nullable: true)
+        className(nullable: true)
     }
 }

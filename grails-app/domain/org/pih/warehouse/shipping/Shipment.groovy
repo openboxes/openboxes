@@ -801,6 +801,7 @@ class Shipment implements Comparable, Serializable, Historizable {
                 identifier: shipmentNumber,
                 description: description,
                 name: name,
+                className: this.class.simpleName
         )
     }
 

@@ -63,4 +63,5 @@
     <include file="0.9.x/changelog-2026-07-07-1200-add-requisition-allocation-strategy-and-auto-issuance.xml" />
     <include file="0.9.x/changelog-2026-07-22-1200-rename-requisition-auto-allocation-enabled-to-requested.xml" />
     <include file="0.9.x/changelog-2026-08-13-1200-create-table-requisition-event-log.xml" />
+    <include file="0.9.x/changelog-2026-08-31-0000-set-sort-order-on-requisition-event-types.xml" />
 </databaseChangeLog>

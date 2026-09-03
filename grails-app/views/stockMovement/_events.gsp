@@ -7,7 +7,7 @@
     <h2>
         <img src="${resource(dir:'images/icons/silk',file:'date.png')}" alt="event" style="vertical-align: middle"/>
         <label>
-            <g:message code="default.shipmentHistory.label" default="Shipment history"/>
+            <g:message code="default.eventHistory.label" default="Events history"/>
         </label>
     </h2>
     <g:if test="${historyItems.size() > 0}">
@@ -15,6 +15,7 @@
             <thead>
             <tr class="odd">
                 <th><g:message code="default.event.label" default="Event"/></th>
+                <th><g:message code="default.source.label" default="Source"/></th>
                 <th><g:message code="event.identifier.label" default="Event Identifier"/></th>
                 <th><g:message code="event.dateLogged.label" default="Date Logged"/></th>
                 <th><g:message code="event.eventDate.label" default="Event Date"/></th>
@@ -28,6 +29,9 @@
                 <tr>
                     <td>
                         ${historyItem?.eventType?.name}
+                    </td>
+                    <td>
+                        ${historyItem?.referenceDocument?.className}
                     </td>
                     <td>
                         %{-- Shipment events link to the SM but we're already on that page so hide those links --}%
