@@ -117,7 +117,31 @@ class PickTaskService {
             order("l.name", "asc")
         }
 
+        // PickTask is a denormalized snapshot (see the pick_task DB view), not live-linked to the stock
+        // ledger, so a PICKED task's stock can be moved or removed later through a side channel (stock
+        // transfer, manual removal) that never updates it. Flag those rather than hide them, so users
+        // can still recover the work but see it needs a closer look. Only meaningful for a PICKED-only
+        // search - other statuses are left untouched (hasStockIssue stays null).
+        if (statusesToSearch == [PickTaskStatus.PICKED]) {
+            annotateStockIssues(tasks)
+        }
+
         return tasks
+    }
+
+    private void annotateStockIssues(List<PickTask> tasks) {
+        tasks.each { PickTask task ->
+            task.hasStockIssue = !hasPickedStockStillAvailable(task)
+        }
+    }
+
+    private boolean hasPickedStockStillAvailable(PickTask task) {
+        Location binLocation = task.outboundContainer ?: task.location
+        if (!binLocation) {
+            return false
+        }
+        BigDecimal quantityOnHand = productAvailabilityService.getQuantityOnHandInBinLocation(task.inventoryItem, binLocation)
+        return quantityOnHand != null && quantityOnHand >= (task.quantityPicked ?: 0)
     }
 
     @Transactional(readOnly = true)
