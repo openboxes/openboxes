@@ -14,6 +14,7 @@ const ReceivingStep = ({ flushRef, validateBeforeNextRef, setNextDisabled }) => 
     setView,
     putawayEnabled,
     setPutawayEnabled,
+    showPackLevel,
     table: {
       lineItemsState, columns, sort, order,
     },
@@ -61,6 +62,7 @@ const ReceivingStep = ({ flushRef, validateBeforeNextRef, setNextDisabled }) => 
         onResetSort={resetSort}
         updateFilterParams={updateFilterParams}
         clearFilterParams={clearFilterParams}
+        packingListViewEnabled={showPackLevel}
       />
       <ReceivingTable
         lineItemsState={lineItemsState}

@@ -109,6 +109,7 @@ const useReceivingForm = () => {
     setView,
     putawayEnabled,
     setPutawayEnabled,
+    showPackLevel: columnsVisibility.showPackLevel,
     table: {
       lineItemsState: visibleLineItemsState,
       columns,
