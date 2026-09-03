@@ -55,7 +55,7 @@ const ConfirmReceiptFilters = ({
           isLoading={!translationsFetched}
         />
       </div>
-      <div className="d-flex gap-8">
+      <div className="confirm-receipt__action-bar-buttons d-flex gap-8">
         {view !== ReceivingView.PACKING_LIST && (
           <Button
             label="react.receiving.resetSorting.label"

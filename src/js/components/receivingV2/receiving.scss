@@ -440,10 +440,32 @@
 
     &-filters {
       flex-grow: 1;
+      min-width: 0;
     }
 
     .filter-select .filter-select__control {
       min-height: 36px;
+    }
+
+    &-buttons,
+    .filter-group.order-1,
+    .filter-header .buttons {
+      flex-shrink: 0;
+    }
+
+    button {
+      white-space: nowrap;
+    }
+
+    .filter-header > div:first-child,
+    .filter-group:has(.search-input),
+    .filter-group:has(.search-input) .form-element-container {
+      min-width: 0;
+    }
+
+    .search-input {
+      max-width: 100%;
+      min-width: 240px;
     }
   }
 }
