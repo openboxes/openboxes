@@ -47,19 +47,15 @@ const ReceivingFilters = ({
   const fields = useMemo(() => filterFields(translate), [translate]);
 
   const viewOptions = useMemo(() => receivingViewOptions.map((option) => {
-    let disabled = false;
-    let disabledTooltip = null;
-
     // If the shipment has no pack levels, disable the packing list view.
-    if (option.value === ReceivingView.PACKING_LIST && !packingListViewEnabled) {
-      disabled = true;
-      disabledTooltip = translate('react.receiving.packingListView.disabled.label', 'No packing information entered for this shipment.');
-    }
+    const disabled = option.value === ReceivingView.PACKING_LIST && !packingListViewEnabled;
 
     return {
       ...option,
       disabled,
-      disabledTooltip,
+      disabledTooltip: disabled
+        ? translate('react.receiving.packingListView.disabled.label', 'No packing information entered for this shipment.')
+        : null,
     };
   }), [packingListViewEnabled, translate]);
 
