@@ -22,6 +22,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 
 
@@ -107,6 +108,21 @@ class ShipmentItem implements Comparable, Serializable {
 
     Boolean isFullyReceived() {
         return quantityReceivedAndCanceled >= quantity
+    }
+
+    // Resolves the id of the outbound requisition named by backorderItem or backorderReference.
+    // Returns null when the reference doesn't (yet) resolve to a requisition - expected, not an
+    // error, since the outbound demand may not exist in OpenBoxes yet.
+    String resolveBackorderReference() {
+        if (backorderItem) {
+            return backorderItem?.requisition?.id
+        }
+
+        if (backorderReference) {
+            return Requisition.findByRequestNumber(backorderReference)?.id
+        }
+
+        return null
     }
 
     /**
