@@ -154,6 +154,31 @@ class ReceiptV2Service {
         }
     }
 
+    /**
+     * Deletes the markers of the given receipts, for those that have one. Must be called before deleting a receipt,
+     * and before detaching it from its shipment: a marker's foreign key blocks the deletion of the receipt it points
+     * at, and the deletion of a receipt detached from its shipment can be flushed by any query that follows.
+     */
+    @Transactional
+    void deleteMarkersForReceipts(Collection<Receipt> receipts) {
+        if (!receipts) {
+            return
+        }
+        List<ReceiptV2Marker> receiptV2Markers = ReceiptV2Marker.findAllByReceiptInList(receipts.toList())
+        for (ReceiptV2Marker marker : receiptV2Markers) {
+            marker.delete()
+        }
+    }
+
+    /**
+     * Deletes the marker of the given receipt, if it has one. See {@link #deleteMarkersForReceipts} for when to
+     * call it.
+     */
+    @Transactional
+    void deleteMarkerForReceipt(Receipt receipt) {
+        deleteMarkersForReceipts([receipt])
+    }
+
     @Transactional
     ReceiptSaveResponseDto updateItemsBatch(ReceiptItemsBatchRequest request) {
         // The receipt is bound and validated (as existing and pending) by the request, so this assumes a validated

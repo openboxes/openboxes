@@ -16,6 +16,7 @@ import grails.validation.ValidationException
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
+import org.pih.warehouse.api.receiving.v2.ReceiptV2Service
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
@@ -47,6 +48,7 @@ class ReceiptService {
     InventoryService inventoryService
     LocationService locationService
     ReceiptIdentifierService receiptIdentifierService
+    ReceiptV2Service receiptV2Service
     TransactionIdentifierService transactionIdentifierService
     GrailsApplication grailsApplication
     ProductAvailabilityService productAvailabilityService
@@ -415,6 +417,7 @@ class ReceiptService {
         rollbackInboundTransactions(shipment)
 
         if (shipment.receipts) {
+            receiptV2Service.deleteMarkersForReceipts(shipment.receipts)
             shipment.receipts.toArray().each { Receipt receipt ->
                 shipment.removeFromReceipts(receipt)
                 receipt.delete()
@@ -443,6 +446,7 @@ class ReceiptService {
                 shipment.removeFromIncomingTransactions(transaction)
                 transaction.delete()
             }
+            receiptV2Service.deleteMarkerForReceipt(lastReceipt)
             shipment.removeFromReceipts(lastReceipt)
             lastReceipt.delete()
 
