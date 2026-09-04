@@ -221,6 +221,25 @@ class InternalLocationApiSpec extends ApiSpec {
                         .build())
     }
 
+    void 'search with offset should return the remaining page of results with a consistent totalCount and no overlap with the first page'() {
+        given:
+        List<String> expectedIds = [ownMatch1.id, ownMatch2.id, ownNonMatch.id, typeFallbackMatch.id, typeFallbackNonMatch.id]
+
+        when:
+        List<String> page1 = internalLocationApiWrapper.api
+                .search(baseParams() + [max: 3, offset: 0], responseSpecUtil.OK_RESPONSE_SPEC)
+                .jsonPath().getList('data.id', String)
+        List<String> page2 = internalLocationApiWrapper.api
+                .search(baseParams() + [max: 3, offset: 3], responseSpecUtil.OK_RESPONSE_SPEC)
+                .jsonPath().getList('data.id', String)
+
+        then:
+        page1.size() == 3
+        page2.size() == 2
+        page1.intersect(page2).isEmpty()
+        (page1 + page2).toSet() == expectedIds.toSet()
+    }
+
     void 'search with activityCodes and a max lower than the number of matches should cap the results but keep an accurate totalCount'() {
         expect:
         internalLocationApiWrapper.api.search(baseParams() + [activityCodes: ActivityCode.PUTAWAY_CART.id, max: 2], new ResponseSpecBuilder()
