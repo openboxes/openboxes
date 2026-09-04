@@ -41,6 +41,7 @@ import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.receiving.ReceiptV2Marker
 import org.pih.warehouse.receiving.ShipmentForReceiptValidator
 import org.pih.warehouse.receiving.ShipmentItemReceivedQuantitiesDto
+import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentService
@@ -66,8 +67,8 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
     ApplicationContext mainContext
 
     void setupSpec() {
-        mockDomains(Receipt, ReceiptItem, ReceiptV2Marker, Shipment, ShipmentItem, ShipmentType, Transaction,
-                TransactionEntry, Product, InventoryItem, Inventory, Location)
+        mockDomains(Receipt, ReceiptItem, ReceiptV2Marker, Shipment, ShipmentItem, ShipmentType, Container,
+                Transaction, TransactionEntry, Product, InventoryItem, Inventory, Location)
     }
 
     void setup() {
@@ -975,8 +976,77 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
     }
 
     // ----------------------------------------------------------------------------------------------------------
+    // sortByPackLevel - the ordering of the packing list view.
+    // ----------------------------------------------------------------------------------------------------------
+
+    void 'sortByPackLevel should order the items by their pack levels'() {
+        given: 'two pallets of two boxes each, with one item per box, in no particular order'
+        Container pallet1 = buildPallet("Pallet 1", 1)
+        Container pallet2 = buildPallet("Pallet 2", 2)
+        List<ShipmentItem> shipmentItems = [
+                buildPackedShipmentItem("P2-B2", buildBox(pallet2, "Box 2", 2)),
+                buildPackedShipmentItem("P1-B2", buildBox(pallet1, "Box 2", 2)),
+                buildPackedShipmentItem("P2-B1", buildBox(pallet2, "Box 1", 1)),
+                buildPackedShipmentItem("P1-B1", buildBox(pallet1, "Box 1", 1)),
+        ]
+
+        when:
+        List<ShipmentItem> sorted = service.sortByPackLevel(shipmentItems)
+
+        then: 'they come out ordered by pack level 1, then by pack level 2'
+        assert sorted*.lotNumber == ["P1-B1", "P1-B2", "P2-B1", "P2-B2"]
+    }
+
+    void 'sortByPackLevel should keep the order of the items packed at the same level'() {
+        given: 'three items in the same box'
+        Container box = buildBox(buildPallet("Pallet 1", 1), "Box 1", 1)
+        List<ShipmentItem> shipmentItems = [
+                buildPackedShipmentItem("third", box),
+                buildPackedShipmentItem("first", box),
+                buildPackedShipmentItem("second", box),
+        ]
+
+        when:
+        List<ShipmentItem> sorted = service.sortByPackLevel(shipmentItems)
+
+        then: 'the order the query returned them in is preserved'
+        assert sorted*.lotNumber == ["third", "first", "second"]
+    }
+
+    void 'sortByPackLevel should keep the order of the items whose pack levels compare equal'() {
+        given: 'two items in different pallets that carry no sort order of their own'
+        List<ShipmentItem> shipmentItems = [
+                buildPackedShipmentItem("second", buildPallet("Pallet B", null)),
+                buildPackedShipmentItem("first", buildPallet("Pallet A", null)),
+        ]
+
+        when:
+        List<ShipmentItem> sorted = service.sortByPackLevel(shipmentItems)
+
+        then: 'nothing orders the pallets, so the order the query returned the items in stands'
+        assert sorted*.lotNumber == ["second", "first"]
+    }
+
+    // ----------------------------------------------------------------------------------------------------------
     // Fixture helpers
     // ----------------------------------------------------------------------------------------------------------
+
+    private static Container buildPallet(String name, Integer sortOrder) {
+        return new Container(name: name, sortOrder: sortOrder)
+    }
+
+    private static Container buildBox(Container pallet, String name, Integer sortOrder) {
+        return new Container(name: name, sortOrder: sortOrder, parentContainer: pallet)
+    }
+
+    /**
+     * An item packed in the given container, labeled through its lot number so that the assertions can tell the
+     * items apart: a shipment item compares by product and lot number, so asserting on the items themselves would
+     * treat them all as equal.
+     */
+    private static ShipmentItem buildPackedShipmentItem(String label, Container container) {
+        return new ShipmentItem(lotNumber: label, container: container)
+    }
 
     private static ReceiptItemCompleteRequest completeRequest(ReceiptItem receiptItem, boolean cancelRemainingQuantity) {
         return new ReceiptItemCompleteRequest(receiptItem: receiptItem, cancelRemainingQuantity: cancelRemainingQuantity)

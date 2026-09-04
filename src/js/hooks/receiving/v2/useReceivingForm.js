@@ -17,8 +17,8 @@ import useReceivingBinLocations from 'hooks/receiving/v2/useReceivingBinLocation
 import useReceivingColumns from 'hooks/receiving/v2/useReceivingColumns';
 import useReceivingFilters from 'hooks/receiving/v2/useReceivingFilters';
 import useReceivingNextValidation from 'hooks/receiving/v2/useReceivingNextValidation';
+import useReceivingSort from 'hooks/receiving/v2/useReceivingSort';
 import useTableLocationAutofill from 'hooks/receiving/v2/useTableLocationAutofill';
-import useTableSorting from 'hooks/useTableSorting';
 import getOptionalColumnsVisibility from 'utils/receiving/getOptionalColumnsVisibility';
 import hasItemInDifferentBin from 'utils/receiving/hasItemInDifferentBin';
 
@@ -31,9 +31,10 @@ const useReceivingForm = () => {
   const receivingBin = useSelector(getReceivingBin);
   const binLocations = useSelector(getReceivingBinLocations);
   const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
+  // The sorting is shared with the check step, so it survives moving on from here.
   const {
     sortableProps, sort, order, resetSort,
-  } = useTableSorting();
+  } = useReceivingSort();
   const {
     loading,
     receiptId,

@@ -13,7 +13,7 @@ import useConfirmReceiptActions from 'hooks/receiving/v2/useConfirmReceiptAction
 import useConfirmReceiptColumns from 'hooks/receiving/v2/useConfirmReceiptColumns';
 import useConfirmReceiptSaveActions from 'hooks/receiving/v2/useConfirmReceiptSaveActions';
 import useReceivingFilters from 'hooks/receiving/v2/useReceivingFilters';
-import useTableSorting from 'hooks/useTableSorting';
+import useReceivingSort from 'hooks/receiving/v2/useReceivingSort';
 import { formatDateToString } from 'utils/dateUtils';
 import getOptionalColumnsVisibility from 'utils/receiving/getOptionalColumnsVisibility';
 import hasAnyPreviousReceipt from 'utils/receiving/hasAnyPreviousReceipt';
@@ -43,10 +43,11 @@ const useConfirmReceiptForm = () => {
 
   // The check step renders in the view selected on the receiving step.
   const view = useSelector(getReceivingView);
-  // Sorting is done by the backend, so every header click reloads the summary.
+  // Sorting is done by the backend, so every header click reloads the summary. It is carried
+  // over from the receiving step.
   const {
     sortableProps, sort, order, resetSort,
-  } = useTableSorting();
+  } = useReceivingSort();
   const {
     loading, receiptIdRef, lineItemsState, updateLineItemComment,
   } = useConfirmReceiptActions({ view, sort, sortOrder: order });
