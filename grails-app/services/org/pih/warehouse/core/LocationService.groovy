@@ -779,7 +779,13 @@ class LocationService {
         ]
     }
 
-    List<Location> searchInternalLocations(Map params, LocationTypeCode[] locationTypeCodes) {
+    /**
+     * Returns [data: List<Location>, totalCount: Integer] rather than just the page of locations, since
+     * totalCount now comes from a genuinely separate count query rather than a Hibernate criteria
+     * PagedResultList - returning it as an explicit part of the result keeps that visible in the method's
+     * contract instead of relying on callers to know to check for a bonus property on the list.
+     */
+    Map searchInternalLocations(Map params, LocationTypeCode[] locationTypeCodes) {
         Integer max = params.max ? params.int('max') : 25
         Integer offset = params.offset ? params.int('offset') : 0
 
@@ -798,11 +804,7 @@ class LocationService {
                 [max: max, offset: offset]
         ) as List<Location>
 
-        // Preserve the same contract InternalLocationApiController#search expects from a Hibernate
-        // criteria PagedResultList (data + a real totalCount independent of the page size).
-        locations.metaClass.totalCount = totalCount
-
-        return locations
+        return [data: locations, totalCount: totalCount]
     }
 
     def importLocationCsv(ImportDataCommand command) {

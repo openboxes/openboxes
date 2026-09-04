@@ -44,11 +44,9 @@ class InternalLocationApiController {
         }
 
         LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION]
-        List<Location> locations = locationService.searchInternalLocations(params, locationTypeCodes)
+        Map result = locationService.searchInternalLocations(params, locationTypeCodes)
 
-        // FIXME Not a huge fan of this, but it needs to be done to handle the case where we filter locations by
-        //  activity code after the internal locations have been retrieved
-        render([data: locations, totalCount: locations?.hasProperty('totalCount') ? locations.totalCount : locations?.size()] as JSON)
+        render([data: result.data, totalCount: result.totalCount] as JSON)
     }
 
     def listReceiving(ReceivingLocationSearchCommand command) {
