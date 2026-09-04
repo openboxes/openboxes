@@ -21,7 +21,7 @@ import EditLineModal from 'components/receiving/modals/EditLineModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
 import receivingSortOptions from 'consts/receivingSortOptions';
-import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import apiClient, { parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, getReceivingPayloadContainers } from 'utils/form-values-utils';
@@ -731,7 +731,7 @@ class PartialReceivingPage extends Component {
       recipient: formValues?.recipient?.id,
       containers: getReceivingPayloadContainers({ ...formValues, containers }),
     };
-    return apiClient.post(url, flattenRequest(payload));
+    return apiClient.post(url, payload);
   }
 
   saveAndExit(formValues) {
@@ -976,7 +976,7 @@ class PartialReceivingPage extends Component {
         id: values.recipient?.id,
       },
     };
-    apiClient.post(url, flattenRequest(valuesWithoutDisplayNames))
+    apiClient.post(url, valuesWithoutDisplayNames)
       .then((response) => {
         fileDownload(response.data, `PartialReceiving${shipmentId ? `-${shipmentId}` : ''}.csv`, 'text/csv');
         this.props.hideSpinner();
@@ -1017,7 +1017,7 @@ class PartialReceivingPage extends Component {
       containers: getReceivingPayloadContainers(formValues),
     };
 
-    return apiClient.post(url, flattenRequest(payload));
+    return apiClient.post(url, payload);
   }
 
   nextPage(formValues) {
