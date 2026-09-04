@@ -17,7 +17,7 @@ import AddZoneModal from 'components/locations-configuration/modals/AddZoneModal
 import ImportBinModal from 'components/locations-configuration/modals/ImportBinModal';
 import SuccessMessage from 'components/locations-configuration/SuccessMessage';
 import ZoneTable from 'components/locations-configuration/ZoneTable';
-import apiClient, { flattenRequest } from 'utils/apiClient';
+import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -190,7 +190,7 @@ class ZoneAndBinLocations extends Component {
       zone: values.zoneLocation && { id: values.zoneLocation.id },
     };
 
-    apiClient.post(`/api/locations/${values.id}`, flattenRequest(payload))
+    apiClient.post(`/api/locations/${values.id}`, payload)
       .then(() => {
         this.props.hideSpinner();
         if (values.locationType.locationTypeCode === 'ZONE') {

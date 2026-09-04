@@ -23,7 +23,6 @@ import DateFormat from 'consts/dateFormat';
 import AlertMessage from 'utils/AlertMessage';
 import {
   apiClientCustomResponseHandler as apiClient,
-  flattenRequest,
   handleSuccess,
   handleValidationErrors,
 } from 'utils/apiClient';
@@ -533,7 +532,7 @@ class PackingPage extends Component {
     };
 
     if (payload.packPageItems.length) {
-      return apiClient.post(updateItemsUrl, flattenRequest(payload))
+      return apiClient.post(updateItemsUrl, payload)
         .catch(() => Promise.reject(new Error('react.stockMovement.error.saveRequisitionItems.label')));
     }
 
