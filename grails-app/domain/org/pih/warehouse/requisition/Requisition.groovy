@@ -47,6 +47,23 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
         Holders.grailsApplication.mainContext.publishEvent(new RequisitionEvent(this.id, eventType))
     }
 
+    /**
+     * Announces that the requisition's status has been persisted as changed, so that listeners can record the
+     * transition history and trigger webhooks without the domain knowing what either of those involve.
+     *
+     * Detecting the change here - at the point the change is persisted - rather than by overriding setStatus
+     * means every path that mutates status is covered identically (direct assignment, map constructors, data
+     * binding), while transient instances that are never saved (form backing objects, criteria templates)
+     * correctly produce nothing. Bulk updates via executeUpdate bypass Hibernate events and so are not covered.
+     */
+    private void publishStatusChangedEvent(RequisitionStatus oldStatus, RequisitionStatus newStatus) {
+        if (oldStatus == newStatus) {
+            return
+        }
+        Holders.grailsApplication.mainContext.publishEvent(
+                new RequisitionStatusChangedEvent(this.id, oldStatus, newStatus))
+    }
+
     def beforeInsert() {
         createdBy = AuthService.currentUser
         updatedBy = AuthService.currentUser
@@ -54,11 +71,21 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
 
     def beforeUpdate() {
         updatedBy = AuthService.currentUser
+
+        // getPersistentValue reads Hibernate's loaded-state snapshot, which is still intact in beforeUpdate
+        // but has already been refreshed by the time afterUpdate runs - so the comparison has to happen here.
+        if (isDirty('status')) {
+            publishStatusChangedEvent(getPersistentValue('status') as RequisitionStatus, status)
+        }
     }
 
     def afterInsert() {
         publishAutomaticAllocationEvent()
         sendRequisitionEvent(WebhookEventType.REQUISITION_CREATED)
+
+        // On insert there is no previous status by definition, and no snapshot to compare against. Published
+        // from afterInsert rather than beforeInsert so that listeners can load the requisition by id.
+        publishStatusChangedEvent(null, status)
     }
 
     String id
@@ -535,7 +562,7 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
      */
     private Integer getAttemptCount(String messagePrefix, RequisitionStatus expectedStatus) {
         Event mostRecentEvent = getMostRecentEvent()
-        RequisitionStatus mostRecentStatus = mostRecentEvent ? requisitionEventManager?.toRequisitionStatus(mostRecentEvent.eventType) : null
+        RequisitionStatus mostRecentStatus = RequisitionStatus.fromEventCode(mostRecentEvent?.eventType?.eventCode)
         if (mostRecentStatus != null && mostRecentStatus >= expectedStatus) {
             return 0
         }
@@ -602,29 +629,6 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
         }
 
         return null
-    }
-
-    RequisitionEventManager getRequisitionEventManager() {
-        if (!Holders.grailsApplication.mainContext.containsBean('requisitionEventManager')) {
-            return null
-        }
-        return Holders.grailsApplication.mainContext.getBean(RequisitionEventManager)
-    }
-
-    /**
-     * The single path through which requisition.status changes - every direct "requisition.status = X" assignment
-     * in the codebase (as well as map-constructors and data binding) is routed through here by Groovy's normal
-     * property-assignment semantics. Whenever the status actually changes, records the transition (see
-     * RequisitionEventManager#recordStatusChange) so requisition.events stays in sync with requisition.status
-     * and can never drift from it.
-     */
-    void setStatus(RequisitionStatus newStatus) {
-        RequisitionStatus oldStatus = this.@status
-        this.@status = newStatus
-
-        if (newStatus != oldStatus) {
-            requisitionEventManager?.recordStatusChange(this, oldStatus, newStatus, origin)
-        }
     }
 
     Map toJson() {

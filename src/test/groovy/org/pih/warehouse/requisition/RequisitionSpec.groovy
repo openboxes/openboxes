@@ -21,25 +21,6 @@ import org.pih.warehouse.requisition.RequisitionType
 
 class RequisitionSpec extends Specification implements DomainUnitTest<Requisition> {
 
-    void setup() {
-        // requisition.status = X now has a side effect (see Requisition#setStatus): it asks
-        // RequisitionEventManager to record the transition. Stub it out by default so unrelated tests that merely
-        // construct a Requisition with a status aren't affected; tests that care about this behavior install
-        // their own mock instead. toRequisitionStatus is delegated to a real (collaborator-free, since it's a
-        // pure mapping) instance, since getAllocationAttemptCount/getIssuanceAttemptCount/getMostRecentErrorMessage
-        // rely on it even in tests that never touch setStatus.
-        RequisitionEventManager realManager = new RequisitionEventManager(null, null)
-        Requisition.metaClass.getRequisitionEventManager = { ->
-            Stub(RequisitionEventManager) {
-                toRequisitionStatus(_ as EventType) >> { EventType eventType -> realManager.toRequisitionStatus(eventType) }
-            }
-        }
-    }
-
-    void cleanup() {
-        GroovySystem.metaClassRegistry.removeMetaClass(Requisition)
-    }
-
     void 'validate should return true for a valid requisition'() {
         when:
         Location location = new Location()
@@ -222,49 +203,6 @@ class RequisitionSpec extends Specification implements DomainUnitTest<Requisitio
 
         expect:
         requisition.getIssuanceAttemptCount() == 0
-    }
-
-    @Unroll
-    void 'setStatus should ask RequisitionEventManager to record the transition from #oldStatus to #newStatus'() {
-        given:
-        Location origin = new Location()
-        Requisition requisition = new Requisition(status: oldStatus, origin: origin)
-
-        and:
-        RequisitionEventManager mockManager = Mock(RequisitionEventManager)
-        requisition.metaClass.getRequisitionEventManager = { -> mockManager }
-
-        when:
-        requisition.status = newStatus
-
-        then:
-        1 * mockManager.recordStatusChange(requisition, oldStatus, newStatus, origin)
-
-        where:
-        oldStatus                 | newStatus
-        null                      | RequisitionStatus.CREATED
-        RequisitionStatus.CREATED | RequisitionStatus.PICKING
-        RequisitionStatus.PICKING | RequisitionStatus.ISSUED
-        RequisitionStatus.CREATED | RequisitionStatus.VERIFYING
-        // Backward transitions: whether this is a rollback is entirely RequisitionEventManager's call
-        // (see RequisitionEventManagerSpec) - setStatus just has to report both statuses faithfully.
-        RequisitionStatus.ISSUED  | RequisitionStatus.CHECKING
-        RequisitionStatus.CANCELED | RequisitionStatus.PENDING
-    }
-
-    void 'setStatus should not ask RequisitionEventManager to do anything when the status does not actually change'() {
-        given:
-        Requisition requisition = new Requisition(status: RequisitionStatus.CREATED)
-
-        and:
-        RequisitionEventManager mockManager = Mock(RequisitionEventManager)
-        requisition.metaClass.getRequisitionEventManager = { -> mockManager }
-
-        when:
-        requisition.status = RequisitionStatus.CREATED
-
-        then:
-        0 * mockManager.recordStatusChange(*_)
     }
 
     void 'getMostRecentEvent should break ties on EventType.sortOrder when two events land in the same second'() {

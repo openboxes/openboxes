@@ -11,7 +11,6 @@ import org.pih.warehouse.api.picking.SearchPickTaskCommand
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.RequisitionEvent
 import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.WebhookPublisherService
@@ -385,7 +384,7 @@ class PickTaskService {
                     stockMovementService.createMissingShipmentItems(requisition, shipment)
                 }
 
-                grailsApplication.mainContext.publishEvent(new RequisitionEvent(task.requisition.id, WebhookEventType.REQUISITION_STAGED))
+                // REQUISITION_STAGED is published by RequisitionStatusWebhookEventService off the status change above.
             }
         }
 

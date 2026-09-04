@@ -76,11 +76,7 @@ class RequisitionEventManager {
      * same numbering by convention). Returns null for an EventType with no matching RequisitionStatus.
      */
     RequisitionStatus toRequisitionStatus(EventType eventType) {
-        if (eventType?.eventCode == EventCode.CANCELLED) {
-            return RequisitionStatus.CANCELED
-        }
-
-        return RequisitionStatus.values().find { it.name() == eventType?.eventCode?.name() }
+        return RequisitionStatus.fromEventCode(eventType?.eventCode)
     }
 
     /**

@@ -12,7 +12,6 @@ package org.pih.warehouse.requisition
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
-import grails.util.Holders
 import grails.validation.ValidationException
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.joda.time.LocalDate
@@ -29,9 +28,7 @@ import org.pih.warehouse.core.history.EventLog
 import org.pih.warehouse.core.history.EventLogCode
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
-import org.pih.warehouse.core.RequisitionEvent
 import org.pih.warehouse.core.User
-import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
@@ -901,10 +898,9 @@ class RequisitionService {
                 requisition.dateRejected = new Date()
                 requisition.rejectedBy = currentUser
                 break
-            case RequisitionStatus.ISSUED:
-                Holders.grailsApplication.mainContext.publishEvent(new RequisitionEvent(requisition.id, WebhookEventType.REQUISITION_ISSUED))
-                // no break
             default:
+                // REQUISITION_ISSUED and the other webhook-facing transitions are published by
+                // RequisitionStatusWebhookEventService off the status change below.
                 requisition.status = newStatus
         }
         requisition.save(flush: true)

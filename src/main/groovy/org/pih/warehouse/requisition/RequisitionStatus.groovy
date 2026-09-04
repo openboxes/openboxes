@@ -11,6 +11,7 @@ package org.pih.warehouse.requisition
 
 import grails.util.Holders
 import org.pih.warehouse.inventory.StockMovementStatusCode
+import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.StatusType
 
 enum RequisitionStatus {
@@ -61,6 +62,25 @@ enum RequisitionStatus {
 
     RequisitionStatus getDisplayStatus() {
         return this.displayStatusCode?:this
+    }
+
+    /**
+     * The requisition status an {@link EventCode} represents - the inverse of
+     * RequisitionEventManager#toEventCode. A pure mapping, so it lives here rather than on a Spring bean that
+     * the Requisition domain would otherwise have to look up out of the application context.
+     * Returns null for an EventCode with no matching RequisitionStatus.
+     */
+    static RequisitionStatus fromEventCode(EventCode eventCode) {
+        if (eventCode == null) {
+            return null
+        }
+
+        // The only status that doesn't have a one-to-one mapping to an EventCode is CANCELED (single vs double L)
+        if (eventCode == EventCode.CANCELLED) {
+            return CANCELED
+        }
+
+        return values().find { it.name() == eventCode.name() }
     }
 
     static int compare(RequisitionStatus a, RequisitionStatus b) {

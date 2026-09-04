@@ -1,79 +1,151 @@
 package org.pih.warehouse.requisition
 
-import java.lang.reflect.Field
-
-import grails.gorm.transactions.Rollback
-import org.hibernate.SessionFactory
-import org.hibernate.engine.spi.SessionFactoryImplementor
-import org.hibernate.persister.entity.EntityPersister
-import org.hibernate.property.access.spi.Setter
-import org.hibernate.property.access.spi.SetterFieldImpl
-import org.hibernate.tuple.entity.AbstractEntityTuplizer
-
 import org.pih.warehouse.common.base.IntegrationSpec
 import org.pih.warehouse.common.domain.builder.core.LocationTestBuilder
+import org.pih.warehouse.core.Event
+import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 
 /**
- * Verifies that overriding the persistent property setter Requisition.setStatus (OBLS-929) does not leak
- * its Event-creating side effect into Hibernate entity hydration. Hibernate's default access strategy for
- * a mapped property is "property" access, meaning it calls the setter when populating an entity read from
- * the database - which would run recordStatusChange() with a null oldStatus on every Requisition.get().
+ * Verifies that requisition status transitions are recorded as Events by detecting the change where it is
+ * persisted (Requisition#beforeUpdate / #afterInsert, via GORM dirty checking) rather than by intercepting
+ * assignment.
+ *
+ * Deliberately NOT @Rollback: RequisitionStatusChangedEventService runs in the BEFORE_COMMIT phase, so
+ * nothing is recorded unless the transaction actually commits. Test data is removed in cleanup() instead.
  */
-@Rollback
 class RequisitionStatusEventIntegrationSpec extends IntegrationSpec {
 
-    SessionFactory sessionFactory
+    private final List<String> requisitionIds = []
 
-    void 'hibernate does not invoke the overridden setStatus when hydrating a requisition'() {
-        given: 'a persisted requisition whose status transition event has already been recorded'
-        Location origin = new LocationTestBuilder().findOrBuildMainFacility()
-        Location destination = new LocationTestBuilder().name("Test Destination ${UUID.randomUUID()}").build(true)
-        Requisition requisition = Requisition.build(
-                origin: origin,
-                destination: destination,
-                requestedBy: Person.build(),
-                status: RequisitionStatus.CREATED,
-        )
-        Requisition.withSession { it.flush() }
-        String requisitionId = requisition.id
-        int eventCountAfterInsert = countEvents(requisitionId)
-
-        and: 'the session is cleared so the read below is a real hydration and not a first-level cache hit'
-        Requisition.withSession { it.clear() }
-
-        when: 'the requisition is read back from the database'
-        Requisition reloaded = Requisition.get(requisitionId)
-        reloaded.status
-        Requisition.withSession { it.flush() }
-
-        then: 'hydration did not record a second transition event'
-        reloaded.status == RequisitionStatus.CREATED
-        countEvents(requisitionId) == eventCountAfterInsert
+    void cleanup() {
+        Requisition.withNewTransaction {
+            requisitionIds.each { String requisitionId ->
+                Requisition requisition = Requisition.get(requisitionId)
+                if (!requisition) {
+                    return
+                }
+                List<Event> events = new ArrayList<>(requisition.events ?: [])
+                requisition.eventLogs?.each { it.event = null }
+                events.each { requisition.removeFromEvents(it) }
+                requisition.delete()
+                events.each { it.delete() }
+            }
+        }
+        requisitionIds.clear()
     }
 
-    void 'the status property is mapped with field access so the overridden setter is bypassed on load'() {
+    void 'inserting a requisition records the initial status transition against its origin'() {
+        when:
+        String requisitionId = createRequisition(RequisitionStatus.CREATED)
+
+        then: 'the Event is recorded with the origin as its location, which is only populated by insert time'
+        eventCodesFor(requisitionId) == [EventCode.CREATED]
+        locationNameOfFirstEvent(requisitionId) == mainFacilityName()
+    }
+
+    void 'changing the status of a persisted requisition records the transition'() {
         given:
-        EntityPersister persister = ((SessionFactoryImplementor) sessionFactory)
-                .metamodel
-                .entityPersister(Requisition.name)
-        int statusIndex = persister.entityMetamodel.getPropertyIndex('status')
+        String requisitionId = createRequisition(RequisitionStatus.CREATED)
 
         when:
-        AbstractEntityTuplizer tuplizer = (AbstractEntityTuplizer) persister.entityTuplizer
-        Field settersField = AbstractEntityTuplizer.getDeclaredField('setters')
-        settersField.accessible = true
-        Setter statusSetter = ((Setter[]) settersField.get(tuplizer))[statusIndex]
+        transitionTo(requisitionId, RequisitionStatus.PICKING)
 
-        then: 'a SetterMethodImpl here means Hibernate calls Requisition.setStatus() during hydration'
-        statusSetter instanceof SetterFieldImpl
+        then:
+        eventCodesFor(requisitionId) == [EventCode.CREATED, EventCode.PICKING]
     }
 
-    private int countEvents(String requisitionId) {
-        Requisition.executeQuery(
-                'select count(e) from Requisition r join r.events e where r.id = :id',
-                [id: requisitionId],
-        )[0] as int
+    void 'reassigning the same status records nothing'() {
+        given:
+        String requisitionId = createRequisition(RequisitionStatus.CREATED)
+
+        when:
+        transitionTo(requisitionId, RequisitionStatus.CREATED)
+
+        then:
+        eventCodesFor(requisitionId) == [EventCode.CREATED]
+    }
+
+    void 'a requisition that is never saved records nothing'() {
+        given: 'a transient requisition, as built by the controllers to back a create form'
+        int eventCountBefore = countEvents()
+
+        when:
+        Requisition requisition = new Requisition(status: RequisitionStatus.CREATED)
+
+        then: 'no Event and no EventType are written for an object that never reaches the database'
+        requisition.events == null
+        countEvents() == eventCountBefore
+    }
+
+    void 'loading a persisted requisition records nothing'() {
+        given:
+        String requisitionId = createRequisition(RequisitionStatus.CREATED)
+        int eventCountBefore = countEvents()
+
+        when:
+        RequisitionStatus status = Requisition.withNewTransaction {
+            Requisition.withSession { it.clear() }
+            return Requisition.get(requisitionId).status
+        }
+
+        then:
+        status == RequisitionStatus.CREATED
+        countEvents() == eventCountBefore
+    }
+
+    private String createRequisition(RequisitionStatus status) {
+        String requisitionId = Requisition.withNewTransaction {
+            Location origin = new LocationTestBuilder().findOrBuildMainFacility()
+            Location destination = new LocationTestBuilder()
+                    .name("Test Destination ${UUID.randomUUID()}")
+                    .build(true)
+            return Requisition.build(
+                    origin: origin,
+                    destination: destination,
+                    requestedBy: Person.build(),
+                    status: status,
+            ).id
+        }
+        requisitionIds << requisitionId
+        return requisitionId
+    }
+
+    private void transitionTo(String requisitionId, RequisitionStatus status) {
+        Requisition.withNewTransaction {
+            Requisition requisition = Requisition.get(requisitionId)
+            requisition.status = status
+            requisition.save()
+        }
+    }
+
+    private List<EventCode> eventCodesFor(String requisitionId) {
+        return Requisition.withNewTransaction {
+            Requisition.withSession { it.clear() }
+            return Requisition.get(requisitionId)
+                    .events
+                    ?.sort { it.dateCreated }
+                    ?.collect { it.eventType?.eventCode } ?: []
+        }
+    }
+
+    private String locationNameOfFirstEvent(String requisitionId) {
+        return Requisition.withNewTransaction {
+            Requisition.withSession { it.clear() }
+            return Requisition.get(requisitionId).events?.min { it.dateCreated }?.eventLocation?.name
+        }
+    }
+
+    private String mainFacilityName() {
+        return Requisition.withNewTransaction {
+            return new LocationTestBuilder().findOrBuildMainFacility().name
+        }
+    }
+
+    private int countEvents() {
+        return Requisition.withNewTransaction {
+            return Event.count()
+        }
     }
 }
