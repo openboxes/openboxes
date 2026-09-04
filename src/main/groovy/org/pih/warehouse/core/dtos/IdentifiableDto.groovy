@@ -3,7 +3,7 @@ package org.pih.warehouse.core.dtos
 import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
-import groovy.transform.EqualsAndHashCode
+import org.apache.commons.lang.builder.HashCodeBuilder
 
 /**
  * Represents a DTO that is identifiable via some identifier field.
@@ -37,7 +37,6 @@ import groovy.transform.EqualsAndHashCode
  * Notably, this only catches cycles at the point of serialization. If there is a cycle that occurs before this
  * point, such as when converting entities to DTOs, that can still result in an infinite recursion stack overflow.
  */
-@EqualsAndHashCode(includes = ["id"])
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator, property = "id")
 trait IdentifiableDto {
 
@@ -56,4 +55,25 @@ trait IdentifiableDto {
      */
     @JsonProperty("id")
     String id
+
+    @Override
+    boolean equals(Object other) {
+        if (this.is(other)) {
+            return true
+        }
+
+        if (!(other instanceof IdentifiableDto)) {
+            return false
+        }
+
+        IdentifiableDto that = (IdentifiableDto) other
+        return id == that.id
+    }
+
+    @Override
+    int hashCode() {
+        return new HashCodeBuilder()
+                .append(id)
+                .toHashCode()
+    }
 }
