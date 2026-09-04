@@ -43,6 +43,7 @@ import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.date.DateFormatter
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.ProductAndBinKey
 import org.pih.warehouse.inventory.TransactionEntry
 import util.ReportUtil
 
@@ -1652,6 +1653,40 @@ class ProductService {
 
         // Convert list to a map for O(1) accessibility further
         return results.collectEntries { [ (it[0]): it[1] ] }
+    }
+
+    /**
+     * Last counted date, scoped to product+bin rather than latestInventoryDateForProducts' facility+
+     * product grain above.
+     */
+    Map<ProductAndBinKey, Timestamp> getDateLastCountedByProductAndBin(
+            Location facility, List<String> productIds, List<String> binLocationIds) {
+        if (!productIds || !binLocationIds) {
+            return [:]
+        }
+
+        List<String> transactionTypeIds = configService.getProperty('openboxes.inventoryCount.transactionTypes', List) as List<String>
+
+        String hql = """
+            select ii.product.id, te.binLocation.id, max(t.transactionDate)
+            from TransactionEntry te
+            join te.transaction t
+            join te.inventoryItem ii
+            where ii.product.id in (:productIds)
+              and te.binLocation.id in (:binLocationIds)
+              and t.inventory = :inventory
+              and t.transactionType.id in (:transactionTypeIds)
+            group by ii.product.id, te.binLocation.id
+        """
+
+        List<Object[]> results = TransactionEntry.executeQuery(hql, [
+                productIds     : productIds,
+                binLocationIds : binLocationIds,
+                inventory      : facility.inventory,
+                transactionTypeIds: transactionTypeIds,
+        ]) as List<Object[]>
+
+        return results.collectEntries { Object[] row -> [(new ProductAndBinKey((String) row[0], (String) row[1])): (Timestamp) row[2]] }
     }
 
     Map<String, List<Map<String, Object>>> getLotNumbersWithExpirationDate(List<String> productIds) {
