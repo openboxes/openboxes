@@ -548,6 +548,8 @@ class PickTaskService {
 
         List<PickTaskStatus> statusesToSearch = command.status ?: [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
 
+        // FIXME refactor findRequisitionIdsWithPickTaskAssigned method to include it in the query itself,
+        //  it could return a DetachedCriteria and be treated as a subquery instead of two separate queries
         List<String> assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(command.facility, statusesToSearch)
 
         List<Requisition> candidates = PickTask.createCriteria().list {
