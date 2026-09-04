@@ -57,6 +57,9 @@ class PutawayTaskService {
             statuses = statusesByStatusCategory
         }
 
+        Date createdAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
+        Date createdBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
+
         // Search for putaway tasks based on user-provided search parameters
         List<PutawayTask> tasks = PutawayTask.createCriteria().list(max: max, offset: offset, sort: sort, order: sortOrder) {
             if (statuses) {
@@ -88,6 +91,12 @@ class PutawayTaskService {
             }
             if (command.order) {
                 eq('putawayOrder', command.order)
+            }
+            if (createdAfter) {
+                ge('dateCreated', createdAfter)
+            }
+            if (createdBefore) {
+                le('dateCreated', createdBefore)
             }
         }
 

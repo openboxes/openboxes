@@ -728,41 +728,83 @@ class LocationService {
         return "${receivingLocationPrefix}-${identifier}"
     }
 
-    List<Location> searchInternalLocations(Map params, LocationTypeCode[] locationTypeCodes) {
-        List<Location> locations = Location.createCriteria().list(params) {
-            if (!params.includeInactive) {
-                eq("active", Boolean.TRUE)
-            }
+    /**
+     * Builds the shared WHERE clause (and its bind params) for searchInternalLocations, used by both the
+     * paginated select and the count query so they can never drift apart.
+     *
+     * The activityCodes condition mirrors Location#supports(): a location matches if its own
+     * supportedActivities contains one of the given codes, or - only when it has none of its own - its
+     * location type's supportedActivities does. Expressed as correlated EXISTS subqueries rather than a
+     * JOIN so it can't multiply rows: combining a collection JOIN with pagination is a well-known Hibernate
+     * trap (LIMIT/OFFSET apply to the joined row count, not the distinct entity count, silently truncating
+     * or duplicating pages).
+     */
+    private static Map buildSearchInternalLocationsWhere(Map params, LocationTypeCode[] locationTypeCodes) {
+        List<String> clauses = ["1 = 1"]
+        Map<String, Object> queryParams = [:]
 
-            if (params.parentLocation?.id) {
-                eq("parentLocation", Location.get(params.parentLocation.id))
-            }
+        if (locationTypeCodes) {
+            clauses << "lt.locationTypeCode IN (:locationTypeCodes)"
+            queryParams.locationTypeCodes = locationTypeCodes as List
+        }
 
-            if (locationTypeCodes) {
-                locationType {
-                    'in'("locationTypeCode", locationTypeCodes)
-                }
-            }
+        if (!params.includeInactive) {
+            clauses << "l.active = true"
+        }
 
-            if (params.searchTerm) {
-                or {
-                    ilike("name", "%${params.searchTerm}%")
-                    ilike("locationNumber", "%${params.searchTerm}%")
-                }
-            }
+        if (params.parentLocation?.id) {
+            clauses << "l.parentLocation.id = :parentLocationId"
+            queryParams.parentLocationId = params.parentLocation.id
+        }
 
-            order("sortOrder", "asc")
-            order("name", "asc")
+        if (params.searchTerm) {
+            clauses << "(LOWER(l.name) LIKE :searchTermLike OR LOWER(l.locationNumber) LIKE :searchTermLike)"
+            queryParams.searchTermLike = "%${params.searchTerm.toLowerCase()}%"
         }
 
         if (params.activityCodes) {
-            List<String> activityCodes = params.list("activityCodes")
-            locations = locations.findAll { Location loc ->
-                activityCodes.any { String code -> loc.supports(code) }
-            }
+            clauses << """(
+                EXISTS (SELECT 1 FROM Location ownLoc JOIN ownLoc.supportedActivities sa WHERE ownLoc = l AND sa IN (:activityCodes))
+                OR (
+                    NOT EXISTS (SELECT 1 FROM Location anyLoc JOIN anyLoc.supportedActivities anySa WHERE anyLoc = l)
+                    AND EXISTS (SELECT 1 FROM LocationType typ JOIN typ.supportedActivities typSa WHERE typ = lt AND typSa IN (:activityCodes))
+                )
+            )"""
+            queryParams.activityCodes = params.list("activityCodes")
         }
 
-        return locations
+        return [
+                where      : "FROM Location l LEFT JOIN l.locationType lt WHERE " + clauses.join(" AND "),
+                queryParams: queryParams,
+        ]
+    }
+
+    /**
+     * Returns [data: List<Location>, totalCount: Integer] rather than just the page of locations, since
+     * totalCount now comes from a genuinely separate count query rather than a Hibernate criteria
+     * PagedResultList - returning it as an explicit part of the result keeps that visible in the method's
+     * contract instead of relying on callers to know to check for a bonus property on the list.
+     */
+    Map searchInternalLocations(Map params, LocationTypeCode[] locationTypeCodes) {
+        Integer max = params.max ? params.int('max') : 25
+        Integer offset = params.offset ? params.int('offset') : 0
+
+        Map built = buildSearchInternalLocationsWhere(params, locationTypeCodes)
+        String where = built.where as String
+        Map queryParams = built.queryParams as Map
+
+        // Built via String concatenation (+), not GString interpolation ($) - executeQuery specifically
+        // detects a GString query and rewrites its embedded expressions into bind parameters, which is meant
+        // for safely parameterizing values, not for splicing in a raw HQL clause as query syntax.
+        Integer totalCount = (Location.executeQuery("SELECT COUNT(l) " + where, queryParams)[0] as Number).intValue()
+
+        List<Location> locations = Location.executeQuery(
+                "SELECT l " + where + " ORDER BY l.sortOrder ASC, l.name ASC",
+                queryParams,
+                [max: max, offset: offset]
+        ) as List<Location>
+
+        return [data: locations, totalCount: totalCount]
     }
 
     def importLocationCsv(ImportDataCommand command) {

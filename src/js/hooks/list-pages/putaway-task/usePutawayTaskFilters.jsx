@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import queryString from 'query-string';
 import { useSelector } from 'react-redux';
@@ -23,9 +23,15 @@ const usePutawayTaskFilters = () => {
   const statusCategoryOptions = filterFields.statusCategory
     .getDynamicAttr().options;
 
+  // statusCategory defaults to OPEN only for the very first load of the page (e.g.
+  // landing here from the dashboard tile with no statusCategory in the URL at all).
+  // Once that's happened, an absent statusCategory means the user explicitly cleared
+  // it (or switched facility) and wants every status, not that it should snap back.
+  const hasAppliedDefaultStatusCategoryRef = useRef(false);
+
   const clearFilterValues = () => {
     const { pathname } = history.location;
-    history.push({ pathname });
+    history.replace({ pathname });
   };
 
   const initializeDefaultFilterValues = async () => {
@@ -37,10 +43,11 @@ const usePutawayTaskFilters = () => {
     if (queryProps.statusCategory) {
       defaultValues.statusCategory = statusCategoryOptions
         .find(({ id }) => id === queryProps.statusCategory) || '';
-    } else {
+    } else if (!hasAppliedDefaultStatusCategoryRef.current) {
       defaultValues.statusCategory = statusCategoryOptions
         .find(({ id }) => id === 'OPEN') || '';
     }
+    hasAppliedDefaultStatusCategoryRef.current = true;
 
     if (queryProps.status) {
       const statusesFromParams = getParamList(queryProps.status);
@@ -67,6 +74,18 @@ const usePutawayTaskFilters = () => {
       }
     }
 
+    if (queryProps.putawayOrder) {
+      defaultValues.putawayOrder = queryProps.putawayOrder;
+    }
+
+    if (queryProps.createdAfter) {
+      defaultValues.createdAfter = queryProps.createdAfter;
+    }
+
+    if (queryProps.createdBefore) {
+      defaultValues.createdBefore = queryProps.createdBefore;
+    }
+
     setDefaultFilterValues({ ...defaultValues });
     setFiltersInitialized(true);
   };
@@ -77,25 +96,49 @@ const usePutawayTaskFilters = () => {
 
   useCommonFiltersCleaner({ clearFilterValues, initializeDefaultFilterValues, filtersInitialized });
 
-  const setFilterValues = (values) => {
+  const setFilterValues = (values, { replace = false } = {}) => {
     const filterAccessors = {
       statusCategory: { name: 'statusCategory', accessor: 'id' },
       status: { name: 'status', accessor: 'id' },
       searchTerm: { name: 'searchTerm' },
       container: { name: 'container', accessor: 'id' },
       destination: { name: 'destination', accessor: 'id' },
+      putawayOrder: { name: 'putawayOrder' },
+      createdAfter: { name: 'createdAfter' },
+      createdBefore: { name: 'createdBefore' },
     };
 
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);
     const { pathname } = history.location;
     if (Object.keys(values).length) {
-      history.push({ pathname, search: queryFilterParams });
+      history[replace ? 'replace' : 'push']({ pathname, search: queryFilterParams });
     }
     setFilterParams({ ...values });
   };
 
-  return { setFilterValues, defaultFilterValues, filterParams };
+  // Resets all other filters and filters down to every task belonging to the given
+  // putaway order, regardless of status - used by the "Show All Tasks for This
+  // Putaway" row action.
+  const filterByOrder = (orderNumber) => {
+    // putawayOrder is itself one of filterFields' keys, so it has to be set after the
+    // blanking reduce below, not seeded as its initial accumulator - otherwise the
+    // reduce blanks it right back out while clearing every other field.
+    const clearedValues = {
+      ...Object.keys(filterFields).reduce((acc, key) => ({ ...acc, [key]: '' }), {}),
+      putawayOrder: orderNumber,
+    };
+
+    const { pathname } = history.location;
+    history.push({ pathname, search: queryString.stringify({ putawayOrder: orderNumber }) });
+
+    setDefaultFilterValues(clearedValues);
+    setFilterParams(clearedValues);
+  };
+
+  return {
+    setFilterValues, filterByOrder, defaultFilterValues, filterParams,
+  };
 };
 
 export default usePutawayTaskFilters;

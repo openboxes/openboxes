@@ -1,28 +1,40 @@
 import React, { useMemo } from 'react';
 
 import PropTypes from 'prop-types';
-import { RiInformationLine, RiRefreshLine } from 'react-icons/ri';
+import { RiInformationLine, RiRefreshLine, RiSearchLine } from 'react-icons/ri';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
-import { PUTAWAY_URL } from 'consts/applicationUrls';
+import { INVENTORY_ITEM_URL, PUTAWAY_URL } from 'consts/applicationUrls';
 import usePutawayTaskListTableData from 'hooks/list-pages/putaway-task/usePutawayTaskListTableData';
 import ContextMenu from 'utils/ContextMenu';
 import { findActions } from 'utils/list-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const STATUS_VARIANT_MAP = {
-  PENDING: 'secondary',
-  STARTED: 'info',
+  PENDING: 'gray',
+  STARTED: 'primary',
   IN_PROGRESS: 'warning',
   COMPLETED: 'success',
   CANCELED: 'danger',
 };
 
-const PutawayTaskListTable = ({ filterParams }) => {
+const TooltipHeader = ({ id, defaultMessage }) => (
+  <CustomTooltip content={<Translate id={id} defaultMessage={defaultMessage} />}>
+    <Translate id={id} defaultMessage={defaultMessage} />
+  </CustomTooltip>
+);
+
+TooltipHeader.propTypes = {
+  id: PropTypes.string.isRequired,
+  defaultMessage: PropTypes.string.isRequired,
+};
+
+const PutawayTaskListTable = ({ filterParams, onFilterByOrder }) => {
   const {
     onFetchHandler,
     rerunHandler,
@@ -46,6 +58,12 @@ const PutawayTaskListTable = ({ filterParams }) => {
       leftIcon: <RiRefreshLine />,
       statuses: ['PENDING'],
       onClick: (id) => rerunHandler(id),
+    },
+    {
+      label: 'react.putawayTask.filterByPutaway.label',
+      defaultLabel: 'Show All Tasks for This Putaway',
+      leftIcon: <RiSearchLine />,
+      onClick: () => onFilterByOrder(row?.putawayOrder?.orderNumber),
     },
   ];
 
@@ -93,31 +111,44 @@ const PutawayTaskListTable = ({ filterParams }) => {
       ),
     },
     {
-      Header: <Translate id="react.putawayTask.column.productCode.label" defaultMessage="Product Code" />,
+      Header: <TooltipHeader id="react.putawayTask.column.productCode.label" defaultMessage="Product Code" />,
       accessor: 'inventoryItem.product.productCode',
       className: 'd-flex align-items-center',
       headerClassName: 'header',
       maxWidth: 150,
+      Cell: (row) => (
+        <TableCell
+          {...row}
+          tooltip
+          openLinkInNewTab
+          link={row.original.inventoryItem?.product?.id
+            ? INVENTORY_ITEM_URL.showStockCard(row.original.inventoryItem.product.id)
+            : null}
+        />
+      ),
     },
     {
-      Header: <Translate id="react.putawayTask.column.productName.label" defaultMessage="Product Name" />,
+      Header: <TooltipHeader id="react.putawayTask.column.productName.label" defaultMessage="Product Name" />,
       accessor: 'inventoryItem.product.name',
       className: 'd-flex align-items-center',
       headerClassName: 'header',
       minWidth: 200,
+      Cell: (row) => <TableCell {...row} tooltip />,
     },
     {
-      Header: <Translate id="react.putawayTask.column.lotNumber.label" defaultMessage="Lot Number" />,
+      Header: <TooltipHeader id="react.putawayTask.column.lotNumber.label" defaultMessage="Lot Number" />,
       accessor: 'inventoryItem.lotNumber',
       className: 'd-flex align-items-center',
       headerClassName: 'header',
       maxWidth: 150,
+      Cell: (row) => <TableCell {...row} tooltip />,
     },
     {
-      Header: <Translate id="react.putawayTask.column.location.label" defaultMessage="Location" />,
+      Header: <TooltipHeader id="react.putawayTask.column.location.label" defaultMessage="Location" />,
       accessor: 'location.name',
       className: 'd-flex align-items-center',
       headerClassName: 'header',
+      Cell: (row) => <TableCell {...row} tooltip />,
     },
     {
       Header: <Translate id="react.putawayTask.column.quantity.label" defaultMessage="Qty" />,
@@ -127,36 +158,43 @@ const PutawayTaskListTable = ({ filterParams }) => {
       maxWidth: 80,
     },
     {
-      Header: <Translate id="react.putawayTask.column.container.label" defaultMessage="Container" />,
+      Header: <TooltipHeader id="react.putawayTask.column.container.label" defaultMessage="Container" />,
       accessor: 'container.name',
       className: 'd-flex align-items-center',
       headerClassName: 'header',
+      Cell: (row) => <TableCell {...row} tooltip />,
     },
     {
-      Header: <Translate id="react.putawayTask.column.destination.label" defaultMessage="Destination" />,
+      Header: <TooltipHeader id="react.putawayTask.column.destination.label" defaultMessage="Destination" />,
       accessor: 'destination.name',
       className: 'd-flex align-items-center',
       headerClassName: 'header',
+      Cell: (row) => <TableCell {...row} tooltip />,
     },
     {
-      Header: <Translate id="react.putawayTask.column.assignee.label" defaultMessage="Assignee" />,
+      Header: <TooltipHeader id="react.putawayTask.column.assignee.label" defaultMessage="Assignee" />,
       accessor: 'assignee.name',
       className: 'd-flex align-items-center',
       headerClassName: 'header',
+      // assignee.name is a transient (non-persisted) property on the Person domain
+      // class, so the server can't sort by it - keep this column unsortable.
+      sortable: false,
+      Cell: (row) => <TableCell {...row} tooltip />,
     },
     {
-      Header: <Translate id="react.putawayTask.column.strategy.label" defaultMessage="Strategy" />,
+      Header: <TooltipHeader id="react.putawayTask.column.strategy.label" defaultMessage="Strategy" />,
       accessor: 'comment',
       className: 'd-flex align-items-center',
       headerClassName: 'header',
+      Cell: (row) => <TableCell {...row} tooltip />,
     },
     {
-      Header: <Translate id="react.putawayTask.column.dateCreated.label" defaultMessage="Date Created" />,
+      Header: <TooltipHeader id="react.putawayTask.column.dateCreated.label" defaultMessage="Date Created" />,
       accessor: 'dateCreated',
       className: 'd-flex align-items-center',
-      Cell: (row) => <DateCell {...row} />,
+      Cell: (row) => <DateCell {...row} tooltip />,
     },
-  ], [rerunHandler]);
+  ], [rerunHandler, onFilterByOrder]);
 
   return (
     <div className="list-page-list-section">
@@ -187,4 +225,5 @@ export default PutawayTaskListTable;
 
 PutawayTaskListTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
+  onFilterByOrder: PropTypes.func.isRequired,
 };

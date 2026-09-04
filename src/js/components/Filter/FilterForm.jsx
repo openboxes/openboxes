@@ -16,7 +16,9 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/Filter/FilterStyles.scss';
 
-const AutoSubmitOnChange = ({ values, excludeField, onSubmit }) => {
+const AutoSubmitOnChange = ({
+  values, excludeField, onSubmit, pristine,
+}) => {
   const prevValuesRef = useRef(null);
 
   useEffect(() => {
@@ -25,7 +27,11 @@ const AutoSubmitOnChange = ({ values, excludeField, onSubmit }) => {
       ? _.omit(prevValuesRef.current, excludeField)
       : null;
 
-    if (previous !== null && !_.isEqual(current, previous)) {
+    // A pristine form's values only change because they were reinitialized from
+    // defaultValues (e.g. once the async default-filter fetch resolves) - not because
+    // the user touched a filter. Skip those, otherwise this fires its own history.push
+    // right on top of the one FilterForm's own defaultValues effect already replaces.
+    if (previous !== null && !pristine && !_.isEqual(current, previous)) {
       onSubmit();
     }
     prevValuesRef.current = values;
@@ -82,10 +88,12 @@ const FilterForm = ({
   };
 
   // Default values can change based on currentLocation
-  // or any async data defaultValues are waiting for
+  // or any async data defaultValues are waiting for. This is not a user-driven filter
+  // change, so replace the current history entry instead of pushing a new one -
+  // otherwise the browser back button gets stuck cycling through these syncs.
   useEffect(() => {
     if (!disableAutoUpdateFilterParams) {
-      updateFilterParams({ ...defaultValues });
+      updateFilterParams({ ...defaultValues }, { replace: true });
     }
   }, [defaultValues]);
 
@@ -140,8 +148,20 @@ const FilterForm = ({
     return allFiltersEmpty || requiredFiltersMissing;
   };
 
+  // No initial value on purpose: this makes the very first execution of the effect
+  // below always see a falsy previousLocationId and skip, whether currentLocation is
+  // already resolved by the time this component first mounts or not.
+  const previousLocationIdRef = useRef();
+
   useEffect(() => {
-    if (formRef.current) {
+    const previousLocationId = previousLocationIdRef.current;
+    previousLocationIdRef.current = currentLocation?.id;
+
+    // Only clear filters on a genuine facility switch - not the first time
+    // currentLocation resolves from its unset placeholder during session bootstrap,
+    // which isn't a user-driven change and shouldn't wipe defaults (e.g. the putaway
+    // list's default OPEN status filter) that were just correctly applied.
+    if (previousLocationId && formRef.current) {
       onClearHandler(formRef.current);
     }
   }, [currentLocation?.id]);
@@ -164,12 +184,13 @@ const FilterForm = ({
           return (
             <form onSubmit={handleSubmit} className="w-100 m-0">
               {autoSubmitOnFilterChange && (
-                <FormSpy subscription={{ values: true }}>
-                  {({ values: formValues }) => (
+                <FormSpy subscription={{ values: true, pristine: true }}>
+                  {({ values: formValues, pristine }) => (
                     <AutoSubmitOnChange
                       values={formValues}
                       excludeField={searchFieldId}
                       onSubmit={handleSubmit}
+                      pristine={pristine}
                     />
                   )}
                 </FormSpy>
