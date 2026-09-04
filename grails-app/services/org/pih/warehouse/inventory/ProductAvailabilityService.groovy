@@ -36,7 +36,6 @@ import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
-import org.pih.warehouse.core.db.GormUtil
 import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.inventory.product.availability.InventoryByProduct
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
@@ -825,35 +824,39 @@ class ProductAvailabilityService {
         return inventoryService.getQuantityAsAvailableItems(transactionEntries).findAll{ it.quantityOnHand != 0 }
     }
 
-    List getAvailableItems(Location location, List<String> productsIds, boolean excludeNegativeQuantity = false, boolean excludeZeroQuantity = false) {
+    List getAvailableItems(Location location, List<String> productsIds, boolean excludeNegativeQuantity = false, boolean excludeZeroQuantity = false, Map listArgs = null) {
         log.info("getQuantityOnHandByBinLocation: location=${location} product=${productsIds}")
 
         if (!location) {
-            return []
+            return listArgs?.max != null ? new PaginatedList([], 0) : []
         }
 
-        String quantityCondition = ((excludeNegativeQuantity && excludeZeroQuantity) || excludeZeroQuantity) ? "and pa.quantityOnHand <> 0"
-                : (excludeNegativeQuantity) ? "and pa.quantityOnHand > 0" : ""
+        def results = ProductAvailability.createCriteria().list(listArgs ?: [:]) {
+            createAlias("inventoryItem", "ii", JoinType.LEFT_OUTER_JOIN)
+            createAlias("binLocation", "bl", JoinType.LEFT_OUTER_JOIN)
 
-        String sql = """
-                SELECT
-                    ii,
-                    pa.binLocation,
-                    pa.quantityOnHand,
-                    pa.quantityAvailableToPromise
-                FROM
-                    ProductAvailability pa
-                    LEFT OUTER JOIN pa.inventoryItem ii
-                    LEFT OUTER JOIN pa.binLocation bl
-                WHERE
-                    pa.location = :location
-                    ${quantityCondition}
-                    ${productsIds ? "AND pa.product.id IN (:products)" : ""}
-        """
-        def results = ProductAvailability.executeQuery(sql, GormUtil.sanitizeExecuteQueryArgs(sql, [
-                location: location,
-                products: productsIds,
-        ]))
+            eq("location", location)
+            if (excludeZeroQuantity) {
+                ne("quantityOnHand", 0)
+            } else if (excludeNegativeQuantity) {
+                gt("quantityOnHand", 0)
+            }
+            if (productsIds) {
+                product {
+                    inList("id", productsIds)
+                }
+            }
+            if (listArgs?.max != null) {
+                order("id", "asc")
+            }
+
+            projections {
+                property("ii")
+                property("bl")
+                property("quantityOnHand")
+                property("quantityAvailableToPromise")
+            }
+        }
 
         List<AvailableItem> data = results.collect {
             InventoryItem inventoryItem = it[0]
@@ -868,7 +871,10 @@ class ProductAvailabilityService {
                     quantityAvailable : quantityAvailableToPromise
             )
         }
-        return data
+
+        return results instanceof PagedResultList ?
+                new PaginatedList(data, results.totalCount) :
+                data
     }
 
     Map<InventoryItem, Integer> getQuantityOnHandByInventoryItem(Location location, List<InventoryItem> inventoryItems = []) {

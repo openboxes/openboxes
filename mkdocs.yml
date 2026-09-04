@@ -376,6 +376,7 @@ nav:
     - Products API:
         - Categories: api-guide/products/category.md
         - Products: api-guide/products/product.md
+        - Product Availability: api-guide/products/productAvailability.md
     - Inbound API:
         - Putaways: api-guide/inbound/putaway.md
         - Receiving: api-guide/inbound/receiving.md
