@@ -28,40 +28,13 @@ export function parseResponse(data) {
   return data;
 }
 
-export function flattenRequest(data) {
-  // eslint-disable-next-line max-len
-  // TODO: flattenRequest was specifically for the Grails 1. Temporary return unflattened data, but when rebase process will be finished clean up and remove this util
-  return data;
-
-  // if (_.isArray(data)) {
-  //   return _.map(data, value => flattenRequest(value));
-  // }
-  //
-  // if (_.isPlainObject(data)) {
-  //   const obj = {};
-  //
-  //   _.forEach(data, (value, key) => {
-  //     const flattenedVal = flattenRequest(value);
-  //
-  //     if (_.isPlainObject(flattenedVal)) {
-  //       _.forEach(
-  //          flattenedVal,
-  //          (childVal, childKey) => { obj[`${key}.${childKey}`] = childVal; }
-  //       );
-  //     } else {
-  //       obj[key] = flattenedVal;
-  //     }
-  //   });
-  //
-  //   return obj;
-  // }
-  //
-  // return data === null || data === undefined ? '' : data;
-}
-
 export const handleSuccess = (response) => response;
 
 export const handleError = (error) => {
+  if (axios.isCancel(error)) {
+    return Promise.reject(error);
+  }
+
   const errorMessage = _.get(error, 'response.data.errorMessage', '');
   const errorMessages = _.get(error, 'response.data.errorMessages', []).join(', ');
   switch (error.response.status) {
