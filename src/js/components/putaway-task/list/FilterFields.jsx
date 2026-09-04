@@ -2,6 +2,7 @@ import DateFilter from 'components/form-elements/DateFilter/DateFilter';
 import FilterSelectField from 'components/form-elements/FilterSelectField';
 import FilterTextField from 'components/form-elements/FilterTextField';
 import DateFormat from 'consts/dateFormat';
+import { DateFormat as DateFormatMoment } from 'consts/timeFormat';
 
 const STATUS_CATEGORY_OPTIONS = [
   { id: 'OPEN', value: 'OPEN', label: 'Open' },
@@ -100,7 +101,7 @@ export default {
       label: 'react.putawayTask.filters.createdAfter.label',
       defaultMessage: 'Created after',
       // date format in which the date will be sent to the API
-      dateFormat: 'MM/DD/YYYY',
+      dateFormat: DateFormatMoment.MM_DD_YYYY,
       ariaLabel: 'Created after',
       filterElement: true,
     },
@@ -113,7 +114,7 @@ export default {
       label: 'react.putawayTask.filters.createdBefore.label',
       defaultMessage: 'Created before',
       // date format in which the date will be sent to the API
-      dateFormat: 'MM/DD/YYYY',
+      dateFormat: DateFormatMoment.MM_DD_YYYY,
       ariaLabel: 'Created before',
       filterElement: true,
     },
