@@ -154,6 +154,14 @@ class InternalLocationApiSpec extends ApiSpec {
                 .build())
     }
 
+    void 'search should match searchTerm case-insensitively against name'() {
+        expect:
+        internalLocationApiWrapper.api.search(baseParams() + [searchTerm: searchTerm.toUpperCase()], new ResponseSpecBuilder()
+                .expectStatusCode(HttpStatus.SC_OK)
+                .expectBody('data.id', Matchers.hasItem(ownMatch1.id))
+                .build())
+    }
+
     void 'search with activityCodes should include a location whose own supportedActivities include the activity'() {
         expect:
         internalLocationApiWrapper.api.search(baseParams() + [activityCodes: ActivityCode.PUTAWAY_CART.id], new ResponseSpecBuilder()
