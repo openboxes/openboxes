@@ -1282,7 +1282,7 @@ class InventoryService implements ApplicationContextAware {
 
                     // A negative available quantity is normally a data anomaly and gets hidden as 0, but on a
                     // bin that supports negative inventory it's a legitimate quantity and should be shown as-is
-                    quantityAvailable = (quantityAvailable > 0 || binLocation?.isNegativeInventoryAllowed()) ? quantityAvailable : 0
+                    quantityAvailable = (quantityAvailable > 0 || binLocation?.isNegativeInventorySupported()) ? quantityAvailable : 0
 
                     // Exclude bin locations with quantity 0 (include negative quantity for data quality purposes)
                     if (quantityOnHand != 0) {
@@ -1338,7 +1338,7 @@ class InventoryService implements ApplicationContextAware {
         // pull down the total, but on a bin that supports negative inventory it's a legitimate quantity and
         // must still be counted, otherwise the total would be overstated
         Integer quantityAvailableToPromise = productAvailabilityRecords?.sum {
-            (it.quantityAvailableToPromise >= 0 || it.binLocation?.isNegativeInventoryAllowed()) ? it.quantityAvailableToPromise : 0
+            (it.quantityAvailableToPromise >= 0 || it.binLocation?.isNegativeInventorySupported()) ? it.quantityAvailableToPromise : 0
         } as Integer ?: 0
 
         return quantityAvailableToPromise ?: 0
