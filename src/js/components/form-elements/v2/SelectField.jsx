@@ -88,6 +88,7 @@ const SelectField = ({
         fieldRef={fieldRef}
         locationId={locationId}
         onExactProductSelected={onExactProductSelected}
+        valueKey="id"
         {...asyncProps}
         {...fieldProps}
       />
