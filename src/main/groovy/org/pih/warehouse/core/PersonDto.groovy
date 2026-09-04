@@ -1,10 +1,12 @@
 package org.pih.warehouse.core
 
+import org.pih.warehouse.core.dtos.IdentifiableDto
+
 /**
  * A simple, general purpose DTO representing a Person.
  */
-class PersonDto {
-    String id
+class PersonDto implements IdentifiableDto {
+
     String name
     String email
     String phoneNumber

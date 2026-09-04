@@ -3,15 +3,15 @@ package org.pih.warehouse.receiving
 import com.fasterxml.jackson.annotation.JsonProperty
 
 import org.pih.warehouse.core.PersonDto
+import org.pih.warehouse.core.dtos.IdentifiableDto
 import org.pih.warehouse.location.LocationSimpleDto
 import org.pih.warehouse.product.lot.ProductLotDto
 
 /**
  * A simple, general purpose DTO representing a single item of a receipt.
  */
-class ReceiptItemDto {
+class ReceiptItemDto implements IdentifiableDto {
 
-    String id
     String receiptId
     String shipmentItemId
     PersonDto recipient

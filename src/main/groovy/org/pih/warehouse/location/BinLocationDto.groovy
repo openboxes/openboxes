@@ -1,6 +1,7 @@
 package org.pih.warehouse.location
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.dtos.IdentifiableDto
 
 /**
  * The DTO representation of a {@link Location} when the location is a bin location.
@@ -8,9 +9,8 @@ import org.pih.warehouse.core.Location
  * Note that while they should likely be considered their own type, we often serialize internal locations
  * (such as temporary receiving bins) as bin locations.
  */
-class BinLocationDto {
+class BinLocationDto implements IdentifiableDto {
 
-    String id
     String name
     String description
     String locationNumber

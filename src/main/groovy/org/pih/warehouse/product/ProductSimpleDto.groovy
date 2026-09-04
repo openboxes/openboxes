@@ -1,12 +1,13 @@
 package org.pih.warehouse.product
 
+import org.pih.warehouse.core.dtos.IdentifiableDto
+
 /**
  * A simplified representation of a Product, containing only the fields that are required
  * to display the product in its most basic form.
  */
-class ProductSimpleDto {
+class ProductSimpleDto implements IdentifiableDto {
 
-    String id
     String productCode
     String name
 
