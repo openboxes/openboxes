@@ -4,7 +4,6 @@ import io.restassured.builder.ResponseSpecBuilder
 import org.apache.http.HttpStatus
 import org.hamcrest.Matchers
 import org.springframework.beans.factory.annotation.Autowired
-import spock.lang.PendingFeature
 import spock.lang.Shared
 
 import org.pih.warehouse.api.client.core.InternalLocationApiWrapper
@@ -17,8 +16,9 @@ import org.pih.warehouse.core.LocationTypeCode
 /**
  * Covers LocationService#searchInternalLocations (via InternalLocationApiController#search), specifically its
  * activityCodes filter and how it mirrors Location#supports(): a location's own supportedActivities take
- * precedence when present, otherwise its location type's supportedActivities are used as a fallback. This is
- * captured as a regression baseline ahead of a planned rewrite of that query.
+ * precedence when present, otherwise its location type's supportedActivities are used as a fallback. Also
+ * covers case-insensitive searchTerm matching, inactive exclusion, and totalCount accuracy (including under
+ * pagination).
  */
 class InternalLocationApiSpec extends ApiSpec {
 
@@ -221,13 +221,6 @@ class InternalLocationApiSpec extends ApiSpec {
                         .build())
     }
 
-    // Known limitation: when activityCodes is present, a caller-supplied max is currently applied to the
-    // base criteria query before the activity filter runs (instead of only after), because that branch
-    // passes params through unmodified. It happens to still return the right rows here (ordering puts the
-    // real matches first), but totalCount ends up reflecting the already-capped base query, not the true
-    // total. The frontend never sends an explicit max today, so this doesn't currently manifest in
-    // production - tracked to be fixed as part of adding real pagination during the planned HQL rewrite.
-    @PendingFeature(reason = "totalCount is wrong when a caller-supplied max caps the base query before the activityCodes filter runs - see comment above")
     void 'search with activityCodes and a max lower than the number of matches should cap the results but keep an accurate totalCount'() {
         expect:
         internalLocationApiWrapper.api.search(baseParams() + [activityCodes: ActivityCode.PUTAWAY_CART.id, max: 2], new ResponseSpecBuilder()
