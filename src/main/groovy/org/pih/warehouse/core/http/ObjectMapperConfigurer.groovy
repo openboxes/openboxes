@@ -106,7 +106,7 @@ class ObjectMapperConfigurer {
      * These include (in priority order):
      *
      * 1) defining a ResponseMapper for the object
-     * 2) implementing ResponseBodyFormattable
+     * 2) implementing HttpSerializable
      * 3) implementing a toJson() method (supported for backwards compatability with existing DTOs)
      *
      * If any object being serialized has one of the above, it will be serialized via that method, otherwise it
@@ -237,7 +237,7 @@ class ObjectMapperConfigurer {
          * Performs our custom serialization on the given object if one of the following (in priority order) is true:
          *
          * 1) A ResponseMapper is defined for the object
-         * 2) The object implements ResponseBodyFormattable
+         * 2) The object implements HttpSerializable
          * 3) The object defines a toJson() method (supported for backwards compatability with existing DTOs)
          */
         private Map applyCustomMapping(Object value) {
@@ -260,10 +260,10 @@ class ObjectMapperConfigurer {
             if (responseMapper) {
                 return responseMapper.asResponseBody(value)
             }
-            if (value instanceof ResponseBodyFormattable) {
+            if (value instanceof HttpSerializable) {
                 return value.asResponseBody()
             }
-            // toJson() is supported for compatability with existing DTOs. Prefer extending ResponseBodyFormattable.
+            // toJson() is supported for compatability with existing DTOs. Prefer extending HttpSerializable.
             if (value.metaClass.respondsTo(value, "toJson")) {
                 return value.toJson()
             }

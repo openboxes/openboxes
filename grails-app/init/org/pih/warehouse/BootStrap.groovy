@@ -12,7 +12,7 @@ package org.pih.warehouse
 import grails.converters.JSON
 import grails.util.Holders
 
-import org.pih.warehouse.core.http.ResponseBodyFormattable
+import org.pih.warehouse.core.http.HttpSerializable
 import org.pih.warehouse.core.mapper.MapperComponentResolver
 import org.pih.warehouse.core.mapper.ResponseMapper
 import org.pih.warehouse.inventory.CycleCountDetails
@@ -166,10 +166,10 @@ class BootStrap {
             }
         }
 
-        // And do the same for all ResponseBodyFormattable implementations.
+        // And do the same for all HttpSerializable implementations.
         // This mentions "bean definitions" but our filter actually searches for non-components as well.
         ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false)
-        scanner.addIncludeFilter(new AssignableTypeFilter(ResponseBodyFormattable))
+        scanner.addIncludeFilter(new AssignableTypeFilter(HttpSerializable))
         for (beanDefinition in scanner.findCandidateComponents("org.pih.warehouse")) {
             Class clazz = Class.forName(beanDefinition.beanClassName)
             JSON.registerObjectMarshaller(clazz, RESPONSE_BODY_FORMATTABLE_MARSHALLER_PRIORITY) {
