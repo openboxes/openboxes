@@ -4,7 +4,7 @@
     <table id="requisition-items" class="fs-repeat-header" border="0">
         <thead style="display: table-row-group">
             <tr class="">
-                <td colspan="11">
+                <td colspan="10">
                     <h4 class="title">${groupName}</h4>
                 </td>
             </tr>
@@ -24,7 +24,7 @@
         <tbody>
             <g:unless test="${stockTransferItems}">
                 <tr>
-                    <td colspan="11" class="middle center">
+                    <td colspan="10" class="middle center">
                         <span class="fade">
                             <warehouse:message code="default.none.label"/>
                         </span>

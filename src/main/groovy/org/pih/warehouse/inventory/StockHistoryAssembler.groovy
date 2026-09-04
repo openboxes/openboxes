@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.order.Order
-import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
@@ -330,33 +328,7 @@ class StockHistoryAssembler {
                 transactionRefIds.requisitionIdByTransactionId.values().toSet())
         context.orderDtoById = loadOrderDtos(
                 transactionRefIds.orderIdByTransactionId.values().toSet())
-        context.discrepancyReasonCodeByOrderItemKey = loadDiscrepancyReasonCodesByOrderItem(
-                transactionRefIds.orderIdByTransactionId.values().toSet())
         return context
-    }
-
-    /**
-     * Bulk-resolve OrderItem.discrepancyReasonCode (added for stock transfers, OBLS-513) for
-     * the stock history view, keyed by "${orderId}|${inventoryItemId}" since the reason code
-     * is set per line item rather than per order.
-     */
-    private static Map<String, ReasonCode> loadDiscrepancyReasonCodesByOrderItem(Set<String> orderIds) {
-        Map<String, ReasonCode> result = [:]
-        if (!orderIds) {
-            return result
-        }
-
-        OrderItem.executeQuery("""
-            SELECT oi.order.id, oi.inventoryItem.id, oi.discrepancyReasonCode
-            FROM OrderItem oi
-            WHERE oi.order.id IN :ids AND oi.discrepancyReasonCode IS NOT NULL
-        """, [ids: orderIds]).each { Object[] row ->
-            String orderId = row[0] as String
-            String inventoryItemId = row[1] as String
-            result["${orderId}|${inventoryItemId}".toString()] = row[2] as ReasonCode
-        }
-
-        return result
     }
 
     /**

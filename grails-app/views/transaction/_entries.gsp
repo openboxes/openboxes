@@ -17,7 +17,6 @@
                 <th style="text-align: center"><warehouse:message code="product.lotNumber.label"/></th>
                 <th style="text-align: center"><warehouse:message code="product.expirationDate.label"/></th>
                 <th style="text-align: center"><warehouse:message code="default.qty.label"/></th>
-                <th style="text-align: center"><warehouse:message code="default.reasonCode.label"/></th>
             </tr>
             </thead>
             <tbody>
@@ -54,12 +53,6 @@
                         </td>
                         <td class="center">
                             ${transactionEntry?.quantity}
-                        </td>
-                        <td class="center">
-                            <g:set var="matchedOrderItem" value="${transactionInstance?.order?.orderItems?.find { it.inventoryItem?.id == transactionEntry?.inventoryItem?.id } }"/>
-                            <g:if test="${matchedOrderItem?.discrepancyReasonCode}">
-                                ${warehouse.message(code: 'enum.ReasonCode.' + matchedOrderItem?.discrepancyReasonCode)}
-                            </g:if>
                         </td>
                     </tr>
                 </g:each>

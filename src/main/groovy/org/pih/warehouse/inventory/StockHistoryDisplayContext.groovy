@@ -1,7 +1,5 @@
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.core.ReasonCode
-
 /**
  * Pre-resolved projections of the Shipment / Requisition / Order entities
  * referenced from the rows of the stock history page. Bundled together so the
@@ -14,10 +12,4 @@ class StockHistoryDisplayContext {
     Map<String, StockHistoryShipmentDto> shipmentDtoById = [:]
     Map<String, StockHistoryRequisitionDto> requisitionDtoById = [:]
     Map<String, StockHistoryOrderDto> orderDtoById = [:]
-
-    /**
-     * OrderItem.discrepancyReasonCode, keyed by "${orderId}|${inventoryItemId}" since the
-     * reason code is per line item rather than per order.
-     */
-    Map<String, ReasonCode> discrepancyReasonCodeByOrderItemKey = [:]
 }
