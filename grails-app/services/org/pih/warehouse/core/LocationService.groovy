@@ -728,79 +728,79 @@ class LocationService {
         return "${receivingLocationPrefix}-${identifier}"
     }
 
+    /**
+     * Builds the shared WHERE clause (and its bind params) for searchInternalLocations, used by both the
+     * paginated select and the count query so they can never drift apart.
+     *
+     * The activityCodes condition mirrors Location#supports(): a location matches if its own
+     * supportedActivities contains one of the given codes, or - only when it has none of its own - its
+     * location type's supportedActivities does. Expressed as correlated EXISTS subqueries rather than a
+     * JOIN so it can't multiply rows: combining a collection JOIN with pagination is a well-known Hibernate
+     * trap (LIMIT/OFFSET apply to the joined row count, not the distinct entity count, silently truncating
+     * or duplicating pages).
+     */
+    private static Map buildSearchInternalLocationsWhere(Map params, LocationTypeCode[] locationTypeCodes) {
+        List<String> clauses = ["1 = 1"]
+        Map<String, Object> queryParams = [:]
+
+        if (locationTypeCodes) {
+            clauses << "lt.locationTypeCode IN (:locationTypeCodes)"
+            queryParams.locationTypeCodes = locationTypeCodes as List
+        }
+
+        if (!params.includeInactive) {
+            clauses << "l.active = true"
+        }
+
+        if (params.parentLocation?.id) {
+            clauses << "l.parentLocation.id = :parentLocationId"
+            queryParams.parentLocationId = params.parentLocation.id
+        }
+
+        if (params.searchTerm) {
+            clauses << "(LOWER(l.name) LIKE :searchTermLike OR LOWER(l.locationNumber) LIKE :searchTermLike)"
+            queryParams.searchTermLike = "%${params.searchTerm.toLowerCase()}%"
+        }
+
+        if (params.activityCodes) {
+            clauses << """(
+                EXISTS (SELECT 1 FROM Location ownLoc JOIN ownLoc.supportedActivities sa WHERE ownLoc = l AND sa IN (:activityCodes))
+                OR (
+                    NOT EXISTS (SELECT 1 FROM Location anyLoc JOIN anyLoc.supportedActivities anySa WHERE anyLoc = l)
+                    AND EXISTS (SELECT 1 FROM LocationType typ JOIN typ.supportedActivities typSa WHERE typ = lt AND typSa IN (:activityCodes))
+                )
+            )"""
+            queryParams.activityCodes = params.list("activityCodes")
+        }
+
+        return [
+                where      : "FROM Location l LEFT JOIN l.locationType lt WHERE " + clauses.join(" AND "),
+                queryParams: queryParams,
+        ]
+    }
+
     List<Location> searchInternalLocations(Map params, LocationTypeCode[] locationTypeCodes) {
         Integer max = params.max ? params.int('max') : 25
+        Integer offset = params.offset ? params.int('offset') : 0
 
-        // When filtering by activity code below, the cap has to be applied after that
-        // in-memory filter runs - capping the base query here too could cut away rows
-        // that would otherwise have matched, and return fewer (or zero) results.
-        boolean requiresActivityCodeFilter = params.activityCodes as Boolean
-        Map criteriaParams = requiresActivityCodeFilter ? params : (params + [max: max])
+        Map built = buildSearchInternalLocationsWhere(params, locationTypeCodes)
+        String where = built.where as String
+        Map queryParams = built.queryParams as Map
 
-        List<Location> locations = Location.createCriteria().list(criteriaParams) {
-            if (!params.includeInactive) {
-                eq("active", Boolean.TRUE)
-            }
+        // Built via String concatenation (+), not GString interpolation ($) - executeQuery specifically
+        // detects a GString query and rewrites its embedded expressions into bind parameters, which is meant
+        // for safely parameterizing values, not for splicing in a raw HQL clause as query syntax.
+        Integer totalCount = (Location.executeQuery("SELECT COUNT(l) " + where, queryParams)[0] as Number).intValue()
 
-            if (params.parentLocation?.id) {
-                eq("parentLocation", Location.get(params.parentLocation.id))
-            }
+        List<Location> locations = Location.executeQuery(
+                "SELECT l " + where + " ORDER BY l.sortOrder ASC, l.name ASC",
+                queryParams,
+                [max: max, offset: offset]
+        ) as List<Location>
 
-            if (locationTypeCodes) {
-                locationType {
-                    'in'("locationTypeCode", locationTypeCodes)
-                }
-            }
-
-            if (params.searchTerm) {
-                or {
-                    ilike("name", "%${params.searchTerm}%")
-                    ilike("locationNumber", "%${params.searchTerm}%")
-                }
-            }
-
-            order("sortOrder", "asc")
-            order("name", "asc")
-        }
-
-        if (requiresActivityCodeFilter) {
-            List<String> activityCodes = params.list("activityCodes")
-
-            // Bulk-fetch each location's supported activities in a single query instead of
-            // lazily loading the (lazy hasMany) collection once per location below, which was
-            // triggering an N+1 query pattern on every debounced keystroke.
-            List<String> locationIds = locations*.id
-            Map<String, Set<String>> activitiesByLocationId = [:].withDefault { [] as Set }
-            if (locationIds) {
-                Location.executeQuery(
-                        'select l.id, s from Location l join l.supportedActivities s where l.id in (:locationIds)',
-                        [locationIds: locationIds]
-                ).each { row -> activitiesByLocationId[row[0] as String] << (row[1] as String) }
-            }
-
-            // Location#supports() falls back to the location type's supported activities
-            // when a location has none of its own - bulk-fetch those too (keyed by the
-            // handful of distinct location types among the candidates, not per location),
-            // so that fallback doesn't lazily load each type's collection one at a time.
-            List<String> locationTypeIds = locations*.locationType*.id.findAll().unique()
-            Map<String, Set<String>> activitiesByLocationTypeId = [:].withDefault { [] as Set }
-            if (locationTypeIds) {
-                LocationType.executeQuery(
-                        'select lt.id, s from LocationType lt join lt.supportedActivities s where lt.id in (:locationTypeIds)',
-                        [locationTypeIds: locationTypeIds]
-                ).each { row -> activitiesByLocationTypeId[row[0] as String] << (row[1] as String) }
-            }
-
-            locations = locations.findAll { Location loc ->
-                Set<String> ownActivities = activitiesByLocationId[loc.id]
-                Set<String> typeActivities = activitiesByLocationTypeId[loc.locationType?.id]
-                // Mirrors Location#supports(): use the location's own supported activities
-                // if set, otherwise fall back to its location type's supported activities.
-                activityCodes.any { String code ->
-                    ownActivities ? code in ownActivities : code in typeActivities
-                }
-            }
-        }
+        // Preserve the same contract InternalLocationApiController#search expects from a Hibernate
+        // criteria PagedResultList (data + a real totalCount independent of the page size).
+        locations.metaClass.totalCount = totalCount
 
         return locations
     }
