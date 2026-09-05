@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  openboxes:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      OPENBOXES_DB_HOST: mariadb
+      OPENBOXES_DB_PORT: "3306"
+      OPENBOXES_DB_NAME: openboxes
+      OPENBOXES_DB_USERNAME: openboxes
+      OPENBOXES_DB_PASSWORD: openboxes
+      OPENBOXES_SERVER_URL: http://localhost:8080
+    volumes:
+      - openboxes-data:/app/data
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mariadb:
+    image: mariadb:11
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: openboxes
+      MARIADB_USER: openboxes
+      MARIADB_PASSWORD: openboxes
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  openboxes-data:
+  mariadb-data:
