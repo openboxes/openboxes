@@ -32,8 +32,8 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 // completion) - receiving a different product or lot is done on a split row.
 const isOriginalLine = (row) => !row.original?.isSplitItem;
 
-// Rendered in the footer of the column right after Receiving now: Location, or Actions when bin
-// location support is off.
+// Rendered in the footer of the column right after Receiving now, which is Location when bin
+// location support is on, otherwise Actions.
 const totalStatusFooter = ({ table }) => (
   <TotalStatusFooter remainingToReceive={table.options.meta?.remainingToReceive} />
 );
