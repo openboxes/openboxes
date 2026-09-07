@@ -20,6 +20,9 @@
                         <th>
                             <g:message code="email.stockTransfer.message.transferedBy.label"/>
                         </th>
+                        <th>
+                            <g:message code="default.reasonCode.label"/>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -49,6 +52,11 @@
                             </td>
                             <td class="value">
                                 ${stockTransfer?.orderedBy?.name}
+                            </td>
+                            <td class="value">
+                                <g:if test="${row?.reasonCode}">
+                                    ${warehouse.message(code: 'enum.ReasonCode.' + row?.reasonCode)}
+                                </g:if>
                             </td>
                         </tr>
                     </g:each>
