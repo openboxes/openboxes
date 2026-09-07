@@ -608,7 +608,7 @@ class ReceiptV2Service {
      */
     private static List<ReceiptItem> findReceiptItems(List<ShipmentItem> shipmentItems) {
         return ReceiptItem.createCriteria().list {
-            'in'("shipmentItem", shipmentItems)
+            inList("shipmentItem", shipmentItems)
             order("sortOrder", "asc")
             order("dateCreated", "asc")
         } as List<ReceiptItem>
