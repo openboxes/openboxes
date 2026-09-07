@@ -410,6 +410,14 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return supports(ActivityCode.NEGATIVE_INVENTORY_FALLBACK)
     }
 
+    /**
+     * Whether this location may legitimately hold a negative quantity, either because it directly allows
+     * negative inventory or because it's the fallback location that absorbs negative inventory.
+     */
+    Boolean isNegativeInventorySupported() {
+        return isNegativeInventoryAllowed() || isNegativeInventoryFallbackLocation()
+    }
+
     LocationPurpose getLocationPurpose() {
         if (supports(ActivityCode.DISPLAY_STOCK)) {
             return LocationPurpose.DISPLAY
