@@ -31,7 +31,9 @@
                         ${historyItem?.eventType?.name}
                     </td>
                     <td>
-                        ${historyItem?.referenceDocument?.className}
+                        <g:if test="${historyItem?.referenceDocument?.source}">
+                            <g:message code="${historyItem.referenceDocument.source}"/>
+                        </g:if>
                     </td>
                     <td>
                         %{-- Shipment events link to the SM but we're already on that page so hide those links --}%

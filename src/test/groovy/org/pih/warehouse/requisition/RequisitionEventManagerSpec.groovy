@@ -137,7 +137,7 @@ class RequisitionEventManagerSpec extends Specification implements DataTest {
     @Unroll
     void 'toRequisitionStatus should be the inverse of toEventCode for #eventCode'() {
         expect:
-        requisitionEventManager.toRequisitionStatus(new EventType(eventCode: eventCode)) == expectedStatus
+        RequisitionEventManager.toRequisitionStatus(new EventType(eventCode: eventCode)) == expectedStatus
 
         where:
         eventCode                  || expectedStatus
@@ -150,6 +150,6 @@ class RequisitionEventManagerSpec extends Specification implements DataTest {
 
     void 'toRequisitionStatus should return null for a null EventType'() {
         expect:
-        requisitionEventManager.toRequisitionStatus(null) == null
+        RequisitionEventManager.toRequisitionStatus(null) == null
     }
 }

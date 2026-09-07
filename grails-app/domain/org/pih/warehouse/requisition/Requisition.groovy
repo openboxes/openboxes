@@ -50,10 +50,29 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
     def beforeInsert() {
         createdBy = AuthService.currentUser
         updatedBy = AuthService.currentUser
+
+        // The very first status assignment has no persisted old status to compare against -
+        // RequisitionStatusChangedEventService records this as a forward transition from null
+        // (see RequisitionEventManager#recordStatusChange). Guarded on status being
+        // set at all, since a null-to-null "transition" isn't a real one.
+        if (status) {
+            publishStatusChangedEvent(null, status)
+        }
     }
 
     def beforeUpdate() {
         updatedBy = AuthService.currentUser
+
+        // requisition.status is the one field whose changes drive the requisition lifecycle timeline (see
+        // RequisitionEventManager#recordStatusChange, invoked from RequisitionStatusChangedEventService).
+        // isDirty already means "differs from the persisted value", so no extra equality check is needed.
+        if (isDirty('status')) {
+            publishStatusChangedEvent(getPersistentValue('status'), status)
+        }
+    }
+
+    def publishStatusChangedEvent(RequisitionStatus oldStatus, RequisitionStatus newStatus) {
+        Holders.grailsApplication.mainContext.publishEvent(new RequisitionStatusChangedEvent(this, oldStatus, newStatus))
     }
 
     def afterInsert() {
@@ -535,8 +554,8 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
      */
     private Integer getAttemptCount(String messagePrefix, RequisitionStatus expectedStatus) {
         Event mostRecentEvent = getMostRecentEvent()
-        RequisitionStatus mostRecentStatus = mostRecentEvent ? requisitionEventManager?.toRequisitionStatus(mostRecentEvent.eventType) : null
-        if (mostRecentStatus != null && mostRecentStatus >= expectedStatus) {
+        RequisitionStatus mostRecentStatus = mostRecentEvent ? RequisitionEventManager.toRequisitionStatus(mostRecentEvent.eventType) : null
+        if (mostRecentStatus != null && mostRecentStatus.sortOrder >= expectedStatus.sortOrder) {
             return 0
         }
 
@@ -591,7 +610,7 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
                 identifier: requestNumber,
                 description: description,
                 name: name,
-                className: this.class.simpleName,
+                source: "requisition.label",
         )
     }
 
@@ -602,29 +621,6 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
         }
 
         return null
-    }
-
-    RequisitionEventManager getRequisitionEventManager() {
-        if (!Holders.grailsApplication.mainContext.containsBean('requisitionEventManager')) {
-            return null
-        }
-        return Holders.grailsApplication.mainContext.getBean(RequisitionEventManager)
-    }
-
-    /**
-     * The single path through which requisition.status changes - every direct "requisition.status = X" assignment
-     * in the codebase (as well as map-constructors and data binding) is routed through here by Groovy's normal
-     * property-assignment semantics. Whenever the status actually changes, records the transition (see
-     * RequisitionEventManager#recordStatusChange) so requisition.events stays in sync with requisition.status
-     * and can never drift from it.
-     */
-    void setStatus(RequisitionStatus newStatus) {
-        RequisitionStatus oldStatus = this.@status
-        this.@status = newStatus
-
-        if (newStatus != oldStatus) {
-            requisitionEventManager?.recordStatusChange(this, oldStatus, newStatus, origin)
-        }
     }
 
     Map toJson() {

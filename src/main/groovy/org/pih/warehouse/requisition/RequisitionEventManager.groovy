@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.requisition
 
 import grails.validation.ValidationException
@@ -60,7 +69,7 @@ class RequisitionEventManager {
      * aren't part of the tracked transition timeline (no matching EventCode, e.g. the legacy/unused RECEIVED,
      * DELETED, ERROR, DISPATCHED, REQUESTED, OPEN, FULFILLED, REVIEWING, CONFIRMING).
      */
-    private EventCode toEventCode(RequisitionStatus status) {
+    private static EventCode toEventCode(RequisitionStatus status) {
         // The only status that doesn't have a one-to-one mapping to an EventCode is CANCELED (singe vs double L)
         if (status == RequisitionStatus.CANCELED) {
             return EventCode.CANCELLED
@@ -74,8 +83,12 @@ class RequisitionEventManager {
      * so callers can compare two requisition lifecycle positions directly instead of comparing an EventType's
      * sortOrder against a RequisitionStatus's sortOrder (two different things that only happen to share the
      * same numbering by convention). Returns null for an EventType with no matching RequisitionStatus.
+     *
+     * Static (and public), it's a pure mapping with no dependency on this manager's
+     * collaborators, so callers like Requisition#getAttemptCount can use it directly without needing to wire
+     * in (and mock, in tests) the whole manager just for this lookup.
      */
-    RequisitionStatus toRequisitionStatus(EventType eventType) {
+    static RequisitionStatus toRequisitionStatus(EventType eventType) {
         if (eventType?.eventCode == EventCode.CANCELLED) {
             return RequisitionStatus.CANCELED
         }
@@ -86,7 +99,7 @@ class RequisitionEventManager {
     /**
      * Create a new Requisition Event representing a status transition, then logs the action.
      */
-    Event createEvent(Requisition requisition, EventCode eventCode, Location location) {
+    private Event createEvent(Requisition requisition, EventCode eventCode, Location location) {
         EventType eventType = eventTypeManager.getOrCreateEventType(eventCode)
         Event event = new Event(
                 eventDate: new Date(),
