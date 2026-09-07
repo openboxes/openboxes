@@ -12,6 +12,17 @@ class LocalizationApiSpec extends ApiSpec {
     @Autowired
     LocalizationApiWrapper localizationApiWrapper
 
+    void 'localization mode messages remain available without offering its locale for selection'() {
+        when:
+        LocalizedMessagesDto messages = localizationApiWrapper.listOK('ach', 'default.lot.label')
+
+        then:
+        assert messages.currentLocale == new Locale('ach')
+        assert messages.messages.get('default.lot.label').startsWith('crwdns')
+        assert !messages.supportedLocales.contains('ach')
+        assert messages.supportedLocales.contains('en')
+    }
+
     void 'listing the messages returns without error for all supported locales'() {
         when: 'we fetch the default locale messages'
         LocalizedMessagesDto messages = localizationApiWrapper.listOK()

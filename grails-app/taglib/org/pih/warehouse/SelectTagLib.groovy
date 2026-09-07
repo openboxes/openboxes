@@ -759,7 +759,7 @@ class SelectTagLib {
     }
 
     def selectLocale = { attrs, body ->
-        attrs.from = grailsApplication.config.openboxes.locale.supportedLocales?.sort()
+        attrs.from = LocalizationUtil.supportedLocaleCodes?.sort()
         attrs.optionValue = { LocalizationUtil.getLocale(it).getDisplayName(LocalizationUtil.currentLocale) }
         out << g.select(attrs)
     }

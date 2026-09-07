@@ -49,9 +49,18 @@ class LocalizationUtil {
         return StringUtils.parseLocaleString(localeCode)
     }
 
+    /**
+     * Locales that users can select. The Crowdin locale is reserved for the dedicated localization mode,
+     * even when an existing installation still includes it in supportedLocales.
+     */
+    static List<String> getSupportedLocaleCodes() {
+        def localeConfig = Holders.config.openboxes.locale
+        Locale localizationModeLocale = getLocale(localeConfig.localizationModeLocale)
+        return localeConfig.supportedLocales.findAll { getLocale(it) != localizationModeLocale }
+    }
+
     static List<Locale> getSupportedLocales() {
-        def supportedLocales = Holders.config.openboxes.locale.supportedLocales
-        return supportedLocales.collect { getLocale(it) }
+        return supportedLocaleCodes.collect { getLocale(it) }
     }
 
     static String getLocalizedString(Transaction transaction) {
