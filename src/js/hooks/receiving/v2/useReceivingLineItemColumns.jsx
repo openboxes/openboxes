@@ -17,6 +17,7 @@ import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import TextInput from 'components/form-elements/v2/TextInput';
+import TotalStatusFooter from 'components/receivingV2/editModal/TotalStatusFooter';
 import LocationAutofillHeader from 'components/receivingV2/LocationAutofillHeader';
 import receivingColumns from 'consts/receivingColumns';
 import { DateFormatDateFns } from 'consts/timeFormat';
@@ -30,6 +31,12 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 // so they are read-only here, and it cannot be removed (it backs the cancel-remaining flow on
 // completion) - receiving a different product or lot is done on a split row.
 const isOriginalLine = (row) => !row.original?.isSplitItem;
+
+// Rendered in the footer of the column right after Receiving now: Location, or Actions when bin
+// location support is off.
+const totalStatusFooter = ({ table }) => (
+  <TotalStatusFooter remainingToReceive={table.options.meta?.remainingToReceive} />
+);
 
 /**
  * Columns for the editable "Receiving now" table in the edit modal.
@@ -225,6 +232,7 @@ const useReceivingLineItemColumns = ({
             )}
           />
         ),
+        footer: totalStatusFooter,
         size: 150,
       }),
     ] : []),
@@ -262,6 +270,7 @@ const useReceivingLineItemColumns = ({
           </TableCell>
         );
       },
+      footer: hasBinLocationSupport ? undefined : totalStatusFooter,
       size: hasBinLocationSupport ? 130 : 108,
     }),
   ], [
