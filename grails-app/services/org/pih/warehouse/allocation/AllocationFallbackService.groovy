@@ -74,7 +74,7 @@ class AllocationFallbackService {
     private List<Location> getCandidateBinLocations(Location facility, Product product) {
         List<Location> assignedLocations = InventoryLevel.getPutawayLocations(facility, product) ?: []
         List<Location> stockedLocations = productAvailabilityService
-                .getAllAvailableBinLocations(facility, product?.id)
+                .getAvailableItems(facility, [product?.id], false, true)
                 ?.collect { it.binLocation }
                 ?.findAll { it } ?: []
 
