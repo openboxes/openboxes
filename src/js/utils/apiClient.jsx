@@ -31,6 +31,8 @@ export function parseResponse(data) {
 export const handleSuccess = (response) => response;
 
 export const handleError = (error) => {
+  // If the client cancels the request before a response is returned, don't throw an error.
+  // This can can occur, for example, if the user navigates very quickly through pages.
   if (axios.isCancel(error)) {
     return Promise.reject(error);
   }
