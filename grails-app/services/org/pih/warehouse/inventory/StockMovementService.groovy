@@ -2241,6 +2241,7 @@ class StockMovementService {
         def picklistItems = getPicklistItems(requisitionItem)
 
         availableItems = availableItems.findAll { it.quantityOnHand > 0 }
+        // FIXME Replace these activity markers with a dedicated ALLOCATE_STOCK activity code.
         availableItems = availableItems.findAll {
             !it.binLocation?.supports(ActivityCode.INBOUND_SORTATION) &&
                     !it.binLocation?.supports(ActivityCode.PUTAWAY_CART)

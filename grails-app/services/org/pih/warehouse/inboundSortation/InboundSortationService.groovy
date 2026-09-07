@@ -46,6 +46,7 @@ class InboundSortationService {
                 }
             }
             reportUnassignedQuantity(receipt.shipment, putawayContext, results)
+            reportCrossDockDeclined(receipt.shipment, putawayContext, results)
         }
     }
 
@@ -125,6 +126,9 @@ class InboundSortationService {
         )
     }
 
+    /**
+     * Records the quantity that no strategy was able to place
+     */
     private void reportUnassignedQuantity(Shipment shipment, PutawayContext context, List<PutawayResult> results) {
         if (!shipment) {
             return
@@ -141,6 +145,31 @@ class InboundSortationService {
                 "Could not assign a putaway location for ${quantityUnassigned} of product ${context.product?.productCode}",
                 LocaleContextHolder.locale)
 
+        addSystemComment(shipment, message)
+    }
+
+    /**
+     * Records that an inbound item carrying a backorder link was not cross-docked
+     */
+    private void reportCrossDockDeclined(Shipment shipment, PutawayContext context, List<PutawayResult> results) {
+        if (!shipment || (!context.backorderReference && !context.backorderItem)) {
+            return
+        }
+        if (results?.any { it.destination?.supports(ActivityCode.CROSS_DOCKING) }) {
+            return
+        }
+
+        String backorderNumber = context.backorderReference ?: context.backorderItem?.requisition?.requestNumber
+        String message = messageSource.getMessage(
+                "putaway.crossDockDeclined.message",
+                [context.product?.productCode, backorderNumber] as Object[],
+                "Product ${context.product?.productCode} on backorder ${backorderNumber} was not cross-docked",
+                LocaleContextHolder.locale)
+
+        addSystemComment(shipment, message)
+    }
+
+    private void addSystemComment(Shipment shipment, String message) {
         boolean alreadyLogged = shipment.comments.any {
             it.type == CommentType.SYSTEM && it.comment == message
         }

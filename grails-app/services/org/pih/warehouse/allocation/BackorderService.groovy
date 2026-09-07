@@ -10,6 +10,10 @@ class BackorderService {
 
     BackorderMatchingService backorderMatchingService
 
+    /**
+     * Rejects the shipment when a backorder reference does not resolve, or when an inbound item has no
+     * uncovered demand left to match on that backorder. Inbound and demanded quantities need not match.
+     */
     void validateBackorderReferences(Shipment shipment) {
         for (String requisitionNumber : shipment.uniqueBackorderReferences) {
             Requisition backorder = Requisition.findByRequestNumber(requisitionNumber)

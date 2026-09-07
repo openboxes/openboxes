@@ -21,7 +21,7 @@ class AllocationRequest {
 
     /**
      * Set only by the cross-dock release, once the putaway has moved the stock into the cross-dock
-     * zone. Ordinary allocation must leave a sales linked demand alone until then.
+     * zone. Ordinary allocation must leave a backordered demand alone until then.
      */
     Boolean crossDockRelease = false
 }
