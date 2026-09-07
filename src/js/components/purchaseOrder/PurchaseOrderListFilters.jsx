@@ -47,7 +47,7 @@ const PurchaseOrderListFilters = ({
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
         filterFields={filterFields}
-        updateFilterParams={(values, options) => setFilterParams({ ...values }, options)}
+        updateFilterParams={(values) => setFilterParams({ ...values })}
         formProps={{
           ...formProps,
           debouncedOriginLocationsFetch,

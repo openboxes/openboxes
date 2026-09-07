@@ -30,7 +30,7 @@ const useProductFilters = () => {
 
   const clearFilterValues = () => {
     const { pathname } = history.location;
-    history.replace({ pathname });
+    history.push({ pathname });
   };
 
   const setDefaultValue = (queryPropsParam, elementsList) => {
@@ -124,7 +124,7 @@ const useProductFilters = () => {
   // Custom hook for changing location/filters rebuilding logic
   useCommonFiltersCleaner({ filtersInitialized, initializeDefaultFilterValues, clearFilterValues });
 
-  const setFilterValues = (values, { replace = false } = {}) => {
+  const setFilterValues = (values) => {
     const filterAccessors = {
       includeInactive: { name: 'includeInactive' },
       includeCategoryChildren: { name: 'includeCategoryChildren' },
@@ -141,7 +141,7 @@ const useProductFilters = () => {
     const queryFilterParams = queryString.stringify(transformedParams);
     const { pathname } = history.location;
     if (Object.keys(values).length) {
-      history[replace ? 'replace' : 'push']({ pathname, search: queryFilterParams });
+      history.push({ pathname, search: queryFilterParams });
     }
     setFilterParams(values);
   };

@@ -28,7 +28,7 @@ const InvoiceListFilters = ({
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
         filterFields={filterFields}
-        updateFilterParams={(values, options) => setFilterValues({ ...values }, options)}
+        updateFilterParams={(values) => setFilterValues({ ...values })}
         formProps={{
           statuses,
           debouncedPeopleFetch,

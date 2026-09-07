@@ -44,7 +44,7 @@ const StockMovementOutboundFilters = ({
         filterFields={filterFields}
         defaultValues={defaultValues}
         ignoreClearFilters={['origin', 'direction', 'sourceType']}
-        updateFilterParams={(values, options) => setFilterParams({ ...values }, options)}
+        updateFilterParams={(values) => setFilterParams({ ...values })}
         hidden={false}
         formProps={{
           ...formProps,

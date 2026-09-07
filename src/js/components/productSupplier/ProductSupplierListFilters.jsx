@@ -44,7 +44,7 @@ const ProductSupplierListFilters = ({
     <ListFilterFormWrapper>
       <FilterForm
         filterFields={filterFields}
-        updateFilterParams={(values, options) => setFilterParams({ ...values }, options)}
+        updateFilterParams={(values) => setFilterParams({ ...values })}
         formProps={{
           debouncedProductsFetch,
           debouncedOrganizationsFetch,

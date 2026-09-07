@@ -15,7 +15,7 @@ const CycleCountFilters = ({
   <ListFilterFormWrapper>
     <FilterForm
       filterFields={filterFields}
-      updateFilterParams={(values, options) => setFilterParams({ ...values }, options)}
+      updateFilterParams={(values) => setFilterParams({ ...values })}
       formProps={formProps}
       defaultValues={defaultValues}
       allowEmptySubmit
