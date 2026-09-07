@@ -48,7 +48,7 @@ const useProductSupplierFilters = (ignoreClearFilters) => {
     const { pathname, search } = history.location;
     const queryParams = queryString.parse(search);
     const clearedParams = clearQueryParams({ fieldsToIgnore: ignoreClearFilters, queryParams });
-    history.replace({ pathname, search: clearedParams });
+    history.push({ pathname, search: clearedParams });
   };
 
   const initializeDefaultFilterValues = async () => {
@@ -99,7 +99,7 @@ const useProductSupplierFilters = (ignoreClearFilters) => {
     setFiltersInitialized(true);
   };
 
-  const setFilterValues = (values, { replace = false } = {}) => {
+  const setFilterValues = (values) => {
     const filterAccessors = {
       searchTerm: { name: 'searchTerm' },
       product: { name: 'product', accessor: 'id' },
@@ -114,7 +114,7 @@ const useProductSupplierFilters = (ignoreClearFilters) => {
     const queryFilterParams = queryString.stringify(transformedParams);
     const { pathname } = history.location;
     if (Object.keys(values).length) {
-      history[replace ? 'replace' : 'push']({ pathname, search: queryFilterParams });
+      history.push({ pathname, search: queryFilterParams });
     }
     setFilterParams(values);
   };
