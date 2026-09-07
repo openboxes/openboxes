@@ -123,22 +123,21 @@ class PickTaskService {
 
     @Transactional(readOnly = true)
     List<Map> countOrdersByDeliveryType(Location facility, boolean excludeAssignedRequisitions = false) {
-        Map<DeliveryTypeCode, Integer> available = countDistinctRequisitionsByDeliveryType(
-                facility, excludeAssignedRequisitions, [PickTaskStatus.PENDING, PickTaskStatus.PICKING])
-
-        Map<DeliveryTypeCode, Integer> total = countDistinctRequisitionsByDeliveryType(facility, excludeAssignedRequisitions, null)
+        Map<DeliveryTypeCode, Integer> available =
+                countDistinctRequisitionsByDeliveryType(facility, excludeAssignedRequisitions)
 
         return DeliveryTypeCode.values().collect { DeliveryTypeCode code ->
             [
                     deliveryTypeCode: code.name(),
                     availableCount  : available[code] ?: 0,
-                    totalCount      : total[code] ?: 0,
             ]
         }
     }
 
     private Map<DeliveryTypeCode, Integer> countDistinctRequisitionsByDeliveryType(
-            Location facility, boolean excludeAssignedRequisitions, List<PickTaskStatus> statuses) {
+            Location facility, boolean excludeAssignedRequisitions) {
+        List<PickTaskStatus> statuses = [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
+
         List<String> assignedRequisitions
         if (excludeAssignedRequisitions) {
             assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(facility, statuses)
@@ -149,9 +148,8 @@ class PickTaskService {
                 countDistinct("requisition")
             }
             eq("facility", facility)
-            if (statuses) {
-                'in'("status", statuses)
-            }
+            eq("requisitionStatus", RequisitionStatus.PICKING)
+            'in'("status", statuses)
 
             if (assignedRequisitions) {
                 not {
