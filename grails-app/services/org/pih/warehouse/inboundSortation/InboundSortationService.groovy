@@ -6,18 +6,23 @@ import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.CommentType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.putaway.PutawayTask
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.shipping.Shipment
+import org.springframework.context.i18n.LocaleContextHolder
 
 @Transactional
 class InboundSortationService {
 
     def orderIdentifierService
     def putawayService
+    def messageSource
     PutawayStrategyService putawayStrategyService
 
     void createPutawayOrdersFromReceipt(Receipt receipt) {
@@ -40,6 +45,7 @@ class InboundSortationService {
                     putawayService.savePutaway(putaway)
                 }
             }
+            reportUnassignedQuantity(receipt.shipment, putawayContext, results)
         }
     }
 
@@ -60,6 +66,8 @@ class InboundSortationService {
                 preferredBin: task.product.getInventoryLevel(task.facility.id)?.preferredBinLocation,
                 internalLocation: task.product.getDefaultPutawayLocation(task.facility),
                 quantity: task.quantity.intValue(),
+                backorderReference: task.shipmentItem?.backorderReference,
+                backorderItem: task.shipmentItem?.backorderItem,
                 deliveryTypeCode: task.deliveryTypeCode,
         )
 
@@ -115,5 +123,31 @@ class InboundSortationService {
                 putawayStatus: PutawayStatus.PENDING,
                 comment: task.comment
         )
+    }
+
+    private void reportUnassignedQuantity(Shipment shipment, PutawayContext context, List<PutawayResult> results) {
+        if (!shipment) {
+            return
+        }
+        int quantityAssigned = results ? results*.quantity.sum(0) as int : 0
+        int quantityUnassigned = (context.quantity ?: 0) - quantityAssigned
+        if (quantityUnassigned <= 0) {
+            return
+        }
+
+        String message = messageSource.getMessage(
+                "putaway.quantityNotAssigned.message",
+                [quantityUnassigned, context.product?.productCode] as Object[],
+                "Could not assign a putaway location for ${quantityUnassigned} of product ${context.product?.productCode}",
+                LocaleContextHolder.locale)
+
+        boolean alreadyLogged = shipment.comments.any {
+            it.type == CommentType.SYSTEM && it.comment == message
+        }
+        if (!alreadyLogged) {
+            shipment.addToComments(new Comment(comment: message, sender: null))
+            shipment.save(failOnError: true)
+        }
+        log.warn("Shipment ${shipment.id}: ${message}")
     }
 }

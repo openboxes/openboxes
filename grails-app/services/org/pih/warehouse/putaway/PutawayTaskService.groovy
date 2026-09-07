@@ -14,6 +14,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.PutawayTypeCode
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryService
@@ -24,6 +25,7 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.putaway.discrepancy.PutawayDiscrepancyEvent
+import org.pih.warehouse.shipping.Shipment
 
 @Transactional
 class PutawayTaskService {
@@ -553,7 +555,13 @@ class PutawayTaskService {
         task.discard()
 
         // Create transaction
-        inventoryService.transferStock(command)
+        Transaction transaction = inventoryService.transferStock(command)
+        if (transaction?.hasErrors()) {
+            String errorMessage = transaction.errors.allErrors.collect { it.defaultMessage ?: it.code }.join('; ')
+            throw new ValidationException(
+                    "Unable to transfer stock for putaway task ${task?.identifier}: ${errorMessage}",
+                    transaction.errors)
+        }
 
         // Emit putawayTask.completed event which will refresh the product availability table
         grailsApplication.mainContext.publishEvent(new PutawayTaskCompletedEvent(task))
@@ -639,6 +647,32 @@ class PutawayTaskService {
         }
 
         return discrepancyLocation
+    }
+
+    /**
+     * Whether the shipment still has a cross-dock putaway that has not been completed or canceled.
+     * Allocation has to wait for it, because until the putaway runs the stock is still sitting in
+     * inbound sortation where it must not be allocated from.
+     */
+    @Transactional(readOnly = true)
+    boolean hasOpenCrossDockTask(Shipment shipment) {
+        if (!shipment) {
+            return false
+        }
+        List<PutawayTask> openTasks = PutawayTask.createCriteria().list {
+            not {
+                'in'('status', [PutawayTaskStatus.COMPLETED, PutawayTaskStatus.CANCELED])
+            }
+            putawayOrderItem {
+                receiptItem {
+                    shipmentItem {
+                        eq('shipment', shipment)
+                    }
+                }
+            }
+        } as List<PutawayTask>
+
+        return openTasks.any { it.putawayTypeCode == PutawayTypeCode.CROSS_DOCK }
     }
 
     List<Location> getAlternateDestinations(PutawayTask task) {

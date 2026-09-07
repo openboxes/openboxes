@@ -25,11 +25,9 @@ class PutawayStrategyService {
             }
         }
 
-        // FIXME There should not be any quantity remaining at this point unless
-        //  we've create a strategy that takes location capacity into account
-        //  (i.e. strategies that limit the quantity allowed per strategy)
         if (quantityRemaining > 0) {
-            throw new RuntimeException("Quantity remaining should be 0 at this point. Something went wrong.")
+            log.warn("No putaway destination for ${quantityRemaining} of product " +
+                    "${context.product?.productCode} in facility ${context.facility?.name}")
         }
 
         return results

@@ -9,19 +9,17 @@
  **/
 package org.pih.warehouse.allocation
 
-import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.shipping.ShipmentItem
 
-class AllocationRequest {
-    Integer quantityRequired
-    RequisitionItem requisitionItem
-    AllocationMode allocationMode
-    List<AvailableItem> availableItems
-    List<AllocationSourceStrategy> allocationStrategies
+class BackorderMatch {
 
-    /**
-     * Set only by the cross-dock release, once the putaway has moved the stock into the cross-dock
-     * zone. Ordinary allocation must leave a sales linked demand alone until then.
-     */
-    Boolean crossDockRelease = false
+    ShipmentItem inboundItem
+    RequisitionItem demand
+    Integer quantityMatched
+
+    @Override
+    String toString() {
+        return "BackorderMatch(demand=${demand?.id}, product=${demand?.product?.productCode}, quantity=${quantityMatched})"
+    }
 }

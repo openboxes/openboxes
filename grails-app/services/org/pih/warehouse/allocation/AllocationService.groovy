@@ -17,6 +17,7 @@ import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.CycleCountService
@@ -85,8 +86,13 @@ class AllocationService {
             Integer quantityRequired = requisitionItem.calculateQuantityRequired()
             List<SuggestedItem> suggestedItems = getAutoSuggestedItems(requisitionItem, quantityRequired, strategies, [], mode)
 
-            stockMovementService.clearPicklist(requisitionItem)
-            stockMovementService.allocateSuggestedItems(requisitionItem, suggestedItems, true)
+            // No suggestion means allocation declined this line rather than failed to find stock - a
+            // backordered line is left to the cross-dock release. Clearing the picklist would delete
+            // whatever that release has already covered.
+            if (suggestedItems) {
+                stockMovementService.clearPicklist(requisitionItem)
+                stockMovementService.allocateSuggestedItems(requisitionItem, suggestedItems, true)
+            }
         } else if (mode == AllocationMode.MANUAL) {
             List<PicklistItem> existingPickListItems = PicklistItem.findAllByRequisitionItem(requisitionItem)
             Set<String> processedPickIds = []
@@ -146,7 +152,8 @@ class AllocationService {
         Integer quantityRequired = request.quantityRequired ?: requisitionItem.calculateQuantityRequired()
         List<SuggestedItem> suggestedItems
         if (mode == AllocationMode.AUTO) {
-            suggestedItems = getAutoSuggestedItems(requisitionItem, quantityRequired, request.allocationStrategies, [], mode)
+            suggestedItems = getAutoSuggestedItems(requisitionItem, quantityRequired,
+                    request.allocationStrategies, [], request.crossDockRelease)
         } else if (mode == AllocationMode.MANUAL) {
             List<AvailableItem> manualItems = request.availableItems?.findAll { it.inventoryItem.product?.id == requisitionItem.product?.id }
             suggestedItems = stockMovementService.getSuggestedItems(manualItems, quantityRequired)
@@ -160,7 +167,12 @@ class AllocationService {
         }
 
         if (saveAllocation) {
-            stockMovementService.clearPicklist(requisitionItem)
+            // The cross-dock release only ever allocates the quantity still outstanding, so the
+            // picklist is added to rather than rebuilt - clearing it would drop what an earlier
+            // delivery already covered.
+            if (!request.crossDockRelease) {
+                stockMovementService.clearPicklist(requisitionItem)
+            }
             stockMovementService.allocateSuggestedItems(requisitionItem, suggestedItems, mode == AllocationMode.AUTO)
         }
         return new AllocationResult(allocationRequest: request, suggestedItems: suggestedItems)
@@ -222,6 +234,9 @@ class AllocationService {
             } ?: []
 
             results.each { AllocationResult result ->
+                if (!result.suggestedItems) {
+                    return
+                }
                 RequisitionItem requisitionItem = result.allocationRequest.requisitionItem
                 stockMovementService.clearPicklist(requisitionItem)
                 stockMovementService.allocateSuggestedItems(requisitionItem, result.suggestedItems, allocationMode == AllocationMode.AUTO)
@@ -283,10 +298,11 @@ class AllocationService {
         }
     }
 
-    private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationSourceStrategy> strategies, List<AvailableItem> excludeList = [], AllocationMode allocationMode = null) {
+    private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationSourceStrategy> strategies, List<AvailableItem> excludeList = [], Boolean crossDockRelease = false) {
         Location facility = requisitionItem.requisition.origin
         Product product = requisitionItem.product
-        List<AvailableItem> allAvailableItems = stockMovementService.getAvailableItems(facility, requisitionItem, false)
+        List<AvailableItem> allAvailableItems =
+                stockMovementService.getAvailableItems(facility, requisitionItem, false, !crossDockRelease)
 
         allAvailableItems = allAvailableItems.findAll { !it.binLocation?.isNegativeInventoryFallbackLocation() }
 
@@ -295,8 +311,24 @@ class AllocationService {
             quantityRequired = requisitionItem.quantityBackordered
         }
 
+        // A backordered line waits for its cross-dock delivery and is not covered from ordinary stock.
+        // Until the cross-dock putaway has run there is nothing to allocate
+        if (isBackordered && !crossDockRelease) {
+            log.info("Requisition item ${requisitionItem.id} is backordered, skipping ordinary allocation")
+            return []
+        }
+
         List<AllocationSourceStrategy> resolvedStrategies = resolveStrategies(requisitionItem.requisition, strategies)
         RotationRule rotationRule = getConfiguredRotationRule()
+
+        // Cross-dock release: take the cross-dock zone first and fall back to ordinary stock only for
+        // the quantity no inbound covered
+        if (crossDockRelease) {
+            List<AvailableItem> ordered = crossDockFirst(orderByStrategy(
+                    resolvedStrategies.first(), facility, product,
+                    applyRotation(rotationRule, allAvailableItems)))
+            return stockMovementService.getSuggestedItems(ordered, quantityRequired)
+        }
 
         Integer bestQuantityAvailable = 0
         List<AvailableItem> bestItems = []
@@ -431,6 +463,13 @@ class AllocationService {
 
     private RotationRule getConfiguredRotationRule() {
         return (grailsApplication.config.openboxes.order.allocation.rotation ?: RotationRule.FEFO) as RotationRule
+    }
+
+    private List<AvailableItem> crossDockFirst(List<AvailableItem> availableItems) {
+        List<AvailableItem> crossDockItems = availableItems.findAll {
+            it.binLocation?.supports(ActivityCode.CROSS_DOCKING)
+        }
+        return crossDockItems + (availableItems - crossDockItems)
     }
 
     private List<AvailableItem> orderByStrategy(AllocationSourceStrategy strategy, Location facility, Product product, List<AvailableItem> availableItems) {

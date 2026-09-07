@@ -2,21 +2,14 @@ package org.pih.warehouse.allocation
 
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
 @Transactional
 class BackorderService {
 
-    // UPDATE: now the inbound item has to be at least equal to the outbound demand, no longer an exact match
-    // Special case: we only fulfill a backorder with an inbound item that exactly matches
-    // the outbound demand. The general behaviour of backorder fulfillment is partial matching
-    // (any inbound quantity reduces the demanded quantity, even if it only partially fulfills
-    // the backorder), but our ASN contains a separate shipment item per backordered demand
-    // line, so inbound and demanded quantities are expected to match one-to-one.
-    // This hard-coded equality rule will eventually be replaced by a strategy pattern
-    // (shared with AutomaticBackorderReallocationJob) - here the strategy is equality match.
+    BackorderMatchingService backorderMatchingService
+
     void validateBackorderReferences(Shipment shipment) {
         for (String requisitionNumber : shipment.uniqueBackorderReferences) {
             Requisition backorder = Requisition.findByRequestNumber(requisitionNumber)
@@ -27,25 +20,18 @@ class BackorderService {
                         "Backorder ${requisitionNumber} not found")
                 continue
             }
-            Collection<ShipmentItem> inboundItems = shipment.shipmentItems.findAll {
-                it.backorderReference == requisitionNumber && !it.backorderItem
-            }
-            Set consumedRequisitionItems = [] as Set
+
+            Collection<ShipmentItem> inboundItems = backorderMatchingService
+                    .findInboundItems(shipment, requisitionNumber)
+            List<BackorderMatch> matches = backorderMatchingService.match(backorder, inboundItems)
+
             for (ShipmentItem inboundItem : inboundItems) {
-                def matchingBackorderItem = backorder.requisitionItems.find { RequisitionItem demand ->
-                    demand.product == inboundItem.product &&
-                            demand.quantity <= inboundItem.quantity &&
-                            !demand.isAllocated() &&
-                            !consumedRequisitionItems.contains(demand)
-                }
-                if (!matchingBackorderItem) {
+                if (!matches.any { it.inboundItem == inboundItem }) {
                     shipment.errors.reject(
                             "backorder.unavailable.message",
                             [inboundItem.product?.productCode, requisitionNumber] as Object[],
-                            "No unallocated lines for ${inboundItem.product?.productCode} on ${requisitionNumber}")
-                    continue
+                            "No demand left for ${inboundItem.product?.productCode} on ${requisitionNumber}")
                 }
-                consumedRequisitionItems.add(matchingBackorderItem)
             }
         }
     }
