@@ -17,7 +17,7 @@ import { TableCell } from 'components/DataTable';
 import SplitLineModal from 'components/put-away/SplitLineModal';
 import { ORDER_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
-import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import apiClient, { parseResponse } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import showLocationChangedAlert from 'utils/location-change-alert';
@@ -463,7 +463,7 @@ class PutAwaySecondPage extends Component {
     this.props.showSpinner();
     const url = `/api/putaways?location.id=${this.state.location.id}`;
 
-    return apiClient.post(url, flattenRequest(putAwayToSave))
+    return apiClient.post(url, putAwayToSave)
       .then((response) => {
         const putAway = parseResponse(response.data.data);
 
