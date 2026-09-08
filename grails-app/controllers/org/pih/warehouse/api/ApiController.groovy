@@ -46,9 +46,12 @@ class ApiController {
         def username = request.JSON.username
         def password = request.JSON.password
         if (userService.authenticate(username, password)) {
-            session.user = User.findByUsernameOrEmail(username, username)
+            User user = User.findByUsernameOrEmail(username, username)
+            session.user = user
             if (request.JSON.location) {
                 session.warehouse = Location.get(request.JSON.location)
+            } else if (user?.warehouse && user?.rememberLastLocation) {
+                session.warehouse = user.warehouse
             }
             render([status: 200, text: "Authentication was successful"])
             return
