@@ -1,7 +1,9 @@
 import React, { useMemo } from 'react';
 
+import { RiAlertLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { useSelector } from 'react-redux';
+import { Tooltip } from 'react-tippy';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
@@ -49,6 +51,29 @@ const PickTaskListTable = () => {
       className: 'd-flex align-items-center justify-content-end',
       headerClassName: 'header',
       maxWidth: 120,
+      Cell: (row) => (
+        <span className="d-flex align-items-center justify-content-end">
+          {row.value}
+          {row.original.hasStockIssue ? (
+            <Tooltip
+              arrow="true"
+              delay="150"
+              duration="250"
+              hideDelay="50"
+              html={translate(
+                'react.dashboard.readyToStage.issue.tooltip.label',
+                'The picked quantity may no longer be available at this location - it may have been transferred or removed from stock since it was picked',
+              )}
+              className="cursor-help"
+            >
+              <RiAlertLine className="text-warning ml-1" data-testid="pick-task-stock-issue-icon" />
+            </Tooltip>
+          ) : (
+            // Invisible placeholder so the quantity lines up whether or not the icon shows.
+            <RiAlertLine className="invisible ml-1" aria-hidden="true" />
+          )}
+        </span>
+      ),
     },
     {
       Header: <Translate id="react.dashboard.readyToStage.location.label" defaultMessage="Location" />,
@@ -63,7 +88,7 @@ const PickTaskListTable = () => {
       className: 'd-flex align-items-center',
       headerClassName: 'header',
     },
-  ], []);
+  ], [translate]);
 
   return (
     <div className="list-page-list-section">

@@ -49,6 +49,12 @@ class PickTask {
     Date dateCreated
     Date lastUpdated
 
+    // Not backed by a column - set at query time by PickTaskService.search() for a PICKED-only
+    // search, since PickTask is a denormalized snapshot that can drift from the live stock ledger
+    // (see the pick_task DB view). Null/absent for any other search.
+    Boolean hasStockIssue
+
+    static transients = ["hasStockIssue"]
     // Order level pick progress, aggregated across the whole requisition by the pick_task view.
     Integer orderTotalTaskCount
     Integer orderOpenTaskCount
@@ -130,6 +136,7 @@ class PickTask {
                 orderPickStatusCode: orderPickStatusCode?.name(),
                 dateCreated     : dateCreated,
                 lastUpdated     : lastUpdated,
+                hasStockIssue   : hasStockIssue,
         ]
     }
 }
