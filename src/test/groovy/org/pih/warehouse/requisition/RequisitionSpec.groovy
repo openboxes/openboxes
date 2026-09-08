@@ -1,6 +1,9 @@
 package org.pih.warehouse.requisition
 
 import grails.testing.gorm.DomainUnitTest
+import org.pih.warehouse.core.Event
+import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.history.EventLog
@@ -17,6 +20,10 @@ import java.time.Instant
 import org.pih.warehouse.requisition.RequisitionType
 
 class RequisitionSpec extends Specification implements DomainUnitTest<Requisition> {
+
+    void cleanup() {
+        GroovySystem.metaClassRegistry.removeMetaClass(Requisition)
+    }
 
     void 'validate should return true for a valid requisition'() {
         when:
@@ -84,5 +91,182 @@ class RequisitionSpec extends Specification implements DomainUnitTest<Requisitio
 
         expect:
         requisition.getMostRecentErrorMessage() == "Allocation failed: second"
+    }
+
+    void 'getMostRecentErrorMessage should return null once a real transition has happened since the error'() {
+        given:
+        Requisition requisition = new Requisition()
+
+        EventLog error = new EventLog(eventLogCode: EventLogCode.ERROR_OCCURRED, message: "Allocation failed: boom")
+        error.dateCreated = Instant.now().minusSeconds(60)
+        requisition.eventLogs = [error]
+
+        // The requisition went on to actually reach PICKING after the error was logged, e.g. a later retry
+        // succeeded - the error is no longer the current problem.
+        Date laterDate = new Date()
+        Event laterEvent = new Event(eventDate: laterDate, eventType: new EventType(eventCode: EventCode.PICKING, sortOrder: 7))
+        laterEvent.dateCreated = laterDate
+        requisition.events = [laterEvent]
+
+        expect:
+        requisition.getMostRecentErrorMessage() == null
+    }
+
+    void 'getMostRecentErrorMessage should still return the message when the error is the most recent thing that happened'() {
+        given:
+        Requisition requisition = new Requisition()
+
+        Date earlierDate = new Date() - 1
+        Event earlierEvent = new Event(eventDate: earlierDate, eventType: new EventType(eventCode: EventCode.CREATED, sortOrder: 1))
+        earlierEvent.dateCreated = earlierDate
+        requisition.events = [earlierEvent]
+
+        EventLog error = new EventLog(eventLogCode: EventLogCode.ERROR_OCCURRED, message: "Allocation failed: boom")
+        error.dateCreated = Instant.now()
+        requisition.eventLogs = [error]
+
+        expect:
+        requisition.getMostRecentErrorMessage() == "Allocation failed: boom"
+    }
+
+    void 'getAllocationAttemptCount should count all matching errors when there is no recorded event yet'() {
+        given:
+        Requisition requisition = new Requisition()
+        EventLog first = new EventLog(eventLogCode: EventLogCode.ERROR_OCCURRED, message: "Allocation failed: first")
+        first.dateCreated = Instant.now().minusSeconds(120)
+        EventLog second = new EventLog(eventLogCode: EventLogCode.ERROR_OCCURRED, message: "Allocation failed: second")
+        second.dateCreated = Instant.now()
+        requisition.eventLogs = [first, second]
+
+        expect:
+        requisition.getAllocationAttemptCount() == 2
+    }
+
+    void 'getAllocationAttemptCount should not count errors from an earlier cycle, before the most recent event'() {
+        given:
+        Requisition requisition = new Requisition()
+
+        Date recently = new Date()
+        Event mostRecentEvent = new Event(eventDate: recently, eventType: new EventType(eventCode: EventCode.CREATED, sortOrder: 1))
+        mostRecentEvent.dateCreated = recently
+        requisition.events = [mostRecentEvent]
+
+        EventLog oldError = new EventLog(eventLogCode: EventLogCode.ERROR_OCCURRED, message: "Allocation failed: from an earlier cycle")
+        oldError.dateCreated = Instant.EPOCH
+        EventLog newError = new EventLog(eventLogCode: EventLogCode.ERROR_OCCURRED, message: "Allocation failed: this cycle")
+        newError.dateCreated = Instant.now()
+        requisition.eventLogs = [oldError, newError]
+
+        expect:
+        requisition.getAllocationAttemptCount() == 1
+    }
+
+    void 'getAllocationAttemptCount should return 0 once the requisition has reached PICKING'() {
+        given:
+        Requisition requisition = new Requisition()
+        Date now = new Date()
+        Event pickingEvent = new Event(eventDate: now, eventType: new EventType(eventCode: EventCode.PICKING, sortOrder: 7))
+        pickingEvent.dateCreated = now
+        requisition.events = [pickingEvent]
+
+        EventLog error = new EventLog(eventLogCode: EventLogCode.ERROR_OCCURRED, message: "Allocation failed: boom")
+        error.dateCreated = Instant.now()
+        requisition.eventLogs = [error]
+
+        expect:
+        requisition.getAllocationAttemptCount() == 0
+    }
+
+    void 'getIssuanceAttemptCount should count Issuance failed errors recorded since the most recent event'() {
+        given:
+        Requisition requisition = new Requisition()
+        Date now = new Date()
+        Event pickingEvent = new Event(eventDate: now, eventType: new EventType(eventCode: EventCode.PICKING, sortOrder: 7))
+        pickingEvent.dateCreated = now
+        requisition.events = [pickingEvent]
+
+        EventLog error = new EventLog(eventLogCode: EventLogCode.ERROR_OCCURRED, message: "Issuance failed: boom")
+        error.dateCreated = Instant.now()
+        requisition.eventLogs = [error]
+
+        expect:
+        requisition.getIssuanceAttemptCount() == 1
+    }
+
+    void 'getIssuanceAttemptCount should return 0 once the requisition has reached ISSUED'() {
+        given:
+        Requisition requisition = new Requisition()
+        Date now = new Date()
+        Event issuedEvent = new Event(eventDate: now, eventType: new EventType(eventCode: EventCode.ISSUED, sortOrder: 12))
+        issuedEvent.dateCreated = now
+        requisition.events = [issuedEvent]
+
+        EventLog error = new EventLog(eventLogCode: EventLogCode.ERROR_OCCURRED, message: "Issuance failed: boom")
+        error.dateCreated = Instant.now()
+        requisition.eventLogs = [error]
+
+        expect:
+        requisition.getIssuanceAttemptCount() == 0
+    }
+
+    void 'beforeInsert should publish a RequisitionStatusChangedEvent from null to the initial status'() {
+        given:
+        Requisition requisition = new Requisition(status: RequisitionStatus.CREATED)
+        List published = []
+        requisition.metaClass.publishStatusChangedEvent = { RequisitionStatus oldStatus, RequisitionStatus newStatus ->
+            published << [oldStatus, newStatus]
+        }
+
+        when:
+        requisition.beforeInsert()
+
+        then:
+        published == [[null, RequisitionStatus.CREATED]]
+    }
+
+    void 'beforeInsert should not publish a RequisitionStatusChangedEvent when there is no status to record'() {
+        given:
+        Requisition requisition = new Requisition()
+        List published = []
+        requisition.metaClass.publishStatusChangedEvent = { RequisitionStatus oldStatus, RequisitionStatus newStatus ->
+            published << [oldStatus, newStatus]
+        }
+
+        when:
+        requisition.beforeInsert()
+
+        then:
+        published.isEmpty()
+    }
+
+    // beforeUpdate's isDirty('status')/getPersistentValue('status') calls aren't unit-testable here: Groovy
+    // resolves a same-class call to a GORM trait method (DirtyCheckable) directly to the trait's real
+    // implementation rather than through the metaClass, so overriding them on a test instance is silently
+    // ignored - and the real implementation needs an actual persisted/loaded entity to have a meaningful
+    // "persistent value" to compare against, which a bare `new Requisition()` doesn't have. This is covered
+    // instead by RequisitionStatusChangedEventIntegrationSpec, which exercises beforeUpdate against a real
+    // Hibernate session.
+
+    void 'getMostRecentEvent should break ties on EventType.sortOrder when two events land in the same second'() {
+        // event_date/date_created only have second precision in the DB (see the
+        // set-sort-order-on-requisition-event-types migration), so an automatic allocation immediately followed
+        // by automatic issuance can produce two Events with identical timestamps. EventType.sortOrder is what
+        // Event#compareTo falls back on to still order them correctly.
+        given:
+        Date sameSecond = new Date()
+
+        Event pickingEvent = new Event(eventDate: sameSecond, eventType: new EventType(eventCode: EventCode.PICKING, sortOrder: 7))
+        pickingEvent.dateCreated = sameSecond
+
+        Event issuedEvent = new Event(eventDate: sameSecond, eventType: new EventType(eventCode: EventCode.ISSUED, sortOrder: 12))
+        issuedEvent.dateCreated = sameSecond
+
+        Requisition requisition = new Requisition()
+        // Deliberately added with the earlier (lower sortOrder) event last, so a naive "last added" or Set
+        // iteration order tiebreak would return the wrong (chronologically earlier) event.
+        requisition.events = [issuedEvent, pickingEvent]
+
+        expect:
+        requisition.getMostRecentEvent() == issuedEvent
     }
 }

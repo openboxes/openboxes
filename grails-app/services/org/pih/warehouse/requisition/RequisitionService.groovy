@@ -17,7 +17,6 @@ import grails.validation.ValidationException
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.joda.time.LocalDate
 import org.pih.warehouse.DateUtil
-import javassist.NotFoundException
 import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
@@ -25,8 +24,6 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.CommentType
 import org.pih.warehouse.core.Event
-import org.pih.warehouse.core.EventCode
-import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.history.EventLog
 import org.pih.warehouse.core.history.EventLogCode
@@ -859,44 +856,40 @@ class RequisitionService {
             """, ['location': location, 'startDate': startDate, 'endDate': endDate])[0] ?: 0
     }
 
-    Event createEvent(EventCode eventCode, Location eventLocation, Date eventDate, User currentUser) {
-        EventType eventType = EventType.findByEventCode(eventCode)
-        if (!eventType) {
-            throw new NotFoundException("No event type with code ${eventCode} has been found")
-        }
-        return new Event(eventDate: eventDate, eventType: eventType, eventLocation: eventLocation, createdBy: currentUser)
-    }
-
-    Requisition transitionRequisitionStatus(Requisition requisition, RequisitionStatus requisitionStatus, EventCode eventCode, User currentUser, Comment comment = null) {
+    /**
+     * Sets the requisition's status - which creates the transition Event via Requisition#setStatus - and
+     * attaches the given comment to that Event, if any.
+     */
+    Requisition transitionRequisitionStatus(Requisition requisition, RequisitionStatus requisitionStatus, Comment comment = null) {
         requisition.status = requisitionStatus
-        Event event = createEvent(eventCode, requisition.origin, new Date(), currentUser)
-        requisition.addToEvents(event)
 
         if (comment) {
-            event.comment = comment
+            requisition.mostRecentEvent?.comment = comment
             requisition.addToComments(comment)
         }
+
+        return requisition
     }
 
     void triggerRequisitionStatusTransition(Requisition requisition, User currentUser, RequisitionStatus newStatus, Comment comment = null) {
         // OBPIH-5134 Request approval feature implements additional status transitions for a request
         switch(newStatus) {
             case RequisitionStatus.VERIFYING:
-                transitionRequisitionStatus(requisition, RequisitionStatus.VERIFYING, EventCode.SUBMITTED, currentUser)
+                transitionRequisitionStatus(requisition, RequisitionStatus.VERIFYING)
                 requisition.approvalRequired = false
                 break
             case RequisitionStatus.PENDING_APPROVAL:
                 if (!requisition.origin.approvalRequired) {
                     throw new IllegalArgumentException("Fulfilling location must support Request Approval")
                 }
-                transitionRequisitionStatus(requisition, RequisitionStatus.PENDING_APPROVAL, EventCode.PENDING_APPROVAL, currentUser)
+                transitionRequisitionStatus(requisition, RequisitionStatus.PENDING_APPROVAL)
                 requisition.approvalRequired = true
                 break
             case RequisitionStatus.APPROVED:
                 if (!requisition.origin.approvalRequired) {
                     throw new IllegalArgumentException("Fulfilling location must support Request Approval")
                 }
-                transitionRequisitionStatus(requisition, RequisitionStatus.APPROVED, EventCode.APPROVED, currentUser)
+                transitionRequisitionStatus(requisition, RequisitionStatus.APPROVED)
                 requisition.dateApproved = new Date()
                 requisition.approvedBy = currentUser
                 break
@@ -904,7 +897,7 @@ class RequisitionService {
                 if (!requisition.origin.approvalRequired) {
                     throw new IllegalArgumentException("Fulfilling location must support Request Approval")
                 }
-                transitionRequisitionStatus(requisition, RequisitionStatus.REJECTED, EventCode.REJECTED, currentUser, comment)
+                transitionRequisitionStatus(requisition, RequisitionStatus.REJECTED, comment)
                 requisition.dateRejected = new Date()
                 requisition.rejectedBy = currentUser
                 break

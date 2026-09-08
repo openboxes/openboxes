@@ -19,6 +19,7 @@ class RequisitionEventService {
             return
         }
 
+        // TODO: Should be moved to the RequisitionStatusChangedEventService and should be tied to state transition
         switch (event.eventType) {
             case WebhookEventType.REQUISITION_STAGED:
                 // workaround to delay AutomaticIssuanceJob 1 second after RefreshProductAvailabilityJob; it needs product refresh to complete first

@@ -35,6 +35,8 @@ import org.pih.warehouse.fulfillment.Fulfillment
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.Product
 
+import java.time.Instant
+
 class Requisition implements Comparable<Requisition>, Serializable, Historizable {
 
     def publishAutomaticAllocationEvent() {
@@ -48,10 +50,29 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
     def beforeInsert() {
         createdBy = AuthService.currentUser
         updatedBy = AuthService.currentUser
+
+        // The very first status assignment has no persisted old status to compare against -
+        // RequisitionStatusChangedEventService records this as a forward transition from null
+        // (see RequisitionEventManager#recordStatusChange). Guarded on status being
+        // set at all, since a null-to-null "transition" isn't a real one.
+        if (status) {
+            publishStatusChangedEvent(null, status)
+        }
     }
 
     def beforeUpdate() {
         updatedBy = AuthService.currentUser
+
+        // requisition.status is the one field whose changes drive the requisition lifecycle timeline (see
+        // RequisitionEventManager#recordStatusChange, invoked from RequisitionStatusChangedEventService).
+        // isDirty already means "differs from the persisted value", so no extra equality check is needed.
+        if (isDirty('status')) {
+            publishStatusChangedEvent(getPersistentValue('status'), status)
+        }
+    }
+
+    def publishStatusChangedEvent(RequisitionStatus oldStatus, RequisitionStatus newStatus) {
+        Holders.grailsApplication.mainContext.publishEvent(new RequisitionStatusChangedEvent(this, oldStatus, newStatus))
     }
 
     def afterInsert() {
@@ -175,6 +196,7 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
             "recentComment",
             "mostRecentEvent",
             "allocationAttemptCount",
+            "issuanceAttemptCount",
             "mostRecentErrorMessage",
             "inErrorState",
     ]
@@ -503,25 +525,66 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
     }
 
     /**
-     * Message based count of ERROR_OCCURRED event logs, used as the allocation-attempt count for the retry cap.
+     * Message based count of ERROR_OCCURRED "Allocation failed" event logs recorded since the requisition's
+     * most recent real transition, used as the allocation-attempt count for the retry cap. Only meaningful
+     * before the requisition has reached PICKING - once it has, allocation succeeded, so any earlier failures
+     * are a resolved past cycle rather than the current one.
      * FIXME: stand-in for a proper classification subtype on EventLog (see EventLogCode#ERROR_OCCURRED).
-     *  The intermediary improvement will be basing this on the Requisition's status and a state transition event
-     *  occurence date in comparison to the event log created date - windowed count (after implementing:
-     *  https://openboxes.atlassian.net/browse/OBLS-929).
      */
     Integer getAllocationAttemptCount() {
+        return getAttemptCount(Constants.ALLOCATION_FAILED, RequisitionStatus.PICKING)
+    }
+
+    /**
+     * Message based count of ERROR_OCCURRED "Issuance failed" event logs recorded since the requisition's most
+     * recent real transition, used as the issuance-attempt count for a retry cap. Only meaningful before the
+     * requisition has reached ISSUED - once it has, issuance succeeded, so any earlier failures are a resolved
+     * past cycle rather than the current one.
+     * FIXME: stand-in for a proper classification subtype on EventLog (see EventLogCode#ERROR_OCCURRED).
+     */
+    Integer getIssuanceAttemptCount() {
+        return getAttemptCount(Constants.ISSUANCE_FAILED, RequisitionStatus.ISSUED)
+    }
+
+    /**
+     * Counts ERROR_OCCURRED event logs whose message starts with messagePrefix, windowed to those recorded
+     * since the requisition's most recent real transition (Event) - so failures from a since-resolved earlier
+     * cycle aren't counted towards the current one. Short-circuits to 0 once the requisition has reached
+     * expectedStatus, since the failures being counted are no longer relevant past that point.
+     */
+    private Integer getAttemptCount(String messagePrefix, RequisitionStatus expectedStatus) {
+        Event mostRecentEvent = getMostRecentEvent()
+        RequisitionStatus mostRecentStatus = mostRecentEvent ? RequisitionEventManager.toRequisitionStatus(mostRecentEvent.eventType) : null
+        if (mostRecentStatus != null && mostRecentStatus.sortOrder >= expectedStatus.sortOrder) {
+            return 0
+        }
+
+        Instant since = mostRecentEvent?.dateCreated?.toInstant()
         return eventLogs?.count {
-            it.eventLogCode == EventLogCode.ERROR_OCCURRED && it.message.startsWith(Constants.ALLOCATION_FAILED)
+            it.eventLogCode == EventLogCode.ERROR_OCCURRED &&
+                    it.message?.startsWith(messagePrefix) &&
+                    (!since || it.dateCreated >= since)
         } ?: 0
     }
 
     /**
-     * The most recent ERROR_OCCURRED message, for display.
+     * The most recent ERROR_OCCURRED message, for display - but only when the error is still the most recent
+     * thing that happened to the requisition. If a real transition (Event) has happened since, the requisition
+     * has moved on and the error is no longer the current problem.
      */
     String getMostRecentErrorMessage() {
-        return eventLogs?.findAll { it.eventLogCode == EventLogCode.ERROR_OCCURRED }
+        EventLog mostRecentErrorLog = eventLogs?.findAll { it.eventLogCode == EventLogCode.ERROR_OCCURRED }
                 ?.max { it.dateCreated }
-                ?.message
+        if (!mostRecentErrorLog) {
+            return null
+        }
+
+        Event mostRecentEvent = getMostRecentEvent()
+        if (mostRecentEvent?.dateCreated?.toInstant() > mostRecentErrorLog.dateCreated) {
+            return null
+        }
+
+        return mostRecentErrorLog.message
     }
 
     /**
@@ -547,6 +610,7 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
                 identifier: requestNumber,
                 description: description,
                 name: name,
+                source: "requisition.label",
         )
     }
 

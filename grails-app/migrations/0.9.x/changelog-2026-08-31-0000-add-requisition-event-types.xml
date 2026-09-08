@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <property name="now" value="now()"/>
+
+    <changeSet author="awalkowiak" id="310820260000-1">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="event_type" />
+        </preConditions>
+        <insert tableName="event_type">
+            <column name="id" value="f3148216-e2aa-46dd-892b-a82bf24dd9a1"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="${now}"/>
+            <column name="description" value="Requisition has been created"/>
+            <column name="event_code" value="CREATED"/>
+            <column name="last_updated" valueDate="${now}"/>
+            <column name="name" value="Created"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="awalkowiak" id="310820260000-2">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="event_type" />
+        </preConditions>
+        <insert tableName="event_type">
+            <column name="id" value="c162b2e7-f2c5-488f-a251-05de285189ba"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="${now}"/>
+            <column name="description" value="Requisition is being edited"/>
+            <column name="event_code" value="EDITING"/>
+            <column name="last_updated" valueDate="${now}"/>
+            <column name="name" value="Editing"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="awalkowiak" id="310820260000-3">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="event_type" />
+        </preConditions>
+        <insert tableName="event_type">
+            <column name="id" value="8636427a-3eb9-43e9-8e4b-142ff9da1aeb"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="${now}"/>
+            <column name="description" value="Requisition is being verified"/>
+            <column name="event_code" value="VERIFYING"/>
+            <column name="last_updated" valueDate="${now}"/>
+            <column name="name" value="Verifying"/>
+            <column name="sort_order" valueNumeric="6"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="awalkowiak" id="310820260000-4">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="event_type" />
+        </preConditions>
+        <insert tableName="event_type">
+            <column name="id" value="eae46aa5-ed31-4b02-83cd-37cfe591c888"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="${now}"/>
+            <column name="description" value="Requisition has been allocated"/>
+            <column name="event_code" value="PICKING"/>
+            <column name="last_updated" valueDate="${now}"/>
+            <column name="name" value="Picking"/>
+            <column name="sort_order" valueNumeric="7"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="awalkowiak" id="310820260000-5">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="event_type" />
+        </preConditions>
+        <insert tableName="event_type">
+            <column name="id" value="1950f4fa-d02d-4319-9a7d-68ccc243007d"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="${now}"/>
+            <column name="description" value="Requisition has been picked"/>
+            <column name="event_code" value="PICKED"/>
+            <column name="last_updated" valueDate="${now}"/>
+            <column name="name" value="Picked"/>
+            <column name="sort_order" valueNumeric="8"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="awalkowiak" id="310820260000-6">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="event_type" />
+        </preConditions>
+        <insert tableName="event_type">
+            <column name="id" value="20636890-d41f-40ba-90c8-c2276c81d500"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="${now}"/>
+            <column name="description" value="Requisition is pending"/>
+            <column name="event_code" value="PENDING"/>
+            <column name="last_updated" valueDate="${now}"/>
+            <column name="name" value="Pending"/>
+            <column name="sort_order" valueNumeric="9"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="awalkowiak" id="310820260000-7">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="event_type" />
+        </preConditions>
+        <insert tableName="event_type">
+            <column name="id" value="332c88a3-ac96-41e5-8430-c2e7fc323fd5"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="${now}"/>
+            <column name="description" value="Requisition is being checked"/>
+            <column name="event_code" value="CHECKING"/>
+            <column name="last_updated" valueDate="${now}"/>
+            <column name="name" value="Checking"/>
+            <column name="sort_order" valueNumeric="10"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="awalkowiak" id="310820260000-8">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="event_type" />
+        </preConditions>
+        <insert tableName="event_type">
+            <column name="id" value="f0e0561f-d109-4de2-83c7-b14f6acf8d12"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="${now}"/>
+            <column name="description" value="Requisition has been staged"/>
+            <column name="event_code" value="STAGED"/>
+            <column name="last_updated" valueDate="${now}"/>
+            <column name="name" value="Staged"/>
+            <column name="sort_order" valueNumeric="11"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="awalkowiak" id="310820260000-9">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="event_type" />
+        </preConditions>
+        <insert tableName="event_type">
+            <column name="id" value="e1460892-e99f-4f9b-a73e-0f356d4f75f1"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="${now}"/>
+            <column name="description" value="Requisition has been issued"/>
+            <column name="event_code" value="ISSUED"/>
+            <column name="last_updated" valueDate="${now}"/>
+            <column name="name" value="Issued"/>
+            <column name="sort_order" valueNumeric="12"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="awalkowiak" id="310820260000-10">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="event_type" />
+        </preConditions>
+        <insert tableName="event_type">
+            <column name="id" value="6fbbf387-201f-41c5-9abf-1958e1ed9bfe"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" valueDate="${now}"/>
+            <column name="description" value="Requisition has been canceled"/>
+            <column name="event_code" value="CANCELLED"/>
+            <column name="last_updated" valueDate="${now}"/>
+            <column name="name" value="Cancelled"/>
+            <column name="sort_order" valueNumeric="14"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
