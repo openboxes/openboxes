@@ -122,36 +122,32 @@ class PickTaskService {
     }
 
     @Transactional(readOnly = true)
-    List<Map> countOrdersByDeliveryType(Location facility, boolean excludeAssignedRequisitions = false) {
-        Map<DeliveryTypeCode, Integer> available = countDistinctRequisitionsByDeliveryType(
-                facility, excludeAssignedRequisitions, [PickTaskStatus.PENDING, PickTaskStatus.PICKING])
-
-        Map<DeliveryTypeCode, Integer> total = countDistinctRequisitionsByDeliveryType(facility, excludeAssignedRequisitions, null)
+    List<Map> countOrdersByDeliveryType(SearchPickTaskCommand command) {
+        Map<DeliveryTypeCode, Integer> available = countDistinctRequisitionsByDeliveryType(command)
 
         return DeliveryTypeCode.values().collect { DeliveryTypeCode code ->
             [
                     deliveryTypeCode: code.name(),
                     availableCount  : available[code] ?: 0,
-                    totalCount      : total[code] ?: 0,
             ]
         }
     }
 
-    private Map<DeliveryTypeCode, Integer> countDistinctRequisitionsByDeliveryType(
-            Location facility, boolean excludeAssignedRequisitions, List<PickTaskStatus> statuses) {
+    private Map<DeliveryTypeCode, Integer> countDistinctRequisitionsByDeliveryType(SearchPickTaskCommand command) {
+        List<PickTaskStatus> statuses = command.status ?: [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
+
         List<String> assignedRequisitions
-        if (excludeAssignedRequisitions) {
-            assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(facility, statuses)
+        if (command.excludeAssignedRequisitions) {
+            assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(command.facility, statuses)
         }
         List results = PickTask.createCriteria().list {
             projections {
                 groupProperty("deliveryTypeCode")
                 countDistinct("requisition")
             }
-            eq("facility", facility)
-            if (statuses) {
-                'in'("status", statuses)
-            }
+            eq("facility", command.facility)
+            'in'("requisitionStatus", RequisitionStatus.listNotYetPicked())
+            'in'("status", statuses)
 
             if (assignedRequisitions) {
                 not {
@@ -557,7 +553,7 @@ class PickTaskService {
                 distinct("requisition")
             }
             eq("facility", command.facility)
-            eq("requisitionStatus", RequisitionStatus.PICKING)
+            'in'("requisitionStatus", RequisitionStatus.listNotYetPicked())
             'in'("status", statusesToSearch)
 
             if (command.deliveryTypeCode) {
