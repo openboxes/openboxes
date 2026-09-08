@@ -422,6 +422,10 @@ export const getReceivingBinLocations = (state) => state.partialReceiving.binLoc
 
 export const getReceivingView = (state) => state.partialReceiving.view;
 
+// The column the receiving table is sorted by, shared by the receiving and the check step.
+// A null sort means the shipment order, which the backend applies by default.
+export const getReceivingSort = (state) => state.partialReceiving.sorting;
+
 export const getReceivingDateDelivered = (state, shipmentId) =>
   state.partialReceiving.dateDeliveredByShipment?.[shipmentId] ?? null;
 
