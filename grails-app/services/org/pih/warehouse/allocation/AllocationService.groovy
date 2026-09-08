@@ -84,7 +84,7 @@ class AllocationService {
 
         if (mode == AllocationMode.AUTO) {
             Integer quantityRequired = requisitionItem.calculateQuantityRequired()
-            List<SuggestedItem> suggestedItems = getAutoSuggestedItems(requisitionItem, quantityRequired, strategies, [], mode)
+            List<SuggestedItem> suggestedItems = getAutoSuggestedItems(requisitionItem, quantityRequired, strategies, [], false, mode)
 
             // No suggestion means allocation declined this line rather than failed to find stock - a
             // backordered line is left to the cross-dock release. Clearing the picklist would delete
@@ -153,13 +153,13 @@ class AllocationService {
         List<SuggestedItem> suggestedItems
         if (mode == AllocationMode.AUTO) {
             suggestedItems = getAutoSuggestedItems(requisitionItem, quantityRequired,
-                    request.allocationStrategies, [], request.crossDockRelease)
+                    request.allocationStrategies, [], request.crossDockRelease, mode)
         } else if (mode == AllocationMode.MANUAL) {
             List<AvailableItem> manualItems = request.availableItems?.findAll { it.inventoryItem.product?.id == requisitionItem.product?.id }
             suggestedItems = stockMovementService.getSuggestedItems(manualItems, quantityRequired)
             Integer quantitySuggested = suggestedItems.sum { it.quantityAvailable } ?: 0
             if (quantitySuggested < quantityRequired) {
-                List<SuggestedItem> remainingItems = getAutoSuggestedItems(requisitionItem, quantityRequired - quantitySuggested, null, suggestedItems, mode)
+                List<SuggestedItem> remainingItems = getAutoSuggestedItems(requisitionItem, quantityRequired - quantitySuggested, null, suggestedItems, false, mode)
                 suggestedItems.addAll(remainingItems)
             }
         } else {
@@ -296,7 +296,8 @@ class AllocationService {
         }
     }
 
-    private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationSourceStrategy> strategies, List<AvailableItem> excludeList = [], Boolean crossDockRelease = false) {
+    private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationSourceStrategy> strategies, List<AvailableItem> excludeList = [], Boolean crossDockRelease = false,
+                                                      AllocationMode allocationMode = null) {
         Location facility = requisitionItem.requisition.origin
         Product product = requisitionItem.product
         List<AvailableItem> allAvailableItems =
