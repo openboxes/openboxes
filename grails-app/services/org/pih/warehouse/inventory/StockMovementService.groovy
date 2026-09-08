@@ -2233,11 +2233,22 @@ class StockMovementService {
     }
 
     List<AvailableItem> getAvailableItems(Location location, RequisitionItem requisitionItem, Boolean calculateStatus) {
+        return getAvailableItems(location, requisitionItem, calculateStatus, true)
+    }
+
+    List<AvailableItem> getAvailableItems(Location location, RequisitionItem requisitionItem, Boolean calculateStatus, Boolean releaseOwnAllocation) {
         List<AvailableItem> availableItems = productAvailabilityService.getAllAvailableBinLocations(location, requisitionItem.product?.id)
         def picklistItems = getPicklistItems(requisitionItem)
 
         availableItems = availableItems.findAll { it.quantityOnHand > 0 }
-        availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
+        // FIXME Replace these activity markers with a dedicated ALLOCATE_STOCK activity code.
+        availableItems = availableItems.findAll {
+            !it.binLocation?.supports(ActivityCode.INBOUND_SORTATION) &&
+                    !it.binLocation?.supports(ActivityCode.PUTAWAY_CART)
+        }
+        if (releaseOwnAllocation) {
+            availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
+        }
 
         if (calculateStatus) {
             return calculateAvailableItemsStatus(requisitionItem, availableItems)

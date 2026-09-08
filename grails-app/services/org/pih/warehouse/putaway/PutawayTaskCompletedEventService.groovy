@@ -9,17 +9,42 @@
  **/
 package org.pih.warehouse.putaway
 
+import grails.core.GrailsApplication
+import org.pih.warehouse.allocation.AutomaticBackorderReallocationEvent
+import org.pih.warehouse.core.PutawayTypeCode
 import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
 
 class PutawayTaskCompletedEventService {
 
     def productAvailabilityService
+    GrailsApplication grailsApplication
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     void onPutawayTaskCompleted(PutawayTaskCompletedEvent event) {
         PutawayTask task = (PutawayTask) event.source
         log.info "Putaway ${task?.id} completed; refreshing PA for facility=${task?.facility?.id}, product=${task?.product?.id}"
         productAvailabilityService.triggerRefreshProductAvailability(task?.facility?.id, [task?.product?.id], event?.forceRefresh)
+
+        requestBackorderAllocation(task?.id)
+    }
+
+    private void requestBackorderAllocation(String taskId) {
+        if (!taskId) {
+            return
+        }
+        PutawayTask.withNewTransaction {
+            PutawayTask task = PutawayTask.get(taskId)
+            if (task?.putawayTypeCode != PutawayTypeCode.CROSS_DOCK) {
+                return
+            }
+            String shipmentId = task.shipmentItem?.shipment?.id
+            if (!shipmentId) {
+                log.warn "Cross-dock putaway ${taskId} has no shipment, cannot trigger backorder allocation"
+                return
+            }
+            log.info "Cross-dock putaway ${taskId} completed; requesting backorder allocation for shipment ${shipmentId}"
+            grailsApplication.mainContext.publishEvent(new AutomaticBackorderReallocationEvent(shipmentId))
+        }
     }
 }
