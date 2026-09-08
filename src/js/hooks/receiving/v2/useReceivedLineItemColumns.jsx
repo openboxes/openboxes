@@ -15,6 +15,7 @@ import LocationAutofillHeader from 'components/receivingV2/LocationAutofillHeade
 import receivingColumns from 'consts/receivingColumns';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
+import ProductSelectCell from 'utils/cells/ProductSelectCell';
 import SelectCell from 'utils/cells/SelectCell';
 
 /**
@@ -40,9 +41,8 @@ const useReceivedLineItemColumns = ({ control, copyToReceive }) => {
           name={`receivedItems.${row.index}.product`}
           control={control}
           render={({ field }) => (
-            <SelectCell
+            <ProductSelectCell
               {...field}
-              productSelect
               locationId={locationId}
               disabled
               label="react.receiving.product.label"
