@@ -43,6 +43,7 @@ class PickTaskApiController extends RestfulController<PickTask> {
                 offset: offset,
         ]
 
+        // getTotalCount() triggers a separate count query, so only pay for it when the caller paginates
         if (params.containsKey('max') || params.containsKey('offset')) {
             result.totalCount = tasks.totalCount
         }
@@ -55,7 +56,7 @@ class PickTaskApiController extends RestfulController<PickTask> {
             throw new ValidationException("Validation errors", command.errors)
         }
 
-        def data = pickTaskService.countOrdersByDeliveryType(command.facility, command.excludeAssignedRequisitions)
+        def data = pickTaskService.countOrdersByDeliveryType(command)
 
         render([data: data] as JSON)
     }
