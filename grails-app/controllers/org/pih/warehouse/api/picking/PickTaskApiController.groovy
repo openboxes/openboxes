@@ -37,18 +37,12 @@ class PickTaskApiController extends RestfulController<PickTask> {
 
         def tasks = pickTaskService.search(command, params)
 
-        Map result = [
-                data  : tasks,
-                max   : max,
-                offset: offset,
-        ]
-
-        // getTotalCount() triggers a separate count query, so only pay for it when the caller paginates
-        if (params.containsKey('max') || params.containsKey('offset')) {
-            result.totalCount = tasks.totalCount
-        }
-
-        render (result as JSON)
+        render ([
+                data: tasks,
+                totalCount: tasks.totalCount,
+                max: max,
+                offset: offset
+        ] as JSON)
     }
 
     def counts(SearchPickTaskCommand command) {
