@@ -37,6 +37,11 @@
 		.restricted {
 			background-color: #fff3cd !important;
 		}
+
+		.negative-quantity {
+			color: #d9534f;
+			font-weight: bold;
+		}
 	</style>
 </head>
 <body>

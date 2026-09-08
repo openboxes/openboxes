@@ -1,0 +1,3484 @@
+/**
+ * openboxes-theme.css — uniform design theme for legacy (GSP) pages.
+ *
+ * Extracted from PR #6073 ("Add opt-in unified design for legacy and mobile
+ * pages") by @christianallen. That PR gates this stylesheet behind a new layout
+ * plus a SiteMesh decorator-resolution override; here it is linked directly
+ * from custom.gsp behind the same config flag, which needs none of that
+ * machinery. Mobile and React-side changes stay with #6073.
+ *
+ * One deviation from #6073: the .box scroll rule is wrapped in
+ * @supports selector(:has(*)) -- see the comment at that rule.
+ *
+ * Restyles pages using layouts/custom.gsp to match the newer React pages
+ * (reference: /product/list). Specs are derived from the React stack's SCSS:
+ * src/css/colors.scss, src/css/main.scss, DataTable.scss, Layout/v2/styles.scss,
+ * form-elements/v2/style.scss.
+ *
+ * Loaded from custom.gsp AFTER <g:layoutHead/> (so it takes precedence over
+ * page-specific stylesheets) and BEFORE /common/_customCss.gsp (so per-warehouse
+ * header colors keep working).
+ *
+ * CSS only — no markup changes. Keep selectors as low-specificity as source
+ * order allows; prefer position over !important.
+ */
+
+/* ============================================================
+   1. DESIGN TOKENS
+   Authoritative copy of src/css/colors.scss :root for legacy pages.
+   (openboxes.css carries an older partial copy; this one wins by order.)
+   ============================================================ */
+:root {
+  --page-background: #F0F1F4;
+  --color-red: #C71610;
+  --color-green: #13AD60;
+  --color-yellow: #F3A157;
+
+  --red-100: #FFF1F0;
+  --red-200: #F36D5F;
+  --red-500: #E43B35;
+  --red-800: #C7161033;
+
+  --blue-primary: #0052CC;
+  --blue-100: #F7F9FD;
+  --blue-200: #F0F6FF;
+  --blue-201: #F4F7FE;
+  --blue-202: #E4F0FA;
+  --blue-300: #E9EDF4;
+  --blue-301: #D0DAED;
+  --blue-400: #7AA3F3;
+  --blue-401: #2192EE;
+  --blue-500: #2264E5;
+  --blue-700: #2B3674;
+  --blue-800: #202750;
+
+  --gray-100: #EAEAEA;
+  --gray-101: #F6F6F6;
+  --gray-102: #DFE4ED;
+  --gray-103: #EDEDED;
+  --gray-200: #D6D8DC;
+  --gray-250: #D0DAED;
+  --gray-300: #CED4DA;
+  --gray-301: #BFC3CB;
+  --gray-350: #9299A6;
+  --gray-400: #636D81;
+  --gray-401: #747C93;
+  --gray-500: #636D81;
+  --gray-600: #464F60;
+
+  --purple-100: #EFEDFD;
+  --purple-600: #644FFF;
+
+  --green-500: #30a64a;
+  --green-800: #13AD6033;
+
+  /* Shared effects (theme-local additions) */
+  --focus-ring: 0 1px 2px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(104, 113, 130, 0.16), 0 0 0 4px rgba(34, 100, 229, 0.15);
+  --card-radius: 4px;
+
+  /* ---- Elevation -------------------------------------------------
+     Three levels, and everything else is flat. The app had collected
+     seven unrelated shadows (5px 5px 5px #ccc on every input, a near
+     black 0 0 2px rgba(0,0,0,.8) halo on wizard steps, three different
+     0 4px 4px blurs at .15 and .25 alpha), so nothing read as a
+     consistent height.
+
+     All three share one soft, low-alpha, two-layer recipe — a tight
+     contact shadow plus a wider ambient one — so surfaces differ by how
+     far they float, not by how the shadow is drawn.
+
+     The rule for which level applies is what the surface DOES:
+       overlay - transient, sits above the page and can be dismissed
+                 (menus, dialogs, date pickers, autocomplete, tooltips)
+       raised  - a card the page is centred on, with nothing behind it
+                 to compete (login, location chooser)
+       sticky  - chrome pinned over content that scrolls beneath it
+                 (the top banner) — downward only, since the lift is
+                 what it needs to show, not the depth
+
+     Everything else stays FLAT, in particular in-app content cards
+     (.box). They sit on the grey page background with a 1px border,
+     which is what the React reference does; giving each one a shadow
+     turns a dense page into noise. Form controls are flat too — depth
+     there competes with the focus ring for the same signal. */
+  --shadow-overlay: 0 2px 6px rgba(0, 0, 0, 0.06), 0 6px 16px rgba(0, 0, 0, 0.08);
+  --shadow-raised: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.07);
+  --shadow-sticky: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 6px rgba(0, 0, 0, 0.06);
+
+  /* kept as an alias so existing references stay valid */
+  --focus-card-shadow: var(--shadow-raised);
+}
+
+/* ============================================================
+   2. FOUNDATIONS
+   Page sits on --page-background; content in white radius-4 cards.
+   Base UI text: Inter 14px, --gray-600 on data surfaces.
+   ============================================================ */
+
+/* html carries the background as well as body. #loginContainer has a
+   legacy `margin: 50px auto`, and with nothing between it and <body> to
+   stop the collapse, that margin propagates out and shifts the body box
+   down — so the canvas showed through as a white strip above the login
+   card. Painting the root the same colour makes the gap part of the
+   page rather than a seam. */
+html {
+  background-color: var(--page-background);
+}
+
+body {
+  background: var(--page-background);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #333;
+}
+
+a {
+  color: var(--blue-primary);
+}
+
+/* Page/section headings — React section-title spec (v2/styles.scss).
+   The legacy global h2 is a 40px gray bar (openboxes.css:1529); flatten it. */
+h2 {
+  height: auto;
+  line-height: 24px;
+  background: transparent;
+  border: none; /* legacy h2 carries a full 1px #D5D5D5 border */
+  color: var(--blue-primary);
+  font-size: 18px;
+  font-weight: 600;
+  text-shadow: none;
+  padding: 16px;
+  margin: 0;
+}
+
+h1 {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--blue-800);
+}
+
+/* ============================================================
+   2b. PAGE RHYTHM
+   React list pages use a 32px page gutter (.list-page-main) with
+   content in cards. Give legacy pages the same gutter and a
+   consistent vertical rhythm.
+   ============================================================ */
+
+/* The gutter lives on #content, not on .body: several pages (e.g.
+   productComponent, the scaffolded views) have no .body wrapper and
+   were rendering flush against the viewport edge. */
+#content {
+  padding: 0 32px 24px;
+}
+
+#content > .body {
+  padding: 0;
+}
+
+h1 {
+  margin: 16px 0 8px;
+}
+
+.buttonBar,
+.button-bar {
+  padding: 16px 0 8px;
+}
+
+/* ============================================================
+   3e. PANELS & MESSAGES (early: boxes frame everything else)
+   ============================================================ */
+
+/* .box — the universal legacy panel → white card, radius 4, no border */
+.box,
+.box-white {
+  background-color: #ffffff;
+  border: none;
+  border-radius: var(--card-radius);
+  margin: 16px 0;
+}
+
+/* Most cards put their <h2> straight inside .box, but a few wrap it in a
+   plain div (product/batchEdit's results card), which left those headers
+   with none of the card treatment at all — legacy 16px padding, no rule
+   beneath, not a flex row. Match one level of wrapping too. */
+.box > h2,
+.box > div > h2 {
+  border-bottom: 1px solid var(--gray-250);
+  /* The legacy 16px inset left card titles sitting 6px right of the first
+     column below them and made the header band taller than it needed to
+     be. Match the table's 10px cell inset and centre the title in what is
+     left. */
+  /* 13/11 rather than 12/12: the cap-height sits high in an 18px/24px
+     line box, so equal padding reads 2px top-heavy */
+  padding: 13px 10px 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* A <label> used as the card title (rather than for a form field) has to
+   read as the title, not as a field label — "Results" was rendering at
+   the form-label's 14px/700 grey inside an 18px blue heading. */
+.box > h2 > label,
+.box > div > h2 > label {
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  margin: 0;
+}
+
+/* Actions that live in a card header (batchEdit's Reset) sit to the far
+   right as a secondary button. They were inheriting the heading's
+   18px/600 and rendering as grey heading text, which read as a broken
+   title rather than something you could click. */
+.box > h2 > a:not(.button),
+.box > div > h2 > a:not(.button) {
+  margin-left: auto;
+  flex: 0 0 auto;
+  background-color: var(--blue-100);
+  color: var(--gray-600);
+  border-radius: var(--card-radius);
+  /* 2px vertical, so the control is exactly as tall as the title's line
+     box and the header band stays 49px — batchEdit sits this card beside
+     the Filters card, where an 8px taller header would show */
+  padding: 2px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+
+.box > h2 > a:not(.button):hover,
+.box > div > h2 > a:not(.button):hover {
+  background-color: var(--blue-200);
+  color: var(--blue-primary);
+  text-decoration: none;
+}
+
+/* Breathing room for non-table box content (tables stay flush like the
+   React list card; forms/filter stacks get the card's 16px inset) */
+.box > form,
+.box > fieldset,
+.box > p,
+.box > .filter-list {
+  display: block;
+  padding: 8px 16px 16px;
+}
+
+/* Legacy definition-style form rows (tr.prop > td.name/td.value):
+   kill the gray label column and dotted row separators */
+.prop {
+  border-top: none;
+}
+
+.prop .name,
+.prop td.name {
+  background-color: transparent;
+  color: var(--gray-600);
+  font-weight: 500;
+  text-align: right;
+  padding-right: 16px;
+}
+
+.prop .value,
+.prop td.value {
+  background-color: transparent;
+}
+
+/* Definition cards (Status / Details / Auditing) cannot widen, so their
+   table must never be allowed to outgrow them. The legacy <label> is
+   `white-space: nowrap`, which pinned the label column at its longest
+   string — 220px of a 330px card — and an auto-layout table answers that
+   by growing rather than squeezing, so a value like a bin location
+   "RM1-RACK2-SHELF1" hung past the card edge.
+
+   Fixed layout caps the columns at a share of the card instead of the
+   content, so containment holds for any value. Both cells wrap, so
+   nothing is truncated and nothing needs a tooltip to be read — a bin
+   location is an instruction someone acts on, so it has to stay visible.
+
+   Matched via :has(tr.prop > td.label) to hit only these definition
+   lists. DataTables also carry tr.prop on their header rows, and fixing
+   their layout would wreck columns sized to real data. */
+.box table:has(tr.prop > td.label) {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* 55%: enough that a typical value still fits on one line, while the
+   longer labels wrap to two. */
+.box table:has(tr.prop > td.label) tr.prop > td.label {
+  width: 55%;
+}
+
+.box table:has(tr.prop > td.label) tr.prop > td.label label {
+  white-space: normal;
+}
+
+/* The same failure, the same cause, in the other definition markup:
+   tr.prop > td.name is the Grails scaffolding pattern, and its <label> is
+   nowrap too. shipment/showDetails already shows it — a 364px table in a
+   330px card, twelve cells over the edge — and order/show sits at exactly
+   330, one long value away from the same thing.
+
+   Scoped to .yui-gf's quarter-width first column rather than applied by
+   markup alone: td.name appears in ~212 views, most of them full width,
+   where a 55% label column would be far too wide. This is the structural
+   proxy for "narrow", since CSS cannot ask how much room a card has. */
+.yui-gf > .yui-u.first .box table:has(tr.prop > td.name) {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* 50% here, not the 55% used opposite: these labels are right-aligned, so
+   they read as hugging their values and can afford the tighter column. */
+.yui-gf > .yui-u.first .box table:has(tr.prop > td.name) tr.prop > td.name {
+  width: 50%;
+}
+
+.yui-gf > .yui-u.first .box table:has(tr.prop > td.name) tr.prop > td.name label {
+  white-space: normal;
+}
+
+/* Fixing the outer table is not enough on its own: shipment/showDetails
+   nests a whole table of document links inside one value cell, and that
+   inner table keeps its own auto layout, so it grew 50px past the card
+   even once the outer one was contained.
+
+   The cause is the same `label { white-space: nowrap }` a third time —
+   "Goods Receipt Note (Excel)" as one unbreakable run sets a 248px
+   min-content, which width:100% cannot shrink past. Rather than chase it
+   selector by selector, no label in this narrow column stays nowrap:
+   there is no room for one anywhere in 330px. */
+.yui-gf > .yui-u.first .box label {
+  white-space: normal;
+}
+
+.yui-gf > .yui-u.first .box td table {
+  width: 100%;
+  max-width: 100%;
+}
+
+.yui-gf > .yui-u.first .box td table td {
+  overflow-wrap: anywhere;
+}
+
+/* Flash/info/error/warning boxes → React alert spec: white card,
+   1px severity border, radius 4. Keep the silk icons for now. */
+.message {
+  background-color: #ffffff;
+  border: 1px solid var(--gray-500);
+  border-radius: 4px;
+  color: var(--gray-600);
+  font-size: 14px;
+  padding: 12px 16px 12px 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23636D81' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 11v5M12 7.5h.01'/%3E%3C/svg%3E");
+  background-position: 12px 50%;
+  background-repeat: no-repeat;
+  background-size: 16px 16px;
+}
+
+.warning {
+  background-color: #ffffff;
+  border: 1px solid var(--color-yellow);
+  border-radius: 4px;
+  color: var(--gray-600);
+  font-size: 14px;
+  padding: 12px 16px 12px 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F3A157' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3.5L22 20H2z'/%3E%3Cpath d='M12 10v4.5M12 17.5h.01'/%3E%3C/svg%3E");
+  background-position: 12px 50%;
+  background-repeat: no-repeat;
+  background-size: 16px 16px;
+}
+
+div.errors {
+  background-color: #ffffff;
+  border: 1px solid var(--color-red);
+  border-radius: 4px;
+  color: var(--red-500);
+  font-size: 14px;
+  padding: 12px 16px;
+}
+
+/* ============================================================
+   3a. BUTTONS
+   Legacy .button is CSS3-GitHub-Buttons (gray gradient, blue-gradient
+   hover) — openboxes.css:2724. Default maps to the React SECONDARY
+   variant; explicit submits map to PRIMARY.
+   ============================================================ */
+
+.button,
+.buttons input,
+input[type="submit"],
+button {
+  background-color: var(--blue-100);
+  background-image: none;
+  color: var(--gray-600);
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.02em;
+  text-shadow: none;
+  cursor: pointer;
+}
+
+/* No border changes on hover/active: the rest-state rule already
+   zeroes borders, and stripping them here shifts layout on bordered
+   buttons (e.g. the nav location chooser) */
+/* a.button:hover in openboxes.css sets white text (invisible on the
+   light secondary background) and outranks a bare .button:hover */
+.button:hover,
+.button:focus,
+a.button:hover,
+a.button:focus,
+a.button:link,
+a.button:visited,
+.buttons input:hover,
+input[type="submit"]:hover,
+button:hover {
+  background-color: var(--blue-100);
+  background-image: none;
+  color: var(--blue-500);
+  text-shadow: none;
+  text-decoration: none;
+}
+
+a.button:link,
+a.button:visited {
+  color: var(--gray-600);
+}
+
+.button:active,
+.button.active {
+  background-color: var(--blue-100);
+  background-image: none;
+  color: var(--blue-500);
+  outline: 1px solid var(--blue-primary);
+}
+
+/* Form submit actions are the "primary" of their form — explicit
+   type="submit" only (implicitly-submitting <button>s without a type,
+   like the Download action-menu triggers, stay secondary) */
+input[type="submit"],
+button[type="submit"],
+.buttons input.save {
+  background-color: var(--blue-primary);
+  color: #ffffff;
+}
+
+input[type="submit"]:hover,
+button[type="submit"]:hover,
+button[type="submit"]:focus,
+.buttons input.save:hover {
+  background-color: var(--blue-500);
+  background-image: none;
+  color: #ffffff;
+}
+
+/* GH-sprite icons are dark — flip them white on the blue background */
+button[type="submit"].icon:before {
+  filter: brightness(0) invert(1);
+}
+
+/* Implicit-submit primary conventions: report "Run" buttons and
+   filter "Search" buttons are their form's primary action */
+button[value="run"],
+button[name="search"],
+button[name="save"],
+button[name="create"] {
+  background-color: var(--blue-primary);
+  color: #ffffff;
+}
+
+button[value="run"]:hover,
+button[value="run"]:focus,
+button[name="search"]:hover,
+button[name="search"]:focus,
+button[name="save"]:hover,
+button[name="save"]:focus,
+button[name="create"]:hover,
+button[name="create"]:focus {
+  background-color: var(--blue-500);
+  color: #ffffff;
+}
+
+button[name="search"].icon:before,
+button[name="save"].icon:before,
+button[name="create"].icon:before {
+  filter: brightness(0) invert(1);
+}
+
+/* Delete's danger treatment lives with the other destructive
+   signals further down. */
+
+/* Buttons lay out as centered flex rows: icon images and sprite icons
+   align optically without baseline fiddling */
+/* 8px icon-to-text gap matches the React Button component (gap-8) */
+.button,
+button.button,
+a.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 36px;
+  box-sizing: border-box;
+}
+
+.button img {
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* Filter sidebars: action buttons stack full-width with an 8px gap
+   instead of a centered ragged pile */
+/* .filter-list-item.buttons is handled with the other action-row
+   flavours further down — a `gap` here would stack on top of the
+   16px child margins used there and double the spacing. */
+
+/* Legacy affirmative/destructive semantics → React primary / danger-outline */
+button.positive,
+.button.positive,
+input.positive,
+.button.primary {
+  background-color: var(--blue-primary);
+  background-image: none;
+  color: #ffffff;
+  border: none;
+}
+
+button.positive:hover,
+.button.positive:hover,
+input.positive:hover,
+.button.primary:hover {
+  background-color: var(--blue-500);
+  background-image: none;
+  color: #ffffff;
+}
+
+button.negative,
+.button.negative,
+input.negative,
+.button.danger {
+  background-color: #ffffff;
+  background-image: none;
+  color: var(--color-red);
+  border: 1px solid var(--color-red);
+}
+
+button.negative:hover,
+.button.negative:hover,
+input.negative:hover,
+.button.danger:hover,
+.button.danger:focus,
+.button.danger:active {
+  background: var(--red-100);
+  background-image: none;
+  color: var(--color-red);
+  border-color: var(--color-red);
+}
+
+/* Legacy .button carries margin: 5px — tighten to the React 8px gap rhythm */
+.button {
+  margin: 2px 8px 2px 0;
+}
+
+/* GH-buttons semantic icons: approve (Save, 43 uses) is the page's
+   primary action; trash/remove are destructive. The rest sprite-shifts
+   to the white icon variant so it reads on the blue background. */
+.button.icon.approve {
+  background-color: var(--blue-primary);
+  background-image: none;
+  color: #ffffff;
+  border: none;
+}
+
+.button.icon.approve:hover,
+.button.icon.approve:focus,
+.button.icon.approve:active {
+  background-color: var(--blue-500);
+  background-image: none;
+  color: #ffffff;
+}
+
+.button.approve.icon:before {
+  filter: brightness(0) invert(1); /* white check at rest (blue bg) */
+}
+
+/* The .icon.trash / .icon.remove classes describe a GLYPH, not an
+   intent: across the views they label "Cancel" more often than
+   "Delete" (trash: 14 cancels vs 7 deletes). Styling them as danger
+   painted Cancel buttons red, so they stay secondary and the danger
+   treatment keys off signals that really do mean destruction. */
+a.button[href*="delete" i],
+button[name="delete" i],
+button[value="delete" i],
+input.delete,
+input[name*="_action_delete" i],
+button[name*="_action_delete" i],
+.button.negative,
+.button.danger {
+  background-color: #ffffff;
+  background-image: none;
+  color: var(--color-red);
+  border: 1px solid var(--color-red);
+}
+
+a.button[href*="delete" i]:hover,
+button[name="delete" i]:hover,
+button[value="delete" i]:hover,
+input.delete:hover,
+input[name*="_action_delete" i]:hover,
+button[name*="_action_delete" i]:hover,
+.button.negative:hover,
+.button.danger:hover {
+  background: var(--red-100);
+  background-image: none;
+  color: var(--color-red);
+  border-color: var(--color-red);
+}
+
+/* A danger button's icon matches its border and label */
+a.button[href*="delete" i].icon:before,
+button[name="delete" i].icon:before,
+button[value="delete" i].icon:before,
+.button.negative.icon:before,
+.button.danger.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C71610' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16M10 3.5h4M6.5 7l1 13.5h9l1-13.5M10 11v6M14 11v6'/%3E%3C/svg%3E") !important;
+}
+
+/* ============================================================
+   ICONS — unify on line-style SVG glyphs (Remixicon look: 24-grid,
+   2px stroke, round caps). Replaces the dark gh-icons.png sprite for
+   every icon class in use; markup untouched. Default color is
+   --gray-600; primary/blue contexts flip white via the invert filter.
+   ============================================================ */
+
+.button.icon:before {
+  content: "";
+  float: none;
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  top: 0;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 15px 15px;
+  background-image: none;
+  flex-shrink: 0;
+}
+
+/* The legacy sprite rules set per-icon background-positions at higher
+   specificity (.button.X.icon:before) — pin the SVGs back to center
+   at the same specificity for every icon class in use */
+.button.approve.icon:before,
+.button.accept.icon:before,
+.button.trash.icon:before,
+.button.delete.icon:before,
+.button.add.icon:before,
+.button.search.icon:before,
+.button.reload.icon:before,
+.button.loop.icon:before,
+.button.remove.icon:before,
+.button.log.icon:before,
+.button.edit.icon:before,
+.button.mail.icon:before,
+.button.email.icon:before,
+.button.arrowright.icon:before,
+.button.arrowleft.icon:before,
+.button.arrowdown.icon:before,
+.button.arrowup.icon:before,
+.button.user.icon:before,
+.button.tag.icon:before,
+.button.move.icon:before {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 15px 15px;
+}
+
+/* ...and the legacy :hover/:focus/:active sprite shifts, which are
+   written per icon (.button.reload.icon:hover:before = 3 classes) and
+   would otherwise shove the SVG out of its box on hover, making the
+   icon vanish. The repeated .icon lifts this above them. */
+.button.icon.icon:is(:hover, :focus, :active):before {
+  background-position: center !important;
+  background-size: 15px 15px !important;
+}
+
+.button.approve.icon:before,
+.button.accept.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 12.8l5 5L19.5 6.5'/%3E%3C/svg%3E");
+}
+
+.button.trash.icon:before,
+.button.delete.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16M10 3.5h4M6.5 7l1 13.5h9l1-13.5M10 11v6M14 11v6'/%3E%3C/svg%3E");
+}
+
+.button.add.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M12 4.5v15M4.5 12h15'/%3E%3C/svg%3E");
+}
+
+.button.search.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15.5 15.5L20.5 20.5'/%3E%3C/svg%3E");
+}
+
+.button.reload.icon:before,
+.button.loop.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 12a8 8 0 1 1-2.34-5.66'/%3E%3Cpath d='M20 4v5h-5'/%3E%3C/svg%3E");
+}
+
+.button.remove.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M5.5 5.5l13 13M18.5 5.5l-13 13'/%3E%3C/svg%3E");
+}
+
+.button.log.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6.5 3h8l4 4v14h-12z'/%3E%3Cpath d='M14 3v4.5h4.5M9.5 12.5h5M9.5 16h5'/%3E%3C/svg%3E");
+}
+
+.button.edit.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20l1-4L16.5 4.5l3 3L8 19l-4 1z'/%3E%3C/svg%3E");
+}
+
+.button.mail.icon:before,
+.button.email.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5.5' width='18' height='13' rx='2'/%3E%3Cpath d='M3.5 7l8.5 6 8.5-6'/%3E%3C/svg%3E");
+}
+
+.button.arrowright.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 12h15M13.5 6l6 6-6 6'/%3E%3C/svg%3E");
+}
+
+.button.arrowleft.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19.5 12h-15M10.5 6l-6 6 6 6'/%3E%3C/svg%3E");
+}
+
+.button.arrowdown.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.5v15M6 13.5l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+.button.arrowup.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 19.5v-15M6 10.5l6-6 6 6'/%3E%3C/svg%3E");
+}
+
+.button.user.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4.5 20.5c1.5-3.5 4.2-5 7.5-5s6 1.5 7.5 5'/%3E%3C/svg%3E");
+}
+
+.button.tag.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M3.5 3.5h8l9 9-8 8-9-9z'/%3E%3Ccircle cx='8' cy='8' r='1.4' fill='%23464F60'/%3E%3C/svg%3E");
+}
+
+.button.move.icon:before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3'/%3E%3C/svg%3E");
+}
+
+/* The most-used silk PNGs are swapped outright for line icons via the
+   `content` property — the one way CSS can replace an <img>'s pixels
+   without touching markup. Ranked by usage across the GSP views. */
+img[src*="/icons/silk/add.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M12 4.5v15M4.5 12h15'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/pencil.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20l1-4L16.5 4.5l3 3L8 19l-4 1z'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/delete.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16M10 3.5h4M6.5 7l1 13.5h9l1-13.5M10 11v6M14 11v6'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/accept.png"],
+img[src*="/icons/silk/tick.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 12.8l5 5L19.5 6.5'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/bullet_arrow_down.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9.5l6 6 6-6'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/application_view_list.png"],
+img[src*="/icons/silk/application_side_list.png"],
+img[src*="/icons/silk/application.png"],
+img[src*="/icons/silk/table.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round'%3E%3Crect x='3.5' y='4.5' width='17' height='15' rx='2'/%3E%3Cpath d='M3.5 9.5h17M9 9.5v10'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/zoom.png"],
+img[src*="/icons/silk/magnifier.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15.5 15.5L20.5 20.5'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/decline.png"],
+img[src*="/icons/silk/cross.png"],
+img[src*="/icons/silk/cancel.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/printer.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 9V4h10v5M7 18H5a1.5 1.5 0 0 1-1.5-1.5v-5A1.5 1.5 0 0 1 5 10h14a1.5 1.5 0 0 1 1.5 1.5v5A1.5 1.5 0 0 1 19 18h-2'/%3E%3Cpath d='M7 15h10v5.5H7z'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/error.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C71610' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7.5v5.5M12 16.5h.01'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/email.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5.5' width='18' height='13' rx='2'/%3E%3Cpath d='M3.5 7l8.5 6 8.5-6'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/play_green.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M7.5 4.8l12 7.2-12 7.2z'/%3E%3C/svg%3E"); }
+/* Some pictographs live outside the silk folder — match by filename */
+img[src$="/truck.png"],
+img[src$="/lorry_stop.png"],
+img[src$="/handtruck.png"],
+img[src$="/ShipmentTypeLand.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 6.5h10v10h-10zM12.5 10h4l3 3v3.5h-7z'/%3E%3Ccircle cx='6.5' cy='18.5' r='1.8'/%3E%3Ccircle cx='16.5' cy='18.5' r='1.8'/%3E%3C/svg%3E") !important; }
+img[src$="/map.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 4.5L3.5 6.8v12.7L9 17.2l6 2.3 5.5-2.3V4.5L15 6.8z'/%3E%3Cpath d='M9 4.5v12.7M15 6.8v12.7'/%3E%3C/svg%3E") !important; }
+img[src$="/package_add.png"],
+img[src$="/basket_put.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l8 4.5v9L12 21l-8-4.5v-9z'/%3E%3Cpath d='M4 7.5l8 4.5 8-4.5M12 12v9'/%3E%3C/svg%3E") !important; }
+img[src$="/text_list_numbers.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6h11M9 12h11M9 18h11M4 5.5h1.5V9M4 17h2.5v3H4zM4 14h2.5'/%3E%3C/svg%3E") !important; }
+img[src$="/page_break.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 3.5h7l4 4V10M7 21h11v-3M3 14h18'/%3E%3C/svg%3E") !important; }
+img[src$="/clock.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 7v5.2l3.2 2'/%3E%3C/svg%3E") !important; }
+
+img[src$="/truck.png"],
+img[src$="/lorry_stop.png"],
+img[src$="/handtruck.png"],
+img[src$="/ShipmentTypeLand.png"],
+img[src$="/map.png"],
+img[src$="/package_add.png"],
+img[src$="/basket_put.png"],
+img[src$="/text_list_numbers.png"],
+img[src$="/page_break.png"],
+img[src$="/clock.png"] {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+img[src*="/icons/silk/html.png"],
+img[src*="/icons/silk/page_code.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6.5 3h8l4 4v14h-12z'/%3E%3Cpath d='M14 3v4.5h4.5M9.5 13l-1.5 2 1.5 2M14.5 13l1.5 2-1.5 2'/%3E%3C/svg%3E"); }
+
+/* Prefix patterns so icon FAMILIES are covered, not one file at a
+   time (package_in/_go/_green/_delete, lorry_add, link_add, ...) */
+img[src*="/icons/silk/package"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l8 4.5v9L12 21l-8-4.5v-9z'/%3E%3Cpath d='M4 7.5l8 4.5 8-4.5M12 12v9'/%3E%3C/svg%3E") !important; }
+img[src*="/icons/silk/lorry"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 6.5h10v10h-10zM12.5 10h4l3 3v3.5h-7z'/%3E%3Ccircle cx='6.5' cy='18.5' r='1.8'/%3E%3Ccircle cx='16.5' cy='18.5' r='1.8'/%3E%3C/svg%3E") !important; }
+img[src*="/icons/silk/link"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13.5a4 4 0 0 0 5.7 0l3-3a4 4 0 1 0-5.7-5.7L11.5 6.3'/%3E%3Cpath d='M14 10.5a4 4 0 0 0-5.7 0l-3 3a4 4 0 1 0 5.7 5.7l1.5-1.5'/%3E%3C/svg%3E") !important; }
+img[src*="/icons/silk/calendar"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.5' y='5' width='17' height='15.5' rx='2'/%3E%3Cpath d='M3.5 9.5h17M8 3v4M16 3v4'/%3E%3C/svg%3E") !important; }
+/* The open-book outline collapsed into two ambiguous bars at 16px; a ruled
+   ledger with a spine holds up and suits both "Record stock" here and
+   "Show stock card" on the pages that use book.png. */
+img[src*="/icons/silk/book"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4.5' y='3' width='15' height='18' rx='2'/%3E%3Cpath d='M8.5 3v18M11.5 8h5M11.5 12h5'/%3E%3C/svg%3E") !important; }
+
+img[src*="/icons/silk/package"],
+img[src*="/icons/silk/lorry"],
+img[src*="/icons/silk/link"],
+img[src*="/icons/silk/calendar"],
+img[src*="/icons/silk/book"] {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+/* The two prefix families above are too blunt for menus: every package_*
+   collapsed to one carton (which reads as the OpenBoxes cube) across five
+   unrelated actions, and every book_* to one book across four. Give each
+   file its own glyph. Same specificity as the family rules, so these must
+   stay AFTER them to win. Each is built from the shared 24px grid, 2px
+   round-joined stroke, so they sit in the same family as the rest. */
+
+/* Transfer in — arrow descending into an open tray */
+img[src*="/icons/silk/package_in.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v9M8.5 8.5l3.5 3.5 3.5-3.5'/%3E%3Cpath d='M4 14.5v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3'/%3E%3C/svg%3E") !important; }
+
+/* Transfer out — the same tray, arrow rising out of it */
+img[src*="/icons/silk/package_go.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 12V3M8.5 6.5L12 3l3.5 3.5'/%3E%3Cpath d='M4 14.5v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3'/%3E%3C/svg%3E") !important; }
+
+/* Add to stock — carton with a plus badge */
+img[src*="/icons/silk/package_add.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 12V7.5L12 3 4 7.5v9l8 4.5 2.5-1.4'/%3E%3Cpath d='M4 7.5l8 4.5v9'/%3E%3Cpath d='M18.5 15.5v6M15.5 18.5h6'/%3E%3C/svg%3E") !important; }
+
+/* Adjust inventory — sliders, the one action that changes a level rather
+   than moving goods */
+img[src*="/icons/silk/package_green.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16M4 17h16'/%3E%3Ccircle cx='9' cy='7' r='2.5'/%3E%3Ccircle cx='15' cy='17' r='2.5'/%3E%3C/svg%3E") !important; }
+
+/* Write-off — carton with a cross badge. Serves both "Create debit" and
+   "Mark as damaged": they share package_delete.png in the markup, so CSS
+   alone cannot tell them apart, and both remove stock. */
+img[src*="/icons/silk/package_delete.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 12V7.5L12 3 4 7.5v9l8 4.5 2.5-1.4'/%3E%3Cpath d='M4 7.5l8 4.5v9'/%3E%3Cpath d='M16.5 17l5 5M21.5 17l-5 5'/%3E%3C/svg%3E") !important; }
+
+/* On hold — carton with a barred badge */
+img[src*="/icons/silk/package_stop.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 12V7.5L12 3 4 7.5v9l8 4.5 2.5-1.4'/%3E%3Cpath d='M4 7.5l8 4.5v9'/%3E%3Ccircle cx='18.5' cy='18.5' r='3.5'/%3E%3Cpath d='M16 21l5-5'/%3E%3C/svg%3E") !important; }
+
+/* Adjust stock — deliberately the same sliders as "Adjust inventory"
+   above. These are the same operation surfaced in two different menus, so
+   matching them is the point; it is not the accidental collapsing the
+   per-file rules exist to undo. */
+img[src*="/icons/silk/book_open.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16M4 17h16'/%3E%3Ccircle cx='9' cy='7' r='2.5'/%3E%3Ccircle cx='15' cy='17' r='2.5'/%3E%3C/svg%3E") !important; }
+
+/* Transfer stock — goods moving both ways between locations */
+img[src*="/icons/silk/book_next.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 9h13M13.5 5.5L17 9l-3.5 3.5'/%3E%3Cpath d='M20 15H7M10.5 11.5L7 15l3.5 3.5'/%3E%3C/svg%3E") !important; }
+
+/* Return stock — and, on other pages, the transaction log: an arrow
+   doubling back reads as both "send back" and "what came before" */
+img[src*="/icons/silk/book_previous.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5.5L4.5 10 9 14.5'/%3E%3Cpath d='M4.5 10h9.5a5.5 5.5 0 0 1 5.5 5.5v3'/%3E%3C/svg%3E") !important; }
+
+/* Record inventory — a counted page being written on */
+img[src*="/icons/silk/book_edit.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 3.5H6.5A1.5 1.5 0 0 0 5 5v14a1.5 1.5 0 0 0 1.5 1.5h8a1.5 1.5 0 0 0 1.5-1.5v-5'/%3E%3Cpath d='M8.5 8h4M8.5 12h3'/%3E%3Cpath d='M15 13.5l5-5 2 2-5 5h-2z'/%3E%3C/svg%3E") !important; }
+
+/* "Show stock history" is the only menu use of calendar.png — everywhere
+   else (the record-inventory date pickers) it really is a calendar, so
+   scope the clock to menus rather than repointing the file globally. */
+.actions img[src*="/calendar.png"],
+.action-menu-item img[src*="/calendar.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 3v5h5'/%3E%3Cpath d='M3.05 13A9 9 0 1 0 6 5.3L3 8'/%3E%3Cpath d='M12 7v5l4 2'/%3E%3C/svg%3E") !important; }
+
+/* Report-page icons the earlier sweeps missed — found by auditing every
+   <img> whose computed content is still 'normal', i.e. still rendering the
+   original raster. Same 24px grid and 2px round-joined stroke as the rest. */
+
+/* "Run Report" — two different legacy files for one action, so one glyph */
+img[src*="/icons/silk/cog_go.png"],
+img[src$="/play_blue.png"],
+img[src*="/icons/silk/play_blue.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7.5 4.5l11 7.5-11 7.5z'/%3E%3C/svg%3E") !important; }
+
+/* "Show report" — a page of figures */
+img[src$="/report.png"],
+img[src*="/icons/silk/report.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4.5' y='3' width='15' height='18' rx='2'/%3E%3Cpath d='M8.5 14.5v3M12 10.5v7M15.5 12.5v5'/%3E%3C/svg%3E") !important; }
+
+/* "Edit report" — the same page, with a pencil */
+img[src$="/report_edit.png"],
+img[src*="/icons/silk/report_edit.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 3.5H6.5A1.5 1.5 0 0 0 5 5v14a1.5 1.5 0 0 0 1.5 1.5h8a1.5 1.5 0 0 0 1.5-1.5v-5'/%3E%3Cpath d='M8.5 9h4M8.5 13h3'/%3E%3Cpath d='M15 13.5l5-5 2 2-5 5h-2z'/%3E%3C/svg%3E") !important; }
+
+/* "Refresh data" and "Clear" both mean re-run: a closed refresh cycle */
+img[src$="/table_refresh.png"],
+img[src*="/icons/silk/table_refresh.png"],
+img[src$="/arrow_refresh_small.png"],
+img[src*="/icons/silk/arrow_refresh_small.png"],
+img[src*="/icons/silk/arrow_refresh.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20.5 11a8.5 8.5 0 0 0-14.6-4.4L3 9.5'/%3E%3Cpath d='M3 4.5V10h5.5'/%3E%3Cpath d='M3.5 13a8.5 8.5 0 0 0 14.6 4.4L21 14.5'/%3E%3Cpath d='M21 19.5V14h-5.5'/%3E%3C/svg%3E") !important; }
+
+img[src*="/icons/silk/cog_go.png"],
+img[src$="/play_blue.png"],
+img[src$="/report.png"],
+img[src$="/report_edit.png"],
+img[src$="/table_refresh.png"],
+img[src$="/arrow_refresh_small.png"] {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+img[src$="/clipboard.png"],
+img[src*="/icons/silk/clipboard"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 4.5H7a1.5 1.5 0 0 0-1.5 1.5v13A1.5 1.5 0 0 0 7 20.5h10a1.5 1.5 0 0 0 1.5-1.5V6A1.5 1.5 0 0 0 17 4.5h-2'/%3E%3Crect x='9' y='2.5' width='6' height='4' rx='1'/%3E%3Cpath d='M8.5 11h7M8.5 15h7'/%3E%3C/svg%3E") !important; }
+img[src$="/calculator.png"],
+img[src*="/icons/silk/calculator"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='3' width='14' height='18' rx='2'/%3E%3Cpath d='M8.5 7h7M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M15.5 14.5h.01M8.5 18h.01M12 18h.01M15.5 18h.01'/%3E%3C/svg%3E") !important; }
+img[src$="/barcode.png"],
+img[src*="/icons/silk/barcode"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3.5 5v14M7 5v14M10.5 5v10M14 5v14M17.5 5v10M20.5 5v14'/%3E%3C/svg%3E") !important; }
+
+img[src$="/clipboard.png"],
+img[src$="/calculator.png"],
+img[src$="/barcode.png"],
+img[src*="/icons/silk/clipboard"],
+img[src*="/icons/silk/calculator"],
+img[src*="/icons/silk/barcode"] {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+img[src*="/icons/silk/comment_add.png"],
+img[src*="/icons/silk/comment.png"],
+img[src*="/icons/silk/comment_edit.png"],
+img[src*="/icons/silk/comments.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20.5 15a2 2 0 0 1-2 2H8l-4.5 3.5V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/cart_go.png"],
+img[src*="/icons/silk/cart_add.png"],
+img[src*="/icons/silk/cart_delete.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4h2.5l2.2 10.5h9.6L19.5 7H6'/%3E%3Ccircle cx='9' cy='19' r='1.6'/%3E%3Ccircle cx='17' cy='19' r='1.6'/%3E%3C/svg%3E"); }
+
+img[src*="/icons/silk/page_go.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 4.5H6.5v15h11V9'/%3E%3Cpath d='M20 4l-7 7M20 4h-4.5M20 4v4.5'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/page_world.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M3.5 12h17M12 3.5c2.2 2.4 3.3 5.3 3.3 8.5S14.2 18.1 12 20.5c-2.2-2.4-3.3-5.3-3.3-8.5S9.8 5.9 12 3.5z'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/page_attach.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 8.5l-7.6 7.6a3 3 0 0 1-4.2-4.2l8-8a4.5 4.5 0 0 1 6.4 6.4l-8 8a6 6 0 0 1-8.5-8.5l7-7'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/lorry.png"],
+img[src*="/icons/silk/truck.png"],
+img[src*="/icons/silk/handtruck.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 6.5h10v10h-10zM12.5 10h4l3 3v3.5h-7z'/%3E%3Ccircle cx='6.5' cy='18.5' r='1.8'/%3E%3Ccircle cx='16.5' cy='18.5' r='1.8'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/arrow_switch.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8.5h13M13.5 5l3.5 3.5-3.5 3.5M20 15.5H7M10.5 12L7 15.5l3.5 3.5'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/arrow_undo.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 10h10a5.5 5.5 0 0 1 0 11h-3'/%3E%3Cpath d='M8 5.5L3.5 10 8 14.5'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/page_add.png"],
+img[src*="/icons/silk/page_edit.png"],
+img[src*="/icons/silk/page.png"],
+img[src*="/icons/silk/note.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6.5 3h8l4 4v14h-12z'/%3E%3Cpath d='M14 3v4.5h4.5M9.5 12.5h5M9.5 16h5'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/exclamation.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F3A157' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3.5L22 20H2z'/%3E%3Cpath d='M12 10v4.5M12 17.5h.01'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/cart_edit.png"],
+img[src*="/icons/silk/cart.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4h2.5l2.2 10.5h9.6L19.5 7H6'/%3E%3Ccircle cx='9' cy='19' r='1.6'/%3E%3Ccircle cx='17' cy='19' r='1.6'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/trash.png"],
+img[src*="/icons/silk/bin.png"],
+img[src*="/icons/silk/bin_closed.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16M10 3.5h4M6.5 7l1 13.5h9l1-13.5M10 11v6M14 11v6'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/package.png"],
+img[src*="/icons/silk/package_white.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l8 4.5v9L12 21l-8-4.5v-9z'/%3E%3Cpath d='M4 7.5l8 4.5 8-4.5M12 12v9'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/section_collapsed.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/section_expanded.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); }
+
+img[src*="/icons/silk/arrow_nsew.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23747C93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v18M3 12h18M12 3l-2.5 2.5M12 3l2.5 2.5M12 21l-2.5-2.5M12 21l2.5-2.5M3 12l2.5-2.5M3 12l2.5 2.5M21 12l-2.5-2.5M21 12l2.5 2.5' /%3E%3C/svg%3E"); }
+
+img[src*="/icons/silk/arrow_refresh.png"],
+img[src*="/icons/silk/reload.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 12a8 8 0 1 1-2.34-5.66'/%3E%3Cpath d='M20 4v5h-5'/%3E%3C/svg%3E"); }
+img[src*="/icons/silk/hourglass.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 3.5h10M7 20.5h10M8 3.5v4l4 4 4-4v-4M8 20.5v-4l4-4 4 4v4'/%3E%3C/svg%3E"); }
+
+/* Swapped icons are already the right colour — skip the muting filter */
+img[src*="/icons/silk/add.png"],
+img[src*="/icons/silk/pencil.png"],
+img[src*="/icons/silk/delete.png"],
+img[src*="/icons/silk/accept.png"],
+img[src*="/icons/silk/tick.png"],
+img[src*="/icons/silk/bullet_arrow_down.png"],
+img[src*="/icons/silk/application_view_list.png"],
+img[src*="/icons/silk/application_side_list.png"],
+img[src*="/icons/silk/application.png"],
+img[src*="/icons/silk/table.png"],
+img[src*="/icons/silk/zoom.png"],
+img[src*="/icons/silk/magnifier.png"],
+img[src*="/icons/silk/decline.png"],
+img[src*="/icons/silk/cross.png"],
+img[src*="/icons/silk/cancel.png"],
+img[src*="/icons/silk/printer.png"],
+img[src*="/icons/silk/error.png"],
+img[src*="/icons/silk/email.png"],
+img[src*="/icons/silk/play_green.png"],
+img[src*="/icons/silk/arrow_refresh.png"],
+img[src*="/icons/silk/reload.png"],
+img[src*="/icons/silk/arrow_nsew.png"],
+img[src*="/icons/silk/page_go.png"],
+img[src*="/icons/silk/page_world.png"],
+img[src*="/icons/silk/page_attach.png"],
+img[src*="/icons/silk/lorry.png"],
+img[src*="/icons/silk/truck.png"],
+img[src*="/icons/silk/handtruck.png"],
+img[src*="/icons/silk/arrow_switch.png"],
+img[src*="/icons/silk/arrow_undo.png"],
+img[src*="/icons/silk/page_add.png"],
+img[src*="/icons/silk/page_edit.png"],
+img[src*="/icons/silk/page.png"],
+img[src*="/icons/silk/note.png"],
+img[src*="/icons/silk/exclamation.png"],
+img[src*="/icons/silk/cart_edit.png"],
+img[src*="/icons/silk/cart.png"],
+img[src*="/icons/silk/trash.png"],
+img[src*="/icons/silk/bin.png"],
+img[src*="/icons/silk/bin_closed.png"],
+img[src*="/icons/silk/package.png"],
+img[src*="/icons/silk/package_white.png"],
+img[src*="/icons/silk/section_collapsed.png"],
+img[src*="/icons/silk/section_expanded.png"],
+img[src*="/icons/silk/comment_add.png"],
+img[src*="/icons/silk/comment.png"],
+img[src*="/icons/silk/comment_edit.png"],
+img[src*="/icons/silk/comments.png"],
+img[src*="/icons/silk/cart_go.png"],
+img[src*="/icons/silk/cart_add.png"],
+img[src*="/icons/silk/cart_delete.png"],
+img[src*="/icons/silk/html.png"],
+img[src*="/icons/silk/page_code.png"],
+img[src*="/icons/silk/hourglass.png"] {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+/* Remaining colorful silk PNGs: mute to a uniform monochrome 14px so
+   they sit quietly next to the line icons.
+   Catch-all by src path — buttons, headers, tabs, cells, links alike. */
+img[src*="/icons/silk/"] {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  filter: grayscale(1) contrast(0.85);
+  opacity: 0.75;
+}
+
+/* Non-silk pictographs under images/icons/ (truck, handtruck,
+   ShipmentType*, …): same monochrome treatment, natural size capped */
+img[src*="/icons/"]:not([src*="/icons/silk/"]) {
+  max-height: 20px;
+  filter: grayscale(1) contrast(0.85);
+  opacity: 0.75;
+}
+
+/* Exception: document-type glyphs keep their color in content areas
+   (PDF red / Excel green is information, not chrome) — any path */
+img[src*="acrobat"],
+img[src*="excel"],
+img[src*="/icons/pdf"],
+img[src*="_word"] {
+  filter: none;
+  opacity: 1;
+}
+
+/* ...but stay muted when used inside buttons (there they are chrome) */
+.button img[src*="/icons/silk/"],
+.buttons img[src*="/icons/silk/"] {
+  filter: grayscale(1) contrast(0.85);
+  opacity: 0.75;
+}
+
+/* Silk icons inside headings (login lock, card-header glyphs like
+   shipment Details / Lead Time) get the same monochrome treatment */
+h2 img,
+h3 img,
+.box > h2 img {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+  filter: grayscale(1) contrast(0.85);
+  opacity: 0.7;
+  vertical-align: -2px;
+  margin-right: 8px; /* same icon-to-text gap as buttons and nav items */
+}
+
+/* ...and flip them white inside primary (blue) buttons. Needs
+   !important to beat the swapped-icon `filter: none !important`
+   above, which would otherwise leave a dark glyph on dark blue. */
+input[type="submit"] img,
+button[type="submit"] img,
+button[value="run"] img,
+button[name="search"] img,
+button[name="save"] img,
+button[name="create"] img,
+.button.positive img,
+.button.icon.approve img {
+  filter: brightness(0) invert(1) !important;
+  opacity: 0.95 !important;
+}
+
+/* buttonBar links: silk background icons exist for ~30 classes (home,
+   status bullets, clock, lorry, cog, …) — strip all to clean text
+   links; only the two core actions below keep a line icon */
+.linkButton a:not(.list):not(.new):not(.create) {
+  background-image: none;
+  padding-left: 16px;
+}
+
+/* Sortable-column arrows (skin/sorted_*.gif) → line chevrons */
+th.asc a {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23636D81' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 14l6-6 6 6'/%3E%3C/svg%3E");
+  background-size: 12px 12px;
+  background-position: right center;
+  background-repeat: no-repeat;
+  padding-right: 16px;
+}
+
+th.desc a {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23636D81' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 10l6 6 6-6'/%3E%3C/svg%3E");
+  background-size: 12px 12px;
+  background-position: right center;
+  background-repeat: no-repeat;
+  padding-right: 16px;
+}
+
+/* Error-list exclamation (skin png) → plain list inside the bordered box */
+div.errors li {
+  background-image: none;
+  padding-left: 16px;
+}
+
+/* Legacy .buttons rows: drop the shadow.jpg gradient strip */
+.buttons {
+  background: none;
+  border: none;
+}
+
+/* Autocomplete inputs: silk magnifier (inline template CSS) → line icon.
+   input.autocomplete out-ranks the template's .autocomplete class. */
+input.autocomplete {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239299A6' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15.5 15.5L20.5 20.5'/%3E%3C/svg%3E");
+  background-size: 14px 14px;
+  background-position: right 10px center;
+  background-repeat: no-repeat;
+}
+
+/* buttonBar link icons (background silk on a.list / a.new) → SVG */
+.linkButton a.list {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M8.5 6h11M8.5 12h11M8.5 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01'/%3E%3C/svg%3E");
+  background-size: 15px 15px;
+}
+
+.linkButton a.new,
+.linkButton a.create {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M12 4.5v15M4.5 12h15'/%3E%3C/svg%3E");
+  background-size: 15px 15px;
+}
+
+/* buttonBar action links (span.linkButton > a with silk-icon classes)
+   → secondary buttons; keep the icon, inset it like button text */
+.linkButton a {
+  display: inline-block;
+  background-color: var(--blue-100);
+  background-position: 12px 50%;
+  background-repeat: no-repeat;
+  color: var(--gray-600);
+  border-radius: 4px;
+  padding: 8px 16px 8px 34px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  text-decoration: none;
+  margin-right: 8px;
+}
+
+.linkButton a:hover {
+  color: var(--blue-500);
+  text-decoration: none;
+}
+
+/* ============================================================
+   3b. FORMS
+   React v2 input spec: 36px, radius 4, 1px --gray-200, Inter 14,
+   --gray-600 text, blue border + layered focus ring on focus.
+   ============================================================ */
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input.text,
+input.large,
+textarea,
+select {
+  background-color: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--gray-600);
+}
+
+/* Legacy fields carry hardcoded `size` attributes (and fixed widths),
+   which spill out of narrow panels — e.g. a 424px autocomplete in a
+   330px filter card. Never let a control exceed its container. */
+.box input[type="text"],
+.box input[type="password"],
+.box input[type="email"],
+.box input[type="number"],
+.box input[type="search"],
+.box input.text,
+.box input.large,
+.box textarea,
+.box select,
+.box .chzn-container,
+.box .chosen-container,
+.box .select2-container {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Uniform 36px control height for all single-line inputs (matches
+   selects, chosen, select2, react-select and %button-base) */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input.text,
+input.large {
+  height: 36px;
+  box-sizing: border-box;
+}
+
+/* Native selects match the select2/chosen skin: no OS chrome, token
+   chevron, same 36px box as text inputs */
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  height: 36px;
+  padding: 6px 32px 6px 8px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23636D81' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+select[multiple],
+select[size]:not([size="1"]) {
+  height: auto;
+  padding: 6px 8px;
+  background-image: none;
+}
+
+/* Native file inputs: picker button styled as a secondary button */
+input[type="file"]::file-selector-button {
+  background-color: var(--blue-100);
+  color: var(--gray-600);
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  margin-right: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input.text:focus,
+input.large:focus,
+textarea:focus,
+select:focus {
+  outline: 0;
+  border: 1px solid var(--blue-primary);
+  box-shadow: var(--focus-ring);
+}
+
+input[type="checkbox"],
+input[type="radio"],
+input.checkbox,
+input.radio {
+  accent-color: var(--blue-primary);
+  width: 16px;
+  height: 16px;
+}
+
+input[readonly="readonly"],
+input[readonly] {
+  background-color: var(--gray-101);
+  color: var(--gray-400);
+}
+
+label {
+  font-size: 14px;
+}
+
+/* ============================================================
+   3c. TABLES
+   React table spec (DataTable.scss): header bg --blue-100, bold,
+   --gray-600, 12px padding, no column borders; body rows white with
+   1px --gray-100 bottom border; hover #F8FAFF; no zebra striping.
+   NOTE: legacy GSPs also use <table> for form layout — row borders are
+   scoped to list-ish tables only.
+   ============================================================ */
+
+td, th {
+  font: 400 14px/20px 'Inter', sans-serif;
+  color: var(--gray-600);
+  /* 12px vertical matches the React DataTable spec; 10px horizontal
+     keeps dense legacy tables reasonable (they scroll in-card now) */
+  padding: 12px 10px;
+}
+
+th {
+  /* blue-200 at 55% over white reads as blue-100 but lets the card's
+     scroll shadow show through instead of masking it */
+  background-color: rgba(240, 246, 255, 0.55);
+  color: var(--gray-600);
+  font-weight: 700;
+  font-size: 14px;
+  border-top: none;
+  /* Headers never soft-wrap into word stacks; intentional <br>s still break */
+  white-space: nowrap;
+}
+
+/* Wide tables scroll inside their card instead of stretching the page
+   (matches the React DataTable behavior). The layered backgrounds are
+   the classic CSS-only scroll affordance: the white "cover" panes are
+   attached to the content, the shadow panes to the viewport, so a
+   soft edge-shadow appears only on the side that has more to reveal
+   and fades away once you reach that end. */
+/* Gated on :has() because the opt-out below is expressed entirely in :has()
+   selectors. An engine without :has() drops that whole rule -- a selector list
+   is invalidated by any unsupported selector in it -- which would leave every
+   .box scrolling, including form panels, whose Chosen/Select2 dropdowns would
+   then be clipped. Gating the cause means such an engine simply keeps the
+   pre-theme overflow behaviour instead. */
+@supports selector(:has(*)) {
+  .box {
+    overflow-x: auto;
+    background-image:
+      linear-gradient(to right, #ffffff 20%, rgba(255, 255, 255, 0)),
+      linear-gradient(to left, #ffffff 20%, rgba(255, 255, 255, 0)),
+      radial-gradient(farthest-side at 0 50%, rgba(32, 39, 80, 0.18), rgba(32, 39, 80, 0)),
+      radial-gradient(farthest-side at 100% 50%, rgba(32, 39, 80, 0.18), rgba(32, 39, 80, 0));
+    background-position: 0 0, 100% 0, 0 0, 100% 0;
+    background-repeat: no-repeat;
+    background-size: 32px 100%, 32px 100%, 20px 100%, 20px 100%;
+    background-attachment: local, local, scroll, scroll;
+  }
+}
+
+/* Visible, on-brand scrollbar so the overflow is discoverable before
+   you scroll — same treatment as the React DataTable */
+.box::-webkit-scrollbar {
+  height: 10px;
+}
+
+.box::-webkit-scrollbar-track {
+  background: var(--blue-200);
+  border-radius: 0 0 4px 4px;
+}
+
+.box::-webkit-scrollbar-thumb {
+  background-color: var(--blue-301);
+  border-radius: 4px;
+}
+
+.box::-webkit-scrollbar-thumb:hover {
+  background-color: var(--gray-350);
+}
+
+.box {
+  scrollbar-color: var(--blue-301) var(--blue-200);
+  scrollbar-width: thin;
+}
+
+/* ...but only data panels should scroll. Setting overflow-x: auto also
+   forces overflow-y to auto, which gives form panels a pointless
+   vertical scrollbar and clips their select dropdowns. Form layouts
+   (tr.prop), filter panels and anything with a Chosen dropdown opt out.
+
+   tr.prop is qualified: it marks definition-style form rows, but some
+   DataTables put it on their header row too, and those are data panels
+   that must scroll rather than spill off the page. */
+.box:has(tr.prop):not(:has(table.dataTable)),
+.box:has(.filters),
+.box:has(.filter-list),
+.box:has(.chosen-container),
+.box:has(.chzn-container) {
+  overflow: visible;
+  background-image: none;
+}
+
+th a:link,
+th a:visited,
+th a:hover {
+  color: var(--gray-600);
+  font-size: 14px;
+}
+
+th a:hover {
+  color: var(--blue-primary);
+}
+
+/* Row separators + hover, scoped to data tables */
+.list table tbody td {
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.list td {
+  vertical-align: middle;
+}
+
+/* Stop columns collapsing into word stacks: data tables size to their
+   content (columns get natural width, icon columns stay narrow), fill
+   the card at minimum, and the card's horizontal scroll absorbs any
+   excess. Very long text still wraps via the per-cell cap. */
+.box > table,
+.list > table,
+.list table {
+  width: max-content;
+  min-width: 100%;
+}
+
+.box table td,
+.list table td {
+  max-width: 340px;
+  /* `anywhere` breaks ONLY when a string would otherwise overflow —
+     unlike break-all, which chops every word. Keeps long lot numbers
+     and codes inside their panel. */
+  overflow-wrap: anywhere;
+}
+
+.list tbody tr:hover {
+  background: rgba(240, 246, 255, 0.5);
+}
+
+/* Kill zebra striping (React reference has none) */
+.odd {
+  background: transparent;
+}
+
+.even {
+  background: transparent;
+}
+
+/* Pagination → React pagination spec (#FBFCFC bar, 12px, quiet controls) */
+.paginateButtons {
+  background: #FBFCFC;
+  border: none;
+  color: var(--gray-600);
+  font-size: 12px;
+  padding: 12px;
+}
+
+.paginateButtons a {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: 2px;
+  color: var(--gray-600);
+  padding: 4px 8px;
+}
+
+.paginateButtons a:hover {
+  color: var(--blue-primary);
+  border-color: var(--blue-primary);
+}
+
+.paginateButtons span.currentStep {
+  color: var(--blue-primary);
+  font-weight: 600;
+}
+
+/* ============================================================
+   3d. JQUERY UI (smoothness theme overrides) + CHOSEN + SELECT2
+   Widget chrome: white surfaces, --gray-200 borders, radius 4;
+   active/selected states use --blue-primary / --blue-200;
+   pickers' headers use --blue-100 like table headers.
+   ============================================================ */
+
+.ui-widget {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+}
+
+.ui-widget input,
+.ui-widget select,
+.ui-widget textarea,
+.ui-widget button {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+}
+
+.ui-widget-content {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  color: var(--gray-600);
+}
+
+.ui-corner-all,
+.ui-corner-top,
+.ui-corner-bottom {
+  border-radius: 4px;
+}
+
+.ui-widget-header {
+  background: var(--blue-100);
+  border: none;
+  color: var(--gray-600);
+  font-weight: 600;
+}
+
+.ui-state-default,
+.ui-widget-content .ui-state-default,
+.ui-widget-header .ui-state-default {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+.ui-state-hover,
+.ui-widget-content .ui-state-hover,
+.ui-state-focus,
+.ui-widget-content .ui-state-focus {
+  background: var(--blue-100);
+  border: 1px solid var(--gray-200);
+  color: var(--blue-primary);
+}
+
+.ui-state-active,
+.ui-widget-content .ui-state-active {
+  background: var(--blue-200);
+  border: 1px solid var(--blue-primary);
+  color: var(--blue-primary);
+}
+
+.ui-state-highlight,
+.ui-widget-content .ui-state-highlight {
+  background: var(--blue-200);
+  border: 1px solid var(--blue-301);
+  color: var(--gray-600);
+}
+
+.ui-state-error,
+.ui-widget-content .ui-state-error {
+  background: var(--red-100);
+  border: 1px solid var(--color-red);
+  color: var(--red-500);
+}
+
+/* Dialogs */
+.ui-dialog {
+  border: none;
+  border-radius: 4px;
+  box-shadow: var(--shadow-overlay);
+  padding: 0;
+}
+
+.ui-dialog .ui-dialog-titlebar {
+  background: #ffffff;
+  border-bottom: 1px solid var(--gray-250);
+  border-radius: 4px 4px 0 0;
+  color: var(--blue-primary);
+  font-size: 18px;
+  font-weight: 600;
+  padding: 16px;
+}
+
+/* Datepicker */
+.ui-datepicker {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-overlay);
+  padding: 8px;
+}
+
+.ui-datepicker .ui-datepicker-header {
+  background: var(--blue-100);
+  border: none;
+}
+
+.ui-datepicker td a,
+.ui-datepicker td span {
+  text-align: center;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+.ui-datepicker td a.ui-state-default {
+  background: transparent;
+  border: none;
+}
+
+.ui-datepicker td a.ui-state-hover {
+  background: var(--blue-200);
+  border: none;
+  color: var(--blue-primary);
+}
+
+.ui-datepicker td a.ui-state-active {
+  background: var(--blue-primary);
+  border: none;
+  color: #ffffff;
+}
+
+/* Autocomplete / menus */
+.ui-autocomplete.ui-menu,
+.ui-menu {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  box-shadow: var(--shadow-overlay);
+}
+
+.ui-menu .ui-menu-item a {
+  color: var(--gray-600);
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+.ui-menu .ui-menu-item a.ui-state-hover,
+.ui-menu .ui-menu-item a.ui-state-focus {
+  background: var(--blue-200);
+  border: none;
+  color: var(--gray-600);
+  margin: 0;
+}
+
+/* Progressbar */
+.ui-progressbar .ui-progressbar-value {
+  background: var(--blue-primary);
+  border: none;
+}
+
+/* CHOSEN single/multi selects → input spec */
+.chzn-container-single .chzn-single {
+  height: 36px;
+  line-height: 34px;
+  background: #ffffff;
+  background-image: none;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  box-shadow: none;
+  color: var(--gray-600);
+  font-size: 14px;
+  padding: 0 12px;
+}
+
+.chzn-container-single .chzn-single div {
+  width: 24px;
+}
+
+.chzn-container-single .chzn-single div b {
+  background: none;
+}
+
+.chzn-container-single .chzn-single div b::before {
+  content: '';
+  display: block;
+  margin: 15px auto 0;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid var(--gray-400);
+}
+
+.chzn-container .chzn-drop {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: 0 0 4px 4px;
+  box-shadow: var(--shadow-overlay);
+}
+
+.chzn-container-single .chzn-search input {
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  background-image: none;
+  padding: 6px 8px;
+  font-family: 'Inter', sans-serif;
+}
+
+.chzn-container .chzn-results .highlighted {
+  background: var(--blue-200);
+  background-image: none;
+  color: var(--gray-600);
+}
+
+.chzn-container-active .chzn-single,
+.chzn-container-active .chzn-single-with-drop {
+  border: 1px solid var(--blue-primary);
+  box-shadow: var(--focus-ring);
+  background-image: none;
+}
+
+.chzn-container-multi .chzn-choices {
+  background-image: none;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.chzn-container-multi .chzn-choices .search-choice {
+  background: var(--blue-100);
+  background-image: none;
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+  color: var(--gray-600);
+  padding: 4px 20px 4px 8px;
+}
+
+/* CHOSEN v1.x (chosen-* class generation, e.g. inventory browse) —
+   same input spec as the older chzn-* generation */
+.chosen-container-single .chosen-single {
+  height: 36px;
+  line-height: 34px;
+  background: #ffffff;
+  background-image: none;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  box-shadow: none;
+  color: var(--gray-600);
+  font-size: 14px;
+  padding: 0 12px;
+}
+
+.chosen-container-single .chosen-single div {
+  width: 24px;
+}
+
+.chosen-container-single .chosen-single div b {
+  background: none;
+}
+
+.chosen-container-single .chosen-single div b::before {
+  content: '';
+  display: block;
+  margin: 15px auto 0;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid var(--gray-400);
+}
+
+.chosen-container .chosen-drop {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: 0 0 4px 4px;
+  box-shadow: var(--shadow-overlay);
+}
+
+.chosen-container-single .chosen-search input[type="text"],
+.chosen-container .chosen-search-input {
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  background-image: none;
+  padding: 6px 8px;
+  height: 32px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+}
+
+.chosen-container .chosen-results li.highlighted {
+  background: var(--blue-200);
+  background-image: none;
+  color: var(--gray-600);
+}
+
+.chosen-container-active .chosen-single,
+.chosen-container-active.chosen-with-drop .chosen-single {
+  border: 1px solid var(--blue-primary);
+  box-shadow: var(--focus-ring);
+  background-image: none;
+}
+
+.chosen-container-multi .chosen-choices {
+  background-image: none;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  padding: 0 8px;
+  min-height: 36px;
+  height: auto;
+  box-sizing: border-box;
+  font-size: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+/* The inner search field fills the 36px box instead of its own 25px */
+.chosen-container-multi .chosen-choices li.search-field,
+.chosen-container-multi .chosen-choices li.search-field input[type="text"] {
+  height: 34px;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--gray-600);
+}
+
+/* Multi-select focus matches every other control */
+.chosen-container-active .chosen-choices {
+  border: 1px solid var(--blue-primary);
+  box-shadow: var(--focus-ring);
+}
+
+.chosen-container-multi .chosen-choices li.search-choice {
+  background: var(--blue-100);
+  background-image: none;
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+  color: var(--gray-600);
+  padding: 4px 20px 4px 8px;
+}
+
+.chosen-container .chosen-results li {
+  font-size: 14px;
+  color: var(--gray-600);
+}
+
+/* Chosen ships a retina media query that re-applies its sprite sheet
+   with !important (chosen.css:482) — invisible at 1x, visible as
+   stray glyphs on every hi-dpi screen. Kill it wherever it lands. */
+.chosen-container-single .chosen-single abbr,
+.chosen-container-single .chosen-single div b,
+.chosen-container-single .chosen-search input[type="text"],
+.chosen-container-multi .chosen-choices .search-choice .search-choice-close,
+.chosen-container .chosen-results-scroll-down span,
+.chosen-container .chosen-results-scroll-up span {
+  background-image: none !important;
+}
+
+/* Clear (X) affordance → line icon, vertically centered, clear of the
+   chevron; replaces the sprite's off-center 12px glyph */
+.chosen-container-single .chosen-single abbr {
+  top: 50%;
+  right: 32px;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23636D81' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: 12px 12px !important;
+}
+
+.chosen-container-single .chosen-single abbr:hover {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C71610' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E") !important;
+}
+
+/* Dropdown search field: same focus treatment as every other input */
+.chosen-container-single .chosen-search input[type="text"]:focus,
+.chosen-container .chosen-search-input:focus {
+  outline: 0;
+  border: 1px solid var(--blue-primary);
+  box-shadow: var(--focus-ring);
+}
+
+/* Multi-select chips' close affordance → line icon */
+.chosen-container-multi .chosen-choices .search-choice .search-choice-close {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23636D81' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: 10px 10px !important;
+}
+
+/* SELECT2 (v4) → input spec */
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+  height: 36px;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: 34px;
+  color: var(--gray-600);
+  font-size: 14px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 34px;
+}
+
+/* The single select got a line-height above, but the multi-select carries
+   its placeholder on an inline search field that had none — so "Select
+   Options" sat at the top of a 36px box while every other control in the
+   panel centred its text. Same 34px inner height as the single variant. */
+.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 34px;
+  margin: 0;
+  padding: 0 6px;
+  line-height: 20px;
+}
+
+.select2-container--default .select2-selection--multiple .select2-search--inline {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.select2-container--default .select2-selection--multiple .select2-search__field {
+  height: 32px;
+  line-height: 32px;
+  margin: 0;
+  padding: 0 2px;
+  font-size: 14px;
+  color: var(--gray-600);
+}
+
+/* the pills sit on the same centre line rather than riding the top edge */
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 2px 8px;
+  background-color: var(--blue-100);
+  border: 1px solid var(--gray-250);
+  border-radius: 4px;
+  color: var(--gray-600);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--single {
+  border: 1px solid var(--blue-primary);
+  box-shadow: var(--focus-ring);
+}
+
+.select2-dropdown {
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  box-shadow: var(--shadow-overlay);
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background-color: var(--blue-200);
+  color: var(--gray-600);
+}
+
+.select2-container--default .select2-results__option[aria-selected=true] {
+  background-color: var(--blue-100);
+}
+
+/* ============================================================
+   3f. TABS & WIZARDS
+   Tab strips → quiet underline tabs (matches the app navbar's
+   active-link treatment): no boxes, active = blue text + 2px bar.
+   ============================================================ */
+
+.ui-tabs {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.ui-tabs .ui-tabs-nav,
+.tabs:not(.tabs-left) > ul {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--gray-200);
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.ui-tabs .ui-tabs-nav li,
+.tabs:not(.tabs-left) > ul > li {
+  background: transparent;
+  border: none;
+  margin: 0;
+  border-radius: 0;
+}
+
+.ui-tabs .ui-tabs-nav li a,
+.tabs:not(.tabs-left) > ul > li > a {
+  color: var(--gray-400);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 16px;
+  border: none;
+  border-bottom: 2px solid transparent;
+}
+
+.ui-tabs .ui-tabs-nav li a:hover,
+.tabs:not(.tabs-left) > ul > li > a:hover {
+  color: var(--blue-primary);
+  text-decoration: none;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected,
+.ui-tabs .ui-tabs-nav li.ui-state-active {
+  background: transparent;
+  border: none;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a,
+.ui-tabs .ui-tabs-nav li.ui-state-active a,
+.tabs:not(.tabs-left) > ul > li.ui-tabs-selected > a,
+.tabs:not(.tabs-left) > ul > li.ui-state-active > a {
+  color: var(--blue-primary);
+  border-bottom: 2px solid var(--blue-primary);
+}
+
+.ui-tabs .ui-tabs-panel {
+  background: #ffffff;
+  border: none;
+  border-radius: 0 0 4px 4px;
+  padding: 16px;
+}
+
+/* Pop-up menus (in-table .actions, download/action-menu dropdowns).
+   Legacy items are 11px with icons at whatever size the source PNG
+   happened to be, so rows are different heights and the labels do not
+   line up. One spec for all of them: 14px text, 16px icons, uniform
+   row height, blue hover. */
+.actions {
+  background-color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  box-shadow: var(--shadow-overlay);
+  padding: 4px;
+  min-width: 200px;
+}
+
+.actions .action-menu-item,
+.actions > div {
+  padding: 0;
+  margin: 0;
+}
+
+/* openboxes.css targets .actions .action-menu-item a (3 classes) and
+   .actions .download-subbuttons button — match that reach */
+.actions a,
+.actions button,
+.action-menu-item > a,
+.action-menu-item > button,
+.actions .action-menu-item a,
+.actions .action-menu-item button,
+.actions .download-subbuttons button,
+.actions .action-menu-info a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 34px;
+  padding: 6px 10px;
+  margin: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--gray-600);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: left;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Every glyph occupies the same box, so the labels align */
+.actions a img,
+.actions button img,
+.action-menu-item img,
+.actions .action-menu-item a img,
+.actions .download-subbuttons button img {
+  width: 16px !important;
+  height: 16px !important;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.actions a:hover,
+.actions button:hover,
+.action-menu-item > a:hover,
+.action-menu-item > button:hover,
+.actions .action-menu-item a:hover,
+.actions .action-menu-item button:hover,
+.actions .download-subbuttons button:hover,
+.actions .download-subbuttons:hover {
+  background-color: var(--blue-200);
+  color: var(--blue-primary);
+  text-decoration: none;
+  /* the legacy rules re-declare display/padding on :hover, which
+     relaid out the item under the cursor — restate them so hovering
+     changes nothing but colour */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  padding: 6px 10px;
+}
+
+/* Menu glyphs are chrome, so file-type icons become a plain document
+   mark here even though they keep their colour in content areas */
+.actions img[src*="excel"],
+.actions img[src*="acrobat"],
+.actions img[src*="/pdf"],
+.actions img[src*="_word"],
+.actions img[src*="html"],
+.actions img[src*="page_code"],
+.actions img[src*="page_white"] {
+  content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3.5v11M7.5 10l4.5 4.5 4.5-4.5M4.5 19.5h15'/%3E%3C/svg%3E") !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+/* ============================================================
+   3g. BADGES & FOOTER (consistency pass)
+   Legacy .tag chips (statuses + product tags) wore the 2010 lime
+   green; map the family to the token badge formula used by the
+   React value-indicator (tinted bg + saturated text, radius 4).
+   ============================================================ */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  float: none;
+  border: none;
+  border-radius: 4px;
+  padding: 2px 8px;
+  background: var(--green-800);
+  color: var(--color-green);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+.tag a {
+  color: inherit;
+  font-size: 12px;
+}
+
+.tag-success,
+.tag-alert {
+  background: var(--green-800);
+  color: var(--color-green);
+  border: none;
+}
+
+.tag-danger {
+  background: var(--red-100);
+  color: var(--red-500);
+  border: none;
+}
+
+.tag-info {
+  background: var(--blue-200);
+  color: var(--blue-700);
+  border: none;
+}
+
+.tag-warning {
+  background: #F3A15733; /* --color-yellow @ 20% */
+  color: #A16207;        /* readable amber derived from --color-yellow */
+  border: none;
+}
+
+/* Footer sits directly on the page background — no card, no borders.
+   Build/debug info hides behind a CSS-only disclosure whose toggle is
+   the info icon (checkbox + label in _footer.gsp; no JavaScript). */
+#ft,
+#footer {
+  background: transparent;
+  border: none;
+  color: var(--gray-401);
+  font-size: 12px;
+  padding: 12px 32px;
+  margin-top: 24px;
+}
+
+#ft a,
+#footer a {
+  color: var(--gray-401);
+}
+
+.footer-toggle {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.footer-summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  line-height: 2em;
+}
+
+.footer-toggle-icon {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  cursor: pointer;
+  opacity: 0.65;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23747C93' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 11v5M12 7.5h.01'/%3E%3C/svg%3E") center / 15px 15px no-repeat;
+}
+
+.footer-toggle-icon:hover {
+  opacity: 1;
+}
+
+.footer-details {
+  display: none;
+}
+
+.footer-toggle:checked ~ .footer-details {
+  display: block;
+}
+
+.footer-toggle:focus-visible ~ .footer-summary .footer-toggle-icon {
+  outline: 2px solid var(--blue-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+  opacity: 1;
+}
+
+/* Page-summary bands (.summary — browse, order/requisition headers):
+   titles sit directly on the page background like the React
+   list-page header, not in their own gray bordered strip */
+/* Vertical rhythm matches the React .list-page-header: title sits
+   ~39px below the navbar and the band runs ~100px before content */
+.summary {
+  background-color: transparent;
+  border-bottom: none;
+  padding: 32px 0 24px;
+  min-height: 92px;
+  box-sizing: border-box;
+}
+
+/* A rich header (product thumbnail, status chip — e.g. the stock card)
+   brings its own height; the page-title rhythm above would stack ~56px
+   of dead space on top of it. */
+.summary:has(img) {
+  padding: 16px 0 8px;
+  min-height: 0;
+}
+
+/* The stock card's action bar is marked up as a two-cell table, so every
+   control inherited 10px of cell padding on the left and 12px top and
+   bottom — which pushed the menu button out of line with the Status card
+   and stacked dead space above the grid. Lay the row out as flex on the
+   page gutter itself — left flush with the Status card, right flush with
+   the tab panel, which is the white edge the eye actually reads (the
+   .box inside it is inset a further 16px). */
+.summary-actions {
+  padding: 0;
+}
+
+.summary-actions > table,
+.summary-actions > table > tbody {
+  display: block;
+  width: 100%;
+}
+
+.summary-actions > table tr {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.summary-actions > table td {
+  display: flex;
+  align-items: center;
+  width: auto;
+  padding: 0;
+  border: 0;
+}
+
+/* the cell holding the button groups takes the remaining width, so the
+   right-hand group can be pushed to the far edge */
+.summary-actions > table td:last-child {
+  flex: 1;
+}
+
+.summary-actions .button-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0;
+}
+
+.summary-actions .button-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.summary-actions .button-group.right {
+  margin-left: auto;
+}
+
+/* One height for everything in the bar — the menu button was 30px against
+   the buttons' 36px */
+.summary-actions .action-btn,
+.summary-actions a.button,
+.summary-actions button.button {
+  height: 36px;
+  min-height: 36px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+}
+
+/* barcode.png is not a silk icon and came in at 20px against everyone
+   else's 14 — give every glyph in the bar the same box */
+.summary-actions .button img,
+.summary-actions .action-btn img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+/* The status chip sits in the header table above and has to land on the
+   same right edge as the bar and the tab panel below */
+#product-summary-table > tbody > tr > td:last-child {
+  padding-right: 0;
+}
+
+/* Breathing room between the action bar and the tab strip */
+#transactionLogTabs {
+  padding-top: 1em;
+}
+
+/* A card dropped into a tab panel sits on the panel's own white surface,
+   so the panel's top padding and the card's top margin stack as plain
+   white above the header — 46px above the title against 14px below. Both
+   are redundant here: the header's own padding should define the band, as
+   it already does in the left-hand column, where that same margin falls on
+   grey page background and reads as separation. Panels that open with
+   something other than a card keep their padding. */
+/* A tab panel that holds cards should not be a surface of its own: the
+   cards already bring the white, so a white panel behind them stacks its
+   own padding on top of each card's margin and the result reads as dead
+   space above the first heading.
+
+   Not keyed to :first-child — product/edit puts three hidden inputs ahead
+   of its first card inside the <form>, so the card is the fourth child and
+   every :first-child rule silently missed it. Keying on "contains a card"
+   avoids depending on where in the form it happens to sit. */
+.ui-tabs-panel:has(> .box),
+.ui-tabs-panel:has(> form > .box) {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* product/create has a single tab, which the theme hides (see .single-tab
+   on product/edit.gsp). That leaves the panel's white surface running
+   straight into the navbar with no page background between them — the
+   page reads as though the card has no top margin at all.
+
+   With no tab strip above it the panel has nothing to be, so it stops
+   being a surface: the card then sits on the page background with its own
+   16px margin, exactly like a page that never had tabs. */
+.tabs.single-tab > .ui-tabs-panel {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* stockCard.gsp caps zone names at 50px and bin names at 100px, which
+   ellipsizes any real bin ("Cold Chain Room B / Rack 14 …") down to a few
+   characters. Let them wrap as ordinary text — the cell's own max-width
+   still bounds the column. Two classes deep so it outranks that layout. */
+/* stockCard.gsp caps zone names at 50px and bin names at 100px, so a real
+   bin ("Cold Chain Room B / Rack 14 / Shelf 3 …") ellipsises down to about a
+   dozen characters. Wrap within a bounded column instead: the stock card's
+   table then fits its panel outright, and the two wide tables that use this
+   markup (stock history, record inventory) already scroll horizontally, so
+   they simply carry the full name. Two classes deep to outrank that layout. */
+.box table .line {
+  display: block;
+  min-width: 0;
+  max-width: 200px;
+}
+
+.box table .line .line-base,
+.box table .line .line-extension {
+  display: inline;
+  max-width: none;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+}
+
+/* The product code rides inside the page title as a bare <small>, only a
+   few points smaller and in the same colour, so it read as part of the
+   product name. Set it on its own white chip — the header sits on the
+   grey page background, so white reads as a distinct token — and drop it
+   to a metadata colour so the name keeps the emphasis. */
+#product-title small {
+  display: inline-block;
+  vertical-align: 2px;
+  margin-right: 6px;
+  padding: 2px 8px;
+  background-color: #ffffff;
+  border-radius: var(--card-radius);
+  font-size: 12px;
+  font-weight: 600;
+  /* fixed, so the chip does not stretch the title's line box */
+  line-height: 16px;
+  letter-spacing: 0.02em;
+  color: var(--gray-500);
+}
+
+.summary .title,
+div.title {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+  color: var(--blue-800);
+}
+
+/* Megamenu section headers (non-clickable): small-caps label, clearly
+   distinct from the clickable menu items beneath them */
+.dropdown-menu-content .subsection-title,
+.dropdown-menu-wrapper .subsection-title {
+  color: var(--gray-350);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Both focus cards share the same shadow */
+.location-chooser {
+  box-shadow: var(--focus-card-shadow);
+}
+
+#loginBox {
+  box-shadow: var(--focus-card-shadow);
+}
+
+/* A lone tab offers no choice, so the strip is just noise — the view
+   flags it with .single-tab (see product/edit.gsp) */
+.tabs.single-tab > ul,
+.tabs.single-tab > .ui-tabs-nav {
+  display: none;
+}
+
+/* Vertical tab rails (.tabs-left, e.g. the location chooser) keep
+   their left accent bar only — no horizontal underline, whether the
+   rules arrive via .tabs or runtime ui-tabs classes */
+.tabs.tabs-left > ul,
+.tabs.tabs-left .ui-tabs-nav {
+  border-bottom: none;
+}
+
+.tabs.tabs-left > ul > li > a,
+.tabs.tabs-left .ui-tabs-nav li a,
+.tabs.tabs-left .ui-tabs-nav li.ui-state-active a,
+.tabs.tabs-left .ui-tabs-nav li.ui-tabs-selected a {
+  border-bottom: none;
+}
+
+/* Location-chooser tiles (chooseLocation page + nav dropdown): keep
+   their identity — they carry the per-warehouse tint via
+   --location-color — but align metrics to the 36px control system
+   and ban mid-word breaking */
+.location-chooser .tabs .location-group .element {
+  min-height: 36px;
+  align-items: center;
+  padding: 8px 12px;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+
+/* Full-width hint/instruction blocks (e.g. the inventory summary
+   explainer) read as prose on the page, not as a white card */
+.yui-gf > .box.p-2 {
+  background: transparent;
+  padding: 0 0 16px !important;
+  margin: 0 0 8px;
+  color: var(--gray-500);
+  line-height: 1.6;
+}
+
+/* Filter panels nest their fields deeper than the browse page does
+   (form > .filters > .prop > .filter-list-item), stacking an extra
+   16px + 5px of inset. Drop both so every filter panel shares the
+   single 10px inset that .filter-list-item already provides. */
+.yui-u.first .box > form,
+.box > form:has(.filters) {
+  padding: 0;
+}
+
+/* With the form's padding at 0, the last row's bottom margin had nothing
+   to push against and collapsed straight out through .filters and the
+   form, so every filter panel ended flush with its final control — the
+   Download and Search buttons sat on the card's bottom edge. flow-root
+   gives .filters its own formatting context, which contains the margin
+   instead of letting it escape. */
+.filters {
+  display: flow-root;
+}
+
+.filters .prop {
+  padding: 0;
+}
+
+/* Some panels (report parameters) put fields straight into .prop with
+   no .filter-list-item, so they never picked up its 10px inset */
+.filters .prop:not(:has(.filter-list-item)) {
+  margin: 10px 10px 16px;
+}
+
+/* The panels built from .buttons close with 20px of padding under their
+   last control; match that here so the two kinds of filter panel end on
+   the same gap rather than 16 against 20. */
+.filters .prop:not(:has(.filter-list-item)):last-child {
+  margin-bottom: 20px;
+}
+
+/* Action rows come in three flavours across the filter panels:
+   .buttons, a .center div inside .prop, and .filter-list-item.center.
+   All of them stack full width, inset with their fields. */
+.filter-list-item.center:has(> .button),
+.filter-list-item.center:has(> button),
+/* A fifth flavour: inventory/listExpiredStock drops its Filter button
+   straight into .filter-list-item with no .center or .buttons wrapper, so
+   it stayed inline at its natural 90px against the ~305px every other
+   panel uses, and closed on a 2px gap instead of 20. */
+.filter-list-item:not(.center):not(.buttons):has(> .button),
+.filter-list-item:not(.center):not(.buttons):has(> button),
+.filters .prop > .center {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: left;
+  font-size: 0;
+}
+
+.filters .prop > .center > .button,
+.filters .prop > .center > button,
+.filters .prop > .center > .action-menu,
+.filter-list-item.center > .button,
+.filter-list-item.center > button,
+.filter-list-item.center > .action-menu,
+.filter-list-item:not(.center):not(.buttons) > .button,
+.filter-list-item:not(.center):not(.buttons) > button,
+.filter-list-item:not(.center):not(.buttons) > .action-menu {
+  width: 100%;
+  margin: 0 0 16px !important;
+  font-size: 14px;
+}
+
+.filters .prop > .center > *:last-child,
+.filter-list-item.center > *:last-child,
+.filter-list-item:not(.center):not(.buttons) > *:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* ...and it needs the same 20px close the .buttons flavour has, since that
+   row is the last thing in the card. As padding, not margin: this item is
+   a direct child of .box, so a bottom margin collapses straight out and
+   leaves the button flush with the card edge. */
+.filter-list-item:not(.center):not(.buttons):has(> .button),
+.filter-list-item:not(.center):not(.buttons):has(> button) {
+  padding-bottom: 20px;
+}
+
+/* Every filter panel was inset 10px left but 15px right, from a stray 5px
+   of padding on the row. Symmetric now, so the controls sit centred in
+   the card rather than 5px off it. */
+.filter-list-item {
+  padding-right: 0;
+}
+
+
+/* Filter fields: label needs room to breathe above its control */
+.filter-list-item > label,
+.filters .prop > label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: var(--gray-600);
+}
+
+/* Panels that stack several fields in one .prop get the same rhythm
+   between fields that separate .filter-list-item blocks provide */
+.filters .prop > label:not(:first-child) {
+  margin-top: 14px;
+}
+
+.filter-list-item {
+  margin-bottom: 16px;
+}
+
+/* ...but a label paired with a checkbox belongs beside it, not under */
+.filter-list-item > input[type="checkbox"] + label,
+.filter-list-item > input[type="radio"] + label,
+.filters .prop > input[type="checkbox"] + label {
+  display: inline;
+  margin-bottom: 0;
+  margin-left: 6px;
+  font-weight: 400;
+}
+
+/* Stacked action groups in narrow filter columns share one width —
+   a ragged pile of different-width buttons reads as unfinished */
+/* Filter actions stack like the fields above them: same 10px/5px
+   inset as .filter-list-item, so they line up with the inputs rather
+   than running to the card edge, and the same 36px control height */
+.filters .buttons,
+.filter-list-item.buttons,
+.yui-u.first .box .buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: left;
+  margin: 10px 10px 0;
+  /* bottom spacing as padding, not margin: a bottom margin collapses
+     straight out of the card and leaves the last button flush with
+     the card's edge. Sides are 0 so the 10px inset comes from the margin
+     alone — the old 5px on the right made every action row sit 5px off
+     centre in its card. */
+  padding: 8px 0 20px;
+  /* the markup separates buttons with &nbsp;, which is not collapsible
+     and would otherwise become a phantom flex item between them. It is
+     zero-height with font-size 0, but it would still consume `gap`
+     twice — so the 16px rhythm comes from child margins instead. */
+  font-size: 0;
+}
+
+/* consumption/show nests .buttons inside a .filter-list-item, so both
+   carried a 10px side margin and its action row sat twice as far in as
+   everyone else's. The row inside inherits the item's inset. */
+.filter-list-item > .buttons,
+/* four classes, to outrank .yui-u.first .box .buttons above */
+.yui-u.first .box .filter-list-item > .buttons {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.filters .buttons > *,
+.yui-u.first .box .buttons > * {
+  font-size: 14px;
+}
+
+.filters .buttons > .button,
+.filters .buttons > button,
+.filters .buttons > .action-menu,
+.filter-list-item.buttons > .button,
+.filter-list-item.buttons > button,
+.filter-list-item.buttons > .action-menu,
+.yui-u.first .box .buttons > .button,
+.yui-u.first .box .buttons > button,
+.yui-u.first .box .buttons > .action-menu {
+  width: 100%;
+  /* 16px matches the gap between the fields above */
+  margin: 0 0 16px !important;
+}
+
+.filters .buttons > *:last-child,
+.filter-list-item.buttons > *:last-child,
+.yui-u.first .box .buttons > *:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Dropdown actions are a .action-menu span wrapping the real button —
+   stretching the wrapper alone leaves the button at content width */
+.filters .buttons > .action-menu > .button,
+.filters .buttons > .action-menu > button,
+.yui-u.first .box .buttons > .action-menu > .button,
+.yui-u.first .box .buttons > .action-menu > button,
+.filter-list-item.buttons > .action-menu > .button,
+.filter-list-item.buttons > .action-menu > button {
+  width: 100%;
+  margin: 0 !important;
+}
+
+/* ============================================================
+   3h. DATATABLES 1.9.4
+   Its CDN stylesheet out-ranks the generic td/th rules and brings its
+   own scroll container, sort sprites and chrome. Bring all of it onto
+   the table spec.
+   ============================================================ */
+
+/* DataTables' own rules are thead th / tbody td (0,1,3) — match that
+   specificity or the 3px padding wins */
+table.dataTable thead th,
+table.dataTable thead td,
+table.dataTable tbody th,
+table.dataTable tbody td,
+table.dataTable tfoot th,
+table.dataTable tfoot td {
+  padding: 12px 10px;
+  font: 400 14px/20px 'Inter', sans-serif;
+  color: var(--gray-600);
+  border-right: none;
+  border-left: none;
+}
+
+/* Table cells also carry jQuery UI's .ui-state-default, whose opaque
+   white (a class) out-ranks the element-level th rule and blanked the
+   scroll shadow behind footer/total rows */
+table th.ui-state-default,
+table td.ui-state-default,
+table.dataTable th.ui-state-default,
+table.dataTable td.ui-state-default {
+  background: rgba(240, 246, 255, 0.55);
+  border-color: var(--gray-100);
+}
+
+table.dataTable thead th {
+  background-color: rgba(240, 246, 255, 0.55);
+  color: var(--gray-600);
+  font-weight: 700;
+  border-bottom: none;
+  /* DataTables fixes column widths in JS, so nowrap headers spill into
+     the next column. Wrap at word boundaries instead — never mid-word,
+     which is what produced letter-stacked columns before. */
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: none;
+  vertical-align: middle;
+}
+
+/* Transparent, not white: the card's scroll shadow is painted on the
+   container background, so opaque rows would hide it */
+table.dataTable tbody tr {
+  background-color: transparent;
+}
+
+table.dataTable tbody tr:hover,
+table.dataTable tbody tr.odd:hover,
+table.dataTable tbody tr.even:hover {
+  background-color: rgba(240, 246, 255, 0.5);
+}
+
+table.dataTable tbody tr.odd,
+table.dataTable tbody tr.even {
+  background-color: transparent;
+}
+
+table.dataTable tbody td {
+  border-bottom: 1px solid var(--gray-100);
+}
+
+/* DataTables draws 1px black rules under thead and over tfoot */
+table.dataTable,
+table.dataTable tfoot th,
+table.dataTable tfoot td,
+.dataTables_wrapper .dataTables_scrollHead,
+.dataTables_wrapper .dataTables_scrollBody,
+.dataTables_wrapper .dataTables_scrollFoot,
+.dataTables_wrapper .dataTables_scrollFootInner,
+.dataTables_wrapper .dataTables_scrollFootInner table {
+  border: none;
+}
+
+table.dataTable tfoot th,
+table.dataTable tfoot td {
+  border-top: 1px solid var(--gray-100);
+}
+
+/* Sort indicators → line chevrons instead of the DataTables sprites */
+table.dataTable thead th.sorting,
+table.dataTable thead th.sorting_asc,
+table.dataTable thead th.sorting_desc {
+  background-repeat: no-repeat;
+  background-position: center right 6px;
+  background-size: 11px 11px;
+  padding: 12px 24px 12px 10px;
+  cursor: pointer;
+}
+
+table.dataTable thead th.sorting {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23CED4DA' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 10l5-5 5 5M7 14l5 5 5-5'/%3E%3C/svg%3E");
+}
+
+table.dataTable thead th.sorting_asc {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 15l6-6 6 6'/%3E%3C/svg%3E");
+}
+
+table.dataTable thead th.sorting_desc {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* DataTables scrolls in its own element — give it the same scroll
+   affordance and visible scrollbar as the .box containers */
+.dataTables_wrapper .dataTables_scrollBody {
+  background-image:
+    linear-gradient(to right, #ffffff 20%, rgba(255, 255, 255, 0)),
+    linear-gradient(to left, #ffffff 20%, rgba(255, 255, 255, 0)),
+    radial-gradient(farthest-side at 0 50%, rgba(32, 39, 80, 0.18), rgba(32, 39, 80, 0)),
+    radial-gradient(farthest-side at 100% 50%, rgba(32, 39, 80, 0.18), rgba(32, 39, 80, 0));
+  background-position: 0 0, 100% 0, 0 0, 100% 0;
+  background-repeat: no-repeat;
+  background-size: 32px 100%, 32px 100%, 20px 100%, 20px 100%;
+  background-attachment: local, local, scroll, scroll;
+  scrollbar-color: var(--blue-301) var(--blue-200);
+  scrollbar-width: thin;
+}
+
+.dataTables_wrapper .dataTables_scrollBody::-webkit-scrollbar {
+  height: 10px;
+}
+
+.dataTables_wrapper .dataTables_scrollBody::-webkit-scrollbar-track {
+  background: var(--blue-200);
+}
+
+.dataTables_wrapper .dataTables_scrollBody::-webkit-scrollbar-thumb {
+  background-color: var(--blue-301);
+  border-radius: 4px;
+}
+
+/* These wrappers painted opaque white/tint over the shadow — the card
+   underneath already provides the surface */
+.dataTables_wrapper .dataTables_scrollHead,
+.dataTables_wrapper .dataTables_scrollFoot,
+.dataTables_wrapper .dataTables_processing,
+.dataTables_wrapper .fg-toolbar,
+.dataTables_wrapper .ui-toolbar {
+  background-color: transparent;
+}
+
+.paginateButtons {
+  background-color: rgba(251, 252, 252, 0.6);
+}
+
+/* Wrapper chrome: search field, length menu, info line, pagination.
+   These are block children of the horizontally scrolling card, so by
+   default they are only as wide as the visible area and slide away
+   (background and all) when the table is scrolled. Pinning them to
+   the left keeps the chrome — and the card header — in place. */
+/* A sticky child can only stay put while its containing block is still
+   under the scrollport. The wrapper is a block child of the scrolling
+   card, so it is only as wide as the visible area — it (and anything
+   sticky inside it) slid away. Letting the wrapper span the full
+   scroll width gives the sticky chrome something to hold onto. */
+.dataTables_wrapper {
+  width: max-content;
+  min-width: 100%;
+}
+
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+  font-size: 12px;
+  color: var(--gray-600);
+  padding: 12px 16px;
+  position: sticky;
+  left: 0;
+  /* hug the content so the pinned row does not stretch to the full
+     scroll width (which would push right-floated chrome off-screen) */
+  width: fit-content;
+  float: none;
+  text-align: left;
+}
+
+/* Card headers pin both ways: left, so they survive the table's
+   horizontal scroll, and top — the legacy h2 rule sets `top: 0`, which
+   sticky honours — so they stay put as the page scrolls. That makes an
+   opaque surface necessary, or content shows through them. Safe
+   everywhere: every .box is already white behind its header. */
+.box > h2,
+.box > div > h2 {
+  position: sticky;
+  left: 0;
+  background-color: #ffffff;
+  /* above positioned form controls (select2/Chosen wrappers) that
+     would otherwise slide over the header, but below the navbar's 4 */
+  z-index: 3;
+}
+
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+  height: 36px;
+  box-sizing: border-box;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin-left: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--gray-600);
+}
+
+.dataTables_wrapper .dataTables_filter input:focus,
+.dataTables_wrapper .dataTables_length select:focus {
+  outline: 0;
+  border: 1px solid var(--blue-primary);
+  box-shadow: var(--focus-ring);
+}
+
+/* DataTables' jQuery-UI pagination renders .fg-button anchors whose
+   line boxes overflowed the 24px-tall row, so the card clipped them.
+   Lay the row out as flex and give the controls real button metrics. */
+.dataTables_wrapper .dataTables_paginate,
+.dataTables_wrapper .dataTables_paginate.paging_full_numbers {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 16px 16px;
+  /* DataTables pins .paging_full_numbers to a 22px line box, which
+     cropped the taller controls at the bottom of the card */
+  height: auto;
+  line-height: normal;
+}
+
+.dataTables_wrapper .dataTables_paginate .fg-button,
+.dataTables_wrapper .dataTables_paginate .ui-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 6px 12px;
+  margin: 0;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  background: #ffffff;
+  color: var(--gray-600);
+  font-size: 12px;
+  line-height: 16px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.dataTables_wrapper .dataTables_paginate .fg-button:hover:not(.ui-state-disabled) {
+  background: var(--blue-100);
+  border-color: var(--blue-primary);
+  color: var(--blue-primary);
+}
+
+.dataTables_wrapper .dataTables_paginate .ui-state-disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.dataTables_wrapper .dataTables_paginate .fg-button.ui-state-active,
+.dataTables_wrapper .dataTables_paginate .ui-state-highlight {
+  background: var(--blue-200);
+  border-color: var(--blue-primary);
+  color: var(--blue-primary);
+  font-weight: 600;
+}
+
+.dataTables_wrapper .paginate_button,
+.dataTables_wrapper .paginate_active,
+.dataTables_wrapper .paginate_disabled_previous,
+.dataTables_wrapper .paginate_enabled_previous,
+.dataTables_wrapper .paginate_disabled_next,
+.dataTables_wrapper .paginate_enabled_next {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  color: var(--gray-600);
+  padding: 4px 10px;
+  margin: 0 2px;
+  cursor: pointer;
+}
+
+.dataTables_wrapper .paginate_active {
+  background: var(--blue-200);
+  border-color: var(--blue-primary);
+  color: var(--blue-primary);
+  font-weight: 600;
+}
+
+/* Download/export buttons carry an Excel PNG — inside a button it is
+   chrome, so it becomes the download line icon (document lists keep
+   their colored file-type glyphs) */
+.button img[src*="excel"],
+.buttons img[src*="excel"],
+button img[src*="excel"] {
+  content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3.5v11M7.5 10l4.5 4.5 4.5-4.5M4.5 19.5h15'/%3E%3C/svg%3E");
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+/* Property-table forms are top-aligned, so a one-line label sat above
+   the middle of its 36px control. Centre them; rows with a textarea
+   keep top alignment, where centring would look adrift. */
+tr.prop > td,
+tr.prop > td.name,
+tr.prop > td.value {
+  vertical-align: middle;
+}
+
+tr.prop:has(textarea) > td {
+  vertical-align: top;
+}
+
+/* Native file inputs match the control height */
+input[type="file"] {
+  height: 36px;
+  box-sizing: border-box;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Category tree — tree.gsp ships an inline <style> (gray fill, dashed
+   borders) that loads after this file, so these need !important. */
+.category-tree {
+  list-style: none;
+  padding-left: 0;
+}
+
+/* Only the outermost tree becomes a card — the template nests
+   .category-tree recursively inside each li */
+fieldset > div > .category-tree {
+  background: #ffffff;
+  border-radius: var(--card-radius);
+  padding: 8px;
+}
+
+.category-tree ul {
+  margin-left: 24px !important;
+  list-style: none;
+  padding-left: 0;
+}
+
+.category-tree li {
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 4px;
+  padding: 6px 12px !important;
+  margin: 2px 0 !important;
+}
+
+.category-tree li:hover {
+  background-color: var(--blue-200) !important;
+}
+
+.category-tree li > p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+/* Push the row actions to the trailing edge without float hacks */
+.category-tree li > p > span[style*="float"] {
+  float: none !important;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ============================================================
+   4. PER-PAGE FIXES
+   ============================================================ */
+
+/* CSV import — "Upload data file". The two download buttons and their
+   "-- OR --" separator are inline with no spacing, and Cancel is a bare
+   link beside a primary button. */
+#upload-form td.value > div {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+#upload-form td.value > div > b {
+  color: var(--gray-400);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+#upload-form td > a:not(.button) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 8px 16px;
+  margin-left: 8px;
+  border-radius: 4px;
+  background-color: var(--blue-100);
+  color: var(--gray-600);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+#upload-form td > a:not(.button):hover {
+  color: var(--blue-500);
+}
+
+/* Login: #loginFormBox drew its own gray border inside the themed
+   .box card — drop it so the card reads as one surface. The page's
+   inline stylesheet also centers input text and inflates padding;
+   normalize to the standard control look. */
+#loginFormBox {
+  border: none;
+  padding: 24px;
+}
+
+#loginBox input.text {
+  text-align: left;
+  padding: 6px 12px;
+}
+
+/* Brand header above the login card (the overhaul's one markup
+   addition): blue logo stacked over the wordmark, both primary blue */
+.login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding-bottom: 28px;
+}
+
+.login-brand img {
+  width: 84px;
+  height: 84px;
+}
+
+/* Notices sit between the logo and the card, clear of both */
+#loginForm > .message,
+#loginForm > .errors {
+  margin: 0 0 20px;
+}
+
+.login-brand-name {
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--blue-primary);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* First-impression sizing: login controls run ~50% larger than the
+   app-wide 36px standard (deliberate exception, this page only) */
+#loginBox input.text {
+  height: 54px;
+  font-size: 17px;
+  padding: 12px 16px;
+}
+
+#loginBox button[type="submit"] {
+  min-height: 54px;
+  font-size: 17px;
+  font-weight: 600;
+  padding: 14px 16px;
+}
+
+#loginBox h2 {
+  font-size: 20px;
+}
+
+#loginBox td {
+  font-size: 16px;
+}
+
+/* The header's silk padlock PNG → line-style lock in the title blue */
+#loginBox h2 img {
+  display: none;
+}
+
+#loginBox h2::before {
+  content: "";
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  vertical-align: -3px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230052CC' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4.5' y='10.5' width='15' height='9.5' rx='2'/%3E%3Cpath d='M8 10.5V7.5a4 4 0 0 1 8 0v3M12 14.5v2'/%3E%3C/svg%3E") center / 18px no-repeat;
+}
+
+#loginBox button[type="submit"] {
+  padding: 8px 16px;
+}
+
+/* ============================================================
+   ELEVATION — bringing the legacy shadows onto the scale
+   ============================================================
+
+   The rules below re-point the shadows that live in openboxes.css.
+   Each one is listed with what it was, because the old values are the
+   argument for the new ones: they ranged from a 5px hard grey offset to
+   a near-black halo, none of them related to each other. */
+
+/* The top banner floats over content that scrolls under it. Was
+   `0 4px 4px rgba(0,0,0,.15)` — a hard 4px blur with no ambient layer,
+   which read as a drawn line rather than a lift. */
+#main-wrapper {
+  box-shadow: var(--shadow-sticky);
+}
+
+/* Megamenu panels. Was `0 4px 4px rgba(0,0,0,.25)` — the heaviest
+   shadow in the app, on one of its most frequently opened surfaces. */
+.dropdown-menu-content,
+.dropdown-menu-wrapper .dropdown-menu-content {
+  box-shadow: var(--shadow-overlay);
+}
+
+/* Global search results and tooltips are overlays like any other menu;
+   they carried two more one-off values (a doubled .15 blur, and a
+   1px 1px offset at .098). */
+.global-search-results,
+.tooltip {
+  box-shadow: var(--shadow-overlay);
+}
+
+/* Form controls: `select, input, textarea` carried `5px 5px 5px #ccc`,
+   a hard offset grey shadow on every field in the app. Depth here
+   fights the focus ring, which is the real state signal — so they are
+   flat, and only the ring moves. */
+select,
+input,
+textarea,
+.form-control {
+  box-shadow: none;
+}
+
+select:focus,
+input:focus,
+textarea:focus {
+  box-shadow: var(--focus-ring);
+}
+
+/* Wizard step markers carried `0 0 2px rgba(0,0,0,0.8)` — 80% black,
+   by far the darkest value in the stylesheet, and on a small element
+   where it read as a smudge. The active step is already marked by
+   colour. */
+.wizard-steps .active-step span,
+.wizard-steps .active-step a:after {
+  box-shadow: none;
+}
+
+/* ============================================================
+   MEGAMENU — fit the sections without scrolling
+   ============================================================ */
+
+/* The Reporting menu has four sections totalling ~982px, but the panel is
+   capped at max-width: 50vw — 720px on a 1440 screen, and 960px on a 1920,
+   which is 22px short of fitting. So the fourth section wrapped to a second
+   row every time, and because the wrap put one of the two TALLEST sections
+   (Data Exports, 8 links) below the other (Inventory Reports, 7 links), the
+   panel exceeded its own max-height: 60vh and had to scroll.
+
+   Widening is the fix rather than reordering: flex-wrap gives no control
+   over which items pair up, so "stack the two short ones instead" cannot be
+   expressed reliably — and with room for all four in one row, nothing needs
+   to stack at all. Still bounded by the viewport, so narrow screens keep
+   the old wrapping behaviour. */
+.dropdown-menu-subsections {
+  max-width: min(1040px, 94vw);
+}
+
+/* Fitting it on one row made it ~990px, and at that size it cannot sit
+   under its own trigger. In a 1440 viewport the Reporting button spans
+   x=660-745, so aligning the panel's left edge to it overflows the right
+   by 210px, and aligning its right edge overflows the LEFT by 245 — which
+   is what Bootstrap picks, so the first section was cut off.
+
+   Past a certain width the only workable anchor is the viewport, so the
+   panel stops tracking its trigger and pins to the right edge. Right
+   rather than left because this trigger sits right of centre: the pinned
+   panel still spans the trigger's x-range, so the pointer travels
+   straight down into it.
+
+   Keyed to a fifth section because that is what makes a menu too wide to
+   anchor — Inventory and Products have four but come in at 685px and
+   506px and anchor fine, so they are left alone. */
+/* Only where it is actually needed: past ~1700px the trigger has moved far
+   enough right that the panel anchors on screen by itself, and pinning it
+   there would drag it away from its own button — measured at 1920, the
+   pinned panel started 77px right of where the trigger ends, so the
+   pointer would have had to leave the menu to reach it. */
+@media (max-width: 1700px) {
+  .dropdown-menu-wrapper:has(.dropdown-menu-subsections > :nth-child(5)) {
+    position: fixed !important;
+    /* the navbar is sticky at the top and 56px tall */
+    top: 56px;
+    left: auto !important;
+    right: 12px !important;
+    transform: none !important;
+    max-width: calc(100vw - 24px);
+  }
+}
+
+/* showTransactionReport puts its "Reload Data" button inside the card
+   header's <th>, not in a .filter-list-item, so it kept the 10px side
+   margin every .buttons row carries and came out 290px against the 310px
+   the other panels use. Three classes plus the element, to outrank
+   `.yui-u.first .box .buttons`. */
+.yui-u.first .box th > .buttons,
+.yui-u.first .box td > .buttons {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Right-aligned definition labels wrap raggedly because the markup leaves
+   a newline between </label> and </td>. That whitespace collapses to a
+   real space at the end of the label's LAST line, and text-align: right
+   aligns the line including it — so the visible text stops 10px short
+   while the first line lands flush against the cell's content edge.
+
+   Making the label its own block takes it out of that shared line box:
+   its lines align to its own right edge, and the stray space after it
+   forms a whitespace-only anonymous block, which generates no line box
+   and so adds no height. */
+.prop td.name label,
+.prop td.label label {
+  display: block;
+}
+
+/* A card the page marked as having nothing to render. Sections driven by
+   configurable data (product attributes, for one) otherwise appear as a
+   heading over an empty table. The GSP sets the class; hiding it is the
+   theme's job. */
+.box.is-empty {
+  display: none;
+}
+
+/* ============================================================
+   CATEGORY TREE — put the three bands on one edge
+   ============================================================
+
+   category/tree stacks a button bar, a tree panel and a footer action,
+   and each landed on a different left edge: 32px (the page gutter), 42
+   (the tree sits inside a layout <td> carrying the table cell padding)
+   and 56 (Bootstrap's p-4 on the footer wrapper). */
+
+/* The tree's table is layout scaffolding, not data, so its cells should
+   not inset the content the way a real table's do. */
+.body:has(.category-tree) > .yui-ga td,
+.body:has(.category-tree) > .yui-ga fieldset {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* The footer action sits OUTSIDE .body, as a sibling inside the content
+   column, so it has to be matched from there. Bootstrap's spacing
+   utilities are !important, so this has to be too. */
+.yui-b:has(.category-tree) > .p-4 {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* `.button + .button` adds 15px on top of the 8px every button already
+   carries as margin-right, so adjacent buttons in a legacy button bar sat
+   23px apart against the 8px used everywhere else. */
+.buttonBar .button + .button,
+.button-bar .button + .button {
+  margin-left: 0;
+}
+
+
+/* ============================================================
+   MORE LEGACY ICONS — found by widening the audit to the list
+   and admin pages (see .tools/shots/iconaudit.js)
+   ============================================================ */
+
+/* Import product associations — a data store being loaded */
+img[src$="/database_refresh.png"],
+img[src*="/icons/silk/database_refresh.png"],
+img[src*="/icons/silk/database_"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cellipse cx='12' cy='5.5' rx='7' ry='2.8'/%3E%3Cpath d='M5 5.5v13c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8v-13'/%3E%3Cpath d='M5 12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8'/%3E%3C/svg%3E") !important; }
+
+/* Tree node marker */
+img[src$="/bullet_white.png"],
+img[src*="/icons/silk/bullet_white.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3.5'/%3E%3C/svg%3E") !important; }
+
+/* Find */
+img[src$="/find.png"],
+img[src*="/icons/silk/find.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='6.5'/%3E%3Cpath d='M15.8 15.8l4.7 4.7'/%3E%3C/svg%3E") !important; }
+
+/* Upload an image */
+img[src$="/photo_add.png"],
+img[src*="/icons/silk/photo_add.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='13' height='11' rx='2'/%3E%3Ccircle cx='7' cy='9' r='1.5'/%3E%3Cpath d='M3.5 13.5l3.5-3 4 3.5'/%3E%3Cpath d='M18.5 14.5v6M15.5 17.5h6'/%3E%3C/svg%3E") !important; }
+
+/* Create user */
+img[src$="/user_add.png"],
+img[src*="/icons/silk/user_add.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='7.5' r='3.5'/%3E%3Cpath d='M2.5 20a6.5 6.5 0 0 1 13 0'/%3E%3Cpath d='M18.5 8.5v6M15.5 11.5h6'/%3E%3C/svg%3E") !important; }
+
+/* Settings */
+img[src$="/cog.png"],
+img[src*="/icons/silk/cog.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M12 2.5v3M12 18.5v3M21.5 12h-3M5.5 12h-3M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1M18.7 18.7l-2.1-2.1M7.4 7.4L5.3 5.3'/%3E%3C/svg%3E") !important; }
+
+/* Verify — inspect closely */
+img[src$="/zoom_in.png"],
+img[src*="/icons/silk/zoom_in.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='6.5'/%3E%3Cpath d='M15.8 15.8l4.7 4.7M8.5 11h5M11 8.5v5'/%3E%3C/svg%3E") !important; }
+
+/* Pick items — basket with a plus */
+img[src$="/basket_add.png"],
+img[src*="/icons/silk/basket_add.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 9h14l-1.3 8.6a2 2 0 0 1-2 1.7H6.8a2 2 0 0 1-2-1.7z'/%3E%3Cpath d='M7.5 9l2.2-4.5M13.5 9l-2.2-4.5'/%3E%3Cpath d='M18.5 15.5v5M16 18h5'/%3E%3C/svg%3E") !important; }
+
+/* Check items — basket with a tick */
+img[src$="/basket_edit.png"],
+img[src*="/icons/silk/basket_edit.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 9h14l-1.3 8.6a2 2 0 0 1-2 1.7H6.8a2 2 0 0 1-2-1.7z'/%3E%3Cpath d='M7.5 9l2.2-4.5M13.5 9l-2.2-4.5'/%3E%3Cpath d='M16 18l2 2 4-4'/%3E%3C/svg%3E") !important; }
+
+/* Issue stock — basket going out */
+img[src$="/basket_go.png"],
+img[src*="/icons/silk/basket_go.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 9h14l-1.3 8.6a2 2 0 0 1-2 1.7H6.8a2 2 0 0 1-2-1.7z'/%3E%3Cpath d='M7.5 9l2.2-4.5M13.5 9l-2.2-4.5'/%3E%3Cpath d='M15.5 18h6M19 15.5l2.5 2.5-2.5 2.5'/%3E%3C/svg%3E") !important; }
+
+/* Dashboard / home */
+img[src$="/house.png"],
+img[src*="/icons/silk/house.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 10.5L12 3.5l8.5 7'/%3E%3Cpath d='M5.5 9.5V20h13V9.5'/%3E%3C/svg%3E") !important; }
+
+/* Browse inventory — a record being searched */
+img[src$="/application_form_magnify.png"],
+img[src*="/icons/silk/application_form_magnify.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13.5 3.5h-7A1.5 1.5 0 0 0 5 5v14a1.5 1.5 0 0 0 1.5 1.5h5'/%3E%3Cpath d='M8 8h5M8 12h3'/%3E%3Ccircle cx='16.5' cy='15.5' r='3.5'/%3E%3Cpath d='M19 18l2.5 2.5'/%3E%3C/svg%3E") !important; }
+
+/* Download — same mark the file-type icons use in chrome */
+img[src$="/disk.png"],
+img[src*="/icons/silk/disk.png"] { content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23464F60' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3.5v11M7.5 10l4.5 4.5 4.5-4.5M4.5 19.5h15'/%3E%3C/svg%3E") !important; }
+
+/* these are chrome, so they take the flat monochrome treatment */
+img[src$="/database_refresh.png"],
+img[src*="/icons/silk/database_refresh.png"],
+img[src*="/icons/silk/database_"],
+img[src$="/bullet_white.png"],
+img[src*="/icons/silk/bullet_white.png"],
+img[src$="/find.png"],
+img[src*="/icons/silk/find.png"],
+img[src$="/photo_add.png"],
+img[src*="/icons/silk/photo_add.png"],
+img[src$="/user_add.png"],
+img[src*="/icons/silk/user_add.png"],
+img[src$="/cog.png"],
+img[src*="/icons/silk/cog.png"],
+img[src$="/zoom_in.png"],
+img[src*="/icons/silk/zoom_in.png"],
+img[src$="/basket_add.png"],
+img[src*="/icons/silk/basket_add.png"],
+img[src$="/basket_edit.png"],
+img[src*="/icons/silk/basket_edit.png"],
+img[src$="/basket_go.png"],
+img[src*="/icons/silk/basket_go.png"],
+img[src$="/house.png"],
+img[src*="/icons/silk/house.png"],
+img[src$="/application_form_magnify.png"],
+img[src*="/icons/silk/application_form_magnify.png"],
+img[src$="/disk.png"],
+img[src*="/icons/silk/disk.png"] {
+  filter: none !important;
+  opacity: 1 !important;
+}

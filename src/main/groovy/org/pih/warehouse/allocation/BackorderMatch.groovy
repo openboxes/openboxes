@@ -9,21 +9,17 @@
  **/
 package org.pih.warehouse.allocation
 
-/**
- * Warehouse only: preferred warehouse bins, then remaining warehouse bins. Display bins are excluded.
- */
-class StorageOnlyHandler extends AbstractAllocationSourceStrategyHandler {
+import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.shipping.ShipmentItem
+
+class BackorderMatch {
+
+    ShipmentItem inboundItem
+    RequisitionItem demand
+    Integer quantityMatched
 
     @Override
-    AllocationSourceStrategy getStrategy() {
-        return AllocationSourceStrategy.STORAGE_ONLY
-    }
-
-    @Override
-    List<AllocationSourceGroup> getGroupOrder() {
-        return [
-                AllocationSourceGroup.PREFERRED_STORAGE,
-                AllocationSourceGroup.REMAINING_STORAGE,
-        ]
+    String toString() {
+        return "BackorderMatch(demand=${demand?.id}, product=${demand?.product?.productCode}, quantity=${quantityMatched})"
     }
 }

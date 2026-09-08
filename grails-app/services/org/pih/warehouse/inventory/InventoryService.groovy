@@ -1280,8 +1280,9 @@ class InventoryService implements ApplicationContextAware {
                     def quantityAvailableMap = quantityAvailableInventoryItemMap[product][inventoryItem]
                     Integer quantityAvailable = quantityAvailableMap ? quantityAvailableMap[binLocation?.id] : 0
 
-                    // We don't want to show the negative values on the frontend
-                    quantityAvailable = quantityAvailable > 0 ? quantityAvailable : 0
+                    // A negative available quantity is normally a data anomaly and gets hidden as 0, but on a
+                    // bin that supports negative inventory it's a legitimate quantity and should be shown as-is
+                    quantityAvailable = (quantityAvailable > 0 || binLocation?.isNegativeInventorySupported()) ? quantityAvailable : 0
 
                     // Exclude bin locations with quantity 0 (include negative quantity for data quality purposes)
                     if (quantityOnHand != 0) {
@@ -1328,17 +1329,19 @@ class InventoryService implements ApplicationContextAware {
     }
 
     Integer getQuantityAvailableToPromise(Product product, Location location) {
-        def productAvailability = ProductAvailability.createCriteria().get {
-            projections {
-                sum("quantityAvailableToPromise")
-            }
+        List<ProductAvailability> productAvailabilityRecords = ProductAvailability.createCriteria().list {
             eq("location", location)
             eq("product", product)
-            // Filter out negative quantity available to promise (in a case when a record was picked and then recalled)
-            ge("quantityAvailableToPromise", 0)
         }
 
-        return productAvailability ?: 0
+        // A negative ATP record is normally a data anomaly (e.g. a pick that was later recalled) and should not
+        // pull down the total, but on a bin that supports negative inventory it's a legitimate quantity and
+        // must still be counted, otherwise the total would be overstated
+        Integer quantityAvailableToPromise = productAvailabilityRecords?.sum {
+            (it.quantityAvailableToPromise >= 0 || it.binLocation?.isNegativeInventorySupported()) ? it.quantityAvailableToPromise : 0
+        } as Integer ?: 0
+
+        return quantityAvailableToPromise ?: 0
     }
 
 

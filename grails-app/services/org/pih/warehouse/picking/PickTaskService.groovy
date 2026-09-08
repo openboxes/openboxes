@@ -68,8 +68,9 @@ class PickTaskService {
                 eq("facility", command.facility)
             }
 
-            if (!requisitionIds.isEmpty()) {
-                'in'("requisition.id", requisitionIds)
+            if (command.ordersCount) {
+                // an empty candidate list must yield no results rather than an unfiltered search
+                'in'("requisition.id", requisitionIds ?: [""])
             }
 
             if (command.deliveryTypeCode) {
@@ -145,36 +146,32 @@ class PickTaskService {
     }
 
     @Transactional(readOnly = true)
-    List<Map> countOrdersByDeliveryType(Location facility, boolean excludeAssignedRequisitions = false) {
-        Map<DeliveryTypeCode, Integer> available = countDistinctRequisitionsByDeliveryType(
-                facility, excludeAssignedRequisitions, [PickTaskStatus.PENDING, PickTaskStatus.PICKING])
-
-        Map<DeliveryTypeCode, Integer> total = countDistinctRequisitionsByDeliveryType(facility, excludeAssignedRequisitions, null)
+    List<Map> countOrdersByDeliveryType(SearchPickTaskCommand command) {
+        Map<DeliveryTypeCode, Integer> available = countDistinctRequisitionsByDeliveryType(command)
 
         return DeliveryTypeCode.values().collect { DeliveryTypeCode code ->
             [
                     deliveryTypeCode: code.name(),
                     availableCount  : available[code] ?: 0,
-                    totalCount      : total[code] ?: 0,
             ]
         }
     }
 
-    private Map<DeliveryTypeCode, Integer> countDistinctRequisitionsByDeliveryType(
-            Location facility, boolean excludeAssignedRequisitions, List<PickTaskStatus> statuses) {
+    private Map<DeliveryTypeCode, Integer> countDistinctRequisitionsByDeliveryType(SearchPickTaskCommand command) {
+        List<PickTaskStatus> statuses = command.status ?: [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
+
         List<String> assignedRequisitions
-        if (excludeAssignedRequisitions) {
-            assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(facility, statuses)
+        if (command.excludeAssignedRequisitions) {
+            assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(command.facility, statuses)
         }
         List results = PickTask.createCriteria().list {
             projections {
                 groupProperty("deliveryTypeCode")
                 countDistinct("requisition")
             }
-            eq("facility", facility)
-            if (statuses) {
-                'in'("status", statuses)
-            }
+            eq("facility", command.facility)
+            'in'("requisitionStatus", RequisitionStatus.listNotYetPicked())
+            'in'("status", statuses)
 
             if (assignedRequisitions) {
                 not {
@@ -569,16 +566,28 @@ class PickTaskService {
             return []
         }
 
+        List<PickTaskStatus> statusesToSearch = command.status ?: [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
+
+        // FIXME refactor findRequisitionIdsWithPickTaskAssigned method to include it in the query itself,
+        //  it could return a DetachedCriteria and be treated as a subquery instead of two separate queries
+        List<String> assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(command.facility, statusesToSearch)
+
         List<Requisition> candidates = PickTask.createCriteria().list {
             projections {
                 distinct("requisition")
             }
             eq("facility", command.facility)
-            eq("requisitionStatus", RequisitionStatus.PICKING)
-            'in'("status", command.status ?: [PickTaskStatus.PENDING, PickTaskStatus.PICKING])
+            'in'("requisitionStatus", RequisitionStatus.listNotYetPicked())
+            'in'("status", statusesToSearch)
 
             if (command.deliveryTypeCode) {
                 eq("deliveryTypeCode", command.deliveryTypeCode)
+            }
+
+            if (assignedRequisitions) {
+                not {
+                    'in'("requisition.id", assignedRequisitions)
+                }
             }
         }
 

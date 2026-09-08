@@ -9,21 +9,18 @@
  **/
 package org.pih.warehouse.allocation
 
-/**
- * Warehouse only: preferred warehouse bins, then remaining warehouse bins. Display bins are excluded.
- */
-class StorageOnlyHandler extends AbstractAllocationSourceStrategyHandler {
+enum AllocationStep {
 
-    @Override
-    AllocationSourceStrategy getStrategy() {
-        return AllocationSourceStrategy.STORAGE_ONLY
-    }
+    /** Locations that hold enough stock, in source strategy order. The ordinary case. */
+    AVAILABLE_STOCK(1),
 
-    @Override
-    List<AllocationSourceGroup> getGroupOrder() {
-        return [
-                AllocationSourceGroup.PREFERRED_STORAGE,
-                AllocationSourceGroup.REMAINING_STORAGE,
-        ]
-    }
+    /** Locations permitted to hold a negative quantity, in source strategy order. */
+    NEGATIVE_INVENTORY(2),
+
+    /** The fallback location, which always succeeds. No suitable location exists. */
+    FALLBACK_LOCATION(3)
+
+    final Integer stepNumber
+
+    AllocationStep(Integer stepNumber) { this.stepNumber = stepNumber }
 }

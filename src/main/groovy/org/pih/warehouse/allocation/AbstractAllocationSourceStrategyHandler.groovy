@@ -20,9 +20,14 @@ import org.pih.warehouse.product.Product
 abstract class AbstractAllocationSourceStrategyHandler implements AllocationSourceStrategyHandler {
 
     @Override
-    List<AvailableItem> order(Location facility, Product product, List<AvailableItem> availableItems) {
-        return orderGroups(new AvailableItemGroups(facility, product, availableItems))
+    List<AvailableItem> orderAvailableItems(Location facility, Product product, List<AvailableItem> availableItems) {
+        AvailableItemGroups groups = new AvailableItemGroups(facility, product, availableItems)
+        return groupOrder.collectMany { groups.itemsFor(it) }
     }
 
-    protected abstract List<AvailableItem> orderGroups(AvailableItemGroups groups)
+    @Override
+    List<Location> orderLocations(Location facility, Product product, List<Location> candidateLocations) {
+        CandidateLocationGroups groups = new CandidateLocationGroups(facility, product, candidateLocations)
+        return groupOrder.collectMany { groups.locationsFor(it) }
+    }
 }

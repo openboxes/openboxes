@@ -387,6 +387,37 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return supports(ActivityCode.DISPLAY_STOCK)
     }
 
+    /**
+     * Whether the negative inventory feature is turned on at this facility at all. Ask this of a facility;
+     * ask {@link #isNegativeInventoryAllowed} of the bin you are about to decrement.
+     */
+    Boolean isNegativeInventoryEnabled() {
+        return supports(ActivityCode.ALLOW_NEGATIVE_INVENTORY)
+    }
+
+    /**
+     * Whether this specific location may be decremented below zero, which needs the activity code on both
+     * the bin and the facility it belongs to.
+     */
+    Boolean isNegativeInventoryAllowed() {
+        return supports(ActivityCode.ALLOW_NEGATIVE_INVENTORY) && parentLocation?.isNegativeInventoryEnabled()
+    }
+
+    /**
+     * Whether this is the fallback location that accepts a stock movement when no other location is able to.
+     */
+    Boolean isNegativeInventoryFallbackLocation() {
+        return supports(ActivityCode.NEGATIVE_INVENTORY_FALLBACK)
+    }
+
+    /**
+     * Whether this location may legitimately hold a negative quantity, either because it directly allows
+     * negative inventory or because it's the fallback location that absorbs negative inventory.
+     */
+    Boolean isNegativeInventorySupported() {
+        return isNegativeInventoryAllowed() || isNegativeInventoryFallbackLocation()
+    }
+
     LocationPurpose getLocationPurpose() {
         if (supports(ActivityCode.DISPLAY_STOCK)) {
             return LocationPurpose.DISPLAY

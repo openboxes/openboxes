@@ -18,6 +18,7 @@ class AllocationSourceStrategyHandlerResolver {
                 new StorageFirstHandler(),
                 new DisplayFirstHandler(),
                 new StorageOnlyHandler(),
+                new DisplayOnlyHandler(),
         ])
     }
 

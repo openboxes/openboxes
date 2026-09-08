@@ -10,20 +10,19 @@
 package org.pih.warehouse.allocation
 
 /**
- * Warehouse only: preferred warehouse bins, then remaining warehouse bins. Display bins are excluded.
+ * Display bins only, storage bins excluded.
  */
-class StorageOnlyHandler extends AbstractAllocationSourceStrategyHandler {
+class DisplayOnlyHandler extends AbstractAllocationSourceStrategyHandler {
 
     @Override
     AllocationSourceStrategy getStrategy() {
-        return AllocationSourceStrategy.STORAGE_ONLY
+        return AllocationSourceStrategy.DISPLAY_ONLY
     }
 
     @Override
     List<AllocationSourceGroup> getGroupOrder() {
         return [
-                AllocationSourceGroup.PREFERRED_STORAGE,
-                AllocationSourceGroup.REMAINING_STORAGE,
+                AllocationSourceGroup.DISPLAY,
         ]
     }
 }

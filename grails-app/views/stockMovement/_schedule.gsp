@@ -28,7 +28,7 @@
                                   class="chzn-select-deselect"
                                   noSelection="['': '']"
                                   from="${org.pih.warehouse.core.DeliveryTypeCode.values()}"
-                                  value="${stockMovement.requisition.deliveryTypeCode}"/>
+                                  value="${stockMovement.requisition?.deliveryTypeCode}"/>
 
                     </td>
                 </tr>

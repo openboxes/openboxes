@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" type="text/css" />
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/css/jquery.dataTables.min.css" type="text/css">
     <link rel="stylesheet" href="${resource(dir:'css',file:'footable.css')}" type="text/css" media="all" />
-    <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap' rel='stylesheet'>
 
     <g:render template="/localization/crowdin"/>
 
@@ -48,6 +48,16 @@
 
     <!-- Grails Layout : write head element for page-->
     <g:layoutHead />
+
+    <%-- Uniform design theme: must load after layoutHead (so it overrides page-specific
+         CSS) and before customCss (so per-warehouse header colors keep precedence).
+         Set openboxes.layout.unified.enabled = false to keep the original design.
+         Compared as a trimmed, case-insensitive string because external
+         openboxes-config.properties overrides arrive as strings, so a Boolean
+         check would silently ignore "false", "FALSE" and padded values. --%>
+    <g:if test="${!(grailsApplication.config.openboxes.layout.unified.enabled?.toString()?.trim()?.equalsIgnoreCase('false'))}">
+        <link rel="stylesheet" href="${resource(dir:'css',file:'openboxes-theme.css')}?v=${g.meta(name: 'app.version')}" type="text/css" media="all" />
+    </g:if>
 
     <g:render template="/common/customCss"/>
     <g:render template="/common/fullstory"/>
