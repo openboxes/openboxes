@@ -320,9 +320,9 @@ const buildPackingListViewState = (summaryById, grouped, usersById) => {
 };
 
 /**
- * Merge the lines created by the start receipt endpoint into a summary that was read before the
- * receipt existed, so the rows carry their receipt item ids right away instead of only after a
- * reload.
+ * Merge the lines of a receipt that was just started - or whose lines were just synced - into a
+ * summary that was read before the receipt existed, or before the sync filled in its missing lines,
+ * so the rows carry their receipt item ids right away instead of only after a reload.
  */
 export const mergeStartedReceipt = (summary, startedReceipt) => {
   if (!startedReceipt?.id) {

@@ -145,13 +145,126 @@ class ReceiptV2Service {
     /**
      * Stamps the receipt as created by the v2 workflow, for reads that must know which workflow's semantics its
      * lines were written under - the workflow cannot be inferred from the persisted data afterwards, so it is
-     * recorded when the receipt is started (see {@link ReceiptV2Marker}).
+     * recorded when the receipt is started, or when the lines of a receipt started by the old workflow are synced
+     * (see {@link #syncReceiptLines} and {@link ReceiptV2Marker}).
      */
     private static void markReceiptAsV2(Receipt receipt) {
         ReceiptV2Marker marker = new ReceiptV2Marker(receipt: receipt)
         if (!marker.save()) {
             throw new ValidationException("Receipt v2 marker is invalid", marker.errors)
         }
+    }
+
+    /**
+     * Reconciles the lines of a shipment's pending receipt with what is currently left to receive, which also
+     * brings a receipt started by the old receiving workflow over to the shape the v2 endpoints expect, by:
+     *  1. creating the original line (isSplitItem: false) of every still-receivable shipment item that has none,
+     *     exactly as {@link #startReceipt} creates them: empty, carrying the shipment item's full quantity shipped
+     *     (see {@link #createReceiptItemFromShipmentItem}),
+     *  2. re-allocating the quantities shipped of its lines to the v2 convention (see
+     *     {@link #reallocateQuantitiesShipped}),
+     *  3. stamping it as a v2 receipt, so that its lines are aggregated per shipment item under the v2 semantics
+     *     they are written under from here on (see {@link ReceiptV2Marker}).
+     * Quantities already received are never touched, and neither are shipment items that previous receipts have
+     * already consumed: they get no line, exactly as when a receipt is started.
+     *
+     * Step 1 is not conditional on the workflow, because two kinds of receipt need it: an old-workflow receipt
+     * arrives missing most of its lines (that workflow only persisted the ones the user touched), and a v2 receipt
+     * has all of its lines only as of the moment it was started - anything that later reopens a shipment item
+     * (rolling back a completed receipt, adding a shipment item, raising a quantity) leaves it without one.
+     *
+     * Steps 2 and 3 likewise run whatever shape the receipt is already in - one the old workflow happened to leave
+     * v2-shaped is indistinguishable from a v2 one, so it has to be stamped too. All three are no-ops on a receipt
+     * already in that shape, so this is idempotent and can be called on every entry to the receiving page.
+     * Concurrent calls for the same receipt are resolved by the marker's unique constraint - the loser's
+     * transaction rolls back as a whole, so no half-synced receipt is left behind.
+     *
+     * Only the pending receipt is ever touched: it is looked up by status rather than taken from the caller, so a
+     * completed old-workflow receipt cannot be stamped, which would retroactively change how its lines are
+     * aggregated per shipment item (see {@link #getReceivedQuantitiesByShipmentItemId}).
+     *
+     * For a receipt of the old workflow this is one-way - the re-allocated quantities shipped no longer match what
+     * that workflow's screens expect, so such a receipt has to be finished here.
+     */
+    @Transactional
+    ReceiptDto syncReceiptLines(String shipmentId) {
+        Shipment shipment = Shipment.get(shipmentId)
+        if (!shipment) {
+            throw new ObjectNotFoundException(shipmentId, Shipment.toString())
+        }
+
+        Receipt receipt = Receipt.findByShipmentAndReceiptStatusCode(shipment, ReceiptStatusCode.PENDING)
+        if (!receipt) {
+            throw new ObjectNotFoundException(shipmentId, Receipt.toString())
+        }
+
+        Set<ShipmentItem> shipmentItemsMissingOriginalLine = findShipmentItemsMissingOriginalLine(shipment, receipt)
+        if (shipmentItemsMissingOriginalLine) {
+            Location receivingBin = receiptService.createTemporaryReceivingBin(shipment)
+            for (ShipmentItem shipmentItem : shipmentItemsMissingOriginalLine) {
+                createReceiptItemFromShipmentItem(receipt, shipmentItem, receivingBin)
+            }
+        }
+
+        reallocateQuantitiesShipped(shipment, receipt)
+
+        // A receipt carries at most one marker, so a receipt that already has one - a v2 one, or one synced on an
+        // earlier entry to the page - only has its lines brought over here.
+        if (ReceiptV2Marker.countByReceipt(receipt) == 0) {
+            markReceiptAsV2(receipt)
+        }
+
+        return ReceiptDto.from(receipt)
+    }
+
+    /**
+     * The shipment items of the shipment that still have something left to receive but carry no original line
+     * (see {@link ReceiptItem#isOriginalLine}) on the given receipt - the lines {@link #syncReceiptLines} has to
+     * create.
+     *
+     * Shipment items already consumed by previous receipts are left out: they are expected to have no line at all
+     * (see {@link #createReceiptItemFromShipmentItem}), so a missing line there says nothing about which workflow
+     * wrote the receipt.
+     */
+    private static Set<ShipmentItem> findShipmentItemsMissingOriginalLine(Shipment shipment, Receipt receipt) {
+        Map<String, List<ReceiptItem>> linesByShipmentItemId = groupLinesByShipmentItemId(receipt)
+
+        return (shipment.shipmentItems ?: [] as Set<ShipmentItem>).findAll { ShipmentItem shipmentItem ->
+            List<ReceiptItem> receiptItems = linesByShipmentItemId.get(shipmentItem.id)
+            boolean hasOriginalLine = receiptItems?.any { ReceiptItem line -> line.isOriginalLine() }
+            return !hasOriginalLine && getShipmentItemQuantityRemaining(shipmentItem) > 0
+        }
+    }
+
+    /**
+     * Re-allocates the quantities shipped of a receipt's lines to the v2 convention, per shipment item: its
+     * original line carries the shipment item's full quantity while its split lines carry zero. The old workflow
+     * instead split the quantity shipped across the lines it created, which the
+     * cancel-remaining logic of a completion does not expect (see {@link #cancelRemainingQuantities}).
+     *
+     * Which line is which is taken from the split flag the old workflow already left on it, and left as it is: it
+     * persisted exactly one unflagged line per shipment item (a split is only ever added alongside it, and it is
+     * never deleted), and step 1 of the sync has just created that line for any shipment item that had none.
+     * A line carrying no flag at all counts as the original, as it does everywhere else.
+     */
+    private static void reallocateQuantitiesShipped(Shipment shipment, Receipt receipt) {
+        Map<String, List<ReceiptItem>> linesByShipmentItemId = groupLinesByShipmentItemId(receipt)
+
+        for (ShipmentItem shipmentItem : (shipment.shipmentItems ?: [])) {
+            List<ReceiptItem> receiptItems = linesByShipmentItemId.get(shipmentItem.id) ?: []
+            for (ReceiptItem line : receiptItems) {
+                line.quantityShipped = line.isOriginalLine() ? shipmentItem.quantity : 0
+            }
+        }
+    }
+
+    /**
+     * The lines of the receipt grouped by the id of the shipment item they receive against. Callers only ever look
+     * a shipment item's own id up, so the group of lines that have none (the association is nullable, though no
+     * code writes a line without one) is simply never read.
+     */
+    private static Map<String, List<ReceiptItem>> groupLinesByShipmentItemId(Receipt receipt) {
+        return (receipt.receiptItems ?: []).groupBy { ReceiptItem line -> line.shipmentItem?.id }
     }
 
     /**
@@ -371,7 +484,7 @@ class ReceiptV2Service {
      *     receipt closes the shipment as received (see {@link #createShipmentReceivedEvent}), so no future receipt
      *     can consume what is left of it.
      *
-     * Only the original line of a shipment item (isSplitItem: false, created when the receipt was started) can
+     * Only the original line of a shipment item (see {@link ReceiptItem#isOriginalLine}) can
      * carry a cancel - the shipment item's canceled quantity is summed over all of its receipt items, so the
      * cancel must land on exactly one line to not be double-counted. Split lines are skipped here outright
      * (flagging them is also rejected upfront by the request validator) - the quantities received on them reduce
@@ -380,10 +493,10 @@ class ReceiptV2Service {
      * The remainder accounts for quantities received or canceled by previous receipts, quantities received on
      * sibling (split) lines, and cancels applied earlier in this loop (each cancel is immediately reflected in the
      * shipment item's remaining quantity), so the total can never be over-canceled. Writing the full item remainder
-     * to the line (rather than capping it by the line's own quantity shipped) relies on only receipts created by
-     * {@link #startReceipt} ever completing through here: their original line is the only line with a quantity
-     * shipped, so the item remainder IS the original line's remainder. Old-workflow receipts, whose lines can carry
-     * per-line quantity-shipped allocations, never reach this code.
+     * to the line (rather than capping it by the line's own quantity shipped) assumes the v2 allocation of quantities
+     * shipped: the original line is the only line of its shipment item carrying one, so the item remainder IS the
+     * original line's remainder. Receipts started by the old workflow can carry per-line allocations instead, and are
+     * brought over to the v2 allocation when synced (see {@link #reallocateQuantitiesShipped}).
      */
     private static void cancelRemainingQuantities(Receipt receipt, List<ReceiptItemCompleteRequest> itemsToComplete) {
         List<ReceiptItem> receiptItemsToCancel =
@@ -395,7 +508,7 @@ class ReceiptV2Service {
 
         for (ReceiptItem receiptItem : receiptItemsToCancel) {
             // Only the original line can carry a cancel - split lines have no quantity shipped to compute one from.
-            if (receiptItem.isSplitItem) {
+            if (!receiptItem.isOriginalLine()) {
                 continue
             }
 
