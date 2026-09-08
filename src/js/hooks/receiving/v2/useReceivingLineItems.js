@@ -162,6 +162,7 @@ const useReceivingLineItems = ({
     copyToReceiving,
     revertToOriginal,
     receivingNow,
+    remainingToReceive,
     summaryData,
     getLineItems,
     handleSubmit,

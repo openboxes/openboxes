@@ -9,7 +9,7 @@ import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
 
 const ReceivingLineItemsTable = ({
-  fields, columns, receivingNow, revertToOriginal,
+  fields, columns, receivingNow, remainingToReceive, revertToOriginal,
 }) => {
   const translate = useTranslate();
 
@@ -43,7 +43,7 @@ const ReceivingLineItemsTable = ({
           totalCount={fields.length}
           disablePagination
           showFooter
-          meta={{ totalReceivingNow: receivingNow }}
+          meta={{ totalReceivingNow: receivingNow, remainingToReceive }}
           emptyTableMessage={{
             id: 'react.receiving.emptyTable.label',
             defaultMessage: 'No items to receive',
@@ -58,6 +58,7 @@ ReceivingLineItemsTable.propTypes = {
   fields: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   columns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   receivingNow: PropTypes.number.isRequired,
+  remainingToReceive: PropTypes.number.isRequired,
   revertToOriginal: PropTypes.func.isRequired,
 };
 
