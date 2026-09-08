@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 
 import PropTypes from 'prop-types';
 import { RiInformationLine, RiRefreshLine } from 'react-icons/ri';
+import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
@@ -22,7 +23,7 @@ const STATUS_VARIANT_MAP = {
   CANCELED: 'danger',
 };
 
-const PutawayTaskListTable = ({ filterParams }) => {
+const PutawayTaskListTable = ({ filterParams, highestRole }) => {
   const {
     onFetchHandler,
     rerunHandler,
@@ -45,7 +46,17 @@ const PutawayTaskListTable = ({ filterParams }) => {
       defaultLabel: 'Rerun Strategy',
       leftIcon: <RiRefreshLine />,
       statuses: ['PENDING'],
-      onClick: (id) => rerunHandler(id),
+      onClick: (id) => rerunHandler(id, row.status),
+    },
+    {
+      label: 'react.putawayTask.rerunStrategy.label',
+      defaultLabel: 'Rerun Strategy',
+      leftIcon: <RiRefreshLine />,
+      statuses: ['IN_PROGRESS'],
+      // Rerunning the strategy on an in-progress task can move its destination, so it's
+      // restricted to superusers. The container it was already scanned into is unaffected.
+      minimumRequiredRole: 'Superuser',
+      onClick: (id) => rerunHandler(id, row.status),
     },
   ];
 
@@ -60,7 +71,7 @@ const PutawayTaskListTable = ({ filterParams }) => {
         <ContextMenu
           positions={['right']}
           dropdownClasses="action-dropdown-offset"
-          actions={findActions(getActions(row.original), row, {})}
+          actions={findActions(getActions(row.original), row, { highestRole })}
           id={row.original.id}
         />
       ),
@@ -156,7 +167,7 @@ const PutawayTaskListTable = ({ filterParams }) => {
       className: 'd-flex align-items-center',
       Cell: (row) => <DateCell {...row} />,
     },
-  ], [rerunHandler]);
+  ], [rerunHandler, highestRole]);
 
   return (
     <div className="list-page-list-section">
@@ -183,8 +194,13 @@ const PutawayTaskListTable = ({ filterParams }) => {
   );
 };
 
-export default PutawayTaskListTable;
+const mapStateToProps = (state) => ({
+  highestRole: state.session.highestRole,
+});
+
+export default connect(mapStateToProps)(PutawayTaskListTable);
 
 PutawayTaskListTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
+  highestRole: PropTypes.string.isRequired,
 };
