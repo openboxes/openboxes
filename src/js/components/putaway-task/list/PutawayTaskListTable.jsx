@@ -84,7 +84,7 @@ const PutawayTaskListTable = ({ filterParams, onFilterByOrder }) => {
       ),
     },
     {
-      Header: <Translate id="react.putawayTask.column.identifier.label" defaultMessage="Putaway #" />,
+      Header: <Translate id="react.putawayTask.column.putawayNumber.label" defaultMessage="Putaway #" />,
       accessor: 'putawayOrder.orderNumber',
       className: 'd-flex align-items-center',
       headerClassName: 'header',
@@ -96,6 +96,14 @@ const PutawayTaskListTable = ({ filterParams, onFilterByOrder }) => {
             : null}
         />
       ),
+    },
+    {
+      Header: <TooltipHeader id="react.putawayTask.column.taskIdentifier.label" defaultMessage="Task Identifier" />,
+      accessor: 'identifier',
+      className: 'd-flex align-items-center',
+      headerClassName: 'header',
+      maxWidth: 150,
+      Cell: (row) => <TableCell {...row} tooltip />,
     },
     {
       Header: <Translate id="react.putawayTask.column.status.label" defaultMessage="Status" />,
