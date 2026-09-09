@@ -27,7 +27,7 @@ const usePutawayTaskListTableData = (filterParams) => {
   }) => {
     const {
       statusCategory, status, searchTerm, container, destination,
-      putawayOrder, createdAfter, createdBefore,
+      createdAfter, createdBefore,
     } = filterParams;
     return _.omitBy({
       offset: `${offset}`,
@@ -38,7 +38,6 @@ const usePutawayTaskListTableData = (filterParams) => {
       searchTerm,
       container: container?.id,
       destination: destination?.id,
-      putawayOrder,
       createdAfter,
       createdBefore,
     }, (value) => value === '' || value === undefined || value === null || (Array.isArray(value) && value.length === 0));

@@ -74,10 +74,6 @@ const usePutawayTaskFilters = () => {
       }
     }
 
-    if (queryProps.putawayOrder) {
-      defaultValues.putawayOrder = queryProps.putawayOrder;
-    }
-
     if (queryProps.createdAfter) {
       defaultValues.createdAfter = queryProps.createdAfter;
     }
@@ -103,7 +99,6 @@ const usePutawayTaskFilters = () => {
       searchTerm: { name: 'searchTerm' },
       container: { name: 'container', accessor: 'id' },
       destination: { name: 'destination', accessor: 'id' },
-      putawayOrder: { name: 'putawayOrder' },
       createdAfter: { name: 'createdAfter' },
       createdBefore: { name: 'createdBefore' },
     };
@@ -119,18 +114,18 @@ const usePutawayTaskFilters = () => {
 
   // Resets all other filters and filters down to every task belonging to the given
   // putaway order, regardless of status - used by the "Show All Tasks for This
-  // Putaway" row action.
+  // Putaway" row action. Routed through the same free-text search box used for
+  // everything else (searchTerm isn't a filterFields key, so it's untouched by the
+  // blanking reduce below) - this is a substring match rather than an exact one, but
+  // putaway order numbers are unique so that's not expected to over-match in practice.
   const filterByOrder = (orderNumber) => {
-    // putawayOrder is itself one of filterFields' keys, so it has to be set after the
-    // blanking reduce below, not seeded as its initial accumulator - otherwise the
-    // reduce blanks it right back out while clearing every other field.
     const clearedValues = {
       ...Object.keys(filterFields).reduce((acc, key) => ({ ...acc, [key]: '' }), {}),
-      putawayOrder: orderNumber,
+      searchTerm: orderNumber,
     };
 
     const { pathname } = history.location;
-    history.push({ pathname, search: queryString.stringify({ putawayOrder: orderNumber }) });
+    history.push({ pathname, search: queryString.stringify({ searchTerm: orderNumber }) });
 
     setDefaultFilterValues(clearedValues);
     setFilterParams(clearedValues);

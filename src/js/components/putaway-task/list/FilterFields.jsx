@@ -1,6 +1,5 @@
 import DateFilter from 'components/form-elements/DateFilter/DateFilter';
 import FilterSelectField from 'components/form-elements/FilterSelectField';
-import FilterTextField from 'components/form-elements/FilterTextField';
 import DateFormat from 'consts/dateFormat';
 import { DateFormat as DateFormatMoment } from 'consts/timeFormat';
 
@@ -84,14 +83,6 @@ export default {
     getDynamicAttr: ({ debouncedDestinationFetch }) => ({
       loadOptions: debouncedDestinationFetch,
     }),
-  },
-  putawayOrder: {
-    type: FilterTextField,
-    attributes: {
-      filterElement: true,
-      placeholder: 'react.putawayTask.filters.order.placeholder.label',
-      defaultPlaceholder: 'Putaway #',
-    },
   },
   createdAfter: {
     type: DateFilter,

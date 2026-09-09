@@ -73,6 +73,9 @@ class PutawayTaskService {
             if (command.searchTerm) {
                 or {
                     ilike('identifier', "%${command.searchTerm}%")
+                    putawayOrder {
+                        ilike('orderNumber', "%${command.searchTerm}%")
+                    }
                     product {
                         or {
                             ilike('productCode', "${command.searchTerm}%")
