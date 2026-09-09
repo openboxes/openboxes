@@ -60,7 +60,9 @@ class LocalizationUtil {
     }
 
     static List<Locale> getSupportedLocales() {
-        return supportedLocaleCodes.collect { getLocale(it) }
+        def localeConfig = Holders.config.openboxes.locale
+        Locale localizationModeLocale = getLocale(localeConfig.localizationModeLocale)
+        return localeConfig.supportedLocales.collect { getLocale(it) }.findAll { it != localizationModeLocale }
     }
 
     static String getLocalizedString(Transaction transaction) {
