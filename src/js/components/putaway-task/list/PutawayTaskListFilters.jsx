@@ -35,7 +35,7 @@ const PutawayTaskListFilters = ({
         }}
         defaultValues={defaultValues}
         searchFieldPlaceholder="react.putawayTask.filters.searchField.placeholder.label"
-        searchFieldDefaultPlaceholder="Search by putaway task ID, product code, name, or description"
+        searchFieldDefaultPlaceholder="Search by putaway #, task ID, product code, name, or description"
         searchFieldId="searchTerm"
         allowEmptySubmit
         autoSubmitOnFilterChange
