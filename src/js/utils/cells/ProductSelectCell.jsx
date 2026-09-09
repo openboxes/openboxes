@@ -11,8 +11,6 @@ const ProductSelectCell = (props) => (
   <SelectCell
     {...props}
     selectFieldComponent={ProductSelectField}
-    // The ProductSelect component handles specifying the display text for the select options.
-    labelKey=""
   />
 );
 
