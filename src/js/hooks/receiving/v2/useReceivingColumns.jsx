@@ -460,7 +460,7 @@ const useReceivingColumns = ({
         },
         size: 125,
       }),
-      // The Location (putaway bin) column is only shown when "Enable Putaway" is on
+      // The Location (putaway bin) column is only shown when "Show Putaway" is on
       // and a bin tracking location.
       ...(putawayEnabled && hasBinLocationSupport ? [
         columnHelper.display({
