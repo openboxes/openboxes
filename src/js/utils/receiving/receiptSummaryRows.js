@@ -55,6 +55,7 @@ const buildLineItem = ({ summary, receiptItem, usersById }) => {
   // A receipt item always carries its own product. The shipment item product is used
   // only for rows that have no receipt item yet.
   const product = receiptItem?.productLot?.product ?? shipmentItem.productLot?.product;
+  const shippedRecipient = shipmentItem.recipientId ? usersById[shipmentItem.recipientId] : null;
   const quantityRemaining = shipmentItem.quantity - totalQuantityReceived - totalQuantityCanceled;
   return {
     // Unique per-row id (a shipment item may eventually map to several rows once line
@@ -83,8 +84,9 @@ const buildLineItem = ({ summary, receiptItem, usersById }) => {
       ?? shipmentItem.productLot?.lotNumber,
     expirationDate: receiptItem?.productLot?.expirationDate
       ?? shipmentItem.productLot?.expirationDate,
-    recipient: mapToFormSelectOption(receiptItem?.recipient)
-      ?? (shipmentItem.recipientId ? usersById[shipmentItem.recipientId] : null),
+    recipient: mapToFormSelectOption(receiptItem?.recipient) ?? shippedRecipient,
+    // The recipient of the shipment item, displayed in the shipment information of the edit modal
+    shippedRecipient,
     binLocation: mapToFormSelectOption(receiptItem?.binLocation),
     // Baseline bin location as of load / last successful save, used (like
     // initialQuantityReceiving) to skip no-op edits on save.
