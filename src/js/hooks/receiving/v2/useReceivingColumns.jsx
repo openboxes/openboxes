@@ -22,10 +22,10 @@ import useTranslate from 'hooks/useTranslate';
 import ActionsCell from 'utils/cells/ActionsCell';
 import AutosaveQuantityInputCell from 'utils/cells/AutosaveQuantityInputCell';
 import ExpirationDateCell from 'utils/cells/ExpirationDateCell';
-import MultilineCell from 'utils/cells/MultilineCell';
 import PackLevelCell from 'utils/cells/PackLevelCell';
 import PackLevelGroupCell from 'utils/cells/receiving/PackLevelGroupCell';
 import ProductCodeCell from 'utils/cells/receiving/ProductCodeCell';
+import ProductNameCell from 'utils/cells/receiving/ProductNameCell';
 import ShippedQuantityCell from 'utils/cells/receiving/ShippedQuantityCell';
 import SelectCell from 'utils/cells/SelectCell';
 import ValueCell from 'utils/cells/ValueCell';
@@ -213,12 +213,11 @@ const useReceivingColumns = ({
             return <TableCell className="rt-td" />;
           }
           return (
-            <MultilineCell
-              value={item?.product?.name}
+            <ProductNameCell
+              product={item?.product}
               className={struckIfChanged(item?.rowType, item?.productChanged)}
-              label="react.receiving.product.label"
-              defaultLabel="Product"
-              maxLines={2}
+              showHandlingIcons
+              maxLines={3}
             />
           );
         },

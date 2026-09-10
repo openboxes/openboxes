@@ -21,10 +21,10 @@ import useFormatNumber from 'hooks/useFormatNumber';
 import useTranslate from 'hooks/useTranslate';
 import ActionsCell from 'utils/cells/ActionsCell';
 import ExpirationDateCell from 'utils/cells/ExpirationDateCell';
-import MultilineCell from 'utils/cells/MultilineCell';
 import PackLevelCell from 'utils/cells/PackLevelCell';
 import PackLevelGroupCell from 'utils/cells/receiving/PackLevelGroupCell';
 import ProductCodeCell from 'utils/cells/receiving/ProductCodeCell';
+import ProductNameCell from 'utils/cells/receiving/ProductNameCell';
 import ShippedQuantityCell from 'utils/cells/receiving/ShippedQuantityCell';
 import ValueCell from 'utils/cells/ValueCell';
 import { getConfirmReceiptRowActions } from 'utils/receiving/getReceivingRowActions';
@@ -214,12 +214,11 @@ const useConfirmReceiptColumns = ({
             return <TableCell className="rt-td" />;
           }
           return (
-            <MultilineCell
-              value={item?.product?.name}
+            <ProductNameCell
+              product={item?.product}
               className={struckIfChanged(item?.rowType, item?.productChanged)}
-              label="react.receiving.product.label"
-              defaultLabel="Product"
-              maxLines={2}
+              showHandlingIcons
+              maxLines={3}
             />
           );
         },

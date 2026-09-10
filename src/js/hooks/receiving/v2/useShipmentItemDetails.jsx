@@ -10,6 +10,7 @@ import { DateFormatDateFns } from 'consts/timeFormat';
 import useFormatNumber from 'hooks/useFormatNumber';
 import useTranslate from 'hooks/useTranslate';
 import { formatDateToString } from 'utils/dateUtils';
+import renderHandlingIcons from 'utils/product-handling-icons';
 import getShippedQuantityInPoUom from 'utils/receiving/getShippedQuantityInPoUom';
 
 /**
@@ -38,6 +39,8 @@ const useShipmentItemDetails = (lineItem) => {
     </>
   ) : quantityShipped;
 
+  const handlingIcons = renderHandlingIcons(lineItem?.product?.handlingIcons);
+
   const badge = {
     current: {
       label: translate('react.receiving.status.shipped.label', 'Shipped'),
@@ -49,7 +52,14 @@ const useShipmentItemDetails = (lineItem) => {
   const fields = [
     {
       label: translate('react.receiving.product.label', 'Product'),
-      value: lineItem?.product?.name,
+      value: (
+        <>
+          {lineItem?.product?.name}
+          {handlingIcons && (
+            <span className="receiving-product-name__icons">{handlingIcons}</span>
+          )}
+        </>
+      ),
       // Each of these flags adds one optional field, the supplier item code and the bin
       // location, so with both the grid has four columns and the product name spans two
       className: isShipmentFromPurchaseOrder && hasBinLocationSupport ? 'item-details__field--span-2' : '',
