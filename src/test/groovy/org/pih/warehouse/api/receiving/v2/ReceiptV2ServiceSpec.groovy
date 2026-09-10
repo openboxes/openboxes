@@ -39,6 +39,7 @@ import org.pih.warehouse.receiving.ReceiptItemCompleteRequest
 import org.pih.warehouse.receiving.ReceiptItemEditReceivingInfoRequest
 import org.pih.warehouse.receiving.ReceiptService
 import org.pih.warehouse.receiving.ReceiptStatusCode
+import org.pih.warehouse.receiving.ReceiptSynchronizer
 import org.pih.warehouse.receiving.ReceiptV2Marker
 import org.pih.warehouse.receiving.ShipmentForReceiptValidator
 import org.pih.warehouse.receiving.ShipmentItemReceivedQuantitiesDto
@@ -92,6 +93,8 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         service.inventoryItemManager = inventoryItemManager
         service.receiptIdentifierService = receiptIdentifierService
         service.receiptService = receiptService
+        // The real synchronizer, on the same mocked receipt service - the sync is asserted through the endpoint.
+        service.receiptSynchronizer = new ReceiptSynchronizer(receiptService: receiptService)
         service.grailsApplication = Stub(GrailsApplication) {
             getMainContext() >> mainContext
         }
