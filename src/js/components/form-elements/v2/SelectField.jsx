@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import PropTypes from 'prop-types';
 
-import ProductSelect from 'components/product-select/ProductSelect';
 import componentType from 'consts/componentType';
 import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import Select from 'utils/Select';
@@ -24,7 +23,7 @@ const SelectField = ({
   defaultValue,
   multiple,
   onChange,
-  productSelect,
+  selectComponent: SelectComponent,
   hasErrors,
   className,
   warning,
@@ -36,6 +35,7 @@ const SelectField = ({
   ariaLabel,
   locationId,
   onExactProductSelected,
+  labelKey,
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -55,8 +55,6 @@ const SelectField = ({
     onChange?.(selectedOption);
     setValue(selectedOption);
   };
-
-  const SelectComponent = productSelect ? ProductSelect : Select;
 
   const fieldRef = useRef(null);
 
@@ -89,6 +87,7 @@ const SelectField = ({
         locationId={locationId}
         onExactProductSelected={onExactProductSelected}
         valueKey="id"
+        labelKey={labelKey}
         {...asyncProps}
         {...fieldProps}
       />
@@ -135,7 +134,8 @@ SelectField.propTypes = {
   multiple: PropTypes.bool,
   // Function triggered on change
   onChange: PropTypes.func,
-  productSelect: PropTypes.bool,
+  // The Select component to render, e.g. the base Select or ProductSelect
+  selectComponent: PropTypes.elementType,
   // indicator whether field should be marked as invalid
   hasErrors: PropTypes.bool,
   className: PropTypes.string,
@@ -157,6 +157,7 @@ SelectField.propTypes = {
   }),
   locationId: PropTypes.string,
   onExactProductSelected: PropTypes.func,
+  labelKey: PropTypes.string,
 };
 
 SelectField.defaultProps = {
@@ -173,7 +174,7 @@ SelectField.defaultProps = {
   defaultValue: null,
   multiple: false,
   onChange: () => {},
-  productSelect: false,
+  selectComponent: Select,
   hasErrors: false,
   className: '',
   hideErrorMessageWrapper: false,
@@ -185,4 +186,5 @@ SelectField.defaultProps = {
   ariaLabel: null,
   locationId: null,
   onExactProductSelected: () => {},
+  labelKey: null,
 };

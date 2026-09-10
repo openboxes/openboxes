@@ -22,6 +22,7 @@ import LocationAutofillHeader from 'components/receivingV2/LocationAutofillHeade
 import receivingColumns from 'consts/receivingColumns';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
+import ProductSelectCell from 'utils/cells/ProductSelectCell';
 import QuantityInputCell from 'utils/cells/QuantityInputCell';
 import SelectCell from 'utils/cells/SelectCell';
 import { debouncePeopleFetch } from 'utils/option-utils';
@@ -74,9 +75,8 @@ const useReceivingLineItemColumns = ({
           name={`lineItems.${row.index}.product`}
           control={control}
           render={({ field }) => (
-            <SelectCell
+            <ProductSelectCell
               {...field}
-              productSelect
               locationId={locationId}
               disabled={isOriginalLine(row)}
               label="react.receiving.product.label"
