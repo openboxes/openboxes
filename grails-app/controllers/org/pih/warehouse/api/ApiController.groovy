@@ -180,7 +180,7 @@ class ApiController {
         def logoLabel = grailsApplication.config.openboxes.logo.label
         def pageSize = grailsApplication.config.openboxes.api.pagination.pageSize
         def logoUrl = location?.logo ? "${createLink(controller: 'location', action: 'viewLogo', id: location?.id)}" : grailsApplication.config.openboxes.logo.url
-        def locales = grailsApplication.config.openboxes.locale.supportedLocales
+        def locales = LocalizationUtil.supportedLocaleCodes
         def browserConnectionTimeout = grailsApplication.config.openboxes.browser.connection.status.timeout
         def isAutosaveEnabled = grailsApplication.config.openboxes.client.autosave.enabled &&
                 supportedActivities.contains(ActivityCode.AUTOSAVE.name())
