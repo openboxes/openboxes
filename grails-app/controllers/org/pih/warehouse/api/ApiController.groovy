@@ -46,9 +46,12 @@ class ApiController {
         def username = request.JSON.username
         def password = request.JSON.password
         if (userService.authenticate(username, password)) {
-            session.user = User.findByUsernameOrEmail(username, username)
+            User user = User.findByUsernameOrEmail(username, username)
+            session.user = user
             if (request.JSON.location) {
                 session.warehouse = Location.get(request.JSON.location)
+            } else if (user?.warehouse && user?.rememberLastLocation) {
+                session.warehouse = user.warehouse
             }
             render([status: 200, text: "Authentication was successful"])
             return
@@ -166,7 +169,7 @@ class ApiController {
         // TODO: investigate why in isUserManager method in userService there is Assistant role included
         ArrayList<RoleType> managerRoles = [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER]
         boolean isUserManager = userService.getEffectiveRoles(user).any { managerRoles.contains(it.roleType) }
-        def supportedActivities = location.supportedActivities ?: location.locationType.supportedActivities
+        def supportedActivities = location ? (location.supportedActivities ?: location.locationType.supportedActivities) : []
         boolean isImpersonated = session.impersonateUserId ? true : false
         def buildNumber = gitProperties.shortCommitId
         def buildDate = grailsApplication.metadata.getProperty('build.time') ?: messageSource.getMessage('application.realTimeBuild.label', null, currentLocale)
