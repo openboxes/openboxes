@@ -42,11 +42,11 @@ export const parseDateAndStripTimezone = (date, providedFormat) => {
 /**
  * Converts an ISO date string to a Date object or a date-only Date without timezone information
  * @param {Object} params
- * @param {Object} params.options
  * @param {string} params.date - ISO date string (e.g. '2025-09-18' or '2025-09-18T14:30:00')
- * @param {Boolean} params.dateOnly - if true, returns the full date-time; if false, returns
+ * @param {Boolean} [params.dateOnly] - if true, returns the full date-time; if false, returns
  * date with time zeroed
- * @param {String} params.options.providedFormat - format of the passed date
+ * @param {Object} [params.options]
+ * @param {String} [params.options.providedDateFormat] - format of the passed date
  * @returns {Date | null}
  */
 export const parseStringToDate = ({
