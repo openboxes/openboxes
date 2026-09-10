@@ -451,7 +451,7 @@ const useConfirmReceiptColumns = ({
         },
         size: 125,
       }),
-      // The Location (putaway bin) column is shown even when "Enable Putaway" is off on the
+      // The Location (putaway bin) column is shown even when "Show Putaway" is off on the
       // receiving step, so the user sees which bin the shipment is received into.
       ...(hasBinLocationSupport ? [
         columnHelper.display({

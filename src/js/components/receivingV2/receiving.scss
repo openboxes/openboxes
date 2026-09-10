@@ -291,6 +291,8 @@
 .receiving-edit-modal {
   max-height: calc(80vh - 100px);
   overflow-y: auto;
+  padding-left: 8px;
+  padding-right: 8px;
 
   &::-webkit-scrollbar {
     width: 0.5em;
