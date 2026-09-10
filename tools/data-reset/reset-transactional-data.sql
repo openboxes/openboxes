@@ -119,6 +119,7 @@ DELETE FROM requisition_comment;
 DELETE FROM order_event;
 DELETE FROM shipment_event;
 DELETE FROM requisition_event;
+DELETE FROM requisition_event_log;
 
 DELETE FROM order_document;
 DELETE FROM shipment_document;

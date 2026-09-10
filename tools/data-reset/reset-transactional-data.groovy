@@ -60,7 +60,7 @@ def tablesToClear = [
     'order_adjustment_invoice', 'order_invoice', 'order_shipment', 'shipment_invoice',
     'fulfillment_item_shipment_item',
     'order_item_comment', 'order_comment', 'shipment_comment', 'requisition_comment',
-    'order_event', 'shipment_event', 'requisition_event',
+    'order_event', 'shipment_event', 'requisition_event', 'requisition_event_log',
     'order_document', 'shipment_document', 'invoice_document',
     'shipment_reference_number', 'invoice_reference_number',
     'requisition_approvers',

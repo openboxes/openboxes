@@ -34,6 +34,7 @@ FROM (
     SELECT 'order_event'                      UNION ALL
     SELECT 'shipment_event'                   UNION ALL
     SELECT 'requisition_event'                UNION ALL
+    SELECT 'requisition_event_log'            UNION ALL
     SELECT 'order_document'                   UNION ALL
     SELECT 'shipment_document'                UNION ALL
     SELECT 'invoice_document'                 UNION ALL
