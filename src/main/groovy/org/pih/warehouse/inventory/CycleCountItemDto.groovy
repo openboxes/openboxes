@@ -2,13 +2,12 @@ package org.pih.warehouse.inventory
 
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
+import org.pih.warehouse.core.dtos.IdentifiableDto
 import org.pih.warehouse.location.BinLocationDto
 import org.pih.warehouse.location.FacilityDto
 import org.pih.warehouse.product.ProductSimpleDto
 
-class CycleCountItemDto {
-
-    String id
+class CycleCountItemDto implements IdentifiableDto {
 
     FacilityDto facility
 

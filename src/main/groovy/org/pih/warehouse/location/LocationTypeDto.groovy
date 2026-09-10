@@ -2,12 +2,13 @@ package org.pih.warehouse.location
 
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.LocationTypeCode
+import org.pih.warehouse.core.dtos.IdentifiableDto
 
 /**
  * The DTO representation of a {@link org.pih.warehouse.core.LocationType}.
  */
-class LocationTypeDto {
-    String id
+class LocationTypeDto implements IdentifiableDto {
+
     String name
     String description
     Integer sortOrder

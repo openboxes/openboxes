@@ -448,7 +448,7 @@ class CycleCountService {
             MultiKey<String> key = new MultiKey(
                     item.product.productCode,
                     item.inventoryItem?.lotNumber,
-                    item.binLocation?.get('name'),
+                    item.binLocation?.name,
             )
             Map<Integer, CycleCountItemDto> countItemByIndex = countItemsMap.computeIfAbsent(key, { k -> [:] })
             countItemByIndex.put(item.countIndex, item)

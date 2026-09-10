@@ -1,7 +1,9 @@
 package org.pih.warehouse.product
 
-class ProductCatalogDto {
-    String id
+import org.pih.warehouse.core.dtos.IdentifiableDto
+
+class ProductCatalogDto implements IdentifiableDto {
+
     String code
     String name
     String description
