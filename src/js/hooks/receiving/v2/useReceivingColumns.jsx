@@ -6,6 +6,7 @@ import {
   getCurrentLocale,
   getHasBinLocationSupport,
   getIsShipmentFromPurchaseOrder,
+  getReceivingBin,
   getReceivingBinLocations,
 } from 'selectors';
 
@@ -31,7 +32,9 @@ import ValueCell from 'utils/cells/ValueCell';
 import getReceivingRowActions, { getReceivingSplitItemActions } from 'utils/receiving/getReceivingRowActions';
 import getReceivingRowStatus from 'utils/receiving/getReceivingRowStatus';
 import hasRowSavedQuantity from 'utils/receiving/hasRowSavedQuantity';
+import hasSplitItemInDifferentBinThanReplacedRow from 'utils/receiving/hasSplitItemInDifferentBinThanReplacedRow';
 import struckIfChanged from 'utils/receiving/struckIfChanged';
+import sumSplitItemsQuantityReceiving from 'utils/receiving/sumSplitItemsQuantityReceiving';
 import VerticalStripeIndicator from 'utils/VerticalStripeIndicator';
 
 const useReceivingColumns = ({
@@ -51,6 +54,7 @@ const useReceivingColumns = ({
   const currentLocale = useSelector(getCurrentLocale);
   const isShipmentFromPurchaseOrder = useSelector(getIsShipmentFromPurchaseOrder);
   const binLocations = useSelector(getReceivingBinLocations);
+  const receivingBin = useSelector(getReceivingBin);
   const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
   const isPackingListView = view === ReceivingView.PACKING_LIST;
 
@@ -65,16 +69,6 @@ const useReceivingColumns = ({
   // time. The row `meta` drives row-level greying/disabling of fully received lines.
   const getItem = (row, table) => table.options.meta?.entities?.[row.original.id];
 
-  // Sum of split items quantityReceiving for a replaced row, read live from the entities
-  // map so editing a child updates the parent value.
-  const getSplitItemsQuantityReceivingSum = (item, entities) => {
-    const splitItemIds = entities?.[item.toggleRowId]?.splitItemIds ?? [];
-    return splitItemIds.reduce(
-      (sum, splitItemId) => sum + (Number(entities?.[splitItemId]?.quantityReceiving) || 0),
-      0,
-    );
-  };
-
   // Remaining quantity kept live while editing: the quantity the row can still take
   // (quantityAvailableToReceive, fixed at load) minus the quantity entered in the input.
   const getCurrentQuantityRemaining = (item, entities) => {
@@ -84,7 +78,7 @@ const useReceivingColumns = ({
     // A replaced row shows the status of the whole group, so it subtracts the quantities
     // of all its split items.
     if (item.rowType === ReceivingRowType.REPLACED) {
-      return item.quantityAvailableToReceive - getSplitItemsQuantityReceivingSum(item, entities);
+      return item.quantityAvailableToReceive - sumSplitItemsQuantityReceiving(item, entities);
     }
     return item.quantityAvailableToReceive - (Number(item.quantityReceiving) || 0);
   };
@@ -190,7 +184,7 @@ const useReceivingColumns = ({
                 isPackingListView={isPackingListView}
                 isExpanded={row.getIsExpanded()}
                 onToggle={row.getToggleExpandedHandler()}
-                className={struckIfChanged(item, 'productChanged')}
+                className={struckIfChanged(item?.rowType, item?.productChanged)}
               />
             </>
           );
@@ -221,7 +215,7 @@ const useReceivingColumns = ({
           return (
             <MultilineCell
               value={item?.product?.name}
-              className={struckIfChanged(item, 'productChanged')}
+              className={struckIfChanged(item?.rowType, item?.productChanged)}
               label="react.receiving.product.label"
               defaultLabel="Product"
               maxLines={2}
@@ -286,7 +280,7 @@ const useReceivingColumns = ({
               <ValueCell
                 value={value}
                 tooltipLabel={value}
-                className={struckIfChanged(item, 'lotChanged')}
+                className={struckIfChanged(item?.rowType, item?.lotChanged)}
                 label="react.receiving.lotSerialNo.short.label"
                 defaultLabel="Lot/SN"
                 truncate
@@ -314,7 +308,7 @@ const useReceivingColumns = ({
               <ExpirationDateCell
                 value={item?.expirationDate}
                 localeKey={currentLocale}
-                className={struckIfChanged(item, 'expirationChanged')}
+                className={struckIfChanged(item?.rowType, item?.expirationChanged)}
                 label="react.receiving.expirationDate.short.label"
                 defaultLabel="Exp Date"
                 showExpiryStatus={item?.rowType !== ReceivingRowType.REPLACED}
@@ -343,7 +337,7 @@ const useReceivingColumns = ({
               <ValueCell
                 value={recipient?.name}
                 tooltipLabel={recipient?.name}
-                className={struckIfChanged(item, 'recipientChanged')}
+                className={struckIfChanged(item?.rowType, item?.recipientChanged)}
                 label="react.receiving.recipient.label"
                 defaultLabel="Recipient"
                 truncate
@@ -400,7 +394,7 @@ const useReceivingColumns = ({
           // The replaced row shows the sum of its split items' receiving-now quantities
           // as a read-only value (no input) so it stays out of the editing flow.
           if (item?.rowType === ReceivingRowType.REPLACED) {
-            const sum = getSplitItemsQuantityReceivingSum(item, table.options.meta?.entities);
+            const sum = sumSplitItemsQuantityReceiving(item, table.options.meta?.entities);
             const value = formatNumber(sum);
             return (
               <ValueCell
@@ -473,14 +467,32 @@ const useReceivingColumns = ({
             if (item?.rowType === ReceivingRowType.TOGGLE) {
               return null;
             }
+            // The parent shows the receiving bin, struck when a split item's bin differs from it.
+            if (item?.rowType === ReceivingRowType.REPLACED) {
+              const isBinLocationChanged = hasSplitItemInDifferentBinThanReplacedRow(
+                item,
+                table.options.meta?.entities,
+                receivingBin,
+              );
+              const struckBin = struckIfChanged(item?.rowType, isBinLocationChanged);
+              return (
+                <ValueCell
+                  value={receivingBin?.name}
+                  tooltipLabel={receivingBin?.name}
+                  className={`receiving-table__parent-location ${struckBin}`}
+                  label="react.receiving.location.label"
+                  defaultLabel="Location"
+                  truncate
+                />
+              );
+            }
             return (
               <SelectCell
                 options={binLocations}
                 value={item?.binLocation}
                 onChange={(binLocation) =>
                   table.options.meta?.updateLineItem(row.original.id, { binLocation })}
-                // The replaced row of a changed item keeps its select visible but disabled.
-                disabled={item?.rowType === ReceivingRowType.REPLACED || item?.isCompleted}
+                disabled={item?.isCompleted}
                 label="react.receiving.location.label"
                 defaultLabel="Location"
               />
@@ -555,6 +567,7 @@ const useReceivingColumns = ({
     hasBinLocationSupport,
     isShipmentFromPurchaseOrder,
     binLocations,
+    receivingBin,
     showLotNumber,
     showExpirationDate,
     showRecipient,

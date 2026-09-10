@@ -72,7 +72,7 @@ const useShipmentItemDetails = (lineItem) => {
     },
     {
       label: translate('react.receiving.recipient.label', 'Recipient'),
-      value: lineItem?.recipient?.name,
+      value: lineItem?.shippedRecipient?.name,
       className: !isShipmentFromPurchaseOrder && !hasBinLocationSupport ? 'item-details__field--span-2' : '',
     },
     ...(hasBinLocationSupport ? [

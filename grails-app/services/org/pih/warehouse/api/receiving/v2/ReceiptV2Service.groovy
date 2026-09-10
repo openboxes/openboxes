@@ -560,8 +560,7 @@ class ReceiptV2Service {
         // together.
         List<ShipmentItem> shipmentItems = findShipmentItems(shipment, command)
         Map<String, List<ReceiptItem>> receiptItemsByShipmentItemId = !shipmentItems ? [:] :
-                ReceiptItem.findAllByShipmentItemInList(shipmentItems)
-                        .groupBy { it.shipmentItemId.toString() }
+                findReceiptItems(shipmentItems).groupBy { it.shipmentItemId.toString() }
         Map<String, String> supplierCodeByShipmentItemId = getSupplierCodesByShipmentItemId(shipment)
 
         ShipmentReceivingSummaryDto shipmentSummary = new ShipmentReceivingSummaryDto(
@@ -602,6 +601,18 @@ class ReceiptV2Service {
         shipmentSummary.setShipmentItemsGrouped(shipmentItemsGrouped)
 
         return shipmentSummary
+    }
+
+    /**
+     * The lines of the given shipment items, in the order they were created. The original receipt item of a shipment
+     * item comes first, as it is created when the receipt is started, followed by the lines added while receiving.
+     */
+    private static List<ReceiptItem> findReceiptItems(List<ShipmentItem> shipmentItems) {
+        return ReceiptItem.createCriteria().list {
+            inList("shipmentItem", shipmentItems)
+            order("sortOrder", "asc")
+            order("dateCreated", "asc")
+        } as List<ReceiptItem>
     }
 
     private static List<ShipmentItem> findShipmentItems(Shipment shipment, ShipmentReceivingSummaryCommand command) {

@@ -206,6 +206,110 @@ describe('transformReceiptSummary() - table view', () => {
     expect(toggleRow.originalLineItem).toBeNull();
   });
 
+  it('should mark the lot and expiration as changed when the shipment item had no lot', () => {
+    const data = buildData([buildSummary('a', {
+      shipmentItem: { id: 'a', quantity: 100, productLot: { product: { id: 'product-a' } } },
+      currentReceiptItems: [
+        {
+          id: 'original',
+          quantityReceived: 5,
+          productLot: { product: { id: 'product-a' }, lotNumber: 'new-lot' },
+        },
+      ],
+      totalQuantityReceived: 5,
+    })], { order: ['a'] });
+
+    const [replacedRow] = entitiesInOrder(transformReceiptSummary(data, ReceivingView.TABLE, {}));
+
+    // The blank lot and expiration are struck too - the table draws the line over an empty field.
+    expect(replacedRow).toMatchObject({
+      rowType: ReceivingRowType.REPLACED,
+      lotNumber: undefined,
+      expirationDate: undefined,
+      productChanged: false,
+      lotChanged: true,
+      expirationChanged: true,
+    });
+  });
+
+  it('should keep a recipient change on the original line as a plain row', () => {
+    const data = buildData([buildSummary('a', {
+      currentReceiptItems: [
+        {
+          id: 'original',
+          quantityReceived: 5,
+          productLot: { product: { id: 'product-a' }, lotNumber: 'lot-a' },
+          recipient: { id: 'user-1', name: 'User One' },
+        },
+      ],
+      totalQuantityReceived: 5,
+    })], { order: ['a'] });
+
+    const rows = entitiesInOrder(transformReceiptSummary(data, ReceivingView.TABLE, {}));
+
+    // A recipient change alone is not a split - the new one replaces the old on the same row.
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      rowType: null,
+      receiptItemId: 'original',
+      recipient: { id: 'user-1', name: 'User One' },
+    });
+  });
+
+  it('should not strike a value only the hidden zeroed original line changed', () => {
+    const data = buildData([buildSummary('a', {
+      currentReceiptItems: [
+        {
+          id: 'original',
+          quantityReceived: 0,
+          productLot: { product: { id: 'product-a' }, lotNumber: 'lot-a' },
+          recipient: { id: 'user-1', name: 'User One' },
+        },
+        {
+          id: 'split',
+          isSplitItem: true,
+          quantityReceived: 3,
+          productLot: { product: { id: 'product-a' }, lotNumber: 'other-lot' },
+        },
+      ],
+      totalQuantityReceived: 3,
+    })], { order: ['a'] });
+
+    const [replacedRow] = entitiesInOrder(transformReceiptSummary(data, ReceivingView.TABLE, {}));
+
+    // The zeroed original has no row of its own, so it is not one of the child lines the parent
+    // is compared against - only the split line's lot is struck.
+    expect(replacedRow).toMatchObject({
+      rowType: ReceivingRowType.REPLACED,
+      lotChanged: true,
+      recipientChanged: false,
+    });
+  });
+
+  it('should order the product groups by their lines, not by the product id', () => {
+    const data = buildData([buildSummary('a', {
+      currentReceiptItems: [
+        {
+          id: 'original',
+          quantityReceived: 5,
+          productLot: { product: { id: '10005' }, lotNumber: 'lot-a' },
+        },
+        {
+          id: 'added',
+          isSplitItem: true,
+          quantityReceived: 3,
+          productLot: { product: { id: '10004' }, lotNumber: 'lot-b' },
+        },
+      ],
+      totalQuantityReceived: 8,
+    })], { order: ['a'] });
+
+    const rows = entitiesInOrder(transformReceiptSummary(data, ReceivingView.TABLE, {}));
+
+    const splitItemRows = rows.filter((row) => row.rowType === ReceivingRowType.SPLIT_ITEM);
+    expect(splitItemRows.map((row) => row.receiptItemId)).toEqual(['original', 'added']);
+  });
+
   it('should carry a zeroed original line on the toggle row of its group', () => {
     const data = buildData([buildSummary('a', {
       currentReceiptItems: [

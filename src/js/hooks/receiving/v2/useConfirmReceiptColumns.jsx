@@ -7,6 +7,7 @@ import {
   getHasBinLocationSupport,
   getHasPartialReceivingSupport,
   getIsShipmentFromPurchaseOrder,
+  getReceivingBin,
 } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
@@ -28,7 +29,9 @@ import ShippedQuantityCell from 'utils/cells/receiving/ShippedQuantityCell';
 import ValueCell from 'utils/cells/ValueCell';
 import { getConfirmReceiptRowActions } from 'utils/receiving/getReceivingRowActions';
 import getReceivingRowStatus from 'utils/receiving/getReceivingRowStatus';
+import hasSplitItemInDifferentBinThanReplacedRow from 'utils/receiving/hasSplitItemInDifferentBinThanReplacedRow';
 import struckIfChanged from 'utils/receiving/struckIfChanged';
+import sumSplitItemsQuantityReceiving from 'utils/receiving/sumSplitItemsQuantityReceiving';
 
 const useConfirmReceiptColumns = ({
   view,
@@ -47,6 +50,7 @@ const useConfirmReceiptColumns = ({
   const currentLocale = useSelector(getCurrentLocale);
   const hasPartialReceivingSupport = useSelector(getHasPartialReceivingSupport);
   const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
+  const receivingBin = useSelector(getReceivingBin);
   const isShipmentFromPurchaseOrder = useSelector(getIsShipmentFromPurchaseOrder);
   const isPackingListView = view === ReceivingView.PACKING_LIST;
 
@@ -73,6 +77,17 @@ const useConfirmReceiptColumns = ({
       className="receiving-table__quantity"
       label={label}
       defaultLabel={defaultLabel}
+    />
+  );
+
+  const locationCell = (value, className = '') => (
+    <ValueCell
+      value={value}
+      tooltipLabel={value}
+      className={className}
+      label="react.receiving.location.label"
+      defaultLabel="Location"
+      truncate
     />
   );
 
@@ -171,7 +186,7 @@ const useConfirmReceiptColumns = ({
               isPackingListView={isPackingListView}
               isExpanded={row.getIsExpanded()}
               onToggle={row.getToggleExpandedHandler()}
-              className={struckIfChanged(item, 'productChanged')}
+              className={struckIfChanged(item?.rowType, item?.productChanged)}
             />
           );
         },
@@ -201,7 +216,7 @@ const useConfirmReceiptColumns = ({
           return (
             <MultilineCell
               value={item?.product?.name}
-              className={struckIfChanged(item, 'productChanged')}
+              className={struckIfChanged(item?.rowType, item?.productChanged)}
               label="react.receiving.product.label"
               defaultLabel="Product"
               maxLines={2}
@@ -266,7 +281,7 @@ const useConfirmReceiptColumns = ({
               <ValueCell
                 value={value}
                 tooltipLabel={value}
-                className={struckIfChanged(item, 'lotChanged')}
+                className={struckIfChanged(item?.rowType, item?.lotChanged)}
                 label="react.receiving.lotSerialNo.short.label"
                 defaultLabel="Lot/SN"
                 truncate
@@ -294,7 +309,7 @@ const useConfirmReceiptColumns = ({
               <ExpirationDateCell
                 value={item?.expirationDate}
                 localeKey={currentLocale}
-                className={struckIfChanged(item, 'expirationChanged')}
+                className={struckIfChanged(item?.rowType, item?.expirationChanged)}
                 label="react.receiving.expirationDate.short.label"
                 defaultLabel="Exp Date"
                 showExpiryStatus={item?.rowType !== ReceivingRowType.REPLACED}
@@ -323,7 +338,7 @@ const useConfirmReceiptColumns = ({
               <ValueCell
                 value={recipient?.name}
                 tooltipLabel={recipient?.name}
-                className={struckIfChanged(item, 'recipientChanged')}
+                className={struckIfChanged(item?.rowType, item?.recipientChanged)}
                 label="react.receiving.recipient.label"
                 defaultLabel="Recipient"
                 truncate
@@ -395,9 +410,16 @@ const useConfirmReceiptColumns = ({
         header: () => quantityHeader('react.receiving.receivingNow.label', 'Receiving Now'),
         cell: ({ row, table }) => {
           const item = getItem(row, table);
-          if (item?.rowType === ReceivingRowType.REPLACED
-            || item?.rowType === ReceivingRowType.TOGGLE) {
+          if (item?.rowType === ReceivingRowType.TOGGLE) {
             return null;
+          }
+          if (item?.rowType === ReceivingRowType.REPLACED) {
+            const sum = sumSplitItemsQuantityReceiving(item, table.options.meta?.entities);
+            return quantityCell(
+              formatNumber(sum),
+              'react.receiving.receivingNow.label',
+              'Receiving Now',
+            );
           }
           // A location without partial receiving receives every line of the shipment, so a line
           // left blank is a line received as zero - the completion writes that zero over it
@@ -469,16 +491,19 @@ const useConfirmReceiptColumns = ({
             if (item?.rowType === ReceivingRowType.TOGGLE) {
               return null;
             }
-            const value = item?.binLocation?.name;
-            return (
-              <ValueCell
-                value={value}
-                tooltipLabel={value}
-                label="react.receiving.location.label"
-                defaultLabel="Location"
-                truncate
-              />
-            );
+            // The parent shows the receiving bin, struck when a split item's bin differs from it.
+            if (item?.rowType === ReceivingRowType.REPLACED) {
+              const isBinLocationChanged = hasSplitItemInDifferentBinThanReplacedRow(
+                item,
+                table.options.meta?.entities,
+                receivingBin,
+              );
+              return locationCell(
+                receivingBin?.name,
+                struckIfChanged(item?.rowType, isBinLocationChanged),
+              );
+            }
+            return locationCell(item?.binLocation?.name);
           },
           size: 125,
         }),
@@ -551,6 +576,7 @@ const useConfirmReceiptColumns = ({
     hasPartialReceivingSupport,
     hasPreviousReceipts,
     isShipmentFromPurchaseOrder,
+    receivingBin,
     showLotNumber,
     showExpirationDate,
     showRecipient,
