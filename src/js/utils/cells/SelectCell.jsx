@@ -17,7 +17,8 @@ const SelectCell = React.memo(({
   defaultLabel,
   placeholder,
   disabled,
-  productSelect,
+  selectFieldComponent: SelectFieldComponent,
+  labelKey,
   locationId,
   async,
   loadOptions,
@@ -29,15 +30,14 @@ const SelectCell = React.memo(({
   return (
     <TableCell className="rt-td">
       <div className="w-100" aria-label={translate(label, defaultLabel)}>
-        <SelectField
+        <SelectFieldComponent
           options={options}
           value={value}
           onChange={onChange}
-          labelKey="name"
+          labelKey={labelKey}
           placeholder={placeholder}
           disabled={disabled}
           hideErrorMessageWrapper
-          productSelect={productSelect}
           locationId={locationId}
           async={async}
           loadOptions={loadOptions}
@@ -59,7 +59,8 @@ SelectCell.propTypes = {
   defaultLabel: PropTypes.string.isRequired,
   placeholder: PropTypes.string,
   disabled: PropTypes.bool,
-  productSelect: PropTypes.bool,
+  selectFieldComponent: PropTypes.elementType,
+  labelKey: PropTypes.string,
   locationId: PropTypes.string,
   async: PropTypes.bool,
   loadOptions: PropTypes.func,
@@ -73,7 +74,8 @@ SelectCell.defaultProps = {
   onChange: undefined,
   placeholder: '',
   disabled: false,
-  productSelect: false,
+  selectFieldComponent: SelectField,
+  labelKey: 'name',
   locationId: null,
   async: false,
   loadOptions: () => [],

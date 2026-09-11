@@ -101,12 +101,12 @@ const ReceivingFilters = ({
             onChange={onPutawayChange}
             titles={{
               checked: {
-                id: 'react.receiving.enablePutaway.label',
-                defaultMessage: 'Enable Putaway',
+                id: 'react.receiving.showPutaway.label',
+                defaultMessage: 'Show Putaway',
               },
               unchecked: {
-                id: 'react.receiving.enablePutaway.label',
-                defaultMessage: 'Enable Putaway',
+                id: 'react.receiving.showPutaway.label',
+                defaultMessage: 'Show Putaway',
               },
             }}
           />
@@ -128,6 +128,8 @@ const ReceivingFilters = ({
           EndIcon={<RiMagicLine size={16} />}
         />
 
+        {/* TODO: Re-enable this button once import support is added in 0.9.10. */}
+        {false && (
         <Button
           label="react.receiving.import.label"
           defaultLabel="Import"
@@ -135,6 +137,8 @@ const ReceivingFilters = ({
           isDropdown
           EndIcon={<RiArrowDownSLine size={16} />}
         />
+        )}
+
         <Button
           label="react.receiving.saveAndExit.label"
           defaultLabel="Save & Exit"

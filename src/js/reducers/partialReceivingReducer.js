@@ -1,12 +1,16 @@
 import {
   REMOVE_RECEIVING_PUTAWAY_ENABLED,
+  RESET_RECEIVING_SORT,
   UPDATE_RECEIVING_BIN_LOCATIONS,
   UPDATE_RECEIVING_DATE_DELIVERED,
   UPDATE_RECEIVING_HEADER,
   UPDATE_RECEIVING_PUTAWAY_ENABLED,
+  UPDATE_RECEIVING_SORT,
   UPDATE_RECEIVING_VIEW,
 } from 'actions/types';
 import { ReceivingView } from 'consts/receivingViewOptions';
+
+const initialSorting = { sort: null, order: null };
 
 const initialState = {
   headerInfo: [],
@@ -15,6 +19,11 @@ const initialState = {
   shipmentDetails: {},
   binLocations: [],
   view: ReceivingView.TABLE,
+  // The sorting is shared by the receiving and the check step, so the column picked while
+  // receiving still applies after moving on to the check step. This reducer is excluded from
+  // persistence (see the store blacklist) and the receiving page is only ever entered and left
+  // through a full page load, so every visit starts in the shipment order.
+  sorting: initialSorting,
   // The delivery date entered on the check step, kept per shipment so it survives a trip back
   // to the receiving step without prop drilling.
   dateDeliveredByShipment: {},
@@ -47,6 +56,21 @@ export default function partialReceivingReducer(state = initialState, action) {
       return {
         ...state,
         view: action.payload.view,
+      };
+
+    case UPDATE_RECEIVING_SORT:
+      return {
+        ...state,
+        sorting: {
+          sort: action.payload.sort,
+          order: action.payload.order,
+        },
+      };
+
+    case RESET_RECEIVING_SORT:
+      return {
+        ...state,
+        sorting: initialSorting,
       };
 
     case UPDATE_RECEIVING_DATE_DELIVERED:

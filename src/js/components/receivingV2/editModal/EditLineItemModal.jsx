@@ -24,6 +24,7 @@ const EditLineItemModal = ({
     copyToReceiving,
     revertToOriginal,
     receivingNow,
+    remainingToReceive,
     summaryData,
     getLineItems,
     handleSubmit,
@@ -88,6 +89,7 @@ const EditLineItemModal = ({
           fields={fields}
           columns={columns}
           receivingNow={receivingNow}
+          remainingToReceive={remainingToReceive}
           revertToOriginal={revertToOriginal}
         />
         <EditLineItemModalFooter

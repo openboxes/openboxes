@@ -158,6 +158,26 @@
   &__struck {
     text-decoration: line-through;
     color: var(--gray-350);
+
+    &:empty,
+    .expiration-cell__date:empty {
+      position: relative;
+      width: 28px;
+      height: 14px;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 100%;
+        border-top: 1px solid currentColor;
+      }
+    }
+  }
+
+  &__parent-location {
+    padding-left: 8px;
   }
 
   // Quantities are right aligned
@@ -291,6 +311,8 @@
 .receiving-edit-modal {
   max-height: calc(80vh - 100px);
   overflow-y: auto;
+  padding-left: 8px;
+  padding-right: 8px;
 
   &::-webkit-scrollbar {
     width: 0.5em;
