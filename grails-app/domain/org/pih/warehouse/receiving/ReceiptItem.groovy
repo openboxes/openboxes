@@ -68,6 +68,15 @@ class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
     }
 
     /**
+     * Whether this is the original line of its shipment item - the line mirroring the shipment item, created when
+     * the receipt was started - rather than a split line added while receiving. A line carrying no flag at all
+     * counts as an original: the flag is nullable, and lines written before its column existed have none.
+     */
+    boolean isOriginalLine() {
+        return !isSplitItem
+    }
+
+    /**
      * Sorts receipt items in the same order as shipment items.
      */
     int compareTo(ReceiptItem other) {

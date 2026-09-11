@@ -239,6 +239,7 @@ export const RECEIPT_BY_ID = (receiptId) => `${RECEIPT_API}/${receiptId}`;
 export const RECEIPT_BY_SHIPMENT = (shipmentId) => `${RECEIPT_API}/shipment/${shipmentId}`;
 export const RECEIPT_SUMMARY_BY_SHIPMENT = (shipmentId) => `${RECEIPT_BY_SHIPMENT(shipmentId)}/summary`;
 export const RECEIPT_START = (shipmentId) => `${RECEIPT_BY_SHIPMENT(shipmentId)}/start`;
+export const RECEIPT_SYNC = (shipmentId) => `${RECEIPT_BY_SHIPMENT(shipmentId)}/sync`;
 export const RECEIPT_ITEMS_BATCH = (receiptId) => `${RECEIPT_BY_ID(receiptId)}/items/batch`;
 export const RECEIPT_COMPLETE = (receiptId) => `${RECEIPT_BY_ID(receiptId)}/complete`;
 export const RECEIPT_ITEMS_BY_SHIPMENT_ITEM = (receiptId, shipmentItemId) => `${RECEIPT_BY_ID(receiptId)}/shipmentItems/${shipmentItemId}/receiptItems`;

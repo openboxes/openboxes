@@ -14,7 +14,7 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
     ReceiptCompleteRequestCommandValidator validator = new ReceiptCompleteRequestCommandValidator()
 
     void setupSpec() {
-        mockDomains(Receipt, ReceiptItem, ReceiptV2Marker, Product)
+        mockDomains(Receipt, ReceiptItem, Product)
 
         // ReceiptItemCompleteRequest implements ObjectValidatable, whose validate() performs javax validation
         // through the "defaultValidator" bean. A running app gets that bean from Boot's autoconfiguration, but
@@ -24,8 +24,8 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
         }
     }
 
-    void 'doValidate should reject a receipt that was not created by the v2 workflow'() {
-        given: 'a pending receipt without the v2 marker'
+    void 'doValidate should accept a receipt that was started by the old receiving workflow'() {
+        given: 'a pending receipt carrying no v2 marker'
         Receipt receipt = new Receipt(receiptStatusCode: ReceiptStatusCode.PENDING, actualDeliveryDate: new Date())
         receipt.save(failOnError: true, flush: true)
 
@@ -35,9 +35,8 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
                 itemsToComplete: [],
         ))
 
-        then:
-        assert !result.valid
-        assert result.errors*.code == ["receiptCompleteRequestCommand.receipt.notV2"]
+        then: 'the workflow the receipt was started by does not gate its completion'
+        assert result.valid
     }
 
     void 'doValidate should reject the cancel-remaining flag on a split item'() {
@@ -103,8 +102,6 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
     private static Receipt buildPendingReceipt() {
         Receipt receipt = new Receipt(receiptStatusCode: ReceiptStatusCode.PENDING, actualDeliveryDate: new Date())
         receipt.save(failOnError: true, flush: true)
-        // The completable receipts of these tests are v2 receipts, so stamp the marker startReceipt would create.
-        new ReceiptV2Marker(receipt: receipt).save(failOnError: true, flush: true)
         return receipt
     }
 

@@ -35,16 +35,19 @@ import org.pih.warehouse.receiving.ReceiptItemCommentSaveCommand
 import org.pih.warehouse.receiving.ReceiptItemCompleteRequest
 import org.pih.warehouse.receiving.ReceiptItemDto
 import org.pih.warehouse.receiving.ReceiptItemEditReceivingInfoRequest
+import org.pih.warehouse.receiving.ReceiptItemFactory
 import org.pih.warehouse.receiving.ReceiptItemUpsertRequest
 import org.pih.warehouse.receiving.ReceiptItemSaveDto
 import org.pih.warehouse.receiving.ReceiptItemsBatchRequest
 import org.pih.warehouse.receiving.ReceiptSaveResponseDto
 import org.pih.warehouse.receiving.ReceiptService
 import org.pih.warehouse.receiving.ReceiptStatusCode
+import org.pih.warehouse.receiving.ReceiptSynchronizer
 import org.pih.warehouse.receiving.ReceiptV2Marker
 import org.pih.warehouse.receiving.ShipmentForReceiptValidator
 import org.pih.warehouse.receiving.ShipmentItemReceivedQuantitiesDto
 import org.pih.warehouse.receiving.ShipmentItemReceivingSummaryDto
+import org.pih.warehouse.receiving.ShipmentReceivingCalculator
 import org.pih.warehouse.receiving.ShipmentReceivingSummaryCommand
 import org.pih.warehouse.receiving.ShipmentReceivingSummaryDto
 import org.pih.warehouse.shipping.Container
@@ -62,7 +65,10 @@ class ReceiptV2Service {
 
     ReceiptIdentifierService receiptIdentifierService
     ReceiptService receiptService  // Inject old receipt service to reuse bin creation logic
+    ReceiptItemFactory receiptItemFactory
+    ReceiptSynchronizer receiptSynchronizer
     ShipmentForReceiptValidator shipmentForReceiptValidator
+    ShipmentReceivingCalculator shipmentReceivingCalculator
     MessageLocalizer messageLocalizer
     InventoryItemManager inventoryItemManager
     ShipmentService shipmentService
@@ -96,8 +102,8 @@ class ReceiptV2Service {
 
         for (ShipmentItem shipmentItem : shipment.shipmentItems) {
             // In the case of partial receipts, we only want to create receipt items for shipment items that have not yet been fully received
-            if (getShipmentItemQuantityRemaining(shipmentItem) > 0) {
-                createReceiptItemFromShipmentItem(receipt, shipmentItem, receivingBin)
+            if (shipmentReceivingCalculator.getShipmentItemQuantityRemaining(shipmentItem) > 0) {
+                receiptItemFactory.createReceiptItemFromShipmentItem(receipt, shipmentItem, receivingBin)
             }
         }
 
@@ -105,54 +111,50 @@ class ReceiptV2Service {
     }
 
     /**
-     * Creates the "original" receipt item of a shipment item: an empty (nothing received yet) line mirroring the
-     * shipment item and carrying its full quantity as the quantity shipped. Its quantity received is left null
-     * rather than zero: null means "nothing entered yet" (the client renders an empty input, autofills it and
-     * filters on it) while a zero is a quantity the user deliberately entered. Nulls only ever live on a pending
-     * receipt - completing one writes them out as zeros (see {@link #zeroOutEmptyReceivedQuantities}).
-     * Exactly one original line exists per still-receivable shipment item on a receipt - it is created when the
-     * receipt is started, cannot be deleted (the batch update endpoint rejects deleting it) and is the only line
-     * whose remainder can be canceled on completion. Shipment items already fully consumed by previous receipts
-     * get no line: it would only produce zero-quantity transaction entries on completion, and the receiving client
-     * marks an item as completed precisely by it having nothing pending on the current receipt.
-     * Lines added while receiving are split lines instead: they are flagged with isSplitItem and carry a quantity
-     * shipped of zero, so they never factor into the cancel-remaining math.
-     */
-    private static ReceiptItem createReceiptItemFromShipmentItem(
-            Receipt receipt, ShipmentItem shipmentItem, Location receivingBin) {
-        ReceiptItem receiptItem = new ReceiptItem(
-                product: shipmentItem.product,
-                inventoryItem: shipmentItem.inventoryItem,
-                lotNumber: shipmentItem.lotNumber,
-                expirationDate: shipmentItem.expirationDate,
-                recipient: shipmentItem.recipient,
-                quantityShipped: shipmentItem.quantity,
-                quantityReceived: null,
-                isSplitItem: Boolean.FALSE,
-                binLocation: receivingBin,
-                sortOrder: shipmentItem.receiptItems?.size() ?: 0,
-        )
-
-        receipt.addToReceiptItems(receiptItem)
-        shipmentItem.addToReceiptItems(receiptItem)
-
-        if (!receiptItem.save()) {
-            throw new ValidationException("Receipt item is invalid", receiptItem.errors)
-        }
-
-        return receiptItem
-    }
-
-    /**
      * Stamps the receipt as created by the v2 workflow, for reads that must know which workflow's semantics its
      * lines were written under - the workflow cannot be inferred from the persisted data afterwards, so it is
-     * recorded when the receipt is started (see {@link ReceiptV2Marker}).
+     * recorded when the receipt is started, or when the lines of a receipt started by the old workflow are synced
+     * (see {@link #syncReceiptLines} and {@link ReceiptV2Marker}).
      */
     private static void markReceiptAsV2(Receipt receipt) {
         ReceiptV2Marker marker = new ReceiptV2Marker(receipt: receipt)
         if (!marker.save()) {
             throw new ValidationException("Receipt v2 marker is invalid", marker.errors)
         }
+    }
+
+    /**
+     * Migrates the pending receipt of a shipment (if there is one) that was starting during the old receiving workflow,
+     * transforming the receipt items into the format used in the V2 flow.
+     */
+    @Transactional
+    ReceiptDto syncReceiptLines(String shipmentId) {
+        Shipment shipment = Shipment.get(shipmentId)
+        if (!shipment) {
+            throw new ObjectNotFoundException(shipmentId, Shipment.toString())
+        }
+
+        Receipt receiptToSync = findPendingReceipt(shipment)
+        if (!receiptToSync) {
+            throw new ObjectNotFoundException(shipmentId, Receipt.toString())
+        }
+
+        receiptSynchronizer.syncLines(shipment, receiptToSync)
+
+        // A receipt carries at most one marker, so a receipt that already has one - a v2 one, or one synced on an
+        // earlier entry to the page - only has its lines brought over here.
+        if (ReceiptV2Marker.countByReceipt(receiptToSync) == 0) {
+            markReceiptAsV2(receiptToSync)
+        }
+
+        return ReceiptDto.from(receiptToSync)
+    }
+
+    /**
+     * The pending (still open) receipt of the shipment, or null when it has none. A shipment carries at most one.
+     */
+    private static Receipt findPendingReceipt(Shipment shipment) {
+        return Receipt.findByShipmentAndReceiptStatusCode(shipment, ReceiptStatusCode.PENDING)
     }
 
     /**
@@ -352,7 +354,8 @@ class ReceiptV2Service {
 
     /**
      * Writes a zero over the quantity received of every line that was never given one. A null quantity received
-     * means "nothing entered yet" while the receipt is pending (see {@link #createReceiptItemFromShipmentItem})
+     * means "nothing entered yet" while the receipt is pending (see
+     * {@link ReceiptItemFactory#createReceiptItemFromShipmentItem})
      */
     private static void zeroOutEmptyReceivedQuantities(Receipt receipt) {
         receipt.receiptItems.each { ReceiptItem receiptItem ->
@@ -362,7 +365,8 @@ class ReceiptV2Service {
 
     /**
      * Cancels the quantity still left to receive on every line the completion cancels: the shipment item's remaining
-     * quantity ({@link #getShipmentItemQuantityRemaining}) is written to the line as its canceled quantity.
+     * quantity ({@link ShipmentReceivingCalculator#getShipmentItemQuantityRemaining}) is written to the line as its
+     * canceled quantity.
      *
      * Which lines those are depends on the destination:
      *  1. It supports partial receiving: the lines flagged with cancelRemainingQuantity. Lines missing from the
@@ -372,7 +376,7 @@ class ReceiptV2Service {
      *     receipt closes the shipment as received (see {@link #createShipmentReceivedEvent}), so no future receipt
      *     can consume what is left of it.
      *
-     * Only the original line of a shipment item (isSplitItem: false, created when the receipt was started) can
+     * Only the original line of a shipment item (see {@link ReceiptItem#isOriginalLine}) can
      * carry a cancel - the shipment item's canceled quantity is summed over all of its receipt items, so the
      * cancel must land on exactly one line to not be double-counted. Split lines are skipped here outright
      * (flagging them is also rejected upfront by the request validator) - the quantities received on them reduce
@@ -381,12 +385,12 @@ class ReceiptV2Service {
      * The remainder accounts for quantities received or canceled by previous receipts, quantities received on
      * sibling (split) lines, and cancels applied earlier in this loop (each cancel is immediately reflected in the
      * shipment item's remaining quantity), so the total can never be over-canceled. Writing the full item remainder
-     * to the line (rather than capping it by the line's own quantity shipped) relies on only receipts created by
-     * {@link #startReceipt} ever completing through here: their original line is the only line with a quantity
-     * shipped, so the item remainder IS the original line's remainder. Old-workflow receipts, whose lines can carry
-     * per-line quantity-shipped allocations, never reach this code.
+     * to the line (rather than capping it by the line's own quantity shipped) assumes the v2 allocation of quantities
+     * shipped: the original line is the only line of its shipment item carrying one, so the item remainder IS the
+     * original line's remainder. Receipts started by the old workflow can carry per-line allocations instead, and are
+     * brought over to the v2 allocation when synced (see {@link ReceiptSynchronizer#syncLines}).
      */
-    private static void cancelRemainingQuantities(Receipt receipt, List<ReceiptItemCompleteRequest> itemsToComplete) {
+    private void cancelRemainingQuantities(Receipt receipt, List<ReceiptItemCompleteRequest> itemsToComplete) {
         List<ReceiptItem> receiptItemsToCancel =
                 receipt.shipment.destination.supports(ActivityCode.PARTIAL_RECEIVING)
                         ? itemsToComplete
@@ -396,44 +400,12 @@ class ReceiptV2Service {
 
         for (ReceiptItem receiptItem : receiptItemsToCancel) {
             // Only the original line can carry a cancel - split lines have no quantity shipped to compute one from.
-            if (receiptItem.isSplitItem) {
+            if (!receiptItem.isOriginalLine()) {
                 continue
             }
 
-            receiptItem.quantityCanceled = Math.max(0, getShipmentItemQuantityRemaining(receiptItem.shipmentItem))
-        }
-    }
-
-    /**
-     * The quantity of a shipment item still left to receive: its quantity minus everything received or canceled
-     * on its receipt items across completed receipts (the receipt being completed is already flagged as RECEIVED
-     * when the cancels are computed, so its lines count too).
-     *
-     * Deliberately not {@link ShipmentItem#getQuantityRemaining}: the legacy getters behind it only count receipt
-     * items whose product matches the shipment item's, while lines can be received against an edited product
-     * (see {@link #upsertReceiptItem}) and must still consume the shipment item's remainder - exactly as
-     * {@link ShipmentItemReceivingSummaryDto} totals them for the receiving client.
-     */
-    private static Integer getShipmentItemQuantityRemaining(ShipmentItem shipmentItem) {
-        int quantityReceivedAndCanceled = (shipmentItem.receiptItems ?: []).sum(0) { ReceiptItem receiptItem ->
-            receiptItem.receipt?.receiptStatusCode == ReceiptStatusCode.RECEIVED
-                    ? (receiptItem.quantityReceived ?: 0) + (receiptItem.quantityCanceled ?: 0)
-                    : 0
-        } as int
-        return (shipmentItem.quantity ?: 0) - quantityReceivedAndCanceled
-    }
-
-    /**
-     * Whether every line of the shipment is fully received: nothing left to receive (or cancel) on any of its
-     * shipment items, per the same product-agnostic math as {@link #getShipmentItemQuantityRemaining}.
-     *
-     * Deliberately not {@link Shipment#isFullyReceived}: the legacy check ignores lines received against an edited
-     * product, so after the v2 flow consumed a shipment item's full quantity that way it would still report the
-     * shipment as receivable (and only ever partially received).
-     */
-    static boolean isShipmentFullyReceived(Shipment shipment) {
-        return shipment.shipmentItems?.every { ShipmentItem shipmentItem ->
-            getShipmentItemQuantityRemaining(shipmentItem) <= 0
+            receiptItem.quantityCanceled = Math.max(
+                    0, shipmentReceivingCalculator.getShipmentItemQuantityRemaining(receiptItem.shipmentItem))
         }
     }
 
@@ -449,14 +421,15 @@ class ReceiptV2Service {
      *         receiving. The rest of the remaining quantities should be canceled
      *     PARTIALLY_RECEIVED - not allowed
      *
-     * Fully received is decided with the v2 receiving math ({@link #isShipmentFullyReceived}), not the legacy
-     * {@link Shipment#isFullyReceived}.
+     * Fully received is decided with the v2 receiving math
+     * ({@link ShipmentReceivingCalculator#isShipmentFullyReceived}), not the legacy {@link Shipment#isFullyReceived}.
      */
     private void createShipmentReceivedEvent(Receipt receipt) {
         Shipment shipment = receipt.shipment
 
         if (!shipment.wasReceived() &&
-                (!shipment.destination.supports(ActivityCode.PARTIAL_RECEIVING) || isShipmentFullyReceived(shipment))) {
+                (!shipment.destination.supports(ActivityCode.PARTIAL_RECEIVING) ||
+                        shipmentReceivingCalculator.isShipmentFullyReceived(shipment))) {
             shipmentService.createShipmentEvent(
                     shipment, receipt.actualDeliveryDate, EventCode.RECEIVED, shipment.destination)
             return
@@ -552,7 +525,7 @@ class ReceiptV2Service {
         Shipment shipment = command.shipment
         ReceiptGroup group = command.group
 
-        String currentReceiptId = Receipt.findByShipmentAndReceiptStatusCode(shipment, ReceiptStatusCode.PENDING)?.id
+        String currentReceiptId = findPendingReceipt(shipment)?.id
 
         // This summary centers on the relationship between a shipment item and its receipt items, so don't bother
         // with the receipts themselves. Instead, fetch the shipment items (already sorted per the requested params)
