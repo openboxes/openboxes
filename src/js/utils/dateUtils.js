@@ -187,6 +187,36 @@ export const formatDateToDateOnlyString = (date, locale = locales.enUS) => {
 export const formatISODate = (date, dateFormat) => format(parseISO(date), dateFormat);
 
 /**
+ * A method for parsing a date-only string as APIs send it (e.g. '2026-09-19') to a Date.
+ * @param {String} date - date-only string in the yyyy-MM-dd format
+ * @returns {Date|null} the parsed date, or null when the value is empty or not a valid date
+ */
+export const parseApiDate = (date) => {
+  if (typeof date !== 'string' || !date) {
+    return null;
+  }
+
+  const parsedDate = parseISO(date);
+  return isValid(parsedDate) ? parsedDate : null;
+};
+
+/**
+ * A method for converting a date-only string as APIs send it (e.g. '2026-09-19') to a string in
+ * the given format, without the timezone shift formatting the string directly would introduce.
+ * @param {Object} params
+ * @param {String} params.date - date-only string in the yyyy-MM-dd format
+ * @param {String} params.dateFormat - output date format
+ * @param {Object} params.options
+ * @param {Locale} params.options.locale - output locale
+ * @returns {String|null}
+ */
+export const formatApiDateToString = ({ date, dateFormat, options }) => formatDateToString({
+  date: parseApiDate(date),
+  dateFormat,
+  options,
+});
+
+/**
  * Get timezone offset, defaulting to the user's timezone offset
  * @param {Number} timezoneOffset
  * @returns {string}

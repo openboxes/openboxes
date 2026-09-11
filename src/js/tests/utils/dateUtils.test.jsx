@@ -3,12 +3,14 @@ import * as locales from 'date-fns/locale';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import {
   displayTimezoneOffset,
+  formatApiDateToString,
   formatDateToDateOnlyString,
   formatDateToDatetimeString,
   formatDateToString,
   formatDateToZonedDateTimeString,
   formatStringToInstant,
   getFilenameDateString,
+  parseApiDate,
   parseStringToDate,
 } from 'utils/dateUtils';
 
@@ -311,5 +313,70 @@ describe('getFilenameDateString()', () => {
   it('returns a string matching YYYYMMDD_HHMMSS pattern', () => {
     const filename = getFilenameDateString();
     expect(filename).toMatch(/^\d{8}-\d{6}$/);
+  });
+});
+
+describe('parseApiDate()', () => {
+  it('should return null if date is empty', () => {
+    expect(parseApiDate(null)).toBe(null);
+    expect(parseApiDate('')).toBe(null);
+  });
+
+  it('should return null if the value is not a date the API could have sent', () => {
+    expect(parseApiDate('19/Sep/2026')).toBe(null);
+    expect(parseApiDate('not a date')).toBe(null);
+  });
+
+  it('should return null rather than throw for a value that is not a string at all', () => {
+    expect(parseApiDate(new Date(2026, 8, 19))).toBe(null);
+    expect(parseApiDate(1789000000000)).toBe(null);
+  });
+
+  it('should parse a date-only string to local midnight, so the day never shifts west of UTC', () => {
+    const date = parseApiDate('2026-09-19');
+
+    expect(date.getFullYear()).toBe(2026);
+    expect(date.getMonth()).toBe(8);
+    expect(date.getDate()).toBe(19);
+    expect(date.getHours()).toBe(0);
+  });
+});
+
+describe('formatApiDateToString()', () => {
+  it('should return null if date is empty', () => {
+    const date = formatApiDateToString({
+      date: null,
+      dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+    });
+
+    expect(date).toBe(null);
+  });
+
+  it('should format a date-only string without shifting the day', () => {
+    const date = formatApiDateToString({
+      date: '2026-09-19',
+      dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+    });
+
+    expect(date).toBe('19/Sep/2026');
+  });
+
+  it('should round-trip a date-only string back to the format the API sent', () => {
+    const date = formatApiDateToString({
+      date: '2026-09-19',
+      dateFormat: DateFormatDateFns.YYYY_MM_DD,
+    });
+
+    expect(date).toBe('2026-09-19');
+  });
+
+  it('should format in the given locale', () => {
+    const date = formatApiDateToString({
+      date: '2026-09-19',
+      dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+      options: { locale: locales.es },
+    });
+
+    expect(date).toBe('19/sep/2026');
   });
 });

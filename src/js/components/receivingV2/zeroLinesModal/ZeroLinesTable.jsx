@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { DateFormatDateFns } from 'consts/timeFormat';
-import { formatDateToString, getDateFnsLocale } from 'utils/dateUtils';
+import { formatApiDateToString, getDateFnsLocale } from 'utils/dateUtils';
 
 import 'components/receivingV2/receiving.scss';
 
@@ -29,7 +29,7 @@ const ZeroLinesTable = ({ lines, translate, localeKey }) => (
             <td>{line.product?.name}</td>
             <td>{line.lotNumber}</td>
             <td>
-              {formatDateToString({
+              {formatApiDateToString({
                 date: line.expirationDate,
                 dateFormat: DateFormatDateFns.DD_MMM_YYYY,
                 options: { locale: getDateFnsLocale(localeKey) },
