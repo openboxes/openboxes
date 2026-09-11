@@ -46,7 +46,8 @@ const InboundSendForm = ({ previous }) => {
   } = useInboundSendForm({ previous });
 
   // Check if shipment is dispatched (used for disabling buttons and enabling rollback)
-  const isDispatched = statusCode === requisitionStatus.DISPATCHED;
+  const isDispatched = statusCode === requisitionStatus.DISPATCHED
+      || statusCode === requisitionStatus.ISSUED;
 
   // Rollback button is visible only for admins when shipment has been dispatched
   const rollbackButtonVisible = hasRoleAdmin && shipped;

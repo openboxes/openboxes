@@ -118,7 +118,7 @@
                     </g:if>
                 </g:else>
 
-                <g:if test="${stockMovement?.hasBeenIssued() && (stockMovement?.hasBeenShipped() || stockMovement?.hasBeenPartiallyReceived())}">
+                <g:if test="${stockMovement?.hasBeenShipped() || stockMovement?.hasBeenPartiallyReceived()}">
                     <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
                         <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
                         <warehouse:message code="default.button.receive.label" />
@@ -145,8 +145,8 @@
                             <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
                         </g:link>
                     </g:if>
-                    <g:elseif test="${stockMovement?.hasBeenIssued() || ((stockMovement?.hasBeenShipped() ||
-                            stockMovement?.hasBeenPartiallyReceived()) && stockMovement?.isFromOrder)}">
+                    <g:elseif test="${stockMovement?.hasBeenIssued() || stockMovement?.hasBeenShipped()
+                            || (stockMovement?.hasBeenPartiallyReceived() && stockMovement?.isFromOrder)}">
                         <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
                             <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
                             <warehouse:message code="default.button.rollback.label" />
@@ -204,7 +204,7 @@
 
                 <g:if test="${grailsApplication.config.openboxes.stockMovement.allocate.enabled}">
                     <g:isUserAdmin>
-                        <g:if test="${stockMovement?.canGeneratePickList()}">
+                        <g:if test="${isSameOrigin && stockMovement?.canGeneratePickList()}">
                             <g:link
                                 controller="stockMovement"
                                 action="allocate"
