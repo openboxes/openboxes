@@ -43,6 +43,17 @@ class ReceiptApiController extends BaseApiController {
     }
 
     /**
+     * Reconciles the lines of a shipment's pending receipt with what is currently left to receive, and brings a
+     * receipt started by the old receiving workflow over to the shape this API expects, so that it can be received
+     * against and completed here. A receipt already in that shape is returned unchanged, so this is safe to call
+     * for any shipment whose receipt is in progress.
+     */
+    def syncReceiptLines() {
+        ReceiptDto receipt = receiptV2Service.syncReceiptLines(params.shipmentId)
+        renderResponse(receipt)
+    }
+
+    /**
      * List all receipts (and their receipt items) that are associated with a shipment.
      */
     def listShipmentReceipts(String shipmentId) {

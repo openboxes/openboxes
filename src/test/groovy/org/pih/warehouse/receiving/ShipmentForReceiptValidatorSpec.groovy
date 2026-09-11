@@ -29,7 +29,7 @@ class ShipmentForReceiptValidatorSpec extends Specification implements DataTest 
     }
 
     void setup() {
-        validator = new ShipmentForReceiptValidator()
+        validator = new ShipmentForReceiptValidator(shipmentReceivingCalculator: new ShipmentReceivingCalculator())
     }
 
     void 'doValidate should pass for a #shipmentStatus shipment with something left to receive'() {

@@ -11,8 +11,9 @@ import java.time.Instant
  * canceled quantities) must therefore know which rule a receipt was written under, and that fact cannot be recovered
  * later: old-workflow receipts can produce exactly the same data shape as v2 ones (added lines carrying an edited
  * product and a zero quantity shipped), and configuration (which locations use the v2 flow) changes over time while
- * the data lives forever. So the workflow is recorded explicitly when the receipt is started - as a standalone marker
- * row rather than a column, keeping the legacy {@link Receipt} domain untouched.
+ * the data lives forever. So the workflow is recorded explicitly when the receipt is started (or when a receipt
+ * started by the old workflow is synced - see ReceiptV2Service.syncReceiptLines) - as a standalone marker row
+ * rather than a column, keeping the legacy {@link Receipt} domain untouched.
  *
  * Rows are insert-only: they are never updated, and are deleted only together with their receipt. Their foreign key
  * restricts deletes rather than cascading, so every flow that deletes a receipt (the receiving rollbacks) has to
