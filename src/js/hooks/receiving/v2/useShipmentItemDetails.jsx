@@ -9,7 +9,7 @@ import {
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useFormatNumber from 'hooks/useFormatNumber';
 import useTranslate from 'hooks/useTranslate';
-import { formatDateToString } from 'utils/dateUtils';
+import { formatApiDateToString, formatDateToString } from 'utils/dateUtils';
 import ProductHandlingIcons from 'utils/ProductHandlingIcons';
 import getShippedQuantityInPoUom from 'utils/receiving/getShippedQuantityInPoUom';
 
@@ -70,7 +70,7 @@ const useShipmentItemDetails = (lineItem) => {
     },
     {
       label: translate('react.receiving.expiration.label', 'Expiration'),
-      value: formatDateToString({
+      value: formatApiDateToString({
         date: lineItem?.expirationDate,
         dateFormat: DateFormatDateFns.DD_MMM_YYYY,
         options: { locale: locales[currentLocale] },

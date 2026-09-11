@@ -11,7 +11,7 @@ import useEditLineItemValidation from 'hooks/receiving/v2/useEditLineItemValidat
 import useEditModalLocationAutofill from 'hooks/receiving/v2/useEditModalLocationAutofill';
 import useReceivingLineItemColumns from 'hooks/receiving/v2/useReceivingLineItemColumns';
 import useTranslate from 'hooks/useTranslate';
-import { formatDateToString } from 'utils/dateUtils';
+import { formatApiDateToString } from 'utils/dateUtils';
 
 /**
  * Form state for the editable "Receiving now" table in the edit modal
@@ -33,7 +33,7 @@ const useReceivingLineItems = ({
     receiptItemId: item?.receiptItemId ?? null,
     product: item?.product ?? null,
     lotNumber: item?.lotNumber ?? '',
-    expirationDate: formatDateToString({
+    expirationDate: formatApiDateToString({
       date: item?.expirationDate,
       dateFormat: DateFormatDateFns.DD_MMM_YYYY,
     }) ?? '',
