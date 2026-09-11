@@ -28,14 +28,14 @@ const PutawayTaskListFilters = ({
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
         filterFields={filterFields}
-        updateFilterParams={(values) => setFilterParams({ ...values })}
+        updateFilterParams={(values, options) => setFilterParams({ ...values }, options)}
         formProps={{
           debouncedContainerFetch,
           debouncedDestinationFetch,
         }}
         defaultValues={defaultValues}
         searchFieldPlaceholder="react.putawayTask.filters.searchField.placeholder.label"
-        searchFieldDefaultPlaceholder="Search by putaway task ID, product code, name, or description"
+        searchFieldDefaultPlaceholder="Search by putaway #, task ID, product code, name, or description"
         searchFieldId="searchTerm"
         allowEmptySubmit
         autoSubmitOnFilterChange
