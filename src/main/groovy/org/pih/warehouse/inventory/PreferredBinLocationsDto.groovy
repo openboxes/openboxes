@@ -1,13 +1,13 @@
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.core.http.ResponseBodyFormattable
+import org.pih.warehouse.core.http.HttpSerializable
 import org.pih.warehouse.location.LocationSimpleDto
 
 /**
  * The preferred bin locations of a set of products at a given facility, keyed by product id.
  * Products with no preferred bin location configured are omitted.
  */
-class PreferredBinLocationsDto implements ResponseBodyFormattable {
+class PreferredBinLocationsDto implements HttpSerializable {
 
     Map<String, LocationSimpleDto> preferredBinLocationsByProductId = [:]
 

@@ -1,11 +1,11 @@
 package org.pih.warehouse.receiving
 
-import org.pih.warehouse.core.http.ResponseBodyFormattable
+import org.pih.warehouse.core.http.HttpSerializable
 
 /**
  * The comment of a single receipt item.
  */
-class ReceiptItemCommentDto implements ResponseBodyFormattable {
+class ReceiptItemCommentDto implements HttpSerializable {
 
     String receiptItemId
     String comment

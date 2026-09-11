@@ -2,7 +2,7 @@ package org.pih.warehouse.core
 
 import org.codehaus.groovy.runtime.typehandling.GroovyCastException
 
-import org.pih.warehouse.core.http.ResponseBodyFormattable
+import org.pih.warehouse.core.http.HttpSerializable
 
 /**
  * Provides optional context around how some data might be grouped.
@@ -61,7 +61,7 @@ import org.pih.warehouse.core.http.ResponseBodyFormattable
  * be converted to a LinkedHashSet) or an additional DataGroup (for chaining groups) is allowed. Attempting to
  * put any other structure (such as a plain Map) will cause an error.
  */
-class DataGroup implements ResponseBodyFormattable {
+class DataGroup implements HttpSerializable {
 
     private HashMap<String, Object> group = [:]
 

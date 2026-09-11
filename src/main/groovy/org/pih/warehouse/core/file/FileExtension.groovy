@@ -12,6 +12,7 @@ enum FileExtension {
     DOC('doc'),
     DOCX('docx'),
     GIF('gif'),
+    HTML('html'),
     JPEG('jpeg'),
     JPG('jpg'),
     JSON('json'),
