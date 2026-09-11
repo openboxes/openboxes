@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { TableCell } from 'components/DataTable';
 import useIconsAfterLastLine from 'hooks/useIconsAfterLastLine';
 import useTranslate from 'hooks/useTranslate';
-import renderHandlingIcons from 'utils/product-handling-icons';
+import ProductHandlingIcons from 'utils/ProductHandlingIcons';
 
 import 'utils/cells/ProductNameCell.scss';
 
@@ -19,15 +19,16 @@ const ProductNameCell = React.memo(({
   const translate = useTranslate();
   const textRef = useRef(null);
   const iconsRef = useRef(null);
-  const handlingIcons = showHandlingIcons && renderHandlingIcons(product?.handlingIcons);
+  const handlingLabels = showHandlingIcons ? product?.handlingLabels : [];
+  const hasHandlingIcons = Boolean(handlingLabels?.length);
   const isClamped = Boolean(maxLines);
 
   useIconsAfterLastLine({
     textRef,
     iconsRef,
-    enabled: isClamped && Boolean(handlingIcons),
+    enabled: isClamped && hasHandlingIcons,
     content: product?.name,
-    iconsCount: product?.handlingIcons?.length,
+    iconsCount: handlingLabels?.length,
   });
 
   return (
@@ -39,15 +40,11 @@ const ProductNameCell = React.memo(({
           aria-label={translate(label, defaultLabel)}
         >
           {product?.name}
-          {handlingIcons && !isClamped && (
-            <span className="d-inline-flex align-middle">
-              {handlingIcons}
-            </span>
-          )}
+          {!isClamped && <ProductHandlingIcons handlingLabels={handlingLabels} />}
         </div>
-        {handlingIcons && isClamped && (
+        {hasHandlingIcons && isClamped && (
           <span ref={iconsRef} className="product-name__icons--pinned">
-            {handlingIcons}
+            <ProductHandlingIcons handlingLabels={handlingLabels} />
           </span>
         )}
       </div>
@@ -60,9 +57,9 @@ ProductNameCell.displayName = 'ProductNameCell';
 ProductNameCell.propTypes = {
   product: PropTypes.shape({
     name: PropTypes.string,
-    handlingIcons: PropTypes.arrayOf(PropTypes.shape({
-      icon: PropTypes.string,
-      color: PropTypes.string,
+    handlingLabels: PropTypes.arrayOf(PropTypes.shape({
+      labelCode: PropTypes.string,
+      labelText: PropTypes.string,
     })),
   }),
   label: PropTypes.string.isRequired,

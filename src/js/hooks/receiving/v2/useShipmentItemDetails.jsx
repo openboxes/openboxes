@@ -10,7 +10,7 @@ import { DateFormatDateFns } from 'consts/timeFormat';
 import useFormatNumber from 'hooks/useFormatNumber';
 import useTranslate from 'hooks/useTranslate';
 import { formatDateToString } from 'utils/dateUtils';
-import renderHandlingIcons from 'utils/product-handling-icons';
+import ProductHandlingIcons from 'utils/ProductHandlingIcons';
 import getShippedQuantityInPoUom from 'utils/receiving/getShippedQuantityInPoUom';
 
 /**
@@ -39,8 +39,6 @@ const useShipmentItemDetails = (lineItem) => {
     </>
   ) : quantityShipped;
 
-  const handlingIcons = renderHandlingIcons(lineItem?.product?.handlingIcons);
-
   const badge = {
     current: {
       label: translate('react.receiving.status.shipped.label', 'Shipped'),
@@ -55,9 +53,7 @@ const useShipmentItemDetails = (lineItem) => {
       value: (
         <>
           {lineItem?.product?.name}
-          {handlingIcons && (
-            <span className="d-inline-flex align-middle">{handlingIcons}</span>
-          )}
+          <ProductHandlingIcons handlingLabels={lineItem?.product?.handlingLabels} />
         </>
       ),
       // Each of these flags adds one optional field, the supplier item code and the bin

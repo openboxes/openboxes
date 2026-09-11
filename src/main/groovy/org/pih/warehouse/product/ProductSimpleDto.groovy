@@ -10,14 +10,14 @@ class ProductSimpleDto {
     String productCode
     String name
 
-    List<ProductHandlingIconDto> handlingIcons = []
+    List<ProductHandlingLabel> handlingLabels = []
 
     static ProductSimpleDto from(Product product) {
         return !product ? null : new ProductSimpleDto(
                 id: product.id,
                 productCode: product.productCode,
                 name: product.name,
-                handlingIcons: ProductHandlingIconDto.from(product),
+                handlingLabels: ProductHandlingLabel.of(product),
         )
     }
 }
