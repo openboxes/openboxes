@@ -82,7 +82,7 @@
                         <g:set var="lotEntries" value="${entry.value.picklistItemsByLot.entrySet().toList()}"/>
                         <g:set var="firstLot" value="${lotEntries[0]}"/>
                         <td>
-                            ${firstLot.value.quantity.sum()} ${product?.unitOfMeasure}
+                            ${firstLot.value.sum { it.quantityPicked ?: 0 }} ${product?.unitOfMeasure}
                         </td>
                         <td>
                             ${firstLot.key}
@@ -101,7 +101,7 @@
                         <tr class="${(status%2==0)?'even':'odd' } prop">
                             <td colspan="9"></td>
                             <td>
-                                ${piEntry.value.quantity.sum()} ${product?.unitOfMeasure}
+                                ${piEntry.value.sum { it.quantityPicked ?: 0 }} ${product?.unitOfMeasure}
                             </td>
                             <td>
                                 ${piEntry.key}
@@ -134,7 +134,7 @@
                     ${itemsMap.values()["quantityAllocated"].sum() ?: 0} ${product?.unitOfMeasure}
                 </td>
                 <td>
-                    ${itemsMap.values()["picklistItemsByLot"]*.values()["quantity"]?.flatten()?.sum() ?: 0} ${product?.unitOfMeasure}
+                    ${itemsMap.values()["picklistItemsByLot"]*.values()["quantityPicked"]?.flatten()?.sum { it ?: 0 } ?: 0} ${product?.unitOfMeasure}
                 </td>
                 <td></td>
             </tr>
