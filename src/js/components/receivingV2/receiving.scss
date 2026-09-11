@@ -38,27 +38,6 @@
   gap: 16px;
 }
 
-.receiving-product-name {
-  position: relative;
-
-  // Where the name is not clamped, the icons sit in its text flow, centred on the line.
-  &__icons {
-    display: inline-flex;
-    vertical-align: middle;
-  }
-
-  // In the table the icons are placed at the end of the last visible line of the clamped name,
-  // which only a measurement can tell - the cell positions them, the line they land on sizes them.
-  // Until then they sit in the room reserved for them at the end of the name.
-  &__icons--pinned {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    align-items: center;
-  }
-}
-
 .receiving-table {
   &--striped {
     .receiving-table__block--even {

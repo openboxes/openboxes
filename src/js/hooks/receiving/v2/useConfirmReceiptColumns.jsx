@@ -22,9 +22,9 @@ import useTranslate from 'hooks/useTranslate';
 import ActionsCell from 'utils/cells/ActionsCell';
 import ExpirationDateCell from 'utils/cells/ExpirationDateCell';
 import PackLevelCell from 'utils/cells/PackLevelCell';
+import ProductNameCell from 'utils/cells/ProductNameCell';
 import PackLevelGroupCell from 'utils/cells/receiving/PackLevelGroupCell';
 import ProductCodeCell from 'utils/cells/receiving/ProductCodeCell';
-import ProductNameCell from 'utils/cells/receiving/ProductNameCell';
 import ShippedQuantityCell from 'utils/cells/receiving/ShippedQuantityCell';
 import ValueCell from 'utils/cells/ValueCell';
 import { getConfirmReceiptRowActions } from 'utils/receiving/getReceivingRowActions';
@@ -217,6 +217,8 @@ const useConfirmReceiptColumns = ({
             <ProductNameCell
               product={item?.product}
               className={struckIfChanged(item?.rowType, item?.productChanged)}
+              label="react.receiving.product.label"
+              defaultLabel="Product"
               showHandlingIcons
               maxLines={3}
             />

@@ -56,7 +56,7 @@ const useShipmentItemDetails = (lineItem) => {
         <>
           {lineItem?.product?.name}
           {handlingIcons && (
-            <span className="receiving-product-name__icons">{handlingIcons}</span>
+            <span className="d-inline-flex align-middle">{handlingIcons}</span>
           )}
         </>
       ),

@@ -3,16 +3,18 @@ import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 
 import { TableCell } from 'components/DataTable';
-import useIconsAfterLastLine from 'hooks/receiving/v2/useIconsAfterLastLine';
+import useIconsAfterLastLine from 'hooks/useIconsAfterLastLine';
 import useTranslate from 'hooks/useTranslate';
 import renderHandlingIcons from 'utils/product-handling-icons';
+
+import 'utils/cells/ProductNameCell.scss';
 
 /**
  * The product name cell, optionally with the product's handling icons displayed after the name.
  * Given maxLines, cutting the name down to them, so the name ends with ellipsis.
  */
 const ProductNameCell = React.memo(({
-  product, className, showHandlingIcons, maxLines,
+  product, label, defaultLabel, className, showHandlingIcons, maxLines,
 }) => {
   const translate = useTranslate();
   const textRef = useRef(null);
@@ -30,21 +32,21 @@ const ProductNameCell = React.memo(({
 
   return (
     <TableCell className="rt-td multiline-cell" customTooltip tooltipLabel={product?.name}>
-      <div className="receiving-product-name">
+      <div className="product-name">
         <div
           ref={textRef}
           className={`${isClamped ? `limit-lines-${maxLines}` : ''} ${className}`}
-          aria-label={translate('react.receiving.product.label', 'Product')}
+          aria-label={translate(label, defaultLabel)}
         >
           {product?.name}
           {handlingIcons && !isClamped && (
-            <span className="receiving-product-name__icons">
+            <span className="d-inline-flex align-middle">
               {handlingIcons}
             </span>
           )}
         </div>
         {handlingIcons && isClamped && (
-          <span ref={iconsRef} className="receiving-product-name__icons--pinned">
+          <span ref={iconsRef} className="product-name__icons--pinned">
             {handlingIcons}
           </span>
         )}
@@ -63,6 +65,8 @@ ProductNameCell.propTypes = {
       color: PropTypes.string,
     })),
   }),
+  label: PropTypes.string.isRequired,
+  defaultLabel: PropTypes.string.isRequired,
   className: PropTypes.string,
   showHandlingIcons: PropTypes.bool,
   /** Number of lines the name is cut down to. Without it the name is displayed in full. */
