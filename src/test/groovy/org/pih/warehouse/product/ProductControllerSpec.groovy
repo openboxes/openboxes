@@ -26,9 +26,7 @@ class ProductControllerSpec extends Specification implements ControllerUnitTest<
         mockTagLib(ValidationTagLib)
         mockTagLib(MessageTagLib)
         if (!applicationContext.containsBean('productValidator')) {
-            applicationContext.beanFactory.registerSingleton('productValidator', Stub(ProductValidator) {
-                validate(_) >> true
-            })
+            applicationContext.beanFactory.registerSingleton('productValidator', new ProductValidator())
         }
     }
 
