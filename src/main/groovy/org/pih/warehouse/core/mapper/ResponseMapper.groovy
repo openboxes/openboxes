@@ -19,7 +19,7 @@ import org.springframework.core.GenericTypeResolver
  */
 trait ResponseMapper<Source> {
 
-    Class<Source> getSourceType() {
+    Class<Source> getSerializableSourceType() {
         return (Class<Source>) GenericTypeResolver.resolveTypeArgument(getClass(), ResponseMapper.class)
     }
 

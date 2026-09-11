@@ -2,6 +2,7 @@ package org.pih.warehouse.inventory
 
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
+import org.pih.warehouse.core.mapper.SmartMapper
 import org.pih.warehouse.location.BinLocationDto
 import org.pih.warehouse.location.FacilityDto
 import org.pih.warehouse.product.ProductSimpleDto
@@ -44,7 +45,7 @@ class CycleCountItemDto {
         return new CycleCountItemDto(
                 id: cycleCountItem.id,
                 facility: FacilityDto.from(cycleCountItem.facility),
-                product: ProductSimpleDto.from(cycleCountItem.product),
+                product: SmartMapper.mapStatic(cycleCountItem.product, ProductSimpleDto),
                 inventoryItem: cycleCountItem.inventoryItem,
                 binLocation: BinLocationDto.from(cycleCountItem.location),
                 countIndex: cycleCountItem.countIndex,

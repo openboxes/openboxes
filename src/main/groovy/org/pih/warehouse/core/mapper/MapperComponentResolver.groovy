@@ -21,7 +21,7 @@ class MapperComponentResolver {
 
     private void populateResponseMapperMap(List<ResponseMapper> responseMappers) {
         for (responseMapper in responseMappers) {
-            Class sourceType = responseMapper.sourceType
+            Class sourceType = responseMapper.serializableSourceType
             if (responseMappersBySourceType.containsKey(sourceType)) {
                 throw new RuntimeException(
                         "Found multiple response mappers for source type ${sourceType}. Only one is allowed.")

@@ -18,11 +18,21 @@ class ProductSimpleDtoMapperSpec extends Specification {
 
     void 'asResponseBody should name every handling label of the product'() {
         given:
+        List<ProductHandlingLabelDto> labels = [
+                new ProductHandlingLabelDto(
+                        labelCode: ProductHandlingLabel.COLD_CHAIN,
+                        labelText: "Cold chain",
+                ),
+                new ProductHandlingLabelDto(
+                        labelCode: ProductHandlingLabel.RECONDITIONED,
+                        labelText: "Reconditioned",
+                ),
+        ]
         ProductSimpleDto product = new ProductSimpleDto(
                 id: "1",
                 productCode: "PC1",
                 name: "Ibuprofen 200mg",
-                handlingLabels: [ProductHandlingLabel.COLD_CHAIN, ProductHandlingLabel.RECONDITIONED],
+                handlingLabels: labels,
         )
 
         when:
@@ -37,8 +47,8 @@ class ProductSimpleDtoMapperSpec extends Specification {
                 ProductHandlingLabel.RECONDITIONED,
         ]
         assert response.handlingLabels*.labelText == [
-                "product.coldChain.label",
-                "product.reconditioned.label",
+                "Cold chain",
+                "Reconditioned",
         ]
     }
 
@@ -47,6 +57,6 @@ class ProductSimpleDtoMapperSpec extends Specification {
         ProductSimpleDto product = new ProductSimpleDto(id: "1", name: "Ibuprofen 200mg")
 
         expect:
-        mapper.asResponseBody(product).handlingLabels.isEmpty()
+        assert mapper.asResponseBody(product).handlingLabels.isEmpty()
     }
 }

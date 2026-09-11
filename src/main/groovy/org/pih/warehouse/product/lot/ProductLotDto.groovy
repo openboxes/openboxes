@@ -4,6 +4,7 @@ import java.time.LocalDate
 
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.date.LocalDateParser
+import org.pih.warehouse.core.mapper.SmartMapper
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.LotStatusCode
 import org.pih.warehouse.product.ProductSimpleDto
@@ -24,7 +25,7 @@ class ProductLotDto {
 
     static ProductLotDto from(InventoryItem inventoryItem) {
         return !inventoryItem ? null : new ProductLotDto(
-                product: ProductSimpleDto.from(inventoryItem.product),
+                product: SmartMapper.mapStatic(inventoryItem.product, ProductSimpleDto),
                 lotNumber: inventoryItem.lotNumber,
                 // InventoryItem.expirationDate is a (legacy) java.util.Date. Resolve it to a calendar date in the
                 // system zone, mirroring how the InventoryItem JSON marshaller formats it (MM/dd/yyyy, system zone).

@@ -1,10 +1,17 @@
 package org.pih.warehouse.product
 
 /**
- * One of a product's handling labels in an API response: the label itself and its name
+ * A handling label that can be associated with a product.
  */
 class ProductHandlingLabelDto {
 
+    /**
+     * Identifies the label.
+     */
     ProductHandlingLabel labelCode
+
+    /**
+     * The display text for the label.
+     */
     String labelText
 }

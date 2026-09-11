@@ -1,7 +1,10 @@
 package org.pih.warehouse.product
 
 /**
- * A handling flag of a product.
+ * Represents the different types of handling labels that a product can be associated with.
+ *
+ * Since these labels have logic associated with them baked into the code (via fields on the Product), we keep them
+ * as an enum. Eventually these should be migrated to be a domain entity so that they can be fully customizable.
  */
 enum ProductHandlingLabel {
 
@@ -10,11 +13,13 @@ enum ProductHandlingLabel {
     HAZARDOUS_MATERIAL("product.hazardousMaterial.label"),
     RECONDITIONED("product.reconditioned.label")
 
-    /** Code of the message naming */
-    final String messageCode
+    /**
+     * Localization code representing the display text for the label.
+     * */
+    final String labelTextCode
 
-    ProductHandlingLabel(String messageCode) {
-        this.messageCode = messageCode
+    ProductHandlingLabel(String labelTextCode) {
+        this.labelTextCode = labelTextCode
     }
 
     /**
