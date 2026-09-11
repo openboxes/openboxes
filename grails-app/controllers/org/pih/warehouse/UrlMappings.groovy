@@ -190,6 +190,11 @@ class UrlMappings {
             action = [POST: "importBinLocations"]
         }
 
+        "/api/facilities/$facilityId/availableItems" {
+            controller = { "productAvailabilityApi" }
+            action = [GET: "list"]
+        }
+
         "/api/locations/template" {
             controller = { "locationApi" }
             action = [GET: "downloadTemplate"]
