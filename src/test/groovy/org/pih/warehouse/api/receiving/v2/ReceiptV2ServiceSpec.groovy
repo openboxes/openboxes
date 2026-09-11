@@ -19,6 +19,8 @@ import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.core.localization.MessageLocalizer
+import org.pih.warehouse.core.mapper.SmartMapper
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryItemManager
@@ -121,6 +123,11 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         transferInType.id = Constants.TRANSFER_IN_TRANSACTION_TYPE_ID
         GroovySpy(TransactionType, global: true)
         TransactionType.get(_) >> transferInType
+
+        // When converting to DTOs, if a field has a Mapper component defined (which we access via the smart mapper),
+        // ignore the result of mapping that field. We assume that component will specify its own tests.
+        GroovyMock(SmartMapper, global: true)
+        SmartMapper.mapStatic(*_) >> { return null }
     }
 
     // ----------------------------------------------------------------------------------------------------------
