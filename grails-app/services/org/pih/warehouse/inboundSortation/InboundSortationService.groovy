@@ -5,10 +5,12 @@ import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.api.PutawayTaskStatus
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.CommentType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.putaway.PutawayTask
@@ -23,6 +25,7 @@ class InboundSortationService {
     def orderIdentifierService
     def putawayService
     def messageSource
+    UserService userService
     PutawayStrategyService putawayStrategyService
 
     void createPutawayOrdersFromReceipt(Receipt receipt) {
@@ -51,12 +54,18 @@ class InboundSortationService {
     }
 
     void rerunPutawayStrategy(PutawayTask task) {
-        // 1. Validate PENDING only
-        if (task.status != PutawayTaskStatus.PENDING) {
-            throw new IllegalStateException("Can only rerun strategy on PENDING putaway tasks")
+        // 1. Validate PENDING or IN_PROGRESS only
+        if (task.status != PutawayTaskStatus.PENDING && task.status != PutawayTaskStatus.IN_PROGRESS) {
+            throw new IllegalStateException("Can only rerun strategy on PENDING or IN_PROGRESS putaway tasks")
         }
 
-        // 2. Build PutawayContext from existing task
+        // 2. Rerunning the strategy for an in-progress task (i.e. one already scanned into a
+        //    putaway container) is a superuser-only action since it can move the item's destination.
+        if (task.status == PutawayTaskStatus.IN_PROGRESS && !userService.isSuperuser(AuthService.currentUser)) {
+            throw new IllegalStateException("Only a superuser can rerun the putaway strategy for an in-progress putaway task")
+        }
+
+        // 3. Build PutawayContext from existing task
         PutawayContext context = new PutawayContext(
                 facility: task.facility,
                 product: task.product,
@@ -72,14 +81,18 @@ class InboundSortationService {
                 deliveryTypeCode: task.deliveryTypeCode,
         )
 
-        // 3. Execute strategy chain
+        // 4. Execute strategy chain
         List<PutawayResult> results = putawayStrategyService.execute(context)
         PutawayResult result = results?.find { it.quantity > 0 }
 
-        // 4. Update existing order item with new strategy results
+        // 5. Update existing order item with new strategy results. For an in-progress task the
+        //    item has already been physically scanned into a container, so only the destination
+        //    is reassigned -- the container it's already sitting in must not change.
         OrderItem orderItem = OrderItem.get(task.putawayOrderItem.id)
         orderItem.destinationBinLocation = result?.destination
-        orderItem.containerLocation = result?.container
+        if (task.status == PutawayTaskStatus.PENDING) {
+            orderItem.containerLocation = result?.container
+        }
         orderItem.description = result?.comment
         orderItem.save(failOnError: true)
     }
