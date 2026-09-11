@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter
 import org.springframework.stereotype.Component
 
 import org.pih.warehouse.DateUtil
+import org.pih.warehouse.core.formatter.Formatter
 
 /**
  * A formatter that converts Date objects to Strings.
@@ -23,7 +24,7 @@ import org.pih.warehouse.DateUtil
  * (after the refactor the DateFormatterContext wont be needed so it'll just be dateFormatter.format(date)).
  */
 @Component
-class JavaUtilDateFormatter implements IDateFormatter<Date> {
+class JavaUtilDateFormatter extends Formatter<Date, DateFormatterContext> {
 
     private static final String EMPTY_DISPLAY_DATE = ''
 
@@ -31,7 +32,13 @@ class JavaUtilDateFormatter implements IDateFormatter<Date> {
     private static final DateTimeFormatter DEFAULT_DISPLAY_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MMM/yyyy HH:mm:ss XXX")
     private static final DateTimeFormatter DEFAULT_DISPLAY_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss")
 
-    String format(Date date, DateFormatterContext context=null) {
+    @Override
+    boolean isDefaultFormatterForType() {
+        return true
+    }
+
+    @Override
+    String doFormat(Date date, DateFormatterContext context=null) {
         switch (context?.displayStyleOverride) {
             case DateDisplayStyle.DATE_TIME:
             case DateDisplayStyle.DATE_TIME_ZONE:

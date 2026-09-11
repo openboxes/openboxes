@@ -10,14 +10,22 @@ import org.springframework.stereotype.Component
 @Component
 class ZonedDateTimeFormatter extends AbstractDateFormatter<ZonedDateTime> {
 
+    @Override
+    boolean isDefaultFormatterForType() {
+        return true
+    }
+
+    @Override
     DateTimeFormatter getJsonFormatter() {
         return DateTimeFormatter.ISO_OFFSET_DATE_TIME
     }
 
+    @Override
     DateTimeFormatter getGspFormatter() {
         return getFormatterFromDisplayStyle(DateDisplayStyle.DATE_TIME)
     }
 
+    @Override
     DateTimeFormatter getCsvFormatter() {
         // TODO: Preserve the existing display format until we can start the date refactor (scheduled for 0.9.7).
         //       Once we decide on a format/style to use for CSVs, update this line.
@@ -30,6 +38,7 @@ class ZonedDateTimeFormatter extends AbstractDateFormatter<ZonedDateTime> {
         //return DateTimeFormatter.ISO_OFFSET_DATE_TIME
     }
 
+    @Override
     DateTimeFormatter getFileNameFormatter() {
         return DateTimeFormatter.ofPattern('yyyyMMdd-HHmmss')
     }
