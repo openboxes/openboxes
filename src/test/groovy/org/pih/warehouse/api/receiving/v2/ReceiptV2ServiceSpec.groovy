@@ -37,12 +37,14 @@ import org.pih.warehouse.receiving.ReceiptIdentifierService
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptItemCompleteRequest
 import org.pih.warehouse.receiving.ReceiptItemEditReceivingInfoRequest
+import org.pih.warehouse.receiving.ReceiptItemFactory
 import org.pih.warehouse.receiving.ReceiptService
 import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.receiving.ReceiptSynchronizer
 import org.pih.warehouse.receiving.ReceiptV2Marker
 import org.pih.warehouse.receiving.ShipmentForReceiptValidator
 import org.pih.warehouse.receiving.ShipmentItemReceivedQuantitiesDto
+import org.pih.warehouse.receiving.ShipmentReceivingCalculator
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentService
@@ -66,6 +68,10 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
     ReceiptService receiptService
     MessageLocalizer messageLocalizer
     ApplicationContext mainContext
+    // The real factory and calculator, shared with the synchronizer and the validator below - the lines they write
+    // and the receiving math they compute are what these tests assert.
+    ReceiptItemFactory receiptItemFactory
+    ShipmentReceivingCalculator shipmentReceivingCalculator
 
     void setupSpec() {
         mockDomains(Receipt, ReceiptItem, ReceiptV2Marker, Shipment, ShipmentItem, ShipmentType, Transaction,
@@ -86,15 +92,24 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
             localize(_ as ObjectError) >> { ObjectError error -> error.code }
         }
 
+        receiptItemFactory = new ReceiptItemFactory()
+        shipmentReceivingCalculator = new ShipmentReceivingCalculator()
+
         service.messageLocalizer = messageLocalizer
-        service.shipmentForReceiptValidator = new ShipmentForReceiptValidator()
+        service.receiptItemFactory = receiptItemFactory
+        service.shipmentReceivingCalculator = shipmentReceivingCalculator
+        service.shipmentForReceiptValidator =
+                new ShipmentForReceiptValidator(shipmentReceivingCalculator: shipmentReceivingCalculator)
         service.shipmentService = shipmentService
         service.transactionIdentifierService = transactionIdentifierService
         service.inventoryItemManager = inventoryItemManager
         service.receiptIdentifierService = receiptIdentifierService
         service.receiptService = receiptService
         // The real synchronizer, on the same mocked receipt service - the sync is asserted through the endpoint.
-        service.receiptSynchronizer = new ReceiptSynchronizer(receiptService: receiptService)
+        service.receiptSynchronizer = new ReceiptSynchronizer(
+                receiptService: receiptService,
+                receiptItemFactory: receiptItemFactory,
+                shipmentReceivingCalculator: shipmentReceivingCalculator)
         service.grailsApplication = Stub(GrailsApplication) {
             getMainContext() >> mainContext
         }

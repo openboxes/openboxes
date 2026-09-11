@@ -22,11 +22,17 @@ class ReceiptSynchronizer {
     @Autowired
     ReceiptService receiptService  // Inject old receipt service to reuse bin creation logic
 
+    @Autowired
+    ReceiptItemFactory receiptItemFactory
+
+    @Autowired
+    ShipmentReceivingCalculator shipmentReceivingCalculator
+
     /**
      * Syncs the lines of a pending receipt with what its shipment currently has left to receive, by:
      *  1. creating the original line (isSplitItem: false) of every still-receivable shipment item that has none,
      *     exactly as a receipt being started gets them: empty, carrying the shipment item's full quantity shipped
-     *     (see {@link ReceiptV2Service#createReceiptItemFromShipmentItem}),
+     *     (see {@link ReceiptItemFactory#createReceiptItemFromShipmentItem}),
      *  2. re-allocating the quantities shipped of its lines to the v2 convention (see
      *     {@link #reallocateQuantitiesShipped}).
      * Quantities already received are never touched, and neither are shipment items that previous receipts have
@@ -51,7 +57,7 @@ class ReceiptSynchronizer {
      * (see {@link ReceiptItem#isOriginalLine}) on the given receipt - the lines {@link #syncLines} has to create.
      *
      * Shipment items already consumed by previous receipts are left out: they are expected to have no line at all
-     * (see {@link ReceiptV2Service#createReceiptItemFromShipmentItem}), so a missing line there says nothing about
+     * (see {@link ReceiptItemFactory#createReceiptItemFromShipmentItem}), so a missing line there says nothing about
      * which workflow wrote the receipt.
      */
     private Set<ShipmentItem> findShipmentItemsMissingOriginalLine(Shipment shipment, Receipt receipt) {
@@ -64,13 +70,14 @@ class ReceiptSynchronizer {
         return shipment.shipmentItems.findAll { ShipmentItem shipmentItem ->
             List<ReceiptItem> receiptItems = linesByShipmentItemId.get(shipmentItem.id)
             boolean hasOriginalLine = receiptItems?.any { ReceiptItem line -> line.isOriginalLine() }
-            return !hasOriginalLine && ReceiptV2Service.getShipmentItemQuantityRemaining(shipmentItem) > 0
+            return !hasOriginalLine &&
+                    shipmentReceivingCalculator.getShipmentItemQuantityRemaining(shipmentItem) > 0
         } as Set<ShipmentItem>
     }
 
     /**
      * Creates the original line of each of the given shipment items on the receipt, all sharing the shipment's
-     * temporary receiving bin (see {@link ReceiptV2Service#createReceiptItemFromShipmentItem}). Creating the bin is
+     * temporary receiving bin (see {@link ReceiptItemFactory#createReceiptItemFromShipmentItem}). Creating the bin is
      * left to the point where there is a line to put in it, so a receipt with nothing missing is untouched.
      */
     private void createMissingReceiptItems(
@@ -81,7 +88,7 @@ class ReceiptSynchronizer {
 
         Location receivingBin = receiptService.createTemporaryReceivingBin(shipment)
         for (ShipmentItem shipmentItem : shipmentItemsMissingOriginalLine) {
-            ReceiptV2Service.createReceiptItemFromShipmentItem(receipt, shipmentItem, receivingBin)
+            receiptItemFactory.createReceiptItemFromShipmentItem(receipt, shipmentItem, receivingBin)
         }
     }
 
