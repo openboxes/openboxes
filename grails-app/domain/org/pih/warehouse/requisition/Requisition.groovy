@@ -183,6 +183,8 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
     Boolean partialIssuanceAllowed
     Boolean autoIssuanceRequested
 
+    Boolean negativeInventoryAllowed
+
     AllocationSourceStrategy allocationSourceStrategy
 
     // Removed comments, documents, events for the time being.
@@ -288,6 +290,7 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
         partialIssuanceAllowed(nullable: true)
         allocationSourceStrategy(nullable: true)
         autoIssuanceRequested(nullable: true)
+        negativeInventoryAllowed(nullable: true)
     }
 
     Comment getRecentComment() {
@@ -649,6 +652,7 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
                 partialIssuanceAllowed  : partialIssuanceAllowed,
                 allocationSourceStrategy      : allocationSourceStrategy?.name(),
                 autoIssuanceRequested     : autoIssuanceRequested,
+                negativeInventoryAllowed: negativeInventoryAllowed,
         ]
     }
 
@@ -673,6 +677,7 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
             partialIssuanceAllowed: partialIssuanceAllowed,
             allocationSourceStrategy: allocationSourceStrategy?.name(),
             autoIssuanceRequested: autoIssuanceRequested,
+            negativeInventoryAllowed: negativeInventoryAllowed,
         ]
     }
 }

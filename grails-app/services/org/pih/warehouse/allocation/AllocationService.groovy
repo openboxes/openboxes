@@ -355,7 +355,7 @@ class AllocationService {
 
         // No location holds enough, so rather than abandon the order we take whatever stock exists and record
         // the rest against a location permitted to go negative or the facility's fallback location
-        if (isFallbackApplicable(allocationMode, facility)) {
+        if (isFallbackApplicable(allocationMode, facility, requisitionItem.requisition)) {
             List<SuggestedItem> fallbackItems =
                     getFallbackSuggestedItems(requisitionItem, quantityRequired, bestStrategy, bestItems)
             if (fallbackItems != null) {
@@ -368,10 +368,15 @@ class AllocationService {
 
     /**
      * Checks if fallback allocation approach is allowed. It should be applicable for auto allocations and
-     * for facilities that allow it
+     * only when both the order and the facility permit it
      */
-    private static boolean isFallbackApplicable(AllocationMode allocationMode, Location facility) {
+    private static boolean isFallbackApplicable(AllocationMode allocationMode, Location facility,
+                                                Requisition requisition) {
         if (allocationMode != AllocationMode.AUTO) {
+            return false
+        }
+
+        if (!requisition?.negativeInventoryAllowed) {
             return false
         }
 
