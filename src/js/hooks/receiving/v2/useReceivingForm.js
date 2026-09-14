@@ -1,5 +1,5 @@
 import {
-  useCallback, useEffect, useRef,
+  useCallback, useEffect, useMemo, useRef,
 } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,8 +16,10 @@ import useReceivingActions from 'hooks/receiving/v2/useReceivingActions';
 import useReceivingBinLocations from 'hooks/receiving/v2/useReceivingBinLocations';
 import useReceivingColumns from 'hooks/receiving/v2/useReceivingColumns';
 import useReceivingFilters from 'hooks/receiving/v2/useReceivingFilters';
+import useReceivingNextValidation from 'hooks/receiving/v2/useReceivingNextValidation';
+import useReceivingSort from 'hooks/receiving/v2/useReceivingSort';
 import useTableLocationAutofill from 'hooks/receiving/v2/useTableLocationAutofill';
-import useTableSorting from 'hooks/useTableSorting';
+import getOptionalColumnsVisibility from 'utils/receiving/getOptionalColumnsVisibility';
 import hasItemInDifferentBin from 'utils/receiving/hasItemInDifferentBin';
 
 const useReceivingForm = () => {
@@ -29,9 +31,10 @@ const useReceivingForm = () => {
   const receivingBin = useSelector(getReceivingBin);
   const binLocations = useSelector(getReceivingBinLocations);
   const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
+  // The sorting is shared with the check step, so it survives moving on from here.
   const {
     sortableProps, sort, order, resetSort,
-  } = useTableSorting();
+  } = useReceivingSort();
   const {
     loading,
     receiptId,
@@ -54,16 +57,20 @@ const useReceivingForm = () => {
     }
     dispatch(updateReceivingPutawayEnabled(receiptId, enabled));
   }, [dispatch, receiptId]);
-  useReceivingBinLocations();
+  useReceivingBinLocations({ receiptId });
   const {
     visibleLineItemsState,
     updateFilterParams,
     clearFilterParams,
   } = useReceivingFilters({ lineItemsState });
+
+  const { isNextDisabled, validateBeforeNext } = useReceivingNextValidation({ lineItemsState });
+
   const { onLocationAutofill } = useTableLocationAutofill({
     lineItemsState: visibleLineItemsState,
     updateLineItems,
   });
+
   const autofillVisibleQuantities = useCallback(
     () => autofillQuantities(visibleLineItemsState),
     [autofillQuantities, visibleLineItemsState],
@@ -83,12 +90,19 @@ const useReceivingForm = () => {
       setPutawayEnabled(true);
     }
   }, [lineItemsState, receivingBin, binLocations]);
+  // Optional columns are read from the full state, so filtering the table down to rows
+  // without a lot or a recipient does not collapse their columns.
+  const columnsVisibility = useMemo(
+    () => getOptionalColumnsVisibility(lineItemsState),
+    [lineItemsState],
+  );
   const { columns } = useReceivingColumns({
     view,
     putawayEnabled,
     sortableProps,
     sort,
     order,
+    ...columnsVisibility,
   });
 
   return {
@@ -96,11 +110,18 @@ const useReceivingForm = () => {
     setView,
     putawayEnabled,
     setPutawayEnabled,
+    showPackLevel: columnsVisibility.showPackLevel,
     table: {
       lineItemsState: visibleLineItemsState,
       columns,
       sort,
       order,
+    },
+    next: {
+      // Nothing is known about the lines until the receipt is loaded, so the transition waits
+      // for it - otherwise the validation would run on an empty table.
+      isNextDisabled: loading || isNextDisabled,
+      validateBeforeNext,
     },
     actions: {
       loading,

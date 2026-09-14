@@ -35,7 +35,7 @@ const WizardPageLayout = ({
   className,
   children,
 }) => (
-  <PageWrapper className={className}>
+  <PageWrapper className={`mb-3 ${className}`}>
     <Section showTitle={false} className="mt-4 wizard-page-section">
       <WizardPageHeader label={label} info={info} status={status} />
     </Section>

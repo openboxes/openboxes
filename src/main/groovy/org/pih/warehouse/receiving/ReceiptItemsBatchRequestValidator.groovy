@@ -7,10 +7,10 @@ import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.core.validation.ObjectValidator
 
 @Component
-class ReceiptItemsBatchRequestValidator implements ObjectValidator<ReceiptItemsBatchRequest> {
+class ReceiptItemsBatchRequestValidator extends ObjectValidator<ReceiptItemsBatchRequest> {
 
     @Override
-    ObjectValidationResult doValidate(ReceiptItemsBatchRequest request) {
+    protected ObjectValidationResult doValidate(ReceiptItemsBatchRequest request) {
         return new ObjectValidationResult(
                 validateReceiptIsPending(request),
                 validateItemsToSaveAreValid(request),

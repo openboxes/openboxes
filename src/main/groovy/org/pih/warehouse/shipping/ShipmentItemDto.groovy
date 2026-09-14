@@ -13,13 +13,14 @@ class ShipmentItemDto implements IdentifiableDto {
     Integer quantity
     String recipientId
     String donorId
+    String supplierCode
     ContainerSimpleDto container
     String unitOfMeasure
     BigDecimal packSize
     Date dateCreated
     Date lastUpdated
-
-    static ShipmentItemDto from(ShipmentItem shipmentItem) {
+    
+    static ShipmentItemDto from(ShipmentItem shipmentItem, String supplierCode = null) {
         return !shipmentItem ? null : new ShipmentItemDto(
                 id: shipmentItem.id,
                 shipmentId: shipmentItem.shipmentId,
@@ -29,6 +30,7 @@ class ShipmentItemDto implements IdentifiableDto {
                 quantity: shipmentItem.quantity,
                 recipientId: shipmentItem.recipient?.id,
                 donorId: shipmentItem.donorId,
+                supplierCode: supplierCode,
                 container: ContainerSimpleDto.from(shipmentItem.container),
                 unitOfMeasure: shipmentItem.unitOfMeasure,
                 packSize: shipmentItem.packSize,

@@ -10,21 +10,39 @@ import useTranslate from 'hooks/useTranslate';
  * Memoized cell rendering a dropdown.
  */
 const SelectCell = React.memo(({
-  options, value, onChange, label, defaultLabel, placeholder, disabled,
+  options,
+  value,
+  onChange,
+  label,
+  defaultLabel,
+  placeholder,
+  disabled,
+  selectFieldComponent: SelectFieldComponent,
+  labelKey,
+  locationId,
+  async,
+  loadOptions,
+  showValueTooltip,
+  onBlur,
 }) => {
   const translate = useTranslate();
 
   return (
     <TableCell className="rt-td">
       <div className="w-100" aria-label={translate(label, defaultLabel)}>
-        <SelectField
+        <SelectFieldComponent
           options={options}
           value={value}
           onChange={onChange}
-          labelKey="name"
+          labelKey={labelKey}
           placeholder={placeholder}
           disabled={disabled}
           hideErrorMessageWrapper
+          locationId={locationId}
+          async={async}
+          loadOptions={loadOptions}
+          showValueTooltip={showValueTooltip}
+          onBlur={onBlur}
         />
       </div>
     </TableCell>
@@ -41,6 +59,13 @@ SelectCell.propTypes = {
   defaultLabel: PropTypes.string.isRequired,
   placeholder: PropTypes.string,
   disabled: PropTypes.bool,
+  selectFieldComponent: PropTypes.elementType,
+  labelKey: PropTypes.string,
+  locationId: PropTypes.string,
+  async: PropTypes.bool,
+  loadOptions: PropTypes.func,
+  showValueTooltip: PropTypes.bool,
+  onBlur: PropTypes.func,
 };
 
 SelectCell.defaultProps = {
@@ -49,6 +74,13 @@ SelectCell.defaultProps = {
   onChange: undefined,
   placeholder: '',
   disabled: false,
+  selectFieldComponent: SelectField,
+  labelKey: 'name',
+  locationId: null,
+  async: false,
+  loadOptions: () => [],
+  showValueTooltip: false,
+  onBlur: undefined,
 };
 
 export default SelectCell;

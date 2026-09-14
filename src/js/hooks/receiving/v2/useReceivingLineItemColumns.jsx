@@ -3,7 +3,7 @@ import React, { useCallback, useMemo } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
-import { RiDeleteBinLine } from 'react-icons/ri';
+import { RiAddCircleLine, RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import {
   getCurrentLocationId,
@@ -16,13 +16,15 @@ import {
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
-import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
+import TotalStatusFooter from 'components/receivingV2/editModal/TotalStatusFooter';
 import LocationAutofillHeader from 'components/receivingV2/LocationAutofillHeader';
 import receivingColumns from 'consts/receivingColumns';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
+import ProductSelectCell from 'utils/cells/ProductSelectCell';
 import QuantityInputCell from 'utils/cells/QuantityInputCell';
+import SelectCell from 'utils/cells/SelectCell';
 import { debouncePeopleFetch } from 'utils/option-utils';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
@@ -31,11 +33,18 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 // completion) - receiving a different product or lot is done on a split row.
 const isOriginalLine = (row) => !row.original?.isSplitItem;
 
+// Rendered in the footer of the column right after Receiving now, which is Location when bin
+// location support is on, otherwise Actions.
+const totalStatusFooter = ({ table }) => (
+  <TotalStatusFooter remainingToReceive={table.options.meta?.remainingToReceive} />
+);
+
 /**
  * Columns for the editable "Receiving now" table in the edit modal.
  */
 const useReceivingLineItemColumns = ({
   control,
+  addRow,
   removeRow,
   onLocationAutofill,
   errors,
@@ -61,25 +70,35 @@ const useReceivingLineItemColumns = ({
         </TableHeaderCell>
       ),
       cell: ({ row }) => (
-        <TableCell className="rt-td">
-          <Controller
-            key={row.original.rowId}
-            name={`lineItems.${row.index}.product`}
-            control={control}
-            render={({ field }) => (
-              <SelectField
-                {...field}
-                productSelect
-                locationId={locationId}
-                disabled={isOriginalLine(row)}
-                hideErrorMessageWrapper
-                ariaLabel={{ id: 'react.receiving.product.label', defaultMessage: 'Product' }}
-              />
-            )}
-          />
-        </TableCell>
+        <Controller
+          key={row.original.rowId}
+          name={`lineItems.${row.index}.product`}
+          control={control}
+          render={({ field }) => (
+            <ProductSelectCell
+              {...field}
+              locationId={locationId}
+              disabled={isOriginalLine(row)}
+              label="react.receiving.product.label"
+              defaultLabel="Product"
+            />
+          )}
+        />
       ),
-      footer: () => translate('react.receiving.totalReceivingNow.label', 'Total Receiving Now'),
+      footer: () => (
+        <>
+          <button
+            type="button"
+            className="receiving-edit-modal__add-record d-flex align-items-center gap-8 border-0 bg-transparent cursor-pointer font-size-xs"
+            data-testid="add-new-record"
+            onClick={addRow}
+          >
+            <RiAddCircleLine size={18} />
+            {translate('react.receiving.addNewRecord.label', 'Add new record')}
+          </button>
+          {translate('react.receiving.totalReceivingNow.label', 'Total Receiving Now')}
+        </>
+      ),
       size: 220,
     }),
     columnHelper.accessor(receivingColumns.LOT_NUMBER, {
@@ -141,23 +160,21 @@ const useReceivingLineItemColumns = ({
         </TableHeaderCell>
       ),
       cell: ({ row }) => (
-        <TableCell className="rt-td">
-          <Controller
-            key={row.original.rowId}
-            name={`lineItems.${row.index}.recipient`}
-            control={control}
-            render={({ field }) => (
-              <SelectField
-                {...field}
-                async
-                loadOptions={debouncedPeopleFetch}
-                hideErrorMessageWrapper
-                showValueTooltip
-                ariaLabel={{ id: 'react.receiving.recipient.label', defaultMessage: 'Recipient' }}
-              />
-            )}
-          />
-        </TableCell>
+        <Controller
+          key={row.original.rowId}
+          name={`lineItems.${row.index}.recipient`}
+          control={control}
+          render={({ field }) => (
+            <SelectCell
+              {...field}
+              async
+              loadOptions={debouncedPeopleFetch}
+              showValueTooltip
+              label="react.receiving.recipient.label"
+              defaultLabel="Recipient"
+            />
+          )}
+        />
       ),
       size: 150,
     }),
@@ -201,22 +218,21 @@ const useReceivingLineItemColumns = ({
       columnHelper.accessor(receivingColumns.LOCATION, {
         header: () => <LocationAutofillHeader onSelect={onLocationAutofill} />,
         cell: ({ row }) => (
-          <TableCell className="rt-td">
-            <Controller
-              key={row.original.rowId}
-              name={`lineItems.${row.index}.binLocation`}
-              control={control}
-              render={({ field }) => (
-                <SelectField
-                  {...field}
-                  options={binLocationOptions}
-                  hideErrorMessageWrapper
-                  ariaLabel={{ id: 'react.receiving.location.label', defaultMessage: 'Location' }}
-                />
-              )}
-            />
-          </TableCell>
+          <Controller
+            key={row.original.rowId}
+            name={`lineItems.${row.index}.binLocation`}
+            control={control}
+            render={({ field }) => (
+              <SelectCell
+                {...field}
+                options={binLocationOptions}
+                label="react.receiving.location.label"
+                defaultLabel="Location"
+              />
+            )}
+          />
         ),
+        footer: totalStatusFooter,
         size: 150,
       }),
     ] : []),
@@ -254,11 +270,13 @@ const useReceivingLineItemColumns = ({
           </TableCell>
         );
       },
+      footer: hasBinLocationSupport ? undefined : totalStatusFooter,
       size: hasBinLocationSupport ? 130 : 108,
     }),
   ], [
     translate,
     control,
+    addRow,
     locationId,
     debouncedPeopleFetch,
     removeRow,
@@ -273,6 +291,7 @@ const useReceivingLineItemColumns = ({
 
 useReceivingLineItemColumns.propTypes = {
   control: PropTypes.shape({}).isRequired,
+  addRow: PropTypes.func.isRequired,
   removeRow: PropTypes.func.isRequired,
   onLocationAutofill: PropTypes.func.isRequired,
   errors: PropTypes.shape({}),

@@ -16,6 +16,7 @@ const useEditLineItemSave = ({
   getLineItems,
   loadReceipt,
   onClose,
+  confirmExpirationDateChange,
 }) => {
   const dispatch = useDispatch();
 
@@ -39,6 +40,12 @@ const useEditLineItemSave = ({
 
     if (!payload.itemsToSave.length && !itemsToDelete.length) {
       onClose();
+      return;
+    }
+    // Saving a lot that is already in inventory updates its expiration date in every depot, so
+    // the user confirms it first. Canceling leaves the edit modal open with the entered values.
+    const isExpiryChangeConfirmed = await confirmExpirationDateChange(lineItems);
+    if (!isExpiryChangeConfirmed) {
       return;
     }
 
@@ -66,6 +73,7 @@ const useEditLineItemSave = ({
     loadReceipt,
     onClose,
     dispatch,
+    confirmExpirationDateChange,
   ]);
 
   return { onSave };

@@ -112,8 +112,10 @@ class BulkDataValidator {
             return []
         }
 
+        List<BulkDataError> errors = []
+
         // We provide two hook-ins for configuring custom validation. One for validating across rows...
-        List<BulkDataError> errors = configuresValidator.customValidateAcrossRows(rows)?.allErrors ?: []
+        errors.addAll(configuresValidator.customValidateAcrossRows(rows)?.allErrors ?: [])
 
         // And one for validating rows individually.
         errors.addAll(customValidateEachRow(configuresValidator, rows))

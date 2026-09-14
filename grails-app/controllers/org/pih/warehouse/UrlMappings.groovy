@@ -160,6 +160,11 @@ class UrlMappings {
             action = [GET: "getLotNumbersWithExpirationDate"]
         }
 
+        "/api/products/inventoryItems/getAvailabilityInAllDepots" {
+            controller = { "productApi" }
+            action = [POST: "getAvailabilityInAllDepots"]
+        }
+
         "/api/facilities/$facilityId/products/classifications" {
             controller = "productClassificationApi"
             action = [GET: "list"]
@@ -441,6 +446,11 @@ class UrlMappings {
         "/api/receipts/v2/shipment/$shipmentId/start" {
             controller = "receiptApi"
             action = [POST: "start"]
+        }
+
+        "/api/receipts/v2/shipment/$shipmentId/sync" {
+            controller = "receiptApi"
+            action = [POST: "syncReceiptLines"]
         }
 
         "/api/receipts/v2/shipment/$shipmentId" {
@@ -1188,6 +1198,11 @@ class UrlMappings {
         "/api/inventories/expirationHistoryReport" {
             controller = { "inventoryApi" }
             action = [GET: "getExpirationHistoryReport"]
+        }
+
+        "/api/bulkData/import" {
+            controller = { "importApi" }
+            action = [POST: "importData"]
         }
 
         // Error handling

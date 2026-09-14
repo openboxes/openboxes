@@ -1,5 +1,9 @@
 import { useSelector } from 'react-redux';
-import { getCurrentLocale, getReceivingShipmentDetails } from 'selectors';
+import {
+  getCurrentLocale,
+  getHasPartialReceivingSupport,
+  getReceivingShipmentDetails,
+} from 'selectors';
 
 import SHIPMENT_STATUS_BADGES from 'consts/shipmentStatusBadges';
 import { DateFormatDateFns } from 'consts/timeFormat';
@@ -12,6 +16,7 @@ import { formatDateToString, getDateFnsLocale } from 'utils/dateUtils';
 const useConfirmReceiptDetails = () => {
   const translate = useTranslate();
   const currentLocale = useSelector(getCurrentLocale);
+  const hasPartialReceivingSupport = useSelector(getHasPartialReceivingSupport);
   const {
     origin,
     destination,
@@ -19,7 +24,9 @@ const useConfirmReceiptDetails = () => {
     shipmentStatus,
   } = useSelector(getReceivingShipmentDetails);
 
-  const statusBadge = SHIPMENT_STATUS_BADGES[shipmentStatus];
+  // A location without partial receiving support takes the shipment from shipped straight to
+  // received, so there is no status progression worth badging.
+  const statusBadge = hasPartialReceivingSupport ? SHIPMENT_STATUS_BADGES[shipmentStatus] : null;
   const badge = statusBadge && {
     current: {
       label: translate(statusBadge.label, statusBadge.defaultLabel),

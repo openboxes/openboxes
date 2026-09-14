@@ -6,6 +6,8 @@ import {
   getCurrentLocale,
   getHasBinLocationSupport,
   getHasPartialReceivingSupport,
+  getIsShipmentFromPurchaseOrder,
+  getReceivingBin,
 } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
@@ -19,31 +21,49 @@ import useFormatNumber from 'hooks/useFormatNumber';
 import useTranslate from 'hooks/useTranslate';
 import ActionsCell from 'utils/cells/ActionsCell';
 import ExpirationDateCell from 'utils/cells/ExpirationDateCell';
-import MultilineCell from 'utils/cells/MultilineCell';
 import PackLevelCell from 'utils/cells/PackLevelCell';
+import ProductNameCell from 'utils/cells/ProductNameCell';
 import PackLevelGroupCell from 'utils/cells/receiving/PackLevelGroupCell';
 import ProductCodeCell from 'utils/cells/receiving/ProductCodeCell';
+import ShippedQuantityCell from 'utils/cells/receiving/ShippedQuantityCell';
 import ValueCell from 'utils/cells/ValueCell';
 import { getConfirmReceiptRowActions } from 'utils/receiving/getReceivingRowActions';
 import getReceivingRowStatus from 'utils/receiving/getReceivingRowStatus';
+import hasSplitItemInDifferentBinThanReplacedRow from 'utils/receiving/hasSplitItemInDifferentBinThanReplacedRow';
+import struckIfChanged from 'utils/receiving/struckIfChanged';
+import sumSplitItemsQuantityReceiving from 'utils/receiving/sumSplitItemsQuantityReceiving';
 
-const useConfirmReceiptColumns = ({ view } = {}) => {
+const useConfirmReceiptColumns = ({
+  view,
+  hasPreviousReceipts,
+  sortableProps,
+  sort,
+  order,
+  showLotNumber,
+  showExpirationDate,
+  showRecipient,
+  showPackLevel,
+} = {}) => {
   const translate = useTranslate();
   const formatNumber = useFormatNumber();
   const columnHelper = createColumnHelper();
   const currentLocale = useSelector(getCurrentLocale);
   const hasPartialReceivingSupport = useSelector(getHasPartialReceivingSupport);
   const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
+  const receivingBin = useSelector(getReceivingBin);
+  const isShipmentFromPurchaseOrder = useSelector(getIsShipmentFromPurchaseOrder);
   const isPackingListView = view === ReceivingView.PACKING_LIST;
+
+  const sortHeaderProps = (columnId) => (isPackingListView ? {} : {
+    sortable: true,
+    columnId,
+    ...sortableProps,
+  });
 
   // Rows are { id, meta } objects; the entities live in the normalized state
   // passed through the table `meta`, so each cell reads its item by id at render
   // time. The row `meta` drives row-level greying/disabling of fully received lines.
   const getItem = (row, table) => table.options.meta?.entities?.[row.original.id];
-
-  // Replaced rows of a changed item show the original shipment values struck through
-  // (everything except quantities).
-  const struckIfReplaced = (rowType) => (rowType === ReceivingRowType.REPLACED ? 'receiving-table__struck' : '');
 
   // Shipment-level columns (quantities, status, cancel remaining) don't apply to the rows
   // of a changes group.
@@ -60,8 +80,20 @@ const useConfirmReceiptColumns = ({ view } = {}) => {
     />
   );
 
-  const quantityHeader = (label, defaultLabel) => (
+  const locationCell = (value, className = '') => (
+    <ValueCell
+      value={value}
+      tooltipLabel={value}
+      className={className}
+      label="react.receiving.location.label"
+      defaultLabel="Location"
+      truncate
+    />
+  );
+
+  const quantityHeader = (label, defaultLabel, columnId) => (
     <TableHeaderCell
+      {...(columnId ? sortHeaderProps(columnId) : {})}
       tooltip
       tooltipLabel={translate(label, defaultLabel)}
       className="receiving-table__quantity"
@@ -139,20 +171,25 @@ const useConfirmReceiptColumns = ({ view } = {}) => {
         id: receivingColumns.PRODUCT_CODE,
         header: () => (
           <TableHeaderCell
+            {...sortHeaderProps(receivingColumns.PRODUCT_CODE)}
             tooltip
             tooltipLabel={translate('react.receiving.code.label', 'Code')}
           >
             {translate('react.receiving.code.label', 'Code')}
           </TableHeaderCell>
         ),
-        cell: ({ row, table }) => (
-          <ProductCodeCell
-            item={getItem(row, table)}
-            isPackingListView={isPackingListView}
-            isExpanded={row.getIsExpanded()}
-            onToggle={row.getToggleExpandedHandler()}
-          />
-        ),
+        cell: ({ row, table }) => {
+          const item = getItem(row, table);
+          return (
+            <ProductCodeCell
+              item={item}
+              isPackingListView={isPackingListView}
+              isExpanded={row.getIsExpanded()}
+              onToggle={row.getToggleExpandedHandler()}
+              className={struckIfChanged(item?.rowType, item?.productChanged)}
+            />
+          );
+        },
         meta: {
           pinned: 'left',
         },
@@ -162,6 +199,7 @@ const useConfirmReceiptColumns = ({ view } = {}) => {
         id: receivingColumns.PRODUCT,
         header: () => (
           <TableHeaderCell
+            {...sortHeaderProps(receivingColumns.PRODUCT)}
             tooltip
             tooltipLabel={translate('react.receiving.product.label', 'Product')}
           >
@@ -176,12 +214,13 @@ const useConfirmReceiptColumns = ({ view } = {}) => {
             return <TableCell className="rt-td" />;
           }
           return (
-            <MultilineCell
-              value={item?.product?.name}
-              className={struckIfReplaced(item?.rowType)}
+            <ProductNameCell
+              product={item?.product}
+              className={struckIfChanged(item?.rowType, item?.productChanged)}
               label="react.receiving.product.label"
               defaultLabel="Product"
-              maxLines={2}
+              showHandlingIcons
+              maxLines={3}
             />
           );
         },
@@ -190,120 +229,206 @@ const useConfirmReceiptColumns = ({ view } = {}) => {
         },
         size: 300,
       }),
+      ...(isShipmentFromPurchaseOrder ? [
+        columnHelper.display({
+          id: receivingColumns.SUPPLIER_CODE,
+          header: () => (
+            <TableHeaderCell
+              {...sortHeaderProps(receivingColumns.SUPPLIER_CODE)}
+              tooltip
+              tooltipLabel={translate('react.receiving.supplierItemCode.label', 'Supplier Item Code')}
+              className="text-left"
+            >
+              {translate('react.receiving.supplierItemCode.label', 'Supplier Item Code')}
+            </TableHeaderCell>
+          ),
+          cell: ({ row, table }) => {
+            const item = getItem(row, table);
+            if (isSplitItemOrToggle(item)) {
+              return null;
+            }
+            return (
+              <ValueCell
+                value={item?.supplierCode}
+                tooltipLabel={item?.supplierCode}
+                label="react.receiving.supplierItemCode.label"
+                defaultLabel="Supplier Item Code"
+                truncate
+              />
+            );
+          },
+          size: 125,
+        }),
+      ] : []),
       // In the packing list view, the pack level column is not needed
       // because the parent group name is rendered on the separator rows.
-      ...(isPackingListView ? [] : [packLevelColumn]),
-      columnHelper.display({
-        id: receivingColumns.LOT_NUMBER,
-        header: () => (
-          <TableHeaderCell
-            tooltip
-            tooltipLabel={translate('react.receiving.lotSerialNo.label', 'Lot/Serial No.')}
-          >
-            {translate('react.receiving.lotSerialNo.short.label', 'Lot/SN')}
-          </TableHeaderCell>
-        ),
-        cell: ({ row, table }) => {
-          const item = getItem(row, table);
-          const value = item?.lotNumber;
-          return (
-            <ValueCell
-              value={value}
-              tooltipLabel={value}
-              className={struckIfReplaced(item?.rowType)}
-              label="react.receiving.lotSerialNo.short.label"
-              defaultLabel="Lot/SN"
-              truncate
-            />
-          );
-        },
-        size: 125,
-      }),
-      columnHelper.display({
-        id: receivingColumns.EXPIRATION_DATE,
-        header: () => (
-          <TableHeaderCell
-            tooltip
-            tooltipLabel={translate('react.receiving.expirationDate.label', 'Expiration date')}
-          >
-            {translate('react.receiving.expirationDate.short.label', 'Exp Date')}
-          </TableHeaderCell>
-        ),
-        cell: ({ row, table }) => {
-          const item = getItem(row, table);
-          return (
-            <ExpirationDateCell
-              value={item?.expirationDate}
-              localeKey={currentLocale}
-              className={struckIfReplaced(item?.rowType)}
-              label="react.receiving.expirationDate.short.label"
-              defaultLabel="Exp Date"
-              showExpiryStatus={item?.rowType !== ReceivingRowType.REPLACED}
-            />
-          );
-        },
-        size: 110,
-      }),
+      ...(isPackingListView || !showPackLevel ? [] : [packLevelColumn]),
+      ...(showLotNumber ? [
+        columnHelper.display({
+          id: receivingColumns.LOT_NUMBER,
+          header: () => (
+            <TableHeaderCell
+              {...sortHeaderProps(receivingColumns.LOT_NUMBER)}
+              tooltip
+              tooltipLabel={translate('react.receiving.lotSerialNo.label', 'Lot/Serial No.')}
+            >
+              {translate('react.receiving.lotSerialNo.short.label', 'Lot/SN')}
+            </TableHeaderCell>
+          ),
+          cell: ({ row, table }) => {
+            const item = getItem(row, table);
+            const value = item?.lotNumber;
+            return (
+              <ValueCell
+                value={value}
+                tooltipLabel={value}
+                className={struckIfChanged(item?.rowType, item?.lotChanged)}
+                label="react.receiving.lotSerialNo.short.label"
+                defaultLabel="Lot/SN"
+                truncate
+              />
+            );
+          },
+          size: 125,
+        }),
+      ] : []),
+      ...(showExpirationDate ? [
+        columnHelper.display({
+          id: receivingColumns.EXPIRATION_DATE,
+          header: () => (
+            <TableHeaderCell
+              {...sortHeaderProps(receivingColumns.EXPIRATION_DATE)}
+              tooltip
+              tooltipLabel={translate('react.receiving.expirationDate.label', 'Expiration date')}
+            >
+              {translate('react.receiving.expirationDate.short.label', 'Exp Date')}
+            </TableHeaderCell>
+          ),
+          cell: ({ row, table }) => {
+            const item = getItem(row, table);
+            return (
+              <ExpirationDateCell
+                value={item?.expirationDate}
+                localeKey={currentLocale}
+                className={struckIfChanged(item?.rowType, item?.expirationChanged)}
+                label="react.receiving.expirationDate.short.label"
+                defaultLabel="Exp Date"
+                showExpiryStatus={item?.rowType !== ReceivingRowType.REPLACED}
+              />
+            );
+          },
+          size: 110,
+        }),
+      ] : []),
+      ...(showRecipient ? [
+        columnHelper.display({
+          id: receivingColumns.RECIPIENT,
+          header: () => (
+            <TableHeaderCell
+              {...sortHeaderProps(receivingColumns.RECIPIENT)}
+              tooltip
+              tooltipLabel={translate('react.receiving.recipient.label', 'Recipient')}
+            >
+              {translate('react.receiving.recipient.label', 'Recipient')}
+            </TableHeaderCell>
+          ),
+          cell: ({ row, table }) => {
+            const item = getItem(row, table);
+            const recipient = item?.recipient;
+            return (
+              <ValueCell
+                value={recipient?.name}
+                tooltipLabel={recipient?.name}
+                className={struckIfChanged(item?.rowType, item?.recipientChanged)}
+                label="react.receiving.recipient.label"
+                defaultLabel="Recipient"
+                truncate
+              />
+            );
+          },
+          size: 125,
+        }),
+      ] : []),
       columnHelper.display({
         id: receivingColumns.QUANTITY_SHIPPED,
-        header: () => quantityHeader('react.receiving.shipped.label', 'Shipped'),
+        header: () => quantityHeader(
+          'react.receiving.shipped.label',
+          'Shipped',
+          receivingColumns.QUANTITY_SHIPPED,
+        ),
         cell: ({ row, table }) => {
           const item = getItem(row, table);
           if (isSplitItemOrToggle(item)) {
             return null;
           }
-          return quantityCell(
-            formatNumber(item?.quantityShipped),
-            'react.receiving.shipped.label',
-            'Shipped',
+          return (
+            <ShippedQuantityCell
+              item={item}
+              isShipmentFromPurchaseOrder={isShipmentFromPurchaseOrder}
+              label="react.receiving.shipped.label"
+              defaultLabel="Shipped"
+            />
           );
         },
         size: 100,
       }),
-      columnHelper.display({
-        id: receivingColumns.QUANTITY_RECEIVED,
-        header: () => quantityHeader('react.receiving.received.label', 'Received'),
-        cell: ({ row, table }) => {
-          const item = getItem(row, table);
-          if (isSplitItemOrToggle(item)) {
-            return null;
-          }
-          return quantityCell(
-            formatNumber(item?.quantityReceived),
-            'react.receiving.received.label',
-            'Received',
-          );
-        },
-        size: 100,
-      }),
-      columnHelper.display({
-        id: receivingColumns.QUANTITY_TO_RECEIVE,
-        header: () => quantityHeader('react.receiving.toReceive.label', 'To Receive'),
-        cell: ({ row, table }) => {
-          const item = getItem(row, table);
-          if (isSplitItemOrToggle(item)) {
-            return null;
-          }
-          return quantityCell(
-            formatNumber(item?.quantityAvailableToReceive),
-            'react.receiving.toReceive.label',
-            'To Receive',
-          );
-        },
-        size: 110,
-      }),
+      ...(hasPreviousReceipts ? [
+        columnHelper.display({
+          id: receivingColumns.QUANTITY_RECEIVED,
+          header: () => quantityHeader('react.receiving.received.label', 'Received'),
+          cell: ({ row, table }) => {
+            const item = getItem(row, table);
+            if (isSplitItemOrToggle(item)) {
+              return null;
+            }
+            return quantityCell(
+              formatNumber(item?.quantityReceived),
+              'react.receiving.received.label',
+              'Received',
+            );
+          },
+          size: 100,
+        }),
+        columnHelper.display({
+          id: receivingColumns.QUANTITY_TO_RECEIVE,
+          header: () => quantityHeader('react.receiving.toReceive.label', 'To Receive'),
+          cell: ({ row, table }) => {
+            const item = getItem(row, table);
+            if (isSplitItemOrToggle(item)) {
+              return null;
+            }
+            return quantityCell(
+              formatNumber(item?.quantityAvailableToReceive),
+              'react.receiving.toReceive.label',
+              'To Receive',
+            );
+          },
+          size: 110,
+        }),
+      ] : []),
       columnHelper.display({
         id: receivingColumns.QUANTITY_RECEIVING,
         header: () => quantityHeader('react.receiving.receivingNow.label', 'Receiving Now'),
         cell: ({ row, table }) => {
           const item = getItem(row, table);
-          if (item?.rowType === ReceivingRowType.REPLACED
-            || item?.rowType === ReceivingRowType.TOGGLE) {
+          if (item?.rowType === ReceivingRowType.TOGGLE) {
             return null;
           }
-          const value = item?.quantityReceiving == null
-            ? null
-            : formatNumber(item.quantityReceiving);
+          if (item?.rowType === ReceivingRowType.REPLACED) {
+            const sum = sumSplitItemsQuantityReceiving(item, table.options.meta?.entities);
+            return quantityCell(
+              formatNumber(sum),
+              'react.receiving.receivingNow.label',
+              'Receiving Now',
+            );
+          }
+          // A location without partial receiving receives every line of the shipment, so a line
+          // left blank is a line received as zero - the completion writes that zero over it
+          // (ReceiptV2Service#zeroOutEmptyReceivedQuantities), the confirmation on the receiving
+          // step warns about it.
+          const quantityReceiving = item?.quantityReceiving
+            ?? (hasPartialReceivingSupport ? null : 0);
+          const value = quantityReceiving === null ? null : formatNumber(quantityReceiving);
           return quantityCell(value, 'react.receiving.receivingNow.label', 'Receiving Now');
         },
         size: 110,
@@ -323,9 +448,17 @@ const useConfirmReceiptColumns = ({ view } = {}) => {
           if (isSplitItemOrToggle(item)) {
             return null;
           }
+          const { cancelRemainingIds } = table.options.meta ?? {};
+          // A location without partial receiving cancels whatever is left on every line of the
+          // receipt (ReceiptV2Service#cancelRemainingQuantities), so those leftovers read as
+          // canceled right away - there is no checkbox to flag them with.
+          const isRemainingCanceled = hasPartialReceivingSupport
+            ? Boolean(cancelRemainingIds?.has(item?.originalReceiptItemId))
+            : (item?.quantityRemaining ?? 0) > 0;
           const { className, value } = getReceivingRowStatus({
             quantityRemaining: item?.quantityRemaining,
-            isCompleted: item?.isCompleted || item?.quantityRemaining === 0,
+            isCompleted: item?.isCompleted,
+            isRemainingCanceled,
             translate,
             formatNumber,
           });
@@ -336,13 +469,12 @@ const useConfirmReceiptColumns = ({ view } = {}) => {
               className={className}
               label="react.receiving.status.label"
               defaultLabel="Status"
-              truncate
             />
           );
         },
         size: 125,
       }),
-      // The Location (putaway bin) column is shown even when "Enable Putaway" is off on the
+      // The Location (putaway bin) column is shown even when "Show Putaway" is off on the
       // receiving step, so the user sees which bin the shipment is received into.
       ...(hasBinLocationSupport ? [
         columnHelper.display({
@@ -360,17 +492,19 @@ const useConfirmReceiptColumns = ({ view } = {}) => {
             if (item?.rowType === ReceivingRowType.TOGGLE) {
               return null;
             }
-            const value = item?.binLocation?.name;
-            return (
-              <ValueCell
-                value={value}
-                tooltipLabel={value}
-                className={struckIfReplaced(item?.rowType)}
-                label="react.receiving.location.label"
-                defaultLabel="Location"
-                truncate
-              />
-            );
+            // The parent shows the receiving bin, struck when a split item's bin differs from it.
+            if (item?.rowType === ReceivingRowType.REPLACED) {
+              const isBinLocationChanged = hasSplitItemInDifferentBinThanReplacedRow(
+                item,
+                table.options.meta?.entities,
+                receivingBin,
+              );
+              return locationCell(
+                receivingBin?.name,
+                struckIfChanged(item?.rowType, isBinLocationChanged),
+              );
+            }
+            return locationCell(item?.binLocation?.name);
           },
           size: 125,
         }),
@@ -415,10 +549,12 @@ const useConfirmReceiptColumns = ({ view } = {}) => {
           ),
           cell: ({ row, table }) => {
             const item = getItem(row, table);
-            if (isSplitItemOrToggle(item)) {
+            // Only the lines that still have a quantity left to cancel get a checkbox - the
+            // predicate also covers the split item and toggle rows of a changes group.
+            if (!isCancellableRow(item)) {
               return null;
             }
-            const { originalReceiptItemId } = item ?? {};
+            const { originalReceiptItemId } = item;
             const { cancelRemainingIds, onToggleCancelRemaining } = table.options.meta ?? {};
             return (
               <TableCell className="rt-td d-flex justify-content-center align-items-center">
@@ -426,7 +562,6 @@ const useConfirmReceiptColumns = ({ view } = {}) => {
                   noWrapper
                   value={Boolean(cancelRemainingIds?.has(originalReceiptItemId))}
                   onChange={() => onToggleCancelRemaining?.(originalReceiptItemId)}
-                  disabled={!isCancellableRow(item)}
                 />
               </TableCell>
             );
@@ -435,7 +570,21 @@ const useConfirmReceiptColumns = ({ view } = {}) => {
         }),
       ] : []),
     ];
-  }, [translate, currentLocale, isPackingListView, hasPartialReceivingSupport]);
+  }, [
+    translate,
+    currentLocale,
+    isPackingListView,
+    hasPartialReceivingSupport,
+    hasPreviousReceipts,
+    isShipmentFromPurchaseOrder,
+    receivingBin,
+    showLotNumber,
+    showExpirationDate,
+    showRecipient,
+    showPackLevel,
+    sort,
+    order,
+  ]);
 
   return { columns };
 };

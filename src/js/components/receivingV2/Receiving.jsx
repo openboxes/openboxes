@@ -15,6 +15,9 @@ const Receiving = () => {
     Step,
     stepsTitles,
     flushRef,
+    validateBeforeNextRef,
+    setNextDisabled,
+    isNextDisabled,
     completeReceiptRef,
     isCheckStep,
     previous,
@@ -31,7 +34,14 @@ const Receiving = () => {
     <WizardPageLayout
       title={title}
       wizard={{ steps: stepsTitles, currentStepKey: Step.key }}
-      topSection={isCheckStep ? <ConfirmReceiptHeader onBackToReceive={previous} /> : undefined}
+      topSection={isCheckStep
+        ? (
+          <ConfirmReceiptHeader
+            onBackToReceive={previous}
+            onCompleteReceipt={onCompleteReceipt}
+          />
+        )
+        : undefined}
       buttons={isCheckStep
         ? {
           previous: {
@@ -46,9 +56,14 @@ const Receiving = () => {
             defaultLabel: 'Complete Receipt',
           },
         }
-        : { next: { onClick: onNext } }}
+        : { next: { onClick: onNext, disabled: isNextDisabled } }}
     >
-      <Step.Component flushRef={flushRef} completeReceiptRef={completeReceiptRef} />
+      <Step.Component
+        flushRef={flushRef}
+        validateBeforeNextRef={validateBeforeNextRef}
+        setNextDisabled={setNextDisabled}
+        completeReceiptRef={completeReceiptRef}
+      />
     </WizardPageLayout>
   );
 };

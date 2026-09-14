@@ -1,6 +1,6 @@
 package org.pih.warehouse.core.validation
 
-import org.springframework.core.GenericTypeResolver
+import grails.validation.ValidationException
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
@@ -8,26 +8,24 @@ import org.springframework.validation.ObjectError
 /**
  * Validates instances of some class.
  *
- * We can create validator components s for objects whose validation involves performing complex operations such as
+ * We suggest creating validator components for objects whose validation involves performing complex operations, such as
  * calling out to beans and/or making database queries. By breaking validation logic out into a separate, dedicated
  * component, we let our objects remain small and single purpose.
  *
- * This validator works in tandem with Grails Domain classes and non-domain classes that implement {@link Validatable}.
- * The validation in this class is in addition to any validation defined in the static constraints block of the object
- * as well as to any javax constraint annotations.
+ * This validator works in tandem with framework-aware objects such as Grails Domain classes and Request DTOs.
+ * As long as the framework-aware object implements {@link Validatable}, the validation in this class will be triggered
+ * alongside any validation defined in the static constraints block of the object and via javax constraint annotations.
  */
-trait Validator<T> implements org.springframework.validation.Validator {
+abstract class Validator<T> {
 
     /**
      * Contains the main validation logic for the validator. The returned ObjectValidationResult should contain
      * all validation errors that were triggered during validation.
      *
-     * Do not call this method directly! To validate an object, call {@link #validate(T)} instead.
-     *
      * @param toValidate The object instance to be validated.
      * @return ObjectValidationResult the result of the validation. Contains validation errors if there are any.
      */
-    abstract ObjectValidationResult doValidate(T toValidate)
+    protected abstract ObjectValidationResult doValidate(T toValidate)
 
     /**
      * Extracts the Errors object from the object to validate (or initializes a new Errors instance).
@@ -35,36 +33,24 @@ trait Validator<T> implements org.springframework.validation.Validator {
      */
     abstract Errors getErrors(T toValidate)
 
-    private Class<T> getClassOfValidatableObject() {
-        // Determines (at runtime) the type of the class level generic "T".
-        return (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), Validator.class)
-    }
-
-    @Override
-    boolean supports(Class<?> clazz) {
-        return classOfValidatableObject.isAssignableFrom(clazz)
-    }
-
-    @Override
-    void validate(Object toValidate, Errors errors) {
-        if (!supports(toValidate.class)) {
-            throw new IllegalArgumentException("Validator ${getClass()} does not support validating class: ${toValidate.class}")
-        }
-
-        validate(classOfValidatableObject.cast(toValidate))
-    }
-
     /**
      * Validates the given object. The errors object associated with the object to validate will be populated
      * with any validation errors that occur.
      *
+     * It's important to note that for framework-aware Validateable objects, if you call the validator directly
+     * via xValidator.validate(x) ONLY the validator logic will be triggered. To trigger the full validation flow
+     * of the framework (which includes Grails constraints and Javax annotations), you must use the object's
+     * x.validate() method.
+     *
+     * @param toValidate The object instance to be validated.
+     * @param errorOnFailure True if we should throw an exception if validation fails.
      * @return true if the object is valid, false otherwise.
      */
-    boolean validate(T toValidate) {
+    ObjectValidationResult validate(T toValidate, boolean errorOnFailure = true) {
         // We do not clear errors before validating because we assume that will be handled by the framework.
         ObjectValidationResult results = doValidate(toValidate)
         if (results.valid) {
-            return true
+            return results
         }
 
         // If there are errors, we add them all to the "errors" field of the object being validated.
@@ -84,7 +70,12 @@ trait Validator<T> implements org.springframework.validation.Validator {
                     throw new IllegalArgumentException("Unknown error type ${error.class}")
             }
         }
-        return !errors.hasErrors()
+
+        if (errorOnFailure) {
+            throw new ValidationException("Validation failed for ${toValidate?.class?.simpleName}", errors)
+        }
+
+        return results
     }
 
     /**
@@ -95,7 +86,10 @@ trait Validator<T> implements org.springframework.validation.Validator {
      * @param errorCode The l10n message key containing the message to display when rendering the errors of the entity.
      * @param errorArgs Values to use for any args contained within the errorCode message
      */
-    FieldError rejectField(String fieldName, Object rejectedValue, String errorCode, Object[] errorArgs=null) {
+    protected FieldError rejectField(String fieldName,
+                                     Object rejectedValue,
+                                     String errorCode,
+                                     Object[] errorArgs=null) {
         return new FieldError(
                 "Object",  // objectName will be set automatically when adding the errors to the object being validated.
                 fieldName,
@@ -109,12 +103,10 @@ trait Validator<T> implements org.springframework.validation.Validator {
     /**
      * Mark the object itself as invalid. For use when not validating a specific field.
      *
-     * @param field The name of the field that failed validation
      * @param errorCode The l10n message key containing the message to display when rendering the errors of the entity.
      * @param errorArgs Values to use for any args contained within the errorCode message
      */
-    ObjectError rejectObject(Errors errors, String field, String errorCode, Object[] errorArgs=null) {
-        errors.rejectValue(field, errorCode, errorArgs, null)
+    protected ObjectError rejectObject(String errorCode, Object[] errorArgs=null) {
         return new ObjectError(
                 "Object",  // objectName will be set automatically when adding the errors to the object being validated.
                 [errorCode] as String[],

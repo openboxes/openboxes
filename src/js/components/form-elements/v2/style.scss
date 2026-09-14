@@ -372,5 +372,10 @@ input, .date-field-input {
     &:focus {
       outline: none;
     }
+
+    &[aria-disabled="true"] {
+      cursor: not-allowed !important;
+      color: var(--gray-300);
+    }
   }
 }

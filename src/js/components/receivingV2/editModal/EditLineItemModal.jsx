@@ -3,10 +3,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Modal from 'react-modal';
 
+import ConfirmExpiryChangeWithDepotsModal from 'components/modals/ConfirmExpiryChangeWithDepotsModal';
 import EditLineItemModalFooter from 'components/receivingV2/editModal/EditLineItemModalFooter';
 import EditLineItemModalHeader from 'components/receivingV2/editModal/EditLineItemModalHeader';
 import ReceivedLineItemsTable from 'components/receivingV2/editModal/ReceivedLineItemsTable';
 import ReceivingLineItemsTable from 'components/receivingV2/editModal/ReceivingLineItemsTable';
+import useConfirmExpirationDateChange from 'hooks/receiving/v2/useConfirmExpirationDateChange';
 import useEditLineItemSave from 'hooks/receiving/v2/useEditLineItemSave';
 import useReceivedLineItems from 'hooks/receiving/v2/useReceivedLineItems';
 import useReceivingLineItems from 'hooks/receiving/v2/useReceivingLineItems';
@@ -14,20 +16,27 @@ import useShipmentItemDetails from 'hooks/receiving/v2/useShipmentItemDetails';
 import ItemDetails from 'utils/ItemDetails';
 
 const EditLineItemModal = ({
-  onClose, lineItem, initialLineItems, receiptId, loadReceipt,
+  onClose, lineItem, initialLineItems, receiptId, loadReceipt, hasPreviousReceipts,
 }) => {
   const {
     fields,
     columns,
-    addRow,
     copyToReceiving,
     revertToOriginal,
     receivingNow,
+    remainingToReceive,
     summaryData,
     getLineItems,
     handleSubmit,
     hasErrors,
-  } = useReceivingLineItems({ lineItem, initialLineItems });
+  } = useReceivingLineItems({ lineItem, initialLineItems, hasPreviousReceipts });
+
+  const {
+    confirmExpirationDateChange,
+    isExpirationModalOpen,
+    lotChangesToConfirm,
+    handleExpirationModalResponse,
+  } = useConfirmExpirationDateChange();
 
   const { onSave } = useEditLineItemSave({
     receiptId,
@@ -36,6 +45,7 @@ const EditLineItemModal = ({
     getLineItems,
     loadReceipt,
     onClose,
+    confirmExpirationDateChange,
   });
 
   const {
@@ -52,6 +62,7 @@ const EditLineItemModal = ({
   const {
     badge,
     fields: detailsFields,
+    className: detailsClassName,
   } = useShipmentItemDetails(lineItem);
 
   return (
@@ -67,7 +78,7 @@ const EditLineItemModal = ({
         <ItemDetails
           badge={badge}
           fields={detailsFields}
-          className="mt-3"
+          className={`mt-3 ${detailsClassName}`}
         />
         <ReceivedLineItemsTable
           receivedItems={receivedItems}
@@ -78,8 +89,8 @@ const EditLineItemModal = ({
           fields={fields}
           columns={columns}
           receivingNow={receivingNow}
+          remainingToReceive={remainingToReceive}
           revertToOriginal={revertToOriginal}
-          addRow={addRow}
         />
         <EditLineItemModalFooter
           summaryData={summaryData}
@@ -87,6 +98,12 @@ const EditLineItemModal = ({
           isSaveDisabled={hasErrors}
         />
       </form>
+      <ConfirmExpiryChangeWithDepotsModal
+        isOpen={isExpirationModalOpen}
+        data={lotChangesToConfirm}
+        onConfirm={() => handleExpirationModalResponse(true)}
+        onCancel={() => handleExpirationModalResponse(false)}
+      />
     </Modal>
   );
 };
@@ -113,6 +130,9 @@ EditLineItemModal.propTypes = {
   }),
   initialLineItems: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   loadReceipt: PropTypes.func.isRequired,
+  /** Whether the shipment already has a submitted receipt - keeps the "Received" card visible
+   * at locations that do not support partial receiving */
+  hasPreviousReceipts: PropTypes.bool.isRequired,
 };
 
 EditLineItemModal.defaultProps = {

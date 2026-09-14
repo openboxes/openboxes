@@ -3,6 +3,8 @@ import { useCallback } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import _ from 'lodash';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { useSelector } from 'react-redux';
+import { getHasPartialReceivingSupport } from 'selectors';
 
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useEditLineItemValidation from 'hooks/receiving/v2/useEditLineItemValidation';
@@ -13,12 +15,16 @@ import { formatDateToString } from 'utils/dateUtils';
 
 /**
  * Form state for the editable "Receiving now" table in the edit modal
+ *
+ * @param hasPreviousReceipts Whether the shipment being received already has a submitted receipt.
  */
 const useReceivingLineItems = ({
   lineItem,
   initialLineItems,
+  hasPreviousReceipts,
 }) => {
   const translate = useTranslate();
+  const hasPartialReceivingSupport = useSelector(getHasPartialReceivingSupport);
 
   const buildDefaultRow = (item) => ({
     // Stable id so rows can be removed by identity, not index.
@@ -44,18 +50,16 @@ const useReceivingLineItems = ({
   // The original line of the shipment item - the row every split line is split off from.
   const originalLineItem = initialLineItems.find((item) => !item.isSplitItem);
 
-  // New rows split the same shipment item line, so they start with the line's product.
+  // New rows are prefilled with the product and the recipient of the shipment item, and with the
+  // bin the original line has when the modal opens.
   const buildSplitRow = () => ({
-    ...buildDefaultRow({ product: originalLineItem?.product ?? lineItem?.product }),
+    ...buildDefaultRow({
+      product: lineItem?.product,
+      recipient: lineItem?.recipient,
+      binLocation: originalLineItem?.binLocation,
+    }),
     isSplitItem: true,
   });
-
-  // If a line has already some persisted split items, we don't want to prefill a new split row
-  // We want to prefill a new split row with filled product row, only if a line doesn't
-  // have any persisted split items yet
-  const defaultLineItems = initialLineItems.some((item) => item.isSplitItem)
-    ? initialLineItems.map(buildDefaultRow)
-    : [...initialLineItems.map(buildDefaultRow), buildSplitRow()];
 
   const { validationSchema } = useEditLineItemValidation();
 
@@ -63,7 +67,7 @@ const useReceivingLineItems = ({
     control, getValues, setValue, reset, handleSubmit, formState: { errors },
   } = useForm({
     mode: 'onBlur',
-    defaultValues: { lineItems: defaultLineItems },
+    defaultValues: { lineItems: initialLineItems.map(buildDefaultRow) },
     resolver: zodResolver(validationSchema),
   });
 
@@ -86,14 +90,18 @@ const useReceivingLineItems = ({
     setValue,
   });
 
+  const addRow = useCallback(
+    () => append(buildSplitRow()),
+    [append, lineItem, originalLineItem],
+  );
+
   const { columns } = useReceivingLineItemColumns({
     control,
+    addRow,
     removeRow,
     onLocationAutofill,
     errors,
   });
-
-  const addRow = () => append(buildSplitRow());
 
   const copyToReceiving = useCallback((receivedItem) => append({
     rowId: _.uniqueId('row-'),
@@ -122,15 +130,21 @@ const useReceivingLineItems = ({
   const received = lineItem?.quantityReceived ?? 0;
   const remainingToReceive = Number((quantityShipped - received - receivingNow).toFixed(2));
 
+  // Received card should only be visible for a location with partial receiving or if there is
+  // any previous receipt for a shipment
+  const showReceived = Boolean(hasPartialReceivingSupport || hasPreviousReceipts);
+
   const summaryData = [
     {
       title: translate('react.receiving.quantityShipped.label', 'Quantity Shipped'),
       data: quantityShipped,
     },
-    {
-      title: translate('react.receiving.received.label', 'Received'),
-      data: received,
-    },
+    ...(showReceived ? [
+      {
+        title: translate('react.receiving.received.label', 'Received'),
+        data: received,
+      },
+    ] : []),
     {
       title: translate('react.receiving.receivingNow.label', 'Receiving Now'),
       data: receivingNow,
@@ -148,6 +162,7 @@ const useReceivingLineItems = ({
     copyToReceiving,
     revertToOriginal,
     receivingNow,
+    remainingToReceive,
     summaryData,
     getLineItems,
     handleSubmit,

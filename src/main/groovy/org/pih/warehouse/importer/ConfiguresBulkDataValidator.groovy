@@ -17,22 +17,22 @@ trait ConfiguresBulkDataValidator<T extends Importable> {
     abstract BulkDataValidatorConfig getBulkDataValidatorConfig()
 
     /**
-     * Performs any cross-row validation that was not already automatically handled by the data validator.
-     * Implementations can utilize the add*Error(...) methods on BulkDataValidationErrors to raise validation errors.
+     * Designed to be overridden when you need to perform custom validation that spans across multiple rows.
+     * Implementations can utilize the add*Error(...) methods on CustomBulkDataErrors to raise validation errors.
      *
-     * This method is designed to be overridden when you need to perform validation that spans across multiple rows.
+     * Note that this validation will be executed after the default validation is executed.
      */
-    BulkDataValidationErrors customValidateAcrossRows(List<T> rows) {
-        return null  // Do nothing by default
+    CustomBulkDataErrors customValidateAcrossRows(List<T> rows) {
+        return CustomBulkDataErrors.NO_ERRORS  // Do nothing by default
     }
 
     /**
-     * Performs any custom validation on a row that was not already automatically handled by the data validator.
-     * Implementations can utilize the add*Error(...) methods on BulkDataValidationErrors to raise validation errors.
+     * Designed to be overridden when you need to perform custom validation on each row individually.
+     * Implementations can utilize the add*Error(...) methods on CustomBulkDataErrors to raise validation errors.
      *
-     * This method is designed to be overridden when you need to perform per row validation.
+     * Note that this validation will be executed after the default validation is executed.
      */
-    BulkDataValidationErrors customValidateRow(T row) {
-        return null  // Do nothing by default
+    CustomBulkDataErrors customValidateRow(T row) {
+        return CustomBulkDataErrors.NO_ERRORS  // Do nothing by default
     }
 }

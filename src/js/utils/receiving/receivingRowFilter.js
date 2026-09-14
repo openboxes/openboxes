@@ -5,7 +5,7 @@ import ShipmentItemReceiptStatus from 'consts/shipmentItemReceiptStatus';
 import rowMatchesSearch from 'utils/searchRows';
 
 // Row fields the receiving search bar matches against
-const SEARCHABLE_PATHS = ['productCode', 'product.name', 'lotNumber', 'recipient.name'];
+const SEARCHABLE_PATHS = ['productCode', 'product.name', 'supplierCode', 'lotNumber', 'recipient.name'];
 
 // Rows carrying the "receiving now" quantity of a shipment item. Replaced (struck through)
 // and toggle (UI-only) rows are skipped.
@@ -53,8 +53,10 @@ const matchesReceiptStatus = ({ shipmentItemRows, statusCodes }) => {
       case ShipmentItemReceiptStatus.RECEIVED_LESS_THAN_SHIPPED:
         return quantityRemaining > 0;
       case ShipmentItemReceiptStatus.NO_QUANTITY_ENTERED:
+        // Nothing entered is an empty quantity, not a zero one - a deliberate 0 counts as
+        // entered, the same rule the quantity autofill skips such rows by.
         return quantityRemaining > 0
-          && currentRows.every((row) => (row.quantityReceiving ?? 0) === 0);
+          && currentRows.every((row) => row.quantityReceiving == null);
       default:
         return false;
     }
