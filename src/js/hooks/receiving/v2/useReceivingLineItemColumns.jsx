@@ -179,6 +179,7 @@ const useReceivingLineItemColumns = ({
       size: 150,
     }),
     columnHelper.accessor(receivingColumns.QUANTITY_RECEIVING, {
+      meta: { arrowNavigable: true },
       header: () => (
         <TableHeaderCell className="receiving-table__quantity">
           {translate('react.receiving.receivingNow.label', 'Receiving Now')}

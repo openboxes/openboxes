@@ -32,7 +32,7 @@ const QuantityInputCell = React.memo(({
   // Commit on blur. Skip when nothing changed so the caller doesn't re-store / mark the row dirty.
   const onBlur = () => {
     const committed = inputValue === '' ? null : inputValue;
-    if (committed !== (value ?? null)) {
+    if (inputValue !== (value ?? '')) {
       onCommit(committed);
     }
   };
