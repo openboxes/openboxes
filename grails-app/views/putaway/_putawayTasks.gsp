@@ -62,6 +62,22 @@
                                     </a>
                                 </div>
                             </g:if>
+                            <g:elseif test="${task.status == PutawayTaskStatus.IN_PROGRESS}">
+                                <%-- Rerunning strategy for an in-progress task reassigns the destination only
+                                     (the container it's already been scanned into does not change), so it's
+                                     restricted to superusers. --%>
+                                <g:isSuperuser>
+                                    <div class="action-menu-item">
+                                        <a href="javascript:void(0)"
+                                           class="btn-rerun-strategy"
+                                           data-task-id="${task.id}"
+                                           data-facility-id="${orderInstance?.destination?.id}">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}" />
+                                            &nbsp;<warehouse:message code="react.putawayTask.rerunStrategy.label" default="Rerun Strategy"/>
+                                        </a>
+                                    </div>
+                                </g:isSuperuser>
+                            </g:elseif>
                         </div>
                     </span>
                 </td>
