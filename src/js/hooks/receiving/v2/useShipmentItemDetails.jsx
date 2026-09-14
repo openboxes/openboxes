@@ -9,7 +9,7 @@ import {
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useFormatNumber from 'hooks/useFormatNumber';
 import useTranslate from 'hooks/useTranslate';
-import { formatApiDateToString, formatDateToString } from 'utils/dateUtils';
+import { formatApiDateToString } from 'utils/dateUtils';
 import ProductHandlingIcons from 'utils/ProductHandlingIcons';
 import getShippedQuantityInPoUom from 'utils/receiving/getShippedQuantityInPoUom';
 
