@@ -249,9 +249,12 @@
         </td>
         <td class="middle center">
             <g:set var="pickReasonCode" value="${requisitionItem?.modificationItem?.pickReasonCode ?: requisitionItem?.substitutionItem?.pickReasonCode ?: requisitionItem?.pickReasonCode}"/>
-            <g:if test="${requisitionItem?.cancelReasonCode || pickReasonCode }">
+            <g:set var="reasonCodesOf" value="${{ items -> items?.findAll { it?.reasonCode }*.reasonCode?.unique()?.join(', ') }}"/>
+            <g:set var="picklistReasonCodes" value="${reasonCodesOf(requisitionItem?.modificationItem?.picklistItems) ?: reasonCodesOf(requisitionItem?.substitutionItem?.picklistItems) ?: reasonCodesOf(requisitionItem?.picklistItems)}"/>
+            <g:if test="${requisitionItem?.cancelReasonCode || pickReasonCode || picklistReasonCodes }">
                 <div title="${requisitionItem?.cancelReasonCode ? 'Edit reason code: ' + requisitionItem?.cancelReasonCode : ''}
-${pickReasonCode ? 'Pick reason code: ' + pickReasonCode : ''}">
+${pickReasonCode ? 'Pick reason code: ' + pickReasonCode : ''}
+${picklistReasonCodes ? 'Mobile pick reason code: ' + picklistReasonCodes : ''}">
                     <img src="${resource(dir:'images/icons/silk',file:'note.png')}" />
                 </div>
             </g:if>
