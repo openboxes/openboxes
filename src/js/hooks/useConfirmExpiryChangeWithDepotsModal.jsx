@@ -9,15 +9,17 @@ import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import depotAvailabilityColumn from 'consts/depotAvailabilityColumn';
 import useTranslate from 'hooks/useTranslate';
-import { formatDateToDatetimeString } from 'utils/dateUtils';
+import { formatDateToDatetimeString, parseApiDate } from 'utils/dateUtils';
 
 const useConfirmExpiryChangeWithDepotsModal = () => {
   const translate = useTranslate();
   const currentLocale = useSelector(getCurrentLocale);
   const columnHelper = createColumnHelper();
 
-  const formatDate = (date) => formatDateToDatetimeString(date, locales[currentLocale])
-    ?? translate('react.confirmExpirationDate.modal.noDate.label', 'no date');
+  const formatDate = (date) => formatDateToDatetimeString(
+    parseApiDate(date),
+    locales[currentLocale],
+  ) ?? translate('react.confirmExpirationDate.modal.noDate.label', 'no date');
 
   // A product's default lot is stored with no lot number, so it has to be named somehow.
   // TODO: Remove this fallback once there can no longer be a default lot with an expiration date.

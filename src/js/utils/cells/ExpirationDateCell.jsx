@@ -7,7 +7,7 @@ import { TableCell } from 'components/DataTable';
 import EXPIRY_BADGES from 'consts/expiryBadges';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
-import { formatDateToString } from 'utils/dateUtils';
+import { formatDateToString, parseApiDate } from 'utils/dateUtils';
 import getExpiryStatus from 'utils/expirationStatus';
 
 /**
@@ -19,13 +19,15 @@ const ExpirationDateCell = React.memo(({
 }) => {
   const translate = useTranslate();
 
+  const expirationDate = parseApiDate(value);
+
   const formatted = formatDateToString({
-    date: value,
+    date: expirationDate,
     dateFormat: DateFormatDateFns.DD_MMM_YYYY,
     options: { locale: locales[localeKey] },
   });
 
-  const status = showExpiryStatus ? getExpiryStatus(value) : null;
+  const status = showExpiryStatus ? getExpiryStatus(expirationDate) : null;
   const { Icon, label: badgeLabel, defaultLabel: badgeDefaultLabel } = EXPIRY_BADGES[status] || {};
 
   const tooltipLabel = formatted

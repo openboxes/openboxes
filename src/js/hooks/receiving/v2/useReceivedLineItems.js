@@ -5,7 +5,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useReceivedLineItemColumns from 'hooks/receiving/v2/useReceivedLineItemColumns';
-import { formatDateToString } from 'utils/dateUtils';
+import { formatApiDateToString } from 'utils/dateUtils';
 import mapToFormSelectOption from 'utils/mapToFormSelectOption';
 
 /**
@@ -18,7 +18,7 @@ const useReceivedLineItems = (lineItem, { onCopyToReceive } = {}) => {
     rowId: _.uniqueId('received-'),
     product: item?.productLot?.product ?? lineItem?.product ?? null,
     lotNumber: item?.productLot?.lotNumber ?? '',
-    expirationDate: formatDateToString({
+    expirationDate: formatApiDateToString({
       date: item?.productLot?.expirationDate,
       dateFormat: DateFormatDateFns.DD_MMM_YYYY,
     }) ?? '',

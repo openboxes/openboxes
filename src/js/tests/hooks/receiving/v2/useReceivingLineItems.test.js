@@ -96,6 +96,18 @@ describe('useReceivingLineItems', () => {
     });
   });
 
+  it('should keep the expiration date the API sent', () => {
+    const { result } = renderLineItems([{ ...originalLine, expirationDate: '2026-09-19' }]);
+
+    expect(result.current.fields[0].expirationDate).toBe('19/Sep/2026');
+  });
+
+  it('should leave the expiration date empty for a lot with no expiry', () => {
+    const { result } = renderLineItems([{ ...originalLine, expirationDate: null }]);
+
+    expect(result.current.fields[0].expirationDate).toBe('');
+  });
+
   describe('autofill of an added row', () => {
     it('should carry the product, the recipient and the bin of the line', () => {
       const { result } = renderLineItems([originalLine, splitLine]);
