@@ -20,8 +20,10 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryItemManager
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionAction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionIdentifierService
+import org.pih.warehouse.inventory.TransactionSource
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptCompleteRequestCommand
@@ -182,6 +184,44 @@ class ReceiptV2Service {
         deleteMarkersForReceipts([receipt])
     }
 
+    /**
+     * Deletes the transaction sources of the given receipts, for those that have one (see
+     * {@link #createTransactionSource}). Must be called before deleting a receipt, for the same reason as
+     * {@link #deleteMarkersForReceipts}: a transaction source's foreign key blocks the deletion of the receipt it
+     * points at.
+     */
+    @Transactional
+    void deleteTransactionSourcesForReceipts(Collection<Receipt> receipts) {
+        if (!receipts) {
+            return
+        }
+
+        List<TransactionSource> transactionSources = TransactionSource.findAllByReceiptInList(receipts.toList())
+        if (!transactionSources) {
+            return
+        }
+
+        // Not likely: the rollback flows we use delete the transaction first. Just in case one gets here with it
+        // still alive, let go of the reference - its foreign key would block the delete below.
+        List<Transaction> stampedTransactions = Transaction.findAllByTransactionSourceInList(transactionSources)
+        for (Transaction transaction : stampedTransactions) {
+            transaction.transactionSource = null
+        }
+
+        for (TransactionSource transactionSource : transactionSources) {
+            transactionSource.delete()
+        }
+    }
+
+    /**
+     * Deletes the transaction source of the given receipt, if it has one. See
+     * {@link #deleteTransactionSourcesForReceipts} for when to call it.
+     */
+    @Transactional
+    void deleteTransactionSourceForReceipt(Receipt receipt) {
+        deleteTransactionSourcesForReceipts([receipt])
+    }
+
     @Transactional
     ReceiptSaveResponseDto updateItemsBatch(ReceiptItemsBatchRequest request) {
         // The receipt is bound and validated (as existing and pending) by the request, so this assumes a validated
@@ -264,13 +304,19 @@ class ReceiptV2Service {
 
         ShipmentItem shipmentItem = item.shipmentItem
 
+        // Lines created here are split lines - the original line of a shipment item is only ever written when the
+        // receipt is started or synced (see ReceiptItemFactory#createReceiptItemFromShipmentItem), so the split flag
+        // is owned by the server: forced on creation, never bound from the request. Split lines also carry a quantity
+        // shipped of zero - the shipment item's full quantity stays on the original line, which keeps that line the
+        // only one with a remainder that can be canceled on completion (see cancelRemainingQuantities).
         ReceiptItem receiptItem = new ReceiptItem(
                 product: shipmentItem.product,
                 inventoryItem: shipmentItem.inventoryItem,
                 lotNumber: shipmentItem.lotNumber,
                 expirationDate: shipmentItem.expirationDate,
                 recipient: shipmentItem.recipient,
-                quantityShipped: shipmentItem.quantity,
+                isSplitItem: Boolean.TRUE,
+                quantityShipped: 0,
                 quantityReceived: item.quantityReceiving,
                 binLocation: item.binLocation,
                 sortOrder: shipmentItem.receiptItems.size(),
@@ -442,8 +488,9 @@ class ReceiptV2Service {
     }
 
     /**
-     * Records the inbound stock transaction of a completed receipt: one entry per receipt item, crediting the
-     * received quantities to the destination's inventory.
+     * Records the inbound stock transaction of a completed receipt: one entry per line that received something,
+     * crediting the received quantities to the destination's inventory. Lines completed with nothing received get
+     * no entry.
      */
     private Transaction createInboundTransaction(Receipt receipt) {
         Shipment shipment = receipt.shipment
@@ -461,17 +508,24 @@ class ReceiptV2Service {
                 destination: null,
                 inventory: shipment.destination.inventory,
                 transactionDate: receipt.actualDeliveryDate,
+                transactionSource: createTransactionSource(receipt),
         )
         transaction.transactionNumber = transactionIdentifierService.generate(transaction)
 
-        receipt.receiptItems.each { ReceiptItem receiptItem ->
+        // Do not include not touched items in the transaction entries. Since we create original items for
+        // every line, in any partial receipt we would create an entry even if we don't really receive an item
+        Set<ReceiptItem> receivedItems = receipt.receiptItems.findAll { ReceiptItem receiptItem ->
+            (receiptItem.quantityReceived ?: 0) > 0
+        }
+
+        receivedItems.each { ReceiptItem receiptItem ->
             // Receipt items created via the v2 endpoints always carry an inventory item, but fall back to resolving
             // one from the lot fields to support receipts against legacy shipment items that never had one.
             InventoryItem inventoryItem = receiptItem.inventoryItem ?: inventoryItemManager.getOrCreateInventoryItem(
                     receiptItem.product, receiptItem.lotNumber, receiptItem.expirationDate)
 
             transaction.addToTransactionEntries(new TransactionEntry(
-                    quantity: receiptItem.quantityReceived ?: 0,
+                    quantity: receiptItem.quantityReceived,
                     binLocation: receiptItem.binLocation,
                     inventoryItem: inventoryItem,
             ))
@@ -493,6 +547,30 @@ class ReceiptV2Service {
         }
 
         return transaction
+    }
+
+    /**
+     * Records the action that produced the inbound transaction of a completed receipt (see {@link TransactionSource}):
+     * the receipt and the shipment (with its requisition) it was received against, between the two locations the
+     * stock moved.
+     */
+    private TransactionSource createTransactionSource(Receipt receipt) {
+        Shipment shipment = receipt.shipment
+
+        TransactionSource transactionSource = new TransactionSource(
+                transactionAction: TransactionAction.RECEIPT,
+                receipt: receipt,
+                shipment: shipment,
+                requisition: shipment.requisition,
+                origin: shipment.origin,
+                destination: shipment.destination,
+        )
+
+        if (!transactionSource.save()) {
+            throw new ValidationException("Transaction source is invalid", transactionSource.errors)
+        }
+
+        return transactionSource
     }
 
     /**

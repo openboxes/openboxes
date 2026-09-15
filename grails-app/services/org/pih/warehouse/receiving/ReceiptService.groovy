@@ -418,6 +418,7 @@ class ReceiptService {
 
         if (shipment.receipts) {
             receiptV2Service.deleteMarkersForReceipts(shipment.receipts)
+            receiptV2Service.deleteTransactionSourcesForReceipts(shipment.receipts)
             shipment.receipts.toArray().each { Receipt receipt ->
                 shipment.removeFromReceipts(receipt)
                 receipt.delete()
@@ -447,6 +448,7 @@ class ReceiptService {
                 transaction.delete()
             }
             receiptV2Service.deleteMarkerForReceipt(lastReceipt)
+            receiptV2Service.deleteTransactionSourceForReceipt(lastReceipt)
             shipment.removeFromReceipts(lastReceipt)
             lastReceipt.delete()
 
