@@ -15,7 +15,7 @@ const blurOnWheel = (e) => e.currentTarget.blur();
  * caller decides where to store it; pass `value` to keep the input in sync with that store.
  */
 const QuantityInputCell = React.memo(({
-  value, onCommit, label, defaultLabel, disabled, errorMessage, className,
+  value, onCommit, onBlur, label, defaultLabel, disabled, errorMessage, className,
 }) => {
   const [inputValue, setInputValue] = useState(value ?? '');
 
@@ -30,11 +30,12 @@ const QuantityInputCell = React.memo(({
   };
 
   // Commit on blur. Skip when nothing changed so the caller doesn't re-store / mark the row dirty.
-  const onBlur = () => {
+  const handleBlur = () => {
     const committed = inputValue === '' ? null : inputValue;
     if (inputValue !== (value ?? '')) {
       onCommit(committed);
     }
+    onBlur?.();
   };
 
   return (
@@ -44,7 +45,7 @@ const QuantityInputCell = React.memo(({
         className={`hide-arrows input-xs ${className}`}
         value={inputValue}
         onChange={onChange}
-        onBlur={onBlur}
+        onBlur={handleBlur}
         disabled={disabled}
         errorMessage={errorMessage}
         hideErrorMessageWrapper
@@ -62,6 +63,7 @@ QuantityInputCell.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   // Called on blur with the committed value, or null when the field is cleared.
   onCommit: PropTypes.func.isRequired,
+  onBlur: PropTypes.func,
   label: PropTypes.string.isRequired,
   defaultLabel: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
@@ -71,6 +73,7 @@ QuantityInputCell.propTypes = {
 
 QuantityInputCell.defaultProps = {
   value: null,
+  onBlur: undefined,
   disabled: false,
   errorMessage: undefined,
   className: '',

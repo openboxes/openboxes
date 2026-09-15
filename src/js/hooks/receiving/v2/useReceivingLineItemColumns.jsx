@@ -195,10 +195,8 @@ const useReceivingLineItemColumns = ({
             render={({ field }) => (
               <QuantityInputCell
                 value={field.value}
-                onCommit={(quantityReceiving) => {
-                  field.onChange(quantityReceiving ?? '');
-                  field.onBlur();
-                }}
+                onCommit={(quantityReceiving) => field.onChange(quantityReceiving ?? '')}
+                onBlur={field.onBlur}
                 errorMessage={errorMessage}
                 className="receiving-table__quantity"
                 label="react.receiving.receivingNow.label"

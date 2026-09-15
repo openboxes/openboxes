@@ -1,12 +1,8 @@
 import { useEffect, useRef } from 'react';
 
 import navigationKey from 'consts/navigationKey';
-import {
-  CELL_SELECTOR,
-  closeCalendarIfOpen,
-  FIELD_SELECTOR,
-  getColumnId,
-} from 'utils/arrowNavigation';
+import { CELL_SELECTOR, FIELD_SELECTOR, getColumnId } from 'utils/arrowNavigation';
+import closeCalendarIfOpen from 'utils/datePickerUtils';
 
 // `withinColumn` is the scope of the fields a key can land on, `step` the way it walks that list.
 // Left and right see the whole table as one list, so they continue in the neighbouring row.
