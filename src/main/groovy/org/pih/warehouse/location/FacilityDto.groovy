@@ -1,12 +1,12 @@
 package org.pih.warehouse.location
 
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.dtos.IdentifiableDto
+import org.pih.warehouse.core.dtos.DomainDto
 
 /**
  * The DTO representation of a {@link Location} when the location is a facility.
  */
-class FacilityDto implements IdentifiableDto {
+class FacilityDto implements DomainDto<Location> {
 
     String name
     String description

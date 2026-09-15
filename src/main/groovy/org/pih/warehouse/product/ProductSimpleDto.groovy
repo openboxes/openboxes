@@ -1,13 +1,13 @@
 package org.pih.warehouse.product
 
-import org.pih.warehouse.core.dtos.IdentifiableDto
+import org.pih.warehouse.core.dtos.DomainDto
 import org.pih.warehouse.core.http.HasResponseMapper
 
 /**
  * A simplified representation of a Product, containing only the fields that are required
  * to display the product in its most basic form.
  */
-class ProductSimpleDto implements IdentifiableDto, HasResponseMapper<ProductSimpleDtoMapper> {
+class ProductSimpleDto implements DomainDto<Product>, HasResponseMapper<ProductSimpleDtoMapper> {
 
     String productCode
     String name

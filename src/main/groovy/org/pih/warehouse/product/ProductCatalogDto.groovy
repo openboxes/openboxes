@@ -1,8 +1,8 @@
 package org.pih.warehouse.product
 
-import org.pih.warehouse.core.dtos.IdentifiableDto
+import org.pih.warehouse.core.dtos.DomainDto
 
-class ProductCatalogDto implements IdentifiableDto {
+class ProductCatalogDto implements DomainDto<ProductCatalog> {
 
     String code
     String name

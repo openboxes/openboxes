@@ -4,7 +4,7 @@ import java.time.LocalDate
 
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.date.LocalDateParser
-import org.pih.warehouse.core.dtos.IdentifiableDto
+import org.pih.warehouse.core.dtos.DomainDto
 import org.pih.warehouse.core.mapper.SmartMapper
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.LotStatusCode
@@ -14,7 +14,7 @@ import org.pih.warehouse.product.ProductSimpleDto
  * Represents a specific lot number of a product.
  * The DTO form of an InventoryItem.
  */
-class ProductLotDto implements IdentifiableDto {
+class ProductLotDto implements DomainDto<InventoryItem> {
 
     ProductSimpleDto product
     String lotNumber

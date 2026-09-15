@@ -2,12 +2,12 @@ package org.pih.warehouse.location
 
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.LocationTypeCode
-import org.pih.warehouse.core.dtos.IdentifiableDto
+import org.pih.warehouse.core.dtos.DomainDto
 
 /**
- * The DTO representation of a {@link org.pih.warehouse.core.LocationType}.
+ * The DTO representation of a {@link LocationType}.
  */
-class LocationTypeDto implements IdentifiableDto {
+class LocationTypeDto implements DomainDto<LocationType> {
 
     String name
     String description

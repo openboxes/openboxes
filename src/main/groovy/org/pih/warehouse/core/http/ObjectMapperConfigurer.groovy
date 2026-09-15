@@ -51,11 +51,6 @@ class ObjectMapperConfigurer {
         objectMapper.registerModule(new JavaTimeModule())
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
-        // Cycle detection in Jackson's @JsonIdentityInfo defaults to comparing objects by JVM identity. Enabling this
-        // setting uses equals() instead, if it is defined, which is more accurate in our use case. This is especially
-        // true for DTOs that implement IdentifiableDto (which are based on Hibernate entities with a unique id field).
-        objectMapper.enable(SerializationFeature.USE_EQUALITY_FOR_OBJECT_ID)
-
         // Instruct the ObjectMapper to consult our custom module whenever it constructs a serializer.
         SimpleModule module = new SimpleModule("OpenBoxes")
         module.setSerializerModifier(new OpenBoxesBeanSerializerModifier(mapperComponentResolver))

@@ -1,12 +1,12 @@
 package org.pih.warehouse.shipping
 
-import org.pih.warehouse.core.dtos.IdentifiableDto
+import org.pih.warehouse.core.dtos.DomainDto
 
 /**
  * A simplified representation of a Container, containing only the fields that are required
  * to display the container in its most basic form.
  */
-class ContainerSimpleDto implements IdentifiableDto {
+class ContainerSimpleDto implements DomainDto<Container> {
 
     String name
     ContainerSimpleDto parentContainer
