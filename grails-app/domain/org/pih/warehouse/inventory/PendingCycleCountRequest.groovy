@@ -3,11 +3,11 @@ package org.pih.warehouse.inventory
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
-import org.pih.warehouse.core.http.ResponseBodyFormattable
+import org.pih.warehouse.core.http.HttpSerializable
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalogDto
 
-class PendingCycleCountRequest implements ResponseBodyFormattable {
+class PendingCycleCountRequest implements HttpSerializable {
 
     String id
 
