@@ -1,0 +1,18 @@
+# Adds links to the "New issue" chooser alongside the blank issue option.
+blank_issues_enabled: true
+contact_links:
+  - name: 📖 Contributor Guide
+    url: https://openboxes.gitbook.io/contributor-guide
+    about: How to set up OpenBoxes locally, report a bug well, translate the app, or contribute code.
+  - name: 💬 Ask on Slack
+    url: http://slack-signup.openboxes.com/
+    about: The fastest way to get help with setup, the codebase, or whether something is a known issue.
+  - name: 🗣️ Community forums
+    url: https://community.openboxes.com/
+    about: Longer-form discussion, implementation questions, and release announcements.
+  - name: 💡 Suggest a feature
+    url: https://github.com/openboxes/openboxes/discussions/categories/ideas
+    about: Propose new functionality and discuss it with the community before it becomes an issue.
+  - name: 📚 User & admin documentation
+    url: https://docs.openboxes.com
+    about: Installing, configuring and using OpenBoxes.

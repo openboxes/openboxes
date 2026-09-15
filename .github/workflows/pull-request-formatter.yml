@@ -12,9 +12,28 @@ jobs:
 
     permissions:
       contents: read
+      issues: write
       pull-requests: write
 
     steps:
       # See .github/labeler.yml for config
       - name: Label Pull Request
         uses: actions/labeler@v5
+
+      # Only fires on a contributor's very first pull request, so regular
+      # contributors never see it. Neither step checks out the PR's code,
+      # which is what keeps pull_request_target safe to use here.
+      - name: Welcome First-Time Contributors
+        uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-message: |
+            Thanks for opening your first pull request in OpenBoxes! :tada:
+
+            If you haven't already, our [Contributor Guide](https://openboxes.gitbook.io/contributor-guide/contribute-code) covers how we branch, test and review changes:
+
+            - [Write your change](https://openboxes.gitbook.io/contributor-guide/contribute-code/write-your-change/forking-and-branching) — our `ft/*`, `bug/*` and `td/*` branch naming scheme
+            - [Test your change](https://openboxes.gitbook.io/contributor-guide/contribute-code/test-your-change) — running the frontend, backend and end-to-end suites
+            - [Open a pull request](https://openboxes.gitbook.io/contributor-guide/contribute-code/open-a-pull-request) — what reviewers look for
+
+            A maintainer will review this as soon as they can. If it goes quiet, give us a nudge on [Slack](http://slack-signup.openboxes.com/). Thanks for contributing!
