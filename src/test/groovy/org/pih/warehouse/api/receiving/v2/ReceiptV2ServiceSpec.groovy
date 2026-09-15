@@ -26,9 +26,11 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryItemManager
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionAction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionIdentifierService
+import org.pih.warehouse.inventory.TransactionSource
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
@@ -40,6 +42,9 @@ import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptItemCompleteRequest
 import org.pih.warehouse.receiving.ReceiptItemEditReceivingInfoRequest
 import org.pih.warehouse.receiving.ReceiptItemFactory
+import org.pih.warehouse.receiving.ReceiptItemUpsertRequest
+import org.pih.warehouse.receiving.ReceiptItemsBatchRequest
+import org.pih.warehouse.receiving.ReceiptSaveResponseDto
 import org.pih.warehouse.receiving.ReceiptService
 import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.receiving.ReceiptSynchronizer
@@ -47,6 +52,7 @@ import org.pih.warehouse.receiving.ReceiptV2Marker
 import org.pih.warehouse.receiving.ShipmentForReceiptValidator
 import org.pih.warehouse.receiving.ShipmentItemReceivedQuantitiesDto
 import org.pih.warehouse.receiving.ShipmentReceivingCalculator
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
@@ -78,7 +84,8 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
 
     void setupSpec() {
         mockDomains(Receipt, ReceiptItem, ReceiptV2Marker, Shipment, ShipmentItem, ShipmentType, Container,
-                Transaction, TransactionEntry, Product, InventoryItem, Inventory, Location)
+                Transaction, TransactionEntry, TransactionSource, Product, InventoryItem, Inventory, Location,
+                Requisition)
     }
 
     void setup() {
@@ -643,6 +650,46 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
     }
 
     // ----------------------------------------------------------------------------------------------------------
+    // updateItemsBatch - the lines a batch save creates, against a minimal real domain graph.
+    // ----------------------------------------------------------------------------------------------------------
+
+    void 'updateItemsBatch should create split lines with a quantity shipped of zero'() {
+        given: 'a pending receipt whose shipment item already carries its original line'
+        Shipment shipment = buildShipment()
+        ShipmentItem shipmentItem = buildShipmentItem(100)
+        ReceiptItem originalItem = buildReceiptItem(shipmentItem, 40)
+        Receipt receipt = createReceipt(shipment, [originalItem], ReceiptStatusCode.PENDING)
+
+        ReceiptItemsBatchRequest request = new ReceiptItemsBatchRequest(
+                receipt: receipt,
+                itemsToSave: [new ReceiptItemUpsertRequest(
+                        rowId: "temp-1",
+                        shipmentItem: shipmentItem,
+                        quantityReceiving: 30,
+                )],
+        )
+
+        when:
+        ReceiptSaveResponseDto response = service.updateItemsBatch(request)
+
+        then: 'the new line is flagged as a split server-side and carries no quantity shipped of its own'
+        ReceiptItem splitItem = receipt.receiptItems.find { it.isSplitItem }
+        assert splitItem.quantityShipped == 0
+        assert splitItem.quantityReceived == 30
+        assert splitItem.product == shipmentItem.product
+        assert shipmentItem.receiptItems.contains(splitItem)
+
+        and: 'the original line keeps the full quantity shipped of the shipment item'
+        assert originalItem.isSplitItem == Boolean.FALSE
+        assert originalItem.quantityShipped == 100
+
+        and: 'the response carries the created line against the row it was sent as'
+        assert response.updatedLines.size() == 1
+        assert response.updatedLines.first().rowId == "temp-1"
+        assert response.updatedLines.first().isSplitItem == Boolean.TRUE
+    }
+
+    // ----------------------------------------------------------------------------------------------------------
     // editReceivingInfo - the split lines added while receiving, against a minimal real domain graph.
     // ----------------------------------------------------------------------------------------------------------
 
@@ -1039,10 +1086,11 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
     void 'createInboundTransaction should record an inbound transfer transaction crediting the received quantities'() {
         given:
         Shipment shipment = buildShipment()
+        shipment.requisition = new Requisition(name: "REQ-1").save(validate: false, flush: true)
         ShipmentItem firstShipmentItem = buildShipmentItem(100)
         ReceiptItem firstItem = buildReceiptItem(firstShipmentItem, 70, [binLocation: new Location(name: "Bin")])
         ShipmentItem secondShipmentItem = buildShipmentItem(50)
-        ReceiptItem secondItem = buildReceiptItem(secondShipmentItem, null)
+        ReceiptItem secondItem = buildReceiptItem(secondShipmentItem, 30)
         Receipt receipt = createReceipt(shipment, [firstItem, secondItem], ReceiptStatusCode.RECEIVED)
 
         when:
@@ -1061,13 +1109,66 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         assert transaction.transactionDate == receipt.actualDeliveryDate
         assert shipment.incomingTransactions.contains(transaction)
 
-        and: 'each receipt item is credited with its received quantity (defaulting to zero)'
+        and: 'the action that created it is recorded as a receipt against the two locations the stock moved between'
+        assert TransactionSource.list() == [transaction.transactionSource]
+        TransactionSource transactionSource = transaction.transactionSource
+        assert transactionSource.transactionAction == TransactionAction.RECEIPT
+        assert transactionSource.receipt == receipt
+        assert transactionSource.shipment == shipment
+        assert transactionSource.requisition == shipment.requisition
+        assert transactionSource.origin == shipment.origin
+        assert transactionSource.destination == shipment.destination
+
+        and: 'each receipt item is credited with its received quantity'
         assert transaction.transactionEntries.size() == 2
         TransactionEntry firstEntry = transaction.transactionEntries.find { it.inventoryItem == firstItem.inventoryItem }
         assert firstEntry.quantity == 70
         assert firstEntry.binLocation == firstItem.binLocation
         TransactionEntry secondEntry = transaction.transactionEntries.find { it.inventoryItem == secondItem.inventoryItem }
-        assert secondEntry.quantity == 0
+        assert secondEntry.quantity == 30
+    }
+
+    void 'createInboundTransaction should not credit the lines that received nothing'() {
+        given: 'a receipt whose second line was received against and whose other two lines were not'
+        Shipment shipment = buildShipment()
+        ShipmentItem emptyShipmentItem = buildShipmentItem(50)
+        ReceiptItem emptyItem = buildReceiptItem(emptyShipmentItem, null)
+        ShipmentItem receivedShipmentItem = buildShipmentItem(100)
+        ReceiptItem receivedItem = buildReceiptItem(receivedShipmentItem, 70)
+        ShipmentItem zeroShipmentItem = buildShipmentItem(20)
+        ReceiptItem zeroItem = buildReceiptItem(zeroShipmentItem, 0)
+        Receipt receipt = createReceipt(shipment, [emptyItem, receivedItem, zeroItem], ReceiptStatusCode.RECEIVED)
+
+        when:
+        Transaction transaction = service.createInboundTransaction(receipt)
+
+        then: 'only the line that moved stock is credited - the other two get no entry of their own'
+        assert transaction.transactionEntries.size() == 1
+        TransactionEntry entry = transaction.transactionEntries.first()
+        assert entry.inventoryItem == receivedItem.inventoryItem
+        assert entry.quantity == 70
+
+        and: 'no inventory item is resolved for the lines that were left out'
+        0 * inventoryItemManager.getOrCreateInventoryItem(_, _, _)
+    }
+
+    void 'deleteTransactionSourcesForReceipts should clear the transaction that the source it deletes stamps'() {
+        given: 'a completed receipt with its inbound transaction and the source recorded for it'
+        Shipment shipment = buildShipment()
+        ShipmentItem shipmentItem = buildShipmentItem(100)
+        ReceiptItem receiptItem = buildReceiptItem(shipmentItem, 100)
+        Receipt receipt = createReceipt(shipment, [receiptItem], ReceiptStatusCode.RECEIVED)
+        transactionIdentifierService.generate(_ as Transaction) >> "TRX-003"
+        Transaction transaction = service.createInboundTransaction(receipt)
+        TransactionSource transactionSource = transaction.transactionSource
+
+        when:
+        service.deleteTransactionSourcesForReceipts([receipt])
+
+        then: 'the transaction lets go of the source before it is deleted - its foreign key would otherwise block it'
+        assert transactionSource != null
+        assert transaction.transactionSource == null
+        assert TransactionSource.count() == 0
     }
 
     void 'createInboundTransaction should resolve a missing inventory item from the lot fields'() {
@@ -1215,6 +1316,26 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
 
         then: 'the "nothing entered yet" null does not outlive the pending receipt'
         assert receiptItem.quantityReceived == 0
+    }
+
+    void 'completeReceipt should not record a transaction entry for a line left out of a partial receipt'() {
+        given: 'a pending receipt receiving one of its two lines, the other left untouched'
+        Shipment shipment = buildShipment()
+        ShipmentItem receivedShipmentItem = buildShipmentItem(100)
+        ReceiptItem receivedItem = buildReceiptItem(receivedShipmentItem, 70)
+        ShipmentItem untouchedShipmentItem = buildShipmentItem(50)
+        ReceiptItem untouchedItem = buildReceiptItem(untouchedShipmentItem, null)
+        Receipt receipt = createReceipt(shipment, [receivedItem, untouchedItem], ReceiptStatusCode.PENDING)
+
+        when: 'the request completes the receipt without canceling anything'
+        service.completeReceipt(new ReceiptCompleteRequestCommand(receipt: receipt))
+
+        then: 'the untouched line is zeroed out but leaves the stock of its product alone'
+        assert untouchedItem.quantityReceived == 0
+        Transaction transaction = Transaction.list().first()
+        assert transaction.transactionEntries.size() == 1
+        assert transaction.transactionEntries.first().quantity == 70
+        assert transaction.transactionEntries.first().inventoryItem == receivedItem.inventoryItem
     }
 
     void 'completeReceipt should cancel the whole quantity of a line left empty when the destination does not support partial receiving'() {
