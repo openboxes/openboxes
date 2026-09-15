@@ -179,6 +179,7 @@ const useReceivingLineItemColumns = ({
       size: 150,
     }),
     columnHelper.accessor(receivingColumns.QUANTITY_RECEIVING, {
+      meta: { arrowNavigable: true },
       header: () => (
         <TableHeaderCell className="receiving-table__quantity">
           {translate('react.receiving.receivingNow.label', 'Receiving Now')}
@@ -194,10 +195,8 @@ const useReceivingLineItemColumns = ({
             render={({ field }) => (
               <QuantityInputCell
                 value={field.value}
-                onCommit={(quantityReceiving) => {
-                  field.onChange(quantityReceiving ?? '');
-                  field.onBlur();
-                }}
+                onCommit={(quantityReceiving) => field.onChange(quantityReceiving ?? '')}
+                onBlur={field.onBlur}
                 errorMessage={errorMessage}
                 className="receiving-table__quantity"
                 label="react.receiving.receivingNow.label"

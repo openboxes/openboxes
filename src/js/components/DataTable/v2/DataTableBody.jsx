@@ -8,6 +8,7 @@ import TableRow from 'components/DataTable/TableRow';
 import DataTableStatus from 'components/DataTable/v2/DataTableStatus';
 import useTableColumnMeta from 'hooks/useTableColumnMeta';
 import useTranslate from 'hooks/useTranslate';
+import { arrowNavigationProps } from 'utils/arrowNavigation';
 import getCommonPinningStyles from 'utils/getCommonPinningStyles';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
@@ -40,6 +41,7 @@ const DataTableBody = ({
   tableWithPinnedColumns,
   isScreenWiderThanTable,
   virtualize,
+  arrowNavigationForAllFields,
 }) => {
   const translate = useTranslate();
   const parentRef = useRef(null);
@@ -141,24 +143,33 @@ const DataTableBody = ({
             const isLastSubRow = rowData.original?.isLastSubRow;
             return (
               <CustomTooltip
+                key={rowData.id}
                 content={isRowDisabled && translate(label, defaultMessage)}
                 show={isRowDisabled}
               >
                 <div
-                  key={rowData.id}
                   className={`rt-tr-group cell-wrapper ${rowData.original?.className || ''} ${mergeWithNextRow ? 'rt-tr-group-merged' : ''} ${isLastSubRow ? 'rt-tr-group-last-subrow' : ''}`}
                   role="rowgroup"
                   {...rowProps}
                 >
                   <TableRow key={rowData.id} className={`rt-tr ${isRowDisabled ? 'bg-light disabled' : ''} ${isSeparator ? 'rt-tr-separator' : ''} ${rowData.depth > 0 ? 'rt-tr-subrow' : ''}`}>
                     {rowData.getVisibleCells().map((cell) => {
-                      const { hide, flexWidth, className } = useTableColumnMeta(cell.column);
+                      const {
+                        hide,
+                        flexWidth,
+                        className,
+                        arrowNavigable,
+                      } = useTableColumnMeta(cell.column);
                       if (hide) {
                         return null;
                       }
                       const cellContent = getCellContent(cell, isSeparator);
                       return (
                         <div
+                          data-column-id={cell.column.id}
+                          {...arrowNavigationProps(
+                            arrowNavigationForAllFields || arrowNavigable,
+                          )}
                           className={`d-flex ${className} ${isRowDisabled && 'text-muted'}`}
                           style={{
                             ...getCommonPinningStyles(
@@ -223,6 +234,7 @@ DataTableBody.propTypes = {
     overscan: PropTypes.number,
     customRowsHeight: PropTypes.bool,
   }),
+  arrowNavigationForAllFields: PropTypes.bool,
 };
 
 DataTableBody.defaultProps = {
@@ -230,6 +242,7 @@ DataTableBody.defaultProps = {
   loadingMessage: null,
   loading: false,
   tableWithPinnedColumns: false,
+  arrowNavigationForAllFields: false,
   virtualize: {
     enabled: false,
     minSize: 20,
