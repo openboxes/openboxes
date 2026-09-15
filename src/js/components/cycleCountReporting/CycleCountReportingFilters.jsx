@@ -3,12 +3,13 @@ import React, { useCallback, useRef } from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
+import { getCurrentLocationId } from 'selectors';
 
 import FilterForm from 'components/Filter/FilterForm';
 import { INDICATORS_TAB } from 'consts/cycleCount';
 import { DateFormat } from 'consts/timeFormat';
 import useQueryParams from 'hooks/useQueryParams';
-import { debounceProductsFetch } from 'utils/option-utils';
+import { debounceInternalLocationsFetch, debounceProductsFetch } from 'utils/option-utils';
 import ListFilterFormWrapper from 'wrappers/ListFilterFormWrapper';
 
 const CycleCountReportingFilters = ({
@@ -28,6 +29,7 @@ const CycleCountReportingFilters = ({
     debounceTime: state.session.searchConfig.debounceTime,
     minSearchLength: state.session.searchConfig.minSearchLength,
   }));
+  const currentLocationId = useSelector(getCurrentLocationId);
   const { tab } = useQueryParams();
   const { setSerializedParams } = tablePaginationProps;
   const debouncedProductsFetch = useCallback(
@@ -35,6 +37,13 @@ const CycleCountReportingFilters = ({
       debounceTime,
       minSearchLength,
     ), [debounceTime, minSearchLength],
+  );
+  const debouncedBinLocationFetch = useCallback(
+    debounceInternalLocationsFetch(
+      debounceTime,
+      minSearchLength,
+      currentLocationId,
+    ), [debounceTime, minSearchLength, currentLocationId],
   );
   return (
     <ListFilterFormWrapper>
@@ -59,6 +68,7 @@ const CycleCountReportingFilters = ({
         formProps={{
           ...formProps,
           debouncedProductsFetch,
+          debouncedBinLocationFetch,
         }}
         defaultValues={defaultValues}
         ignoreClearFilters={['tab']}
