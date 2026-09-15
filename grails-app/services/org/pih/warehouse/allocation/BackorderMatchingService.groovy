@@ -25,7 +25,7 @@ class BackorderMatchingService {
     List<BackorderMatch> match(Requisition backorder, Collection<ShipmentItem> inboundItems) {
         List<BackorderMatch> matches = []
         Map<String, Integer> quantityRemainingByDemand = [:]
-        backorder.requisitionItems.each { RequisitionItem demand ->
+        demandItems(backorder).each { RequisitionItem demand ->
             quantityRemainingByDemand[demand.id] = remainingDemand(demand)
         }
 
@@ -64,7 +64,7 @@ class BackorderMatchingService {
             if (!backorder) {
                 return null
             }
-            demand = backorder.requisitionItems
+            demand = demandItems(backorder)
                     .findAll { it.product == product && remainingDemand(it) > 0 }
                     .sort { remainingDemand(it) }
                     .find()
@@ -115,8 +115,18 @@ class BackorderMatchingService {
      */
     private List<RequisitionItem> candidatesFor(Requisition backorder, Product product,
                                                 Map<String, Integer> quantityRemainingByDemand) {
-        return backorder.requisitionItems
+        return demandItems(backorder)
                 .findAll { it.product == product && quantityRemainingByDemand[it.id] > 0 }
                 .sort { quantityRemainingByDemand[it.id] }
+    }
+
+    /**
+     * Items that carry demand in their own right. A revised line keeps both rows on the requisition -
+     * the canceled original and its modification item - and both report the revised quantity, so
+     * matching against the original as well would cover the same demand twice and would record the
+     * cross-dock allocation against the row that is never picked.
+     */
+    private static List<RequisitionItem> demandItems(Requisition backorder) {
+        return backorder.requisitionItems.findAll { !it.modificationItem }
     }
 }
