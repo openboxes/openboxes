@@ -310,12 +310,12 @@ class AllocationService {
         // The backordered quantity waits for its cross-dock delivery, so ordinary stock only ever covers
         // the rest of the line
         if (isBackordered && !crossDockRelease) {
-            Integer quantityAllocatable = requisitionItem.calculateQuantityRequired() ?: 0
-            if (quantityAllocatable <= 0) {
+            Integer quantityExcludingBackorder = requisitionItem.calculateQuantityRequired() ?: 0
+            if (quantityExcludingBackorder <= 0) {
                 log.info("Requisition item ${requisitionItem.id} is fully backordered, skipping ordinary allocation")
                 return []
             }
-            quantityRequired = Math.min(quantityRequired ?: 0, quantityAllocatable)
+            quantityRequired = Math.min(quantityRequired ?: 0, quantityExcludingBackorder)
         }
 
         List<AllocationSourceStrategy> resolvedStrategies = resolveStrategies(requisitionItem.requisition, strategies)
