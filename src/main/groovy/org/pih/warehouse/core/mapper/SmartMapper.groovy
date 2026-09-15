@@ -1,6 +1,7 @@
 package org.pih.warehouse.core.mapper
 
 import grails.util.Holders
+import org.hibernate.proxy.HibernateProxy
 import org.springframework.stereotype.Component
 
 /**
@@ -30,9 +31,12 @@ class SmartMapper {
             return null
         }
 
-        Mapper mapper = mapperComponentResolver.getMapper(source.class, targetClass)
+        Class<Source> sourceClass = determineSourceClass(source)
+
+        Mapper mapper = mapperComponentResolver.getMapper(sourceClass, targetClass)
         if (mapper == null) {
-            throw new RuntimeException("No mapper was found between source ${source.class} and target ${targetClass}.")
+            throw new RuntimeException("No org.pih.warehouse.core.mapper.Mapper implementation was found between " +
+                    "source ${sourceClass} and target ${targetClass}.")
         }
         return mapper.map(source, config)
     }
@@ -52,11 +56,31 @@ class SmartMapper {
             return null
         }
 
-        List<Target> mappedList = []
-        for (source in sourceCollection) {
-            mappedList.add(map(source, targetClass, config))
+        if (sourceCollection.empty) {
+            return []
         }
-        return mappedList
+
+        Class<Source> sourceClass = determineSourceClass(sourceCollection.first())
+
+        Mapper mapper = mapperComponentResolver.getMapper(sourceClass, targetClass)
+        if (mapper == null) {
+            throw new RuntimeException("No org.pih.warehouse.core.mapper.Mapper implementation was found between " +
+                    "source ${sourceClass} and target ${targetClass}.")
+        }
+        return mapper.mapCollection(sourceCollection, config)
+    }
+
+    /**
+     * Determine the class of the source object.
+     *
+     * If the source object is a Hibernate proxy, meaning it has not yet been fetched from the database,
+     * we determine the class without triggering a database query.
+     */
+    private <Source> Class<Source> determineSourceClass(Source source) {
+        if (source instanceof HibernateProxy) {
+            return source.hibernateLazyInitializer.persistentClass
+        }
+        return source.class as Class<Source>
     }
 
     private static SmartMapper getSmartMapperStatic() {
