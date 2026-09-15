@@ -674,11 +674,14 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
     /**
      * Quantity that still needs to be picked from ordinary stock: the ordered quantity after any
-     * revision or cancellation, less anything backordered and waiting on an inbound delivery.
+     * cancellation, less anything backordered and waiting on an inbound delivery. A revised item
+     * carries its own quantity and backorder, so the modification item answers for itself.
      */
     def calculateQuantityRequired() {
-        Integer quantityOrdered = modificationItem ? modificationItem?.quantity :
-                quantityCanceled ? (quantity - quantityCanceled) : quantity
+        if (modificationItem) {
+            return modificationItem.calculateQuantityRequired()
+        }
+        Integer quantityOrdered = quantityCanceled ? (quantity - quantityCanceled) : quantity
         return Math.max(0, (quantityOrdered ?: 0) - (quantityBackordered ?: 0))
     }
 
