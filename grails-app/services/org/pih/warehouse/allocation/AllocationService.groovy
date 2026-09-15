@@ -355,7 +355,7 @@ class AllocationService {
 
         // No location holds enough, so rather than abandon the order we take whatever stock exists and record
         // the rest against a location permitted to go negative or the facility's fallback location
-        if (isFallbackApplicable(allocationMode, facility, requisitionItem.requisition)) {
+        if (isNegativeAllocationApplicable(allocationMode, facility, requisitionItem.requisition)) {
             List<SuggestedItem> fallbackItems =
                     getFallbackSuggestedItems(requisitionItem, quantityRequired, bestStrategy, bestItems)
             if (fallbackItems != null) {
@@ -363,20 +363,24 @@ class AllocationService {
             }
         }
 
-        throw new IllegalArgumentException("Insufficient stock for product ${product?.productCode} - ${product?.name} in order ${requisitionItem.requisition?.requestNumber}. Required quantity: ${quantityRequired}, Available quantity: ${bestQuantityAvailable}")
+        throw new IllegalArgumentException("Insufficient stock for product ${product?.productCode} - " +
+                "${product?.name} in order ${requisitionItem.requisition?.requestNumber}. " +
+                "Required quantity: ${quantityRequired}, Available quantity: ${bestQuantityAvailable}. " +
+                "Negative allocation also failed: it is either disabled for this order or no location " +
+                "is configured to allow it.")
     }
 
     /**
-     * Checks if fallback allocation approach is allowed. It should be applicable for auto allocations and
-     * only when both the order and the facility permit it
+     * Checks if allocating below zero is allowed. It should be applicable for auto allocations and only
+     * when both the order and the facility permit it
      */
-    private static boolean isFallbackApplicable(AllocationMode allocationMode, Location facility,
-                                                Requisition requisition) {
+    private static boolean isNegativeAllocationApplicable(AllocationMode allocationMode, Location facility,
+                                                          Requisition requisition) {
         if (allocationMode != AllocationMode.AUTO) {
             return false
         }
 
-        if (!requisition?.negativeInventoryAllowed) {
+        if (!requisition?.negativeAllocationAllowed) {
             return false
         }
 

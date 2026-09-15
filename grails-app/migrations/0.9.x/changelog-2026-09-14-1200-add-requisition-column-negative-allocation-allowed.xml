@@ -6,12 +6,12 @@
     <changeSet author="druchniewicz" id="140920261200-0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="requisition" columnName="negative_inventory_allowed"/>
+                <columnExists tableName="requisition" columnName="negative_allocation_allowed"/>
             </not>
         </preConditions>
 
         <addColumn tableName="requisition">
-            <column name="negative_inventory_allowed" type="BIT(1)"/>
+            <column name="negative_allocation_allowed" type="BIT(1)" defaultValueBoolean="false"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>
