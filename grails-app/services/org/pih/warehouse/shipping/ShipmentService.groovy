@@ -45,6 +45,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
+import org.pih.warehouse.receiving.ReceiptTransactionManager
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
@@ -60,6 +61,7 @@ class ShipmentService {
     TransactionIdentifierService transactionIdentifierService
     ShipmentIdentifierService shipmentIdentifierService
     ReceiptV2Service receiptV2Service
+    ReceiptTransactionManager receiptTransactionManager
     def documentService
     def personService
     def productAvailabilityService
@@ -1733,7 +1735,7 @@ class ShipmentService {
     void deleteReceipts(Shipment shipment) {
         if (shipment?.receipts) {
             receiptV2Service.deleteMarkersForReceipts(shipment.receipts)
-            receiptV2Service.deleteTransactionSourcesForReceipts(shipment.receipts)
+            receiptTransactionManager.deleteTransactionSourcesForReceipts(shipment.receipts)
             shipment?.receipts.toArray().each { Receipt receipt ->
                 shipment.removeFromReceipts(receipt)
                 receipt.delete()

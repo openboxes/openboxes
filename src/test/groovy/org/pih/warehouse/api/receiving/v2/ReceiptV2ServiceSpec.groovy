@@ -48,6 +48,7 @@ import org.pih.warehouse.receiving.ReceiptSaveResponseDto
 import org.pih.warehouse.receiving.ReceiptService
 import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.receiving.ReceiptSynchronizer
+import org.pih.warehouse.receiving.ReceiptTransactionManager
 import org.pih.warehouse.receiving.ReceiptV2Marker
 import org.pih.warehouse.receiving.ShipmentForReceiptValidator
 import org.pih.warehouse.receiving.ShipmentItemReceivedQuantitiesDto
@@ -64,8 +65,8 @@ import org.pih.warehouse.shipping.ShipmentType
 /**
  * The cancel-remaining logic and the shipment event decision are exercised through the service's private helpers
  * (Groovy dynamic dispatch does not enforce private), which keeps those tests free of the persistence fixture that
- * the full completeReceipt flow requires. The transaction and orchestration tests run the real flow against a
- * minimal valid domain graph.
+ * the full completeReceipt flow requires. The orchestration tests run the real flow against a minimal valid
+ * domain graph, with the real transaction manager recording the transaction (see ReceiptTransactionManagerSpec).
  */
 @Unroll
 class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<ReceiptV2Service>, DataTest {
@@ -111,8 +112,11 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         service.shipmentForReceiptValidator =
                 new ShipmentForReceiptValidator(shipmentReceivingCalculator: shipmentReceivingCalculator)
         service.shipmentService = shipmentService
-        service.transactionIdentifierService = transactionIdentifierService
         service.inventoryItemManager = inventoryItemManager
+        // The real manager, on the same mocked identifier service - the transaction it records is
+        // what the completeReceipt tests assert.
+        service.receiptTransactionManager =
+                new ReceiptTransactionManager(transactionIdentifierService, inventoryItemManager)
         service.receiptIdentifierService = receiptIdentifierService
         service.receiptService = receiptService
         // The real synchronizer, on the same mocked receipt service - the sync is asserted through the endpoint.
@@ -1077,131 +1081,6 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         then: 'the legacy product-filtered check would see it as partial - the v2 math sees it as fully received'
         1 * shipmentService.createShipmentEvent(_, _, EventCode.RECEIVED, _)
         0 * shipmentService.createShipmentEvent(_, _, EventCode.PARTIALLY_RECEIVED, _)
-    }
-
-    // ----------------------------------------------------------------------------------------------------------
-    // createInboundTransaction - runs against a minimal real domain graph so the transaction actually persists.
-    // ----------------------------------------------------------------------------------------------------------
-
-    void 'createInboundTransaction should record an inbound transfer transaction crediting the received quantities'() {
-        given:
-        Shipment shipment = buildShipment()
-        shipment.requisition = new Requisition(name: "REQ-1").save(validate: false, flush: true)
-        ShipmentItem firstShipmentItem = buildShipmentItem(100)
-        ReceiptItem firstItem = buildReceiptItem(firstShipmentItem, 70, [binLocation: new Location(name: "Bin")])
-        ShipmentItem secondShipmentItem = buildShipmentItem(50)
-        ReceiptItem secondItem = buildReceiptItem(secondShipmentItem, 30)
-        Receipt receipt = createReceipt(shipment, [firstItem, secondItem], ReceiptStatusCode.RECEIVED)
-
-        when:
-        Transaction transaction = service.createInboundTransaction(receipt)
-
-        then: 'a transfer-in transaction is persisted and associated with the receipt and shipment'
-        1 * transactionIdentifierService.generate(_ as Transaction) >> "TRX-002"
-        assert Transaction.list() == [transaction]
-        assert transaction.transactionType.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID
-        assert transaction.transactionNumber == "TRX-002"
-        assert transaction.receipt == receipt
-        assert transaction.incomingShipment == shipment
-        assert transaction.source == shipment.origin
-        assert transaction.destination == null
-        assert transaction.inventory == shipment.destination.inventory
-        assert transaction.transactionDate == receipt.actualDeliveryDate
-        assert shipment.incomingTransactions.contains(transaction)
-
-        and: 'the action that created it is recorded as a receipt against the two locations the stock moved between'
-        assert TransactionSource.list() == [transaction.transactionSource]
-        TransactionSource transactionSource = transaction.transactionSource
-        assert transactionSource.transactionAction == TransactionAction.RECEIPT
-        assert transactionSource.receipt == receipt
-        assert transactionSource.shipment == shipment
-        assert transactionSource.requisition == shipment.requisition
-        assert transactionSource.origin == shipment.origin
-        assert transactionSource.destination == shipment.destination
-
-        and: 'each receipt item is credited with its received quantity'
-        assert transaction.transactionEntries.size() == 2
-        TransactionEntry firstEntry = transaction.transactionEntries.find { it.inventoryItem == firstItem.inventoryItem }
-        assert firstEntry.quantity == 70
-        assert firstEntry.binLocation == firstItem.binLocation
-        TransactionEntry secondEntry = transaction.transactionEntries.find { it.inventoryItem == secondItem.inventoryItem }
-        assert secondEntry.quantity == 30
-    }
-
-    void 'createInboundTransaction should not credit the lines that received nothing'() {
-        given: 'a receipt whose second line was received against and whose other two lines were not'
-        Shipment shipment = buildShipment()
-        ShipmentItem emptyShipmentItem = buildShipmentItem(50)
-        ReceiptItem emptyItem = buildReceiptItem(emptyShipmentItem, null)
-        ShipmentItem receivedShipmentItem = buildShipmentItem(100)
-        ReceiptItem receivedItem = buildReceiptItem(receivedShipmentItem, 70)
-        ShipmentItem zeroShipmentItem = buildShipmentItem(20)
-        ReceiptItem zeroItem = buildReceiptItem(zeroShipmentItem, 0)
-        Receipt receipt = createReceipt(shipment, [emptyItem, receivedItem, zeroItem], ReceiptStatusCode.RECEIVED)
-
-        when:
-        Transaction transaction = service.createInboundTransaction(receipt)
-
-        then: 'only the line that moved stock is credited - the other two get no entry of their own'
-        assert transaction.transactionEntries.size() == 1
-        TransactionEntry entry = transaction.transactionEntries.first()
-        assert entry.inventoryItem == receivedItem.inventoryItem
-        assert entry.quantity == 70
-
-        and: 'no inventory item is resolved for the lines that were left out'
-        0 * inventoryItemManager.getOrCreateInventoryItem(_, _, _)
-    }
-
-    void 'deleteTransactionSourcesForReceipts should clear the transaction that the source it deletes stamps'() {
-        given: 'a completed receipt with its inbound transaction and the source recorded for it'
-        Shipment shipment = buildShipment()
-        ShipmentItem shipmentItem = buildShipmentItem(100)
-        ReceiptItem receiptItem = buildReceiptItem(shipmentItem, 100)
-        Receipt receipt = createReceipt(shipment, [receiptItem], ReceiptStatusCode.RECEIVED)
-        transactionIdentifierService.generate(_ as Transaction) >> "TRX-003"
-        Transaction transaction = service.createInboundTransaction(receipt)
-        TransactionSource transactionSource = transaction.transactionSource
-
-        when:
-        service.deleteTransactionSourcesForReceipts([receipt])
-
-        then: 'the transaction lets go of the source before it is deleted - its foreign key would otherwise block it'
-        assert transactionSource != null
-        assert transaction.transactionSource == null
-        assert TransactionSource.count() == 0
-    }
-
-    void 'createInboundTransaction should resolve a missing inventory item from the lot fields'() {
-        given: 'a receipt item without an inventory item (legacy shipment item)'
-        Shipment shipment = buildShipment()
-        ShipmentItem shipmentItem = buildShipmentItem(100)
-        Date expirationDate = new Date() + 365
-        ReceiptItem receiptItem = buildReceiptItem(
-                shipmentItem, 100, [inventoryItem: null, lotNumber: "LOT-9", expirationDate: expirationDate])
-        Receipt receipt = createReceipt(shipment, [receiptItem], ReceiptStatusCode.RECEIVED)
-
-        InventoryItem resolvedInventoryItem = new InventoryItem(product: receiptItem.product, lotNumber: "LOT-9")
-
-        when:
-        Transaction transaction = service.createInboundTransaction(receipt)
-
-        then:
-        1 * inventoryItemManager.getOrCreateInventoryItem(receiptItem.product, "LOT-9", expirationDate) >> resolvedInventoryItem
-        assert transaction.transactionEntries.first().inventoryItem == resolvedInventoryItem
-    }
-
-    void 'createInboundTransaction should fail when the destination has no inventory'() {
-        given:
-        Shipment shipment = buildShipment(null)
-        ShipmentItem shipmentItem = buildShipmentItem(100)
-        ReceiptItem receiptItem = buildReceiptItem(shipmentItem, 100)
-        Receipt receipt = createReceipt(shipment, [receiptItem], ReceiptStatusCode.RECEIVED)
-
-        when:
-        service.createInboundTransaction(receipt)
-
-        then:
-        thrown(IllegalStateException)
     }
 
     // ----------------------------------------------------------------------------------------------------------

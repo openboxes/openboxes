@@ -7,9 +7,11 @@ import org.pih.warehouse.api.receiving.v2.ReceiptV2Service
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.InventoryItemManager
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionAction
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionIdentifierService
 import org.pih.warehouse.inventory.TransactionSource
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptService
@@ -36,8 +38,11 @@ class ReceiptServiceSpec extends Specification implements ServiceUnitTest<Receip
             createShipmentEvent(_, _, _, _) >> void
         }
         service.shipmentService = shipmentService
-        // The real service, not a mock: the rollbacks are expected to actually delete the markers.
+        // The real service and manager, not mocks: the rollbacks are expected to actually delete the markers and
+        // the transaction sources. Neither dependency of the manager is reached by a rollback.
         service.receiptV2Service = new ReceiptV2Service()
+        service.receiptTransactionManager =
+                new ReceiptTransactionManager(Mock(TransactionIdentifierService), Mock(InventoryItemManager))
     }
 
     void 'savePartialReceiptEvent should create RECEIVED event when partial receiving is not supported'() {

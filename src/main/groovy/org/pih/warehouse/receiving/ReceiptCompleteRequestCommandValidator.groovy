@@ -13,6 +13,7 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
     protected ObjectValidationResult doValidate(ReceiptCompleteRequestCommand command) {
         return new ObjectValidationResult(
                 validateReceiptIsPending(command),
+                validateSomethingWasReceived(command),
                 validateItemsToCompleteAreValid(command),
                 validateNoDuplicateItemsToComplete(command),
                 validateItemsToCompleteBelongToReceipt(command),
@@ -36,6 +37,27 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
         }
 
         return null
+    }
+
+    /**
+     * A receipt must have received something to be completed: at least one of its lines with a quantity received
+     * above zero. Completing one that received nothing would record an inbound transaction carrying no entries at
+     * all (see {@link ReceiptTransactionManager#createInboundTransaction}).
+     */
+    private ObjectError validateSomethingWasReceived(ReceiptCompleteRequestCommand command) {
+        if (!command.receipt) {
+            return null
+        }
+
+        // The same lines the transaction credits: a null quantity received is a line that was never given one.
+        boolean nothingReceived = !(command.receipt.receiptItems ?: []).any { ReceiptItem receiptItem ->
+            (receiptItem.quantityReceived ?: 0) > 0
+        }
+
+        return nothingReceived ?
+                rejectField("receipt", command.receipt, "receiptCompleteRequestCommand.receipt.nothingReceived",
+                        [command.receipt.receiptNumber]) :
+                null
     }
 
     /**

@@ -49,6 +49,7 @@ class ReceiptService {
     LocationService locationService
     ReceiptIdentifierService receiptIdentifierService
     ReceiptV2Service receiptV2Service
+    ReceiptTransactionManager receiptTransactionManager
     TransactionIdentifierService transactionIdentifierService
     GrailsApplication grailsApplication
     ProductAvailabilityService productAvailabilityService
@@ -418,7 +419,7 @@ class ReceiptService {
 
         if (shipment.receipts) {
             receiptV2Service.deleteMarkersForReceipts(shipment.receipts)
-            receiptV2Service.deleteTransactionSourcesForReceipts(shipment.receipts)
+            receiptTransactionManager.deleteTransactionSourcesForReceipts(shipment.receipts)
             shipment.receipts.toArray().each { Receipt receipt ->
                 shipment.removeFromReceipts(receipt)
                 receipt.delete()
@@ -448,7 +449,7 @@ class ReceiptService {
                 transaction.delete()
             }
             receiptV2Service.deleteMarkerForReceipt(lastReceipt)
-            receiptV2Service.deleteTransactionSourceForReceipt(lastReceipt)
+            receiptTransactionManager.deleteTransactionSourceForReceipt(lastReceipt)
             shipment.removeFromReceipts(lastReceipt)
             lastReceipt.delete()
 
