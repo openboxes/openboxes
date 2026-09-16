@@ -20,14 +20,14 @@ const store = configureStore()({ session: {}, localize: { languages: [] } });
 
 describe('useTableArrowNavigation', () => {
   // A stand-in for a table, with a row per field.
-  const Table = ({ rows, onAddRow, verticalOnly }) => {
+  const Table = ({ rows, onNavigatePastLastField, verticalOnly }) => {
     const [addedRows, setAddedRows] = useState([]);
 
     const tableRef = useTableArrowNavigation({
       verticalOnly,
-      onAddRow: onAddRow
+      onNavigatePastLastField: onNavigatePastLastField
         ? (column) => {
-          onAddRow(column);
+          onNavigatePastLastField(column);
           setAddedRows((currentRows) => [...currentRows, `added-${currentRows.length}`]);
         }
         : undefined,
@@ -209,14 +209,14 @@ describe('useTableArrowNavigation', () => {
   });
 
   it('adds a row from the last field of the table and focuses the field it brings', () => {
-    const onAddRow = jest.fn();
-    renderTable(gridRows, { onAddRow });
+    const onNavigatePastLastField = jest.fn();
+    renderTable(gridRows, { onNavigatePastLastField });
 
     arrowDownNatively(screen.getByTestId('recipient-second'));
-    expect(onAddRow).not.toHaveBeenCalled();
+    expect(onNavigatePastLastField).not.toHaveBeenCalled();
 
     arrowDownNatively(screen.getByTestId('quantity-second'));
-    expect(onAddRow).toHaveBeenCalledWith(COLUMN);
+    expect(onNavigatePastLastField).toHaveBeenCalledWith(COLUMN);
     expect(screen.getByTestId('added-0')).toHaveFocus();
   });
 });

@@ -52,9 +52,9 @@ const DataTable = ({
   defaultExpandedSubRows,
   arrowNavigation,
 }) => {
-  const { enabledForAllFields, verticalOnly, onAddRow } = arrowNavigation;
+  const { enabledForAllFields, verticalOnly, onNavigatePastLastField } = arrowNavigation;
   // Arrow key navigation. With no cell marked as navigable, the listener does nothing.
-  const arrowNavigationRef = useTableArrowNavigation({ onAddRow, verticalOnly });
+  const arrowNavigationRef = useTableArrowNavigation({ onNavigatePastLastField, verticalOnly });
   const {
     defaultEmptyTableMessage,
     defaultLoadingTableMessage,
@@ -167,9 +167,8 @@ DataTable.propTypes = {
     enabledForAllFields: PropTypes.bool,
     // Limits the moves to up and down, leaving left and right to move the caret in the field.
     verticalOnly: PropTypes.bool,
-    // Called with the column when arrow down or right leaves the last field of the table. The
-    // focus lands in the row it adds.
-    onAddRow: PropTypes.func,
+    // Called with the column when arrow down or right leaves the last field of the table.
+    onNavigatePastLastField: PropTypes.func,
   }),
 };
 

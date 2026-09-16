@@ -44,7 +44,7 @@ const ReceivingLineItemsTable = ({
           disablePagination
           showFooter
           meta={{ totalReceivingNow: receivingNow, remainingToReceive }}
-          arrowNavigation={{ verticalOnly: true, onAddRow: addRow }}
+          arrowNavigation={{ verticalOnly: true, onNavigatePastLastField: addRow }}
           emptyTableMessage={{
             id: 'react.receiving.emptyTable.label',
             defaultMessage: 'No items to receive',
