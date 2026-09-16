@@ -4,6 +4,8 @@ import grails.util.Holders
 import org.hibernate.proxy.HibernateProxy
 import org.springframework.stereotype.Component
 
+import org.pih.warehouse.core.Identifiable
+
 /**
  * A wrapper on all {@link Mapper} components that allows converting any source object into any target object
  * as long as there is a Mapper defined between the two.
@@ -39,6 +41,21 @@ class SmartMapper {
                     "source ${sourceClass} and target ${targetClass}.")
         }
         return mapper.map(source, config)
+    }
+
+    /**
+     * A convenience method for mapping {@link Identifiable} objects when we only want to map the id field.
+     * This allows us to map between objects without actually hydrating them.
+     *
+     * @param source The collection of object to be converted from.
+     * @param targetClass The target class type to convert each of the sources to.
+     * @return A new list of instances of the target object with only the id field set.
+     */
+    static <Source extends Identifiable, Target extends Identifiable> Target mapIdOnly(Source source,
+                                                                                       Class<Target> targetClass) {
+        // If the source object is a Hibernate proxy (ie a non-hydrated domain entity object),
+        // accessing its "id" field will not cause the entity to be fetched/hydrated from the database.
+        return targetClass.newInstance(id: source.id)
     }
 
     /**
