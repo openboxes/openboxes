@@ -4,18 +4,18 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 import org.pih.warehouse.core.localization.MessageLocalizer
-import org.pih.warehouse.core.mapper.Mapper
+import org.pih.warehouse.core.mapper.EntityToDtoMapper
 import org.pih.warehouse.core.mapper.MapperConfig
 import org.pih.warehouse.core.mapper.ResponseMapper
 
 @Component
-class ProductSimpleDtoMapper implements Mapper<Product, ProductSimpleDto>, ResponseMapper<ProductSimpleDto> {
+class ProductSimpleDtoMapper implements EntityToDtoMapper<Product, ProductSimpleDto>, ResponseMapper<ProductSimpleDto> {
 
     @Autowired
     MessageLocalizer messageLocalizer
 
     @Override
-    ProductSimpleDto map(Product product, MapperConfig config) {
+    ProductSimpleDto doMap(Product product, MapperConfig config) {
         return !product ? null : new ProductSimpleDto(
                 id: product.id,
                 productCode: product.productCode,

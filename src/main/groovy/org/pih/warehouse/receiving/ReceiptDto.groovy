@@ -1,11 +1,12 @@
 package org.pih.warehouse.receiving
 
+import org.pih.warehouse.core.dtos.DomainDto
+
 /**
  * A simple, general purpose DTO representing a receipt and its items.
  */
-class ReceiptDto implements Comparable<ReceiptDto> {
+class ReceiptDto implements DomainDto<Receipt>, Comparable<ReceiptDto> {
 
-    String id
     ReceiptStatusCode receiptStatus
     String shipmentId
     Date dateDelivered
