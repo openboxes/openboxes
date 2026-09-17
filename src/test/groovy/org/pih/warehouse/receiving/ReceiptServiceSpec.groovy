@@ -7,6 +7,12 @@ import org.pih.warehouse.api.receiving.v2.ReceiptV2Service
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.InventoryItemManager
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionAction
+import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionIdentifierService
+import org.pih.warehouse.inventory.TransactionSource
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptService
 import org.pih.warehouse.shipping.Shipment
@@ -23,7 +29,8 @@ class ReceiptServiceSpec extends Specification implements ServiceUnitTest<Receip
     ShipmentService shipmentService
 
     void setupSpec() {
-        mockDomains(Receipt, ReceiptV2Marker, Shipment, ShipmentType, Location)
+        mockDomains(Receipt, ReceiptV2Marker, Shipment, ShipmentType, Location, Transaction, TransactionEntry,
+                TransactionSource)
     }
 
     void setup() {
@@ -31,8 +38,11 @@ class ReceiptServiceSpec extends Specification implements ServiceUnitTest<Receip
             createShipmentEvent(_, _, _, _) >> void
         }
         service.shipmentService = shipmentService
-        // The real service, not a mock: the rollbacks are expected to actually delete the markers.
+        // The real service and manager, not mocks: the rollbacks are expected to actually delete the markers and
+        // the transaction sources. Neither dependency of the manager is reached by a rollback.
         service.receiptV2Service = new ReceiptV2Service()
+        service.receiptTransactionManager =
+                new ReceiptTransactionManager(Mock(TransactionIdentifierService), Mock(InventoryItemManager))
     }
 
     void 'savePartialReceiptEvent should create RECEIVED event when partial receiving is not supported'() {
@@ -194,6 +204,38 @@ class ReceiptServiceSpec extends Specification implements ServiceUnitTest<Receip
         then:
         assert ReceiptV2Marker.count() == 0
         assert Receipt.count() == 0
+    }
+
+    void 'rollbackLastReceipt should delete the transaction source of the receipt it rolls back'() {
+        given: 'a received receipt whose completion recorded a transaction source'
+        Shipment shipment = buildShipmentWithReceipts(ReceiptStatusCode.RECEIVED)
+        Receipt receipt = shipment.receipts.first()
+        buildTransactionSource(receipt)
+
+        when:
+        service.rollbackLastReceipt(shipment)
+
+        then: 'the source goes with it - its foreign key would otherwise block the deletion of the receipt'
+        assert TransactionSource.count() == 0
+        assert Receipt.count() == 0
+    }
+
+    void 'rollbackPartialReceipts should delete the transaction source of every receipt it rolls back'() {
+        given: 'a completed and a pending receipt, the completed one carrying a transaction source'
+        Shipment shipment = buildShipmentWithReceipts(ReceiptStatusCode.RECEIVED, ReceiptStatusCode.PENDING)
+        shipment.receipts.each { Receipt receipt -> buildTransactionSource(receipt) }
+
+        when:
+        service.rollbackPartialReceipts(shipment)
+
+        then:
+        assert TransactionSource.count() == 0
+        assert Receipt.count() == 0
+    }
+
+    private static TransactionSource buildTransactionSource(Receipt receipt) {
+        return new TransactionSource(transactionAction: TransactionAction.RECEIPT, receipt: receipt)
+                .save(failOnError: true, flush: true)
     }
 
     /**

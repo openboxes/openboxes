@@ -26,8 +26,8 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
 
     void 'doValidate should accept a receipt that was started by the old receiving workflow'() {
         given: 'a pending receipt carrying no v2 marker'
-        Receipt receipt = new Receipt(receiptStatusCode: ReceiptStatusCode.PENDING, actualDeliveryDate: new Date())
-        receipt.save(failOnError: true, flush: true)
+        Receipt receipt = buildPendingReceipt()
+        buildReceiptItem(receipt, false)
 
         when:
         ObjectValidationResult result = validator.doValidate(new ReceiptCompleteRequestCommand(
@@ -36,6 +36,48 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
         ))
 
         then: 'the workflow the receipt was started by does not gate its completion'
+        assert result.valid
+    }
+
+    void 'doValidate should reject a receipt that received nothing (quantityReceived: #quantityReceived)'() {
+        given: 'a pending receipt whose only line received nothing'
+        Receipt receipt = buildPendingReceipt()
+        buildReceiptItem(receipt, false, quantityReceived)
+
+        when:
+        ObjectValidationResult result = validator.doValidate(new ReceiptCompleteRequestCommand(receipt: receipt))
+
+        then: 'completing it would record an inbound transaction with no entries at all, so it is rejected'
+        assert !result.valid
+        assert result.errors*.code == ["receiptCompleteRequestCommand.receipt.nothingReceived"]
+
+        where: 'the line was either never given a quantity, or deliberately given a zero'
+        quantityReceived << [null, 0]
+    }
+
+    void 'doValidate should reject a receipt that carries no lines at all'() {
+        given:
+        Receipt receipt = buildPendingReceipt()
+
+        when:
+        ObjectValidationResult result = validator.doValidate(new ReceiptCompleteRequestCommand(receipt: receipt))
+
+        then:
+        assert !result.valid
+        assert result.errors*.code == ["receiptCompleteRequestCommand.receipt.nothingReceived"]
+    }
+
+    void 'doValidate should accept a receipt where a single line received something'() {
+        given: 'a pending receipt whose lines received nothing, except for one'
+        Receipt receipt = buildPendingReceipt()
+        buildReceiptItem(receipt, false, 0)
+        buildReceiptItem(receipt, true, null)
+        buildReceiptItem(receipt, true, 5)
+
+        when:
+        ObjectValidationResult result = validator.doValidate(new ReceiptCompleteRequestCommand(receipt: receipt))
+
+        then: 'the one line that moved stock is enough - the transaction gets its entry'
         assert result.valid
     }
 
@@ -105,10 +147,11 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
         return receipt
     }
 
-    private static ReceiptItem buildReceiptItem(Receipt receipt, Boolean isSplitItem) {
+    private static ReceiptItem buildReceiptItem(Receipt receipt, Boolean isSplitItem, Integer quantityReceived = 10) {
         ReceiptItem receiptItem = new ReceiptItem(
                 product: new Product(name: "Product"),
                 quantityShipped: isSplitItem ? 0 : 100,
+                quantityReceived: quantityReceived,
                 isSplitItem: isSplitItem,
         )
         receipt.addToReceiptItems(receiptItem)

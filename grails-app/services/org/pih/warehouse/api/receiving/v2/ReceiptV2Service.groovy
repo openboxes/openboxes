@@ -9,7 +9,6 @@ import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.OrderedDataGroup
@@ -20,9 +19,6 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryItemManager
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.inventory.TransactionEntry
-import org.pih.warehouse.inventory.TransactionIdentifierService
-import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptCompleteRequestCommand
 import org.pih.warehouse.receiving.ReceiptDto
@@ -43,6 +39,7 @@ import org.pih.warehouse.receiving.ReceiptSaveResponseDto
 import org.pih.warehouse.receiving.ReceiptService
 import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.receiving.ReceiptSynchronizer
+import org.pih.warehouse.receiving.ReceiptTransactionManager
 import org.pih.warehouse.receiving.ReceiptV2Marker
 import org.pih.warehouse.receiving.ShipmentForReceiptValidator
 import org.pih.warehouse.receiving.ShipmentItemReceivedQuantitiesDto
@@ -72,7 +69,7 @@ class ReceiptV2Service {
     MessageLocalizer messageLocalizer
     InventoryItemManager inventoryItemManager
     ShipmentService shipmentService
-    TransactionIdentifierService transactionIdentifierService
+    ReceiptTransactionManager receiptTransactionManager
     GrailsApplication grailsApplication
 
     @Transactional
@@ -264,13 +261,19 @@ class ReceiptV2Service {
 
         ShipmentItem shipmentItem = item.shipmentItem
 
+        // Lines created here are split lines - the original line of a shipment item is only ever written when the
+        // receipt is started or synced (see ReceiptItemFactory#createReceiptItemFromShipmentItem), so the split flag
+        // is owned by the server: forced on creation, never bound from the request. Split lines also carry a quantity
+        // shipped of zero - the shipment item's full quantity stays on the original line, which keeps that line the
+        // only one with a remainder that can be canceled on completion (see cancelRemainingQuantities).
         ReceiptItem receiptItem = new ReceiptItem(
                 product: shipmentItem.product,
                 inventoryItem: shipmentItem.inventoryItem,
                 lotNumber: shipmentItem.lotNumber,
                 expirationDate: shipmentItem.expirationDate,
                 recipient: shipmentItem.recipient,
-                quantityShipped: shipmentItem.quantity,
+                isSplitItem: Boolean.TRUE,
+                quantityShipped: 0,
                 quantityReceived: item.quantityReceiving,
                 binLocation: item.binLocation,
                 sortOrder: shipmentItem.receiptItems.size(),
@@ -329,7 +332,7 @@ class ReceiptV2Service {
         zeroOutEmptyReceivedQuantities(receipt)
 
         // The order summary refresh is left suppressed here because it already rides on the shipment save at the
-        // end of createInboundTransaction.
+        // end of ReceiptTransactionManager#createInboundTransaction.
         receipt.disableRefresh = true
         if (!receipt.save()) {
             throw new ValidationException("Receipt is invalid", receipt.errors)
@@ -338,7 +341,7 @@ class ReceiptV2Service {
         // The canceled quantities count towards the shipment being fully received, so the shipment event (which
         // decides between RECEIVED and PARTIALLY_RECEIVED) can only be created after they are applied.
         createShipmentReceivedEvent(receipt)
-        Transaction transaction = createInboundTransaction(receipt)
+        Transaction transaction = receiptTransactionManager.createInboundTransaction(receipt)
 
         // Trigger shipment status transition event to handle email notifications
         grailsApplication.mainContext.publishEvent(
@@ -439,60 +442,6 @@ class ReceiptV2Service {
             shipmentService.createShipmentEvent(
                     shipment, receipt.actualDeliveryDate, EventCode.PARTIALLY_RECEIVED, shipment.destination)
         }
-    }
-
-    /**
-     * Records the inbound stock transaction of a completed receipt: one entry per receipt item, crediting the
-     * received quantities to the destination's inventory.
-     */
-    private Transaction createInboundTransaction(Receipt receipt) {
-        Shipment shipment = receipt.shipment
-        if (!shipment.destination?.inventory) {
-            throw new IllegalStateException(
-                    "Destination ${shipment.destination?.name} must have an inventory in order to receive stock")
-        }
-
-        Transaction transaction = new Transaction(
-                transactionType: TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID),
-                incomingShipment: shipment,
-                requisition: shipment.requisition,
-                receipt: receipt,
-                source: shipment.origin,
-                destination: null,
-                inventory: shipment.destination.inventory,
-                transactionDate: receipt.actualDeliveryDate,
-        )
-        transaction.transactionNumber = transactionIdentifierService.generate(transaction)
-
-        receipt.receiptItems.each { ReceiptItem receiptItem ->
-            // Receipt items created via the v2 endpoints always carry an inventory item, but fall back to resolving
-            // one from the lot fields to support receipts against legacy shipment items that never had one.
-            InventoryItem inventoryItem = receiptItem.inventoryItem ?: inventoryItemManager.getOrCreateInventoryItem(
-                    receiptItem.product, receiptItem.lotNumber, receiptItem.expirationDate)
-
-            transaction.addToTransactionEntries(new TransactionEntry(
-                    quantity: receiptItem.quantityReceived ?: 0,
-                    binLocation: receiptItem.binLocation,
-                    inventoryItem: inventoryItem,
-            ))
-        }
-
-        // Block the refresh of the product availability table (to be triggered at the end of the request)
-        transaction.disableRefresh = Boolean.TRUE
-
-        if (!transaction.save(flush: true)) {
-            throw new ValidationException(
-                    "Failed to receive shipment due to error while saving transaction", transaction.errors)
-        }
-
-        // Associate the incoming transaction with the shipment
-        shipment.addToIncomingTransactions(transaction)
-        shipment.disableRefresh = false
-        if (!shipment.save(flush: true)) {
-            throw new ValidationException("Shipment is invalid", shipment.errors)
-        }
-
-        return transaction
     }
 
     /**
