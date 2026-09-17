@@ -6,10 +6,9 @@ import org.springframework.stereotype.Component
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.core.mapper.EntityToDtoMapper
 import org.pih.warehouse.core.mapper.MapperConfig
-import org.pih.warehouse.core.mapper.ResponseMapper
 
 @Component
-class ProductSimpleDtoMapper implements EntityToDtoMapper<Product, ProductSimpleDto>, ResponseMapper<ProductSimpleDto> {
+class ProductSimpleDtoMapper implements EntityToDtoMapper<Product, ProductSimpleDto> {
 
     @Autowired
     MessageLocalizer messageLocalizer
@@ -22,16 +21,6 @@ class ProductSimpleDtoMapper implements EntityToDtoMapper<Product, ProductSimple
                 name: product.name,
                 handlingLabels: mapHandlingLabelsToDto(product),
         )
-    }
-
-    @Override
-    Map<String, Object> asResponseBody(ProductSimpleDto source) {
-        return [
-                id            : source.id,
-                productCode   : source.productCode,
-                name          : source.name,
-                handlingLabels: source.handlingLabels,
-        ]
     }
 
     private List<ProductHandlingLabelDto> mapHandlingLabelsToDto(Product product) {

@@ -3,30 +3,32 @@ package org.pih.warehouse.core.mapper
 import org.apache.commons.collections4.map.MultiKeyMap
 import org.springframework.stereotype.Component
 
+import org.pih.warehouse.core.serialization.SerializationMapper
+
 /**
  * Caches components relating to mapping/converting data.
  */
 @Component
 class MapperComponentResolver {
 
-    private final Map<Class, ResponseMapper> responseMappersBySourceType = [:]
+    private final Map<Class, SerializationMapper> serializationMappersBySourceType = [:]
     private final MultiKeyMap<Class, Mapper> mappersBySourceAndTargetType = new MultiKeyMap<>()
 
     // Components are wrapped with optional to avoid an error when no implementations are defined.
-    MapperComponentResolver(final Optional<List<ResponseMapper>> responseMappers,
+    MapperComponentResolver(final Optional<List<SerializationMapper>> serializationMappers,
                             final Optional<List<Mapper>> mappers) {
-        populateResponseMapperMap(responseMappers.orElse([]))
+        populateSerializationMapperMap(serializationMappers.orElse([]))
         populateMapperMap(mappers.orElse([]))
     }
 
-    private void populateResponseMapperMap(List<ResponseMapper> responseMappers) {
-        for (responseMapper in responseMappers) {
-            Class sourceType = responseMapper.serializableSourceType
-            if (responseMappersBySourceType.containsKey(sourceType)) {
-                throw new RuntimeException(
-                        "Found multiple response mappers for source type ${sourceType}. Only one is allowed.")
+    private void populateSerializationMapperMap(List<SerializationMapper> serializationMappers) {
+        for (serializationMapper in serializationMappers) {
+            Class serializableType = serializationMapper.serializableType
+            if (serializationMappersBySourceType.containsKey(serializableType)) {
+                throw new RuntimeException("Found multiple serialization mappers for serializable type " +
+                        "${serializableType}. Only one is allowed.")
             }
-            responseMappersBySourceType.put(sourceType, responseMapper)
+            serializationMappersBySourceType.put(serializableType, serializationMapper)
         }
     }
 
@@ -52,17 +54,17 @@ class MapperComponentResolver {
     }
 
     /**
-     * @return The response mapper associated with the given source type.
+     * @return The serialization mapper associated with the given source type.
      */
-    ResponseMapper getResponseMapper(Class sourceType) {
-        responseMappersBySourceType.get(sourceType)
+    SerializationMapper getSerializationMapper(Class sourceType) {
+        serializationMappersBySourceType.get(sourceType)
     }
 
     /**
-     * @return All response mappers. Should only be used when registering JSON marshallers.
+     * @return All serialization mappers. Should only be used when registering JSON marshallers.
      */
-    Map<Class, ResponseMapper> getAllResponseMappers() {
-        return responseMappersBySourceType
+    Map<Class, SerializationMapper> getAllSerializationMappers() {
+        return serializationMappersBySourceType
     }
 
     /**

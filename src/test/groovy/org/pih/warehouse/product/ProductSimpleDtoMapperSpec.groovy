@@ -16,47 +16,67 @@ class ProductSimpleDtoMapperSpec extends Specification {
         mapper = new ProductSimpleDtoMapper(messageLocalizer: MessageLocalizerStub.MESSAGE_LOCALIZER_STUB)
     }
 
-    void 'asResponseBody should name every handling label of the product'() {
+    void 'map should name every handling label of the product'() {
         given:
-        List<ProductHandlingLabelDto> labels = [
-                new ProductHandlingLabelDto(
-                        labelCode: ProductHandlingLabel.COLD_CHAIN,
-                        labelText: "Cold chain",
-                ),
-                new ProductHandlingLabelDto(
-                        labelCode: ProductHandlingLabel.RECONDITIONED,
-                        labelText: "Reconditioned",
-                ),
-        ]
-        ProductSimpleDto product = new ProductSimpleDto(
-                id: "1",
+        Product product = new Product(
                 productCode: "PC1",
                 name: "Ibuprofen 200mg",
-                handlingLabels: labels,
+                coldChain: true,
+                controlledSubstance: true,
+                hazardousMaterial: true,
+                reconditioned: true,
         )
+        product.id = "1"
 
         when:
-        Map response = mapper.asResponseBody(product)
+        ProductSimpleDto dto = mapper.map(product)
 
         then:
-        assert response.id == "1"
-        assert response.productCode == "PC1"
-        assert response.name == "Ibuprofen 200mg"
-        assert response.handlingLabels*.labelCode == [
+        assert dto.id == "1"
+        assert dto.productCode == "PC1"
+        assert dto.name == "Ibuprofen 200mg"
+        assert dto.handlingLabels*.labelCode == [
                 ProductHandlingLabel.COLD_CHAIN,
+                ProductHandlingLabel.CONTROLLED_SUBSTANCE,
+                ProductHandlingLabel.HAZARDOUS_MATERIAL,
                 ProductHandlingLabel.RECONDITIONED,
         ]
-        assert response.handlingLabels*.labelText == [
-                "Cold chain",
-                "Reconditioned",
+        assert dto.handlingLabels*.labelText == [
+                "product.coldChain.label",
+                "product.controlledSubstance.label",
+                "product.hazardousMaterial.label",
+                "product.reconditioned.label",
         ]
     }
 
-    void 'asResponseBody should return no handling labels for a product without any'() {
+    void 'map should name only the handling labels of the product that are true'() {
         given:
-        ProductSimpleDto product = new ProductSimpleDto(id: "1", name: "Ibuprofen 200mg")
+        Product product = new Product(
+                coldChain: true,
+                controlledSubstance: true,
+                hazardousMaterial: false,
+                reconditioned: false,
+        )
+
+        when:
+        ProductSimpleDto dto = mapper.map(product)
+
+        then:
+        assert dto.handlingLabels*.labelCode == [
+                ProductHandlingLabel.COLD_CHAIN,
+                ProductHandlingLabel.CONTROLLED_SUBSTANCE,
+        ]
+        assert dto.handlingLabels*.labelText == [
+                "product.coldChain.label",
+                "product.controlledSubstance.label",
+        ]
+    }
+
+    void 'map should return no handling labels for a product without any'() {
+        given:
+        Product product = new Product(name: "Ibuprofen 200mg")
 
         expect:
-        assert mapper.asResponseBody(product).handlingLabels.isEmpty()
+        assert mapper.map(product).handlingLabels.isEmpty()
     }
 }

@@ -3,14 +3,14 @@ package org.pih.warehouse.inventory
 import org.springframework.stereotype.Component
 
 import org.pih.warehouse.core.Tag
-import org.pih.warehouse.core.mapper.ResponseMapper
+import org.pih.warehouse.core.serialization.SerializationMapper
 import org.pih.warehouse.product.ProductCatalogDto
 
 @Component
-class CycleCountCandidateMapper implements ResponseMapper<CycleCountCandidate> {
+class CycleCountCandidateMapper implements SerializationMapper<CycleCountCandidate> {
 
     @Override
-    Map<String, Object> asResponseBody(CycleCountCandidate source) {
+    Map<String, Object> serialize(CycleCountCandidate source) {
         return [
                 product: [
                         id: source.product?.id,
@@ -25,7 +25,7 @@ class CycleCountCandidateMapper implements ResponseMapper<CycleCountCandidate> {
                         name: source.product?.category?.name,
                 ],
                 internalLocations: source.internalLocations,
-                tags: tagsAsResponseBody(source.product?.tags),
+                tags: serializeTags(source.product?.tags),
                 productCatalogs: source.product?.productCatalogs?.collect { ProductCatalogDto.from(it) },
                 abcClass: source.abcClass,
                 quantityOnHand: source.quantityOnHand,
@@ -39,18 +39,12 @@ class CycleCountCandidateMapper implements ResponseMapper<CycleCountCandidate> {
         ]
     }
 
-    private List<Map> tagsAsResponseBody(Collection<Tag> tags) {
+    private List<Map> serializeTags(Collection<Tag> tags) {
         return tags?.collect { Tag tag ->
             [
                     id : tag.id,
                     tag: tag.tag,
             ]
         }
-    }
-
-    @Override
-    Map<String, Object> asExportRow(CycleCountCandidate object) {
-        // TODO: will be implemented after refactoring export/import flow
-        return null
     }
 }

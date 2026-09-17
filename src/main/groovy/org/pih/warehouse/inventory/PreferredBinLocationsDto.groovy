@@ -1,13 +1,13 @@
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.core.http.ResponseBodyFormattable
 import org.pih.warehouse.location.LocationSimpleDto
+import org.pih.warehouse.core.serialization.Serializable
 
 /**
  * The preferred bin locations of a set of products at a given facility, keyed by product id.
  * Products with no preferred bin location configured are omitted.
  */
-class PreferredBinLocationsDto implements ResponseBodyFormattable {
+class PreferredBinLocationsDto implements Serializable<PreferredBinLocationsDtoMapper> {
 
     Map<String, LocationSimpleDto> preferredBinLocationsByProductId = [:]
 
@@ -17,12 +17,5 @@ class PreferredBinLocationsDto implements ResponseBodyFormattable {
                     [(inventoryLevel.product.id): LocationSimpleDto.from(inventoryLevel.preferredBinLocation)]
                 }
         return new PreferredBinLocationsDto(preferredBinLocationsByProductId: preferredBinLocationsByProductId)
-    }
-
-    @Override
-    Map<String, Object> asResponseBody() {
-        return preferredBinLocationsByProductId.collectEntries { String productId, LocationSimpleDto preferredBinLocation ->
-            [(productId): preferredBinLocation]
-        } as Map<String, Object>
     }
 }

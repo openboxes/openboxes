@@ -2,7 +2,7 @@ package org.pih.warehouse.core
 
 import org.codehaus.groovy.runtime.typehandling.GroovyCastException
 
-import org.pih.warehouse.core.http.ResponseBodyFormattable
+import org.pih.warehouse.core.serialization.Serializable
 
 /**
  * Provides optional context around how some data might be grouped.
@@ -61,9 +61,9 @@ import org.pih.warehouse.core.http.ResponseBodyFormattable
  * be converted to a LinkedHashSet) or an additional DataGroup (for chaining groups) is allowed. Attempting to
  * put any other structure (such as a plain Map) will cause an error.
  */
-class DataGroup implements ResponseBodyFormattable {
+class DataGroup implements Serializable<DataGroupMapper> {
 
-    private HashMap<String, Object> group = [:]
+    HashMap<String, Object> group = [:]
 
     /**
      * Puts a new object to the group.
@@ -136,11 +136,5 @@ class DataGroup implements ResponseBodyFormattable {
             throw new IllegalArgumentException("Failed adding element to group. Expected a collection of values but " +
                     "got something else. Make sure you're not mixing and matching structures/types within a group", e)
         }
-    }
-
-    @Override
-    Map<String, Object> asResponseBody() {
-        // We don't want to add another nested key in the JSON for the group so simply render the group map itself.
-        return group
     }
 }

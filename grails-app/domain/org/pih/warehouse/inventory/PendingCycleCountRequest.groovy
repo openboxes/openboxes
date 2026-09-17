@@ -3,11 +3,11 @@ package org.pih.warehouse.inventory
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
-import org.pih.warehouse.core.http.ResponseBodyFormattable
+import org.pih.warehouse.core.serialization.Serializable
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalogDto
 
-class PendingCycleCountRequest implements ResponseBodyFormattable {
+class PendingCycleCountRequest implements Serializable<PendingCycleCountRequestMapper> {
 
     String id
 
@@ -44,44 +44,5 @@ class PendingCycleCountRequest implements ResponseBodyFormattable {
     static mapping = {
         table "pending_cycle_count_request"
         version false
-    }
-
-    @Override
-    Map<String, Object> asResponseBody() {
-        return [
-                id: id,
-                facility: facility?.id,
-                cycleCountRequest: cycleCountRequest,
-                product: [
-                        id: product.id,
-                        name: product.name,
-                        productCode: product.productCode,
-                ],
-                category: [
-                        id: product.category?.id,
-                        name: product.category?.name,
-                ],
-                internalLocations: internalLocations,
-                tags: tagsToJson(),
-                productCatalogs: product.productCatalogs.collect { ProductCatalogDto.from(it) },
-                abcClass: abcClass,
-                quantityOnHand: quantityOnHand,
-                quantityAllocated: quantityAllocated,
-                status: status.toString(),
-                negativeItemCount: negativeItemCount,
-                requestType: requestType.toString(),
-                blindCount: blindCount,
-                dateCreated: dateCreated,
-                lastUpdated: lastUpdated,
-        ]
-    }
-
-    List<Map> tagsToJson() {
-        return product.tags?.collect { Tag tag ->
-            [
-                    id : tag.id,
-                    tag: tag.tag,
-            ]
-        }
     }
 }

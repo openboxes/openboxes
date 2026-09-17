@@ -1,11 +1,9 @@
 package org.pih.warehouse.receiving
 
-import org.pih.warehouse.core.http.ResponseBodyFormattable
-
 /**
  * The comment of a single receipt item.
  */
-class ReceiptItemCommentDto implements ResponseBodyFormattable {
+class ReceiptItemCommentDto {
 
     String receiptItemId
     String comment
@@ -15,13 +13,5 @@ class ReceiptItemCommentDto implements ResponseBodyFormattable {
                 receiptItemId: receiptItem.id,
                 comment: receiptItem.comment,
         )
-    }
-
-    @Override
-    Map<String, Object> asResponseBody() {
-        return [
-                receiptItemId: receiptItemId,
-                comment: comment,
-        ]
     }
 }
