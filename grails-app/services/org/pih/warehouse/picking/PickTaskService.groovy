@@ -60,7 +60,7 @@ class PickTaskService {
 
         List<String> assignedRequisitions
         if (excludeAssignedRequisitions) {
-            assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(command.facility, statusesToSearch)
+            assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(command.facility, statusesToSearch, command.currentUserId)
         }
 
         List<PickTask> tasks = PickTask.createCriteria().list(max: max, offset: offset) {
@@ -162,7 +162,7 @@ class PickTaskService {
 
         List<String> assignedRequisitions
         if (command.excludeAssignedRequisitions) {
-            assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(command.facility, statuses)
+            assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(command.facility, statuses, command.currentUserId)
         }
         List results = PickTask.createCriteria().list {
             projections {
@@ -570,7 +570,7 @@ class PickTaskService {
 
         // FIXME refactor findRequisitionIdsWithPickTaskAssigned method to include it in the query itself,
         //  it could return a DetachedCriteria and be treated as a subquery instead of two separate queries
-        List<String> assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(command.facility, statusesToSearch)
+        List<String> assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(command.facility, statusesToSearch, command.currentUserId)
 
         List<Requisition> candidates = PickTask.createCriteria().list {
             projections {
@@ -599,12 +599,18 @@ class PickTaskService {
         }.take(ordersCount)*.id
     }
 
-    private List<String> findRequisitionIdsWithPickTaskAssigned(Location facility, List<PickTaskStatus> statusesToSearch) {
+    private List<String> findRequisitionIdsWithPickTaskAssigned(Location facility, List<PickTaskStatus> statusesToSearch, String currentUserId = null) {
+        // A requisition assigned to the requesting mobile user should still be offered to them (e.g. after
+        // navigating back out of it), so only requisitions assigned to someone else are excluded here.
+        // currentUserId comes from the request itself (command.assigneeId), not the web session user.
         List<Requisition> requisitions = PickTask.createCriteria().list {
             projections {
                 distinct("requisition")
             }
             isNotNull("assignee")
+            if (currentUserId) {
+                ne("assignee.id", currentUserId)
+            }
             if (statusesToSearch) {
                 'in'("status", statusesToSearch)
             }
