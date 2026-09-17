@@ -12,9 +12,9 @@ package org.pih.warehouse
 import grails.converters.JSON
 import grails.util.Holders
 
-import org.pih.warehouse.core.http.HttpSerializable
 import org.pih.warehouse.core.mapper.MapperComponentResolver
-import org.pih.warehouse.core.mapper.ResponseMapper
+import org.pih.warehouse.core.serialization.Serializable
+import org.pih.warehouse.core.serialization.SerializationMapper
 import org.pih.warehouse.inventory.CycleCountDetails
 import org.pih.warehouse.inventory.CycleCountSummary
 import org.pih.warehouse.inventory.InventoryAuditDetails
@@ -27,8 +27,6 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import javax.sql.DataSource
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
-import org.springframework.core.type.filter.AssignableTypeFilter
 import liquibase.Contexts
 import liquibase.LabelExpression
 import liquibase.Liquibase
@@ -105,10 +103,6 @@ import org.pih.warehouse.shipping.ShipmentType
 
 class BootStrap {
 
-    // If there are multiple marshallers for the same object, the one with the highest priority is used.
-    private static int RESPONSE_MAPPER_MARSHALLER_PRIORITY = 20
-    private static int RESPONSE_BODY_FORMATTABLE_MARSHALLER_PRIORITY = 10
-
     UploadService uploadService
     DataSource dataSource
     MapperComponentResolver mapperComponentResolver
@@ -153,27 +147,16 @@ class BootStrap {
     void registerJsonMarshallers() {
 
         /*
-         * Automatically register all of our ResponseMapper components with Grails' JSON marshaller.
-         * Not required for controllers that extend from BaseController as they will call the ResponseMapper directly.
-         * Registering the mappers here allows us to utilize them in controllers that don't extend BaseController.
-         * This way, calling render(X as JSON) will automatically use the ResponseMapper for X if one exists.
+         * Automatically register all of our serialization mapper components with Grails' JSON marshaller.
+         * Not required for controllers that extend from BaseController as they will call the serializer directly.
+         * Registering the serializers here allows us to utilize them in controllers that don't extend BaseController.
+         * This way, calling render(X as JSON) will automatically use the serialization mapper for X if one exists.
          */
-        for (responseMapperBySource in mapperComponentResolver.allResponseMappers) {
-            Class sourceType = responseMapperBySource.key
-            ResponseMapper responseMapper = responseMapperBySource.value
-            JSON.registerObjectMarshaller(sourceType, RESPONSE_MAPPER_MARSHALLER_PRIORITY) {
-                return responseMapper.asResponseBody(it)
-            }
-        }
-
-        // And do the same for all HttpSerializable implementations.
-        // This mentions "bean definitions" but our filter actually searches for non-components as well.
-        ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false)
-        scanner.addIncludeFilter(new AssignableTypeFilter(HttpSerializable))
-        for (beanDefinition in scanner.findCandidateComponents("org.pih.warehouse")) {
-            Class clazz = Class.forName(beanDefinition.beanClassName)
-            JSON.registerObjectMarshaller(clazz, RESPONSE_BODY_FORMATTABLE_MARSHALLER_PRIORITY) {
-                return it.asResponseBody()
+        for (serializationMapperBySource in mapperComponentResolver.allSerializationMappers) {
+            Class sourceType = serializationMapperBySource.key
+            SerializationMapper serializationMapper = serializationMapperBySource.value
+            JSON.registerObjectMarshaller(sourceType) {
+                return serializationMapper.serialize(it as Serializable)
             }
         }
 

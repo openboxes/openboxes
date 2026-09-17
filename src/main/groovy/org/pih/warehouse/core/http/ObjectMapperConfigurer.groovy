@@ -23,7 +23,8 @@ import org.grails.datastore.gorm.GormEntity
 import org.springframework.stereotype.Component
 
 import org.pih.warehouse.core.mapper.MapperComponentResolver
-import org.pih.warehouse.core.mapper.ResponseMapper
+import org.pih.warehouse.core.serialization.Serializable
+import org.pih.warehouse.core.serialization.SerializationMapper
 
 /**
  * Configures Jackson's ObjectMapper, which handles API serialization.
@@ -105,9 +106,8 @@ class ObjectMapperConfigurer {
      *
      * These include (in priority order):
      *
-     * 1) defining a ResponseMapper for the object
-     * 2) implementing HttpSerializable
-     * 3) implementing a toJson() method (supported for backwards compatability with existing DTOs)
+     * 1) defining a SerializationMapper for the object
+     * 2) implementing a toJson() method (supported for backwards compatability with existing DTOs)
      *
      * If any object being serialized has one of the above, it will be serialized via that method, otherwise it
      * will serialize via Jackson's default behaviour.
@@ -236,9 +236,8 @@ class ObjectMapperConfigurer {
         /**
          * Performs our custom serialization on the given object if one of the following (in priority order) is true:
          *
-         * 1) A ResponseMapper is defined for the object
-         * 2) The object implements HttpSerializable
-         * 3) The object defines a toJson() method (supported for backwards compatability with existing DTOs)
+         * 1) A SerializationMapper is defined for the object
+         * 2) The object defines a toJson() method (supported for backwards compatability with existing DTOs)
          */
         private Map applyCustomMapping(Object value) {
             if (value == null) {
@@ -256,14 +255,11 @@ class ObjectMapperConfigurer {
                 return null
             }
 
-            ResponseMapper responseMapper = mapperComponentResolver.getResponseMapper(valueClass)
-            if (responseMapper) {
-                return responseMapper.asResponseBody(value)
+            SerializationMapper serializationMapper = mapperComponentResolver.getSerializationMapper(valueClass)
+            if (serializationMapper && value) {
+                return serializationMapper.serialize(value as Serializable)
             }
-            if (value instanceof HttpSerializable) {
-                return value.asResponseBody()
-            }
-            // toJson() is supported for compatability with existing DTOs. Prefer extending HttpSerializable.
+            // toJson() is supported for compatability with existing DTOs. Prefer using a serialization mapper.
             if (value.metaClass.respondsTo(value, "toJson")) {
                 return value.toJson()
             }

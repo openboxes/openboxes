@@ -9,7 +9,7 @@ import org.pih.warehouse.api.BaseApiController
 import org.pih.warehouse.core.file.FileNameGenerator
 import org.pih.warehouse.core.http.JsonSerializer
 import org.pih.warehouse.core.mapper.MapperComponentResolver
-import org.pih.warehouse.core.mapper.ResponseMapper
+import org.pih.warehouse.core.serialization.SerializationMapper
 
 /**
  * A base class for all unit tests on API Controllers.
@@ -29,9 +29,9 @@ abstract class ApiControllerSpec<T extends BaseApiController> extends Specificat
     }
 
     void setup() {
-        // Sets up the ResponseMapper components that the spec defines to be used when serializing JSON responses.
+        // Sets up the mapper components to be used in tests when serializing JSON responses.
         MapperComponentResolver mapperComponentResolver = new MapperComponentResolver(
-                Optional.of(setupResponseMappers()),
+                Optional.of(setupSerializationMappers()),
                 Optional.empty())
 
         // Enables controllers to serialize their response objects to JSON during tests.
@@ -45,7 +45,7 @@ abstract class ApiControllerSpec<T extends BaseApiController> extends Specificat
     /**
      * Meant to be overwritten.
      *
-     * Returns the list of response mappers to use when serializing controller responses during tests.
+     * Returns the list of mappers to use when serializing controller responses during tests.
      *
      * If a mapper is not specified, any controller that would have used it will instead fall back to other
      * serialization methods (see BaseController for details).
@@ -53,7 +53,7 @@ abstract class ApiControllerSpec<T extends BaseApiController> extends Specificat
      * We've opted to require you to manually specify the mappers (instead of autowiring them in for tests) to give
      * us more control of the exact behaviour that we want to test.
      */
-    List<ResponseMapper> setupResponseMappers() {
+    List<SerializationMapper> setupSerializationMappers() {
         return []
     }
 }
