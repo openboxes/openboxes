@@ -59,6 +59,7 @@
         color: var(--gray-600);
         font-weight: bold;
         border-right: none;
+        white-space: normal;
 
         .required {
           font-size: 12px;
@@ -113,6 +114,10 @@
     .rt-tbody, .rt-tbody-v2 {
       .rt-tr-group {
         border-bottom: 1px solid var(--gray-100);
+
+        &.rt-tr-group-merged {
+          border-bottom: none;
+        }
       }
       .rt-td {
         border-right: none;
@@ -134,6 +139,20 @@
 
           .invalid-cell {
             color: var(--red-500);
+          }
+        }
+
+        &.rt-tr-separator {
+          background-color: var(--blue-200);
+
+          // Pinned cells have their own white background, so make them transparent here
+          // to keep the whole separator row blue.
+          > div {
+            background: transparent !important;
+          }
+
+          &:hover, &:hover .rt-td {
+            background-color: var(--blue-200);
           }
         }
       }
@@ -250,6 +269,32 @@
     }
   }
 
+  // Opacity creates a stacking context a child can't override.
+  // A column opts out via `data-table__interactive`.
+  .app-react-table--disabled {
+    .rt-thead .rt-th,
+    .rt-tbody-v2 .rt-td,
+    .rt-tfoot .footer-cell {
+      opacity: 0.5;
+    }
+
+    .rt-tbody-v2 .data-table__interactive .rt-td {
+      opacity: 1;
+    }
+  }
+
+  // Column-aligned footer row (DataTableFooterRow)
+  .rt-tfoot {
+    box-shadow: none;
+
+    .footer-cell {
+      padding: 12px;
+      background-color: var(--blue-100);
+      color: var(--gray-600);
+      box-shadow: none;
+    }
+  }
+
   .table-pagination-bottom {
     padding: 0.75rem !important;
   }
@@ -317,4 +362,85 @@
 
 .value-indicator {
   font-weight: 600;
+}
+
+.pack-level {
+  &__primary {
+    color: var(--gray-350);
+  }
+
+  &__secondary {
+    color: var(--gray-600);
+  }
+}
+
+.expiration-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+
+  &--expiring .expiration-cell__date {
+    color: var(--color-yellow);
+  }
+
+  &--expired .expiration-cell__date {
+    color: var(--color-red);
+  }
+}
+
+.expiry-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  white-space: nowrap;
+
+  &--expiring {
+    background-color: var(--yellow-800);
+    color: var(--color-yellow);
+  }
+
+  &--expired {
+    background-color: var(--red-800);
+    color: var(--color-red);
+  }
+}
+
+.actions-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  &__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--gray-600);
+    cursor: pointer;
+
+    &:not([aria-disabled="true"]):hover {
+      color: var(--blue-primary);
+    }
+  }
+
+  // Disabled actions stay hoverable (so their tooltip opens), so the cursor is what marks them
+  // as inert. The action is only aria-disabled - a natively disabled button would swallow the
+  // hover its tooltip needs - which keeps Bootstrap's `[type="button"]:not(:disabled)` cursor
+  // rule matching, so this selector repeats the block class to outweigh it.
+  .actions-cell__button[aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  &__badge {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
+  }
 }

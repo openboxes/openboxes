@@ -1,0 +1,750 @@
+package org.pih.warehouse.api.receiving.v2
+
+import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
+import grails.validation.ValidationException
+import org.grails.datastore.mapping.query.api.Criteria
+import org.hibernate.ObjectNotFoundException
+import org.hibernate.criterion.Order
+import org.hibernate.sql.JoinType
+import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.OrderedDataGroup
+import org.pih.warehouse.core.date.JavaUtilDateParser
+import org.pih.warehouse.core.localization.MessageLocalizer
+import org.pih.warehouse.core.validation.ObjectValidationResult
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryItemManager
+import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.receiving.ReceiptCompleteRequestCommand
+import org.pih.warehouse.receiving.ReceiptDto
+import org.pih.warehouse.receiving.ReceiptEditReceivingInfoCommand
+import org.pih.warehouse.receiving.ReceiptGroup
+import org.pih.warehouse.receiving.ReceiptIdentifierService
+import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.receiving.ReceiptItemCommentDto
+import org.pih.warehouse.receiving.ReceiptItemCommentSaveCommand
+import org.pih.warehouse.receiving.ReceiptItemCompleteRequest
+import org.pih.warehouse.receiving.ReceiptItemDto
+import org.pih.warehouse.receiving.ReceiptItemEditReceivingInfoRequest
+import org.pih.warehouse.receiving.ReceiptItemFactory
+import org.pih.warehouse.receiving.ReceiptItemUpsertRequest
+import org.pih.warehouse.receiving.ReceiptItemSaveDto
+import org.pih.warehouse.receiving.ReceiptItemsBatchRequest
+import org.pih.warehouse.receiving.ReceiptSaveResponseDto
+import org.pih.warehouse.receiving.ReceiptService
+import org.pih.warehouse.receiving.ReceiptStatusCode
+import org.pih.warehouse.receiving.ReceiptSynchronizer
+import org.pih.warehouse.receiving.ReceiptTransactionManager
+import org.pih.warehouse.receiving.ReceiptV2Marker
+import org.pih.warehouse.receiving.ShipmentForReceiptValidator
+import org.pih.warehouse.receiving.ShipmentItemReceivedQuantitiesDto
+import org.pih.warehouse.receiving.ShipmentItemReceivingSummaryDto
+import org.pih.warehouse.receiving.ShipmentReceivingCalculator
+import org.pih.warehouse.receiving.ShipmentReceivingSummaryCommand
+import org.pih.warehouse.receiving.ShipmentReceivingSummaryDto
+import org.pih.warehouse.shipping.Container
+import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentItemDto
+import org.pih.warehouse.shipping.ShipmentService
+import org.pih.warehouse.shipping.ShipmentStatusCode
+import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
+import org.pih.warehouse.sort.SortParam
+import org.pih.warehouse.sort.SortUtil
+
+@Transactional(readOnly = true)
+class ReceiptV2Service {
+
+    ReceiptIdentifierService receiptIdentifierService
+    ReceiptService receiptService  // Inject old receipt service to reuse bin creation logic
+    ReceiptItemFactory receiptItemFactory
+    ReceiptSynchronizer receiptSynchronizer
+    ShipmentForReceiptValidator shipmentForReceiptValidator
+    ShipmentReceivingCalculator shipmentReceivingCalculator
+    MessageLocalizer messageLocalizer
+    InventoryItemManager inventoryItemManager
+    ShipmentService shipmentService
+    ReceiptTransactionManager receiptTransactionManager
+    GrailsApplication grailsApplication
+
+    @Transactional
+    ReceiptDto startReceipt(String shipmentId) {
+        Shipment shipment = Shipment.get(shipmentId)
+        if (!shipment) {
+            throw new ObjectNotFoundException(shipmentId, Shipment.toString())
+        }
+
+        shipmentForReceiptValidator.validate(shipment)
+
+        Receipt receipt = new Receipt()
+        receipt.receiptNumber = receiptIdentifierService.generate(receipt)
+        receipt.receiptStatusCode = ReceiptStatusCode.PENDING
+        receipt.recipient = AuthService.currentUser
+        receipt.expectedDeliveryDate = shipment.expectedDeliveryDate
+        receipt.actualDeliveryDate = shipment.actualDeliveryDate ?: new Date()
+        receipt.disableRefresh = true
+        Location receivingBin = receiptService.createTemporaryReceivingBin(shipment)
+        shipment.addToReceipts(receipt)
+
+        if (!receipt.save()) {
+            throw new ValidationException("Receipt is invalid", receipt.errors)
+        }
+
+        markReceiptAsV2(receipt)
+
+        for (ShipmentItem shipmentItem : shipment.shipmentItems) {
+            // In the case of partial receipts, we only want to create receipt items for shipment items that have not yet been fully received
+            if (shipmentReceivingCalculator.getShipmentItemQuantityRemaining(shipmentItem) > 0) {
+                receiptItemFactory.createReceiptItemFromShipmentItem(receipt, shipmentItem, receivingBin)
+            }
+        }
+
+        return ReceiptDto.from(receipt)
+    }
+
+    /**
+     * Stamps the receipt as created by the v2 workflow, for reads that must know which workflow's semantics its
+     * lines were written under - the workflow cannot be inferred from the persisted data afterwards, so it is
+     * recorded when the receipt is started, or when the lines of a receipt started by the old workflow are synced
+     * (see {@link #syncReceiptLines} and {@link ReceiptV2Marker}).
+     */
+    private static void markReceiptAsV2(Receipt receipt) {
+        ReceiptV2Marker marker = new ReceiptV2Marker(receipt: receipt)
+        if (!marker.save()) {
+            throw new ValidationException("Receipt v2 marker is invalid", marker.errors)
+        }
+    }
+
+    /**
+     * Migrates the pending receipt of a shipment (if there is one) that was starting during the old receiving workflow,
+     * transforming the receipt items into the format used in the V2 flow.
+     */
+    @Transactional
+    ReceiptDto syncReceiptLines(String shipmentId) {
+        Shipment shipment = Shipment.get(shipmentId)
+        if (!shipment) {
+            throw new ObjectNotFoundException(shipmentId, Shipment.toString())
+        }
+
+        Receipt receiptToSync = findPendingReceipt(shipment)
+        if (!receiptToSync) {
+            throw new ObjectNotFoundException(shipmentId, Receipt.toString())
+        }
+
+        receiptSynchronizer.syncLines(shipment, receiptToSync)
+
+        // A receipt carries at most one marker, so a receipt that already has one - a v2 one, or one synced on an
+        // earlier entry to the page - only has its lines brought over here.
+        if (ReceiptV2Marker.countByReceipt(receiptToSync) == 0) {
+            markReceiptAsV2(receiptToSync)
+        }
+
+        return ReceiptDto.from(receiptToSync)
+    }
+
+    /**
+     * The pending (still open) receipt of the shipment, or null when it has none. A shipment carries at most one.
+     */
+    private static Receipt findPendingReceipt(Shipment shipment) {
+        return Receipt.findByShipmentAndReceiptStatusCode(shipment, ReceiptStatusCode.PENDING)
+    }
+
+    /**
+     * Deletes the markers of the given receipts, for those that have one. Must be called before deleting a receipt,
+     * and before detaching it from its shipment: a marker's foreign key blocks the deletion of the receipt it points
+     * at, and the deletion of a receipt detached from its shipment can be flushed by any query that follows.
+     */
+    @Transactional
+    void deleteMarkersForReceipts(Collection<Receipt> receipts) {
+        if (!receipts) {
+            return
+        }
+        List<ReceiptV2Marker> receiptV2Markers = ReceiptV2Marker.findAllByReceiptInList(receipts.toList())
+        for (ReceiptV2Marker marker : receiptV2Markers) {
+            marker.delete()
+        }
+    }
+
+    /**
+     * Deletes the marker of the given receipt, if it has one. See {@link #deleteMarkersForReceipts} for when to
+     * call it.
+     */
+    @Transactional
+    void deleteMarkerForReceipt(Receipt receipt) {
+        deleteMarkersForReceipts([receipt])
+    }
+
+    @Transactional
+    ReceiptSaveResponseDto updateItemsBatch(ReceiptItemsBatchRequest request) {
+        // The receipt is bound and validated (as existing and pending) by the request, so this assumes a validated
+        // request - see ReceiptItemsBatchRequestValidator.
+        Receipt receipt = request.receipt
+
+        request.itemsToDelete.each { String receiptItemId -> deleteReceiptItem(receipt, receiptItemId) }
+
+        List<ReceiptItemSaveDto> updatedLines = request.itemsToSave.collect { ReceiptItemUpsertRequest item ->
+            item.receiptItem ? updateReceiptItem(item) : createReceiptItem(receipt, item)
+        }
+
+        return new ReceiptSaveResponseDto(updatedLines: updatedLines)
+    }
+
+    /**
+     * Creates/updates the receipt items of a single shipment item, additionally allowing the product lot (lot number
+     * and expiration date) and recipient of each item to be edited. Behaves like {@link #updateItemsBatch} but scoped
+     * to the one shipment item identified in the URL, and without support for deletes.
+     *
+     * The receipt and shipment item are carried (and validated as existing/pending) by the command, so this assumes a
+     * validated command - see {@link ReceiptEditReceivingInfoCommandValidator}.
+     */
+    @Transactional
+    ReceiptSaveResponseDto editReceivingInfo(ReceiptEditReceivingInfoCommand command) {
+        List<ReceiptItemSaveDto> updatedLines =
+                command.itemsToSave.collect { ReceiptItemEditReceivingInfoRequest item ->
+                    upsertReceiptItem(command.receipt, command.shipmentItem, item)
+                }
+
+        return new ReceiptSaveResponseDto(updatedLines: updatedLines)
+    }
+
+    /**
+     * Creates or updates a single receipt item from an edit-receiving-info request. The inventory item is resolved
+     * (and created if necessary) from the requested product + lot number + expiration date and is potentially swapped
+     * onto the receipt item, which is what allows the lot to be edited.
+     */
+    private ReceiptItemSaveDto upsertReceiptItem(
+            Receipt receipt, ShipmentItem shipmentItem, ReceiptItemEditReceivingInfoRequest item) {
+        // InventoryItem.expirationDate is a (legacy) java.util.Date, so convert the request's date-only LocalDate at
+        // the domain boundary. asDate resolves it to start-of-day in the system zone, so the stored Date and its
+        // MM/dd/yyyy formatting (see the InventoryItem JSON marshaller) stay identical to before.
+        Date expirationDate = item.expirationDate ? JavaUtilDateParser.asDate(item.expirationDate) : null
+        InventoryItem inventoryItem = inventoryItemManager.getOrCreateInventoryItem(
+                item.product, item.lotNumber, expirationDate)
+        inventoryItemManager.updateExpirationDate(inventoryItem, expirationDate)
+
+        // Lines created here are split lines - the original line always exists already (created when the receipt
+        // was started), so the split flag is owned by the server: forced on creation, never rebound afterwards.
+        // Split lines also carry a quantity shipped of zero - the shipment item's full quantity stays on the
+        // original line, which keeps that line the only one with a remainder that can be canceled on completion
+        // (see cancelRemainingQuantities).
+        ReceiptItem receiptItem = item.receiptItem ?: new ReceiptItem(
+                isSplitItem: Boolean.TRUE,
+                quantityShipped: 0,
+                sortOrder: shipmentItem.receiptItems.size(),
+        )
+
+        receiptItem.product = item.product
+        receiptItem.inventoryItem = inventoryItem
+        receiptItem.lotNumber = inventoryItem.lotNumber
+        receiptItem.expirationDate = inventoryItem.expirationDate
+        receiptItem.recipient = item.recipient
+        receiptItem.quantityReceived = item.quantityReceiving
+        receiptItem.binLocation = item.binLocation
+
+        if (!item.receiptItem) {
+            receipt.addToReceiptItems(receiptItem)
+            shipmentItem.addToReceiptItems(receiptItem)
+            if (!receiptItem.save()) {
+                throw new ValidationException("Receipt item is invalid", receiptItem.errors)
+            }
+        }
+
+        return ReceiptItemSaveDto.from(receiptItem, item.rowId)
+    }
+
+    private static ReceiptItemSaveDto createReceiptItem(Receipt receipt, ReceiptItemUpsertRequest item) {
+
+        ShipmentItem shipmentItem = item.shipmentItem
+
+        // Lines created here are split lines - the original line of a shipment item is only ever written when the
+        // receipt is started or synced (see ReceiptItemFactory#createReceiptItemFromShipmentItem), so the split flag
+        // is owned by the server: forced on creation, never bound from the request. Split lines also carry a quantity
+        // shipped of zero - the shipment item's full quantity stays on the original line, which keeps that line the
+        // only one with a remainder that can be canceled on completion (see cancelRemainingQuantities).
+        ReceiptItem receiptItem = new ReceiptItem(
+                product: shipmentItem.product,
+                inventoryItem: shipmentItem.inventoryItem,
+                lotNumber: shipmentItem.lotNumber,
+                expirationDate: shipmentItem.expirationDate,
+                recipient: shipmentItem.recipient,
+                isSplitItem: Boolean.TRUE,
+                quantityShipped: 0,
+                quantityReceived: item.quantityReceiving,
+                binLocation: item.binLocation,
+                sortOrder: shipmentItem.receiptItems.size(),
+        )
+
+        receipt.addToReceiptItems(receiptItem)
+        shipmentItem.addToReceiptItems(receiptItem)
+
+        if (!receiptItem.save()) {
+            throw new ValidationException("Receipt item is invalid", receiptItem.errors)
+        }
+
+        return ReceiptItemSaveDto.from(receiptItem, item.rowId)
+    }
+
+    private static ReceiptItemSaveDto updateReceiptItem(ReceiptItemUpsertRequest item) {
+        ReceiptItem receiptItem = item.receiptItem
+        receiptItem.quantityReceived = item.quantityReceiving
+        receiptItem.binLocation = item.binLocation
+
+        return ReceiptItemSaveDto.from(receiptItem, item.rowId)
+    }
+
+    private static void deleteReceiptItem(Receipt receipt, String receiptItemId) {
+        ReceiptItem receiptItem = ReceiptItem.get(receiptItemId)
+        if (!receiptItem) {
+            throw new ObjectNotFoundException(receiptItemId, ReceiptItem.class.toString())
+        }
+
+        receipt.removeFromReceiptItems(receiptItem)
+        receiptItem.shipmentItem?.removeFromReceiptItems(receiptItem)
+        receiptItem.delete()
+    }
+
+    /**
+     * Completes a pending receipt: flags it as received (optionally canceling the quantities that are still left to
+     * receive), marks the shipment as (partially) received and records the inbound stock transaction, then triggers
+     * the follow-up notifications and the product availability refresh.
+     *
+     * The receipt is bound and validated (as existing and pending, with the items belonging to it) by the command,
+     * so this assumes a validated command - see {@link ReceiptCompleteRequestCommandValidator}.
+     */
+    @Transactional
+    ReceiptDto completeReceipt(ReceiptCompleteRequestCommand command) {
+        Receipt receipt = command.receipt
+
+        // The receipt must be flagged as received before the canceled quantities are computed - the shipment item
+        // quantity getters only count receipt items that belong to RECEIVED receipts.
+        receipt.receiptStatusCode = ReceiptStatusCode.RECEIVED
+        if (command.dateDelivered) {
+            // Receipt.actualDeliveryDate is a (legacy) java.util.Date, so convert at the domain boundary.
+            receipt.actualDeliveryDate = JavaUtilDateParser.asDate(command.dateDelivered)
+        }
+
+        cancelRemainingQuantities(receipt, command.itemsToComplete)
+        zeroOutEmptyReceivedQuantities(receipt)
+
+        // The order summary refresh is left suppressed here because it already rides on the shipment save at the
+        // end of ReceiptTransactionManager#createInboundTransaction.
+        receipt.disableRefresh = true
+        if (!receipt.save()) {
+            throw new ValidationException("Receipt is invalid", receipt.errors)
+        }
+
+        // The canceled quantities count towards the shipment being fully received, so the shipment event (which
+        // decides between RECEIVED and PARTIALLY_RECEIVED) can only be created after they are applied.
+        createShipmentReceivedEvent(receipt)
+        Transaction transaction = receiptTransactionManager.createInboundTransaction(receipt)
+
+        // Trigger shipment status transition event to handle email notifications
+        grailsApplication.mainContext.publishEvent(
+                new ShipmentStatusTransitionEvent(receipt, ShipmentStatusCode.RECEIVED))
+
+        // Trigger product availability refresh
+        transaction.disableRefresh = Boolean.FALSE
+        grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(
+                transaction, transaction.associatedLocation, transaction.associatedProducts, false))
+
+        return ReceiptDto.from(receipt)
+    }
+
+    /**
+     * Writes a zero over the quantity received of every line that was never given one. A null quantity received
+     * means "nothing entered yet" while the receipt is pending (see
+     * {@link ReceiptItemFactory#createReceiptItemFromShipmentItem})
+     */
+    private static void zeroOutEmptyReceivedQuantities(Receipt receipt) {
+        receipt.receiptItems.each { ReceiptItem receiptItem ->
+            receiptItem.quantityReceived = receiptItem.quantityReceived ?: 0
+        }
+    }
+
+    /**
+     * Cancels the quantity still left to receive on every line the completion cancels: the shipment item's remaining
+     * quantity ({@link ShipmentReceivingCalculator#getShipmentItemQuantityRemaining}) is written to the line as its
+     * canceled quantity.
+     *
+     * Which lines those are depends on the destination:
+     *  1. It supports partial receiving: the lines flagged with cancelRemainingQuantity. Lines missing from the
+     *     request (or sent with the flag disabled) cancel nothing, so their shipment item's remainder stays open for
+     *     future receipts.
+     *  2. It does not support partial receiving: every line of the receipt, whatever the request carries. Such a
+     *     receipt closes the shipment as received (see {@link #createShipmentReceivedEvent}), so no future receipt
+     *     can consume what is left of it.
+     *
+     * Only the original line of a shipment item (see {@link ReceiptItem#isOriginalLine}) can
+     * carry a cancel - the shipment item's canceled quantity is summed over all of its receipt items, so the
+     * cancel must land on exactly one line to not be double-counted. Split lines are skipped here outright
+     * (flagging them is also rejected upfront by the request validator) - the quantities received on them reduce
+     * the remainder that the original line cancels.
+     *
+     * The remainder accounts for quantities received or canceled by previous receipts, quantities received on
+     * sibling (split) lines, and cancels applied earlier in this loop (each cancel is immediately reflected in the
+     * shipment item's remaining quantity), so the total can never be over-canceled. Writing the full item remainder
+     * to the line (rather than capping it by the line's own quantity shipped) assumes the v2 allocation of quantities
+     * shipped: the original line is the only line of its shipment item carrying one, so the item remainder IS the
+     * original line's remainder. Receipts started by the old workflow can carry per-line allocations instead, and are
+     * brought over to the v2 allocation when synced (see {@link ReceiptSynchronizer#syncLines}).
+     */
+    private void cancelRemainingQuantities(Receipt receipt, List<ReceiptItemCompleteRequest> itemsToComplete) {
+        List<ReceiptItem> receiptItemsToCancel =
+                receipt.shipment.destination.supports(ActivityCode.PARTIAL_RECEIVING)
+                        ? itemsToComplete
+                                .findAll { ReceiptItemCompleteRequest item -> item.cancelRemainingQuantity }
+                                .collect { ReceiptItemCompleteRequest item -> item.receiptItem }
+                        : receipt.receiptItems as List<ReceiptItem>
+
+        for (ReceiptItem receiptItem : receiptItemsToCancel) {
+            // Only the original line can carry a cancel - split lines have no quantity shipped to compute one from.
+            if (!receiptItem.isOriginalLine()) {
+                continue
+            }
+
+            receiptItem.quantityCanceled = Math.max(
+                    0, shipmentReceivingCalculator.getShipmentItemQuantityRemaining(receiptItem.shipmentItem))
+        }
+    }
+
+    /**
+     * Creates the shipment-level event marking the receiving that just happened. We create a RECEIVED or
+     * PARTIALLY_RECEIVED event depending on the case:
+     *  1. When the location supports partial receiving:
+     *     RECEIVED - when the shipment is not already received and is now fully received (canceled quantities count
+     *         towards this)
+     *     PARTIALLY_RECEIVED - when the shipment wasn't partially received before (it's created only once)
+     *  2. When the location doesn't support partial receiving:
+     *     RECEIVED - after receiving for the first time, we cannot receive for the second time without partial
+     *         receiving. The rest of the remaining quantities should be canceled
+     *     PARTIALLY_RECEIVED - not allowed
+     *
+     * Fully received is decided with the v2 receiving math
+     * ({@link ShipmentReceivingCalculator#isShipmentFullyReceived}), not the legacy {@link Shipment#isFullyReceived}.
+     */
+    private void createShipmentReceivedEvent(Receipt receipt) {
+        Shipment shipment = receipt.shipment
+
+        if (!shipment.wasReceived() &&
+                (!shipment.destination.supports(ActivityCode.PARTIAL_RECEIVING) ||
+                        shipmentReceivingCalculator.isShipmentFullyReceived(shipment))) {
+            shipmentService.createShipmentEvent(
+                    shipment, receipt.actualDeliveryDate, EventCode.RECEIVED, shipment.destination)
+            return
+        }
+
+        if (!shipment.wasPartiallyReceived()) {
+            shipmentService.createShipmentEvent(
+                    shipment, receipt.actualDeliveryDate, EventCode.PARTIALLY_RECEIVED, shipment.destination)
+        }
+    }
+
+    /**
+     * The reason the shipment cannot be received right now, through the view page
+     */
+    String getReceivingBlockedReason(Shipment shipment, Location currentLocation = AuthService.currentLocation) {
+        ObjectValidationResult result =
+                shipmentForReceiptValidator.validateForReceivingAccess(shipment, currentLocation)
+
+        return result.valid ? null : result.errors.collect { messageLocalizer.localize(it) }.join(" ")
+    }
+
+    /**
+     * List all receipts (and their receipt items) that are associated with a shipment.
+     */
+    List<ReceiptDto> listShipmentReceipts(String shipmentId) {
+        Shipment shipment = Shipment.read(shipmentId)
+        if (!shipment) {
+            throw new ObjectNotFoundException(shipmentId, Shipment.toString())
+        }
+
+        List<Receipt> receipts = Receipt.findAllByShipment(shipment)
+        return receipts.collect { ReceiptDto.from(it) }
+    }
+
+    /**
+     * Fetches an overview of a shipment's current state of receiving.
+     */
+    ShipmentReceivingSummaryDto getShipmentReceivingSummary(ShipmentReceivingSummaryCommand command) {
+        Shipment shipment = command.shipment
+        ReceiptGroup group = command.group
+
+        String currentReceiptId = findPendingReceipt(shipment)?.id
+
+        // This summary centers on the relationship between a shipment item and its receipt items, so don't bother
+        // with the receipts themselves. Instead, fetch the shipment items (already sorted per the requested params)
+        // and then collect the receipt items grouped by their shipment item so that we can easily loop both of them
+        // together.
+        List<ShipmentItem> shipmentItems = findShipmentItems(shipment, command)
+        Map<String, List<ReceiptItem>> receiptItemsByShipmentItemId = !shipmentItems ? [:] :
+                findReceiptItems(shipmentItems).groupBy { it.shipmentItemId.toString() }
+        Map<String, String> supplierCodeByShipmentItemId = getSupplierCodesByShipmentItemId(shipment)
+
+        ShipmentReceivingSummaryDto shipmentSummary = new ShipmentReceivingSummaryDto(
+                shipmentId: shipment.id,
+                pendingReceiptId: currentReceiptId,
+        )
+
+        // Build the summary for each shipment item.
+        for (shipmentItem in shipmentItems) {
+            String shipmentItemId = shipmentItem.id
+
+            ShipmentItemReceivingSummaryDto shipmentItemSummary = new ShipmentItemReceivingSummaryDto(
+                    shipmentItem: ShipmentItemDto.from(shipmentItem, supplierCodeByShipmentItemId.get(shipmentItemId)),
+            )
+
+            // We split up the current and previous receipt items only because it is more convenient for the client.
+            for (receiptItem in receiptItemsByShipmentItemId.get(shipmentItemId)) {
+                ReceiptItemDto receiptItemDto = ReceiptItemDto.from(receiptItem)
+                if (receiptItemDto.receiptId == currentReceiptId) {
+                    shipmentItemSummary.currentReceiptItems.add(receiptItemDto)
+                } else {
+                    shipmentItemSummary.previousReceiptItems.add(receiptItemDto)
+                }
+            }
+            shipmentSummary.shipmentItemSummaryById.put(shipmentItemId, shipmentItemSummary)
+        }
+
+        // Populate the shipment item group map for the client if they requested us to do so.
+        OrderedDataGroup shipmentItemsGrouped
+        switch(group) {
+            case ReceiptGroup.PACK_LEVEL:
+                shipmentItemsGrouped = buildPackLevelGroup(shipmentItems)
+                break
+            case ReceiptGroup.SHIPMENT_ITEM:
+                shipmentItemsGrouped = buildShipmentItemGroup(shipmentItems)
+                break
+        }
+        shipmentSummary.setShipmentItemsGrouped(shipmentItemsGrouped)
+
+        return shipmentSummary
+    }
+
+    /**
+     * The lines of the given shipment items, in the order they were created. The original receipt item of a shipment
+     * item comes first, as it is created when the receipt is started, followed by the lines added while receiving.
+     */
+    private static List<ReceiptItem> findReceiptItems(List<ShipmentItem> shipmentItems) {
+        return ReceiptItem.createCriteria().list {
+            inList("shipmentItem", shipmentItems)
+            order("sortOrder", "asc")
+            order("dateCreated", "asc")
+        } as List<ReceiptItem>
+    }
+
+    private static List<ShipmentItem> findShipmentItems(Shipment shipment, ShipmentReceivingSummaryCommand command) {
+        // The client only ever sends a single sort field, so we take the first entry from the
+        // SortParamList and ignore the rest.
+        SortParam sortParam = command.sort?.get(0)
+
+        List<ShipmentItem> shipmentItems = ShipmentItem.createCriteria().list {
+            createAlias("recipient", "r", JoinType.LEFT_OUTER_JOIN)
+            createAlias("inventoryItem", "ii", JoinType.LEFT_OUTER_JOIN)
+            createAlias("ii.product", "p", JoinType.LEFT_OUTER_JOIN)
+            eq("shipment", shipment)
+            if (sortParam) {
+                applySortOrder(sortParam, delegate)
+            }
+            applyShipmentOrder(delegate)
+        } as List<ShipmentItem>
+
+        // The packing list view renders the items grouped by pack level, so there the grouping has to drive the
+        // ordering, with whatever the query ordered by applying within a pack level.
+        return command.group == ReceiptGroup.PACK_LEVEL ? sortByPackLevel(shipmentItems) : shipmentItems
+    }
+
+    /**
+     * Orders the items by the order of the shipment: the order in which the items are listed on the shipment itself
+     */
+    private static void applyShipmentOrder(Criteria criteria) {
+        criteria.addOrder(Order.asc("sortOrder"))
+        criteria.addOrder(Order.asc("dateCreated"))
+        criteria.addOrder(Order.asc("id"))
+    }
+
+    /**
+     * Reorders the items into their pack level grouping: by pack level 1, then by pack level 2
+     */
+    private static List<ShipmentItem> sortByPackLevel(List<ShipmentItem> shipmentItems) {
+        return shipmentItems.toSorted { ShipmentItem a, ShipmentItem b ->
+            getPackLevel1(a) <=> getPackLevel1(b) ?: getPackLevel2(a) <=> getPackLevel2(b)
+        }
+    }
+
+    private static Container getPackLevel1(ShipmentItem shipmentItem) {
+        return shipmentItem.container?.parentContainer ?: shipmentItem.container
+    }
+
+    private static Container getPackLevel2(ShipmentItem shipmentItem) {
+        return shipmentItem.container?.parentContainer ? shipmentItem.container : null
+    }
+
+    private static void applySortOrder(SortParam sortParam, Criteria criteria) {
+        switch (sortParam.fieldName) {
+            case "productCode":
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "p.productCode"))
+                break
+            case "product":
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "p.name"))
+                break
+            case "lotNumber":
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "ii.lotNumber"))
+                break
+            case "expirationDate":
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "ii.expirationDate"))
+                break
+            case "recipient":
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "r.lastName"))
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "r.firstName"))
+                break
+            case "quantityShipped":
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "quantity"))
+                break
+            case "supplierCode":
+                criteria.createAlias("orderItems", "oi", JoinType.INNER_JOIN)
+                criteria.createAlias("oi.productSupplier", "ps", JoinType.LEFT_OUTER_JOIN)
+                criteria.addOrder(SortUtil.getSortOrderForCriteria(sortParam, "ps.supplierCode"))
+                break
+            default:
+                break
+        }
+    }
+
+    /**
+     * Fetches the supplier code of every shipment item of the given shipment, keyed by shipment item id.
+     */
+    private static Map<String, String> getSupplierCodesByShipmentItemId(Shipment shipment) {
+        List<Object[]> rows = ShipmentItem.createCriteria().list {
+            createAlias("orderItems", "oi", JoinType.INNER_JOIN)
+            createAlias("oi.productSupplier", "ps", JoinType.INNER_JOIN)
+            eq("shipment", shipment)
+            projections {
+                property("id")
+                property("ps.supplierCode")
+            }
+        } as List<Object[]>
+        return rows.collectEntries { [ (it[0]): it[1] ] }
+    }
+
+    private OrderedDataGroup buildPackLevelGroup(List<ShipmentItem> shipmentItems) {
+        String unpackedGroupName = messageLocalizer.localize("shipping.unpacked.label")
+
+        OrderedDataGroup packLevel1Group = new OrderedDataGroup()
+        for (shipmentItem in shipmentItems) {
+            // Items not packed at a level fall back to the "Unpacked" group. We avoid a null key both because it
+            // groups nothing and because the JSON serializer drops map entries keyed on null.
+            String packLevel1Name = getPackLevel1(shipmentItem)?.name ?: unpackedGroupName
+            String packLevel2Name = getPackLevel2(shipmentItem)?.name ?: unpackedGroupName
+
+            OrderedDataGroup packLevel2Group = new OrderedDataGroup()
+            packLevel2Group.put(packLevel2Name, shipmentItem.id)
+
+            packLevel1Group.put(packLevel1Name, packLevel2Group)
+        }
+        return packLevel1Group
+    }
+
+    private OrderedDataGroup buildShipmentItemGroup(List<ShipmentItem> shipmentItems) {
+        OrderedDataGroup shipmentItemGroup = new OrderedDataGroup()
+        for (shipmentItem in shipmentItems) {
+            // The grouping doesn't really matter here because we're keying on item id so there will always only
+            // ever be one element in each group, but we preserve the format for consistency (in case the client
+            // wants to create a standard approach to parsing data groups) and so that the client use the ordering.
+            shipmentItemGroup.put(shipmentItem.id, shipmentItem.id)
+        }
+        return shipmentItemGroup
+    }
+
+    /**
+     * The received and canceled totals of every shipment item of the shipment, keyed by shipment item id, summed
+     * over the lines of completed (RECEIVED) receipts under the semantics of the workflow each receipt was created
+     * with: lines of v2 receipts (see {@link ReceiptV2Marker}) always consume their shipment item, even when they
+     * were received against an edited product, while old-workflow lines count only when their product matches the
+     * shipment item's (an old-workflow line with an edited product deliberately does not consume the remainder).
+     *
+     * Deliberately not {@link ShipmentItem#getQuantityReceived}/{@link ShipmentItem#getQuantityCanceled}: the legacy
+     * getters filter every line by product and so undercount v2 receipts. Legacy views (e.g. the stock movement
+     * packing list) should render receiving state from this map instead.
+     */
+    Map<String, ShipmentItemReceivedQuantitiesDto> getReceivedQuantitiesByShipmentItemId(Shipment shipment) {
+        if (!shipment?.shipmentItems) {
+            return [:]
+        }
+
+        Set<String> receiptV2Ids = findReceiptV2Ids(shipment)
+
+        return shipment.shipmentItems.collectEntries { ShipmentItem shipmentItem ->
+            [(shipmentItem.id): buildReceivedQuantities(shipmentItem, receiptV2Ids)]
+        }
+    }
+
+    private static ShipmentItemReceivedQuantitiesDto buildReceivedQuantities(ShipmentItem shipmentItem, Set<String> receiptV2Ids) {
+        int quantityReceived = 0
+        int quantityCanceled = 0
+
+        (shipmentItem.receiptItems ?: []).each { ReceiptItem receiptItem ->
+            if (receiptItem.receipt?.receiptStatusCode != ReceiptStatusCode.RECEIVED) {
+                return
+            }
+            // The per-line workflow rule: v2 lines always count, old-workflow lines only on a matching product.
+            if (!(receiptItem.receipt.id in receiptV2Ids) && receiptItem.product != shipmentItem.product) {
+                return
+            }
+            quantityReceived += receiptItem.quantityReceived ?: 0
+            quantityCanceled += receiptItem.quantityCanceled ?: 0
+        }
+
+        return new ShipmentItemReceivedQuantitiesDto(
+                quantityReceived: quantityReceived,
+                quantityCanceled: quantityCanceled,
+                // The same shape as the legacy ShipmentItem.isFullyReceived, on the workflow-aware totals.
+                fullyReceived: quantityReceived + quantityCanceled >= (shipmentItem.quantity ?: 0),
+        )
+    }
+
+    /**
+     * The ids of the shipment's receipts that were created by the v2 workflow. A dynamic finder rather than a
+     * query joining through Receipt so that the mocked datastore of unit tests (no HQL support) can run it too.
+     */
+    private static Set<String> findReceiptV2Ids(Shipment shipment) {
+        List<Receipt> receipts = shipment.receipts?.toList()
+        if (!receipts) {
+            return [] as Set<String>
+        }
+        return ReceiptV2Marker.findAllByReceiptInList(receipts).collect { ReceiptV2Marker marker ->
+            marker.receipt.id
+        } as Set<String>
+    }
+
+    /**
+     * Sets (adds or edits) the comment of the given receipt item.
+     */
+    @Transactional
+    ReceiptItemCommentDto saveReceiptItemComment(ReceiptItemCommentSaveCommand command) {
+        ReceiptItem receiptItem = command.receiptItem
+
+        boolean addingNewComment = !receiptItem.comment
+        receiptItem.comment = command.comment
+
+        // Explicit .save is only needed for brand new entities
+        if (addingNewComment) {
+            receiptItem.save(failOnError: true)
+        }
+
+        return ReceiptItemCommentDto.from(receiptItem)
+    }
+
+    @Transactional
+    void deleteReceiptItemComment(String receiptItemId) {
+        ReceiptItem receiptItem = ReceiptItem.get(receiptItemId)
+        if (!receiptItem) {
+            throw new ObjectNotFoundException(receiptItemId, ReceiptItem.toString())
+        }
+        receiptItem.comment = null
+    }
+}
