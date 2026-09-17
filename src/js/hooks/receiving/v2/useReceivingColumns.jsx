@@ -378,6 +378,7 @@ const useReceivingColumns = ({
       }),
       columnHelper.display({
         id: receivingColumns.QUANTITY_RECEIVING,
+        meta: { arrowNavigable: true },
         header: () => (
           <TableHeaderCell
             tooltip
