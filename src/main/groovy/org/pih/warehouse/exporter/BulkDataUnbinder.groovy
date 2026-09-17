@@ -4,9 +4,9 @@ import java.lang.reflect.Field
 
 import org.springframework.stereotype.Component
 
-import org.pih.warehouse.core.http.HttpSerializable
 import org.pih.warehouse.core.mapper.MapperComponentResolver
-import org.pih.warehouse.core.mapper.ResponseMapper
+import org.pih.warehouse.core.serialization.SerializationMapper
+import org.pih.warehouse.core.serialization.TabularSerializable
 
 /**
  * Takes in a List of strongly typed Exportable objects and "unbinds" them to a List of Map of bulk data.
@@ -41,19 +41,21 @@ class BulkDataUnbinder {
     }
 
     private Map<String, Object> unbindObject(Object objectToUnbind) {
-        // If the object explicitly defines how it should be serialized, unbind via that approach.
-        ResponseMapper responseMapper = mapperComponentResolver.getResponseMapper(objectToUnbind.class)
-        if (responseMapper) {
-            return responseMapper.asExportRow(objectToUnbind)
-        }
-
-        if (objectToUnbind instanceof HttpSerializable) {
-            return objectToUnbind.asExportRow()
+        // If a mapper exists that defines how the object should be serialized for export, use it to unbind the object.
+        if (objectToUnbind instanceof TabularSerializable) {
+            SerializationMapper serializationMapper = mapperComponentResolver.getSerializationMapper(objectToUnbind.class)
+            if (serializationMapper) {
+                try {
+                    return serializationMapper.serializeTabular(objectToUnbind)
+                }
+                catch (UnsupportedOperationException ignore) {
+                    // The mapper exists but does not actually specify how to format as tabular data.
+                }
+            }
         }
 
         // Otherwise, simply collect all fields declared on the object as a Map.
-        return getDeclaredFields(objectToUnbind.class).collectEntries { [it.name, objectToUnbind."${it.name}"]
-        }
+        return getDeclaredFields(objectToUnbind.class).collectEntries { [it.name, objectToUnbind."${it.name}"] }
     }
 
     /**

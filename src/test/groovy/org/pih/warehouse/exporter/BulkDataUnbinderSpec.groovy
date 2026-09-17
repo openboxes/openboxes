@@ -7,9 +7,9 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import org.pih.warehouse.core.http.HttpSerializable
 import org.pih.warehouse.core.mapper.MapperComponentResolver
-import org.pih.warehouse.core.mapper.ResponseMapper
+import org.pih.warehouse.core.serialization.Serializable
+import org.pih.warehouse.core.serialization.SerializationMapper
 
 @Unroll
 class BulkDataUnbinderSpec extends Specification {
@@ -25,29 +25,18 @@ class BulkDataUnbinderSpec extends Specification {
         unbinder = new BulkDataUnbinder(componentResolverStub)
     }
 
-    void "unbindData works for an object that has a ResponseMapper"() {
+    void "unbindData works for an object that has a SerializationMapper"() {
         given:
         List<DummyClass> toUnbind = [new DummyClass(string: "A")]
 
         and:
-        hasResponseMapper(true)
+        hasSerializationMapper(true)
 
         expect:
-        assert unbinder.unbindData(toUnbind) == [[test: "used ResponseMapper"]]
+        assert unbinder.unbindData(toUnbind) == [[test: "used SerializationMapper"]]
     }
 
-    void "unbindData works for an object that implements HttpSerializable"() {
-        given:
-        List<DummySerializableClass> toUnbind = [new DummySerializableClass(string: "A")]
-
-        and:
-        hasResponseMapper(false)
-
-        expect:
-        assert unbinder.unbindData(toUnbind) == [[test: "used HttpSerializable"]]
-    }
-
-    void "unbindData works for an object with neither a ResponseMapper nor HttpSerializable"() {
+    void "unbindData works for an object with neither a SerializationMapper nor HttpSerializable"() {
         given:
         List<DummyClass> toUnbind = [new DummyClass(
                 parentString : "B",
@@ -62,7 +51,7 @@ class BulkDataUnbinderSpec extends Specification {
         )]
 
         and:
-        hasResponseMapper(false)
+        hasSerializationMapper(false)
 
         expect: "Only the declared fields are included, with all of their values unchanged"
         unbinder.unbindData(toUnbind) == [[
@@ -81,12 +70,12 @@ class BulkDataUnbinderSpec extends Specification {
     /**
      * Modify the component resolver to either find or not find a response mapper for the object.
      */
-    private void hasResponseMapper(boolean hasResponseMapper) {
-        if (hasResponseMapper) {
-            componentResolverStub.getResponseMapper(_ as Class) >> { new DummyResponseMapper() }
+    private void hasSerializationMapper(boolean hasSerializationMapper) {
+        if (hasSerializationMapper) {
+            componentResolverStub.getSerializationMapper(_ as Class) >> { new DummySerializationMapper() }
         }
         else {
-            componentResolverStub.getResponseMapper(_ as Class) >> { null }
+            componentResolverStub.getSerializationMapper(_ as Class) >> { null }
         }
     }
 
@@ -94,7 +83,7 @@ class BulkDataUnbinderSpec extends Specification {
         String parentString
     }
 
-    static class DummyClass extends DummyParentClass {
+    static class DummyClass extends DummyParentClass implements Serializable<DummySerializationMapper> {
         String string
         Integer integer
         Boolean bool
@@ -105,33 +94,18 @@ class BulkDataUnbinderSpec extends Specification {
         Instant instant
     }
 
-    static class DummySerializableClass extends DummyClass implements HttpSerializable {
+    static class DummySerializationMapper implements SerializationMapper<DummyClass> {
         @Override
-        Map<String, Object> asResponseBody() {
+        Map<String, Object> serialize(DummyClass o) {
             // We're not testing this flow so it doesn't matter what this returns.
             return null
         }
 
         @Override
-        Map<String, Object> asExportRow() {
-            // This method is completely custom, so we only need to assert that it gets invoked.
-            // It doesn't matter what this returns.
-            return [test: "used HttpSerializable"]
-        }
-    }
-
-    static class DummyResponseMapper implements ResponseMapper<DummyClass> {
-        @Override
-        Map<String, Object> asResponseBody(DummyClass o) {
-            // We're not testing this flow so it doesn't matter what this returns.
-            return null
-        }
-
-        @Override
-        Map<String, Object> asExportRow(DummyClass o) {
+        Map<String, Object> serializeTabular(DummyClass o) {
             // We're not testing the mapper itself, we only need to assert that it gets invoked,
             // so it doesn't matter what this returns.
-            return [test: "used ResponseMapper"]
+            return [test: "used SerializationMapper"]
         }
     }
 }
