@@ -28,12 +28,13 @@ const DropzoneFileSelect = ({
   isFormDisabled,
   showButtonOnly,
   throwErrorOnInvalidFiles,
+  onChange,
   ...fieldProps
 }) => {
   const maxFileSize = useSelector(getMaxUploadFileSize);
 
   const onDrop = useCallback((acceptedFiles) => {
-    fieldProps.onChange?.(multiple ? acceptedFiles : acceptedFiles[0]);
+    onChange?.(multiple ? acceptedFiles : acceptedFiles[0]);
   }, []);
 
   const translate = useTranslate();
@@ -212,6 +213,8 @@ DropzoneFileSelect.propTypes = {
   showButtonOnly: PropTypes.bool,
   // If true, will display errors for invalid files (useful when displaying only the button)
   throwErrorOnInvalidFiles: PropTypes.bool,
+  // Called with the selected file(s) when the user picks files
+  onChange: PropTypes.func,
 };
 
 DropzoneFileSelect.defaultProps = {
@@ -234,4 +237,5 @@ DropzoneFileSelect.defaultProps = {
   isFormDisabled: false,
   showButtonOnly: false,
   throwErrorOnInvalidFiles: false,
+  onChange: () => {},
 };

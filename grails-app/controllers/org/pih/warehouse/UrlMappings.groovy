@@ -1100,6 +1100,11 @@ class UrlMappings {
             action = [GET: "list"]
         }
 
+        "/api/facilities/$facility/cycle-counts/$cycleCountId" {
+            controller = "cycleCountApi"
+            action = [DELETE: "deleteCycleCount"]
+        }
+
         "/api/facilities/$facility/cycle-counts/$cycleCountId/count" {
             controller = "cycleCountApi"
             action = [POST: "submitCount"]

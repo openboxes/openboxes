@@ -645,6 +645,7 @@ class AddItemsPage extends Component {
       newItem: false,
       totalCount: 0,
       isFirstPageLoaded: false,
+      hasItemsLoaded: false,
       isRequestFromWard: false,
       itemFilter: '',
     };
@@ -876,7 +877,13 @@ class AddItemsPage extends Component {
       },
       sortOrder,
     }), () => {
-      if (!_.isNull(startIndex) && this.state.values.lineItems.length !== this.state.totalCount) {
+      const shouldLoadMore = !_.isNull(startIndex)
+        && this.state.values.lineItems.length !== this.state.totalCount;
+      // Items are fetched page by page, so we have to keep track of whether all of them have
+      // already been loaded. Proceeding to the next step with only a part of them loaded would
+      // leave zero quantity lines untouched on the request
+      this.setState({ hasItemsLoaded: !shouldLoadMore });
+      if (shouldLoadMore) {
         this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
       }
       this.props.hideSpinner();
@@ -1020,6 +1027,7 @@ class AddItemsPage extends Component {
     return apiClient.post(url, formData, config)
       .then(() => {
         this.setState((prev) => ({
+          hasItemsLoaded: false,
           values: {
             ...prev.values,
             lineItems: [],
@@ -1084,6 +1092,7 @@ class AddItemsPage extends Component {
    * @public
    */
   fetchAllData() {
+    this.setState({ hasItemsLoaded: false });
     this.fetchAddItemsPageData();
     if (!this.props.isPaginated) {
       this.fetchLineItems();
@@ -1278,6 +1287,7 @@ class AddItemsPage extends Component {
           sortOrder: 0,
           newItem: false,
           totalCount: 0,
+          hasItemsLoaded: false,
         }), () => this.fetchAllData()))
         .catch(() => Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items'))));
     }
@@ -1453,6 +1463,7 @@ class AddItemsPage extends Component {
         this.setState((prev) => ({
           totalCount: 1,
           currentLineItems: [],
+          hasItemsLoaded: true,
           values: {
             ...prev.values,
             lineItems: new Array(1).fill({ sortOrder: 100 }),
@@ -1772,8 +1783,12 @@ class AddItemsPage extends Component {
                     callback: () => this.nextPage(values),
                   })}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
+                  title={!this.state.hasItemsLoaded
+                    ? this.props.translate('react.stockMovement.loadingItems.label', 'Loading items, please wait...')
+                    : ''}
                   disabled={
-                    invalid || !_.some(values.lineItems, (item) =>
+                    invalid || !this.state.hasItemsLoaded
+                    || !_.some(values.lineItems, (item) =>
                       item.product && _.parseInt(item.quantityRequested))
                   }
                 >

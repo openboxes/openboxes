@@ -20,7 +20,7 @@ import ProductSelect from 'components/product-select/ProductSelect';
 import DateFormat from 'consts/dateFormat';
 import locationType from 'consts/locationType';
 import StockMovementStatus from 'consts/stockMovementStatus';
-import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import apiClient, { parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName } from 'utils/form-values-utils';
@@ -364,7 +364,7 @@ class AddItemsPage extends Component {
     };
     const url = `/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
 
-    apiClient.put(url, flattenRequest(payload))
+    apiClient.put(url, payload)
       .then((resp) => {
         const outboundReturns = resp.data.data;
         this.props.hideSpinner();
