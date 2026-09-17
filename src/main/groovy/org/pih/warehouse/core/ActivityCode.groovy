@@ -159,6 +159,9 @@ enum ActivityCode {
     // Pre-pick location codes
     PREPICK_STOCK('PREPICK_STOCK'),
 
+    // Enables zone-level validation of the staging location scanned during pick drop (facility-level toggle)
+    VALIDATE_STAGING_LOCATION_ZONE('VALIDATE_STAGING_LOCATION_ZONE'),
+
     PICKING_SHORTAGE('PICKING_SHORTAGE'),
 
     // Track internal locations
@@ -254,6 +257,7 @@ enum ActivityCode {
                 OUTBOUND_CONTAINER,
                 STAGING_LOCATION,
                 PREPICK_STOCK,
+                VALIDATE_STAGING_LOCATION_ZONE,
 
                 // Allows classification of location by delivery type
                 DELIVERY_TYPE_LOCAL_DELIVERY,

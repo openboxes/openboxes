@@ -14,6 +14,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.order.OrderItem
@@ -65,6 +66,8 @@ class PicklistItem implements Serializable {
     Date dateAssigned
     Person stagedBy
     Date dateStaged
+    ReasonCode stagingLocationOverrideReasonCode
+    String stagingLocationOverrideComment
 
     Integer sortOrder = 0
 
@@ -96,6 +99,8 @@ class PicklistItem implements Serializable {
         dateStarted(nullable: true)
         stagedBy(nullable: true)
         dateStaged(nullable: true)
+        stagingLocationOverrideReasonCode(nullable: true)
+        stagingLocationOverrideComment(nullable: true)
     }
 
     static transients = ['associatedLocation', 'associatedProducts', 'disableRefresh', 'pickable']
@@ -202,6 +207,8 @@ class PicklistItem implements Serializable {
             dateStarted         : dateStarted,
             stagedBy            : stagedBy,
             dateStaged          : dateStaged,
+            stagingLocationOverrideReasonCode : stagingLocationOverrideReasonCode?.name(),
+            stagingLocationOverrideComment    : stagingLocationOverrideComment,
 
             // Used in Bin Replenishment feature
             binLocation                 : binLocation?.toJson(LocationTypeCode.INTERNAL),
