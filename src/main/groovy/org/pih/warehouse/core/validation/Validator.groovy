@@ -101,6 +101,21 @@ abstract class Validator<T> {
     }
 
     /**
+     * Mark a field of the object as invalid.
+     *
+     * For use when we don't need the message to be localized, such as for developer-facing errors.
+     *
+     * @param fieldName The name of the field that failed validation
+     * @param plainTextErrorMessage The message to display when rendering the errors of the entity.
+     */
+    FieldError rejectField(String fieldName, String plainTextErrorMessage) {
+        return new FieldError(
+                "Object",  // objectName will be set automatically when adding the errors to the object being validated.
+                fieldName,
+                plainTextErrorMessage)
+    }
+
+    /**
      * Mark the object itself as invalid. For use when not validating a specific field.
      *
      * @param errorCode The l10n message key containing the message to display when rendering the errors of the entity.
