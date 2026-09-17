@@ -54,14 +54,14 @@ class MapperComponentResolver {
     }
 
     /**
-     * @return The response mapper associated with the given source type.
+     * @return The serialization mapper associated with the given source type.
      */
     SerializationMapper getSerializationMapper(Class sourceType) {
         serializationMappersBySourceType.get(sourceType)
     }
 
     /**
-     * @return All response mappers. Should only be used when registering JSON marshallers.
+     * @return All serialization mappers. Should only be used when registering JSON marshallers.
      */
     Map<Class, SerializationMapper> getAllSerializationMappers() {
         return serializationMappersBySourceType
