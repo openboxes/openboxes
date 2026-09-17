@@ -50,9 +50,9 @@ const DataTable = ({
   disabled,
   getSubRows,
   defaultExpandedSubRows,
-  arrowNavigation,
+  arrowNavigationSettings,
 }) => {
-  const { enabledForAllFields, verticalOnly, onNavigatePastLastField } = arrowNavigation;
+  const { enabledForAllFields, verticalOnly, onNavigatePastLastField } = arrowNavigationSettings;
   // Arrow key navigation. With no cell marked as navigable, the listener does nothing.
   const arrowNavigationRef = useTableArrowNavigation({ onNavigatePastLastField, verticalOnly });
   const {
@@ -98,7 +98,7 @@ const DataTable = ({
             tableWithPinnedColumns={tableWithPinnedColumns}
             isScreenWiderThanTable={isScreenWiderThanTable}
             overflowVisible={overflowVisible}
-            arrowNavigationForAllFields={enabledForAllFields}
+            arrowNavigationEnabledForAllFields={enabledForAllFields}
           />
           {showFooter && (
             <DataTableFooterRow
@@ -161,7 +161,7 @@ DataTable.propTypes = {
   // Expands all expandable rows by default.
   defaultExpandedSubRows: PropTypes.bool,
   // Arrow key navigation between the fields of the table.
-  arrowNavigation: PropTypes.shape({
+  arrowNavigationSettings: PropTypes.shape({
     // Takes every field the table renders. To take only some columns, leave it out and give each
     // of those columns `meta: { arrowNavigable: true }` instead.
     enabledForAllFields: PropTypes.bool,
@@ -195,5 +195,5 @@ DataTable.defaultProps = {
   disabled: false,
   getSubRows: undefined,
   defaultExpandedSubRows: false,
-  arrowNavigation: {},
+  arrowNavigationSettings: {},
 };

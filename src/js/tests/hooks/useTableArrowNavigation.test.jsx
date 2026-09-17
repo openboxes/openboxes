@@ -7,7 +7,6 @@ import { legacy_configureStore as configureStore } from 'redux-mock-store';
 import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import SelectField from 'components/form-elements/v2/SelectField';
 import useTableArrowNavigation from 'hooks/useTableArrowNavigation';
-import { arrowNavigationProps } from 'utils/arrowNavigation';
 
 import '@testing-library/jest-dom';
 
@@ -37,7 +36,7 @@ describe('useTableArrowNavigation', () => {
     const renderField = ({
       id, column, disabled, unmarked, field,
     }) => (
-      <div key={id} data-column-id={column} {...arrowNavigationProps(!unmarked)}>
+      <div key={id} data-column-id={column} data-arrow-navigation={!unmarked || undefined}>
         {field === 'date' && <DateFieldDateFns onChange={() => {}} showCustomInput={false} />}
         {field === 'select' && <SelectField options={[{ id: 'a', label: 'A' }]} />}
         {field === 'hidden' && <input type="hidden" data-testid={id} />}

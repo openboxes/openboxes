@@ -47,7 +47,6 @@ const useReceivingLineItemColumns = ({
   addRow,
   removeRow,
   onLocationAutofill,
-  errors,
 }) => {
   const translate = useTranslate();
   const columnHelper = createColumnHelper();
@@ -185,27 +184,24 @@ const useReceivingLineItemColumns = ({
           {translate('react.receiving.receivingNow.label', 'Receiving Now')}
         </TableHeaderCell>
       ),
-      cell: ({ row }) => {
-        const errorMessage = errors?.lineItems?.[row.index]?.quantityReceiving?.message;
-        return (
-          <Controller
-            key={row.original.rowId}
-            name={`lineItems.${row.index}.quantityReceiving`}
-            control={control}
-            render={({ field }) => (
-              <QuantityInputCell
-                value={field.value}
-                onCommit={(quantityReceiving) => field.onChange(quantityReceiving ?? '')}
-                onBlur={field.onBlur}
-                errorMessage={errorMessage}
-                className="receiving-table__quantity"
-                label="react.receiving.receivingNow.label"
-                defaultLabel="Receiving Now"
-              />
-            )}
-          />
-        );
-      },
+      cell: ({ row }) => (
+        <Controller
+          key={row.original.rowId}
+          name={`lineItems.${row.index}.quantityReceiving`}
+          control={control}
+          render={({ field, fieldState }) => (
+            <QuantityInputCell
+              value={field.value}
+              onCommit={(quantityReceiving) => field.onChange(quantityReceiving ?? '')}
+              onBlur={field.onBlur}
+              errorMessage={fieldState.error?.message}
+              className="receiving-table__quantity"
+              label="react.receiving.receivingNow.label"
+              defaultLabel="Receiving Now"
+            />
+          )}
+        />
+      ),
       footer: ({ table }) => (
         <span className="receiving-table__quantity w-100">
           {table.options.meta?.totalReceivingNow ?? 0}
@@ -282,7 +278,6 @@ const useReceivingLineItemColumns = ({
     binLocationOptions,
     hasBinLocationSupport,
     onLocationAutofill,
-    errors,
   ]);
 
   return { columns };
@@ -293,11 +288,6 @@ useReceivingLineItemColumns.propTypes = {
   addRow: PropTypes.func.isRequired,
   removeRow: PropTypes.func.isRequired,
   onLocationAutofill: PropTypes.func.isRequired,
-  errors: PropTypes.shape({}),
-};
-
-useReceivingLineItemColumns.defaultProps = {
-  errors: {},
 };
 
 export default useReceivingLineItemColumns;

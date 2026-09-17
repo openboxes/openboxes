@@ -100,7 +100,6 @@ const useReceivingLineItems = ({
     addRow,
     removeRow,
     onLocationAutofill,
-    errors,
   });
 
   const copyToReceiving = useCallback((receivedItem) => append({

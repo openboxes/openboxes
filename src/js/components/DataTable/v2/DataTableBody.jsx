@@ -8,7 +8,6 @@ import TableRow from 'components/DataTable/TableRow';
 import DataTableStatus from 'components/DataTable/v2/DataTableStatus';
 import useTableColumnMeta from 'hooks/useTableColumnMeta';
 import useTranslate from 'hooks/useTranslate';
-import { arrowNavigationProps } from 'utils/arrowNavigation';
 import getCommonPinningStyles from 'utils/getCommonPinningStyles';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
@@ -41,7 +40,7 @@ const DataTableBody = ({
   tableWithPinnedColumns,
   isScreenWiderThanTable,
   virtualize,
-  arrowNavigationForAllFields,
+  arrowNavigationEnabledForAllFields,
 }) => {
   const translate = useTranslate();
   const parentRef = useRef(null);
@@ -167,9 +166,11 @@ const DataTableBody = ({
                       return (
                         <div
                           data-column-id={cell.column.id}
-                          {...arrowNavigationProps(
-                            arrowNavigationForAllFields || arrowNavigable,
-                          )}
+                          data-arrow-navigation={
+                            arrowNavigationEnabledForAllFields
+                            || arrowNavigable
+                            || undefined
+                          }
                           className={`d-flex ${className} ${isRowDisabled && 'text-muted'}`}
                           style={{
                             ...getCommonPinningStyles(
@@ -234,7 +235,7 @@ DataTableBody.propTypes = {
     overscan: PropTypes.number,
     customRowsHeight: PropTypes.bool,
   }),
-  arrowNavigationForAllFields: PropTypes.bool,
+  arrowNavigationEnabledForAllFields: PropTypes.bool,
 };
 
 DataTableBody.defaultProps = {
@@ -242,7 +243,7 @@ DataTableBody.defaultProps = {
   loadingMessage: null,
   loading: false,
   tableWithPinnedColumns: false,
-  arrowNavigationForAllFields: false,
+  arrowNavigationEnabledForAllFields: false,
   virtualize: {
     enabled: false,
     minSize: 20,

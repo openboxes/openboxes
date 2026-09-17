@@ -17,9 +17,9 @@ const MOVE_BY_KEY = {
  * Arrow key navigation between the fields of a table. One listener, and the focus moves through
  * the DOM, so there is no state to keep and nothing re-renders.
  *
- * `DataTable` mounts this and marks the cells, so a table only passes its `arrowNavigation`
- * config object. Calling the hook and attaching the ref it returns is for markup `DataTable` does
- * not render. A cell with no enabled field is skipped.
+ * `DataTable` mounts this and marks the cells, so a table only passes its
+ * `arrowNavigationSettings` config object. Calling the hook and attaching the ref it returns is
+ * for markup `DataTable` does not render. A cell with no enabled field is skipped.
  *
  * TODO: selects and date fields are handled and should work, but the navigation has only been
  * used on a column of text fields. Verify them before turning it on for a column with one.
@@ -74,10 +74,6 @@ const useTableArrowNavigation = ({ onNavigatePastLastField, verticalOnly } = {})
     const columnScope = move.vertical ? columnId : null;
     const fields = getFields(table, columnScope);
 
-    // Kept from the field, which would step its value, open its menu or move its caret.
-    event.preventDefault();
-    event.stopPropagation();
-
     const targetIndex = fields.indexOf(event.target) + move.step;
     // A move with nothing ahead calls `onNavigatePastLastField` only when it leaves the last field
     // of the whole table, not when it runs out of the fields of one column.
@@ -95,6 +91,11 @@ const useTableArrowNavigation = ({ onNavigatePastLastField, verticalOnly } = {})
       : fields[targetIndex];
 
     moveFocusTo(event.target, targetField);
+
+    // Keeps the key for the navigation. Without it, for example, arrow up would also raise the
+    // number in a quantity field, or arrow down would open the dropdown of a select.
+    event.preventDefault();
+    event.stopPropagation();
   };
 
   useEffect(() => {
