@@ -37,6 +37,8 @@ class ReasonCodeApiController {
             reasonCodes.addAll(getReasonCodes(ReasonCode.listPutawayDiscrepancyCodes()))
         } else if (ActivityCode.PICKING_SHORTAGE in activityCodes) {
             reasonCodes.addAll(getReasonCodes(ReasonCode.listPickingShortageReasonCodes()))
+        } else if (ActivityCode.VALIDATE_STAGING_LOCATION_ZONE in activityCodes) {
+            reasonCodes.addAll(getReasonCodes(ReasonCode.listStagingLocationOverrideReasonCodes()))
         } else {
             reasonCodes.addAll(getReasonCodes(ReasonCode.listDefault()))
         }

@@ -282,4 +282,11 @@ enum ReasonCode {
                 PUTAWAY_DISCREPANCY,
         ]
     }
+
+    static listStagingLocationOverrideReasonCodes() {
+        [
+                APPROVED_CHANGE,
+                OTHER,
+        ]
+    }
 }
