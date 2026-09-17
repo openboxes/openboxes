@@ -16,6 +16,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.mapper.SmartMapper
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
 import org.hibernate.criterion.CriteriaSpecification
@@ -31,6 +32,7 @@ class CycleCountService {
 
     CycleCountTransactionService cycleCountTransactionService
     CycleCountProductAvailabilityService cycleCountProductAvailabilityService
+    SmartMapper smartMapper
 
     List<CycleCountCandidate> getCandidates(CycleCountCandidateFilterCommand command, String facilityId) {
         if (command.hasErrors()) {
@@ -448,7 +450,7 @@ class CycleCountService {
             MultiKey<String> key = new MultiKey(
                     item.product.productCode,
                     item.inventoryItem?.lotNumber,
-                    item.binLocation?.get('name'),
+                    item.binLocation?.name,
             )
             Map<Integer, CycleCountItemDto> countItemByIndex = countItemsMap.computeIfAbsent(key, { k -> [:] })
             countItemByIndex.put(item.countIndex, item)
@@ -827,7 +829,7 @@ class CycleCountService {
         // We've updated the status of a cycle count item so we need to also update the status of the count.
         cycleCountItem.cycleCount.status = cycleCountItem.cycleCount.recomputeStatus()
 
-        return CycleCountItemDto.from(cycleCountItem)
+        return smartMapper.map(cycleCountItem, CycleCountItemDto)
     }
 
     List<CycleCountItemDto> createCycleCountItems(List<CycleCountItemCommand> items) {
@@ -885,7 +887,7 @@ class CycleCountService {
         cycleCount.addToCycleCountItems(cycleCountItem)
         cycleCount.status = cycleCount.recomputeStatus()
 
-        return CycleCountItemDto.from(cycleCountItem)
+        return smartMapper.map(cycleCountItem, CycleCountItemDto)
     }
 
     void deleteCycleCountItem(String cycleCountItemId) {

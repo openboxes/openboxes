@@ -15,12 +15,18 @@ jest.mock('hooks/receiving/v2/useEditModalLocationAutofill', () => () => ({
 
 const product = { id: 'product-1', name: 'Ibuprofen 200mg' };
 const splitProduct = { id: 'product-2', name: 'Paracetamol 500mg' };
+const shipmentRecipient = { id: 'person-1', name: 'John Doe', label: 'John Doe' };
+const editedRecipient = { id: 'person-2', name: 'Jane Roe', label: 'Jane Roe' };
+const receivingBin = { id: 'bin-1', name: 'R-00001', label: 'R-00001' };
+const putawayBin = { id: 'bin-2', name: 'Zone A', label: 'Zone A' };
 
 const originalLine = {
   rowId: 'row-1',
   receiptItemId: 'receipt-item-1',
   product,
   lotNumber: 'LOT-1',
+  recipient: shipmentRecipient,
+  binLocation: receivingBin,
   quantityReceiving: 5,
   quantityShipped: 10,
   quantityReceived: 0,
@@ -50,10 +56,10 @@ describe('useReceivingLineItems', () => {
     useSelector.mockImplementation(() => true);
   });
 
-  it('should open with the original line and an empty split row carrying its product', () => {
+  it('should open with the persisted lines only, without an empty split row', () => {
     const { result } = renderLineItems([originalLine]);
 
-    expect(result.current.fields).toHaveLength(2);
+    expect(result.current.fields).toHaveLength(1);
     expect(result.current.fields[0]).toMatchObject({
       receiptItemId: 'receipt-item-1',
       product,
@@ -61,17 +67,9 @@ describe('useReceivingLineItems', () => {
       quantityReceiving: 5,
       isSplitItem: false,
     });
-    expect(result.current.fields[1]).toMatchObject({
-      receiptItemId: null,
-      product,
-      lotNumber: '',
-      recipient: null,
-      quantityReceiving: '',
-      isSplitItem: true,
-    });
   });
 
-  it('should not add the empty split row to a line that already has a split item saved', () => {
+  it('should open with every persisted split item of the line', () => {
     const { result } = renderLineItems([originalLine, splitLine]);
 
     expect(result.current.fields).toHaveLength(2);
@@ -83,18 +81,86 @@ describe('useReceivingLineItems', () => {
     });
   });
 
-  it('should keep the empty split row when reverting to original', () => {
+  it('should drop the rows added in the modal when reverting to original', () => {
     const { result } = renderLineItems([originalLine]);
 
     act(() => result.current.addRow());
-    expect(result.current.fields).toHaveLength(3);
+    expect(result.current.fields).toHaveLength(2);
 
     act(() => result.current.revertToOriginal());
 
-    expect(result.current.fields).toHaveLength(2);
-    expect(result.current.fields[1]).toMatchObject({
-      product,
-      isSplitItem: true,
+    expect(result.current.fields).toHaveLength(1);
+    expect(result.current.fields[0]).toMatchObject({
+      receiptItemId: 'receipt-item-1',
+      isSplitItem: false,
+    });
+  });
+
+  it('should keep the expiration date the API sent', () => {
+    const { result } = renderLineItems([{ ...originalLine, expirationDate: '2026-09-19' }]);
+
+    expect(result.current.fields[0].expirationDate).toBe('19/Sep/2026');
+  });
+
+  it('should leave the expiration date empty for a lot with no expiry', () => {
+    const { result } = renderLineItems([{ ...originalLine, expirationDate: null }]);
+
+    expect(result.current.fields[0].expirationDate).toBe('');
+  });
+
+  describe('autofill of an added row', () => {
+    it('should carry the product, the recipient and the bin of the line', () => {
+      const { result } = renderLineItems([originalLine, splitLine]);
+
+      act(() => result.current.addRow());
+
+      expect(result.current.fields[2]).toMatchObject({
+        receiptItemId: null,
+        product,
+        lotNumber: '',
+        recipient: shipmentRecipient,
+        binLocation: receivingBin,
+        quantityReceiving: '',
+        isSplitItem: true,
+      });
+    });
+
+    it('should carry the same values for a line without any split item saved', () => {
+      const { result } = renderLineItems([originalLine]);
+
+      act(() => result.current.addRow());
+
+      expect(result.current.fields[1]).toMatchObject({
+        receiptItemId: null,
+        product,
+        lotNumber: '',
+        recipient: shipmentRecipient,
+        binLocation: receivingBin,
+        quantityReceiving: '',
+        isSplitItem: true,
+      });
+    });
+
+    it('should take the bin the original line sits in, not the receiving bin it started in', () => {
+      const { result } = renderLineItems([
+        { ...originalLine, binLocation: putawayBin },
+        splitLine,
+      ]);
+
+      act(() => result.current.addRow());
+
+      expect(result.current.fields[2]).toMatchObject({ binLocation: putawayBin });
+    });
+
+    it('should take the recipient of the shipment item, not the one entered on the line', () => {
+      const { result } = renderLineItems([
+        { ...originalLine, recipient: editedRecipient },
+        splitLine,
+      ]);
+
+      act(() => result.current.addRow());
+
+      expect(result.current.fields[2]).toMatchObject({ recipient: shipmentRecipient });
     });
   });
 

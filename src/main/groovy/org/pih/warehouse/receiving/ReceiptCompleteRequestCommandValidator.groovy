@@ -13,7 +13,7 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
     protected ObjectValidationResult doValidate(ReceiptCompleteRequestCommand command) {
         return new ObjectValidationResult(
                 validateReceiptIsPending(command),
-                validateReceiptIsV2(command),
+                validateSomethingWasReceived(command),
                 validateItemsToCompleteAreValid(command),
                 validateNoDuplicateItemsToComplete(command),
                 validateItemsToCompleteBelongToReceipt(command),
@@ -40,23 +40,24 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
     }
 
     /**
-     * Only receipts created by the v2 workflow (stamped with a {@link ReceiptV2Marker} when started) may be
-     * completed through this endpoint. The cancel-remaining math writes the shipment item's full remainder to the
-     * flagged original line, which is only correct for v2-shaped lines (the original carries the full quantity
-     * shipped, splits carry zero) - an old-workflow pending receipt, whose lines can carry per-line quantity-shipped
-     * allocations, could over-cancel the remainders of its sibling lines.
+     * A receipt must have received something to be completed: at least one of its lines with a quantity received
+     * above zero. Completing one that received nothing would record an inbound transaction carrying no entries at
+     * all (see {@link ReceiptTransactionManager#createInboundTransaction}).
      */
-    private ObjectError validateReceiptIsV2(ReceiptCompleteRequestCommand command) {
+    private ObjectError validateSomethingWasReceived(ReceiptCompleteRequestCommand command) {
         if (!command.receipt) {
             return null
         }
 
-        if (ReceiptV2Marker.countByReceipt(command.receipt) == 0) {
-            return rejectField("receipt", command.receipt, "receiptCompleteRequestCommand.receipt.notV2",
-                    [command.receipt.receiptNumber])
+        // The same lines the transaction credits: a null quantity received is a line that was never given one.
+        boolean nothingReceived = !(command.receipt.receiptItems ?: []).any { ReceiptItem receiptItem ->
+            (receiptItem.quantityReceived ?: 0) > 0
         }
 
-        return null
+        return nothingReceived ?
+                rejectField("receipt", command.receipt, "receiptCompleteRequestCommand.receipt.nothingReceived",
+                        [command.receipt.receiptNumber]) :
+                null
     }
 
     /**
@@ -109,13 +110,13 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
     }
 
     /**
-     * The cancel-remaining flag is only allowed on original lines (the per-shipment-item lines created when the
-     * receipt was started, flagged isSplitItem: false). Split lines carry a quantity shipped of zero, so they have
-     * no remainder of their own to cancel - flagging one is a client error.
+     * The cancel-remaining flag is only allowed on original lines (see {@link ReceiptItem#isOriginalLine}). Split
+     * lines carry a quantity shipped of zero, so they have no remainder of their own to cancel - flagging one is a
+     * client error.
      */
     private ObjectError validateCancelRemainingOnlyOnOriginalItems(ReceiptCompleteRequestCommand command) {
         List<String> flaggedSplitItemIds = command.itemsToComplete
-                .findAll { it.cancelRemainingQuantity && it.receiptItem?.isSplitItem }
+                .findAll { it.receiptItem && it.cancelRemainingQuantity && !it.receiptItem.isOriginalLine() }
                 .collect { it.receiptItem.id }
 
         return flaggedSplitItemIds ?

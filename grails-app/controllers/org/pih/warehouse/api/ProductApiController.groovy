@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.api
 
+import javax.validation.Valid
+
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.core.GrailsApplication
@@ -19,7 +21,9 @@ import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.importer.CSVUtils
+import org.pih.warehouse.inventory.AvailabilityCommand
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.LotAvailabilityDto
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
@@ -293,6 +297,16 @@ class ProductApiController extends BaseDomainApiController {
             return
         }
         render([inventoryItem: inventoryItem, quantityOnHand: 0] as JSON)
+    }
+
+    /**
+     * Returns, for each of the given product lots, its expiration date and the depots holding it, counting only
+     * positive quantities.
+     */
+    def getAvailabilityInAllDepots(@Valid AvailabilityCommand command) {
+        List<LotAvailabilityDto> availability = productAvailabilityService.getAvailabilityInAllDepots(command)
+
+        render([data: availability] as JSON)
     }
 
     def getLatestInventoryCountDate() {

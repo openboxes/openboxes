@@ -9,9 +9,17 @@
     background-color: var(--blue-100);
   }
 
+  &--four-columns &__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
   &__field {
     gap: 6px;
     min-width: 0;
+
+    &--span-2 {
+      grid-column: span 2;
+    }
   }
 
   &__label {

@@ -1,11 +1,13 @@
 package org.pih.warehouse.api.receiving.v2
 
 import java.time.Instant
+import java.time.LocalDate
 
 import grails.core.GrailsApplication
 import grails.testing.gorm.DataTest
 import grails.validation.ValidationException
 import grails.testing.services.ServiceUnitTest
+import org.hibernate.ObjectNotFoundException
 import org.springframework.context.ApplicationContext
 import org.springframework.validation.ObjectError
 import spock.lang.Specification
@@ -15,15 +17,20 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.core.localization.MessageLocalizer
+import org.pih.warehouse.core.mapper.SmartMapper
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryItemManager
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionAction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionIdentifierService
+import org.pih.warehouse.inventory.TransactionSource
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
@@ -34,11 +41,20 @@ import org.pih.warehouse.receiving.ReceiptIdentifierService
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptItemCompleteRequest
 import org.pih.warehouse.receiving.ReceiptItemEditReceivingInfoRequest
+import org.pih.warehouse.receiving.ReceiptItemFactory
+import org.pih.warehouse.receiving.ReceiptItemUpsertRequest
+import org.pih.warehouse.receiving.ReceiptItemsBatchRequest
+import org.pih.warehouse.receiving.ReceiptSaveResponseDto
 import org.pih.warehouse.receiving.ReceiptService
 import org.pih.warehouse.receiving.ReceiptStatusCode
+import org.pih.warehouse.receiving.ReceiptSynchronizer
+import org.pih.warehouse.receiving.ReceiptTransactionManager
 import org.pih.warehouse.receiving.ReceiptV2Marker
 import org.pih.warehouse.receiving.ShipmentForReceiptValidator
 import org.pih.warehouse.receiving.ShipmentItemReceivedQuantitiesDto
+import org.pih.warehouse.receiving.ShipmentReceivingCalculator
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentService
@@ -49,8 +65,8 @@ import org.pih.warehouse.shipping.ShipmentType
 /**
  * The cancel-remaining logic and the shipment event decision are exercised through the service's private helpers
  * (Groovy dynamic dispatch does not enforce private), which keeps those tests free of the persistence fixture that
- * the full completeReceipt flow requires. The transaction and orchestration tests run the real flow against a
- * minimal valid domain graph.
+ * the full completeReceipt flow requires. The orchestration tests run the real flow against a minimal valid
+ * domain graph, with the real transaction manager recording the transaction (see ReceiptTransactionManagerSpec).
  */
 @Unroll
 class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<ReceiptV2Service>, DataTest {
@@ -62,10 +78,15 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
     ReceiptService receiptService
     MessageLocalizer messageLocalizer
     ApplicationContext mainContext
+    // The real factory and calculator, shared with the synchronizer and the validator below - the lines they write
+    // and the receiving math they compute are what these tests assert.
+    ReceiptItemFactory receiptItemFactory
+    ShipmentReceivingCalculator shipmentReceivingCalculator
 
     void setupSpec() {
-        mockDomains(Receipt, ReceiptItem, ReceiptV2Marker, Shipment, ShipmentItem, ShipmentType, Transaction,
-                TransactionEntry, Product, InventoryItem, Inventory, Location)
+        mockDomains(Receipt, ReceiptItem, ReceiptV2Marker, Shipment, ShipmentItem, ShipmentType, Container,
+                Transaction, TransactionEntry, TransactionSource, Product, InventoryItem, Inventory, Location,
+                Requisition)
     }
 
     void setup() {
@@ -82,13 +103,27 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
             localize(_ as ObjectError) >> { ObjectError error -> error.code }
         }
 
+        receiptItemFactory = new ReceiptItemFactory()
+        shipmentReceivingCalculator = new ShipmentReceivingCalculator()
+
         service.messageLocalizer = messageLocalizer
-        service.shipmentForReceiptValidator = new ShipmentForReceiptValidator()
+        service.receiptItemFactory = receiptItemFactory
+        service.shipmentReceivingCalculator = shipmentReceivingCalculator
+        service.shipmentForReceiptValidator =
+                new ShipmentForReceiptValidator(shipmentReceivingCalculator: shipmentReceivingCalculator)
         service.shipmentService = shipmentService
-        service.transactionIdentifierService = transactionIdentifierService
         service.inventoryItemManager = inventoryItemManager
+        // The real manager, on the same mocked identifier service - the transaction it records is
+        // what the completeReceipt tests assert.
+        service.receiptTransactionManager =
+                new ReceiptTransactionManager(transactionIdentifierService, inventoryItemManager)
         service.receiptIdentifierService = receiptIdentifierService
         service.receiptService = receiptService
+        // The real synchronizer, on the same mocked receipt service - the sync is asserted through the endpoint.
+        service.receiptSynchronizer = new ReceiptSynchronizer(
+                receiptService: receiptService,
+                receiptItemFactory: receiptItemFactory,
+                shipmentReceivingCalculator: shipmentReceivingCalculator)
         service.grailsApplication = Stub(GrailsApplication) {
             getMainContext() >> mainContext
         }
@@ -99,6 +134,11 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         transferInType.id = Constants.TRANSFER_IN_TRANSACTION_TYPE_ID
         GroovySpy(TransactionType, global: true)
         TransactionType.get(_) >> transferInType
+
+        // When converting to DTOs, if a field has a Mapper component defined (which we access via the smart mapper),
+        // ignore the result of mapping that field. We assume that component will specify its own tests.
+        GroovyMock(SmartMapper, global: true)
+        SmartMapper.mapStatic(*_) >> { return null }
     }
 
     // ----------------------------------------------------------------------------------------------------------
@@ -127,7 +167,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
 
         and: 'each line is an empty original mirroring its shipment item'
         ReceiptItem originalItem = receipt.receiptItems.find { it.shipmentItem == firstShipmentItem }
-        assert originalItem.quantityReceived == 0
+        assert originalItem.quantityReceived == null
         assert originalItem.isSplitItem == Boolean.FALSE
         assert originalItem.quantityShipped == 100
         assert originalItem.product == firstShipmentItem.product
@@ -140,7 +180,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         and: 'the response carries the created lines'
         assert result.receiptStatus == ReceiptStatusCode.PENDING
         assert result.receiptItems.size() == 2
-        assert result.receiptItems.every { it.quantityReceived == 0 && !it.isSplitItem }
+        assert result.receiptItems.every { it.quantityReceived == null && !it.isSplitItem }
     }
 
     void 'startReceipt should assign the receiving bin of the shipment to every line it creates'() {
@@ -179,7 +219,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         assert receipt.receiptItems.size() == 1
         ReceiptItem newOriginalItem = receipt.receiptItems.first()
         assert newOriginalItem.shipmentItem == openItem
-        assert newOriginalItem.quantityReceived == 0
+        assert newOriginalItem.quantityReceived == null
         assert newOriginalItem.isSplitItem == Boolean.FALSE
         assert newOriginalItem.quantityShipped == 50
 
@@ -244,6 +284,239 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         then: 'the legacy product-filtered check would still see 60 to receive - the v2 math rejects the start'
         ValidationException e = thrown(ValidationException)
         assert e.errors.getFieldError("shipmentItems").code == "stockMovement.hasAlreadyBeenReceived.message"
+    }
+
+    // ----------------------------------------------------------------------------------------------------------
+    // syncReceiptLines - reconciling a receipt's lines with what is left to receive, which also brings a receipt
+    // started by the old workflow over to the v2 shape.
+    // ----------------------------------------------------------------------------------------------------------
+
+    void 'syncReceiptLines should create the original line of a shipment item the old workflow never persisted'() {
+        given: 'an old-workflow pending receipt carrying a line only for the item the user touched'
+        ShipmentItem touchedItem = buildShipmentItem(100)
+        ShipmentItem untouchedItem = buildShipmentItem(50)
+        Shipment shipment = buildReceivableShipment([touchedItem, untouchedItem])
+        ReceiptItem touchedLine = buildReceiptItem(touchedItem, 40)
+        Receipt receipt = createReceipt(shipment, [touchedLine], ReceiptStatusCode.PENDING)
+        Location receivingBin = new Location(name: "R-TEST")
+
+        when:
+        ReceiptDto result = service.syncReceiptLines(shipment.id)
+
+        then:
+        1 * receiptService.createTemporaryReceivingBin(shipment) >> receivingBin
+
+        and: 'the untouched item gets the empty original line startReceipt would have created for it'
+        assert receipt.receiptItems.size() == 2
+        ReceiptItem backfilledLine = receipt.receiptItems.find { it.shipmentItem == untouchedItem }
+        assert backfilledLine.isSplitItem == Boolean.FALSE
+        assert backfilledLine.quantityShipped == 50
+        assert backfilledLine.quantityReceived == null
+        assert backfilledLine.product == untouchedItem.product
+        assert backfilledLine.inventoryItem == untouchedItem.inventoryItem
+        assert backfilledLine.binLocation == receivingBin
+        assert untouchedItem.receiptItems.contains(backfilledLine)
+
+        and: 'what the user already entered is left alone'
+        assert touchedLine.quantityReceived == 40
+
+        and: 'the response carries both lines, so the client gets their ids without a reload'
+        assert result.id == receipt.id
+        assert result.receiptItems.size() == 2
+    }
+
+    void 'syncReceiptLines should re-allocate the quantities shipped of a split to the v2 convention'() {
+        given: 'an old-workflow receipt whose split modal allocated 100 across two lines as 60/40'
+        ShipmentItem splitItem = buildShipmentItem(100)
+        Shipment shipment = buildReceivableShipment([splitItem, buildShipmentItem(20)])
+        ReceiptItem originalLine = buildReceiptItem(splitItem, 60, [quantityShipped: 60])
+        ReceiptItem splitLine = buildReceiptItem(splitItem, 40, [quantityShipped: 40, isSplitItem: true])
+        createReceipt(shipment, [originalLine, splitLine], ReceiptStatusCode.PENDING)
+
+        when:
+        service.syncReceiptLines(shipment.id)
+
+        then: 'the original line carries the shipment item whole quantity and the split line none'
+        assert originalLine.quantityShipped == 100
+        assert originalLine.isSplitItem == Boolean.FALSE
+        assert splitLine.quantityShipped == 0
+        assert splitLine.isSplitItem == Boolean.TRUE
+
+        and: 'the quantities received on both lines are untouched'
+        assert originalLine.quantityReceived == 60
+        assert splitLine.quantityReceived == 40
+    }
+
+    void 'syncReceiptLines should mark the synced receipt as a v2 receipt'() {
+        given:
+        ShipmentItem touchedItem = buildShipmentItem(100)
+        Shipment shipment = buildReceivableShipment([touchedItem, buildShipmentItem(50)])
+        Receipt receipt = createReceipt(shipment, [buildReceiptItem(touchedItem, 40)], ReceiptStatusCode.PENDING)
+
+        when:
+        service.syncReceiptLines(shipment.id)
+
+        then: 'the stamp is what makes its lines read under v2 semantics from here on'
+        assert ReceiptV2Marker.count() == 1
+        assert ReceiptV2Marker.list().first().receipt == receipt
+    }
+
+    void 'syncReceiptLines should stamp and re-allocate a receipt the old workflow left already in the v2 shape'() {
+        given: 'an old-workflow receipt with a line per shipment item, so no original line is missing'
+        ShipmentItem firstItem = buildShipmentItem(100)
+        ShipmentItem secondItem = buildShipmentItem(50)
+        Shipment shipment = buildReceivableShipment([firstItem, secondItem])
+        ReceiptItem partiallyAllocatedLine = buildReceiptItem(firstItem, 40, [quantityShipped: 40])
+        Receipt receipt = createReceipt(
+                shipment, [partiallyAllocatedLine, buildReceiptItem(secondItem, 10)], ReceiptStatusCode.PENDING)
+
+        and: 'nothing in its shape gives the old workflow away, and it carries no stamp'
+        assert ReceiptV2Marker.count() == 0
+
+        when:
+        service.syncReceiptLines(shipment.id)
+
+        then: 'it is stamped anyway, so its lines are read under the semantics they are written under from here on'
+        assert ReceiptV2Marker.count() == 1
+        assert ReceiptV2Marker.list().first().receipt == receipt
+
+        and: 'its per-line quantity shipped is brought over to the v2 allocation'
+        assert partiallyAllocatedLine.isSplitItem == Boolean.FALSE
+        assert partiallyAllocatedLine.quantityShipped == 100
+        assert partiallyAllocatedLine.quantityReceived == 40
+
+        and: 'no line is added, and no receiving bin is resolved, since none was missing'
+        assert receipt.receiptItems.size() == 2
+        0 * receiptService.createTemporaryReceivingBin(_)
+    }
+
+    void 'syncReceiptLines should leave a v2 receipt unchanged'() {
+        given: 'a receipt started by v2: an original line per receivable item, plus a split line of its own'
+        ShipmentItem firstItem = buildShipmentItem(100)
+        ShipmentItem secondItem = buildShipmentItem(50)
+        Shipment shipment = buildReceivableShipment([firstItem, secondItem])
+        ReceiptItem originalLine = buildReceiptItem(firstItem, 60)
+        ReceiptItem splitLine = buildReceiptItem(firstItem, 40, [quantityShipped: 0, isSplitItem: true])
+        ReceiptItem secondOriginalLine = buildReceiptItem(secondItem, null)
+        Receipt receipt = createReceipt(
+                shipment, [originalLine, splitLine, secondOriginalLine], ReceiptStatusCode.PENDING)
+        markAsV2(receipt)
+
+        when:
+        ReceiptDto result = service.syncReceiptLines(shipment.id)
+
+        then: 'no line is missing, so no receiving bin is resolved'
+        0 * receiptService.createTemporaryReceivingBin(_)
+
+        and: 'no line is added and none changes'
+        assert receipt.receiptItems.size() == 3
+        assert originalLine.quantityShipped == 100
+        assert originalLine.quantityReceived == 60
+        assert splitLine.quantityShipped == 0
+        assert secondOriginalLine.quantityReceived == null
+        assert ReceiptV2Marker.count() == 1
+
+        and: 'the receipt is still returned, so the client can call this on every entry to the page'
+        assert result.id == receipt.id
+        assert result.receiptItems.size() == 3
+    }
+
+    void 'syncReceiptLines should be idempotent'() {
+        given:
+        ShipmentItem touchedItem = buildShipmentItem(100)
+        Shipment shipment = buildReceivableShipment([touchedItem, buildShipmentItem(50)])
+        Receipt receipt = createReceipt(shipment, [buildReceiptItem(touchedItem, 40)], ReceiptStatusCode.PENDING)
+
+        when: 'the client calls it again on the next entry to the page'
+        service.syncReceiptLines(shipment.id)
+        service.syncReceiptLines(shipment.id)
+
+        then: 'only the first call has anything to do'
+        1 * receiptService.createTemporaryReceivingBin(shipment)
+
+        and:
+        assert receipt.receiptItems.size() == 2
+        assert ReceiptV2Marker.count() == 1
+    }
+
+    void 'syncReceiptLines should skip shipment items already fully consumed by previous receipts'() {
+        given: 'an item fully received by a completed receipt, next to an item with no line at all'
+        ShipmentItem consumedItem = buildShipmentItem(30)
+        ShipmentItem untouchedItem = buildShipmentItem(50)
+        Shipment shipment = buildReceivableShipment([consumedItem, untouchedItem])
+        createReceipt(shipment, [buildReceiptItem(consumedItem, 30)], ReceiptStatusCode.RECEIVED)
+        Receipt pendingReceipt = createReceipt(shipment, [], ReceiptStatusCode.PENDING)
+
+        when:
+        service.syncReceiptLines(shipment.id)
+
+        then: 'only the item that still has a remainder gets a line'
+        assert pendingReceipt.receiptItems.size() == 1
+        assert pendingReceipt.receiptItems.first().shipmentItem == untouchedItem
+        assert consumedItem.receiptItems.size() == 1
+    }
+
+    void 'syncReceiptLines should create an original line for a shipment item left with only split lines'() {
+        given: 'a shipment item whose only line was added as a split'
+        ShipmentItem splitOnlyItem = buildShipmentItem(100)
+        Shipment shipment = buildReceivableShipment([splitOnlyItem])
+        ReceiptItem splitLine = buildReceiptItem(splitOnlyItem, 40, [quantityShipped: 40, isSplitItem: true])
+        Receipt receipt = createReceipt(shipment, [splitLine], ReceiptStatusCode.PENDING)
+
+        when:
+        service.syncReceiptLines(shipment.id)
+
+        then: 'it gets an original line to carry its quantity shipped, and the split keeps none'
+        assert receipt.receiptItems.size() == 2
+        ReceiptItem originalLine = receipt.receiptItems.find { !it.isSplitItem }
+        assert originalLine.quantityShipped == 100
+        assert originalLine.quantityReceived == null
+        assert splitLine.quantityShipped == 0
+        assert splitLine.quantityReceived == 40
+    }
+
+    void 'syncReceiptLines should treat a line carrying no split flag as the original'() {
+        given: 'an unflagged line predating the is_split_item column, next to a flagged split'
+        ShipmentItem shipmentItem = buildShipmentItem(100)
+        Shipment shipment = buildReceivableShipment([shipmentItem])
+        ReceiptItem unflaggedLine = buildReceiptItem(shipmentItem, 40, [quantityShipped: 40])
+        unflaggedLine.isSplitItem = null
+        ReceiptItem splitLine = buildReceiptItem(shipmentItem, 20, [quantityShipped: 0, isSplitItem: true])
+        createReceipt(shipment, [unflaggedLine, splitLine], ReceiptStatusCode.PENDING)
+
+        when:
+        service.syncReceiptLines(shipment.id)
+
+        then: 'it carries the shipment item quantity, and its missing flag is left missing'
+        assert unflaggedLine.quantityShipped == 100
+        assert unflaggedLine.isSplitItem == null
+        assert unflaggedLine.quantityReceived == 40
+
+        and: 'the flagged split is left as a split, carrying none of the quantity'
+        assert splitLine.isSplitItem == Boolean.TRUE
+        assert splitLine.quantityShipped == 0
+        assert splitLine.quantityReceived == 20
+    }
+
+    void 'syncReceiptLines should reject a shipment with no pending receipt'() {
+        given: 'a shipment whose only receipt is already completed'
+        ShipmentItem shipmentItem = buildShipmentItem(100)
+        Shipment shipment = buildReceivableShipment([shipmentItem])
+        createReceipt(shipment, [buildReceiptItem(shipmentItem, 100)], ReceiptStatusCode.RECEIVED)
+
+        when:
+        service.syncReceiptLines(shipment.id)
+
+        then: 'a completed receipt is never synced'
+        thrown(ObjectNotFoundException)
+    }
+
+    void 'syncReceiptLines should reject an unknown shipment'() {
+        when:
+        service.syncReceiptLines("does-not-exist")
+
+        then:
+        thrown(ObjectNotFoundException)
     }
 
     // ----------------------------------------------------------------------------------------------------------
@@ -381,6 +654,46 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
     }
 
     // ----------------------------------------------------------------------------------------------------------
+    // updateItemsBatch - the lines a batch save creates, against a minimal real domain graph.
+    // ----------------------------------------------------------------------------------------------------------
+
+    void 'updateItemsBatch should create split lines with a quantity shipped of zero'() {
+        given: 'a pending receipt whose shipment item already carries its original line'
+        Shipment shipment = buildShipment()
+        ShipmentItem shipmentItem = buildShipmentItem(100)
+        ReceiptItem originalItem = buildReceiptItem(shipmentItem, 40)
+        Receipt receipt = createReceipt(shipment, [originalItem], ReceiptStatusCode.PENDING)
+
+        ReceiptItemsBatchRequest request = new ReceiptItemsBatchRequest(
+                receipt: receipt,
+                itemsToSave: [new ReceiptItemUpsertRequest(
+                        rowId: "temp-1",
+                        shipmentItem: shipmentItem,
+                        quantityReceiving: 30,
+                )],
+        )
+
+        when:
+        ReceiptSaveResponseDto response = service.updateItemsBatch(request)
+
+        then: 'the new line is flagged as a split server-side and carries no quantity shipped of its own'
+        ReceiptItem splitItem = receipt.receiptItems.find { it.isSplitItem }
+        assert splitItem.quantityShipped == 0
+        assert splitItem.quantityReceived == 30
+        assert splitItem.product == shipmentItem.product
+        assert shipmentItem.receiptItems.contains(splitItem)
+
+        and: 'the original line keeps the full quantity shipped of the shipment item'
+        assert originalItem.isSplitItem == Boolean.FALSE
+        assert originalItem.quantityShipped == 100
+
+        and: 'the response carries the created line against the row it was sent as'
+        assert response.updatedLines.size() == 1
+        assert response.updatedLines.first().rowId == "temp-1"
+        assert response.updatedLines.first().isSplitItem == Boolean.TRUE
+    }
+
+    // ----------------------------------------------------------------------------------------------------------
     // editReceivingInfo - the split lines added while receiving, against a minimal real domain graph.
     // ----------------------------------------------------------------------------------------------------------
 
@@ -447,6 +760,80 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         assert originalItem.quantityReceived == 60
         assert originalItem.isSplitItem == Boolean.FALSE
         assert originalItem.quantityShipped == 100
+    }
+
+    void 'editReceivingInfo should apply an edited expiration date to the lot being received against'() {
+        given: 'a pending receipt whose original line is received against an existing lot'
+        Shipment shipment = buildShipment()
+        ShipmentItem shipmentItem = buildShipmentItem(100)
+        ReceiptItem originalItem = buildReceiptItem(shipmentItem, 40)
+        Receipt receipt = createReceipt(shipment, [originalItem], ReceiptStatusCode.PENDING)
+
+        LocalDate newExpirationDate = LocalDate.of(2028, 3, 1)
+        Date expectedExpirationDate = JavaUtilDateParser.asDate(newExpirationDate)
+
+        ReceiptEditReceivingInfoCommand command = new ReceiptEditReceivingInfoCommand(
+                receipt: receipt,
+                shipmentItem: shipmentItem,
+                itemsToSave: [new ReceiptItemEditReceivingInfoRequest(
+                        receiptItem: originalItem,
+                        product: shipmentItem.product,
+                        lotNumber: "LOT-1",
+                        expirationDate: newExpirationDate,
+                        quantityReceiving: 40,
+                )],
+        )
+
+        when:
+        service.editReceivingInfo(command)
+
+        then: 'the date is pushed onto the existing lot, which getOrCreateInventoryItem alone would have left as is'
+        1 * inventoryItemManager.getOrCreateInventoryItem(shipmentItem.product, "LOT-1", expectedExpirationDate) >>
+                shipmentItem.inventoryItem
+        1 * inventoryItemManager.updateExpirationDate(shipmentItem.inventoryItem, expectedExpirationDate) >>
+                { InventoryItem inventoryItem, Date expirationDate ->
+                    inventoryItem.expirationDate = expirationDate
+                    return inventoryItem
+                }
+
+        and: 'the received line follows the lot'
+        assert originalItem.expirationDate == expectedExpirationDate
+    }
+
+    void 'editReceivingInfo should clear the expiration date of the lot when the date is emptied'() {
+        given: 'a pending receipt whose original line is received against a lot carrying a date'
+        Shipment shipment = buildShipment()
+        ShipmentItem shipmentItem = buildShipmentItem(100)
+        shipmentItem.inventoryItem.expirationDate = JavaUtilDateParser.asDate(LocalDate.of(2028, 3, 1))
+        ReceiptItem originalItem = buildReceiptItem(shipmentItem, 40)
+        Receipt receipt = createReceipt(shipment, [originalItem], ReceiptStatusCode.PENDING)
+
+        ReceiptEditReceivingInfoCommand command = new ReceiptEditReceivingInfoCommand(
+                receipt: receipt,
+                shipmentItem: shipmentItem,
+                itemsToSave: [new ReceiptItemEditReceivingInfoRequest(
+                        receiptItem: originalItem,
+                        product: shipmentItem.product,
+                        lotNumber: "LOT-1",
+                        expirationDate: null,
+                        quantityReceiving: 40,
+                )],
+        )
+
+        when:
+        service.editReceivingInfo(command)
+
+        then: 'the emptied date reaches the lot instead of being dropped on the way'
+        1 * inventoryItemManager.getOrCreateInventoryItem(shipmentItem.product, "LOT-1", null) >>
+                shipmentItem.inventoryItem
+        1 * inventoryItemManager.updateExpirationDate(shipmentItem.inventoryItem, null) >>
+                { InventoryItem inventoryItem, Date expirationDate ->
+                    inventoryItem.expirationDate = expirationDate
+                    return inventoryItem
+                }
+
+        and: 'the received line follows the lot'
+        assert originalItem.expirationDate == null
     }
 
     // ----------------------------------------------------------------------------------------------------------
@@ -697,77 +1084,6 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
     }
 
     // ----------------------------------------------------------------------------------------------------------
-    // createInboundTransaction - runs against a minimal real domain graph so the transaction actually persists.
-    // ----------------------------------------------------------------------------------------------------------
-
-    void 'createInboundTransaction should record an inbound transfer transaction crediting the received quantities'() {
-        given:
-        Shipment shipment = buildShipment()
-        ShipmentItem firstShipmentItem = buildShipmentItem(100)
-        ReceiptItem firstItem = buildReceiptItem(firstShipmentItem, 70, [binLocation: new Location(name: "Bin")])
-        ShipmentItem secondShipmentItem = buildShipmentItem(50)
-        ReceiptItem secondItem = buildReceiptItem(secondShipmentItem, null)
-        Receipt receipt = createReceipt(shipment, [firstItem, secondItem], ReceiptStatusCode.RECEIVED)
-
-        when:
-        Transaction transaction = service.createInboundTransaction(receipt)
-
-        then: 'a transfer-in transaction is persisted and associated with the receipt and shipment'
-        1 * transactionIdentifierService.generate(_ as Transaction) >> "TRX-002"
-        assert Transaction.list() == [transaction]
-        assert transaction.transactionType.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID
-        assert transaction.transactionNumber == "TRX-002"
-        assert transaction.receipt == receipt
-        assert transaction.incomingShipment == shipment
-        assert transaction.source == shipment.origin
-        assert transaction.destination == null
-        assert transaction.inventory == shipment.destination.inventory
-        assert transaction.transactionDate == receipt.actualDeliveryDate
-        assert shipment.incomingTransactions.contains(transaction)
-
-        and: 'each receipt item is credited with its received quantity (defaulting to zero)'
-        assert transaction.transactionEntries.size() == 2
-        TransactionEntry firstEntry = transaction.transactionEntries.find { it.inventoryItem == firstItem.inventoryItem }
-        assert firstEntry.quantity == 70
-        assert firstEntry.binLocation == firstItem.binLocation
-        TransactionEntry secondEntry = transaction.transactionEntries.find { it.inventoryItem == secondItem.inventoryItem }
-        assert secondEntry.quantity == 0
-    }
-
-    void 'createInboundTransaction should resolve a missing inventory item from the lot fields'() {
-        given: 'a receipt item without an inventory item (legacy shipment item)'
-        Shipment shipment = buildShipment()
-        ShipmentItem shipmentItem = buildShipmentItem(100)
-        Date expirationDate = new Date() + 365
-        ReceiptItem receiptItem = buildReceiptItem(
-                shipmentItem, 100, [inventoryItem: null, lotNumber: "LOT-9", expirationDate: expirationDate])
-        Receipt receipt = createReceipt(shipment, [receiptItem], ReceiptStatusCode.RECEIVED)
-
-        InventoryItem resolvedInventoryItem = new InventoryItem(product: receiptItem.product, lotNumber: "LOT-9")
-
-        when:
-        Transaction transaction = service.createInboundTransaction(receipt)
-
-        then:
-        1 * inventoryItemManager.getOrCreateInventoryItem(receiptItem.product, "LOT-9", expirationDate) >> resolvedInventoryItem
-        assert transaction.transactionEntries.first().inventoryItem == resolvedInventoryItem
-    }
-
-    void 'createInboundTransaction should fail when the destination has no inventory'() {
-        given:
-        Shipment shipment = buildShipment(null)
-        ShipmentItem shipmentItem = buildShipmentItem(100)
-        ReceiptItem receiptItem = buildReceiptItem(shipmentItem, 100)
-        Receipt receipt = createReceipt(shipment, [receiptItem], ReceiptStatusCode.RECEIVED)
-
-        when:
-        service.createInboundTransaction(receipt)
-
-        then:
-        thrown(IllegalStateException)
-    }
-
-    // ----------------------------------------------------------------------------------------------------------
     // completeReceipt - the full orchestration against a minimal real domain graph.
     // ----------------------------------------------------------------------------------------------------------
 
@@ -867,9 +1183,129 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         1 * shipmentService.createShipmentEvent(shipment, _, EventCode.RECEIVED, shipment.destination)
     }
 
+    void 'completeReceipt should write out a zero on the lines that were never given a quantity'() {
+        given: 'a pending receipt whose original line was started but never received against'
+        Shipment shipment = buildShipment()
+        ShipmentItem shipmentItem = buildShipmentItem(100)
+        ReceiptItem receiptItem = buildReceiptItem(shipmentItem, null)
+        Receipt receipt = createReceipt(shipment, [receiptItem], ReceiptStatusCode.PENDING)
+
+        when:
+        service.completeReceipt(new ReceiptCompleteRequestCommand(receipt: receipt))
+
+        then: 'the "nothing entered yet" null does not outlive the pending receipt'
+        assert receiptItem.quantityReceived == 0
+    }
+
+    void 'completeReceipt should not record a transaction entry for a line left out of a partial receipt'() {
+        given: 'a pending receipt receiving one of its two lines, the other left untouched'
+        Shipment shipment = buildShipment()
+        ShipmentItem receivedShipmentItem = buildShipmentItem(100)
+        ReceiptItem receivedItem = buildReceiptItem(receivedShipmentItem, 70)
+        ShipmentItem untouchedShipmentItem = buildShipmentItem(50)
+        ReceiptItem untouchedItem = buildReceiptItem(untouchedShipmentItem, null)
+        Receipt receipt = createReceipt(shipment, [receivedItem, untouchedItem], ReceiptStatusCode.PENDING)
+
+        when: 'the request completes the receipt without canceling anything'
+        service.completeReceipt(new ReceiptCompleteRequestCommand(receipt: receipt))
+
+        then: 'the untouched line is zeroed out but leaves the stock of its product alone'
+        assert untouchedItem.quantityReceived == 0
+        Transaction transaction = Transaction.list().first()
+        assert transaction.transactionEntries.size() == 1
+        assert transaction.transactionEntries.first().quantity == 70
+        assert transaction.transactionEntries.first().inventoryItem == receivedItem.inventoryItem
+    }
+
+    void 'completeReceipt should cancel the whole quantity of a line left empty when the destination does not support partial receiving'() {
+        given: 'a pending receipt of a destination that cannot receive in parts, whose only line was never received against'
+        Shipment shipment = buildShipment(new Inventory(), false)
+        ShipmentItem shipmentItem = buildShipmentItem(100)
+        ReceiptItem receiptItem = buildReceiptItem(shipmentItem, null)
+        Receipt receipt = createReceipt(shipment, [receiptItem], ReceiptStatusCode.PENDING)
+
+        when: 'the request carries no lines to cancel'
+        service.completeReceipt(new ReceiptCompleteRequestCommand(receipt: receipt))
+
+        then: 'the empty line counts as nothing received, so the full shipped quantity is canceled'
+        assert receiptItem.quantityCanceled == 100
+
+        and: 'the "nothing entered yet" null is written out as a zero'
+        assert receiptItem.quantityReceived == 0
+    }
+
+    // ----------------------------------------------------------------------------------------------------------
+    // sortByPackLevel - the ordering of the packing list view.
+    // ----------------------------------------------------------------------------------------------------------
+
+    void 'sortByPackLevel should order the items by their pack levels'() {
+        given: 'two pallets of two boxes each, with one item per box, in no particular order'
+        Container pallet1 = buildPallet("Pallet 1", 1)
+        Container pallet2 = buildPallet("Pallet 2", 2)
+        List<ShipmentItem> shipmentItems = [
+                buildPackedShipmentItem("P2-B2", buildBox(pallet2, "Box 2", 2)),
+                buildPackedShipmentItem("P1-B2", buildBox(pallet1, "Box 2", 2)),
+                buildPackedShipmentItem("P2-B1", buildBox(pallet2, "Box 1", 1)),
+                buildPackedShipmentItem("P1-B1", buildBox(pallet1, "Box 1", 1)),
+        ]
+
+        when:
+        List<ShipmentItem> sorted = service.sortByPackLevel(shipmentItems)
+
+        then: 'they come out ordered by pack level 1, then by pack level 2'
+        assert sorted*.lotNumber == ["P1-B1", "P1-B2", "P2-B1", "P2-B2"]
+    }
+
+    void 'sortByPackLevel should keep the order of the items packed at the same level'() {
+        given: 'three items in the same box'
+        Container box = buildBox(buildPallet("Pallet 1", 1), "Box 1", 1)
+        List<ShipmentItem> shipmentItems = [
+                buildPackedShipmentItem("third", box),
+                buildPackedShipmentItem("first", box),
+                buildPackedShipmentItem("second", box),
+        ]
+
+        when:
+        List<ShipmentItem> sorted = service.sortByPackLevel(shipmentItems)
+
+        then: 'the order the query returned them in is preserved'
+        assert sorted*.lotNumber == ["third", "first", "second"]
+    }
+
+    void 'sortByPackLevel should keep the order of the items whose pack levels compare equal'() {
+        given: 'two items in different pallets that carry no sort order of their own'
+        List<ShipmentItem> shipmentItems = [
+                buildPackedShipmentItem("second", buildPallet("Pallet B", null)),
+                buildPackedShipmentItem("first", buildPallet("Pallet A", null)),
+        ]
+
+        when:
+        List<ShipmentItem> sorted = service.sortByPackLevel(shipmentItems)
+
+        then: 'nothing orders the pallets, so the order the query returned the items in stands'
+        assert sorted*.lotNumber == ["second", "first"]
+    }
+
     // ----------------------------------------------------------------------------------------------------------
     // Fixture helpers
     // ----------------------------------------------------------------------------------------------------------
+
+    private static Container buildPallet(String name, Integer sortOrder) {
+        return new Container(name: name, sortOrder: sortOrder)
+    }
+
+    private static Container buildBox(Container pallet, String name, Integer sortOrder) {
+        return new Container(name: name, sortOrder: sortOrder, parentContainer: pallet)
+    }
+
+    /**
+     * An item packed in the given container, labeled through its lot number so that the assertions can tell the
+     * items apart: a shipment item compares by product and lot number, so asserting on the items themselves would
+     * treat them all as equal.
+     */
+    private static ShipmentItem buildPackedShipmentItem(String label, Container container) {
+        return new ShipmentItem(lotNumber: label, container: container)
+    }
 
     private static ReceiptItemCompleteRequest completeRequest(ReceiptItem receiptItem, boolean cancelRemainingQuantity) {
         return new ReceiptItemCompleteRequest(receiptItem: receiptItem, cancelRemainingQuantity: cancelRemainingQuantity)

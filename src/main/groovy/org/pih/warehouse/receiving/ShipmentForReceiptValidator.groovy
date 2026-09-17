@@ -1,9 +1,9 @@
 package org.pih.warehouse.receiving
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.validation.ObjectError
 
-import org.pih.warehouse.api.receiving.v2.ReceiptV2Service
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.core.validation.PlainObjectValidator
@@ -17,14 +17,21 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 @Component
 class ShipmentForReceiptValidator extends PlainObjectValidator<Shipment> {
 
+    @Autowired
+    ShipmentReceivingCalculator shipmentReceivingCalculator
+
     /**
      * Whether a new receipt can be opened on the shipment: it has to be shipped, have something left to receive,
      * and not already carry a pending receipt.
      */
     @Override
     protected ObjectValidationResult doValidate(Shipment shipment) {
+        ObjectError hasBeenShippedError = validateShipmentHasBeenShipped(shipment)
+        if (hasBeenShippedError) {
+            return new ObjectValidationResult(hasBeenShippedError)
+        }
+
         return new ObjectValidationResult(
-                validateShipmentHasBeenShipped(shipment),
                 validateShipmentNotFullyReceived(shipment),
                 validateShipmentHasNoPendingReceipt(shipment),
         )
@@ -34,8 +41,12 @@ class ShipmentForReceiptValidator extends PlainObjectValidator<Shipment> {
      * Whether a receiving page can be accessed
      */
     ObjectValidationResult validateForReceivingAccess(Shipment shipment, Location currentLocation) {
+        ObjectError hasBeenShippedError = validateShipmentHasBeenShipped(shipment)
+        if (hasBeenShippedError) {
+            return new ObjectValidationResult(hasBeenShippedError)
+        }
+
         return new ObjectValidationResult(
-                validateShipmentHasBeenShipped(shipment),
                 validateShipmentNotFullyReceived(shipment),
                 validateShipmentDestination(shipment, currentLocation),
         )
@@ -57,7 +68,7 @@ class ShipmentForReceiptValidator extends PlainObjectValidator<Shipment> {
      * Nothing left to receive (or cancel) on any line of the shipment.
      */
     private ObjectError validateShipmentNotFullyReceived(Shipment shipment) {
-        if (!shipment || !ReceiptV2Service.isShipmentFullyReceived(shipment)) {
+        if (!shipment || !shipmentReceivingCalculator.isShipmentFullyReceived(shipment)) {
             return null
         }
 

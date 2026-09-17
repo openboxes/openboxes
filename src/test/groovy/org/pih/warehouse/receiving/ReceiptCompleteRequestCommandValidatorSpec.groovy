@@ -14,7 +14,7 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
     ReceiptCompleteRequestCommandValidator validator = new ReceiptCompleteRequestCommandValidator()
 
     void setupSpec() {
-        mockDomains(Receipt, ReceiptItem, ReceiptV2Marker, Product)
+        mockDomains(Receipt, ReceiptItem, Product)
 
         // ReceiptItemCompleteRequest implements ObjectValidatable, whose validate() performs javax validation
         // through the "defaultValidator" bean. A running app gets that bean from Boot's autoconfiguration, but
@@ -24,10 +24,10 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
         }
     }
 
-    void 'doValidate should reject a receipt that was not created by the v2 workflow'() {
-        given: 'a pending receipt without the v2 marker'
-        Receipt receipt = new Receipt(receiptStatusCode: ReceiptStatusCode.PENDING, actualDeliveryDate: new Date())
-        receipt.save(failOnError: true, flush: true)
+    void 'doValidate should accept a receipt that was started by the old receiving workflow'() {
+        given: 'a pending receipt carrying no v2 marker'
+        Receipt receipt = buildPendingReceipt()
+        buildReceiptItem(receipt, false)
 
         when:
         ObjectValidationResult result = validator.doValidate(new ReceiptCompleteRequestCommand(
@@ -35,9 +35,50 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
                 itemsToComplete: [],
         ))
 
+        then: 'the workflow the receipt was started by does not gate its completion'
+        assert result.valid
+    }
+
+    void 'doValidate should reject a receipt that received nothing (quantityReceived: #quantityReceived)'() {
+        given: 'a pending receipt whose only line received nothing'
+        Receipt receipt = buildPendingReceipt()
+        buildReceiptItem(receipt, false, quantityReceived)
+
+        when:
+        ObjectValidationResult result = validator.doValidate(new ReceiptCompleteRequestCommand(receipt: receipt))
+
+        then: 'completing it would record an inbound transaction with no entries at all, so it is rejected'
+        assert !result.valid
+        assert result.errors*.code == ["receiptCompleteRequestCommand.receipt.nothingReceived"]
+
+        where: 'the line was either never given a quantity, or deliberately given a zero'
+        quantityReceived << [null, 0]
+    }
+
+    void 'doValidate should reject a receipt that carries no lines at all'() {
+        given:
+        Receipt receipt = buildPendingReceipt()
+
+        when:
+        ObjectValidationResult result = validator.doValidate(new ReceiptCompleteRequestCommand(receipt: receipt))
+
         then:
         assert !result.valid
-        assert result.errors*.code == ["receiptCompleteRequestCommand.receipt.notV2"]
+        assert result.errors*.code == ["receiptCompleteRequestCommand.receipt.nothingReceived"]
+    }
+
+    void 'doValidate should accept a receipt where a single line received something'() {
+        given: 'a pending receipt whose lines received nothing, except for one'
+        Receipt receipt = buildPendingReceipt()
+        buildReceiptItem(receipt, false, 0)
+        buildReceiptItem(receipt, true, null)
+        buildReceiptItem(receipt, true, 5)
+
+        when:
+        ObjectValidationResult result = validator.doValidate(new ReceiptCompleteRequestCommand(receipt: receipt))
+
+        then: 'the one line that moved stock is enough - the transaction gets its entry'
+        assert result.valid
     }
 
     void 'doValidate should reject the cancel-remaining flag on a split item'() {
@@ -103,15 +144,14 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
     private static Receipt buildPendingReceipt() {
         Receipt receipt = new Receipt(receiptStatusCode: ReceiptStatusCode.PENDING, actualDeliveryDate: new Date())
         receipt.save(failOnError: true, flush: true)
-        // The completable receipts of these tests are v2 receipts, so stamp the marker startReceipt would create.
-        new ReceiptV2Marker(receipt: receipt).save(failOnError: true, flush: true)
         return receipt
     }
 
-    private static ReceiptItem buildReceiptItem(Receipt receipt, Boolean isSplitItem) {
+    private static ReceiptItem buildReceiptItem(Receipt receipt, Boolean isSplitItem, Integer quantityReceived = 10) {
         ReceiptItem receiptItem = new ReceiptItem(
                 product: new Product(name: "Product"),
                 quantityShipped: isSplitItem ? 0 : 100,
+                quantityReceived: quantityReceived,
                 isSplitItem: isSplitItem,
         )
         receipt.addToReceiptItems(receiptItem)

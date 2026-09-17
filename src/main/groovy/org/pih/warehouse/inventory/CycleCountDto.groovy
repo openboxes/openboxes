@@ -6,9 +6,10 @@ import org.pih.warehouse.core.Person
 
 import java.time.LocalDate
 
-class CycleCountDto {
+import org.pih.warehouse.core.dtos.DomainDto
+import org.pih.warehouse.core.mapper.SmartMapper
 
-    String id
+class CycleCountDto implements DomainDto<CycleCount> {
 
     String status
 
@@ -35,7 +36,7 @@ class CycleCountDto {
                         deadline: cycleCountRequest?.recountDeadline
                 ),
                 status: cycleCount.status.toString(),
-                cycleCountItems: cycleCount.cycleCountItems.collect { CycleCountItemDto.from(it) }
+                cycleCountItems: SmartMapper.mapCollectionStatic(cycleCount.cycleCountItems, CycleCountItemDto)
         )
     }
 

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { RiAddCircleLine, RiArrowGoBackLine } from 'react-icons/ri';
+import { RiArrowGoBackLine } from 'react-icons/ri';
 
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
@@ -9,7 +9,7 @@ import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
 
 const ReceivingLineItemsTable = ({
-  fields, columns, receivingNow, revertToOriginal, addRow,
+  fields, columns, receivingNow, remainingToReceive, revertToOriginal, addRow,
 }) => {
   const translate = useTranslate();
 
@@ -23,6 +23,10 @@ const ReceivingLineItemsTable = ({
             clickable={false}
           />
         </div>
+        {/* TODO: This button is hidden (instead of removed) since we are revising its behaviour.
+                  The revision is scheduled for 0.9.10, but if we decide the button isn't needed,
+                  it and its existing (broken) functionality should be removed entirely. */}
+        {false && (
         <Button
           label="react.receiving.revertToOriginal.label"
           defaultLabel="Revert to original"
@@ -30,29 +34,23 @@ const ReceivingLineItemsTable = ({
           EndIcon={<RiArrowGoBackLine size={18} />}
           onClick={revertToOriginal}
         />
+        )}
       </div>
-      <form className="receiving-table mt-2">
+      <form className="receiving-table receiving-edit-modal__receiving-table mt-2">
         <DataTable
           columns={columns}
           data={fields}
           totalCount={fields.length}
           disablePagination
           showFooter
-          meta={{ totalReceivingNow: receivingNow }}
+          meta={{ totalReceivingNow: receivingNow, remainingToReceive }}
+          arrowNavigationSettings={{ verticalOnly: true, onNavigatePastLastField: addRow }}
           emptyTableMessage={{
             id: 'react.receiving.emptyTable.label',
             defaultMessage: 'No items to receive',
           }}
         />
       </form>
-      <button
-        type="button"
-        className="receiving-edit-modal__add-record d-flex align-items-center gap-8 p-0 border-0 bg-transparent cursor-pointer font-weight-500 font-size-xs"
-        onClick={addRow}
-      >
-        <RiAddCircleLine size={18} />
-        {translate('react.receiving.addNewRecord.label', 'Add new record')}
-      </button>
     </>
   );
 };
@@ -61,6 +59,7 @@ ReceivingLineItemsTable.propTypes = {
   fields: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   columns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   receivingNow: PropTypes.number.isRequired,
+  remainingToReceive: PropTypes.number.isRequired,
   revertToOriginal: PropTypes.func.isRequired,
   addRow: PropTypes.func.isRequired,
 };

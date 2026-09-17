@@ -28,4 +28,23 @@ trait Mapper<Source, Target> {
      * @return A new instance of the target object.
      */
     abstract Target map(Source source, MapperConfig config=null)
+
+    /**
+     * Converts a collection of instances of the source object into a List of instances of the target object.
+     *
+     * @param sources The objects to be converted from.
+     * @param config The configuration to use when performing the mapping.
+     * @return A new List of instances of the target object.
+     */
+    List<Target> mapCollection(Collection<Source> sources, MapperConfig config=null) {
+        if (sources == null) {
+            return null
+        }
+
+        List<Target> mappedList = []
+        for (source in sources) {
+            mappedList.add(map(source, config))
+        }
+        return mappedList
+    }
 }

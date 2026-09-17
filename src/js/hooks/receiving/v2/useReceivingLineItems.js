@@ -11,7 +11,7 @@ import useEditLineItemValidation from 'hooks/receiving/v2/useEditLineItemValidat
 import useEditModalLocationAutofill from 'hooks/receiving/v2/useEditModalLocationAutofill';
 import useReceivingLineItemColumns from 'hooks/receiving/v2/useReceivingLineItemColumns';
 import useTranslate from 'hooks/useTranslate';
-import { formatDateToString } from 'utils/dateUtils';
+import { formatApiDateToString } from 'utils/dateUtils';
 
 /**
  * Form state for the editable "Receiving now" table in the edit modal
@@ -33,7 +33,7 @@ const useReceivingLineItems = ({
     receiptItemId: item?.receiptItemId ?? null,
     product: item?.product ?? null,
     lotNumber: item?.lotNumber ?? '',
-    expirationDate: formatDateToString({
+    expirationDate: formatApiDateToString({
       date: item?.expirationDate,
       dateFormat: DateFormatDateFns.DD_MMM_YYYY,
     }) ?? '',
@@ -50,18 +50,16 @@ const useReceivingLineItems = ({
   // The original line of the shipment item - the row every split line is split off from.
   const originalLineItem = initialLineItems.find((item) => !item.isSplitItem);
 
-  // New rows split the same shipment item line, so they start with the line's product.
+  // New rows are prefilled with the product and the recipient of the shipment item, and with the
+  // bin the original line has when the modal opens.
   const buildSplitRow = () => ({
-    ...buildDefaultRow({ product: originalLineItem?.product ?? lineItem?.product }),
+    ...buildDefaultRow({
+      product: lineItem?.product,
+      recipient: lineItem?.recipient,
+      binLocation: originalLineItem?.binLocation,
+    }),
     isSplitItem: true,
   });
-
-  // If a line has already some persisted split items, we don't want to prefill a new split row
-  // We want to prefill a new split row with filled product row, only if a line doesn't
-  // have any persisted split items yet
-  const defaultLineItems = initialLineItems.some((item) => item.isSplitItem)
-    ? initialLineItems.map(buildDefaultRow)
-    : [...initialLineItems.map(buildDefaultRow), buildSplitRow()];
 
   const { validationSchema } = useEditLineItemValidation();
 
@@ -69,7 +67,7 @@ const useReceivingLineItems = ({
     control, getValues, setValue, reset, handleSubmit, formState: { errors },
   } = useForm({
     mode: 'onBlur',
-    defaultValues: { lineItems: defaultLineItems },
+    defaultValues: { lineItems: initialLineItems.map(buildDefaultRow) },
     resolver: zodResolver(validationSchema),
   });
 
@@ -92,14 +90,17 @@ const useReceivingLineItems = ({
     setValue,
   });
 
+  const addRow = useCallback(
+    () => append(buildSplitRow()),
+    [append, lineItem, originalLineItem],
+  );
+
   const { columns } = useReceivingLineItemColumns({
     control,
+    addRow,
     removeRow,
     onLocationAutofill,
-    errors,
   });
-
-  const addRow = () => append(buildSplitRow());
 
   const copyToReceiving = useCallback((receivedItem) => append({
     rowId: _.uniqueId('row-'),
@@ -160,6 +161,7 @@ const useReceivingLineItems = ({
     copyToReceiving,
     revertToOriginal,
     receivingNow,
+    remainingToReceive,
     summaryData,
     getLineItems,
     handleSubmit,

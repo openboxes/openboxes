@@ -35,6 +35,7 @@ const ReceivingFilters = ({
   onResetSort,
   updateFilterParams,
   clearFilterParams,
+  packingListViewEnabled,
 }) => {
   const translate = useTranslate();
   // Add loading for filters section. Loading will display before the translations are fetched.
@@ -44,6 +45,19 @@ const ReceivingFilters = ({
   // Recomputed whenever translations change, so that the field configs hold
   // already translated labels.
   const fields = useMemo(() => filterFields(translate), [translate]);
+
+  const viewOptions = useMemo(() => receivingViewOptions.map((option) => {
+    // If the shipment has no pack levels, disable the packing list view.
+    const disabled = option.value === ReceivingView.PACKING_LIST && !packingListViewEnabled;
+
+    return {
+      ...option,
+      disabled,
+      disabledTooltip: disabled
+        ? translate('react.receiving.packingListView.disabled.label', 'No packing information entered for this shipment.')
+        : null,
+    };
+  }), [packingListViewEnabled, translate]);
 
   // Clearing the filters is not a submit, so the snapshot of matching rows has to be
   // dropped here as well - otherwise the table would keep showing the previously
@@ -57,7 +71,7 @@ const ReceivingFilters = ({
     <div className="receiving-filters">
       <div className="receiving-filters__row d-flex justify-content-between align-items-center">
         <SlidingButtonGroup
-          options={receivingViewOptions}
+          options={viewOptions}
           defaultOption={view}
           onChange={onViewChange}
         />
@@ -87,12 +101,12 @@ const ReceivingFilters = ({
             onChange={onPutawayChange}
             titles={{
               checked: {
-                id: 'react.receiving.enablePutaway.label',
-                defaultMessage: 'Enable Putaway',
+                id: 'react.receiving.showPutaway.label',
+                defaultMessage: 'Show Putaway',
               },
               unchecked: {
-                id: 'react.receiving.enablePutaway.label',
-                defaultMessage: 'Enable Putaway',
+                id: 'react.receiving.showPutaway.label',
+                defaultMessage: 'Show Putaway',
               },
             }}
           />
@@ -114,6 +128,8 @@ const ReceivingFilters = ({
           EndIcon={<RiMagicLine size={16} />}
         />
 
+        {/* TODO: Re-enable this button once import support is added in 0.9.10. */}
+        {false && (
         <Button
           label="react.receiving.import.label"
           defaultLabel="Import"
@@ -121,6 +137,8 @@ const ReceivingFilters = ({
           isDropdown
           EndIcon={<RiArrowDownSLine size={16} />}
         />
+        )}
+
         <Button
           label="react.receiving.saveAndExit.label"
           defaultLabel="Save & Exit"
@@ -144,6 +162,7 @@ ReceivingFilters.propTypes = {
   onResetSort: PropTypes.func.isRequired,
   updateFilterParams: PropTypes.func.isRequired,
   clearFilterParams: PropTypes.func.isRequired,
+  packingListViewEnabled: PropTypes.bool.isRequired,
 };
 
 export default ReceivingFilters;

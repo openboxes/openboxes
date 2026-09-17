@@ -7,6 +7,7 @@ import DataTableFooter from 'components/DataTable/v2/DataTableFooter';
 import DataTableFooterRow from 'components/DataTable/v2/DataTableFooterRow';
 import DataTableHeader from 'components/DataTable/v2/DataTableHeader';
 import useDataTable from 'hooks/useDataTable';
+import useTableArrowNavigation from 'hooks/useTableArrowNavigation';
 import useWindowWidthCheck from 'hooks/useWindowWidthCheck';
 
 import 'react-table/react-table.css';
@@ -49,7 +50,11 @@ const DataTable = ({
   disabled,
   getSubRows,
   defaultExpandedSubRows,
+  arrowNavigationSettings,
 }) => {
+  const { enabledForAllFields, verticalOnly, onNavigatePastLastField } = arrowNavigationSettings;
+  // Arrow key navigation. With no cell marked as navigable, the listener does nothing.
+  const arrowNavigationRef = useTableArrowNavigation({ onNavigatePastLastField, verticalOnly });
   const {
     defaultEmptyTableMessage,
     defaultLoadingTableMessage,
@@ -71,7 +76,7 @@ const DataTable = ({
   const isScreenWiderThanTable = useWindowWidthCheck(tableWidth);
 
   return (
-    <div className="app-react-table-wrapper table-v2">
+    <div className="app-react-table-wrapper table-v2" ref={arrowNavigationRef}>
       <div className={`ReactTable app-react-table ${disabled ? 'app-react-table--disabled' : ''}`}>
         <div className={`rt-table ${overflowVisible ? 'overflow-visible' : ''}`} role="grid">
           <DataTableHeader
@@ -93,6 +98,7 @@ const DataTable = ({
             tableWithPinnedColumns={tableWithPinnedColumns}
             isScreenWiderThanTable={isScreenWiderThanTable}
             overflowVisible={overflowVisible}
+            arrowNavigationEnabledForAllFields={enabledForAllFields}
           />
           {showFooter && (
             <DataTableFooterRow
@@ -154,6 +160,16 @@ DataTable.propTypes = {
   getSubRows: PropTypes.func,
   // Expands all expandable rows by default.
   defaultExpandedSubRows: PropTypes.bool,
+  // Arrow key navigation between the fields of the table.
+  arrowNavigationSettings: PropTypes.shape({
+    // Takes every field the table renders. To take only some columns, leave it out and give each
+    // of those columns `meta: { arrowNavigable: true }` instead.
+    enabledForAllFields: PropTypes.bool,
+    // Limits the moves to up and down, leaving left and right to move the caret in the field.
+    verticalOnly: PropTypes.bool,
+    // Called with the column when arrow down or right leaves the last field of the table.
+    onNavigatePastLastField: PropTypes.func,
+  }),
 };
 
 DataTable.defaultProps = {
@@ -179,4 +195,5 @@ DataTable.defaultProps = {
   disabled: false,
   getSubRows: undefined,
   defaultExpandedSubRows: false,
+  arrowNavigationSettings: {},
 };
