@@ -23,6 +23,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.StockMovementService
+import org.pih.warehouse.picking.PickTaskService
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
@@ -39,6 +40,7 @@ class RequisitionController {
     def inventoryService
     def productService
     StockMovementService stockMovementService
+    PickTaskService pickTaskService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -355,6 +357,33 @@ class RequisitionController {
         def requisition = Requisition.get(params?.id)
         requisitionService.clearPicklist(requisition)
         redirect(action: "pick", id: requisition?.id)
+    }
+
+    def unassignPicker() {
+        def requisition = Requisition.get(params?.id)
+        try {
+            pickTaskService.unassign(requisition)
+            flash.message = g.message(code: 'picklist.unassign.success.message', default: 'Picker was unassigned and the order was returned to the pick queue')
+        } catch (Exception e) {
+            flash.error = g.message(code: 'picklist.unassign.error.message', args: [e.message], default: 'Unable to unassign picker: {0}')
+        }
+        redirect(controller: "stockMovement", action: "show", id: params.id)
+    }
+
+    def reassignPicker() {
+        def requisition = Requisition.get(params?.id)
+        try {
+            pickTaskService.reassign(requisition, params?.assigneeId)
+            flash.message = g.message(code: 'picklist.reassign.success.message', default: 'Picker was reassigned')
+        } catch (Exception e) {
+            flash.error = g.message(code: 'picklist.reassign.error.message', args: [e.message], default: 'Unable to reassign picker: {0}')
+        }
+        redirect(controller: "stockMovement", action: "show", id: params.id)
+    }
+
+    def reassignPickerDialog() {
+        def requisition = Requisition.get(params?.id)
+        render(template: "reassignPickerDialog", model: [requisition: requisition])
     }
 
     def showPicklistDialog() {

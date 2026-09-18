@@ -966,13 +966,13 @@ class RequisitionService {
      * Writes an EventLog in the caller's transaction. Use {@link #logRequisitionEvent} instead when the
      * caller is about to roll back and the entry still has to survive.
      */
-    void addSystemEventLog(Requisition requisition, String message) {
+    void addSystemEventLog(Requisition requisition, String message, EventLogCode eventLogCode = EventLogCode.ERROR_OCCURRED) {
         // TODO: event_log.message is a VARCHAR(255) column; expand the column (and remove this cap) if longer
         //  messages are needed.
         String truncatedMessage = message?.length() > 255 ? message.take(255) : message
 
         requisition.addToEventLogs(new EventLog(
-                eventLogCode: EventLogCode.ERROR_OCCURRED,
+                eventLogCode: eventLogCode,
                 eventDate: Instant.now(),
                 message: truncatedMessage,
         ))
@@ -1000,14 +1000,14 @@ class RequisitionService {
      * though the caller is about to roll back and rethrow the triggering exception.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    void logRequisitionEvent(String requisitionId, String message) {
+    void logRequisitionEvent(String requisitionId, String message, EventLogCode eventLogCode = EventLogCode.ERROR_OCCURRED) {
         Requisition requisition = Requisition.get(requisitionId)
         if (!requisition) {
             log.warn("Unable to log requisition error - requisition ${requisitionId} not found: ${message}")
             return
         }
 
-        addSystemEventLog(requisition, message)
+        addSystemEventLog(requisition, message, eventLogCode)
     }
 
     RequisitionItem buildRequisitionItem(Map params) {
