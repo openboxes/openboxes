@@ -20,18 +20,23 @@ const removeSplitItemRow = (state, rowId) => {
   const toggleRowId = state.ids
     .find((id) => state.entities[id]?.splitItemIds?.includes(rowId));
   const toggle = state.entities[toggleRowId];
+  const replacedRow = state.entities[toggle.replacedRowId];
   const splitItemIds = toggle.splitItemIds.filter((id) => id !== rowId);
-  // Removing the only split item dissolves the whole group - the replaced row turns
-  // back into the plain original shipment line.
+  // Removing the only split item dissolves the whole group - the replaced row turns back into
+  // the plain original line, taking its saved values from the zeroed original on the toggle row.
   if (splitItemIds.length === 0) {
     return updateNormalizedItem(
       removeNormalizedItems(state, [rowId, toggleRowId]),
       toggle.replacedRowId,
-      { rowType: null },
+      {
+        ...toggle.originalLineItem,
+        rowId: toggle.replacedRowId,
+        rowType: null,
+        quantityAvailableToReceive: replacedRow.quantityAvailableToReceive,
+      },
     );
   }
   const remainingSplitItem = state.entities[splitItemIds[0]];
-  const replacedRow = state.entities[toggle.replacedRowId];
   // A single change left is no longer a group - drop the group rows and turn the
   // remaining split item back into a plain row. Only dissolve when the remaining split
   // item matches the original on all tracked fields; any diff (product, lot, expiration)

@@ -84,7 +84,7 @@ const buildLineItem = ({ summary, receiptItem, usersById }) => {
       ?? shipmentItem.productLot?.lotNumber,
     expirationDate: receiptItem?.productLot?.expirationDate
       ?? shipmentItem.productLot?.expirationDate,
-    recipient: mapToFormSelectOption(receiptItem?.recipient) ?? shippedRecipient,
+    recipient: receiptItem ? mapToFormSelectOption(receiptItem.recipient) : shippedRecipient,
     // The recipient of the shipment item, displayed in the shipment information of the edit modal
     shippedRecipient,
     binLocation: mapToFormSelectOption(receiptItem?.binLocation),
