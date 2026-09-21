@@ -3,6 +3,7 @@ package org.pih.warehouse.receiving
 import org.springframework.stereotype.Component
 import org.springframework.validation.ObjectError
 
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.core.validation.ObjectValidator
 
@@ -18,6 +19,7 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
                 validateNoDuplicateItemsToComplete(command),
                 validateItemsToCompleteBelongToReceipt(command),
                 validateCancelRemainingOnlyOnOriginalItems(command),
+                validateBinLocationIsPresent(command),
         )
     }
 
@@ -123,6 +125,40 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
                 rejectField("itemsToComplete", command.itemsToComplete,
                         "receiptCompleteRequestCommand.itemsToComplete.cancelRemainingOnSplitItem",
                         [flaggedSplitItemIds.toString()]) :
+                null
+    }
+
+    /**
+     * Every line the completion moves stock on has to carry a bin location when the receipt is received into a
+     * destination that tracks bin locations (Location.hasBinLocationSupport) - its stock would otherwise land outside
+     * of any bin. Lines that received nothing record no transaction entry, so they are not checked, and neither are
+     * the lines of a destination that holds no bins.
+     *
+     * The receiving page fills the bins in before it lets the user reach the completion, so this guards the API.
+     */
+    private ObjectError validateBinLocationIsPresent(ReceiptCompleteRequestCommand command) {
+        if (!command.receipt) {
+            return null
+        }
+
+        // The same lines the transaction credits (see ReceiptTransactionManager#createInboundTransaction).
+        List<String> itemIds = (command.receipt.receiptItems ?: [])
+                .findAll { ReceiptItem receiptItem ->
+                    (receiptItem.quantityReceived ?: 0) > 0 && receiptItem.binLocation == null
+                }
+                .collect { ReceiptItem receiptItem -> receiptItem.id }
+
+        // The lines are checked first so that a receipt that carries a bin location on each of them doesn't load the
+        // shipment and its destination.
+        if (!itemIds) {
+            return null
+        }
+
+        Location destination = command.receipt.shipment?.destination
+
+        return destination?.hasBinLocationSupport() ?
+                rejectField("receipt", command.receipt,
+                        "receiptCompleteRequestCommand.receipt.binLocationMissing", [itemIds.toString()]) :
                 null
     }
 }
