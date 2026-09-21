@@ -10,12 +10,6 @@ import org.pih.warehouse.core.validation.ObjectValidatable
 class BulkDataWriterConfig implements ObjectValidatable<BulkDataWriterConfigValidator> {
 
     /**
-     * Will be concatenated to construct the file name of the file being output.
-     * Only needed if we are writing to a file.
-     */
-    Collection<Object> fileNameArgs = []
-
-    /**
      * True if we should create a header row (constructed using the field config)
      */
     boolean addHeaderRow = true
