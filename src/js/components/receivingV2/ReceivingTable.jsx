@@ -87,6 +87,8 @@ const ReceivingTable = ({
         disablePagination
         tableWithPinnedColumns
         arrowNavigationSettings={{ verticalOnly: true }}
+        initialHorizontalScroll="end"
+        showTopScrollbar
         loading={loading}
         loadingMessage={{
           id: 'react.default.loading.label',
