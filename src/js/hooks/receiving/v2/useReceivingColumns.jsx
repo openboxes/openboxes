@@ -497,6 +497,7 @@ const useReceivingColumns = ({
                 disabled={item?.isCompleted}
                 label="react.receiving.location.label"
                 defaultLabel="Location"
+                clearable={false}
               />
             );
           },

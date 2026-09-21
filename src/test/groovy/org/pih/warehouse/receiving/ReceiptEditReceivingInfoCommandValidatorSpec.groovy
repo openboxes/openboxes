@@ -9,81 +9,32 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentItem
 
 @Unroll
-class ReceiptItemsBatchRequestValidatorSpec extends Specification implements DataTest {
+class ReceiptEditReceivingInfoCommandValidatorSpec extends Specification implements DataTest {
 
-    ReceiptItemsBatchRequestValidator validator = new ReceiptItemsBatchRequestValidator()
+    ReceiptEditReceivingInfoCommandValidator validator = new ReceiptEditReceivingInfoCommandValidator()
 
     void setupSpec() {
-        mockDomains(Receipt, ReceiptItem, Product, Shipment, ShipmentItem, Location)
-    }
-
-    void 'doValidate should reject deleting an original item'() {
-        given: 'an original line and a split line'
-        Receipt receipt = buildPendingReceipt()
-        ReceiptItem originalItem = buildReceiptItem(receipt, false)
-        ReceiptItem splitItem = buildReceiptItem(receipt, true)
-
-        when: 'both are requested to be deleted'
-        ObjectValidationResult result = validator.doValidate(new ReceiptItemsBatchRequest(
-                receipt: receipt,
-                itemsToDelete: [originalItem.id, splitItem.id],
-        ))
-
-        then: 'only the original line is rejected'
-        assert !result.valid
-        assert result.errors*.code == ["receiptItemsBatchRequest.itemsToDelete.originalItem"]
-        assert result.errors.first().arguments.toString().contains(originalItem.id.toString())
-        assert !result.errors.first().arguments.toString().contains(splitItem.id.toString())
-    }
-
-    void 'doValidate should accept deleting split items'() {
-        given:
-        Receipt receipt = buildPendingReceipt()
-        ReceiptItem splitItem = buildReceiptItem(receipt, true)
-
-        when:
-        ObjectValidationResult result = validator.doValidate(new ReceiptItemsBatchRequest(
-                receipt: receipt,
-                itemsToDelete: [splitItem.id],
-        ))
-
-        then:
-        assert result.valid
-    }
-
-    void 'doValidate should leave unknown item identifiers for the service to report'() {
-        given:
-        Receipt receipt = buildPendingReceipt()
-
-        when:
-        ObjectValidationResult result = validator.doValidate(new ReceiptItemsBatchRequest(
-                receipt: receipt,
-                itemsToDelete: ["unknown-id"],
-        ))
-
-        then:
-        assert result.valid
+        mockDomains(Receipt, ReceiptItem, Product, Shipment, Location)
     }
 
     void 'doValidate should reject removing the bin location at a location supporting #supportedActivity'() {
         given: 'a pending receipt with one line put away to a bin and one line without a bin'
         Receipt receipt = buildPendingReceipt()
-        ReceiptItem itemWithBin = buildReceiptItem(receipt, false, new Location(name: "Bin"))
-        ReceiptItem itemWithoutBin = buildReceiptItem(receipt, true)
+        ReceiptItem itemWithBin = buildReceiptItem(receipt, new Location(name: "Bin"))
+        ReceiptItem itemWithoutBin = buildReceiptItem(receipt)
         receiveInto(receipt, supportedActivity)
 
         when: 'both are saved without a bin location'
-        ObjectValidationResult result = validator.doValidate(new ReceiptItemsBatchRequest(
+        ObjectValidationResult result = validator.doValidate(new ReceiptEditReceivingInfoCommand(
                 receipt: receipt,
-                itemsToSave: [buildUpsertRequest(itemWithBin), buildUpsertRequest(itemWithoutBin)],
+                itemsToSave: [buildEditRequest(itemWithBin), buildEditRequest(itemWithoutBin)],
         ))
 
         then: 'only the line that would lose its bin is rejected'
         assert !result.valid
-        assert result.errors*.code == ["receiptItemsBatchRequest.itemsToSave.binLocationRemoved"]
+        assert result.errors*.code == ["receiptEditReceivingInfoCommand.itemsToSave.binLocationRemoved"]
         assert result.errors.first().arguments.toString().contains(itemWithBin.id.toString())
         assert !result.errors.first().arguments.toString().contains(itemWithoutBin.id.toString())
 
@@ -94,13 +45,13 @@ class ReceiptItemsBatchRequestValidatorSpec extends Specification implements Dat
     void 'doValidate should accept moving an item to another bin location'() {
         given:
         Receipt receipt = buildPendingReceipt()
-        ReceiptItem receiptItem = buildReceiptItem(receipt, false, new Location(name: "Bin"))
+        ReceiptItem receiptItem = buildReceiptItem(receipt, new Location(name: "Bin"))
         receiveInto(receipt, ActivityCode.PUTAWAY_STOCK)
 
         when:
-        ObjectValidationResult result = validator.doValidate(new ReceiptItemsBatchRequest(
+        ObjectValidationResult result = validator.doValidate(new ReceiptEditReceivingInfoCommand(
                 receipt: receipt,
-                itemsToSave: [buildUpsertRequest(receiptItem, new Location(name: "Another bin"))],
+                itemsToSave: [buildEditRequest(receiptItem, new Location(name: "Another bin"))],
         ))
 
         then:
@@ -113,9 +64,9 @@ class ReceiptItemsBatchRequestValidatorSpec extends Specification implements Dat
         receiveInto(receipt, ActivityCode.PUTAWAY_STOCK)
 
         when: 'a line that does not exist yet is saved without a bin location'
-        ObjectValidationResult result = validator.doValidate(new ReceiptItemsBatchRequest(
+        ObjectValidationResult result = validator.doValidate(new ReceiptEditReceivingInfoCommand(
                 receipt: receipt,
-                itemsToSave: [buildUpsertRequest(null)],
+                itemsToSave: [buildEditRequest(null)],
         ))
 
         then: 'there is no bin location to remove'
@@ -125,19 +76,22 @@ class ReceiptItemsBatchRequestValidatorSpec extends Specification implements Dat
     void 'doValidate should accept removing the bin location at a location that does not track bin locations'() {
         given: 'a receipt received into a location without bin location support'
         Receipt receipt = buildPendingReceipt()
-        ReceiptItem receiptItem = buildReceiptItem(receipt, false, new Location(name: "Bin"))
+        ReceiptItem receiptItem = buildReceiptItem(receipt, new Location(name: "Bin"))
         receiveInto(receipt, ActivityCode.RECEIVE_STOCK)
 
         when:
-        ObjectValidationResult result = validator.doValidate(new ReceiptItemsBatchRequest(
+        ObjectValidationResult result = validator.doValidate(new ReceiptEditReceivingInfoCommand(
                 receipt: receipt,
-                itemsToSave: [buildUpsertRequest(receiptItem)],
+                itemsToSave: [buildEditRequest(receiptItem)],
         ))
 
         then: 'the bin is not tracked there, so the client is free to drop it'
         assert result.valid
     }
 
+    // ----------------------------------------------------------------------------------------------------------
+    // Fixture helpers - the items are persisted so that they carry the ids the errors are reported with.
+    // ----------------------------------------------------------------------------------------------------------
 
     private static Receipt buildPendingReceipt() {
         Receipt receipt = new Receipt(receiptStatusCode: ReceiptStatusCode.PENDING, actualDeliveryDate: new Date())
@@ -145,11 +99,11 @@ class ReceiptItemsBatchRequestValidatorSpec extends Specification implements Dat
         return receipt
     }
 
-    private static ReceiptItem buildReceiptItem(Receipt receipt, Boolean isSplitItem, Location binLocation = null) {
+    private static ReceiptItem buildReceiptItem(Receipt receipt, Location binLocation = null) {
         ReceiptItem receiptItem = new ReceiptItem(
                 product: new Product(name: "Product"),
-                quantityShipped: isSplitItem ? 0 : 100,
-                isSplitItem: isSplitItem,
+                quantityShipped: 100,
+                isSplitItem: false,
                 binLocation: binLocation,
         )
         receipt.addToReceiptItems(receiptItem)
@@ -169,10 +123,11 @@ class ReceiptItemsBatchRequestValidatorSpec extends Specification implements Dat
         ))
     }
 
-    private static ReceiptItemUpsertRequest buildUpsertRequest(ReceiptItem receiptItem, Location binLocation = null) {
-        return new ReceiptItemUpsertRequest(
+    private static ReceiptItemEditReceivingInfoRequest buildEditRequest(
+            ReceiptItem receiptItem, Location binLocation = null) {
+        return new ReceiptItemEditReceivingInfoRequest(
                 receiptItem: receiptItem,
-                shipmentItem: new ShipmentItem(),
+                product: new Product(name: "Product"),
                 quantityReceiving: 5,
                 binLocation: binLocation,
         )

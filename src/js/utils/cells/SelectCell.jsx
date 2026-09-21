@@ -24,6 +24,7 @@ const SelectCell = React.memo(({
   loadOptions,
   showValueTooltip,
   onBlur,
+  clearable,
 }) => {
   const translate = useTranslate();
 
@@ -43,6 +44,7 @@ const SelectCell = React.memo(({
           loadOptions={loadOptions}
           showValueTooltip={showValueTooltip}
           onBlur={onBlur}
+          clearable={clearable}
         />
       </div>
     </TableCell>
@@ -66,6 +68,7 @@ SelectCell.propTypes = {
   loadOptions: PropTypes.func,
   showValueTooltip: PropTypes.bool,
   onBlur: PropTypes.func,
+  clearable: PropTypes.bool,
 };
 
 SelectCell.defaultProps = {
@@ -81,6 +84,7 @@ SelectCell.defaultProps = {
   loadOptions: () => [],
   showValueTooltip: false,
   onBlur: undefined,
+  clearable: true,
 };
 
 export default SelectCell;
