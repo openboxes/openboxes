@@ -871,6 +871,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                 totalQuantity         : totalQuantity(),
                 quantityCanceled      : quantityCanceled,
                 totalQuantityCanceled : totalQuantityCanceled(),
+                quantityBackordered   : quantityBackordered,
+                backorderedReasonCode : backorderedReasonCode,
                 comment               : comment,
                 recipient             : recipient,
                 substitutable         : substitutable,
