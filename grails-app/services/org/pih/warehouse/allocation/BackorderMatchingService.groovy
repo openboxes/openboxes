@@ -25,7 +25,7 @@ class BackorderMatchingService {
     List<BackorderMatch> match(Requisition backorder, Collection<ShipmentItem> inboundItems) {
         List<BackorderMatch> matches = []
         Map<String, Integer> quantityRemainingByDemand = [:]
-        backorder.requisitionItems.each { RequisitionItem demand ->
+        demandItems(backorder).each { RequisitionItem demand ->
             quantityRemainingByDemand[demand.id] = remainingDemand(demand)
         }
 
@@ -64,7 +64,7 @@ class BackorderMatchingService {
             if (!backorder) {
                 return null
             }
-            demand = backorder.requisitionItems
+            demand = demandItems(backorder)
                     .findAll { it.product == product && remainingDemand(it) > 0 }
                     .sort { remainingDemand(it) }
                     .find()
@@ -115,8 +115,43 @@ class BackorderMatchingService {
      */
     private List<RequisitionItem> candidatesFor(Requisition backorder, Product product,
                                                 Map<String, Integer> quantityRemainingByDemand) {
-        return backorder.requisitionItems
+        return demandItems(backorder)
                 .findAll { it.product == product && quantityRemainingByDemand[it.id] > 0 }
                 .sort { quantityRemainingByDemand[it.id] }
+    }
+
+    /**
+     * Items that carry demand in their own right. A revised or substituted line keeps its original row
+     * on the requisition alongside the row that replaced it, and both report the same quantity, so
+     * matching against the original as well would cover the same demand twice and would record the
+     * cross-dock allocation against the row that is never picked. Walk down from the original lines
+     * and take only the item at the end of each chain.
+     */
+    private static List<RequisitionItem> demandItems(Requisition backorder) {
+        return backorder.initialRequisitionItems.collectMany { RequisitionItem item ->
+            effectiveItems(item)
+        }
+    }
+
+    /**
+     * The item itself, or the items that replaced it. A substitution is not carried any backorder
+     * recorded against the line it replaces: the product has usually changed, and even when it has
+     * not the substitution starts from its own quantity.
+     */
+    private static List<RequisitionItem> effectiveItems(RequisitionItem item) {
+        if (item.isSubstituted()) {
+            // isSubstituted() also covers a substitution linked only through substitutionItem, in which
+            // case the typed child collection is empty
+            Collection<RequisitionItem> substitutions = item.substitutionItems ?: [item.substitutionItem].findAll()
+            return substitutions.collectMany { effectiveItems(it) }
+        }
+        if (item.modificationItem) {
+            return effectiveItems(item.modificationItem)
+        }
+        // Cancellation is all or nothing (cancelQuantity sets quantityCanceled to the full quantity), so
+        // a canceled line has no demand left. isCanceled() cannot be used here because it reports false
+        // while a backorder is still recorded against the item.
+        boolean isFullyCanceled = (item.quantityCanceled ?: 0) >= (item.quantity ?: 0)
+        return isFullyCanceled ? [] : [item]
     }
 }
