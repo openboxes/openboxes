@@ -20,13 +20,13 @@
 		    <g:set var="unifiedLayout" value="${grailsApplication.config.getProperty('openboxes.layout.unified.enabled', Boolean, false)}"/>
 		    <div id="loginContainer" class="dialog">
 				<div id="loginForm">
-					%{-- Unified design only — openboxes-theme.css sizes this;
+					%{-- Unified design only - openboxes-theme.css sizes this;
 					     without it the raw image renders at natural size.
 					     Brand first: session-timeout and validation notices read
 					     as messages about the page below, not above, the logo. --}%
 					<g:if test="${unifiedLayout}">
 						<div class="login-brand">
-							<img src="${request.contextPath}/static/images/logo/logo-blue.png" alt="OpenBoxes logo"/>
+							<img src="${resource(dir: 'images/logo', file: 'logo-blue.png')}" alt="OpenBoxes logo"/>
 						</div>
 					</g:if>
 
