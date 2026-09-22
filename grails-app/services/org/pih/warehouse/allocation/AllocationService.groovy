@@ -275,24 +275,33 @@ class AllocationService {
 
                 log.info("Automatic allocation for requisition ${requisition.requestNumber} (${requisition.id}) ...")
                 List<AllocationResult> results = allocate(requisition, AllocationMode.AUTO, [])
-
-                if (requisition.autoIssuanceRequested) {
-                    try {
-                        stockMovementService.issueRequisition(requisition)
-                        // TODO this is sync refresh as a temporary workaround for async refresh after transaction creation
-                        //  it should be implemented in better way, ticket for it - OBLS-937
-                        productAvailabilityService.refreshProductsAvailability(
-                                requisition.origin?.id, requisition.requisitionItems*.product*.id, false)
-                    } catch (Exception e) {
-                        requisitionService.logRequisitionEvent(requisition.id, "${Constants.ISSUANCE_FAILED} ${e.message ?: 'Unknown error'}")
-                        throw e
-                    }
-                } else if (results.any { it.suggestedItems }) {
-                    stockMovementService.updateRequisitionStatus(requisitionId, RequisitionStatus.PICKING)
-                }
+                completeAllocation(requisition, results.any { it.suggestedItems })
             }
         } catch (Exception e) {
             log.error("Error processing requisition ${requisitionId}", e)
+        }
+    }
+
+    /**
+     * Finishes an allocation: issues the requisition right away if auto-issuance was requested,
+     * otherwise moves it to PICKING for manual picking/issuance. Shared by the automatic allocation
+     * job and the manual "Allocate" action, so a requisition that was stuck (e.g. after the automatic
+     * job hit its max allocation attempts) and is later allocated manually still gets auto-issued.
+     */
+    void completeAllocation(Requisition requisition, Boolean allocationResultNotEmpty) {
+        if (requisition.autoIssuanceRequested) {
+            try {
+                stockMovementService.issueRequisition(requisition)
+                // TODO this is sync refresh as a temporary workaround for async refresh after transaction creation
+                //  it should be implemented in better way, ticket for it - OBLS-937
+                productAvailabilityService.refreshProductsAvailability(
+                        requisition.origin?.id, requisition.requisitionItems*.product*.id, false)
+            } catch (Exception e) {
+                requisitionService.logRequisitionEvent(requisition.id, "${Constants.ISSUANCE_FAILED} ${e.message ?: 'Unknown error'}")
+                throw e
+            }
+        } else if (allocationResultNotEmpty) {
+            stockMovementService.updateRequisitionStatus(requisition.id, RequisitionStatus.PICKING)
         }
     }
 
