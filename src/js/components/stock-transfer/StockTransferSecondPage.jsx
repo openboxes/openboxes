@@ -15,7 +15,7 @@ import { extractStockTransferItems, prepareRequest } from 'components/stock-tran
 import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
 import StockTransferStatus from 'consts/stockTransferStatus';
-import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import apiClient, { parseResponse } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import Select from 'utils/Select';
@@ -369,7 +369,7 @@ class StockTransferSecondPage extends Component {
   saveStockTransfer(data, callback) {
     const url = `/api/stockTransfers/${this.props.match.params.stockTransferId}`;
     const payload = prepareRequest(data, StockTransferStatus.APPROVED);
-    apiClient.put(url, flattenRequest(payload))
+    apiClient.put(url, payload)
       .then((response) => {
         const stockTransfer = parseResponse(response.data.data);
         const stockTransferItems = extractStockTransferItems(stockTransfer);

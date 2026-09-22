@@ -36,9 +36,11 @@ const DataTableBody = ({
   loading,
   rowModel,
   dataLength,
+  tableWidth,
   tableWithPinnedColumns,
   isScreenWiderThanTable,
   virtualize,
+  arrowNavigationEnabledForAllFields,
 }) => {
   const translate = useTranslate();
   const parentRef = useRef(null);
@@ -54,22 +56,40 @@ const DataTableBody = ({
 
   const rowVirtualizer = useVirtualizer({
     count: rowModel?.rows?.length,
-    getScrollElement: () => parentRef.current,
+    // With pinned columns the scroll for both axes lives on `.rt-table`, so the virtualizer must
+    // measure that element to work correctly. Otherwise, the body scrolls itself.
+    getScrollElement: () => (tableWithPinnedColumns
+      ? parentRef.current?.closest('.rt-table')
+      : parentRef.current),
     estimateSize: () => estimateSize,
     overscan,
     enabled: isVirtualizationEnabled,
   });
 
+  const getCellContent = (cell, isSeparator) => {
+    if (isSeparator) {
+      const { renderSeparator } = cell.column.columnDef.meta || {};
+      return renderSeparator ? flexRender(renderSeparator, cell.getContext()) : null;
+    }
+    return flexRender(cell.column.columnDef.cell, cell.getContext());
+  };
+
   const dataToMap = isVirtualizationEnabled
     ? rowVirtualizer.getVirtualItems()
     : rowModel.rows;
+
+  // Virtualized rows are absolutely positioned, so they don't expand a `fit-content` body and it
+  // collapses. Use the explicit table width in that case.
+  const horizontalScrollWidth = isVirtualizationEnabled ? `${tableWidth}px` : 'fit-content';
 
   return (
     <div
       ref={parentRef}
       className="rt-tbody-v2"
       style={{
-        width: (!isScreenWiderThanTable && tableWithPinnedColumns && dataLength && !loading) ? 'fit-content' : undefined,
+        width: (!isScreenWiderThanTable && tableWithPinnedColumns && dataLength && !loading)
+          ? horizontalScrollWidth
+          : undefined,
       }}
     >
       <DataTableStatus
@@ -115,25 +135,42 @@ const DataTableBody = ({
               label: '',
               defaultMessage: '',
             };
+            // Separator row: cells render column meta.renderSeparator instead of the normal cell.
+            const isSeparator = rowData.original?.isSeparator;
+            // Merge with the row below by removing the separating border.
+            const mergeWithNextRow = rowData.original?.mergeWithNextRow;
+            const isLastSubRow = rowData.original?.isLastSubRow;
             return (
               <CustomTooltip
+                key={rowData.id}
                 content={isRowDisabled && translate(label, defaultMessage)}
                 show={isRowDisabled}
               >
                 <div
-                  key={rowData.id}
-                  className="rt-tr-group cell-wrapper"
+                  className={`rt-tr-group cell-wrapper ${rowData.original?.className || ''} ${mergeWithNextRow ? 'rt-tr-group-merged' : ''} ${isLastSubRow ? 'rt-tr-group-last-subrow' : ''}`}
                   role="rowgroup"
                   {...rowProps}
                 >
-                  <TableRow key={rowData.id} className={`rt-tr ${isRowDisabled && 'bg-light'}`}>
+                  <TableRow key={rowData.id} className={`rt-tr ${isRowDisabled ? 'bg-light disabled' : ''} ${isSeparator ? 'rt-tr-separator' : ''} ${rowData.depth > 0 ? 'rt-tr-subrow' : ''}`}>
                     {rowData.getVisibleCells().map((cell) => {
-                      const { hide, flexWidth, className } = useTableColumnMeta(cell.column);
+                      const {
+                        hide,
+                        flexWidth,
+                        className,
+                        arrowNavigable,
+                      } = useTableColumnMeta(cell.column);
                       if (hide) {
                         return null;
                       }
+                      const cellContent = getCellContent(cell, isSeparator);
                       return (
                         <div
+                          data-column-id={cell.column.id}
+                          data-arrow-navigation={
+                            arrowNavigationEnabledForAllFields
+                            || arrowNavigable
+                            || undefined
+                          }
                           className={`d-flex ${className} ${isRowDisabled && 'text-muted'}`}
                           style={{
                             ...getCommonPinningStyles(
@@ -142,11 +179,12 @@ const DataTableBody = ({
                               isScreenWiderThanTable,
                               dataLength,
                               loading,
+                              isRowDisabled,
                             ),
                           }}
                           key={cell.id}
                         >
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          {cellContent}
                         </div>
                       );
                     })}
@@ -187,6 +225,7 @@ DataTableBody.propTypes = {
     ).isRequired,
   }).isRequired,
   dataLength: PropTypes.number.isRequired,
+  tableWidth: PropTypes.number.isRequired,
   tableWithPinnedColumns: PropTypes.bool,
   isScreenWiderThanTable: PropTypes.bool.isRequired,
   virtualize: PropTypes.shape({
@@ -196,6 +235,7 @@ DataTableBody.propTypes = {
     overscan: PropTypes.number,
     customRowsHeight: PropTypes.bool,
   }),
+  arrowNavigationEnabledForAllFields: PropTypes.bool,
 };
 
 DataTableBody.defaultProps = {
@@ -203,6 +243,7 @@ DataTableBody.defaultProps = {
   loadingMessage: null,
   loading: false,
   tableWithPinnedColumns: false,
+  arrowNavigationEnabledForAllFields: false,
   virtualize: {
     enabled: false,
     minSize: 20,

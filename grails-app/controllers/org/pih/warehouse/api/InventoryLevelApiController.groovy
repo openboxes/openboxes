@@ -1,17 +1,23 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import javax.validation.Valid
+
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.importer.InventoryLevelImportDataService
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.InventoryLevelService
+import org.pih.warehouse.inventory.PreferredBinLocationsCommand
+import org.pih.warehouse.inventory.PreferredBinLocationsDto
 
-class InventoryLevelApiController {
+class InventoryLevelApiController extends BaseApiController {
 
     DataService dataService
     DocumentService documentService
     InventoryLevelImportDataService inventoryLevelImportDataService
+    InventoryLevelService inventoryLevelService
 
     def list() {
         Location facility = Location.get(params.facilityId)
@@ -43,5 +49,14 @@ class InventoryLevelApiController {
                 render([data: inventoryLevels] as JSON)
             }
         }
+    }
+
+    /**
+     * Returns the preferred bin location of each given product, keyed by product id. Products without
+     * an inventory level or with no preferred bin location configured are omitted from the response.
+     */
+    def getPreferredBinLocations(@Valid PreferredBinLocationsCommand command) {
+        PreferredBinLocationsDto preferredBinLocations = inventoryLevelService.getPreferredBinLocations(command)
+        renderResponse(preferredBinLocations)
     }
 }

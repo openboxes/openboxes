@@ -87,6 +87,21 @@ export const parseStringToDate = ({
 };
 
 /**
+ * Resolves a date-fns locale object for the given locale code.
+ * `enUS` is a fallback when the locale is missing or unsupported — the 'ar' locale
+ * crashes the date picker, so it is intentionally fallback.
+ * @param {String} localeCode - locale code
+ * @returns {Locale} date-fns locale object
+ */
+export const getDateFnsLocale = (localeCode) => {
+  if (!localeCode || ['en', 'ar'].includes(localeCode)) {
+    return locales.enUS;
+  }
+
+  return locales[localeCode] ?? locales.enUS;
+};
+
+/**
  * Converts a date to a string in specified format
  * @param {Object} params
  * @param {Object} options
@@ -111,15 +126,6 @@ export const formatDateToString = ({
   });
 };
 
-export const dateFnsLocale = (currentLocale) => {
-  // Temporary workaround: using 'ar' locale causes the app to crash when selecting a date.
-  // Fallback to 'en' to avoid the crash
-  if (!currentLocale || ['en', 'ar'].includes(currentLocale)) {
-    return locales.enUS;
-  }
-  return locales[currentLocale];
-};
-
 /**
  A method for converting Date to an ISO-formatted date-time string (for formatting API
  request fields)
@@ -128,6 +134,21 @@ export const formatDateToZonedDateTimeString = (date) => formatDateToString({
   date,
   dateFormat: DateFormatDateFns.MM_DD_YYYY_HH_MM_Z,
 });
+
+/**
+ * A method for converting a date string held in a display format (the value of a date field) to
+ * an ISO instant, which is the format APIs binding a java.time.Instant expect.
+ * @param {String} date - date string to convert
+ * @param {String} providedDateFormat - format the given string is in
+ * @returns {String|null} ISO instant, or null when the value is empty or not a valid date
+ */
+export const formatStringToInstant = (date, providedDateFormat) => {
+  if (!date) {
+    return null;
+  }
+  const parsedDate = parse(date, providedDateFormat, new Date());
+  return isValid(parsedDate) ? parsedDate.toISOString() : null;
+};
 
 /**
  * A method for converting Date to a localized date string for display (shifted time by timezone
@@ -164,6 +185,36 @@ export const formatDateToDateOnlyString = (date, locale = locales.enUS) => {
  * A method for formating ISO date string to date in another format
  */
 export const formatISODate = (date, dateFormat) => format(parseISO(date), dateFormat);
+
+/**
+ * A method for parsing a date-only string as APIs send it (e.g. '2026-09-19') to a Date.
+ * @param {String} date - date-only string in the yyyy-MM-dd format
+ * @returns {Date|null} the parsed date, or null when the value is empty or not a valid date
+ */
+export const parseApiDate = (date) => {
+  if (typeof date !== 'string' || !date) {
+    return null;
+  }
+
+  const parsedDate = parseISO(date);
+  return isValid(parsedDate) ? parsedDate : null;
+};
+
+/**
+ * A method for converting a date-only string as APIs send it (e.g. '2026-09-19') to a string in
+ * the given format, without the timezone shift formatting the string directly would introduce.
+ * @param {Object} params
+ * @param {String} params.date - date-only string in the yyyy-MM-dd format
+ * @param {String} params.dateFormat - output date format
+ * @param {Object} params.options
+ * @param {Locale} params.options.locale - output locale
+ * @returns {String|null}
+ */
+export const formatApiDateToString = ({ date, dateFormat, options }) => formatDateToString({
+  date: parseApiDate(date),
+  dateFormat,
+  options,
+});
 
 /**
  * Get timezone offset, defaulting to the user's timezone offset

@@ -103,7 +103,7 @@
                     <warehouse:message code="shipping.receiveShipment.label"/>
                 </g:link>
                 <g:if test="${shipmentInstance?.isPartialReceiveAllowed()}">
-                    <g:link controller="partialReceiving" action="create" id="${shipmentInstance.id}"
+                    <g:link uri="/receiving/create/${shipmentInstance.id}"
                             name="receiveShipmentLink" class="button">
                         <img src="${resource(dir: 'images/icons', file: 'handtruck.png')}"
                              class="middle"/>&nbsp;

@@ -9,10 +9,6 @@ import Footer from 'components/Layout/Footer';
 import '@testing-library/jest-dom';
 
 jest.mock('react-localize-redux', () => ({
-  getLanguages: () => [
-    { code: 'en', name: 'English' },
-    { code: 'fr', name: 'French' },
-  ],
   getTranslate: () => (id) => id,
   setActiveLanguage: (code) => ({ type: 'SET_ACTIVE_LANGUAGE', payload: code }),
 }));
@@ -33,6 +29,10 @@ const mockStore = configureStore();
 
 const session = {
   activeLanguage: 'en',
+  supportedLocales: [
+    { code: 'en', name: 'English' },
+    { code: 'fr', name: 'French' },
+  ],
   grailsVersion: '3.3.16',
   appVersion: '0.9.5',
   branchName: 'develop',
@@ -43,7 +43,6 @@ const session = {
   timezone: 'UTC',
   ipAddress: '127.0.0.1',
   localizationModeEnabled: false,
-  localizationModeLocale: 'en',
 };
 
 const renderFooter = () => render(

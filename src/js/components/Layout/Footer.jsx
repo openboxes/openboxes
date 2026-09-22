@@ -2,11 +2,11 @@ import React from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { getLanguages, getTranslate, setActiveLanguage } from 'react-localize-redux';
+import { getTranslate, setActiveLanguage } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import { changeCurrentLocale } from 'actions';
-import { DISABLE_LOCALIZATION, ENABLE_LOCALIZATION } from 'api/urls';
+import { DISABLE_LOCALIZATION } from 'api/urls';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { isUnifiedLayout } from 'utils/unifiedLayout';
 
@@ -26,7 +26,6 @@ const ClassicFooter = ({
   environment,
   buildDate,
   localizationModeEnabled,
-  localizationModeLocale,
 }) => (
   <div className="border-top align-self-end text-center py-2 w-100 footer">
     <div className="d-flex flex-row justify-content-center m-2 flex-wrap">
@@ -99,18 +98,6 @@ const ClassicFooter = ({
         {' '}
         {' '}
         { _.map(languages, (language) => {
-          // When clicking on language that is a translation mode language, enable localization mode
-          if (language.code === localizationModeLocale) {
-            return (
-              <a
-                className={`${locale === language.code ? 'selected' : ''}`}
-                key={language.code}
-                href={ENABLE_LOCALIZATION}
-              >
-                {language.name}
-              </a>
-            );
-          }
           // If we are in localization mode and we click on non-translation mode language,
           // we want to disable the localization mode
           if (localizationModeEnabled) {
@@ -196,7 +183,6 @@ const UnifiedFooter = ({
   environment,
   buildDate,
   localizationModeEnabled,
-  localizationModeLocale,
   translate,
 }) => (
   <div className="align-self-end text-center py-2 w-100 footer">
@@ -280,19 +266,6 @@ const UnifiedFooter = ({
           {' '}
           {' '}
           { _.map(languages, (language) => {
-          // When clicking on a language that is a translation mode
-          // language, enable localization mode
-            if (language.code === localizationModeLocale) {
-              return (
-                <a
-                  className={`${locale === language.code ? 'selected' : ''}`}
-                  key={language.code}
-                  href={ENABLE_LOCALIZATION}
-                >
-                  {language.name}
-                </a>
-              );
-            }
             // If we are in localization mode and we click on non-translation mode language,
             // we want to disable the localization mode
             if (localizationModeEnabled) {
@@ -374,9 +347,8 @@ const mapStateToProps = (state) => ({
   hostname: state.session.hostname,
   timezone: state.session.timezone,
   ipAddress: state.session.ipAddress,
-  languages: getLanguages(state.localize),
+  languages: state.session.supportedLocales,
   localizationModeEnabled: state.session.localizationModeEnabled,
-  localizationModeLocale: state.session.localizationModeLocale,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
@@ -404,7 +376,6 @@ Footer.propTypes = {
   timezone: PropTypes.string.isRequired,
   ipAddress: PropTypes.string.isRequired,
   localizationModeEnabled: PropTypes.bool.isRequired,
-  localizationModeLocale: PropTypes.string.isRequired,
 };
 
 ClassicFooter.propTypes = Footer.propTypes;

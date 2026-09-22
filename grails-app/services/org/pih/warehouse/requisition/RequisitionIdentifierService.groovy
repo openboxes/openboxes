@@ -3,6 +3,7 @@ package org.pih.warehouse.requisition
 import grails.gorm.transactions.Transactional
 
 import org.pih.warehouse.core.IdentifierService
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.identification.BlankIdentifierResolver
 import org.pih.warehouse.shipping.Shipment
 
@@ -16,12 +17,21 @@ class RequisitionIdentifierService extends IdentifierService<Requisition> implem
 
     @Override
     protected Integer countByIdentifier(String id) {
+        Integer count = Requisition.countByRequestNumber(id)
+        if (count > 0) {
+            return count
+        }
+
         // We use requisition.requestNumber as shipment.shipmentNumber when performing stock movements so we need
         // to check that the id is unique for shipments as well. See StockMovementService.createShipment for details.
-        Integer count = Requisition.countByRequestNumber(id)
+        count = Shipment.countByShipmentNumber(id)
+        if (count > 0) {
+            return count
+        }
 
-        // Only bother checking shipment if requisition doesn't already have a duplicate.
-        return count > 0 ? count : Shipment.countByShipmentNumber(id)
+        // We also use shipmentNumber as locationNumber when creating internal receiving locations so we need to verify
+        // that the id is unique for locations as well. See LocationService.findOrCreateInternalLocation for details.
+        return Location.countByLocationNumber(id)
     }
 
     @Override

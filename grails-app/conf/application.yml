@@ -461,6 +461,11 @@ openboxes:
         delay: 300
         minLength: 3
 
+    # The amount of time (in milliseconds) to display Notify.js notification popups before hiding them.
+    # Notify.js defaults this value to 5000 (5 seconds) if no config is specified.
+    notify:
+        autoHideDelay: 10000
+
     refreshAnalyticsDataOnStartup:
         enabled: true
 
@@ -570,7 +575,7 @@ openboxes:
             enabled: false
         defaultLocale: 'en'
         localizationModeLocale: 'ach'
-        supportedLocales: ['ar', 'ach', 'de', 'en', 'es', 'es_MX', 'fr', 'ht', 'it', 'pt', 'fi', 'zh']
+        supportedLocales: ['ar', 'de', 'en', 'es', 'es_MX', 'fr', 'ht', 'it', 'pt', 'fi', 'zh']
         # Currency configuration
         defaultCurrencyCode: "USD"
         defaultCurrencySymbol: '\$'

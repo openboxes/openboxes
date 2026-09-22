@@ -12,7 +12,7 @@ import { Tooltip } from 'react-tippy';
 import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
 import EmailModal from 'components/stock-list-management/EmailModal';
 import { INVENTORY_ITEM_URL, REQUISITION_TEMPLATE_URL, STOCKLIST_URL } from 'consts/applicationUrls';
-import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import apiClient, { parseResponse } from 'utils/apiClient';
 import Input from 'utils/Input';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -180,7 +180,7 @@ class StocklistManagement extends Component {
       url = `/api/stocklistItems/${item.id}`;
     }
 
-    apiClient.post(url, flattenRequest(item))
+    apiClient.post(url, item)
       .then((response) => {
         this.setState((prev) => ({
           data: update(prev.data, {

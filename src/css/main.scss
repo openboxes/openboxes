@@ -1698,6 +1698,35 @@ div.search-input:focus-within {
   background-color: rgba(0, 0, 0, 0.45) !important;
 }
 
+.modal-content:has(.expiry-change-modal) {
+  top: 15%;
+
+  .modal-content__main {
+    max-height: calc(75vh - 200px);
+  }
+}
+
+.expiry-change-modal {
+  &__warning {
+    margin-top: 16px;
+  }
+
+  .expiry-change {
+    &:not(:first-child) {
+      margin-top: 24px;
+    }
+
+    &__product {
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    &__title {
+      margin-bottom: 8px;
+    }
+  }
+}
+
 .modal-content {
   position: absolute;
   top: 20%;
@@ -1905,5 +1934,78 @@ div.search-input:focus-within {
     flex: 1;
     display: flex;
     flex-direction: column;
+  }
+}
+
+/* Chrome, Safari, Edge, Opera */
+input.hide-arrows::-webkit-outer-spin-button,
+input.hide-arrows::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input.hide-arrows[type=number] {
+  -moz-appearance: textfield;
+}
+
+
+// Comment editor rendered as a popover anchored under the row's comment icon. The overlay stays
+// transparent (page remains visible) but still captures the outside click that closes it; the
+// content position (top/right) is applied inline from the measured icon rect.
+.ReactModal__Overlay.comment-modal__overlay {
+  background-color: transparent !important;
+}
+
+.comment-modal__overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: transparent;
+  z-index: 1050;
+  overflow-y: auto;
+}
+
+.comment-modal {
+  position: absolute;
+  width: 460px;
+  max-width: calc(100vw - 24px);
+  padding: 16px;
+  background-color: #fff;
+  border: 1px solid var(--blue-200);
+  border-radius: 8px;
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.25);
+  outline: none;
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__title {
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-600);
+  }
+
+  textarea {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+
+    &:focus {
+      border-color: var(--blue-primary);
+      box-shadow: 0 0 0 4px #0052CC26;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
   }
 }
