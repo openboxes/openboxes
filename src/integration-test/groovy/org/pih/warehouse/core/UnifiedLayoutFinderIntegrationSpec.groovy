@@ -195,20 +195,6 @@ class UnifiedLayoutFinderIntegrationSpec extends IntegrationSpec {
         'main'   | true
     }
 
-    void "a request that named its own layout keeps it"() {
-        given: 'the ?layout= override the interceptor sets'
-        optIn(true)
-        MockHttpServletRequest request = request()
-        request.setAttribute(GroovyPageLayoutFinder.LAYOUT_ATTRIBUTE, 'custom')
-        request.setAttribute(UnifiedLayoutFinder.OVERRIDE_ATTRIBUTE, Boolean.TRUE)
-
-        when:
-        Decorator decorator = viaPageEntryPoint(groovyPageLayoutFinder, request, pageDeclaring('custom'))
-
-        then: 'the reviewer comparing the two layouts gets the one they asked for'
-        decorator.name == 'custom'
-    }
-
     void "a page declaring no layout is unaffected by the flag"() {
         given: 'a page naming no layout, which falls through to Grails\' own default'
         Page page = pageDeclaring(null)

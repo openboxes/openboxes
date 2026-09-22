@@ -24,14 +24,12 @@ import javax.servlet.http.HttpServletRequest
  *    `groovyPageLayoutFinder` bean (this class, swapped in by
  *    UnifiedLayoutFinderPostProcessor) for a decorator.
  * 2. super.findLayout() runs stock Grails resolution, in the framework's own
- *    order: the `org.grails.layout.name` request attribute first — which is
- *    how the interceptor's ?layout= override wins — then the page's
- *    `meta layout` declaration, then the application default.
- * 3. Only when that resolved to "custom", the flag is on, and the request did
- *    not name a layout itself (OVERRIDE_ATTRIBUTE below), the "default"
+ *    order: the `org.grails.layout.name` request attribute first, then the
+ *    page's `meta layout` declaration, then the application default.
+ * 3. Only when that resolved to "custom" and the flag is on, the "default"
  *    decorator is looked up with the same getNamedDecorator() call Grails
  *    uses internally, and returned instead.
- * 4. Everything else — react, print, mobile, email, resolution failures —
+ * 4. Everything else - react, print, mobile, email, resolution failures -
  *    returns exactly what stock Grails resolved.
  *
  * WHY THIS RUNS HERE, AND NOT IN AN INTERCEPTOR
@@ -66,9 +64,6 @@ class UnifiedLayoutFinder extends GroovyPageLayoutFinder {
     /** The restyled equivalent served in its place. */
     static final String UNIFIED_LAYOUT = 'default'
 
-    /** Set by LayoutInterceptor when ?layout= named the layout explicitly. */
-    static final String OVERRIDE_ATTRIBUTE = 'org.pih.warehouse.layout.override'
-
     /**
      * Bound once at startup. Cached rather than read per request (reviewer
      * preference): changing the flag needs a restart either way, since the
@@ -87,8 +82,7 @@ class UnifiedLayoutFinder extends GroovyPageLayoutFinder {
         if (resolved == null) {
             return null
         }
-        boolean explicitOverride = request.getAttribute(OVERRIDE_ATTRIBUTE) != null
-        if (!shouldSubstitute(resolved.name, unifiedLayoutEnabled, explicitOverride)) {
+        if (!shouldSubstitute(resolved.name, unifiedLayoutEnabled)) {
             return resolved
         }
         Decorator unified = getNamedDecorator(request, UNIFIED_LAYOUT)
@@ -104,11 +98,10 @@ class UnifiedLayoutFinder extends GroovyPageLayoutFinder {
     /**
      * The whole policy, separated from the SiteMesh plumbing so it can be
      * tested without a Spring context. Substitute only when the page asked for
-     * the legacy layout, the instance has opted in, and this request did not
-     * name a layout itself.
+     * the legacy layout and the instance has opted in.
      */
-    static boolean shouldSubstitute(String resolvedLayout, boolean enabled, boolean explicitOverride) {
-        return resolvedLayout == DECLARED_LAYOUT && enabled && !explicitOverride
+    static boolean shouldSubstitute(String resolvedLayout, boolean enabled) {
+        return resolvedLayout == DECLARED_LAYOUT && enabled
     }
 
 }
