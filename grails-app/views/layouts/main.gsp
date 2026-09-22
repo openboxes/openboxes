@@ -13,22 +13,14 @@
     <g:render template="/localization/crowdin"/>
     <g:googleSiteTag />
     <g:render template="/common/hotjar"/>
-    %{-- The unified design ships a blue mark; keep the original for instances
-         that have not opted in, so the browser tab does not change under them.
-         default.gsp needs no such guard — it only renders when opted in. --}%
-    <g:if test="${grailsApplication.config.getProperty('openboxes.layout.unified.enabled', Boolean, false)}">
-        <link rel="shortcut icon" href="${request.contextPath}/static/images/favicon-unified.ico?v=1" type="image/x-icon"/>
-    </g:if>
-    <g:else>
-        <asset:link rel="icon" href="favicon.ico" type="image/x-ico"/>
-    </g:else>
+    <asset:link rel="icon" href="favicon.ico" type="image/x-ico"/>
 
     <asset:stylesheet src="application.css"/>
 
     <g:layoutHead/>
 </head>
 
-<body class="${grailsApplication.config.getProperty('openboxes.layout.unified.enabled', Boolean, false) ? 'unified-layout' : ''}">
+<body>
 
 <header>
     <nav class="navbar navbar-expand-md navbar-light" role="navigation">
