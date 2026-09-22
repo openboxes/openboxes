@@ -1,11 +1,13 @@
 package org.pih.warehouse.core
 
+import java.nio.charset.StandardCharsets
 import java.time.Instant
 import org.apache.commons.lang.StringUtils
 import org.springframework.http.HttpStatus
 
 import org.pih.warehouse.core.file.FileExtension
 import org.pih.warehouse.core.file.FileNameGenerator
+import org.pih.warehouse.core.http.ContentType
 import org.pih.warehouse.core.http.JsonSerializer
 import org.pih.warehouse.core.http.JsonSerializerContext
 import org.pih.warehouse.core.http.RenderType
@@ -102,13 +104,18 @@ abstract class BaseController {
      * Renders a response that returns a JSON message body.
      *
      * @param data Holds all of the data that will be used during rendering
-     * @param status
+     * @param additionalFields A map of additional fields to include in the root level of the response.
+     * @param status The HTTP status code to return. We expect non-error codes only.
      */
     void renderJsonResponse(Object data, Map<String, Object> additionalFields=[:], int status=HttpStatus.OK.value()) {
-        render(jsonSerializer.serialize(data, new JsonSerializerContext(
-                additionalFields: additionalFields,
-                status: status,
-        )))
+        render((Map) [
+                text: jsonSerializer.serialize(data, new JsonSerializerContext(
+                        additionalFields: additionalFields,
+                        status: status,
+                )),
+                contentType: ContentType.JSON.mediaType.toString(),
+                encoding: StandardCharsets.UTF_8.name(),
+      ])
     }
 
     /**
@@ -175,11 +182,11 @@ abstract class BaseController {
             throw new RuntimeException("This endpoint does not support formatting to HTML.")
         }
 
-        render(
+        render((Map) [
                 model: model,
                 template: renderType == RenderType.TEMPLATE ? htmlFile : null,
                 view: renderType == RenderType.VIEW ? htmlFile : null,
-        )
+        ])
     }
 
     /**

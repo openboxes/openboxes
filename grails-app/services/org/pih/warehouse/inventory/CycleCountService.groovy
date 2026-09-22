@@ -1,6 +1,5 @@
 package org.pih.warehouse.inventory
 
-import grails.converters.JSON
 import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
@@ -12,18 +11,16 @@ import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
-import org.pih.warehouse.DateUtil
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.mapper.SmartMapper
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.report.CycleCountReportCommand
-
-import java.time.LocalDate
 
 @Transactional
 class CycleCountService {
@@ -35,6 +32,7 @@ class CycleCountService {
 
     CycleCountTransactionService cycleCountTransactionService
     CycleCountProductAvailabilityService cycleCountProductAvailabilityService
+    SmartMapper smartMapper
 
     List<CycleCountCandidate> getCandidates(CycleCountCandidateFilterCommand command, String facilityId) {
         if (command.hasErrors()) {
@@ -452,7 +450,7 @@ class CycleCountService {
             MultiKey<String> key = new MultiKey(
                     item.product.productCode,
                     item.inventoryItem?.lotNumber,
-                    item.binLocation?.get('name'),
+                    item.binLocation?.name,
             )
             Map<Integer, CycleCountItemDto> countItemByIndex = countItemsMap.computeIfAbsent(key, { k -> [:] })
             countItemByIndex.put(item.countIndex, item)
@@ -568,6 +566,11 @@ class CycleCountService {
 
         List<AvailableItem> itemsToSave = cycleCountProductAvailabilityService.getAvailableItems(
                 facility, request.cycleCountRequest.product)
+        if (!itemsToSave) {
+            throw new RuntimeException("Cannot start a cycle count on a product with no stock. Please cancel the " +
+                    "count on product [${request.cycleCountRequest.product.productCode}] to proceed.")
+        }
+
         // 1:1 association between cycle count and cycle count request
         request.cycleCountRequest.cycleCount = newCycleCount
         request.cycleCountRequest.status = CycleCountRequestStatus.IN_PROGRESS
@@ -826,7 +829,7 @@ class CycleCountService {
         // We've updated the status of a cycle count item so we need to also update the status of the count.
         cycleCountItem.cycleCount.status = cycleCountItem.cycleCount.recomputeStatus()
 
-        return cycleCountItem.toDto()
+        return smartMapper.map(cycleCountItem, CycleCountItemDto)
     }
 
     List<CycleCountItemDto> createCycleCountItems(List<CycleCountItemCommand> items) {
@@ -884,7 +887,7 @@ class CycleCountService {
         cycleCount.addToCycleCountItems(cycleCountItem)
         cycleCount.status = cycleCount.recomputeStatus()
 
-        return cycleCountItem.toDto()
+        return smartMapper.map(cycleCountItem, CycleCountItemDto)
     }
 
     void deleteCycleCountItem(String cycleCountItemId) {

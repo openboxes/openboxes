@@ -28,43 +28,18 @@ export function parseResponse(data) {
   return data;
 }
 
-export function flattenRequest(data) {
-  // eslint-disable-next-line max-len
-  // TODO: flattenRequest was specifically for the Grails 1. Temporary return unflattened data, but when rebase process will be finished clean up and remove this util
-  return data;
-
-  // if (_.isArray(data)) {
-  //   return _.map(data, value => flattenRequest(value));
-  // }
-  //
-  // if (_.isPlainObject(data)) {
-  //   const obj = {};
-  //
-  //   _.forEach(data, (value, key) => {
-  //     const flattenedVal = flattenRequest(value);
-  //
-  //     if (_.isPlainObject(flattenedVal)) {
-  //       _.forEach(
-  //          flattenedVal,
-  //          (childVal, childKey) => { obj[`${key}.${childKey}`] = childVal; }
-  //       );
-  //     } else {
-  //       obj[key] = flattenedVal;
-  //     }
-  //   });
-  //
-  //   return obj;
-  // }
-  //
-  // return data === null || data === undefined ? '' : data;
-}
-
 export const handleSuccess = (response) => response;
 
 export const handleError = (error) => {
+  // If the client cancels the request before a response is returned, don't throw an error.
+  // This can can occur, for example, if the user navigates very quickly through pages.
+  if (axios.isCancel(error)) {
+    return Promise.reject(error);
+  }
+
   const errorMessage = _.get(error, 'response.data.errorMessage', '');
   const errorMessages = _.get(error, 'response.data.errorMessages', []).join(', ');
-  switch (error.response.status) {
+  switch (error.response?.status) {
     case 400: {
       notification(NotificationType.ERROR_OUTLINED)({
         message: 'Bad request',
@@ -130,7 +105,7 @@ export const urlInterceptor = (config) => {
 };
 
 export const handleValidationErrors = (setState) => (error) => {
-  if (error.response.status === 400) {
+  if (error.response?.status === 400) {
     const alertMessage = _.join(_.get(error, 'response.data.errorMessages', ''), ' ');
     setState({ alertMessage, showAlert: true });
 

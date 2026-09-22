@@ -1,12 +1,15 @@
 package org.pih.warehouse.inventory
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import org.pih.warehouse.core.Person
 
 import java.time.LocalDate
 
-class CycleCountDto {
+import org.pih.warehouse.core.dtos.DomainDto
+import org.pih.warehouse.core.mapper.SmartMapper
 
-    String id
+class CycleCountDto implements DomainDto<CycleCount> {
 
     String status
 
@@ -33,13 +36,14 @@ class CycleCountDto {
                         deadline: cycleCountRequest?.recountDeadline
                 ),
                 status: cycleCount.status.toString(),
-                cycleCountItems: cycleCount.cycleCountItems.collect { it.toDto() }
+                cycleCountItems: SmartMapper.mapCollectionStatic(cycleCount.cycleCountItems, CycleCountItemDto)
         )
     }
 
     /**
      * @return The largest count index of all the cycle count items. Helps determine what count we're on.
      */
+    @JsonProperty("maxCountIndex")
     Integer getMaxCountIndex() {
         return cycleCountItems.max{ it.countIndex }?.countIndex
     }

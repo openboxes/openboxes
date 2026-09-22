@@ -18,7 +18,7 @@ import { TableCell } from 'components/DataTable';
 import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
 import { InfoBar, InfoBarConfigs } from 'consts/infoBar';
-import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import apiClient, { parseResponse } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import Translate from 'utils/Translate';
@@ -211,7 +211,7 @@ class CreateStockTransfer extends Component {
       ),
     };
 
-    apiClient.post(url, flattenRequest(payload))
+    apiClient.post(url, payload)
       .then((response) => {
         const stockTransfer = parseResponse(response.data.data);
         this.props.hideSpinner();

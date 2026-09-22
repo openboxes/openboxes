@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component
 import org.springframework.validation.ObjectError
 
 @Component
-class ProductAssociationValidator implements DomainValidator<ProductAssociation> {
+class ProductAssociationValidator extends DomainValidator<ProductAssociation> {
 
     @Override
-    ObjectValidationResult doValidate(ProductAssociation productAssociation) {
+    protected ObjectValidationResult doValidate(ProductAssociation productAssociation) {
         return new ObjectValidationResult(
                 validateDuplicates(productAssociation),
         )

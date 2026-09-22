@@ -2,11 +2,11 @@ import React from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { getLanguages, setActiveLanguage } from 'react-localize-redux';
+import { setActiveLanguage } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import { changeCurrentLocale } from 'actions';
-import { DISABLE_LOCALIZATION, ENABLE_LOCALIZATION } from 'api/urls';
+import { DISABLE_LOCALIZATION } from 'api/urls';
 import Translate from 'utils/Translate';
 
 const Footer = ({
@@ -25,7 +25,6 @@ const Footer = ({
   environment,
   buildDate,
   localizationModeEnabled,
-  localizationModeLocale,
 }) => (
   <div className="border-top align-self-end text-center py-2 w-100 footer">
     <div className="d-flex flex-row justify-content-center m-2 flex-wrap">
@@ -98,18 +97,6 @@ const Footer = ({
         {' '}
         {' '}
         { _.map(languages, (language) => {
-          // When clicking on language that is a translation mode language, enable localization mode
-          if (language.code === localizationModeLocale) {
-            return (
-              <a
-                className={`${locale === language.code ? 'selected' : ''}`}
-                key={language.code}
-                href={ENABLE_LOCALIZATION}
-              >
-                {language.name}
-              </a>
-            );
-          }
           // If we are in localization mode and we click on non-translation mode language,
           // we want to disable the localization mode
           if (localizationModeEnabled) {
@@ -184,9 +171,8 @@ const mapStateToProps = (state) => ({
   hostname: state.session.hostname,
   timezone: state.session.timezone,
   ipAddress: state.session.ipAddress,
-  languages: getLanguages(state.localize),
+  languages: state.session.supportedLocales,
   localizationModeEnabled: state.session.localizationModeEnabled,
-  localizationModeLocale: state.session.localizationModeLocale,
 });
 
 const mapDispatchToProps = {
@@ -212,5 +198,4 @@ Footer.propTypes = {
   timezone: PropTypes.string.isRequired,
   ipAddress: PropTypes.string.isRequired,
   localizationModeEnabled: PropTypes.bool.isRequired,
-  localizationModeLocale: PropTypes.string.isRequired,
 };

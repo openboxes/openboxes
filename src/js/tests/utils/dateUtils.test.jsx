@@ -3,11 +3,14 @@ import * as locales from 'date-fns/locale';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import {
   displayTimezoneOffset,
+  formatApiDateToString,
   formatDateToDateOnlyString,
   formatDateToDatetimeString,
   formatDateToString,
   formatDateToZonedDateTimeString,
+  formatStringToInstant,
   getFilenameDateString,
+  parseApiDate,
   parseStringToDate,
 } from 'utils/dateUtils';
 
@@ -188,6 +191,27 @@ describe('formatDateToZonedDateTimeString()', () => {
   });
 });
 
+describe('formatStringToInstant()', () => {
+  it('should convert a date string in the given format to an ISO instant', () => {
+    const instant = formatStringToInstant(
+      '19/Sep/2025 15:10:05',
+      DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS,
+    );
+    // The string holds a local time, so the instant is the same moment in UTC
+    expect(instant).toBe(DATE_WITH_SECONDS.toISOString());
+  });
+
+  it('should return null if date is empty', () => {
+    expect(formatStringToInstant(null, DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS)).toBe(null);
+    expect(formatStringToInstant('', DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS)).toBe(null);
+  });
+
+  it('should return null if the date does not match the given format', () => {
+    expect(formatStringToInstant('not a date', DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS)).toBe(null);
+    expect(formatStringToInstant('19/Sep/2025', DateFormatDateFns.YYYY_MM_DD)).toBe(null);
+  });
+});
+
 describe('formatDateToDatetimeString()', () => {
   it('should return date string without timezone', () => {
     const date = formatDateToDatetimeString(DATE_WITH_DAY);
@@ -289,5 +313,70 @@ describe('getFilenameDateString()', () => {
   it('returns a string matching YYYYMMDD_HHMMSS pattern', () => {
     const filename = getFilenameDateString();
     expect(filename).toMatch(/^\d{8}-\d{6}$/);
+  });
+});
+
+describe('parseApiDate()', () => {
+  it('should return null if date is empty', () => {
+    expect(parseApiDate(null)).toBe(null);
+    expect(parseApiDate('')).toBe(null);
+  });
+
+  it('should return null if the value is not a date the API could have sent', () => {
+    expect(parseApiDate('19/Sep/2026')).toBe(null);
+    expect(parseApiDate('not a date')).toBe(null);
+  });
+
+  it('should return null rather than throw for a value that is not a string at all', () => {
+    expect(parseApiDate(new Date(2026, 8, 19))).toBe(null);
+    expect(parseApiDate(1789000000000)).toBe(null);
+  });
+
+  it('should parse a date-only string to local midnight, so the day never shifts west of UTC', () => {
+    const date = parseApiDate('2026-09-19');
+
+    expect(date.getFullYear()).toBe(2026);
+    expect(date.getMonth()).toBe(8);
+    expect(date.getDate()).toBe(19);
+    expect(date.getHours()).toBe(0);
+  });
+});
+
+describe('formatApiDateToString()', () => {
+  it('should return null if date is empty', () => {
+    const date = formatApiDateToString({
+      date: null,
+      dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+    });
+
+    expect(date).toBe(null);
+  });
+
+  it('should format a date-only string without shifting the day', () => {
+    const date = formatApiDateToString({
+      date: '2026-09-19',
+      dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+    });
+
+    expect(date).toBe('19/Sep/2026');
+  });
+
+  it('should round-trip a date-only string back to the format the API sent', () => {
+    const date = formatApiDateToString({
+      date: '2026-09-19',
+      dateFormat: DateFormatDateFns.YYYY_MM_DD,
+    });
+
+    expect(date).toBe('2026-09-19');
+  });
+
+  it('should format in the given locale', () => {
+    const date = formatApiDateToString({
+      date: '2026-09-19',
+      dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+      options: { locale: locales.es },
+    });
+
+    expect(date).toBe('19/sep/2026');
   });
 });

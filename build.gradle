@@ -132,6 +132,8 @@ bootRun {
     jvmArgs = [
         '-Dspring.output.ansi.enabled=never',
         '-Xdebug',
+        '-Xms1g',
+        '-Xmx4g',
         '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005'
     ]
     systemProperties System.properties
@@ -771,6 +773,10 @@ dependencies {
     implementation "org.xhtmlrenderer:flying-saucer-pdf-openpdf:${flyingSaucerVersion}"
 
     implementation 'com.github.albfernandez:juniversalchardet:2.4.0'
+
+    // Allows Jackson's ObjectMapper to serialize java.util.Date and Java.time classes
+    // (LocalDate, Instant, ZonedDateTime) to JSON. Automatically included in Jackson 3+
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
 
     // security patch
     compile 'org.yaml:snakeyaml:1.33'

@@ -138,7 +138,7 @@
                                 </td>
                                 <td class="value">
                                     <ul>
-                                    <g:each in="${grailsApplication.config.openboxes.locale.supportedLocales}" var="l">
+                                    <g:each in="${LocalizationUtil.supportedLocaleCodes}" var="l">
                                         <li>
                                         <g:set var="locale" value="${LocalizationUtil.getLocale(l)}"/>
                                         <g:set var="defaultLocale" value="${new Locale(grailsApplication.config.openboxes.locale.defaultLocale)}"/>
