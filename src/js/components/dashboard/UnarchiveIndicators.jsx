@@ -2,17 +2,12 @@ import React from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import {
-  RiArchiveLine, RiBarChartHorizontalLine, RiBarChartLine, RiLineChartLine,
-  RiPieChartLine, RiRefreshLine, RiTableLine,
-} from 'react-icons/ri';
 import ReactLoading from 'react-loading';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import { getRandomColor } from 'consts/dataFormat/colorMapping';
 import { translateWithDefaultMessage } from 'utils/Translate';
-import { isUnifiedLayout } from 'utils/unifiedLayout';
 
 const Numbers = () => {
   const colors = ['green', 'yellow', 'red'];
@@ -70,25 +65,20 @@ const ArchivedGraph = (props) => {
   let graph;
 
   if (props.type === 'line') {
-    graph = isUnifiedLayout()
-      ? <RiLineChartLine style={{ color: getRandomColor() }} />
-      : <i className="fa fa-line-chart" style={{ color: getRandomColor() }} />;
+    graph = <i className="fa fa-line-chart" style={{ color: getRandomColor() }} />;
   } else if (props.type === 'bar') {
-    graph = isUnifiedLayout()
-      ? <RiBarChartLine style={{ color: getRandomColor() }} />
-      : <i className="fa fa-bar-chart" style={{ color: getRandomColor() }} />;
+    graph = <i className="fa fa-bar-chart" style={{ color: getRandomColor() }} />;
   } else if (props.type === 'numbersCustomColors') {
-    graph = isUnifiedLayout()
-      ? <RiBarChartLine style={{ color: getRandomColor() }} />
-      : <i className="fa fa-bar-chart" style={{ color: getRandomColor() }} />;
+    graph = <i className="fa fa-bar-chart" style={{ color: getRandomColor() }} />;
   } else if (props.type === 'doughnut') {
-    graph = isUnifiedLayout()
-      ? <RiPieChartLine style={{ color: getRandomColor() }} />
-      : <i className="fa fa-pie-chart" style={{ color: getRandomColor() }} />;
+    graph = <i className="fa fa-pie-chart" style={{ color: getRandomColor() }} />;
   } else if (props.type === 'horizontalBar') {
-    graph = isUnifiedLayout()
-      ? <RiBarChartHorizontalLine style={{ color: getRandomColor() }} />
-      : <i className="fa fa-bar-chart horizontal-bar" style={{ color: getRandomColor() }} />;
+    graph = (
+      <i
+        className="fa fa-bar-chart horizontal-bar"
+        style={{ color: getRandomColor() }}
+      />
+    );
   } else if (props.type === 'numbers') {
     graph = <Numbers />;
   } else if (props.type === 'loading') {
@@ -101,11 +91,9 @@ const ArchivedGraph = (props) => {
       />
     );
   } else if (props.type === 'error') {
-    graph = isUnifiedLayout() ? <RiRefreshLine /> : <i className="fa fa-repeat" />;
+    graph = <i className="fa fa-repeat" />;
   } else if (props.type === 'table' || props.type === 'numberTable') {
-    graph = isUnifiedLayout()
-      ? <RiTableLine style={{ color: getRandomColor() }} />
-      : <i className="fa fa-table" style={{ color: getRandomColor() }} />;
+    graph = <i className="fa fa-table" style={{ color: getRandomColor() }} />;
   }
 
   return (
@@ -176,7 +164,7 @@ const UnarchiveIndicators = (props) => {
           {size}
           )
           {' '}
-          {isUnifiedLayout() ? <RiArchiveLine /> : <i className="fa fa-archive" />}
+          <i className="fa fa-archive" />
         </span>
       </div>
       <div className="unarchive-popover">

@@ -187,10 +187,8 @@
       margin-right: 6px;
     }
 
-    // Unified design also sizes the react-icons <svg> the same as the
-    // legacy <i>, so the two icon families sit identically
     .unified-layout & {
-      i, svg {
+      i {
         flex-shrink: 0;
         font-size: 14px;
         width: 14px;
@@ -290,7 +288,7 @@
           gap: 8px;
           font-size: 14px;
 
-          i, svg {
+          i {
             flex-shrink: 0;
             width: 18px;
             height: 18px;
@@ -422,7 +420,7 @@
     }
 
     .unified-layout & {
-      i, svg {
+      i {
         color: var(--gray-350);
       }
     }
@@ -498,7 +496,7 @@
     }
 
     .unified-layout & {
-      i, svg {
+      i {
         color: var(--gray-350);
       }
     }

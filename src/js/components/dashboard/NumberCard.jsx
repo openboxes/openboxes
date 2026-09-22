@@ -2,7 +2,6 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { Line } from 'react-chartjs-2';
-import { RiInformationLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { SortableElement } from 'react-sortable-hoc';
@@ -11,7 +10,6 @@ import { Tooltip } from 'react-tippy';
 import DragHandle from 'components/dashboard/DragHandle';
 import { getColorByName } from 'consts/dataFormat/colorMapping';
 import { translateWithDefaultMessage } from 'utils/Translate';
-import { isUnifiedLayout } from 'utils/unifiedLayout';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'components/dashboard/Dashboard.scss';
@@ -87,7 +85,7 @@ const NumberSparklineCard = ({
         content={translate(cardInfo, cardInfoDefaultValue || cardInfo)}
         show={cardInfo}
       >
-        {isUnifiedLayout() ? <RiInformationLine /> : <i className="fa fa-info-circle" />}
+        <i className="fa fa-info-circle" />
       </CustomTooltip>
     </div>
     <DragHandle />
@@ -159,7 +157,7 @@ const NumberCard = SortableElement(({
                   theme="transparent"
                   arrow="true"
                 >
-                  {infoIcon || (isUnifiedLayout() ? <RiInformationLine /> : <i className="fa fa-info-circle" />)}
+                  {infoIcon || <i className="fa fa-info-circle" />}
                 </CustomTooltip>
               </div>
             )
