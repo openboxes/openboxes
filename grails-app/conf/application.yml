@@ -504,6 +504,11 @@ openboxes:
             enabled: true
             cronExpression: "0 0 1 * * ?" # at 01:00:00am every day
 
+        # Rebuild the inventory count candidate tables and report any drift from the incremental updates
+        refreshInventoryCountsJob:
+            enabled: true
+            cronExpression: "0 0 3 * * ?" # at 03:00:00am every day
+
         # Assign identifier job
         assignIdentifierJob:
             enabled: true

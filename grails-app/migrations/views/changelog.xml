@@ -111,7 +111,34 @@
   <changeSet id="1740696149645-0" author="kchelstowski" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/product-inventory-candidate.sql"/>
   </changeSet>
+  <!--
+    Built once, when either table is missing, and maintained from the app layer after that: incrementally by
+    InventoryCountService as counts are submitted, and rebuilt nightly by RefreshInventoryCountsJob. The OR means a
+    manually dropped table is rebuilt on the next boot, and the sql file drops both before recreating them, so
+    rebuilding one rebuilds the pair. runAlways is what gets the precondition re-evaluated on every startup.
+
+    The unique index checks are what upgrade an existing database. Before this changeset grew a precondition the
+    file rebuilt both tables on every boot, so an existing database already has the tables but not the unique key
+    that inventory_counts now relies on to use UNION ALL. Missing the index re-runs the file once, which rebuilds
+    the pair with the current index set, and every boot after that skips it.
+  -->
   <changeSet id="1748970410098-6" author="kchelstowski" runOnChange="true" runAlways="true" failOnError="true">
+    <preConditions onFail="MARK_RAN">
+      <or>
+        <not>
+          <tableExists tableName="adjustment_candidate" />
+        </not>
+        <not>
+          <tableExists tableName="inventory_baseline_candidate" />
+        </not>
+        <not>
+          <indexExists tableName="adjustment_candidate" indexName="uq_transaction_product_facility" />
+        </not>
+        <not>
+          <indexExists tableName="inventory_baseline_candidate" indexName="uq_transaction_product_facility" />
+        </not>
+      </or>
+    </preConditions>
     <sqlFile path="views/inventory-counts-helper-views.sql"/>
   </changeSet>
   <changeSet id="1740696149645-1" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
