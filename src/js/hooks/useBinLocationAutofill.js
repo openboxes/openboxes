@@ -5,7 +5,10 @@ import { useSelector } from 'react-redux';
 import { getCurrentLocationId, getReceivingBin } from 'selectors';
 
 import inventoryLevelApi from 'api/services/InventoryLevelApi';
+import notification from 'components/Layout/notifications/notification';
+import NotificationType from 'consts/notificationTypes';
 import { LocationAutofillOption } from 'consts/receivingLocationOptions';
+import useTranslate from 'hooks/useTranslate';
 import mapToFormSelectOption from 'utils/mapToFormSelectOption';
 import confirmLocationAutofillOverwrite from 'utils/receiving/confirmLocationAutofillOverwrite';
 
@@ -26,6 +29,7 @@ const useBinLocationAutofill = ({
 }) => {
   const facilityId = useSelector(getCurrentLocationId);
   const receivingBin = useSelector(getReceivingBin);
+  const translate = useTranslate();
 
   const applyPreferredBins = async (items) => {
     const productIds = _.uniq(items
@@ -45,6 +49,16 @@ const useBinLocationAutofill = ({
       }
       return acc;
     }, {});
+    // Notify when no product of the autofilled rows has a preferred bin
+    if (_.isEmpty(newDataByRowId)) {
+      notification(NotificationType.INFO)({
+        message: translate(
+          'react.receiving.autofillLocation.noPreferredBins.label',
+          'The assigned bin location has not been updated because your location does not have preferred bins set for these items. To add preferred bins, reach out to your administrator.',
+        ),
+      });
+      return;
+    }
     updateLineItems(newDataByRowId);
   };
 
@@ -96,7 +110,7 @@ const useBinLocationAutofill = ({
       return;
     }
     applyAutofill(optionId, items);
-  }, [getRows, getRowBinLocation, updateLineItems, facilityId, receivingBin]);
+  }, [getRows, getRowBinLocation, updateLineItems, facilityId, receivingBin, translate]);
 
   return { onLocationAutofill };
 };
