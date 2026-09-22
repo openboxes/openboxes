@@ -274,7 +274,7 @@ class AllocationService {
                 }
 
                 log.info("Automatic allocation for requisition ${requisition.requestNumber} (${requisition.id}) ...")
-                allocate(requisition, AllocationMode.AUTO, [])
+                List<AllocationResult> results = allocate(requisition, AllocationMode.AUTO, [])
 
                 if (requisition.autoIssuanceRequested) {
                     try {
@@ -287,7 +287,7 @@ class AllocationService {
                         requisitionService.logRequisitionEvent(requisition.id, "${Constants.ISSUANCE_FAILED} ${e.message ?: 'Unknown error'}")
                         throw e
                     }
-                } else {
+                } else if (results.any { it.suggestedItems }) {
                     stockMovementService.updateRequisitionStatus(requisitionId, RequisitionStatus.PICKING)
                 }
             }
@@ -300,10 +300,6 @@ class AllocationService {
                                                       AllocationMode allocationMode = null) {
         Location facility = requisitionItem.requisition.origin
         Product product = requisitionItem.product
-        List<AvailableItem> allAvailableItems =
-                stockMovementService.getAvailableItems(facility, requisitionItem, false, !crossDockRelease)
-
-        allAvailableItems = allAvailableItems.findAll { !it.binLocation?.isNegativeInventoryFallbackLocation() }
 
         boolean isBackordered = requisitionItem.isBackordered()
 
@@ -317,6 +313,11 @@ class AllocationService {
             }
             quantityRequired = Math.min(quantityRequired ?: 0, quantityExcludingBackorder)
         }
+
+        List<AvailableItem> allAvailableItems =
+                stockMovementService.getAvailableItems(facility, requisitionItem, false, !crossDockRelease)
+
+        allAvailableItems = allAvailableItems.findAll { !it.binLocation?.isNegativeInventoryFallbackLocation() }
 
         List<AllocationSourceStrategy> resolvedStrategies = resolveStrategies(requisitionItem.requisition, strategies)
         RotationRule rotationRule = getConfiguredRotationRule()
