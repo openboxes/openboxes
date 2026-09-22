@@ -13,8 +13,13 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.mapper.MapperComponentResolver
+import org.pih.warehouse.core.mapper.SmartMapper
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductSimpleDtoMapper
+
+import testutil.MessageLocalizerStub
 
 import java.time.LocalDate
 
@@ -30,6 +35,17 @@ class CycleCountServiceSpec extends Specification implements DataTest {
     void setupSpec() {
         mockDomains(CycleCount, CycleCountItem, CycleCountRequest, InventoryItem, Product, Category, Location,
                 Person, User, Transaction, TransactionSource)
+
+        // The DTOs the service returns are built by mapper components. CycleCountDto.toDto looks the
+        // SmartMapper up from the application context by bean name, which the DataTest context does not
+        // register, so define it here with the real item and product mappers behind it.
+        MapperComponentResolver mapperComponentResolver = new MapperComponentResolver(Optional.empty(), Optional.of([
+                new CycleCountItemDtoMapper(productSimpleDtoMapper:
+                        new ProductSimpleDtoMapper(messageLocalizer: MessageLocalizerStub.MESSAGE_LOCALIZER_STUB)),
+        ]))
+        defineBeans {
+            smartMapper(SmartMapper, mapperComponentResolver)
+        }
     }
 
     void setup() {
@@ -45,6 +61,8 @@ class CycleCountServiceSpec extends Specification implements DataTest {
 
         cycleCountTransactionServiceMock = Mock(CycleCountTransactionService)
         cycleCountService.cycleCountTransactionService = cycleCountTransactionServiceMock
+
+        cycleCountService.smartMapper = applicationContext.getBean(SmartMapper)
     }
 
     void cleanup() {
@@ -427,6 +445,24 @@ class CycleCountServiceSpec extends Specification implements DataTest {
         assert requestA.cycleCount != null
         assert requestB.cycleCount != null
         assert dtos*.id.containsAll([requestA.cycleCount.id, requestB.cycleCount.id])
+    }
+
+    void 'startCycleCount should refuse to start a count on a product with no stock'() {
+        given:
+        Location facility = createFacility()
+        Product product = createProduct("AB12")
+        CycleCountRequest request = createRequest(facility: facility, product: product)
+        cycleCountProductAvailabilityServiceMock.getAvailableItems(facility, product) >> []
+
+        when:
+        cycleCountService.startCycleCount(new CycleCountStartCommand(cycleCountRequest: request), facility)
+
+        then: 'the failure names the product and the request is left as it was'
+        RuntimeException e = thrown()
+        assert e.message.contains("AB12")
+        assert request.cycleCount == null
+        assert request.status == CycleCountRequestStatus.CREATED
+        assert CycleCount.count() == 0
     }
 
     // ---------------------------------------------------------------------------------------------
