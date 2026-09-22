@@ -38,16 +38,19 @@ CREATE TABLE inventory_baseline_candidate AS
         t.inventory_id,
         facility.id;
 
--- Helps the TIMESTAMPDIFF match in baseline_adjustment_matches
-CREATE INDEX idx_inventory_product_date
-    ON inventory_baseline_candidate (inventory_id, product_id, transaction_date);
-
--- Helps matching by transaction_id in joins
-CREATE INDEX idx_transaction_id
-    ON inventory_baseline_candidate (transaction_id);
-
+-- Helps the equality half of the baseline/adjustment join in inventory_counts. The TIMESTAMPDIFF
+-- predicate is not sargable, so only the product_id/inventory_id prefix is used to seek; both tables
+-- are indexed with the same column order so either side can drive the join.
 CREATE INDEX idx_product_inventory_date
     ON adjustment_candidate (product_id, inventory_id, transaction_date);
 
-CREATE INDEX idx_product_inventory_base
+CREATE INDEX idx_product_inventory_date
     ON inventory_baseline_candidate (product_id, inventory_id, transaction_date);
+
+-- Helps the by-transaction DELETE and product merge UPDATE that InventoryCountService runs against both
+-- tables to maintain them incrementally between rebuilds
+CREATE INDEX idx_transaction_id
+    ON adjustment_candidate (transaction_id);
+
+CREATE INDEX idx_transaction_id
+    ON inventory_baseline_candidate (transaction_id);
