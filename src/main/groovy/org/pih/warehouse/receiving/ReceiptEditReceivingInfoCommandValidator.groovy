@@ -3,6 +3,7 @@ package org.pih.warehouse.receiving
 import org.springframework.stereotype.Component
 import org.springframework.validation.ObjectError
 
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.core.validation.ObjectValidator
 
@@ -15,6 +16,7 @@ class ReceiptEditReceivingInfoCommandValidator extends ObjectValidator<ReceiptEd
                 validateReceiptIsPending(command),
                 validateItemsToSaveAreValid(command),
                 validateNoDuplicateItemsToSave(command),
+                validateBinLocationIsNotRemoved(command),
         )
     }
 
@@ -64,6 +66,34 @@ class ReceiptEditReceivingInfoCommandValidator extends ObjectValidator<ReceiptEd
         return duplicateIds ?
                 rejectField("itemsToSave", command.itemsToSave,
                         "receiptEditReceivingInfoCommand.itemsToSave.duplicateExists", [duplicateIds.toString()]) :
+                null
+    }
+
+    /**
+     * When the receipt is received into a destination that tracks bin locations
+     * (Location.hasBinLocationSupport), the bin location of a receipt item can be changed but never removed - a line
+     * left without one receives its stock outside of any bin. Destinations without bin location support hold no bins
+     * at all, so their lines are not checked.
+     */
+    private ObjectError validateBinLocationIsNotRemoved(ReceiptEditReceivingInfoCommand command) {
+        // Only existing items can have their bin location removed - a new item never had one to begin with.
+        List<String> itemIds = command.itemsToSave
+                .findAll { ReceiptItemEditReceivingInfoRequest item ->
+                    item.receiptItem?.binLocation != null && item.binLocation == null
+                }
+                .collect { ReceiptItemEditReceivingInfoRequest item -> item.receiptItem.id }
+
+        // The items are checked first so that a request that changes no bin location at all doesn't load the
+        // shipment and its destination.
+        if (!itemIds) {
+            return null
+        }
+
+        Location destination = command.receipt?.shipment?.destination
+
+        return destination?.hasBinLocationSupport() ?
+                rejectField("itemsToSave", command.itemsToSave,
+                        "receiptEditReceivingInfoCommand.itemsToSave.binLocationRemoved", [itemIds.toString()]) :
                 null
     }
 }

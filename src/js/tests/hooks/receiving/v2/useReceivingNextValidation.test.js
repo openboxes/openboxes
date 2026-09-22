@@ -1,16 +1,19 @@
 import { renderHook } from '@testing-library/react-hooks';
 import { useSelector } from 'react-redux';
+import { getHasBinLocationSupport, getHasPartialReceivingSupport } from 'selectors';
 
 import useReceivingNextValidation from 'hooks/receiving/v2/useReceivingNextValidation';
+import alertMissingBinLocations from 'utils/receiving/alertMissingBinLocations';
 import confirmBlankLinesAsZero from 'utils/receiving/confirmBlankLinesAsZero';
 
 import '@testing-library/jest-dom';
 
-// The hook only reads the partial receiving activity code of the current location.
+// The hook only reads the activity codes of the current location (and the locale, unused here).
 jest.mock('react-redux', () => ({
   useSelector: jest.fn(() => false),
 }));
 jest.mock('utils/receiving/confirmBlankLinesAsZero', () => jest.fn());
+jest.mock('utils/receiving/alertMissingBinLocations', () => jest.fn());
 
 const buildRow = (rowId, overrides = {}) => ({
   rowId,
@@ -25,8 +28,19 @@ const buildState = (rows) => ({
   ids: rows.map((row) => row.rowId),
 });
 
-const renderValidation = (rows, { hasPartialReceivingSupport = false } = {}) => {
-  useSelector.mockImplementation(() => hasPartialReceivingSupport);
+const renderValidation = (rows, {
+  hasPartialReceivingSupport = false,
+  hasBinLocationSupport = false,
+} = {}) => {
+  useSelector.mockImplementation((selector) => {
+    if (selector === getHasPartialReceivingSupport) {
+      return hasPartialReceivingSupport;
+    }
+    if (selector === getHasBinLocationSupport) {
+      return hasBinLocationSupport;
+    }
+    return undefined;
+  });
   const { result } = renderHook(() => useReceivingNextValidation({
     lineItemsState: buildState(rows),
   }));
@@ -107,6 +121,47 @@ describe('useReceivingNextValidation', () => {
       ]);
 
       await expect(result.current.validateBeforeNext()).resolves.toBe(false);
+    });
+
+    it('should block the transition when a line being received has no location', async () => {
+      const { result } = renderValidation(
+        [buildRow('row-1', { quantityReceiving: 2 })],
+        { hasBinLocationSupport: true },
+      );
+
+      await expect(result.current.validateBeforeNext()).resolves.toBe(false);
+      expect(alertMissingBinLocations).toHaveBeenCalledWith(1);
+      expect(confirmBlankLinesAsZero).not.toHaveBeenCalled();
+    });
+
+    it('should let the lines that carry a location through', async () => {
+      const { result } = renderValidation(
+        [buildRow('row-1', { quantityReceiving: 2, binLocation: { id: 'bin-1' } })],
+        { hasBinLocationSupport: true },
+      );
+
+      await expect(result.current.validateBeforeNext()).resolves.toBe(true);
+      expect(alertMissingBinLocations).not.toHaveBeenCalled();
+    });
+
+    it('should not ask for a location on a line receiving nothing', async () => {
+      const { result } = renderValidation(
+        [
+          buildRow('row-1', { quantityReceiving: 0 }),
+          buildRow('row-2', { quantityReceiving: 2, binLocation: { id: 'bin-1' } }),
+        ],
+        { hasBinLocationSupport: true },
+      );
+
+      await expect(result.current.validateBeforeNext()).resolves.toBe(true);
+      expect(alertMissingBinLocations).not.toHaveBeenCalled();
+    });
+
+    it('should not ask for a location at a location that does not track bins', async () => {
+      const { result } = renderValidation([buildRow('row-1', { quantityReceiving: 2 })]);
+
+      await expect(result.current.validateBeforeNext()).resolves.toBe(true);
+      expect(alertMissingBinLocations).not.toHaveBeenCalled();
     });
 
     it('should not count completed lines as blank', async () => {

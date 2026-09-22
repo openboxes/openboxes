@@ -36,6 +36,7 @@ const SelectField = ({
   locationId,
   onExactProductSelected,
   labelKey,
+  clearable,
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -88,6 +89,7 @@ const SelectField = ({
         onExactProductSelected={onExactProductSelected}
         valueKey="id"
         labelKey={labelKey}
+        clearable={clearable}
         {...asyncProps}
         {...fieldProps}
       />
@@ -158,6 +160,7 @@ SelectField.propTypes = {
   locationId: PropTypes.string,
   onExactProductSelected: PropTypes.func,
   labelKey: PropTypes.string,
+  clearable: PropTypes.bool,
 };
 
 SelectField.defaultProps = {
@@ -187,4 +190,5 @@ SelectField.defaultProps = {
   locationId: null,
   onExactProductSelected: () => {},
   labelKey: null,
+  clearable: true,
 };

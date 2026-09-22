@@ -3,6 +3,7 @@ package org.pih.warehouse.receiving
 import org.springframework.stereotype.Component
 import org.springframework.validation.ObjectError
 
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.core.validation.ObjectValidator
 
@@ -15,6 +16,7 @@ class ReceiptItemsBatchRequestValidator extends ObjectValidator<ReceiptItemsBatc
                 validateReceiptIsPending(request),
                 validateItemsToSaveAreValid(request),
                 validateNoDuplicateItemsToSave(request),
+                validateBinLocationIsNotRemoved(request),
                 validateItemsAreNotBothSavedAndDeleted(request),
                 validateItemsToDeleteAreNotOriginalItems(request),
         )
@@ -65,6 +67,34 @@ class ReceiptItemsBatchRequestValidator extends ObjectValidator<ReceiptItemsBatc
         return duplicateIds ?
                 rejectField("itemsToSave", request.itemsToSave,
                         "receiptItemsBatchRequest.itemsToSave.duplicateExists", [duplicateIds.toString()]) :
+                null
+    }
+
+    /**
+     * When the receipt is received into a destination that tracks bin locations
+     * (Location.hasBinLocationSupport), the bin location of a receipt item can be changed but never removed - a line
+     * left without one receives its stock outside of any bin. Destinations without bin location support hold no bins
+     * at all, so their lines are not checked.
+     */
+    private ObjectError validateBinLocationIsNotRemoved(ReceiptItemsBatchRequest request) {
+        // Only existing items can have their bin location removed - a new item never had one to begin with.
+        List<String> itemIds = request.itemsToSave
+                .findAll { ReceiptItemUpsertRequest item ->
+                    item.receiptItem?.binLocation != null && item.binLocation == null
+                }
+                .collect { ReceiptItemUpsertRequest item -> item.receiptItem.id }
+
+        // The items are checked first so that a request that changes no bin location at all doesn't load the
+        // shipment and its destination.
+        if (!itemIds) {
+            return null
+        }
+
+        Location destination = request.receipt?.shipment?.destination
+
+        return destination?.hasBinLocationSupport() ?
+                rejectField("itemsToSave", request.itemsToSave,
+                        "receiptItemsBatchRequest.itemsToSave.binLocationRemoved", [itemIds.toString()]) :
                 null
     }
 

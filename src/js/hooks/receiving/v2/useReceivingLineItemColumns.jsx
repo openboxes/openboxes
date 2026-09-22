@@ -223,6 +223,7 @@ const useReceivingLineItemColumns = ({
                 options={binLocationOptions}
                 label="react.receiving.location.label"
                 defaultLabel="Location"
+                clearable={false}
               />
             )}
           />
