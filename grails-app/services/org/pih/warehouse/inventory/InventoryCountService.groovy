@@ -37,6 +37,10 @@ class InventoryCountService {
                     :inventoryId,
                     :facilityId
                 )
+                -- The table carries a unique key on (transaction_id, product_id, facility_id). Re-inserting a row
+                -- that is already there is a no-op rather than an error, so a retried save cannot roll back the
+                -- caller's transaction.
+                ON DUPLICATE KEY UPDATE transaction_date = VALUES(transaction_date)
             """
             sql.executeInsert(params, query)
         }
@@ -74,10 +78,24 @@ class InventoryCountService {
                     obsoleteProductId: obsoleteProductId,
                     primaryProductId: primaryProductId
             ]
+            // A single transaction can touch both the obsolete and the primary product, in which case the row
+            // for the primary product already exists and the UPDATE below would violate the unique key on
+            // (transaction_id, product_id, facility_id). Drop the obsolete row in that case - the primary one
+            // already represents the count for this transaction.
+            String deleteCollidingQuery = """
+                DELETE obsolete FROM adjustment_candidate obsolete
+                JOIN adjustment_candidate primary_row
+                  ON primary_row.transaction_id = obsolete.transaction_id
+                  AND primary_row.facility_id = obsolete.facility_id
+                  AND primary_row.product_id = :primaryProductId
+                WHERE obsolete.transaction_id = :transactionId
+                AND obsolete.product_id = :obsoleteProductId
+            """
+            sql.executeUpdate(params, deleteCollidingQuery)
             String query = """
-                UPDATE adjustment_candidate 
+                UPDATE adjustment_candidate
                 SET product_id = :primaryProductId
-                WHERE product_id = :obsoleteProductId 
+                WHERE product_id = :obsoleteProductId
                 AND transaction_id = :transactionId
             """
             sql.executeUpdate(params, query)
@@ -99,10 +117,24 @@ class InventoryCountService {
                     obsoleteProductId: obsoleteProductId,
                     primaryProductId: primaryProductId
             ]
+            // A single transaction can touch both the obsolete and the primary product, in which case the row
+            // for the primary product already exists and the UPDATE below would violate the unique key on
+            // (transaction_id, product_id, facility_id). Drop the obsolete row in that case - the primary one
+            // already represents the count for this transaction.
+            String deleteCollidingQuery = """
+                DELETE obsolete FROM inventory_baseline_candidate obsolete
+                JOIN inventory_baseline_candidate primary_row
+                  ON primary_row.transaction_id = obsolete.transaction_id
+                  AND primary_row.facility_id = obsolete.facility_id
+                  AND primary_row.product_id = :primaryProductId
+                WHERE obsolete.transaction_id = :transactionId
+                AND obsolete.product_id = :obsoleteProductId
+            """
+            sql.executeUpdate(params, deleteCollidingQuery)
             String query = """
-                UPDATE inventory_baseline_candidate 
+                UPDATE inventory_baseline_candidate
                 SET product_id = :primaryProductId
-                WHERE product_id = :obsoleteProductId 
+                WHERE product_id = :obsoleteProductId
                 AND transaction_id = :transactionId
             """
             sql.executeUpdate(params, query)
@@ -135,6 +167,10 @@ class InventoryCountService {
                     :inventoryId,
                     :facilityId
                 )
+                -- The table carries a unique key on (transaction_id, product_id, facility_id). Re-inserting a row
+                -- that is already there is a no-op rather than an error, so a retried save cannot roll back the
+                -- caller's transaction.
+                ON DUPLICATE KEY UPDATE transaction_date = VALUES(transaction_date)
             """
             sql.executeInsert(params, query)
         }

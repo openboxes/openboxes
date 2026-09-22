@@ -47,10 +47,12 @@ CREATE INDEX idx_product_inventory_date
 CREATE INDEX idx_product_inventory_date
     ON inventory_baseline_candidate (product_id, inventory_id, transaction_date);
 
--- Helps the by-transaction DELETE and product merge UPDATE that InventoryCountService runs against both
--- tables to maintain them incrementally between rebuilds
-CREATE INDEX idx_transaction_id
-    ON adjustment_candidate (transaction_id);
+-- The CTAS above is deduplicated by its GROUP BY, but InventoryCountService keeps these tables up to date
+-- incrementally between rebuilds, and an unguarded INSERT could otherwise duplicate a row. inventory_counts
+-- relies on each table being duplicate-free so it can use UNION ALL instead of UNION.
+-- The leftmost prefix also serves the by-transaction DELETE and the product merge UPDATE that the service runs.
+CREATE UNIQUE INDEX uq_transaction_product_facility
+    ON adjustment_candidate (transaction_id, product_id, facility_id);
 
-CREATE INDEX idx_transaction_id
-    ON inventory_baseline_candidate (transaction_id);
+CREATE UNIQUE INDEX uq_transaction_product_facility
+    ON inventory_baseline_candidate (transaction_id, product_id, facility_id);
