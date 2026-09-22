@@ -31,7 +31,7 @@ import SelectCell from 'utils/cells/SelectCell';
 import ValueCell from 'utils/cells/ValueCell';
 import getReceivingRowActions, { getReceivingSplitItemActions } from 'utils/receiving/getReceivingRowActions';
 import getReceivingRowStatus from 'utils/receiving/getReceivingRowStatus';
-import hasRowSavedQuantity from 'utils/receiving/hasRowSavedQuantity';
+import getRowStripeStatus from 'utils/receiving/getRowStripeStatus';
 import hasSplitItemInDifferentBinThanReplacedRow from 'utils/receiving/hasSplitItemInDifferentBinThanReplacedRow';
 import struckIfChanged from 'utils/receiving/struckIfChanged';
 import sumSplitItemsQuantityReceiving from 'utils/receiving/sumSplitItemsQuantityReceiving';
@@ -126,9 +126,9 @@ const useReceivingColumns = ({
         const item = getItem(row, table);
         return (
           <>
-            {/* The stripe marks rows whose quantity is saved. It lives in the first (pinned)
+            {/* The stripe marks row status. It lives in the first (pinned)
                 column so its absolutely positioned span anchors to the row's left edge. */}
-            <VerticalStripeIndicator display={hasRowSavedQuantity(item)} />
+            <VerticalStripeIndicator status={getRowStripeStatus(item)} />
             <PackLevelGroupCell
               item={item}
               isExpanded={row.getIsExpanded()}
@@ -175,10 +175,10 @@ const useReceivingColumns = ({
           const item = getItem(row, table);
           return (
             <>
-              {/* In packing list view the saved stripe is rendered by the pack level group
+              {/* In packing list view the status stripe is rendered by the pack level group
                   column, which is the leftmost one there. */}
               {!isPackingListView
-                && <VerticalStripeIndicator display={hasRowSavedQuantity(item)} />}
+                && <VerticalStripeIndicator status={getRowStripeStatus(item)} />}
               <ProductCodeCell
                 item={item}
                 isPackingListView={isPackingListView}

@@ -61,8 +61,7 @@ const buildReceivingTableRows = (lineItemsState) => {
           ...buildSubRow(splitItemId, i, splitItemIds),
           className,
         })),
-        // A replaced row is always followed by its toggle row and merges with it.
-        mergeWithNextRow: isReplaced(entry),
+        mergeWithNextRow: isReplaced(entry) || Boolean(entities[entry]?.mergeWithNextRow),
       });
       return acc;
     }, { rows: [], blockIndex: 0 });
