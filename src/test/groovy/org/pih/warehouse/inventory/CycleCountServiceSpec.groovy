@@ -47,6 +47,12 @@ class CycleCountServiceSpec extends Specification implements DataTest {
         cycleCountService.cycleCountTransactionService = cycleCountTransactionServiceMock
     }
 
+    void cleanup() {
+        // The current user lives in a static thread-local; clear it so it does not leak into
+        // whatever spec runs next on this thread.
+        new AuthService().setCurrentUser(null)
+    }
+
     // ---------------------------------------------------------------------------------------------
     // Fixture helpers
     // ---------------------------------------------------------------------------------------------
@@ -219,7 +225,7 @@ class CycleCountServiceSpec extends Specification implements DataTest {
         assert !requests[1].blindCount
     }
 
-    void 'createRequests should stop at the first invalid request'() {
+    void 'createRequests should fail when any request is invalid'() {
         given: 'the second request is invalid (no facility)'
         Location facility = createFacility()
         Product product = createProduct("AB12")
@@ -231,12 +237,11 @@ class CycleCountServiceSpec extends Specification implements DataTest {
         when:
         cycleCountService.createRequests(command)
 
-        then: 'the batch fails before returning anything'
+        then:
         thrown(ValidationException)
-        // The service validates and saves one request at a time, so the valid first request has
-        // already been saved when the second one fails. Whether that first save actually reaches
-        // the database is up to the surrounding transaction's rollback, which a unit test
-        // does not cover.
+        // The service validates and saves one request at a time, so what happens to the requests
+        // before the invalid one is decided by the surrounding transaction's rollback, which a
+        // unit test does not cover.
     }
 
     void 'updateRequests should apply the #description assignment to the matching field pair'() {
@@ -546,6 +551,17 @@ class CycleCountServiceSpec extends Specification implements DataTest {
         and: 'the recount assignee is only applied to availability-backed items, not carried custom ones'
         assert recountItems.find { it.inventoryItem == trackedLot }.assignee == recounter
         assert carried.assignee == null
+
+        when: 'the recount is started a second time'
+        cycleCountService.startRecount(facility,
+                new CycleCountStartRecountCommand(cycleCountRequest: request, countIndex: 1))
+
+        then: 'the restart reassigns every recount item, so the carried item is now assigned after all'
+        // Documents today's behavior: a carried item is unassigned after the first start of the
+        // recount and assigned after a restart of it.
+        List<CycleCountItem> restartedItems = cycleCount.cycleCountItems.findAll { it.countIndex == 1 } as List
+        assert restartedItems.every { it.assignee == recounter }
+        assert restartedItems.find { it.inventoryItem == foundLot }.assignee == recounter
     }
 
     void 'startRecount should not duplicate a custom item that availability already produced for the recount'() {
@@ -783,8 +799,10 @@ class CycleCountServiceSpec extends Specification implements DataTest {
     }
 
     void 'submitCount should treat a count whose items were all canceled as completed'() {
-        // Documents today's behavior: recomputeStatus() treats canceled items as resolved, so a
-        // count whose items were ALL canceled comes out COMPLETED, never CANCELED. As a result the
+        // Documents today's behavior: submitCount re-derives every item's status from its
+        // quantities (approved when they match or no recount is required, counted otherwise), so
+        // a cancellation does not survive the submit - the canceled item is treated like any other.
+        // A count whose items were ALL canceled therefore comes out COMPLETED, never CANCELED, the
         // cancellation branch of the close-out logic can never run from submitCount, and a fully
         // canceled count still creates inventory transactions for its products.
         given:
@@ -806,7 +824,8 @@ class CycleCountServiceSpec extends Specification implements DataTest {
                 failOnOutdatedQuantity: false,
                 requireRecountOnDiscrepancy: false))
 
-        then:
+        then: 'the cancellation is overwritten and the count completes'
+        assert canceledItem.status == CycleCountItemStatus.APPROVED
         assert dto.status == CycleCountStatus.COMPLETED.toString()
         assert request.status == CycleCountRequestStatus.COMPLETED
 
@@ -883,11 +902,13 @@ class CycleCountServiceSpec extends Specification implements DataTest {
         item.save(validate: false, flush: true)
 
         when:
+        Date before = new Date()
         cycleCountService.updateCycleCountItem(new CycleCountUpdateItemCommand(cycleCountItem: item, recount: false))
+        Date after = new Date()
 
         then:
         assert item.dateCounted != null
-        assert Math.abs(item.dateCounted.time - new Date().time) < 5000
+        assert !item.dateCounted.before(before) && !item.dateCounted.after(after)
     }
 
     void 'updateCycleCountItems should update every item in the batch and preserve order'() {
@@ -1299,7 +1320,7 @@ class CycleCountServiceSpec extends Specification implements DataTest {
                 product: product,
                 abcClass: "A",
                 internalLocations: "A1,B2",
-                dateLastCount: new Date(1200000000000L),
+                dateLastCount: Date.parse("yyyy-MM-dd", "2008-01-10"),
                 quantityOnHand: 42,
         )
 
@@ -1366,6 +1387,7 @@ class CycleCountServiceSpec extends Specification implements DataTest {
         assert rows[0]["Expiration Date"] == "01/31/2027"
         assert rows[0]["Bin Location"] == "A1"
         assert rows[0]["User Counted"] == assignee.name
+        assert rows[0]["Date Counted"] == "08/15/2026"
 
         and: 'a counted quantity of zero renders as 0, not as blank - blank means "not counted yet"'
         assert rows[0]["Quantity Counted"] == 0
