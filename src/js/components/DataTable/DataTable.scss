@@ -23,6 +23,37 @@
     display: none;
   }
 
+  .rt-top-scrollbar {
+    position: absolute;
+    left: 0;
+    z-index: 4;
+    height: 7px;
+    margin-top: -7px;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    // The spacer that makes the bar overflow. A box of zero height reports nothing to scroll.
+    &::after {
+      content: '';
+      display: block;
+      width: var(--table-content-width, 0);
+      height: 1px;
+    }
+
+    &::-webkit-scrollbar {
+      height: 7px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--blue-200);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--blue-301);
+      border-radius: 4px;
+    }
+  }
+
   .rt-table {
     font-size: 14px;
 

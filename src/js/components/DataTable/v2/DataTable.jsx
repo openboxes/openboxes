@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 import PropTypes from 'prop-types';
 
@@ -8,6 +8,8 @@ import DataTableFooterRow from 'components/DataTable/v2/DataTableFooterRow';
 import DataTableHeader from 'components/DataTable/v2/DataTableHeader';
 import useDataTable from 'hooks/useDataTable';
 import useTableArrowNavigation from 'hooks/useTableArrowNavigation';
+import useTableScrollToEnd from 'hooks/useTableScrollToEnd';
+import useTableTopScrollbar from 'hooks/useTableTopScrollbar';
 import useWindowWidthCheck from 'hooks/useWindowWidthCheck';
 
 import 'react-table/react-table.css';
@@ -51,7 +53,12 @@ const DataTable = ({
   getSubRows,
   defaultExpandedSubRows,
   arrowNavigationSettings,
+  initialHorizontalScroll,
+  showTopScrollbar,
 }) => {
+  const bottomScrollbarRef = useRef(null);
+  const hasRows = Boolean(data?.length) && !loading;
+
   const { enabledForAllFields, verticalOnly, onNavigatePastLastField } = arrowNavigationSettings;
   // Arrow key navigation. With no cell marked as navigable, the listener does nothing.
   const arrowNavigationRef = useTableArrowNavigation({ onNavigatePastLastField, verticalOnly });
@@ -75,10 +82,23 @@ const DataTable = ({
   const tableWidth = table.getTotalSize();
   const isScreenWiderThanTable = useWindowWidthCheck(tableWidth);
 
+  useTableScrollToEnd({
+    bottomScrollbarRef, initialHorizontalScroll, hasRows, tableWidth,
+  });
+
+  const topScrollbarRef = useTableTopScrollbar({
+    bottomScrollbarRef,
+    showTopScrollbar,
+    hasRows,
+    tableWidth,
+    isScreenWiderThanTable,
+  });
+
   return (
     <div className="app-react-table-wrapper table-v2" ref={arrowNavigationRef}>
       <div className={`ReactTable app-react-table ${disabled ? 'app-react-table--disabled' : ''}`}>
-        <div className={`rt-table ${overflowVisible ? 'overflow-visible' : ''}`} role="grid">
+        {showTopScrollbar && <div className="rt-top-scrollbar" ref={topScrollbarRef} />}
+        <div ref={bottomScrollbarRef} className={`rt-table ${overflowVisible ? 'overflow-visible' : ''}`} role="grid">
           <DataTableHeader
             headerGroups={table.getHeaderGroups()}
             tableWithPinnedColumns={tableWithPinnedColumns}
@@ -170,6 +190,10 @@ DataTable.propTypes = {
     // Called with the column when arrow down or right leaves the last field of the table.
     onNavigatePastLastField: PropTypes.func,
   }),
+  // Where the horizontal scroll starts: on the left-most columns, or on the right-most ones.
+  initialHorizontalScroll: PropTypes.oneOf(['start', 'end']),
+  // Adds a second horizontal scrollbar under the header row, synced with the table's own one.
+  showTopScrollbar: PropTypes.bool,
 };
 
 DataTable.defaultProps = {
@@ -196,4 +220,6 @@ DataTable.defaultProps = {
   getSubRows: undefined,
   defaultExpandedSubRows: false,
   arrowNavigationSettings: {},
+  initialHorizontalScroll: 'start',
+  showTopScrollbar: false,
 };

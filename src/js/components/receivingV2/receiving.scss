@@ -241,6 +241,16 @@
   }
 }
 
+.receiving-container .receiving-table .app-react-table {
+  z-index: 0;
+}
+
+// What is left in the viewport, so the table's horizontal scrollbar is not pushed below the
+// fold. The 700px is the page around it: header, wizard, filters, buttons.
+.receiving-container .receiving-table .rt-table {
+  max-height: max(calc(100vh - 700px), 30vh);
+}
+
 .location-header {
   width: 100%;
 

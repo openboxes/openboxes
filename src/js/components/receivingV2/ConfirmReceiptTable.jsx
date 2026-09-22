@@ -62,6 +62,7 @@ const ConfirmReceiptTable = ({
         meta={meta}
         disablePagination
         tableWithPinnedColumns
+        showTopScrollbar
         loading={loading}
         loadingMessage={{
           id: 'react.default.loading.label',
