@@ -107,10 +107,16 @@ class MigrationController {
     def materializedViews() {
         def productDemandCount = dataService.executeQuery("select count(*) as count from product_demand_details")[0]?.count ?: 0
         def productAvailabilityCount = dataService.executeQuery("select count(*) as count from product_availability")[0]?.count ?: 0
+        def adjustmentCandidateCount = dataService.executeQuery("select count(*) as count from adjustment_candidate")[0]?.count ?: 0
+        def inventoryBaselineCandidateCount = dataService.executeQuery("select count(*) as count from inventory_baseline_candidate")[0]?.count ?: 0
+        def productInventoryCandidateCount = dataService.executeQuery("select count(*) as count from product_inventory_candidate")[0]?.count ?: 0
 
         [
-                productDemandCount       : productDemandCount,
-                productAvailabilityCount : productAvailabilityCount
+                productDemandCount              : productDemandCount,
+                productAvailabilityCount        : productAvailabilityCount,
+                adjustmentCandidateCount        : adjustmentCandidateCount,
+                inventoryBaselineCandidateCount : inventoryBaselineCandidateCount,
+                productInventoryCandidateCount  : productInventoryCandidateCount
         ]
     }
 
