@@ -24,10 +24,17 @@ import org.pih.warehouse.product.Category
  * Verifies that a response rendered inside a transactional controller action is not completed for the client
  * before the transaction has committed.
  *
- * The test blocks the commit of a category save from inside Hibernate's post-insert event (which fires when the
- * INSERT is flushed, after the controller has already rendered the response) and checks that the HTTP client is
- * still waiting while the commit is blocked. Without DeferResponseCloseFilter the client receives the complete
- * response as soon as the JSON converter closes the response writer, which is before the INSERT is even flushed.
+ * Step by step:
+ *  1. Register a Hibernate post-insert listener on the session factory. It ignores everything except a Category
+ *     with the name the test armed it with.
+ *  2. Post that category through the API from a second thread, so that this thread stays free to observe.
+ *  3. When the INSERT is flushed - which happens inside the commit, after the controller has already rendered its
+ *     response - the listener fires, counts down the "inserted" latch and then waits on the "released" latch.
+ *     That holds the transaction open with the response already rendered: the exact window the flakiness lives in.
+ *  4. While it is held, assert that the HTTP client is still waiting (its Future times out). Without
+ *     DeferResponseCloseFilter this assertion fails, because the client receives the complete response as soon as
+ *     the JSON converter closes the response writer, which is before the INSERT is even flushed.
+ *  5. Release the listener, then assert that the client completes and can read the category back.
  */
 class DeferResponseCloseFilterSpec extends ApiSpec {
 

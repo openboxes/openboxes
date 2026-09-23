@@ -10,25 +10,27 @@ import javax.servlet.http.HttpServletResponseWrapper
 import org.springframework.web.filter.OncePerRequestFilter
 
 /**
- * Test-only servlet filter that keeps a response finished by closing the response writer or output stream from
- * completing on the wire before the request has fully unwound.
+ * Test-only servlet filter that keeps a response from completing on the wire before the request has fully unwound.
  *
- * The Grails JSON/XML converters close the response writer at the end of render(), and closing the writer makes the
- * servlet container finish the response immediately (for a chunked response it writes the terminal chunk). In a
- * controller action that runs inside a transaction (for example a controller annotated with @Transactional at the
- * class level), the client therefore sees a complete response before the transaction has committed. Our API specs
- * fire their next request the moment the previous response completes, so a follow-up request can reach the database
- * before that commit - which shows up as intermittent "foreign key constraint fails" and "unsaved transient instance"
- * errors on entities created by the immediately preceding request.
+ * Why: the Grails JSON/XML converters end render() by calling close() on the response writer, and closing the
+ * writer makes the servlet container finish the response immediately (for a chunked response it writes the
+ * terminal chunk). In a controller action that runs inside a transaction (for example a controller annotated with
+ * @Transactional at the class level), the client therefore sees a complete response before the transaction has
+ * committed. Our API specs fire their next request the moment the previous response completes, so that request can
+ * reach the database before the commit - which shows up as intermittent "foreign key constraint fails" and
+ * "unsaved transient instance" errors on entities created by the immediately preceding request.
  *
- * This filter wraps the response so that close() on the response writer or output stream flushes what has been
- * written and then discards any further output (which is what the container does after a real close), but does not
- * close the underlying stream. The container completes the response when the request finishes, which is after the
+ * What it does: the response is wrapped so that close() on the response writer (called by the converters) or on
+ * the output stream (called by download actions) flushes what has been written and then discards any further
+ * output, which is what the container does after a real close - but the container's own writer/stream is never
+ * closed by application code. The container closes it itself when the request finishes, which is after the
  * controller action has returned and its transaction has completed. Status, headers and body bytes are still sent
  * when the action flushes them; only the end of the response moves.
  *
- * It lives in the integration test source set on purpose: it is test infrastructure and is not packaged into the
- * application. It is registered for every integration spec in IntegrationSpecConfig.
+ * This class is not component-scanned (no stereotype annotation, and IntegrationSpecConfig only scans the api,
+ * slice and smoke packages); IntegrationSpecConfig constructs it in a @Bean method. It lives in the integration
+ * test source set on purpose: that source set compiles to its own output directory and is not packaged into the
+ * application.
  */
 class DeferResponseCloseFilter extends OncePerRequestFilter {
 
