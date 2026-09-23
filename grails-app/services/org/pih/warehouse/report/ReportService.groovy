@@ -63,6 +63,7 @@ import org.pih.warehouse.reporting.InventoryShrinkageResult
 import org.pih.warehouse.shipping.ShipmentService
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
+import org.springframework.transaction.annotation.Isolation
 import org.xhtmlrenderer.pdf.ITextRenderer
 import util.InventoryUtil
 
@@ -416,7 +417,7 @@ class ReportService implements ApplicationContextAware {
             SELECT 0, transaction_type.transaction_code, substring_index(transaction_type.name, '|', 1), transaction_type.id
             FROM transaction_type
         """
-        dataService.executeStatements([insertStatement])
+        dataService.executeStatements([insertStatement], Isolation.READ_COMMITTED)
     }
 
     void buildLotDimension() {
@@ -426,7 +427,7 @@ class ReportService implements ApplicationContextAware {
             FROM inventory_item
             JOIN product ON product.id = inventory_item.product_id;
         """
-        dataService.executeStatements([insertStatement])
+        dataService.executeStatements([insertStatement], Isolation.READ_COMMITTED)
     }
 
     void buildProductDimension() {
@@ -436,7 +437,7 @@ class ReportService implements ApplicationContextAware {
             FROM product
             JOIN category ON category.id = product.category_id
         """
-        dataService.executeStatements([insertStatement])
+        dataService.executeStatements([insertStatement], Isolation.READ_COMMITTED)
     }
 
     void buildLocationDimension() {
@@ -447,7 +448,7 @@ class ReportService implements ApplicationContextAware {
             JOIN location_type ON location_type.id = location.location_type_id
             LEFT JOIN location_group ON location_group.id = location.location_group_id
             LEFT JOIN location parent_location ON parent_location.id = location.parent_location_id;        """
-        dataService.executeStatements([insertStatement])
+        dataService.executeStatements([insertStatement], Isolation.READ_COMMITTED)
     }
 
     void buildDateDimension() {
@@ -521,7 +522,7 @@ class ReportService implements ApplicationContextAware {
             where transaction.order_id is null 
             or `order`.order_type_id not in ('PUTAWAY_ORDER') ;
         """
-        dataService.executeStatements([deleteStatement, insertStatement])
+        dataService.executeStatements([deleteStatement, insertStatement], Isolation.READ_COMMITTED)
     }
 
 
@@ -567,7 +568,7 @@ class ReportService implements ApplicationContextAware {
             join date_dimension transaction_date_dimension on transaction_date_dimension.date = date(transaction.transaction_date)
             WHERE transaction_type.transaction_code = 'DEBIT'
         """
-        dataService.executeStatements([deleteStatement, insertStatement])
+        dataService.executeStatements([deleteStatement, insertStatement], Isolation.READ_COMMITTED)
     }
 
 
@@ -599,7 +600,7 @@ class ReportService implements ApplicationContextAware {
             );
             """
 
-        dataService.executeStatements([createTableStatement])
+        dataService.executeStatements([createTableStatement], Isolation.READ_COMMITTED)
     }
 
     void buildStockoutFact() {
@@ -628,7 +629,7 @@ class ReportService implements ApplicationContextAware {
             JOIN date_dimension ON date_dimension.id = stockout_fact.date_dimension_id
             WHERE date_dimension.date = '${dateParam}';
         """
-        dataService.executeStatement(deleteStatement)
+        dataService.executeStatement(deleteStatement, Isolation.READ_COMMITTED)
     }
 
     void populateStockoutFact(Date date) {
@@ -657,7 +658,7 @@ class ReportService implements ApplicationContextAware {
             ) as stockout_tmp
             on duplicate key update stockout_fact.quantity_on_hand = stockout_tmp.quantity_on_hand;
         """
-        dataService.executeStatement(insertStatement)
+        dataService.executeStatement(insertStatement, Isolation.READ_COMMITTED)
     }
 
     def refreshProductDemandData() {
@@ -694,7 +695,7 @@ class ReportService implements ApplicationContextAware {
                 "INSERT INTO product_demand_details SELECT * FROM product_demand_details_tmp;",
                 "ALTER TABLE product_demand_details ADD INDEX (product_id, origin_id, destination_id, date_issued, date_requested)"
         ]
-        dataService.executeStatements(statements)
+        dataService.executeStatements(statements, Isolation.READ_COMMITTED)
     }
 
     List getOnOrderSummary(Location location) {
