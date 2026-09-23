@@ -105,6 +105,9 @@ class AutomaticBackorderReallocationJob {
                 return
             }
 
+            Integer quantityOrdered = (requisitionItem.quantity ?: 0) - (requisitionItem.quantityCanceled ?: 0)
+            Integer quantityUncovered = Math.max(0, quantityOrdered - (requisitionItem.calculateQuantityAllocated() ?: 0))
+
             AllocationRequest allocationRequest = new AllocationRequest(
                     quantityRequired: quantityOutstanding,
                     requisitionItem: requisitionItem,
@@ -117,7 +120,7 @@ class AutomaticBackorderReallocationJob {
             if (quantityAllocated > 0) {
                 allocatedAnything = true
             }
-            updateQuantityBackordered(requisitionItem, quantityOutstanding, quantityAllocated)
+            updateQuantityBackordered(requisitionItem, quantityUncovered, quantityAllocated)
             log.info("Cross-dock release allocated ${quantityAllocated} for requisition item ${requisitionItem.id}")
         }
 
@@ -126,9 +129,9 @@ class AutomaticBackorderReallocationJob {
         }
     }
 
-    private void updateQuantityBackordered(RequisitionItem requisitionItem, Integer quantityOutstanding,
+    private void updateQuantityBackordered(RequisitionItem requisitionItem, Integer quantityUncovered,
                                            Integer quantityAllocated) {
-        Integer quantityRemaining = Math.max(0, (quantityOutstanding ?: 0) - (quantityAllocated ?: 0))
+        Integer quantityRemaining = Math.max(0, (quantityUncovered ?: 0) - (quantityAllocated ?: 0))
 
         if (quantityRemaining > 0) {
             requisitionItem.quantityBackordered = quantityRemaining
