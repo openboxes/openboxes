@@ -170,6 +170,10 @@ class ProductAvailabilityService {
     }
 
     def refreshProductAvailability(Location location, Product product, Boolean forceRefresh) {
+        if (!location?.supports(ActivityCode.MANAGE_INVENTORY)) {
+            log.info "Skipping refresh product availability for location ${location} because it does not support ${ActivityCode.MANAGE_INVENTORY}"
+            return
+        }
         log.info "Refreshing product availability location ${location}, product ${product}, forceRefresh ${forceRefresh}..."
         def startTime = System.currentTimeMillis()
         List binLocations = product ? calculateBinLocations(location, product) : calculateBinLocations(location)
