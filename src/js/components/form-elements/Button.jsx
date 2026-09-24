@@ -3,7 +3,9 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
+import useTranslate from 'hooks/useTranslate';
 import Translate from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const Button = ({
   label,
@@ -17,28 +19,37 @@ const Button = ({
   StartIcon,
   className,
   customRef,
+  tooltipLabel,
+  defaultTooltipLabel,
 }) => {
+  const translate = useTranslate();
   const buttonClass = 'd-flex justify-content-around align-items-center gap-8';
   const variantClass = `${variant}-button`;
   const dropDownClass = `${isDropdown ? 'dropdown-toggle' : ''}`;
+  const hasTooltip = Boolean(tooltipLabel);
 
   return (
-    <button
-      className={[variantClass, buttonClass, dropDownClass, className].join(' ')}
-      disabled={disabled}
-      type={type}
-      onClick={onClick}
-      data-toggle={isDropdown && 'dropdown'}
-      aria-haspopup={isDropdown && 'true'}
-      aria-expanded={isDropdown && 'false'}
-      ref={customRef}
+    <CustomTooltip
+      content={hasTooltip ? translate(tooltipLabel, defaultTooltipLabel) : ''}
+      show={hasTooltip}
     >
-      <>
-        {StartIcon && StartIcon}
-        <Translate id={label} defaultMessage={defaultLabel} />
-        {EndIcon && EndIcon}
-      </>
-    </button>
+      <button
+        className={[variantClass, buttonClass, dropDownClass, className].join(' ')}
+        disabled={disabled}
+        type={type}
+        onClick={onClick}
+        data-toggle={isDropdown && 'dropdown'}
+        aria-haspopup={isDropdown && 'true'}
+        aria-expanded={isDropdown && 'false'}
+        ref={customRef}
+      >
+        <>
+          {StartIcon && StartIcon}
+          <Translate id={label} defaultMessage={defaultLabel} />
+          {EndIcon && EndIcon}
+        </>
+      </button>
+    </CustomTooltip>
   );
 };
 
@@ -66,6 +77,8 @@ Button.propTypes = {
     PropTypes.func,
     PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
   ]),
+  tooltipLabel: PropTypes.string,
+  defaultTooltipLabel: PropTypes.string,
 };
 
 Button.defaultProps = {
@@ -78,4 +91,6 @@ Button.defaultProps = {
   StartIcon: null,
   className: '',
   customRef: null,
+  tooltipLabel: null,
+  defaultTooltipLabel: '',
 };

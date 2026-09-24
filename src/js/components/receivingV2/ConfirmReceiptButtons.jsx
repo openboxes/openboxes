@@ -9,11 +9,15 @@ const ConfirmReceiptButtons = ({ onBackToReceive, onCompleteReceipt }) => (
     <Button
       label="react.receiving.backToReceive.label"
       defaultLabel="Back to Receive"
+      tooltipLabel="react.receiving.backToReceive.tooltip.label"
+      defaultTooltipLabel="Edit previously-entered receiving information"
       variant="primary-outline"
       onClick={onBackToReceive}
     />
     <Button
       label="react.receiving.completeReceipt.label"
+      tooltipLabel="react.receiving.completeReceipt.tooltip.label"
+      defaultTooltipLabel="Submit the receipt"
       defaultLabel="Complete Receipt"
       variant="primary"
       onClick={onCompleteReceipt}

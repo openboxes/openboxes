@@ -91,11 +91,11 @@ const useConfirmReceiptColumns = ({
     />
   );
 
-  const quantityHeader = (label, defaultLabel, columnId) => (
+  const quantityHeader = (label, defaultLabel, tooltipLabel, defaultTooltipLabel, columnId) => (
     <TableHeaderCell
       {...(columnId ? sortHeaderProps(columnId) : {})}
       tooltip
-      tooltipLabel={translate(label, defaultLabel)}
+      tooltipLabel={translate(tooltipLabel, defaultTooltipLabel)}
       className="receiving-table__quantity"
     >
       {translate(label, defaultLabel)}
@@ -354,6 +354,8 @@ const useConfirmReceiptColumns = ({
         header: () => quantityHeader(
           'react.receiving.shipped.label',
           'Shipped',
+          'react.receiving.shipped.tooltip.label',
+          'The quantity shipped in the base unit of measure of the system',
           receivingColumns.QUANTITY_SHIPPED,
         ),
         cell: ({ row, table }) => {
@@ -375,7 +377,12 @@ const useConfirmReceiptColumns = ({
       ...(hasPreviousReceipts ? [
         columnHelper.display({
           id: receivingColumns.QUANTITY_RECEIVED,
-          header: () => quantityHeader('react.receiving.received.label', 'Received'),
+          header: () => quantityHeader(
+            'react.receiving.received.label',
+            'Received',
+            'react.receiving.received.tooltip.label',
+            'Quantity already received in previous receipts',
+          ),
           cell: ({ row, table }) => {
             const item = getItem(row, table);
             if (isSplitItemOrToggle(item)) {
@@ -391,7 +398,12 @@ const useConfirmReceiptColumns = ({
         }),
         columnHelper.display({
           id: receivingColumns.QUANTITY_TO_RECEIVE,
-          header: () => quantityHeader('react.receiving.toReceive.label', 'To Receive'),
+          header: () => quantityHeader(
+            'react.receiving.toReceive.label',
+            'To Receive',
+            'react.receiving.toReceive.tooltip.label',
+            'Quantity that is available to receive in this receipt (Quantity shipped - Quantity Received)',
+          ),
           cell: ({ row, table }) => {
             const item = getItem(row, table);
             if (isSplitItemOrToggle(item)) {
@@ -408,7 +420,12 @@ const useConfirmReceiptColumns = ({
       ] : []),
       columnHelper.display({
         id: receivingColumns.QUANTITY_RECEIVING,
-        header: () => quantityHeader('react.receiving.receivingNow.label', 'Receiving Now'),
+        header: () => quantityHeader(
+          'react.receiving.receivingNow.label',
+          'Receiving Now',
+          'react.receiving.receivingNow.tooltip.label',
+          'The quantity that will be received into inventory when this receipt is completed',
+        ),
         cell: ({ row, table }) => {
           const item = getItem(row, table);
           if (item?.rowType === ReceivingRowType.TOGGLE) {
@@ -438,7 +455,10 @@ const useConfirmReceiptColumns = ({
         header: () => (
           <TableHeaderCell
             tooltip
-            tooltipLabel={translate('react.receiving.status.label', 'Status')}
+            tooltipLabel={translate(
+              'react.receiving.status.tooltip.label',
+              'Shows the amount being received versus the amount available to receive. A shipment with no discrepancies will show "complete" in all rows.',
+            )}
           >
             {translate('react.receiving.status.label', 'Status')}
           </TableHeaderCell>
@@ -482,7 +502,10 @@ const useConfirmReceiptColumns = ({
           header: () => (
             <TableHeaderCell
               tooltip
-              tooltipLabel={translate('react.receiving.location.label', 'Location')}
+              tooltipLabel={translate(
+                'react.receiving.location.tooltip.label',
+                'The bin location that the stock will be received into',
+              )}
             >
               {translate('react.receiving.location.label', 'Location')}
             </TableHeaderCell>
@@ -512,7 +535,13 @@ const useConfirmReceiptColumns = ({
       columnHelper.display({
         id: 'actions',
         header: () => (
-          <TableHeaderCell>
+          <TableHeaderCell
+            tooltip
+            tooltipLabel={translate(
+              'react.receiving.actions.tooltip.label',
+              'The actions that you can perform on the receipt item',
+            )}
+          >
             {translate('react.receiving.actions.label', 'Actions')}
           </TableHeaderCell>
         ),
@@ -542,7 +571,10 @@ const useConfirmReceiptColumns = ({
           header: () => (
             <TableHeaderCell
               tooltip
-              tooltipLabel={translate('react.receiving.cancelRemaining.label', 'Cancel Remaining')}
+              tooltipLabel={translate(
+                'react.receiving.cancelRemaining.tooltip.label',
+                'Checking this box indicates that the remaining quantity is not expected in a future shipment and this line should be considered fully received with a discrepancy.',
+              )}
             >
               {translate('react.receiving.cancelRemaining.label', 'Cancel Remaining')}
             </TableHeaderCell>

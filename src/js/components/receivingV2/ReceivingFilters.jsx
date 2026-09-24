@@ -53,9 +53,6 @@ const ReceivingFilters = ({
     return {
       ...option,
       disabled,
-      disabledTooltip: disabled
-        ? translate('react.receiving.packingListView.disabled.label', 'No packing information entered for this shipment.')
-        : null,
     };
   }), [packingListViewEnabled, translate]);
 
@@ -103,10 +100,14 @@ const ReceivingFilters = ({
               checked: {
                 id: 'react.receiving.showPutaway.label',
                 defaultMessage: 'Show Putaway',
+                tooltipLabel: 'react.receiving.showPutaway.checked.tooltip.label',
+                defaultTooltipLabel: 'Hides the bin location field. All updates to the values in the field will still be saved.',
               },
               unchecked: {
                 id: 'react.receiving.showPutaway.label',
                 defaultMessage: 'Show Putaway',
+                tooltipLabel: 'react.receiving.showPutaway.unchecked.tooltip.label',
+                defaultTooltipLabel: 'Reveals the bin location field, enabling users to receive directly into non-receiving bins.',
               },
             }}
           />
@@ -115,6 +116,8 @@ const ReceivingFilters = ({
           <Button
             label="react.receiving.resetSorting.label"
             defaultLabel="Reset sorting"
+            tooltipLabel="react.receiving.resetSorting.tooltip.label"
+            defaultTooltipLabel="Revert the list to the order of the original shipment"
             variant="secondary"
             onClick={onResetSort}
             EndIcon={<RiRefreshLine size={16} />}
@@ -123,6 +126,8 @@ const ReceivingFilters = ({
         <Button
           label="react.receiving.autofillQuantities.label"
           defaultLabel="Autofill quantities"
+          tooltipLabel="react.receiving.autofillQuantities.tooltip.label"
+          defaultTooltipLabel='Fills the "receiving now" field with the quantity remaining to receive from the packing list. Use if the receipt perfectly matches the shipment.'
           variant="secondary"
           onClick={onAutofillQuantities}
           EndIcon={<RiMagicLine size={16} />}
@@ -142,6 +147,8 @@ const ReceivingFilters = ({
         <Button
           label="react.receiving.saveAndExit.label"
           defaultLabel="Save & Exit"
+          tooltipLabel="react.receiving.saveAndExit.tooltip.label"
+          defaultTooltipLabel="Save and exit without completing the receipt"
           variant="secondary"
           onClick={onSaveAndExit}
           EndIcon={<RiLogoutBoxRLine size={16} />}

@@ -14,7 +14,10 @@ const LocationAutofillHeader = ({ onSelect }) => {
     <TableHeaderCell
       className="location-header-cell"
       tooltip
-      tooltipLabel={translate('react.receiving.location.label', 'Location')}
+      tooltipLabel={translate(
+        'react.receiving.location.tooltip.label',
+        'The bin location that the stock will be received into',
+      )}
     >
       <SelectField
         options={receivingLocationOptions(translate)}
