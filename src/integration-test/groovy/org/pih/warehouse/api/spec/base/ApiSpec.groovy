@@ -233,18 +233,29 @@ abstract class ApiSpec extends IntegrationSpec {
         return new LocationTestBuilder().findOrBuildMainFacility()
     }
 
+    /**
+     * Creates the shared test product directly via GORM rather than through the API.
+     *
+     * Because setup() is transactional, the insert is committed before the test body issues its first request, so
+     * the product is guaranteed to be visible to the server. Creating it through the API instead would only commit
+     * once the (transactional) controller action returns, which is after the response has already been sent, and so
+     * the first request of the test body could reach the database before the commit.
+     */
     private Product createMainProduct() {
-        return productApiWrapper.saveOK(new ProductTestBuilder()
+        return new ProductTestBuilder()
                 .name("Test Product A")
                 .category(rootCategory)
-                .build())
+                .findOrBuild()
     }
 
+    /**
+     * Creates the shared root category directly via GORM. See createMainProduct() for why we don't use the API.
+     */
     private Category createRootCategory() {
-        return categoryApiWrapper.createOK(new CategoryTestBuilder()
+        return new CategoryTestBuilder()
                 .name("Test Root Category")
                 .rootCategory()
-                .build())
+                .findOrBuild()
     }
 
     /**
