@@ -15,7 +15,6 @@ import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.RequisitionEvent
 import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.WebhookPublisherService
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
@@ -33,9 +32,17 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionService
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
+import org.springframework.validation.BeanPropertyBindingResult
+import org.springframework.validation.ObjectError
 
 @Transactional
 class PickTaskService {
+
+    // Error code on the ValidationException thrown by validateStagingLocationZone, used by
+    // PickTaskApiController to distinguish an overridable zone mismatch from any other
+    // ValidationException (e.g. from requisition.save() in save()) and to recover the
+    // structured delivery type / location / zone data carried in the error's arguments.
+    static final String STAGING_LOCATION_ZONE_MISMATCH_CODE = 'STAGING_LOCATION_ZONE_MISMATCH'
 
     GrailsApplication grailsApplication
     InventoryService inventoryService
@@ -367,7 +374,7 @@ class PickTaskService {
 
             case 'drop':
                 dropToStaging(outboundContainer, data.stagingLocationId as String, data.stagedById as String,
-                        data.overrideReasonCode as ReasonCode, data.overrideComment as String)
+                        data.overrideStagingLocationZone as Boolean ?: false)
                 break
 
             default:
@@ -427,11 +434,7 @@ class PickTaskService {
     }
 
     void dropToStaging(Location outboundContainer, String stagingLocationId, String stagedById,
-                        ReasonCode overrideReasonCode = null, String overrideComment = null) {
-        if (overrideReasonCode && !ReasonCode.listStagingLocationOverrideReasonCodes().contains(overrideReasonCode)) {
-            throw new IllegalArgumentException("Invalid staging location override reason code: ${overrideReasonCode}")
-        }
-
+                        boolean overrideStagingLocationZone = false) {
         Location stagingLocation = Location.findByLocationNumberOrId(stagingLocationId, stagingLocationId)
         validateStagingLocation(stagingLocation)
 
@@ -446,7 +449,7 @@ class PickTaskService {
         List<PickTask> allTasks = itemsToMove.collectMany { item ->
             PickTask.findAllByOutboundContainerAndInventoryItemAndStatus(outboundContainer, item.inventoryItem, PickTaskStatus.PICKED)
         }.unique { it.id }
-        allTasks.each { task -> validateStagingLocationZone(stagingLocation, task, overrideReasonCode) }
+        allTasks.each { task -> validateStagingLocationZone(stagingLocation, task, overrideStagingLocationZone) }
 
         Person stagedBy = Person.get(stagedById)
         itemsToMove.each { item ->
@@ -460,10 +463,6 @@ class PickTaskService {
                 existingPickItem.stagingLocation = stagingLocation
                 existingPickItem.dateStaged = new Date()
                 existingPickItem.stagedBy = stagedBy
-                if (overrideReasonCode) {
-                    existingPickItem.stagingLocationOverrideReasonCode = overrideReasonCode
-                    existingPickItem.stagingLocationOverrideComment = overrideComment
-                }
 
                 save(task)
             }
@@ -674,7 +673,9 @@ class PickTaskService {
     // facility via ActivityCode.VALIDATE_STAGING_LOCATION_ZONE so behaviour can be tuned per
     // facility rather than hard-coded (OBLS-853). Fails closed on missing zone/config so an
     // incomplete facility setup surfaces as a validation failure rather than silently no-op'ing.
-    private void validateStagingLocationZone(Location stagingLocation, PickTask task, ReasonCode overrideReasonCode) {
+    // The mismatch is overridable: the caller (mobile app) can show the details carried on the
+    // thrown ValidationException's error and resubmit with overrideStagingLocationZone = true.
+    private void validateStagingLocationZone(Location stagingLocation, PickTask task, boolean overrideStagingLocationZone) {
         ActivityCode deliveryTypeActivity = task.deliveryTypeCode?.activityCode
         if (!deliveryTypeActivity) {
             // Nothing to validate the zone against (e.g. DEFAULT delivery type)
@@ -685,20 +686,20 @@ class PickTaskService {
             return
         }
 
-        if (overrideReasonCode) {
-            // Caller has already acknowledged and explained the mismatch
+        if (overrideStagingLocationZone) {
             return
         }
 
         Location zone = stagingLocation.zone
         if (!zone || !zone.supports(deliveryTypeActivity)) {
             List<Location> expectedZones = locationService.getZones(task.facility).findAll { it.supports(deliveryTypeActivity) }
-            throw new StagingLocationZoneMismatchException(
-                    message: "Staging location ${stagingLocation.name} is not in a zone that supports ${task.deliveryTypeCode} deliveries",
-                    stagingLocation: stagingLocation,
-                    deliveryTypeCode: task.deliveryTypeCode,
-                    expectedZones: expectedZones,
-            )
+            String zoneNames = expectedZones ? expectedZones*.name.join(', ') : 'none'
+            String message = "This order is ${task.deliveryTypeCode}. You scanned ${stagingLocation.name} " +
+                    "(zone: ${zone?.name ?: 'none'}), expected zone is ${zoneNames}."
+
+            BeanPropertyBindingResult errors = new BeanPropertyBindingResult(stagingLocation, "stagingLocation")
+            errors.addError(new ObjectError("stagingLocation", [STAGING_LOCATION_ZONE_MISMATCH_CODE] as String[], null, message))
+            throw new ValidationException(message, errors)
         }
     }
 }

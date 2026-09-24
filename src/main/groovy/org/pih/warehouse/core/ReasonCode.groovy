@@ -283,10 +283,4 @@ enum ReasonCode {
         ]
     }
 
-    static listStagingLocationOverrideReasonCodes() {
-        [
-                APPROVED_CHANGE,
-                OTHER,
-        ]
-    }
 }
