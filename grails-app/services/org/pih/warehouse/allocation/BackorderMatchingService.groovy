@@ -81,15 +81,15 @@ class BackorderMatchingService {
     }
 
     /**
-     * Quantity still to be covered on a demand line
+     * Quantity still to be covered on a demand line: whatever is backordered and waiting on an inbound,
+     * plus the rest of the line that ordinary stock has not covered. Everything received against a sales
+     * link belongs to that order, so the whole uncovered quantity is what a delivery may cross-dock.
      */
     Integer remainingDemand(RequisitionItem demand) {
-        if (demand.isBackordered()) {
-            return Math.max(0, demand.quantityBackordered ?: 0)
-        }
         Integer quantityRequired = demand.calculateQuantityRequired() ?: 0
         Integer quantityAllocated = demand.calculateQuantityAllocated() ?: 0
-        return Math.max(0, quantityRequired - quantityAllocated)
+        Integer quantityUncovered = Math.max(0, quantityRequired - quantityAllocated)
+        return quantityUncovered + Math.max(0, demand.quantityBackordered ?: 0)
     }
 
     /**
