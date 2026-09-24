@@ -60,18 +60,20 @@ class DataService {
      */
     void executeStatements(List<String> statementList, Isolation isolation = null) {
         Sql sql = new Sql(dataSource)
-        withTransactionIsolation(sql.connection, isolation) {
-            sql.withTransaction {
-                statementList.each { String statement ->
-                    def startTime = System.currentTimeMillis()
-                    log.info "Executing statement ${statement}"
-                    try {
-                        sql.execute(statement)
-                    } catch (Exception e) {
-                        log.error("Failed executing statement: ${statement}", e)
-                        throw e
+        sql.cacheConnection { Connection connection ->
+            withTransactionIsolation(connection, isolation) {
+                sql.withTransaction {
+                    statementList.each { String statement ->
+                        def startTime = System.currentTimeMillis()
+                        log.info "Executing statement ${statement}"
+                        try {
+                            sql.execute(statement)
+                        } catch (Exception e) {
+                            log.error("Failed executing statement: ${statement}", e)
+                            throw e
+                        }
+                        log.info "Updated ${sql.updateCount} rows in " + (System.currentTimeMillis() - startTime) + " ms"
                     }
-                    log.info "Updated ${sql.updateCount} rows in " + (System.currentTimeMillis() - startTime) + " ms"
                 }
             }
         }
