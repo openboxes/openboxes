@@ -6,6 +6,7 @@ import grails.validation.ValidationException
 import org.pih.warehouse.picking.PickTask
 import org.pih.warehouse.picking.PickTaskService
 import org.springframework.http.HttpStatus
+import org.springframework.validation.ObjectError
 
 class PickTaskApiController extends RestfulController<PickTask> {
 
@@ -96,8 +97,17 @@ class PickTaskApiController extends RestfulController<PickTask> {
         try {
             pickTaskService.drop(outboundContainerId, jsonBody)
         } catch (Exception e) {
+            ObjectError zoneMismatchError = (e instanceof ValidationException) ?
+                    (e as ValidationException).errors?.allErrors?.find {
+                        it.codes?.contains(PickTaskService.STAGING_LOCATION_ZONE_MISMATCH_CODE)
+                    } as ObjectError : null
+
             response.status = 500
-            render([errorCode: 500, errorMessage: e?.message ?: "Error occurred"] as JSON)
+            render([
+                    errorCode   : 500,
+                    overridable : zoneMismatchError != null,
+                    errorMessage: zoneMismatchError?.defaultMessage ?: (e?.message ?: "Error occurred"),
+            ] as JSON)
             return
         }
 

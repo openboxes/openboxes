@@ -156,6 +156,9 @@ enum ActivityCode {
     // Staging location codes
     STAGING_LOCATION('STAGING_LOCATION'),
 
+    // Enables zone-level validation of the staging location scanned during pick drop (facility-level toggle)
+    VALIDATE_STAGING_LOCATION_ZONE('VALIDATE_STAGING_LOCATION_ZONE'),
+
     PICKING_SHORTAGE('PICKING_SHORTAGE'),
 
     // Track internal locations
@@ -250,6 +253,7 @@ enum ActivityCode {
                 // Internal locations used for picking
                 OUTBOUND_CONTAINER,
                 STAGING_LOCATION,
+                VALIDATE_STAGING_LOCATION_ZONE,
 
                 // Allows classification of location by delivery type
                 DELIVERY_TYPE_LOCAL_DELIVERY,
