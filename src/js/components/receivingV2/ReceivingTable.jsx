@@ -21,6 +21,7 @@ const ReceivingTable = ({
   removeSplitItem,
   loadReceipt,
   onLocationAutofill,
+  onPackLevelLocationChange,
   sort,
   order,
 }) => {
@@ -58,6 +59,7 @@ const ReceivingTable = ({
       onOpenCommentModal,
       onOpenEditModal: openEditModal,
       onLocationAutofill,
+      onPackLevelLocationChange,
     }),
     [
       lineItemsState.entities,
@@ -66,6 +68,7 @@ const ReceivingTable = ({
       openEditModal,
       removeSplitItem,
       onLocationAutofill,
+      onPackLevelLocationChange,
     ],
   );
 
@@ -155,6 +158,7 @@ ReceivingTable.propTypes = {
   removeSplitItem: PropTypes.func.isRequired,
   loadReceipt: PropTypes.func.isRequired,
   onLocationAutofill: PropTypes.func.isRequired,
+  onPackLevelLocationChange: PropTypes.func.isRequired,
   sort: PropTypes.string,
   order: PropTypes.string,
 };

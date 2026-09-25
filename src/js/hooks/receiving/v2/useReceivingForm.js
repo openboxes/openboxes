@@ -66,7 +66,7 @@ const useReceivingForm = () => {
 
   const { isNextDisabled, validateBeforeNext } = useReceivingNextValidation({ lineItemsState });
 
-  const { onLocationAutofill } = useTableLocationAutofill({
+  const { onLocationAutofill, onPackLevelLocationChange } = useTableLocationAutofill({
     lineItemsState: visibleLineItemsState,
     updateLineItems,
   });
@@ -134,6 +134,7 @@ const useReceivingForm = () => {
       onSaveAndExit,
       flush,
       onLocationAutofill,
+      onPackLevelLocationChange,
       autosaveStatus,
       resetSort,
       updateFilterParams,

@@ -30,6 +30,7 @@ const ReceivingStep = ({ flushRef, validateBeforeNextRef, setNextDisabled }) => 
       loadReceipt,
       flush,
       onLocationAutofill,
+      onPackLevelLocationChange,
       autosaveStatus,
       resetSort,
       updateFilterParams,
@@ -74,6 +75,7 @@ const ReceivingStep = ({ flushRef, validateBeforeNextRef, setNextDisabled }) => 
         removeSplitItem={removeSplitItem}
         loadReceipt={loadReceipt}
         onLocationAutofill={onLocationAutofill}
+        onPackLevelLocationChange={onPackLevelLocationChange}
         sort={sort}
         order={order}
       />
