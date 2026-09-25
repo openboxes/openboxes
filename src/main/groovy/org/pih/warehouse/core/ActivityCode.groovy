@@ -156,6 +156,9 @@ enum ActivityCode {
     // Staging location codes
     STAGING_LOCATION('STAGING_LOCATION'),
 
+    // Pre-pick location codes
+    PREPICK_STOCK('PREPICK_STOCK'),
+
     PICKING_SHORTAGE('PICKING_SHORTAGE'),
 
     // Track internal locations
@@ -250,6 +253,7 @@ enum ActivityCode {
                 // Internal locations used for picking
                 OUTBOUND_CONTAINER,
                 STAGING_LOCATION,
+                PREPICK_STOCK,
 
                 // Allows classification of location by delivery type
                 DELIVERY_TYPE_LOCAL_DELIVERY,

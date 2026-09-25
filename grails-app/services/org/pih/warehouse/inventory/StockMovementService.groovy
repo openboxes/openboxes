@@ -2244,7 +2244,8 @@ class StockMovementService {
         // FIXME Replace these activity markers with a dedicated ALLOCATE_STOCK activity code.
         availableItems = availableItems.findAll {
             !it.binLocation?.supports(ActivityCode.INBOUND_SORTATION) &&
-                    !it.binLocation?.supports(ActivityCode.PUTAWAY_CART)
+                    !it.binLocation?.supports(ActivityCode.PUTAWAY_CART) &&
+                    !it.binLocation?.supports(ActivityCode.PREPICK_STOCK)
         }
         if (releaseOwnAllocation) {
             availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
