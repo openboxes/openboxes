@@ -12,11 +12,13 @@ const blurOnWheel = (e) => e.currentTarget.blur();
  *
  * Unlike the generic QuantityInputCell (which commits on blur), this cell reports every change
  * through `onCommit` as the user types - the committed integer value, or null when the field is
- * cleared. The autosave hook debounces the actual requests, so committing per keystroke only
- * marks the row dirty; nothing is sent until typing pauses or enough rows accumulate.
+ * cleared. Invalid values (decimals, negatives) are committed as-is so the caller can validate
+ * them and pass back an `errorMessage`. The autosave hook debounces the actual requests, so
+ * committing per keystroke only marks the row dirty; nothing is sent until typing pauses or
+ * enough rows accumulate.
  */
 const AutosaveQuantityInputCell = React.memo(({
-  value, onCommit, label, defaultLabel, disabled, className,
+  value, onCommit, label, defaultLabel, disabled, errorMessage, className,
 }) => {
   const [inputValue, setInputValue] = useState(value ?? '');
   // Last value handed to onCommit. The `value` prop lags one render behind the store, so
@@ -32,7 +34,7 @@ const AutosaveQuantityInputCell = React.memo(({
   // TextInput (type="number") hands us a number, or undefined when the field is empty.
   const onChange = (enteredValue) => {
     setInputValue(enteredValue ?? '');
-    const committed = enteredValue == null ? null : Math.trunc(enteredValue);
+    const committed = enteredValue ?? null;
     if (committed !== lastCommittedRef.current) {
       lastCommittedRef.current = committed;
       onCommit(committed);
@@ -40,14 +42,15 @@ const AutosaveQuantityInputCell = React.memo(({
   };
 
   return (
-    <TableCell className="rt-td">
+    <TableCell className="rt-td" customTooltip={!!errorMessage} tooltipLabel={errorMessage}>
       <TextInput
         type="number"
         className={`hide-arrows input-xs ${className}`}
         value={inputValue}
         onChange={onChange}
         disabled={disabled}
-        min="0"
+        errorMessage={errorMessage}
+        hideErrorMessageWrapper
         ariaLabel={{ id: label, defaultMessage: defaultLabel }}
         onWheel={blurOnWheel}
       />
@@ -65,12 +68,14 @@ AutosaveQuantityInputCell.propTypes = {
   label: PropTypes.string.isRequired,
   defaultLabel: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
+  errorMessage: PropTypes.string,
   className: PropTypes.string,
 };
 
 AutosaveQuantityInputCell.defaultProps = {
   value: null,
   disabled: false,
+  errorMessage: null,
   className: '',
 };
 
