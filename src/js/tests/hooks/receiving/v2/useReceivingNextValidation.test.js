@@ -14,6 +14,7 @@ jest.mock('react-redux', () => ({
 }));
 jest.mock('utils/receiving/confirmBlankLinesAsZero', () => jest.fn());
 jest.mock('utils/receiving/alertMissingBinLocations', () => jest.fn());
+jest.mock('hooks/useTranslate', () => () => (id, defaultMessage) => defaultMessage);
 
 const buildRow = (rowId, overrides = {}) => ({
   rowId,
@@ -72,6 +73,21 @@ describe('useReceivingNextValidation', () => {
       const { result } = renderValidation([buildRow('row-1', { isCompleted: true })]);
 
       expect(result.current.isNextDisabled).toBe(false);
+    });
+
+    it('should be disabled when a line carries a decimal or negative quantity', () => {
+      const { result } = renderValidation([
+        buildRow('row-1', { quantityReceiving: 5 }),
+        buildRow('row-2', { quantityReceiving: 1.5 }),
+        buildRow('row-3', { quantityReceiving: -1 }),
+        buildRow('row-4'),
+      ]);
+
+      expect(result.current.isNextDisabled).toBe(true);
+      expect(result.current.lineItemErrors).toEqual({
+        'row-2': { quantityReceiving: 'Decimals are not allowed' },
+        'row-3': { quantityReceiving: 'Negative values are not allowed' },
+      });
     });
   });
 

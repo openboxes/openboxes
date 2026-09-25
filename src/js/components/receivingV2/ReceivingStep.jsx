@@ -16,7 +16,7 @@ const ReceivingStep = ({ flushRef, validateBeforeNextRef, setNextDisabled }) => 
     setPutawayEnabled,
     showPackLevel,
     table: {
-      lineItemsState, columns, sort, order,
+      lineItemsState, columns, sort, order, lineItemErrors,
     },
     next: { isNextDisabled, validateBeforeNext },
     actions: {
@@ -78,6 +78,7 @@ const ReceivingStep = ({ flushRef, validateBeforeNextRef, setNextDisabled }) => 
         onPackLevelLocationChange={onPackLevelLocationChange}
         sort={sort}
         order={order}
+        lineItemErrors={lineItemErrors}
       />
     </div>
   );

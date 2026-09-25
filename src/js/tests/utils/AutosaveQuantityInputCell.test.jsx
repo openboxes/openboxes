@@ -30,7 +30,7 @@ describe('AutosaveQuantityInputCell', () => {
     onCommit = jest.fn();
   });
 
-  it('commits the truncated integer value on every change, without waiting for blur', () => {
+  it('commits the entered value on every change, without waiting for blur', () => {
     renderCell();
     const input = getInput();
 
@@ -40,6 +40,31 @@ describe('AutosaveQuantityInputCell', () => {
     expect(onCommit).toHaveBeenCalledTimes(2);
     expect(onCommit).toHaveBeenNthCalledWith(1, 1);
     expect(onCommit).toHaveBeenNthCalledWith(2, 15);
+  });
+
+  it('commits decimals and negatives as-is so the caller can flag them', () => {
+    renderCell();
+    const input = getInput();
+
+    fireEvent.change(input, { target: { value: '1.5' } });
+    fireEvent.change(input, { target: { value: '-2' } });
+
+    expect(onCommit).toHaveBeenNthCalledWith(1, 1.5);
+    expect(onCommit).toHaveBeenNthCalledWith(2, -2);
+  });
+
+  it('marks the input when an error message is passed', () => {
+    render(
+      <AutosaveQuantityInputCell
+        value={-2}
+        onCommit={onCommit}
+        errorMessage="Negative values are not allowed"
+        label="react.receiving.receivingNow.label"
+        defaultLabel="Receiving Now"
+      />,
+    );
+
+    expect(getInput()).toHaveClass('has-errors');
   });
 
   it('commits null when the field is cleared', () => {

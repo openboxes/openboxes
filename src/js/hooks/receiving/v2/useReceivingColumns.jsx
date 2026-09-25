@@ -413,6 +413,9 @@ const useReceivingColumns = ({
               onCommit={(quantityReceiving) =>
                 table.options.meta?.updateLineItem(row.original.id, { quantityReceiving })}
               disabled={item?.isCompleted}
+              errorMessage={
+                table.options.meta?.lineItemErrors?.[row.original.id]?.quantityReceiving
+              }
               className="receiving-table__quantity"
               label="react.receiving.receivingNow.label"
               defaultLabel="Receiving Now"

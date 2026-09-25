@@ -1,5 +1,6 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
+import _ from 'lodash';
 import { useSelector } from 'react-redux';
 import {
   getCurrentLocale,
@@ -7,6 +8,7 @@ import {
   getHasPartialReceivingSupport,
 } from 'selectors';
 
+import useReceivingLineItemValidation from 'hooks/receiving/v2/useReceivingLineItemValidation';
 import useTranslate from 'hooks/useTranslate';
 import alertMissingBinLocations from 'utils/receiving/alertMissingBinLocations';
 import confirmBlankLinesAsZero from 'utils/receiving/confirmBlankLinesAsZero';
@@ -18,19 +20,33 @@ import getRowsMissingBinLocation from 'utils/receiving/getRowsMissingBinLocation
  * looks at the full line items state, not at the rows the filter shows, so a filtered out line
  * cannot slip through unvalidated.
  *
- * @returns {{ isNextDisabled: boolean, validateBeforeNext: Function }}
- *   `isNextDisabled` - true while no line carries a quantity, there is nothing to review yet.
+ * @returns {{ isNextDisabled: boolean, validateBeforeNext: Function, lineItemErrors: Object }}
+ *   `isNextDisabled` - true while no line carries a quantity, or any line fails validation.
  *   `validateBeforeNext` - resolves to false when the user decides to stay on the step.
+ *   `lineItemErrors` - error messages of the invalid lines, keyed by row id and then by field,
+ *                      e.g. { 'row-2': { quantityReceiving: 'Decimals are not allowed' } }.
  */
 const useReceivingNextValidation = ({ lineItemsState }) => {
   const hasPartialReceivingSupport = useSelector(getHasPartialReceivingSupport);
   const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
   const translate = useTranslate();
   const localeKey = useSelector(getCurrentLocale);
+  const { lineItemSchema } = useReceivingLineItemValidation();
   const editableRows = getEditableReceivingRows(lineItemsState);
 
-  const isNextDisabled = editableRows.length > 0
-    && editableRows.every((row) => row.quantityReceiving === null);
+  // TODO: support rendering multiple errors in the tooltip of a TableCell
+  // Cells only show a single error so reduce down to only the first message of each field.
+  const lineItemErrors = useMemo(() => editableRows.reduce((errors, row) => {
+    const { success, error } = lineItemSchema.safeParse(row);
+    if (success) {
+      return errors;
+    }
+    const fieldErrors = _.mapValues(error.flatten().fieldErrors, ([message]) => message);
+    return { ...errors, [row.rowId]: fieldErrors };
+  }, {}), [lineItemsState, translate]);
+
+  const isNextDisabled = Object.keys(lineItemErrors).length > 0 || (editableRows.length > 0
+    && editableRows.every((row) => row.quantityReceiving === null));
 
   const validateBeforeNext = useCallback(async () => {
     // An edge case if creating a receiving bin is disabled in the config,
@@ -56,7 +72,7 @@ const useReceivingNextValidation = ({ lineItemsState }) => {
     return confirmBlankLinesAsZero({ blankRows, translate, localeKey });
   }, [lineItemsState, hasPartialReceivingSupport, hasBinLocationSupport, translate, localeKey]);
 
-  return { isNextDisabled, validateBeforeNext };
+  return { isNextDisabled, validateBeforeNext, lineItemErrors };
 };
 
 export default useReceivingNextValidation;
