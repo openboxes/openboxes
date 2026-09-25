@@ -33,6 +33,8 @@
         color: #333;
     }
 </style>
+<%-- Once the item has been placed (IN_PROGRESS), stock has already been moved into the container --%>
+<g:set var="containerEditable" value="${task?.status in [PutawayTaskStatus.PENDING, PutawayTaskStatus.STARTED]}"/>
 <g:form name="editPutawayTaskForm" method="post">
     <g:hiddenField id="dlgTaskId" name="task.id" value="${task?.id}"/>
 
@@ -111,12 +113,17 @@
                 <label for="dlgContainer"><warehouse:message code="putawayTask.container.label" default="Putaway Container"/></label>
             </td>
             <td valign="top" class="value">
-                <g:selectInternalLocation id="dlgContainer"
-                                          name="container.id"
-                                          value="${task?.container?.id}"
-                                          from="${facility?.internalLocations?.sort { it.name }}"
-                                          class="select2"
-                                          noSelection="['':'']"/>
+                <g:if test="${containerEditable}">
+                    <g:selectInternalLocation id="dlgContainer"
+                                              name="container.id"
+                                              value="${task?.container?.id}"
+                                              from="${facility?.internalLocations?.sort { it.name }}"
+                                              class="select2"
+                                              noSelection="['':'']"/>
+                </g:if>
+                <g:else>
+                    ${task?.container?.name ?: '-'}
+                </g:else>
             </td>
         </tr>
         <tr class="prop">
