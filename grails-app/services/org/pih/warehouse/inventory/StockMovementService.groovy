@@ -25,6 +25,7 @@ import org.pih.warehouse.api.AvailableItemStatus
 import org.pih.warehouse.api.DocumentGroupCode
 import org.pih.warehouse.api.PackPageItem
 import org.pih.warehouse.api.PickPageItem
+import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementItem
@@ -2256,6 +2257,148 @@ class StockMovementService {
         }
 
         return productAvailabilityService.sortAvailableItems(availableItems)
+    }
+
+    /**
+     * Stock sitting in a pre-pick bin. These bins are kept out of {@link #getAvailableItems} so that no other
+     * order can take from them, which leaves this as the only way in.
+     */
+    List<AvailableItem> getPrepickAvailableItems(Location location, RequisitionItem requisitionItem) {
+        List<AvailableItem> availableItems =
+                productAvailabilityService.getAllAvailableBinLocations(location, requisitionItem.product?.id)
+
+        availableItems = availableItems.findAll {
+            it.quantityOnHand > 0 && it.binLocation?.supports(ActivityCode.PREPICK_STOCK)
+        }
+
+        return productAvailabilityService.sortAvailableItems(availableItems)
+    }
+
+    /**
+     * Mirrors {@link #getSuggestedItems} for pre-pick bins. Those bins are deliberately held (HOLD_STOCK), which
+     * makes them unpickable, so the ordinary suggestion logic would discard them. Here the hold is the point -
+     * the stock is reserved for the back counter and this is the only path that may take it.
+     */
+    List<SuggestedItem> getPrepickSuggestedItems(List<AvailableItem> availableItems, Integer quantityRequested) {
+        List<SuggestedItem> suggestedItems = []
+        Integer quantityRemaining = quantityRequested
+
+        for (AvailableItem availableItem : availableItems) {
+            if (quantityRemaining <= 0) {
+                break
+            }
+
+            Integer quantityOnHand = availableItem.quantityOnHand?.toInteger() ?: 0
+            if (quantityOnHand <= 0) {
+                continue
+            }
+
+            Integer quantityPicked = Math.min(quantityRemaining, quantityOnHand)
+            suggestedItems << new SuggestedItem(
+                    inventoryItem: availableItem.inventoryItem,
+                    binLocation: availableItem.binLocation,
+                    quantityAvailable: availableItem.quantityAvailable,
+                    quantityOnHand: availableItem.quantityOnHand,
+                    quantityRequested: quantityRequested,
+                    quantityPicked: quantityPicked)
+            quantityRemaining -= quantityPicked
+        }
+
+        return suggestedItems
+    }
+
+    /**
+     * Records pre-picked stock as already picked and staged. The part physically left the pre-pick bin when the
+     * back counter handed it over, so there is nothing left for a picker to do and no pick task is raised.
+     */
+    void allocatePrepickItems(RequisitionItem requisitionItem, List<SuggestedItem> suggestedItems) {
+        if (!suggestedItems) {
+            return
+        }
+
+        Requisition requisition = requisitionItem.requisition
+        Location stagingLocation = findPrepickStagingLocation(requisition)
+
+        for (SuggestedItem suggestedItem : suggestedItems) {
+            Integer quantity = suggestedItem.quantityPicked?.intValueExact() ?: 0
+            if (quantity <= 0) {
+                continue
+            }
+
+            createOrUpdatePicklistItem(requisitionItem, null, suggestedItem.inventoryItem,
+                    suggestedItem.binLocation, quantity, null, null, true, quantity)
+
+            PicklistItem picklistItem = requisitionItem.picklistItems?.find {
+                it.binLocation == suggestedItem.binLocation && it.inventoryItem == suggestedItem.inventoryItem
+            }
+            if (!picklistItem) {
+                log.warn("Could not find the pick created for pre-picked stock of product " +
+                        "${requisitionItem.product?.productCode} in order ${requisitionItem.requisition?.requestNumber}")
+                continue
+            }
+
+            if (stagingLocation) {
+                transferPrepickStock(suggestedItem, stagingLocation, quantity)
+            }
+
+            Date now = new Date()
+            picklistItem.status = PickTaskStatus.STAGED.name()
+            picklistItem.quantityPicked = quantity
+            picklistItem.datePicked = now
+            picklistItem.dateStaged = now
+            picklistItem.stagingLocation = stagingLocation
+        }
+
+        requisitionItem.requisition?.picklist?.save(flush: true)
+    }
+
+    /**
+     * The staging location the pickers would have dropped to, which is the one marked for the order's delivery
+     * type. Without one there is nowhere sensible to put the stock, so it stays in the pre-pick bin.
+     */
+    private Location findPrepickStagingLocation(Requisition requisition) {
+        Location facility = requisition?.origin
+        ActivityCode deliveryTypeActivity = requisition?.deliveryTypeCode?.activityCode
+        if (!facility || !deliveryTypeActivity) {
+            return null
+        }
+
+        Location stagingLocation = locationService
+                .getInternalLocations(facility, [ActivityCode.STAGING_LOCATION])
+                ?.find { it.supports(ActivityCode.HOLD_STOCK) && it.supports(deliveryTypeActivity) }
+
+        if (!stagingLocation) {
+            log.warn("No staging location supporting ${deliveryTypeActivity} and ${ActivityCode.HOLD_STOCK} " +
+                    "in facility ${facility.name}, pre-picked stock will be left in the pre-pick bin")
+        }
+
+        return stagingLocation
+    }
+
+    private void transferPrepickStock(SuggestedItem suggestedItem, Location stagingLocation, Integer quantity) {
+        Location facility = suggestedItem.binLocation?.parentLocation
+        if (!facility?.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS)) {
+            log.warn("Skipping transfer of pre-picked stock: facility does not support " +
+                    "${ActivityCode.TRACK_INTERNAL_TRANSACTIONS} activity")
+            return
+        }
+
+        TransferStockCommand command = new TransferStockCommand()
+        command.location = facility
+        command.binLocation = suggestedItem.binLocation
+        command.inventoryItem = suggestedItem.inventoryItem
+        command.quantity = quantity
+        command.otherLocation = facility
+        command.otherBinLocation = stagingLocation
+        command.transferOut = Boolean.TRUE
+        command.disableRefresh = Boolean.TRUE
+
+        Transaction transaction = inventoryService.transferStock(command)
+        if (transaction.hasErrors()) {
+            String errorMessage = transaction.errors.allErrors.collect { it.defaultMessage ?: it.code }.join('; ')
+            throw new ValidationException("Unable to move pre-picked stock to staging: ${errorMessage}",
+                    transaction.errors)
+        }
     }
 
     List<AvailableItem> calculateQuantityAvailableToPromise(List<AvailableItem> availableItems, def picklistItems) {
