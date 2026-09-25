@@ -143,11 +143,10 @@
                 <label><warehouse:message code="putawayTask.dateStarted.label" default="Date Started"/></label>
             </td>
             <td valign="top" class="value">
-                <g:datePicker name="dateStarted"
-                              value="${task?.dateStarted}"
-                              precision="minute"
-                              default="none"
-                              noSelection="['':'']"/>
+                <g:if test="${task?.dateStarted}">
+                    <g:formatDate date="${task.dateStarted}" format="dd/MM/yyyy HH:mm"/>
+                </g:if>
+                <g:else>-</g:else>
             </td>
         </tr>
         <tr class="prop">
@@ -155,11 +154,10 @@
                 <label><warehouse:message code="putawayTask.dateCompleted.label" default="Date Completed"/></label>
             </td>
             <td valign="top" class="value">
-                <g:datePicker name="dateCompleted"
-                              value="${task?.dateCompleted}"
-                              precision="minute"
-                              default="none"
-                              noSelection="['':'']"/>
+                <g:if test="${task?.dateCompleted}">
+                    <g:formatDate date="${task.dateCompleted}" format="dd/MM/yyyy HH:mm"/>
+                </g:if>
+                <g:else>-</g:else>
             </td>
         </tr>
         </tbody>
