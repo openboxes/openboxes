@@ -87,13 +87,10 @@
         <tbody>
         <tr class="prop">
             <td valign="top" class="name">
-                <label for="dlgStatus"><warehouse:message code="putawayTask.status.label" default="Status"/></label>
+                <label><warehouse:message code="putawayTask.status.label" default="Status"/></label>
             </td>
             <td valign="top" class="value">
-                <g:select id="dlgStatus" name="status"
-                          from="${PutawayTaskStatus.values()}"
-                          value="${task?.status}"
-                          class="select2"/>
+                ${task?.status}
             </td>
         </tr>
         <tr class="prop">
