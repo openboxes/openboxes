@@ -67,6 +67,26 @@ describe('AutosaveQuantityInputCell', () => {
     expect(getInput()).toHaveClass('has-errors');
   });
 
+  it('keeps the same input element when an error appears, so it does not lose focus', () => {
+    const buildCellWithError = (errorMessage) => (
+      <AutosaveQuantityInputCell
+        value={-2}
+        onCommit={onCommit}
+        errorMessage={errorMessage}
+        label="react.receiving.receivingNow.label"
+        defaultLabel="Receiving Now"
+      />
+    );
+    const { rerender } = render(buildCellWithError(null));
+    const input = getInput();
+    input.focus();
+
+    rerender(buildCellWithError('Negative values are not allowed'));
+
+    expect(getInput()).toBe(input);
+    expect(input).toHaveFocus();
+  });
+
   it('commits null when the field is cleared', () => {
     renderCell(7);
     const input = getInput();

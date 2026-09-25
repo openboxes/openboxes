@@ -8,6 +8,7 @@ const CustomTooltip = ({
   content,
   className,
   show,
+  disabled,
   icon: Icon,
 }) => (
   // This div was added to ensure the tooltip works correctly with absolute positioning
@@ -17,6 +18,7 @@ const CustomTooltip = ({
         delay={150}
         duration={250}
         hideDelay={50}
+        disabled={disabled}
         className="w-100"
         html={<div className={`p-2 tooltip-dark-blue ${!content && 'd-none'}`}>{content}</div>}
       >
@@ -35,7 +37,25 @@ CustomTooltip.propTypes = {
   children: PropTypes.node.isRequired,
   content: PropTypes.node.isRequired,
   className: PropTypes.string,
+  /**
+   * If false, the {@link Tooltip} will not even be rendered, and so setting `disabled=false`
+   * will have no impact.
+   *
+   * If you need to conditionally enable the tooltip without reloading the page, set `show`
+   * to true and use `disabled` to dynamically control the state of the tooltip.
+   */
   show: PropTypes.bool,
+  /**
+   * True if the {@link Tooltip} added by `show` should be disabled.
+   *
+   * Useful for cases where the tooltip will conditionally be active depending on user interaction
+   * with `children` (for example, for displaying validation errors). We don't want the tooltip
+   * to ever get unmounted, even if there is nothing for it to show, since unmounting it can alter
+   * state, trigger a redraw, and cause a child element to lose focus.
+   *
+   * If `show` is false, `disabled` will have no effect.
+   */
+  disabled: PropTypes.bool,
   icon: PropTypes.elementType,
 };
 
@@ -43,4 +63,5 @@ CustomTooltip.defaultProps = {
   className: '',
   icon: null,
   show: true,
+  disabled: false,
 };

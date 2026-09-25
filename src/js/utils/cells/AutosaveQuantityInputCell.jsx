@@ -42,7 +42,12 @@ const AutosaveQuantityInputCell = React.memo(({
   };
 
   return (
-    <TableCell className="rt-td" customTooltip={!!errorMessage} tooltipLabel={errorMessage}>
+    <TableCell
+      className="rt-td"
+      customTooltip
+      customTooltipDisabled={!errorMessage}
+      tooltipLabel={errorMessage}
+    >
       <TextInput
         type="number"
         className={`hide-arrows input-xs ${className}`}
