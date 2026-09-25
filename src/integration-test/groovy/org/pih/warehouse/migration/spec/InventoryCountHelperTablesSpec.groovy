@@ -1,8 +1,9 @@
-package org.pih.warehouse.smoke.spec
+package org.pih.warehouse.migration.spec
 
 import grails.gorm.transactions.Transactional
 import groovy.sql.GroovyRowResult
 import groovy.sql.Sql
+import org.pih.warehouse.common.base.IntegrationSpec
 import org.pih.warehouse.common.domain.builder.core.LocationTestBuilder
 import org.pih.warehouse.common.domain.builder.product.CategoryTestBuilder
 import org.pih.warehouse.common.domain.builder.product.ProductTestBuilder
@@ -15,7 +16,6 @@ import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.smoke.spec.base.SmokeSpec
 import util.LiquibaseUtil
 
 import javax.sql.DataSource
@@ -28,9 +28,11 @@ import javax.sql.DataSource
  * that disappears proves the table was rebuilt from the transaction data.
  *
  * DDL does not roll back and the database is shared by every integration spec, so every case cleans up
- * the rows it planted, and cleanup rebuilds any helper table a failed case may have left missing.
+ * the rows it planted, and cleanup rebuilds any helper table a failed case may have left missing. Not a
+ * smoke spec on purpose: it reruns the migrations and rebuilds tables, which a deploy-time health check
+ * must never do.
  */
-class InventoryCountHelperTablesSpec extends SmokeSpec {
+class InventoryCountHelperTablesSpec extends IntegrationSpec {
 
     static final List<String> HELPER_TABLES = [
             'adjustment_candidate',
