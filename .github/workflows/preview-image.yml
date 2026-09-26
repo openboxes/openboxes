@@ -1,0 +1,248 @@
+name: Preview Environment
+
+# Builds a per-PR image and pushes it to ttl.sh (anonymous, auto-expiring registry). This image
+# is the artifact a preview host runs. Separate from docker-image.yml (releases -> GHCR).
+#
+# NOTE: The Uffizzi render/deploy/teardown jobs below are RETAINED BUT DISABLED (if: false).
+# Uffizzi Cloud was shut down in 2024; the jobs are kept for reference / a possible self-hosted
+# Uffizzi Enterprise install. The active preview host is being migrated (Preevy / a PaaS).
+#
+# Preview policy (cost control):
+#   - "claude/*" branches get a preview automatically (no label needed).
+#   - Any other PR can opt in by adding the "preview" label.
+#   - workflow_dispatch builds the image only.
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, labeled, closed]
+  workflow_dispatch:
+
+concurrency:
+  group: preview-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # ttl.sh image lifetime. Accepts values like 10m, 1h, 24h.
+  PREVIEW_TTL: 1h
+
+jobs:
+  build:
+    name: Build preview image
+    # Gate: never on close; manual runs always; PRs only for claude/* branches or "preview" label.
+    if: >-
+      github.event.action != 'closed' &&
+      ( github.event_name == 'workflow_dispatch' ||
+        startsWith(github.head_ref, 'claude/') ||
+        contains(github.event.pull_request.labels.*.name, 'preview') )
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.vars.outputs.image }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Compute ephemeral image reference
+        id: vars
+        # Untrusted values (branch names) are passed via env, never interpolated into the script.
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REF_NAME: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            slug="pr-${PR_NUMBER}"
+          else
+            slug="branch-${REF_NAME//\//-}"
+          fi
+          echo "image=ttl.sh/openboxes-preview-${slug}-${SHA::7}:${PREVIEW_TTL}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 8
+          distribution: temurin
+          cache: gradle
+
+      - name: Build dependencies, project and prepare files for Docker build
+        run: ./gradlew prepareDocker -Dgrails.env=prod --console=plain
+
+      - name: Build and push preview image to ttl.sh
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: build/docker/
+          file: build/docker/Dockerfile
+          push: true
+          tags: ${{ steps.vars.outputs.image }}
+
+  render-compose-file:
+    name: Render Uffizzi compose file
+    needs: build
+    if: false  # disabled: Uffizzi path (Uffizzi Cloud shut down 2024)
+    runs-on: ubuntu-latest
+    outputs:
+      compose-file-cache-key: ${{ steps.hash.outputs.hash }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Render docker-compose.uffizzi.yml with the built image
+        env:
+          OB_IMAGE: ${{ needs.build.outputs.image }}
+        run: |
+          export OB_IMAGE
+          # Only substitute $OB_IMAGE; leave any other shell-like tokens untouched.
+          envsubst '$OB_IMAGE' < docker/docker-compose.uffizzi.yml > docker-compose.rendered.yml
+          echo "Rendered compose file:"
+          cat docker-compose.rendered.yml
+
+      - name: Hash rendered compose file
+        id: hash
+        run: echo "hash=$(md5sum docker-compose.rendered.yml | awk '{ print $1 }')" >> "$GITHUB_OUTPUT"
+
+      - name: Cache rendered compose file
+        uses: actions/cache@v4
+        with:
+          path: docker-compose.rendered.yml
+          key: ${{ steps.hash.outputs.hash }}
+
+  deploy-uffizzi-preview:
+    name: Deploy preview to Uffizzi
+    needs: render-compose-file
+    if: false  # disabled: Uffizzi Cloud shut down 2024 (kept for Uffizzi Enterprise/self-hosted)
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    uses: UffizziCloud/preview-action/.github/workflows/reusable.yaml@v3
+    with:
+      compose-file-cache-key: ${{ needs.render-compose-file.outputs.compose-file-cache-key }}
+      compose-file-cache-path: docker-compose.rendered.yml
+      server: https://app.uffizzi.com
+      healthcheck-url-path: /openboxes/health
+    secrets: inherit
+
+  delete-uffizzi-preview:
+    name: Delete Uffizzi preview
+    if: false  # disabled: Uffizzi Cloud shut down 2024
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    uses: UffizziCloud/preview-action/.github/workflows/reusable.yaml@v3
+    with:
+      compose-file-cache-key: ""
+      compose-file-cache-path: docker-compose.rendered.yml
+      server: https://app.uffizzi.com
+    secrets: inherit
+
+  # ---- Active preview host: per-PR deploy to a VPS, routed via Traefik with HTTPS ----
+  deploy-vps-preview:
+    name: Deploy preview to VPS
+    needs: build
+    if: >-
+      github.event_name == 'pull_request' && github.event.action != 'closed' &&
+      ( startsWith(github.head_ref, 'claude/') ||
+        contains(github.event.pull_request.labels.*.name, 'preview') )
+    runs-on: ubuntu-latest
+    environment: preview
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure SSH
+        env:
+          SSH_KEY: ${{ secrets.PREVIEW_SSH_KEY }}
+          SSH_HOST: ${{ vars.PREVIEW_SSH_HOST }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy preview stack
+        env:
+          SSH_HOST: ${{ vars.PREVIEW_SSH_HOST }}
+          SSH_USER: ${{ vars.PREVIEW_SSH_USER }}
+          OB_IMAGE: ${{ needs.build.outputs.image }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_DOMAIN: ${{ vars.PREVIEW_BASE_DOMAIN }}
+          ACME_EMAIL: ${{ vars.PREVIEW_ACME_EMAIL }}
+          MAX_CONCURRENT: ${{ vars.PREVIEW_MAX_CONCURRENT }}
+        run: |
+          project="pr-${PR_NUMBER}"
+          host="pr-${PR_NUMBER}.${BASE_DOMAIN}"
+          target="$SSH_USER@$SSH_HOST"
+          ssh -i ~/.ssh/deploy_key "$target" "mkdir -p ~/openboxes-preview"
+          scp -i ~/.ssh/deploy_key \
+            docker/docker-compose.preview.yml \
+            docker/docker-compose.traefik.yml \
+            docker/preview-deploy.sh \
+            "$target:~/openboxes-preview/"
+          ssh -i ~/.ssh/deploy_key "$target" \
+            "chmod +x ~/openboxes-preview/preview-deploy.sh && PREVIEW_ACME_EMAIL='$ACME_EMAIL' PREVIEW_MAX_CONCURRENT='${MAX_CONCURRENT:-3}' ~/openboxes-preview/preview-deploy.sh '$project' '$host' '$OB_IMAGE'"
+
+      - name: Comment preview URL on PR
+        uses: actions/github-script@v7
+        env:
+          BASE_DOMAIN: ${{ vars.PREVIEW_BASE_DOMAIN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        with:
+          script: |
+            const marker = '<!-- vps-preview -->';
+            const host = `pr-${process.env.PR_NUMBER}.${process.env.BASE_DOMAIN}`;
+            const url = `https://${host}/openboxes`;
+            const body = [
+              marker,
+              '### Preview environment deployed',
+              '',
+              `URL: ${url}`,
+              '',
+              '_Per-PR preview on the VPS, routed through Traefik with HTTPS. Tears down when this PR closes. First boot runs Liquibase migrations, so give it a minute (and the TLS cert a few seconds to issue)._',
+            ].join('\n');
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            });
+            const existing = comments.find((c) => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner, repo: context.repo.repo, comment_id: existing.id, body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body,
+              });
+            }
+
+  teardown-vps-preview:
+    name: Teardown VPS preview
+    if: >-
+      github.event_name == 'pull_request' && github.event.action == 'closed' &&
+      ( startsWith(github.head_ref, 'claude/') ||
+        contains(github.event.pull_request.labels.*.name, 'preview') )
+    runs-on: ubuntu-latest
+    environment: preview
+    permissions:
+      contents: read
+    steps:
+      - name: Configure SSH
+        env:
+          SSH_KEY: ${{ secrets.PREVIEW_SSH_KEY }}
+          SSH_HOST: ${{ vars.PREVIEW_SSH_HOST }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Tear down preview stack
+        env:
+          SSH_HOST: ${{ vars.PREVIEW_SSH_HOST }}
+          SSH_USER: ${{ vars.PREVIEW_SSH_USER }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          project="pr-${PR_NUMBER}"
+          ssh -i ~/.ssh/deploy_key "$SSH_USER@$SSH_HOST" \
+            "docker compose -p '$project' -f ~/openboxes-preview/docker-compose.preview.yml down --remove-orphans || true"
