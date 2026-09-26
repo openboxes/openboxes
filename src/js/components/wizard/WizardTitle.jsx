@@ -4,7 +4,10 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 
 const WizardTitle = (props) => {
-  if (!props.title && !props.additionalTitle) {
+  // An empty array is truthy, so `!props.title` let a title-less wizard
+  // step render an empty heading bar (e.g. stock transfer creation,
+  // where there is no movement number until the transfer exists).
+  if (_.isEmpty(props.title) && !props.additionalTitle) {
     return null;
   }
 

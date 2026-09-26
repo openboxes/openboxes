@@ -1,6 +1,10 @@
 <g:set var="showUnlinkedAttributes" value="${showUnlinkedAttributes?:false}"/>
-<g:set var="availableAttributes" value="${org.pih.warehouse.product.Attribute.findAllByActive(true)}"/>
-<g:set var="availableAttributes" value="${availableAttributes.findAll {((it.entityTypeCodes.any { it in entityTypeCodes} ) ||
+%{-- A caller may hand the list in: the product details page needs to know
+     whether this renders anything so it can hide an otherwise empty
+     section, and working it out in both places would risk the two
+     answers diverging. Falls back to querying when nothing is passed. --}%
+<g:set var="availableAttributes" value="${availableAttributes != null ? availableAttributes :
+        org.pih.warehouse.product.Attribute.findAllByActive(true).findAll {((it.entityTypeCodes.any { code -> code in entityTypeCodes} ) ||
         (it.entityTypeCodes.empty && showUnlinkedAttributes))}}"/>
 
 <g:if test="${availableAttributes}">
