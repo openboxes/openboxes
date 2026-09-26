@@ -3,7 +3,9 @@ import React, { useEffect, useState } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 
+import useTranslate from 'hooks/useTranslate';
 import Translate from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import './style.scss';
 
@@ -14,6 +16,7 @@ const Switch = ({
   className,
   ...fieldProps
 }) => {
+  const translate = useTranslate();
   const [value, changeValue] = useState(fieldProps?.value ?? defaultValue);
   const toggleId = _.uniqueId();
 
@@ -30,34 +33,42 @@ const Switch = ({
     }
   }, [fieldProps?.value]);
 
+  const [tooltipId, tooltipDefault] = value
+    ? [titles?.checked?.tooltipLabel, titles?.checked?.defaultTooltipLabel]
+    : [titles?.unchecked?.tooltipLabel, titles?.unchecked?.defaultTooltipLabel];
+  const showTooltip = Boolean(tooltipId || tooltipDefault);
+  const tooltipText = showTooltip ? translate(tooltipId, tooltipDefault) : '';
+
   return (
-    <div className={`switch-container ${className}`}>
-      <label htmlFor={`toggle-${toggleId}`} className="switch">
-        <input
-          id={`toggle-${toggleId}`}
-          type="checkbox"
-          defaultChecked={value}
-          onChange={onChangeValue}
-          checked={value}
-          {...fieldProps}
-        />
-        <div className="slider" />
-      </label>
-      <div className="switch-title">
-        {value
-          ? (
-            <Translate
-              id={titles?.checked?.id}
-              defaultMessage={titles?.checked?.defaultMessage}
-            />
-          ) : (
-            <Translate
-              id={titles?.unchecked?.id}
-              defaultMessage={titles?.unchecked?.defaultMessage}
-            />
-          )}
+    <CustomTooltip content={tooltipText} show={showTooltip}>
+      <div className={`switch-container ${className}`}>
+        <label htmlFor={`toggle-${toggleId}`} className="switch">
+          <input
+            id={`toggle-${toggleId}`}
+            type="checkbox"
+            defaultChecked={value}
+            onChange={onChangeValue}
+            checked={value}
+            {...fieldProps}
+          />
+          <div className="slider" />
+        </label>
+        <div className="switch-title">
+          {value
+            ? (
+              <Translate
+                id={titles?.checked?.id}
+                defaultMessage={titles?.checked?.defaultMessage}
+              />
+            ) : (
+              <Translate
+                id={titles?.unchecked?.id}
+                defaultMessage={titles?.unchecked?.defaultMessage}
+              />
+            )}
+        </div>
       </div>
-    </div>
+    </CustomTooltip>
   );
 };
 
@@ -71,10 +82,14 @@ Switch.propTypes = {
     checked: PropTypes.shape({
       id: PropTypes.string,
       defaultMessage: PropTypes.string,
+      tooltipLabel: PropTypes.string,
+      defaultTooltipLabel: PropTypes.string,
     }),
     unchecked: PropTypes.shape({
       id: PropTypes.string,
       defaultMessage: PropTypes.string,
+      tooltipLabel: PropTypes.string,
+      defaultTooltipLabel: PropTypes.string,
     }),
   }),
   onChange: PropTypes.func,

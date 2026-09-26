@@ -353,7 +353,10 @@ const useReceivingColumns = ({
           <TableHeaderCell
             {...sortHeaderProps(receivingColumns.QUANTITY_SHIPPED)}
             tooltip
-            tooltipLabel={translate('react.receiving.shipped.label', 'Shipped')}
+            tooltipLabel={translate(
+              'react.receiving.shipped.tooltip.label',
+              'The quantity shipped in the base unit of measure of the system',
+            )}
             className="receiving-table__quantity"
           >
             {translate('react.receiving.shipped.label', 'Shipped')}
@@ -381,7 +384,10 @@ const useReceivingColumns = ({
         header: () => (
           <TableHeaderCell
             tooltip
-            tooltipLabel={translate('react.receiving.receivingNow.label', 'Receiving now')}
+            tooltipLabel={translate(
+              'react.receiving.receivingNow.tooltip.label',
+              'The quantity that will be received into inventory when this receipt is completed',
+            )}
             className="receiving-table__quantity"
           >
             {translate('react.receiving.receivingNow.label', 'Receiving Now')}
@@ -400,7 +406,10 @@ const useReceivingColumns = ({
             return (
               <ValueCell
                 value={value}
-                tooltipLabel={value}
+                tooltipLabel={translate(
+                  'react.receiving.receivingNow.split.tooltip.label',
+                  'This field cannot be edited because the receipt has been split into multiple lines. It now represents the sum of the "receiving now" quantities of the split lines. To update, edit the split lines below.',
+                )}
                 className="receiving-table__quantity"
                 label="react.receiving.receivingNow.label"
                 defaultLabel="Receiving Now"
@@ -426,7 +435,10 @@ const useReceivingColumns = ({
         header: () => (
           <TableHeaderCell
             tooltip
-            tooltipLabel={translate('react.receiving.status.label', 'Status')}
+            tooltipLabel={translate(
+              'react.receiving.status.tooltip.label',
+              'Shows the amount being received versus the amount available to receive. A shipment with no discrepancies will show "complete" in all rows.',
+            )}
           >
             {translate('react.receiving.status.label', 'Status')}
           </TableHeaderCell>
@@ -479,7 +491,10 @@ const useReceivingColumns = ({
               return (
                 <ValueCell
                   value={receivingBin?.name}
-                  tooltipLabel={receivingBin?.name}
+                  tooltipLabel={translate(
+                    'react.receiving.location.split.tooltip.label',
+                    'This field cannot be edited because the receipt has been split into multiple lines. To update, edit the split lines below.',
+                  )}
                   className={`receiving-table__parent-location ${struckBin}`}
                   label="react.receiving.location.label"
                   defaultLabel="Location"
@@ -519,7 +534,13 @@ const useReceivingColumns = ({
       columnHelper.display({
         id: 'actions',
         header: () => (
-          <TableHeaderCell>
+          <TableHeaderCell
+            tooltip
+            tooltipLabel={translate(
+              'react.receiving.actions.tooltip.label',
+              'The actions that you can perform on the receipt item',
+            )}
+          >
             {translate('react.receiving.actions.label', 'Actions')}
           </TableHeaderCell>
         ),

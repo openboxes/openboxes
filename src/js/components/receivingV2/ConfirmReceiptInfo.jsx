@@ -15,9 +15,32 @@ const ConfirmReceiptInfo = ({ control, lineItemsState }) => {
   const { badge, fields } = useConfirmReceiptDetails();
   const { nextBadge } = useConfirmReceiptStatusTransition({ lineItemsState });
 
+  const getBadgeTooltip = () => {
+    if (!badge) {
+      return '';
+    }
+    if (nextBadge) {
+      return translate(
+        'react.receiving.status.transition.tooltip.label',
+        `The current status of this shipment is [${badge.current.label}]. Upon completion of this receipt, it will transition to [${nextBadge.label}].`,
+        [badge.current.label, nextBadge.label],
+      );
+    }
+    return translate(
+      'react.receiving.status.unchanged.tooltip.label',
+      `Upon completion of this receipt, the status of this shipment will remain [${badge.current.label}].`,
+      [badge.current.label],
+    );
+  };
+
   return (
     <ItemDetails
-      badge={badge && { current: badge.current, next: nextBadge, clickable: false }}
+      badge={badge && {
+        current: badge.current,
+        next: nextBadge,
+        clickable: false,
+        tooltip: getBadgeTooltip(),
+      }}
       fields={fields}
       className="confirm-receipt__details"
     >
@@ -34,6 +57,10 @@ const ConfirmReceiptInfo = ({ control, lineItemsState }) => {
               required
               showTimeSelect
               customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
+              tooltip={{
+                id: 'react.receiving.deliveredOn.tooltip.label',
+                defaultMessage: 'The date these items will be received into inventory. Defaults to today. If entering a previous receipt, the date should match the date the stock was entered into inventory physically/on paper.',
+              }}
               errorMessage={fieldState.error
                 && translate(fieldState.error.message, 'This field is required')}
             />
