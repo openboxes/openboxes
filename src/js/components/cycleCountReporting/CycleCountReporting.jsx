@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { getCurrentLocationSupportedActivities } from 'selectors';
 
 import { fetchReasonCodes } from 'actions';
 import { FETCH_CYCLE_COUNT_REASON_CODES } from 'actions/types';
+import AutoIssuanceTransactionsTab from 'components/cycleCountReporting/AutoIssuanceTransactionsTab';
 import cycleCountReportingFilterFields from 'components/cycleCountReporting/CycleCountReportingFilterFields';
 import CycleCountReportingFilters from 'components/cycleCountReporting/CycleCountReportingFilters';
 import CycleCountReportingHeader from 'components/cycleCountReporting/CycleCountReportingHeader';
@@ -11,7 +13,9 @@ import IndicatorsTab from 'components/cycleCountReporting/IndicatorsTab/Indicato
 import InventoryTransactionsTab from 'components/cycleCountReporting/InventoryTransactionsTab';
 import ProductsTab from 'components/cycleCountReporting/ProductsTab';
 import Tabs from 'components/listPagesUtils/Tabs';
+import ActivityCode from 'consts/activityCode';
 import {
+  AUTO_ISSUANCE_TAB,
   INDICATORS_TAB,
   INVENTORY_TRANSACTIONS_TAB,
   PRODUCTS_TAB,
@@ -21,6 +25,7 @@ import useCycleCountPagination from 'hooks/useCycleCountPagination';
 import useQueryParams from 'hooks/useQueryParams';
 import useSwitchTabs from 'hooks/useSwitchTabs';
 import useTranslation from 'hooks/useTranslation';
+import { supports } from 'utils/supportedActivitiesUtils';
 import PageWrapper from 'wrappers/PageWrapper';
 
 import 'components/cycleCount/cycleCount.scss';
@@ -31,6 +36,11 @@ const CycleCountReporting = () => {
   const { tab: currentTab } = useQueryParams();
   const dispatch = useDispatch();
 
+  // Auto-Issuance Transactions is only relevant to facilities that allow negative inventory, so
+  // it stays hidden everywhere else instead of showing an empty/irrelevant report by default.
+  const supportedActivities = useSelector(getCurrentLocationSupportedActivities);
+  const showAutoIssuanceTab = supports(supportedActivities, ActivityCode.ALLOW_NEGATIVE_INVENTORY);
+
   // Each tab will have different filters, that's why we will need this function
   const getFilterFields = () => {
     switch (currentTab) {
@@ -38,6 +48,10 @@ const CycleCountReporting = () => {
         return cycleCountReportingFilterFields.products;
       case INVENTORY_TRANSACTIONS_TAB:
         return cycleCountReportingFilterFields.inventoryTransactions;
+      case AUTO_ISSUANCE_TAB:
+        return showAutoIssuanceTab
+          ? cycleCountReportingFilterFields.autoIssuanceTransactions
+          : cycleCountReportingFilterFields.products;
       case INDICATORS_TAB:
         return cycleCountReportingFilterFields.indicators;
       default:
@@ -75,6 +89,15 @@ const CycleCountReporting = () => {
       },
       onClick: (tab) => switchTab(tab, () => updateParams({ isTabSwitch: true })),
     },
+    ...(showAutoIssuanceTab ? {
+      [AUTO_ISSUANCE_TAB]: {
+        label: {
+          id: 'react.cycleCount.autoIssuanceTransactions.label',
+          defaultMessage: 'Auto-Issuance Transactions',
+        },
+        onClick: (tab) => switchTab(tab, () => updateParams({ isTabSwitch: true })),
+      },
+    } : {}),
     [INDICATORS_TAB]: {
       label: {
         id: 'react.cycleCount.indicators.label',
@@ -115,6 +138,15 @@ const CycleCountReporting = () => {
         )}
         {currentTab === INVENTORY_TRANSACTIONS_TAB && (
           <InventoryTransactionsTab
+            tablePaginationProps={tablePaginationProps}
+            filterParams={filterParams}
+            shouldFetch={shouldFetch}
+            setShouldFetch={setShouldFetch}
+            filtersInitialized={filtersInitialized}
+          />
+        )}
+        {currentTab === AUTO_ISSUANCE_TAB && showAutoIssuanceTab && (
+          <AutoIssuanceTransactionsTab
             tablePaginationProps={tablePaginationProps}
             filterParams={filterParams}
             shouldFetch={shouldFetch}
