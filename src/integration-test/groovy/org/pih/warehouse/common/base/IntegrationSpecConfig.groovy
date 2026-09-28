@@ -38,9 +38,10 @@ class IntegrationSpecConfig {
     @Bean
     FilterRegistrationBean deferResponseCloseFilterRegistration() {
         FilterRegistrationBean registration = new FilterRegistrationBean(new DeferResponseCloseFilter())
-        // Right after the Sentry tracing filter (HIGHEST_PRECEDENCE + 1 in resources.groovy), so that Sentry's request
-        // span still wraps everything and every other filter and the Grails dispatcher see the wrapped response.
-        registration.order = Ordered.HIGHEST_PRECEDENCE + 2
+        // Must run before Grails' grailsWebRequestFilter (HIGHEST_PRECEDENCE + 30): that filter builds the
+        // GrailsWebRequest from the response it receives and render() writes to that response, so it has to receive
+        // the wrapped one. Registered at the highest precedence so that filters added later cannot end up in front.
+        registration.order = Ordered.HIGHEST_PRECEDENCE
         return registration
     }
 }
