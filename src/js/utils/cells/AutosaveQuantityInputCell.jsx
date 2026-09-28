@@ -45,7 +45,6 @@ const AutosaveQuantityInputCell = React.memo(({
     <TableCell
       className="rt-td"
       customTooltip
-      customTooltipDisabled={!errorMessage}
       tooltipLabel={errorMessage}
     >
       <TextInput
@@ -58,6 +57,10 @@ const AutosaveQuantityInputCell = React.memo(({
         hideErrorMessageWrapper
         ariaLabel={{ id: label, defaultMessage: defaultLabel }}
         onWheel={blurOnWheel}
+        // We disable arrow key stepping on table fields, and we expect usages of this component to
+        // set the 'errorMessage' prop with any field errors, which populates the tooltip. As such,
+        // we set the step to "any" to hide browser-generated error tooltips on input elements.
+        step="any"
       />
     </TableCell>
   );

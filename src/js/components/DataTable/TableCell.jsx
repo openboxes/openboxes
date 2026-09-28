@@ -22,7 +22,6 @@ const TableCell = ({
   tooltipForm,
   tooltipClassname,
   customTooltip,
-  customTooltipDisabled,
 }) => {
   let cellValue = children || value || defaultValue;
   const errorMessage = tdProps?.rest?.error;
@@ -64,11 +63,12 @@ const TableCell = ({
   }
 
   if (customTooltip) {
+    const content = tooltipLabel || value;
     cellValue = (
       <CustomTooltip
-        content={tooltipLabel || value}
+        content={content}
         className={tooltipClassname}
-        disabled={customTooltipDisabled}
+        disabled={!content}
       >
         {cellValue}
       </CustomTooltip>
@@ -116,7 +116,6 @@ TableCell.defaultProps = {
   showError: false,
   tdProps: {},
   tooltipLabel: '',
-  customTooltipDisabled: false,
 };
 
 TableCell.propTypes = {
@@ -144,24 +143,9 @@ TableCell.propTypes = {
   tooltipForm: PropTypes.bool,
   tooltipClassname: PropTypes.string,
   /**
-   * True if the cell should be wrapped in a {@link CustomTooltip}. If false, the tooltip will
-   * not be rendered at all, and so setting `customTooltipDisabled=false` will have no impact.
-   *
-   * If you need to conditionally enable the tooltip without reloading the page, set `customTooltip`
-   * to true and use `customTooltipDisabled` to dynamically control the state of the tooltip.
+   * True if the cell should be wrapped in a {@link CustomTooltip}.
    */
   customTooltip: PropTypes.bool,
-  /**
-   * True if the {@link CustomTooltip} added by `customTooltip` should be disabled.
-   *
-   * Useful for cases where the tooltip will conditionally be active depending on user interaction
-   * with the cell (for example, for displaying validation errors). We don't want the tooltip
-   * to ever get unmounted, even if there is nothing for it to show, since unmounting it can alter
-   * state, trigger a redraw, and cause the cell to lose focus.
-   *
-   * If `customTooltip` is false, `customTooltipDisabled` will have no effect.
-   */
-  customTooltipDisabled: PropTypes.bool,
 };
 
 export default TableCell;
