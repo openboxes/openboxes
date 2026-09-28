@@ -3,9 +3,8 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-import useTranslate from 'hooks/useTranslate';
+import TooltipWrapper from 'components/form-elements/TooltipWrapper';
 import Translate from 'utils/Translate';
-import CustomTooltip from 'wrappers/CustomTooltip';
 
 const Button = ({
   label,
@@ -22,35 +21,37 @@ const Button = ({
   tooltipLabel,
   defaultTooltipLabel,
 }) => {
-  const translate = useTranslate();
   const buttonClass = 'd-flex justify-content-around align-items-center gap-8';
   const variantClass = `${variant}-button`;
   const dropDownClass = `${isDropdown ? 'dropdown-toggle' : ''}`;
-  const hasTooltip = Boolean(tooltipLabel);
+  const hasTooltip = Boolean(tooltipLabel) || Boolean(defaultTooltipLabel);
 
-  return (
-    <CustomTooltip
-      content={hasTooltip ? translate(tooltipLabel, defaultTooltipLabel) : ''}
-      show={hasTooltip}
+  const button = (
+    <button
+      className={[variantClass, buttonClass, dropDownClass, className].join(' ')}
+      disabled={disabled}
+      type={type}
+      onClick={onClick}
+      data-toggle={isDropdown && 'dropdown'}
+      aria-haspopup={isDropdown && 'true'}
+      aria-expanded={isDropdown && 'false'}
+      ref={customRef}
     >
-      <button
-        className={[variantClass, buttonClass, dropDownClass, className].join(' ')}
-        disabled={disabled}
-        type={type}
-        onClick={onClick}
-        data-toggle={isDropdown && 'dropdown'}
-        aria-haspopup={isDropdown && 'true'}
-        aria-expanded={isDropdown && 'false'}
-        ref={customRef}
-      >
-        <>
-          {StartIcon && StartIcon}
-          <Translate id={label} defaultMessage={defaultLabel} />
-          {EndIcon && EndIcon}
-        </>
-      </button>
-    </CustomTooltip>
+      <>
+        {StartIcon && StartIcon}
+        <Translate id={label} defaultMessage={defaultLabel} />
+        {EndIcon && EndIcon}
+      </>
+    </button>
   );
+
+  return hasTooltip
+    ? (
+      <TooltipWrapper tooltipLabel={tooltipLabel} defaultTooltipLabel={defaultTooltipLabel}>
+        {button}
+      </TooltipWrapper>
+    )
+    : button;
 };
 
 export default Button;

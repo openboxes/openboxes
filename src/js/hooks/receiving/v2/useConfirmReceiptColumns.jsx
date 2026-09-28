@@ -91,7 +91,13 @@ const useConfirmReceiptColumns = ({
     />
   );
 
-  const quantityHeader = (label, defaultLabel, tooltipLabel, defaultTooltipLabel, columnId) => (
+  const quantityHeader = ({
+    label,
+    defaultLabel,
+    tooltipLabel,
+    defaultTooltipLabel,
+    columnId,
+  }) => (
     <TableHeaderCell
       {...(columnId ? sortHeaderProps(columnId) : {})}
       tooltip
@@ -351,13 +357,13 @@ const useConfirmReceiptColumns = ({
       ] : []),
       columnHelper.display({
         id: receivingColumns.QUANTITY_SHIPPED,
-        header: () => quantityHeader(
-          'react.receiving.shipped.label',
-          'Shipped',
-          'react.receiving.shipped.tooltip.label',
-          'The quantity shipped in the base unit of measure of the system',
-          receivingColumns.QUANTITY_SHIPPED,
-        ),
+        header: () => quantityHeader({
+          label: 'react.receiving.shipped.label',
+          defaultLabel: 'Shipped',
+          tooltipLabel: 'react.receiving.shipped.tooltip.label',
+          defaultTooltipLabel: 'The quantity shipped in the base unit of measure of the system',
+          columnId: receivingColumns.QUANTITY_SHIPPED,
+        }),
         cell: ({ row, table }) => {
           const item = getItem(row, table);
           if (isSplitItemOrToggle(item)) {
@@ -377,12 +383,12 @@ const useConfirmReceiptColumns = ({
       ...(hasPreviousReceipts ? [
         columnHelper.display({
           id: receivingColumns.QUANTITY_RECEIVED,
-          header: () => quantityHeader(
-            'react.receiving.received.label',
-            'Received',
-            'react.receiving.received.tooltip.label',
-            'Quantity already received in previous receipts',
-          ),
+          header: () => quantityHeader({
+            label: 'react.receiving.received.label',
+            defaultLabel: 'Received',
+            tooltipLabel: 'react.receiving.received.tooltip.label',
+            defaultTooltipLabel: 'Quantity already received in previous receipts',
+          }),
           cell: ({ row, table }) => {
             const item = getItem(row, table);
             if (isSplitItemOrToggle(item)) {
@@ -398,12 +404,12 @@ const useConfirmReceiptColumns = ({
         }),
         columnHelper.display({
           id: receivingColumns.QUANTITY_TO_RECEIVE,
-          header: () => quantityHeader(
-            'react.receiving.toReceive.label',
-            'To Receive',
-            'react.receiving.toReceive.tooltip.label',
-            'Quantity that is available to receive in this receipt (Quantity shipped - Quantity Received)',
-          ),
+          header: () => quantityHeader({
+            label: 'react.receiving.toReceive.label',
+            defaultLabel: 'To Receive',
+            tooltipLabel: 'react.receiving.toReceive.tooltip.label',
+            defaultTooltipLabel: 'Quantity that is available to receive in this receipt (Quantity shipped - Quantity Received)',
+          }),
           cell: ({ row, table }) => {
             const item = getItem(row, table);
             if (isSplitItemOrToggle(item)) {
@@ -420,12 +426,12 @@ const useConfirmReceiptColumns = ({
       ] : []),
       columnHelper.display({
         id: receivingColumns.QUANTITY_RECEIVING,
-        header: () => quantityHeader(
-          'react.receiving.receivingNow.label',
-          'Receiving Now',
-          'react.receiving.receivingNow.tooltip.label',
-          'The quantity that will be received into inventory when this receipt is completed',
-        ),
+        header: () => quantityHeader({
+          label: 'react.receiving.receivingNow.label',
+          defaultLabel: 'Receiving Now',
+          tooltipLabel: 'react.receiving.receivingNow.tooltip.label',
+          defaultTooltipLabel: 'The quantity that will be received into inventory when this receipt is completed',
+        }),
         cell: ({ row, table }) => {
           const item = getItem(row, table);
           if (item?.rowType === ReceivingRowType.TOGGLE) {
