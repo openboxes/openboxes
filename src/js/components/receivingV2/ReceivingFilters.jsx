@@ -92,6 +92,7 @@ const ReceivingFilters = ({
         showFilterVisibilityToggler={false}
         alignButtonsToFilters
         isLoading={!translationsFetched}
+        autoSubmit
       />
       <div className="receiving-filters__row receiving-filters__actions d-flex flex-wrap justify-content-end align-items-center">
         {hasBinLocationSupport && (
