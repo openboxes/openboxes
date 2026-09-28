@@ -4,6 +4,7 @@ import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
 import groovy.sql.Sql
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.data.DataService
 
 import javax.sql.DataSource
 
@@ -11,6 +12,7 @@ import javax.sql.DataSource
 class InventoryCountService {
 
     DataSource dataSource
+    DataService dataService
 
     void refreshAdjustmentCandidatesView(Inventory inventory, List<String> productIds, String transactionId, Date transactionDate) {
         productIds.each {
@@ -207,23 +209,9 @@ class InventoryCountService {
             }
             log.info "Refreshing ${name} from ${sqlFile}"
             Sql sql = new Sql(dataSource)
-            readMigrationStatements(sqlFile).each { String statement ->
+            dataService.readStatements(sqlFile).each { String statement ->
                 sql.execute(statement)
             }
         }
-    }
-
-    /**
-     * Reads a migration SQL file from the classpath and splits it into statements: comment-only lines are
-     * dropped and each statement ends with a semicolon (none of the helper files contain one elsewhere).
-     */
-    static List<String> readMigrationStatements(String path) {
-        InputStream stream = InventoryCountService.classLoader.getResourceAsStream(path)
-        if (!stream) {
-            throw new IllegalStateException("Migration SQL file not found on the classpath: ${path}")
-        }
-        String sql = stream.withStream { InputStream it -> it.getText('UTF-8') }
-        String withoutCommentLines = sql.readLines().findAll { !it.trim().startsWith('--') }.join('\n')
-        return withoutCommentLines.split(';').collect { it.trim() }.findAll { it }
     }
 }

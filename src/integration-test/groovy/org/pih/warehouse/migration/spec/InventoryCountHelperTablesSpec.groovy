@@ -9,6 +9,7 @@ import org.pih.warehouse.common.domain.builder.product.CategoryTestBuilder
 import org.pih.warehouse.common.domain.builder.product.ProductTestBuilder
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.data.DataService
 import org.pih.warehouse.inventory.InventoryCountService
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
@@ -47,6 +48,7 @@ class InventoryCountHelperTablesSpec extends IntegrationSpec {
     ]
 
     InventoryCountService inventoryCountService
+    DataService dataService
     DataSource dataSource
 
     Sql sql
@@ -162,9 +164,17 @@ class InventoryCountHelperTablesSpec extends IntegrationSpec {
 
     void "the migration SQL files split into the statements the migration runs"() {
         expect:
-        assert InventoryCountService.readMigrationStatements('views/adjustment-candidate.sql').size() == 3
-        assert InventoryCountService.readMigrationStatements('views/inventory-baseline-candidate.sql').size() == 5
-        assert InventoryCountService.readMigrationStatements('views/product-inventory-candidate.sql').size() == 5
+        assert dataService.readStatements('views/adjustment-candidate.sql').size() == 3
+        assert dataService.readStatements('views/inventory-baseline-candidate.sql').size() == 5
+        assert dataService.readStatements('views/product-inventory-candidate.sql').size() == 5
+    }
+
+    void "reading a SQL file that is not on the classpath fails loudly"() {
+        when:
+        dataService.readStatements('views/no-such-file.sql')
+
+        then:
+        thrown(IllegalStateException)
     }
 
     /**
