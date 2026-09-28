@@ -17,24 +17,37 @@ const useConfirmReceiptValidation = () => {
 
   // This date (and format) comes from the stock movement API response
   const { dateShipped } = useSelector(getReceivingShipmentDetails);
-  const shippedDate = parseStringToDate(dateShipped, DateFormatDateFns.MM_DD_YYYY_HH_MM_Z);
+  const shippedDate = parseStringToDate({
+    date: dateShipped,
+    currentDateFormat: DateFormatDateFns.MM_DD_YYYY_HH_MM_Z,
+  });
 
   const requiredFieldMessage = translate(
     'react.default.error.requiredField.label',
     'This field is required',
   );
 
+  /**
+   * @param {string} deliveredString
+   * @return {boolean}
+   */
   const dateDeliveredNotFuture = (deliveredString) => {
-    const deliveredDate = parseStringToDate(
-      deliveredString, DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS,
-    );
+    const deliveredDate = parseStringToDate({
+      date: deliveredString,
+      currentDateFormat: DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS,
+    });
     return !deliveredDate || !isAfter(deliveredDate, new Date());
   };
 
+  /**
+   * @param {string} deliveredString
+   * @return {boolean}
+   */
   const dateDeliveredAfterShipped = (deliveredString) => {
-    const deliveredDate = parseStringToDate(
-      deliveredString, DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS,
-    );
+    const deliveredDate = parseStringToDate({
+      date: deliveredString,
+      currentDateFormat: DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS,
+    });
     if (!deliveredDate || !shippedDate) {
       return true;
     }
