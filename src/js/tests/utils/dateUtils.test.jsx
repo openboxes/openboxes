@@ -18,100 +18,72 @@ const DATE_WITH_DAY = new Date(2025, 8, 19);
 const DATE_WITH_SECONDS = new Date(2025, 8, 19, 15, 10, 5);
 
 describe('parseStringToDate()', () => {
-  it('should return null if date is empty', () => {
-    const nullDate = parseStringToDate({
-      date: null,
-      dateOnly: true,
-    });
-    const emptyStringDate = parseStringToDate({
-      date: '',
-      dateOnly: true,
-    });
-    expect(nullDate).toBe(null);
-    expect(emptyStringDate).toBe(null);
+  it.each([
+    ['null', null],
+    ['empty string', ''],
+    ['Date', DATE_WITH_DAY],
+    ['timestamp', 1758153600000],
+  ])('should return null if date is (%s)', (_, date) => {
+    expect(parseStringToDate(date, DateFormatDateFns.DD_MMM_YYYY)).toBe(null);
   });
 
-  it('should return parsed date without time when date without time is passed', () => {
-    const date = parseStringToDate({
-      date: '2025-09-18',
-      dateOnly: true,
-      options: {
-        providedDateFormat: DateFormatDateFns.YYYY_MM_DD,
-      },
-    });
+  it.each([
+    ['not a valid date', 'not a date'],
+    ['does not match format', '19/Sep/2025'],
+  ])('should throw if date is (%s)', (_, date) => {
+    expect(() => parseStringToDate(date, DateFormatDateFns.YYYY_MM_DD))
+      .toThrow('Invalid date string or provided format');
+  });
+
+  it('should throw if no date format is given', () => {
+    expect(() => parseStringToDate('18/Sep/2025')).toThrow('dateFormat is required');
+  });
+
+  it.each([
+    [DateFormatDateFns.DD_MMM_YYYY, '19/Sep/2025'],
+    [DateFormatDateFns.YYYY_MM_DD, '2025-09-19'],
+  ])('should return correct date if date-only has format (%s)', (format, dateString) => {
+    const date = parseStringToDate(dateString, format);
+    expect(date).toEqual(DATE_WITH_DAY);
     expect(date.getFullYear()).toBe(2025);
-    expect(date.getMonth()).toBe(8);
-    expect(date.getDate()).toBe(18);
+    expect(date.getMonth()).toBe(8); // zero-indexed
+    expect(date.getDate()).toBe(19);
     expect(date.getHours()).toBe(0);
     expect(date.getMinutes()).toBe(0);
     expect(date.getSeconds()).toBe(0);
   });
 
-  it('should return parsed date without time when date with time is passed', () => {
-    const date = parseStringToDate({
-      date: '2025-09-18T14:30:15',
-      dateOnly: true,
-      options: {
-        providedDateFormat: DateFormatDateFns.YYYY_MM_DD_HH_MM_SS,
-      },
-    });
+  it.each([
+    [DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS, '19/Sep/2025 15:10:05'],
+    [DateFormatDateFns.YYYY_MM_DD_HH_MM_SS, '2025-09-19T15:10:05'],
+  ])('should return correct date if datetime has format (%s)', (format, dateString) => {
+    const date = parseStringToDate(dateString, format);
+    expect(date).toEqual(DATE_WITH_SECONDS);
     expect(date.getFullYear()).toBe(2025);
-    expect(date.getMonth()).toBe(8);
-    expect(date.getDate()).toBe(18);
-    expect(date.getHours()).toBe(0);
-    expect(date.getMinutes()).toBe(0);
-    expect(date.getSeconds()).toBe(0);
+    expect(date.getMonth()).toBe(8); // zero-indexed
+    expect(date.getDate()).toBe(19);
+    expect(date.getHours()).toBe(15);
+    expect(date.getMinutes()).toBe(10);
+    expect(date.getSeconds()).toBe(5);
   });
 
-  it('should return parsed date with time when date without time is passed', () => {
-    const date = parseStringToDate({
-      date: '2025-09-18',
-    });
-    expect(date.getFullYear()).toBe(2025);
-    expect(date.getMonth()).toBe(8);
-    expect(date.getDate()).toBe(18);
-    expect(date.getHours()).toBe(0);
-    expect(date.getMinutes()).toBe(0);
-    expect(date.getSeconds()).toBe(0);
-  });
+  it.each([
+    ['+00:00', 0],
+    ['Z', 0],
+    ['+01:00', 1],
+    ['-01:00', -1],
+  ])('should return correct date if datetime + zone has zone (%s)', (zone, hourOffset) => {
+    const expectedHour = 15 - hourOffset;
+    const date = parseStringToDate(`2025-09-19T15:10${zone}`, DateFormatDateFns.YYYY_MM_DD_HH_MM_Z);
+    expect(date.toISOString()).toBe(`2025-09-19T${expectedHour}:10:00.000Z`);
 
-  it('should return parsed date with time when date with time is passed', () => {
-    const date = parseStringToDate({
-      date: '2025-09-18T14:30:15',
-    });
-    expect(date.getFullYear()).toBe(2025);
-    expect(date.getMonth()).toBe(8);
-    expect(date.getDate()).toBe(18);
-    expect(date.getHours()).toBe(14);
-    expect(date.getMinutes()).toBe(30);
-    expect(date.getSeconds()).toBe(15);
-  });
-
-  it('should return the same date when timezone is ahead of UTC (stripping timezone)', () => {
-    const date = parseStringToDate({
-      date: '2025-01-01T00:00+07:00',
-      dateOnly: true,
-      options: {
-        providedDateFormat: DateFormatDateFns.YYYY_MM_DD_HH_MM_Z,
-      },
-    });
-    expect(date.getFullYear()).toBe(2025);
-    expect(date.getMonth()).toBe(0);
-    expect(date.getDate()).toBe(1);
-    expect(date.getHours()).toBe(0);
-    expect(date.getMinutes()).toBe(0);
-    expect(date.getSeconds()).toBe(0);
-  });
-
-  it('should return the appropriate date when timezone is ahead of UTC (with timezone)', () => {
-    const date = parseStringToDate({
-      date: '2025-01-01T00:00+07:00',
-    });
-    expect(date.getUTCFullYear()).toBe(2024);
-    expect(date.getUTCMonth()).toBe(11);
-    expect(date.getUTCDate()).toBe(31);
-    expect(date.getUTCHours()).toBe(17);
-    expect(date.getUTCMinutes()).toBe(0);
+    // Use getUTC* to avoid tests flaking depending on the timezone of the environment
+    // that they're running on.
+    expect(date.getUTCFullYear()).toBe(2025);
+    expect(date.getUTCMonth()).toBe(8); // zero-indexed
+    expect(date.getUTCDate()).toBe(19);
+    expect(date.getUTCHours()).toBe(expectedHour);
+    expect(date.getUTCMinutes()).toBe(10);
     expect(date.getUTCSeconds()).toBe(0);
   });
 });
@@ -250,13 +222,7 @@ describe('formatDateToDateOnlyString()', () => {
   });
 
   it('should skip timezone', () => {
-    const date = parseStringToDate({
-      date: '2025-09-19T1:22+07:00',
-      dateOnly: true,
-      options: {
-        providedDateFormat: DateFormatDateFns.YYYY_MM_DD_HH_MM_Z,
-      },
-    });
+    const date = parseStringToDate('2025-09-19T1:22+07:00', DateFormatDateFns.YYYY_MM_DD_HH_MM_Z);
     const formattedDate = formatDateToDateOnlyString(date);
     expect(formattedDate).toBe('19/Sep/2025');
   });

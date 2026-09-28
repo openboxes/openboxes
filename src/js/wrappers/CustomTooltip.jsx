@@ -19,6 +19,10 @@ const CustomTooltip = ({
         duration={250}
         hideDelay={50}
         disabled={disabled}
+        // react-tippy has a quirk where it resets its non-styled tooltip to have value of `title`
+        // when the tooltip is re-enabled after being disabled. This causes a non-styled "undefined"
+        // tooltip to display. Setting a blank title hides the tooltip in this scenario.
+        title=" "
         className="w-100"
         html={<div className={`p-2 tooltip-dark-blue ${!content && 'd-none'}`}>{content}</div>}
       >

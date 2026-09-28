@@ -31,11 +31,7 @@ const useConfirmExpirationDateChange = () => {
    */
   const getLotChange = (lineItem, lotAvailability) => {
     const newExpiry = formatDateToString({
-      date: parseStringToDate({
-        date: lineItem.expirationDate,
-        dateOnly: true,
-        options: { providedDateFormat: DateFormatDateFns.DD_MMM_YYYY },
-      }),
+      date: parseStringToDate(lineItem.expirationDate, DateFormatDateFns.DD_MMM_YYYY),
       dateFormat: DateFormatDateFns.YYYY_MM_DD,
     });
 

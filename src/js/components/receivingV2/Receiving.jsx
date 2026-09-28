@@ -39,6 +39,7 @@ const Receiving = () => {
           <ConfirmReceiptHeader
             onBackToReceive={previous}
             onCompleteReceipt={onCompleteReceipt}
+            isCompleteDisabled={isNextDisabled}
           />
         )
         : undefined}
@@ -58,6 +59,7 @@ const Receiving = () => {
             defaultLabel: 'Complete Receipt',
             tooltipLabel: 'react.receiving.completeReceipt.tooltip.label',
             defaultTooltipLabel: 'Submit the receipt',
+            disabled: isNextDisabled,
           },
         }
 

@@ -9,11 +9,7 @@ const toIsoDateString = (displayDate) => {
   if (!displayDate) {
     return null;
   }
-  const parsed = parseStringToDate({
-    date: displayDate,
-    dateOnly: true,
-    options: { providedDateFormat: DateFormatDateFns.DD_MMM_YYYY },
-  });
+  const parsed = parseStringToDate(displayDate, DateFormatDateFns.DD_MMM_YYYY);
   return formatDateToString({ date: parsed, dateFormat: DateFormatDateFns.YYYY_MM_DD });
 };
 
