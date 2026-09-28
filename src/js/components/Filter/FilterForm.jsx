@@ -44,7 +44,6 @@ const FilterForm = ({
   onSubmit,
   autoSubmit,
   debounceTime,
-  showSubmitButton,
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
   const [filtersHidden, setFiltersHidden] = useState(hidden);
@@ -60,7 +59,7 @@ const FilterForm = ({
   useEffect(() => () => debouncedSubmit?.cancel(), [debouncedSubmit]);
 
   const withAutoSubmit = (fieldConfig) => {
-    if (!debouncedSubmit) {
+    if (!autoSubmit) {
       return fieldConfig;
     }
     return {
@@ -220,7 +219,7 @@ const FilterForm = ({
                       variant="transparent"
                       type="button"
                     />
-                    {showSubmitButton && (
+                    {!autoSubmit && (
                       <Button
                         defaultLabel={customSubmitButtonDefaultLabel || 'Search'}
                         label={customSubmitButtonLabel || 'react.button.search.label'}
@@ -290,7 +289,6 @@ FilterForm.propTypes = {
   // When true, the form is submitted automatically after the values change
   autoSubmit: PropTypes.bool,
   debounceTime: PropTypes.number.isRequired,
-  showSubmitButton: PropTypes.bool,
 };
 
 FilterForm.defaultProps = {
@@ -312,5 +310,4 @@ FilterForm.defaultProps = {
   alignButtonsToFilters: false,
   onSubmit: () => {},
   autoSubmit: false,
-  showSubmitButton: true,
 };

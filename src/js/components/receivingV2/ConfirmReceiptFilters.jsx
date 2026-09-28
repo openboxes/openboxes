@@ -54,7 +54,6 @@ const ConfirmReceiptFilters = ({
           alignButtonsToFilters
           isLoading={!translationsFetched}
           autoSubmit
-          showSubmitButton={false}
         />
       </div>
       <div className="confirm-receipt__action-bar-buttons d-flex gap-8">
