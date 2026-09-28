@@ -99,6 +99,13 @@ describe('parseStringToDate()', () => {
     [DateFormatDateFns.YYYY_MM_DD_HH_MM_Z, '2025-09-19T00:00+07:00'],
     [DateFormatDateFns.YYYY_MM_DD_HH_MM_Z, '2025-09-19T23:59-07:00'],
     [DateFormatDateFns.YYYY_MM_DD_HH_MM_Z, '2025-09-19T12:00Z'],
+    // Whitespace between the time and the offset
+    [DateFormatDateFns.MM_DD_YYYY_HH_MM_Z, '09/19/2025 00:00 +07:00'],
+    [DateFormatDateFns.MM_DD_YYYY_HH_MM_Z, '09/19/2025 23:59 -07:00'],
+    [DateFormatDateFns.MM_DD_YYYY_HH_MM_Z, '09/19/2025 12:00 Z'],
+    // Offset without a colon
+    ["yyyy-MM-dd'T'HH:mmXX", '2025-09-19T00:00+0700'],
+    ["yyyy-MM-dd'T'HH:mmXX", '2025-09-19T23:59-0700'],
   ])('should return date with time and zone stripped if dateOnly and format (%s)', (format, dateString) => {
     const date = parseStringToDate({ date: dateString, currentDateFormat: format, dateOnly: true });
     expect(date).toEqual(DATE_WITH_DAY);

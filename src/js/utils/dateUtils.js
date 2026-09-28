@@ -34,22 +34,19 @@ const dateWithoutTimeZone = ({
 };
 
 /**
- * Removes the timezone offset from a date string.
- * For example: '01/Jan/2000 00:00:00+07:00' becomes '01/Jan/2000 00:00:00'
+ * Removes the timezone offset from both a date string and its format
+ * .
+ * For example: ('01/Jan/2000 00:00:00+07:00', 'dd/MMM/yyyy HH:mm:ssXXX') becomes
+ *              ('01/Jan/2000 00:00:00',       'dd/MMM/yyyy HH:mm:ss')
  *
- * @param {string} date - The date string to check. Ex: '01/Jan/2000 00:00:00+07:00'
- * @return {string} the date string without the timezone offset
+ * @param {string} date - The date string to strip.
+ * @param {string} dateFormat - The format of the date string.
+ * @return {[string, string]} the date string and format, both without the timezone offset
  */
-const stripTimezoneFromDateString = (date) => date.replace(/([+-]\d{2}:\d{2}|Z)$/, '');
-
-/**
- * Removes the timezone offset from a date format.
- * For example: 'dd/MMM/yyyy HH:mm:ssXXX' becomes 'dd/MMM/yyyy HH:mm:ss'
- *
- * @param {string} dateFormat - The date format to check. Ex: 'dd/MMM/yyyy HH:mm:ssXXX'
- * @return {string} the date format without the timezone offset
- */
-const stripOffsetFromDateFormat = (dateFormat) => dateFormat.replace('XXX', '');
+const stripTimezoneOffset = (date, dateFormat) => [
+  date.replace(/\s*([+-]\d{2}:?\d{2}|Z)$/, ''),
+  dateFormat.replace(/\s*X+$/, ''),
+];
 
 /**
  * Converts a date string to a Date object.
@@ -84,7 +81,7 @@ export const parseStringToDate = ({
 
   // Conditionally strip out timezone offset. See the docstring for details.
   const [dateToParse, formatToParse] = dateOnly
-    ? [stripTimezoneFromDateString(date), stripOffsetFromDateFormat(currentDateFormat)]
+    ? stripTimezoneOffset(date, currentDateFormat)
     : [date, currentDateFormat];
 
   const parsedDate = parse(dateToParse, formatToParse, new Date());
