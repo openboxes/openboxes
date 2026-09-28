@@ -137,8 +137,10 @@ const DataTableBody = ({
             };
             // Separator row: cells render column meta.renderSeparator instead of the normal cell.
             const isSeparator = rowData.original?.isSeparator;
-            // Merge with the row below by removing the separating border.
-            const mergeWithNextRow = rowData.original?.mergeWithNextRow;
+            // Merge with the row below by removing the separating border. A collapsed row
+            // never merges, since its sub-rows (the rows it would merge with) are hidden.
+            const isCollapsed = rowData.subRows?.length > 0 && !rowData.getIsExpanded();
+            const mergeWithNextRow = rowData.original?.mergeWithNextRow && !isCollapsed;
             const isLastSubRow = rowData.original?.isLastSubRow;
             return (
               <CustomTooltip
