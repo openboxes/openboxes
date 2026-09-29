@@ -16,7 +16,7 @@ const WizardPageHeader = ({ label, info, status }) => {
 
   return (
     <div className="wizard-page-header-title d-flex align-items-center justify-content-between w-100">
-      <h5 className="wizard-page-header-content m-0">
+      <h5 className="wizard-page-header-content m-0" data-testid="wizard-title">
         {info?.length > 0 && (
         <>
           {label && (

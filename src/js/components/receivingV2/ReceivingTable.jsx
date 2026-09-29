@@ -78,7 +78,7 @@ const ReceivingTable = ({
   );
 
   return (
-    <div className="receiving-table receiving-table--striped">
+    <div className="receiving-table receiving-table--striped" data-testid="receiving-table">
       <DataTable
         // Force TanStack table remount whenever the sort changes so the initialState
         // (`expanded: true`) re-applies and every changes group is expanded again.

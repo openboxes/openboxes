@@ -38,7 +38,7 @@ const ConfirmReceiptFilters = ({
   }, [clearFilterParams]);
 
   return (
-    <div className="confirm-receipt__action-bar">
+    <div className="confirm-receipt__action-bar" data-testid="confirm-receipt-action-bar">
       <div className="confirm-receipt__action-bar-filters">
         <FilterForm
           searchFieldId="q"

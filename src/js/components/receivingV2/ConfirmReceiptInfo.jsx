@@ -16,31 +16,33 @@ const ConfirmReceiptInfo = ({ control, lineItemsState }) => {
   const { nextBadge } = useConfirmReceiptStatusTransition({ lineItemsState });
 
   return (
-    <ItemDetails
-      badge={badge && { current: badge.current, next: nextBadge, clickable: false }}
-      fields={fields}
-      className="confirm-receipt__details"
-    >
-      <div className="confirm-receipt__delivered-on">
-        <Controller
-          name="dateDelivered"
-          control={control}
-          // The date is required for completing the receipt
-          rules={{ required: 'react.default.error.requiredField.label' }}
-          render={({ field, fieldState }) => (
-            <DateFieldDateFns
-              {...field}
-              title={{ id: 'react.receiving.deliveredOn.label', defaultMessage: 'Delivered on' }}
-              required
-              showTimeSelect
-              customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
-              errorMessage={fieldState.error
-                && translate(fieldState.error.message, 'This field is required')}
-            />
-          )}
-        />
-      </div>
-    </ItemDetails>
+    <div data-testid="confirm-receipt-details">
+      <ItemDetails
+        badge={badge && { current: badge.current, next: nextBadge, clickable: false }}
+        fields={fields}
+        className="confirm-receipt__details"
+      >
+        <div className="confirm-receipt__delivered-on">
+          <Controller
+            name="dateDelivered"
+            control={control}
+            // The date is required for completing the receipt
+            rules={{ required: 'react.default.error.requiredField.label' }}
+            render={({ field, fieldState }) => (
+              <DateFieldDateFns
+                {...field}
+                title={{ id: 'react.receiving.deliveredOn.label', defaultMessage: 'Delivered on' }}
+                required
+                showTimeSelect
+                customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
+                errorMessage={fieldState.error
+                  && translate(fieldState.error.message, 'This field is required')}
+              />
+            )}
+          />
+        </div>
+      </ItemDetails>
+    </div>
   );
 };
 

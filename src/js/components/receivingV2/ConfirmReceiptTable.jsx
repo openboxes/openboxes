@@ -51,7 +51,7 @@ const ConfirmReceiptTable = ({
   const data = useMemo(() => buildReceivingTableRows(lineItemsState), [lineItemsState]);
 
   return (
-    <div className="receiving-table receiving-table--striped">
+    <div className="receiving-table receiving-table--striped" data-testid="confirm-receipt-table">
       <DataTable
         // Force TanStack table remount whenever the sort changes so the initialState
         // (`expanded: true`) re-applies and every changes group is expanded again.

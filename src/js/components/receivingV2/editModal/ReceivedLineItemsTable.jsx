@@ -28,7 +28,7 @@ const ReceivedLineItemsTable = ({ receivedItems, columns, totalReceived }) => {
           </div>
         )}
       >
-        <div className="receiving-table">
+        <div className="receiving-table" data-testid="edit-modal-received-table">
           <DataTable
             columns={columns}
             data={receivedItems}

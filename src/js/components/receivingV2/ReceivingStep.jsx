@@ -51,7 +51,7 @@ const ReceivingStep = ({ flushRef, validateBeforeNextRef, setNextDisabled }) => 
   }, [isNextDisabled]);
 
   return (
-    <div className="receiving-container receiving-step">
+    <div className="receiving-container receiving-step" data-testid="receiving-step">
       <ReceivingFilters
         view={view}
         onViewChange={setView}
