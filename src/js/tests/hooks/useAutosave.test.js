@@ -119,6 +119,39 @@ describe('useAutosave', () => {
     expect(result.current.autosaveStatus).toBe(AutosaveStatus.SAVED);
   });
 
+  describe('isRowValid', () => {
+    const rowOptions = { isRowValid: (row) => row.quantityReceiving >= 0 };
+
+    it('does not save invalid row', async () => {
+      const { result } = renderUseAutosave({ rowOptions });
+
+      act(() => result.current.updateRow('row-1', { quantityReceiving: -1 }));
+      act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
+      await flushPromises();
+
+      expect(updateFn).not.toHaveBeenCalled();
+      expect(result.current.rows['row-1'].saveStatus).toBe(RowSaveStatus.INVALID);
+      expect(result.current.isSavePending).toBe(false);
+      expect(result.current.autosaveStatus).toBe(AutosaveStatus.ERROR);
+    });
+
+    it('saves invalid row once it is edited back to a valid value', async () => {
+      const { result } = renderUseAutosave({ rowOptions });
+
+      act(() => result.current.updateRow('row-1', { quantityReceiving: -1 }));
+      act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
+      act(() => result.current.updateRow('row-1', { quantityReceiving: 5 }));
+      act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
+
+      expect(updateFn).toHaveBeenCalledTimes(1);
+      deferreds[0].resolve([{ rowId: 'row-1' }]);
+      await flushPromises();
+
+      expect(result.current.rows['row-1'].saveStatus).toBe(RowSaveStatus.SAVED);
+      expect(result.current.autosaveStatus).toBe(AutosaveStatus.SAVED);
+    });
+  });
+
   it('flushes immediately when the batch size is reached', () => {
     const { result } = renderUseAutosave({ flushOptions: { batchSize: 2 } });
 
