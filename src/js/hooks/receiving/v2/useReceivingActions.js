@@ -94,11 +94,11 @@ const useReceivingActions = ({ view, sort, sortOrder } = {}) => {
       : summary;
   };
 
-  const loadReceipt = async ({ keepScrollPosition = false } = {}) => {
-    // With keepScrollPosition the table stays rendered during the refetch, so its scroll is not
+  const loadReceipt = async ({ skipLoadingState = false } = {}) => {
+    // With skipLoadingState the table stays rendered during the refetch, so its scroll is not
     // reset. The caller must wrap this call in the page spinner, otherwise the stale rows
     // stay editable until the refetch finishes.
-    if (!keepScrollPosition) {
+    if (!skipLoadingState) {
       setLoading(true);
     }
     try {
