@@ -94,8 +94,13 @@ const useReceivingActions = ({ view, sort, sortOrder } = {}) => {
       : summary;
   };
 
-  const loadReceipt = async () => {
-    setLoading(true);
+  const loadReceipt = async ({ keepScrollPosition = false } = {}) => {
+    // With keepScrollPosition the table stays rendered during the refetch, so its scroll is not
+    // reset. The caller must wrap this call in the page spinner, otherwise the stale rows
+    // stay editable until the refetch finishes.
+    if (!keepScrollPosition) {
+      setLoading(true);
+    }
     try {
       // Push pending edits out before refetching (view switch, modal reload, sort change),
       // so the summary reflects them and nothing is lost when the autosave state resets.

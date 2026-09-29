@@ -61,7 +61,7 @@ const useEditLineItemSave = ({
         await receivingApi.editReceivingInfo(receiptId, lineItem.shipmentItemId, payload);
       }
       onClose();
-      loadReceipt();
+      await loadReceipt({ keepScrollPosition: true });
     } finally {
       dispatch(hideSpinner());
     }
