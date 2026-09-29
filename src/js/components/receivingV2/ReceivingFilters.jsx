@@ -68,14 +68,14 @@ const ReceivingFilters = ({
   }, [clearFilterParams]);
 
   return (
-    <div className="receiving-filters">
+    <div className="receiving-filters" data-testid="receiving-filters">
       <div className="receiving-filters__row d-flex justify-content-between align-items-center">
         <SlidingButtonGroup
           options={viewOptions}
           defaultOption={view}
           onChange={onViewChange}
         />
-        <div className="receiving-filters__autosave-slot">
+        <div className="receiving-filters__autosave-slot" data-testid="receiving-autosave-status">
           <AutosaveIndicator status={autosaveStatus} />
         </div>
       </div>
@@ -96,21 +96,23 @@ const ReceivingFilters = ({
       />
       <div className="receiving-filters__row receiving-filters__actions d-flex flex-wrap justify-content-end align-items-center">
         {hasBinLocationSupport && (
-          <Switch
-            className="receiving-filters__switch"
-            value={putawayEnabled}
-            onChange={onPutawayChange}
-            titles={{
-              checked: {
-                id: 'react.receiving.showPutaway.label',
-                defaultMessage: 'Show Putaway',
-              },
-              unchecked: {
-                id: 'react.receiving.showPutaway.label',
-                defaultMessage: 'Show Putaway',
-              },
-            }}
-          />
+          <div data-testid="show-putaway-switch">
+            <Switch
+              className="receiving-filters__switch"
+              value={putawayEnabled}
+              onChange={onPutawayChange}
+              titles={{
+                checked: {
+                  id: 'react.receiving.showPutaway.label',
+                  defaultMessage: 'Show Putaway',
+                },
+                unchecked: {
+                  id: 'react.receiving.showPutaway.label',
+                  defaultMessage: 'Show Putaway',
+                },
+              }}
+            />
+          </div>
         )}
         {view !== ReceivingView.PACKING_LIST && (
           <Button

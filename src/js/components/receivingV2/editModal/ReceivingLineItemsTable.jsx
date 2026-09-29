@@ -36,7 +36,10 @@ const ReceivingLineItemsTable = ({
         />
         )}
       </div>
-      <form className="receiving-table receiving-edit-modal__receiving-table mt-2">
+      <form
+        className="receiving-table receiving-edit-modal__receiving-table mt-2"
+        data-testid="edit-modal-receiving-table"
+      >
         <DataTable
           columns={columns}
           data={fields}

@@ -22,6 +22,7 @@ const ChangesToggleCell = React.memo(({ isExpanded, onToggle, changeCount }) => 
       <button
         type="button"
         className="receiving-table__expand-button"
+        data-testid="changes-toggle"
         onClick={onToggle}
       >
         {isExpanded

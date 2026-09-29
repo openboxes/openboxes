@@ -154,7 +154,7 @@ const useConfirmReceiptColumns = ({
             customTooltip
             tooltipLabel={row.original.name}
           >
-            <span className="receiving-table__separator-label">
+            <span className="receiving-table__separator-label" data-testid="pack-level-separator">
               {row.original.name}
             </span>
           </TableCell>

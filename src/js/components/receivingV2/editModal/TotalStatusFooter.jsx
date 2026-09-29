@@ -19,7 +19,7 @@ const TotalStatusFooter = ({ remainingToReceive }) => {
   });
 
   return (
-    <span>
+    <span data-testid="edit-modal-total-status">
       (
       <span className={className}>{value}</span>
       )

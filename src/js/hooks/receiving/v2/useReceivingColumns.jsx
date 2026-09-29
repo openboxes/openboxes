@@ -146,7 +146,10 @@ const useReceivingColumns = ({
             customTooltip
             tooltipLabel={row.original.name}
           >
-            <span className={`receiving-table__separator-label ${putawayEnabled ? 'py-0' : ''}`}>
+            <span
+              className={`receiving-table__separator-label ${putawayEnabled ? 'py-0' : ''}`}
+              data-testid="pack-level-separator"
+            >
               {row.original.name}
             </span>
           </TableCell>

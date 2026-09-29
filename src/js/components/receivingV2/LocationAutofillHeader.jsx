@@ -16,26 +16,28 @@ const LocationAutofillHeader = ({ onSelect }) => {
       tooltip
       tooltipLabel={translate('react.receiving.location.label', 'Location')}
     >
-      <SelectField
-        options={receivingLocationOptions(translate)}
-        labelKey="name"
-        onChange={(option) => option && onSelect?.(option.id)}
-        placeholder={(
-          <span className="location-header__placeholder">
-            <span className="location-header__location">
-              {translate('react.receiving.location.label', 'Location')}
+      <div className="w-100" data-testid="location-autofill">
+        <SelectField
+          options={receivingLocationOptions(translate)}
+          labelKey="name"
+          onChange={(option) => option && onSelect?.(option.id)}
+          placeholder={(
+            <span className="location-header__placeholder">
+              <span className="location-header__location">
+                {translate('react.receiving.location.label', 'Location')}
+              </span>
+              <span className="location-header__autofill">
+                {translate('react.receiving.autofill.label', 'Autofill')}
+              </span>
+              <span className="location-header__caret" aria-hidden="true" />
             </span>
-            <span className="location-header__autofill">
-              {translate('react.receiving.autofill.label', 'Autofill')}
-            </span>
-            <span className="location-header__caret" aria-hidden="true" />
-          </span>
-        )}
-        className="location-header"
-        hideErrorMessageWrapper
-        controlShouldRenderValue={false}
-        isSearchable={false}
-      />
+          )}
+          className="location-header"
+          hideErrorMessageWrapper
+          controlShouldRenderValue={false}
+          isSearchable={false}
+        />
+      </div>
     </TableHeaderCell>
   );
 };
