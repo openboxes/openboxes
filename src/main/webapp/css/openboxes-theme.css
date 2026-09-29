@@ -1420,6 +1420,23 @@ th a:hover {
   font-size: 14px;
 }
 
+/* Angled column headers (location/list activity columns). The legacy
+   rule rotates a 20px box, so the text's real extent never reaches layout:
+   the row keeps its inline 100px, sized for the old 11px font, and the
+   wrapping .table-container (overflow-x: auto, so overflow-y clips too)
+   cut the longer labels off at the top once the theme set headers to 14px.
+   200px of cell leaves room for the longest English label ("Putaway
+   container assignment by delivery type", ~180px of rise at 14px) plus
+   the cell padding. */
+.vertical-text {
+  font-family: 'Inter', sans-serif;
+  color: var(--gray-600);
+}
+
+th:has(> .vertical-text) {
+  height: 200px;
+}
+
 th a:hover {
   color: var(--blue-primary);
 }
