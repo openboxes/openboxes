@@ -34,40 +34,42 @@ const ConfirmReceiptInfo = ({ control, lineItemsState }) => {
   };
 
   return (
-    <ItemDetails
-      badge={badge && {
-        current: badge.current,
-        next: nextBadge,
-        clickable: false,
-        tooltip: getBadgeTooltip(),
-      }}
-      fields={fields}
-      className="confirm-receipt__details"
-    >
-      <div className="confirm-receipt__delivered-on">
-        <Controller
-          name="dateDelivered"
-          control={control}
-          // The date is required for completing the receipt
-          rules={{ required: 'react.default.error.requiredField.label' }}
-          render={({ field, fieldState }) => (
-            <DateFieldDateFns
-              {...field}
-              title={{ id: 'react.receiving.deliveredOn.label', defaultMessage: 'Delivered on' }}
-              required
-              showTimeSelect
-              customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
-              tooltip={{
-                id: 'react.receiving.deliveredOn.tooltip.label',
-                defaultMessage: 'The date these items will be received into inventory. Defaults to today. If entering a previous receipt, the date should match the date the stock was entered into inventory physically/on paper.',
-              }}
-              errorMessage={fieldState.error
-                && translate(fieldState.error.message, 'This field is required')}
-            />
-          )}
-        />
-      </div>
-    </ItemDetails>
+    <div data-testid="confirm-receipt-details">
+      <ItemDetails
+        badge={badge && {
+          current: badge.current,
+          next: nextBadge,
+          clickable: false,
+          tooltip: getBadgeTooltip(),
+        }}
+        fields={fields}
+        className="confirm-receipt__details"
+      >
+        <div className="confirm-receipt__delivered-on">
+          <Controller
+            name="dateDelivered"
+            control={control}
+            // The date is required for completing the receipt
+            rules={{ required: 'react.default.error.requiredField.label' }}
+            render={({ field, fieldState }) => (
+              <DateFieldDateFns
+                {...field}
+                title={{ id: 'react.receiving.deliveredOn.label', defaultMessage: 'Delivered on' }}
+                required
+                showTimeSelect
+                customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
+                tooltip={{
+                  id: 'react.receiving.deliveredOn.tooltip.label',
+                  defaultMessage: 'The date these items will be received into inventory. Defaults to today. If entering a previous receipt, the date should match the date the stock was entered into inventory physically/on paper.',
+                }}
+                errorMessage={fieldState.error
+                  && translate(fieldState.error.message, 'This field is required')}
+              />
+            )}
+          />
+        </div>
+      </ItemDetails>
+    </div>
   );
 };
 

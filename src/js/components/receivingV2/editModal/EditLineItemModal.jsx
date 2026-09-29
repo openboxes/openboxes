@@ -76,11 +76,13 @@ const EditLineItemModal = ({
         <EditLineItemModalHeader
           onClose={onClose}
         />
-        <ItemDetails
-          badge={badge}
-          fields={detailsFields}
-          className={`mt-3 ${detailsClassName}`}
-        />
+        <div data-testid="edit-modal-item-details">
+          <ItemDetails
+            badge={badge}
+            fields={detailsFields}
+            className={`mt-3 ${detailsClassName}`}
+          />
+        </div>
         <ReceivedLineItemsTable
           receivedItems={receivedItems}
           columns={receivedColumns}

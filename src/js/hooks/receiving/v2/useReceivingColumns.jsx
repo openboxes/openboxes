@@ -14,7 +14,6 @@ import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import LocationAutofillHeader from 'components/receivingV2/LocationAutofillHeader';
 import receivingColumns from 'consts/receivingColumns';
-import receivingLocationOptions from 'consts/receivingLocationOptions';
 import ReceivingRowType from 'consts/receivingRowType';
 import { ReceivingView } from 'consts/receivingViewOptions';
 import useFormatNumber from 'hooks/useFormatNumber';
@@ -147,7 +146,10 @@ const useReceivingColumns = ({
             customTooltip
             tooltipLabel={row.original.name}
           >
-            <span className={`receiving-table__separator-label ${putawayEnabled ? 'py-0' : ''}`}>
+            <span
+              className={`receiving-table__separator-label ${putawayEnabled ? 'py-0' : ''}`}
+              data-testid="pack-level-separator"
+            >
               {row.original.name}
             </span>
           </TableCell>
@@ -516,13 +518,14 @@ const useReceivingColumns = ({
               />
             );
           },
-          // Separator rows also get a select, used to autofill the location for the whole group.
+          // Separator rows also get a select, used to set one location for the whole group.
           meta: {
             renderSeparator: ({ row, table }) => (
               <SelectCell
-                options={receivingLocationOptions(translate)}
-                onChange={(option) =>
-                  option && table.options.meta?.onLocationAutofill(option.id, row.original.id)}
+                options={binLocations}
+                onChange={(binLocation) =>
+                  binLocation
+                  && table.options.meta?.onPackLevelLocationChange(binLocation, row.original.id)}
                 label="react.receiving.location.label"
                 defaultLabel="Location"
               />

@@ -18,7 +18,10 @@ import 'utils/utils.scss';
 const ZeroLinesConfirmModal = ({
   lines, translate, localeKey, onConfirm, onCancel,
 }) => (
-  <div className="d-flex flex-column custom-modal-content justify-content-between bg-white">
+  <div
+    className="d-flex flex-column custom-modal-content justify-content-between bg-white"
+    data-testid="zero-lines-confirm-modal"
+  >
     <ZeroLinesConfirmModalHeader
       title={translate('react.receiving.zeroLines.confirm.title', 'Confirm receiving')}
       onClose={onCancel}

@@ -13,7 +13,7 @@ const ConfirmReceiptHeader = ({ onBackToReceive, onCompleteReceipt }) => {
   const translate = useTranslate();
 
   return (
-    <div className="d-flex justify-content-between align-items-center mb-3">
+    <div className="d-flex justify-content-between align-items-center mb-3" data-testid="confirm-receipt-header">
       <h5 className="m-0 font-weight-500 font-size-md">
         {translate('react.receiving.confirmReceipt.label', 'Confirm Receipt')}
       </h5>

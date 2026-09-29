@@ -21,6 +21,7 @@ const ReceivingTable = ({
   removeSplitItem,
   loadReceipt,
   onLocationAutofill,
+  onPackLevelLocationChange,
   sort,
   order,
 }) => {
@@ -58,6 +59,7 @@ const ReceivingTable = ({
       onOpenCommentModal,
       onOpenEditModal: openEditModal,
       onLocationAutofill,
+      onPackLevelLocationChange,
     }),
     [
       lineItemsState.entities,
@@ -66,6 +68,7 @@ const ReceivingTable = ({
       openEditModal,
       removeSplitItem,
       onLocationAutofill,
+      onPackLevelLocationChange,
     ],
   );
 
@@ -75,7 +78,7 @@ const ReceivingTable = ({
   );
 
   return (
-    <div className="receiving-table receiving-table--striped">
+    <div className="receiving-table receiving-table--striped" data-testid="receiving-table">
       <DataTable
         // Force TanStack table remount whenever the sort changes so the initialState
         // (`expanded: true`) re-applies and every changes group is expanded again.
@@ -155,6 +158,7 @@ ReceivingTable.propTypes = {
   removeSplitItem: PropTypes.func.isRequired,
   loadReceipt: PropTypes.func.isRequired,
   onLocationAutofill: PropTypes.func.isRequired,
+  onPackLevelLocationChange: PropTypes.func.isRequired,
   sort: PropTypes.string,
   order: PropTypes.string,
 };

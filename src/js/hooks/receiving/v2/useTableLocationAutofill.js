@@ -4,9 +4,9 @@ import ReceivingRowType from 'consts/receivingRowType';
 import useBinLocationAutofill from 'hooks/useBinLocationAutofill';
 
 /**
- * Location autofill of the main receiving table, triggered from the column header dropdown
- * or from a pack level separator row (packing list view). Applies the shared autofill to
- * the normalized line items state.
+ * Location autofill of the main receiving table, triggered from the column header dropdown,
+ * plus the location picked on a pack level separator row (packing list view). Both apply
+ * to the normalized line items state.
  */
 const useTableLocationAutofill = ({
   lineItemsState,
@@ -27,11 +27,21 @@ const useTableLocationAutofill = ({
     })
     .map((id) => lineItemsState.entities[id]), [lineItemsState]);
 
-  return useBinLocationAutofill({
+  const { onLocationAutofill } = useBinLocationAutofill({
     getRows: getAutofillableItems,
     getRowBinLocation,
     updateLineItems,
   });
+
+  // The location picked on a pack level separator row is applied to all rows of its group.
+  const onPackLevelLocationChange = useCallback((binLocation, separatorId) => {
+    updateLineItems(getAutofillableItems(separatorId).reduce((acc, item) => {
+      acc[item.rowId] = { binLocation };
+      return acc;
+    }, {}));
+  }, [getAutofillableItems, updateLineItems]);
+
+  return { onLocationAutofill, onPackLevelLocationChange };
 };
 
 export default useTableLocationAutofill;

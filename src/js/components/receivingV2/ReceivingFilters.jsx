@@ -65,14 +65,14 @@ const ReceivingFilters = ({
   }, [clearFilterParams]);
 
   return (
-    <div className="receiving-filters">
+    <div className="receiving-filters" data-testid="receiving-filters">
       <div className="receiving-filters__row d-flex justify-content-between align-items-center">
         <SlidingButtonGroup
           options={viewOptions}
           defaultOption={view}
           onChange={onViewChange}
         />
-        <div className="receiving-filters__autosave-slot">
+        <div className="receiving-filters__autosave-slot" data-testid="receiving-autosave-status">
           <AutosaveIndicator status={autosaveStatus} />
         </div>
       </div>
@@ -89,28 +89,31 @@ const ReceivingFilters = ({
         showFilterVisibilityToggler={false}
         alignButtonsToFilters
         isLoading={!translationsFetched}
+        autoSubmit
       />
       <div className="receiving-filters__row receiving-filters__actions d-flex flex-wrap justify-content-end align-items-center">
         {hasBinLocationSupport && (
-          <Switch
-            className="receiving-filters__switch"
-            value={putawayEnabled}
-            onChange={onPutawayChange}
-            titles={{
-              checked: {
-                id: 'react.receiving.showPutaway.label',
-                defaultMessage: 'Show Putaway',
-                tooltipLabel: 'react.receiving.showPutaway.checked.tooltip.label',
-                defaultTooltipLabel: 'Hides the bin location field. All updates to the values in the field will still be saved.',
-              },
-              unchecked: {
-                id: 'react.receiving.showPutaway.label',
-                defaultMessage: 'Show Putaway',
-                tooltipLabel: 'react.receiving.showPutaway.unchecked.tooltip.label',
-                defaultTooltipLabel: 'Reveals the bin location field, enabling users to receive directly into non-receiving bins.',
-              },
-            }}
-          />
+          <div data-testid="show-putaway-switch">
+            <Switch
+              className="receiving-filters__switch"
+              value={putawayEnabled}
+              onChange={onPutawayChange}
+              titles={{
+                checked: {
+                  id: 'react.receiving.showPutaway.label',
+                  defaultMessage: 'Show Putaway',
+                  tooltipLabel: 'react.receiving.showPutaway.checked.tooltip.label',
+                  defaultTooltipLabel: 'Hides the bin location field. All updates to the values in the field will still be saved.',
+                },
+                unchecked: {
+                  id: 'react.receiving.showPutaway.label',
+                  defaultMessage: 'Show Putaway',
+                  tooltipLabel: 'react.receiving.showPutaway.unchecked.tooltip.label',
+                  defaultTooltipLabel: 'Reveals the bin location field, enabling users to receive directly into non-receiving bins.',
+                },
+              }}
+            />
+          </div>
         )}
         {view !== ReceivingView.PACKING_LIST && (
           <Button

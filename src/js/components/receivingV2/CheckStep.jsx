@@ -28,7 +28,7 @@ const CheckStep = ({ completeReceiptRef }) => {
   completeReceiptRef.current = onCompleteReceipt;
 
   return (
-    <div className="receiving-container confirm-receipt">
+    <div className="receiving-container confirm-receipt" data-testid="check-step">
       <ConfirmReceiptInfo control={control} lineItemsState={lineItemsState} />
       <ConfirmReceiptFilters
         view={view}
