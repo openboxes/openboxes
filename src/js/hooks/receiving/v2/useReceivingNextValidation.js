@@ -36,14 +36,16 @@ const useReceivingNextValidation = ({ lineItemsState }) => {
 
   // TODO: support rendering multiple errors in the tooltip of a TableCell
   // Cells only show a single error so reduce down to only the first message of each field.
-  const lineItemErrors = useMemo(() => editableRows.reduce((errors, row) => {
-    const { success, error } = lineItemSchema.safeParse(row);
-    if (success) {
-      return errors;
-    }
-    const fieldErrors = _.mapValues(error.flatten().fieldErrors, ([message]) => message);
-    return { ...errors, [row.rowId]: fieldErrors };
-  }, {}), [lineItemsState, translate]);
+  const lineItemErrors = useMemo(() => {
+    const errors = {};
+    editableRows.forEach((row) => {
+      const { success, error } = lineItemSchema.safeParse(row);
+      if (!success) {
+        errors[row.rowId] = _.mapValues(error.flatten().fieldErrors, ([message]) => message);
+      }
+    });
+    return errors;
+  }, [lineItemsState, translate]);
 
   const isNextDisabled = Object.keys(lineItemErrors).length > 0 || (editableRows.length > 0
     && editableRows.every((row) => row.quantityReceiving === null));
