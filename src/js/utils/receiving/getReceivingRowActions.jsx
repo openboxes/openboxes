@@ -12,6 +12,8 @@ const buildCommentAction = ({ itemId, hasComment, onOpenCommentModal }) => ({
   onClick: (event) => onOpenCommentModal?.(itemId, event),
   label: 'react.receiving.comment.label',
   defaultLabel: 'Comment',
+  tooltipLabel: 'react.receiving.actions.comment.tooltip.label',
+  defaultTooltipLabel: 'Add a comment',
 });
 
 /**
@@ -26,6 +28,8 @@ const getReceivingRowActions = ({
     onClick: () => onOpenEditModal?.(itemId),
     label: 'react.default.button.edit.label',
     defaultLabel: 'Edit',
+    tooltipLabel: 'react.receiving.actions.edit.tooltip.label',
+    defaultTooltipLabel: 'Edit or split lot information',
   },
   // The comment lives on a receipt item, so rows that don't back one (e.g. a line already
   // received in full) don't offer it.
@@ -56,9 +60,8 @@ export const getReceivingSplitItemActions = ({ rowId, onRemove, isOriginalLine }
     ),
     onClick: () => onRemove?.(rowId),
     disabled: isOriginalLine,
-    // Only the line that cannot be deleted explains itself on hover.
-    tooltipLabel: isOriginalLine ? 'react.receiving.deleteOriginalLine.tooltip.label' : null,
-    defaultTooltipLabel: 'This line cannot be deleted because it represents the original product and lot entered by the shipper. If you did not receive this lot, enter zero in the receiving now field.',
+    tooltipLabel: isOriginalLine ? 'react.receiving.deleteOriginalLine.tooltip.label' : 'react.receiving.actions.delete.tooltip.label',
+    defaultTooltipLabel: isOriginalLine ? 'This line cannot be deleted because it represents the original product and lot entered by the shipper. If you did not receive this lot, enter zero in the receiving now field.' : 'Delete',
     label: 'react.default.button.delete.label',
     defaultLabel: 'Delete',
   },

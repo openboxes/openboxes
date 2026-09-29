@@ -18,6 +18,7 @@ const ItemDetails = ({
         current={badge.current}
         next={badge.next}
         clickable={badge.clickable}
+        tooltip={badge.tooltip}
       />
     )}
     <div className="item-details__grid">
@@ -46,6 +47,7 @@ ItemDetails.propTypes = {
       variant: PropTypes.string.isRequired,
     }),
     clickable: PropTypes.bool,
+    tooltip: PropTypes.string,
   }),
   fields: PropTypes.arrayOf(PropTypes.shape({
     label: PropTypes.node.isRequired,

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import PropTypes from 'prop-types';
 
+import useTranslate from 'hooks/useTranslate';
 import Translate from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
@@ -10,6 +11,7 @@ import 'components/form-elements/v2/style.scss';
 const SlidingButtonGroup = ({
   options, defaultOption, onChange, className, style,
 }) => {
+  const translate = useTranslate();
   const [activeOption, setActiveOption] = useState(defaultOption);
   const sliderPositionRef = useRef(null);
   const buttonRefs = useRef([]);
@@ -39,10 +41,17 @@ const SlidingButtonGroup = ({
     <div className={`sliding-button-group ${className ? `${className}` : ''}`} style={style} role="group">
       <div className="sliding-button-group__slider" ref={sliderPositionRef} />
       {options.map((option, index) => {
-        const showDisabledTooltip = option.disabled && option.disabledTooltip;
-        const tooltipText = showDisabledTooltip ? option.disabledTooltip : '';
+        // We allow displaying a tooltip even if the button group is disabled so we need to
+        // determine which tooltip we should be displaying (if any).
+        const [tooltipLabel, tooltipDefault] = option.disabled
+          ? [option.disabledTooltipLabel, option.defaultDisabledTooltipLabel]
+          : [option.tooltipLabel, option.defaultTooltipLabel];
+
+        const showTooltip = Boolean(tooltipLabel || tooltipDefault);
+        const tooltipText = showTooltip ? translate(tooltipLabel, tooltipDefault) : '';
+
         return (
-          <CustomTooltip content={tooltipText} show={showDisabledTooltip}>
+          <CustomTooltip content={tooltipText} show={showTooltip}>
             <button
               key={option.value}
               ref={(el) => { buttonRefs.current[index] = el; }}
@@ -69,8 +78,11 @@ SlidingButtonGroup.propTypes = {
     value: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
     defaultLabel: PropTypes.string.isRequired,
+    tooltipLabel: PropTypes.string,
+    defaultTooltipLabel: PropTypes.string,
     disabled: PropTypes.bool,
-    disabledTooltip: PropTypes.string,
+    disabledTooltipLabel: PropTypes.string,
+    defaultDisabledTooltipLabel: PropTypes.string,
   })).isRequired,
   defaultOption: PropTypes.string.isRequired,
   onChange: PropTypes.func,

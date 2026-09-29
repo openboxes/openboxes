@@ -82,7 +82,7 @@ SelectCell.defaultProps = {
   locationId: null,
   async: false,
   loadOptions: () => [],
-  showValueTooltip: false,
+  showValueTooltip: true,
   onBlur: undefined,
   clearable: true,
 };
