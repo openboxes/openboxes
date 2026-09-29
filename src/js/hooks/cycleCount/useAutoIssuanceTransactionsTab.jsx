@@ -80,11 +80,11 @@ const useAutoIssuanceTransactionsTab = ({
     setTableData,
   } = useTableDataV2({
     url: AUTO_ISSUANCE_TRANSACTIONS_REPORT,
-    errorMessageId: 'react.cycleCount.table.errorMessage.label',
+    errorMessageId: 'react.cycleCount.table.autoIssuance.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch auto-issuance transactions',
     // We should start fetching only after clicking the button
     // or after refreshing the page with filters selected
-    shouldFetch: !!(shouldFetch && endDate && startDate),
+    shouldFetch: Boolean(shouldFetch && endDate && startDate),
     setShouldFetch,
     disableInitialLoading: true,
     getParams,

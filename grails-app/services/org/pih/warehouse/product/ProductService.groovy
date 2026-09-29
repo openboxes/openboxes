@@ -1666,25 +1666,43 @@ class ProductService {
         }
 
         List<String> transactionTypeIds = configService.getProperty('openboxes.inventoryCount.transactionTypes', List) as List<String>
+        // A null bin location id stands for the default bin, which can't be matched with IN (...)
+        List<String> nonNullBinLocationIds = binLocationIds.findAll()
+        boolean includeDefaultBin = binLocationIds.contains(null)
+
+        List<String> binLocationConditions = []
+        if (nonNullBinLocationIds) {
+            binLocationConditions << "bin.id in (:binLocationIds)"
+        }
+        if (includeDefaultBin) {
+            binLocationConditions << "bin.id is null"
+        }
 
         String hql = """
-            select ii.product.id, te.binLocation.id, max(t.transactionDate)
+            select ii.product.id, bin.id, max(t.transactionDate)
             from TransactionEntry te
             join te.transaction t
             join te.inventoryItem ii
+            left join te.binLocation bin
             where ii.product.id in (:productIds)
-              and te.binLocation.id in (:binLocationIds)
+              and (${binLocationConditions.join(' or ')})
               and t.inventory = :inventory
               and t.transactionType.id in (:transactionTypeIds)
-            group by ii.product.id, te.binLocation.id
+              and (t.comment <> :commentToFilter or t.comment IS NULL)
+            group by ii.product.id, bin.id
         """
 
-        List<Object[]> results = TransactionEntry.executeQuery(hql, [
-                productIds     : productIds,
-                binLocationIds : binLocationIds,
-                inventory      : facility.inventory,
+        Map<String, Object> queryParams = [
+                productIds        : productIds,
+                inventory         : facility.inventory,
                 transactionTypeIds: transactionTypeIds,
-        ]) as List<Object[]>
+                commentToFilter   : Constants.INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT,
+        ]
+        if (nonNullBinLocationIds) {
+            queryParams.binLocationIds = nonNullBinLocationIds
+        }
+
+        List<Object[]> results = TransactionEntry.executeQuery(hql, queryParams) as List<Object[]>
 
         return results.collectEntries { Object[] row -> [(new ProductAndBinKey((String) row[0], (String) row[1])): (Timestamp) row[2]] }
     }

@@ -74,6 +74,16 @@ const CycleCountReporting = () => {
     setShouldFetch,
     defaultPageSize: currentTab === PRODUCTS_TAB ? 10 : 25,
   });
+
+  // Redirect to the default tab when the auto-issuance tab is not available for the current
+  // location (e.g. after switching location or opening a stale URL), so the page is not blank.
+  // Wait for supported activities to be loaded, so we don't redirect before the location is known.
+  useEffect(() => {
+    if (currentTab === AUTO_ISSUANCE_TAB && supportedActivities && !showAutoIssuanceTab) {
+      switchTab(PRODUCTS_TAB, () => updateParams({ isTabSwitch: true }));
+    }
+  }, [currentTab, supportedActivities, showAutoIssuanceTab]);
+
   const tabs = {
     [PRODUCTS_TAB]: {
       label: {

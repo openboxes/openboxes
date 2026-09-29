@@ -22,26 +22,29 @@ const useAutoIssuanceTransactionsTabExport = ({
 
   const exportAutoIssuanceTransactionsReport = async (filters) => {
     spinner.show();
-    await exportFileFromAPI({
-      url: AUTO_ISSUANCE_TRANSACTIONS_REPORT_CSV,
-      params: _.omitBy({
-        endDate: dateWithoutTimeZone({
-          date: filters.endDate,
+    try {
+      await exportFileFromAPI({
+        url: AUTO_ISSUANCE_TRANSACTIONS_REPORT_CSV,
+        params: _.omitBy({
+          endDate: dateWithoutTimeZone({
+            date: filters.endDate,
+          }),
+          startDate: dateWithoutTimeZone({
+            date: filters.startDate,
+          }),
+          products: filters.products?.map?.((product) => product.id),
+          binLocations: filters.binLocations?.map?.((binLocation) => binLocation.id),
+          facility: currentLocationId,
+        }, (val) => {
+          if (typeof val === 'boolean') {
+            return !val;
+          }
+          return _.isEmpty(val);
         }),
-        startDate: dateWithoutTimeZone({
-          date: filters.startDate,
-        }),
-        products: filters.products?.map?.((product) => product.id),
-        binLocations: filters.binLocations?.map?.((binLocation) => binLocation.id),
-        facility: currentLocationId,
-      }, (val) => {
-        if (typeof val === 'boolean') {
-          return !val;
-        }
-        return _.isEmpty(val);
-      }),
-      afterExporting: spinner.hide,
-    });
+      });
+    } finally {
+      spinner.hide();
+    }
   };
 
   const actions = [

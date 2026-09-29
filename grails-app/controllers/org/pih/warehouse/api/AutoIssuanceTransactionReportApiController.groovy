@@ -33,7 +33,7 @@ class AutoIssuanceTransactionReportApiController {
 
         if (params.format == 'csv') {
             String text = dataService.generateCsv(autoIssuanceTransactionFormatter.toCsv(autoIssuanceTransactions))
-            String fileName = "auto-issuance-transactions-${command.facility}-${dateFormatter.formatCurrentDateForFileName()}.csv"
+            String fileName = "auto-issuance-transactions-${command.facility}-${dateFormatter.formatCurrentDateForFileName()}"
             response.setHeader("Content-disposition", "attachment; filename=\"${fileName}.csv\"")
             render(contentType: "text/csv", text: CSVUtils.prependBomToCsvString(text), encoding: "UTF-8")
             return

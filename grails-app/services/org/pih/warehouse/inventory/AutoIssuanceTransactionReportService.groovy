@@ -75,7 +75,8 @@ class AutoIssuanceTransactionReportService {
         List<Object[]> rows = buildAutoIssuanceTransactionsQuery(queryString, command, true).list() as List<Object[]>
 
         List<String> productIds = rows.collect { (String) it[0] }.unique()
-        List<String> binLocationIds = rows.collect { (String) it[3] }.findAll().unique()
+        // Null bin id (default bin) is kept on purpose, so default-bin rows also get their last counted date
+        List<String> binLocationIds = rows.collect { (String) it[3] }.unique()
 
         Map<ProductAndBinKey, Timestamp> dateLastCountedByProductAndBin =
                 productService.getDateLastCountedByProductAndBin(command.facility, productIds, binLocationIds)
@@ -105,22 +106,24 @@ class AutoIssuanceTransactionReportService {
         }
 
         String totalCountQueryString = """
-            SELECT product.id
-            FROM transaction_entry
-            JOIN transaction ON transaction.id = transaction_entry.transaction_id
-            JOIN requisition ON requisition.id = transaction.requisition_id
-            JOIN inventory_item ON inventory_item.id = transaction_entry.inventory_item_id
-            JOIN product ON product.id = inventory_item.product_id
-            LEFT JOIN location bin_location ON bin_location.id = transaction_entry.bin_location_id
-            WHERE transaction.transaction_type_id = :transactionTypeId
-              AND transaction.inventory_id = :inventoryId
-              AND requisition.auto_issuance_requested = true
-              AND transaction.transaction_date BETWEEN :startDate AND :endDate
-              ${command.products ? 'AND product.id IN (:products)' : ''}
-              ${command.binLocations ? 'AND bin_location.id IN (:binLocations)' : ''}
-            GROUP BY product.id, bin_location.id, transaction.id, requisition.id
+            SELECT COUNT(*) FROM (
+                SELECT product.id
+                FROM transaction_entry
+                JOIN transaction ON transaction.id = transaction_entry.transaction_id
+                JOIN requisition ON requisition.id = transaction.requisition_id
+                JOIN inventory_item ON inventory_item.id = transaction_entry.inventory_item_id
+                JOIN product ON product.id = inventory_item.product_id
+                LEFT JOIN location bin_location ON bin_location.id = transaction_entry.bin_location_id
+                WHERE transaction.transaction_type_id = :transactionTypeId
+                  AND transaction.inventory_id = :inventoryId
+                  AND requisition.auto_issuance_requested = true
+                  AND transaction.transaction_date BETWEEN :startDate AND :endDate
+                  ${command.products ? 'AND product.id IN (:products)' : ''}
+                  ${command.binLocations ? 'AND bin_location.id IN (:binLocations)' : ''}
+                GROUP BY product.id, bin_location.id, transaction.id, requisition.id
+            ) AS grouped_rows
         """
-        int totalCount = buildAutoIssuanceTransactionsQuery(totalCountQueryString, command, false).list().size()
+        int totalCount = ((Number) buildAutoIssuanceTransactionsQuery(totalCountQueryString, command, false).uniqueResult()).intValue()
 
         return new PaginatedList<AutoIssuanceTransactionDto>(data, totalCount)
     }

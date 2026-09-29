@@ -11,7 +11,7 @@ import { setShouldRebuildFilterParams } from 'actions';
 import { INDICATORS_TAB } from 'consts/cycleCount';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { transformFilterParams } from 'utils/list-utils';
-import { fetchLocationById, fetchProduct } from 'utils/option-utils';
+import { fetchBins, fetchProduct } from 'utils/option-utils';
 
 const useCycleCountReportingFilters = ({ filterFields }) => {
   const [filterParams, setFilterParams] = useState({});
@@ -99,9 +99,8 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
           ? queryProps.binLocations
           : [queryProps.binLocations];
 
-        const binLocations = await Promise.all(
-          binLocationIds.map((id) => fetchLocationById(id)),
-        );
+        const bins = await fetchBins(currentLocation?.id);
+        const binLocations = bins.filter((bin) => binLocationIds.includes(bin.id));
 
         defaultValues.binLocations = binLocations.map((binLocation) => ({
           ...binLocation,
