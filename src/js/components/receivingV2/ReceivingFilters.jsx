@@ -103,13 +103,13 @@ const ReceivingFilters = ({
                   id: 'react.receiving.showPutaway.label',
                   defaultMessage: 'Show Putaway',
                   tooltipLabel: 'react.receiving.showPutaway.checked.tooltip.label',
-                  defaultTooltipLabel: 'Hides the bin location field. All updates to the values in the field will still be saved.',
+                  defaultTooltipLabel: 'Click to hide the bin location field. All updates to the values in the field will still be saved.',
                 },
                 unchecked: {
                   id: 'react.receiving.showPutaway.label',
                   defaultMessage: 'Show Putaway',
                   tooltipLabel: 'react.receiving.showPutaway.unchecked.tooltip.label',
-                  defaultTooltipLabel: 'Reveals the bin location field, enabling users to receive directly into non-receiving bins.',
+                  defaultTooltipLabel: 'Click to reveal the bin location field, enabling users to receive directly into non-receiving bins.',
                 },
               }}
             />
