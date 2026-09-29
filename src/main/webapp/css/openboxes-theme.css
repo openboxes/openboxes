@@ -1437,6 +1437,15 @@ th:has(> .vertical-text) {
   height: 200px;
 }
 
+/* The same page squeezes its dozens of columns into width: 100%, and the
+   `overflow-wrap: anywhere` on .box cells lets that squeeze reach one
+   character per line: `anywhere` also shrinks a cell's min-content, so
+   Name or Status broke mid-word. Wrap only between words here; the
+   .table-container already scrolls horizontally for the extra width. */
+.box .table-container table td {
+  overflow-wrap: break-word;
+}
+
 th a:hover {
   color: var(--blue-primary);
 }
@@ -1468,32 +1477,6 @@ th a:hover {
      unlike break-all, which chops every word. Keeps long lot numbers
      and codes inside their panel. */
   overflow-wrap: anywhere;
-}
-
-/* Product > Stock levels tab: 16 columns. At natural width (nowrap headers,
-   max-content table) it spills past the page, and its tr.prop rows opt the
-   card out of in-card scrolling. Make it fit the card instead: headers wrap
-   at word boundaries and padding is tighter. */
-form[action$="/product/updateInventoryLevels"] > .box > table {
-  width: 100%;
-  min-width: 0;
-}
-
-form[action$="/product/updateInventoryLevels"] > .box > table th {
-  white-space: normal;
-  word-break: normal;
-  overflow-wrap: normal;
-  hyphens: none;
-  vertical-align: bottom;
-}
-
-form[action$="/product/updateInventoryLevels"] > .box > table th,
-form[action$="/product/updateInventoryLevels"] > .box > table td {
-  padding: 8px 6px;
-}
-
-form[action$="/product/updateInventoryLevels"] > .box > table td {
-  max-width: 200px;
 }
 
 .list tbody tr:hover {
