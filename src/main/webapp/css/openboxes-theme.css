@@ -1505,6 +1505,35 @@ form[action$="/product/updateInventoryLevels"] > .box > table td {
   max-width: 200px;
 }
 
+/* Stock card > Stock history: 14 columns at natural width came to 1661px
+   against a 1383px card at 1920, so even a full-HD screen got the card's
+   scrollbar, and `anywhere` still split values like "05:50P|M". Fit it to
+   the card the way the legacy page did: headers wrap at word boundaries,
+   cells never break mid-word, and tighter side padding brings its minimum
+   (~1020px) back to the legacy one. Narrower than that, the card scrolls. */
+.box > table.stockHistory {
+  width: 100%;
+  min-width: 0;
+}
+
+.box > table.stockHistory th {
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: none;
+  vertical-align: bottom;
+}
+
+.box > table.stockHistory td {
+  overflow-wrap: normal;
+}
+
+.box > table.stockHistory th,
+.box > table.stockHistory td {
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
 .list tbody tr:hover {
   background: rgba(240, 246, 255, 0.5);
 }
@@ -2368,8 +2397,13 @@ form[action$="/product/updateInventoryLevels"] > .box > table td {
   flex: 1;
 }
 
+/* Both levels wrap: the legacy inline-block groups flowed onto a second
+   line on a narrow window, but a nowrap flex row holds every button on one
+   line, so the bar alone (~1380px on the stock card) set the page's
+   minimum width and forced a horizontal scrollbar. */
 .summary-actions .button-container {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   width: 100%;
@@ -2378,6 +2412,7 @@ form[action$="/product/updateInventoryLevels"] > .box > table td {
 
 .summary-actions .button-group {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   margin: 0;
