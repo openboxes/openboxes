@@ -355,20 +355,30 @@ h1 {
   white-space: normal;
 }
 
-/* Dialogs have a fixed width too, and the same auto-layout growth pushes
-   their form rows past the edge: Location > Bin Locations > Add Internal
-   Location has a size="80" name field, ~750px at Inter 14px, which widened
-   the table to 823px in an 800px dialog, and the 100%-wide Chosen above it
-   followed. Fixed layout sizes the columns from the dialog instead (label
-   column keeps the legacy 25% from openboxes.css `.prop .name`), and the
-   max-width guard on controls keeps each one inside its cell. */
-.ui-dialog table:has(tr.prop > td.name) {
+/* The location page's Add Internal Location / Add Zone Location dialogs
+   have a fixed width too, and the same auto-layout growth pushes their form
+   rows past the edge: the size="80" name field is ~750px at Inter 14px,
+   which widened the table to 823px in an 800px dialog, and the 100%-wide
+   Chosen above it followed. Fixed layout sizes the columns from the dialog
+   instead (label column keeps the legacy 25% from openboxes.css
+   `.prop .name`), and the max-width guard keeps each control inside its
+   cell. Scoped to these two dialogs rather than every .ui-dialog, since
+   other dialogs' form tables have not been checked against fixed layout. */
+:is(#dlgAddBinLocation, #dlgAddZoneLocation) table:has(tr.prop > td.name) {
   table-layout: fixed;
   width: 100%;
 }
 
-.ui-dialog table:has(tr.prop > td.name) tr.prop > td.name label {
+:is(#dlgAddBinLocation, #dlgAddZoneLocation) table:has(tr.prop > td.name) tr.prop > td.name label {
   white-space: normal;
+}
+
+:is(#dlgAddBinLocation, #dlgAddZoneLocation) input[type="text"],
+:is(#dlgAddBinLocation, #dlgAddZoneLocation) select,
+:is(#dlgAddBinLocation, #dlgAddZoneLocation) .chzn-container,
+:is(#dlgAddBinLocation, #dlgAddZoneLocation) .chosen-container {
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .yui-gf > .yui-u.first .box td table {
@@ -1234,9 +1244,7 @@ select {
 
 /* Legacy fields carry hardcoded `size` attributes (and fixed widths),
    which spill out of narrow panels — e.g. a 424px autocomplete in a
-   330px filter card. Never let a control exceed its container.
-   Dialogs get the same guard; see the fixed-layout dialog rule above for
-   why it needs that too. */
+   330px filter card. Never let a control exceed its container. */
 .box input[type="text"],
 .box input[type="password"],
 .box input[type="email"],
@@ -1248,19 +1256,7 @@ select {
 .box select,
 .box .chzn-container,
 .box .chosen-container,
-.box .select2-container,
-.ui-dialog input[type="text"],
-.ui-dialog input[type="password"],
-.ui-dialog input[type="email"],
-.ui-dialog input[type="number"],
-.ui-dialog input[type="search"],
-.ui-dialog input.text,
-.ui-dialog input.large,
-.ui-dialog textarea,
-.ui-dialog select,
-.ui-dialog .chzn-container,
-.ui-dialog .chosen-container,
-.ui-dialog .select2-container {
+.box .select2-container {
   max-width: 100%;
   box-sizing: border-box;
 }
