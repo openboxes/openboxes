@@ -355,6 +355,32 @@ h1 {
   white-space: normal;
 }
 
+/* The location page's Add Internal Location / Add Zone Location dialogs
+   have a fixed width too, and the same auto-layout growth pushes their form
+   rows past the edge: the size="80" name field is ~750px at Inter 14px,
+   which widened the table to 823px in an 800px dialog, and the 100%-wide
+   Chosen above it followed. Fixed layout sizes the columns from the dialog
+   instead (label column keeps the legacy 25% from openboxes.css
+   `.prop .name`), and the max-width guard keeps each control inside its
+   cell. Scoped to these two dialogs rather than every .ui-dialog, since
+   other dialogs' form tables have not been checked against fixed layout. */
+:is(#dlgAddBinLocation, #dlgAddZoneLocation) table:has(tr.prop > td.name) {
+  table-layout: fixed;
+  width: 100%;
+}
+
+:is(#dlgAddBinLocation, #dlgAddZoneLocation) table:has(tr.prop > td.name) tr.prop > td.name label {
+  white-space: normal;
+}
+
+:is(#dlgAddBinLocation, #dlgAddZoneLocation) input[type="text"],
+:is(#dlgAddBinLocation, #dlgAddZoneLocation) select,
+:is(#dlgAddBinLocation, #dlgAddZoneLocation) .chzn-container,
+:is(#dlgAddBinLocation, #dlgAddZoneLocation) .chosen-container {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 .yui-gf > .yui-u.first .box td table {
   width: 100%;
   max-width: 100%;
