@@ -710,7 +710,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                     // When a shortage occurred (reasonCode is set), use quantityPicked instead of quantity
                     // to avoid counting canceled/unpicked quantities
                     picklistItem.reasonCode ? (picklistItem.quantityPicked ?: 0) : picklistItem.quantity
-                }
+                } ?: 0
             }
         } else {
             quantityAllocated = PicklistItem.findAllByRequisitionItem(this).sum { picklistItem ->
