@@ -106,8 +106,12 @@ class PutawayController {
             if (params.containsKey('assignee.id')) {
                 task.assignee = params['assignee.id'] ? Person.get(params['assignee.id']) : null
             }
-            task.dateStarted = parseDateStruct(params, 'dateStarted')
-            task.dateCompleted = parseDateStruct(params, 'dateCompleted')
+            if (params.containsKey('dateStarted')) {
+                task.dateStarted = parseDateStruct(params, 'dateStarted')
+            }
+            if (params.containsKey('dateCompleted')) {
+                task.dateCompleted = parseDateStruct(params, 'dateCompleted')
+            }
             putawayTaskService.save(task)
             render(status: 200, text: "OK")
         } catch (Exception e) {

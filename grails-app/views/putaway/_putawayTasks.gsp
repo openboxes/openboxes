@@ -36,14 +36,16 @@
                             <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
                         </button>
                         <div class="actions">
-                            <div class="action-menu-item">
-                                <a href="javascript:void(0)"
-                                   class="btn-edit-putaway-task"
-                                   data-task-id="${task.id}">
-                                    <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />
-                                    &nbsp;<warehouse:message code="putawayTask.edit.label" default="Edit Putaway Task"/>
-                                </a>
-                            </div>
+                            <g:if test="${task.status?.isOpen()}">
+                                <div class="action-menu-item">
+                                    <a href="javascript:void(0)"
+                                       class="btn-edit-putaway-task"
+                                       data-task-id="${task.id}">
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />
+                                        &nbsp;<warehouse:message code="putawayTask.edit.label" default="Edit Putaway Task"/>
+                                    </a>
+                                </div>
+                            </g:if>
                             <div class="action-menu-item">
                                 <a href="${createLink(controller: 'putaway', action: 'putawayTaskTicket', id: task.id)}"
                                    target="_blank">
