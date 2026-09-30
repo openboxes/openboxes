@@ -223,6 +223,8 @@ export const INVENTORY_AUDIT_SUMMARY_REPORT = `${REPORTS}/inventory-audit-summar
 export const INVENTORY_AUDIT_SUMMARY_REPORT_CSV = `${INVENTORY_AUDIT_SUMMARY_REPORT}.csv`;
 export const INVENTORY_TRANSACTIONS_SUMMARY = `${REPORTS}/inventory-transactions-summary`;
 export const INVENTORY_TRANSACTIONS_SUMMARY_CSV = `${INVENTORY_TRANSACTIONS_SUMMARY}.csv`;
+export const AUTO_ISSUANCE_TRANSACTIONS_REPORT = `${REPORTS}/auto-issuance-transactions`;
+export const AUTO_ISSUANCE_TRANSACTIONS_REPORT_CSV = `${AUTO_ISSUANCE_TRANSACTIONS_REPORT}.csv`;
 
 // INDICATORS
 export const INDICATORS_REPORT = `${API}/reports/indicators`;

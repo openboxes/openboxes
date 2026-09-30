@@ -11,7 +11,7 @@ import { setShouldRebuildFilterParams } from 'actions';
 import { INDICATORS_TAB } from 'consts/cycleCount';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { transformFilterParams } from 'utils/list-utils';
-import { fetchProduct } from 'utils/option-utils';
+import { fetchBins, fetchProduct } from 'utils/option-utils';
 
 const useCycleCountReportingFilters = ({ filterFields }) => {
   const [filterParams, setFilterParams] = useState({});
@@ -93,6 +93,21 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
           value: product.id,
         }));
       }
+
+      if (queryProps.binLocations) {
+        const binLocationIds = Array.isArray(queryProps.binLocations)
+          ? queryProps.binLocations
+          : [queryProps.binLocations];
+
+        const bins = await fetchBins(currentLocation?.id);
+        const binLocations = bins.filter((bin) => binLocationIds.includes(bin.id));
+
+        defaultValues.binLocations = binLocations.map((binLocation) => ({
+          ...binLocation,
+          label: binLocation.name,
+          value: binLocation.id,
+        }));
+      }
       setFilterParams(defaultValues);
       setDefaultFilterValues(defaultValues);
       setFiltersInitialized(true);
@@ -120,6 +135,7 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
       startDate: { name: 'startDate' },
       endDate: { name: 'endDate' },
       products: { name: 'products', accessor: 'id' },
+      binLocations: { name: 'binLocations', accessor: 'id' },
       tab: { name: 'tab' },
     };
     const transformedParams = transformFilterParams(values, filterAccessors);

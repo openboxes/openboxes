@@ -1,3 +1,14 @@
+.bin-location-default-label {
+  font-style: italic;
+  color: var(--gray-300);
+}
+
+// Matches the negative-quantity styling on the product's Stock Card (stockCard.gsp)
+.negative-quantity {
+  color: #d9534f;
+  font-weight: bold;
+}
+
 .dashboard-container {
   background: white;
 

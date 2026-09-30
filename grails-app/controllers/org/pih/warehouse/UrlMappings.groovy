@@ -1226,6 +1226,11 @@ class UrlMappings {
             action = [GET: "getInventoryTransactionsSummary"]
         }
 
+        "/api/reports/auto-issuance-transactions(.$format)?" {
+            controller = "autoIssuanceTransactionReportApi"
+            action = [GET: "getAutoIssuanceTransactions"]
+        }
+
         "/api/reports/indicators/productsInventoried" {
             controller = "indicatorApi"
             action = [GET: "getProductsInventoried"]

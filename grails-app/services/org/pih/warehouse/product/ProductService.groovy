@@ -43,6 +43,7 @@ import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.date.DateFormatter
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.ProductAndBinKey
 import org.pih.warehouse.inventory.TransactionEntry
 import util.ReportUtil
 
@@ -1652,6 +1653,58 @@ class ProductService {
 
         // Convert list to a map for O(1) accessibility further
         return results.collectEntries { [ (it[0]): it[1] ] }
+    }
+
+    /**
+     * Last counted date, scoped to product+bin rather than latestInventoryDateForProducts' facility+
+     * product grain above.
+     */
+    Map<ProductAndBinKey, Timestamp> getDateLastCountedByProductAndBin(
+            Location facility, List<String> productIds, List<String> binLocationIds) {
+        if (!productIds || !binLocationIds) {
+            return [:]
+        }
+
+        List<String> transactionTypeIds = configService.getProperty('openboxes.inventoryCount.transactionTypes', List) as List<String>
+        // A null bin location id stands for the default bin, which can't be matched with IN (...)
+        List<String> nonNullBinLocationIds = binLocationIds.findAll()
+        boolean includeDefaultBin = binLocationIds.contains(null)
+
+        List<String> binLocationConditions = []
+        if (nonNullBinLocationIds) {
+            binLocationConditions << "bin.id in (:binLocationIds)"
+        }
+        if (includeDefaultBin) {
+            binLocationConditions << "bin.id is null"
+        }
+
+        String hql = """
+            select ii.product.id, bin.id, max(t.transactionDate)
+            from TransactionEntry te
+            join te.transaction t
+            join te.inventoryItem ii
+            left join te.binLocation bin
+            where ii.product.id in (:productIds)
+              and (${binLocationConditions.join(' or ')})
+              and t.inventory = :inventory
+              and t.transactionType.id in (:transactionTypeIds)
+              and (t.comment <> :commentToFilter or t.comment IS NULL)
+            group by ii.product.id, bin.id
+        """
+
+        Map<String, Object> queryParams = [
+                productIds        : productIds,
+                inventory         : facility.inventory,
+                transactionTypeIds: transactionTypeIds,
+                commentToFilter   : Constants.INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT,
+        ]
+        if (nonNullBinLocationIds) {
+            queryParams.binLocationIds = nonNullBinLocationIds
+        }
+
+        List<Object[]> results = TransactionEntry.executeQuery(hql, queryParams) as List<Object[]>
+
+        return results.collectEntries { Object[] row -> [(new ProductAndBinKey((String) row[0], (String) row[1])): (Timestamp) row[2]] }
     }
 
     Map<String, List<Map<String, Object>>> getLotNumbersWithExpirationDate(List<String> productIds) {
