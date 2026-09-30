@@ -19,6 +19,7 @@ import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.CycleCountService
 import org.pih.warehouse.inventory.InventoryItem
@@ -151,9 +152,15 @@ class AllocationService {
         RequisitionItem requisitionItem = request.requisitionItem
         Integer quantityRequired = request.quantityRequired ?: requisitionItem.calculateQuantityRequired()
         List<SuggestedItem> suggestedItems
+        List<SuggestedItem> prepickItems = []
         if (mode == AllocationMode.AUTO) {
-            suggestedItems = getAutoSuggestedItems(requisitionItem, quantityRequired,
-                    request.allocationStrategies, [], request.crossDockRelease, mode)
+            prepickItems = getPrepickSuggestedItems(requisitionItem, quantityRequired, request.crossDockRelease)
+            Integer quantityPrepicked = (prepickItems.sum { it.quantityPicked } ?: 0) as Integer
+            Integer quantityOutstanding = quantityRequired - quantityPrepicked
+            suggestedItems = quantityOutstanding > 0
+                    ? getAutoSuggestedItems(requisitionItem, quantityOutstanding,
+                            request.allocationStrategies, [], request.crossDockRelease, mode)
+                    : []
         } else if (mode == AllocationMode.MANUAL) {
             List<AvailableItem> manualItems = request.availableItems?.findAll { it.inventoryItem.product?.id == requisitionItem.product?.id }
             suggestedItems = stockMovementService.getSuggestedItems(manualItems, quantityRequired)
@@ -174,8 +181,9 @@ class AllocationService {
                 stockMovementService.clearPicklist(requisitionItem)
             }
             stockMovementService.allocateSuggestedItems(requisitionItem, suggestedItems, mode == AllocationMode.AUTO)
+            stockMovementService.allocatePrepickItems(requisitionItem, prepickItems)
         }
-        return new AllocationResult(allocationRequest: request, suggestedItems: suggestedItems)
+        return new AllocationResult(allocationRequest: request, suggestedItems: suggestedItems, prepickItems: prepickItems)
     }
 
     Boolean deallocate(Requisition requisition) {
@@ -234,12 +242,13 @@ class AllocationService {
             } ?: []
 
             results.each { AllocationResult result ->
-                if (!result.suggestedItems) {
+                if (!result.suggestedItems && !result.prepickItems) {
                     return
                 }
                 RequisitionItem requisitionItem = result.allocationRequest.requisitionItem
                 stockMovementService.clearPicklist(requisitionItem)
                 stockMovementService.allocateSuggestedItems(requisitionItem, result.suggestedItems, allocationMode == AllocationMode.AUTO)
+                stockMovementService.allocatePrepickItems(requisitionItem, result.prepickItems)
             }
             return results
         } catch (Exception e) {
@@ -303,6 +312,32 @@ class AllocationService {
         } else if (allocationResultNotEmpty) {
             stockMovementService.updateRequisitionStatus(requisition.id, RequisitionStatus.PICKING)
         }
+    }
+
+    /**
+     * Stock a back counter operator already matched and scanned into a pre-pick bin. It is consumed before any
+     * pick is raised, so the warehouse never fetches a part the technician is holding. Matching is by product
+     * only - there is no reservation per order, so whichever line allocates first takes it.
+     */
+    private List<SuggestedItem> getPrepickSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired,
+                                                         Boolean crossDockRelease) {
+        if (crossDockRelease || !quantityRequired || quantityRequired <= 0) {
+            return []
+        }
+
+        if (requisitionItem.requisition?.deliveryTypeCode != DeliveryTypeCode.SERVICE) {
+            return []
+        }
+
+        List<AvailableItem> availableItems = stockMovementService.getPrepickAvailableItems(
+                requisitionItem.requisition.origin, requisitionItem)
+
+        if (!availableItems) {
+            return []
+        }
+
+        return stockMovementService.getPrepickSuggestedItems(
+                applyRotation(getConfiguredRotationRule(), availableItems), quantityRequired)
     }
 
     private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationSourceStrategy> strategies, List<AvailableItem> excludeList = [], Boolean crossDockRelease = false,
