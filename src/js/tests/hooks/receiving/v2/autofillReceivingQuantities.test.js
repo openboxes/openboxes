@@ -8,7 +8,7 @@ import {
 
 import '@testing-library/jest-dom';
 
-// Stub the save and exit modal. It is not invoked in these ytests, and it pulls in
+// Stub the save and exit modal. It is not invoked in these tests, and it pulls in
 // react-icons/all, which jest cannot parse.
 jest.mock('utils/receiving/confirmExitWithUnsavedRows', () => jest.fn());
 

@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import { getAutosaveBatchSize, getAutosaveDebounceTime } from 'selectors';
 
 import { AutosaveStatus } from 'consts/autosaveStatuses';
-import RowSaveStatus, { isRowUnsaved } from 'consts/rowSaveStatus';
+import RowSaveStatus, { isRowUnsaved as defaultIsRowUnsaved } from 'consts/rowSaveStatus';
 import useAutosaveQueue from 'hooks/useAutosaveQueue';
 import useAutosaveRetry from 'hooks/useAutosaveRetry';
 import useAutosaveRows from 'hooks/useAutosaveRows';
@@ -68,6 +68,8 @@ import {
  * @param {Function} [options.rowOptions.isRowValid] - decides whether a row that needs a
  *   request can be sent: (row) => boolean. Checked at flush time, after `shouldSaveRow`; when
  *   it returns false, the row is marked INVALID without a request.
+ * @param {Function} [options.rowOptions.isRowUnsaved] - decides whether a row counts as
+ *   unsaved: (row) => boolean. Used by `flush` and `autosaveStatus`.
  * @param {Function} [options.rowOptions.reconcileRow] - builds the changes to apply to a row
  *   from a fresh response (the row was not edited while its request was running):
  *   (row, serverRow) => partial. The returned partial is merged into the row.
@@ -123,6 +125,7 @@ const useAutosave = ({
     generateRowId = () => _.uniqueId('row-'),
     shouldSaveRow = () => true,
     isRowValid = () => true,
+    isRowUnsaved = defaultIsRowUnsaved,
     reconcileRow = (row, serverRow) => serverRow,
     reconcileStaleRow = () => ({}),
     removeRowFromState = removeNormalizedItem,
@@ -174,6 +177,7 @@ const useAutosave = ({
     deleteFn,
     shouldSaveRow,
     isRowValid,
+    isRowUnsaved,
     reconcileRow,
     reconcileStaleRow,
     removeRowFromState,
@@ -442,7 +446,8 @@ const useAutosave = ({
     } finally {
       isFlushingRef.current = false;
     }
-    const hasUnsavedRows = Object.values(stateRef.current.entities).some(isRowUnsaved);
+    const hasUnsavedRows = Object.values(stateRef.current.entities)
+      .some(optionsRef.current.isRowUnsaved);
     if (hasUnsavedRows) {
       throw new Error('Autosave failed: some rows could not be saved');
     }
@@ -456,7 +461,8 @@ const useAutosave = ({
 
   // General status for the autosave indicator
   const autosaveStatus = useMemo(() => {
-    const hasUnsavedRows = Object.values(rowsState.entities || {}).some(isRowUnsaved);
+    const hasUnsavedRows = Object.values(rowsState.entities || {})
+      .some(optionsRef.current.isRowUnsaved);
 
     if (hasUnsavedRows) {
       return AutosaveStatus.ERROR;

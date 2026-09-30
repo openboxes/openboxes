@@ -14,14 +14,10 @@ const useReceivingSaveAction = ({ flush }) => {
   // Autosave persists edits continuously, so exiting only needs to flush whatever is still unsaved.
   const onSaveAndExit = useCallback(async () => {
     dispatch(showSpinner());
-    let hasUnsavedRows = false;
-    try {
-      await flush();
-    } catch {
-      hasUnsavedRows = true;
-    } finally {
-      dispatch(hideSpinner());
-    }
+    const hasUnsavedRows = await flush()
+      .then(() => false)
+      .catch(() => true)
+      .finally(() => dispatch(hideSpinner()));
     // If the flush failed (some rows could not be saved, or are invalid), prompt the user to
     // decide if they still want to exit and lose those updates.
     if (hasUnsavedRows && !(await confirmExitWithUnsavedRows())) {
