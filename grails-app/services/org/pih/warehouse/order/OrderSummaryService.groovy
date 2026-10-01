@@ -414,7 +414,7 @@ class OrderSummaryService {
         }
 
         if (statements && checkIfOrderSummaryExists()) {
-            dataService.executeStatements(statements, false)
+            dataService.executeStatements(statements)
         }
     }
 
