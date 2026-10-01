@@ -159,37 +159,45 @@ class ErrorsController {
     def processError() {
 
         def enabled = ConfigHelper.booleanValue(grailsApplication.config.openboxes.mail.errors.enabled)
-        if (enabled) {
-            def recipients = ConfigHelper.listValue(grailsApplication.config.openboxes.mail.errors.recipients) as List
-
-            def errorNotificationList = userService.findUsersByRoleType(RoleType.ROLE_ERROR_NOTIFICATION)
-            errorNotificationList.each { errorNotificationUser ->
-                if (errorNotificationUser.email)
-                    recipients.add(errorNotificationUser.email)
-            }
-
-            def ccList = []
-            def reportedBy = User.findByUsername(params.reportedBy)
-            if (params.ccMe && reportedBy) {
-                ccList.add(reportedBy?.email)
-            }
-
-            def dom = params.remove("dom")
-            def stacktrace = params.remove("stacktrace")
-            def subject = "${params.summary ?: warehouse.message(code: 'email.errorReportSubject.message')}"
-            def body = "${g.render(template: '/email/errorReport', model: [stacktrace: stacktrace], params: params)}"
-
-            boolean sent = mailService.sendHtmlMailWithAttachment(reportedBy, recipients, ccList, subject, body.toString(), dom?.bytes, "error.html", "text/html")
-            // React renders the message as text, so the recipients must not be HTML-encoded (encodeAs skips that)
-            if (sent) {
-                flash.message = "${warehouse.message(code: 'email.errorReportSuccess.message', args: [recipients], encodeAs: 'raw')}"
-            } else {
-                flash.error = "${warehouse.message(code: 'email.notSent.message', args: [recipients], encodeAs: 'raw')}"
-            }
-        } else {
+        if (!enabled) {
             flash.error = "${warehouse.message(code: 'email.errorReportDisabled.message')}"
+            redirectToDashboard()
+            return
         }
-        // The dashboard is a React page, which only reads flash messages from the URL (see useFlashScopeListener)
+
+        def recipients = ConfigHelper.listValue(grailsApplication.config.openboxes.mail.errors.recipients) as List
+
+        def errorNotificationList = userService.findUsersByRoleType(RoleType.ROLE_ERROR_NOTIFICATION)
+        errorNotificationList.each { errorNotificationUser ->
+            if (errorNotificationUser.email)
+                recipients.add(errorNotificationUser.email)
+        }
+
+        def ccList = []
+        def reportedBy = User.findByUsername(params.reportedBy)
+        if (params.ccMe && reportedBy) {
+            ccList.add(reportedBy?.email)
+        }
+
+        def dom = params.remove("dom")
+        def stacktrace = params.remove("stacktrace")
+        def subject = "${params.summary ?: warehouse.message(code: 'email.errorReportSubject.message')}"
+        def body = "${g.render(template: '/email/errorReport', model: [stacktrace: stacktrace], params: params)}"
+
+        boolean sent = mailService.sendHtmlMailWithAttachment(reportedBy, recipients, ccList, subject, body.toString(), dom?.bytes, "error.html", "text/html")
+        // React renders the message as text, so the recipients must not be HTML-encoded (encodeAs skips that)
+        if (!sent) {
+            flash.error = "${warehouse.message(code: 'email.notSent.message', args: [recipients], encodeAs: 'raw')}"
+            redirectToDashboard()
+            return
+        }
+
+        flash.message = "${warehouse.message(code: 'email.errorReportSuccess.message', args: [recipients], encodeAs: 'raw')}"
+        redirectToDashboard()
+    }
+
+    // The dashboard is a React page, which only reads flash messages from the URL (see useFlashScopeListener)
+    private void redirectToDashboard() {
         redirect(controller: "dashboard", action: "index", params: ["flash": flash as JSON])
     }
 
