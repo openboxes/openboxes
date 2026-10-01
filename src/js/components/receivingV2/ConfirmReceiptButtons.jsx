@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import Button from 'components/form-elements/Button';
 
-const ConfirmReceiptButtons = ({ onBackToReceive, onCompleteReceipt }) => (
+const ConfirmReceiptButtons = ({ onBackToReceive, onCompleteReceipt, isCompleteDisabled }) => (
   <div className="d-flex gap-8">
     <Button
       label="react.receiving.backToReceive.label"
@@ -21,6 +21,7 @@ const ConfirmReceiptButtons = ({ onBackToReceive, onCompleteReceipt }) => (
       defaultLabel="Complete Receipt"
       variant="primary"
       onClick={onCompleteReceipt}
+      disabled={isCompleteDisabled}
     />
   </div>
 );
@@ -28,11 +29,13 @@ const ConfirmReceiptButtons = ({ onBackToReceive, onCompleteReceipt }) => (
 ConfirmReceiptButtons.propTypes = {
   onBackToReceive: PropTypes.func,
   onCompleteReceipt: PropTypes.func,
+  isCompleteDisabled: PropTypes.bool,
 };
 
 ConfirmReceiptButtons.defaultProps = {
   onBackToReceive: () => {},
   onCompleteReceipt: () => {},
+  isCompleteDisabled: false,
 };
 
 export default ConfirmReceiptButtons;

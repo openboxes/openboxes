@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import PropTypes from 'prop-types';
 
@@ -9,9 +9,10 @@ import useConfirmReceiptForm from 'hooks/receiving/v2/useConfirmReceiptForm';
 
 import 'components/receivingV2/receiving.scss';
 
-const CheckStep = ({ completeReceiptRef }) => {
+const CheckStep = ({ completeReceiptRef, setNextDisabled }) => {
   const {
     onCompleteReceipt,
+    isCompleteDisabled,
     onSaveAndExit,
     control,
     view,
@@ -26,6 +27,10 @@ const CheckStep = ({ completeReceiptRef }) => {
   // Handed up to the wizard, whose Complete Receipt button runs it.
   // eslint-disable-next-line no-param-reassign
   completeReceiptRef.current = onCompleteReceipt;
+
+  useEffect(() => {
+    setNextDisabled(isCompleteDisabled);
+  }, [isCompleteDisabled]);
 
   return (
     <div className="receiving-container confirm-receipt" data-testid="check-step">
@@ -53,6 +58,7 @@ const CheckStep = ({ completeReceiptRef }) => {
 
 CheckStep.propTypes = {
   completeReceiptRef: PropTypes.shape({ current: PropTypes.func }).isRequired,
+  setNextDisabled: PropTypes.func.isRequired,
 };
 
 export default CheckStep;

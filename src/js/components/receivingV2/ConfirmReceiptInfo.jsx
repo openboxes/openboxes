@@ -9,6 +9,7 @@ import useConfirmReceiptDetails from 'hooks/receiving/v2/useConfirmReceiptDetail
 import useConfirmReceiptStatusTransition from 'hooks/receiving/v2/useConfirmReceiptStatusTransition';
 import useTranslate from 'hooks/useTranslate';
 import ItemDetails from 'utils/ItemDetails';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const ConfirmReceiptInfo = ({ control, lineItemsState }) => {
   const translate = useTranslate();
@@ -49,22 +50,26 @@ const ConfirmReceiptInfo = ({ control, lineItemsState }) => {
           <Controller
             name="dateDelivered"
             control={control}
-            // The date is required for completing the receipt
-            rules={{ required: 'react.default.error.requiredField.label' }}
             render={({ field, fieldState }) => (
-              <DateFieldDateFns
-                {...field}
-                title={{ id: 'react.receiving.deliveredOn.label', defaultMessage: 'Delivered on' }}
-                required
-                showTimeSelect
-                customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
-                tooltip={{
-                  id: 'react.receiving.deliveredOn.tooltip.label',
-                  defaultMessage: 'The date these items will be received into inventory. Defaults to today. If entering a previous receipt, the date should match the date the stock was entered into inventory physically/on paper.',
-                }}
-                errorMessage={fieldState.error
-                  && translate(fieldState.error.message, 'This field is required')}
-              />
+              <CustomTooltip
+                content={fieldState.error?.message}
+                disabled={!fieldState.error}
+              >
+                <DateFieldDateFns
+                  {...field}
+                  title={{ id: 'react.receiving.deliveredOn.label', defaultMessage: 'Delivered on' }}
+                  required
+                  showTimeSelect
+                  customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
+                  tooltip={{
+                    id: 'react.receiving.deliveredOn.tooltip.label',
+                    defaultMessage: 'The date these items will be received into inventory. Defaults to today. If entering a previous receipt, the date should match the date the stock was entered into inventory physically/on paper.',
+                  }}
+                  clearable={false}
+                  errorMessage={fieldState.error?.message}
+                  hideErrorMessageWrapper
+                />
+              </CustomTooltip>
             )}
           />
         </div>

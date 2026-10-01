@@ -64,7 +64,11 @@ const useReceivingForm = () => {
     clearFilterParams,
   } = useReceivingFilters({ lineItemsState });
 
-  const { isNextDisabled, validateBeforeNext } = useReceivingNextValidation({ lineItemsState });
+  const {
+    isNextDisabled,
+    validateBeforeNext,
+    lineItemErrors,
+  } = useReceivingNextValidation({ lineItemsState });
 
   const { onLocationAutofill, onPackLevelLocationChange } = useTableLocationAutofill({
     lineItemsState: visibleLineItemsState,
@@ -116,6 +120,7 @@ const useReceivingForm = () => {
       columns,
       sort,
       order,
+      lineItemErrors,
     },
     next: {
       // Nothing is known about the lines until the receipt is loaded, so the transition waits

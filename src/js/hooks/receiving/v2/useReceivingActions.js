@@ -19,9 +19,12 @@ import {
   transformReceiptSummary,
 } from 'utils/receiving/receiptSummaryRows';
 
-// Only rows with an editable quantity input can be autofilled: plain lines (no row type)
-// and split items.
-const AUTOFILL_EXCLUDED_ROW_TYPES = [ReceivingRowType.REPLACED, ReceivingRowType.TOGGLE];
+// Only editable plain lines (no row type) can be autofilled
+const AUTOFILL_EXCLUDED_ROW_TYPES = [
+  ReceivingRowType.REPLACED,
+  ReceivingRowType.TOGGLE,
+  ReceivingRowType.SPLIT_ITEM,
+];
 
 // A row qualifies for autofill only when it can still be received (not completed, something
 // left to receive) and the user hasn't entered anything yet (0 counts as entered).
