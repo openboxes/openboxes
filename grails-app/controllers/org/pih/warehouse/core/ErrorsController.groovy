@@ -160,7 +160,7 @@ class ErrorsController {
 
         def enabled = ConfigHelper.booleanValue(grailsApplication.config.openboxes.mail.errors.enabled)
         if (!enabled) {
-            flash.error = "${warehouse.message(code: 'email.errorReportDisabled.message')}"
+            flash.error = messageLocalizer.localize('email.errorReportDisabled.message')
             redirectToDashboard()
             return
         }
@@ -181,18 +181,17 @@ class ErrorsController {
 
         def dom = params.remove("dom")
         def stacktrace = params.remove("stacktrace")
-        def subject = "${params.summary ?: warehouse.message(code: 'email.errorReportSubject.message')}"
+        def subject = "${params.summary ?: messageLocalizer.localize('email.errorReportSubject.message')}"
         def body = "${g.render(template: '/email/errorReport', model: [stacktrace: stacktrace], params: params)}"
 
         boolean sent = mailService.sendHtmlMailWithAttachment(reportedBy, recipients, ccList, subject, body.toString(), dom?.bytes, "error.html", "text/html")
-        // React renders the message as text, so the recipients must not be HTML-encoded (encodeAs skips that)
         if (!sent) {
-            flash.error = "${warehouse.message(code: 'email.notSent.message', args: [recipients], encodeAs: 'raw')}"
+            flash.error = messageLocalizer.localize('email.notSent.message', [recipients])
             redirectToDashboard()
             return
         }
 
-        flash.message = "${warehouse.message(code: 'email.errorReportSuccess.message', args: [recipients], encodeAs: 'raw')}"
+        flash.message = messageLocalizer.localize('email.errorReportSuccess.message', [recipients])
         redirectToDashboard()
     }
 

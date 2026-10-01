@@ -4,10 +4,9 @@ import grails.testing.gorm.DataTest
 import grails.testing.web.controllers.ControllerUnitTest
 import groovy.json.JsonSlurper
 import spock.lang.Specification
+import testutil.MessageLocalizerStub
 
 class ErrorsControllerSpec extends Specification implements ControllerUnitTest<ErrorsController>, DataTest {
-
-    List<Map> messageCalls = []
 
     Closure doWithConfig() {{ config ->
         config.openboxes.mail.errors.enabled = true
@@ -23,12 +22,7 @@ class ErrorsControllerSpec extends Specification implements ControllerUnitTest<E
         controller.userService = Stub(UserService) {
             findUsersByRoleType(_) >> []
         }
-        Expando stubMessager = new Expando()
-        stubMessager.message = { Map attrs ->
-            messageCalls << attrs
-            return attrs.code
-        }
-        controller.metaClass.warehouse = stubMessager
+        controller.messageLocalizer = MessageLocalizerStub.MESSAGE_LOCALIZER_STUB
     }
 
     void "processError shows a success message when the bug report is sent"() {
@@ -43,7 +37,6 @@ class ErrorsControllerSpec extends Specification implements ControllerUnitTest<E
         then:
         response.redirectedUrl.startsWith('/dashboard/index')
         redirectedFlash() == [message: 'email.errorReportSuccess.message']
-        messageCall('email.errorReportSuccess.message') == [code: 'email.errorReportSuccess.message', args: [['errors@openboxes.com']], encodeAs: 'raw']
     }
 
     void "processError shows an error when the bug report is not sent"() {
@@ -58,7 +51,6 @@ class ErrorsControllerSpec extends Specification implements ControllerUnitTest<E
         then:
         response.redirectedUrl.startsWith('/dashboard/index')
         redirectedFlash() == [error: 'email.notSent.message']
-        messageCall('email.notSent.message') == [code: 'email.notSent.message', args: [['errors@openboxes.com']], encodeAs: 'raw']
     }
 
     void "processError shows an error when bug reporting is disabled"() {
@@ -77,10 +69,6 @@ class ErrorsControllerSpec extends Specification implements ControllerUnitTest<E
 
         cleanup:
         config.openboxes.mail.errors.enabled = true
-    }
-
-    private Map messageCall(String code) {
-        return messageCalls.find { it.code == code }
     }
 
     private Map redirectedFlash() {
