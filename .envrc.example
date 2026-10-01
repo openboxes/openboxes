@@ -1,0 +1,22 @@
+# Per-environment config for direnv (https://direnv.net)
+# Usage: cp .envrc.example .envrc && direnv allow
+# Each clone/worktree should use a unique port and database.
+
+# Remote debugging (JDWP)
+# Attach your IDE debugger to DEBUG_PORT. Use a unique port per
+# environment (e.g. 5005, 5006, 5007) so parallel apps don't collide.
+export DEBUG_ENABLED=true
+export DEBUG_PORT=5005
+
+# Application server
+# SERVER_PORT must be unique per environment (e.g. 8080, 8081, 8082).
+# GRAILS_SERVER_URL is used to build absolute links (emails, redirects);
+# keep its port in sync with SERVER_PORT.
+export SERVER_PORT=8080
+export GRAILS_SERVER_URL=http://localhost:${SERVER_PORT}/openboxes
+
+# Database
+# Point each environment at its own schema to avoid Liquibase changelog
+# conflicts between branches, environments, or projects.
+# serverTimezone should match the timezone of your system.
+export DATASOURCE_URL="jdbc:mysql://localhost:3306/openboxes?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC"
