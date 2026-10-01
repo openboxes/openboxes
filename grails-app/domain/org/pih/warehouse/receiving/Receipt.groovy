@@ -84,15 +84,7 @@ class Receipt implements Serializable, Comparable<Receipt> {
         return receiptItems?.findAll { it.quantityReceived > 0 || it.quantityCanceled > 0 }
     }
 
-    List<ReceiptItem> sortReceiptItemsBySortOrder() {
-        return sortBySortOrder(receiptItems)
-    }
-
-    List<ReceiptItem> sortReceiptItemsWithQuantityBySortOrder() {
-        return sortBySortOrder(receiptItemsWithQuantity)
-    }
-
-    private static List<ReceiptItem> sortBySortOrder(Collection<ReceiptItem> receiptItems) {
+    List<ReceiptItem> sortReceiptItemsBySortOrder(Collection<ReceiptItem> receiptItems = this.receiptItems) {
         def receiptItemsComparator = { a, b ->
             return a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
                     a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
@@ -101,5 +93,9 @@ class Receipt implements Serializable, Comparable<Receipt> {
         }
 
         return receiptItems?.sort(receiptItemsComparator)
+    }
+
+    List<ReceiptItem> sortReceiptItemsWithQuantityBySortOrder() {
+        return sortReceiptItemsBySortOrder(receiptItemsWithQuantity)
     }
 }
