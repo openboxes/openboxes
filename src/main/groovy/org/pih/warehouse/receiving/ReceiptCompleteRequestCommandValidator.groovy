@@ -6,6 +6,8 @@ import org.springframework.validation.ObjectError
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.core.validation.ObjectValidator
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.product.Product
 
 @Component
 class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptCompleteRequestCommand> {
@@ -20,6 +22,7 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
                 validateItemsToCompleteBelongToReceipt(command),
                 validateCancelRemainingOnlyOnOriginalItems(command),
                 validateBinLocationIsPresent(command),
+                validateProductLotAndExpiryControl(command),
         )
     }
 
@@ -160,5 +163,51 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
                 rejectField("receipt", command.receipt,
                         "receiptCompleteRequestCommand.receipt.binLocationMissing", [itemIds.toString()]) :
                 null
+    }
+
+    /**
+     * Validates that every receipt item with a product that has the "lot and expiry control" restriction
+     * has a non-empty lot number and expiration date.
+     *
+     * The exception is when we have a non-split row that is receiving 0 quantity. Users cannot edit the lot of
+     * those rows, so if the row has no lot already and they're not receiving quantity to it, bypass validation.
+     */
+    private List<ObjectError> validateProductLotAndExpiryControl(ReceiptCompleteRequestCommand command) {
+        Set<ReceiptItem> receiptItems = command.receipt?.receiptItems
+        if (!receiptItems) {
+            return null
+        }
+
+        Set<String> productIdsWithLotAndExpiryControl = receiptItems.product
+                .findAll{ it.lotAndExpiryControl }
+                .collect { it.id }
+
+        if (!productIdsWithLotAndExpiryControl) {
+            return null
+        }
+
+        List<ObjectError> errors = []
+        for (receiptItem in receiptItems) {
+            Product product = receiptItem.product
+            if (!productIdsWithLotAndExpiryControl.contains(product.id)) {
+                continue
+            }
+
+            // Non-split items come directly from the shipment items and are not editable by users. Even if the item
+            // has no lot, as long as the user is not trying to receive any quantity on that item, bypass validation.
+            if (!receiptItem.isSplitItem && receiptItem.quantityReceived == 0) {
+                continue
+            }
+
+            InventoryItem inventoryItem = receiptItem.inventoryItem
+            if (!inventoryItem || !inventoryItem.lotNumber || !inventoryItem.expirationDate) {
+                errors.add(rejectField("receipt", command.receipt,
+                        "receiptCompleteRequestCommand.receipt.missingLotAndExpiry",
+                        [product.productCode, product.name],
+                ))
+            }
+        }
+
+        return errors
     }
 }
