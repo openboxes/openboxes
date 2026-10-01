@@ -1,11 +1,12 @@
 import receivingApi from 'api/services/ReceivingApi';
+import useReceivingLineItemValidation from 'hooks/receiving/v2/useReceivingLineItemValidation';
 import useAutosave from 'hooks/useAutosave';
 import buildReceiptItemsBatchPayload from 'utils/receiving/buildReceiptItemsBatchPayload';
 import removeSplitItemRow from 'utils/receiving/removeSplitItemRow';
 
 // Only send rows whose quantity or bin location really differs from the baseline captured
 // at load / last save, so no-op edits (e.g. 3 -> 4 -> 3) are skipped.
-const shouldSaveRow = (row) => row.quantityReceiving !== row.initialQuantityReceiving
+const hasRowChanged = (row) => row.quantityReceiving !== row.initialQuantityReceiving
   || (row.binLocation?.id ?? null) !== (row.initialBinLocationId ?? null);
 
 // The response echoes our rowId and returns the saved receipt item id, so the next save
@@ -24,9 +25,13 @@ const reconcileStaleRow = (row, line) => ({ receiptItemId: line.id });
 
 /**
  * Receiving wiring of the generic autosave hook: batch-saves dirty line items to the pending
- * receipt and deletes split item rows through the same serial queue.
+ * receipt and deletes split item rows through the same serial queue. Invalid rows are not saved.
  */
 const useReceivingAutosave = ({ initialRows, receiptId }) => {
+  const { lineItemSchema } = useReceivingLineItemValidation();
+
+  const shouldSaveRow = (row) => hasRowChanged(row) && lineItemSchema.safeParse(row).success;
+
   const updateFn = async (dirtyRows) => {
     const payload = buildReceiptItemsBatchPayload(dirtyRows);
     const { data: { data } } = await receivingApi.updateItemsBatch(receiptId, payload);
