@@ -7,7 +7,7 @@ import org.pih.warehouse.shipping.ShipmentItem
 
 class ReceiptSpec extends Specification implements DomainUnitTest<Receipt> {
 
-    void 'getReceiptItemsWithQuantity should only return the items that received or canceled something'() {
+    void 'getReceiptItemsWithQuantityReceivedOrCanceled should skip the empty items'() {
         given:
         ReceiptItem receivedItem = new ReceiptItem(quantityReceived: 5)
         ReceiptItem canceledItem = new ReceiptItem(quantityReceived: 0, quantityCanceled: 3)
@@ -16,10 +16,10 @@ class ReceiptSpec extends Specification implements DomainUnitTest<Receipt> {
         Receipt receipt = buildReceipt([receivedItem, canceledItem, zeroedItem, untouchedItem])
 
         expect:
-        receipt.receiptItemsWithQuantity == [receivedItem, canceledItem] as Set
+        receipt.receiptItemsWithQuantityReceivedOrCanceled == [receivedItem, canceledItem] as Set
     }
 
-    void 'sortReceiptItemsWithQuantityBySortOrder should sort only the items with a quantity'() {
+    void 'sortReceiptItemsWithQuantityReceivedOrCanceledBySortOrder should skip the empty items'() {
         given:
         ReceiptItem secondItem = new ReceiptItem(quantityReceived: 5, shipmentItem: new ShipmentItem(sortOrder: 2))
         ReceiptItem untouchedItem = new ReceiptItem(shipmentItem: new ShipmentItem(sortOrder: 0))
@@ -27,7 +27,7 @@ class ReceiptSpec extends Specification implements DomainUnitTest<Receipt> {
         Receipt receipt = buildReceipt([secondItem, untouchedItem, firstItem])
 
         expect:
-        receipt.sortReceiptItemsWithQuantityBySortOrder() == [firstItem, secondItem]
+        receipt.sortReceiptItemsWithQuantityReceivedOrCanceledBySortOrder() == [firstItem, secondItem]
         receipt.sortReceiptItemsBySortOrder() == [untouchedItem, firstItem, secondItem]
     }
 

@@ -36,6 +36,7 @@ import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ShipmentItemReceivedQuantitiesDto
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -469,7 +470,7 @@ class StockMovementController {
 
     def receipts() {
         def stockMovement = getStockMovement(params.id)
-        def receiptItems = stockMovementService.getStockMovementReceiptItems(stockMovement)
+        List<ReceiptItem> receiptItems = stockMovementService.getStockMovementReceiptItems(stockMovement, true)
         render(template: "receipts", model: [receiptItems: receiptItems])
     }
 

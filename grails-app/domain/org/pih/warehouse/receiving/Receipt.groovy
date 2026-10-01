@@ -80,7 +80,7 @@ class Receipt implements Serializable, Comparable<Receipt> {
     /**
      * @return The subset of receipt items of the receipt that have a positive quantity (received or canceled).
      */
-    Set<ReceiptItem> getReceiptItemsWithQuantity() {
+    Set<ReceiptItem> getReceiptItemsWithQuantityReceivedOrCanceled() {
         return receiptItems?.findAll { it.quantityReceived > 0 || it.quantityCanceled > 0 }
     }
 
@@ -95,7 +95,7 @@ class Receipt implements Serializable, Comparable<Receipt> {
         return receiptItems?.sort(receiptItemsComparator)
     }
 
-    List<ReceiptItem> sortReceiptItemsWithQuantityBySortOrder() {
-        return sortReceiptItemsBySortOrder(receiptItemsWithQuantity)
+    List<ReceiptItem> sortReceiptItemsWithQuantityReceivedOrCanceledBySortOrder() {
+        return sortReceiptItemsBySortOrder(receiptItemsWithQuantityReceivedOrCanceled)
     }
 }
