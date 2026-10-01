@@ -30,7 +30,7 @@ const reconcileStaleRow = (row, line) => ({ receiptItemId: line.id });
 const useReceivingAutosave = ({ initialRows, receiptId }) => {
   const { lineItemSchema } = useReceivingLineItemValidation();
 
-  const shouldSaveRow = (row) => hasRowChanged(row) && lineItemSchema.safeParse(row).success;
+  const isRowValid = (row) => lineItemSchema.safeParse(row).success;
 
   const updateFn = async (dirtyRows) => {
     const payload = buildReceiptItemsBatchPayload(dirtyRows);
@@ -53,7 +53,8 @@ const useReceivingAutosave = ({ initialRows, receiptId }) => {
     initialRows,
     requests: { updateFn, deleteFn },
     rowOptions: {
-      shouldSaveRow,
+      shouldSaveRow: hasRowChanged,
+      isRowValid,
       reconcileRow,
       reconcileStaleRow,
       removeRowFromState: removeSplitItemRow,

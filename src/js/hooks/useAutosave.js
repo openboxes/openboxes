@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import { getAutosaveBatchSize, getAutosaveDebounceTime } from 'selectors';
 
 import { AutosaveStatus } from 'consts/autosaveStatuses';
-import RowSaveStatus from 'consts/rowSaveStatus';
+import RowSaveStatus, { isRowUnsaved as defaultIsRowUnsaved } from 'consts/rowSaveStatus';
 import useAutosaveQueue from 'hooks/useAutosaveQueue';
 import useAutosaveRetry from 'hooks/useAutosaveRetry';
 import useAutosaveRows from 'hooks/useAutosaveRows';
@@ -35,6 +35,8 @@ import {
  *   response only copies in server-assigned ids (`reconcileStaleRow`), so an older request
  *   can never overwrite a newer edit. The row stays dirty and the next flush sends its
  *   latest value.
+ * - a dirty row where `isRowValid==false` is not sent: it is marked INVALID and left out of the
+ *   dirty map until edited again, so it counts as unsaved.
  * - a failed batch marks its rows dirty again (saveStatus ERROR) and retries with exponential
  *   backoff (`retryDelay`, doubled on each try, limited at `maxRetryDelay`). Failures answered
  *   by the server are added until `maxRetries` is reached; network failures (`isNetworkError`)
@@ -62,7 +64,12 @@ import {
  * @param {Function} [options.rowOptions.generateRowId] - () => id for added rows
  * @param {Function} [options.rowOptions.shouldSaveRow] - decides whether a dirty row really
  *   needs a request: (row) => boolean. Checked at flush time; when it returns false, the row
- *   is marked SAVED without a request.
+ *   is marked SAVED without a request (e.g. an edit that restored the saved value).
+ * @param {Function} [options.rowOptions.isRowValid] - decides whether a row that needs a
+ *   request can be sent: (row) => boolean. Checked at flush time, after `shouldSaveRow`; when
+ *   it returns false, the row is marked INVALID without a request.
+ * @param {Function} [options.rowOptions.isRowUnsaved] - decides whether a row counts as
+ *   unsaved: (row) => boolean. Used by `flush` and `autosaveStatus`.
  * @param {Function} [options.rowOptions.reconcileRow] - builds the changes to apply to a row
  *   from a fresh response (the row was not edited while its request was running):
  *   (row, serverRow) => partial. The returned partial is merged into the row.
@@ -117,6 +124,8 @@ const useAutosave = ({
     keyField = 'rowId',
     generateRowId = () => _.uniqueId('row-'),
     shouldSaveRow = () => true,
+    isRowValid = () => true,
+    isRowUnsaved = defaultIsRowUnsaved,
     reconcileRow = (row, serverRow) => serverRow,
     reconcileStaleRow = () => ({}),
     removeRowFromState = removeNormalizedItem,
@@ -167,6 +176,8 @@ const useAutosave = ({
     updateFn,
     deleteFn,
     shouldSaveRow,
+    isRowValid,
+    isRowUnsaved,
     reconcileRow,
     reconcileStaleRow,
     removeRowFromState,
@@ -197,22 +208,30 @@ const useAutosave = ({
     debounceTimerRef.current = setTimeout(() => flushDirtyRef.current(), delay);
   }, []);
 
-  // Collects the rows to send. Rows that no longer exist are dropped, edits
-  // (shouldSaveRow) are marked SAVED without a request, and rows that ran out of retries
-  // stay dirty but are skipped until edited again (or retried by flush()).
+  // Collects the rows to send
   const drainDirtyRows = useCallback(() => {
     const batchIds = [];
     dirtyRef.current.forEach(({ attempts }, rowId) => {
       const row = stateRef.current.entities[rowId];
+      // Rows that no longer exist are dropped
       if (!row) {
         dirtyRef.current.delete(rowId);
         return;
       }
+      // Edits that need no request (e.g. an edit that restored the saved value) are marked SAVED
       if (!optionsRef.current.shouldSaveRow(row)) {
         dirtyRef.current.delete(rowId);
         setRowStatus(rowId, RowSaveStatus.SAVED);
         return;
       }
+      // Invalid rows (likely due to failed validation) are marked INVALID
+      if (!optionsRef.current.isRowValid(row)) {
+        dirtyRef.current.delete(rowId);
+        setRowStatus(rowId, RowSaveStatus.INVALID);
+        return;
+      }
+      // Rows that ran out of retries stay dirty, but are skipped until edited again or are
+      // retried by a flush() call.
       if (attempts > optionsRef.current.maxRetries) {
         return;
       }
@@ -428,7 +447,7 @@ const useAutosave = ({
       isFlushingRef.current = false;
     }
     const hasUnsavedRows = Object.values(stateRef.current.entities)
-      .some((row) => row?.saveStatus === RowSaveStatus.ERROR);
+      .some(optionsRef.current.isRowUnsaved);
     if (hasUnsavedRows) {
       throw new Error('Autosave failed: some rows could not be saved');
     }
@@ -442,10 +461,10 @@ const useAutosave = ({
 
   // General status for the autosave indicator
   const autosaveStatus = useMemo(() => {
-    const hasFailedRows = Object.values(rowsState.entities || {})
-      .some((row) => row?.saveStatus === RowSaveStatus.ERROR);
+    const hasUnsavedRows = Object.values(rowsState.entities || {})
+      .some(optionsRef.current.isRowUnsaved);
 
-    if (hasFailedRows) {
+    if (hasUnsavedRows) {
       return AutosaveStatus.ERROR;
     }
     if (isSavePending) {
