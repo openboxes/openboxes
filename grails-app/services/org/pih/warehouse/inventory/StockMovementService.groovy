@@ -1781,6 +1781,9 @@ class StockMovementService {
         }
     }
 
+    /**
+     * Returns the receipt items of a stock movement that have a positive quantity (received or canceled).
+     */
     List<ReceiptItem> getStockMovementReceiptItems(def stockMovement) {
         return (stockMovement.requisition) ?
                 getRequisitionBasedStockMovementReceiptItems(stockMovement) :
@@ -1810,14 +1813,15 @@ class StockMovementService {
     }
 
     List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(def stockMovement) {
-        def shipments = Shipment.findAllByRequisition(stockMovement.requisition)
-        List<ReceiptItem> receiptItems = shipments*.receipts?.flatten()*.sortReceiptItemsBySortOrder()?.flatten()
+        List<Shipment> shipments = Shipment.findAllByRequisition(stockMovement.requisition)
+        List<ReceiptItem> receiptItems =
+                shipments*.receipts?.flatten()*.sortReceiptItemsWithQuantityBySortOrder()?.flatten()
         return receiptItems
     }
 
     List<ReceiptItem> getShipmentBasedStockMovementReceiptItems(def stockMovement) {
         Shipment shipment = stockMovement.shipment
-        List<ReceiptItem> receiptItems = shipment.receipts*.sortReceiptItemsBySortOrder()?.flatten()
+        List<ReceiptItem> receiptItems = shipment.receipts*.sortReceiptItemsWithQuantityBySortOrder()?.flatten()
         return receiptItems
     }
 

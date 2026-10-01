@@ -77,7 +77,22 @@ class Receipt implements Serializable, Comparable<Receipt> {
                         id <=> otherReceipt?.id
     }
 
+    /**
+     * @return The subset of receipt items of the receipt that have a positive quantity (received or canceled).
+     */
+    Set<ReceiptItem> getReceiptItemsWithQuantity() {
+        return receiptItems?.findAll { it.quantityReceived > 0 || it.quantityCanceled > 0 }
+    }
+
     List<ReceiptItem> sortReceiptItemsBySortOrder() {
+        return sortBySortOrder(receiptItems)
+    }
+
+    List<ReceiptItem> sortReceiptItemsWithQuantityBySortOrder() {
+        return sortBySortOrder(receiptItemsWithQuantity)
+    }
+
+    private static List<ReceiptItem> sortBySortOrder(Collection<ReceiptItem> receiptItems) {
         def receiptItemsComparator = { a, b ->
             return a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
                     a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
