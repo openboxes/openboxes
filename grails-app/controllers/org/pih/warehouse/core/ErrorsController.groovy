@@ -179,12 +179,18 @@ class ErrorsController {
             def subject = "${params.summary ?: warehouse.message(code: 'email.errorReportSubject.message')}"
             def body = "${g.render(template: '/email/errorReport', model: [stacktrace: stacktrace], params: params)}"
 
-            mailService.sendHtmlMailWithAttachment(reportedBy, recipients, ccList, subject, body.toString(), dom?.bytes, "error.html", "text/html")
-            flash.message = "${warehouse.message(code: 'email.errorReportSuccess.message', args: [recipients])}"
+            boolean sent = mailService.sendHtmlMailWithAttachment(reportedBy, recipients, ccList, subject, body.toString(), dom?.bytes, "error.html", "text/html")
+            // React renders the message as text, so the recipients must not be HTML-encoded (encodeAs skips that)
+            if (sent) {
+                flash.message = "${warehouse.message(code: 'email.errorReportSuccess.message', args: [recipients], encodeAs: 'raw')}"
+            } else {
+                flash.error = "${warehouse.message(code: 'email.notSent.message', args: [recipients], encodeAs: 'raw')}"
+            }
         } else {
-            flash.message = "${warehouse.message(code: 'email.errorReportDisabled.message')}"
+            flash.error = "${warehouse.message(code: 'email.errorReportDisabled.message')}"
         }
-        redirect(controller: "dashboard", action: "index")
+        // The dashboard is a React page, which only reads flash messages from the URL (see useFlashScopeListener)
+        redirect(controller: "dashboard", action: "index", params: ["flash": flash as JSON])
     }
 
 }
