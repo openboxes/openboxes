@@ -1817,22 +1817,30 @@ class StockMovementService {
     List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(def stockMovement, boolean excludeItemsWithoutQuantityReceivedOrCanceled = false) {
         List<Shipment> shipments = Shipment.findAllByRequisition(stockMovement.requisition)
         return shipments*.receipts?.flatten()?.collect { Receipt receipt ->
-            filterAndSortReceiptItems(receipt.receiptItems, excludeItemsWithoutQuantityReceivedOrCanceled)
+            sortReceiptItemsBySortOrder(getReceiptItems(receipt, excludeItemsWithoutQuantityReceivedOrCanceled))
         }?.flatten()
     }
 
     List<ReceiptItem> getShipmentBasedStockMovementReceiptItems(def stockMovement, boolean excludeItemsWithoutQuantityReceivedOrCanceled = false) {
         Shipment shipment = stockMovement.shipment
         return shipment.receipts?.collect { Receipt receipt ->
-            filterAndSortReceiptItems(receipt.receiptItems, excludeItemsWithoutQuantityReceivedOrCanceled)
+            sortReceiptItemsBySortOrder(getReceiptItems(receipt, excludeItemsWithoutQuantityReceivedOrCanceled))
         }?.flatten()
     }
 
-    private static List<ReceiptItem> filterAndSortReceiptItems(Collection<ReceiptItem> receiptItems, boolean excludeItemsWithoutQuantityReceivedOrCanceled) {
-        Collection<ReceiptItem> receiptItemsToSort = excludeItemsWithoutQuantityReceivedOrCanceled ?
-                receiptItems?.findAll { it.hasQuantityReceivedOrCanceled() } :
-                receiptItems
-        return receiptItemsToSort?.sort { ReceiptItem a, ReceiptItem b -> a.compareToBySortOrder(b) }
+    private static Collection<ReceiptItem> getReceiptItems(Receipt receipt, boolean excludeItemsWithoutQuantityReceivedOrCanceled) {
+        return excludeItemsWithoutQuantityReceivedOrCanceled ?
+                receipt.receiptItems?.findAll { it.quantityReceived > 0 || it.quantityCanceled > 0 } :
+                receipt.receiptItems
+    }
+
+    private static List<ReceiptItem> sortReceiptItemsBySortOrder(Collection<ReceiptItem> receiptItems) {
+        return receiptItems?.sort { ReceiptItem a, ReceiptItem b ->
+            a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
+                    a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
+                            a.sortOrder <=> b.sortOrder ?:
+                                    a.inventoryItem?.product?.name <=> b.inventoryItem?.product?.name
+        }
     }
 
     // It expects to receive a stock movement id
