@@ -69,6 +69,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.putaway.PutawayService
+import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.ReplenishmentTypeCode
 import org.pih.warehouse.requisition.Requisition
@@ -1781,10 +1782,14 @@ class StockMovementService {
         }
     }
 
-    List<ReceiptItem> getStockMovementReceiptItems(def stockMovement) {
+    /**
+     * Returns the receipt items of a stock movement. When excludeItemsWithoutQuantityReceivedOrCanceled is true, the
+     * ones without a positive quantity received or canceled are filtered out.
+     */
+    List<ReceiptItem> getStockMovementReceiptItems(def stockMovement, boolean excludeItemsWithoutQuantityReceivedOrCanceled = false) {
         return (stockMovement.requisition) ?
-                getRequisitionBasedStockMovementReceiptItems(stockMovement) :
-                getShipmentBasedStockMovementReceiptItems(stockMovement)
+                getRequisitionBasedStockMovementReceiptItems(stockMovement, excludeItemsWithoutQuantityReceivedOrCanceled) :
+                getShipmentBasedStockMovementReceiptItems(stockMovement, excludeItemsWithoutQuantityReceivedOrCanceled)
     }
 
     /**
@@ -1809,16 +1814,33 @@ class StockMovementService {
         return historyItems ? historyItems[0] : null
     }
 
-    List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(def stockMovement) {
-        def shipments = Shipment.findAllByRequisition(stockMovement.requisition)
-        List<ReceiptItem> receiptItems = shipments*.receipts?.flatten()*.sortReceiptItemsBySortOrder()?.flatten()
-        return receiptItems
+    List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(def stockMovement, boolean excludeItemsWithoutQuantityReceivedOrCanceled = false) {
+        List<Shipment> shipments = Shipment.findAllByRequisition(stockMovement.requisition)
+        return shipments*.receipts?.flatten()?.collect { Receipt receipt ->
+            sortReceiptItemsBySortOrder(getReceiptItems(receipt, excludeItemsWithoutQuantityReceivedOrCanceled))
+        }?.flatten()
     }
 
-    List<ReceiptItem> getShipmentBasedStockMovementReceiptItems(def stockMovement) {
+    List<ReceiptItem> getShipmentBasedStockMovementReceiptItems(def stockMovement, boolean excludeItemsWithoutQuantityReceivedOrCanceled = false) {
         Shipment shipment = stockMovement.shipment
-        List<ReceiptItem> receiptItems = shipment.receipts*.sortReceiptItemsBySortOrder()?.flatten()
-        return receiptItems
+        return shipment.receipts?.collect { Receipt receipt ->
+            sortReceiptItemsBySortOrder(getReceiptItems(receipt, excludeItemsWithoutQuantityReceivedOrCanceled))
+        }?.flatten()
+    }
+
+    private static Collection<ReceiptItem> getReceiptItems(Receipt receipt, boolean excludeItemsWithoutQuantityReceivedOrCanceled) {
+        return excludeItemsWithoutQuantityReceivedOrCanceled ?
+                receipt.receiptItems?.findAll { it.quantityReceived > 0 || it.quantityCanceled > 0 } :
+                receipt.receiptItems
+    }
+
+    private static List<ReceiptItem> sortReceiptItemsBySortOrder(Collection<ReceiptItem> receiptItems) {
+        return receiptItems?.sort { ReceiptItem a, ReceiptItem b ->
+            a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
+                    a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
+                            a.sortOrder <=> b.sortOrder ?:
+                                    a.inventoryItem?.product?.name <=> b.inventoryItem?.product?.name
+        }
     }
 
     // It expects to receive a stock movement id
