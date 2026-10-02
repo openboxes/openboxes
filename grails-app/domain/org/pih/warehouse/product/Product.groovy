@@ -11,13 +11,12 @@ package org.pih.warehouse.product
 
 import grails.databinding.BindUsing
 import grails.util.Holders
-import java.time.Instant
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.EmptyStringsToNullBinder
-import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.BaseDomain
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.GlAccount
@@ -26,7 +25,6 @@ import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
-import org.pih.warehouse.core.User
 import org.pih.warehouse.core.validation.DomainValidatable
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
@@ -50,16 +48,7 @@ import org.pih.warehouse.LocalizationUtil
  * 20 mg tablets vs a 50 count bottle of 20 mg tablets will both be stored
  * as 20 mg tablets).
  */
-class Product implements Comparable, Serializable, DomainValidatable<ProductValidator> {
-
-    def beforeInsert() {
-        createdBy = AuthService.currentUser
-        updatedBy = AuthService.currentUser
-    }
-
-    def beforeUpdate() {
-        updatedBy = AuthService.currentUser
-    }
+class Product extends BaseDomain<Product> implements DomainValidatable<ProductValidator> {
 
     def publishPersistenceEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new InventorySnapshotEvent(this))
@@ -76,10 +65,6 @@ class Product implements Comparable, Serializable, DomainValidatable<ProductVali
     def afterDelete() {
         publishPersistenceEvent()
     }
-
-
-    // Base product information
-    String id
 
     // Specific description for the product
     String name
@@ -230,12 +215,6 @@ class Product implements Comparable, Serializable, DomainValidatable<ProductVali
 
     GlAccount glAccount
 
-    // Auditing
-    Instant dateCreated
-    Instant lastUpdated
-    User createdBy
-    User updatedBy
-
     String color
 
     ProductGroup productFamily
@@ -277,7 +256,6 @@ class Product implements Comparable, Serializable, DomainValidatable<ProductVali
     ]
 
     static mapping = {
-        id generator: 'uuid'
         cache true
         tags joinTable: [name: 'product_tag', column: 'tag_id', key: 'product_id']
         categories joinTable: [name: 'product_category', column: 'category_id', key: 'product_id']
@@ -712,7 +690,7 @@ class Product implements Comparable, Serializable, DomainValidatable<ProductVali
      * Sort by name
      */
     @Override
-    int compareTo(obj) {
+    int compareTo(Product obj) {
         return name <=> obj?.name ?: id <=> obj?.id
     }
 
