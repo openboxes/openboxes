@@ -19,17 +19,19 @@ const useQuantityReceivingValidation = () => {
   })
     .int(translate(
       'react.receiving.error.quantityDecimal.label',
-      'Decimals are not allowed',
+      'Value cannot be a decimal number',
     ))
     .min(0, translate(
       'react.receiving.error.quantityNegative.label',
-      'Negative values are not allowed',
+      'Value cannot be a negative number',
     ));
 
   // The same quantity validation except the field is also required.
   const requiredQuantityReceivingSchema = z.preprocess(
-    (v) => (v === '' || v == null ? undefined : Number(v)),
-    quantitySchema,
+    (v) => (v === '' || v == null ? null : Number(v)),
+    quantitySchema
+      .nullable()
+      .refine((quantity) => quantity !== null, requiredFieldMessage),
   );
 
   const quantityReceivingSchema = quantitySchema.nullish();

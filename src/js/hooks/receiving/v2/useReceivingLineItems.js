@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import _ from 'lodash';
@@ -64,7 +64,7 @@ const useReceivingLineItems = ({
   const { validationSchema } = useEditLineItemValidation();
 
   const {
-    control, getValues, setValue, reset, handleSubmit, formState: { errors },
+    control, getValues, setValue, reset, handleSubmit, trigger, formState: { errors },
   } = useForm({
     mode: 'onBlur',
     defaultValues: { lineItems: initialLineItems.map(buildDefaultRow) },
@@ -78,6 +78,18 @@ const useReceivingLineItems = ({
     name: 'lineItems',
   });
 
+  // Some rules compare the rows with each other (e.g. duplicates), so a change of one row can
+  // affect the errors of any other row, so every row is revalidated.
+  const validateLineItems = useCallback(() => {
+    const fieldNames = getValues('lineItems').flatMap((row, index) =>
+      Object.keys(_.omit(row, 'quantityReceiving')).map((field) => `lineItems.${index}.${field}`));
+    return trigger(fieldNames);
+  }, [trigger, getValues]);
+
+  useEffect(() => {
+    validateLineItems();
+  }, [fields]);
+
   const removeRow = useCallback((rowId) => {
     const index = getValues('lineItems').findIndex((item) => item.rowId === rowId);
     if (index !== -1) {
@@ -88,6 +100,7 @@ const useReceivingLineItems = ({
   const { onLocationAutofill } = useEditModalLocationAutofill({
     getValues,
     setValue,
+    onLineItemsUpdated: validateLineItems,
   });
 
   const addRow = useCallback(
@@ -100,6 +113,7 @@ const useReceivingLineItems = ({
     addRow,
     removeRow,
     onLocationAutofill,
+    validateLineItems,
   });
 
   const copyToReceiving = useCallback((receivedItem) => append({

@@ -11,6 +11,8 @@ class ProductSimpleDto implements DomainDto<Product> {
     String productCode
     String name
 
+    Boolean lotAndExpiryControl
+
     // You could argue that the handling labels aren't necessary to display a product in its most "basic" form,
     // but we're trying to standardize on *always* showing the labels, so we opt to include them here.
     List<ProductHandlingLabelDto> handlingLabels = []

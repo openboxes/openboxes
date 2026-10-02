@@ -1,6 +1,8 @@
 import { act, renderHook } from '@testing-library/react-hooks';
 import { useSelector } from 'react-redux';
 
+import useEditModalLocationAutofill from 'hooks/receiving/v2/useEditModalLocationAutofill';
+import useReceivingLineItemColumns from 'hooks/receiving/v2/useReceivingLineItemColumns';
 import useReceivingLineItems from 'hooks/receiving/v2/useReceivingLineItems';
 
 // The hook only reads the partial receiving activity code of the current location.
@@ -8,10 +10,10 @@ jest.mock('react-redux', () => ({
   useSelector: jest.fn(() => true),
 }));
 jest.mock('hooks/useTranslate', () => () => (id, defaultMessage) => defaultMessage);
-jest.mock('hooks/receiving/v2/useReceivingLineItemColumns', () => () => ({ columns: [] }));
-jest.mock('hooks/receiving/v2/useEditModalLocationAutofill', () => () => ({
+jest.mock('hooks/receiving/v2/useReceivingLineItemColumns', () => jest.fn(() => ({ columns: [] })));
+jest.mock('hooks/receiving/v2/useEditModalLocationAutofill', () => jest.fn(() => ({
   onLocationAutofill: jest.fn(),
-}));
+})));
 
 const product = { id: 'product-1', name: 'Ibuprofen 200mg' };
 const splitProduct = { id: 'product-2', name: 'Paracetamol 500mg' };
@@ -50,6 +52,18 @@ const renderLineItems = (initialLineItems, hasPreviousReceipts = false) =>
   }));
 
 const summaryTitles = (result) => result.current.summaryData.map(({ title }) => title);
+
+// The callbacks handed to the columns - the cells call them on change / blur / delete.
+const lastCallProps = (mockedHook) => mockedHook.mock.calls[mockedHook.mock.calls.length - 1][0];
+const getColumnsProps = () => lastCallProps(useReceivingLineItemColumns);
+const getValidateLineItems = () => getColumnsProps().validateLineItems;
+const getRemoveRow = () => getColumnsProps().removeRow;
+
+// The resolver validates asynchronously, so its result is awaited before the errors are
+// asserted (React 16.8 has no async act).
+const flushValidation = () => new Promise((resolve) => {
+  setTimeout(resolve, 0);
+});
 
 describe('useReceivingLineItems', () => {
   beforeEach(() => {
@@ -199,6 +213,86 @@ describe('useReceivingLineItems', () => {
         'Receiving Now',
         'Remaining to Receive',
       ]);
+    });
+  });
+
+  describe('validation', () => {
+    const lotControlledProduct = { ...product, lotAndExpiryControl: true };
+
+    it('should have no errors for valid lines', async () => {
+      const { result } = renderLineItems([originalLine, splitLine]);
+
+      getValidateLineItems()();
+      await flushValidation();
+
+      expect(result.current.hasErrors).toBe(false);
+    });
+
+    it('should flag an added row of a product with lot and expiry control right away', async () => {
+      const { result } = renderHook(() => useReceivingLineItems({
+        lineItem: { ...originalLine, product: lotControlledProduct },
+        initialLineItems: [{ ...originalLine, product: lotControlledProduct }],
+        hasPreviousReceipts: false,
+      }));
+
+      act(() => result.current.addRow());
+
+      await flushValidation();
+      expect(result.current.hasErrors).toBe(true);
+    });
+
+    it('should not flag the blank quantity of an added row before the field is left', async () => {
+      const { result } = renderLineItems([originalLine]);
+
+      act(() => result.current.addRow());
+      getValidateLineItems()();
+      await flushValidation();
+
+      expect(result.current.hasErrors).toBe(false);
+    });
+
+    it('should flag an added row duplicating the original line', async () => {
+      const { result } = renderLineItems([{ ...originalLine, lotNumber: '' }]);
+
+      act(() => result.current.addRow());
+
+      await flushValidation();
+      expect(result.current.hasErrors).toBe(true);
+    });
+
+    it('should clear the duplicate errors once the duplicated row is removed', async () => {
+      const { result } = renderLineItems([{ ...originalLine, lotNumber: '' }]);
+
+      act(() => result.current.addRow());
+      await flushValidation();
+      expect(result.current.hasErrors).toBe(true);
+
+      const [, addedRow] = result.current.getLineItems();
+      act(() => getRemoveRow()(addedRow.rowId));
+
+      await flushValidation();
+      expect(result.current.hasErrors).toBe(false);
+    });
+
+    it('should clear the errors of the added rows when reverting to original', async () => {
+      const { result } = renderLineItems([{ ...originalLine, lotNumber: '' }]);
+
+      act(() => result.current.addRow());
+      await flushValidation();
+      expect(result.current.hasErrors).toBe(true);
+
+      act(() => result.current.revertToOriginal());
+
+      await flushValidation();
+      expect(result.current.hasErrors).toBe(false);
+    });
+
+    it('should revalidate the rows after the location autofill', () => {
+      renderLineItems([originalLine]);
+
+      const { onLineItemsUpdated } = lastCallProps(useEditModalLocationAutofill);
+
+      expect(onLineItemsUpdated).toBe(getValidateLineItems());
     });
   });
 });
