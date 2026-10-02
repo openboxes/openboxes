@@ -37,8 +37,6 @@ import org.pih.warehouse.inventory.InventoryLevel
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
-import java.math.RoundingMode
-
 class ProductController {
 
     def dataService
@@ -372,7 +370,7 @@ class ProductController {
         BigDecimal parsedUnitPrice = null
         if (params.price) {
             try {
-                parsedUnitPrice = new BigDecimal(params.price).setScale(2, RoundingMode.FLOOR)
+                parsedUnitPrice = new BigDecimal(params.price)
             } catch (Exception e) {
                 log.error("Unable to parse unit price: " + e.message, e)
                 flash.message = "Could not parse unit price with value: ${params.price}."
