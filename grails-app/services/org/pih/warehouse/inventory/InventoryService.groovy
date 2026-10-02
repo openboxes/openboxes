@@ -817,16 +817,15 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
-     * Should be used with caution (i.e. not in a loop) since it requires an expensive call to
-     * calculate all quantity within a parent location.
+     * Get quantity by bin location for a single bin within a facility.
      *
      * @param location
      * @param internalLocation
      * @return
      */
     List getQuantityByBinLocation(Location location, Location internalLocation) {
-        List binLocationEntries = getQuantityByBinLocation(location)
-        return binLocationEntries.findAll { it.binLocation == internalLocation }
+        List<TransactionEntry> entries = getTransactionEntriesByInventoryAndBinLocation(location.inventory, internalLocation)
+        return getQuantityByBinLocation(entries, false)
     }
 
     List getProductQuantityByBinLocation(Location location, Product product) {
@@ -1876,6 +1875,26 @@ class InventoryService implements ApplicationContextAware {
             if (products) {
                 inventoryItem { inList("product", products) }
             }
+        }
+        return transactionEntries
+    }
+
+    /**
+     * Get all transaction entries for a single bin location within an inventory.
+     *
+     * @param inventory
+     * @param binLocation
+     * @return
+     */
+    List<TransactionEntry> getTransactionEntriesByInventoryAndBinLocation(Inventory inventory, Location binLocation) {
+        def criteria = TransactionEntry.createCriteria()
+        def transactionEntries = criteria.list {
+            transaction {
+                eq("inventory", inventory)
+                order("transactionDate", "asc")
+                order("dateCreated", "asc")
+            }
+            eq("binLocation", binLocation)
         }
         return transactionEntries
     }
