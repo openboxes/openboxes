@@ -85,8 +85,8 @@ describe('useReceivingNextValidation', () => {
 
       expect(result.current.isNextDisabled).toBe(true);
       expect(result.current.lineItemErrors).toEqual({
-        'row-2': { quantityReceiving: 'Decimals are not allowed' },
-        'row-3': { quantityReceiving: 'Negative values are not allowed' },
+        'row-2': { quantityReceiving: 'Value cannot be a decimal number' },
+        'row-3': { quantityReceiving: 'Value cannot be a negative number' },
       });
     });
   });

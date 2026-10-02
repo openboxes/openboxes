@@ -24,7 +24,7 @@ import getRowsMissingBinLocation from 'utils/receiving/getRowsMissingBinLocation
  *   `isNextDisabled` - true while no line carries a quantity, or any line fails validation.
  *   `validateBeforeNext` - resolves to false when the user decides to stay on the step.
  *   `lineItemErrors` - error messages of the invalid lines, keyed by row id and then by field,
- *                      e.g. { 'row-2': { quantityReceiving: 'Decimals are not allowed' } }.
+ *                      e.g. { 'row-2': { quantityReceiving: 'Value cannot be a decimal number' } }.
  */
 const useReceivingNextValidation = ({ lineItemsState }) => {
   const hasPartialReceivingSupport = useSelector(getHasPartialReceivingSupport);

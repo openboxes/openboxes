@@ -47,6 +47,7 @@ const useReceivingLineItemColumns = ({
   addRow,
   removeRow,
   onLocationAutofill,
+  validateLineItems,
 }) => {
   const translate = useTranslate();
   const columnHelper = createColumnHelper();
@@ -60,6 +61,11 @@ const useReceivingLineItemColumns = ({
     debouncePeopleFetch(debounceTime, minSearchLength),
     [debounceTime, minSearchLength],
   );
+
+  const withValidation = (onChange) => (value) => {
+    onChange(value);
+    validateLineItems();
+  };
 
   const columns = useMemo(() => [
     columnHelper.accessor(receivingColumns.PRODUCT, {
@@ -76,9 +82,11 @@ const useReceivingLineItemColumns = ({
           key={row.original.rowId}
           name={`lineItems.${row.index}.product`}
           control={control}
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <ProductSelectCell
               {...field}
+              onChange={withValidation(field.onChange)}
+              errorMessage={fieldState.error?.message}
               locationId={locationId}
               disabled={isOriginalLine(row)}
               label="react.receiving.product.label"
@@ -113,22 +121,32 @@ const useReceivingLineItemColumns = ({
         </TableHeaderCell>
       ),
       cell: ({ row }) => (
-        <TableCell className="rt-td">
-          <Controller
-            key={row.original.rowId}
-            name={`lineItems.${row.index}.lotNumber`}
-            control={control}
-            render={({ field }) => (
+        <Controller
+          key={row.original.rowId}
+          name={`lineItems.${row.index}.lotNumber`}
+          control={control}
+          render={({ field, fieldState }) => (
+            <TableCell
+              className="rt-td"
+              customTooltip
+              tooltipLabel={fieldState.error?.message}
+              tooltipClassname="w-100"
+            >
               <TextInput
                 {...field}
+                onBlur={() => {
+                  field.onBlur();
+                  validateLineItems();
+                }}
                 autoComplete="off"
                 disabled={isOriginalLine(row)}
+                errorMessage={fieldState.error?.message}
                 hideErrorMessageWrapper
                 ariaLabel={{ id: 'react.receiving.lotSerialNo.short.label', defaultMessage: 'Lot/SN' }}
               />
-            )}
-          />
-        </TableCell>
+            </TableCell>
+          )}
+        />
       ),
       size: 130,
     }),
@@ -142,22 +160,29 @@ const useReceivingLineItemColumns = ({
         </TableHeaderCell>
       ),
       cell: ({ row }) => (
-        <TableCell className="rt-td">
-          <Controller
-            key={row.original.rowId}
-            name={`lineItems.${row.index}.expirationDate`}
-            control={control}
-            render={({ field }) => (
+        <Controller
+          key={row.original.rowId}
+          name={`lineItems.${row.index}.expirationDate`}
+          control={control}
+          render={({ field, fieldState }) => (
+            <TableCell
+              className="rt-td"
+              customTooltip
+              tooltipLabel={fieldState.error?.message}
+              tooltipClassname="w-100"
+            >
               <DateFieldDateFns
                 {...field}
+                onChange={withValidation(field.onChange)}
                 showCustomInput={false}
                 customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
+                errorMessage={fieldState.error?.message}
                 hideErrorMessageWrapper
                 ariaLabel={{ id: 'react.receiving.expirationDate.short.label', defaultMessage: 'Exp. Date' }}
               />
-            )}
-          />
-        </TableCell>
+            </TableCell>
+          )}
+        />
       ),
       size: 130,
     }),
@@ -175,9 +200,11 @@ const useReceivingLineItemColumns = ({
           key={row.original.rowId}
           name={`lineItems.${row.index}.recipient`}
           control={control}
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <SelectCell
               {...field}
+              onChange={withValidation(field.onChange)}
+              errorMessage={fieldState.error?.message}
               async
               loadOptions={debouncedPeopleFetch}
               showValueTooltip
@@ -236,9 +263,11 @@ const useReceivingLineItemColumns = ({
             key={row.original.rowId}
             name={`lineItems.${row.index}.binLocation`}
             control={control}
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <SelectCell
                 {...field}
+                onChange={withValidation(field.onChange)}
+                errorMessage={fieldState.error?.message}
                 options={binLocationOptions}
                 label="react.receiving.location.label"
                 defaultLabel="Location"
@@ -305,6 +334,7 @@ const useReceivingLineItemColumns = ({
     binLocationOptions,
     hasBinLocationSupport,
     onLocationAutofill,
+    validateLineItems,
   ]);
 
   return { columns };
@@ -315,6 +345,7 @@ useReceivingLineItemColumns.propTypes = {
   addRow: PropTypes.func.isRequired,
   removeRow: PropTypes.func.isRequired,
   onLocationAutofill: PropTypes.func.isRequired,
+  validateLineItems: PropTypes.func.isRequired,
 };
 
 export default useReceivingLineItemColumns;

@@ -19,6 +19,7 @@ class ProductSimpleDtoMapper implements EntityToDtoMapper<Product, ProductSimple
                 id: product.id,
                 productCode: product.productCode,
                 name: product.name,
+                lotAndExpiryControl: product.lotAndExpiryControl,
                 handlingLabels: mapHandlingLabelsToDto(product),
         )
     }
