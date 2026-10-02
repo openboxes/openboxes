@@ -88,6 +88,17 @@ class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
                                                 quantityReceived <=> other?.quantityReceived
     }
 
+    int compareToBySortOrder(ReceiptItem other) {
+        return shipmentItem?.requisitionItem?.orderIndex <=> other.shipmentItem?.requisitionItem?.orderIndex ?:
+                shipmentItem?.sortOrder <=> other.shipmentItem?.sortOrder ?:
+                        sortOrder <=> other?.sortOrder ?:
+                                inventoryItem?.product?.name <=>  other?.inventoryItem?.product?.name
+    }
+
+    boolean hasQuantityReceivedOrCanceled() {
+        return quantityReceived > 0 || quantityCanceled > 0
+    }
+
     String toString() {
         return "${id}:${product?.name}:${inventoryItem?.lotNumber}:${quantityShipped}:${quantityReceived}:${comment}"
     }

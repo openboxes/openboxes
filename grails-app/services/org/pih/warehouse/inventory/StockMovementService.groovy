@@ -1816,19 +1816,23 @@ class StockMovementService {
 
     List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(def stockMovement, boolean excludeItemsWithoutQuantityReceivedOrCanceled = false) {
         List<Shipment> shipments = Shipment.findAllByRequisition(stockMovement.requisition)
-        List<Receipt> receipts = shipments*.receipts?.flatten() as List<Receipt>
-        List<ReceiptItem> receiptItems = excludeItemsWithoutQuantityReceivedOrCanceled ?
-                receipts*.sortReceiptItemsWithQuantityReceivedOrCanceledBySortOrder()?.flatten() :
-                receipts*.sortReceiptItemsBySortOrder()?.flatten()
-        return receiptItems
+        return shipments*.receipts?.flatten()?.collect { Receipt receipt ->
+            filterAndSortReceiptItems(receipt.receiptItems, excludeItemsWithoutQuantityReceivedOrCanceled)
+        }?.flatten()
     }
 
     List<ReceiptItem> getShipmentBasedStockMovementReceiptItems(def stockMovement, boolean excludeItemsWithoutQuantityReceivedOrCanceled = false) {
         Shipment shipment = stockMovement.shipment
-        List<ReceiptItem> receiptItems = excludeItemsWithoutQuantityReceivedOrCanceled ?
-                shipment.receipts*.sortReceiptItemsWithQuantityReceivedOrCanceledBySortOrder()?.flatten() :
-                shipment.receipts*.sortReceiptItemsBySortOrder()?.flatten()
-        return receiptItems
+        return shipment.receipts?.collect { Receipt receipt ->
+            filterAndSortReceiptItems(receipt.receiptItems, excludeItemsWithoutQuantityReceivedOrCanceled)
+        }?.flatten()
+    }
+
+    private static List<ReceiptItem> filterAndSortReceiptItems(Collection<ReceiptItem> receiptItems, boolean excludeItemsWithoutQuantityReceivedOrCanceled) {
+        Collection<ReceiptItem> receiptItemsToSort = excludeItemsWithoutQuantityReceivedOrCanceled ?
+                receiptItems?.findAll { it.hasQuantityReceivedOrCanceled() } :
+                receiptItems
+        return receiptItemsToSort?.sort { ReceiptItem a, ReceiptItem b -> a.compareToBySortOrder(b) }
     }
 
     // It expects to receive a stock movement id
