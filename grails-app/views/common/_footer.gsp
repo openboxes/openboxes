@@ -4,9 +4,28 @@
 <%@ page import="util.ConfigHelper" %>
 
 <div id="footer">
+    <g:set var="unifiedLayout" value="${grailsApplication.config.getProperty('openboxes.layout.unified.enabled', Boolean, false)}"/>
+    %{-- Unified design only: a CSS-only disclosure — the label toggles the
+         checkbox, which reveals .footer-details via a sibling selector, all
+         styled by openboxes-theme.css. Without that stylesheet the checkbox
+         renders as a visible stray control, so the classic footer keeps the
+         original single-line markup below. --}%
+    <g:if test="${unifiedLayout}">
+    <input type="checkbox" id="footer-details-toggle" class="footer-toggle"/>
+    <div class="footer-summary center middle">
+        &copy; <g:copyrightYear/>
+        <a href="https://openboxes.com"><warehouse:message code="default.poweredBy.label" default="Powered by OpenBoxes"/></a>
+        <label for="footer-details-toggle" class="footer-toggle-icon"
+               title="${g.message(code: 'application.buildInformation.label', default: 'Build information')}"
+               aria-label="${g.message(code: 'application.buildInformation.label', default: 'Build information')}"></label>
+    </div>
+    </g:if>
+    <div class="${unifiedLayout ? 'footer-details' : ''}">
 	<div style="line-height: 2em;" class="center middle">
-		&copy; <g:copyrightYear/>
+        <g:if test="${!unifiedLayout}">
+        &copy; <g:copyrightYear/>
         <a href="https://openboxes.com"><warehouse:message code="default.poweredBy.label" default="Powered by OpenBoxes"/></a> &nbsp;&nbsp; | &nbsp;&nbsp;
+        </g:if>
         <g:message code="application.grailsVersion.label"/>: &nbsp; <b><g:meta name="info.app.grailsVersion"></g:meta></b> &nbsp;&nbsp; | &nbsp;&nbsp;
         <g:message code="application.version.label"/>: &nbsp;<b><a href="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'info.app.version')}"><g:meta name="info.app.version"/></a></b>&nbsp;&nbsp; | &nbsp;&nbsp;
         <g:if test="${gitProperties}">
@@ -72,4 +91,5 @@
             </span>
         </g:if>
 	</div>
+    </div>
 </div>
