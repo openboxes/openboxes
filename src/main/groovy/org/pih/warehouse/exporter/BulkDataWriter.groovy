@@ -4,6 +4,7 @@ import grails.validation.ValidationException
 import org.apache.commons.lang.StringUtils
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Lazy
+import org.springframework.core.GenericTypeResolver
 
 import org.pih.warehouse.core.formatter.DefaultTypeFormatter
 import org.pih.warehouse.core.formatter.Formatter
@@ -67,8 +68,11 @@ abstract class BulkDataWriter<OutputType, Config extends BulkDataWriterConfig> {
     BulkDataWriterResult<OutputType> write(List<Map<String, Object>> rowsToWrite,
                                            ContentType contentType,
                                            Config config) {
-        validateConfig(contentType, config)
-        return doWrite(rowsToWrite, contentType, config)
+
+        Config configToUse = config ?: getDefaultWriterConfig()
+
+        validateConfig(contentType, configToUse)
+        return doWrite(rowsToWrite, contentType, configToUse)
     }
 
     /**
@@ -87,9 +91,8 @@ abstract class BulkDataWriter<OutputType, Config extends BulkDataWriterConfig> {
         return write(rowsToWrite, contentType, writerConfig)
     }
 
-
     private void validateConfig(ContentType contentType, Config config) {
-        if (!config?.validate()) {
+        if (config && !config.validate()) {
             throw new ValidationException("Config is invalid", config?.errors)
         }
 
@@ -97,6 +100,17 @@ abstract class BulkDataWriter<OutputType, Config extends BulkDataWriterConfig> {
             throw new IllegalArgumentException("Writer does not support content-type ${contentType}. " +
                     "Only the following content-types are allowed: ${supportedContentTypes}")
         }
+    }
+
+    /**
+     * Constructs a writer config containing all default values.
+     */
+    private Config getDefaultWriterConfig() {
+        return getBulkDataWriterConfigType().newInstance()
+    }
+
+    private Class<Config> getBulkDataWriterConfigType() {
+        return (Class<Config>) GenericTypeResolver.resolveTypeArguments(getClass(), BulkDataWriter)[1]
     }
 
     /**
