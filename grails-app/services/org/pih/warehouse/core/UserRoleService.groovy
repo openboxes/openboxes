@@ -22,7 +22,7 @@ class UserRoleService {
             throw new ObjectNotFoundException(facilityId, Location.toString())
         }
 
-        List<Role> roles = user.roles?.sort(false) ?: []
+        List<Role> roles = user.roles?.toSorted() ?: []
         List<LocationRole> locationRoles = user.locationRoles
                 ?.findAll { !facilityId || it.location.id == facilityId }
                 ?.sort { a, b -> a.location.name <=> b.location.name ?: a.role <=> b.role } ?: []
