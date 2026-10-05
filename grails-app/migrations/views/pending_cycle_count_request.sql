@@ -12,7 +12,8 @@ CREATE OR REPLACE VIEW pending_cycle_count_request AS
         ccr.last_updated,
         ccr.created_by_id,
         ccr.updated_by_id,
-        product_classification.abc_class as abc_class,
+        -- MIN is for ONLY_FULL_GROUP_BY. Every row in a group joins the same product_classification row.
+        MIN(product_classification.abc_class) as abc_class,
         SUM(pa.quantity_on_hand) AS quantity_on_hand,
         SUM(pa.quantity_allocated) AS quantity_allocated,
         SUM(CASE WHEN pa.quantity_on_hand < 0 THEN 1 ELSE 0 END) as negative_item_count,
