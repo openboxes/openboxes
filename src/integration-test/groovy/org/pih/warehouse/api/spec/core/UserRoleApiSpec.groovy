@@ -33,7 +33,8 @@ class UserRoleApiSpec extends ApiSpec {
 
     @Override
     void setupData() {
-        otherFacility = new LocationTestBuilder().asFacility().name("Test Facility ${UUID.randomUUID()}").build(true)
+        // Reuse the facility between tests because locations can't be deleted in cleanup (see Location.afterDelete)
+        otherFacility = new LocationTestBuilder().asFacility().findOrBuild()
 
         userPassword = randomUtil.randomStringFieldValue("password")
         user = new User(
@@ -51,6 +52,7 @@ class UserRoleApiSpec extends ApiSpec {
 
     @Override
     void cleanupData() {
+        // Also deletes the user's location roles
         User.get(user.id)?.delete()
     }
 
