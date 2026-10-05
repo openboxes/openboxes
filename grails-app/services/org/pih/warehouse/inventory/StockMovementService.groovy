@@ -1828,13 +1828,13 @@ class StockMovementService {
         }?.flatten()
     }
 
-    private static Collection<ReceiptItem> getReceiptItems(Receipt receipt, boolean excludeItemsWithoutQuantityReceivedOrCanceled) {
+    private Collection<ReceiptItem> getReceiptItems(Receipt receipt, boolean excludeItemsWithoutQuantityReceivedOrCanceled) {
         return excludeItemsWithoutQuantityReceivedOrCanceled ?
                 receipt.receiptItems?.findAll { it.quantityReceived > 0 || it.quantityCanceled > 0 } :
                 receipt.receiptItems
     }
 
-    private static List<ReceiptItem> sortReceiptItemsBySortOrder(Collection<ReceiptItem> receiptItems) {
+    private List<ReceiptItem> sortReceiptItemsBySortOrder(Collection<ReceiptItem> receiptItems) {
         return receiptItems?.sort { ReceiptItem a, ReceiptItem b ->
             a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
                     a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:

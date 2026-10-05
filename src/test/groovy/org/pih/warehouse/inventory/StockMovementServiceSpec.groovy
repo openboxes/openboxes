@@ -14,10 +14,6 @@ import org.pih.warehouse.shipping.ShipmentItem
 
 class StockMovementServiceSpec extends Specification implements ServiceUnitTest<StockMovementService>, DataTest {
 
-    void setupSpec() {
-        mockDomains(Shipment, ShipmentItem, Receipt, ReceiptItem)
-    }
-
     void 'getStockMovementReceiptItems should return all receipt items by default'() {
         given:
         ReceiptItem receivedReceiptItem = new ReceiptItem(sortOrder: 1, quantityReceived: 5)
@@ -71,9 +67,7 @@ class StockMovementServiceSpec extends Specification implements ServiceUnitTest<
     }
 
     private static Receipt buildReceipt(List<ReceiptItem> receiptItems) {
-        Receipt receipt = new Receipt()
-        receiptItems.each { ReceiptItem receiptItem -> receipt.addToReceiptItems(receiptItem) }
-        return receipt
+        return new Receipt(receiptItems: receiptItems as Set)
     }
 
     private static ReceiptItem buildReceiptItem(Integer orderIndex, Integer shipmentItemSortOrder, Integer sortOrder,
