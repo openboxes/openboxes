@@ -23,8 +23,6 @@ class UserRoleService {
         }
 
         List<Role> roles = user.roles?.sort(false) ?: []
-
-        // Compare ids so we don't fetch every location just to check if it's the facility
         List<LocationRole> locationRoles = user.locationRoles
                 ?.findAll { !facilityId || it.location.id == facilityId }
                 ?.sort { a, b -> a.location.name <=> b.location.name ?: a.role <=> b.role } ?: []
