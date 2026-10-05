@@ -17,9 +17,10 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 import 'components/Filter/FilterStyles.scss';
 
 const AutoSubmitOnChange = ({
-  values, excludeField, onSubmit, pristine,
+  values, excludeField, onSubmit, initialValues,
 }) => {
   const prevValuesRef = useRef(null);
+  const prevInitialValuesRef = useRef(initialValues);
 
   useEffect(() => {
     const current = _.omit(values, excludeField);
@@ -27,15 +28,31 @@ const AutoSubmitOnChange = ({
       ? _.omit(prevValuesRef.current, excludeField)
       : null;
 
-    // A pristine form's values only change because they were reinitialized from
-    // defaultValues (e.g. once the async default-filter fetch resolves) - not because
-    // the user touched a filter. Skip those, otherwise this fires its own history.push
+    // A values change caused by the form's own initialValues changing (i.e. defaultValues
+    // changed upstream, e.g. the async default-filter fetch resolving) is a reinit, not a
+    // user-driven filter change. Skip those, otherwise this fires its own history.push
     // right on top of the one FilterForm's own defaultValues effect already replaces.
-    if (previous !== null && !pristine && !_.isEqual(current, previous)) {
+    //
+    // initialValues is read from this same FormSpy subscription as values, rather than
+    // from the defaultValues prop directly, so both always come from the same final-form
+    // notification and can never be one render out of step with each other - an earlier
+    // version read defaultValues as a separate prop and intermittently consumed its
+    // "changed" signal in a render where values hadn't caught up to the reinit yet,
+    // causing the *next* render (where values finally did reflect it) to wrongly treat
+    // the reinit as a user edit and fire an extra, unwanted history.push.
+    //
+    // initialValues (rather than pristine, the original approach before that) matters
+    // because pristine also flips to true whenever the user edits a field back to its
+    // initial value by hand, which would wrongly skip that perfectly valid, user-driven
+    // change and leave the results stale until the next edit or a manual Search click.
+    const initialValuesChanged = !_.isEqual(initialValues, prevInitialValuesRef.current);
+
+    if (previous !== null && !initialValuesChanged && !_.isEqual(current, previous)) {
       onSubmit();
     }
     prevValuesRef.current = values;
-  }, [values]);
+    prevInitialValuesRef.current = initialValues;
+  }, [values, initialValues]);
 
   return null;
 };
@@ -184,13 +201,13 @@ const FilterForm = ({
           return (
             <form onSubmit={handleSubmit} className="w-100 m-0">
               {autoSubmitOnFilterChange && (
-                <FormSpy subscription={{ values: true, pristine: true }}>
-                  {({ values: formValues, pristine }) => (
+                <FormSpy subscription={{ values: true, initialValues: true }}>
+                  {({ values: formValues, initialValues: formInitialValues }) => (
                     <AutoSubmitOnChange
                       values={formValues}
                       excludeField={searchFieldId}
                       onSubmit={handleSubmit}
-                      pristine={pristine}
+                      initialValues={formInitialValues}
                     />
                   )}
                 </FormSpy>
