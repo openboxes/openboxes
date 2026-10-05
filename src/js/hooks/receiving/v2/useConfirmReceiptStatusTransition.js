@@ -13,13 +13,16 @@ import { denormalizeData } from 'utils/normalizationUtils';
 
 // Completing the receipt makes the shipment fully received when every shipment-level
 // line has nothing left to receive (pending "receiving now" quantities are already
-// subtracted from quantityRemaining).
-const willBeFullyReceived = (lineItemsState) => {
+// subtracted from quantityRemaining). A line selected to cancel its remaining quantity
+// counts as covered too
+const willBeFullyReceived = (lineItemsState, canceledReceiptItemIds) => {
   const shipmentLevelRows = denormalizeData(lineItemsState)
     .filter((row) => row
       && (row.rowType === null || row.rowType === ReceivingRowType.REPLACED));
   return shipmentLevelRows.length > 0
-    && shipmentLevelRows.every((row) => row.isCompleted || row.quantityRemaining <= 0);
+    && shipmentLevelRows.every((row) => row.isCompleted
+      || row.quantityRemaining <= 0
+      || canceledReceiptItemIds.has(row.originalReceiptItemId));
 };
 
 const hasReceivingNowQuantities = (lineItemsState) => denormalizeData(lineItemsState)
@@ -29,15 +32,23 @@ const hasReceivingNowQuantities = (lineItemsState) => denormalizeData(lineItemsS
 // received once everything is covered (always the case when the location does not
 // support partial receiving), a shipped one becomes partially received otherwise.
 // With nothing being received the status does not change at all.
-const getNextStatus = ({ shipmentStatus, partialReceivingEnabled, lineItemsState }) => {
+const getNextStatus = ({
+  shipmentStatus,
+  partialReceivingEnabled,
+  shipmentLineItemsState,
+  canceledReceiptItemIds,
+}) => {
   if (shipmentStatus === ShipmentStatusCode.PARTIALLY_RECEIVED) {
-    return willBeFullyReceived(lineItemsState) ? ShipmentStatusCode.RECEIVED : null;
+    return willBeFullyReceived(shipmentLineItemsState, canceledReceiptItemIds)
+      ? ShipmentStatusCode.RECEIVED
+      : null;
   }
   if (shipmentStatus !== ShipmentStatusCode.SHIPPED
-    || !hasReceivingNowQuantities(lineItemsState)) {
+    || !hasReceivingNowQuantities(shipmentLineItemsState)) {
     return null;
   }
-  return partialReceivingEnabled && !willBeFullyReceived(lineItemsState)
+  return partialReceivingEnabled
+    && !willBeFullyReceived(shipmentLineItemsState, canceledReceiptItemIds)
     ? ShipmentStatusCode.PARTIALLY_RECEIVED
     : ShipmentStatusCode.RECEIVED;
 };
@@ -46,7 +57,10 @@ const getNextStatus = ({ shipmentStatus, partialReceivingEnabled, lineItemsState
  * Badge of the status the shipment transitions into on complete receipt,
  * rendered after the arrow in the check step details box.
  */
-const useConfirmReceiptStatusTransition = ({ lineItemsState } = {}) => {
+const useConfirmReceiptStatusTransition = ({
+  shipmentLineItemsState,
+  canceledReceiptItemIds,
+} = {}) => {
   const translate = useTranslate();
   const supportedActivities = useSelector(getCurrentLocationSupportedActivities);
   const { shipmentStatus } = useSelector(getReceivingShipmentDetails);
@@ -55,7 +69,8 @@ const useConfirmReceiptStatusTransition = ({ lineItemsState } = {}) => {
     shipmentStatus,
     partialReceivingEnabled:
       Boolean(supportedActivities?.includes(ActivityCode.PARTIAL_RECEIVING)),
-    lineItemsState,
+    shipmentLineItemsState,
+    canceledReceiptItemIds,
   });
 
   const nextBadge = SHIPMENT_STATUS_BADGES[nextStatus];

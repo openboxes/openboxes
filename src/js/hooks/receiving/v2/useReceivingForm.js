@@ -20,6 +20,7 @@ import useReceivingNextValidation from 'hooks/receiving/v2/useReceivingNextValid
 import useReceivingSort from 'hooks/receiving/v2/useReceivingSort';
 import useTableLocationAutofill from 'hooks/receiving/v2/useTableLocationAutofill';
 import getOptionalColumnsVisibility from 'utils/receiving/getOptionalColumnsVisibility';
+import hasAnyPreviousReceipt from 'utils/receiving/hasAnyPreviousReceipt';
 import hasItemInDifferentBin from 'utils/receiving/hasItemInDifferentBin';
 
 const useReceivingForm = () => {
@@ -100,9 +101,11 @@ const useReceivingForm = () => {
     () => getOptionalColumnsVisibility(lineItemsState),
     [lineItemsState],
   );
+  const hasPreviousReceipts = hasAnyPreviousReceipt(lineItemsState);
   const { columns } = useReceivingColumns({
     view,
     putawayEnabled,
+    hasPreviousReceipts,
     sortableProps,
     sort,
     order,

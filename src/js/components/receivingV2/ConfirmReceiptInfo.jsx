@@ -11,10 +11,13 @@ import useTranslate from 'hooks/useTranslate';
 import ItemDetails from 'utils/ItemDetails';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
-const ConfirmReceiptInfo = ({ control, lineItemsState }) => {
+const ConfirmReceiptInfo = ({ control, shipmentLineItemsState, canceledReceiptItemIds }) => {
   const translate = useTranslate();
   const { badge, fields } = useConfirmReceiptDetails();
-  const { nextBadge } = useConfirmReceiptStatusTransition({ lineItemsState });
+  const { nextBadge } = useConfirmReceiptStatusTransition({
+    shipmentLineItemsState,
+    canceledReceiptItemIds,
+  });
 
   const getBadgeTooltip = () => {
     if (!badge) {
@@ -80,7 +83,7 @@ const ConfirmReceiptInfo = ({ control, lineItemsState }) => {
 
 ConfirmReceiptInfo.propTypes = {
   control: PropTypes.shape({}).isRequired,
-  lineItemsState: PropTypes.shape({
+  shipmentLineItemsState: PropTypes.shape({
     entities: PropTypes.shape({}),
     ids: PropTypes.arrayOf(PropTypes.oneOfType([
       PropTypes.string,
@@ -89,6 +92,7 @@ ConfirmReceiptInfo.propTypes = {
       PropTypes.shape({}),
     ])),
   }).isRequired,
+  canceledReceiptItemIds: PropTypes.instanceOf(Set).isRequired,
 };
 
 export default ConfirmReceiptInfo;
