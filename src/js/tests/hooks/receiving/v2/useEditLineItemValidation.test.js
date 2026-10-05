@@ -1,16 +1,12 @@
 import { renderHook } from '@testing-library/react-hooks';
 
-import useEditLineItemValidation from 'hooks/receiving/v2/useEditLineItemValidation';
+import useEditLineItemValidation, {
+  EditLineItemErrorMessage,
+} from 'hooks/receiving/v2/useEditLineItemValidation';
+import { QuantityReceivingErrorMessage } from 'hooks/receiving/v2/useQuantityReceivingValidation';
 
+// Translations resolve to the default message, so the errors are asserted against it.
 jest.mock('hooks/useTranslate', () => () => (id, defaultMessage) => defaultMessage);
-
-const REQUIRED = 'This field is required';
-const LOT_REQUIRED = 'Lot or serial number required for this product';
-const EXPIRY_REQUIRED = 'Expiration date required for this product';
-const EXPIRY_WITHOUT_LOT = 'Cannot enter an expiration date without a lot number';
-const DIFFERENT_EXPIRATION_DATES = 'You have entered two different expiration dates for the same lot number';
-const DUPLICATE = 'Duplicate rows for this inventory item';
-const INVALID_DATE = 'This date is invalid. Please enter a date after 2000.';
 
 const product = { id: 'product-1', lotAndExpiryControl: false };
 const lotControlledProduct = { id: 'product-2', lotAndExpiryControl: true };
@@ -55,7 +51,7 @@ describe('useEditLineItemValidation', () => {
       ['null', null],
     ])('should require the quantity (%s)', (_, quantityReceiving) => {
       expect(validate([buildRow({ quantityReceiving })])).toEqual({
-        '0.quantityReceiving': [REQUIRED],
+        '0.quantityReceiving': [QuantityReceivingErrorMessage.REQUIRED.defaultMessage],
       });
     });
 
@@ -64,8 +60,8 @@ describe('useEditLineItemValidation', () => {
     });
 
     it.each([
-      ['a negative number', -1, 'Value cannot be a negative number'],
-      ['a decimal number', 1.5, 'Value cannot be a decimal number'],
+      ['a negative number', -1, QuantityReceivingErrorMessage.NEGATIVE.defaultMessage],
+      ['a decimal number', 1.5, QuantityReceivingErrorMessage.DECIMAL.defaultMessage],
     ])('should reject %s', (_, quantityReceiving, message) => {
       expect(validate([buildRow({ quantityReceiving })])).toEqual({
         '0.quantityReceiving': [message],
@@ -81,9 +77,9 @@ describe('useEditLineItemValidation', () => {
       })]);
 
       expect(errors).toEqual({
-        '0.quantityReceiving': [REQUIRED],
-        '0.lotNumber': [LOT_REQUIRED],
-        '0.expirationDate': [EXPIRY_REQUIRED],
+        '0.quantityReceiving': [QuantityReceivingErrorMessage.REQUIRED.defaultMessage],
+        '0.lotNumber': [EditLineItemErrorMessage.LOT_NUMBER_REQUIRED.defaultMessage],
+        '0.expirationDate': [EditLineItemErrorMessage.EXPIRATION_DATE_REQUIRED.defaultMessage],
       });
     });
   });
@@ -97,8 +93,8 @@ describe('useEditLineItemValidation', () => {
       })]);
 
       expect(errors).toEqual({
-        '0.lotNumber': [LOT_REQUIRED],
-        '0.expirationDate': [EXPIRY_REQUIRED],
+        '0.lotNumber': [EditLineItemErrorMessage.LOT_NUMBER_REQUIRED.defaultMessage],
+        '0.expirationDate': [EditLineItemErrorMessage.EXPIRATION_DATE_REQUIRED.defaultMessage],
       });
     });
 
@@ -128,19 +124,19 @@ describe('useEditLineItemValidation', () => {
       ['blank lot', '   '],
     ])('should reject an expiration date without a lot (%s)', (_, lotNumber) => {
       expect(validate([buildRow({ lotNumber })])).toEqual({
-        '0.expirationDate': [EXPIRY_WITHOUT_LOT],
+        '0.expirationDate': [EditLineItemErrorMessage.EXPIRATION_DATE_WITHOUT_LOT.defaultMessage],
       });
     });
 
     it('should reject an expiration date without a lot on the original line too', () => {
       expect(validate([buildRow({ isSplitItem: false, lotNumber: '' })])).toEqual({
-        '0.expirationDate': [EXPIRY_WITHOUT_LOT],
+        '0.expirationDate': [EditLineItemErrorMessage.EXPIRATION_DATE_WITHOUT_LOT.defaultMessage],
       });
     });
 
     it('should reject a date before 2000', () => {
       expect(validate([buildRow({ expirationDate: '31/Dec/1999' })])).toEqual({
-        '0.expirationDate': [INVALID_DATE],
+        '0.expirationDate': [EditLineItemErrorMessage.INVALID_EXPIRATION_DATE.defaultMessage],
       });
     });
 
@@ -152,10 +148,10 @@ describe('useEditLineItemValidation', () => {
   describe('duplicated lines', () => {
     const errorsOfRows = (...indexes) => indexes.reduce((acc, index) => ({
       ...acc,
-      [`${index}.product`]: [DUPLICATE],
-      [`${index}.lotNumber`]: [DUPLICATE],
-      [`${index}.recipient`]: [DUPLICATE],
-      [`${index}.binLocation`]: [DUPLICATE],
+      [`${index}.product`]: [EditLineItemErrorMessage.DUPLICATED_LINE.defaultMessage],
+      [`${index}.lotNumber`]: [EditLineItemErrorMessage.DUPLICATED_LINE.defaultMessage],
+      [`${index}.recipient`]: [EditLineItemErrorMessage.DUPLICATED_LINE.defaultMessage],
+      [`${index}.binLocation`]: [EditLineItemErrorMessage.DUPLICATED_LINE.defaultMessage],
     }), {});
 
     it('should mark every field of every duplicated row', () => {
@@ -201,9 +197,9 @@ describe('useEditLineItemValidation', () => {
       ]);
 
       expect(errors).toEqual({
-        '0.expirationDate': [DIFFERENT_EXPIRATION_DATES],
-        '1.expirationDate': [DIFFERENT_EXPIRATION_DATES],
-        '2.expirationDate': [DIFFERENT_EXPIRATION_DATES],
+        '0.expirationDate': [EditLineItemErrorMessage.DIFFERENT_EXPIRATION_DATES.defaultMessage],
+        '1.expirationDate': [EditLineItemErrorMessage.DIFFERENT_EXPIRATION_DATES.defaultMessage],
+        '2.expirationDate': [EditLineItemErrorMessage.DIFFERENT_EXPIRATION_DATES.defaultMessage],
       });
     });
 
@@ -214,8 +210,8 @@ describe('useEditLineItemValidation', () => {
       ]);
 
       expect(errors).toEqual({
-        '0.expirationDate': [DIFFERENT_EXPIRATION_DATES],
-        '1.expirationDate': [DIFFERENT_EXPIRATION_DATES],
+        '0.expirationDate': [EditLineItemErrorMessage.DIFFERENT_EXPIRATION_DATES.defaultMessage],
+        '1.expirationDate': [EditLineItemErrorMessage.DIFFERENT_EXPIRATION_DATES.defaultMessage],
       });
     });
 

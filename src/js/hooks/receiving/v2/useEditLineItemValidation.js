@@ -6,6 +6,33 @@ import { DateFormatDateFns } from 'consts/timeFormat';
 import useQuantityReceivingValidation from 'hooks/receiving/v2/useQuantityReceivingValidation';
 import useTranslate from 'hooks/useTranslate';
 
+export const EditLineItemErrorMessage = {
+  LOT_NUMBER_REQUIRED: {
+    id: 'react.receiving.error.lotNumberRequired.label',
+    defaultMessage: 'Lot or serial number required for this product',
+  },
+  EXPIRATION_DATE_REQUIRED: {
+    id: 'react.receiving.error.expirationDateRequired.label',
+    defaultMessage: 'Expiration date required for this product',
+  },
+  EXPIRATION_DATE_WITHOUT_LOT: {
+    id: 'react.receiving.error.expirationDateWithoutLot.label',
+    defaultMessage: 'Cannot enter an expiration date without a lot number',
+  },
+  DUPLICATED_LINE: {
+    id: 'react.receiving.error.duplicatedLine.label',
+    defaultMessage: 'Duplicate rows for this inventory item',
+  },
+  DIFFERENT_EXPIRATION_DATES: {
+    id: 'react.receiving.error.differentExpirationDates.label',
+    defaultMessage: 'You have entered two different expiration dates for the same lot number',
+  },
+  INVALID_EXPIRATION_DATE: {
+    id: 'react.stockMovement.error.invalidDate.label',
+    defaultMessage: 'This date is invalid. Please enter a date after 2000.',
+  },
+};
+
 const MIN_EXPIRATION_DATE = new Date(2000, 0, 1);
 
 // The date picker only accepts valid dates, but lets through the ones before 2000.
@@ -33,6 +60,7 @@ const getDuplicateKey = (row) => [
  */
 const useEditLineItemValidation = () => {
   const translate = useTranslate();
+  const translateMessage = ({ id, defaultMessage }) => translate(id, defaultMessage);
   const { requiredQuantityReceivingSchema } = useQuantityReceivingValidation();
 
   const checkLotAndExpiryRequired = (row, ctx) => {
@@ -43,10 +71,7 @@ const useEditLineItemValidation = () => {
     if (!getLotNumber(row)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: translate(
-          'react.receiving.error.lotNumberRequired.label',
-          'Lot or serial number required for this product',
-        ),
+        message: translateMessage(EditLineItemErrorMessage.LOT_NUMBER_REQUIRED),
         path: ['lotNumber'],
       });
     }
@@ -54,10 +79,7 @@ const useEditLineItemValidation = () => {
     if (!row.expirationDate) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: translate(
-          'react.receiving.error.expirationDateRequired.label',
-          'Expiration date required for this product',
-        ),
+        message: translateMessage(EditLineItemErrorMessage.EXPIRATION_DATE_REQUIRED),
         path: ['expirationDate'],
       });
     }
@@ -70,19 +92,13 @@ const useEditLineItemValidation = () => {
 
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: translate(
-        'react.receiving.error.expirationDateWithoutLot.label',
-        'Cannot enter an expiration date without a lot number',
-      ),
+      message: translateMessage(EditLineItemErrorMessage.EXPIRATION_DATE_WITHOUT_LOT),
       path: ['expirationDate'],
     });
   };
 
   const checkDuplicatedLines = (lineItems, ctx) => {
-    const message = translate(
-      'react.receiving.error.duplicatedLine.label',
-      'Duplicate rows for this inventory item',
-    );
+    const message = translateMessage(EditLineItemErrorMessage.DUPLICATED_LINE);
     const rowsWithProduct = lineItems.filter((row) => row.product?.id);
     Object.values(_.groupBy(rowsWithProduct, getDuplicateKey))
       .filter((group) => group.length > 1)
@@ -95,10 +111,7 @@ const useEditLineItemValidation = () => {
   };
 
   const checkDifferentExpirationDatesForTheSameLot = (lineItems, ctx) => {
-    const message = translate(
-      'react.receiving.error.differentExpirationDates.label',
-      'You have entered two different expiration dates for the same lot number',
-    );
+    const message = translateMessage(EditLineItemErrorMessage.DIFFERENT_EXPIRATION_DATES);
     const rowsWithLot = lineItems.filter((row) => row.product?.id && getLotNumber(row));
     Object.values(_.groupBy(rowsWithLot, (row) => `${row.product.id}|${getLotNumber(row)}`))
       .filter((group) => _.uniqBy(group, (row) => row.expirationDate || '').length > 1)
@@ -115,10 +128,10 @@ const useEditLineItemValidation = () => {
     quantityReceiving: requiredQuantityReceivingSchema,
     expirationDate: z.string()
       .nullish()
-      .refine(isExpirationDateAfterMinimum, translate(
-        'react.stockMovement.error.invalidDate.label',
-        'This date is invalid. Please enter a date after 2000.',
-      )),
+      .refine(
+        isExpirationDateAfterMinimum,
+        translateMessage(EditLineItemErrorMessage.INVALID_EXPIRATION_DATE),
+      ),
   })
     // By default z.object() strips the keys missing from the schema, and the refinements receive
     // the parsed row - without passthrough they wouldn't see the product, lot, recipient, bin etc.

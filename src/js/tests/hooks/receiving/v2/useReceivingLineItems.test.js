@@ -228,6 +228,15 @@ describe('useReceivingLineItems', () => {
       expect(result.current.hasErrors).toBe(false);
     });
 
+    it('should not validate the lines when the modal opens, before anything is changed', async () => {
+      const duplicatedLine = { ...originalLine, rowId: 'row-2', isSplitItem: true };
+      const { result } = renderLineItems([originalLine, duplicatedLine]);
+
+      await flushValidation();
+
+      expect(result.current.hasErrors).toBe(false);
+    });
+
     it('should flag an added row of a product with lot and expiry control right away', async () => {
       const { result } = renderHook(() => useReceivingLineItems({
         lineItem: { ...originalLine, product: lotControlledProduct },
@@ -290,9 +299,9 @@ describe('useReceivingLineItems', () => {
     it('should revalidate the rows after the location autofill', () => {
       renderLineItems([originalLine]);
 
-      const { onLineItemsUpdated } = lastCallProps(useEditModalLocationAutofill);
+      const { validateLineItems } = lastCallProps(useEditModalLocationAutofill);
 
-      expect(onLineItemsUpdated).toBe(getValidateLineItems());
+      expect(validateLineItems).toBe(getValidateLineItems());
     });
   });
 });

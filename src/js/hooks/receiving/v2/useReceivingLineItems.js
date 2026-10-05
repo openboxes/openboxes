@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import _ from 'lodash';
@@ -86,27 +86,24 @@ const useReceivingLineItems = ({
     return trigger(fieldNames);
   }, [trigger, getValues]);
 
-  useEffect(() => {
-    validateLineItems();
-  }, [fields]);
-
   const removeRow = useCallback((rowId) => {
     const index = getValues('lineItems').findIndex((item) => item.rowId === rowId);
     if (index !== -1) {
       remove(index);
+      validateLineItems();
     }
-  }, [getValues, remove]);
+  }, [getValues, remove, validateLineItems]);
 
   const { onLocationAutofill } = useEditModalLocationAutofill({
     getValues,
     setValue,
-    onLineItemsUpdated: validateLineItems,
+    validateLineItems,
   });
 
-  const addRow = useCallback(
-    () => append(buildSplitRow()),
-    [append, lineItem, originalLineItem],
-  );
+  const addRow = useCallback(() => {
+    append(buildSplitRow());
+    validateLineItems();
+  }, [append, lineItem, originalLineItem, validateLineItems]);
 
   const { columns } = useReceivingLineItemColumns({
     control,
@@ -116,17 +113,20 @@ const useReceivingLineItems = ({
     validateLineItems,
   });
 
-  const copyToReceiving = useCallback((receivedItem) => append({
-    rowId: _.uniqueId('row-'),
-    receiptItemId: null,
-    product: receivedItem.product ?? null,
-    lotNumber: receivedItem.lotNumber ?? '',
-    expirationDate: receivedItem.expirationDate ?? '',
-    recipient: receivedItem.recipient ?? null,
-    quantityReceiving: receivedItem.quantityReceived ?? '',
-    binLocation: receivedItem.binLocation ?? null,
-    isSplitItem: true,
-  }), [append]);
+  const copyToReceiving = useCallback((receivedItem) => {
+    append({
+      rowId: _.uniqueId('row-'),
+      receiptItemId: null,
+      product: receivedItem.product ?? null,
+      lotNumber: receivedItem.lotNumber ?? '',
+      expirationDate: receivedItem.expirationDate ?? '',
+      recipient: receivedItem.recipient ?? null,
+      quantityReceiving: receivedItem.quantityReceived ?? '',
+      binLocation: receivedItem.binLocation ?? null,
+      isSplitItem: true,
+    });
+    validateLineItems();
+  }, [append, validateLineItems]);
 
   const revertToOriginal = () => reset();
 

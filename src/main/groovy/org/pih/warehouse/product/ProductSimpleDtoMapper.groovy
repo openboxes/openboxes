@@ -19,19 +19,7 @@ class ProductSimpleDtoMapper implements EntityToDtoMapper<Product, ProductSimple
                 id: product.id,
                 productCode: product.productCode,
                 name: product.name,
-                lotAndExpiryControl: product.lotAndExpiryControl,
-                handlingLabels: mapHandlingLabelsToDto(product),
+                handlingLabels: ProductHandlingLabelDto.listFrom(product, messageLocalizer),
         )
-    }
-
-    private List<ProductHandlingLabelDto> mapHandlingLabelsToDto(Product product) {
-        List<ProductHandlingLabel> handlingLabels = ProductHandlingLabel.of(product)
-
-        return handlingLabels.collect {
-            new ProductHandlingLabelDto(
-                    labelCode: it,
-                    labelText: messageLocalizer.localize(it.labelTextCode),
-            )
-        }
     }
 }

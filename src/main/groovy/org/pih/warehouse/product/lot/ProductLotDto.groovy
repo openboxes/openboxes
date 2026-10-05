@@ -8,7 +8,7 @@ import org.pih.warehouse.core.dtos.DomainDto
 import org.pih.warehouse.core.mapper.SmartMapper
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.LotStatusCode
-import org.pih.warehouse.product.ProductSimpleDto
+import org.pih.warehouse.product.ProductDto
 
 /**
  * Represents a specific lot number of a product.
@@ -16,7 +16,7 @@ import org.pih.warehouse.product.ProductSimpleDto
  */
 class ProductLotDto implements DomainDto<InventoryItem> {
 
-    ProductSimpleDto product
+    ProductDto product
     String lotNumber
     // A date-only LocalDate (not Date) so it serializes as e.g. "2028-03-01" instead of an instant that the server's
     // timezone offset can shift to the previous day (e.g. "2028-02-29T23:00:00Z"). See the LocalDate JSON marshaller.
@@ -27,7 +27,7 @@ class ProductLotDto implements DomainDto<InventoryItem> {
     static ProductLotDto from(InventoryItem inventoryItem) {
         return !inventoryItem ? null : new ProductLotDto(
                 id: inventoryItem.id,
-                product: SmartMapper.mapStatic(inventoryItem.product, ProductSimpleDto),
+                product: SmartMapper.mapStatic(inventoryItem.product, ProductDto),
                 lotNumber: inventoryItem.lotNumber,
                 // InventoryItem.expirationDate is a (legacy) java.util.Date. Resolve it to a calendar date in the
                 // system zone, mirroring how the InventoryItem JSON marshaller formats it (MM/dd/yyyy, system zone).
