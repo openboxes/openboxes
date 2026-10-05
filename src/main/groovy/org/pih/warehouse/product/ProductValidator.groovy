@@ -51,7 +51,7 @@ class ProductValidator extends DomainValidator<Product> {
                 product, ActivityCode.MANAGE_INVENTORY)
 
         return locations ?
-                rejectField(ACTIVE_FIELD_NAME, product.active, "product.active.invalid.inStock", locations) :
+                rejectField(ACTIVE_FIELD_NAME, product.active, "product.active.invalid.inStock", [locations]) :
                 null
     }
 
@@ -62,7 +62,7 @@ class ProductValidator extends DomainValidator<Product> {
                 [ShipmentStatusCode.SHIPPED, ShipmentStatusCode.PARTIALLY_RECEIVED])
 
         return locations ?
-                rejectField(ACTIVE_FIELD_NAME, product.active, "product.active.invalid.inShipment", locations) :
+                rejectField(ACTIVE_FIELD_NAME, product.active, "product.active.invalid.inShipment", [locations]) :
                 null
     }
 

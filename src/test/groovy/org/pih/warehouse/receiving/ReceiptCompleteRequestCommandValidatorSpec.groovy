@@ -8,6 +8,7 @@ import spock.lang.Unroll
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.validation.ObjectValidationResult
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 
@@ -189,6 +190,59 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
         assert result.valid
     }
 
+    void 'doValidate should reject a split item with lot: #lotNumber and expiry: #expirationDate when lotAndExpiryControl is enabled'() {
+        given: 'a pending receipt for a split item on a product with lotAndExpiryControl enabled'
+        Receipt receipt = buildPendingReceipt()
+        buildReceiptItem(receipt, true, 5, null, true, lotNumber, expirationDate)
+
+        when:
+        ObjectValidationResult result = validator.doValidate(new ReceiptCompleteRequestCommand(receipt: receipt))
+
+        then:
+        assert !result.valid
+        assert result.errors*.code == ["receiptCompleteRequestCommand.receipt.missingLotAndExpiry"]
+        assert result.errors.first().arguments.toString().contains("Product")
+        assert !result.errors.first().arguments.toString().contains("Code")
+
+        where:
+        lotNumber | expirationDate
+        null      | null
+        "valid"   | null
+        null      | new Date(2025, 01, 01)
+    }
+
+    void 'doValidate should accept a split item with a valid lot and expiry when lotAndExpiryControl is enabled'() {
+        given: 'a pending receipt for a split item on a product with lotAndExpiryControl enabled and both fields set'
+        Receipt receipt = buildPendingReceipt()
+        buildReceiptItem(receipt, true, 5, null, true, "valid", new Date(2025, 01, 01))
+
+        expect:
+        assert validator.doValidate(new ReceiptCompleteRequestCommand(receipt: receipt)).valid
+    }
+
+    void 'doValidate should accept an item with isSplitItem: #splitItem, lot: #lotNumber, expiry: #expirationDate, and quantity: #quantity when lotAndExpiryControl is #lotAndExpiryControl'() {
+        given: 'a pending receipt for a product with lotAndExpiryControl disabled'
+        Receipt receipt = buildPendingReceipt()
+        buildReceiptItem(receipt, splitItem, quantity, null, lotAndExpiryControl, lotNumber, expirationDate)
+
+        and: 'another receipt item that makes the receipt valid even if the other item receives nothing'
+        buildReceiptItem(receipt, false)
+
+        expect:
+        assert validator.doValidate(new ReceiptCompleteRequestCommand(receipt: receipt)).valid
+
+        where:
+        splitItem  | lotAndExpiryControl | quantity | lotNumber | expirationDate
+        // Split item and invalid but lotAndExpiryControl is disabled
+        true       | false               | 5        | null      | null
+        true       | false               | 5        | "valid"   | null
+        true       | false               | 5        | null      | new Date(2025, 01, 01)
+        // Not a split item and invalid but receiving no quantity so still succeeds even if lotAndExpiryControl is enabled
+        false      | true                | 0        | null      | null
+        false      | true                | 0        | "valid"   | null
+        false      | true                | 0        | null      | new Date(2025, 01, 01)
+    }
+
     // ----------------------------------------------------------------------------------------------------------
     // Fixture helpers - the items are persisted so they carry distinct ids (transient items would all share a
     // null id and falsely trip the duplicate check).
@@ -201,9 +255,22 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
     }
 
     private static ReceiptItem buildReceiptItem(
-            Receipt receipt, Boolean isSplitItem, Integer quantityReceived = 10, Location binLocation = null) {
+            Receipt receipt,
+            Boolean isSplitItem,
+            Integer quantityReceived = 10,
+            Location binLocation = null,
+            boolean lotAndExpiryControl = false,
+            String lotNumber = null,
+            Date expirationDate = null
+    ) {
+        InventoryItem inventoryItem = (lotNumber && expirationDate) ? new InventoryItem(
+                lotNumber: lotNumber,
+                expirationDate: expirationDate,
+        ) : null
+
         ReceiptItem receiptItem = new ReceiptItem(
-                product: new Product(name: "Product"),
+                product: new Product(name: "Product", code: "Code", lotAndExpiryControl: lotAndExpiryControl),
+                inventoryItem: inventoryItem,
                 quantityShipped: isSplitItem ? 0 : 100,
                 quantityReceived: quantityReceived,
                 isSplitItem: isSplitItem,

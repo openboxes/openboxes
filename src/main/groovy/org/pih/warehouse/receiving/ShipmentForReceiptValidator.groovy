@@ -61,7 +61,7 @@ class ShipmentForReceiptValidator extends PlainObjectValidator<Shipment> {
         }
 
         return rejectField("currentStatus", shipment?.currentStatus,
-                "stockMovement.hasNotBeenShipped.message", [shipment?.shipmentNumber] as Object[])
+                "stockMovement.hasNotBeenShipped.message", [shipment?.shipmentNumber])
     }
 
     /**
@@ -73,7 +73,7 @@ class ShipmentForReceiptValidator extends PlainObjectValidator<Shipment> {
         }
 
         return rejectField("shipmentItems", shipment.shipmentItems,
-                "stockMovement.hasAlreadyBeenReceived.message", [shipment.shipmentNumber] as Object[])
+                "stockMovement.hasAlreadyBeenReceived.message", [shipment.shipmentNumber])
     }
 
     /**
@@ -86,7 +86,7 @@ class ShipmentForReceiptValidator extends PlainObjectValidator<Shipment> {
         }
 
         return rejectField("receipts", shipment.receipts,
-                "shipment.pendingReceiptExists.message", [shipment.shipmentNumber] as Object[])
+                "shipment.pendingReceiptExists.message", [shipment.shipmentNumber])
     }
 
     /**
