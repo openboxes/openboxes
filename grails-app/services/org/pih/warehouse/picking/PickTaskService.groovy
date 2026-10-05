@@ -32,17 +32,9 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionService
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
-import org.springframework.validation.BeanPropertyBindingResult
-import org.springframework.validation.ObjectError
 
 @Transactional
 class PickTaskService {
-
-    // Error code on the ValidationException thrown by validateStagingLocationZone, used by
-    // PickTaskApiController to distinguish an overridable zone mismatch from any other
-    // ValidationException (e.g. from requisition.save() in save()) and to recover the
-    // structured delivery type / location / zone data carried in the error's arguments.
-    static final String STAGING_LOCATION_ZONE_MISMATCH_CODE = 'STAGING_LOCATION_ZONE_MISMATCH'
 
     GrailsApplication grailsApplication
     InventoryService inventoryService
@@ -673,8 +665,8 @@ class PickTaskService {
     // facility via ActivityCode.VALIDATE_STAGING_LOCATION_ZONE so behaviour can be tuned per
     // facility rather than hard-coded (OBLS-853). Fails closed on missing zone/config so an
     // incomplete facility setup surfaces as a validation failure rather than silently no-op'ing.
-    // The mismatch is overridable: the caller (mobile app) can show the details carried on the
-    // thrown ValidationException's error and resubmit with overrideStagingLocationZone = true.
+    // The mismatch is overridable: the caller (mobile app) can show the message carried on the
+    // thrown StagingLocationMismatchException and resubmit with overrideStagingLocationZone = true.
     private void validateStagingLocationZone(Location stagingLocation, PickTask task, boolean overrideStagingLocationZone) {
         ActivityCode deliveryTypeActivity = task.deliveryTypeCode?.activityCode
         if (!deliveryTypeActivity) {
@@ -697,9 +689,7 @@ class PickTaskService {
             String message = "This order is ${task.deliveryTypeCode}. You scanned ${stagingLocation.name} " +
                     "(zone: ${zone?.name ?: 'none'}), expected zone is ${zoneNames}."
 
-            BeanPropertyBindingResult errors = new BeanPropertyBindingResult(stagingLocation, "stagingLocation")
-            errors.addError(new ObjectError("stagingLocation", [STAGING_LOCATION_ZONE_MISMATCH_CODE] as String[], null, message))
-            throw new ValidationException(message, errors)
+            throw new StagingLocationMismatchException(message)
         }
     }
 }
