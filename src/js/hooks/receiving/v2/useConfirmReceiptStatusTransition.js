@@ -35,20 +35,20 @@ const hasReceivingNowQuantities = (lineItemsState) => denormalizeData(lineItemsS
 const getNextStatus = ({
   shipmentStatus,
   partialReceivingEnabled,
-  shipmentLineItemsState,
+  shipmentItemsState,
   canceledReceiptItemIds,
 }) => {
   if (shipmentStatus === ShipmentStatusCode.PARTIALLY_RECEIVED) {
-    return willBeFullyReceived(shipmentLineItemsState, canceledReceiptItemIds)
+    return willBeFullyReceived(shipmentItemsState, canceledReceiptItemIds)
       ? ShipmentStatusCode.RECEIVED
       : null;
   }
   if (shipmentStatus !== ShipmentStatusCode.SHIPPED
-    || !hasReceivingNowQuantities(shipmentLineItemsState)) {
+    || !hasReceivingNowQuantities(shipmentItemsState)) {
     return null;
   }
   return partialReceivingEnabled
-    && !willBeFullyReceived(shipmentLineItemsState, canceledReceiptItemIds)
+    && !willBeFullyReceived(shipmentItemsState, canceledReceiptItemIds)
     ? ShipmentStatusCode.PARTIALLY_RECEIVED
     : ShipmentStatusCode.RECEIVED;
 };
@@ -58,7 +58,7 @@ const getNextStatus = ({
  * rendered after the arrow in the check step details box.
  */
 const useConfirmReceiptStatusTransition = ({
-  shipmentLineItemsState,
+  shipmentItemsState,
   canceledReceiptItemIds,
 } = {}) => {
   const translate = useTranslate();
@@ -69,7 +69,7 @@ const useConfirmReceiptStatusTransition = ({
     shipmentStatus,
     partialReceivingEnabled:
       Boolean(supportedActivities?.includes(ActivityCode.PARTIAL_RECEIVING)),
-    shipmentLineItemsState,
+    shipmentItemsState,
     canceledReceiptItemIds,
   });
 

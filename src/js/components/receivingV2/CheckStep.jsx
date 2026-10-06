@@ -17,7 +17,7 @@ const CheckStep = ({ completeReceiptRef, setNextDisabled }) => {
     control,
     view,
     table,
-    shipmentLineItemsState,
+    shipmentItemsState,
     filters,
     loading,
     commentModal,
@@ -36,7 +36,7 @@ const CheckStep = ({ completeReceiptRef, setNextDisabled }) => {
     <div className="receiving-container confirm-receipt" data-testid="check-step">
       <ConfirmReceiptInfo
         control={control}
-        shipmentLineItemsState={shipmentLineItemsState}
+        shipmentItemsState={shipmentItemsState}
         canceledReceiptItemIds={cancelRemaining.ids}
       />
       <ConfirmReceiptFilters

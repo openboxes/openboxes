@@ -18,7 +18,7 @@ const useConfirmReceiptActions = ({ view, sort, sortOrder } = {}) => {
   const receiptIdRef = useRef(null);
   const [lineItemsState, setLineItemsState] = useState(createNormalizedState());
   // All shipment lines, including the ones with no quantity entered
-  const [shipmentLineItemsState, setShipmentLineItemsState] = useState(createNormalizedState());
+  const [shipmentItemsState, setShipmentItemsState] = useState(createNormalizedState());
   const { shipmentId } = useParams();
   const users = useSelector(getUsers);
   const hasPartialReceivingSupport = useSelector(getHasPartialReceivingSupport);
@@ -35,7 +35,7 @@ const useConfirmReceiptActions = ({ view, sort, sortOrder } = {}) => {
       // With partial receiving the lines left blank are not part of this receipt, so they stay
       // out of the review.
       setLineItemsState(hasPartialReceivingSupport ? omitBlankReceivingRows(rows) : rows);
-      setShipmentLineItemsState(rows);
+      setShipmentItemsState(rows);
     } finally {
       setLoading(false);
     }
@@ -65,7 +65,7 @@ const useConfirmReceiptActions = ({ view, sort, sortOrder } = {}) => {
     loading,
     receiptIdRef,
     lineItemsState,
-    shipmentLineItemsState,
+    shipmentItemsState,
     updateLineItemComment,
   };
 };

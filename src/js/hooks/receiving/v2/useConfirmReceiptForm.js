@@ -61,7 +61,7 @@ const useConfirmReceiptForm = () => {
     sortableProps, sort, order, resetSort,
   } = useReceivingSort();
   const {
-    loading, receiptIdRef, lineItemsState, shipmentLineItemsState, updateLineItemComment,
+    loading, receiptIdRef, lineItemsState, shipmentItemsState, updateLineItemComment,
   } = useConfirmReceiptActions({ view, sort, sortOrder: order });
   const hasPreviousReceipts = hasAnyPreviousReceipt(lineItemsState);
   // Optional columns are read from the full state, so filtering the table down to rows
@@ -105,7 +105,7 @@ const useConfirmReceiptForm = () => {
       sort,
       order,
     },
-    shipmentLineItemsState,
+    shipmentItemsState,
     filters: {
       updateFilterParams,
       clearFilterParams,
