@@ -6,13 +6,14 @@ import java.time.temporal.TemporalAccessor
 import org.apache.commons.lang.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 
+import org.pih.warehouse.core.formatter.Formatter
 import org.pih.warehouse.core.localization.LocaleManager
 import org.pih.warehouse.core.session.SessionManager
 
 /**
  * A base class for formatters that convert date objects to Strings.
  */
-abstract class AbstractDateFormatter<T extends TemporalAccessor> implements IDateFormatter<T> {
+abstract class AbstractDateFormatter<T extends TemporalAccessor> extends Formatter<T, DateFormatterContext> {
 
     @Autowired
     LocaleManager localeManager
@@ -43,15 +44,8 @@ abstract class AbstractDateFormatter<T extends TemporalAccessor> implements IDat
      */
     abstract DateTimeFormatter getFileNameFormatter()
 
-    /**
-     * Converts the given date object to a String.
-     */
-    String format(T date, DateFormatterContext context=null) {
-        if (date == null) {
-            return context?.defaultValue  // If no default value is specified, will return null.
-        }
-
-        return addContextToFormatter(getFormatter(context), context).format(date)
+    String doFormat(T toFormat, DateFormatterContext context) {
+        return addContextToFormatter(getFormatter(context), context).format(toFormat)
     }
 
     /**

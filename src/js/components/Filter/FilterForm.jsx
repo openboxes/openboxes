@@ -1,10 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+  useEffect, useMemo, useRef, useState,
+} from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import { getDebounceTime } from 'selectors';
 
 import { setShouldRebuildFilterParams } from 'actions';
 import FilterVisibilityToggler from 'components/Filter/FilterVisibilityToggler';
@@ -37,11 +40,51 @@ const FilterForm = ({
   showFilterVisibilityToggler,
   showSearchField,
   disableAutoUpdateFilterParams,
+  alignButtonsToFilters,
   onSubmit,
+  autoSubmit,
+  debounceTime,
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
   const [filtersHidden, setFiltersHidden] = useState(hidden);
   const formRef = useRef(null);
+
+  // When enabled, the form is submitted automatically after the values stop changing
+  // for the given amount of time, so the user does not have to click the submit button.
+  const debouncedSubmit = useMemo(() => (autoSubmit
+    ? _.debounce(() => formRef.current?.submit(), debounceTime)
+    : null
+  ), [autoSubmit, debounceTime]);
+
+  useEffect(() => () => debouncedSubmit?.cancel(), [debouncedSubmit]);
+
+  const withAutoSubmit = (fieldConfig) => {
+    if (!autoSubmit) {
+      return fieldConfig;
+    }
+    return {
+      ...fieldConfig,
+      // Trigger a debounced submit (resetting the debounce timer) after the field's own onChange
+      // behaviour. Done via getDynamicAttr because BaseField (which is wrapped by our form fields)
+      // spreads the dynamic attributes over the static ones.
+      getDynamicAttr: (props) => {
+        const dynamicAttr = fieldConfig.getDynamicAttr?.(props) ?? {};
+        const fieldOnChange = dynamicAttr.onChange ?? fieldConfig.attributes?.onChange;
+        return {
+          ...dynamicAttr,
+          onChange: (value) => {
+            fieldOnChange?.(value);
+            debouncedSubmit();
+          },
+        };
+      },
+    };
+  };
+
+  const autoSubmitFilterFields = useMemo(
+    () => _.mapValues(filterFields, withAutoSubmit),
+    [filterFields, debouncedSubmit],
+  );
 
   const submitOnEnter = (event) => {
     if (event.key === 'Enter') {
@@ -52,7 +95,7 @@ const FilterForm = ({
     }
   };
 
-  const searchField = {
+  const searchField = withAutoSubmit({
     type: SearchField,
     attributes: {
       placeholder: translate(searchFieldPlaceholder, searchFieldDefaultPlaceholder),
@@ -60,7 +103,7 @@ const FilterForm = ({
       filterElement: true,
       onKeyPress: submitOnEnter,
     },
-  };
+  });
 
   // Default values can change based on currentLocation
   // or any async data defaultValues are waiting for
@@ -135,6 +178,10 @@ const FilterForm = ({
     <div className="filter-form">
       <Form
         onSubmit={(values) => {
+          // Avoids double submitting the form in the case where it is submitted manually
+          // by the user while a debounced submit is pending.
+          debouncedSubmit?.cancel();
+
           updateFilterParams(values);
           onSubmit(values);
         }}
@@ -146,10 +193,10 @@ const FilterForm = ({
             <form onSubmit={handleSubmit} className="w-100 m-0">
               <div className="classic-form with-description align-items-center flex-wrap">
                 <div className="w-100 d-flex filter-header align-items-center">
-                  <div className="min-w-50 d-flex align-items-center gap-8">
+                  <div className={`d-flex align-items-center gap-8 ${alignButtonsToFilters ? '' : 'min-w-50'}`}>
                     {_.map(
                       // Render filters with top: true
-                      _.pickBy(filterFields, (field) => field.attributes?.top),
+                      _.pickBy(autoSubmitFilterFields, (field) => field.attributes?.top),
                       (fieldConfig, fieldName) =>
                         renderFormField(fieldConfig, fieldName, formProps),
                     )}
@@ -164,7 +211,7 @@ const FilterForm = ({
                     />
                     )}
                   </div>
-                  <div className="d-flex justify-content-end buttons">
+                  <div className={`d-flex buttons ${alignButtonsToFilters ? '' : 'justify-content-end flex-grow-1'}`}>
                     <Button
                       defaultLabel="Clear"
                       label="react.button.clear.label"
@@ -172,13 +219,15 @@ const FilterForm = ({
                       variant="transparent"
                       type="button"
                     />
-                    <Button
-                      defaultLabel={customSubmitButtonDefaultLabel || 'Search'}
-                      label={customSubmitButtonLabel || 'react.button.search.label'}
-                      disabled={isSubmitDisabled(values)}
-                      variant="primary"
-                      type="submit"
-                    />
+                    {!autoSubmit && (
+                      <Button
+                        defaultLabel={customSubmitButtonDefaultLabel || 'Search'}
+                        label={customSubmitButtonLabel || 'react.button.search.label'}
+                        disabled={isSubmitDisabled(values)}
+                        variant="primary"
+                        type="submit"
+                      />
+                    )}
                   </div>
                 </div>
 
@@ -186,7 +235,7 @@ const FilterForm = ({
                   {!filtersHidden
                     && _.map(
                       // Render filters with top: false
-                      _.pickBy(filterFields, (field) => !field.attributes?.top),
+                      _.pickBy(autoSubmitFilterFields, (field) => !field.attributes?.top),
                       (fieldConfig, fieldName) =>
                         renderFormField(fieldConfig, fieldName, formProps),
                     )}
@@ -203,6 +252,7 @@ const FilterForm = ({
 const mapStateToProps = (state) => ({
   currentLocation: state.session.currentLocation,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  debounceTime: getDebounceTime(state),
 });
 
 const mapDispatchToProps = {
@@ -234,7 +284,11 @@ FilterForm.propTypes = {
   customSubmitButtonDefaultLabel: PropTypes.string,
   showFilterVisibilityToggler: PropTypes.bool,
   disableAutoUpdateFilterParams: PropTypes.bool,
+  alignButtonsToFilters: PropTypes.bool,
   onSubmit: PropTypes.func,
+  // When true, the form is submitted automatically after the values change
+  autoSubmit: PropTypes.bool,
+  debounceTime: PropTypes.number.isRequired,
 };
 
 FilterForm.defaultProps = {
@@ -253,5 +307,7 @@ FilterForm.defaultProps = {
   customSubmitButtonDefaultLabel: null,
   showFilterVisibilityToggler: true,
   disableAutoUpdateFilterParams: false,
+  alignButtonsToFilters: false,
   onSubmit: () => {},
+  autoSubmit: false,
 };

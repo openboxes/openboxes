@@ -1,0 +1,22 @@
+.wizard-page-header-title {
+  font-size: 20px;
+  font-weight: 600;
+
+  .wizard-page-header-content {
+    color: var(--gray-600);
+  }
+
+  .wizard-page-header-source-code {
+    color: var(--gray-500);
+  }
+}
+
+.wizard-page-section {
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
+  padding: 18px;
+
+  .wizard-page-header-content {
+    font-size: 22px;
+    font-weight: 500;
+  }
+}

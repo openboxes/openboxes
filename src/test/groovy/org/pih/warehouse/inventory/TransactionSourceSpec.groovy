@@ -59,6 +59,16 @@ class TransactionSourceSpec extends Specification implements DomainUnitTest<Tran
         assert TransactionAction.isCountAction(transactionSource.transactionAction)
     }
 
+    void 'receipt should not be considered as a count action'() {
+        given:
+        TransactionSource transactionSource = new TransactionSource(
+                transactionAction: TransactionAction.RECEIPT,
+        )
+
+        expect:
+        assert !TransactionAction.isCountAction(transactionSource.transactionAction)
+    }
+
     void 'cycle count, inventory import, record stock, inventory adjustment should be considered as a count action'() {
         given:
         domain.transactionAction = transactionAction

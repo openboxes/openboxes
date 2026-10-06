@@ -11,14 +11,15 @@ package org.pih.warehouse
 
 import grails.converters.JSON
 import grails.util.Holders
-import org.pih.warehouse.inventory.CycleCount
+
+import org.pih.warehouse.core.mapper.MapperComponentResolver
+import org.pih.warehouse.core.serialization.Serializable
+import org.pih.warehouse.core.serialization.SerializationMapper
 import org.pih.warehouse.inventory.CycleCountDetails
-import org.pih.warehouse.inventory.CycleCountItem
 import org.pih.warehouse.inventory.CycleCountSummary
 import org.pih.warehouse.inventory.InventoryAuditDetails
 import org.pih.warehouse.inventory.InventoryAuditSummary
 import org.pih.warehouse.inventory.InventoryTransactionsSummary
-import org.pih.warehouse.inventory.PendingCycleCountRequest
 import org.pih.warehouse.reporting.CycleCountProductSummary
 
 import java.math.RoundingMode
@@ -66,8 +67,6 @@ import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.core.User
-import org.pih.warehouse.inventory.CycleCountCandidate
-import org.pih.warehouse.inventory.CycleCountRequest
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InboundStockMovementListItem
 import org.pih.warehouse.inventory.OutboundStockMovementListItem
@@ -106,6 +105,7 @@ class BootStrap {
 
     UploadService uploadService
     DataSource dataSource
+    MapperComponentResolver mapperComponentResolver
 
     def init = { servletContext ->
         log.info("Registering JSON marshallers ...")
@@ -145,6 +145,20 @@ class BootStrap {
     }
 
     void registerJsonMarshallers() {
+
+        /*
+         * Automatically register all of our serialization mapper components with Grails' JSON marshaller.
+         * Not required for controllers that extend from BaseController as they will call the serializer directly.
+         * Registering the serializers here allows us to utilize them in controllers that don't extend BaseController.
+         * This way, calling render(X as JSON) will automatically use the serialization mapper for X if one exists.
+         */
+        for (serializationMapperBySource in mapperComponentResolver.allSerializationMappers) {
+            Class sourceType = serializationMapperBySource.key
+            SerializationMapper serializationMapper = serializationMapperBySource.value
+            JSON.registerObjectMarshaller(sourceType) {
+                return serializationMapper.serialize(it as Serializable)
+            }
+        }
 
         // java.time types. With these marshallers we don't need to call toString() on the java.time fields in the
         // toJson() methods of Domains/DTOs or in the other object marshallers below. When we're on Grails 5+ we can
@@ -208,8 +222,9 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(LocationGroup) { LocationGroup locationGroup ->
             [
-                id  : locationGroup.id,
-                name: locationGroup.name
+                id     : locationGroup.id,
+                name   : locationGroup.name,
+                address: locationGroup.address,
             ]
         }
 
@@ -637,32 +652,12 @@ class BootStrap {
             return productPackage.toJson()
         }
 
-        JSON.registerObjectMarshaller(CycleCount) { CycleCount cycleCount ->
-            return cycleCount.toJson()
-        }
-
-        JSON.registerObjectMarshaller(CycleCountItem) { CycleCountItem cycleCountItem ->
-            return cycleCountItem.toJson()
-        }
-
-        JSON.registerObjectMarshaller(CycleCountCandidate) { CycleCountCandidate cycleCountCandidate ->
-            return cycleCountCandidate.toJson()
-        }
-
         JSON.registerObjectMarshaller(CycleCountDetails) { CycleCountDetails cycleCountDetails ->
             return cycleCountDetails.toJson()
         }
 
-        JSON.registerObjectMarshaller(CycleCountRequest) { CycleCountRequest cycleCountRequest ->
-            return cycleCountRequest.toJson()
-        }
-
         JSON.registerObjectMarshaller(CycleCountSummary) { CycleCountSummary cycleCountSummary ->
             return cycleCountSummary.toJson()
-        }
-
-        JSON.registerObjectMarshaller(PendingCycleCountRequest) { PendingCycleCountRequest pendingCycleCountRequest ->
-            return pendingCycleCountRequest.toJson()
         }
 
         JSON.registerObjectMarshaller(InventoryAuditDetails) { InventoryAuditDetails inventoryAuditDetails ->

@@ -81,6 +81,7 @@ export const PREPAYMENT_INVOICE_ITEM_BY_ID = (id) => `${PREPAYMENT_INVOICE_ITEM_
 export const PRODUCT_API = `${API}/products`;
 export const INVENTORY_ITEM = (productCode, lotNumber) => `${CONTEXT_PATH}/${PRODUCT_API}/${productCode}/inventoryItems/${lotNumber}`;
 export const LOT_NUMBERS_WITH_EXPIRATION_DATE = `${PRODUCT_API}/inventoryItems/lotNumbersWithExpirationDate`;
+export const AVAILABILITY_IN_ALL_DEPOTS = `${PRODUCT_API}/inventoryItems/getAvailabilityInAllDepots`;
 export const AVAILABLE_ITEMS = `${PRODUCT_API}/availableItems`;
 
 // STOCK LIST
@@ -190,6 +191,7 @@ export const HANDLING_REQUIREMENTS_OPTIONS = `${API}/handlingRequirementsOptions
 
 // INTERNAL LOCATIONS
 export const INTERNAL_LOCATIONS = `${API}/internalLocations`;
+export const RECEIVING_INTERNAL_LOCATIONS = `${INTERNAL_LOCATIONS}/receiving`;
 
 // CYCLE COUNT
 export const CYCLE_COUNT = (locationId) => `${API}/facilities/${locationId}/cycle-counts`;
@@ -229,3 +231,16 @@ export const INDICATORS_INVENTORY_ACCURACY = `${INDICATORS_REPORT}/inventoryAccu
 export const INVENTORY_API = (id) => `${API}/facilities/${id}/inventories`;
 export const REORDER_REPORT = (id) => `${INVENTORY_API(id)}/reorderReport`;
 export const EXPIRATION_HISTORY_REPORT = `${API}/inventories/expirationHistoryReport`;
+export const PREFERRED_BIN_LOCATIONS = (facilityId) => `${API}/facilities/${facilityId}/inventory-levels/preferred-bin-locations`;
+
+// RECEIVING
+export const RECEIPT_API = `${API}/receipts/v2`;
+export const RECEIPT_BY_ID = (receiptId) => `${RECEIPT_API}/${receiptId}`;
+export const RECEIPT_BY_SHIPMENT = (shipmentId) => `${RECEIPT_API}/shipment/${shipmentId}`;
+export const RECEIPT_SUMMARY_BY_SHIPMENT = (shipmentId) => `${RECEIPT_BY_SHIPMENT(shipmentId)}/summary`;
+export const RECEIPT_START = (shipmentId) => `${RECEIPT_BY_SHIPMENT(shipmentId)}/start`;
+export const RECEIPT_SYNC = (shipmentId) => `${RECEIPT_BY_SHIPMENT(shipmentId)}/sync`;
+export const RECEIPT_ITEMS_BATCH = (receiptId) => `${RECEIPT_BY_ID(receiptId)}/items/batch`;
+export const RECEIPT_COMPLETE = (receiptId) => `${RECEIPT_BY_ID(receiptId)}/complete`;
+export const RECEIPT_ITEMS_BY_SHIPMENT_ITEM = (receiptId, shipmentItemId) => `${RECEIPT_BY_ID(receiptId)}/shipmentItems/${shipmentItemId}/receiptItems`;
+export const RECEIPT_ITEM_COMMENTS = (receiptItemId) => `${RECEIPT_API}/receiptItems/${receiptItemId}/comments`;

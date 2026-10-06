@@ -2,17 +2,19 @@ package org.pih.warehouse.inventory
 
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
-import org.pih.warehouse.product.Product
+import org.pih.warehouse.core.dtos.DomainDto
+import org.pih.warehouse.core.mapper.SmartMapper
+import org.pih.warehouse.location.BinLocationDto
+import org.pih.warehouse.location.FacilityDto
+import org.pih.warehouse.product.ProductSimpleDto
 
-class CycleCountItemDto {
+class CycleCountItemDto implements DomainDto<CycleCountItem> {
 
-    String id
+    FacilityDto facility
 
-    Map facility
+    BinLocationDto binLocation
 
-    Map binLocation
-
-    Product product
+    ProductSimpleDto product
 
     InventoryItem inventoryItem
 

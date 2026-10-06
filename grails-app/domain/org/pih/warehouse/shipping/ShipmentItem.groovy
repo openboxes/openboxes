@@ -261,6 +261,12 @@ class ShipmentItem implements Comparable, Serializable {
         return quantityPicked?:quantity
     }
 
+    /**
+     * @return The subset of receipt items of the shipment that have a positive quantity (received or canceled).
+     */
+    Set<ReceiptItem> getReceiptItemsWithQuantity() {
+        return receiptItems.findAll { it.quantityReceived > 0 || it.quantityCanceled > 0 }
+    }
 
     String[] getComments() {
         def comments = []

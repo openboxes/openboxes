@@ -35,7 +35,6 @@ class LocationService {
     GrailsApplication grailsApplication
     UserService userService
     LocationImportDataService locationImportDataService
-    LocationDataService locationGormService
 
     Location findInternalLocation(Location parentLocation, String[] names) {
         return Location.createCriteria().get {
@@ -768,7 +767,7 @@ class LocationService {
             throw new IllegalArgumentException("The organization ${location.organization.name} is inactive, you can't assign it to the location")
         }
 
-        locationGormService.save(location)
+        location.save(failOnError: true)
         return location
     }
 }

@@ -1,6 +1,7 @@
 package org.pih.warehouse.importer
 
 import grails.validation.ValidationException
+import org.springframework.context.annotation.Lazy
 
 import org.pih.warehouse.core.http.ContentType
 
@@ -12,6 +13,14 @@ import org.pih.warehouse.core.http.ContentType
  * without needing to know anything about where the data came from.
  */
 abstract class BulkDataReader<Config extends BulkDataReaderConfig> {
+
+    final private BulkDataImportComponentResolver componentResolver
+
+    // The component resolver is annotated with @Lazy because it wires in the readers, creating a circular dependency.
+    // Fortunately the reader doesn't immediately use the component resolver so we can simply delay fetching it.
+    BulkDataReader(@Lazy final BulkDataImportComponentResolver componentResolver) {
+        this.componentResolver = componentResolver
+    }
 
     /**
      * Contains the logic for reading in the source object and binding its rows to a List of Map of fields.
@@ -38,6 +47,32 @@ abstract class BulkDataReader<Config extends BulkDataReaderConfig> {
 
     /**
      * Reads in the source object, binding its rows to a List of Map of fields.
+     *
+     * For use when we want to rely on the default reader configuration for a given bulk data type.
+     *
+     * @param source The source object to read in.
+     * @param bulkDataType Determines which configurer to use when reading the data source.
+     * @return BulkDataReaderResult The result of reading the bulk data source.
+     */
+    BulkDataReaderResult read(BulkDataSource source, BulkDataType bulkDataType) {
+        ContentType contentType = source.contentType
+        ConfiguresBulkDataReader readerConfigurer = componentResolver.getBulkDataReaderConfigurer(
+                contentType, bulkDataType)
+        if (!readerConfigurer) {
+            throw new RuntimeException("No bulk data reader config was found for content type ${contentType} " +
+                    "and bulk data type ${bulkDataType}")
+        }
+        return read(source, readerConfigurer.getBulkDataReaderConfig(contentType) as Config)
+    }
+
+    /**
+     * Reads in the source object, binding its rows to a List of Map of fields.
+     *
+     * For use when we want to provide custom reader configuration that overrides the default.
+     *
+     * @param source The source object to read in.
+     * @param config Configuration for reading in the source object.
+     * @return BulkDataReaderResult The result of reading the bulk data source.
      */
     BulkDataReaderResult read(BulkDataSource source, Config config) {
         validateSource(source)

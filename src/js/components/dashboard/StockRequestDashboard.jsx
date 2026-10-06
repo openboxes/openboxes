@@ -9,14 +9,16 @@ import { Tooltip } from 'react-tippy';
 
 import { fetchTranslations } from 'actions';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import { DateFormatDateFns } from 'consts/timeFormat';
 import apiClient from 'utils/apiClient';
+import { formatDateToString, getDateFnsLocale } from 'utils/dateUtils';
 import { getCurrentEventComment } from 'utils/list-utils';
 import Translate from 'utils/Translate';
 
 import 'react-table/react-table.css';
 import './StockRequestDashboard.scss';
 
-const COLUMNS = [
+const getColumns = ({ currentLocale }) => [
   {
     Header: 'Request Number',
     accessor: 'identifier',
@@ -85,6 +87,11 @@ const COLUMNS = [
     headerClassName: 'text-left font-weight-bold px-4 py-3',
     className: 'px-4 py-2',
     maxWidth: 180,
+    Cell: (row) => formatDateToString({
+      date: row.value,
+      dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+      options: { locale: getDateFnsLocale(currentLocale) },
+    }),
   },
 ];
 
@@ -155,7 +162,7 @@ class StockRequestDashboard extends Component {
         </div>
         <ReactTable
           data={this.state.stockRequests}
-          columns={COLUMNS}
+          columns={getColumns({ currentLocale: this.props.locale })}
           defaultPageSize={10}
           loading={this.state.isLoading}
           sortable={false}

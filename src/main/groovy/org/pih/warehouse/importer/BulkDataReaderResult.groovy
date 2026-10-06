@@ -13,8 +13,9 @@ class BulkDataReaderResult {
 
     /**
      * The resulting rows that were extracted from the file.
+     * The keys of the column map are the field names as specified in the data reader configuration.
      */
-    List<Map<String, Object>> rows = []
+    List<Map<String, BulkDataCell>> rows = []
 
     /**
      * The epoch date to use when parsing date fields.
@@ -22,4 +23,9 @@ class BulkDataReaderResult {
      * This is required for importing Excel files and can likely be ignored for all other scenarios.
      */
     EpochDate epochDate = EpochDate.UNIX_EPOCH
+
+    /**
+     * The collection of errors that occurred during the bulk data reader process.
+     */
+    List<BulkDataError> readErrors = []
 }

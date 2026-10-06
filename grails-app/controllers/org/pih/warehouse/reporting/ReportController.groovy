@@ -32,6 +32,7 @@ import org.pih.warehouse.report.MultiLocationInventoryReportCommand
 
 import org.quartz.JobKey
 import org.quartz.impl.StdScheduler
+import org.springframework.web.util.UriUtils
 import util.ReportUtil
 
 import java.math.RoundingMode
@@ -347,49 +348,73 @@ class ReportController {
         [command: command]
     }
 
-    def downloadTransactionReport() {
-        def baseUri = request.scheme + "://" + request.serverName + ":" + request.serverPort
-
-        // JSESSIONID is required because otherwise the login page is rendered
-        def url = baseUri + params.url + ";jsessionid=" + session.getId()
-        url += "?print=true"
-        url += "&location.id=" + params.location.id
-        url += "&category.id=" + params.category.id
-        url += "&startDate=" + params.startDate
-        url += "&endDate=" + params.endDate
-        url += "&showTransferBreakdown=" + params.showTransferBreakdown
-        url += "&hideInactiveProducts=" + params.hideInactiveProducts
-        url += "&insertPageBreakBetweenCategories=" + params.insertPageBreakBetweenCategories
-        url += "&includeChildren=" + params.includeChildren
-        url += "&includeEntities=true"
-
-        // Let the browser know what content type to expect
-        response.setContentType("application/pdf")
-
-        // Render pdf to the response output stream
-        log.info "BaseUri is $baseUri"
-        log.info("Session ID: " + session.id)
-        log.info "Fetching url $url"
-        reportService.generatePdf(url, response.getOutputStream())
-    }
-
     def downloadShippingReport() {
         if (params.format == 'docx') {
             def tempFile = documentService.generateChecklistAsDocx()
             response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
             response.outputStream << tempFile.readBytes()
         } else if (params.format == 'pdf') {
-            def baseUri = request.scheme + "://" + request.serverName + ":" + request.serverPort
-            def url = baseUri + params.url + ";jsessionid=" + session.getId()
-            url += "?print=true&orientation=portrait"
-            url += "&shipment.id=" + params.shipment.id
-            url += "&includeEntities=true"
+            String url
+            try {
+                url = (
+                    buildApplicationUri(params.url).toString() +
+                    ';jsessionid=' + session.getId() +
+                    '?print=true&orientation=portrait' +
+                    '&shipment.id=' + params.shipment.id +
+                    '&includeEntities=true'
+                )
+            } catch (IllegalArgumentException e) {
+                response.status = 400
+                render 'The URL parameter must refer to a path within this application.'
+                return
+            }
             log.info "Fetching url $url"
             response.setContentType("application/pdf")
             reportService.generatePdf(url, response.getOutputStream())
         } else {
             throw new UnsupportedOperationException("Format '${params.format}' not supported")
         }
+    }
+
+    /**
+     * Build a URI from path, and return it only if it stays within the app context.
+     *
+     * Host and port come from the local TCP socket (request.localName /
+     * localPort), not from request.serverName / serverPort, because the
+     * latter are derived from the client-supplied Host header and can be
+     * spoofed.
+     *
+     * @throws IllegalArgumentException if path is null, empty, or exits the app context.
+     */
+    private URI buildApplicationUri(String path) {
+        if (!path) {
+            throw new IllegalArgumentException('Path must not be empty')
+        }
+        try {
+            String resolvedPath = decodeThenNormalize(path)
+            String contextPath = request.contextPath ?: ''
+            if (!resolvedPath.startsWith(contextPath + '/')) {
+                throw new IllegalArgumentException("Path leaves application context: ${path}")
+            }
+            return new URI(request.scheme, null, request.localName, request.localPort,
+                    resolvedPath, null, null)
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("Malformed path: ${path}", e)
+        }
+    }
+
+    /**
+     * Decode any percent-encoded characters in path, then normalize it (e.g., process '..' segments).
+     *
+     * java.net.URI.normalize() operates on raw, still-encoded path segments,
+     * so a percent-encoded dot segment like %2e%2e would otherwise slip past
+     * normalization untouched. Decoding first puts literal and percent-encoded
+     * forms on the same footing. TBH I'm surprised we have to roll our own
+     * function here instead of getting a library to do it for us?
+     */
+    private static String decodeThenNormalize(String path) {
+        String decoded = UriUtils.decode(path, 'UTF-8')
+        return new URI(null, null, decoded, null).normalize().path
     }
 
     //@CacheFlush(["binLocationReportCache", "binLocationSummaryCache"])

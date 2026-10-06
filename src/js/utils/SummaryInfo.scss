@@ -1,0 +1,34 @@
+.summary-info {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--gray-102);
+  border-radius: 8px;
+  padding: 16px 24px;
+
+  &__item {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    text-align: center;
+
+    & + & {
+      border-left: 1px solid var(--gray-102);
+    }
+  }
+
+  &__title {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--gray-500);
+  }
+
+  &__data {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--blue-700);
+  }
+}

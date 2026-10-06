@@ -16,6 +16,7 @@ import grails.validation.ValidationException
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
+import org.pih.warehouse.api.receiving.v2.ReceiptV2Service
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
@@ -47,6 +48,8 @@ class ReceiptService {
     InventoryService inventoryService
     LocationService locationService
     ReceiptIdentifierService receiptIdentifierService
+    ReceiptV2Service receiptV2Service
+    ReceiptTransactionManager receiptTransactionManager
     TransactionIdentifierService transactionIdentifierService
     GrailsApplication grailsApplication
     ProductAvailabilityService productAvailabilityService
@@ -415,6 +418,8 @@ class ReceiptService {
         rollbackInboundTransactions(shipment)
 
         if (shipment.receipts) {
+            receiptV2Service.deleteMarkersForReceipts(shipment.receipts)
+            receiptTransactionManager.deleteTransactionSourcesForReceipts(shipment.receipts)
             shipment.receipts.toArray().each { Receipt receipt ->
                 shipment.removeFromReceipts(receipt)
                 receipt.delete()
@@ -443,6 +448,8 @@ class ReceiptService {
                 shipment.removeFromIncomingTransactions(transaction)
                 transaction.delete()
             }
+            receiptV2Service.deleteMarkerForReceipt(lastReceipt)
+            receiptTransactionManager.deleteTransactionSourceForReceipt(lastReceipt)
             shipment.removeFromReceipts(lastReceipt)
             lastReceipt.delete()
 
@@ -473,7 +480,11 @@ class ReceiptService {
         }
     }
 
-    void createTemporaryReceivingBin(Shipment shipment) {
+    /**
+     * @return the receiving bin of the shipment, or null when the destination does not track bin locations or the
+     * creation of receiving bins is disabled by config.
+     */
+    Location createTemporaryReceivingBin(Shipment shipment) {
         // Create temporary receiving area for the Partial Receipt process
         if (Holders.grailsApplication.config.openboxes.receiving.createReceivingLocation.enabled && shipment?.destination?.hasBinLocationSupport()) {
             LocationType locationType = LocationType.findByName("Receiving")
@@ -481,8 +492,10 @@ class ReceiptService {
                 throw new IllegalArgumentException("Unable to find location type 'Receiving'")
             }
 
-            locationService.findOrCreateInternalLocation(shipment.shipmentNumber,
+            return locationService.findOrCreateInternalLocation(shipment.shipmentNumber,
                     shipment.shipmentNumber, locationType, shipment.destination)
         }
+
+        return null
     }
 }

@@ -1,0 +1,36 @@
+.item-details {
+  &__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px 24px;
+    margin-top: 12px;
+    padding: 16px;
+    border-radius: 6px;
+    background-color: var(--blue-100);
+  }
+
+  &--four-columns &__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  &__field {
+    gap: 6px;
+    min-width: 0;
+
+    &--span-2 {
+      grid-column: span 2;
+    }
+  }
+
+  &__label {
+    color: var(--gray-350);
+  }
+
+  &__value {
+    color: var(--gray-600);
+  }
+
+  &__value-secondary {
+    font-size: 12px;
+  }
+}

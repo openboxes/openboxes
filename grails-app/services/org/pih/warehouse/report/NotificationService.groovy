@@ -28,6 +28,8 @@ import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.data.FileGenerationService
+import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -177,13 +179,37 @@ class NotificationService {
     }
 
     void sendReceiptNotifications(PartialReceipt partialReceipt) {
-        Shipment shipment = partialReceipt?.shipment
-        EmailValidator emailValidator = EmailValidator.getInstance()
         Map<Person, List<PartialReceiptItem>> recipientItems = partialReceipt.partialReceiptItems.groupBy {it.recipient }
-        recipientItems.each { Person recipient, items ->
+        sendReceiptNotificationEmails(partialReceipt?.shipment, partialReceipt.recipient, recipientItems)
+    }
+
+    /**
+     * Receiving v2 flavour of the receipt notifications, driven by the completed receipt itself instead of the
+     * PartialReceipt view of it. The receipt items are adapted to the property names that the (shared) email
+     * template expects, which was written against {@link PartialReceiptItem}.
+     */
+    void sendReceiptNotifications(Receipt receipt) {
+        Map<Person, List<Map>> recipientItems = receipt.receiptItems
+                .groupBy { ReceiptItem receiptItem -> receiptItem.recipient }
+                .collectEntries { Person recipient, List<ReceiptItem> receiptItems ->
+                    [(recipient): receiptItems.collect { ReceiptItem receiptItem ->
+                        [
+                                inventoryItem    : receiptItem.inventoryItem,
+                                quantityReceiving: receiptItem.quantityReceived,
+                                quantityCanceled : receiptItem.quantityCanceled,
+                                comment          : receiptItem.comment,
+                        ]
+                    }]
+                }
+        sendReceiptNotificationEmails(receipt.shipment, receipt.recipient, recipientItems)
+    }
+
+    private void sendReceiptNotificationEmails(Shipment shipment, Person receivedBy, Map<Person, List> recipientItems) {
+        EmailValidator emailValidator = EmailValidator.getInstance()
+        recipientItems.each { Person recipient, List items ->
             if (emailValidator.isValid(recipient?.email)) {
                 String subject = messageLocalizer.localize("email.yourItemReceived.message", shipment.destination.name, shipment.shipmentNumber)
-                GString body = "${applicationTagLib.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items, recipient: recipient, receivedBy: partialReceipt.recipient])}"
+                GString body = "${applicationTagLib.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items, recipient: recipient, receivedBy: receivedBy])}"
 
                 File barcodeFile = fileGenerationService.generateBarcodeFile(shipment.shipmentNumber)
                 String barcodeFileUri = fileGenerationService.getFileUri(barcodeFile)

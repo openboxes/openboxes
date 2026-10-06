@@ -133,9 +133,9 @@ const useResolveStep = () => {
   }, [currentLocation?.id]);
 
   const mapRootCauseToSelectedOption = (rootCause) => (rootCause ? ({
-    id: rootCause?.name,
-    label: reasonCodes?.find?.((reasonCode) => reasonCode?.id === rootCause?.name)?.label,
-    value: rootCause?.name,
+    id: rootCause,
+    label: reasonCodes?.find?.((reasonCode) => reasonCode?.id === rootCause)?.label,
+    value: rootCause,
   }) : null);
 
   const mergeCycleCountItems = (items) => {

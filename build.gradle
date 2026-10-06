@@ -132,6 +132,8 @@ bootRun {
     jvmArgs = [
         '-Dspring.output.ansi.enabled=never',
         '-Xdebug',
+        '-Xms1g',
+        '-Xmx4g',
         '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005'
     ]
     systemProperties System.properties
@@ -479,6 +481,8 @@ dependencies {
 
     compile 'commons-lang:commons-lang:2.6'  // FIXME migrate to commons-lang3
 
+    implementation 'org.apache.commons:commons-text:1.15.0'
+
     implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.docx4j:${xDocReportVersion}"
     implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.document:${xDocReportVersion}"
     implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template:${xDocReportVersion}"
@@ -770,6 +774,10 @@ dependencies {
 
     implementation 'com.github.albfernandez:juniversalchardet:2.4.0'
 
+    // Allows Jackson's ObjectMapper to serialize java.util.Date and Java.time classes
+    // (LocalDate, Instant, ZonedDateTime) to JSON. Automatically included in Jackson 3+
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+
     // security patch
     compile 'org.yaml:snakeyaml:1.33'
     console 'org.yaml:snakeyaml:1.33'
@@ -908,7 +916,7 @@ jacocoTestReport {
 tasks.withType(Test) {
     // never consider test tasks as up-to-date - always run them when requested
     outputs.upToDateWhen { false }
-    
+
     // https://github.com/testcontainers/testcontainers-java/pull/11216
     systemProperty 'api.version', dockerApiVersion
 

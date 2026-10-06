@@ -19,6 +19,7 @@ import org.apache.poi.ss.usermodel.Row
 import org.hibernate.FetchMode
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.StockTransfer
+import org.pih.warehouse.api.receiving.v2.ReceiptV2Service
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
@@ -44,6 +45,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
+import org.pih.warehouse.receiving.ReceiptTransactionManager
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
@@ -58,6 +60,8 @@ class ShipmentService {
     def inventoryService
     TransactionIdentifierService transactionIdentifierService
     ShipmentIdentifierService shipmentIdentifierService
+    ReceiptV2Service receiptV2Service
+    ReceiptTransactionManager receiptTransactionManager
     def documentService
     def personService
     def productAvailabilityService
@@ -1730,6 +1734,8 @@ class ShipmentService {
 
     void deleteReceipts(Shipment shipment) {
         if (shipment?.receipts) {
+            receiptV2Service.deleteMarkersForReceipts(shipment.receipts)
+            receiptTransactionManager.deleteTransactionSourcesForReceipts(shipment.receipts)
             shipment?.receipts.toArray().each { Receipt receipt ->
                 shipment.removeFromReceipts(receipt)
                 receipt.delete()

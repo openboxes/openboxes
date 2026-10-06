@@ -83,6 +83,11 @@ const initialState = {
   notificationAutohideDelay: 8000,
   browserConnectionTimeout: 0,
   isAutosaveEnabled: false,
+  autosaveBatchSize: 4,
+  autosaveDebounceTime: 2000,
+  autosaveMaxRetries: 3,
+  autosaveRetryDelay: 5000,
+  autosaveMaxRetryDelay: 40000,
   cycleCountMaxSelectedProducts: 50,
   maxUploadFileSize: 2097152,
 };
@@ -132,6 +137,11 @@ export default function (state = initialState, action) {
         notificationAutohideDelay: _.get(action, 'payload.data.data.notificationAutohideDelay', 8000),
         browserConnectionTimeout: _.get(action, 'payload.data.data.browserConnectionTimeout', 0),
         isAutosaveEnabled: _.get(action, 'payload.data.data.isAutosaveEnabled', false),
+        autosaveBatchSize: _.get(action, 'payload.data.data.autosaveBatchSize', 4),
+        autosaveDebounceTime: _.get(action, 'payload.data.data.autosaveDebounceTime', 2000),
+        autosaveMaxRetries: _.get(action, 'payload.data.data.autosaveMaxRetries', 3),
+        autosaveRetryDelay: _.get(action, 'payload.data.data.autosaveRetryDelay', 5000),
+        autosaveMaxRetryDelay: _.get(action, 'payload.data.data.autosaveMaxRetryDelay', 40000),
         cycleCountMaxSelectedProducts: _.get(action, 'payload.data.data.cycleCountMaxSelectedProducts', 50),
         maxUploadFileSize: _.get(action, 'payload.data.data.maxUploadFileSize', 2097152),
       };

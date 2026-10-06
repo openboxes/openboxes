@@ -7,6 +7,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
@@ -53,6 +54,21 @@ class InboundStockMovementListItem implements Serializable, Validateable {
         }
         if (order) {
             return order.status
+        }
+        return null
+    }
+
+    // Combines the statusCode resolution logic previously living in
+    // StockMovement.createFromRequisition and StockMovement.createFromShipment. An item may carry both
+    // a requisition and a shipment (or only a shipment), so the requisition takes precedence, mirroring
+    // the priority used in getStatus().
+    String getStatusCode() {
+        if (requisition) {
+            return RequisitionStatus.toStockMovementStatus(requisition.status)?.name()
+        }
+        if (shipment) {
+            return (shipment.status?.code == ShipmentStatusCode.PENDING) ?
+                RequisitionStatus.PENDING.toString() : RequisitionStatus.ISSUED.toString()
         }
         return null
     }
@@ -105,6 +121,7 @@ class InboundStockMovementListItem implements Serializable, Validateable {
             name                : name,
             description         : description,
             shipmentType        : shipmentType,
+            statusCode          : statusCode,
             displayStatus       : displayStatus,
             identifier          : identifier,
             origin              : [
@@ -120,6 +137,7 @@ class InboundStockMovementListItem implements Serializable, Validateable {
             ],
             stocklist           : stocklist,
             dateCreated         : dateCreated,
+            dateRequested       : dateRequested,
             expectedDeliveryDate: shipment?.expectedDeliveryDate,
             requestedBy         : requestedBy,
             lineItemCount       : lineItemCount,
@@ -127,6 +145,7 @@ class InboundStockMovementListItem implements Serializable, Validateable {
             isReceived          : received,
             isPartiallyReceived : partiallyReceived,
             isPending           : pending,
+            currentEvent        : requisition?.mostRecentEvent,
         ]
     }
 }

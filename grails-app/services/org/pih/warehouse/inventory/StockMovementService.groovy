@@ -69,6 +69,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.putaway.PutawayService
+import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.ReplenishmentTypeCode
 import org.pih.warehouse.requisition.Requisition
@@ -990,7 +991,12 @@ class StockMovementService {
 
         def template = requisition.requisitionTemplate
         if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
-            def quantityDemand = forecastingService.getDemand(requisition.destination, null, editPageItem.product)
+            // If request FROM downstream consumer (location without managed inventory but supporting submitting requests),
+            // then pull demand from origin to that location.
+            // If request is NOT FROM downstream consumer, then pull demand outgoing FROM destination to all other locations.
+            Map<String, Object> quantityDemand = requisition?.destination?.isDownstreamConsumer() ?
+                    forecastingService.getDemand(requisition.origin, requisition.destination, editPageItem.product) :
+                    forecastingService.getDemand(requisition.destination, null, editPageItem.product)
             editPageItem << [
                     quantityDemandRequesting        : quantityDemand?.monthlyDemand?:0,
                     demandPerReplenishmentPeriod    : Math.ceil((quantityDemand?.dailyDemand?:0) * (template?.replenishmentPeriod?:30))
@@ -1776,10 +1782,14 @@ class StockMovementService {
         }
     }
 
-    List<ReceiptItem> getStockMovementReceiptItems(def stockMovement) {
+    /**
+     * Returns the receipt items of a stock movement. When excludeItemsWithoutQuantityReceivedOrCanceled is true, the
+     * ones without a positive quantity received or canceled are filtered out.
+     */
+    List<ReceiptItem> getStockMovementReceiptItems(def stockMovement, boolean excludeItemsWithoutQuantityReceivedOrCanceled = false) {
         return (stockMovement.requisition) ?
-                getRequisitionBasedStockMovementReceiptItems(stockMovement) :
-                getShipmentBasedStockMovementReceiptItems(stockMovement)
+                getRequisitionBasedStockMovementReceiptItems(stockMovement, excludeItemsWithoutQuantityReceivedOrCanceled) :
+                getShipmentBasedStockMovementReceiptItems(stockMovement, excludeItemsWithoutQuantityReceivedOrCanceled)
     }
 
     /**
@@ -1804,16 +1814,41 @@ class StockMovementService {
         return historyItems ? historyItems[0] : null
     }
 
-    List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(def stockMovement) {
-        def shipments = Shipment.findAllByRequisition(stockMovement.requisition)
-        List<ReceiptItem> receiptItems = shipments*.receipts?.flatten()*.sortReceiptItemsBySortOrder()?.flatten()
+    List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(def stockMovement, boolean excludeItemsWithoutQuantityReceivedOrCanceled = false) {
+        List<Shipment> shipments = Shipment.findAllByRequisition(stockMovement.requisition)
+        List<ReceiptItem> receiptItems = []
+        shipments*.receipts?.flatten()?.each { Receipt receipt ->
+            List<ReceiptItem> receiptItemsOfReceipt = getReceiptItems(receipt, excludeItemsWithoutQuantityReceivedOrCanceled)
+            sortReceiptItemsBySortOrder(receiptItemsOfReceipt)
+            receiptItems.addAll(receiptItemsOfReceipt)
+        }
         return receiptItems
     }
 
-    List<ReceiptItem> getShipmentBasedStockMovementReceiptItems(def stockMovement) {
+    List<ReceiptItem> getShipmentBasedStockMovementReceiptItems(def stockMovement, boolean excludeItemsWithoutQuantityReceivedOrCanceled = false) {
         Shipment shipment = stockMovement.shipment
-        List<ReceiptItem> receiptItems = shipment.receipts*.sortReceiptItemsBySortOrder()?.flatten()
+        List<ReceiptItem> receiptItems = []
+        shipment.receipts?.each { Receipt receipt ->
+            List<ReceiptItem> receiptItemsOfReceipt = getReceiptItems(receipt, excludeItemsWithoutQuantityReceivedOrCanceled)
+            sortReceiptItemsBySortOrder(receiptItemsOfReceipt)
+            receiptItems.addAll(receiptItemsOfReceipt)
+        }
         return receiptItems
+    }
+
+    private List<ReceiptItem> getReceiptItems(Receipt receipt, boolean excludeItemsWithoutQuantityReceivedOrCanceled) {
+        return excludeItemsWithoutQuantityReceivedOrCanceled ?
+                receipt.receiptItems.findAll { it.quantityReceived > 0 || it.quantityCanceled > 0 }.toList() :
+                receipt.receiptItems.toList()
+    }
+
+    private void sortReceiptItemsBySortOrder(List<ReceiptItem> receiptItems) {
+        receiptItems.sort { ReceiptItem a, ReceiptItem b ->
+            a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
+                    a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
+                            a.sortOrder <=> b.sortOrder ?:
+                                    a.inventoryItem?.product?.name <=> b.inventoryItem?.product?.name
+        }
     }
 
     // It expects to receive a stock movement id
@@ -3617,6 +3652,9 @@ class StockMovementService {
         switch (documentCode) {
             case DocumentCode.INVOICE_TEMPLATE:
                 action = "renderInvoiceTemplate"
+                break
+            case DocumentCode.SHIPPING_XLS_TEMPLATE:
+                action = "renderShipmentXlsTemplate"
                 break
             case DocumentCode.SHIPPING_TEMPLATE:
                 action = "render"

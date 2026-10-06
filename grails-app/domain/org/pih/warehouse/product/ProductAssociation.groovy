@@ -9,14 +9,14 @@
  **/
 package org.pih.warehouse.product
 
-import org.pih.warehouse.core.validation.Validatable
+import org.pih.warehouse.core.validation.DomainValidatable
 
 import java.time.Instant
 
 /**
  * Represents an association between two products.
  */
-class ProductAssociation implements Validatable<ProductAssociationValidator> {
+class ProductAssociation implements DomainValidatable<ProductAssociationValidator> {
 
     def beforeDelete() {
         if (mutualAssociation) {

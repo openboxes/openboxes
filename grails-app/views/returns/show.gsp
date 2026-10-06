@@ -74,7 +74,7 @@
                 <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
                 <warehouse:message code="default.button.edit.label" />
             </g:link>
-            <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
+            <g:link uri="/receiving/create/${stockMovement?.shipment?.id}" class="button">
                 <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
                 <warehouse:message code="default.button.receive.label" />
             </g:link>

@@ -43,13 +43,13 @@ class RoleInterceptor {
 
     def static adminControllers = ['createProduct', 'createProductFromTemplate', 'admin']
     def static adminActions = [
-        'product'      : ['create'],
-        'person'       : ['list'],
-        'user'         : ['list'],
-        'location'     : ['edit'],
-        'shipper'      : ['create'],
-        'locationGroup': ['create'],
-        'locationType' : ['list'],
+        'product'        : ['create'],
+        'person'         : ['list'],
+        'user'           : ['list'],
+        'location'       : ['edit'],
+        'shipper'        : ['create'],
+        'locationGroup'  : ['create'],
+        'locationType'   : ['list'],
         'productSupplier': ['create', 'delete', 'edit']
     ]
 

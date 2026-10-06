@@ -1,17 +1,15 @@
 package org.pih.warehouse.inventory
 
-import grails.util.Holders
-import org.pih.warehouse.api.AvailableItem
-
 import java.time.LocalDate
 
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.serialization.Serializable
 import org.pih.warehouse.product.Product
 
-class CycleCountRequest {
+class CycleCountRequest implements Serializable<CycleCountRequestMapper> {
 
     String id
 
@@ -82,27 +80,5 @@ class CycleCountRequest {
         countDeadline(nullable: true)
         recountAssignee(nullable: true)
         recountDeadline(nullable: true)
-    }
-
-    Map toJson() {
-        return [
-                id: id,
-                facility: facility.toBaseJson(),
-                product: product,
-                status: status.toString(),
-                requestType: requestType.toString(),
-                initialCount: [
-                        deadline: countDeadline,
-                        assignee: countAssignee
-                ],
-                verificationCount: [
-                        deadline: recountDeadline,
-                        assignee: recountAssignee
-                ],
-                inventoryItemsCount: inventoryItemsCount,
-                blindCount: blindCount,
-                dateCreated: dateCreated,
-                lastUpdated: lastUpdated,
-        ]
     }
 }
