@@ -270,6 +270,9 @@ const buildItemRows = (summary, usersById) => {
 
   const toggleRowId = _.uniqueId('row-');
 
+  const firstSplitItemHasSameProductAsOriginalItem = splitItemRows[0]?.product?.id
+    === replacedRow.product?.id;
+
   return [
     { ...replacedRow, toggleRowId },
     {
@@ -280,6 +283,9 @@ const buildItemRows = (summary, usersById) => {
       replacedRowId: replacedRow.rowId,
       splitItemIds: splitItemRows.map((splitItem) => splitItem.rowId),
       originalLineItem: hiddenOriginalLineItem,
+      // We group rows by product, so make sure to only include the dotted separator between
+      // the first split row and original row above it if they have different products.
+      mergeWithNextRow: firstSplitItemHasSameProductAsOriginalItem,
     },
     ...splitItemRows,
   ];

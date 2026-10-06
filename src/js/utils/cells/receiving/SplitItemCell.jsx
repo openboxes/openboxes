@@ -19,7 +19,11 @@ const SplitItemCell = React.memo(({
     {isFirstSplitItem && (
       <>
         {withArrow && (
-          <FaArrowRight size={16} className={`receiving-table__split-item-arrow ${productCode ? 'mr-2' : ''}`} />
+          <FaArrowRight
+            size={16}
+            className={`receiving-table__split-item-arrow ${productCode ? 'mr-2' : ''}`}
+            data-testid="split-item-arrow"
+          />
         )}
         {productCode && <span>{productCode}</span>}
       </>

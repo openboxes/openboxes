@@ -64,7 +64,7 @@ const useReceivingLineItems = ({
   const { validationSchema } = useEditLineItemValidation();
 
   const {
-    control, getValues, setValue, reset, handleSubmit, formState: { errors },
+    control, getValues, setValue, reset, handleSubmit, trigger, formState: { errors },
   } = useForm({
     mode: 'onBlur',
     defaultValues: { lineItems: initialLineItems.map(buildDefaultRow) },
@@ -78,41 +78,55 @@ const useReceivingLineItems = ({
     name: 'lineItems',
   });
 
+  // Some rules compare the rows with each other (e.g. duplicates), so a change of one row can
+  // affect the errors of any other row, so every row is revalidated.
+  const validateLineItems = useCallback(() => {
+    const fieldNames = getValues('lineItems').flatMap((row, index) =>
+      Object.keys(_.omit(row, 'quantityReceiving')).map((field) => `lineItems.${index}.${field}`));
+    return trigger(fieldNames);
+  }, [trigger, getValues]);
+
   const removeRow = useCallback((rowId) => {
     const index = getValues('lineItems').findIndex((item) => item.rowId === rowId);
     if (index !== -1) {
       remove(index);
+      validateLineItems();
     }
-  }, [getValues, remove]);
+  }, [getValues, remove, validateLineItems]);
 
   const { onLocationAutofill } = useEditModalLocationAutofill({
     getValues,
     setValue,
+    validateLineItems,
   });
 
-  const addRow = useCallback(
-    () => append(buildSplitRow()),
-    [append, lineItem, originalLineItem],
-  );
+  const addRow = useCallback(() => {
+    append(buildSplitRow());
+    validateLineItems();
+  }, [append, lineItem, originalLineItem, validateLineItems]);
 
   const { columns } = useReceivingLineItemColumns({
     control,
     addRow,
     removeRow,
     onLocationAutofill,
+    validateLineItems,
   });
 
-  const copyToReceiving = useCallback((receivedItem) => append({
-    rowId: _.uniqueId('row-'),
-    receiptItemId: null,
-    product: receivedItem.product ?? null,
-    lotNumber: receivedItem.lotNumber ?? '',
-    expirationDate: receivedItem.expirationDate ?? '',
-    recipient: receivedItem.recipient ?? null,
-    quantityReceiving: receivedItem.quantityReceived ?? '',
-    binLocation: receivedItem.binLocation ?? null,
-    isSplitItem: true,
-  }), [append]);
+  const copyToReceiving = useCallback((receivedItem) => {
+    append({
+      rowId: _.uniqueId('row-'),
+      receiptItemId: null,
+      product: receivedItem.product ?? null,
+      lotNumber: receivedItem.lotNumber ?? '',
+      expirationDate: receivedItem.expirationDate ?? '',
+      recipient: receivedItem.recipient ?? null,
+      quantityReceiving: receivedItem.quantityReceived ?? '',
+      binLocation: receivedItem.binLocation ?? null,
+      isSplitItem: true,
+    });
+    validateLineItems();
+  }, [append, validateLineItems]);
 
   const revertToOriginal = () => reset();
 

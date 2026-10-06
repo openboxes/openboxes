@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import PropTypes from 'prop-types';
 
@@ -9,14 +9,15 @@ import useConfirmReceiptForm from 'hooks/receiving/v2/useConfirmReceiptForm';
 
 import 'components/receivingV2/receiving.scss';
 
-const CheckStep = ({ completeReceiptRef }) => {
+const CheckStep = ({ completeReceiptRef, setNextDisabled }) => {
   const {
     onCompleteReceipt,
+    isCompleteDisabled,
     onSaveAndExit,
     control,
     view,
     table,
-    lineItemsState,
+    shipmentItemsState,
     filters,
     loading,
     commentModal,
@@ -27,9 +28,17 @@ const CheckStep = ({ completeReceiptRef }) => {
   // eslint-disable-next-line no-param-reassign
   completeReceiptRef.current = onCompleteReceipt;
 
+  useEffect(() => {
+    setNextDisabled(isCompleteDisabled);
+  }, [isCompleteDisabled]);
+
   return (
-    <div className="receiving-container confirm-receipt">
-      <ConfirmReceiptInfo control={control} lineItemsState={lineItemsState} />
+    <div className="receiving-container confirm-receipt" data-testid="check-step">
+      <ConfirmReceiptInfo
+        control={control}
+        shipmentItemsState={shipmentItemsState}
+        canceledReceiptItemIds={cancelRemaining.ids}
+      />
       <ConfirmReceiptFilters
         view={view}
         updateFilterParams={filters.updateFilterParams}
@@ -53,6 +62,7 @@ const CheckStep = ({ completeReceiptRef }) => {
 
 CheckStep.propTypes = {
   completeReceiptRef: PropTypes.shape({ current: PropTypes.func }).isRequired,
+  setNextDisabled: PropTypes.func.isRequired,
 };
 
 export default CheckStep;

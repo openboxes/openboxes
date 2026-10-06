@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -12,6 +13,7 @@ import useCommentModal from 'hooks/receiving/v2/useCommentModal';
 import useConfirmReceiptActions from 'hooks/receiving/v2/useConfirmReceiptActions';
 import useConfirmReceiptColumns from 'hooks/receiving/v2/useConfirmReceiptColumns';
 import useConfirmReceiptSaveActions from 'hooks/receiving/v2/useConfirmReceiptSaveActions';
+import useConfirmReceiptValidation from 'hooks/receiving/v2/useConfirmReceiptValidation';
 import useReceivingFilters from 'hooks/receiving/v2/useReceivingFilters';
 import useReceivingSort from 'hooks/receiving/v2/useReceivingSort';
 import { formatDateToString } from 'utils/dateUtils';
@@ -31,15 +33,25 @@ const useConfirmReceiptForm = () => {
   const storedDateDelivered = useSelector(
     (state) => getReceivingDateDelivered(state, shipmentId),
   );
-  const { control, handleSubmit } = useForm({
+  const { validationSchema, dateShipped } = useConfirmReceiptValidation();
+  const {
+    control, handleSubmit, trigger, formState: { isValid },
+  } = useForm({
+    mode: 'onChange',
     defaultValues: {
       dateDelivered: storedDateDelivered ?? currentDateTime(),
     },
+    resolver: zodResolver(validationSchema),
   });
   const dateDelivered = useWatch({ control, name: 'dateDelivered' });
   useEffect(() => {
     dispatch(updateReceivingDateDelivered(shipmentId, dateDelivered));
   }, [dateDelivered]);
+
+  // Trigger validation immediately on page load once dateShipped is loaded from redux.
+  useEffect(() => {
+    trigger('dateDelivered');
+  }, [dateShipped]);
 
   // The check step renders in the view selected on the receiving step.
   const view = useSelector(getReceivingView);
@@ -49,7 +61,7 @@ const useConfirmReceiptForm = () => {
     sortableProps, sort, order, resetSort,
   } = useReceivingSort();
   const {
-    loading, receiptIdRef, lineItemsState, updateLineItemComment,
+    loading, receiptIdRef, lineItemsState, shipmentItemsState, updateLineItemComment,
   } = useConfirmReceiptActions({ view, sort, sortOrder: order });
   const hasPreviousReceipts = hasAnyPreviousReceipt(lineItemsState);
   // Optional columns are read from the full state, so filtering the table down to rows
@@ -80,9 +92,10 @@ const useConfirmReceiptForm = () => {
   });
 
   return {
-    // Submitting through the form runs the delivery date validation first, so an empty date
+    // Submitting through the form runs the delivery date validation first, so an invalid date
     // blocks the completion instead of reaching the API.
     onCompleteReceipt: handleSubmit(onCompleteReceipt),
+    isCompleteDisabled: !isValid,
     onSaveAndExit,
     control,
     view,
@@ -92,7 +105,7 @@ const useConfirmReceiptForm = () => {
       sort,
       order,
     },
-    lineItemsState,
+    shipmentItemsState,
     filters: {
       updateFilterParams,
       clearFilterParams,

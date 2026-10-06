@@ -21,8 +21,10 @@ const ReceivingTable = ({
   removeSplitItem,
   loadReceipt,
   onLocationAutofill,
+  onPackLevelLocationChange,
   sort,
   order,
+  lineItemErrors,
 }) => {
   const commentModal = useCommentModal({ updateLineItemComment });
   const {
@@ -58,6 +60,8 @@ const ReceivingTable = ({
       onOpenCommentModal,
       onOpenEditModal: openEditModal,
       onLocationAutofill,
+      onPackLevelLocationChange,
+      lineItemErrors,
     }),
     [
       lineItemsState.entities,
@@ -66,6 +70,8 @@ const ReceivingTable = ({
       openEditModal,
       removeSplitItem,
       onLocationAutofill,
+      onPackLevelLocationChange,
+      lineItemErrors,
     ],
   );
 
@@ -75,7 +81,7 @@ const ReceivingTable = ({
   );
 
   return (
-    <div className="receiving-table receiving-table--striped">
+    <div className="receiving-table receiving-table--striped" data-testid="receiving-table">
       <DataTable
         // Force TanStack table remount whenever the sort changes so the initialState
         // (`expanded: true`) re-applies and every changes group is expanded again.
@@ -155,14 +161,18 @@ ReceivingTable.propTypes = {
   removeSplitItem: PropTypes.func.isRequired,
   loadReceipt: PropTypes.func.isRequired,
   onLocationAutofill: PropTypes.func.isRequired,
+  onPackLevelLocationChange: PropTypes.func.isRequired,
   sort: PropTypes.string,
   order: PropTypes.string,
+  // Error messages of the invalid lines, keyed by row id and then by field.
+  lineItemErrors: PropTypes.objectOf(PropTypes.objectOf(PropTypes.string)),
 };
 
 ReceivingTable.defaultProps = {
   receiptId: null,
   sort: null,
   order: null,
+  lineItemErrors: {},
 };
 
 export default ReceivingTable;

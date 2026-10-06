@@ -43,7 +43,7 @@ const useConfirmReceiptDetails = () => {
       label: translate('react.receiving.shippedOn.label', 'Shipped on'),
       value: formatDateToString({
         date: dateShipped,
-        dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+        dateFormat: DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS,
         options: { locale: getDateFnsLocale(currentLocale) },
       }),
     },

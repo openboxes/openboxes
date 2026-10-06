@@ -39,6 +39,7 @@ const Receiving = () => {
           <ConfirmReceiptHeader
             onBackToReceive={previous}
             onCompleteReceipt={onCompleteReceipt}
+            isCompleteDisabled={isNextDisabled}
           />
         )
         : undefined}
@@ -48,15 +49,28 @@ const Receiving = () => {
             onClick: previous,
             label: 'react.receiving.backToReceive.label',
             defaultLabel: 'Back to Receive',
+            tooltipLabel: 'react.receiving.backToReceive.tooltip.label',
+            defaultTooltipLabel: 'Edit previously-entered receiving information',
             variant: 'primary-outline',
           },
           next: {
             onClick: onCompleteReceipt,
             label: 'react.receiving.completeReceipt.label',
             defaultLabel: 'Complete Receipt',
+            tooltipLabel: 'react.receiving.completeReceipt.tooltip.label',
+            defaultTooltipLabel: 'Submit the receipt',
+            disabled: isNextDisabled,
           },
         }
-        : { next: { onClick: onNext, disabled: isNextDisabled } }}
+
+        : {
+          next: {
+            onClick: onNext,
+            disabled: isNextDisabled,
+            tooltipLabel: 'react.receiving.moveToCheck.tooltip.label',
+            defaultTooltipLabel: 'Proceed to the review stage',
+          },
+        }}
     >
       <Step.Component
         flushRef={flushRef}

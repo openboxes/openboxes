@@ -52,20 +52,25 @@ const WizardPageLayout = ({
           <Button
             label={previous.label ?? 'react.default.button.previous.label'}
             defaultLabel={previous.defaultLabel ?? 'Previous'}
+            tooltipLabel={previous.tooltipLabel}
+            defaultTooltipLabel={previous.defaultTooltipLabel}
             variant={previous.variant ?? 'primary'}
             onClick={previous.onClick}
             disabled={previous.disabled}
           />
         )}
         {next && (
-          <Button
-            label={next.label ?? 'react.default.button.next.label'}
-            defaultLabel={next.defaultLabel ?? 'Next'}
-            variant={next.variant ?? 'primary'}
-            onClick={next.onClick}
-            disabled={next.disabled}
-            className="ml-auto"
-          />
+          <div className="ml-auto">
+            <Button
+              label={next.label ?? 'react.default.button.next.label'}
+              defaultLabel={next.defaultLabel ?? 'Next'}
+              tooltipLabel={next.tooltipLabel}
+              defaultTooltipLabel={next.defaultTooltipLabel}
+              variant={next.variant ?? 'primary'}
+              onClick={next.onClick}
+              disabled={next.disabled}
+            />
+          </div>
         )}
       </div>
     )}
@@ -117,6 +122,8 @@ WizardPageLayout.propTypes = {
       /** Translation id for the button label */
       label: PropTypes.string,
       defaultLabel: PropTypes.string,
+      tooltipLabel: PropTypes.string,
+      defaultTooltipLabel: PropTypes.string,
       variant: PropTypes.string,
     }),
     next: PropTypes.shape({
@@ -125,6 +132,8 @@ WizardPageLayout.propTypes = {
       /** Translation id for the button label */
       label: PropTypes.string,
       defaultLabel: PropTypes.string,
+      tooltipLabel: PropTypes.string,
+      defaultTooltipLabel: PropTypes.string,
       variant: PropTypes.string,
     }),
   }),

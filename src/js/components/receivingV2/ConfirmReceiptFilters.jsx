@@ -38,7 +38,7 @@ const ConfirmReceiptFilters = ({
   }, [clearFilterParams]);
 
   return (
-    <div className="confirm-receipt__action-bar">
+    <div className="confirm-receipt__action-bar" data-testid="confirm-receipt-action-bar">
       <div className="confirm-receipt__action-bar-filters">
         <FilterForm
           searchFieldId="q"
@@ -53,6 +53,7 @@ const ConfirmReceiptFilters = ({
           showFilterVisibilityToggler={false}
           alignButtonsToFilters
           isLoading={!translationsFetched}
+          autoSubmit
         />
       </div>
       <div className="confirm-receipt__action-bar-buttons d-flex gap-8">
@@ -60,6 +61,8 @@ const ConfirmReceiptFilters = ({
           <Button
             label="react.receiving.resetSorting.label"
             defaultLabel="Reset sorting"
+            tooltipLabel="react.receiving.resetSorting.tooltip.label"
+            defaultTooltipLabel="Revert the list to the order of the original shipment"
             variant="secondary"
             onClick={onResetSort}
             EndIcon={<RiRefreshLine size={16} />}
@@ -69,6 +72,8 @@ const ConfirmReceiptFilters = ({
           <Button
             label="react.receiving.cancelAllRemaining.label"
             defaultLabel="Cancel All Remaining"
+            tooltipLabel="react.receiving.cancelAllRemaining.tooltip.label"
+            defaultTooltipLabel="Mark all lines in the shipment that still have quantity remaining as fully received with a discrepancy. Use to close out the shipment if you expect no future receipts."
             variant="secondary"
             onClick={onCancelAllRemaining}
             EndIcon={<RiCloseCircleLine size={16} />}
@@ -77,6 +82,8 @@ const ConfirmReceiptFilters = ({
         <Button
           label="react.receiving.saveAndExit.label"
           defaultLabel="Save & Exit"
+          tooltipLabel="react.receiving.saveAndExit.tooltip.label"
+          defaultTooltipLabel="Save and exit without completing the receipt"
           variant="secondary"
           onClick={onSaveAndExit}
           EndIcon={<RiLogoutBoxRLine size={16} />}

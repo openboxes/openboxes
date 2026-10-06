@@ -11,6 +11,7 @@ import useBinLocationAutofill from 'hooks/useBinLocationAutofill';
 const useEditModalLocationAutofill = ({
   getValues,
   setValue,
+  validateLineItems,
 }) => {
   const getRowBinLocation = useCallback((item) => item.binLocation, []);
 
@@ -23,7 +24,8 @@ const useEditModalLocationAutofill = ({
         setValue(`lineItems.${index}.binLocation`, newData.binLocation);
       }
     });
-  }, [getValues, setValue]);
+    validateLineItems();
+  }, [getValues, setValue, validateLineItems]);
 
   return useBinLocationAutofill({
     getRows,

@@ -19,9 +19,12 @@ import {
   transformReceiptSummary,
 } from 'utils/receiving/receiptSummaryRows';
 
-// Only rows with an editable quantity input can be autofilled: plain lines (no row type)
-// and split items.
-const AUTOFILL_EXCLUDED_ROW_TYPES = [ReceivingRowType.REPLACED, ReceivingRowType.TOGGLE];
+// Only editable plain lines (no row type) can be autofilled
+const AUTOFILL_EXCLUDED_ROW_TYPES = [
+  ReceivingRowType.REPLACED,
+  ReceivingRowType.TOGGLE,
+  ReceivingRowType.SPLIT_ITEM,
+];
 
 // A row qualifies for autofill only when it can still be received (not completed, something
 // left to receive) and the user hasn't entered anything yet (0 counts as entered).
@@ -94,8 +97,13 @@ const useReceivingActions = ({ view, sort, sortOrder } = {}) => {
       : summary;
   };
 
-  const loadReceipt = async () => {
-    setLoading(true);
+  const loadReceipt = async ({ skipLoadingState = false } = {}) => {
+    // With skipLoadingState the table stays rendered during the refetch, so its scroll is not
+    // reset. The caller must wrap this call in the page spinner, otherwise the stale rows
+    // stay editable until the refetch finishes.
+    if (!skipLoadingState) {
+      setLoading(true);
+    }
     try {
       // Push pending edits out before refetching (view switch, modal reload, sort change),
       // so the summary reflects them and nothing is lost when the autosave state resets.

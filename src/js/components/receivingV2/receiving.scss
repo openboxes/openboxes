@@ -245,10 +245,16 @@
   z-index: 0;
 }
 
-// What is left in the viewport, so the table's horizontal scrollbar is not pushed below the
-// fold. The 700px is the page around it: header, wizard, filters, buttons.
-.receiving-container .receiving-table .rt-table {
-  max-height: max(calc(100vh - 700px), 30vh);
+// Leaves the table what the viewport has left, so its horizontal scrollbar stays on screen.
+// 600px is roughly the page around it - header, wizard, filters, buttons - and the 30vh floor
+// keeps the table usable on short windows.
+.receiving-step .receiving-table .rt-table {
+  max-height: max(calc(100vh - 600px), 30vh);
+}
+
+// on the confirm receipt step, the table is smaller because of the details section above it.
+.confirm-receipt .receiving-table .rt-table {
+  max-height: max(calc(100vh - 680px), 30vh);
 }
 
 .location-header {

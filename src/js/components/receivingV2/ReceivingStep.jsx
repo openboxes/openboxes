@@ -16,7 +16,7 @@ const ReceivingStep = ({ flushRef, validateBeforeNextRef, setNextDisabled }) => 
     setPutawayEnabled,
     showPackLevel,
     table: {
-      lineItemsState, columns, sort, order,
+      lineItemsState, columns, sort, order, lineItemErrors,
     },
     next: { isNextDisabled, validateBeforeNext },
     actions: {
@@ -30,6 +30,7 @@ const ReceivingStep = ({ flushRef, validateBeforeNextRef, setNextDisabled }) => 
       loadReceipt,
       flush,
       onLocationAutofill,
+      onPackLevelLocationChange,
       autosaveStatus,
       resetSort,
       updateFilterParams,
@@ -50,7 +51,7 @@ const ReceivingStep = ({ flushRef, validateBeforeNextRef, setNextDisabled }) => 
   }, [isNextDisabled]);
 
   return (
-    <div className="receiving-container">
+    <div className="receiving-container receiving-step" data-testid="receiving-step">
       <ReceivingFilters
         view={view}
         onViewChange={setView}
@@ -74,8 +75,10 @@ const ReceivingStep = ({ flushRef, validateBeforeNextRef, setNextDisabled }) => 
         removeSplitItem={removeSplitItem}
         loadReceipt={loadReceipt}
         onLocationAutofill={onLocationAutofill}
+        onPackLevelLocationChange={onPackLevelLocationChange}
         sort={sort}
         order={order}
+        lineItemErrors={lineItemErrors}
       />
     </div>
   );

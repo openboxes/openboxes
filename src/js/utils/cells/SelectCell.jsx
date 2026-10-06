@@ -25,11 +25,17 @@ const SelectCell = React.memo(({
   showValueTooltip,
   onBlur,
   clearable,
+  errorMessage,
 }) => {
   const translate = useTranslate();
 
   return (
-    <TableCell className="rt-td">
+    <TableCell
+      className="rt-td"
+      customTooltip
+      tooltipLabel={errorMessage}
+      tooltipClassname="w-100"
+    >
       <div className="w-100" aria-label={translate(label, defaultLabel)}>
         <SelectFieldComponent
           options={options}
@@ -38,11 +44,12 @@ const SelectCell = React.memo(({
           labelKey={labelKey}
           placeholder={placeholder}
           disabled={disabled}
+          errorMessage={errorMessage}
           hideErrorMessageWrapper
           locationId={locationId}
           async={async}
           loadOptions={loadOptions}
-          showValueTooltip={showValueTooltip}
+          showValueTooltip={showValueTooltip && !errorMessage}
           onBlur={onBlur}
           clearable={clearable}
         />
@@ -69,6 +76,7 @@ SelectCell.propTypes = {
   showValueTooltip: PropTypes.bool,
   onBlur: PropTypes.func,
   clearable: PropTypes.bool,
+  errorMessage: PropTypes.string,
 };
 
 SelectCell.defaultProps = {
@@ -82,9 +90,10 @@ SelectCell.defaultProps = {
   locationId: null,
   async: false,
   loadOptions: () => [],
-  showValueTooltip: false,
+  showValueTooltip: true,
   onBlur: undefined,
   clearable: true,
+  errorMessage: null,
 };
 
 export default SelectCell;

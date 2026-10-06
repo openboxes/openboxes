@@ -89,14 +89,14 @@ abstract class Validator<T> {
     protected FieldError rejectField(String fieldName,
                                      Object rejectedValue,
                                      String errorCode,
-                                     Object[] errorArgs=null) {
+                                     List<Object> errorArgs=null) {
         return new FieldError(
                 "Object",  // objectName will be set automatically when adding the errors to the object being validated.
                 fieldName,
                 rejectedValue,
                 false,  // This is a validation failure. (A binding failure would be if we were given the wrong type.)
                 [errorCode] as String[],
-                errorArgs,
+                errorArgs?.toArray(),
                 errorCode)  // If we don't resolve the errorCode, display the code itself. This helps us catch typos.
     }
 
@@ -121,11 +121,11 @@ abstract class Validator<T> {
      * @param errorCode The l10n message key containing the message to display when rendering the errors of the entity.
      * @param errorArgs Values to use for any args contained within the errorCode message
      */
-    protected ObjectError rejectObject(String errorCode, Object[] errorArgs=null) {
+    protected ObjectError rejectObject(String errorCode, List<Object> errorArgs=null) {
         return new ObjectError(
                 "Object",  // objectName will be set automatically when adding the errors to the object being validated.
                 [errorCode] as String[],
-                errorArgs,
+                errorArgs?.toArray(),
                 errorCode)  // If we don't resolve the errorCode, display the code itself. This helps us catch typos.
     }
 }

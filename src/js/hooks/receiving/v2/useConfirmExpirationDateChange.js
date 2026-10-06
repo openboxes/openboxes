@@ -4,7 +4,7 @@ import ProductApi from 'api/services/ProductApi';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useHandleModalAction from 'hooks/useHandleModalAction';
 import useSpinner from 'hooks/useSpinner';
-import { formatDateToString, parseStringToDate } from 'utils/dateUtils';
+import { formatStringToLocalDate } from 'utils/dateUtils';
 
 /**
  * Confirms the expiration dates entered in the edit line item modal, since a lot's date is shared
@@ -30,14 +30,11 @@ const useConfirmExpirationDateChange = () => {
    * @returns the lot's expiration date change, or null when there is nothing to confirm.
    */
   const getLotChange = (lineItem, lotAvailability) => {
-    const newExpiry = formatDateToString({
-      date: parseStringToDate({
-        date: lineItem.expirationDate,
-        dateOnly: true,
-        options: { providedDateFormat: DateFormatDateFns.DD_MMM_YYYY },
-      }),
-      dateFormat: DateFormatDateFns.YYYY_MM_DD,
-    });
+    // lotAvailability.expirationDate comes from the backend, so for easier comparisons
+    // we reformat the line item's expiration date to match.
+    const newExpiry = formatStringToLocalDate(
+      lineItem.expirationDate, DateFormatDateFns.DD_MMM_YYYY,
+    );
 
     // Only a lot that someone holds and whose date actually changes is worth confirming.
     if (!lotAvailability?.quantityOnHand

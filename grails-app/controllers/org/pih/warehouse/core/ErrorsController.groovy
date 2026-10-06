@@ -159,32 +159,45 @@ class ErrorsController {
     def processError() {
 
         def enabled = ConfigHelper.booleanValue(grailsApplication.config.openboxes.mail.errors.enabled)
-        if (enabled) {
-            def recipients = ConfigHelper.listValue(grailsApplication.config.openboxes.mail.errors.recipients) as List
-
-            def errorNotificationList = userService.findUsersByRoleType(RoleType.ROLE_ERROR_NOTIFICATION)
-            errorNotificationList.each { errorNotificationUser ->
-                if (errorNotificationUser.email)
-                    recipients.add(errorNotificationUser.email)
-            }
-
-            def ccList = []
-            def reportedBy = User.findByUsername(params.reportedBy)
-            if (params.ccMe && reportedBy) {
-                ccList.add(reportedBy?.email)
-            }
-
-            def dom = params.remove("dom")
-            def stacktrace = params.remove("stacktrace")
-            def subject = "${params.summary ?: warehouse.message(code: 'email.errorReportSubject.message')}"
-            def body = "${g.render(template: '/email/errorReport', model: [stacktrace: stacktrace], params: params)}"
-
-            mailService.sendHtmlMailWithAttachment(reportedBy, recipients, ccList, subject, body.toString(), dom?.bytes, "error.html", "text/html")
-            flash.message = "${warehouse.message(code: 'email.errorReportSuccess.message', args: [recipients])}"
-        } else {
-            flash.message = "${warehouse.message(code: 'email.errorReportDisabled.message')}"
+        if (!enabled) {
+            flash.error = messageLocalizer.localize('email.errorReportDisabled.message')
+            redirectToDashboard()
+            return
         }
-        redirect(controller: "dashboard", action: "index")
+
+        def recipients = ConfigHelper.listValue(grailsApplication.config.openboxes.mail.errors.recipients) as List
+
+        def errorNotificationList = userService.findUsersByRoleType(RoleType.ROLE_ERROR_NOTIFICATION)
+        errorNotificationList.each { errorNotificationUser ->
+            if (errorNotificationUser.email)
+                recipients.add(errorNotificationUser.email)
+        }
+
+        def ccList = []
+        def reportedBy = User.findByUsername(params.reportedBy)
+        if (params.ccMe && reportedBy) {
+            ccList.add(reportedBy?.email)
+        }
+
+        def dom = params.remove("dom")
+        def stacktrace = params.remove("stacktrace")
+        def subject = "${params.summary ?: messageLocalizer.localize('email.errorReportSubject.message')}"
+        def body = "${g.render(template: '/email/errorReport', model: [stacktrace: stacktrace], params: params)}"
+
+        boolean sent = mailService.sendHtmlMailWithAttachment(reportedBy, recipients, ccList, subject, body.toString(), dom?.bytes, "error.html", "text/html")
+        if (!sent) {
+            flash.error = messageLocalizer.localize('email.notSent.message', [recipients])
+            redirectToDashboard()
+            return
+        }
+
+        flash.message = messageLocalizer.localize('email.errorReportSuccess.message', [recipients])
+        redirectToDashboard()
+    }
+
+    // The dashboard is a React page, which only reads flash messages from the URL (see useFlashScopeListener)
+    private void redirectToDashboard() {
+        redirect(controller: "dashboard", action: "index", params: ["flash": flash as JSON])
     }
 
 }

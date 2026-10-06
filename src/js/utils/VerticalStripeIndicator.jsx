@@ -2,26 +2,33 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
+import VerticalStripeStatus from 'consts/verticalStripeStatus';
+
 import 'utils/VerticalStripeIndicator.scss';
 
 /**
  * Full-height vertical stripe. Generic visual indicator.
- * It can be displayed via the `display` prop.
+ * Its colour is driven by the `status` prop. A null/omitted status hides the stripe.
  */
-const VerticalStripeIndicator = ({ display }) => {
-  if (!display) {
+const VerticalStripeIndicator = ({ status }) => {
+  if (!status) {
     return null;
   }
 
-  return <span className="vertical-stripe-indicator" aria-hidden />;
+  return (
+    <span
+      className={`vertical-stripe-indicator vertical-stripe-indicator--${status}`}
+      aria-hidden
+    />
+  );
 };
 
 export default VerticalStripeIndicator;
 
 VerticalStripeIndicator.propTypes = {
-  display: PropTypes.bool,
+  status: PropTypes.oneOf(Object.values(VerticalStripeStatus)),
 };
 
 VerticalStripeIndicator.defaultProps = {
-  display: false,
+  status: null,
 };

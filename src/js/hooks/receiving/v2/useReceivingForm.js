@@ -20,6 +20,7 @@ import useReceivingNextValidation from 'hooks/receiving/v2/useReceivingNextValid
 import useReceivingSort from 'hooks/receiving/v2/useReceivingSort';
 import useTableLocationAutofill from 'hooks/receiving/v2/useTableLocationAutofill';
 import getOptionalColumnsVisibility from 'utils/receiving/getOptionalColumnsVisibility';
+import hasAnyPreviousReceipt from 'utils/receiving/hasAnyPreviousReceipt';
 import hasItemInDifferentBin from 'utils/receiving/hasItemInDifferentBin';
 
 const useReceivingForm = () => {
@@ -64,9 +65,13 @@ const useReceivingForm = () => {
     clearFilterParams,
   } = useReceivingFilters({ lineItemsState });
 
-  const { isNextDisabled, validateBeforeNext } = useReceivingNextValidation({ lineItemsState });
+  const {
+    isNextDisabled,
+    validateBeforeNext,
+    lineItemErrors,
+  } = useReceivingNextValidation({ lineItemsState });
 
-  const { onLocationAutofill } = useTableLocationAutofill({
+  const { onLocationAutofill, onPackLevelLocationChange } = useTableLocationAutofill({
     lineItemsState: visibleLineItemsState,
     updateLineItems,
   });
@@ -96,9 +101,11 @@ const useReceivingForm = () => {
     () => getOptionalColumnsVisibility(lineItemsState),
     [lineItemsState],
   );
+  const hasPreviousReceipts = hasAnyPreviousReceipt(lineItemsState);
   const { columns } = useReceivingColumns({
     view,
     putawayEnabled,
+    hasPreviousReceipts,
     sortableProps,
     sort,
     order,
@@ -116,6 +123,7 @@ const useReceivingForm = () => {
       columns,
       sort,
       order,
+      lineItemErrors,
     },
     next: {
       // Nothing is known about the lines until the receipt is loaded, so the transition waits
@@ -134,6 +142,7 @@ const useReceivingForm = () => {
       onSaveAndExit,
       flush,
       onLocationAutofill,
+      onPackLevelLocationChange,
       autosaveStatus,
       resetSort,
       updateFilterParams,

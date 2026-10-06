@@ -8,6 +8,10 @@ import {
 
 import '@testing-library/jest-dom';
 
+// Stub the save and exit modal. It is not invoked in these tests, and it pulls in
+// react-icons/all, which jest cannot parse.
+jest.mock('utils/receiving/confirmExitWithUnsavedRows', () => jest.fn());
+
 const buildRow = (rowId, overrides = {}) => ({
   rowId,
   rowType: null,
@@ -78,14 +82,14 @@ describe('getAutofillQuantityUpdates()', () => {
       .toEqual([]);
   });
 
-  it('should fill an empty split item row', () => {
+  it('should skip an empty split item row', () => {
     const state = buildState([buildRow('row-1', {
       rowType: ReceivingRowType.SPLIT_ITEM,
       quantityAvailableToReceive: 4,
     })]);
 
     expect(getAutofillQuantityUpdates(state))
-      .toEqual([{ rowId: 'row-1', quantityReceiving: 4 }]);
+      .toEqual([]);
   });
 
   it('should fill the rows of a freshly started receipt', () => {

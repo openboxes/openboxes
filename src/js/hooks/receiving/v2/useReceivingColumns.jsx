@@ -14,7 +14,6 @@ import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import LocationAutofillHeader from 'components/receivingV2/LocationAutofillHeader';
 import receivingColumns from 'consts/receivingColumns';
-import receivingLocationOptions from 'consts/receivingLocationOptions';
 import ReceivingRowType from 'consts/receivingRowType';
 import { ReceivingView } from 'consts/receivingViewOptions';
 import useFormatNumber from 'hooks/useFormatNumber';
@@ -31,7 +30,7 @@ import SelectCell from 'utils/cells/SelectCell';
 import ValueCell from 'utils/cells/ValueCell';
 import getReceivingRowActions, { getReceivingSplitItemActions } from 'utils/receiving/getReceivingRowActions';
 import getReceivingRowStatus from 'utils/receiving/getReceivingRowStatus';
-import hasRowSavedQuantity from 'utils/receiving/hasRowSavedQuantity';
+import getRowStripeStatus from 'utils/receiving/getRowStripeStatus';
 import hasSplitItemInDifferentBinThanReplacedRow from 'utils/receiving/hasSplitItemInDifferentBinThanReplacedRow';
 import struckIfChanged from 'utils/receiving/struckIfChanged';
 import sumSplitItemsQuantityReceiving from 'utils/receiving/sumSplitItemsQuantityReceiving';
@@ -40,6 +39,7 @@ import VerticalStripeIndicator from 'utils/VerticalStripeIndicator';
 const useReceivingColumns = ({
   view,
   putawayEnabled,
+  hasPreviousReceipts,
   sortableProps,
   sort,
   order,
@@ -126,9 +126,9 @@ const useReceivingColumns = ({
         const item = getItem(row, table);
         return (
           <>
-            {/* The stripe marks rows whose quantity is saved. It lives in the first (pinned)
+            {/* The stripe marks row status. It lives in the first (pinned)
                 column so its absolutely positioned span anchors to the row's left edge. */}
-            <VerticalStripeIndicator display={hasRowSavedQuantity(item)} />
+            <VerticalStripeIndicator status={getRowStripeStatus(item)} />
             <PackLevelGroupCell
               item={item}
               isExpanded={row.getIsExpanded()}
@@ -147,7 +147,10 @@ const useReceivingColumns = ({
             customTooltip
             tooltipLabel={row.original.name}
           >
-            <span className={`receiving-table__separator-label ${putawayEnabled ? 'py-0' : ''}`}>
+            <span
+              className={`receiving-table__separator-label ${putawayEnabled ? 'py-0' : ''}`}
+              data-testid="pack-level-separator"
+            >
               {row.original.name}
             </span>
           </TableCell>
@@ -175,10 +178,10 @@ const useReceivingColumns = ({
           const item = getItem(row, table);
           return (
             <>
-              {/* In packing list view the saved stripe is rendered by the pack level group
+              {/* In packing list view the status stripe is rendered by the pack level group
                   column, which is the leftmost one there. */}
               {!isPackingListView
-                && <VerticalStripeIndicator display={hasRowSavedQuantity(item)} />}
+                && <VerticalStripeIndicator status={getRowStripeStatus(item)} />}
               <ProductCodeCell
                 item={item}
                 isPackingListView={isPackingListView}
@@ -354,7 +357,10 @@ const useReceivingColumns = ({
           <TableHeaderCell
             {...sortHeaderProps(receivingColumns.QUANTITY_SHIPPED)}
             tooltip
-            tooltipLabel={translate('react.receiving.shipped.label', 'Shipped')}
+            tooltipLabel={translate(
+              'react.receiving.shipped.tooltip.label',
+              'The quantity shipped in the base unit of measure of the system',
+            )}
             className="receiving-table__quantity"
           >
             {translate('react.receiving.shipped.label', 'Shipped')}
@@ -376,13 +382,82 @@ const useReceivingColumns = ({
         },
         size: 100,
       }),
+      ...(hasPreviousReceipts ? [
+        columnHelper.display({
+          id: receivingColumns.QUANTITY_RECEIVED,
+          header: () => (
+            <TableHeaderCell
+              tooltip
+              tooltipLabel={translate(
+                'react.receiving.received.tooltip.label',
+                'Quantity already received in previous receipts',
+              )}
+              className="receiving-table__quantity"
+            >
+              {translate('react.receiving.received.label', 'Received')}
+            </TableHeaderCell>
+          ),
+          cell: ({ row, table }) => {
+            const item = getItem(row, table);
+            if (isSplitItemOrToggle(item)) {
+              return null;
+            }
+            const value = formatNumber(item?.quantityReceived);
+            return (
+              <ValueCell
+                value={value}
+                tooltipLabel={value}
+                className="receiving-table__quantity"
+                label="react.receiving.received.label"
+                defaultLabel="Received"
+              />
+            );
+          },
+          size: 110,
+        }),
+        columnHelper.display({
+          id: receivingColumns.QUANTITY_TO_RECEIVE,
+          header: () => (
+            <TableHeaderCell
+              tooltip
+              tooltipLabel={translate(
+                'react.receiving.toReceive.tooltip.label',
+                'Quantity that is available to receive in this receipt (Quantity shipped - Quantity Received)',
+              )}
+              className="receiving-table__quantity"
+            >
+              {translate('react.receiving.toReceive.label', 'To Receive')}
+            </TableHeaderCell>
+          ),
+          cell: ({ row, table }) => {
+            const item = getItem(row, table);
+            if (isSplitItemOrToggle(item)) {
+              return null;
+            }
+            const value = formatNumber(item?.quantityAvailableToReceive);
+            return (
+              <ValueCell
+                value={value}
+                tooltipLabel={value}
+                className="receiving-table__quantity"
+                label="react.receiving.toReceive.label"
+                defaultLabel="To Receive"
+              />
+            );
+          },
+          size: 110,
+        }),
+      ] : []),
       columnHelper.display({
         id: receivingColumns.QUANTITY_RECEIVING,
         meta: { arrowNavigable: true },
         header: () => (
           <TableHeaderCell
             tooltip
-            tooltipLabel={translate('react.receiving.receivingNow.label', 'Receiving now')}
+            tooltipLabel={translate(
+              'react.receiving.receivingNow.tooltip.label',
+              'The quantity that will be received into inventory when this receipt is completed',
+            )}
             className="receiving-table__quantity"
           >
             {translate('react.receiving.receivingNow.label', 'Receiving Now')}
@@ -401,7 +476,10 @@ const useReceivingColumns = ({
             return (
               <ValueCell
                 value={value}
-                tooltipLabel={value}
+                tooltipLabel={translate(
+                  'react.receiving.receivingNow.split.tooltip.label',
+                  'This field cannot be edited because the receipt has been split into multiple lines. It now represents the sum of the "receiving now" quantities of the split lines. To update, edit the split lines below.',
+                )}
                 className="receiving-table__quantity"
                 label="react.receiving.receivingNow.label"
                 defaultLabel="Receiving Now"
@@ -414,6 +492,9 @@ const useReceivingColumns = ({
               onCommit={(quantityReceiving) =>
                 table.options.meta?.updateLineItem(row.original.id, { quantityReceiving })}
               disabled={item?.isCompleted}
+              errorMessage={
+                table.options.meta?.lineItemErrors?.[row.original.id]?.quantityReceiving
+              }
               className="receiving-table__quantity"
               label="react.receiving.receivingNow.label"
               defaultLabel="Receiving Now"
@@ -427,7 +508,10 @@ const useReceivingColumns = ({
         header: () => (
           <TableHeaderCell
             tooltip
-            tooltipLabel={translate('react.receiving.status.label', 'Status')}
+            tooltipLabel={translate(
+              'react.receiving.status.tooltip.label',
+              'Shows the amount being received versus the amount available to receive. A shipment with no discrepancies will show "complete" in all rows.',
+            )}
           >
             {translate('react.receiving.status.label', 'Status')}
           </TableHeaderCell>
@@ -480,7 +564,10 @@ const useReceivingColumns = ({
               return (
                 <ValueCell
                   value={receivingBin?.name}
-                  tooltipLabel={receivingBin?.name}
+                  tooltipLabel={translate(
+                    'react.receiving.location.split.tooltip.label',
+                    'This field cannot be edited because the receipt has been split into multiple lines. To update, edit the split lines below.',
+                  )}
                   className={`receiving-table__parent-location ${struckBin}`}
                   label="react.receiving.location.label"
                   defaultLabel="Location"
@@ -501,13 +588,14 @@ const useReceivingColumns = ({
               />
             );
           },
-          // Separator rows also get a select, used to autofill the location for the whole group.
+          // Separator rows also get a select, used to set one location for the whole group.
           meta: {
             renderSeparator: ({ row, table }) => (
               <SelectCell
-                options={receivingLocationOptions(translate)}
-                onChange={(option) =>
-                  option && table.options.meta?.onLocationAutofill(option.id, row.original.id)}
+                options={binLocations}
+                onChange={(binLocation) =>
+                  binLocation
+                  && table.options.meta?.onPackLevelLocationChange(binLocation, row.original.id)}
                 label="react.receiving.location.label"
                 defaultLabel="Location"
               />
@@ -519,7 +607,13 @@ const useReceivingColumns = ({
       columnHelper.display({
         id: 'actions',
         header: () => (
-          <TableHeaderCell>
+          <TableHeaderCell
+            tooltip
+            tooltipLabel={translate(
+              'react.receiving.actions.tooltip.label',
+              'The actions that you can perform on the receipt item',
+            )}
+          >
             {translate('react.receiving.actions.label', 'Actions')}
           </TableHeaderCell>
         ),
@@ -567,6 +661,7 @@ const useReceivingColumns = ({
     currentLocale,
     isPackingListView,
     putawayEnabled,
+    hasPreviousReceipts,
     hasBinLocationSupport,
     isShipmentFromPurchaseOrder,
     binLocations,
