@@ -1816,26 +1816,34 @@ class StockMovementService {
 
     List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(def stockMovement, boolean excludeItemsWithoutQuantityReceivedOrCanceled = false) {
         List<Shipment> shipments = Shipment.findAllByRequisition(stockMovement.requisition)
-        return shipments*.receipts?.flatten()?.collect { Receipt receipt ->
-            sortReceiptItemsBySortOrder(getReceiptItems(receipt, excludeItemsWithoutQuantityReceivedOrCanceled))
-        }?.flatten()
+        List<ReceiptItem> receiptItems = []
+        shipments*.receipts?.flatten()?.each { Receipt receipt ->
+            List<ReceiptItem> receiptItemsOfReceipt = getReceiptItems(receipt, excludeItemsWithoutQuantityReceivedOrCanceled)
+            sortReceiptItemsBySortOrder(receiptItemsOfReceipt)
+            receiptItems.addAll(receiptItemsOfReceipt)
+        }
+        return receiptItems
     }
 
     List<ReceiptItem> getShipmentBasedStockMovementReceiptItems(def stockMovement, boolean excludeItemsWithoutQuantityReceivedOrCanceled = false) {
         Shipment shipment = stockMovement.shipment
-        return shipment.receipts?.collect { Receipt receipt ->
-            sortReceiptItemsBySortOrder(getReceiptItems(receipt, excludeItemsWithoutQuantityReceivedOrCanceled))
-        }?.flatten()
+        List<ReceiptItem> receiptItems = []
+        shipment.receipts?.each { Receipt receipt ->
+            List<ReceiptItem> receiptItemsOfReceipt = getReceiptItems(receipt, excludeItemsWithoutQuantityReceivedOrCanceled)
+            sortReceiptItemsBySortOrder(receiptItemsOfReceipt)
+            receiptItems.addAll(receiptItemsOfReceipt)
+        }
+        return receiptItems
     }
 
-    private Collection<ReceiptItem> getReceiptItems(Receipt receipt, boolean excludeItemsWithoutQuantityReceivedOrCanceled) {
+    private List<ReceiptItem> getReceiptItems(Receipt receipt, boolean excludeItemsWithoutQuantityReceivedOrCanceled) {
         return excludeItemsWithoutQuantityReceivedOrCanceled ?
-                receipt.receiptItems?.findAll { it.quantityReceived > 0 || it.quantityCanceled > 0 } :
-                receipt.receiptItems
+                receipt.receiptItems.findAll { it.quantityReceived > 0 || it.quantityCanceled > 0 }.toList() :
+                receipt.receiptItems.toList()
     }
 
-    private List<ReceiptItem> sortReceiptItemsBySortOrder(Collection<ReceiptItem> receiptItems) {
-        return receiptItems?.sort { ReceiptItem a, ReceiptItem b ->
+    private void sortReceiptItemsBySortOrder(List<ReceiptItem> receiptItems) {
+        receiptItems.sort { ReceiptItem a, ReceiptItem b ->
             a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
                     a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
                             a.sortOrder <=> b.sortOrder ?:
