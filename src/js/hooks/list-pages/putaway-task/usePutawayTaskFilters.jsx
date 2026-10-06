@@ -31,7 +31,7 @@ const usePutawayTaskFilters = () => {
 
   const clearFilterValues = () => {
     const { pathname } = history.location;
-    history.replace({ pathname });
+    history.push({ pathname });
   };
 
   const initializeDefaultFilterValues = async () => {
@@ -92,7 +92,7 @@ const usePutawayTaskFilters = () => {
 
   useCommonFiltersCleaner({ clearFilterValues, initializeDefaultFilterValues, filtersInitialized });
 
-  const setFilterValues = (values, { replace = false } = {}) => {
+  const setFilterValues = (values) => {
     const filterAccessors = {
       statusCategory: { name: 'statusCategory', accessor: 'id' },
       status: { name: 'status', accessor: 'id' },
@@ -107,7 +107,7 @@ const usePutawayTaskFilters = () => {
     const queryFilterParams = queryString.stringify(transformedParams);
     const { pathname } = history.location;
     if (Object.keys(values).length) {
-      history[replace ? 'replace' : 'push']({ pathname, search: queryFilterParams });
+      history.push({ pathname, search: queryFilterParams });
     }
     setFilterParams({ ...values });
   };

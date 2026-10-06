@@ -16,11 +16,8 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/Filter/FilterStyles.scss';
 
-const AutoSubmitOnChange = ({
-  values, excludeField, onSubmit, initialValues,
-}) => {
+const AutoSubmitOnChange = ({ values, excludeField, onSubmit }) => {
   const prevValuesRef = useRef(null);
-  const prevInitialValuesRef = useRef(initialValues);
 
   useEffect(() => {
     const current = _.omit(values, excludeField);
@@ -28,31 +25,11 @@ const AutoSubmitOnChange = ({
       ? _.omit(prevValuesRef.current, excludeField)
       : null;
 
-    // A values change caused by the form's own initialValues changing (i.e. defaultValues
-    // changed upstream, e.g. the async default-filter fetch resolving) is a reinit, not a
-    // user-driven filter change. Skip those, otherwise this fires its own history.push
-    // right on top of the one FilterForm's own defaultValues effect already replaces.
-    //
-    // initialValues is read from this same FormSpy subscription as values, rather than
-    // from the defaultValues prop directly, so both always come from the same final-form
-    // notification and can never be one render out of step with each other - an earlier
-    // version read defaultValues as a separate prop and intermittently consumed its
-    // "changed" signal in a render where values hadn't caught up to the reinit yet,
-    // causing the *next* render (where values finally did reflect it) to wrongly treat
-    // the reinit as a user edit and fire an extra, unwanted history.push.
-    //
-    // initialValues (rather than pristine, the original approach before that) matters
-    // because pristine also flips to true whenever the user edits a field back to its
-    // initial value by hand, which would wrongly skip that perfectly valid, user-driven
-    // change and leave the results stale until the next edit or a manual Search click.
-    const initialValuesChanged = !_.isEqual(initialValues, prevInitialValuesRef.current);
-
-    if (previous !== null && !initialValuesChanged && !_.isEqual(current, previous)) {
+    if (previous !== null && !_.isEqual(current, previous)) {
       onSubmit();
     }
     prevValuesRef.current = values;
-    prevInitialValuesRef.current = initialValues;
-  }, [values, initialValues]);
+  }, [values]);
 
   return null;
 };
@@ -105,12 +82,10 @@ const FilterForm = ({
   };
 
   // Default values can change based on currentLocation
-  // or any async data defaultValues are waiting for. This is not a user-driven filter
-  // change, so replace the current history entry instead of pushing a new one -
-  // otherwise the browser back button gets stuck cycling through these syncs.
+  // or any async data defaultValues are waiting for
   useEffect(() => {
     if (!disableAutoUpdateFilterParams) {
-      updateFilterParams({ ...defaultValues }, { replace: true });
+      updateFilterParams({ ...defaultValues });
     }
   }, [defaultValues]);
 
@@ -165,20 +140,8 @@ const FilterForm = ({
     return allFiltersEmpty || requiredFiltersMissing;
   };
 
-  // No initial value on purpose: this makes the very first execution of the effect
-  // below always see a falsy previousLocationId and skip, whether currentLocation is
-  // already resolved by the time this component first mounts or not.
-  const previousLocationIdRef = useRef();
-
   useEffect(() => {
-    const previousLocationId = previousLocationIdRef.current;
-    previousLocationIdRef.current = currentLocation?.id;
-
-    // Only clear filters on a genuine facility switch - not the first time
-    // currentLocation resolves from its unset placeholder during session bootstrap,
-    // which isn't a user-driven change and shouldn't wipe defaults (e.g. the putaway
-    // list's default OPEN status filter) that were just correctly applied.
-    if (previousLocationId && formRef.current) {
+    if (formRef.current) {
       onClearHandler(formRef.current);
     }
   }, [currentLocation?.id]);
@@ -201,13 +164,12 @@ const FilterForm = ({
           return (
             <form onSubmit={handleSubmit} className="w-100 m-0">
               {autoSubmitOnFilterChange && (
-                <FormSpy subscription={{ values: true, initialValues: true }}>
-                  {({ values: formValues, initialValues: formInitialValues }) => (
+                <FormSpy subscription={{ values: true }}>
+                  {({ values: formValues }) => (
                     <AutoSubmitOnChange
                       values={formValues}
                       excludeField={searchFieldId}
                       onSubmit={handleSubmit}
-                      initialValues={formInitialValues}
                     />
                   )}
                 </FormSpy>
