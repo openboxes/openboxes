@@ -39,6 +39,7 @@ import VerticalStripeIndicator from 'utils/VerticalStripeIndicator';
 const useReceivingColumns = ({
   view,
   putawayEnabled,
+  hasPreviousReceipts,
   sortableProps,
   sort,
   order,
@@ -381,6 +382,72 @@ const useReceivingColumns = ({
         },
         size: 100,
       }),
+      ...(hasPreviousReceipts ? [
+        columnHelper.display({
+          id: receivingColumns.QUANTITY_RECEIVED,
+          header: () => (
+            <TableHeaderCell
+              tooltip
+              tooltipLabel={translate(
+                'react.receiving.received.tooltip.label',
+                'Quantity already received in previous receipts',
+              )}
+              className="receiving-table__quantity"
+            >
+              {translate('react.receiving.received.label', 'Received')}
+            </TableHeaderCell>
+          ),
+          cell: ({ row, table }) => {
+            const item = getItem(row, table);
+            if (isSplitItemOrToggle(item)) {
+              return null;
+            }
+            const value = formatNumber(item?.quantityReceived);
+            return (
+              <ValueCell
+                value={value}
+                tooltipLabel={value}
+                className="receiving-table__quantity"
+                label="react.receiving.received.label"
+                defaultLabel="Received"
+              />
+            );
+          },
+          size: 110,
+        }),
+        columnHelper.display({
+          id: receivingColumns.QUANTITY_TO_RECEIVE,
+          header: () => (
+            <TableHeaderCell
+              tooltip
+              tooltipLabel={translate(
+                'react.receiving.toReceive.tooltip.label',
+                'Quantity that is available to receive in this receipt (Quantity shipped - Quantity Received)',
+              )}
+              className="receiving-table__quantity"
+            >
+              {translate('react.receiving.toReceive.label', 'To Receive')}
+            </TableHeaderCell>
+          ),
+          cell: ({ row, table }) => {
+            const item = getItem(row, table);
+            if (isSplitItemOrToggle(item)) {
+              return null;
+            }
+            const value = formatNumber(item?.quantityAvailableToReceive);
+            return (
+              <ValueCell
+                value={value}
+                tooltipLabel={value}
+                className="receiving-table__quantity"
+                label="react.receiving.toReceive.label"
+                defaultLabel="To Receive"
+              />
+            );
+          },
+          size: 110,
+        }),
+      ] : []),
       columnHelper.display({
         id: receivingColumns.QUANTITY_RECEIVING,
         meta: { arrowNavigable: true },
@@ -594,6 +661,7 @@ const useReceivingColumns = ({
     currentLocale,
     isPackingListView,
     putawayEnabled,
+    hasPreviousReceipts,
     hasBinLocationSupport,
     isShipmentFromPurchaseOrder,
     binLocations,
