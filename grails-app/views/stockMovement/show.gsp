@@ -256,16 +256,18 @@
                                     <warehouse:message code="stockMovement.redoAllocation.label" default="Redo Allocation"/>
                                 </g:link>
                             </g:else>
-                            <g:link
-                                    controller="requisition"
-                                    action="unassignPicker"
-                                    id="${stockMovement?.requisition?.id}"
-                                    class="button"
-                                    onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
-                            >
-                                <img src="${resource(dir: 'images/icons/silk/', file: 'user_delete.png')}" />&nbsp;
-                                Unassign picker
-                            </g:link>
+                            <g:if test="${currentAssignee}">
+                                <g:link
+                                        controller="requisition"
+                                        action="unassignPicker"
+                                        id="${stockMovement?.requisition?.id}"
+                                        class="button"
+                                        onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                >
+                                    <img src="${resource(dir: 'images/icons/silk/', file: 'user_delete.png')}" />&nbsp;
+                                    Unassign picker
+                                </g:link>
+                            </g:if>
                             <a href="javascript:void(0);" class="button btn-show-dialog"
                                data-height="200" data-width="500"
                                data-title="Reassign picker"
