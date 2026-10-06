@@ -48,7 +48,7 @@ import org.pih.warehouse.LocalizationUtil
  * 20 mg tablets vs a 50 count bottle of 20 mg tablets will both be stored
  * as 20 mg tablets).
  */
-class Product extends BaseDomain<Product> implements DomainValidatable<ProductValidator> {
+class Product extends BaseDomain implements Comparable, DomainValidatable<ProductValidator> {
 
     def publishPersistenceEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new InventorySnapshotEvent(this))
@@ -690,7 +690,7 @@ class Product extends BaseDomain<Product> implements DomainValidatable<ProductVa
      * Sort by name
      */
     @Override
-    int compareTo(Product obj) {
+    int compareTo(obj) {
         return name <=> obj?.name ?: id <=> obj?.id
     }
 
