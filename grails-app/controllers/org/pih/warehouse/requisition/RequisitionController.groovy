@@ -360,7 +360,12 @@ class RequisitionController {
     }
 
     def unassignPicker() {
-        def requisition = Requisition.get(params?.id)
+        Requisition requisition = Requisition.get(params?.id)
+        if (!requisition) {
+            flash.error = warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])
+            redirect(controller: "stockMovement", action: "show", id: params.id)
+            return
+        }
         try {
             pickTaskService.unassign(requisition)
             flash.message = g.message(code: 'picklist.unassign.success.message', default: 'Picker was unassigned and the order was returned to the pick queue')
@@ -371,7 +376,12 @@ class RequisitionController {
     }
 
     def reassignPicker() {
-        def requisition = Requisition.get(params?.id)
+        Requisition requisition = Requisition.get(params?.id)
+        if (!requisition) {
+            flash.error = warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])
+            redirect(controller: "stockMovement", action: "show", id: params.id)
+            return
+        }
         try {
             pickTaskService.reassign(requisition, params?.assigneeId)
             flash.message = g.message(code: 'picklist.reassign.success.message', default: 'Picker was reassigned')
