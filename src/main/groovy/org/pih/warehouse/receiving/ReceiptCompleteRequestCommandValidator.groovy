@@ -22,6 +22,7 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
                 validateItemsToCompleteBelongToReceipt(command),
                 validateCancelRemainingOnlyOnOriginalItems(command),
                 validateBinLocationIsPresent(command),
+                validateBinLocationsEnabled(command),
                 validateProductLotAndExpiryControl(command),
         )
     }
@@ -163,6 +164,29 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
                 rejectField("receipt", command.receipt,
                         "receiptCompleteRequestCommand.receipt.binLocationMissing", [itemIds.toString()]) :
                 null
+    }
+
+    /**
+     * Do not allow receiving on bins that are disabled.
+     */
+    private List<ObjectError> validateBinLocationsEnabled(ReceiptCompleteRequestCommand command) {
+        Set<ReceiptItem> receiptItems = command.receipt?.receiptItems
+        if (!receiptItems) {
+            return null
+        }
+
+        List<ObjectError> errors = []
+        for (receiptItem in receiptItems) {
+            Location binLocation = receiptItem.binLocation
+            if (binLocation != null && !binLocation.active) {
+                errors.add(rejectField("receipt", command.receipt,
+                        "receiptCompleteRequestCommand.receipt.binLocationInactive",
+                        [binLocation.locationNumber, receiptItem.id],
+                ))
+            }
+        }
+
+        return errors
     }
 
     /**
