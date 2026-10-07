@@ -69,7 +69,7 @@ class ReceiptTransactionManager {
         receivedItems.each { ReceiptItem receiptItem ->
             // Receipt items created via the v2 endpoints always carry an inventory item, but fall back to resolving
             // one from the lot fields to support receipts against legacy shipment items that never had one.
-            InventoryItem inventoryItem = receiptItem.inventoryItem ?: inventoryItemManager.getOrCreateInventoryItem(
+            InventoryItem inventoryItem = receiptItem.inventoryItem ?: inventoryItemManager.upsertInventoryItem(
                     receiptItem.product, receiptItem.lotNumber, receiptItem.expirationDate)
 
             transaction.addToTransactionEntries(new TransactionEntry(

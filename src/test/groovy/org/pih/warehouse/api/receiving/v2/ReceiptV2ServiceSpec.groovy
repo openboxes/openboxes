@@ -20,19 +20,19 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.core.mapper.SmartMapper
-import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryItemByProductLot
 import org.pih.warehouse.inventory.InventoryItemManager
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.inventory.TransactionAction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionIdentifierService
 import org.pih.warehouse.inventory.TransactionSource
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.lot.ProductLot
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptCompleteRequestCommand
 import org.pih.warehouse.receiving.ReceiptDto
@@ -716,13 +716,13 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
                 )],
         )
 
+        and: 'the item exists as is'
+        stubUpsertInventoryItem(splitLot, splitLot.expirationDate)
+
         when:
         service.editReceivingInfo(command)
 
-        then:
-        1 * inventoryItemManager.getOrCreateInventoryItem(shipmentItem.product, "LOT-2", null) >> splitLot
-
-        and: 'the new line is flagged as a split server-side and carries no quantity shipped of its own'
+        then: 'the new line is flagged as a split server-side and carries no quantity shipped of its own'
         ReceiptItem splitItem = receipt.receiptItems.find { it.isSplitItem }
         assert splitItem.quantityShipped == 0
         assert splitItem.quantityReceived == 30
@@ -749,14 +749,13 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
                 )],
         )
 
+        and: 'the item exists as is'
+        stubUpsertInventoryItem(shipmentItem.inventoryItem, shipmentItem.inventoryItem.expirationDate)
+
         when:
         service.editReceivingInfo(command)
 
-        then:
-        1 * inventoryItemManager.getOrCreateInventoryItem(shipmentItem.product, "LOT-1", null) >>
-                shipmentItem.inventoryItem
-
-        and: 'only the receiving info changes - the line stays the original with its full quantity shipped'
+        then: 'only the receiving info changes - the line stays the original with its full quantity shipped'
         assert originalItem.quantityReceived == 60
         assert originalItem.isSplitItem == Boolean.FALSE
         assert originalItem.quantityShipped == 100
@@ -784,19 +783,13 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
                 )],
         )
 
+        and: 'the item exists but the expiration has changed'
+        stubUpsertInventoryItem(shipmentItem.inventoryItem, expectedExpirationDate)
+
         when:
         service.editReceivingInfo(command)
 
-        then: 'the date is pushed onto the existing lot, which getOrCreateInventoryItem alone would have left as is'
-        1 * inventoryItemManager.getOrCreateInventoryItem(shipmentItem.product, "LOT-1", expectedExpirationDate) >>
-                shipmentItem.inventoryItem
-        1 * inventoryItemManager.updateExpirationDate(shipmentItem.inventoryItem, expectedExpirationDate) >>
-                { InventoryItem inventoryItem, Date expirationDate ->
-                    inventoryItem.expirationDate = expirationDate
-                    return inventoryItem
-                }
-
-        and: 'the received line follows the lot'
+        then: 'the received line follows the lot'
         assert originalItem.expirationDate == expectedExpirationDate
     }
 
@@ -820,19 +813,13 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
                 )],
         )
 
+        and: 'the item exists but the expiration has been nulled'
+        stubUpsertInventoryItem(shipmentItem.inventoryItem, null)
+
         when:
         service.editReceivingInfo(command)
 
-        then: 'the emptied date reaches the lot instead of being dropped on the way'
-        1 * inventoryItemManager.getOrCreateInventoryItem(shipmentItem.product, "LOT-1", null) >>
-                shipmentItem.inventoryItem
-        1 * inventoryItemManager.updateExpirationDate(shipmentItem.inventoryItem, null) >>
-                { InventoryItem inventoryItem, Date expirationDate ->
-                    inventoryItem.expirationDate = expirationDate
-                    return inventoryItem
-                }
-
-        and: 'the received line follows the lot'
+        then: 'the received line follows the lot'
         assert originalItem.expirationDate == null
     }
 
@@ -1289,6 +1276,25 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
     // ----------------------------------------------------------------------------------------------------------
     // Fixture helpers
     // ----------------------------------------------------------------------------------------------------------
+
+    private stubUpsertInventoryItem(InventoryItem expectedInventoryItem = null, Date updatedExpirationDate = null) {
+        inventoryItemManager.upsertInventoryItems(_ as Collection<ProductLot>) >> {
+
+            // Stub updating the expiration date
+            expectedInventoryItem.expirationDate = updatedExpirationDate
+
+            // Then return the item
+            InventoryItemByProductLot inventoryItemMap = new InventoryItemByProductLot()
+            inventoryItemMap.put(
+                    new ProductLot(
+                            product: expectedInventoryItem.product,
+                            lotNumber: expectedInventoryItem.lotNumber,
+                    ),
+                    expectedInventoryItem)
+
+            return inventoryItemMap
+        }
+    }
 
     private static Container buildPallet(String name, Integer sortOrder) {
         return new Container(name: name, sortOrder: sortOrder)

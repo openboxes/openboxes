@@ -1474,7 +1474,7 @@ class InventoryService implements ApplicationContextAware {
             }
             // ...Then get/create them all in bulk. Don't refresh product availability for any newly created items.
             // We will manually perform a product availability refresh at the end.
-            InventoryItemByProductLot inventoryItemMap = inventoryItemManager.getOrCreateInventoryItems(
+            InventoryItemByProductLot inventoryItemMap = inventoryItemManager.upsertInventoryItems(
                     itemsToGetOrCreate, true)
 
             // 3. Process each row added to the record inventory page
