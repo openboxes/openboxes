@@ -359,6 +359,7 @@ class UserService {
                         ilike("firstName", "%" + term + "%")
                         ilike("lastName", "%" + term + "%")
                         ilike("email", "%" + term + "%")
+                        ilike("identifier", "%" + term + "%")
                     }
                 }
             }
@@ -377,6 +378,7 @@ class UserService {
                     like("lastName", query)
                     like("email", query)
                     like("username", query)
+                    like("identifier", query)
                 }
             }
             if (params.status) {
