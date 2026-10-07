@@ -1887,8 +1887,7 @@ class InventoryService implements ApplicationContextAware {
      * @return
      */
     List<TransactionEntry> getTransactionEntriesByInventoryAndBinLocation(Inventory inventory, Location binLocation) {
-        def criteria = TransactionEntry.createCriteria()
-        def transactionEntries = criteria.list {
+        List<TransactionEntry> transactionEntries = TransactionEntry.createCriteria().list {
             transaction {
                 eq("inventory", inventory)
                 order("transactionDate", "asc")

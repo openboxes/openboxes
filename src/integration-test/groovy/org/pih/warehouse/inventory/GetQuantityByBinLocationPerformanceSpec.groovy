@@ -1,5 +1,8 @@
 package org.pih.warehouse.inventory
 
+import org.hibernate.SessionFactory
+
+import javax.sql.DataSource
 import java.sql.Timestamp
 
 import groovy.sql.Sql
@@ -23,9 +26,9 @@ class GetQuantityByBinLocationPerformanceSpec extends IntegrationSpec {
     static final int BIN_COUNT = 50
     static final int TARGET_BIN_ITEM_COUNT = 50
 
-    def inventoryService
-    def sessionFactory
-    def dataSource
+    InventoryService inventoryService
+    SessionFactory sessionFactory
+    DataSource dataSource
 
     @Shared
     Location facility
