@@ -60,7 +60,9 @@ SELECT
     SUM(CASE WHEN product_availability.quantity_on_hand < 0 THEN 1 ELSE 0 END)       as negative_item_count,
 
     -- Date last counted and derived properties
-    -- MAX is for ONLY_FULL_GROUP_BY. The subquery has at most one row per inventory and product, so it returns the value from that row.
+    -- The nested query on cycle_count_metadata guarantees that we will always have at most one record per group since
+    --  records are unique on inventory + product.
+    -- We add MAX to each field here solely for avoiding ONLY_FULL_GROUP_BY SQL errors.
     MAX(cycle_count_metadata.date_counted)                                           as date_last_count,
     MAX(cycle_count_metadata.days_since_last_count)                                  as days_since_last_count,
     MAX(cycle_count_metadata.date_expected)                                          as date_next_count,
