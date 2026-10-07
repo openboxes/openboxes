@@ -1277,7 +1277,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
     // Fixture helpers
     // ----------------------------------------------------------------------------------------------------------
 
-    private stubUpsertInventoryItem(InventoryItem expectedInventoryItem = null, Date updatedExpirationDate = null) {
+    private stubUpsertInventoryItem(InventoryItem expectedInventoryItem, Date updatedExpirationDate = null) {
         inventoryItemManager.upsertInventoryItems(_ as Collection<ProductLot>) >> {
 
             // Stub updating the expiration date
