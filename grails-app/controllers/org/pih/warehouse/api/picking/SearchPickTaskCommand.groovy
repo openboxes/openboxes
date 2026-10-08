@@ -11,10 +11,6 @@ class SearchPickTaskCommand implements Validateable {
     DeliveryTypeCode deliveryTypeCode
     Integer ordersCount
     String assigneeId
-    // Id of the user making the request, used only to let requisitions already assigned to them
-    // through the excludeAssignedRequisitions filter. Distinct from assigneeId, which is a hard
-    // filter restricting results to tasks assigned to that person.
-    String currentUserId
     List<PickTaskStatus> status
     Integer priority
     String outboundContainerId
@@ -26,7 +22,6 @@ class SearchPickTaskCommand implements Validateable {
         deliveryTypeCode nullable: true
         ordersCount nullable: true
         assigneeId nullable: true
-        currentUserId nullable: true
         status nullable: true
         priority nullable: true
         outboundContainerId nullable: true
