@@ -190,6 +190,40 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
         assert result.valid
     }
 
+    void 'doValidate should reject completing lines that receive into an inactive bin'() {
+        given:
+        Receipt receipt = buildPendingReceipt()
+        buildReceiptItem(receipt, false, 10,
+                new Location(locationNumber: "ACTIVE-BIN", active: true))
+        ReceiptItem itemInInactiveBin1 = buildReceiptItem(receipt, true, 5,
+                new Location(locationNumber: "INACTIVE-BIN-1", active: false))
+        ReceiptItem itemInInactiveBin2 = buildReceiptItem(receipt, true, 5,
+                new Location(locationNumber: "INACTIVE-BIN-2", active: false))
+
+        when:
+        ObjectValidationResult result = validator.doValidate(new ReceiptCompleteRequestCommand(receipt: receipt))
+
+        then:
+        assert !result.valid
+        assert result.errors*.code == [
+                "receiptCompleteRequestCommand.receipt.binLocationInactive",
+                "receiptCompleteRequestCommand.receipt.binLocationInactive",
+        ]
+        assert result.errors*.arguments*.toList() as Set == [
+                ["INACTIVE-BIN-1", itemInInactiveBin1.id],
+                ["INACTIVE-BIN-2", itemInInactiveBin2.id],
+        ] as Set
+    }
+
+    void 'doValidate should accept completing lines that receive into active bins'() {
+        given:
+        Receipt receipt = buildPendingReceipt()
+        buildReceiptItem(receipt, false, 10, new Location(locationNumber: "BIN-1", active: true))
+
+        expect:
+        assert validator.doValidate(new ReceiptCompleteRequestCommand(receipt: receipt)).valid
+    }
+
     void 'doValidate should reject a split item with lot: #lotNumber and expiry: #expirationDate when lotAndExpiryControl is enabled'() {
         given: 'a pending receipt for a split item on a product with lotAndExpiryControl enabled'
         Receipt receipt = buildPendingReceipt()

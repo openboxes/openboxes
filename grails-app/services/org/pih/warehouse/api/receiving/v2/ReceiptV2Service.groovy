@@ -16,9 +16,11 @@ import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryItemByProductLot
 import org.pih.warehouse.inventory.InventoryItemManager
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.product.lot.ProductLot
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptCompleteRequestCommand
 import org.pih.warehouse.receiving.ReceiptDto
@@ -200,32 +202,41 @@ class ReceiptV2Service {
      * to the one shipment item identified in the URL, and without support for deletes.
      *
      * The receipt and shipment item are carried (and validated as existing/pending) by the command, so this assumes a
-     * validated command - see {@link ReceiptEditReceivingInfoCommandValidator}.
+     * validated command - see {@link org.pih.warehouse.receiving.ReceiptEditReceivingInfoCommandValidator}.
      */
     @Transactional
     ReceiptSaveResponseDto editReceivingInfo(ReceiptEditReceivingInfoCommand command) {
+
+        // Create any new inventory items in bulk upfront in case there are multiple rows that use the same new lot.
+        InventoryItemByProductLot inventoryItemMap = upsertInventoryItems(command.itemsToSave)
+
         List<ReceiptItemSaveDto> updatedLines =
                 command.itemsToSave.collect { ReceiptItemEditReceivingInfoRequest item ->
-                    upsertReceiptItem(command.receipt, command.shipmentItem, item)
+                    InventoryItem inventoryItem = inventoryItemMap.get(item.product, item.lotNumber)
+                    upsertReceiptItem(command.receipt, command.shipmentItem, item, inventoryItem)
                 }
 
         return new ReceiptSaveResponseDto(updatedLines: updatedLines)
     }
 
+    private InventoryItemByProductLot upsertInventoryItems(List<ReceiptItemEditReceivingInfoRequest> receiptItems) {
+        List<ProductLot> itemsToGetOrCreate = receiptItems.collect {
+            new ProductLot(
+                    product: it.product,
+                    lotNumber: it.lotNumber,
+                    expirationDate: it.expirationDate ? JavaUtilDateParser.asDate(it.expirationDate) : null,
+            )
+        }
+        return inventoryItemManager.upsertInventoryItems(itemsToGetOrCreate)
+    }
+
     /**
-     * Creates or updates a single receipt item from an edit-receiving-info request. The inventory item is resolved
-     * (and created if necessary) from the requested product + lot number + expiration date and is potentially swapped
-     * onto the receipt item, which is what allows the lot to be edited.
+     * Creates or updates a single receipt item from an edit-receiving-info request.
      */
-    private ReceiptItemSaveDto upsertReceiptItem(
-            Receipt receipt, ShipmentItem shipmentItem, ReceiptItemEditReceivingInfoRequest item) {
-        // InventoryItem.expirationDate is a (legacy) java.util.Date, so convert the request's date-only LocalDate at
-        // the domain boundary. asDate resolves it to start-of-day in the system zone, so the stored Date and its
-        // MM/dd/yyyy formatting (see the InventoryItem JSON marshaller) stay identical to before.
-        Date expirationDate = item.expirationDate ? JavaUtilDateParser.asDate(item.expirationDate) : null
-        InventoryItem inventoryItem = inventoryItemManager.getOrCreateInventoryItem(
-                item.product, item.lotNumber, expirationDate)
-        inventoryItemManager.updateExpirationDate(inventoryItem, expirationDate)
+    private ReceiptItemSaveDto upsertReceiptItem(Receipt receipt,
+                                                 ShipmentItem shipmentItem,
+                                                 ReceiptItemEditReceivingInfoRequest item,
+                                                 InventoryItem inventoryItem) {
 
         // Lines created here are split lines - the original line always exists already (created when the receipt
         // was started), so the split flag is owned by the server: forced on creation, never rebound afterwards.
@@ -314,7 +325,7 @@ class ReceiptV2Service {
      * the follow-up notifications and the product availability refresh.
      *
      * The receipt is bound and validated (as existing and pending, with the items belonging to it) by the command,
-     * so this assumes a validated command - see {@link ReceiptCompleteRequestCommandValidator}.
+     * so this assumes a validated command - see {@link org.pih.warehouse.receiving.ReceiptCompleteRequestCommandValidator}.
      */
     @Transactional
     ReceiptDto completeReceipt(ReceiptCompleteRequestCommand command) {
