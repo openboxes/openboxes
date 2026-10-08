@@ -2,16 +2,13 @@ package org.pih.warehouse.allocation
 
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
-import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionStatus
 import org.springframework.http.HttpStatus
 
 @Transactional
 class AllocationApiController {
 
     AllocationService allocationService
-    StockMovementService stockMovementService
 
     def allocate() {
         Requisition requisition = Requisition.get(params.id)
@@ -27,9 +24,7 @@ class AllocationApiController {
             List<AllocationSourceStrategy> strategies = parseStrategies(jsonBody.strategies)
 
             List<AllocationResult> results = allocationService.allocate(requisition, mode, strategies)
-            if (results && !results.empty) {
-                stockMovementService.updateRequisitionStatus(requisition.id, RequisitionStatus.PICKING)
-            }
+            allocationService.completeAllocation(requisition, results.any { it.suggestedItems })
 
             render([data: results] as JSON)
         } catch (Exception e) {
