@@ -118,7 +118,7 @@ class ReceiptTransactionManagerSpec extends Specification implements DataTest {
         assert entry.quantity == 70
 
         and: 'no inventory item is resolved for the lines that were left out'
-        0 * inventoryItemManager.getOrCreateInventoryItem(_, _, _)
+        0 * inventoryItemManager.upsertInventoryItem(_, _, _)
     }
 
     void 'deleteTransactionSourcesForReceipts should clear the transaction that the source it deletes stamps'() {
@@ -155,7 +155,7 @@ class ReceiptTransactionManagerSpec extends Specification implements DataTest {
         Transaction transaction = receiptTransactionManager.createInboundTransaction(receipt)
 
         then:
-        1 * inventoryItemManager.getOrCreateInventoryItem(receiptItem.product, "LOT-9", expirationDate) >> resolvedInventoryItem
+        1 * inventoryItemManager.upsertInventoryItem(receiptItem.product, "LOT-9", expirationDate) >> resolvedInventoryItem
         assert transaction.transactionEntries.first().inventoryItem == resolvedInventoryItem
     }
 
