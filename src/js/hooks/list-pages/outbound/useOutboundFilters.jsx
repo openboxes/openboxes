@@ -8,7 +8,9 @@ import { useHistory } from 'react-router-dom';
 import { fetchAvailableApprovers, fetchRequisitionStatusCodes, fetchShipmentTypes } from 'actions';
 import filterFields from 'components/stock-movement/outbound/FilterFields';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import getPriorityLevelOptions from 'consts/priorityLevel';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
+import useTranslate from 'hooks/useTranslate';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
 import { fetchLocationById, fetchUserById, selectNullOption } from 'utils/option-utils';
 
@@ -19,6 +21,7 @@ const useOutboundFilters = (sourceType) => {
 
   const history = useHistory();
   const dispatch = useDispatch();
+  const translate = useTranslate();
   const {
     requisitionStatuses,
     currentLocation,
@@ -119,6 +122,11 @@ const useOutboundFilters = (sourceType) => {
       const shipTypes = getParamList(queryProps.shipmentType);
       defaultValues.shipmentType = shipmentTypes.filter(({ id }) => shipTypes.includes(id));
     }
+    if (queryProps.priorityLevel) {
+      const priorityLevels = getParamList(queryProps.priorityLevel);
+      defaultValues.priorityLevel = getPriorityLevelOptions(translate)
+        .filter(({ id }) => priorityLevels.includes(id));
+    }
     if (sourceType === 'ELECTRONIC' && queryProps.approver) {
       const approvers = getParamList(queryProps.approver);
       defaultValues.approver = availableApprovers.filter(({ id }) => approvers.includes(id));
@@ -173,6 +181,7 @@ const useOutboundFilters = (sourceType) => {
       receiptStatusCode: { name: 'receiptStatusCode' },
       shipmentType: { name: 'shipmentType', accessor: 'id' },
       approver: { name: 'approver', accessor: 'id' },
+      priorityLevel: { name: 'priorityLevel', accessor: 'id' },
     };
 
     const transformedParams = transformFilterParams(values, filterAccessors);
