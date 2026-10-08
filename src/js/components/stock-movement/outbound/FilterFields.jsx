@@ -1,6 +1,7 @@
 import DateFilter from 'components/form-elements/DateFilter/DateFilter';
 import FilterSelectField from 'components/form-elements/FilterSelectField';
 import DateFormat from 'consts/dateFormat';
+import getPriorityLevelOptions from 'consts/priorityLevel';
 
 export default (isRequest) => ({
   requisitionStatusCode: {
@@ -176,6 +177,21 @@ export default (isRequest) => ({
       defaultPlaceholder: 'Request type',
       showLabelTooltip: true,
     },
+  },
+  priorityLevel: {
+    type: FilterSelectField,
+    attributes: {
+      multi: true,
+      filterElement: true,
+      placeholder: 'react.stockMovement.outbound.filters.priority.label',
+      defaultPlaceholder: 'Priority',
+      showLabelTooltip: true,
+      closeMenuOnSelect: false,
+      blurInputOnSelect: false,
+    },
+    getDynamicAttr: ({ translate }) => ({
+      options: getPriorityLevelOptions(translate),
+    }),
   },
   createdAfter: {
     type: DateFilter,
