@@ -212,7 +212,8 @@ class ReceiptV2Service {
 
         List<ReceiptItemSaveDto> updatedLines =
                 command.itemsToSave.collect { ReceiptItemEditReceivingInfoRequest item ->
-                    upsertReceiptItem(command.receipt, command.shipmentItem, item, inventoryItemMap)
+                    InventoryItem inventoryItem = inventoryItemMap.get(item.product, item.lotNumber)
+                    upsertReceiptItem(command.receipt, command.shipmentItem, item, inventoryItem)
                 }
 
         return new ReceiptSaveResponseDto(updatedLines: updatedLines)
@@ -235,10 +236,7 @@ class ReceiptV2Service {
     private ReceiptItemSaveDto upsertReceiptItem(Receipt receipt,
                                                  ShipmentItem shipmentItem,
                                                  ReceiptItemEditReceivingInfoRequest item,
-                                                 InventoryItemByProductLot inventoryItemMap) {
-
-        // We've already fetched/created the inventory items, so simply get the one associated with the receipt item.
-        InventoryItem inventoryItem = inventoryItemMap.get(item.product, item.lotNumber)
+                                                 InventoryItem inventoryItem) {
 
         // Lines created here are split lines - the original line always exists already (created when the receipt
         // was started), so the split flag is owned by the server: forced on creation, never rebound afterwards.
