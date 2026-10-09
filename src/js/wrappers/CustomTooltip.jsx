@@ -24,6 +24,7 @@ const CustomTooltip = ({
         // tooltip to display. Setting a blank title hides the tooltip in this scenario.
         title=" "
         className="w-100"
+        style={{ display: 'block' }}
         html={<div className={`p-2 tooltip-dark-blue ${!content && 'd-none'}`}>{content}</div>}
       >
         <div className="flex items-center">

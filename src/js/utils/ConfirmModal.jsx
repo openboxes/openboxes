@@ -17,6 +17,7 @@ const ConfirmModal = ({
 }) => (
   <div
     className={`d-flex flex-column custom-modal-content justify-content-between bg-white ${className}`}
+    data-testid="confirm-modal"
   >
     <div className="d-flex justify-content-between">
       {(title?.label && title?.default)
