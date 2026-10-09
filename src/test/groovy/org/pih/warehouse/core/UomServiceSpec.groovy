@@ -48,15 +48,10 @@ class UomServiceSpec extends Specification implements ServiceUnitTest<UomService
     void 'getProductPackage should return #expectedPackageName for product #productCode, uom #uomCode and quantity #quantity'() {
         given:
         Product productWithPackages = new Product(productCode: 'P1').save(validate: false, flush: true)
-        Product productWithSupplierPackageOnly = new Product(productCode: 'P2').save(validate: false, flush: true)
-        new Product(productCode: 'P3').save(validate: false, flush: true)
-        ProductSupplier productSupplier = new ProductSupplier(name: 'Supplier', product: productWithSupplierPackageOnly)
-                .save(failOnError: true, flush: true)
+        new Product(productCode: 'P2').save(validate: false, flush: true)
         new ProductPackage(name: 'Box of 10', product: productWithPackages, uom: packageUom, quantity: 10)
                 .save(failOnError: true, flush: true)
         new ProductPackage(name: 'Box of 20', product: productWithPackages, uom: packageUom, quantity: 20)
-                .save(failOnError: true, flush: true)
-        new ProductPackage(name: 'Supplier box of 10', product: productWithSupplierPackageOnly, uom: packageUom, quantity: 10, productSupplier: productSupplier)
                 .save(failOnError: true, flush: true)
 
         when:
@@ -72,6 +67,17 @@ class UomServiceSpec extends Specification implements ServiceUnitTest<UomService
         'P1'        | 'BX'    | 5        || null
         'P1'        | 'USD'   | 10       || null
         'P2'        | 'BX'    | 10       || null
-        'P3'        | 'BX'    | 10       || null
+    }
+
+    void 'getProductPackage should not return package assigned to product supplier'() {
+        given:
+        Product product = new Product(productCode: 'P1').save(validate: false, flush: true)
+        ProductSupplier productSupplier = new ProductSupplier(name: 'Supplier', product: product)
+                .save(failOnError: true, flush: true)
+        new ProductPackage(name: 'Supplier box of 10', product: product, uom: packageUom, quantity: 10, productSupplier: productSupplier)
+                .save(failOnError: true, flush: true)
+
+        expect:
+        service.getProductPackage(product, packageUom, 10) == null
     }
 }

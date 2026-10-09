@@ -28,8 +28,8 @@ class UnitOfMeasureApiSpec extends ApiSpec {
 
     @Override
     void cleanupData() {
-        UnitOfMeasure.get(currencyUom.id)?.delete()
-        UnitOfMeasure.get(quantityUom.id)?.delete()
+        currencyUom?.delete()
+        quantityUom?.delete()
     }
 
     void 'get currencies should return unit of measures of currency type'() {
