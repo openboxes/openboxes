@@ -101,6 +101,11 @@ class UrlMappings {
             action = [GET: "usersOptions"]
         }
 
+        "/api/users/$userId/roles" {
+            controller = "userRoleApi"
+            action = [GET: "getUserRoles"]
+        }
+
         "/api/preferenceTypeOptions" {
             controller = { "selectOptionsApi" }
             action = [GET: "preferenceTypeOptions"]
