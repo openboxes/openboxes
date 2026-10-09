@@ -93,14 +93,7 @@ class PickTaskApiController extends RestfulController<PickTask> {
     def drop() {
         def jsonBody = request.JSON ?: [:]
         String outboundContainerId = params.outboundContainerId
-        try {
-            pickTaskService.drop(outboundContainerId, jsonBody)
-        } catch (Exception e) {
-            response.status = 500
-            render([errorCode: 500, errorMessage: e?.message ?: "Error occurred"] as JSON)
-            return
-        }
-
+        pickTaskService.drop(outboundContainerId, jsonBody)
         render status: 200
     }
 }

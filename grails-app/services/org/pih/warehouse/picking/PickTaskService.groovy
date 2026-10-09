@@ -11,6 +11,7 @@ import org.pih.warehouse.api.picking.SearchPickTaskCommand
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.RequisitionEvent
 import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.core.Person
@@ -42,6 +43,7 @@ class PickTaskService {
     StockMovementService stockMovementService
     WebhookPublisherService webhookPublisherService
     RequisitionService requisitionService
+    LocationService locationService
 
     @Transactional(readOnly = true)
     List<PickTask> search(SearchPickTaskCommand command, Map params = [:]) {
@@ -363,7 +365,8 @@ class PickTaskService {
         switch (data?.action) {
 
             case 'drop':
-                dropToStaging(outboundContainer, data.stagingLocationId as String, data.stagedById as String)
+                dropToStaging(outboundContainer, data.stagingLocationId as String, data.stagedById as String,
+                        data.overrideStagingLocationZone as Boolean ?: false)
                 break
 
             default:
@@ -422,7 +425,8 @@ class PickTaskService {
         task.status = to
     }
 
-    void dropToStaging(Location outboundContainer, String stagingLocationId, String stagedById) {
+    void dropToStaging(Location outboundContainer, String stagingLocationId, String stagedById,
+                        boolean overrideStagingLocationZone = false) {
         Location stagingLocation = Location.findByLocationNumberOrId(stagingLocationId, stagingLocationId)
         validateStagingLocation(stagingLocation)
 
@@ -431,6 +435,13 @@ class PickTaskService {
         if (!itemsToMove) {
             throw new IllegalStateException("Outbound container with number ${outboundContainer.locationNumber} is empty")
         }
+
+        // Validate the zone for every task up front so the drop fails atomically rather than
+        // partially transferring stock before hitting a mismatch on a later item.
+        List<PickTask> allTasks = itemsToMove.collectMany { item ->
+            PickTask.findAllByOutboundContainerAndInventoryItemAndStatus(outboundContainer, item.inventoryItem, PickTaskStatus.PICKED)
+        }.unique { it.id }
+        allTasks.each { task -> validateStagingLocationZone(stagingLocation, task, overrideStagingLocationZone) }
 
         Person stagedBy = Person.get(stagedById)
         itemsToMove.each { item ->
@@ -647,6 +658,38 @@ class PickTaskService {
 
         if (!stagingLocation.supports(ActivityCode.HOLD_STOCK)) {
             throw new IllegalArgumentException("Staging location ${stagingLocation.name} does not support ${ActivityCode.HOLD_STOCK} activity")
+        }
+    }
+
+    // Zone-level check, on top of validateStagingLocation's bin-capability check. Opt-in per
+    // facility via ActivityCode.VALIDATE_STAGING_LOCATION_ZONE so behaviour can be tuned per
+    // facility rather than hard-coded (OBLS-853). Fails closed on missing zone/config so an
+    // incomplete facility setup surfaces as a validation failure rather than silently no-op'ing.
+    // The mismatch is overridable: the caller (mobile app) can show the message carried on the
+    // thrown StagingLocationMismatchException and resubmit with overrideStagingLocationZone = true.
+    private void validateStagingLocationZone(Location stagingLocation, PickTask task, boolean overrideStagingLocationZone) {
+        ActivityCode deliveryTypeActivity = task.deliveryTypeCode?.activityCode
+        if (!deliveryTypeActivity) {
+            // Nothing to validate the zone against (e.g. DEFAULT delivery type)
+            return
+        }
+
+        if (!task.facility?.supports(ActivityCode.VALIDATE_STAGING_LOCATION_ZONE)) {
+            return
+        }
+
+        if (overrideStagingLocationZone) {
+            return
+        }
+
+        Location zone = stagingLocation.zone
+        if (!zone || !zone.supports(deliveryTypeActivity)) {
+            List<Location> expectedZones = locationService.getZones(task.facility).findAll { it.supports(deliveryTypeActivity) }
+            String zoneNames = expectedZones ? expectedZones*.name.join(', ') : 'none'
+            String message = "This order is ${task.deliveryTypeCode}. You scanned ${stagingLocation.name} " +
+                    "(zone: ${zone?.name ?: 'none'}), expected zone is ${zoneNames}."
+
+            throw new StagingLocationMismatchException(message)
         }
     }
 }
