@@ -817,16 +817,16 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
-     * Should be used with caution (i.e. not in a loop) since it requires an expensive call to
-     * calculate all quantity within a parent location.
+     * Get quantity by bin location for a single bin within a facility.
      *
      * @param location
      * @param internalLocation
      * @return
      */
     List getQuantityByBinLocation(Location location, Location internalLocation) {
-        List binLocationEntries = getQuantityByBinLocation(location)
-        return binLocationEntries.findAll { it.binLocation == internalLocation }
+        List<TransactionEntry> entries = getTransactionEntriesByInventoryAndBinLocation(location.inventory, internalLocation)
+        List<BinLocationItem> items = getQuantityByBinLocation(entries, false)
+        return items.findAll { it.binLocation == internalLocation }
     }
 
     List getProductQuantityByBinLocation(Location location, Product product) {
@@ -1875,6 +1875,37 @@ class InventoryService implements ApplicationContextAware {
             }
             if (products) {
                 inventoryItem { inList("product", products) }
+            }
+        }
+        return transactionEntries
+    }
+
+    /**
+     * Get all transaction entries for a single bin location within an inventory.
+     *
+     * @param inventory
+     * @param binLocation
+     * @return
+     */
+    List<TransactionEntry> getTransactionEntriesByInventoryAndBinLocation(Inventory inventory, Location binLocation) {
+        List<TransactionEntry> transactionEntries = TransactionEntry.createCriteria().list {
+            transaction {
+                eq("inventory", inventory)
+                order("transactionDate", "asc")
+                order("dateCreated", "asc")
+            }
+            or {
+                eq("binLocation", binLocation)
+                // INVENTORY/PRODUCT_INVENTORY entries reset quantity for an item/product across ALL bins, so
+                // they must be fetched regardless of which bin they're recorded against - otherwise
+                // getQuantityByProductAndInventoryItemMap computes a stale running total for this bin instead
+                // of honoring the reset (see getTransactionEntriesByInventoryAndProductAndBinLocations for the
+                // same pattern applied per-product).
+                transaction {
+                    transactionType {
+                        inList("transactionCode", [TransactionCode.INVENTORY, TransactionCode.PRODUCT_INVENTORY])
+                    }
+                }
             }
         }
         return transactionEntries
