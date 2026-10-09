@@ -6,7 +6,7 @@ import org.pih.warehouse.core.dtos.DomainDto
 import org.pih.warehouse.core.mapper.SmartMapper
 import org.pih.warehouse.location.BinLocationDto
 import org.pih.warehouse.location.FacilityDto
-import org.pih.warehouse.product.ProductSimpleDto
+import org.pih.warehouse.product.ProductDto
 
 class CycleCountItemDto implements DomainDto<CycleCountItem> {
 
@@ -14,7 +14,7 @@ class CycleCountItemDto implements DomainDto<CycleCountItem> {
 
     BinLocationDto binLocation
 
-    ProductSimpleDto product
+    ProductDto product
 
     InventoryItem inventoryItem
 
