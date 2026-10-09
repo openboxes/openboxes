@@ -825,7 +825,8 @@ class InventoryService implements ApplicationContextAware {
      */
     List getQuantityByBinLocation(Location location, Location internalLocation) {
         List<TransactionEntry> entries = getTransactionEntriesByInventoryAndBinLocation(location.inventory, internalLocation)
-        return getQuantityByBinLocation(entries, false)
+        List<BinLocationItem> items = getQuantityByBinLocation(entries, false)
+        return items.findAll { it.binLocation == internalLocation }
     }
 
     List getProductQuantityByBinLocation(Location location, Product product) {
@@ -1893,7 +1894,19 @@ class InventoryService implements ApplicationContextAware {
                 order("transactionDate", "asc")
                 order("dateCreated", "asc")
             }
-            eq("binLocation", binLocation)
+            or {
+                eq("binLocation", binLocation)
+                // INVENTORY/PRODUCT_INVENTORY entries reset quantity for an item/product across ALL bins, so
+                // they must be fetched regardless of which bin they're recorded against - otherwise
+                // getQuantityByProductAndInventoryItemMap computes a stale running total for this bin instead
+                // of honoring the reset (see getTransactionEntriesByInventoryAndProductAndBinLocations for the
+                // same pattern applied per-product).
+                transaction {
+                    transactionType {
+                        inList("transactionCode", [TransactionCode.INVENTORY, TransactionCode.PRODUCT_INVENTORY])
+                    }
+                }
+            }
         }
         return transactionEntries
     }
