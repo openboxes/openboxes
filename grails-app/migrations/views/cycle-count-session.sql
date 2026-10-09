@@ -60,10 +60,13 @@ SELECT
     SUM(CASE WHEN product_availability.quantity_on_hand < 0 THEN 1 ELSE 0 END)       as negative_item_count,
 
     -- Date last counted and derived properties
-    cycle_count_metadata.date_counted                                                as date_last_count,
-    cycle_count_metadata.days_since_last_count                                       as days_since_last_count,
-    cycle_count_metadata.date_expected                                               as date_next_count,
-    cycle_count_metadata.days_until_next_count                                       as days_until_next_count,
+    -- The nested query on cycle_count_metadata guarantees that we will always have at most one record per group since
+    --  records are unique on inventory + product.
+    -- We add MAX to each field here solely for avoiding ONLY_FULL_GROUP_BY SQL errors.
+    MAX(cycle_count_metadata.date_counted)                                           as date_last_count,
+    MAX(cycle_count_metadata.days_since_last_count)                                  as days_since_last_count,
+    MAX(cycle_count_metadata.date_expected)                                          as date_next_count,
+    MAX(cycle_count_metadata.days_until_next_count)                                  as days_until_next_count,
     NULL                                                                             as date_latest_inventory
 
 FROM product_availability
@@ -96,7 +99,6 @@ FROM product_availability
     -- This subquery adds about 3 seconds to the response time for this query so it might make sense to pull this into
          LEFT OUTER JOIN (SELECT inventory_id,
                                  product_id,
-                                 abc_class,
                                  max(date_counted)          as date_counted,
                                  max(days_since_last_count) as days_since_last_count,
                                  max(date_expected)         as date_expected,
