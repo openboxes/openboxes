@@ -17,7 +17,7 @@ import org.pih.warehouse.core.mapper.MapperComponentResolver
 import org.pih.warehouse.core.mapper.SmartMapper
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.ProductSimpleDtoMapper
+import org.pih.warehouse.product.ProductDtoMapper
 
 import testutil.MessageLocalizerStub
 
@@ -40,8 +40,8 @@ class CycleCountServiceSpec extends Specification implements DataTest {
         // SmartMapper up from the application context by bean name, which the DataTest context does not
         // register, so define it here with the real item and product mappers behind it.
         MapperComponentResolver mapperComponentResolver = new MapperComponentResolver(Optional.empty(), Optional.of([
-                new CycleCountItemDtoMapper(productSimpleDtoMapper:
-                        new ProductSimpleDtoMapper(messageLocalizer: MessageLocalizerStub.MESSAGE_LOCALIZER_STUB)),
+                new CycleCountItemDtoMapper(productDtoMapper:
+                        new ProductDtoMapper(messageLocalizer: MessageLocalizerStub.MESSAGE_LOCALIZER_STUB)),
         ]))
         defineBeans {
             smartMapper(SmartMapper, mapperComponentResolver)
