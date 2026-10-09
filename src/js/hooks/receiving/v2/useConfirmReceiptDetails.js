@@ -38,6 +38,7 @@ const useConfirmReceiptDetails = () => {
     {
       label: translate('react.receiving.origin.label', 'Origin'),
       value: origin,
+      testId: 'confirm-receipt-origin',
     },
     {
       label: translate('react.receiving.shippedOn.label', 'Shipped on'),
@@ -46,10 +47,12 @@ const useConfirmReceiptDetails = () => {
         dateFormat: DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS,
         options: { locale: getDateFnsLocale(currentLocale) },
       }),
+      testId: 'confirm-receipt-shipped-on',
     },
     {
       label: translate('react.receiving.destination.label', 'Destination'),
       value: destination,
+      testId: 'confirm-receipt-destination',
     },
   ];
 

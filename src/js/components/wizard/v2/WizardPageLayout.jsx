@@ -47,7 +47,7 @@ const WizardPageLayout = ({
       {children}
     </Section>
     {(previous || next) && (
-      <div className="submit-buttons d-flex justify-content-between mt-3">
+      <div className="submit-buttons d-flex justify-content-between mt-3" data-testid="wizard-page-buttons">
         {previous && (
           <Button
             label={previous.label ?? 'react.default.button.previous.label'}
