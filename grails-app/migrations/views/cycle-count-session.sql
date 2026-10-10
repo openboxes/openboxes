@@ -35,7 +35,8 @@ SELECT
     MAX(cycle_count_request_summary.status)                                          as status,
 
     -- Product fields
-    product.active                                                                   as product_active,
+    -- MAX is for ONLY_FULL_GROUP_BY. Every row in a group joins the same product row.
+    MAX(product.active)                                                              as product_active,
 
     # Inventory Item Count
     count(product_availability.id)                                                   as inventory_item_count,

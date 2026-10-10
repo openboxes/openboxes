@@ -1,7 +1,8 @@
 CREATE OR REPLACE VIEW pending_cycle_count_request AS
 (
     SELECT
-        CRC32(CONCAT(pa.location_id, pa.product_id)) as id,
+        -- Built from ccr for ONLY_FULL_GROUP_BY. The join makes these equal to pa.location_id and pa.product_id.
+        CRC32(CONCAT(ccr.facility_id, ccr.product_id)) as id,
         ccr.id as cycle_count_request_id,
         ccr.facility_id,
         ccr.product_id,
