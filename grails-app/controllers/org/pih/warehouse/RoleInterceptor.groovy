@@ -66,7 +66,8 @@ class RoleInterceptor {
         'productsConfigurationApi'  : ['downloadCategories', 'importCategories'],
         'locationType'              : ['create', 'edit', 'delete', 'update', 'save'],
         'quartz'                    : ['*'],
-        'jobs'                      : ['*']
+        'jobs'                      : ['*'],
+        'report'                    : ['refreshInventoryCountCandidates']
     ]
 
     def static invoiceActions = [
