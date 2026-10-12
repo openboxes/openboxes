@@ -6,6 +6,7 @@ import { Controller } from 'react-hook-form';
 import { RiAddCircleLine, RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import {
+  getCurrentLocale,
   getCurrentLocationId,
   getDebounceTime,
   getHasBinLocationSupport,
@@ -25,7 +26,9 @@ import useTranslate from 'hooks/useTranslate';
 import ProductSelectCell from 'utils/cells/ProductSelectCell';
 import QuantityInputCell from 'utils/cells/QuantityInputCell';
 import SelectCell from 'utils/cells/SelectCell';
+import { getDateFnsLocale } from 'utils/dateUtils';
 import { debouncePeopleFetch } from 'utils/option-utils';
+import parseTypedExpirationDate from 'utils/receiving/parseTypedExpirationDate';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
 // The original line of the shipment item: its product and lot identify the line being received,
@@ -56,6 +59,7 @@ const useReceivingLineItemColumns = ({
   const minSearchLength = useSelector(getMinSearchLength);
   const binLocationOptions = useSelector(getReceivingBinLocations);
   const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
+  const currentLocale = useSelector(getCurrentLocale);
 
   const debouncedPeopleFetch = useCallback(
     debouncePeopleFetch(debounceTime, minSearchLength),
@@ -66,6 +70,10 @@ const useReceivingLineItemColumns = ({
     onChange(value);
     validateLineItems();
   };
+
+  const onExpirationDateTyped = (onChange) => (event) => withValidation(onChange)(
+    parseTypedExpirationDate(event.target.value, getDateFnsLocale(currentLocale)),
+  );
 
   const columns = useMemo(() => [
     columnHelper.accessor(receivingColumns.PRODUCT, {
@@ -171,15 +179,18 @@ const useReceivingLineItemColumns = ({
               tooltipLabel={fieldState.error?.message}
               tooltipClassname="w-100"
             >
-              <DateFieldDateFns
-                {...field}
-                onChange={withValidation(field.onChange)}
-                showCustomInput={false}
-                customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
-                errorMessage={fieldState.error?.message}
-                hideErrorMessageWrapper
-                ariaLabel={{ id: 'react.receiving.expirationDate.short.label', defaultMessage: 'Exp. Date' }}
-              />
+              <div className="w-100" onChange={onExpirationDateTyped(field.onChange)}>
+                <DateFieldDateFns
+                  {...field}
+                  onChange={withValidation(field.onChange)}
+                  showCustomInput={false}
+                  customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
+                  strictParsing
+                  errorMessage={fieldState.error?.message}
+                  hideErrorMessageWrapper
+                  ariaLabel={{ id: 'react.receiving.expirationDate.short.label', defaultMessage: 'Exp. Date' }}
+                />
+              </div>
             </TableCell>
           )}
         />
@@ -335,6 +346,7 @@ const useReceivingLineItemColumns = ({
     hasBinLocationSupport,
     onLocationAutofill,
     validateLineItems,
+    currentLocale,
   ]);
 
   return { columns };
