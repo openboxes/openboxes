@@ -9,16 +9,24 @@ import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.ObjectNotFoundException
+import org.hibernate.criterion.Criterion
+import org.hibernate.criterion.DetachedCriteria
 import org.hibernate.criterion.Order
+import org.hibernate.criterion.Projections
+import org.hibernate.criterion.Restrictions
+import org.hibernate.criterion.Subqueries
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.mapper.SmartMapper
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductCatalogItem
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.report.CycleCountReportCommand
 
@@ -68,16 +76,10 @@ class CycleCountService {
                 lte("dateLastCount", command.dateLastCount)
             }
             if (command.catalogs) {
-                createProductAlias(delegate, usedAliases)
-                createAlias("product.productCatalogItems", "productCatalogItems")
-                usedAliases.add("productCatalogItems")
-                "in"("productCatalogItems.productCatalog", command.catalogs)
+                add(hasAnyCatalog(command.catalogs))
             }
             if (command.tags) {
-                createProductAlias(delegate, usedAliases)
-                createAlias("product.tags", "tags")
-                usedAliases.add("tags")
-                "in"("tags.id", command.tags.collect { it.id })
+                add(hasAnyTag(command.tags))
             }
             if (command.abcClasses) {
                 "in"("abcClass", command.abcClasses)
@@ -190,16 +192,10 @@ class CycleCountService {
                 }
             }
             if (command.catalogs) {
-                createProductAlias(delegate, usedAliases)
-                createAlias("product.productCatalogItems", "productCatalogItems")
-                usedAliases.add("productCatalogItems")
-                "in"("productCatalogItems.productCatalog", command.catalogs)
+                add(hasAnyCatalog(command.catalogs))
             }
             if (command.tags) {
-                createProductAlias(delegate, usedAliases)
-                createAlias("product.tags", "tags")
-                usedAliases.add("tags")
-                "in"("tags.id", command.tags.collect { it.id })
+                add(hasAnyTag(command.tags))
             }
             if (command.abcClasses) {
                 "in"("abcClass", command.abcClasses)
@@ -233,7 +229,7 @@ class CycleCountService {
                 gt("negativeItemCount", 0)
             }
 
-            applySortOrderForCandidates(command.sort, command.order, delegate, usedAliases)
+            applySortOrderForPendingRequests(command.sort, command.order, delegate, usedAliases)
 
         } as List<PendingCycleCountRequest>
 
@@ -246,29 +242,58 @@ class CycleCountService {
         return pendingCycleCountRequests
     }
 
+    /**
+     * Applies the sort requested by the client to a cycle count candidate query, followed by a tie-breaker.
+     *
+     * When no column is requested, no order is applied so that the one defined by the cycle_count_candidate
+     * view takes effect; adding one here would replace that order rather than extend it.
+     */
     private static void applySortOrderForCandidates(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
+        if (!applyRequestedSortOrder(sortBy, orderDirection, criteria, usedAliases)) {
+            return
+        }
+        criteria.addOrder(Order.asc("id"))
+    }
+
+    /**
+     * Applies the sort requested by the client to a pending cycle count request query, followed by a tie-breaker.
+     *
+     * The tie-breaker is the request rather than the row id because pending_cycle_count_request keys its id on
+     * the facility/product pair, which repeats whenever a product has more than one pending request.
+     */
+    private static void applySortOrderForPendingRequests(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
+        applyRequestedSortOrder(sortBy, orderDirection, criteria, usedAliases)
+        criteria.addOrder(Order.asc("cycleCountRequest.id"))
+    }
+
+    /**
+     * Orders the query by the requested column, if any.
+     *
+     * @return true when the client requested a specific column
+     */
+    private static boolean applyRequestedSortOrder(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
         switch (sortBy) {
             case "product":
                 createProductAlias(criteria, usedAliases)
                 criteria.addOrder(getOrderDirection("product.productCode", orderDirection))
-                break
+                return true
             case "dateLastCount":
                 criteria.addOrder(getOrderDirection("dateLastCount", orderDirection))
-                break
+                return true
             case "category":
                 createProductAlias(criteria, usedAliases)
                 criteria.createAlias("product.category", "category", JoinType.INNER_JOIN)
                 usedAliases.add("category")
                 criteria.addOrder(getOrderDirection("category.name", orderDirection))
-                break
+                return true
             case "abcClass":
                 criteria.addOrder(getOrderDirection("abcClass", orderDirection))
-                break
+                return true
             case "quantityOnHand":
                 criteria.addOrder(getOrderDirection("quantityOnHand", orderDirection))
-                break
+                return true
             default:
-                break
+                return false
         }
     }
 
@@ -298,6 +323,26 @@ class CycleCountService {
             usedAliases.add("product")
             criteria.createAlias("product", "product", JoinType.INNER_JOIN)
         }
+    }
+
+    // Restricts to products belonging to any of the given catalogs. Expressed as a subquery rather than a
+    // join because a product can hold several catalog items (even several for the same catalog), and a join
+    // emits one row per match. Those extra rows count against the page size and inflate the total count.
+    private static Criterion hasAnyCatalog(List<ProductCatalog> catalogs) {
+        return Subqueries.propertyIn("product.id",
+                DetachedCriteria.forClass(ProductCatalogItem, "catalogItem")
+                        .setProjection(Projections.property("catalogItem.product.id"))
+                        .add(Restrictions.in("catalogItem.productCatalog", catalogs)))
+    }
+
+    // Restricts to products carrying any of the given tags. A subquery for the same reason as hasAnyCatalog:
+    // product/tag is many-to-many, so a product matching two of the selected tags would be returned twice.
+    private static Criterion hasAnyTag(List<Tag> tags) {
+        return Subqueries.propertyIn("product.id",
+                DetachedCriteria.forClass(Product, "taggedProduct")
+                        .createAlias("taggedProduct.tags", "tag")
+                        .setProjection(Projections.property("taggedProduct.id"))
+                        .add(Restrictions.in("tag.id", tags*.id)))
     }
 
     // Prevents duplicate alias 'ccr' creation, which can happen when filtering by assignees and deadlines simultaneously.
