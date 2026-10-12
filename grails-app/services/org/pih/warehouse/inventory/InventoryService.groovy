@@ -1888,27 +1888,54 @@ class InventoryService implements ApplicationContextAware {
      * @return
      */
     List<TransactionEntry> getTransactionEntriesByInventoryAndBinLocation(Inventory inventory, Location binLocation) {
-        List<TransactionEntry> transactionEntries = TransactionEntry.createCriteria().list {
+        List<TransactionEntry> binEntries = TransactionEntry.createCriteria().list {
             transaction {
                 eq("inventory", inventory)
-                order("transactionDate", "asc")
-                order("dateCreated", "asc")
+            }
+            eq("binLocation", binLocation)
+        }
+
+        Set<Product> productsInBin = binEntries*.product.findAll { it != null } as Set
+        Set<InventoryItem> itemsInBin = binEntries*.inventoryItem.findAll { it != null } as Set
+
+        if (!productsInBin && !itemsInBin) {
+            return binEntries
+        }
+
+        // INVENTORY/PRODUCT_INVENTORY entries reset quantity for an inventory item/product across ALL bins, so a
+        // reset recorded against a different bin can still invalidate stale activity in this one (see
+        // getTransactionEntriesByInventoryAndProductAndBinLocations for the equivalent single-product case).
+        // Only resets for products/items that already have an entry in this bin can affect this bin's result
+        // (see getQuantityByProductAndInventoryItemMap's reachedInventoryTransaction/reachedProductInventoryTransaction
+        // keys), so scope the lookup to those instead of every reset in the facility - otherwise viewing one bin
+        // pays for the facility's entire reset history, which in practice is most/all of it (PRODUCT_INVENTORY is
+        // the normal transaction type for routine counts).
+        List<TransactionEntry> resetEntries = TransactionEntry.createCriteria().list {
+            transaction {
+                eq("inventory", inventory)
             }
             or {
-                eq("binLocation", binLocation)
-                // INVENTORY/PRODUCT_INVENTORY entries reset quantity for an item/product across ALL bins, so
-                // they must be fetched regardless of which bin they're recorded against - otherwise
-                // getQuantityByProductAndInventoryItemMap computes a stale running total for this bin instead
-                // of honoring the reset (see getTransactionEntriesByInventoryAndProductAndBinLocations for the
-                // same pattern applied per-product).
-                transaction {
-                    transactionType {
-                        inList("transactionCode", [TransactionCode.INVENTORY, TransactionCode.PRODUCT_INVENTORY])
+                if (itemsInBin) {
+                    and {
+                        inList("inventoryItem", itemsInBin as List)
+                        transaction { transactionType { eq("transactionCode", TransactionCode.INVENTORY) } }
+                    }
+                }
+                if (productsInBin) {
+                    and {
+                        inList("product", productsInBin as List)
+                        transaction { transactionType { eq("transactionCode", TransactionCode.PRODUCT_INVENTORY) } }
                     }
                 }
             }
         }
-        return transactionEntries
+
+        // Same row can satisfy both queries (e.g. a reset entry that's itself in this bin);
+        // getQuantityByProductAndInventoryItemMap sums every entry it's given, so duplicates would double-count.
+        // Note: TransactionEntry implements Comparable (delegating to Transaction.compareTo, by date), and
+        // Groovy's no-arg unique() dedupes using that natural ordering rather than equals()/hashCode() - which
+        // would wrongly collapse distinct entries that merely share a transactionDate. Dedupe by id instead.
+        return (binEntries + resetEntries).unique { it.id }
     }
 
     List getTransactionEntriesByInventoryAndProductAndBinLocations(Inventory inventory, Product product, List<Location> binLocations) {
