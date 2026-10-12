@@ -578,7 +578,7 @@ openboxes:
             delayInMilliseconds: 10000
 
         automaticIssuanceJob:
-            enabled: true
+            enabled: false
             cronExpression: "0 */5 * * * ?"     # every five minutes
             bulkAutomaticIssuance: true
 
