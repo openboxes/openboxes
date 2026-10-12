@@ -977,7 +977,11 @@ class RequisitionService {
                 message: truncatedMessage,
         ))
         requisition.save(failOnError: true)
-        log.warn("Requisition ${requisition.id}: ${message}")
+        if (eventLogCode == EventLogCode.ERROR_OCCURRED) {
+            log.warn("Requisition ${requisition.id}: ${message}")
+        } else {
+            log.info("Requisition ${requisition.id}: ${message}")
+        }
     }
 
     /**

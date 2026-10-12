@@ -562,8 +562,19 @@ class PickTaskService {
         return true
     }
 
+    /**
+     * `.find` returns only the first picklist item that has an assignee, on the assumption that any item being
+     * assigned means the whole order is assigned to that same person. Unassign/reassign (below) act on this
+     * same assumption, clearing or overwriting the assignee on ALL picklist items at once.
+     *
+     * That assumption can currently be violated by the mobile app, which assigns one picklist item at a time
+     * and could let different items on the same order end up with different assignees. Unassign/reassign exist
+     * precisely to let an admin recover from that kind of stuck/inconsistent state from the web app.
+     */
     Person getCurrentAssignee(Requisition requisition) {
-        return requisition.picklist?.picklistItems?.find { it.assignee }?.assignee
+        return requisition?.picklist?.picklistItems?.find { PicklistItem item ->
+            item.assignee && (!item.status || item.status in [PickTaskStatus.PENDING.name(), PickTaskStatus.PICKING.name()])
+        }?.assignee
     }
 
     void unassign(Requisition requisition) {

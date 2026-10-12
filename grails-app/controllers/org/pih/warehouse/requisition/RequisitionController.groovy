@@ -42,7 +42,7 @@ class RequisitionController {
     StockMovementService stockMovementService
     PickTaskService pickTaskService
 
-    static allowedMethods = [save: "POST", update: "POST"]
+    static allowedMethods = [save: "POST", update: "POST", unassignPicker: "POST", reassignPicker: "POST"]
 
     def index() {
         redirect(action: "list", params: params)

@@ -8,7 +8,7 @@
     <table>
         <tr class="prop">
             <td class="name">
-                <label>Reassign to</label>
+                <label for="reassignAssigneeId">Reassign to</label>
             </td>
             <td class="value">
                 <g:selectPerson id="reassignAssigneeId" name="assigneeId" noSelection="['null':'']" size="30" class="chzn-select-deselect"/>

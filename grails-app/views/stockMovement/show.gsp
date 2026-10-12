@@ -256,16 +256,17 @@
                                 </g:link>
                             </g:else>
                             <g:if test="${currentAssignee}">
-                                <g:link
-                                        controller="requisition"
-                                        action="unassignPicker"
-                                        id="${stockMovement?.requisition?.id}"
-                                        class="button"
-                                        onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
-                                >
-                                    <img src="${resource(dir: 'images/icons/silk/', file: 'user_delete.png')}" />&nbsp;
-                                    Unassign picker
-                                </g:link>
+                                <g:form controller="requisition" action="unassignPicker" style="display:inline-block; margin: 0;">
+                                    <g:hiddenField name="id" value="${stockMovement?.requisition?.id}"/>
+                                    <button
+                                            type="submit"
+                                            class="button"
+                                            onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                    >
+                                        <img src="${resource(dir: 'images/icons/silk/', file: 'user_delete.png')}" />&nbsp;
+                                        Unassign picker
+                                    </button>
+                                </g:form>
                             </g:if>
                             <a href="javascript:void(0);" class="button btn-show-dialog"
                                data-height="200" data-width="500"

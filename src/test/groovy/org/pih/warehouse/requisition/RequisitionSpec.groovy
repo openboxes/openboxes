@@ -78,6 +78,20 @@ class RequisitionSpec extends Specification implements DomainUnitTest<Requisitio
         RequisitionStatus.CREATED     | null                               || false
     }
 
+    void 'isInErrorState should still be true when an informational event log is recorded after an unresolved error'() {
+        given:
+        Requisition requisition = new Requisition(status: RequisitionStatus.CREATED)
+
+        EventLog error = new EventLog(eventLogCode: EventLogCode.ERROR_OCCURRED, message: "Allocation failed: boom")
+        error.dateCreated = Instant.now().minusSeconds(60)
+        EventLog info = new EventLog(eventLogCode: EventLogCode.INFO_OCCURRED, message: "Picker was unassigned")
+        info.dateCreated = Instant.now()
+        requisition.eventLogs = [error, info]
+
+        expect:
+        requisition.isInErrorState() == true
+    }
+
     void 'getMostRecentErrorMessage should return the message of the latest ERROR_OCCURRED event log'() {
         given:
         Requisition requisition = new Requisition(status: RequisitionStatus.CREATED)
