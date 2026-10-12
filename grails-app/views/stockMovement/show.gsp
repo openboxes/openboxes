@@ -360,6 +360,16 @@
                                 ${stockMovement?.displayStatus?.label}
                             </td>
                         </tr>
+                        <g:if test="${stockMovement?.requisition?.status in [RequisitionStatus.PICKING, RequisitionStatus.PICKED, RequisitionStatus.CHECKING, RequisitionStatus.STAGED]}">
+                            <tr class="prop">
+                                <td class="name">
+                                    <warehouse:message code="picklist.assignee.label" default="Picker"/>
+                                </td>
+                                <td class="value">
+                                    ${currentAssignee?.name ?: 'Unassigned'}
+                                </td>
+                            </tr>
+                        </g:if>
                         <g:if test="${stockMovement?.fulfillmentStatus}">
                             <tr class="prop">
                                 <td class="name">
