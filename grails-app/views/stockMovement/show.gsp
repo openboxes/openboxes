@@ -256,10 +256,9 @@
                                 </g:link>
                             </g:else>
                             <g:if test="${currentAssignee}">
-                                <g:form controller="requisition" action="unassignPicker" style="display:inline-block; margin: 0;">
+                                <g:form controller="requisition" action="unassignPicker" style="display:inline-block; float:left; margin: 0;">
                                     <g:hiddenField name="id" value="${stockMovement?.requisition?.id}"/>
                                     <button
-                                            type="submit"
                                             class="button"
                                             onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
                                     >
