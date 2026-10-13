@@ -26,6 +26,8 @@ import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.core.localization.MessageLocalizer
+import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.ProductAvailabilityService
@@ -53,6 +55,8 @@ class ReceiptService {
     TransactionIdentifierService transactionIdentifierService
     GrailsApplication grailsApplication
     ProductAvailabilityService productAvailabilityService
+    ShipmentForReceiptValidator shipmentForReceiptValidator
+    MessageLocalizer messageLocalizer
 
     @Transactional(readOnly=true)
     PartialReceipt getPartialReceipt(String id, String stepNumber, String sort = null) {
@@ -429,6 +433,17 @@ class ReceiptService {
 
         deleteEvent(shipment, EventCode.RECEIVED)
         deleteEvent(shipment, EventCode.PARTIALLY_RECEIVED)
+    }
+
+    /**
+     * Returns the localized reason why the last receipt of the shipment cannot be rolled back from the given
+     * location, or null when it can.
+     */
+    String getRollbackBlockedReason(Shipment shipment, Location currentLocation = AuthService.currentLocation) {
+        ObjectValidationResult result =
+                shipmentForReceiptValidator.validateForReceiptRollback(shipment, currentLocation)
+
+        return result.valid ? null : result.errors.collect { messageLocalizer.localize(it) }.join(" ")
     }
 
     void rollbackLastReceipt(Shipment shipment) {

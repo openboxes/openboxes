@@ -48,7 +48,17 @@ class ShipmentForReceiptValidator extends PlainObjectValidator<Shipment> {
 
         return new ObjectValidationResult(
                 validateShipmentNotFullyReceived(shipment),
-                validateShipmentDestination(shipment, currentLocation),
+                validateShipmentDestination(shipment, currentLocation, "stockMovement.isDifferentLocation.message"),
+        )
+    }
+
+    /**
+     * Whether the last receipt of the shipment can be rolled back
+     */
+    ObjectValidationResult validateForReceiptRollback(Shipment shipment, Location currentLocation) {
+        return new ObjectValidationResult(
+                validateShipmentDestination(shipment, currentLocation,
+                        "stockMovement.rollbackLastReceipt.isDifferentLocation.message"),
         )
     }
 
@@ -90,13 +100,13 @@ class ShipmentForReceiptValidator extends PlainObjectValidator<Shipment> {
     }
 
     /**
-     * Whether the shipment is received where the user is logged in
+     * Whether the user is logged in at the destination of the shipment
      */
-    private ObjectError validateShipmentDestination(Shipment shipment, Location currentLocation) {
+    private ObjectError validateShipmentDestination(Shipment shipment, Location currentLocation, String messageCode) {
         if (shipment?.destination?.id == currentLocation?.id) {
             return null
         }
 
-        return rejectField("destination", shipment?.destination, "stockMovement.isDifferentLocation.message")
+        return rejectField("destination", shipment?.destination, messageCode)
     }
 }

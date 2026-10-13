@@ -163,6 +163,32 @@ class ShipmentForReceiptValidatorSpec extends Specification implements DataTest 
         assert result.errors.first().code == "stockMovement.isDifferentLocation.message"
     }
 
+    void 'validateForReceiptRollback should pass at the destination of a #shipmentStatus shipment'() {
+        given:
+        Shipment shipment = buildShipment([buildShipmentItem(100)], shipmentStatus)
+        assert shipment.destination.id
+
+        expect:
+        validator.validateForReceiptRollback(shipment, shipment.destination).valid
+
+        where:
+        shipmentStatus << [ShipmentStatusCode.PARTIALLY_RECEIVED, ShipmentStatusCode.RECEIVED]
+    }
+
+    void 'validateForReceiptRollback should reject a location other than the destination of the shipment'() {
+        given:
+        Shipment shipment = buildShipment([buildShipmentItem(100)], ShipmentStatusCode.RECEIVED)
+        Location otherLocation = new Location(name: "Other location")
+        otherLocation.id = "other-location-id"
+
+        when:
+        ObjectValidationResult result = validator.validateForReceiptRollback(shipment, otherLocation)
+
+        then:
+        assert !result.valid
+        assert result.errors.first().code == "stockMovement.rollbackLastReceipt.isDifferentLocation.message"
+    }
+
     private static Shipment buildShipment(
             List<ShipmentItem> shipmentItems, ShipmentStatusCode status = ShipmentStatusCode.SHIPPED) {
         Shipment shipment = new Shipment(
