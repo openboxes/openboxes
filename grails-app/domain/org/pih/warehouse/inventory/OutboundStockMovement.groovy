@@ -252,7 +252,8 @@ class OutboundStockMovement implements Serializable, Validateable, Historizable 
     }
 
     Boolean canGeneratePickList() {
-        return requisition?.status < RequisitionStatus.PICKING && lineItems.size() > 0
+        return requisition?.status < RequisitionStatus.PICKING &&
+                lineItems.any { StockMovementItem item -> !item.requisitionItem?.isCanceled() }
     }
 
     Boolean hasBeenStaged() {
