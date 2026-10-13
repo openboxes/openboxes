@@ -9,7 +9,11 @@ We provide security updates for the [latest official release](https://github.com
 ## Reporting a Vulnerability
 
 If you discover a vulnerability in any public project under the [OpenBoxes](https://github.com/openboxes) organization, 
-please report it responsibly to [support@openboxes.com](mailto:support@openboxes.com).
+please report it responsibly using one of the following channels:
+
+* **Preferred:** Submit a private report through GitHub's 
+  [private vulnerability reporting](https://github.com/openboxes/openboxes/security/advisories/new) form.
+* **Alternative:** Email [support@openboxes.com](mailto:support@openboxes.com).
 
 ## Response SLA
 As an open-source project with limited resources, we will do our best to respond to and resolve security issues 
