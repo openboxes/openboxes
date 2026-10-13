@@ -21,7 +21,7 @@ export const EditLineItemErrorMessage = {
   },
   DUPLICATED_LINE: {
     id: 'react.receiving.error.duplicatedLine.label',
-    defaultMessage: 'Duplicate rows for this inventory item',
+    defaultMessage: 'Two rows cannot have the same combination of product, lot, recipient, and bin location.',
   },
   DIFFERENT_EXPIRATION_DATES: {
     id: 'react.receiving.error.differentExpirationDates.label',

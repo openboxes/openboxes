@@ -15,6 +15,9 @@ export const DateFormat = {
 // see: https://github.com/date-fns/date-fns/blob/main/docs/unicodeTokens.md
 export const DateFormatDateFns = {
   MM_DD_YYYY: 'MM/dd/yyyy',
+  MM_DD_YY: 'MM/dd/yy',
+  DD_MM_YYYY: 'dd/MM/yyyy',
+  DD_MM_YY: 'dd/MM/yy',
   DD_MMM_YYYY: 'dd/MMM/yyyy',
   DD_MMM_YYYY_HH_MM_SS: 'dd/MMM/yyyy HH:mm:ss',
   MMM_DD_YYYY: 'MMM dd, yyyy',
