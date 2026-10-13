@@ -8,20 +8,23 @@ import { useHistory } from 'react-router-dom';
 import { fetchAvailableApprovers, fetchRequisitionStatusCodes, fetchShipmentTypes } from 'actions';
 import filterFields from 'components/stock-movement/outbound/FilterFields';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
-import getPriorityLevelOptions from 'consts/priorityLevel';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
-import useTranslate from 'hooks/useTranslate';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
-import { fetchLocationById, fetchUserById, selectNullOption } from 'utils/option-utils';
+import {
+  fetchLocationById,
+  fetchPriorityLevels,
+  fetchUserById,
+  selectNullOption,
+} from 'utils/option-utils';
 
 const useOutboundFilters = (sourceType) => {
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
   const [filtersInitialized, setFiltersInitialized] = useState(false);
+  const [priorityLevels, setPriorityLevels] = useState([]);
 
   const history = useHistory();
   const dispatch = useDispatch();
-  const translate = useTranslate();
   const {
     requisitionStatuses,
     currentLocation,
@@ -122,10 +125,12 @@ const useOutboundFilters = (sourceType) => {
       const shipTypes = getParamList(queryProps.shipmentType);
       defaultValues.shipmentType = shipmentTypes.filter(({ id }) => shipTypes.includes(id));
     }
+    const priorityLevelOptions = await fetchPriorityLevels();
+    setPriorityLevels(priorityLevelOptions);
     if (queryProps.priorityLevel) {
-      const priorityLevels = getParamList(queryProps.priorityLevel);
-      defaultValues.priorityLevel = getPriorityLevelOptions(translate)
-        .filter(({ id }) => priorityLevels.includes(id));
+      const selectedPriorityLevels = getParamList(queryProps.priorityLevel);
+      defaultValues.priorityLevel = priorityLevelOptions
+        .filter(({ id }) => selectedPriorityLevels.includes(id));
     }
     if (sourceType === 'ELECTRONIC' && queryProps.approver) {
       const approvers = getParamList(queryProps.approver);
@@ -198,6 +203,7 @@ const useOutboundFilters = (sourceType) => {
     defaultFilterValues,
     setFilterValues,
     filterParams,
+    priorityLevels,
   };
 };
 
