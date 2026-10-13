@@ -1,7 +1,6 @@
 import DateFilter from 'components/form-elements/DateFilter/DateFilter';
 import FilterSelectField from 'components/form-elements/FilterSelectField';
 import DateFormat from 'consts/dateFormat';
-import getPriorityLevelOptions from 'consts/priorityLevel';
 
 export default (isRequest) => ({
   requisitionStatusCode: {
@@ -189,8 +188,8 @@ export default (isRequest) => ({
       closeMenuOnSelect: false,
       blurInputOnSelect: false,
     },
-    getDynamicAttr: ({ translate }) => ({
-      options: getPriorityLevelOptions(translate),
+    getDynamicAttr: ({ priorityLevels }) => ({
+      options: priorityLevels,
     }),
   },
   createdAfter: {

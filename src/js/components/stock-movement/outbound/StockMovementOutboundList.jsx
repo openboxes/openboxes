@@ -9,7 +9,6 @@ import StockMovementOutboundFilters from 'components/stock-movement/outbound/Sto
 import StockMovementOutboundHeader from 'components/stock-movement/outbound/StockMovementOutboundHeader';
 import StockMovementOutboundTable from 'components/stock-movement/outbound/StockMovementOutboundTable';
 import useOutboundFilters from 'hooks/list-pages/outbound/useOutboundFilters';
-import useTranslate from 'hooks/useTranslate';
 import useTranslation from 'hooks/useTranslation';
 
 const StockMovementOutboundList = (props) => {
@@ -19,10 +18,10 @@ const StockMovementOutboundList = (props) => {
     defaultFilterValues,
     setFilterValues,
     filterParams,
+    priorityLevels,
   } = useOutboundFilters(props.sourceType);
 
   useTranslation('stockMovement', 'StockMovementType', 'reactTable');
-  const translate = useTranslate();
   const filters = filterFields(isRequestsList);
   return (
     <div className="d-flex flex-column list-page-main">
@@ -38,7 +37,7 @@ const StockMovementOutboundList = (props) => {
           requisitionStatuses: props.requisitionStatuses,
           approvers: props.approvers,
           shipmentTypes: props.shipmentTypes,
-          translate,
+          priorityLevels,
         }}
       />
       <StockMovementOutboundTable

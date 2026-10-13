@@ -348,6 +348,11 @@ export const fetchHandlingRequirements = async () => {
   return data.data;
 };
 
+export const fetchPriorityLevels = async () => {
+  const { data } = await selectOptionsApi.getPriorityLevelOptions();
+  return data.data;
+};
+
 export const fetchProduct = async (id) => {
   const { data } = await productApi.getProduct(id);
   return data.data;
