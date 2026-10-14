@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.validation.ObjectError
 
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.core.validation.PlainObjectValidator
@@ -53,11 +54,11 @@ class ShipmentForReceiptValidator extends PlainObjectValidator<Shipment> {
     }
 
     /**
-     * Whether the last receipt of the shipment can be rolled back
+     * Whether the last receipt of the shipment can be rolled back from the current location
      */
-    ObjectValidationResult validateForReceiptRollback(Shipment shipment, Location currentLocation) {
+    ObjectValidationResult validateForReceiptRollback(Shipment shipment) {
         return new ObjectValidationResult(
-                validateShipmentDestination(shipment, currentLocation,
+                validateShipmentDestination(shipment, AuthService.currentLocation,
                         "stockMovement.rollbackLastReceipt.isDifferentLocation.message"),
         )
     }

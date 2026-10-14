@@ -436,12 +436,11 @@ class ReceiptService {
     }
 
     /**
-     * Returns the localized reason why the last receipt of the shipment cannot be rolled back from the given
+     * Returns the localized reason why the last receipt of the shipment cannot be rolled back from the current
      * location, or null when it can.
      */
-    String getRollbackBlockedReason(Shipment shipment, Location currentLocation = AuthService.currentLocation) {
-        ObjectValidationResult result =
-                shipmentForReceiptValidator.validateForReceiptRollback(shipment, currentLocation)
+    String getRollbackBlockedReason(Shipment shipment) {
+        ObjectValidationResult result = shipmentForReceiptValidator.validateForReceiptRollback(shipment)
 
         return result.valid ? null : result.errors.collect { messageLocalizer.localize(it) }.join(" ")
     }
