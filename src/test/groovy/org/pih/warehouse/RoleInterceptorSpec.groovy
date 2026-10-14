@@ -34,6 +34,8 @@ class RoleInterceptorSpec extends Specification {
         'superuser'       | 'inventoryItem'         | 'transferStock'               || 'requires'
         'superuser'       | 'jobs'                  | 'list'                        || 'requires'
         'superuser'       | 'locationType'          | 'create'                      || 'requires'
+        'superuser'       | 'partialReceiving'      | 'create'                      || 'does not require'
+        'superuser'       | 'partialReceiving'      | 'rollbackLastReceipt'         || 'requires'
         'superuser'       | 'productCatalog'        | 'create'                      || 'requires'
         'superuser'       | 'productType'           | 'edit'                        || 'requires'
         'superuser'       | 'quartz'                | 'index'                       || 'requires'
