@@ -13,7 +13,7 @@ page through this API (there is no unbounded dump endpoint).
 ```
 $ curl -X GET -b cookies.txt \
 -H "Content-Type: application/json" \
-"https://openboxes.ngrok.io/openboxes/api/facilities/1/availableItems?max=1&offset=0" | jsonlint
+"https://openboxes.ngrok.io/openboxes/api/facilities/1/available-items?max=1&offset=0" | jsonlint
 {
   "data": [
     {

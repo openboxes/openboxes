@@ -862,16 +862,23 @@ class ProductAvailabilityService {
         return inventoryService.getQuantityAsAvailableItems(transactionEntries).findAll{ it.quantityOnHand != 0 }
     }
 
-    List getAvailableItems(Location location, List<String> productsIds, boolean excludeNegativeQuantity = false, boolean excludeZeroQuantity = false, Map listArgs = null) {
+    @Transactional(readOnly = true)
+    List getAvailableItems(Location location,
+                           List<String> productsIds,
+                           boolean excludeNegativeQuantity = false,
+                           boolean excludeZeroQuantity = false,
+                           Map paginationParams = null) {
         log.info("getQuantityOnHandByBinLocation: location=${location} product=${productsIds}")
 
         if (!location) {
-            return listArgs?.max != null ? new PaginatedList([], 0) : []
+            return paginationParams?.max != null ? new PaginatedList([], 0) : []
         }
 
-        def results = ProductAvailability.createCriteria().list(listArgs ?: [:]) {
-            createAlias("inventoryItem", "ii", JoinType.LEFT_OUTER_JOIN)
-            createAlias("binLocation", "bl", JoinType.LEFT_OUTER_JOIN)
+        def results = ProductAvailability.createCriteria().list(paginationParams ?: [:]) {
+            // Pre-fetch the relationship entities to avoid N+1 issues. Without the join, they'd be Hibernate proxy
+            // objects with just an id, so accessing their fields would issue a separate database query per instance.
+            join("inventoryItem")
+            join("binLocation")
 
             eq("location", location)
             if (excludeZeroQuantity) {
@@ -884,29 +891,17 @@ class ProductAvailabilityService {
                     inList("id", productsIds)
                 }
             }
-            if (listArgs?.max != null) {
+            if (paginationParams?.max != null) {
                 order("id", "asc")
-            }
-
-            projections {
-                property("ii")
-                property("bl")
-                property("quantityOnHand")
-                property("quantityAvailableToPromise")
             }
         }
 
-        List<AvailableItem> data = results.collect {
-            InventoryItem inventoryItem = it[0]
-            Location binLocation = it[1]
-            Integer quantityOnHand = it[2]
-            Integer quantityAvailableToPromise = it[3]
-
+        List<AvailableItem> data = results.collect { ProductAvailability pa ->
             return new AvailableItem(
-                    inventoryItem     : inventoryItem,
-                    binLocation       : binLocation,
-                    quantityOnHand    : quantityOnHand,
-                    quantityAvailable : quantityAvailableToPromise
+                    inventoryItem     : pa.inventoryItem,
+                    binLocation       : pa.binLocation,
+                    quantityOnHand    : pa.quantityOnHand,
+                    quantityAvailable : pa.quantityAvailableToPromise
             )
         }
 

@@ -26,6 +26,6 @@ class ProductAvailabilityApi extends AuthenticatedApi {
         if (offset != null) {
             builder.addQueryParam("offset", offset)
         }
-        return request(builder.build(), responseSpec, Method.GET, "/facilities/{facilityId}/availableItems")
+        return request(builder.build(), responseSpec, Method.GET, "/facilities/{facilityId}/available-items")
     }
 }

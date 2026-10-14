@@ -1,32 +1,23 @@
 package org.pih.warehouse.api
 
-import grails.converters.JSON
-import org.hibernate.ObjectNotFoundException
+import javax.validation.Valid
 
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.AvailableItemsListCommand
+import org.pih.warehouse.inventory.ListAvailableItemsCommand
 import org.pih.warehouse.inventory.ProductAvailabilityService
 
 /**
  * Facility-scoped product availability APIs.
  */
-class ProductAvailabilityApiController {
+class ProductAvailabilityApiController extends BaseApiController {
 
     ProductAvailabilityService productAvailabilityService
 
     /**
-     * Available items for a facility (paginated). Excludes zero quantity-on-hand rows.
-     * No unbounded full-dump endpoint — large facilities make that a worst-case footgun;
-     * clients that need everything can page through this API.
+     * Fetch a paginated list of all available items for a facility. Excludes zero quantity-on-hand rows.
      */
-    def list(AvailableItemsListCommand command) {
-        Location location = Location.get(command.facilityId)
-        if (!location) {
-            throw new ObjectNotFoundException(command.facilityId, Location.class.toString())
-        }
-
+    def list(@Valid ListAvailableItemsCommand command) {
         List availableItems = productAvailabilityService.getAvailableItems(
-                location, null, false, true, command.paginationParams)
-        render([data: availableItems, totalCount: availableItems.totalCount] as JSON)
+                command.facility, null, false, true, command.paginationParams)
+        renderResponse(availableItems)
     }
 }
