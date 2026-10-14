@@ -1,0 +1,29 @@
+{
+  "comment": "Third-party SERVICES OBAF loads only when configured (analytics, captcha, feedback widgets, in-context translation). They are not libraries a page needs, they call home after loading, and the sealed stack enables none of them; mirror.py does not mirror them and the route handler aborts them as 'excluded'. Match = substring of the https URL.",
+  "exclude": [
+    {
+      "match": "//www.google.com/recaptcha/",
+      "reason": "reCAPTCHA on the self-signup page (auth/signup.gsp): a Google service, not a library"
+    },
+    {
+      "match": "//beacon-v2.helpscout.net",
+      "reason": "HelpScout Beacon help widget, only when openboxes.helpscout.widget.enabled"
+    },
+    {
+      "match": "//widget.uservoice.com/",
+      "reason": "UserVoice feedback widget, only when openboxes.uservoice.widget.enabled"
+    },
+    {
+      "match": "//cdn.crowdin.com/",
+      "reason": "Crowdin in-context translation, only in localization (debug locale) mode"
+    },
+    {
+      "match": "//static.hotjar.com/",
+      "reason": "Hotjar tracking, only when openboxes.hotjar.enabled"
+    },
+    {
+      "match": "//www.googletagmanager.com/",
+      "reason": "Google Analytics gtag, only when tracking ids are configured"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+# OpenBoxes end-to-end stack (test/e2e/up.sh). Nothing here can reach the internet:
+#   - `db`, `app` and `labelstub` sit only on `sealed`, an internal network (no route out);
+#   - `gateway` (socat) is the one container on both networks and only forwards three loopback
+#     ports of the host to services on `sealed`.
+# Host ports are bound to 127.0.0.1 only.
+name: ${E2E_PROJECT:-openboxes-e2e}
+
+networks:
+  sealed:
+    internal: true
+  edge: {}
+
+services:
+  db:
+    image: ${E2E_DB_IMAGE:-mariadb:11.4}
+    networks: [sealed]
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: openboxes
+      MARIADB_USER: openboxes
+      MARIADB_PASSWORD: openboxes
+      # the same for the mysql image (E2E_DB_IMAGE=mysql:8.0.36)
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: openboxes
+      MYSQL_USER: openboxes
+      MYSQL_PASSWORD: openboxes
+    volumes:
+      # src/test/resources/regression-testcontainers/my.cnf (utf8mb3, UTC, sql_mode), the same file the backend suite uses
+      - ${E2E_MY_CNF}:/etc/mysql/conf.d/e2e.cnf:ro
+    tmpfs:
+      - /var/lib/mysql:size=2g
+    mem_limit: 1g
+    healthcheck:
+      # TCP as the app user: the images' init server listens on the socket only, so this passes once the real
+      # server is up (mariadb and mysql images alike)
+      test: ["CMD-SHELL", "mariadb -h127.0.0.1 -uopenboxes -popenboxes -e 'select 1' openboxes >/dev/null 2>&1 || mysql -h127.0.0.1 -uopenboxes -popenboxes -e 'select 1' openboxes >/dev/null 2>&1"]
+      interval: 3s
+      timeout: 5s
+      retries: 60
+
+  labelstub:
+    image: python:3.12.8-alpine
+    networks: [sealed]
+    command: ["python", "-u", "/stub/labelstub.py"]
+    volumes:
+      - ./labelstub.py:/stub/labelstub.py:ro
+    mem_limit: 64m
+
+  app:
+    image: eclipse-temurin:8-jre-jammy
+    networks: [sealed]
+    depends_on:
+      db:
+        condition: service_healthy
+    working_dir: /app
+    environment:
+      # Never set SENTRY_DSN: without it Sentry stays inert (and the network has no route out anyway).
+      JAVA_TOOL_OPTIONS: "-Xms512m -Xmx${E2E_APP_XMX:-1536m} -XX:+UseParallelGC -Djava.awt.headless=true -Duser.home=/app -Duser.timezone=UTC"
+    command: ["java", "-Dgrails.env=prod", "-jar", "/app/openboxes.war"]
+    volumes:
+      - ${E2E_WAR}:/app/openboxes.war:ro
+      - ${E2E_APP_CONFIG}:/app/.grails/openboxes.yml:ro
+    tmpfs:
+      - /app/uploads
+    mem_limit: ${E2E_APP_MEM:-2g}
+
+  gateway:
+    image: alpine/socat:1.8.0.0
+    networks: [sealed, edge]
+    depends_on: [app, db, labelstub]
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        socat TCP-LISTEN:8080,fork,reuseaddr TCP:app:8080 &
+        socat TCP-LISTEN:3306,fork,reuseaddr TCP:db:3306 &
+        socat TCP-LISTEN:8081,fork,reuseaddr TCP:labelstub:8081 &
+        wait
+    ports:
+      - "127.0.0.1:${E2E_HTTP_PORT:-18080}:8080"
+      - "127.0.0.1:${E2E_DB_PORT:-13306}:3306"
+      - "127.0.0.1:${E2E_LABEL_PORT:-18081}:8081"
+    mem_limit: 64m
