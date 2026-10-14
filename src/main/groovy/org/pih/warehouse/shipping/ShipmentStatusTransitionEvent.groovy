@@ -10,11 +10,13 @@
 package org.pih.warehouse.shipping
 
 import org.pih.warehouse.api.PartialReceipt
+import org.pih.warehouse.receiving.Receipt
 import org.springframework.context.ApplicationEvent
 
 class ShipmentStatusTransitionEvent extends ApplicationEvent {
 
     PartialReceipt partialReceipt
+    Receipt receipt
     ShipmentStatusCode shipmentStatusCode
 
     ShipmentStatusTransitionEvent(Shipment shipment, ShipmentStatusCode shipmentStatusCode) {
@@ -25,6 +27,12 @@ class ShipmentStatusTransitionEvent extends ApplicationEvent {
     ShipmentStatusTransitionEvent(PartialReceipt partialReceipt, ShipmentStatusCode shipmentStatusCode) {
         super(partialReceipt.shipment)
         this.partialReceipt = partialReceipt
+        this.shipmentStatusCode = shipmentStatusCode
+    }
+
+    ShipmentStatusTransitionEvent(Receipt receipt, ShipmentStatusCode shipmentStatusCode) {
+        super(receipt.shipment)
+        this.receipt = receipt
         this.shipmentStatusCode = shipmentStatusCode
     }
 

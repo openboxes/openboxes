@@ -54,9 +54,19 @@ export const getHasBinLocationSupport = createSelector(
   (location) => location?.hasBinLocationSupport,
 );
 
+export const getHasPartialReceivingSupport = createSelector(
+  [getCurrentLocation],
+  (location) => location?.hasPartialReceivingSupport,
+);
+
 export const getDefaultTranslationsFetched = createSelector(
   [getSession],
   (session) => session.fetchedTranslations.default,
+);
+
+export const getReceivingTranslationsFetched = createSelector(
+  [getSession],
+  (session) => session.fetchedTranslations.receiving,
 );
 
 export const getCurrentUser = createSelector(
@@ -102,6 +112,31 @@ export const getCurrentLocationSupportedActivities = createSelector(
 export const getCycleCountMaxSelectedProducts = createSelector(
   [getSession],
   (session) => session.cycleCountMaxSelectedProducts,
+);
+
+export const getAutosaveBatchSize = createSelector(
+  [getSession],
+  (session) => session.autosaveBatchSize,
+);
+
+export const getAutosaveDebounceTime = createSelector(
+  [getSession],
+  (session) => session.autosaveDebounceTime,
+);
+
+export const getAutosaveMaxRetries = createSelector(
+  [getSession],
+  (session) => session.autosaveMaxRetries,
+);
+
+export const getAutosaveRetryDelay = createSelector(
+  [getSession],
+  (session) => session.autosaveRetryDelay,
+);
+
+export const getAutosaveMaxRetryDelay = createSelector(
+  [getSession],
+  (session) => session.autosaveMaxRetryDelay,
 );
 
 /**
@@ -369,3 +404,43 @@ export const getCurrencyCode = (state) => state.session.currencyCode;
 export const getInboundHeaderInfo = (state) => state.inbound.headerInfo || [];
 
 export const getInboundHeaderStatus = (state) => state.inbound.headerStatus;
+
+/**
+ * PARTIAL RECEIVING
+ */
+export const getReceivingHeaderInfo = (state) => state.partialReceiving.headerInfo || [];
+
+export const getIsShipmentFromPurchaseOrder = (state) =>
+  state.partialReceiving.isShipmentFromPurchaseOrder;
+
+export const getReceivingShipmentNumber = (state) => state.partialReceiving.shipmentNumber;
+
+export const getReceivingShipmentDetails = (state) =>
+  state.partialReceiving.shipmentDetails || {};
+
+export const getReceivingBinLocations = (state) => state.partialReceiving.binLocations || [];
+
+export const getReceivingView = (state) => state.partialReceiving.view;
+
+// The column the receiving table is sorted by, shared by the receiving and the check step.
+// A null sort means the shipment order, which the backend applies by default.
+export const getReceivingSort = (state) => state.partialReceiving.sorting;
+
+export const getReceivingDateDelivered = (state, shipmentId) =>
+  state.partialReceiving.dateDeliveredByShipment?.[shipmentId] ?? null;
+
+export const getReceivingPutawayEnabled = (state, receiptId) =>
+  state.partialReceiving.putawayEnabledByReceipt?.[receiptId] ?? false;
+
+// The receiving bin generated for the shipment is named "<prefix>-<shipment number>",
+// where the prefix is configurable ("R" by default).
+export const getReceivingBin = createSelector(
+  getReceivingBinLocations,
+  getReceivingShipmentNumber,
+  (binLocations, shipmentNumber) => {
+    if (!shipmentNumber) {
+      return null;
+    }
+    return binLocations.find((bin) => bin.name.endsWith(`-${shipmentNumber}`)) ?? null;
+  },
+);

@@ -46,6 +46,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.product.ProductType
+import org.pih.warehouse.product.lot.ProductLot
 import org.pih.warehouse.requisition.RequisitionStatus
 
 import java.text.SimpleDateFormat
@@ -56,6 +57,7 @@ class ProductAvailabilityService {
     def dataSource
     def gparsService
     GrailsApplication grailsApplication
+    InventoryItemManager inventoryItemManager
     def persistenceInterceptor
     def productService
     def locationService
@@ -422,6 +424,42 @@ class ProductAvailabilityService {
         }
 
         return quantityOnHand
+    }
+
+    /**
+     * Each requested lot's expiration date and the depots holding it, sorted by name. Bin locations roll up into
+     * their depot and only positive holdings count. Lots that are not in inventory yet are left out of the result.
+     */
+    List<LotAvailabilityDto> getAvailabilityInAllDepots(AvailabilityCommand command) {
+        List<ProductLot> productLots = command.productLots.collect {
+            new ProductLot(product: it.product, lotNumber: it.lotNumber)
+        }
+        List<InventoryItem> inventoryItems = inventoryItemManager.getInventoryItems(productLots)
+
+        if (!inventoryItems) {
+            return []
+        }
+
+        // The query returns one row per lot and depot, with the quantities of the depot's bin locations summed up.
+        // Those rows are then split per lot, since a single query covers all of the lots that were asked about.
+        Map<InventoryItem, List<DepotAvailabilityDto>> productAvailabilitiesByDepotAndLot = ProductAvailability.createCriteria().list {
+            resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+            projections {
+                groupProperty("inventoryItem", "inventoryItem")
+                groupProperty("location", "location")
+                sum("quantityOnHand", "qoh")
+            }
+            'in'("inventoryItem", inventoryItems)
+            gt("quantityOnHand", 0)
+        }.groupBy {
+            it.inventoryItem as InventoryItem
+        }.collectEntries { InventoryItem inventoryItem, List<Map> depotRows ->
+            [(inventoryItem): depotRows.collect {
+                DepotAvailabilityDto.from(it.location as Location, it.qoh as Integer)
+            }.sort { it.depot.name }]
+        }
+
+        return inventoryItems.collect { LotAvailabilityDto.from(it, productAvailabilitiesByDepotAndLot[it] ?: []) }
     }
 
     Integer getQuantityOnHand(Product product, Location location) {

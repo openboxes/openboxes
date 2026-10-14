@@ -22,6 +22,7 @@ import {
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
+import ProductSelectField from 'components/form-elements/v2/ProductSelectField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import inboundColumns from 'consts/inboundColumns';
@@ -262,7 +263,7 @@ const useInboundAddItemsColumns = ({
               name={`values.lineItems.${row.index}.product`}
               control={control}
               render={({ field }) => (
-                <SelectField
+                <ProductSelectField
                   {...field}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
                   onBlur={() => handleBlur(field, quantityField)}
@@ -282,7 +283,6 @@ const useInboundAddItemsColumns = ({
                     }
                   }}
                   hasErrors={hasErrors}
-                  productSelect
                   // When using ProductSelect instead of Select, ProductSelect sets
                   // showValueTooltip to true by default. This causes the old tooltip
                   // to appear, which we don't want because we're using the new tooltip.

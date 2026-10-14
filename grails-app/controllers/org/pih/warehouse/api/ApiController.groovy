@@ -16,6 +16,7 @@ import grails.util.Environment
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
@@ -33,6 +34,7 @@ class ApiController {
     def userService
     def helpScoutService
     def localizationService
+    ConfigService configService
     GrailsApplication grailsApplication
     def megamenuService
     def messageSource
@@ -184,6 +186,11 @@ class ApiController {
         def browserConnectionTimeout = grailsApplication.config.openboxes.browser.connection.status.timeout
         def isAutosaveEnabled = grailsApplication.config.openboxes.client.autosave.enabled &&
                 supportedActivities.contains(ActivityCode.AUTOSAVE.name())
+        int autosaveBatchSize = configService.getProperty("openboxes.client.autosave.batchSize", Integer, 4)
+        int autosaveDebounceTime = configService.getProperty("openboxes.client.autosave.debounceTime", Integer, 2000)
+        int autosaveMaxRetries = configService.getProperty("openboxes.client.autosave.maxRetries", Integer, 3)
+        int autosaveRetryDelay = configService.getProperty("openboxes.client.autosave.retryDelay", Integer, 5000)
+        int autosaveMaxRetryDelay = configService.getProperty("openboxes.client.autosave.maxRetryDelay", Integer, 40000)
         int cycleCountMaxSelectedProducts = grailsApplication.config.openboxes.cycleCount.products.maxAmount
         def defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale ?: "en")
         def supportedLocales = locales.collect {
@@ -238,6 +245,11 @@ class ApiController {
                 notificationAutohideDelay     : notificationAutohideDelay,
                 browserConnectionTimeout      : browserConnectionTimeout,
                 isAutosaveEnabled             : isAutosaveEnabled,
+                autosaveBatchSize             : autosaveBatchSize,
+                autosaveDebounceTime          : autosaveDebounceTime,
+                autosaveMaxRetries            : autosaveMaxRetries,
+                autosaveRetryDelay            : autosaveRetryDelay,
+                autosaveMaxRetryDelay         : autosaveMaxRetryDelay,
                 cycleCountMaxSelectedProducts : cycleCountMaxSelectedProducts,
                 maxUploadFileSize             : maxUploadFileSize,
             ],

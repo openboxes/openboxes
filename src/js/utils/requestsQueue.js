@@ -7,10 +7,8 @@ const requestsQueue = () => {
 
   // when tasks amount is equal to MAX_SIMULTANEOUS_REQUESTS
   // then the requests are processed automatically,
-  // so we don't have to start processing manually
-  const enqueueRequest = (request) => {
-    queue.add(request);
-  };
+  // so we don't have to start processing manually.
+  const enqueueRequest = (request) => queue.add(request);
 
   return {
     enqueueRequest,

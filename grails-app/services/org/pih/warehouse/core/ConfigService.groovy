@@ -18,6 +18,14 @@ class ConfigService {
     }
 
     /**
+     * Fetches the given property, casting it to the given type and falling back to the given
+     * default when the property is not set.
+     */
+    public <T> T getProperty(String property, Class<T> type, T defaultValue) {
+        return grailsApplication.config.getProperty(property, type, defaultValue)
+    }
+
+    /**
      * Statically fetches the given property, casting it to the given type.
      * Only to be used outside of the context of the grails app. When possible, use the non-static version.
      */

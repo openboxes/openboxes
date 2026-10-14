@@ -16,6 +16,7 @@ const ModalWithTable = ({
   cancelLabel,
   onConfirm,
   onCancel,
+  children,
 }) => {
   if (!isOpen) {
     document.body.style.overflowY = 'auto';
@@ -30,7 +31,9 @@ const ModalWithTable = ({
           {subtitle && <p className="modal-content__header__subtitle">{subtitle}</p>}
         </div>
         <div className="modal-content__main">
-          <DataTable totalCount={data?.length} data={data} columns={columns} disablePagination />
+          {children ?? (
+            <DataTable totalCount={data?.length} data={data} columns={columns} disablePagination />
+          )}
         </div>
         <div className="modal-content__buttons">
           {onCancel && (
@@ -59,8 +62,8 @@ ModalWithTable.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   title: PropTypes.string,
   subtitle: PropTypes.string,
-  columns: PropTypes.arrayOf(PropTypes.object).isRequired,
-  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  columns: PropTypes.arrayOf(PropTypes.object),
+  data: PropTypes.arrayOf(PropTypes.object),
   confirmLabel: PropTypes.shape({
     id: PropTypes.string.isRequired,
     defaultMessage: PropTypes.string.isRequired,
@@ -71,11 +74,15 @@ ModalWithTable.propTypes = {
   }),
   onConfirm: PropTypes.func,
   onCancel: PropTypes.func,
+  children: PropTypes.node,
 };
 
 ModalWithTable.defaultProps = {
   title: null,
   subtitle: null,
+  columns: [],
+  data: [],
+  children: null,
   confirmLabel: {
     id: 'react.default.yes.label',
     defaultMessage: 'Yes',

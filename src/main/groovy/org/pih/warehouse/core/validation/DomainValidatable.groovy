@@ -3,13 +3,13 @@ package org.pih.warehouse.core.validation
 import org.grails.datastore.gorm.GormValidateable
 
 /**
- * Marks a domain entity as able to be validated by our custom validation logic.
+ * Marks a domain entity as able to be validated by our custom validation flow.
+ * This is achieved by hooking our custom validation into the entity's validate() method.
  *
- * Hooks into Grails validation by wrapping GormValidateable.validate() methods with additional validation.
- *
- * @param <V> Optional. The {@link Validator} component containing additional validation to perform on this object.
+ * @param <V> Optional. The {@link DomainValidator} component containing additional validation to perform on this
+ *            object. If not provided, will only validate via Grails constraints and Javax annotations.
  */
-trait DomainValidatable<V extends Validator> implements Validatable<V>, GormValidateable {
+trait DomainValidatable<V extends DomainValidator> implements Validatable<V>, GormValidateable {
 
     @Override
     boolean validate() {

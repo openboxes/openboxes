@@ -23,15 +23,6 @@
             </g:if>
             <th><warehouse:message code="product.productCode.label"/></th>
             <th><warehouse:message code="product.label"/></th>
-            <th class="left">
-                <warehouse:message code="inventoryItem.binLocation.label" default="Bin Location"/>
-                <g:if test="${shipmentInstance?.origin?.id == session.warehouse?.id}">
-                    <small><warehouse:message code="location.picking.label"/></small>
-                </g:if>
-                <g:elseif test="${shipmentInstance?.destination?.id == session.warehouse?.id}">
-                    <small><warehouse:message code="location.putaway.label"/></small>
-                </g:elseif>
-            </th>
             <th class="left"><warehouse:message code="default.lotSerialNo.label"/></th>
             <th class="center"><warehouse:message code="default.expires.label"/></th>
             <th class="center"><warehouse:message code="shipmentItem.quantityShipped.label"/></th>
@@ -41,6 +32,15 @@
             </g:if>
             <th><warehouse:message code="product.uom.label"/></th>
             <th><warehouse:message code="shipping.recipient.label"/></th>
+            <th class="left">
+                <warehouse:message code="inventoryItem.binLocation.label" default="Bin Location"/>
+                <g:if test="${shipmentInstance?.origin?.id == session.warehouse?.id}">
+                    <small><warehouse:message code="location.picking.label"/></small>
+                </g:if>
+                <g:elseif test="${shipmentInstance?.destination?.id == session.warehouse?.id}">
+                    <small><warehouse:message code="location.putaway.label"/></small>
+                </g:elseif>
+            </th>
             <th class="left"><warehouse:message code="default.comment.label"/></th>
             <th><warehouse:message code="shipmentItem.isFullyReceived.label" default="Received?"/></th>
         </tr>
@@ -50,6 +50,10 @@
             <g:each var="shipmentItem" in="${shipmentInstance.sortShipmentItemsBySortOrder()}" status="i">
                 <g:set var="rowspan" value="${shipmentItemsByContainer[shipmentItem?.container]?.size() }"/>
                 <g:set var="newContainer" value="${previousContainer != shipmentItem?.container }"/>
+                %{-- Workflow-aware received/canceled totals - the ShipmentItem getters undercount v2 receipts
+                     whose lines were received against an edited product --}%
+                <g:set var="receivedQuantities" value="${receivedQuantitiesByShipmentItemId?.get(shipmentItem?.id)}"/>
+                <g:set var="receiptItemsWithQuantitySorted" value="${shipmentItem?.receiptItemsWithQuantity?.sort { it.sortOrder }}"/>
                 <tr class="prop ${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'new-container':''} ${shipmentItem?.hasRecalledLot?'recalled':''} shipmentItem">
                     <td aria-label="Recalled" data-testid="recalled">
                         <g:if test="${shipmentItem?.hasRecalledLot}">
@@ -95,28 +99,9 @@
                             </cache:block>
                         </g:link>
                     </td>
-                    <td aria-label="Bin Location" data-testid="bin-location">
-                        <g:if test="${shipmentInstance?.origin?.id == session.warehouse?.id}">
-                            <g:if test="${shipmentItem?.binLocation}">
-                                ${shipmentItem?.binLocation?.name}
-                            </g:if>
-                            <g:else>
-                                ${g.message(code:'default.label')}
-                            </g:else>
-                        </g:if>
-                        <g:elseif test="${shipmentInstance?.destination?.id == session?.warehouse?.id}">
-                            <g:if test="${shipmentItem?.receiptItems}">
-                                <g:each var="receiptItem" in="${shipmentItem?.receiptItems.sort { it.sortOrder }}">
-                                    <div style="margin-bottom: 10px;" title="${receiptItem?.quantityReceived} ${receiptItem?.inventoryItem?.product?.unitOfMeasure?:'EA'}">
-                                        ${receiptItem?.binLocation?.name?:g.message(code:'default.label')}
-                                    </div>
-                                </g:each>
-                            </g:if>
-                        </g:elseif>
-                    </td>
                     <td aria-label="Lot Number" class="lotNumber" data-testid="lot-number">
-                        <g:if test="${shipmentItem?.receiptItems}">
-                            <g:each var="receiptItem" in="${shipmentItem?.receiptItems.sort { it.sortOrder }}">
+                        <g:if test="${receiptItemsWithQuantitySorted}">
+                            <g:each var="receiptItem" in="${receiptItemsWithQuantitySorted}">
                                 <div style="margin-bottom: 10px;" title="${receiptItem?.quantityReceived} ${receiptItem?.inventoryItem?.product?.unitOfMeasure?:'EA'}">
                                     ${receiptItem?.lotNumber}
                                 </div>
@@ -127,8 +112,8 @@
                         </g:else>
                     </td>
                     <td aria-label="Expiration Date" class="center expirationDate" nowrap="nowrap" data-testid="expiration-date">
-                        <g:if test="${shipmentItem?.receiptItems}">
-                            <g:each var="receiptItem" in="${shipmentItem?.receiptItems.sort { it.sortOrder }}">
+                        <g:if test="${receiptItemsWithQuantitySorted}">
+                            <g:each var="receiptItem" in="${receiptItemsWithQuantitySorted}">
                                 <div style="margin-bottom: 10px;" title="${receiptItem?.quantityReceived} ${receiptItem?.inventoryItem?.product?.unitOfMeasure?:'EA'}">
                                     <g:if test="${receiptItem?.expirationDate}">
                                         <span class="expirationDate">
@@ -164,19 +149,19 @@
                         <g:formatNumber number="${shipmentItem?.quantity}" format="###,##0" />
                     </td>
                     <g:if test="${shipmentInstance?.wasReceived()||shipmentInstance?.wasPartiallyReceived()}">
-                        <td aria-label="Quantity Received" class="center" style="white-space:nowrap;${shipmentItem?.quantityReceived() != shipmentItem?.quantity ? ' color:red;' : ''}" data-testid="quantity-received">
-                            <g:formatNumber number="${shipmentItem?.quantityReceived()}" format="###,##0"/>
+                        <td aria-label="Quantity Received" class="center" style="white-space:nowrap;${receivedQuantities?.quantityReceived != shipmentItem?.quantity ? ' color:red;' : ''}" data-testid="quantity-received">
+                            <g:formatNumber number="${receivedQuantities?.quantityReceived}" format="###,##0"/>
                         </td>
-                        <td aria-label="Quantity Canceled" class="center" style="white-space:nowrap;${shipmentItem?.quantityReceived() != shipmentItem?.quantity ? ' color:red;' : ''}" data-testid="quantity-canceled">
-                            <g:formatNumber number="${shipmentItem?.quantityCanceled()}" format="###,##0"/>
+                        <td aria-label="Quantity Canceled" class="center" style="white-space:nowrap;${receivedQuantities?.quantityReceived != shipmentItem?.quantity ? ' color:red;' : ''}" data-testid="quantity-canceled">
+                            <g:formatNumber number="${receivedQuantities?.quantityCanceled}" format="###,##0"/>
                         </td>
                     </g:if>
                     <td aria-label="Unit Of Measure" data-testid="uom">
                         ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                     </td>
                     <td aria-label="Recipient" class="left" nowrap="nowrap" data-testid="recipient">
-                        <g:if test="${shipmentItem?.receiptItems}">
-                            <g:each var="receiptItem" in="${shipmentItem?.receiptItems.sort { it.sortOrder }}">
+                        <g:if test="${receiptItemsWithQuantitySorted}">
+                            <g:each var="receiptItem" in="${receiptItemsWithQuantitySorted}">
                                 <div style="margin-bottom: 10px;" title="${receiptItem?.quantityReceived} ${receiptItem?.inventoryItem?.product?.unitOfMeasure?:'EA'}">
                                     ${receiptItem?.recipient?.name?:g.message(code:'default.none.label')}
                                 </div>
@@ -189,6 +174,25 @@
                             <div class="fade"><warehouse:message code="default.none.label"/></div>
                         </g:else>
                     </td>
+                    <td aria-label="Bin Location" data-testid="bin-location">
+                        <g:if test="${shipmentInstance?.origin?.id == session.warehouse?.id}">
+                            <g:if test="${shipmentItem?.binLocation}">
+                                ${shipmentItem?.binLocation?.name}
+                            </g:if>
+                            <g:else>
+                                ${g.message(code:'default.label')}
+                            </g:else>
+                        </g:if>
+                        <g:elseif test="${shipmentInstance?.destination?.id == session?.warehouse?.id}">
+                            <g:if test="${receiptItemsWithQuantitySorted}">
+                                <g:each var="receiptItem" in="${receiptItemsWithQuantitySorted}">
+                                    <div style="margin-bottom: 10px;" title="${receiptItem?.quantityReceived} ${receiptItem?.inventoryItem?.product?.unitOfMeasure?:'EA'}">
+                                        ${receiptItem?.binLocation?.name?:g.message(code:'default.label')}
+                                    </div>
+                                </g:each>
+                            </g:if>
+                        </g:elseif>
+                    </td>
                     <td aria-label="Comment" class="left" data-testid="comment">
                         <g:if test="${shipmentItem?.comments}">
                             <div title="${shipmentItem?.comments.join("\r\n")}">
@@ -200,7 +204,7 @@
                         </g:else>
                     </td>
                     <td aria-label="Is Fully Received" data-testid="is-fully-received">
-                        <g:message code="default.boolean.${shipmentItem?.isFullyReceived()}"/>
+                        <g:message code="default.boolean.${receivedQuantities?.fullyReceived ?: false}"/>
                     </td>
                 </tr>
                 <g:set var="previousContainer" value="${shipmentItem.container }"/>

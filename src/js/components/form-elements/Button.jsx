@@ -3,6 +3,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
+import TooltipWrapper from 'components/form-elements/TooltipWrapper';
 import Translate from 'utils/Translate';
 
 const Button = ({
@@ -17,12 +18,15 @@ const Button = ({
   StartIcon,
   className,
   customRef,
+  tooltipLabel,
+  defaultTooltipLabel,
 }) => {
   const buttonClass = 'd-flex justify-content-around align-items-center gap-8';
   const variantClass = `${variant}-button`;
   const dropDownClass = `${isDropdown ? 'dropdown-toggle' : ''}`;
+  const hasTooltip = Boolean(tooltipLabel) || Boolean(defaultTooltipLabel);
 
-  return (
+  const button = (
     <button
       className={[variantClass, buttonClass, dropDownClass, className].join(' ')}
       disabled={disabled}
@@ -40,6 +44,14 @@ const Button = ({
       </>
     </button>
   );
+
+  return hasTooltip
+    ? (
+      <TooltipWrapper tooltipLabel={tooltipLabel} defaultTooltipLabel={defaultTooltipLabel}>
+        {button}
+      </TooltipWrapper>
+    )
+    : button;
 };
 
 export default Button;
@@ -66,6 +78,8 @@ Button.propTypes = {
     PropTypes.func,
     PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
   ]),
+  tooltipLabel: PropTypes.string,
+  defaultTooltipLabel: PropTypes.string,
 };
 
 Button.defaultProps = {
@@ -78,4 +92,6 @@ Button.defaultProps = {
   StartIcon: null,
   className: '',
   customRef: null,
+  tooltipLabel: null,
+  defaultTooltipLabel: '',
 };

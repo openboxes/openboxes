@@ -12,7 +12,7 @@ import testutil.ApiControllerSpec
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.dtos.BatchCommandUtils
-import org.pih.warehouse.core.mapper.ResponseMapper
+import org.pih.warehouse.core.serialization.SerializationMapper
 import org.pih.warehouse.inventory.CycleCountCandidate
 import org.pih.warehouse.inventory.CycleCountCandidateFilterCommand
 import org.pih.warehouse.inventory.CycleCountCandidateMapper
@@ -76,7 +76,7 @@ class CycleCountApiControllerSpec extends ApiControllerSpec<CycleCountApiControl
     }
 
     @Override
-    List<ResponseMapper> setupResponseMappers() {
+    List<SerializationMapper> setupSerializationMappers() {
         return [new CycleCountCandidateMapper()]
     }
 
@@ -84,8 +84,8 @@ class CycleCountApiControllerSpec extends ApiControllerSpec<CycleCountApiControl
         given:
         CycleCountCandidateFilterCommand filterParams = new CycleCountCandidateFilterCommand(format: JSON_FORMAT)
         Query mockQuery = Stub(Query) {
-            list() >> [Mock(CycleCountCandidate),
-                       Mock(CycleCountCandidate),]
+            list() >> [new CycleCountCandidate(),
+                       new CycleCountCandidate(),]
         }
         List<CycleCountCandidate> mockedCandidates = Spy(PagedResultList, constructorArgs: [mockQuery]) {
             getTotalCount() >> mockQuery.list().size()
