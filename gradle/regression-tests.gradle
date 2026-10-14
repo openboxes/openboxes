@@ -1,0 +1,258 @@
+/*
+ * Regression suite: unit specs under org.pih.warehouse.regression (src/test) and integration specs under
+ * org.pih.warehouse.api.regression (src/integration-test). See docs/developer-guide/regression-suite.md.
+ *
+ * They run in their own test tasks so that OpenBoxes' own "test" and "integrationTest" tasks keep their
+ * behaviour and their database settings:
+ *
+ *   regressionTest              the unit specs
+ *   regressionIntegrationTest   the integration specs, on a Testcontainers database configured with
+ *                               src/test/resources/regression-testcontainers/my.cnf (the sql-mode the installation
+ *                               guide recommends for production)
+ *
+ * Run them with ./gradlew regressionTest regressionIntegrationTest. They are not part of "check" or "jacocoTestReport":
+ * CI runs them in their own workflow (.github/workflows/regression-tests.yml), the unit specs once and the integration
+ * specs in parallel shards (-PregressionShard=<i>/<n>, balanced by gradle/regression-spec-times.txt).
+ * Features annotated with @PendingFeature describe a known defect: they are reported as skipped while the defect
+ * is there, and fail once it is fixed (remove the annotation then). -PrunPending runs them as normal features.
+ *
+ * Applied at the end of build.gradle.
+ */
+
+dependencies {
+    // OpenAPI request/response validation of the API calls the integration specs make (SpecValidationFilter).
+    // The excludes keep the classpath as it is without these libraries, plus their own new modules: jsr305 and the
+    // jakarta.xml.bind / jakarta.activation APIs are already there under other names, com.sun.mail:mailapi would
+    // duplicate the javax.mail classes of jakarta.mail, and com.github.fge:jackson-coreutils those of
+    // com.github.java-json-tools:jackson-coreutils.
+    testCompile('com.atlassian.oai:swagger-request-validator-core:2.8.4') {
+        exclude group: 'com.google.code.findbugs', module: 'jsr305'
+        exclude group: 'jakarta.xml.bind', module: 'jakarta.xml.bind-api'
+        exclude group: 'jakarta.activation', module: 'jakarta.activation-api'
+        exclude group: 'com.sun.mail', module: 'mailapi'
+        exclude group: 'com.github.fge', module: 'jackson-coreutils'
+    }
+    testCompile('com.github.java-json-tools:json-schema-validator:2.2.11') {
+        force = true  // the validator and its swagger-parser ask for 2.2.11 and 2.2.8
+        exclude group: 'com.google.code.findbugs', module: 'jsr305'
+        exclude group: 'com.sun.mail', module: 'mailapi'
+    }
+    testCompile('com.atlassian.oai:swagger-request-validator-restassured:2.8.4') {
+        exclude group: 'io.rest-assured'
+        exclude group: 'com.google.code.findbugs', module: 'jsr305'
+        exclude group: 'jakarta.xml.bind', module: 'jakarta.xml.bind-api'
+        exclude group: 'jakarta.activation', module: 'jakarta.activation-api'
+        exclude group: 'com.sun.mail', module: 'mailapi'
+        exclude group: 'com.github.fge', module: 'jackson-coreutils'
+    }
+}
+
+String regressionPackage = 'org/pih/warehouse/regression/**'
+String regressionApiPackage = 'org/pih/warehouse/api/regression/**'
+File regressionReportsDir = new File(buildDir, 'reports/regression')
+
+// OpenBoxes' own test tasks leave the regression packages to the tasks below.
+test {
+    exclude regressionPackage
+}
+integrationTest {
+    exclude regressionApiPackage
+}
+
+task regressionTest(type: Test) {
+    description = 'Runs the regression suite unit specs (org.pih.warehouse.regression).'
+    group = 'Verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    include regressionPackage
+    mustRunAfter test
+    // Unit specs share no state across JVMs: run them in parallel forks.
+    maxParallelForks = Math.max(1, Math.min(4, Runtime.runtime.availableProcessors().intdiv(2)))
+}
+
+task regressionIntegrationTest(type: Test) {
+    description = 'Runs the regression suite integration specs (org.pih.warehouse.api.regression).'
+    group = 'Verification'
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    include regressionApiPackage
+    mustRunAfter integrationTest, regressionTest
+
+    // The same database image as integrationTest (TEST_DATABASE, default mysql:8.0.36), with our my.cnf.
+    // -PtestDatabase=<image> overrides it: a reused Gradle daemon keeps the TEST_DATABASE it was started with.
+    String db = project.findProperty('testDatabase') ?: System.getenv('TEST_DATABASE') ?: 'mysql:8.0.36'
+    environment 'TEST_DATABASE', db
+    systemProperty 'TEST_DATABASE', db
+    systemProperty 'dataSource.url', "jdbc:tc:${db}:///openboxes?TC_MY_CNF=regression-testcontainers".toString()
+    inputs.property 'testDatabase', db
+
+    // -PregressionShard=<i>/<n>: run only shard i of n (1-based), for parallel CI jobs. Spec classes are spread
+    // over the shards by their measured run time (gradle/regression-spec-times.txt, longest first onto the least
+    // loaded shard); a spec missing from that file goes to a shard chosen by its name.
+    String shardArg = project.findProperty('regressionShard')
+    if (shardArg) {
+        List<String> parts = shardArg.tokenize('/')
+        if (parts.size() != 2 || !parts.every { it.isInteger() }) {
+            throw new GradleException("regressionShard must be <i>/<n>, not ${shardArg}")
+        }
+        int shard = parts[0] as int
+        int shards = parts[1] as int
+        if (shards < 1 || shard < 1 || shard > shards) {
+            throw new GradleException("regressionShard must be <i>/<n> with 1 <= i <= n, not ${shardArg}")
+        }
+        Map<String, Integer> assignment = regressionShardAssignment(file('gradle/regression-spec-times.txt'), shards)
+        inputs.property 'regressionShard', shardArg
+        exclude { FileTreeElement e ->
+            if (e.directory || !e.name.endsWith('.class')) {
+                return false
+            }
+            String specName = e.name.replaceAll(/(\$.*)?\.class$/, '')   // inner classes follow their spec
+            Integer assigned = assignment[specName]
+            int target = assigned != null ? assigned : Math.floorMod(specName.hashCode(), shards) + 1
+            return target != shard
+        }
+        // A shard must run something: an empty one would hide a broken partition behind a green job.
+        long testsRun = 0
+        afterSuite { TestDescriptor suite, TestResult result ->
+            if (suite.parent == null) {
+                testsRun += result.testCount
+            }
+        }
+        doLast {
+            if (testsRun == 0) {
+                throw new GradleException("regression shard ${shardArg} ran no tests")
+            }
+        }
+    }
+}
+
+/** Spec simple name -> shard (1-based), greedy by the measured seconds in the times file ("<SpecName> <seconds>"). */
+Map<String, Integer> regressionShardAssignment(File timesFile, int shards) {
+    Map<String, Double> times = [:]
+    if (timesFile.exists()) {
+        timesFile.eachLine { String line ->
+            List<String> parts = line.trim().tokenize()
+            if (parts.size() == 2 && !line.startsWith('#')) {
+                times[parts[0]] = parts[1] as double
+            }
+        }
+    }
+    double[] load = new double[shards]
+    Map<String, Integer> assignment = [:]
+    times.sort { a, b -> b.value <=> a.value ?: a.key <=> b.key }.each { String spec, Double seconds ->
+        int lightest = (0..<shards).min { load[it] }
+        load[lightest] += seconds
+        assignment[spec] = lightest + 1
+    }
+    return assignment
+}
+
+configure([regressionTest, regressionIntegrationTest]) { Test t ->
+    systemProperty 'grails.env', 'test'
+    // The specs assume UTC (as on CI); a developer machine in another zone would fail date-formatting cases.
+    systemProperty 'user.timezone', 'UTC'
+    environment 'TZ', 'UTC'
+    maxHeapSize = '2g'
+    systemProperty 'regression.suite', 'true'   // switches on the API call tracking extension
+    systemProperty 'regression.testTask', t.name
+    systemProperty 'regression.reports.dir', regressionReportsDir.absolutePath
+    systemProperty 'apiCoverage.dir', new File(regressionReportsDir, 'api-coverage').absolutePath  // API operations hit
+    // OpenAPI validation of every API call: report (default) or enforce
+    systemProperty 'regression.specValidation', project.findProperty('regression.specValidation') ?: 'report'
+    if (project.hasProperty('runPending')) {
+        systemProperty 'regression.runPending', 'true'
+    }
+    if (project.findProperty('apiDocs.captureDir')) {
+        systemProperty 'apiDocs.captureDir', project.property('apiDocs.captureDir')
+    }
+    reports.html.destination = file("${buildDir}/reports/tests/${t.name}")
+    reports.junitXml.destination = file("${buildDir}/test-results/${t.name}")
+}
+
+
+/*
+ * The API specs run on a shared database without rollback. apiIsolationTest checks they do not depend on a clean
+ * database: it runs them twice against one persistent database, so the second run meets everything the first one
+ * left behind (duplicate names, counts that assume "only my records", ...).
+ *
+ *   ./gradlew apiIsolationTest -PapiIsolationDbUrl=jdbc:mysql://127.0.0.1:3306/<empty database> \
+ *       [-PapiIsolationDbUser=openboxes -PapiIsolationDbPassword=openboxes] [-PapiIsolationTests=<pattern>]
+ */
+String isolationPattern = project.findProperty('apiIsolationTests') ?: 'org.pih.warehouse.api.regression.platform.spec.*'
+['apiIsolationFirstRun', 'apiIsolationSecondRun'].each { String runName ->
+    task(runName, type: Test) {
+        description = 'One of the two runs of apiIsolationTest.'
+        group = 'Verification'
+        testClassesDirs = sourceSets.integrationTest.output.classesDirs
+        classpath = sourceSets.integrationTest.runtimeClasspath
+        filter {
+            includeTestsMatching isolationPattern
+        }
+        systemProperty 'grails.env', 'test'
+        systemProperty 'user.timezone', 'UTC'
+        environment 'TZ', 'UTC'
+        maxHeapSize = '2g'
+        systemProperty 'regression.suite', 'true'
+        systemProperty 'regression.reports.dir', regressionReportsDir.absolutePath
+        systemProperty 'dataSource.url', project.findProperty('apiIsolationDbUrl') ?: ''
+        systemProperty 'dataSource.driverClassName', 'com.mysql.cj.jdbc.Driver'
+        systemProperty 'dataSource.username', project.findProperty('apiIsolationDbUser') ?: 'openboxes'
+        systemProperty 'dataSource.password', project.findProperty('apiIsolationDbPassword') ?: 'openboxes'
+        reports.html.destination = file("${buildDir}/reports/tests/${runName}")
+        reports.junitXml.destination = file("${buildDir}/test-results/${runName}")
+        jacoco {
+            enabled = false
+        }
+        doFirst {
+            if (!project.findProperty('apiIsolationDbUrl')) {
+                throw new GradleException('apiIsolationTest needs -PapiIsolationDbUrl=<JDBC URL of an empty database>')
+            }
+        }
+    }
+}
+apiIsolationSecondRun.mustRunAfter apiIsolationFirstRun
+task apiIsolationTest {
+    description = 'Runs the regression API specs twice against one database: they must not depend on a clean database.'
+    group = 'Verification'
+    dependsOn apiIsolationFirstRun, apiIsolationSecondRun
+}
+
+// Writes OpenAPI stubs for undocumented API routes into src/integration-test/resources/openapi.
+task apiDocsGenerate(type: Test) {
+    description = 'Adds stub operations to the OpenAPI spec of the regression suite for every undocumented API route.'
+    group = 'documentation'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    filter.includeTestsMatching 'org.pih.warehouse.regression.apidocs.ApiDocsGenerateSpec'
+    systemProperty 'apiDocs.generate', 'true'
+    // -PapiDocs.prune: also remove documented operations no route answers, retarget mismatched ones
+    systemProperty 'apiDocs.prune', project.hasProperty('apiDocs.prune') ? 'true' : 'false'
+    systemProperty 'regression.openapi.dir', file('src/integration-test/resources/openapi').absolutePath
+    outputs.upToDateWhen { false }
+    jacoco.enabled = false
+}
+
+// Summarizes the OpenAPI violations the integration specs saw (report only).
+task regressionReports {
+    description = 'Summarizes the OpenAPI validation report of the regression suite.'
+    group = 'Verification'
+    outputs.upToDateWhen { false }
+    doLast {
+        File violations = new File(regressionReportsDir, 'spec-violations')
+        List<String> lines = []
+        (violations.listFiles() ?: []).findAll { it.name.endsWith('.jsonl') }.each { lines.addAll(it.readLines().findAll { it }) }
+        if (violations.exists()) {
+            new File(regressionReportsDir, 'spec-violations.jsonl').text = lines.join('\n') + (lines ? '\n' : '')
+            Map<String, Integer> byKind = lines.collect { new groovy.json.JsonSlurper().parseText(it).kind as String }.countBy { it }
+            new File(regressionReportsDir, 'spec-violations-summary.txt').text =
+                    "OpenAPI validation (report only): ${lines.size()} violation(s)\n" +
+                    byKind.sort().collect { k, v -> "  ${k}: ${v}" }.join('\n') + '\n'
+            logger.lifecycle("OpenAPI validation (report only): ${lines.size()} violation(s) ${byKind} -> ${regressionReportsDir}")
+        }
+    }
+}
+regressionIntegrationTest.finalizedBy regressionReports
+// Each run reports only its own violations.
+regressionIntegrationTest.doFirst {
+    project.delete(new File(regressionReportsDir, 'spec-violations'))
+}

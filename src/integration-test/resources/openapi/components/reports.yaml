@@ -1,0 +1,229 @@
+# Shared schemas of the inventory audit, inventory transaction and inventory indicator reports.
+# Documented properties are guaranteed (required) or nullable; other properties may appear.
+
+ReportProduct:
+  description: A product as the reports show it.
+  type: object
+  required: [id, productCode, name]
+  properties:
+    id:
+      type: string
+    productCode:
+      type: string
+    name:
+      type: string
+    category:
+      type: string
+      nullable: true
+      description: The category's name.
+    abcClass:
+      type: string
+      nullable: true
+    tags:
+      type: array
+      items:
+        type: object
+        additionalProperties: true
+    catalogs:
+      type: array
+      items:
+        type: object
+        additionalProperties: true
+  additionalProperties: true
+
+ReportFacility:
+  description: The facility a report row belongs to.
+  type: object
+  required: [id, name]
+  properties:
+    id:
+      type: string
+    name:
+      type: string
+    locationNumber:
+      type: string
+      nullable: true
+  additionalProperties: true
+
+InventoryAuditDetailsRow:
+  description: One stock adjustment of a product at the facility, with the stock after it.
+  type: object
+  required: [facility, inventoryItem, transactionType, transactionNumber, transactionDate, quantityAdjusted, quantityOnHand]
+  properties:
+    facility:
+      $ref: '#/ReportFacility'
+    inventoryItem:
+      type: object
+      required: [product]
+      properties:
+        id:
+          type: string
+          nullable: true
+        product:
+          $ref: '#/ReportProduct'
+        lotNumber:
+          type: string
+          nullable: true
+        expirationDate:
+          type: string
+          nullable: true
+        location:
+          type: object
+          description: The bin of the adjustment (id and name null when the stock has no bin).
+          additionalProperties: true
+      additionalProperties: true
+    transactionType:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        operation:
+          type: string
+          description: CREDIT, DEBIT, PRODUCT_INVENTORY or INVENTORY.
+      additionalProperties: true
+    transactionNumber:
+      type: string
+    transactionDate:
+      type: string
+      format: date-time
+    cycleCount:
+      type: object
+      description: The cycle count the adjustment came from (id and status null for other adjustments).
+      additionalProperties: true
+    quantityAdjusted:
+      type: number
+      description: The change in quantity (negative for a loss).
+    amountAdjusted:
+      type: number
+      nullable: true
+      description: quantityAdjusted at the product's unit price.
+    quantityOnHand:
+      type: number
+      description: The stock after the adjustment.
+    amountOnHand:
+      type: number
+      nullable: true
+  additionalProperties: true
+
+InventoryAuditSummaryRow:
+  description: One product's adjustments at the facility over the range, totalled.
+  type: object
+  required: [facility, product, numberOfAdjustments, quantityAdjusted, quantityOnHand]
+  properties:
+    facility:
+      $ref: '#/ReportFacility'
+    product:
+      $ref: '#/ReportProduct'
+    lastCounted:
+      type: string
+      format: date-time
+      nullable: true
+    pricePerUnit:
+      type: number
+      nullable: true
+    numberOfCounts:
+      type: integer
+      nullable: true
+      description: Inventory counts of the product in the range (null when there were none).
+    numberOfAdjustments:
+      type: integer
+    quantityAdjusted:
+      type: number
+    valueAdjusted:
+      type: number
+      nullable: true
+    quantityDemanded:
+      type: number
+    monthsOfStockChange:
+      type: number
+      nullable: true
+    quantityOnHand:
+      type: number
+    valueOnHand:
+      type: number
+      nullable: true
+  additionalProperties: true
+
+InventoryTransactionsSummaryRow:
+  description: One stock count or record-stock transaction, with the quantity before and after it.
+  type: object
+  required: [transaction, product, facility, quantityBefore, quantityAfter, quantityDifference, dateRecorded]
+  properties:
+    transaction:
+      type: object
+      properties:
+        transactionNumber:
+          type: string
+      additionalProperties: true
+    product:
+      type: object
+      required: [id, productCode, name]
+      properties:
+        id:
+          type: string
+        productCode:
+          type: string
+        name:
+          type: string
+        displayName:
+          type: string
+          nullable: true
+      additionalProperties: true
+    facility:
+      $ref: '#/ReportFacility'
+    quantityBefore:
+      type: number
+    quantityAfter:
+      type: number
+    quantityDifference:
+      type: number
+    dateRecorded:
+      type: string
+      format: date-time
+    recordedBy:
+      type: object
+      nullable: true
+      properties:
+        name:
+          type: string
+      additionalProperties: true
+    rootCauses:
+      type: array
+      nullable: true
+      items:
+        type: string
+    comments:
+      type: array
+      items:
+        type: string
+    varianceTypeCode:
+      type: string
+      nullable: true
+      description: MORE, LESS or EQUAL.
+    transactionAction:
+      type: string
+      nullable: true
+      description: What recorded the stock (e.g. RECORD_STOCK, CYCLE_COUNT).
+  additionalProperties: true
+
+InventoryIndicator:
+  description: |
+    One inventory indicator tile. SINGLE tiles carry value; DOUBLE tiles carry firstValue (the figure) and
+    secondValue (what it is based on).
+  type: object
+  required: [name, type]
+  properties:
+    name:
+      type: string
+    type:
+      type: string
+      enum: [SINGLE, DOUBLE]
+    value:
+      type: number
+    firstValue:
+      type: number
+    secondValue:
+      type: number
+  additionalProperties: true

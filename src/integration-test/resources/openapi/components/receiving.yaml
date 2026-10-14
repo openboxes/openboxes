@@ -1,0 +1,306 @@
+# Shared schemas of picking, receiving and putaway (picklists, partial receipts, receipts v2, putaway candidates).
+# Listed under components/schemas in openapi.yaml. Properties not listed may appear in responses; the listed ones are
+# always there (required) or may be null (nullable), as the integration tests check against real responses.
+# Several of these shapes use flat dotted keys ("product.name") - that is how the application renders them.
+
+PicklistItem:
+  description: A picked line of a picklist (lot, bin and quantity of a requested item).
+  type: object
+  required: [id, quantityPicked]
+  properties:
+    id: {type: string}
+    status: {type: string, nullable: true}
+    picklist.id: {type: string}
+    requisitionItem.id: {type: string, nullable: true}
+    inventoryItem.id: {type: string, nullable: true}
+    product.name: {type: string, nullable: true}
+    product.displayName: {type: string, nullable: true}
+    product.color: {type: string, nullable: true}
+    productCode: {type: string, nullable: true}
+    lotNumber: {type: string, nullable: true}
+    expirationDate: {type: string, nullable: true}
+    binLocation.id: {type: string, nullable: true}
+    binLocation.name: {type: string, nullable: true}
+    binLocation.zoneId: {type: string, nullable: true}
+    binLocation.zoneName: {type: string, nullable: true}
+    quantityPicked: {type: integer, nullable: true}
+    reasonCode: {type: string, nullable: true}
+    comment: {type: string, nullable: true}
+  additionalProperties: true
+
+Picklist:
+  description: The picklist of a request (stock movement).
+  type: object
+  required: [id]
+  properties:
+    id: {type: string}
+    name: {type: string, nullable: true}
+    description: {type: string, nullable: true}
+    picker: {type: object, nullable: true, additionalProperties: true}
+    datePicked: {type: string, nullable: true}
+    requisition.id: {type: string, nullable: true}
+    picklistItems:
+      type: array
+      nullable: true
+      description: The picked lines; null in the create response.
+      items: {$ref: '#/PicklistItem'}
+  additionalProperties: true
+
+PicklistInput:
+  description: The fields of a picklist to create or change (on update, only the fields sent change).
+  type: object
+  properties:
+    requisition: {$ref: 'catalog.yaml#/RefInput'}
+    name: {type: string}
+    description: {type: string}
+    datePicked: {type: string}
+  additionalProperties: true
+
+PartialReceiptItem:
+  description: One line of a shipment as the receiving page shows it.
+  type: object
+  required: [shipmentItemId, quantityShipped]
+  properties:
+    receiptItemId: {type: string, nullable: true, description: 'The receipt line, once one is saved.'}
+    shipmentItemId: {type: string}
+    product.id: {type: string}
+    product.productCode: {type: string}
+    product.name: {type: string}
+    lotNumber: {type: string, nullable: true}
+    expirationDate: {type: string, nullable: true}
+    binLocation.id: {type: string, nullable: true}
+    binLocation.name: {type: string, nullable: true}
+    recipient.id: {type: string, nullable: true}
+    recipient.name: {type: string, nullable: true}
+    quantityShipped: {type: integer}
+    quantityReceived: {type: integer, nullable: true}
+    quantityCanceled: {type: integer, nullable: true}
+    quantityReceiving: {type: integer, nullable: true, description: 'What is being received now.'}
+    quantityRemaining: {type: integer, nullable: true}
+    cancelRemaining: {type: boolean, nullable: true}
+    quantityOnHand: {type: integer, nullable: true}
+    comment: {type: string, nullable: true}
+  additionalProperties: true
+
+PartialReceipt:
+  description: |
+    A shipment's state of receiving, as the receiving page works on it: its lines grouped by container (pallet/box),
+    with what was shipped, received, canceled and is being received now.
+  type: object
+  required: [shipmentId, receiptStatus, containers]
+  properties:
+    receiptId: {type: string, nullable: true, description: 'The pending receipt, once one is saved.'}
+    receiptStatus: {type: string, description: 'PENDING, CHECKING, COMPLETED or ROLLBACK.'}
+    shipmentId: {type: string}
+    shipment.name: {type: string, nullable: true}
+    shipment.shipmentNumber: {type: string, nullable: true}
+    shipmentStatus: {type: string, nullable: true}
+    origin.id: {type: string, nullable: true}
+    origin.name: {type: string, nullable: true}
+    destination.id: {type: string, nullable: true}
+    destination.name: {type: string, nullable: true}
+    dateShipped: {type: string, nullable: true}
+    dateDelivered: {type: string, nullable: true}
+    containers:
+      type: array
+      items:
+        type: object
+        properties:
+          container.id: {type: string, nullable: true}
+          container.name: {type: string, nullable: true}
+          shipmentItems:
+            type: array
+            items: {$ref: '#/PartialReceiptItem'}
+        additionalProperties: true
+  additionalProperties: true
+
+PartialReceiptInput:
+  description: |
+    The receiving page's state to save. receiptStatus says what to do: PENDING or CHECKING saves the receipt
+    as pending, COMPLETED receives it, ROLLBACK undoes the shipment's receipts.
+  type: object
+  properties:
+    receiptStatus: {type: string, enum: [PENDING, CHECKING, COMPLETED, ROLLBACK]}
+    dateDelivered: {type: string, description: 'MM/dd/yyyy HH:mm XXX, e.g. 09/30/2026 14:05 -04:00.'}
+    containers:
+      type: array
+      items:
+        type: object
+        properties:
+          shipmentItems:
+            type: array
+            items:
+              type: object
+              properties:
+                shipmentItemId: {type: string}
+                receiptItemId: {type: string, nullable: true}
+                quantityReceiving: {type: integer, nullable: true}
+                quantityShipped: {type: integer}
+                cancelRemaining: {type: boolean}
+                comment: {type: string, nullable: true}
+              additionalProperties: true
+        additionalProperties: true
+  additionalProperties: true
+
+PutawayCandidate:
+  description: Received stock waiting in a receiving bin to be put away (one line per lot and bin).
+  type: object
+  required: [putawayStatus, quantity]
+  properties:
+    id: {type: string, nullable: true}
+    stockMovement.id: {type: string, nullable: true}
+    stockMovement.name: {type: string, nullable: true}
+    putawayStatus: {type: string, description: 'READY, PENDING or COMPLETED.'}
+    currentFacility.id: {type: string, nullable: true}
+    currentLocation.id: {type: string, nullable: true}
+    currentLocation.name: {type: string, nullable: true}
+    product.id: {type: string, nullable: true}
+    product.productCode: {type: string, nullable: true}
+    product.name: {type: string, nullable: true}
+    inventoryItem.id: {type: string, nullable: true}
+    inventoryItem.lotNumber: {type: string, nullable: true}
+    inventoryItem.expirationDate: {type: string, nullable: true}
+    putawayLocation.id: {type: string, nullable: true}
+    putawayLocation.name: {type: string, nullable: true}
+    quantity: {type: integer}
+    splitItems: {type: array, items: {type: object, additionalProperties: true}}
+  additionalProperties: true
+
+ProductLot:
+  type: object
+  required: [product]
+  properties:
+    id: {type: string, nullable: true}
+    product:
+      type: object
+      required: [id, productCode, name]
+      properties:
+        id: {type: string}
+        productCode: {type: string}
+        name: {type: string}
+        handlingLabels: {type: array, items: {type: object, additionalProperties: true}}
+      additionalProperties: true
+    lotNumber: {type: string, nullable: true}
+    expirationDate: {type: string, nullable: true}
+    lotStatus: {type: string, nullable: true}
+  additionalProperties: true
+
+ReceiptItem:
+  description: A line of a receipt (receiving API v2).
+  type: object
+  required: [id, receiptId, shipmentItemId, productLot]
+  properties:
+    id: {type: string}
+    receiptId: {type: string}
+    shipmentItemId: {type: string}
+    rowId: {type: string, nullable: true, description: 'The client row id sent in the save request, if any.'}
+    productLot:
+      description: The product and lot received; null for old shipment lines that name no inventory item.
+      type: object
+      nullable: true
+      properties:
+        id: {type: string, nullable: true}
+        product: {type: object, additionalProperties: true}
+        lotNumber: {type: string, nullable: true}
+        expirationDate: {type: string, nullable: true}
+      additionalProperties: true
+    binLocation:
+      type: object
+      nullable: true
+      properties:
+        id: {type: string}
+        name: {type: string}
+        locationNumber: {type: string, nullable: true}
+        active: {type: boolean}
+      additionalProperties: true
+    recipient: {type: object, nullable: true, additionalProperties: true}
+    quantityReceived: {type: integer, nullable: true}
+    quantityCanceled: {type: integer, nullable: true}
+    comment: {type: string, nullable: true}
+    isSplitItem: {type: boolean}
+  additionalProperties: true
+
+Receipt:
+  description: A receipt of a shipment (receiving API v2).
+  type: object
+  required: [id, receiptStatus, shipmentId, receiptItems]
+  properties:
+    id: {type: string}
+    receiptStatus: {type: string, enum: [PENDING, RECEIVED, CANCELED]}
+    shipmentId: {type: string}
+    dateDelivered: {type: string, nullable: true, description: 'e.g. 2026-10-01T03:03:34.000+0000'}
+    recipientId: {type: string, nullable: true}
+    dateCreated: {type: string, nullable: true}
+    lastUpdated: {type: string, nullable: true}
+    receiptItems: {type: array, items: {$ref: '#/ReceiptItem'}}
+  additionalProperties: true
+
+ReceiptItemsSave:
+  description: The result of saving receipt lines.
+  type: object
+  required: [updatedLines]
+  properties:
+    updatedLines: {type: array, items: {$ref: '#/ReceiptItem'}}
+  additionalProperties: true
+
+ReceiptItemComment:
+  type: object
+  required: [receiptItemId, comment]
+  properties:
+    receiptItemId: {type: string}
+    comment: {type: string, nullable: true}
+  additionalProperties: true
+
+ShipmentReceivingSummary:
+  description: |
+    Where a shipment stands in receiving: per shipment item, what was shipped and the receipt lines received
+    before (previousReceiptItems) and pending now (currentReceiptItems), plus the order to show the items in.
+  type: object
+  required: [shipmentId, shipmentItemSummaryById, shipmentItemsGrouped]
+  properties:
+    shipmentId: {type: string}
+    pendingReceiptId: {type: string, nullable: true}
+    shipmentItemSummaryById:
+      type: object
+      description: Shipment item id to its summary.
+      additionalProperties:
+        type: object
+        required: [shipmentItem, previousReceiptItems, currentReceiptItems, isFullyReceived]
+        properties:
+          shipmentItem:
+            type: object
+            required: [id, shipmentId, quantity, productLot]
+            properties:
+              id: {type: string}
+              shipmentId: {type: string}
+              requisitionItemId: {type: string, nullable: true}
+              productLot:
+                description: The product and lot shipped; null for old shipment lines that name no inventory item.
+                type: object
+                nullable: true
+                additionalProperties: true
+              quantity: {type: integer}
+              container: {type: object, nullable: true, additionalProperties: true}
+            additionalProperties: true
+          previousReceiptItems: {type: array, items: {$ref: '#/ReceiptItem'}}
+          currentReceiptItems: {type: array, items: {$ref: '#/ReceiptItem'}}
+          isFullyReceived: {type: boolean}
+          totalQuantityReceived: {type: integer, nullable: true}
+          totalQuantityCanceled: {type: integer, nullable: true}
+        additionalProperties: true
+    shipmentItemsGrouped:
+      type: object
+      description: |
+        The shipment items grouped, and the order of the groups. By shipment item: each group is a list of shipment
+        item ids. With group=PACK_LEVEL: groups are pallets, each a nested {groups, order} of boxes holding the ids.
+      properties:
+        groups:
+          type: object
+          description: Group name to a list of shipment item ids, or (pack level) to a nested {groups, order}.
+          additionalProperties:
+            oneOf:
+            - {type: array, items: {type: string}}
+            - {type: object, required: [groups, order], additionalProperties: true}
+        order: {type: array, items: {type: string}}
+      additionalProperties: true
+  additionalProperties: true

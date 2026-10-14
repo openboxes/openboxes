@@ -1,0 +1,43 @@
+# Shared schemas of the people and organization API (/api/persons, /api/users, /api/organizations). Objects are open:
+# the documented properties are guaranteed (required) or nullable, others may appear.
+
+Person:
+  description: A person (a user, or a contact without a login).
+  type: object
+  required: [id, name]
+  properties:
+    id: {type: string}
+    name: {type: string}
+    firstName: {type: string, nullable: true}
+    lastName: {type: string, nullable: true}
+    email: {type: string, nullable: true}
+    username: {type: string, nullable: true, description: Login name (users only).}
+    roles: {type: array, items: {type: string}, description: Role types of the user (empty for contacts).}
+  additionalProperties: true
+
+Organization:
+  description: An organization (supplier, manufacturer, the organization a location belongs to, ...).
+  type: object
+  required: [id, name]
+  properties:
+    id: {type: string}
+    name: {type: string}
+    displayName: {type: string, nullable: true, description: '"<code> - <name>".'}
+    code: {type: string, nullable: true}
+    description: {type: string, nullable: true}
+    dateCreated: {type: string, format: date-time, nullable: true}
+    lastUpdated: {type: string, format: date-time, nullable: true}
+    defaultLocation: {type: object, nullable: true, additionalProperties: true}
+    partyType: {type: object, nullable: true, additionalProperties: true}
+    roles:
+      type: array
+      items:
+        type: object
+        properties:
+          id: {type: string}
+          roleType: {type: string, description: 'ROLE_SUPPLIER, ROLE_MANUFACTURER, ROLE_ORGANIZATION, ...'}
+          startDate: {type: string, nullable: true}
+          endDate: {type: string, nullable: true}
+        additionalProperties: true
+    sequences: {type: object, readOnly: true, additionalProperties: true, description: 'Number sequences of the organization (e.g. the last purchase order number). Read-only: changed only on the organization page; a value sent to the API is ignored.'}
+  additionalProperties: true

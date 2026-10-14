@@ -1,0 +1,308 @@
+# Shared schemas of the stock transfer, return and replenishment API (/api/stockTransfers..., /api/replenishments...,
+# /api/requirements). Objects are open: the documented properties are guaranteed (required) or nullable, others may appear.
+# Several responses use flat dotted keys ("product.id") rather than nested objects; they are documented as they are sent.
+
+HandlingIcon:
+  description: An icon for one of the product's handling requirements.
+  type: object
+  properties:
+    icon: {type: string, description: 'Font Awesome icon name, e.g. fa-snowflake.'}
+    color: {type: string, description: Hex colour.}
+    label: {type: string, description: 'The requirement, in the session''s language (e.g. Cold chain).'}
+  additionalProperties: true
+
+Requirement:
+  description: >-
+    A bin of the location whose quantity is below its replenishment level (bin inventory level), with what can be moved
+    into it from the other bins of the location.
+  type: object
+  required: [product.id, binLocation.id, quantityNeeded]
+  properties:
+    id: {type: string, nullable: true}
+    product.id: {type: string}
+    product.productCode: {type: string, nullable: true}
+    product.name: {type: string, nullable: true}
+    binLocation.id: {type: string, description: The bin to replenish.}
+    binLocation.name: {type: string, nullable: true}
+    zone: {type: string, nullable: true, description: Name of the bin's zone.}
+    quantityInBin: {type: integer, nullable: true, description: Quantity on hand in the bin.}
+    minQuantity: {type: integer, nullable: true, description: The bin's minimum.}
+    maxQuantity: {type: integer, nullable: true, description: The bin's maximum.}
+    quantityNeeded: {type: integer, description: 'What to move in: up to the maximum, at most what is available, never below 0.'}
+    quantityAvailable: {type: integer, nullable: true, description: What the other bins of the location hold and can give.}
+  additionalProperties: true
+
+StockTransferItem:
+  description: >-
+    A line of a stock transfer or return, or a candidate for one (what a bin holds of a product lot). Candidates have no
+    id and carry the bin they come from as both origin and destination.
+  type: object
+  required: [product.id, quantity, status, splitItems, picklistItems]
+  properties:
+    id: {type: string, nullable: true, description: The order item id; null for a candidate.}
+    productAvailabilityId: {type: string, nullable: true, description: The stock record a candidate comes from.}
+    product.id: {type: string}
+    product.productCode: {type: string, nullable: true}
+    product.name: {type: string, nullable: true}
+    product.displayName: {type: string, nullable: true}
+    product.handlingIcons:
+      type: array
+      nullable: true
+      items: {$ref: '#/HandlingIcon'}
+    inventoryItem.id: {type: string, nullable: true}
+    lotNumber: {type: string, nullable: true}
+    expirationDate: {type: string, nullable: true, description: MM/dd/yyyy.}
+    recalled: {type: boolean, nullable: true}
+    originBinLocation.id: {type: string, nullable: true}
+    originBinLocation.name: {type: string, nullable: true}
+    originZone: {type: string, nullable: true}
+    onHold: {type: boolean, nullable: true, description: The origin bin holds its stock back (on hold).}
+    destinationBinLocation.id: {type: string, nullable: true}
+    destinationBinLocation.name: {type: string, nullable: true}
+    destinationZone.id: {type: string, nullable: true}
+    destinationZone.name: {type: string, nullable: true}
+    quantity: {type: number, description: Quantity to transfer (a candidate's is what the bin holds).}
+    quantityOnHand: {type: integer, nullable: true}
+    quantityNotPicked: {type: integer, nullable: true}
+    status: {type: string, description: 'PENDING, APPROVED, COMPLETED, ...'}
+    recipient:
+      type: object
+      nullable: true
+      additionalProperties: true
+    splitItems:
+      type: array
+      description: Parts of the line going to different destination bins.
+      items: {type: object, additionalProperties: true}
+    picklistItems:
+      type: array
+      description: The picks of a return line (same shape as a line).
+      items: {type: object, additionalProperties: true}
+    sortOrder: {type: integer, nullable: true}
+  additionalProperties: true
+
+StockTransferSummary:
+  description: A row of the stock transfer list.
+  type: object
+  required: [id, status, orderNumber, orderItemsCount]
+  properties:
+    id: {type: string}
+    status: {type: string, description: 'PENDING, APPROVED, COMPLETED or CANCELED.'}
+    orderNumber: {type: string}
+    name: {type: string, nullable: true}
+    createdBy: {type: string, nullable: true, description: Name of the user who created it.}
+    dateCreated: {type: string, format: date-time}
+    origin: {type: string, nullable: true, description: Location name.}
+    destination: {type: string, nullable: true, description: Location name.}
+    orderItemsCount: {type: integer, description: Lines that are not canceled.}
+  additionalProperties: true
+
+StockTransfer:
+  description: A stock transfer between bins of a location (TRANSFER_ORDER), or a return to or from another location (RETURN_ORDER).
+  type: object
+  required: [id, stockTransferNumber, status, type, stockTransferItems]
+  properties:
+    id: {type: string}
+    description: {type: string, nullable: true}
+    stockTransferNumber: {type: string}
+    status: {type: string, description: 'PENDING, APPROVED, PLACED, COMPLETED, ...'}
+    dateCreated: {type: string, nullable: true, description: 'Long date, e.g. "October 01, 2026".'}
+    origin.id: {type: string, nullable: true}
+    origin.name: {type: string, nullable: true}
+    destination.id: {type: string, nullable: true}
+    destination.name: {type: string, nullable: true}
+    stockTransferItems:
+      type: array
+      items: {$ref: '#/StockTransferItem'}
+    orderedBy: {type: string, nullable: true, description: Name.}
+    type: {type: string, description: TRANSFER_ORDER or RETURN_ORDER.}
+    dateShipped: {type: string, description: 'MM/dd/yyyy, or "" when not set.'}
+    expectedDeliveryDate: {type: string, description: 'MM/dd/yyyy, or "" when not set.'}
+    shipmentType:
+      description: 'The shipment type of a return, or "" when not set.'
+      oneOf:
+        - {type: string}
+        - {type: object, additionalProperties: true}
+    trackingNumber: {type: string}
+    driverName: {type: string}
+    comments: {type: string}
+    documents:
+      description: 'The documents of a transfer with a picklist (pick list prints), otherwise "".'
+      oneOf:
+        - {type: string}
+        - {type: array, items: {type: object, additionalProperties: true}}
+  additionalProperties: true
+
+LooseRef:
+  description: >-
+    A reference in a request as the web app sends it: an object with the record's id (other fields of the record it
+    was read from may come along and are ignored); a null id, or null, means none.
+  type: object
+  nullable: true
+  properties:
+    id: {type: string, nullable: true}
+  additionalProperties: true
+
+StockTransferInput:
+  description: >-
+    A stock transfer as the web app sends it: a candidate or a stock transfer as read, with the dotted keys turned
+    into nested objects ("product.id" -> product.id). Only the fields below are used; others are ignored. Origin,
+    destination and the person ordering default to the current location and user.
+  type: object
+  properties:
+    status: {type: string, nullable: true, description: 'The status to move to (APPROVED; COMPLETED moves the stock; PLACED ships a return).'}
+    type: {type: string, nullable: true, description: TRANSFER_ORDER (default) or RETURN_ORDER; cannot change on an update.}
+    origin: {$ref: '#/LooseRef'}
+    destination: {$ref: '#/LooseRef'}
+    description: {type: string, nullable: true}
+    dateShipped: {type: string, nullable: true, description: 'MM/dd/yyyy; empty for none.'}
+    expectedDeliveryDate: {type: string, nullable: true, description: 'MM/dd/yyyy; empty for none.'}
+    shipmentType:
+      description: 'An object with the shipment type id; "" or null for none.'
+      nullable: true
+      oneOf:
+        - {type: string}
+        - {$ref: '#/LooseRef'}
+    trackingNumber: {type: string, nullable: true}
+    driverName: {type: string, nullable: true}
+    comments: {type: string, nullable: true}
+    stockTransferItems:
+      type: array
+      description: The lines; on an update, lines left out are removed.
+      items:
+        type: object
+        properties:
+          id: {type: string, nullable: true, description: An existing line (update); null or left out for a new one.}
+          product: {$ref: '#/LooseRef'}
+          inventoryItem: {$ref: '#/LooseRef'}
+          lotNumber: {type: string, nullable: true}
+          expirationDate: {type: string, nullable: true, description: MM/dd/yyyy (inbound returns).}
+          originBinLocation: {$ref: '#/LooseRef'}
+          destinationBinLocation: {$ref: '#/LooseRef'}
+          quantity:
+            description: Quantity to transfer (a number, or its text).
+            oneOf:
+              - {type: number}
+              - {type: string}
+          recipient: {$ref: '#/LooseRef'}
+          sortOrder: {type: integer, nullable: true}
+          splitItems:
+            type: array
+            items: {type: object, additionalProperties: true}
+        additionalProperties: true
+  additionalProperties: true
+
+ReplenishmentItem:
+  description: >-
+    A line of a replenishment: a product to move into a bin (currentBinLocation), with its picks from other bins. The
+    picks have the same shape with the bin they come from as replenishmentLocation.
+  type: object
+  required: [id, product, quantity, status, picklistItems]
+  properties:
+    id: {type: string, nullable: true}
+    product: {type: object, additionalProperties: true}
+    inventoryItem: {type: object, nullable: true, additionalProperties: true}
+    lotNumber: {type: string, nullable: true}
+    expirationDate: {type: string, nullable: true, description: MM/dd/yyyy.}
+    replenishmentLocation.id: {type: string, nullable: true}
+    replenishmentLocation.name: {type: string, nullable: true}
+    replenishmentZone.id: {type: string, nullable: true}
+    replenishmentZone.name: {type: string, nullable: true}
+    currentBinLocation.id: {type: string, nullable: true, description: The bin being replenished.}
+    currentBinLocation.name: {type: string, nullable: true}
+    currentZone.id: {type: string, nullable: true}
+    currentZone.name: {type: string, nullable: true}
+    quantity: {type: integer, nullable: true}
+    quantityInBin: {type: integer, nullable: true}
+    minQuantity: {type: integer, nullable: true}
+    maxQuantity: {type: integer, nullable: true}
+    totalQuantityOnHand: {type: integer, nullable: true}
+    quantityNeeded: {type: integer, nullable: true}
+    status: {type: string}
+    picklistItems:
+      type: array
+      description: 'The picks: as replenishment lines after a create or picklist change, as picklist entries in a read.'
+      items: {type: object, additionalProperties: true}
+    availableItems:
+      type: array
+      items: {type: object, additionalProperties: true}
+    suggestedItems:
+      type: array
+      items: {type: object, additionalProperties: true}
+  additionalProperties: true
+
+Replenishment:
+  description: A replenishment of picking bins from other bins of the same location (a transfer order).
+  type: object
+  required: [id, replenishmentNumber, status, replenishmentItems]
+  properties:
+    id: {type: string}
+    replenishmentNumber: {type: string}
+    status: {type: string, description: 'PENDING, APPROVED, COMPLETED, ...'}
+    dateCreated: {type: string, nullable: true, description: 'Long date, e.g. "October 01, 2026".'}
+    origin.id: {type: string, nullable: true}
+    origin.name: {type: string, nullable: true}
+    destination.id: {type: string, nullable: true}
+    destination.name: {type: string, nullable: true}
+    replenishmentItems:
+      type: array
+      items: {$ref: '#/ReplenishmentItem'}
+    orderedBy: {type: string, nullable: true, description: Name.}
+  additionalProperties: true
+
+ReplenishmentInput:
+  description: >-
+    A replenishment as the web app sends it: the requirements the user checked, as listed (dotted keys turned into
+    nested objects); fields not listed below are ignored. Origin, destination and the person ordering default to the
+    current location and user.
+  type: object
+  properties:
+    status: {type: string, nullable: true, description: 'The status to move to (APPROVED; COMPLETED moves the stock).'}
+    replenishmentItems:
+      type: array
+      items:
+        type: object
+        required: [product, binLocation]
+        properties:
+          product: {$ref: 'catalog.yaml#/RefInput'}
+          binLocation: {$ref: 'catalog.yaml#/RefInput'}
+          location: {$ref: '#/LooseRef'}
+          quantity:
+            description: Quantity to move in (a number, or its text).
+            oneOf:
+              - {type: integer}
+              - {type: string}
+          picklistItems:
+            type: array
+            items: {type: object, additionalProperties: true}
+        additionalProperties: true
+  additionalProperties: true
+
+ReplenishmentPickPage:
+  description: The picklist of one replenishment line, with the stock that is available and suggested for it.
+  type: object
+  required: [orderItem.id, quantityRequested, quantityPicked]
+  properties:
+    pickStatusCode: {type: string, nullable: true}
+    orderItem.id: {type: string}
+    product.name: {type: string, nullable: true}
+    productCode: {type: string, nullable: true}
+    productId: {type: string, nullable: true}
+    product: {type: object, nullable: true, additionalProperties: true}
+    quantityRequested: {type: integer}
+    quantityRequired: {type: integer, nullable: true}
+    quantityPicked: {type: integer}
+    quantityAvailable: {type: integer, nullable: true}
+    quantityRemaining: {type: integer, nullable: true}
+    hasAdjustedInventory: {type: boolean, nullable: true}
+    hasChangedPick: {type: boolean, nullable: true}
+    availableItems:
+      type: array
+      items: {type: object, additionalProperties: true}
+    suggestedItems:
+      type: array
+      items: {type: object, additionalProperties: true}
+    picklistItems:
+      type: array
+      items: {type: object, additionalProperties: true}
+    recipient: {type: object, nullable: true, additionalProperties: true}
+  additionalProperties: true
