@@ -17,19 +17,21 @@ class ProductControllerShowSpec extends Specification implements ControllerUnitT
         response.redirectedUrl == '/inventoryItem/showStockCard/abc123'
     }
 
-    void "show does not forward other request params to the stock card"() {
-        given:
+    void "show only passes the id to the stock card and drops other request params"() {
+        given: "an unrelated request param next to the product id"
         params.id = 'abc123'
         params.name = 'should not be forwarded'
 
         when:
         controller.show()
 
-        then:
+        then: "the redirect URL has just the id, with no ?name=... query string"
         response.redirectedUrl == '/inventoryItem/showStockCard/abc123'
     }
 
     void "show redirects to the stock card without an id when none is given"() {
+        // This only checks the redirect that show() itself issues. The stock card then cannot find the product, so
+        // InventoryItemController.showStockCard sets a flash message and sends the user to the dashboard.
         when:
         controller.show()
 
