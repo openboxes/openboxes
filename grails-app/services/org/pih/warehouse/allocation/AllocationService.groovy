@@ -345,17 +345,11 @@ class AllocationService {
         Location facility = requisitionItem.requisition.origin
         Product product = requisitionItem.product
 
-        boolean isBackordered = requisitionItem.isBackordered()
-
-        // The backordered quantity waits for its cross-dock delivery, so ordinary stock only ever covers
-        // the rest of the line
-        if (isBackordered && !crossDockRelease) {
-            Integer quantityExcludingBackorder = requisitionItem.calculateQuantityRequired() ?: 0
-            if (quantityExcludingBackorder <= 0) {
-                log.info("Requisition item ${requisitionItem.id} is fully backordered, skipping ordinary allocation")
-                return []
-            }
-            quantityRequired = Math.min(quantityRequired ?: 0, quantityExcludingBackorder)
+        // A backordered line is a cross-dock line, which waits for its inbound and is allocated only by the
+        // cross-dock release
+        if (requisitionItem.isBackordered() && !crossDockRelease) {
+            log.info("Requisition item ${requisitionItem.id} is backordered, skipping ordinary allocation")
+            return []
         }
 
         List<AvailableItem> allAvailableItems =
@@ -371,7 +365,7 @@ class AllocationService {
         if (crossDockRelease) {
             List<AvailableItem> ordered = crossDockFirst(orderByStrategy(
                     resolvedStrategies.first(), facility, product,
-                    applyRotation(rotationRule, allAvailableItems)))
+                    applyRotation(rotationRule, allAvailableItems)), requisitionItem)
             return stockMovementService.getSuggestedItems(ordered, quantityRequired)
         }
 
@@ -392,11 +386,6 @@ class AllocationService {
             if (canSatisfy(includedItems, quantityRequired)) {
                 return stockMovementService.getSuggestedItems(includedItems, quantityRequired)
             }
-        }
-
-        boolean partialAllocationAllowed = requisitionItem.requisition.partialAllocationAllowed
-        if (isBackordered && partialAllocationAllowed) {
-            return []
         }
 
         // No location holds enough, so rather than abandon the order we take whatever stock exists and record
@@ -519,11 +508,20 @@ class AllocationService {
         return (grailsApplication.config.openboxes.order.allocation.rotation ?: RotationRule.FEFO) as RotationRule
     }
 
-    private List<AvailableItem> crossDockFirst(List<AvailableItem> availableItems) {
-        List<AvailableItem> crossDockItems = availableItems.findAll {
-            it.binLocation?.supports(ActivityCode.CROSS_DOCKING)
+    /**
+     * The order's own cross-dock zone first, then ordinary stock. Other cross-dock zones are left out, since
+     * what sits there was bought for other orders.
+     */
+    private List<AvailableItem> crossDockFirst(List<AvailableItem> availableItems, RequisitionItem requisitionItem) {
+        ActivityCode deliveryActivityCode = requisitionItem.requisition.deliveryTypeCode?.activityCode
+        List<AvailableItem> ownZoneItems = availableItems.findAll {
+            deliveryActivityCode && it.binLocation?.supports(ActivityCode.CROSS_DOCKING) &&
+                    it.binLocation.supports(deliveryActivityCode)
         }
-        return crossDockItems + (availableItems - crossDockItems)
+        List<AvailableItem> ordinaryItems = availableItems.findAll {
+            !it.binLocation?.supports(ActivityCode.CROSS_DOCKING)
+        }
+        return ownZoneItems + ordinaryItems
     }
 
     private List<AvailableItem> orderByStrategy(AllocationSourceStrategy strategy, Location facility, Product product, List<AvailableItem> availableItems) {

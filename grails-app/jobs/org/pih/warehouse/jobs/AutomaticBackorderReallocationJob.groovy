@@ -44,8 +44,8 @@ class AutomaticBackorderReallocationJob {
                     return
                 }
                 if (shipment.shipmentItems?.any { it.backorderItem || it.backorderReference }) {
-                    if (putawayTaskService.hasOpenCrossDockTask(shipment)) {
-                        log.info("Shipment ${shipmentId} has an open cross-dock putaway, " +
+                    if (!putawayTaskService.isCrossDockPutawayCompleted(shipment)) {
+                        log.info("Shipment ${shipmentId} has no completed cross-dock putaway yet, " +
                                 "allocation is deferred until the stock reaches the cross-dock zone")
                         return
                     }
@@ -105,9 +105,6 @@ class AutomaticBackorderReallocationJob {
                 return
             }
 
-            Integer quantityOrdered = (requisitionItem.quantity ?: 0) - (requisitionItem.quantityCanceled ?: 0)
-            Integer quantityUncovered = Math.max(0, quantityOrdered - (requisitionItem.calculateQuantityAllocated() ?: 0))
-
             AllocationRequest allocationRequest = new AllocationRequest(
                     quantityRequired: quantityOutstanding,
                     requisitionItem: requisitionItem,
@@ -120,7 +117,7 @@ class AutomaticBackorderReallocationJob {
             if (quantityAllocated > 0) {
                 allocatedAnything = true
             }
-            updateQuantityBackordered(requisitionItem, quantityUncovered, quantityAllocated)
+            updateQuantityBackordered(requisitionItem, quantityOutstanding, quantityAllocated)
             log.info("Cross-dock release allocated ${quantityAllocated} for requisition item ${requisitionItem.id}")
         }
 

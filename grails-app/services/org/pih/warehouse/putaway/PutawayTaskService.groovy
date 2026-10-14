@@ -662,19 +662,17 @@ class PutawayTaskService {
     }
 
     /**
-     * Whether the shipment still has a cross-dock putaway that has not been completed or canceled.
-     * Allocation has to wait for it, because until the putaway runs the stock is still sitting in
-     * inbound sortation where it must not be allocated from.
+     * Whether the shipment has cross-dock putaways and all of them have been completed. Allocation has to
+     * wait until then: before the putaway runs the stock is still in inbound sortation, and before the
+     * putaway exists the release would cover the order from ordinary stock instead of its own inbound.
      */
     @Transactional(readOnly = true)
-    boolean hasOpenCrossDockTask(Shipment shipment) {
+    boolean isCrossDockPutawayCompleted(Shipment shipment) {
         if (!shipment) {
             return false
         }
-        List<PutawayTask> openTasks = PutawayTask.createCriteria().list {
-            not {
-                'in'('status', [PutawayTaskStatus.COMPLETED, PutawayTaskStatus.CANCELED])
-            }
+        List<PutawayTask> tasks = PutawayTask.createCriteria().list {
+            ne('status', PutawayTaskStatus.CANCELED)
             putawayOrderItem {
                 receiptItem {
                     shipmentItem {
@@ -684,7 +682,8 @@ class PutawayTaskService {
             }
         } as List<PutawayTask>
 
-        return openTasks.any { it.putawayTypeCode == PutawayTypeCode.CROSS_DOCK }
+        List<PutawayTask> crossDockTasks = tasks.findAll { it.putawayTypeCode == PutawayTypeCode.CROSS_DOCK }
+        return crossDockTasks && crossDockTasks.every { it.status == PutawayTaskStatus.COMPLETED }
     }
 
     List<Location> getAlternateDestinations(PutawayTask task) {

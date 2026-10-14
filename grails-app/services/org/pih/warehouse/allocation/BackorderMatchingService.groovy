@@ -48,8 +48,9 @@ class BackorderMatchingService {
     }
 
     /**
-     * Resolves how much of the quantity on hand should be cross-docked, and against which demand line.
-     * Returns null when there is no demand left to cover, in which case the quantity belongs in storage.
+     * Resolves how much of the quantity on hand should be cross-docked, summed across every line of the
+     * order for the product. Returns null when there is no demand left to cover, in which case the quantity
+     * belongs in storage.
      */
     BackorderMatch resolveCrossDockMatch(String backorderReference, RequisitionItem backorderItem,
                                         Product product, Integer quantityAvailable) {
@@ -58,55 +59,46 @@ class BackorderMatchingService {
             return null
         }
 
-        RequisitionItem demand = backorderItem
-        if (!demand) {
+        List<RequisitionItem> demands
+        if (backorderItem) {
+            demands = [backorderItem]
+        } else {
             Requisition backorder = backorderReference ? Requisition.findByRequestNumber(backorderReference) : null
             if (!backorder) {
                 return null
             }
-            demand = demandItems(backorder)
-                    .findAll { it.product == product && remainingDemand(it) > 0 }
-                    .sort { remainingDemand(it) }
-                    .find()
+            demands = demandItems(backorder).findAll { it.product == product }
         }
-        if (!demand) {
+
+        List<RequisitionItem> candidates = demands.findAll { remainingDemand(it) > 0 }
+        if (!candidates) {
             return null
         }
 
-        int quantityMatched = Math.min(quantity, remainingDemand(demand))
-        if (quantityMatched <= 0) {
-            return null
-        }
-        return new BackorderMatch(demand: demand, quantityMatched: quantityMatched)
+        int quantityMatched = Math.min(quantity, candidates.sum { remainingDemand(it) } as int)
+        return new BackorderMatch(demand: candidates.first(), quantityMatched: quantityMatched)
     }
 
     /**
-     * Quantity still to be covered on a demand line: whatever is backordered and waiting on an inbound,
-     * plus the rest of the line that ordinary stock has not covered. Everything received against a sales
-     * link belongs to that order, so the whole uncovered quantity is what a delivery may cross-dock.
+     * Quantity a cross-dock delivery may still cover on a demand line. Only a backordered line is
+     * cross-docked, and it is measured against the whole ordered quantity less everything allocated.
      */
     Integer remainingDemand(RequisitionItem demand) {
-        Integer quantityRequired = demand.calculateQuantityRequired() ?: 0
-        Integer quantityAllocated = demand.calculateQuantityAllocated() ?: 0
-        Integer quantityUncovered = Math.max(0, quantityRequired - quantityAllocated)
-        return quantityUncovered + Math.max(0, demand.quantityBackordered ?: 0)
+        if (!demand.isBackordered()) {
+            return 0
+        }
+        Integer quantityOrdered = (demand.quantity ?: 0) - (demand.quantityCanceled ?: 0)
+        return Math.max(0, quantityOrdered - (demand.calculateQuantityAllocated() ?: 0))
     }
 
     /**
      * Inbound items covering the given backorder through either link: the soft reference used before
-     * the demand line is resolved, or the direct one once it is. findInboundItems only sees the soft
-     * form, which is what the receipt validation needs but would silently skip a hard linked item.
+     * the demand line is resolved, or the direct one once it is.
      */
     Collection<ShipmentItem> findInboundItemsForRequisition(Shipment shipment, Requisition backorder) {
         return shipment.shipmentItems.findAll {
             it.backorderReference == backorder.requestNumber ||
                     it.backorderItem?.requisition?.id == backorder.id
-        }
-    }
-
-    Collection<ShipmentItem> findInboundItems(Shipment shipment, String requisitionNumber) {
-        return shipment.shipmentItems.findAll {
-            it.backorderReference == requisitionNumber && !it.backorderItem
         }
     }
 
