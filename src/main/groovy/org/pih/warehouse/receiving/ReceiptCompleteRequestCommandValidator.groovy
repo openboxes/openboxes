@@ -202,24 +202,16 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
             return null
         }
 
-        Set<String> productIdsWithLotAndExpiryControl = receiptItems.product
-                .findAll{ it.lotAndExpiryControl }
-                .collect { it.id }
-
-        if (!productIdsWithLotAndExpiryControl) {
-            return null
-        }
-
         List<ObjectError> errors = []
         for (receiptItem in receiptItems) {
             Product product = receiptItem.product
-            if (!productIdsWithLotAndExpiryControl.contains(product.id)) {
+            if (!product.lotAndExpiryControl) {
                 continue
             }
 
             // Non-split items come directly from the shipment items and are not editable by users. Even if the item
             // has no lot, as long as the user is not trying to receive any quantity on that item, bypass validation.
-            if (!receiptItem.isSplitItem && receiptItem.quantityReceived == 0) {
+            if (!receiptItem.isSplitItem && !receiptItem.quantityReceived) {
                 continue
             }
 
