@@ -18,7 +18,7 @@ import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfield
 import TextField from 'components/form-elements/TextField';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
-import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import apiClient, { parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, getReceivingPayloadContainers } from 'utils/form-values-utils';
 import Translate from 'utils/Translate';
@@ -371,7 +371,7 @@ class ReceivingCheckScreen extends Component {
       containers: getReceivingPayloadContainers(formValues),
     };
 
-    return apiClient.post(url, flattenRequest(payload));
+    return apiClient.post(url, payload);
   }
 
   /**

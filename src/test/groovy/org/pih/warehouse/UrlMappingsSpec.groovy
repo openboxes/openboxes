@@ -5,10 +5,11 @@ import grails.test.mixin.TestFor
 import org.pih.warehouse.UrlMappings
 import org.pih.warehouse.api.CategoryApiController
 import org.pih.warehouse.api.StockMovementItemApiController
+import org.pih.warehouse.api.UserRoleApiController
 import spock.lang.Specification
 
 @TestFor(UrlMappings)
-@Mock([CategoryApiController, StockMovementItemApiController])
+@Mock([CategoryApiController, StockMovementItemApiController, UserRoleApiController])
 class UrlMappingsSpec extends Specification {
     void "test forward mapping for GETs"() {
         when:
@@ -21,6 +22,10 @@ class UrlMappingsSpec extends Specification {
         // STOCK MOVEMENT ITEMS
         assertForwardUrlMapping("/api/stockMovementItems", controller: 'stockMovementItemApi', action: "list")
         assertForwardUrlMapping("/api/stockMovementItems/123", controller: 'stockMovementItemApi', action: "read")
+        // USER ROLES
+        assertForwardUrlMapping("/api/users/123/roles", controller: 'userRoleApi', action: "getUserRoles") {
+            userId = "123"
+        }
     }
 
     void "test forward mapping for POSTs"() {

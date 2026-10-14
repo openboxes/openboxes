@@ -1,10 +1,10 @@
 package org.pih.warehouse.inventory
 
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.serialization.Serializable
 import org.pih.warehouse.product.Product
 
-class CycleCountCandidate {
+class CycleCountCandidate implements Serializable<CycleCountCandidateMapper> {
 
     String id
 

@@ -1,4 +1,4 @@
-The Instalaltion Guide 
+The Installation Guide 
 provides step-by-step instructions for deploying OpenBoxes on-premise or to a cloud hosting provider
 of your choosing.  
 

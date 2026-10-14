@@ -1,0 +1,82 @@
+import React, { useEffect, useState } from 'react';
+
+import PropTypes from 'prop-types';
+
+import { TableCell } from 'components/DataTable';
+import TextInput from 'components/form-elements/v2/TextInput';
+
+const blurOnWheel = (e) => e.currentTarget.blur();
+
+/**
+ * Memoized cell rendering an editable quantity input.
+ *
+ * Controlled: the typed value is kept in local state so typing stays snappy, and the committed
+ * value (or null when the field is cleared) is reported via `onCommit` on blur. The
+ * caller decides where to store it; pass `value` to keep the input in sync with that store.
+ */
+const QuantityInputCell = React.memo(({
+  value, onCommit, onBlur, label, defaultLabel, disabled, errorMessage, className,
+}) => {
+  const [inputValue, setInputValue] = useState(value ?? '');
+
+  // Re-sync when the stored value changes (e.g. after a save reconciles the row).
+  useEffect(() => {
+    setInputValue(value ?? '');
+  }, [value]);
+
+  // TextInput (type="number") hands us a number, or undefined when the field is empty.
+  const onChange = (enteredValue) => {
+    setInputValue(enteredValue ?? '');
+  };
+
+  // Commit on blur. Skip when nothing changed so the caller doesn't re-store / mark the row dirty.
+  const handleBlur = () => {
+    const committed = inputValue === '' ? null : inputValue;
+    if (inputValue !== (value ?? '')) {
+      onCommit(committed);
+    }
+    onBlur?.();
+  };
+
+  return (
+    <TableCell className="rt-td" customTooltip={!!errorMessage} tooltipLabel={errorMessage}>
+      <TextInput
+        type="number"
+        className={`hide-arrows input-xs ${className}`}
+        value={inputValue}
+        onChange={onChange}
+        onBlur={handleBlur}
+        disabled={disabled}
+        errorMessage={errorMessage}
+        hideErrorMessageWrapper
+        ariaLabel={{ id: label, defaultMessage: defaultLabel }}
+        onWheel={blurOnWheel}
+      />
+    </TableCell>
+  );
+});
+
+QuantityInputCell.displayName = 'QuantityInputCell';
+
+QuantityInputCell.propTypes = {
+  // Committed value to display (null/undefined when nothing has been entered yet).
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  // Called on blur with the committed value, or null when the field is cleared.
+  onCommit: PropTypes.func.isRequired,
+  onBlur: PropTypes.func,
+  label: PropTypes.string.isRequired,
+  defaultLabel: PropTypes.string.isRequired,
+  disabled: PropTypes.bool,
+  errorMessage: PropTypes.string,
+  className: PropTypes.string,
+};
+
+QuantityInputCell.defaultProps = {
+  value: null,
+  onBlur: undefined,
+  disabled: false,
+  errorMessage: undefined,
+  className: '',
+};
+
+export default QuantityInputCell;

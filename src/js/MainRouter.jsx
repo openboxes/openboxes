@@ -21,7 +21,11 @@ class MainRouter extends React.Component {
   componentDidMount() {
     this.props.fetchSessionInfo().then(() => {
       this.props.initialize({
-        languages: this.props.supportedLocales,
+        // Register Crowdin for translation mode without exposing it in ordinary locale selectors.
+        languages: [...this.props.supportedLocales, {
+          code: this.props.localizationModeLocale,
+          name: this.props.localizationModeLocale,
+        }],
         options: {
           renderToStaticMarkup,
           onMissingTranslation,
@@ -55,6 +59,7 @@ class MainRouter extends React.Component {
 const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
   supportedLocales: state.session.supportedLocales,
+  localizationModeLocale: state.session.localizationModeLocale,
 });
 
 export default withLocalize(connect(mapStateToProps, {
@@ -64,6 +69,7 @@ export default withLocalize(connect(mapStateToProps, {
 MainRouter.propTypes = {
   initialize: PropTypes.func.isRequired,
   locale: PropTypes.string.isRequired,
+  localizationModeLocale: PropTypes.string.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
   setActiveLanguage: PropTypes.func.isRequired,
   /** Function called to get the currently selected location */

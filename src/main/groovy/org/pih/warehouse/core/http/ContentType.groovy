@@ -10,9 +10,11 @@ import org.pih.warehouse.core.file.FileExtension
  */
 enum ContentType {
 
+    ALL(FileExtension.NONE, MediaType.ALL),
     CSV(FileExtension.CSV, MediaType.parseMediaType("text/csv")),
     DOCX(FileExtension.DOCX, MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")),
     GIF(FileExtension.GIF, MediaType.IMAGE_GIF),
+    HTML(FileExtension.HTML, MediaType.TEXT_HTML),
     JPEG(FileExtension.JPEG, MediaType.IMAGE_JPEG),
     JPG(FileExtension.JPG, MediaType.IMAGE_JPEG),
     JSON(FileExtension.JSON, MediaType.APPLICATION_JSON),

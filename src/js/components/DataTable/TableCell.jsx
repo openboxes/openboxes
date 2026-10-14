@@ -63,10 +63,12 @@ const TableCell = ({
   }
 
   if (customTooltip) {
+    const content = tooltipLabel || value;
     cellValue = (
       <CustomTooltip
-        content={tooltipLabel || value}
+        content={content}
         className={tooltipClassname}
+        disabled={!content}
       >
         {cellValue}
       </CustomTooltip>
@@ -140,6 +142,9 @@ TableCell.propTypes = {
   ]),
   tooltipForm: PropTypes.bool,
   tooltipClassname: PropTypes.string,
+  /**
+   * True if the cell should be wrapped in a {@link CustomTooltip}.
+   */
   customTooltip: PropTypes.bool,
 };
 

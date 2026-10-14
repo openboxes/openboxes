@@ -101,6 +101,11 @@ class UrlMappings {
             action = [GET: "usersOptions"]
         }
 
+        "/api/users/$userId/roles" {
+            controller = "userRoleApi"
+            action = [GET: "getUserRoles"]
+        }
+
         "/api/preferenceTypeOptions" {
             controller = { "selectOptionsApi" }
             action = [GET: "preferenceTypeOptions"]
@@ -160,6 +165,11 @@ class UrlMappings {
             action = [GET: "getLotNumbersWithExpirationDate"]
         }
 
+        "/api/products/inventoryItems/getAvailabilityInAllDepots" {
+            controller = { "productApi" }
+            action = [POST: "getAvailabilityInAllDepots"]
+        }
+
         "/api/facilities/$facilityId/products/classifications" {
             controller = "productClassificationApi"
             action = [GET: "list"]
@@ -168,6 +178,11 @@ class UrlMappings {
         "/api/facilities/$facilityId/inventory-levels(.$format)?" {
             controller = "inventoryLevelApi"
             action = [GET: "list"]
+        }
+
+        "/api/facilities/$facilityId/inventory-levels/preferred-bin-locations" {
+            controller = "inventoryLevelApi"
+            action = [GET: "getPreferredBinLocations"]
         }
 
         "/api/locations/locationTypes" {
@@ -434,6 +449,60 @@ class UrlMappings {
         "/api/partialReceiving/exportCsv/$id"(parseRequest: true) {
             controller = "partialReceivingApi"
             action = [POST: "exportCsv"]
+        }
+
+        // Receiving v2 API
+
+        "/api/receipts/v2/shipment/$shipmentId/start" {
+            controller = "receiptApi"
+            action = [POST: "start"]
+        }
+
+        "/api/receipts/v2/shipment/$shipmentId/sync" {
+            controller = "receiptApi"
+            action = [POST: "syncReceiptLines"]
+        }
+
+        "/api/receipts/v2/shipment/$shipmentId" {
+            controller = "receiptApi"
+            action = [GET: "listShipmentReceipts"]
+        }
+
+        "/api/receipts/v2/shipment/$shipmentId/summary" {
+            controller = "receiptApi"
+            action = [GET: "getShipmentReceivingSummary"]
+        }
+
+        // TODO: Remove this mapping once the new receiving refactor is complete (legacy PartialReceivingPage)
+        "/partialReceiving/create/$id?" {
+            controller = "receiptApi"
+            action = [GET: "view"]
+        }
+
+        "/receiving/create/$id?" {
+            controller = "receiptApi"
+            action = [GET: "view"]
+        }
+
+
+        "/api/receipts/v2/$receiptId/items/batch" {
+            controller = "receiptApi"
+            action = [POST: "updateItemsBatch"]
+        }
+
+        "/api/receipts/v2/$receiptId/complete" {
+            controller = "receiptApi"
+            action = [POST: "completeReceipt"]
+        }
+
+        "/api/receipts/v2/receiptItems/$receiptItemId/comments" {
+            controller = "receiptApi"
+            action = [POST: "createReceiptItemComment", PUT: "updateReceiptItemComment", DELETE: "deleteReceiptItemComment"]
+        }
+
+        "/api/receipts/v2/$receiptId/shipmentItems/$shipmentItemId/receiptItems" {
+            controller = "receiptApi"
+            action = [POST: "editReceivingInfo"]
         }
 
         // Internal Locations API
@@ -1144,6 +1213,11 @@ class UrlMappings {
         "/api/inventories/expirationHistoryReport" {
             controller = { "inventoryApi" }
             action = [GET: "getExpirationHistoryReport"]
+        }
+
+        "/api/bulkData/import" {
+            controller = { "importApi" }
+            action = [POST: "importData"]
         }
 
         // Error handling

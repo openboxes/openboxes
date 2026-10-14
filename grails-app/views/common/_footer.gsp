@@ -20,7 +20,7 @@
 		<g:message code="default.locale.label"/>: &nbsp;
 		<!-- show all supported locales -->
 		<g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
-		<g:each in="${grailsApplication.config.openboxes.locale.supportedLocales}" var="l">
+		<g:each in="${LocalizationUtil.supportedLocaleCodes}" var="l">
 			<g:set var="locale" value="${LocalizationUtil.getLocale(l)}"/>
 			<g:set var="selected" value="${locale == (session?.locale ?: session?.user?.locale)}"/>
             <g:set var="localizationModeLocale" value="${new Locale(grailsApplication.config.openboxes.locale.localizationModeLocale)}" />
