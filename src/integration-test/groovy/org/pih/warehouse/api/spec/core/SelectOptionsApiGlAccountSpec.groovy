@@ -36,9 +36,9 @@ class SelectOptionsApiGlAccountSpec extends ApiSpec {
 
     @Override
     void cleanupData() {
-        GlAccount.get(activeGlAccount.id)?.delete()
-        GlAccount.get(inactiveGlAccount.id)?.delete()
-        GlAccountType.get(glAccountType.id)?.delete()
+        activeGlAccount?.delete()
+        inactiveGlAccount?.delete()
+        glAccountType?.delete()
     }
 
     void 'get gl account options should return both active and inactive gl accounts when active is not provided'() {
