@@ -35,9 +35,9 @@ class AttributeApiSpec extends ApiSpec {
 
     @Override
     void cleanupData() {
-        Attribute.get(productAttribute.id)?.delete()
-        Attribute.get(productSupplierAttribute.id)?.delete()
-        Attribute.get(inactiveProductAttribute.id)?.delete()
+        productAttribute?.delete()
+        productSupplierAttribute?.delete()
+        inactiveProductAttribute?.delete()
     }
 
     void 'list attributes should return active attributes of all entity types when entity type is not provided'() {

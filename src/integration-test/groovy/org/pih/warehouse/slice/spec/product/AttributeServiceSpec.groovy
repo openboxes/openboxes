@@ -32,8 +32,8 @@ class AttributeServiceSpec extends IntegrationSpec {
         List<Attribute> attributes = attributeService.searchAttributes(prefix.toLowerCase(), [:])
 
         then:
-        attributes*.id == [matching.id]
-        !attributes*.id.contains(notMatching.id)
+        assert attributes*.id == [matching.id]
+        assert !attributes*.id.contains(notMatching.id)
     }
 
     void 'searchAttributes should return all attributes when search term is not provided'() {
@@ -45,7 +45,7 @@ class AttributeServiceSpec extends IntegrationSpec {
         List<Attribute> attributes = attributeService.searchAttributes(searchTerm, [:])
 
         then:
-        attributes*.id.containsAll([first.id, second.id])
+        assert attributes*.id.containsAll([first.id, second.id])
 
         where:
         searchTerm << [null, ""]
@@ -62,7 +62,7 @@ class AttributeServiceSpec extends IntegrationSpec {
         List<Attribute> attributes = attributeService.searchAttributes(prefix, [sort: "name", order: order])
 
         then:
-        attributes*.name == expectedNames.collect { "${prefix} ${it}".toString() }
+        assert attributes*.name == expectedNames.collect { "${prefix} ${it}" }
 
         where:
         order  || expectedNames
@@ -79,8 +79,8 @@ class AttributeServiceSpec extends IntegrationSpec {
         List<Attribute> attributes = attributeService.searchAttributes(prefix, [max: 2, offset: 1, sort: "name", order: "asc"])
 
         then:
-        attributes*.name == ["${prefix} B", "${prefix} C"]*.toString()
-        attributes.totalCount == 3
+        assert attributes*.name == ["${prefix} B", "${prefix} C"]
+        assert attributes.totalCount == 3
     }
 
     void 'list should return only active attributes by default'() {
@@ -92,8 +92,8 @@ class AttributeServiceSpec extends IntegrationSpec {
         List<Attribute> attributes = attributeService.list(null)
 
         then:
-        attributes*.id.contains(active.id)
-        !attributes*.id.contains(inactive.id)
+        assert attributes*.id.contains(active.id)
+        assert !attributes*.id.contains(inactive.id)
     }
 
     void 'list should return only inactive attributes when active is false'() {
@@ -105,8 +105,8 @@ class AttributeServiceSpec extends IntegrationSpec {
         List<Attribute> attributes = attributeService.list(null, false)
 
         then:
-        attributes*.id.contains(inactive.id)
-        !attributes*.id.contains(active.id)
+        assert attributes*.id.contains(inactive.id)
+        assert !attributes*.id.contains(active.id)
     }
 
     void 'list should return attributes regardless of entity type when entity type code is not provided'() {
@@ -119,7 +119,7 @@ class AttributeServiceSpec extends IntegrationSpec {
         List<Attribute> attributes = attributeService.list(null)
 
         then:
-        attributes*.id.containsAll([productAttribute.id, supplierAttribute.id, attributeWithoutType.id])
+        assert attributes*.id.containsAll([productAttribute.id, supplierAttribute.id, attributeWithoutType.id])
     }
 
     void 'list should return only attributes assigned to the given entity type code'() {
@@ -132,9 +132,9 @@ class AttributeServiceSpec extends IntegrationSpec {
         List<Attribute> attributes = attributeService.list(EntityTypeCode.PRODUCT)
 
         then:
-        attributes*.id.contains(productAttribute.id)
-        !attributes*.id.contains(supplierAttribute.id)
-        !attributes*.id.contains(attributeWithoutType.id)
+        assert attributes*.id.contains(productAttribute.id)
+        assert !attributes*.id.contains(supplierAttribute.id)
+        assert !attributes*.id.contains(attributeWithoutType.id)
     }
 
     void 'list should filter by both entity type code and active status'() {
@@ -149,7 +149,7 @@ class AttributeServiceSpec extends IntegrationSpec {
         List<Attribute> attributes = attributeService.list(EntityTypeCode.PRODUCT, false)
 
         then:
-        attributes*.id.contains(inactiveProductAttribute.id)
-        !attributes*.id.contains(activeProductAttribute.id)
+        assert attributes*.id.contains(inactiveProductAttribute.id)
+        assert !attributes*.id.contains(activeProductAttribute.id)
     }
 }
