@@ -312,6 +312,9 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
         false      | true                | 0        | null      | null
         false      | true                | 0        | "valid"   | null
         false      | true                | 0        | null      | new Date(2025, 01, 01)
+        false      | true                | null     | null      | null
+        false      | true                | null     | "valid"   | null
+        false      | true                | null     | null      | new Date(2025, 01, 01)
     }
 
     // ----------------------------------------------------------------------------------------------------------

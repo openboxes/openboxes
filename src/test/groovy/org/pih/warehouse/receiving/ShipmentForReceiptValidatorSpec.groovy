@@ -4,6 +4,7 @@ import grails.testing.gorm.DataTest
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.inventory.Inventory
@@ -30,6 +31,12 @@ class ShipmentForReceiptValidatorSpec extends Specification implements DataTest 
 
     void setup() {
         validator = new ShipmentForReceiptValidator(shipmentReceivingCalculator: new ShipmentReceivingCalculator())
+    }
+
+    void cleanup() {
+        // The current location lives in a static thread-local; clear it so it does not leak into
+        // whatever spec runs next on this thread.
+        new AuthService().setCurrentLocation(null)
     }
 
     void 'doValidate should pass for a #shipmentStatus shipment with something left to receive'() {
@@ -161,6 +168,35 @@ class ShipmentForReceiptValidatorSpec extends Specification implements DataTest 
         then:
         assert !result.valid
         assert result.errors.first().code == "stockMovement.isDifferentLocation.message"
+    }
+
+    void 'validateForReceiptRollback should pass at the destination of a #shipmentStatus shipment'() {
+        given:
+        Shipment shipment = buildShipment([buildShipmentItem(100)], shipmentStatus)
+        assert shipment.destination.id
+        new AuthService().setCurrentLocation(shipment.destination)
+
+        expect:
+        validator.validateForReceiptRollback(shipment).valid
+
+        where:
+        shipmentStatus << [ShipmentStatusCode.PARTIALLY_RECEIVED, ShipmentStatusCode.RECEIVED]
+    }
+
+    void 'validateForReceiptRollback should reject a location other than the destination of the shipment'() {
+        given:
+        Shipment shipment = buildShipment([buildShipmentItem(100)], ShipmentStatusCode.RECEIVED)
+        Location otherLocation = new Location(name: "Other location")
+        otherLocation.save(validate: false, flush: true)
+        new AuthService().setCurrentLocation(otherLocation)
+        assert AuthService.currentLocation
+
+        when:
+        ObjectValidationResult result = validator.validateForReceiptRollback(shipment)
+
+        then:
+        assert !result.valid
+        assert result.errors.first().code == "stockMovement.rollbackLastReceipt.isDifferentLocation.message"
     }
 
     private static Shipment buildShipment(

@@ -7,20 +7,20 @@ import org.pih.warehouse.core.mapper.EntityToDtoMapper
 import org.pih.warehouse.core.mapper.MapperConfig
 import org.pih.warehouse.location.BinLocationDto
 import org.pih.warehouse.location.FacilityDto
-import org.pih.warehouse.product.ProductSimpleDtoMapper
+import org.pih.warehouse.product.ProductDtoMapper
 
 @Component
 class CycleCountItemDtoMapper implements EntityToDtoMapper<CycleCountItem, CycleCountItemDto> {
 
     @Autowired
-    ProductSimpleDtoMapper productSimpleDtoMapper
+    ProductDtoMapper productDtoMapper
 
     @Override
     CycleCountItemDto doMap(CycleCountItem source, MapperConfig config) {
         return new CycleCountItemDto(
                 id: source.id,
                 facility: FacilityDto.from(source.facility),
-                product: productSimpleDtoMapper.map(source.product),
+                product: productDtoMapper.map(source.product),
                 inventoryItem: source.inventoryItem,
                 binLocation: BinLocationDto.from(source.location),
                 countIndex: source.countIndex,

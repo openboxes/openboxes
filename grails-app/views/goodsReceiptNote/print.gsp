@@ -25,7 +25,7 @@
 <body>
 
 <div id="print-header">
-    <span class="title">
+    <span class="title" data-testid="document-title">
         ${warehouse.message(code:'goodsReceiptNote.label')}
     </span>
     <div style="float: right;">

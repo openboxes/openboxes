@@ -42,7 +42,7 @@ const Switch = ({
   return (
     <CustomTooltip content={tooltipText} show={showTooltip}>
       <div className={`switch-container ${className}`}>
-        <label htmlFor={`toggle-${toggleId}`} className="switch">
+        <label htmlFor={`toggle-${toggleId}`} className="switch" data-testid="switch-toggle">
           <input
             id={`toggle-${toggleId}`}
             type="checkbox"

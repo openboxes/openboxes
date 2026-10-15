@@ -13,6 +13,7 @@ const DataTableHeader = ({
 }) => (
   <div
     className="rt-thead -header"
+    data-testid="table-header"
     style={{ width: (!isScreenWiderThanTable && tableWithPinnedColumns) ? 'fit-content' : undefined }}
   >
     <div className="rt-tr">

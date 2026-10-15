@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.validation.ObjectError
 
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.core.validation.PlainObjectValidator
@@ -48,7 +49,17 @@ class ShipmentForReceiptValidator extends PlainObjectValidator<Shipment> {
 
         return new ObjectValidationResult(
                 validateShipmentNotFullyReceived(shipment),
-                validateShipmentDestination(shipment, currentLocation),
+                validateShipmentDestination(shipment, currentLocation, "stockMovement.isDifferentLocation.message"),
+        )
+    }
+
+    /**
+     * Whether the last receipt of the shipment can be rolled back from the current location
+     */
+    ObjectValidationResult validateForReceiptRollback(Shipment shipment) {
+        return new ObjectValidationResult(
+                validateShipmentDestination(shipment, AuthService.currentLocation,
+                        "stockMovement.rollbackLastReceipt.isDifferentLocation.message"),
         )
     }
 
@@ -90,13 +101,13 @@ class ShipmentForReceiptValidator extends PlainObjectValidator<Shipment> {
     }
 
     /**
-     * Whether the shipment is received where the user is logged in
+     * Whether the user is logged in at the destination of the shipment
      */
-    private ObjectError validateShipmentDestination(Shipment shipment, Location currentLocation) {
+    private ObjectError validateShipmentDestination(Shipment shipment, Location currentLocation, String messageCode) {
         if (shipment?.destination?.id == currentLocation?.id) {
             return null
         }
 
-        return rejectField("destination", shipment?.destination, "stockMovement.isDifferentLocation.message")
+        return rejectField("destination", shipment?.destination, messageCode)
     }
 }
