@@ -18,6 +18,7 @@ const StockMovementOutboundList = (props) => {
     defaultFilterValues,
     setFilterValues,
     filterParams,
+    priorityLevels,
   } = useOutboundFilters(props.sourceType);
 
   useTranslation('stockMovement', 'StockMovementType', 'reactTable');
@@ -36,6 +37,7 @@ const StockMovementOutboundList = (props) => {
           requisitionStatuses: props.requisitionStatuses,
           approvers: props.approvers,
           shipmentTypes: props.shipmentTypes,
+          priorityLevels,
         }}
       />
       <StockMovementOutboundTable
