@@ -249,4 +249,19 @@ class ExcelReaderSpec extends Specification {
         then:
         thrown(IllegalArgumentException)
     }
+
+    void 'read should ask which sheet to use when the file has multiple sheets and no sheet name is configured'() {
+        given: "a config that leaves sheetName at its default"
+        ExcelReaderConfig config = new ExcelReaderConfig(
+                linesToSkip: 1,
+                columnMapping: ["A": "string"],
+        )
+
+        when: "reading a file whose sheets are 'string', 'numeric' and 'boolean'"
+        reader.read(xlsFile, config)
+
+        then: "the user is told to pick a sheet, not that a sheet they never named is missing"
+        IllegalArgumentException e = thrown(IllegalArgumentException)
+        assert e.message.contains("multiple sheets")
+    }
 }
