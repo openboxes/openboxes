@@ -5,6 +5,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
+import org.apache.commons.lang.StringUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.CellStyle
@@ -17,8 +18,10 @@ import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 
+import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.date.ZonedDateTimeParser
 import org.pih.warehouse.core.formatter.DefaultTypeFormatter
+import org.pih.warehouse.core.formatter.Formatter
 import org.pih.warehouse.core.http.ContentType
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.core.parser.DoubleParser
@@ -32,6 +35,7 @@ class ExcelWriter extends BulkDataWriter<Workbook, ExcelWriterConfig> {
 
     final DoubleParser doubleParser
     final SessionManager sessionManager
+    final ConfigService configService
 
     // The component resolver is annotated with @Lazy because it wires in the writers, creating a circular dependency.
     // Fortunately the writer doesn't immediately use the component resolver so we can simply delay fetching it.
@@ -40,10 +44,12 @@ class ExcelWriter extends BulkDataWriter<Workbook, ExcelWriterConfig> {
                 final DefaultTypeFormatter defaultTypeFormatter,
                 final DoubleParser doubleParser,
                 final MessageLocalizer messageLocalizer,
-                final SessionManager sessionManager) {
+                final SessionManager sessionManager,
+                final ConfigService configService) {
         super(context, componentResolver, defaultTypeFormatter, messageLocalizer)
         this.doubleParser = doubleParser
         this.sessionManager = sessionManager
+        this.configService = configService
     }
 
     @Override
@@ -66,7 +72,8 @@ class ExcelWriter extends BulkDataWriter<Workbook, ExcelWriterConfig> {
         Workbook workbook = null
         try {
             workbook = getWorkbook(contentType)
-            Sheet sheet = workbook.createSheet(config.sheetName)
+            String sheetName = getSheetName(config.sheetName)
+            Sheet sheet = workbook.createSheet(sheetName)
 
             writeHeaderRow(rowsToWrite, config, workbook, sheet)
             writeDataRows(rowsToWrite, config, sheet, new ExcelCellStyles(workbook))
@@ -79,6 +86,12 @@ class ExcelWriter extends BulkDataWriter<Workbook, ExcelWriterConfig> {
             workbook?.close()
             throw e
         }
+    }
+
+    private String getSheetName(String sheetNameOverride) {
+        return StringUtils.isBlank(sheetNameOverride) ?
+                configService.getProperty("openboxes.export.defaultSheetName") :
+                sheetNameOverride
     }
 
     private Workbook getWorkbook(ContentType contentType) {
@@ -166,8 +179,15 @@ class ExcelWriter extends BulkDataWriter<Workbook, ExcelWriterConfig> {
     }
 
     private def formatCellValueForExcel(Object value, BulkDataWriterFieldConfig config, ZoneId timezone) {
+
+        // If the config contains a specific Formatter to use for the field, use it.
+        if (value != null && config?.formatter != null) {
+            Formatter formatter = context.getBean(config.formatter)
+            return formatter.format(value, config.formatterContext)
+        }
+
         switch (value) {
-            // POI can map some types to their associated types in Excel.
+            // POI has some accepted types that it can automatically map to their associated types in Excel.
             case Number:
                 return doubleParser.parse(value)
             case Boolean:
@@ -188,7 +208,7 @@ class ExcelWriter extends BulkDataWriter<Workbook, ExcelWriterConfig> {
             case Date:
                 return GregorianCalendar.from(ZonedDateTimeParser.asZonedDateTime(value, timezone))
             case Instant:
-                return GregorianCalendar.from(ZonedDateTimeParser.asZonedDateTime(value,timezone))
+                return GregorianCalendar.from(ZonedDateTimeParser.asZonedDateTime(value, timezone))
             case ZonedDateTime:
                 return GregorianCalendar.from(value.withZoneSameInstant(timezone))
 

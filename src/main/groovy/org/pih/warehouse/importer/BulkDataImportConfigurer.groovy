@@ -37,6 +37,15 @@ abstract class BulkDataImportConfigurer<I extends Importable, E> implements
 
     /**
      * A unified configuration for both import and export.
+     *
+     * We wrap getImportExportConfig with a lazy initialized field to avoid recomputing the config each time, which
+     * is safe to do because the config itself is functionally static.
+     */
+    @Lazy
+    private BulkDataImportExportConfig importExportConfig = getImportExportConfig()
+
+    /**
+     * A unified configuration for both import and export.
      * It is likely simplest to construct the config via the builder, which is accessible via {@link #configBuilder()}
      */
     abstract protected BulkDataImportExportConfig getImportExportConfig()

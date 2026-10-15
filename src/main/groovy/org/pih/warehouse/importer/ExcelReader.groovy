@@ -99,7 +99,8 @@ class ExcelReader extends BulkDataReader<ExcelReaderConfig> {
         }
 
         if (StringUtils.isBlank(sheetName)) {
-            throw new IllegalArgumentException("Excel file has multiple sheets. You must specify which sheet to use.")
+            throw new IllegalArgumentException(
+                    "Excel file has multiple sheets. You must specify which sheet to use or delete excess sheets.")
         }
 
         Sheet sheet = workbook.getSheet(sheetName)

@@ -15,6 +15,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 import testutil.MessageLocalizerStub
 
+import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.date.InstantParser
 import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.core.formatter.DefaultTypeFormatter
@@ -41,6 +42,9 @@ class ExcelWriterSpec extends Specification {
     @Shared
     SessionManager sessionManagerStub
 
+    @Shared
+    ConfigService configServiceStub
+
     // Tests can override this to change the timezone of the requesting user.
     TimeZone userTimezone = USER_TIMEZONE
 
@@ -56,6 +60,10 @@ class ExcelWriterSpec extends Specification {
             getTimezone() >> { userTimezone }
         }
 
+        configServiceStub = Stub(ConfigService) {
+            getProperty("openboxes.export.defaultSheetName") >> "Sheet1"
+        }
+
         writer = new ExcelWriter(
                 applicationContextStub,
                 Stub(BulkDataExportComponentResolver),
@@ -63,7 +71,8 @@ class ExcelWriterSpec extends Specification {
                 new DefaultTypeFormatter(Optional.empty()),
                 new DoubleParser(),
                 MessageLocalizerStub.MESSAGE_LOCALIZER_STUB,
-                sessionManagerStub)
+                sessionManagerStub,
+                configServiceStub)
     }
 
     void cleanup() {
@@ -384,6 +393,24 @@ class ExcelWriterSpec extends Specification {
         assert readRows(result) == [
                 ["String Header"],
         ]
+    }
+
+    void "write sets a custom sheet name"() {
+        given:
+        List<Map> toWrite = []
+
+        and: "a valid config"
+        ExcelWriterConfig config = initConfig(true, new ExcelWriterConfig(
+                addHeaderRow: false,
+                fields: [],
+                sheetName: "OVERRIDE"
+        ))
+
+        when:
+        BulkDataWriterResult<Workbook> result = writer.write(toWrite, ContentType.XLS, config)
+
+        then:
+        assert result.result.getSheet("OVERRIDE") != null
     }
 
     void "write succeeds with an empty dataset and no header"() {
