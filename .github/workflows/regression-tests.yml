@@ -44,8 +44,9 @@ jobs:
           distribution: temurin
           cache: gradle
 
+      # No spec needs the webpack bundle (processResources builds it by default; about 4 minutes on a runner).
       - name: Run Regression Unit Specs
-        run: ./gradlew regressionTest --no-daemon
+        run: ./gradlew regressionTest -x npm_run_bundle --no-daemon
 
       - name: Upload Test Report
         if: ${{ failure() }}
@@ -61,8 +62,8 @@ jobs:
       fail-fast: false
       matrix:
         # The shards are balanced by gradle/regression-spec-times.txt. Change both lists together.
-        shard: [1, 2, 3, 4]
-        shards: [4]
+        shard: [1, 2, 3, 4, 5, 6]
+        shards: [6]
         # Pull requests: MySQL 8.0.36 (or the database chosen when run by hand); pushes to the branch: both databases.
         database: ${{ github.event_name == 'push' && fromJSON('["mysql:8.0.36", "mariadb:10.3.39"]') || fromJSON(format('["{0}"]', inputs.database || 'mysql:8.0.36')) }}
 
@@ -79,8 +80,9 @@ jobs:
           distribution: temurin
           cache: gradle
 
+      # Skips the webpack bundle, as the unit job does.
       - name: Run Regression Integration Specs (shard ${{ matrix.shard }} of ${{ matrix.shards }}, ${{ matrix.database }})
-        run: ./gradlew regressionIntegrationTest -PregressionShard=${{ matrix.shard }}/${{ matrix.shards }} --no-daemon
+        run: ./gradlew regressionIntegrationTest -PregressionShard=${{ matrix.shard }}/${{ matrix.shards }} -x npm_run_bundle --no-daemon
         env:
           TEST_DATABASE: ${{ matrix.database }}
 
