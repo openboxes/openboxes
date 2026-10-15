@@ -20,3 +20,8 @@ jobs:
 
       - run: npm ci
       - run: npm test
+
+      # The production bundle, which also runs ESLint (webpack.config.js). The backend tests skip building it.
+      # Runs even when a test fails, so both kinds of failure show in one run.
+      - run: npm run bundle
+        if: ${{ !cancelled() }}
