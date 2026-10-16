@@ -2,6 +2,7 @@ package org.pih.warehouse.core
 
 import grails.core.GrailsApplication
 import org.pih.warehouse.jobs.AutomaticIssuanceJob
+import org.pih.warehouse.jobs.AutomaticReplenishmentJob
 import org.pih.warehouse.requisition.Requisition
 import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
@@ -29,9 +30,27 @@ class RequisitionEventService {
                 AutomaticIssuanceJob.schedule(runAt, [requisitionId: requisition.id])
                 webhookPublisherService.publishRequisitionEvent(requisition, event.eventType)
                 break
+            case WebhookEventType.PICK_COMPLETED:
+                scheduleAutomaticReplenishment(requisition)
+                webhookPublisherService.publishRequisitionEvent(requisition, event.eventType)
+                break
             case WebhookEventType.REQUISITION_CREATED:
                 webhookPublisherService.publishRequisitionEvent(requisition, event.eventType)
                 break
         }
+    }
+
+    void scheduleAutomaticReplenishment(Requisition requisition) {
+        // Delay the job until after RefreshProductAvailabilityJob, so it sees the quantities left in the bins after picking
+        Integer refreshDelayInMilliseconds = grailsApplication.config.getProperty(
+                "openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds", Integer, 0)
+        Integer delayInMilliseconds = grailsApplication.config.getProperty(
+                "openboxes.jobs.automaticReplenishmentJob.delayInMilliseconds", Integer, 0)
+        Date runAt = new Date(System.currentTimeMillis() + refreshDelayInMilliseconds + delayInMilliseconds)
+        log.info "Triggering automaticReplenishmentJob for ${requisition.origin} with ${refreshDelayInMilliseconds + delayInMilliseconds} ms delay"
+        AutomaticReplenishmentJob.schedule(runAt, [
+                facilityId         : requisition.origin.id,
+                targetActivityCodes: [ActivityCode.DISPLAY_STOCK.name()],
+        ])
     }
 }
