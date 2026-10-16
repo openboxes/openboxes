@@ -11,7 +11,8 @@ package org.pih.warehouse.integration
 
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.api.StockMovement
-
+import org.pih.warehouse.core.RequisitionEvent
+import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.requisition.Requisition
@@ -19,6 +20,7 @@ import org.pih.warehouse.requisition.RequisitionStatus
 
 class StateTransitionService {
 
+    def grailsApplication
     def stockMovementService
 
     def triggerStockMovementStatusUpdate(StockMovement stockMovement) {
@@ -37,6 +39,7 @@ class StateTransitionService {
                 if (picklist.isFullyPicked) {
                     log.info "Stock movement ${stockMovement.identifier} has been picked"
                     stockMovementService.transitionRequisitionBasedStockMovement(stockMovement, [status: StockMovementStatusCode.PICKED] as JSONObject)
+                    grailsApplication.mainContext.publishEvent(new RequisitionEvent(requisition.id, WebhookEventType.PICK_COMPLETED))
                 }
             }
         }

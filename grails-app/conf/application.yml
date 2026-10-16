@@ -582,6 +582,12 @@ openboxes:
             cronExpression: "0 */5 * * * ?"     # every five minutes
             bulkAutomaticIssuance: true
 
+        # Generate replenishment lists for bins below minimum (triggered after picking completes)
+        automaticReplenishmentJob:
+            enabled: true
+            cronExpression: "0 */30 * * * ?"    # every thirty minutes
+            delayInMilliseconds: 5000           # added on top of the product availability refresh delay
+
         automaticAllocationJob:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes

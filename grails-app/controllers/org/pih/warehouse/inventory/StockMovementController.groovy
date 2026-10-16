@@ -725,7 +725,7 @@ class StockMovementController {
         try {
             Requisition requisition = Requisition.get(params.id)
 
-            List<AllocationSourceStrategy> strategyList = [AllocationSourceStrategy.STORAGE_FIRST]
+            List<AllocationSourceStrategy> strategyList = [AllocationSourceStrategy.DISPLAY_FIRST]
             def result = allocationService.allocate(requisition, AllocationMode.AUTO, strategyList)
             allocationService.completeAllocation(requisition, result?.any { it.suggestedItems })
 
