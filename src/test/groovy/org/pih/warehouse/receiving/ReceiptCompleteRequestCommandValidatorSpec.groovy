@@ -1,5 +1,8 @@
 package org.pih.warehouse.receiving
 
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+
 import grails.testing.gorm.DataTest
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
 import spock.lang.Specification
@@ -48,6 +51,40 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
 
         then: 'the workflow the receipt was started by does not gate its completion'
         assert result.valid
+    }
+
+    void 'doValidate should reject a delivery date in the future'() {
+        given:
+        Receipt receipt = buildPendingReceipt()
+        buildReceiptItem(receipt, false)
+
+        when:
+        ObjectValidationResult result = validator.doValidate(new ReceiptCompleteRequestCommand(
+                receipt: receipt,
+                dateDelivered: Instant.now().plus(1, ChronoUnit.SECONDS),
+        ))
+
+        then:
+        assert !result.valid
+        assert result.errors*.code == ["receiptCompleteRequestCommand.dateDelivered.future"]
+    }
+
+    void 'doValidate should accept a delivery date of #dateDelivered'() {
+        given:
+        Receipt receipt = buildPendingReceipt()
+        buildReceiptItem(receipt, false)
+
+        expect:
+        assert validator.doValidate(new ReceiptCompleteRequestCommand(
+                receipt: receipt,
+                dateDelivered: dateDelivered,
+        )).valid
+
+        where:
+        dateDelivered << [
+                Instant.now().minus(1, ChronoUnit.HOURS),
+                null,
+        ]
     }
 
     void 'doValidate should reject a receipt that received nothing (quantityReceived: #quantityReceived)'() {

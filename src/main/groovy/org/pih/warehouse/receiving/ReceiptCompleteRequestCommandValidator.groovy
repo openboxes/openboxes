@@ -1,5 +1,7 @@
 package org.pih.warehouse.receiving
 
+import java.time.Instant
+
 import org.springframework.stereotype.Component
 import org.springframework.validation.ObjectError
 
@@ -18,6 +20,7 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
         return new ObjectValidationResult(
                 validateCurrentLocationIsDestination(command),
                 validateReceiptIsPending(command),
+                validateDateDeliveredNotInFuture(command),
                 validateSomethingWasReceived(command),
                 validateItemsToCompleteAreValid(command),
                 validateNoDuplicateItemsToComplete(command),
@@ -61,6 +64,18 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
         }
 
         return null
+    }
+
+    /**
+     * The delivery date can't be in the future. (This is because we use it for transaction date.)
+     */
+    private ObjectError validateDateDeliveredNotInFuture(ReceiptCompleteRequestCommand command) {
+        if (!command.dateDelivered || !command.dateDelivered.isAfter(Instant.now())) {
+            return null
+        }
+
+        return rejectField("dateDelivered", command.dateDelivered,
+                "receiptCompleteRequestCommand.dateDelivered.future", [command.dateDelivered.toString()])
     }
 
     /**
