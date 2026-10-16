@@ -12,36 +12,16 @@ package org.pih.warehouse.data
 import grails.gorm.transactions.Transactional
 import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
-import org.apache.poi.hssf.usermodel.*
-import org.apache.poi.ss.usermodel.*
-import grails.plugins.csv.CSVWriter
-import org.grails.plugins.excelimport.ExpectedPropertyType
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.ProductPrice
-import org.pih.warehouse.core.UnitOfMeasure
-import org.pih.warehouse.core.UnitOfMeasureClass
-import org.pih.warehouse.core.UnitOfMeasureType
 import org.pih.warehouse.importer.CSVUtils
-import org.pih.warehouse.importer.ImportDataCommand
-import org.pih.warehouse.importer.InventoryLevelExcelImporter
-import org.pih.warehouse.core.UnitOfMeasure
-import org.pih.warehouse.core.UnitOfMeasureClass
-import org.pih.warehouse.core.Tag
-import org.pih.warehouse.inventory.Inventory
-import org.pih.warehouse.inventory.InventoryLevel
-import org.pih.warehouse.inventory.InventoryStatus
-import org.pih.warehouse.product.Category
-import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.ProductPackage
-import org.pih.warehouse.product.ProductType
-import org.pih.warehouse.product.ProductTypeCode
+import org.springframework.transaction.annotation.Isolation
 
-import java.text.SimpleDateFormat
+import javax.sql.DataSource
+import java.sql.Connection
 
 @Transactional
 class DataService {
 
-    def dataSource
+    DataSource dataSource
 
     List executeQuery(String query) {
         return new Sql(dataSource).rows(query)
@@ -51,43 +31,77 @@ class DataService {
         return new Sql(dataSource).rows(query, params)
     }
 
-    void executeStatement(String statement, Boolean logStatement = true) {
-        Sql sql = new Sql(dataSource)
-        sql.withTransaction {
-            try {
-                def startTime = System.currentTimeMillis()
-                log.info "Executing statement ${logStatement ? statement : ''}"
-                sql.execute(statement)
-                log.info "Updated ${sql.updateCount} rows in " +  (System.currentTimeMillis() - startTime) + " ms"
-                sql.commit()
-            } catch (Exception e) {
-                sql.rollback()
-                log.error("Rollback due to error while executing statements: " + e.message, e)
-            }
-        }
+    /**
+     * Executes a single SQL statement within its own transaction, optionally
+     * running it under a specific transaction isolation level (see
+     * withTransactionIsolation). Delegates to executeStatements() so both
+     * methods share one implementation of the transaction/isolation handling.
+     */
+    void executeStatement(String statement, Isolation isolation = null) {
+        executeStatements([statement], isolation)
     }
-
-    void executeStatements(List statementList, Boolean logStatements = true) {
-        statementList.each { String statement ->
-            executeStatement(statement, logStatements)
-        }
-    }
-
 
     /**
-     * Should use the apache library to handle this.
-     * @param str
-     * @return
+     * Executes a list of SQL statements as a single atomic transaction. All
+     * statements commit together, or a failure anywhere rolls back the whole
+     * batch and rethrows to the caller (unlike the previous per-statement
+     * behavior, which silently swallowed failures; see OBS-1987/#6190).
+     *
+     * Optionally runs the whole batch under a specific transaction isolation
+     * level instead of the connection's default (REPEATABLE READ), e.g. to
+     * avoid the shared locks MariaDB/MySQL takes on source tables during a
+     * locking read like INSERT...SELECT. See OBPIH-3641 / OBS-1988 / #6189.
+     *
+     * Note: this only provides atomicity for pure DML sequences (DELETE,
+     * INSERT, UPDATE). DDL statements (DROP TABLE, CREATE TABLE) cause an
+     * implicit commit in MySQL/MariaDB regardless of this transaction wrapper.
+     * A sequence containing DDL needs a different pattern (build into a
+     * _tmp table, then RENAME TABLE to swap). See #6190.
      */
-    def getFloat(str) {
-        try {
-            return str.toFloat()
-        } catch (NumberFormatException e) {
-            log.error("Error converting string ${str} to float.")
-
-            throw e
+    void executeStatements(List<String> statementList, Isolation isolation = null) {
+        Sql sql = new Sql(dataSource)
+        sql.cacheConnection { Connection connection ->
+            withTransactionIsolation(connection, isolation) {
+                sql.withTransaction {
+                    statementList.each { String statement ->
+                        def startTime = System.currentTimeMillis()
+                        log.info "Executing statement ${statement}"
+                        try {
+                            sql.execute(statement)
+                        } catch (Exception e) {
+                            log.error("Failed executing statement: ${statement}", e)
+                            throw e
+                        }
+                        log.info "Updated ${sql.updateCount} rows in " + (System.currentTimeMillis() - startTime) + " ms"
+                    }
+                }
+            }
         }
-        return 0.0
+        sql.close()
+    }
+
+    /**
+     * Runs the given closure with the connection's transaction isolation level temporarily
+     * set to transactionIsolation, restoring the previous level afterward regardless of success
+     * or failure. Pass null (or Isolation.DEFAULT) to run the closure unchanged, at
+     * whatever isolation level the connection already has.
+     *
+     * Used to run ETL/reporting queries (e.g. INSERT...SELECT) under READ COMMITTED
+     * instead of the default REPEATABLE READ, avoiding the shared locks MariaDB/MySQL
+     * takes on source table rows during a locking read. See OBPIH-3641 / OBS-1988.
+     */
+    private void withTransactionIsolation(Connection connection, Isolation transactionIsolation, Closure closure) {
+        if (!transactionIsolation || transactionIsolation == Isolation.DEFAULT) {
+            closure()
+            return
+        }
+        Integer previousTransactionIsolation = connection.getTransactionIsolation()
+        try {
+            connection.setTransactionIsolation(transactionIsolation.value())
+            closure()
+        } finally {
+            connection.setTransactionIsolation(previousTransactionIsolation)
+        }
     }
 
     def transformObjects(List objects, List includeFields) {
