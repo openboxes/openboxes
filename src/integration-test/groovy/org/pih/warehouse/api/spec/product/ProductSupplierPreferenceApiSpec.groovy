@@ -1,9 +1,6 @@
 package org.pih.warehouse.api.spec.product
 
-import io.restassured.builder.ResponseSpecBuilder
 import org.apache.http.HttpStatus
-import org.grails.web.json.JSONObject
-import org.hamcrest.Matchers
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Shared
 
@@ -58,77 +55,75 @@ class ProductSupplierPreferenceApiSpec extends ApiSpec {
 
     void 'create product supplier preference should succeed when product supplier and preference type are provided'() {
         given:
-        JSONObject body = new JSONObject()
-                .put('productSupplier', productSupplier.id)
-                .put('preferenceType', preferenceType.id)
+        ProductSupplierPreference newPreference = new ProductSupplierPreference(
+                productSupplier: productSupplier,
+                preferenceType: preferenceType,
+        )
 
-        expect:
-        assert productSupplierPreferenceApiWrapper.createOK(body) != null
+        when:
+        ProductSupplierPreference createdPreference = productSupplierPreferenceApiWrapper.createOK(newPreference)
+
+        then:
+        assert createdPreference.id != null
     }
 
     void 'create product supplier preference should fail when preference type is missing'() {
         given:
-        String body = new JSONObject()
-                .put('productSupplier', productSupplier.id)
-                .toString()
+        ProductSupplierPreference preferenceWithoutType = new ProductSupplierPreference(productSupplier: productSupplier)
 
         expect:
-        productSupplierPreferenceApiWrapper.api.create(body, responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_BAD_REQUEST))
+        productSupplierPreferenceApiWrapper.create(preferenceWithoutType, HttpStatus.SC_BAD_REQUEST)
     }
 
     void 'update product supplier preference should succeed and return updated data'() {
         given:
-        String body = new JSONObject()
-                .put('comments', 'Updated preference')
-                .toString()
+        preference.comments = 'Updated preference'
 
-        expect:
-        productSupplierPreferenceApiWrapper.api.update(preference.id, body, new ResponseSpecBuilder()
-                .expectStatusCode(HttpStatus.SC_OK)
-                .expectBody('data.id', Matchers.equalTo(preference.id))
-                .expectBody('data.comments', Matchers.equalTo('Updated preference'))
-                .build())
+        when:
+        ProductSupplierPreference updatedPreference = productSupplierPreferenceApiWrapper.updateOK(preference)
+
+        then:
+        assert updatedPreference.id == preference.id
+        assert updatedPreference.comments == 'Updated preference'
     }
 
-    void 'delete product supplier preference should succeed when preference exists'() {
-        expect:
+    void 'delete product supplier preference should remove the preference'() {
+        when:
         productSupplierPreferenceApiWrapper.deleteOK(preference.id)
+
+        then:
+        assert ProductSupplierPreference.withNewTransaction { ProductSupplierPreference.get(preference.id) } == null
     }
 
     void 'create or update batch should save all given preferences'() {
         given:
-        JSONObject newPreference = new JSONObject()
-                .put('productSupplier', productSupplier.id)
-                .put('preferenceType', preferenceType.id)
-        JSONObject updatedPreference = new JSONObject()
-                .put('id', preference.id)
-                .put('productSupplier', productSupplierWithPreference.id)
-                .put('preferenceType', preferenceType.id)
-                .put('comments', 'Updated in batch')
-        String body = new JSONObject()
-                .put('productSupplierPreferences', [newPreference, updatedPreference])
-                .toString()
+        ProductSupplierPreference newPreference = new ProductSupplierPreference(
+                productSupplier: productSupplier,
+                preferenceType: preferenceType,
+        )
+        preference.comments = 'Updated in batch'
 
-        expect:
-        productSupplierPreferenceApiWrapper.api.createOrUpdateBatch(body, new ResponseSpecBuilder()
-                .expectStatusCode(HttpStatus.SC_OK)
-                .expectBody('data', Matchers.hasSize(2))
-                .expectBody('data.id', Matchers.everyItem(Matchers.notNullValue()))
-                .expectBody('data.id', Matchers.hasItem(preference.id))
-                .expectBody('data.comments', Matchers.hasItem('Updated in batch'))
-                .build())
+        when:
+        List<ProductSupplierPreference> savedPreferences =
+                productSupplierPreferenceApiWrapper.createOrUpdateBatchOK([newPreference, preference])
+
+        then:
+        assert savedPreferences.size() == 2
+        assert savedPreferences.every { it.id != null }
+        ProductSupplierPreference updatedPreference = savedPreferences.find { it.id == preference.id }
+        assert updatedPreference.comments == 'Updated in batch'
+        ProductSupplierPreference createdPreference = savedPreferences.find { it.id != preference.id }
+        assert createdPreference.comments == null
     }
 
     void 'create or update batch should fail when product supplier already has a default preference'() {
         given:
-        JSONObject secondDefaultPreference = new JSONObject()
-                .put('productSupplier', productSupplierWithPreference.id)
-                .put('preferenceType', preferenceType.id)
-        String body = new JSONObject()
-                .put('productSupplierPreferences', [secondDefaultPreference])
-                .toString()
+        ProductSupplierPreference secondDefaultPreference = new ProductSupplierPreference(
+                productSupplier: productSupplierWithPreference,
+                preferenceType: preferenceType,
+        )
 
         expect:
-        productSupplierPreferenceApiWrapper.api.createOrUpdateBatch(body, responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_BAD_REQUEST))
+        productSupplierPreferenceApiWrapper.createOrUpdateBatch([secondDefaultPreference], HttpStatus.SC_BAD_REQUEST)
     }
 }

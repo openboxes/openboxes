@@ -71,10 +71,11 @@ class ProductSupplierPreferenceServiceSpec extends Specification implements Serv
 
     void 'delete should delete every given preference using data service'() {
         given:
-        Set<ProductSupplierPreference> preferences = [
-                Stub(ProductSupplierPreference) { getId() >> '1' },
-                Stub(ProductSupplierPreference) { getId() >> '2' },
-        ] as Set
+        ProductSupplierPreference firstPreference = new ProductSupplierPreference()
+        firstPreference.id = '1'
+        ProductSupplierPreference secondPreference = new ProductSupplierPreference()
+        secondPreference.id = '2'
+        Set<ProductSupplierPreference> preferences = [firstPreference, secondPreference] as Set
 
         when:
         service.delete(preferences)
