@@ -24,6 +24,7 @@ import org.hibernate.criterion.Junction
 import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 import org.hibernate.criterion.Subqueries
+import org.hibernate.jdbc.ReturningWork
 import org.hibernate.SQLQuery
 import org.hibernate.sql.JoinType
 import org.hibernate.type.StandardBasicTypes
@@ -861,6 +862,167 @@ class ProductAvailabilityService {
 
         // Filter out any items where QoH == 0 because we have no need to operate on items with no quantity.
         return inventoryService.getQuantityAsAvailableItems(transactionEntries).findAll{ it.quantityOnHand != 0 }
+    }
+
+    /**
+     * Same as getAvailableItemsAtDateAsMap, except that stock at a past date is calculated in the database (see
+     * getQuantityOnHandAtDate) rather than by loading the transaction history into memory.
+     *
+     * Only used by the transaction report for now (see #6201).
+     *
+     * @param facility The location to fetch stock for.
+     * @param products The products to fetch stock for.
+     * @param at The moment in time to fetch stock for. If not provided, will fetch the current stock of each item.
+     * @return a map of AvailableItem keyed on ProductAvailabilityKey
+     */
+    AvailableItemMap getQuantityOnHandAtDateAsMap(Location facility, Collection<Product> products, Date at=null) {
+        // Current stock comes from product availability, the same as getAvailableItemsAtDate
+        Date now = new Date()
+        List<AvailableItem> availableItems = (at == null || at == now || at.after(now))
+                ? getAvailableItems(facility, products.collect{ it.id }, false, true)
+                : getQuantityOnHandAtDate(facility, products, at)
+
+        AvailableItemMap availableItemsMap = new AvailableItemMap()
+        availableItemsMap.putAll(availableItems)
+        return availableItemsMap
+    }
+
+    /**
+     * Calculates the stock of each inventory item + bin at a facility at a moment in time, excluding items where
+     * quantity on hand is zero.
+     *
+     * The quantities are summed in the database so that we don't need to load the transaction history into memory
+     * (see #6201). It follows the same rules as InventoryService.getQuantityByProductAndInventoryItemMap, which
+     * replays the history from most recent to oldest:
+     * 1) Transactions are ordered by transaction date, then by date created (see Transaction.compareTo).
+     * 2) A PRODUCT_INVENTORY transaction is a baseline of the product at the facility. Only the most recent one
+     *    counts, along with anything after it. Anything before it is ignored for every inventory item of that product.
+     * 3) An INVENTORY transaction is a baseline of a single inventory item (product + lot) at the facility. Likewise,
+     *    only the most recent one counts, along with anything after it.
+     * 4) DEBIT quantities are subtracted, everything else is added.
+     *
+     * There is one case where the replay gives a different result: it ignores a PRODUCT_INVENTORY when all of its
+     * entries are for inventory items that have a more recent INVENTORY transaction, so it doesn't reset the other
+     * inventory items of the product. We always apply rule 2. INVENTORY transactions are legacy data that is being
+     * migrated to baselines and adjustments (see #165).
+     *
+     * @param facility The location to fetch stock for.
+     * @param products The products to fetch stock for. If null or empty, fetches stock for all products.
+     * @param at The moment in time to fetch stock for (exclusive).
+     */
+    List<AvailableItem> getQuantityOnHandAtDate(Location facility, Collection<Product> products, Date at) {
+        if (!facility?.inventory || !at) {
+            return []
+        }
+
+        List<String> productIds = products?.collect { it.id }?.unique()
+        String productFilter = productIds ? "AND ii.product_id IN (:productIds)" : ""
+
+        // A sortable key that orders transactions the same way as Transaction.compareTo. Fixed width (40 chars) so
+        // that we can append the transaction id and use MAX() to find the most recent baseline transaction.
+        //
+        // Transactions can tie on the key: dates are stored to the second, and a baseline and its adjustment are
+        // often created together with the same transaction date. On a tie the baseline comes first, so credits and
+        // debits that tie with it are counted. If two baselines tie, the one with the highest id wins.
+        String sortKey = """CONCAT(DATE_FORMAT(t.transaction_date, '%Y%m%d%H%i%s%f'),
+                                  DATE_FORMAT(t.date_created, '%Y%m%d%H%i%s%f'))"""
+
+        // The transaction entries (of the given products) that happened at the facility before the given date
+        String entriesBeforeDate = """
+            FROM transaction t
+            JOIN transaction_entry te ON te.transaction_id = t.id
+            JOIN inventory_item ii ON ii.id = te.inventory_item_id
+            JOIN transaction_type tt ON tt.id = t.transaction_type_id
+            WHERE t.inventory_id = :inventoryId
+            AND t.transaction_date < :at
+            ${productFilter}
+        """
+
+        String query = """
+            SELECT e.inventory_item_id AS inventory_item_id,
+                   e.bin_location_id AS bin_location_id,
+                   SUM(CASE e.transaction_code WHEN 'DEBIT' THEN -e.quantity ELSE e.quantity END) AS quantity_on_hand
+            FROM (
+                SELECT te.inventory_item_id, te.bin_location_id, te.quantity, ii.product_id,
+                       t.id AS transaction_id, tt.transaction_code, ${sortKey} AS sort_key
+                ${entriesBeforeDate}
+            ) e
+            LEFT JOIN (
+                SELECT ii.product_id, MAX(CONCAT(${sortKey}, t.id)) AS baseline
+                ${entriesBeforeDate}
+                AND tt.transaction_code = 'PRODUCT_INVENTORY'
+                GROUP BY ii.product_id
+            ) product_baseline ON product_baseline.product_id = e.product_id
+            LEFT JOIN (
+                SELECT te.inventory_item_id, MAX(CONCAT(${sortKey}, t.id)) AS baseline
+                ${entriesBeforeDate}
+                AND tt.transaction_code = 'INVENTORY'
+                GROUP BY te.inventory_item_id
+            ) item_baseline ON item_baseline.inventory_item_id = e.inventory_item_id
+            WHERE (product_baseline.baseline IS NULL
+                OR e.sort_key > LEFT(product_baseline.baseline, 40)
+                OR e.transaction_id = SUBSTRING(product_baseline.baseline, 41)
+                OR (e.sort_key = LEFT(product_baseline.baseline, 40) AND e.transaction_code IN ('CREDIT', 'DEBIT')))
+            AND (item_baseline.baseline IS NULL
+                OR e.sort_key > LEFT(item_baseline.baseline, 40)
+                OR e.transaction_id = SUBSTRING(item_baseline.baseline, 41)
+                OR (e.sort_key = LEFT(item_baseline.baseline, 40) AND e.transaction_code IN ('CREDIT', 'DEBIT')))
+            GROUP BY e.inventory_item_id, e.bin_location_id
+            HAVING quantity_on_hand <> 0
+        """
+
+        // MariaDB's split_materialized optimization turns the baseline subqueries into LATERAL DERIVED tables that
+        // get re-executed for every transaction entry, which takes the query from seconds to many minutes.
+        // SET STATEMENT only applies to this one query. MySQL doesn't have this optimization (or this syntax).
+        if (isMariaDb()) {
+            query = "SET STATEMENT optimizer_switch='split_materialized=off' FOR ${query}"
+        }
+
+        SQLQuery sqlQuery = sessionFactory.currentSession.createSQLQuery(query)
+        // Flush any pending changes to these tables first so that the result includes them
+        sqlQuery.addSynchronizedEntityClass(Transaction)
+                .addSynchronizedEntityClass(TransactionEntry)
+                .addSynchronizedEntityClass(InventoryItem)
+        sqlQuery.addScalar("inventory_item_id", StandardBasicTypes.STRING)
+                .addScalar("bin_location_id", StandardBasicTypes.STRING)
+                .addScalar("quantity_on_hand", StandardBasicTypes.BIG_DECIMAL)
+                .setString("inventoryId", facility.inventory.id)
+                .setTimestamp("at", at)
+                .setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+        if (productIds) {
+            sqlQuery.setParameterList("productIds", productIds)
+        }
+        List<Map> results = sqlQuery.list()
+        if (!results) {
+            return []
+        }
+
+        // Fetch the inventory items and bins in bulk rather than one at a time
+        Map<String, InventoryItem> inventoryItems = InventoryItem.getAll(
+                results.collect { it.inventory_item_id }.unique()).collectEntries { [it.id, it] }
+        List<String> binLocationIds = results.collect { it.bin_location_id }.findAll().unique()
+        Map<String, Location> binLocations = binLocationIds
+                ? Location.getAll(binLocationIds).collectEntries { [it.id, it] }
+                : [:]
+
+        return results.collect { result ->
+            new AvailableItem(
+                    inventoryItem: inventoryItems[result.inventory_item_id],
+                    binLocation: result.bin_location_id ? binLocations[result.bin_location_id] : null,
+                    quantityOnHand: result.quantity_on_hand,
+            )
+        }
+    }
+
+    private Boolean mariaDb
+
+    private boolean isMariaDb() {
+        if (mariaDb == null) {
+            mariaDb = sessionFactory.currentSession.doReturningWork({ connection ->
+                connection.metaData.databaseProductVersion?.toLowerCase()?.contains("mariadb")
+            } as ReturningWork<Boolean>) ?: false
+        }
+        return mariaDb
     }
 
     List getAvailableItems(Location location, List<String> productsIds, boolean excludeNegativeQuantity = false, boolean excludeZeroQuantity = false) {
