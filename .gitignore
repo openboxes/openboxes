@@ -50,3 +50,4 @@ docker/openboxes.war
 .gradle
 .claude
 .~*#
+.envrc

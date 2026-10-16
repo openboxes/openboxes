@@ -30,7 +30,7 @@ buildscript {
          *
          * See https://github.com/n0mer/gradle-git-properties/issues/195
          */
-        resolutionStrategy.force 'org.eclipse.jgit:org.eclipse.jgit:5.13.1.202206130422-r'
+        resolutionStrategy.force 'org.eclipse.jgit:org.eclipse.jgit:5.13.5.202508271544-r'
     }
     dependencies {
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:${assetPipelineVersion}"
@@ -83,6 +83,35 @@ plugins {
     id 'jacoco'
 }
 
+// JGit 5.x (forced above for Java 8 compatibility) cannot read linked
+// git worktrees, where .git is a file rather than a directory. In a
+// worktree, skip the plugin and write git.properties with the git CLI
+// instead, so GitProperties is still populated. See #6186.
+def isWorktree = file('.git').isFile()
+
+generateGitProperties {
+    onlyIf { !isWorktree }
+}
+
+task generateGitPropertiesWithinWorktree {
+    onlyIf { isWorktree }
+    mustRunAfter processResources
+    def outputFile = file("$buildDir/resources/main/git.properties")
+    outputs.file outputFile
+    outputs.upToDateWhen { false }
+    doLast {
+        def git = { String... args -> (['git'] + args.toList()).execute(null, projectDir).text.trim() }
+        outputFile.parentFile.mkdirs()
+        outputFile.text = [
+                "git.branch=${git('rev-parse', '--abbrev-ref', 'HEAD')}",
+                "git.commit.id=${git('rev-parse', 'HEAD')}",
+                "git.commit.id.abbrev=${git('rev-parse', '--short', 'HEAD')}",
+                "git.commit.time=${git('log', '-1', '--format=%cd', '--date=format:%Y-%m-%dT%H:%M:%S%z')}",
+        ].join('\n') + '\n'
+    }
+}
+classes.dependsOn "generateGitPropertiesWithinWorktree"
+
 // prevent warfile issues by applying this before `asset-pipeline`. OBGM-353
 apply plugin: 'org.grails.grails-web'
 
@@ -129,12 +158,16 @@ assets {
 
 bootRun {
     addResources = true
-    jvmArgs = [
-        '-Dspring.output.ansi.enabled=never',
-        '-Xdebug',
-        '-Xms1g',
-        '-Xmx4g',
-        '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005'
+    jvmArgs = System.getenv('DEBUG_ENABLED') ? [
+            '-Dspring.output.ansi.enabled=never',
+            '-Xdebug',
+            '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=' + (System.getenv('DEBUG_PORT') ?: '5005'),
+            '-Xms1g',
+            '-Xmx4g'
+    ] : [
+            '-Dspring.output.ansi.enabled=never',
+            '-Xms1g',
+            '-Xmx4g'
     ]
     systemProperties System.properties
 
