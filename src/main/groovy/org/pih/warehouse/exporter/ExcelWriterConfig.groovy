@@ -18,5 +18,5 @@ class ExcelWriterConfig extends BulkDataWriterConfig {
     /**
      * The styling to use when generating the Excel file.
      */
-    ExcelStyle excelStyle = ExcelStyle.PLAIN
+    ExcelStyle excelStyle = ExcelStyle.TABLE
 }

@@ -179,6 +179,36 @@ class ExcelWriterSpec extends Specification {
         ]
     }
 
+    void "write orders fields by columnIndex for #scenario indexes"() {
+        given:
+        List<Map> toWrite = [
+                declaredIndexes.collectEntries { [(it): "value ${it}"] },
+        ]
+
+        and: "a valid config with the fields defined out of order"
+        ExcelWriterConfig config = initConfig(true, new ExcelWriterConfig(
+                addHeaderRow: true,
+                fields: declaredIndexes.collect {
+                    new BulkDataWriterFieldConfig(fieldName: it, headerPlainText: it, columnIndex: it)
+                },
+        ))
+
+        when:
+        BulkDataWriterResult<Workbook> result = writer.write(toWrite, ContentType.XLS, config)
+
+        then: "columns are ordered by their numerical index, not alphabetically"
+        assert readRows(result) == [
+                expectedIndexes,
+                expectedIndexes.collect { "value ${it}" },
+        ]
+
+        where:
+        scenario    | declaredIndexes                  || expectedIndexes
+        "letter"    | ["AA", "B", "Z", "A", "AB"]      || ["A", "B", "Z", "AA", "AB"]
+        "lowercase" | ["aa", "b", "a"]                 || ["a", "b", "aa"]
+        "numeric"   | ["10", "2", "0", "1", "11"]      || ["0", "1", "2", "10", "11"]
+    }
+
     void "write succeeds with a custom formatter"() {
         given:
         List<Map> toWrite = [

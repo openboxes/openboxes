@@ -23,7 +23,7 @@ class BulkDataWriterConfig implements ObjectValidatable<BulkDataWriterConfigVali
      * @return The field configurations, in the column order that they should be written to.
      */
     List<BulkDataWriterFieldConfig> getFieldConfigsInOrder() {
-        return isFieldConfigOrdinal() ? fields : fields.sort { it.columnIndex }
+        return isFieldConfigOrdinal() ? fields : fields.toSorted { it.resolveColumnIndex() }
     }
 
     private boolean isFieldConfigOrdinal() {
