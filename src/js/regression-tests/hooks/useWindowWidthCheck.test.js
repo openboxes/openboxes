@@ -14,6 +14,10 @@ describe('useWindowWidthCheck', () => {
     window.innerWidth = 1024;
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   afterAll(() => {
     window.innerWidth = originalInnerWidth;
   });
@@ -45,11 +49,15 @@ describe('useWindowWidthCheck', () => {
   });
 
   it('stops listening when unmounted', () => {
-    const { result, unmount } = renderHook(() => useWindowWidthCheck(800));
+    const addEventListener = jest.spyOn(window, 'addEventListener');
+    const removeEventListener = jest.spyOn(window, 'removeEventListener');
+    const { unmount } = renderHook(() => useWindowWidthCheck(800));
+    expect(addEventListener).toHaveBeenCalledWith('resize', expect.any(Function));
+    const [, onResize] = addEventListener.mock.calls.find(([type]) => type === 'resize');
+
     unmount();
 
-    resizeWindowTo(700);
-
-    expect(result.current).toBe(true);
+    // After unmount the result keeps its last value either way, so check the listener itself.
+    expect(removeEventListener).toHaveBeenCalledWith('resize', onResize);
   });
 });

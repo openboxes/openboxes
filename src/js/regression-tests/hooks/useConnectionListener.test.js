@@ -126,6 +126,18 @@ describe('useConnectionListener', () => {
 
     unmount();
     jest.advanceTimersByTime(CONNECTION_TIMEOUT);
+    expect(dispatch).not.toHaveBeenCalled();
+
+    // A listener left behind would start a new reconnection here.
+    goOnline();
+    jest.advanceTimersByTime(CONNECTION_TIMEOUT);
+    expect(dispatch).not.toHaveBeenCalled();
+  });
+
+  it('stops reacting to a lost connection when unmounted', () => {
+    const { unmount } = renderHook(() => useConnectionListener());
+
+    unmount();
     goOffline();
 
     expect(dispatch).not.toHaveBeenCalled();
