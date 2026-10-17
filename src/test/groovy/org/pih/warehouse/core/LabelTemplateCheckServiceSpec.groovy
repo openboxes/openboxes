@@ -4,6 +4,10 @@ import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 import spock.lang.Unroll
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.shipping.Container
+import org.springframework.beans.BeansException
 
 /**
  * The startup check reports the stored label templates BeanPropertyTemplateService will refuse.
@@ -28,6 +32,8 @@ class LabelTemplateCheckServiceSpec extends Specification implements ServiceUnit
                 '^XA^FD${facility}^FS^XZ',
                 '^XA^FD$${literal}^FS^XZ',
                 '^XA^FO50,60^FDno placeholders^FS^XZ',
+                '^XA^FD${location.name:-no bin}^FS^XZ',
+                '',
         ]
     }
 
@@ -49,7 +55,8 @@ class LabelTemplateCheckServiceSpec extends Specification implements ServiceUnit
         "a method call"      | '^XA^FD${product.name.toUpperCase()}^FS^XZ' || 'is an expression'
         "root indexing"      | '^XA^FD${product[0]}^FS^XZ'               || 'is an expression'
         "an unknown name"    | '^XA^FD${shipment.name}^FS^XZ'            || "reads 'shipment'"
-        "an empty template"  | ''                                        || 'empty'
+        "a blocked property" | '^XA^FD${product.class.name}^FS^XZ'      || "reads 'class'"
+        "an indexed blocked property" | '^XA^FD${product.constraints[0]}^FS^XZ' || "reads 'constraints'"
     }
 
     void "checkStoredTemplates should name each stored Zebra template that will not render, and only those"() {
@@ -67,6 +74,51 @@ class LabelTemplateCheckServiceSpec extends Specification implements ServiceUnit
         warnings.size() == 1
         warnings[0].contains("Label template 'old container' (barcodeLabel:container)")
         warnings[0].contains("uses ?.")
+    }
+
+    @Unroll
+    void "findProblems should agree with BeanPropertyTemplateService for #template"() {
+        given: "a model where every allowed name and the properties these templates read are present"
+        Product product = new Product(productCode: "AB123", name: "Gauze")
+        Map model = [
+                product         : product,
+                location        : new Location(name: "A-01"),
+                facility        : new Location(name: "Main"),
+                internalLocation: new Location(name: "B-02"),
+                container       : new Container(name: "Pallet 7"),
+                inventoryItem   : new InventoryItem(lotNumber: "LOT-1", product: product),
+                document        : new Document(name: "label"),
+        ]
+        boolean renders
+        try {
+            new BeanPropertyTemplateService().renderTemplateContents(template, "label", model)
+            renders = true
+        } catch (IllegalArgumentException | BeansException ignored) {
+            renders = false
+        }
+
+        expect:
+        service.findProblems(template).isEmpty() == renders
+
+        where:
+        template << [
+                '${product.productCode}',
+                '${ product.name }',
+                '${inventoryItem.product.productCode}',
+                '${container.name}${internalLocation.name}${facility.name}${location.name}',
+                '${document.name}',
+                '${product.name:-none}',
+                '$${product.name}',
+                '${product?.name}',
+                '${7*191}',
+                '${product.name.toUpperCase()}',
+                '${shipment.name}',
+                '${product.class}',
+                '${product.constraints}',
+                '${product[0]}',
+                '<% out << 1 %>',
+                '<g:set var="x" value="1"/>',
+        ]
     }
 
     void "the startup listener should never throw"() {

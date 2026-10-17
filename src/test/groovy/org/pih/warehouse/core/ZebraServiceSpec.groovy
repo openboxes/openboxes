@@ -74,7 +74,7 @@ class ZebraServiceSpec extends Specification implements ServiceUnitTest<ZebraSer
         service.renderZpl(document, [product: new Product(productCode: "AB123")])
 
         then:
-        IllegalArgumentException e = thrown()
+        LabelTemplateException e = thrown()
         e.message.contains("ZEBRA_TEMPLATE")
 
         where:
@@ -132,13 +132,13 @@ class ZebraServiceSpec extends Specification implements ServiceUnitTest<ZebraSer
         zebraService.renderDocument(document, model)
 
         then:
-        thrown(IllegalArgumentException)
+        thrown(LabelTemplateException)
         0 * zebraService.postData(_, _)
 
         when:
         zebraService.printDocument(document, model)
 
         then:
-        thrown(IllegalArgumentException)
+        thrown(LabelTemplateException)
     }
 }

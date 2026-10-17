@@ -95,7 +95,7 @@ class MobileProductApiController extends BaseDomainApiController {
         InputStream image
         try {
             image = zebraService.renderDocument(document, [product:product])
-        } catch (LabelTemplateException | IllegalArgumentException e) {
+        } catch (LabelTemplateException e) {
             renderLabelTemplateError(e)
             return
         }
@@ -114,7 +114,7 @@ class MobileProductApiController extends BaseDomainApiController {
 
             render([data: "Product label has been printed"] as JSON)
             return
-        } catch (LabelTemplateException | IllegalArgumentException e) {
+        } catch (LabelTemplateException e) {
             renderLabelTemplateError(e)
         } catch (Exception e) {
             render([errorCode: 500, cause: e?.class, errorMessage: e?.message] as JSON)
@@ -275,7 +275,7 @@ class MobileProductApiController extends BaseDomainApiController {
         }
     }
 
-    private void renderLabelTemplateError(Exception e) {
+    private void renderLabelTemplateError(LabelTemplateException e) {
         log.warn(e.message)
         response.status = 400
         render([errorCode: 400, errorMessage: e.message] as JSON)

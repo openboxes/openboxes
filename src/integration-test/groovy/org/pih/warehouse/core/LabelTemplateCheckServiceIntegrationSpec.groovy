@@ -15,7 +15,8 @@ class LabelTemplateCheckServiceIntegrationSpec extends IntegrationSpec {
         given:
         DocumentType zebra = DocumentType.findByDocumentCode(DocumentCode.ZEBRA_TEMPLATE) ?:
                 new DocumentType(name: "Zebra template", documentCode: DocumentCode.ZEBRA_TEMPLATE).save(failOnError: true)
-        DocumentType other = new DocumentType(name: "Other", documentCode: DocumentCode.SHIPPING_TEMPLATE).save(failOnError: true)
+        DocumentType other = DocumentType.findByDocumentCode(DocumentCode.SHIPPING_TEMPLATE) ?:
+                new DocumentType(name: "Shipping template", documentCode: DocumentCode.SHIPPING_TEMPLATE).save(failOnError: true)
         new Document(name: "it-good-label", documentNumber: "it:good", filename: "good.zpl", contentType: "text/plain",
                 fileContents: '^XA^FD${product.productCode}^FS^XZ'.bytes, documentType: zebra).save(failOnError: true, flush: true)
         new Document(name: "it-old-label", documentNumber: "it:old", filename: "old.zpl", contentType: "text/plain",

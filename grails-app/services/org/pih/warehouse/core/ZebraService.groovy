@@ -15,7 +15,7 @@ class ZebraService {
 
     String renderZpl(Document document, Map model) {
         if (document?.documentType?.documentCode != DocumentCode.ZEBRA_TEMPLATE) {
-            throw new IllegalArgumentException("Only documents of type ZEBRA_TEMPLATE can be rendered as Zebra templates")
+            throw new LabelTemplateException(document, "only documents of type ZEBRA_TEMPLATE can be rendered as Zebra templates")
         }
         try {
             return beanPropertyTemplateService.renderTemplate(document, model)

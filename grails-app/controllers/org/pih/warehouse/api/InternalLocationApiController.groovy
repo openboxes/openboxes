@@ -97,7 +97,7 @@ class InternalLocationApiController {
         InputStream image
         try {
             image = zebraService.renderDocument(document, [internalLocation: internalLocation])
-        } catch (LabelTemplateException | IllegalArgumentException e) {
+        } catch (LabelTemplateException e) {
             renderLabelTemplateError(e)
             return
         }
@@ -117,14 +117,14 @@ class InternalLocationApiController {
 
             render([data: "Barcode label has been printed"] as JSON)
             return
-        } catch (LabelTemplateException | IllegalArgumentException e) {
+        } catch (LabelTemplateException e) {
             renderLabelTemplateError(e)
         } catch (Exception e) {
             render([errorCode: 500, cause: e?.class, errorMessage: e?.message] as JSON)
         }
     }
 
-    private void renderLabelTemplateError(Exception e) {
+    private void renderLabelTemplateError(LabelTemplateException e) {
         log.warn(e.message)
         response.status = 400
         render([errorCode: 400, errorMessage: e.message] as JSON)
