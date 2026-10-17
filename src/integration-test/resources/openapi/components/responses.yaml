@@ -1,0 +1,102 @@
+StubSuccess:
+  description: Success. The response body of this operation is not documented yet.
+  content:
+    '*/*':
+      # Not documented yet: any body. (additionalProperties spelled out: validators close undeclared objects.)
+      schema:
+        additionalProperties: true
+StubCreated:
+  description: Created. The response body of this operation is not documented yet.
+  content:
+    '*/*':
+      schema:
+        additionalProperties: true
+StubNoContent:
+  description: Done; no response body.
+Error:
+  description: An error, in the API's one error shape; the HTTP status says what kind.
+  content:
+    application/json:
+      schema:
+        $ref: 'schemas.yaml#/Error'
+      example:
+        errorCode: 500
+        errorMessage: An unexpected error occurred
+BadRequest:
+  description: The request is invalid (for example a validation error); errorMessages lists the problems.
+  content:
+    application/json:
+      schema:
+        $ref: 'schemas.yaml#/Error'
+      example:
+        errorCode: 400
+        errorMessage: 'Validation error: name cannot be blank'
+        errorMessages:
+        - name cannot be blank
+Unauthorized:
+  description: Not logged in, or the session expired. Log in with POST /api/login.
+  content:
+    application/json:
+      schema:
+        $ref: 'schemas.yaml#/Error'
+      example:
+        errorCode: 401
+        errorMessage: 'Login required: log in with POST /api/login'
+Forbidden:
+  description: Logged in, but the user's role does not allow this.
+  content:
+    application/json:
+      schema:
+        $ref: 'schemas.yaml#/Error'
+      example:
+        errorCode: 403
+        errorMessage: Access denied
+NotFound:
+  description: No such resource.
+  content:
+    application/json:
+      schema:
+        $ref: 'schemas.yaml#/Error'
+      example:
+        errorCode: 404
+        errorMessage: Resource not found
+Conflict:
+  description: The change conflicts with existing data (for example deleting something still in use).
+  content:
+    application/json:
+      schema:
+        $ref: 'schemas.yaml#/Error'
+      example:
+        errorCode: 409
+        errorMessage: Resource could not be deleted because of an existing association
+ServerError:
+  description: Unexpected server error.
+  content:
+    application/json:
+      schema:
+        $ref: 'schemas.yaml#/Error'
+      example:
+        errorCode: 500
+        errorMessage: An unexpected error occurred
+PackingListValidated:
+  description: The packing list is valid; data holds its rows as the import screen shows them.
+  content:
+    application/json:
+      schema:
+        $ref: 'schemas.yaml#/PackingListValidated'
+PackingListInvalid:
+  description: |
+    The packing list has validation errors. Besides the API's error fields, errors holds the messages grouped by
+    section and field (packingList: by row id), and data every row as the import screen shows it.
+  content:
+    application/json:
+      schema:
+        $ref: 'schemas.yaml#/PackingListInvalid'
+PackingListSaveInvalid:
+  description: |
+    The packing list has validation errors (errors and data, as for validate), or the outbound it describes cannot
+    be saved (a plain API error).
+  content:
+    application/json:
+      schema:
+        $ref: 'schemas.yaml#/PackingListSaveError'

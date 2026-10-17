@@ -1,0 +1,118 @@
+# Shared schemas of the stock list API (/api/stocklists..., /api/stocklistItems...). A stock list is a requisition
+# template: a named list of products with maximum quantities that a destination requests from an origin. Responses use
+# flat dotted keys ("origin.id") rather than nested objects; they are documented as they are sent. Objects are open:
+# the documented properties are guaranteed (required) or nullable, others may appear.
+
+StocklistSummary:
+  description: A stock list as the list shows it (names only).
+  type: object
+  required: [id, name]
+  properties:
+    id: {type: string}
+    name: {type: string}
+    origin: {type: string, nullable: true, description: Name of the location the stock comes from.}
+    destination: {type: string, nullable: true, description: Name of the location that requests it.}
+    requisitionItemCount: {type: integer, description: Number of lines.}
+    requestedBy: {type: string, nullable: true}
+    createdBy: {type: string, nullable: true}
+    updatedBy: {type: string, nullable: true}
+    dateCreated: {type: string, nullable: true, description: 'MMM dd, yyyy.'}
+    lastUpdated: {type: string, nullable: true, description: 'MMM dd, yyyy.'}
+    isPublished: {type: boolean}
+  additionalProperties: true
+
+Stocklist:
+  description: A stock list (requisition template).
+  type: object
+  required: [requisition.id, name]
+  properties:
+    requisition.id: {type: string, description: The stock list's id.}
+    name: {type: string}
+    destination.id: {type: string, nullable: true}
+    destination.name: {type: string, nullable: true}
+    origin.id: {type: string, nullable: true}
+    origin.name: {type: string, nullable: true}
+    requestedBy.id: {type: string, nullable: true}
+    requestedBy.name: {type: string, nullable: true}
+  additionalProperties: true
+
+StocklistInput:
+  description: 'The fields of a stock list: origin, destination and requester by id.'
+  type: object
+  properties:
+    name: {type: string}
+    origin: {$ref: 'catalog.yaml#/RefInput'}
+    destination: {$ref: 'catalog.yaml#/RefInput'}
+    requestedBy: {$ref: 'catalog.yaml#/RefInput'}
+  additionalProperties: true
+
+StocklistCreate:
+  description: A new stock list (the same fields as StocklistInput; all of them are required).
+  type: object
+  required: [name, origin, destination, requestedBy]
+  properties:
+    name: {type: string}
+    origin: {$ref: 'catalog.yaml#/RefInput'}
+    destination: {$ref: 'catalog.yaml#/RefInput'}
+    requestedBy: {$ref: 'catalog.yaml#/RefInput'}
+  additionalProperties: true
+
+StocklistItem:
+  description: A line of a stock list - one product - with the list's origin and requester.
+  type: object
+  required: [requisitionItem.id, stocklistId]
+  properties:
+    requisitionItem.id: {type: string, description: The line's id.}
+    stocklistId: {type: string}
+    name: {type: string, nullable: true, description: The stock list's name.}
+    location.id: {type: string, nullable: true, description: The stock list's origin (the location that supplies it).}
+    location.name: {type: string, nullable: true}
+    locationGroup.id: {type: string, nullable: true, description: The origin's location group.}
+    locationGroup.name: {type: string, nullable: true}
+    manager.id: {type: string, nullable: true, description: The stock list's requester.}
+    manager.name: {type: string, nullable: true}
+    manager.email: {type: string, nullable: true}
+    uom: {type: string, nullable: true, description: Unit of measure.}
+    maxQuantity: {type: integer, nullable: true}
+    replenishmentPeriod: {type: integer, nullable: true, description: Days between requests.}
+    monthlyDemand: {type: number, nullable: true}
+  additionalProperties: true
+
+StocklistItemRow:
+  description: >-
+    A line of a published stock list that holds a product, as the product's stock list tab lists it - the fields of
+    StocklistItem, with the line's id as id, and monthlyDemand computed as maxQuantity per replenishment period over 30
+    days.
+  type: object
+  required: [id, stocklistId]
+  properties:
+    id: {type: string, description: The line's id.}
+    stocklistId: {type: string}
+    name: {type: string, nullable: true}
+    location.id: {type: string, nullable: true, description: The stock list's origin.}
+    location.name: {type: string, nullable: true}
+    locationGroup.id: {type: string, nullable: true}
+    locationGroup.name: {type: string, nullable: true}
+    manager.id: {type: string, nullable: true, description: The stock list's requester.}
+    manager.name: {type: string, nullable: true}
+    manager.email: {type: string, nullable: true}
+    uom: {type: string, nullable: true}
+    maxQuantity: {type: integer, nullable: true}
+    replenishmentPeriod: {type: integer, nullable: true}
+    monthlyDemand: {type: number, nullable: true}
+  additionalProperties: true
+
+AvailableStocklist:
+  description: A stock list a product line can be added to, with its origin and requester.
+  type: object
+  required: [id, name]
+  properties:
+    id: {type: string}
+    name: {type: string}
+    location.id: {type: string, nullable: true, description: The origin.}
+    location.name: {type: string, nullable: true}
+    locationGroup.id: {type: string, nullable: true}
+    locationGroup.name: {type: string, nullable: true}
+    manager.id: {type: string, nullable: true, description: The requester.}
+    manager.name: {type: string, nullable: true}
+  additionalProperties: true

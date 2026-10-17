@@ -935,3 +935,5 @@ tasks.withType(Test) {
         excludes = jacocoExcludes
     }
 }
+
+apply from: 'gradle/regression-tests.gradle'

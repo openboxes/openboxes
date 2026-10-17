@@ -1,0 +1,38 @@
+# Routes reached through /api mappings that accept any HTTP method: "/api/$action/$id?",
+# "/api/products/$id/$action", "/api/locations/$id/$action" and
+# "/api/facilities/$facilityId/inventories/import". Each entry names the method(s) the route is
+# meant for (from the React client and the controller code); only those are documented.
+# OpenApiCompletenessSpec resolves every entry against the real routing and fails when one stops
+# reaching its controller action, and fails when one of these mappings reaches an action that is
+# neither listed here nor in ignored-routes.yaml.
+
+# Session and application context (ApiController)
+- {path: /api/login, methods: [POST], controller: api, action: login}
+- {path: /api/logout, methods: [POST], controller: api, action: logout}
+- {path: '/api/chooseLocation/{id}', methods: [PUT], controller: api, action: chooseLocation}
+- {path: '/api/chooseLocale/{id}', methods: [PUT], controller: api, action: chooseLocale}
+- {path: /api/getAppContext, methods: [GET], controller: api, action: getAppContext}
+- {path: /api/getMenuConfig, methods: [GET], controller: api, action: getMenuConfig}
+- {path: /api/getRequestTypes, methods: [GET], controller: api, action: getRequestTypes}
+- {path: /api/status, methods: [GET], controller: api, action: status}
+# OBAF: reached through "/api/$action/$id?"; GET is what the React client sends.
+- {path: /api/barcodes, methods: [GET], controller: api, action: barcodes}
+- {path: /api/globalSearch, methods: [GET], controller: api, action: globalSearch}
+
+# Product sub-resources (ProductApiController), all read-only
+- {path: '/api/products/{id}/associatedProducts', methods: [GET], controller: productApi, action: associatedProducts}
+- {path: '/api/products/{id}/availableBins', methods: [GET], controller: productApi, action: availableBins}
+- {path: '/api/products/{id}/demand', methods: [GET], controller: productApi, action: demand}
+- {path: '/api/products/{id}/demandSummary', methods: [GET], controller: productApi, action: demandSummary}
+- {path: '/api/products/{id}/productAvailability', methods: [GET], controller: productApi, action: productAvailability}
+- {path: '/api/products/{id}/productAvailabilityAndDemand', methods: [GET], controller: productApi, action: productAvailabilityAndDemand}
+- {path: '/api/products/{id}/productDemand', methods: [GET], controller: productApi, action: productDemand}
+- {path: '/api/products/{id}/productSummary', methods: [GET], controller: productApi, action: productSummary}
+- {path: '/api/products/{id}/substitutions', methods: [GET], controller: productApi, action: substitutions}
+- {path: '/api/products/{id}/withCatalogs', methods: [GET], controller: productApi, action: withCatalogs}
+
+# Location sub-resources (LocationApiController)
+- {path: '/api/locations/{id}/productSummary', methods: [GET], controller: locationApi, action: productSummary}
+
+# Inventory import (InventoryApiController), CSV request body
+- {path: '/api/facilities/{facilityId}/inventories/import', methods: [POST], controller: inventoryApi, action: importCsv}

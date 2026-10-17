@@ -1,0 +1,11 @@
+openapi: 3.0.3
+info:
+  title: Validator probe
+  version: '1'
+paths:
+  /api/things/{id}:
+    $ref: 'paths/things.yaml#/thingById'
+components:
+  schemas:
+    Thing:
+      $ref: 'components.yaml#/Thing'
