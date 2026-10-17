@@ -2,11 +2,16 @@ package org.pih.warehouse.api.regression.obaf.support
 
 import grails.core.GrailsApplication
 import grails.util.Holders
+import org.pih.warehouse.jobs.AutomaticBackorderReallocationJob
+import org.pih.warehouse.jobs.AutomaticReceiptJob
 import org.quartz.CronTrigger
+import org.quartz.JobExecutionContext
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.TriggerKey
+import org.quartz.impl.matchers.EverythingMatcher
 import org.quartz.impl.matchers.GroupMatcher
+import org.quartz.listeners.TriggerListenerSupport
 import org.springframework.beans.factory.annotation.Autowired
 
 import org.pih.warehouse.api.AvailableItem
@@ -94,6 +99,7 @@ abstract class ObafIntegrationSpec extends IntegrationSpec {
     void setup() {
         config = new ConfigOverride(grailsApplication)
         pauseCronTriggers()
+        vetoEventScheduledJobs()
         actAs('admin')
     }
 
@@ -148,6 +154,37 @@ abstract class ObafIntegrationSpec extends IntegrationSpec {
                 pausedCronTriggers << key
             }
         }
+    }
+
+    /**
+     * Jobs that application events schedule a second after a shipment changes. Run by the scheduler on its own, they
+     * would race the feature that changed the shipment - for example receive the shipment it is about to receive
+     * itself. Only the runs a feature fires through {@link QuartzRunner} are let through.
+     */
+    static final List<Class> EVENT_SCHEDULED_JOBS = [AutomaticReceiptJob, AutomaticBackorderReallocationJob]
+
+    static final String EVENT_JOB_VETO = 'regression-event-scheduled-job-veto'
+
+    /**
+     * Installs, once per JVM, a trigger listener that vetoes every run of the {@link #EVENT_SCHEDULED_JOBS} not fired
+     * by {@link QuartzRunner}. Quartz asks it on the worker thread just before the job runs, so a run scheduled at
+     * any time (by an event, a resumed cron trigger or an earlier spec) is stopped.
+     */
+    static synchronized void vetoEventScheduledJobs() {
+        Scheduler s = scheduler()
+        if (s.listenerManager.getTriggerListener(EVENT_JOB_VETO)) {
+            return
+        }
+        Set<String> jobNames = EVENT_SCHEDULED_JOBS*.name as Set
+        s.listenerManager.addTriggerListener(new TriggerListenerSupport() {
+            @Override
+            String getName() { return EVENT_JOB_VETO }
+
+            @Override
+            boolean vetoJobExecution(Trigger trigger, JobExecutionContext context) {
+                return context.jobDetail.key.name in jobNames && !context.mergedJobDataMap.containsKey(QuartzRunner.RUN_ID)
+            }
+        }, EverythingMatcher.allTriggers())
     }
 
     static synchronized void resumeCronTriggers() {
