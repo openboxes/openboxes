@@ -13,7 +13,7 @@ import spock.lang.Unroll
  */
 class ZebraServiceSpec extends Specification implements ServiceUnitTest<ZebraService>, DataTest {
 
-    private static final String TEMPLATE_DIR = "grails-app/conf/templates/zpl-boarcodes-templates"
+    private static final String TEMPLATE_DIR = "/templates/zpl-boarcodes-templates"
 
     void setupSpec() {
         mockDomains(Document, DocumentType)
@@ -29,7 +29,9 @@ class ZebraServiceSpec extends Specification implements ServiceUnitTest<ZebraSer
     }
 
     private static String bundledTemplate(String name) {
-        return new File("${TEMPLATE_DIR}/${name}.zpl").text
+        URL template = ZebraServiceSpec.getResource("${TEMPLATE_DIR}/${name}.zpl")
+        assert template: "bundled template ${name}.zpl not found on the classpath"
+        return template.text
     }
 
     @Unroll
@@ -50,6 +52,17 @@ class ZebraServiceSpec extends Specification implements ServiceUnitTest<ZebraSer
         "product"          | [product: new Product(productCode: "AB123")]               || "AB123"
         "internalLocation" | [internalLocation: new Location(name: "A-01-02")]          || "A-01-02"
         "container"        | [container: new Container(name: "Pallet 7")]               || "Pallet 7"
+    }
+
+    void "renderZpl should insert values as they are, without HTML encoding"() {
+        given:
+        Document document = document("ZEBRA_TEMPLATE", bundledTemplate("internalLocation"))
+
+        when:
+        String zpl = service.renderZpl(document, [internalLocation: new Location(name: 'Aisle A&B <"1">')])
+
+        then:
+        zpl.contains('^FDAisle A&B <"1">^FS')
     }
 
     @Unroll
