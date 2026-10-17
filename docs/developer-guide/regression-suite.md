@@ -37,7 +37,7 @@ The suite runs in its own test tasks, so OpenBoxes' `test` and `integrationTest`
 ./gradlew regressionTest regressionIntegrationTest   # the whole suite
 ./gradlew regressionTest                    # unit specs (in parallel forks)
 ./gradlew regressionIntegrationTest         # integration specs (Testcontainers, needs Docker)
-./gradlew regressionIntegrationTest -PregressionShard=2/4   # one quarter of the integration specs
+./gradlew regressionIntegrationTest -PregressionShard=2/6   # one sixth of the integration specs, as in CI
 ./gradlew regressionTest --tests 'org.pih.warehouse.regression.obaf.*'
 ```
 
@@ -52,11 +52,13 @@ The test JVMs run in UTC with a 2 GB heap.
 ## CI
 
 `.github/workflows/regression-tests.yml` runs on every pull request, next to "Test Pull Request": one job runs the
-unit specs, and four jobs run a shard each of the integration specs on MySQL 8.0.36 (run the workflow by hand to
+unit specs, and six jobs run a shard each of the integration specs on MySQL 8.0.36 (run the workflow by hand to
 use MariaDB 10.3.39). Every push to the branch runs the shards on both databases. A shard that runs no tests fails.
-The suite is not part of `jacocoTestReport`, so its coverage is not in the Codecov report. `-PregressionShard=<i>/<n>` spreads the spec classes over the shards by their measured run
-time in `gradle/regression-spec-times.txt`; a spec that is not listed there still runs, in a shard chosen by its
-name. Refresh the file from `build/test-results/regressionIntegrationTest` when the shards drift apart.
+The suite is not part of `jacocoTestReport`, so its coverage is not in the Codecov report. The jobs skip the webpack
+bundle (`-x npm_run_bundle`): no spec needs it, and building it takes about 4 minutes on a runner.
+`-PregressionShard=<i>/<n>` spreads the spec classes over the shards by their measured run time in
+`gradle/regression-spec-times.txt`; a spec that is not listed there still runs, in a shard chosen by its name.
+Refresh the file from `build/test-results/regressionIntegrationTest` when the shards drift apart.
 `--tests` and `-PregressionShard` do not combine: a shard that does not own the selected spec has nothing to run.
 
 ## Known defects: `@PendingFeature`
