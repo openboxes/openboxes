@@ -5,6 +5,7 @@ import grails.testing.web.controllers.ControllerUnitTest
 import org.hibernate.ObjectNotFoundException
 import spock.lang.Specification
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.product.Product
 
 /**
  * Zebra template rendering endpoints should reject documents
@@ -13,7 +14,7 @@ import org.pih.warehouse.inventory.InventoryItem
 class DocumentControllerZebraTemplateSpec extends Specification implements ControllerUnitTest<DocumentController>, DataTest {
 
     void setupSpec() {
-        mockDomains(Document, DocumentType, Location, InventoryItem)
+        mockDomains(Document, DocumentType, Location, InventoryItem, Product)
     }
 
     private Document createZebraTemplateDocument() {

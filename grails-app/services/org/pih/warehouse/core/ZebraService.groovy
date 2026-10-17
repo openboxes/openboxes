@@ -9,11 +9,18 @@ import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.HttpClientBuilder
 
 class ZebraService {
-    TemplateService templateService
+    BeanPropertyTemplateService beanPropertyTemplateService
     GrailsApplication grailsApplication
 
+    String renderZpl(Document document, Map model) {
+        if (document?.documentType?.documentCode != DocumentCode.ZEBRA_TEMPLATE) {
+            throw new IllegalArgumentException("Only documents of type ZEBRA_TEMPLATE can be rendered as Zebra templates")
+        }
+        return beanPropertyTemplateService.renderTemplate(document, model)
+    }
+
     def printDocument(Document document, Map model) {
-        String renderedContent = templateService.renderTemplate(document, model)
+        String renderedContent = renderZpl(document, model)
         String ipAddress = grailsApplication.config.openboxes.barcode.printer.ipAddress
         Integer port = grailsApplication.config.openboxes.barcode.printer.port
         log.info "Printing to ${ipAddress}:${port}:\n${renderedContent}"
@@ -21,7 +28,7 @@ class ZebraService {
     }
 
     InputStream renderDocument(Document document, Map model) {
-        String body = templateService.renderTemplate(document, model)
+        String body = renderZpl(document, model)
         log.info "body: " + body
         String renderApiUrl = grailsApplication.config.openboxes.barcode.labelaryApi.url
         return postData(renderApiUrl, body)

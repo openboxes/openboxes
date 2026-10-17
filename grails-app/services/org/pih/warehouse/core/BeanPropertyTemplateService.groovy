@@ -70,6 +70,8 @@ class BeanPropertyTemplateService {
      */
     static final Set<String> ALLOWED_BINDING_NAMES = [
         'document', 'inventoryItem', 'location', 'product', 'facility',
+        // label templates for bins and containers (see zpl-boarcodes-templates)
+        'internalLocation', 'container',
     ] as Set
 
     String renderTemplate(Document document, Map bindings) {
