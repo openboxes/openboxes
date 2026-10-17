@@ -1,0 +1,41 @@
+# Long-running reverse proxy for per-PR previews. Brought up once (idempotently) by
+# preview-deploy.sh under the project name "preview-infra". It discovers each PR's app container
+# via Docker labels, routes pr-<n>.<base-domain> to it, and obtains a Let's Encrypt certificate
+# per host via the HTTP-01 challenge (so no DNS-provider API credentials are required).
+#
+# Requires: the external "traefik" network to exist, ports 80/443 free on the host (remove Apache),
+# and PREVIEW_ACME_EMAIL set in the environment.
+services:
+  traefik:
+    image: traefik:v3.1
+    restart: unless-stopped
+    # NOTE: Traefik v3.1's embedded Docker client speaks API v1.24, which modern daemons reject.
+    # The host daemon must allow it via DOCKER_MIN_API_VERSION=1.24 (a systemd drop-in on the VPS).
+    # Setting DOCKER_API_VERSION on this container does NOT work - Traefik ignores it.
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=traefik
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --certificatesresolvers.le.acme.email=${PREVIEW_ACME_EMAIL}
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.le.acme.httpchallenge=true
+      - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-letsencrypt:/letsencrypt
+    networks:
+      - traefik
+
+volumes:
+  traefik-letsencrypt:
+
+networks:
+  traefik:
+    external: true
