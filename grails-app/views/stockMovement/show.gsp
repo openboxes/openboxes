@@ -203,59 +203,78 @@
                 </g:if>
 
                 <g:isUserAdmin>
-                    <g:if test="${isSameOrigin && stockMovement?.canGeneratePickList()}">
-                        <g:link
-                            controller="stockMovement"
-                            action="allocate"
-                            id="${stockMovement?.requisition?.id}"
-                            class="button"
-                        >
-                            <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
-                            <warehouse:message code="stockMovement.allocate.label" default="Allocate"/>
-                        </g:link>
-                    </g:if>
-                    <g:if test="${stockMovement?.requisition?.picklist?.picklistItems && stockMovement?.requisition?.status < RequisitionStatus.ISSUED}">
-                        <g:if test="${stockMovement?.requisition?.picklist?.picklistItems?.any {pi -> ['PICKED', 'STAGED'].any {pi.status == it}}}">
+                        <g:if test="${isSameOrigin && stockMovement?.canGeneratePickList()}">
                             <g:link
-                                    controller="stockMovement"
-                                    action="clearPicklist"
-                                    id="${stockMovement?.requisition?.id}"
-                                    class="button"
+                                controller="stockMovement"
+                                action="allocate"
+                                id="${stockMovement?.requisition?.id}"
+                                class="button"
                             >
-                               <img src="${resource(dir: 'images/icons/silk/', file: 'bin.png')}" />&nbsp;
-                                <warehouse:message code="stockMovement.rollbackPicklist.label" default="Rollback picklist"/>
-                            </g:link>
-                            <g:link
-                                    controller="stockMovement"
-                                    action="redoAutopick"
-                                    id="${stockMovement?.requisition?.id}"
-                                    class="button"
-                            >
-                                <img src="${resource(dir: 'images/icons/silk/', file: 'arrow_redo.png')}" />&nbsp;
-                                <warehouse:message code="stockMovement.redoAllocation.label" default="Redo Allocation"/>
+                                <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                                <warehouse:message code="stockMovement.allocate.label" default="Allocate"/>
                             </g:link>
                         </g:if>
-                        <g:else>
-                            <g:link
-                                    controller="allocation"
-                                    action="deallocate"
-                                    id="${stockMovement?.requisition?.id}"
-                                    class="button"
-                            >
-                                <img src="${resource(dir: 'images/icons/silk/', file: 'bin.png')}" />&nbsp;
-                                <warehouse:message code="stockMovement.clearAllocation.label" default="Clear Allocation"/>
-                            </g:link>
-                            <g:link
-                                    controller="allocation"
-                                    action="redoAutopick"
-                                    id="${stockMovement?.requisition?.id}"
-                                    class="button"
-                            >
-                                <img src="${resource(dir: 'images/icons/silk/', file: 'arrow_redo.png')}" />&nbsp;
-                                <warehouse:message code="stockMovement.redoAllocation.label" default="Redo Allocation"/>
-                            </g:link>
-                        </g:else>
-                    </g:if>
+                        <g:if test="${stockMovement?.requisition?.picklist?.picklistItems && stockMovement?.requisition?.status < RequisitionStatus.ISSUED}">
+                            <g:if test="${stockMovement?.requisition?.picklist?.picklistItems?.any {pi -> ['PICKED', 'STAGED'].any {pi.status == it}}}">
+                                <g:link
+                                        controller="stockMovement"
+                                        action="clearPicklist"
+                                        id="${stockMovement?.requisition?.id}"
+                                        class="button"
+                                >
+                                   <img src="${resource(dir: 'images/icons/silk/', file: 'bin.png')}" />&nbsp;
+                                    <warehouse:message code="stockMovement.rollbackPicklist.label" default="Rollback picklist"/>
+                                </g:link>
+                                <g:link
+                                        controller="stockMovement"
+                                        action="redoAutopick"
+                                        id="${stockMovement?.requisition?.id}"
+                                        class="button"
+                                >
+                                    <img src="${resource(dir: 'images/icons/silk/', file: 'arrow_redo.png')}" />&nbsp;
+                                    <warehouse:message code="stockMovement.redoAllocation.label" default="Redo Allocation"/>
+                                </g:link>
+                            </g:if>
+                            <g:else>
+                                <g:link
+                                        controller="allocation"
+                                        action="deallocate"
+                                        id="${stockMovement?.requisition?.id}"
+                                        class="button"
+                                >
+                                    <img src="${resource(dir: 'images/icons/silk/', file: 'bin.png')}" />&nbsp;
+                                    <warehouse:message code="stockMovement.clearAllocation.label" default="Clear Allocation"/>
+                                </g:link>
+                                <g:link
+                                        controller="allocation"
+                                        action="redoAutopick"
+                                        id="${stockMovement?.requisition?.id}"
+                                        class="button"
+                                >
+                                    <img src="${resource(dir: 'images/icons/silk/', file: 'arrow_redo.png')}" />&nbsp;
+                                    <warehouse:message code="stockMovement.redoAllocation.label" default="Redo Allocation"/>
+                                </g:link>
+                            </g:else>
+                            <g:if test="${currentAssignee}">
+                                <g:form controller="requisition" action="unassignPicker" style="display:inline-block; float:left; margin: 0;">
+                                    <g:hiddenField name="id" value="${stockMovement?.requisition?.id}"/>
+                                    <button
+                                            class="button"
+                                            onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                    >
+                                        <img src="${resource(dir: 'images/icons/silk/', file: 'user_delete.png')}" />&nbsp;
+                                        Unassign picker
+                                    </button>
+                                </g:form>
+                            </g:if>
+                            <a href="javascript:void(0);" class="button btn-show-dialog"
+                               data-height="200" data-width="500"
+                               data-title="Reassign picker"
+                               data-url="${request.contextPath}/requisition/reassignPickerDialog/${stockMovement?.requisition?.id}">
+                                <img src="${resource(dir: 'images/icons/silk/', file: 'user_add.png')}" />&nbsp;
+                                Reassign picker
+                            </a>
+                        </g:if>
                 </g:isUserAdmin>
 
                 <g:isSuperuser>
@@ -340,6 +359,16 @@
                                 ${stockMovement?.displayStatus?.label}
                             </td>
                         </tr>
+                        <g:if test="${stockMovement?.requisition?.status in [RequisitionStatus.PICKING, RequisitionStatus.PICKED, RequisitionStatus.CHECKING, RequisitionStatus.STAGED]}">
+                            <tr class="prop">
+                                <td class="name">
+                                    <warehouse:message code="picklist.assignee.label" default="Picker"/>
+                                </td>
+                                <td class="value">
+                                    ${currentAssignee?.name ?: 'Unassigned'}
+                                </td>
+                            </tr>
+                        </g:if>
                         <g:if test="${stockMovement?.fulfillmentStatus}">
                             <tr class="prop">
                                 <td class="name">
