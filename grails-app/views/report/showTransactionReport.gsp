@@ -175,7 +175,7 @@
                             <th class="center"><warehouse:message code="report.transaction.openingBalance.label" default="Opening"/></th>
                             <th class="center"><warehouse:message code="default.credits.label" default="Credits"/></th>
                             <th class="center"><warehouse:message code="default.debits.label" default="Debits"/></th>
-                            <th class="center"><warehouse:message code="report.transaction.adjustments.label" default="Adjustments"/></th>
+                            <th class="center"><warehouse:message code="report.transaction.netChange.label" default="Net Change"/></th>
                             <th class="center"><warehouse:message code="report.transaction.closingBalance.label" default="Closing"/></th>
                         </tr>
                         </thead>
@@ -189,7 +189,7 @@
                             <th class="center"><warehouse:message code="report.transaction.openingBalance.label" default="Opening"/></th>
                             <th class="center"><warehouse:message code="default.credits.label" default="Credits"/></th>
                             <th class="center"><warehouse:message code="default.debits.label" default="Debits"/></th>
-                            <th class="center"><warehouse:message code="report.transaction.adjustments.label" default="Adjustments"/></th>
+                            <th class="center"><warehouse:message code="report.transaction.netChange.label" default="Net Change"/></th>
                             <th class="center"><warehouse:message code="report.transaction.closingBalance.label" default="Closing"/></th>
                         </tr>
                         </tfoot>
@@ -305,7 +305,7 @@
 				{"mData": "Opening", "sType": 'numeric', "sClass": "right" },
 				{"mData": "Credits", "sType": 'numeric', "sClass": "right" },
 				{"mData": "Debits", "sType": 'numeric', "sClass": "right" },
-				{"mData": "Adjustments", "sType": 'numeric', "sClass": "right" },
+				{"mData": "Net Change", "sType": 'numeric', "sClass": "right" },
 				{"mData": "Closing", "sType": 'numeric', "sClass": "right" }
 			],
 			"bUseRendered": false,
@@ -319,7 +319,7 @@
                 $('td:eq(3)', nRow).html(Number(aData["Opening"]).toLocaleString('en-US'));
                 $('td:eq(4)', nRow).html(Number(aData["Credits"]).toLocaleString('en-US'));
                 $('td:eq(5)', nRow).html(Number(aData["Debits"]).toLocaleString('en-US'));
-                $('td:eq(6)', nRow).html(Number(aData["Adjustments"]).toLocaleString('en-US'));
+                $('td:eq(6)', nRow).html(Number(aData["Net Change"]).toLocaleString('en-US'));
                 $('td:eq(7)', nRow).html(Number(aData["Closing"]).toLocaleString('en-US'));
 
                 if (aData["Credits"] > 0) {
@@ -330,10 +330,10 @@
                   $('td:eq(5)', nRow).addClass('debit')
                 }
 
-                if (aData["Adjustments"] > 0) {
+                if (aData["Net Change"] > 0) {
                   $('td:eq(6)', nRow).addClass('credit')
-                } else if (aData["Adjustments"] < 0) {
-                  var normalized = 0 - Number(aData["Adjustments"]);
+                } else if (aData["Net Change"] < 0) {
+                  var normalized = 0 - Number(aData["Net Change"]);
                   $('td:eq(6)', nRow).html(normalized.toLocaleString('en-US')).addClass('debit')
 			    }
             	return nRow;
