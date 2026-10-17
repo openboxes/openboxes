@@ -5,6 +5,7 @@ import grails.testing.web.controllers.ControllerUnitTest
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import spock.lang.Specification
+import spock.lang.Unroll
 
 /**
  * The Zebra template actions render with the product, facility, bin location
@@ -61,18 +62,41 @@ class DocumentControllerZebraContextSpec extends Specification implements Contro
         response.text == '^XA^FDAB123|LOT-1^FS^XZ'
     }
 
-    void "buildZebraTemplate should not render a template that reads a value the request did not provide"() {
+    @Unroll
+    void "#action should answer 400 naming a template it cannot render"() {
         given:
         Location facility = new Location(name: "Main Warehouse").save(validate: false)
         Document template = saveTemplate('^XA^FD${product.productCode}^FS^XZ')
         session.warehouse = [id: facility.id]
         params.id = template.id
 
-        when:
-        controller.buildZebraTemplate()
+        when: "the request has no product"
+        controller."${action}"()
 
         then:
-        IllegalArgumentException e = thrown()
-        e.message.contains("product")
+        response.status == 400
+        response.text.contains("Label template 'label' can't be rendered")
+        response.text.contains("upload it again")
+
+        where:
+        action << ["buildZebraTemplate", "renderZebraTemplate", "exportZebraTemplate"]
     }
+
+    void "printZebraTemplate should show which template cannot be rendered and return to the page"() {
+        given:
+        Location facility = new Location(name: "Main Warehouse").save(validate: false)
+        Document template = saveTemplate('^XA^FD${product?.productCode}^FS^XZ')
+        session.warehouse = [id: facility.id]
+        params.id = template.id
+        params.protocol = "raw"
+
+        when:
+        controller.printZebraTemplate()
+
+        then:
+        flash.message.contains("Label template 'label' can't be rendered")
+        response.status == 302
+        response.redirectedUrl == "/"
+    }
+
 }

@@ -81,15 +81,27 @@ class ZebraServiceSpec extends Specification implements ServiceUnitTest<ZebraSer
         documentCode << ["SHIPPING_TEMPLATE", "IMAGE", null]
     }
 
-    void "renderZpl should not evaluate expressions in a template"() {
+    @Unroll
+    void "renderZpl should report a template it cannot render (#reason) with the template's name"() {
         given:
-        Document document = document("ZEBRA_TEMPLATE", '^XA^FD${7*7}^FS^XZ')
+        Document document = document("ZEBRA_TEMPLATE", template)
+        document.documentNumber = "barcodeLabel:product"
 
         when:
         service.renderZpl(document, [product: new Product(productCode: "AB123")])
 
         then:
-        thrown(IllegalArgumentException)
+        LabelTemplateException e = thrown()
+        e.message.contains("Label template 'label' (barcodeLabel:product) can't be rendered")
+        e.message.contains("upload it again")
+
+        where:
+        reason                   | template
+        "an expression"          | '^XA^FD${7*7}^FS^XZ'
+        "safe navigation"        | '^XA^FD${product?.productCode}^FS^XZ'
+        "GSP tags"               | '<% if (true) { %>^XA^XZ<% } %>'
+        "a value not provided"   | '^XA^FD${location.name}^FS^XZ'
+        "an empty association"   | '^XA^FD${product.category.name}^FS^XZ'
     }
 
     void "renderDocument should send the rendered label to the configured render API"() {

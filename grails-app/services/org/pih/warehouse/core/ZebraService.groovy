@@ -7,6 +7,7 @@ import org.apache.http.client.HttpClient
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.HttpClientBuilder
+import org.springframework.beans.BeansException
 
 class ZebraService {
     BeanPropertyTemplateService beanPropertyTemplateService
@@ -16,7 +17,11 @@ class ZebraService {
         if (document?.documentType?.documentCode != DocumentCode.ZEBRA_TEMPLATE) {
             throw new IllegalArgumentException("Only documents of type ZEBRA_TEMPLATE can be rendered as Zebra templates")
         }
-        return beanPropertyTemplateService.renderTemplate(document, model)
+        try {
+            return beanPropertyTemplateService.renderTemplate(document, model)
+        } catch (IllegalArgumentException | BeansException e) {
+            throw new LabelTemplateException(document, e)
+        }
     }
 
     def printDocument(Document document, Map model) {

@@ -30,6 +30,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentWorkflow
+import org.springframework.beans.BeansException
 import org.springframework.web.multipart.MultipartFile
 import util.FileUtil
 import util.RedirectUtil
@@ -562,7 +563,15 @@ class DocumentController {
         InventoryItem inventoryItem = InventoryItem.get(params?.inventoryItem?.id)
 
         Map context = [document: document, inventoryItem: inventoryItem, product: inventoryItem?.product?:product, facility: facility, location: location]
-        String renderedContent = beanPropertyTemplateService.renderTemplate(document, context)
+        String renderedContent
+        try {
+            renderedContent = renderLabelTemplate(document, context)
+        } catch (LabelTemplateException e) {
+            log.warn(e.message)
+            flash.message = e.message
+            RedirectUtil.redirect(this, [location: location, product: product])
+            return
+        }
 
         try {
             if (params.protocol=="usb") {
@@ -596,7 +605,13 @@ class DocumentController {
         Location facility = Location.get(session.warehouse.id)
         Location location = Location.get(params?.location?.id)
         Map model = [document: document, inventoryItem: inventoryItem, product: product?:inventoryItem?.product, facility: facility, location: location]
-        String renderedContent = beanPropertyTemplateService.renderTemplate(document, model)
+        String renderedContent
+        try {
+            renderedContent = renderLabelTemplate(document, model)
+        } catch (LabelTemplateException e) {
+            renderLabelTemplateError(e)
+            return
+        }
         log.info "renderedContent: ${renderedContent}"
         response.setHeader("Content-disposition", "attachment; filename=\"${product?.productCode?:location?.locationNumber}.zpl\"")
         render(contentType: "text/csv", text: renderedContent, encoding: "UTF-8")
@@ -609,7 +624,13 @@ class DocumentController {
         Location facility = Location.get(session.warehouse.id)
         Location location = Location.get(params?.location?.id)
         Map model = [document: document, inventoryItem: inventoryItem, product: product?:inventoryItem?.product, facility: facility, location: location]
-        String body = beanPropertyTemplateService.renderTemplate(document, model)
+        String body
+        try {
+            body = renderLabelTemplate(document, model)
+        } catch (LabelTemplateException e) {
+            renderLabelTemplateError(e)
+            return
+        }
 
         response.contentType = 'image/png'
         // TODO Move labelary URL to application.yml
@@ -628,10 +649,30 @@ class DocumentController {
         Location facility = Location.get(session.warehouse.id)
         Location location = Location.get(params?.location?.id)
         Map model = [document: document, inventoryItem: inventoryItem, product: product?:inventoryItem?.product, facility: facility, location: location]
-        String renderedContent = beanPropertyTemplateService.renderTemplate(document, model)
+        String renderedContent
+        try {
+            renderedContent = renderLabelTemplate(document, model)
+        } catch (LabelTemplateException e) {
+            renderLabelTemplateError(e)
+            return
+        }
         // TODO Move labelary URL to application.yml
         String url = "https://labelary.com/viewer.html?zpl=" + renderedContent
         redirect(url: url)
+    }
+
+    private String renderLabelTemplate(Document document, Map model) {
+        try {
+            return beanPropertyTemplateService.renderTemplate(document, model)
+        } catch (IllegalArgumentException | BeansException e) {
+            throw new LabelTemplateException(document, e)
+        }
+    }
+
+    private void renderLabelTemplateError(LabelTemplateException e) {
+        log.warn(e.message)
+        response.status = 400
+        render(contentType: "text/plain", text: e.message, encoding: "UTF-8")
     }
 
     private Document loadZebraTemplate(Serializable id) {
