@@ -52,11 +52,14 @@ describe('useOptionsFetch', () => {
   it('refetches on location and locale changes by default', () => {
     const { rerender } = renderHook(() => useOptionsFetch([fetchA]));
 
-    setSession({ id: 'loc-2' }, 'en');
+    const otherLocation = { id: 'loc-2' };
+    setSession(otherLocation, 'en');
     rerender();
-    setSession({ id: 'loc-2' }, 'fr');
-    rerender();
+    expect(fetchA).toHaveBeenCalledTimes(2);
 
+    // The same location object, so only the locale changes.
+    setSession(otherLocation, 'fr');
+    rerender();
     expect(fetchA).toHaveBeenCalledTimes(3);
   });
 
