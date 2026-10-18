@@ -50,7 +50,11 @@ import ResolveStep from 'components/cycleCount/toResolveTab/ResolveStep';
 import ResolveStepTable from 'components/cycleCount/toResolveTab/ResolveStepTable';
 /* eslint-enable import/first,import/order */
 
-const BIN_ACTIVITIES = ['MANAGE_INVENTORY', 'PUTAWAY_STOCK', 'PICK_STOCK'];
+// A location of its own: getCurrentLocation caches the locations it has seen by id.
+const BIN_LOCATION = {
+  location: { id: 'loc-bins', name: 'Bin warehouse' },
+  activities: ['MANAGE_INVENTORY', 'PUTAWAY_STOCK', 'PICK_STOCK'],
+};
 
 const cycleCounts = () => [
   {
@@ -125,7 +129,7 @@ describe('count step', () => {
     useCountStep.mockReturnValue(hook);
     renderScreen(
       <CountStep />,
-      cycleCountStore({ cycleCounts: cycleCounts(), activities: BIN_ACTIVITIES }),
+      cycleCountStore({ cycleCounts: cycleCounts(), ...BIN_LOCATION }),
     );
 
     expect(screen.getByText('P-0001 Ibuprofen 200mg')).toBeInTheDocument();
@@ -148,6 +152,8 @@ describe('count step', () => {
     const store = cycleCountStore({ cycleCounts: cycleCounts() });
     const { container } = renderScreen(<CountStep />, store);
     expect(screen.getAllByRole('spinbutton')).toHaveLength(2);
+    // The default location does not use bins.
+    expect(screen.queryByText('Bin Location')).not.toBeInTheDocument();
 
     fireEvent.click(button('Add new record'));
     expect(screen.getAllByRole('spinbutton')).toHaveLength(3);
