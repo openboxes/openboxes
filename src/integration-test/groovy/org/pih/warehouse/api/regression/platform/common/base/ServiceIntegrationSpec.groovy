@@ -18,6 +18,7 @@ import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.common.domain.builder.product.CategoryTestBuilder
@@ -125,26 +126,45 @@ abstract class ServiceIntegrationSpec extends IntegrationSpec {
         }
     }
 
+    // The default baseline date of stock(): one value for the whole feature, so its baselines can share a transaction
+    protected final Date defaultStockDate = new Date() - 1
+
+    // Baseline transactions made by stock(), by depot, product and date
+    protected final Map<String, String> baselineTransactionIds = [:]
+
     /**
      * Records the quantity of a lot of the product in the depot (an inventory baseline entry, dated the day before
      * by default) and refreshes the product availability of the depot.
+     *
+     * A baseline (any PRODUCT_INVENTORY transaction) is a product-wide count: the latest one replaces every earlier count of the product. So the lots of a
+     * product stocked as baselines at the same date go into one transaction, as in a real count. Separate baselines
+     * with the same date would count all lots or only the last one, depending on whether they were saved in the same
+     * second.
      */
     protected InventoryItem stock(Location depot, Product product, String lotNumber, Date expirationDate, int quantity,
-                                  Location bin = null, Date transactionDate = new Date() - 1,
+                                  Location bin = null, Date transactionDate = null,
                                   String transactionTypeId = Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID) {
+        Date date = transactionDate ?: defaultStockDate
+        String baselineKey = "${depot.id}:${product.id}:${date.time}"
         InventoryItem inventoryItem = committed {
+            boolean baseline = TransactionType.get(transactionTypeId).transactionCode == TransactionCode.PRODUCT_INVENTORY
             InventoryItem item = InventoryItem.findByProductAndLotNumber(Product.get(product.id), lotNumber) ?:
                     new InventoryItem(product: Product.get(product.id), lotNumber: lotNumber, expirationDate: expirationDate)
                             .save(failOnError: true, flush: true)
-            Transaction transaction = new Transaction(
-                    inventory: Location.get(depot.id).inventory,
-                    transactionType: TransactionType.get(transactionTypeId),
-                    transactionDate: transactionDate,
-                    transactionNumber: uniqueName('T'),
-                    disableRefresh: true)
+            Transaction transaction = baseline && baselineTransactionIds[baselineKey] ?
+                    Transaction.get(baselineTransactionIds[baselineKey]) :
+                    new Transaction(
+                            inventory: Location.get(depot.id).inventory,
+                            transactionType: TransactionType.get(transactionTypeId),
+                            transactionDate: date,
+                            transactionNumber: uniqueName('T'))
+            transaction.disableRefresh = true
             transaction.addToTransactionEntries(new TransactionEntry(product: item.product, inventoryItem: item, quantity: quantity,
                     binLocation: bin?.id ? Location.get(bin.id) : null))
             transaction.save(failOnError: true, flush: true)
+            if (baseline) {
+                baselineTransactionIds[baselineKey] = transaction.id
+            }
             return item
         }
         committed {

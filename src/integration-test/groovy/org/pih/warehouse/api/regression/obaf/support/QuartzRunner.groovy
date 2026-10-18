@@ -24,6 +24,9 @@ import java.util.concurrent.TimeUnit
  */
 class QuartzRunner {
 
+    /** The JobDataMap key that marks a run fired here (see ObafIntegrationSpec.vetoEventScheduledJobs). */
+    static final String RUN_ID = 'regressionRunId'
+
     static class Run {
         JobExecutionException exception
         boolean finished
@@ -47,7 +50,7 @@ class QuartzRunner {
 
             @Override
             void jobWasExecuted(JobExecutionContext context, JobExecutionException jobException) {
-                if (context.mergedJobDataMap.get('regressionRunId') == runId) {
+                if (context.mergedJobDataMap.get(RUN_ID) == runId) {
                     run.exception = jobException
                     done.countDown()
                 }
@@ -57,7 +60,7 @@ class QuartzRunner {
         long start = System.currentTimeMillis()
         try {
             JobDataMap map = new JobDataMap(data)
-            map.put('regressionRunId', runId)
+            map.put(RUN_ID, runId)
             scheduler.triggerJob(key, map)
             run.finished = done.await(timeoutMs, TimeUnit.MILLISECONDS)
         } finally {
