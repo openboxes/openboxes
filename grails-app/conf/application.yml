@@ -592,6 +592,9 @@ openboxes:
     report:
         logo:
             url: "https://openboxes.com/img/logo_100.png"
+        transactionReport:
+            # How long (in milliseconds) the page waits for the report before giving up
+            timeout: 300000
 
     # Allow system to anonymize user data to prevent it from being accessed by unauthorized users
     anonymize:
