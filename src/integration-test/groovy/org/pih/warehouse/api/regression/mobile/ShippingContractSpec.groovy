@@ -169,6 +169,14 @@ class ShippingContractSpec extends MobileContractSpec {
 
         when:
         CallResult step1 = call('src/apis/inbound.ts#submitPartialReceiving', [id: s.id], pending)
+        // The pending receipt is delivered "now", stored to the second: the database can round that up to a second
+        // that has not begun yet, and the completed receipt's transaction would then be refused as dated in the
+        // future. A handheld is never that fast; wait until the stored date has passed.
+        Date delivered = Shipment.withNewTransaction { Shipment.get(s.id).receipts*.actualDeliveryDate.max() }
+        long ahead = (delivered?.time ?: 0L) - System.currentTimeMillis()
+        if (ahead >= 0) {
+            sleep(ahead + 1)
+        }
         Map resp = step1.data.data as Map
         Map completed = [isShipmentFromPurchaseOrder: resp.isShipmentFromPurchaseOrder, receiptStatus: 'COMPLETED',
                          containers: (resp.containers as List<Map>).collect { Map c ->
