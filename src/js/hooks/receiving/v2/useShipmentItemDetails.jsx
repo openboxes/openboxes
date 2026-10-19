@@ -2,9 +2,7 @@ import React from 'react';
 
 import * as locales from 'date-fns/locale';
 import { useSelector } from 'react-redux';
-import {
-  getCurrentLocale, getHasBinLocationSupport, getIsShipmentFromPurchaseOrder,
-} from 'selectors';
+import { getCurrentLocale, getIsShipmentFromPurchaseOrder } from 'selectors';
 
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useFormatNumber from 'hooks/useFormatNumber';
@@ -20,7 +18,6 @@ const useShipmentItemDetails = (lineItem) => {
   const translate = useTranslate();
   const formatNumber = useFormatNumber();
   const currentLocale = useSelector(getCurrentLocale);
-  const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
   const isShipmentFromPurchaseOrder = useSelector(getIsShipmentFromPurchaseOrder);
 
   // Only a purchase order has a unit of measure to convert the quantity into.
@@ -56,9 +53,6 @@ const useShipmentItemDetails = (lineItem) => {
           <ProductHandlingIcons handlingLabels={lineItem?.product?.handlingLabels} />
         </>
       ),
-      // Each of these flags adds one optional field, the supplier item code and the bin
-      // location, so with both the grid has four columns and the product name spans two
-      className: isShipmentFromPurchaseOrder && hasBinLocationSupport ? 'item-details__field--span-2' : '',
     },
     ...(isShipmentFromPurchaseOrder ? [{
       label: translate('react.receiving.supplierItemCode.label', 'Supplier Item Code'),
@@ -79,27 +73,17 @@ const useShipmentItemDetails = (lineItem) => {
     {
       label: translate('react.receiving.recipient.label', 'Recipient'),
       value: lineItem?.shippedRecipient?.name,
-      className: !isShipmentFromPurchaseOrder && !hasBinLocationSupport ? 'item-details__field--span-2' : '',
+      // Without the supplier item code there are five fields, so the recipient spans two
+      // columns to keep the shipped quantity in the last column
+      className: isShipmentFromPurchaseOrder ? '' : 'item-details__field--span-2',
     },
-    ...(hasBinLocationSupport ? [
-      {
-        label: translate('react.receiving.location.label', 'Location'),
-        value: lineItem?.binLocation?.name,
-      },
-    ] : []),
     {
       label: translate('react.receiving.shipped.label', 'Shipped'),
       value: shippedValue,
     },
   ];
 
-  return {
-    badge,
-    fields,
-    // The default grid fits six fields in two lines of three, but with both of the optional
-    // fields there is a seventh, so the second line has to fit four of them instead
-    className: isShipmentFromPurchaseOrder && hasBinLocationSupport ? 'item-details--four-columns' : '',
-  };
+  return { badge, fields };
 };
 
 export default useShipmentItemDetails;
