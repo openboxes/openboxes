@@ -18,8 +18,8 @@ and `${product.category.name:-}` prints nothing (use it where older templates us
   bin (`${location.name:-}`).
 
 A label object the page does not provide at all is still an error, with or without a default; so are names that are
-not label objects and properties that do not exist (also after an empty link). When what follows an empty link cannot
-be checked (an untyped property), the empty link is reported as it is without a default. When the label object itself
-is empty, its properties cannot be checked and the default is printed. The default is printed as written and cannot
-contain `}`.
+not label objects and properties that do not exist. After an empty link, the default applies only when the rest of the
+path exists on the declared property types; otherwise (a misspelt property, an untyped property) the empty link is
+reported as it is without a default. When the label object itself is empty, its properties cannot be checked and the
+default is printed. The default is printed as written and cannot contain `}`.
 Without a default, an empty value prints nothing, and an empty link or an empty label object is reported as an error.
