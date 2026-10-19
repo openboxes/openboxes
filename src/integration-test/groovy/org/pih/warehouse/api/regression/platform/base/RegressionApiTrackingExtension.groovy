@@ -13,7 +13,6 @@ import org.spockframework.runtime.model.SpecInfo
  *    so every call any integration spec makes goes through them without editing upstream code;
  *  - tells {@link ApiOperationRecorder} when a Spock feature method (as opposed to a fixture) is running;
  *  - switches {@link ObafAjaxHeaderFilter} on for {@link RegressionApiSpec} subclasses;
- *  - switches {@link CategoryCommitFilter} on for the regression specs;
  *  - hands a spec's {@link EnforceSpecValidation} to {@link SpecValidationFilter}.
  *
  * Registered via META-INF/services in the integration-test resources. Inert unless the test JVM has
@@ -28,7 +27,6 @@ class RegressionApiTrackingExtension implements IGlobalExtension {
             ObafAjaxHeaderFilter.INSTANCE,   // OBAF answers JSON errors to AJAX requests only (RegressionApiSpec only)
             SpecValidationFilter.INSTANCE,   // checks the call against the OpenAPI spec (report-only by default)
             ApiResponseCapture.INSTANCE,     // optionally keeps response samples for the spec
-            CategoryCommitFilter.INSTANCE,   // waits until a created category is committed (see the class)
     ].asImmutable()
 
     static boolean enabled() {
@@ -61,14 +59,12 @@ class RegressionApiTrackingExtension implements IGlobalExtension {
             installFilters()
             ApiOperationRecorder.currentSpec = specName
             ObafAjaxHeaderFilter.enabled = ajax
-            CategoryCommitFilter.enabled = true
             SpecValidationFilter.specEnforcement = enforcement
             try {
                 invocation.proceed()
             } finally {
                 ApiOperationRecorder.currentSpec = null
                 ObafAjaxHeaderFilter.enabled = false
-                CategoryCommitFilter.enabled = false
                 SpecValidationFilter.specEnforcement = null
             }
         }
