@@ -123,6 +123,8 @@ openboxes.security.rbac.rules = [
     [controller: 'stockTransferApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER]],
     [controller: 'stockMovementApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT]],
     [controller: 'product', actions: ['merge'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ADMIN]],
+    // Data export queries run as SQL, so changing one needs the same role as the console
+    [controller: 'dataExport', actions: ['update', 'editDialog'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
     [controller: 'user', actions: ['changePassword'], accessRules: [ minimumRequiredRole: RoleType.ROLE_AUTHENTICATED]],
     // Other controller actions that might need explicit rules
     //[controller: 'putawayItemApi', actions: ['removingItem'], access: [RoleType.ROLE_MANAGER]],

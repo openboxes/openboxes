@@ -352,9 +352,10 @@ class DocumentServiceSpec extends Specification implements ServiceUnitTest<Docum
         service.getDocuments(new DocumentFilterCommand(max: 1, offset: 0)).totalCount == 3
     }
 
-    void 'getNonTemplateDocumentTypes leaves out the template types and sorts by name'() {
+    void 'getNonTemplateDocumentTypes leaves out the template and data export types and sorts by name'() {
         given:
         new DocumentType(name: 'Zebra template', documentCode: DocumentCode.ZEBRA_TEMPLATE).save(validate: false)
+        new DocumentType(name: 'Data export', documentCode: DocumentCode.DATA_EXPORT).save(validate: false)
         new DocumentType(name: 'Invoice', documentCode: DocumentCode.SHIPPING_DOCUMENT).save(validate: false)
         new DocumentType(name: 'Another', documentCode: null).save(validate: false)
 
