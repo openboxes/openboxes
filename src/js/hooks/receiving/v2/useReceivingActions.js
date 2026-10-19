@@ -5,13 +5,15 @@ import {
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { getUsers } from 'selectors';
+import { getReceivingDateDelivered, getUsers } from 'selectors';
 
-import { fetchUsers } from 'actions';
+import { fetchUsers, updateReceivingDateDelivered } from 'actions';
 import receivingApi from 'api/services/ReceivingApi';
 import ReceivingRowType from 'consts/receivingRowType';
+import { DateFormatDateFns } from 'consts/timeFormat';
 import useReceivingAutosave from 'hooks/receiving/v2/useReceivingAutosave';
 import useReceivingSaveAction from 'hooks/receiving/v2/useReceivingSaveAction';
+import { formatISODate } from 'utils/dateUtils';
 import { createNormalizedState } from 'utils/normalizationUtils';
 import getReceiptSummaryParams from 'utils/receiving/getReceiptSummaryParams';
 import {
@@ -56,6 +58,9 @@ const useReceivingActions = ({ view, sort, sortOrder } = {}) => {
   const [initialRows, setInitialRows] = useState(createNormalizedState());
   const { shipmentId } = useParams();
   const dispatch = useDispatch();
+  const storedDateDelivered = useSelector(
+    (state) => getReceivingDateDelivered(state, shipmentId),
+  );
   const users = useSelector(getUsers);
   const {
     rows,
@@ -76,6 +81,19 @@ const useReceivingActions = ({ view, sort, sortOrder } = {}) => {
     return summary;
   };
 
+  // Populates the initial date delivered value in the store using the receipt's delivery date.
+  // Only runs when nothing is stored yet so that we don't override user selected values if they
+  // navigate back to the receiving step.
+  const seedDateDelivered = (receipt) => {
+    if (storedDateDelivered || !receipt?.dateDelivered) {
+      return;
+    }
+    dispatch(updateReceivingDateDelivered(
+      shipmentId,
+      formatISODate(receipt.dateDelivered, DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS),
+    ));
+  };
+
   // Makes sure the shipment has a pending receipt this workflow can receive against, before any of
   // it is shown: one is started when there is none, and the lines of one that already exists are
   // synced - it may have been started by the old receiving workflow, which only persisted the lines
@@ -85,10 +103,12 @@ const useReceivingActions = ({ view, sort, sortOrder } = {}) => {
   const ensureV2Receipt = async (summary) => {
     if (!summary?.pendingReceiptId) {
       const { data: { data: startedReceipt } } = await receivingApi.startReceipt(shipmentId);
+      seedDateDelivered(startedReceipt);
       return mergeStartedReceipt(summary, startedReceipt);
     }
 
     const { data: { data: syncedReceipt } } = await receivingApi.syncReceiptLines(shipmentId);
+    seedDateDelivered(syncedReceipt);
     // The sync only ever adds lines, so an unchanged count means it had nothing to do and the
     // summary already carries the very same lines. Merging then buys nothing and would let the
     // receipt's own (unordered) line order reshuffle the split rows on every sort or view change.
