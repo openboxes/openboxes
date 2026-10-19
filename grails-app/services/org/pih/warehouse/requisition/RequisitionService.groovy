@@ -901,6 +901,13 @@ class RequisitionService {
                 requisition.dateRejected = new Date()
                 requisition.rejectedBy = currentUser
                 break
+            case RequisitionStatus.PICKED:
+                // Publish only on the actual transition, the status can be submitted again for a picked requisition
+                if (requisition.status != RequisitionStatus.PICKED) {
+                    Holders.grailsApplication.mainContext.publishEvent(new RequisitionEvent(requisition.id, WebhookEventType.PICK_COMPLETED))
+                }
+                requisition.status = newStatus
+                break
             case RequisitionStatus.ISSUED:
                 Holders.grailsApplication.mainContext.publishEvent(new RequisitionEvent(requisition.id, WebhookEventType.REQUISITION_ISSUED))
                 // no break
