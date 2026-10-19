@@ -182,11 +182,7 @@ class BeanPropertyTemplateService {
             try {
                 result = new BeanWrapperImpl(root).getPropertyValue(propertyPath)
             } catch (BeansException e) {
-                // a null link in the path (product.category when reading product.category.name);
-                // for an indexed link (tags[0]) Spring wraps it in an InvalidPropertyException
-                boolean nullLink = e instanceof NullValueInNestedPathException ||
-                    e.cause instanceof NullValueInNestedPathException
-                if (defaultForEmptyLink && nullLink && isReadableBehindEmptyLink(root, segments[1..-1])) {
+                if (defaultForEmptyLink && isNullLink(e) && isReadableBehindEmptyLink(root, segments[1..-1])) {
                     return defaultValue
                 }
                 throw e
@@ -207,45 +203,66 @@ class BeanPropertyTemplateService {
         return value.replaceAll(/(?<!\$)\$\{/, '\\$\\${')
     }
 
+    // a null link in the path (product.category when reading product.category.name); for an
+    // indexed link (tags[0]) Spring wraps it in an InvalidPropertyException
+    private static boolean isNullLink(BeansException e) {
+        return e instanceof NullValueInNestedPathException || e.cause instanceof NullValueInNestedPathException
+    }
+
     /*
      * Whether the property path is readable although a link in it is null, so that a default
      * never hides a template error behind an empty link. Follows the actual values up to the
      * null link and the declared property types after it (with their generic arguments, and the
      * element type for indexed segments). Answers false when a declared type does not have the
-     * property, is a blocked type, or cannot tell (Object, a raw collection, a map); the null
-     * link then stays an error, as it is without a default. Reads only the getters the renderer
-     * has just read.
+     * property, is a blocked type, cannot be indexed, or cannot tell (Object, a raw collection,
+     * a map), and when the check itself fails; the null link then stays an error, as it is
+     * without a default. Reads each getter before the null link once more, as the renderer did.
      */
     private static boolean isReadableBehindEmptyLink(Object root, List<String> segments) {
-        Object current = root
-        ResolvableType type = ResolvableType.forClass(root.getClass())
-        for (String segment : segments) {
-            String propertyName = segment.replaceFirst('\\[.*', '')
-            Class owner = current != null ? current.getClass() : type.resolve()
-            if (owner == null || owner == Object) {
-                return false
+        try {
+            Object current = root
+            ResolvableType type = ResolvableType.forClass(root.getClass())
+            for (String segment : segments) {
+                String propertyName = segment.replaceFirst('\\[.*', '')
+                Class owner = current != null ? current.getClass() : type.resolve()
+                if (owner == null || owner == Object) {
+                    return false
+                }
+                PropertyDescriptor descriptor = BeanUtils.getPropertyDescriptor(owner, propertyName)
+                if (descriptor?.readMethod == null) {
+                    return false
+                }
+                // resolve the getter's type against the owner's generic arguments where they are known
+                ResolvableType ownerType = type.resolve() == owner ? type : ResolvableType.forClass(owner)
+                type = ResolvableType.forMethodParameter(new MethodParameter(descriptor.readMethod, -1), ownerType)
+                if (segment.contains('[')) {
+                    if (type.isArray()) {
+                        type = type.getComponentType()
+                    } else if (type.resolve() != null && Collection.isAssignableFrom(type.resolve())) {
+                        type = type.asCollection().getGeneric(0)
+                    } else {
+                        return false
+                    }
+                }
+                Class resolved = type.resolve()
+                if (resolved != null && BLOCKED_TYPES.any { it.isAssignableFrom(resolved) }) {
+                    return false
+                }
+                // up to the null link the path holds values (the renderer followed it that far)
+                if (current != null) {
+                    try {
+                        current = new BeanWrapperImpl(current).getPropertyValue(segment)
+                    } catch (BeansException e) {
+                        if (!isNullLink(e)) {
+                            return false
+                        }
+                        current = null
+                    }
+                }
             }
-            PropertyDescriptor descriptor = BeanUtils.getPropertyDescriptor(owner, propertyName)
-            if (descriptor?.readMethod == null) {
-                return false
-            }
-            // resolve the getter's type against the owner's generic arguments where they are known
-            ResolvableType ownerType = type.resolve() == owner ? type : ResolvableType.forClass(owner)
-            type = ResolvableType.forMethodParameter(new MethodParameter(descriptor.readMethod, -1), ownerType)
-            if (segment.contains('[')) {
-                type = type.isArray() ? type.getComponentType() : type.asCollection().getGeneric(0)
-            }
-            Class resolved = type.resolve()
-            if (resolved != null && BLOCKED_TYPES.any { it.isAssignableFrom(resolved) }) {
-                return false
-            }
-            // up to the null link the path holds values (the renderer followed it that far)
-            if (current != null) {
-                BeanWrapperImpl wrapper = new BeanWrapperImpl(current)
-                Object propertyValue = wrapper.getPropertyValue(propertyName)
-                current = propertyValue != null && segment.contains('[') ? wrapper.getPropertyValue(segment) : propertyValue
-            }
+            return true
+        } catch (Exception ignored) {
+            return false
         }
-        return true
     }
 }

@@ -623,6 +623,27 @@ class BeanPropertyTemplateServiceSpec extends Specification implements ServiceUn
         MockBox<MockCategory> emptyBox
     }
 
+    // reads its category once; a second read fails
+    static class MockReadOnce {
+        int reads = 0
+
+        MockCategory getCategory() {
+            reads++
+            if (reads > 1) {
+                throw new IllegalStateException("category read twice")
+            }
+            return null
+        }
+    }
+
+    void "a failure while checking the path behind an empty link keeps the empty-link error"() {
+        when:
+        service.renderTemplateContents('${product.category.name:-none}', "test", [product: new MockReadOnce()])
+
+        then:
+        thrown(NullValueInNestedPathException)
+    }
+
     void "after an empty link the declared types keep their generic arguments"() {
         given:
         Map bindings = [location: new MockShelf()]
@@ -703,6 +724,7 @@ class BeanPropertyTemplateServiceSpec extends Specification implements ServiceUn
         "a property the declared interface lacks" | '${product.supplier.group.name:-x}'  | [product: new MockLabelProduct()]                        || NullValueInNestedPathException | 'supplier'
         "a blocked type after an empty link"   | '${product.category.kind:-x}'             | [product: new MockLabelProduct()]                        || NullValueInNestedPathException | 'category'
         "a property after an empty link deeper in the path" | '${product.supplier.group.bogus:-x}' | [product: new MockLabelProduct(supplier: new MockSupplier())] || NullValueInNestedPathException | 'group'
+        "an index on a property that is not a list" | '${product.category[0]:-x}'      | [product: new MockLabelProduct()]                        || InvalidPropertyException      | 'category'
         "an untyped link that is empty"        | '${product.untyped.name:-x}'              | [product: new MockLabelProduct()]                        || NullValueInNestedPathException | 'untyped'
         "an empty link in a raw list"          | '${product.rawList[0].name:-x}'           | [product: new MockLabelProduct()]                        || InvalidPropertyException      | 'rawList'
         "a non-numeric index after an empty link" | '${product.tags[x]:-d}'               | [product: new MockLabelProduct()]                        || InvalidPropertyException      | 'tags'
