@@ -89,9 +89,15 @@ class LabelStubs {
         app.config.openboxes.barcode.labelaryApi.url = url
     }
 
-    /** One openboxes.barcode.labelaryApi option, in both views of the config. */
+    /** One openboxes.barcode.labelaryApi option, in both views of the config (null removes it). */
     static void setLabelary(GrailsApplication app, String name, Object value) {
-        app.config.put("openboxes.barcode.labelaryApi.${name}".toString(), value)
+        String key = "openboxes.barcode.labelaryApi.${name}".toString()
+        if (value == null) {
+            app.config.remove(key)
+            app.config.openboxes.barcode.labelaryApi.remove(name)
+            return
+        }
+        app.config.put(key, value)
         app.config.openboxes.barcode.labelaryApi."${name}" = value
     }
 

@@ -35,7 +35,8 @@ openboxes:
         labelaryApi:
             url: "http://labelstub:8081/v1/printers/12dpmm/labels/2x1/0/"
             documentPreviewUrl: "http://labelstub:8081/v1/printers/8dpmm/labels/3x2/0/"
-            viewerUrl: "http://labelstub:8081/viewer.html"
+            # the browser follows the viewer link: the label stub's published loopback port
+            viewerUrl: "http://127.0.0.1:@E2E_LABEL_PORT@/viewer.html"
     locale:
         currencyApi:
             url: "http://127.0.0.1:9/%s"

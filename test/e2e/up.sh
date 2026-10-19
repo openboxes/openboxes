@@ -32,10 +32,11 @@ MY_CNF="$(my_cnf)"
 WAR="$("$E2E_DIR/build-war.sh")"
 FULL="$(basename "$WAR" .war)"; FULL="${FULL#openboxes-}"
 mkdir -p "$E2E_WORK"
-sed "s/@E2E_HTTP_PORT@/$E2E_HTTP_PORT/g" "$E2E_DIR/docker/openboxes.yml" > "$E2E_WORK/openboxes-$E2E_HTTP_PORT.yml"
+export E2E_LABEL_PORT="${E2E_LABEL_PORT:-18081}"
+sed -e "s/@E2E_HTTP_PORT@/$E2E_HTTP_PORT/g" -e "s/@E2E_LABEL_PORT@/$E2E_LABEL_PORT/g" \
+  "$E2E_DIR/docker/openboxes.yml" > "$E2E_WORK/openboxes-$E2E_HTTP_PORT.yml"
 export E2E_WAR="$WAR" E2E_APP_CONFIG="$E2E_WORK/openboxes-$E2E_HTTP_PORT.yml" E2E_MY_CNF="$MY_CNF"
 export E2E_PROJECT E2E_HTTP_PORT E2E_DB_PORT
-export E2E_LABEL_PORT="${E2E_LABEL_PORT:-18081}"
 
 start=$(date +%s)
 log "starting $E2E_PROJECT (OpenBoxes $FULL) on 127.0.0.1:$E2E_HTTP_PORT"

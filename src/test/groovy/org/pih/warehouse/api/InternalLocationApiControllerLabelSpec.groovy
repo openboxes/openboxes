@@ -115,7 +115,10 @@ class InternalLocationApiControllerLabelSpec extends Specification implements Co
         params.id = labelSubjectId()
         params.documentId = saveDocument(DocumentCode.ZEBRA_TEMPLATE).id
         controller.zebraService.grailsApplication = grailsApplication
-        grailsApplication.config.openboxes.barcode.labelaryApi.enabled = false
+        Map labelaryApi = grailsApplication.config.openboxes.barcode.labelaryApi
+        boolean wasSet = labelaryApi.containsKey("enabled")
+        Object enabled = labelaryApi.enabled
+        labelaryApi.enabled = false
 
         when: "a render request would fail the test (see setup)"
         controller.renderLabel()
@@ -126,6 +129,10 @@ class InternalLocationApiControllerLabelSpec extends Specification implements Co
         response.json.errorMessage.contains("Label previews are turned off")
 
         cleanup:
-        grailsApplication.config.openboxes.barcode.labelaryApi.enabled = true
+        if (wasSet) {
+            labelaryApi.enabled = enabled
+        } else {
+            labelaryApi.remove("enabled")
+        }
     }
 }

@@ -184,7 +184,7 @@ class ZebraLabelIntegrationSpec extends ObafIntegrationSpec {
         answer == 'PNG-BYTES'
     }
 
-    @PendingFeature(reason = 'ZebraService.groovy:30-38 returns labelary\'s response body whatever the status: an invalid label (labelary 400 "ERROR: ...") or a labelary outage (5xx) is streamed to the app as the label image with content type image/png')
+    @PendingFeature(reason = 'ZebraService.renderDocument (postData) returns labelary\'s response body whatever the status: an invalid label (labelary 400 "ERROR: ...") or a labelary outage (5xx) is streamed to the app as the label image with content type image/png')
     void 'renderDocument refuses a labelary error answer instead of passing it on as the image'() {
         given:
         LoopbackReceiver labelary = new LoopbackReceiver()
