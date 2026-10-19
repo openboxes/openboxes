@@ -15,6 +15,7 @@ import grails.core.GrailsApplication
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.LabelTemplateException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.core.User
@@ -91,8 +92,15 @@ class MobileProductApiController extends BaseDomainApiController {
         if (!document) {
             throw new ObjectNotFoundException(params.documentId, Document.class.simpleName)
         }
+        InputStream image
+        try {
+            image = zebraService.renderDocument(document, [product:product])
+        } catch (LabelTemplateException e) {
+            renderLabelTemplateError(e)
+            return
+        }
         response.contentType = "image/png"
-        response.outputStream << zebraService.renderDocument(document, [product:product])
+        response.outputStream << image
     }
 
     def printLabel() {
@@ -106,6 +114,8 @@ class MobileProductApiController extends BaseDomainApiController {
 
             render([data: "Product label has been printed"] as JSON)
             return
+        } catch (LabelTemplateException e) {
+            renderLabelTemplateError(e)
         } catch (Exception e) {
             render([errorCode: 500, cause: e?.class, errorMessage: e?.message] as JSON)
         }
@@ -263,5 +273,11 @@ class MobileProductApiController extends BaseDomainApiController {
         } catch (Exception e) {
             log.error("Error while publishing ProductBarcodeUpdatedEvent for product ${product?.id}", e)
         }
+    }
+
+    private void renderLabelTemplateError(LabelTemplateException e) {
+        log.warn(e.message)
+        response.status = 400
+        render([errorCode: 400, errorMessage: e.message] as JSON)
     }
 }

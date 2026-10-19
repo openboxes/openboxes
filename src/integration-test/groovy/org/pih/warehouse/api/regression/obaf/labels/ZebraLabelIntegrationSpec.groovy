@@ -13,12 +13,12 @@ import org.pih.warehouse.api.regression.mobile.LabelStubs
 import org.pih.warehouse.api.regression.obaf.events.support.LoopbackReceiver
 import org.pih.warehouse.api.regression.obaf.support.ObafIntegrationSpec
 import org.pih.warehouse.api.regression.support.CaptureServers
+import org.pih.warehouse.core.BeanPropertyTemplateService
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.TemplateService
 import org.pih.warehouse.core.ZebraService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Container
@@ -26,7 +26,7 @@ import org.pih.warehouse.shipping.ContainerApiController
 
 /**
  * The label path behaviour: OBAF's three bundled ZPL
- * templates rendered by TemplateService with real models (golden files under
+ * templates rendered by BeanPropertyTemplateService with real models (golden files under
  * src/integration-test/resources/regression-labels/), ZebraService.renderDocument against a
  * loopback labelary, printDocument against a loopback printer socket (written, refused,
  * unresponsive), the three printLabel actions when printing fails, and DocumentService's label
@@ -37,7 +37,7 @@ class ZebraLabelIntegrationSpec extends ObafIntegrationSpec {
     static final String TEMPLATES = 'grails-app/conf/templates/zpl-boarcodes-templates'
 
     @Autowired
-    TemplateService templateService
+    BeanPropertyTemplateService beanPropertyTemplateService
 
     @Autowired
     ZebraService zebraService
@@ -104,7 +104,7 @@ class ZebraLabelIntegrationSpec extends ObafIntegrationSpec {
     String render(String template, Map model) {
         return tx {
             Document d = new Document(name: "test-${template}", fileContents: bundled(template).getBytes('UTF-8'))
-            templateService.renderTemplate(d, model.collectEntries { k, v -> [(k): v instanceof Closure ? v.call() : v] })
+            beanPropertyTemplateService.renderTemplate(d, model.collectEntries { k, v -> [(k): v instanceof Closure ? v.call() : v] })
         } as String
     }
 
@@ -137,18 +137,17 @@ class ZebraLabelIntegrationSpec extends ObafIntegrationSpec {
         }
     }
 
-    void 'a missing model renders empty fields in the null-safe templates, and fails in the product template'() {
+    @spock.lang.Unroll
+    void 'a missing model fails the #template template, naming the value it needed'() {
         when:
-        String container = render('container', [:])
+        render(template, [:])
 
         then:
-        container == '^XA^FO50,60^A0,40^FD ^FS^FO50,100^BY3^BCN,60,,,,A^FD^FS^XZ\n'
+        IllegalArgumentException e = thrown()
+        e.message.contains("'${template}' was not provided")
 
-        when:
-        render('product', [:])
-
-        then: 'product.zpl dereferences ${product.productCode} without ?.'
-        thrown(Exception)
+        where:
+        template << ['product', 'container', 'internalLocation']
     }
 
     // ------------------------------------------------------------------ renderDocument (labelary)
