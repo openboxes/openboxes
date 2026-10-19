@@ -104,6 +104,18 @@ class ZebraServiceSpec extends Specification implements ServiceUnitTest<ZebraSer
         "an empty association"   | '^XA^FD${product.category.name}^FS^XZ'
     }
 
+    void "renderZpl should print the default of a placeholder whose link is empty"() {
+        given: "a product without a category"
+        Document document = document("ZEBRA_TEMPLATE", '^XA^FD${product.productCode}|${product.category.name:-}|${product.category.name:-none}^FS^XZ')
+        document.documentNumber = "barcodeLabel:product"
+
+        when:
+        String zpl = service.renderZpl(document, [product: new Product(productCode: "AB123")])
+
+        then:
+        zpl == '^XA^FDAB123||none^FS^XZ'
+    }
+
     void "renderDocument should send the rendered label to the configured render API"() {
         given:
         ZebraService zebraService = Spy(ZebraService)

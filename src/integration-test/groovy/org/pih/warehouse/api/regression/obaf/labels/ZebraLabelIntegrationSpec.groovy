@@ -16,6 +16,7 @@ import org.pih.warehouse.api.regression.support.CaptureServers
 import org.pih.warehouse.core.BeanPropertyTemplateService
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
+import org.pih.warehouse.core.DocumentController
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Location
@@ -264,6 +265,21 @@ class ZebraLabelIntegrationSpec extends ObafIntegrationSpec {
         then: 'today each body is {errorCode: 500, ...} under status 200'
         answers.every { it.body.contains('"errorCode":500') }
         answers.every { it.status >= 400 }
+    }
+
+    void 'a stored template with an empty default prints a blank field when the page passes no bin'() {
+        given:
+        String dc = depot('LBL-DF')
+        String p = labelProduct('TEST-LBL-0001')
+        String doc = zebraDocument("test-default-${uid()}", '^XA^FD${product.productCode}^FS^FD${location.name:-}^FS^XZ')
+        def ctx = grails.util.Holders.applicationContext
+
+        when: 'the label is built from a product page: a product, no location'
+        Map answer = callController(ctx.getBean(DocumentController), [id: doc, product: [id: p], facility: dc]) { it.buildZebraTemplate() }
+
+        then:
+        answer.status == 200
+        answer.body == '^XA^FDTEST-LBL-0001^FS^FD^FS^XZ'
     }
 
     // ------------------------------------------------------------------ DocumentService label lookups

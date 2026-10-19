@@ -1,9 +1,11 @@
 package org.pih.warehouse.core
 
 import grails.testing.services.ServiceUnitTest
+import org.springframework.beans.InvalidPropertyException
 import org.springframework.beans.NotReadablePropertyException
 import org.springframework.beans.NullValueInNestedPathException
 import spock.lang.Specification
+import spock.lang.Unroll
 
 /**
  * Tests that BeanPropertyTemplateService resolves property paths
@@ -24,6 +26,20 @@ class BeanPropertyTemplateServiceSpec extends Specification implements ServiceUn
 
     static class MockLocation {
         String name = "Main Warehouse"
+    }
+
+    static class MockCategory {
+        String name = "Dressings"
+    }
+
+    // a product with optional values of several types, for the default value features
+    static class MockLabelProduct {
+        String name
+        MockCategory category
+        Integer quantity
+        BigDecimal price
+        Boolean coldChain
+        List<String> tags
     }
 
     // we should block properties of type Class, not just properties named 'class'
@@ -515,5 +531,166 @@ class BeanPropertyTemplateServiceSpec extends Specification implements ServiceUn
 
         then:
         result == 'ABC123 at Main Warehouse'
+    }
+
+    // ------------------------------------------------------------------ default values: ${name.property:-default}
+
+    @Unroll
+    void "the default applies when the value is empty (#reason)"() {
+        given:
+        Map bindings = [product: new MockLabelProduct(name: value)]
+
+        expect:
+        service.renderTemplateContents(template, "test", bindings) == expected
+
+        where:
+        reason                       | template                    | value || expected
+        "no value"                   | '^FD${product.name:-none}^FS' | null  || '^FDnone^FS'
+        "empty text"                 | '^FD${product.name:-none}^FS' | ''    || '^FDnone^FS'
+        "no value, empty default"    | '^FD${product.name:-}^FS'     | null  || '^FD^FS'
+        "empty text, empty default"  | '^FD${product.name:-}^FS'     | ''    || '^FD^FS'
+    }
+
+    @Unroll
+    void "a value is printed as it is, never the default (#reason)"() {
+        given:
+        Map bindings = [product: product]
+
+        expect:
+        service.renderTemplateContents(template, "test", bindings) == expected
+
+        where:
+        reason          | template                         | product                                       || expected
+        "text"          | '${product.name:-none}'          | new MockLabelProduct(name: 'Gauze')           || 'Gauze'
+        "blank text"    | '${product.name:-none}'          | new MockLabelProduct(name: '  ')              || '  '
+        "integer zero"  | '${product.quantity:-none}'      | new MockLabelProduct(quantity: 0)             || '0'
+        "decimal zero"  | '${product.price:-none}'         | new MockLabelProduct(price: new BigDecimal('0.0')) || '0.0'
+        "false"         | '${product.coldChain:-none}'     | new MockLabelProduct(coldChain: false)        || 'false'
+        "a link value"  | '${product.category.name:-none}' | new MockLabelProduct(category: new MockCategory()) || 'Dressings'
+    }
+
+    void "without a default an empty value still prints nothing"() {
+        given:
+        Map bindings = [product: new MockLabelProduct(name: value)]
+
+        expect:
+        service.renderTemplateContents('^FD${product.name}^FS', "test", bindings) == '^FD^FS'
+
+        where:
+        value << [null, '']
+    }
+
+    @Unroll
+    void "the default applies when a link in the path is empty (#template)"() {
+        given:
+        Map bindings = [product: new MockLabelProduct(category: null, tags: null)]
+
+        expect:
+        service.renderTemplateContents(template, "test", bindings) == expected
+
+        where:
+        template                          || expected
+        '${product.category.name:-none}'  || 'none'
+        '${product.category.name:-}'      || ''
+        '${product.tags[0]:-no tag}'      || 'no tag'
+    }
+
+    void "the default applies when the label object was passed without a value"() {
+        given: "a product page passes no bin"
+        Map bindings = [product: new MockLabelProduct(name: 'Gauze'), location: null]
+
+        expect:
+        service.renderTemplateContents('${product.name}|${location.name:-no bin}|${location:-}', "test", bindings) == 'Gauze|no bin|'
+    }
+
+    void "a label object the page does not provide stays an error with a default"() {
+        given:
+        Map bindings = [product: new MockLabelProduct(name: 'Gauze')]
+
+        when:
+        service.renderTemplateContents('${location.name:-no bin}', "test", bindings)
+
+        then:
+        IllegalArgumentException e = thrown()
+        e.message.contains('location')
+        e.message.contains('not provided')
+    }
+
+    @Unroll
+    void "a default does not hide a template error (#reason)"() {
+        when:
+        service.renderTemplateContents(template, "test", bindings)
+
+        then:
+        Exception e = thrown()
+        expectedType.isInstance(e)
+        e.message.contains(expectedMessage)
+
+        where:
+        reason                                 | template                                  | bindings                                                  || expectedType                  | expectedMessage
+        "a property that does not exist"       | '${inventoryItem.lotNumber.bogus:-x}'     | [inventoryItem: new MockInventoryItem()]                  || NotReadablePropertyException  | 'bogus'
+        "an index past the end of a list"      | '${inventoryItem.product.tags[5]:-x}'     | [inventoryItem: new MockInventoryItem()]                  || InvalidPropertyException      | 'tags[5]'
+        "a blocked property"                   | '${location.class.name:-x}'               | [location: new MockLocation()]                            || IllegalArgumentException      | 'not allowed'
+        "a blocked property on an empty object" | '${location.class.name:-x}'              | [location: null]                                          || IllegalArgumentException      | 'not allowed'
+        "a blocked property after an empty link" | '${product.category.metaClass:-x}'      | [product: new MockLabelProduct()]                         || IllegalArgumentException      | 'not allowed'
+        "a blocked type"                       | '${location.unexpectedClassProperty:-x}'  | [location: new MockWithClassTypedProperty()]              || IllegalArgumentException      | 'blocked type'
+        "an expression"                        | '${7*7:-x}'                               | [location: new MockLocation()]                            || IllegalArgumentException      | '7*7'
+        "safe navigation"                      | '${location?.name:-x}'                    | [location: null]                                          || IllegalArgumentException      | 'location?'
+    }
+
+    void "the property path is trimmed and the default is taken as written"() {
+        given:
+        Map bindings = [product: new MockLabelProduct(name: null)]
+
+        expect:
+        service.renderTemplateContents('[${ product.name :-x}][${product.name:- x }]', "test", bindings) == '[x][ x ]'
+    }
+
+    void "a default containing :- keeps everything after the first :-"() {
+        given:
+        Map bindings = [product: new MockLabelProduct(name: null)]
+
+        expect:
+        service.renderTemplateContents('${product.name:-x:-y}', "test", bindings) == 'x:-y'
+    }
+
+    void "a default containing a placeholder is inserted literally, never resolved"() {
+        given:
+        Map bindings = [product: new MockLabelProduct(name: null), location: new MockLocation()]
+
+        expect:
+        service.renderTemplateContents('${product.name:-see ${location.name}}', "test", bindings) == 'see ${location.name}'
+    }
+
+    void "a default with dollar signs is printed as written"() {
+        given:
+        Map bindings = [product: new MockLabelProduct(name: null)]
+
+        expect:
+        service.renderTemplateContents('${product.name:-$5 $$ ${x}', "test", bindings) == '$5 $$ ${x'
+    }
+
+    void "the escape keeps a placeholder with a default literal"() {
+        given:
+        Map bindings = [product: new MockLabelProduct(name: null)]
+
+        expect:
+        service.renderTemplateContents('$${product.name:-x}', "test", bindings) == '${product.name:-x}'
+    }
+
+    @Unroll
+    void "the bundled #template template carries no default and renders exactly as before"() {
+        given:
+        String contents = BeanPropertyTemplateServiceSpec.getResource("/templates/zpl-boarcodes-templates/${template}.zpl").text
+
+        expect:
+        !contents.contains(':-')
+        service.renderTemplateContents(contents, template, [(template): model]) == contents.replace(placeholder, 'V-1')
+
+        where:
+        template           | placeholder                  | model
+        "product"          | '${product.productCode}'     | new MockProduct(productCode: 'V-1')
+        "container"        | '${container.name}'          | new MockLocation(name: 'V-1')
+        "internalLocation" | '${internalLocation.name}'   | new MockLocation(name: 'V-1')
     }
 }
