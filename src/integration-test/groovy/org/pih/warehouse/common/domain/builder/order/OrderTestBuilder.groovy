@@ -16,7 +16,6 @@ class OrderTestBuilder extends TestBuilder<Order> {
     protected Map<String, Object> getDefaults() {
         return [
                 name: randomUtil.randomStringFieldValue("Order"),
-                orderNumber: randomUtil.randomStringFieldValue("PO"),
                 orderType: OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name()),
                 orderedBy: User.findByUsername("admin"),
                 dateOrdered: new Date(),
@@ -25,11 +24,13 @@ class OrderTestBuilder extends TestBuilder<Order> {
 
     OrderTestBuilder origin(Location origin) {
         args.origin = origin
+        args.originParty = origin.organization
         return this
     }
 
     OrderTestBuilder destination(Location destination) {
         args.destination = destination
+        args.destinationParty = destination.organization
         return this
     }
 }

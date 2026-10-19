@@ -14,7 +14,6 @@ class OrderItemTestBuilder extends TestBuilder<OrderItem> {
     @Override
     protected Map<String, Object> getDefaults() {
         return [
-                quantity: 10,
                 quantityPerUom: 1,
                 unitPrice: 1,
         ] as Map<String, Object>

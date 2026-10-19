@@ -18,6 +18,7 @@ import org.pih.warehouse.common.domain.builder.shipping.ShipmentTestBuilder
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.PurchaseOrderIdentifierService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 
@@ -28,6 +29,9 @@ class CombinedShipmentItemApiSpec extends ApiSpec {
 
     @Autowired
     CombinedShipmentItemApiWrapper combinedShipmentItemApiWrapper
+
+    @Autowired
+    PurchaseOrderIdentifierService purchaseOrderIdentifierService
 
     @Shared
     Location supplier
@@ -48,7 +52,9 @@ class CombinedShipmentItemApiSpec extends ApiSpec {
     void setupData() {
         supplier = new LocationTestBuilder().name(randomUtil.randomStringFieldValue("Supplier")).asFacility().build(true)
         shipment = new ShipmentTestBuilder().origin(supplier).destination(facility).build(true)
-        order = new OrderTestBuilder().origin(supplier).destination(facility).build(true)
+        order = new OrderTestBuilder().origin(supplier).destination(facility).build()
+        order.orderNumber = purchaseOrderIdentifierService.generate(order)
+        order.save(failOnError: true)
         orderedProduct = new ProductTestBuilder().randomizedName().category(rootCategory).build(true)
         orderItem = new OrderItemTestBuilder().order(order).product(orderedProduct).quantity(10).build(true)
     }
