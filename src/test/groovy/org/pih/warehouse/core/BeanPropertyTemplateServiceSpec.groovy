@@ -603,6 +603,23 @@ class BeanPropertyTemplateServiceSpec extends Specification implements ServiceUn
         service.renderTemplateContents('${product.name}|${location.name:-no bin}|${location:-}', "test", bindings) == 'Gauze|no bin|'
     }
 
+    void "the properties of a label object passed without a value cannot be checked"() {
+        given: "the object's type is unknown when its value is null"
+        Map bindings = [location: null]
+
+        expect:
+        service.renderTemplateContents('${location.bogus:-no bin}', "test", bindings) == 'no bin'
+    }
+
+    void "without a default an empty label object is reported before a blocked property, as before"() {
+        when:
+        service.renderTemplateContents('${location.class.name}', "test", [location: null])
+
+        then:
+        IllegalArgumentException e = thrown()
+        e.message.contains("binding 'location' is null")
+    }
+
     void "a label object the page does not provide stays an error with a default"() {
         given:
         Map bindings = [product: new MockLabelProduct(name: 'Gauze')]
@@ -634,6 +651,10 @@ class BeanPropertyTemplateServiceSpec extends Specification implements ServiceUn
         "a blocked property on an empty object" | '${location.class.name:-x}'              | [location: null]                                          || IllegalArgumentException      | 'not allowed'
         "a blocked property after an empty link" | '${product.category.metaClass:-x}'      | [product: new MockLabelProduct()]                         || IllegalArgumentException      | 'not allowed'
         "a blocked type"                       | '${location.unexpectedClassProperty:-x}'  | [location: new MockWithClassTypedProperty()]              || IllegalArgumentException      | 'blocked type'
+        "a property that does not exist after an empty link" | '${product.category.bogus:-x}' | [product: new MockLabelProduct()]                 || NotReadablePropertyException  | 'bogus'
+        "a link that does not exist before an empty link" | '${product.bogus.name:-x}'     | [product: new MockLabelProduct()]                    || NotReadablePropertyException  | 'bogus'
+        "a non-numeric index after an empty link" | '${product.tags[x]:-d}'               | [product: new MockLabelProduct()]                        || InvalidPropertyException      | 'tags'
+        "a non-numeric index on an empty object" | '${location.tags[x]:-d}'               | [location: null]                                         || IllegalArgumentException      | 'is null'
         "an expression"                        | '${7*7:-x}'                               | [location: new MockLocation()]                            || IllegalArgumentException      | '7*7'
         "safe navigation"                      | '${location?.name:-x}'                    | [location: null]                                          || IllegalArgumentException      | 'location?'
     }
@@ -654,8 +675,8 @@ class BeanPropertyTemplateServiceSpec extends Specification implements ServiceUn
         service.renderTemplateContents('${product.name:-x:-y}', "test", bindings) == 'x:-y'
     }
 
-    void "a default containing a placeholder is inserted literally, never resolved"() {
-        given:
+    void "a placeholder started inside a default is printed as written, never resolved"() {
+        given: "the placeholder ends at the first }, so the default is 'see \${location.name' and the last } is template text"
         Map bindings = [product: new MockLabelProduct(name: null), location: new MockLocation()]
 
         expect:

@@ -11,10 +11,13 @@ package org.pih.warehouse.core
 
 import org.apache.commons.text.StringSubstitutor
 import org.apache.commons.text.lookup.StringLookup
+import org.springframework.beans.BeanUtils
 import org.springframework.beans.BeanWrapperImpl
 import org.springframework.beans.BeansException
+import org.springframework.beans.NotReadablePropertyException
 import org.springframework.beans.NullValueInNestedPathException
 
+import java.beans.PropertyDescriptor
 import java.security.ProtectionDomain
 
 /**
@@ -40,7 +43,9 @@ import java.security.ProtectionDomain
  *   empty text), when a link in the path is null, or when the binding was passed
  *   with a null value. ${name.property:-} prints nothing in those cases. Numbers,
  *   booleans and blank text are values. A binding that was not passed at all, and
- *   every other error below, stays an error with or without a default. The default
+ *   every other error below, stays an error with or without a default; after a null
+ *   link the rest of the path is checked against the declared property types, but
+ *   when the binding itself is null its properties cannot be checked. The default
  *   is inserted as written (never resolved) and cannot contain '}'.
  * - If a variable resolves to a string that itself contains ${...}, nice try!
  *   Resolved values are escaped so they won't be re-interpreted as templates.
@@ -72,6 +77,10 @@ class BeanPropertyTemplateService {
 
     // separates a property path from its default value: ${name.property:-default}
     static final String DEFAULT_VALUE_SEPARATOR = ':-'
+
+    // a plain property path such as product.productCode or product.tags[0].name; a default
+    // stands in for an empty link or binding only on such a path
+    static final String PROPERTY_PATH = /[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*(\[[0-9]+\])?)*/
 
     /*
      * Currently this set is the maximum we'd want to support for Zebra
@@ -133,6 +142,8 @@ class BeanPropertyTemplateService {
         boolean hasDefault = separator >= 0
         String path = (hasDefault ? expression.substring(0, separator) : expression).trim()
         String defaultValue = hasDefault ? expression.substring(separator + DEFAULT_VALUE_SEPARATOR.length()) : null
+        // the default may stand in for an empty link or binding (instead of an error) only on a plain path
+        boolean defaultForEmptyLink = hasDefault && path ==~ PROPERTY_PATH
 
         String[] segments = path.split('\\.')
         String rootKey = segments[0]
@@ -140,6 +151,10 @@ class BeanPropertyTemplateService {
         if (!bindings.containsKey(rootKey)) {
             throw new IllegalArgumentException(
                 "Template expression '\${${expression}}': '${rootKey}' was not provided as a binding")
+        }
+        if (bindings.get(rootKey) == null && !defaultForEmptyLink) {
+            throw new IllegalArgumentException(
+                "Template expression '\${${expression}}': binding '${rootKey}' is null")
         }
 
         for (String segment : segments) {
@@ -154,11 +169,8 @@ class BeanPropertyTemplateService {
 
         Object root = bindings.get(rootKey)
         if (root == null) {
-            if (hasDefault) {
-                return defaultValue
-            }
-            throw new IllegalArgumentException(
-                "Template expression '\${${expression}}': binding '${rootKey}' is null")
+            // the binding was passed without a value, so the type its properties would have is unknown
+            return defaultValue
         }
 
         Object result = root
@@ -171,7 +183,8 @@ class BeanPropertyTemplateService {
                 // for an indexed link (tags[0]) Spring wraps it in an InvalidPropertyException
                 boolean nullLink = e instanceof NullValueInNestedPathException ||
                     e.cause instanceof NullValueInNestedPathException
-                if (hasDefault && nullLink) {
+                if (defaultForEmptyLink && nullLink) {
+                    checkReadable(root.getClass(), segments[1..-1])
                     return defaultValue
                 }
                 throw e
@@ -190,5 +203,24 @@ class BeanPropertyTemplateService {
         }
         // escape ${ so StringSubstitutor won't re-interpret resolved values as expressions
         return value.replaceAll(/(?<!\$)\$\{/, '\\$\\${')
+    }
+
+    /*
+     * Throws NotReadablePropertyException when the path names a property its declared types do
+     * not have, so a default never hides a misspelt property behind an empty link. Stops at an
+     * indexed segment or an untyped (Object) property, whose contents cannot be known.
+     */
+    private static void checkReadable(Class type, List<String> segments) {
+        for (String segment : segments) {
+            String propertyName = segment.replaceFirst('\\[.*', '')
+            PropertyDescriptor descriptor = BeanUtils.getPropertyDescriptor(type, propertyName)
+            if (descriptor?.readMethod == null) {
+                throw new NotReadablePropertyException(type, propertyName)
+            }
+            if (segment.contains('[') || descriptor.propertyType == Object) {
+                return
+            }
+            type = descriptor.propertyType
+        }
     }
 }

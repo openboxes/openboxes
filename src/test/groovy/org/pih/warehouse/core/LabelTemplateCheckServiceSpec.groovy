@@ -143,6 +143,7 @@ class LabelTemplateCheckServiceSpec extends Specification implements ServiceUnit
         "no bin passed"                 | '${location.name:-no bin}'     | [location: null]                                   || true         | true            | 'no bin'
         "a product without a category"  | '${product.category.name:-}'   | [product: new Product(productCode: "AB123")]       || true         | true            | ''
         "a name that is not allowed"    | '${shipment.name:-x}'          | [product: new Product(productCode: "AB123")]       || false        | false           | null
+        "an index that is not a number" | '${product.tags[x]:-}'         | [product: new Product(productCode: "AB123")]       || false        | false           | null
         // known difference: the check cannot know which values a print request provides,
         // so a template reading a value the page does not pass fails only when printed
         "no container passed"           | '${container.name:-}'          | [product: new Product(productCode: "AB123")]       || true         | false           | null
