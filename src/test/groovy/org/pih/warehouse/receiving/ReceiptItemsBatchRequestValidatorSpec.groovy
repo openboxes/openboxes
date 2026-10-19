@@ -4,6 +4,7 @@ import grails.testing.gorm.DataTest
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.validation.ObjectValidationResult
@@ -18,6 +19,95 @@ class ReceiptItemsBatchRequestValidatorSpec extends Specification implements Dat
 
     void setupSpec() {
         mockDomains(Receipt, ReceiptItem, Product, Shipment, ShipmentItem, Location)
+    }
+
+    void cleanup() {
+        // The current location lives in a static thread-local; clear it so it does not leak into
+        // whatever spec runs next on this thread.
+        new AuthService().setCurrentLocation(null)
+    }
+
+    void 'doValidate should reject editing a receipt when #scenario'() {
+        given: 'a pending receipt on a shipment received into a destination'
+        Location destination = saveLocation("Destination")
+        Location currentLocation = currentLocationName ? saveLocation(currentLocationName) : null
+        Receipt receipt = buildPendingReceipt()
+        receipt.shipment = new Shipment(destination: destination)
+
+        and:
+        new AuthService().setCurrentLocation(currentLocation)
+
+        when:
+        ObjectValidationResult result = validator.doValidate(new ReceiptItemsBatchRequest(receipt: receipt))
+
+        then:
+        assert !result.valid
+        assert result.errors*.code == ["receiptItemsBatchRequest.receipt.isDifferentLocation"]
+
+        where:
+        scenario                                 | currentLocationName
+        'logged in at another location'          | "Other location"
+        'no location is selected in the session' | null
+    }
+
+    void 'doValidate should accept editing a receipt when logged in at the destination of its shipment'() {
+        given:
+        Location destination = saveLocation("Destination")
+        Receipt receipt = buildPendingReceipt()
+        receipt.shipment = new Shipment(destination: destination)
+
+        and:
+        new AuthService().setCurrentLocation(destination)
+
+        expect:
+        assert validator.doValidate(new ReceiptItemsBatchRequest(receipt: receipt)).valid
+    }
+
+    void 'doValidate should reject saving items into a bin location of another location, once per bin location'() {
+        given: 'a pending receipt on a shipment received into the destination the user is logged in at'
+        Location destination = saveLocation("Destination")
+        Receipt receipt = buildPendingReceipt()
+        receipt.shipment = new Shipment(destination: destination)
+        new AuthService().setCurrentLocation(destination)
+
+        and: 'a bin of the destination and a bin of another location'
+        Location destinationBin = saveBinLocation("Destination bin", destination)
+        Location foreignBin = saveBinLocation("Foreign bin", saveLocation("Other location"))
+
+        when: 'two lines are saved into the foreign bin and one into the bin of the destination'
+        ObjectValidationResult result = validator.doValidate(new ReceiptItemsBatchRequest(
+                receipt: receipt,
+                itemsToSave: [
+                        buildUpsertRequest(null, foreignBin),
+                        buildUpsertRequest(null, foreignBin),
+                        buildUpsertRequest(null, destinationBin),
+                ],
+        ))
+
+        then: 'only the foreign bin is rejected, and only once'
+        assert !result.valid
+        assert result.errors*.code == ["receiptItemsBatchRequest.itemsToSave.binLocationNotAtDestination"]
+        assert result.errors.first().arguments == ["Foreign bin"] as Object[]
+    }
+
+    void 'doValidate should accept saving items into a bin location of the destination or without a bin location'() {
+        given:
+        Location destination = saveLocation("Destination")
+        Receipt receipt = buildPendingReceipt()
+        receipt.shipment = new Shipment(destination: destination)
+        new AuthService().setCurrentLocation(destination)
+
+        when:
+        ObjectValidationResult result = validator.doValidate(new ReceiptItemsBatchRequest(
+                receipt: receipt,
+                itemsToSave: [
+                        buildUpsertRequest(null, saveBinLocation("Destination bin", destination)),
+                        buildUpsertRequest(null),
+                ],
+        ))
+
+        then:
+        assert result.valid
     }
 
     void 'doValidate should reject deleting an original item'() {
@@ -176,5 +266,21 @@ class ReceiptItemsBatchRequestValidatorSpec extends Specification implements Dat
                 quantityReceiving: 5,
                 binLocation: binLocation,
         )
+    }
+
+    /**
+     * Persists a location so that it carries an id, which is what the current location and the parent location of
+     * a bin location are compared by.
+     */
+    private static Location saveLocation(String name) {
+        Location location = new Location(name: name)
+        location.save(validate: false, flush: true)
+        return location
+    }
+
+    private static Location saveBinLocation(String name, Location parentLocation) {
+        Location binLocation = new Location(name: name, parentLocation: parentLocation)
+        binLocation.save(validate: false, flush: true)
+        return binLocation
     }
 }

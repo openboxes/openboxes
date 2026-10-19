@@ -1,6 +1,7 @@
 package org.pih.warehouse.receiving
 
 import grails.testing.gorm.DataTest
+import grails.validation.ValidationException
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -42,12 +43,36 @@ class ShipmentForReceiptValidatorSpec extends Specification implements DataTest 
     void 'doValidate should pass for a #shipmentStatus shipment with something left to receive'() {
         given:
         Shipment shipment = buildShipment([buildShipmentItem(100)], shipmentStatus)
+        new AuthService().setCurrentLocation(shipment.destination)
 
         expect:
         validator.doValidate(shipment).valid
 
         where:
         shipmentStatus << [ShipmentStatusCode.SHIPPED, ShipmentStatusCode.PARTIALLY_RECEIVED]
+    }
+
+    void 'doValidate should reject starting a receipt when #scenario'() {
+        given: 'a saved destination, so that the check compares persisted ids and not two nulls'
+        Shipment shipment = buildShipment([buildShipmentItem(100)])
+        assert shipment.destination.id
+
+        and:
+        Location currentLocation = currentLocationName ? new Location(name: currentLocationName) : null
+        currentLocation?.save(validate: false, flush: true)
+        new AuthService().setCurrentLocation(currentLocation)
+
+        when:
+        ObjectValidationResult result = validator.doValidate(shipment)
+
+        then:
+        assert !result.valid
+        assert result.errors*.code == ["stockMovement.startReceipt.isDifferentLocation.message"]
+
+        where:
+        scenario                                 | currentLocationName
+        'logged in at another location'          | "Other location"
+        'no location is selected in the session' | null
     }
 
     void 'doValidate should reject a shipment that already carries a pending receipt'() {
@@ -197,6 +222,43 @@ class ShipmentForReceiptValidatorSpec extends Specification implements DataTest 
         then:
         assert !result.valid
         assert result.errors.first().code == "stockMovement.rollbackLastReceipt.isDifferentLocation.message"
+    }
+
+    void 'validateForReceiptSync should pass at the destination of the shipment'() {
+        given:
+        Shipment shipment = buildShipment([buildShipmentItem(100)])
+        assert shipment.destination.id
+        new AuthService().setCurrentLocation(shipment.destination)
+
+        when:
+        validator.validateForReceiptSync(shipment)
+
+        then:
+        notThrown(ValidationException)
+    }
+
+    void 'validateForReceiptSync should reject syncing the receipt lines when #scenario'() {
+        given: 'a saved destination, so that the check compares persisted ids and not two nulls'
+        Shipment shipment = buildShipment([buildShipmentItem(100)])
+        assert shipment.destination.id
+
+        and:
+        Location currentLocation = currentLocationName ? new Location(name: currentLocationName) : null
+        currentLocation?.save(validate: false, flush: true)
+        new AuthService().setCurrentLocation(currentLocation)
+
+        when:
+        validator.validateForReceiptSync(shipment)
+
+        then:
+        ValidationException e = thrown(ValidationException)
+        assert e.errors.allErrors*.code == ["stockMovement.syncReceiptLines.isDifferentLocation.message"]
+        assert e.errors.getFieldError("destination")
+
+        where:
+        scenario                                 | currentLocationName
+        'logged in at another location'          | "Other location"
+        'no location is selected in the session' | null
     }
 
     private static Shipment buildShipment(
