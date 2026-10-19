@@ -31,8 +31,8 @@ class RequisitionEventService {
                 webhookPublisherService.publishRequisitionEvent(requisition, event.eventType)
                 break
             case WebhookEventType.PICK_COMPLETED:
+                // Used internally only, pick.completed is not sent as a webhook
                 scheduleAutomaticReplenishment(requisition)
-                webhookPublisherService.publishRequisitionEvent(requisition, event.eventType)
                 break
             case WebhookEventType.REQUISITION_CREATED:
                 webhookPublisherService.publishRequisitionEvent(requisition, event.eventType)
