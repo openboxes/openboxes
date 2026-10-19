@@ -56,6 +56,7 @@ class BeanPropertyTemplateServiceSpec extends Specification implements ServiceUn
         MockNamed supplier
         def untyped
         List rawList
+        Queue<MockCategory> queue
     }
 
     // we should block properties of type Class, not just properties named 'class'
@@ -725,6 +726,8 @@ class BeanPropertyTemplateServiceSpec extends Specification implements ServiceUn
         "a blocked type after an empty link"   | '${product.category.kind:-x}'             | [product: new MockLabelProduct()]                        || NullValueInNestedPathException | 'category'
         "a property after an empty link deeper in the path" | '${product.supplier.group.bogus:-x}' | [product: new MockLabelProduct(supplier: new MockSupplier())] || NullValueInNestedPathException | 'group'
         "an index on a property that is not a list" | '${product.category[0]:-x}'      | [product: new MockLabelProduct()]                        || InvalidPropertyException      | 'category'
+        "an index too large to read"           | '${product.groups[99999999999].name:-x}' | [product: new MockLabelProduct()]                       || InvalidPropertyException      | 'groups'
+        "an index on a collection that cannot be indexed" | '${product.queue[0].name:-x}'  | [product: new MockLabelProduct()]                        || InvalidPropertyException      | 'queue'
         "an untyped link that is empty"        | '${product.untyped.name:-x}'              | [product: new MockLabelProduct()]                        || NullValueInNestedPathException | 'untyped'
         "an empty link in a raw list"          | '${product.rawList[0].name:-x}'           | [product: new MockLabelProduct()]                        || InvalidPropertyException      | 'rawList'
         "a non-numeric index after an empty link" | '${product.tags[x]:-d}'               | [product: new MockLabelProduct()]                        || InvalidPropertyException      | 'tags'

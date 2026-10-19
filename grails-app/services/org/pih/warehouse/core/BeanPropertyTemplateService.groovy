@@ -214,9 +214,10 @@ class BeanPropertyTemplateService {
      * never hides a template error behind an empty link. Follows the actual values up to the
      * null link and the declared property types after it (with their generic arguments, and the
      * element type for indexed segments). Answers false when a declared type does not have the
-     * property, is a blocked type, cannot be indexed, or cannot tell (Object, a raw collection,
-     * a map), and when the check itself fails; the null link then stays an error, as it is
-     * without a default. Reads each getter before the null link once more, as the renderer did.
+     * property, is a blocked type or cannot be indexed, when an index is not an int, when a type
+     * cannot tell (Object, a raw collection, a map), and when the check itself fails; the null
+     * link then stays an error, as it is without a default. Reads each getter before the null
+     * link once more, as the renderer did.
      */
     private static boolean isReadableBehindEmptyLink(Object root, List<String> segments) {
         try {
@@ -236,9 +237,12 @@ class BeanPropertyTemplateService {
                 ResolvableType ownerType = type.resolve() == owner ? type : ResolvableType.forClass(owner)
                 type = ResolvableType.forMethodParameter(new MethodParameter(descriptor.readMethod, -1), ownerType)
                 if (segment.contains('[')) {
+                    // an index the renderer can read: an int, on an array, a List or a Set
+                    Integer.parseInt(segment.substring(segment.indexOf('[') + 1, segment.indexOf(']')))
+                    Class indexed = type.resolve()
                     if (type.isArray()) {
                         type = type.getComponentType()
-                    } else if (type.resolve() != null && Collection.isAssignableFrom(type.resolve())) {
+                    } else if (indexed != null && (List.isAssignableFrom(indexed) || Set.isAssignableFrom(indexed))) {
                         type = type.asCollection().getGeneric(0)
                     } else {
                         return false
