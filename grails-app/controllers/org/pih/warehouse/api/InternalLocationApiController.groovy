@@ -15,6 +15,7 @@ import grails.gorm.transactions.Transactional
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.LabelPreviewDisabledException
 import org.pih.warehouse.core.LabelTemplateException
 import org.pih.warehouse.core.InternalLocationSearchCommand
 import org.pih.warehouse.core.Location
@@ -99,6 +100,10 @@ class InternalLocationApiController {
             image = zebraService.renderDocument(document, [internalLocation: internalLocation])
         } catch (LabelTemplateException e) {
             renderLabelTemplateError(e)
+            return
+        } catch (LabelPreviewDisabledException e) {
+            response.status = 503
+            render([errorCode: 503, errorMessage: e.message] as JSON)
             return
         }
         response.contentType = "image/png"

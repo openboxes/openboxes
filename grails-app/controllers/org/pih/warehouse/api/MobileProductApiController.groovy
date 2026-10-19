@@ -15,6 +15,7 @@ import grails.core.GrailsApplication
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.LabelPreviewDisabledException
 import org.pih.warehouse.core.LabelTemplateException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.UserService
@@ -97,6 +98,10 @@ class MobileProductApiController extends BaseDomainApiController {
             image = zebraService.renderDocument(document, [product:product])
         } catch (LabelTemplateException e) {
             renderLabelTemplateError(e)
+            return
+        } catch (LabelPreviewDisabledException e) {
+            response.status = 503
+            render([errorCode: 503, errorMessage: e.message] as JSON)
             return
         }
         response.contentType = "image/png"

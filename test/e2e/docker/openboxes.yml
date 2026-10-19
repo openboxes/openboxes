@@ -34,6 +34,8 @@ openboxes:
             port: 9100
         labelaryApi:
             url: "http://labelstub:8081/v1/printers/12dpmm/labels/2x1/0/"
+            documentPreviewUrl: "http://labelstub:8081/v1/printers/8dpmm/labels/3x2/0/"
+            viewerUrl: "http://labelstub:8081/viewer.html"
     locale:
         currencyApi:
             url: "http://127.0.0.1:9/%s"

@@ -108,4 +108,23 @@ class MobileProductApiControllerLabelSpec extends Specification implements Contr
         response.status == 400
         response.json.errorMessage.contains("Label template 'label'")
     }
+
+    void "renderLabel should answer 503 without a render request when label previews are turned off"() {
+        given:
+        params.id = labelSubjectId()
+        params.documentId = saveDocument(DocumentCode.ZEBRA_TEMPLATE).id
+        controller.zebraService.grailsApplication = grailsApplication
+        grailsApplication.config.openboxes.barcode.labelaryApi.enabled = false
+
+        when: "a render request would fail the test (see setup)"
+        controller.renderLabel()
+
+        then:
+        response.status == 503
+        response.json.errorCode == 503
+        response.json.errorMessage.contains("Label previews are turned off")
+
+        cleanup:
+        grailsApplication.config.openboxes.barcode.labelaryApi.enabled = true
+    }
 }
