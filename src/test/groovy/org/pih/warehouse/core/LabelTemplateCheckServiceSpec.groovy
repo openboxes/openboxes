@@ -122,7 +122,7 @@ class LabelTemplateCheckServiceSpec extends Specification implements ServiceUnit
     }
 
     @Unroll
-    void "findProblems and BeanPropertyTemplateService should agree on #template with #reason"() {
+    void "findProblems and BeanPropertyTemplateService on #template with #reason (they agree except where the check cannot know the values)"() {
         given:
         boolean renders
         String rendered = null

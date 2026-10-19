@@ -30,6 +30,17 @@ class BeanPropertyTemplateServiceSpec extends Specification implements ServiceUn
 
     static class MockCategory {
         String name = "Dressings"
+        Class kind = String
+    }
+
+    static interface MockNamed {
+        String getName()
+    }
+
+    // its group is not on the MockNamed interface it is declared as
+    static class MockSupplier implements MockNamed {
+        String name = "Supplier"
+        MockCategory group
     }
 
     // a product with optional values of several types, for the default value features
@@ -40,6 +51,11 @@ class BeanPropertyTemplateServiceSpec extends Specification implements ServiceUn
         BigDecimal price
         Boolean coldChain
         List<String> tags
+        List<MockCategory> groups
+        MockCategory[] groupArray
+        MockNamed supplier
+        def untyped
+        List rawList
     }
 
     // we should block properties of type Class, not just properties named 'class'
@@ -593,6 +609,17 @@ class BeanPropertyTemplateServiceSpec extends Specification implements ServiceUn
         '${product.category.name:-none}'  || 'none'
         '${product.category.name:-}'      || ''
         '${product.tags[0]:-no tag}'      || 'no tag'
+        '${product.groups[0].name:-none}' || 'none'
+        '${product.groupArray[0].name:-none}' || 'none'
+        '${product.supplier.name:-none}'  || 'none'
+    }
+
+    void "after an empty link the path is checked on the actual values before it, not only the declared types"() {
+        given: "the supplier is declared as MockNamed, which has no group; the actual MockSupplier has one"
+        Map bindings = [product: new MockLabelProduct(supplier: new MockSupplier(group: null))]
+
+        expect:
+        service.renderTemplateContents('${product.supplier.group.name:-none}', "test", bindings) == 'none'
     }
 
     void "the default applies when the label object was passed without a value"() {
@@ -652,7 +679,14 @@ class BeanPropertyTemplateServiceSpec extends Specification implements ServiceUn
         "a blocked property after an empty link" | '${product.category.metaClass:-x}'      | [product: new MockLabelProduct()]                         || IllegalArgumentException      | 'not allowed'
         "a blocked type"                       | '${location.unexpectedClassProperty:-x}'  | [location: new MockWithClassTypedProperty()]              || IllegalArgumentException      | 'blocked type'
         "a property that does not exist after an empty link" | '${product.category.bogus:-x}' | [product: new MockLabelProduct()]                 || NotReadablePropertyException  | 'bogus'
-        "a link that does not exist before an empty link" | '${product.bogus.name:-x}'     | [product: new MockLabelProduct()]                    || NotReadablePropertyException  | 'bogus'
+        "a property after an empty indexed link" | '${product.groups[0].bogus:-x}'     | [product: new MockLabelProduct()]                        || NotReadablePropertyException  | 'bogus'
+        "a property after an empty array link" | '${product.groupArray[0].bogus:-x}'     | [product: new MockLabelProduct()]                        || NotReadablePropertyException  | 'bogus'
+        "a property after an empty interface link" | '${product.supplier.bogus:-x}'       | [product: new MockLabelProduct()]                        || NotReadablePropertyException  | 'bogus'
+        "a blocked type after an empty link"   | '${product.category.kind:-x}'             | [product: new MockLabelProduct()]                        || IllegalArgumentException      | 'blocked type'
+        "a blocked property name after an empty indexed link" | '${product.groups[0].class:-x}' | [product: new MockLabelProduct()]                  || IllegalArgumentException      | 'not allowed'
+        "an untyped link that is empty"        | '${product.untyped.name:-x}'              | [product: new MockLabelProduct()]                        || NullValueInNestedPathException | 'untyped'
+        "an empty link in a raw list"          | '${product.rawList[0].name:-x}'           | [product: new MockLabelProduct()]                        || InvalidPropertyException      | 'rawList'
+        "a property after an empty link deeper in the path" | '${product.supplier.group.bogus:-x}' | [product: new MockLabelProduct(supplier: new MockSupplier())] || NotReadablePropertyException | 'bogus'
         "a non-numeric index after an empty link" | '${product.tags[x]:-d}'               | [product: new MockLabelProduct()]                        || InvalidPropertyException      | 'tags'
         "a non-numeric index on an empty object" | '${location.tags[x]:-d}'               | [location: null]                                         || IllegalArgumentException      | 'is null'
         "an expression"                        | '${7*7:-x}'                               | [location: new MockLocation()]                            || IllegalArgumentException      | '7*7'

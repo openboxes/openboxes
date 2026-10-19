@@ -16,6 +16,7 @@ import org.springframework.beans.BeanWrapperImpl
 import org.springframework.beans.BeansException
 import org.springframework.beans.NotReadablePropertyException
 import org.springframework.beans.NullValueInNestedPathException
+import org.springframework.core.ResolvableType
 
 import java.beans.PropertyDescriptor
 import java.security.ProtectionDomain
@@ -43,9 +44,10 @@ import java.security.ProtectionDomain
  *   empty text), when a link in the path is null, or when the binding was passed
  *   with a null value. ${name.property:-} prints nothing in those cases. Numbers,
  *   booleans and blank text are values. A binding that was not passed at all, and
- *   every other error below, stays an error with or without a default; after a null
- *   link the rest of the path is checked against the declared property types, but
- *   when the binding itself is null its properties cannot be checked. The default
+ *   every other error below, stays an error with or without a default. After a null
+ *   link the default applies only when the rest of the path is readable on the
+ *   declared property types; where they cannot tell, the null link stays an error.
+ *   When the binding itself is null its properties cannot be checked. The default
  *   is inserted as written (never resolved) and cannot contain '}'.
  * - If a variable resolves to a string that itself contains ${...}, nice try!
  *   Resolved values are escaped so they won't be re-interpreted as templates.
@@ -183,8 +185,7 @@ class BeanPropertyTemplateService {
                 // for an indexed link (tags[0]) Spring wraps it in an InvalidPropertyException
                 boolean nullLink = e instanceof NullValueInNestedPathException ||
                     e.cause instanceof NullValueInNestedPathException
-                if (defaultForEmptyLink && nullLink) {
-                    checkReadable(root.getClass(), segments[1..-1])
+                if (defaultForEmptyLink && nullLink && isReadableBehindEmptyLink(expression, root, segments[1..-1])) {
                     return defaultValue
                 }
                 throw e
@@ -206,21 +207,42 @@ class BeanPropertyTemplateService {
     }
 
     /*
-     * Throws NotReadablePropertyException when the path names a property its declared types do
-     * not have, so a default never hides a misspelt property behind an empty link. Stops at an
-     * indexed segment or an untyped (Object) property, whose contents cannot be known.
+     * Whether the property path is readable although a link in it is null, so that a default
+     * never hides a template error behind an empty link. Follows the actual values up to the
+     * null link and the declared property types after it (generic element types for indexed
+     * segments). Throws for a property the declared type does not have or a blocked type;
+     * answers false when a declared type cannot tell (Object, a raw collection, a map), and
+     * the null link then stays an error, as it is without a default.
      */
-    private static void checkReadable(Class type, List<String> segments) {
+    private static boolean isReadableBehindEmptyLink(String expression, Object root, List<String> segments) {
+        Object current = root
+        ResolvableType type = ResolvableType.forClass(root.getClass())
         for (String segment : segments) {
             String propertyName = segment.replaceFirst('\\[.*', '')
-            PropertyDescriptor descriptor = BeanUtils.getPropertyDescriptor(type, propertyName)
+            Class owner = current != null ? current.getClass() : type.resolve()
+            if (owner == null || owner == Object) {
+                return false
+            }
+            PropertyDescriptor descriptor = BeanUtils.getPropertyDescriptor(owner, propertyName)
             if (descriptor?.readMethod == null) {
-                throw new NotReadablePropertyException(type, propertyName)
+                throw new NotReadablePropertyException(owner, propertyName)
             }
-            if (segment.contains('[') || descriptor.propertyType == Object) {
-                return
+            type = ResolvableType.forMethodReturnType(descriptor.readMethod, owner)
+            if (segment.contains('[')) {
+                type = type.isArray() ? type.getComponentType() : type.asCollection().getGeneric(0)
             }
-            type = descriptor.propertyType
+            Class resolved = type.resolve()
+            if (resolved != null && BLOCKED_TYPES.any { it.isAssignableFrom(resolved) }) {
+                throw new IllegalArgumentException(
+                    "Template expression '\${${expression}}': property '${propertyName}' has blocked type ${resolved.name}")
+            }
+            // up to the null link the path holds values (the renderer followed it that far)
+            if (current != null) {
+                Object propertyValue = new BeanWrapperImpl(current).getPropertyValue(propertyName)
+                current = propertyValue != null && segment.contains('[') ?
+                    new BeanWrapperImpl(current).getPropertyValue(segment) : propertyValue
+            }
         }
+        return true
     }
 }
