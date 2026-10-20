@@ -60,11 +60,7 @@ const EditLineItemModal = ({
     },
   );
 
-  const {
-    badge,
-    fields: detailsFields,
-    className: detailsClassName,
-  } = useShipmentItemDetails(lineItem);
+  const { badge, fields: detailsFields } = useShipmentItemDetails(lineItem);
 
   return (
     <Modal isOpen className="modal-content">
@@ -80,7 +76,7 @@ const EditLineItemModal = ({
           <ItemDetails
             badge={badge}
             fields={detailsFields}
-            className={`mt-3 ${detailsClassName}`}
+            className="mt-3"
           />
         </div>
         <ReceivedLineItemsTable
