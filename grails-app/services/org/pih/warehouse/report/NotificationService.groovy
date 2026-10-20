@@ -20,7 +20,6 @@ import grails.web.context.ServletContextHolder
 import org.grails.web.errors.GrailsWrappedRuntimeException
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptItem
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Person
@@ -28,6 +27,8 @@ import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.data.FileGenerationService
+import org.pih.warehouse.receiving.GoodsReceiptNoteDto
+import org.pih.warehouse.receiving.GoodsReceiptNoteService
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.Requisition
@@ -45,6 +46,7 @@ class NotificationService {
     MailService mailService
     GrailsApplication grailsApplication
     FileGenerationService fileGenerationService
+    GoodsReceiptNoteService goodsReceiptNoteService
     MessageLocalizer messageLocalizer
     def messageSource
 
@@ -206,6 +208,7 @@ class NotificationService {
 
     private void sendReceiptNotificationEmails(Shipment shipment, Person receivedBy, Map<Person, List> recipientItems) {
         EmailValidator emailValidator = EmailValidator.getInstance()
+        GoodsReceiptNoteDto goodsReceiptNote = goodsReceiptNoteService.buildGoodsReceiptNote(shipment)
         recipientItems.each { Person recipient, List items ->
             if (emailValidator.isValid(recipient?.email)) {
                 String subject = messageLocalizer.localize("email.yourItemReceived.message", shipment.destination.name, shipment.shipmentNumber)
@@ -216,8 +219,7 @@ class NotificationService {
                 String fileName = "GoodsReceiptNote-${shipment.shipmentNumber}.pdf"
 
                 byte[] goodsDeliveryNotePdf = fileGenerationService.generatePdfFromTemplate("/email/goodsDeliveryNote", [
-                        shipment: shipment,
-                        currentLocation: AuthService.currentLocation,
+                        goodsReceiptNote: goodsReceiptNote,
                         barcodeFileUri: barcodeFileUri
                 ])
 
