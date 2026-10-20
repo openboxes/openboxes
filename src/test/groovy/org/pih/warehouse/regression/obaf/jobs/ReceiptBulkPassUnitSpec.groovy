@@ -1,7 +1,6 @@
 package org.pih.warehouse.regression.obaf.jobs
 
 import grails.testing.gorm.DataTest
-import spock.lang.PendingFeature
 import spock.lang.Specification
 
 import org.pih.warehouse.auth.AuthService
@@ -46,7 +45,6 @@ class ReceiptBulkPassUnitSpec extends Specification implements DataTest {
         1 * receipts.reallocateBackorderedItems('second') >> null
     }
 
-    @PendingFeature(reason = 'ReceiptService.groovy:526 the catch block logs ${requisitionId}, a name not in scope: the MissingPropertyException thrown from the catch escapes, so one failing shipment aborts the bulk pass (and the job run) and later shipments are never received')
     void 'a failing shipment does not stop the next one from being received'() {
         given:
         authService.withSystemUser(_) >> { Closure c -> c.call() }
@@ -62,6 +60,8 @@ class ReceiptBulkPassUnitSpec extends Specification implements DataTest {
 
         then:
         failure == null
+        0 * receipts.reallocateBackorderedItems('first')
         1 * receipts.receiveInboundShipment(second) >> null
+        1 * receipts.reallocateBackorderedItems('second') >> null
     }
 }

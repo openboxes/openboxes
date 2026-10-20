@@ -20,7 +20,7 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
  * Receipt automation on a real database: ReceiptService.receiveInboundShipment (the
  * AutomaticReceiptJob single-shipment path and, with forceAutoReceipt, the manual "auto-receive"
  * button), createAutomaticReceipt / findReceivingLocation, and the bulk pass
- * receiveInboundShipments (its swallowed-error defect is pending in ReceiptBulkPassUnitSpec).
+ * receiveInboundShipments (its error isolation is covered in ReceiptBulkPassUnitSpec).
  *
  * Each receipt here runs with no current user bound, as on the job path once withSystemUser has
  * restored the (absent) job user (see InboundSortationIntegrationSpec for why that matters).
