@@ -8,7 +8,9 @@ import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.api.picking.SearchPickTaskCommand
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.history.EventLogCode
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RequisitionEvent
@@ -560,6 +562,66 @@ class PickTaskService {
         return true
     }
 
+    /**
+     * `.find` returns only the first picklist item that has an assignee, on the assumption that any item being
+     * assigned means the whole order is assigned to that same person. Unassign/reassign (below) act on this
+     * same assumption, clearing or overwriting the assignee on ALL picklist items at once.
+     *
+     * That assumption can currently be violated by the mobile app, which assigns one picklist item at a time
+     * and could let different items on the same order end up with different assignees. Unassign/reassign exist
+     * precisely to let an admin recover from that kind of stuck/inconsistent state from the web app.
+     */
+    Person getCurrentAssignee(Requisition requisition) {
+        return requisition?.picklist?.picklistItems?.find { PicklistItem item ->
+            item.assignee && (!item.status || item.status in [PickTaskStatus.PENDING.name(), PickTaskStatus.PICKING.name()])
+        }?.assignee
+    }
+
+    void unassign(Requisition requisition) {
+        validateAssignmentChangeAllowed(requisition)
+
+        Person previousAssignee = getCurrentAssignee(requisition)
+        if (!previousAssignee) {
+            return
+        }
+
+        requisition.picklist?.picklistItems?.each { PicklistItem item ->
+            if (item.assignee) {
+                item.assignee = null
+                item.dateAssigned = null
+                item.save(failOnError: true)
+            }
+        }
+
+        requisitionService.logRequisitionEvent(requisition.id, "Picker ${previousAssignee.name} was unassigned", EventLogCode.INFO_OCCURRED)
+    }
+
+    void reassign(Requisition requisition, String assigneeId) {
+        validateAssignmentChangeAllowed(requisition)
+
+        Person newAssignee = Person.get(assigneeId)
+        if (!newAssignee) {
+            throw new IllegalArgumentException("Assignee ${assigneeId} not found")
+        }
+
+        Person previousAssignee = getCurrentAssignee(requisition)
+        Date now = new Date()
+        requisition.picklist?.picklistItems?.each { PicklistItem item ->
+            item.assignee = newAssignee
+            item.dateAssigned = now
+            item.save(failOnError: true)
+        }
+
+        requisitionService.logRequisitionEvent(requisition.id,
+                "Picker was reassigned from ${previousAssignee?.name ?: 'Unassigned'} to ${newAssignee.name}", EventLogCode.INFO_OCCURRED)
+    }
+
+    private void validateAssignmentChangeAllowed(Requisition requisition) {
+        if (requisition.status >= RequisitionStatus.ISSUED) {
+            throw new IllegalStateException("Cannot change picker assignment for requisition with status: ${requisition.status}")
+        }
+    }
+
     private List<String> findRequisitionIdsForPicking(SearchPickTaskCommand command) {
         Integer ordersCount = command.ordersCount
         if (!ordersCount) {
@@ -600,11 +662,18 @@ class PickTaskService {
     }
 
     private List<String> findRequisitionIdsWithPickTaskAssigned(Location facility, List<PickTaskStatus> statusesToSearch) {
+        // A requisition assigned to the current mobile user should still be offered to them (e.g. after
+        // navigating back out of it), so only requisitions assigned to someone else are excluded here.
+        Person currentUser = AuthService.currentUser
+
         List<Requisition> requisitions = PickTask.createCriteria().list {
             projections {
                 distinct("requisition")
             }
             isNotNull("assignee")
+            if (currentUser) {
+                ne("assignee.id", currentUser.id)
+            }
             if (statusesToSearch) {
                 'in'("status", statusesToSearch)
             }

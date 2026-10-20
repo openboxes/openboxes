@@ -28,4 +28,10 @@ enum EventLogCode {
      *  The proper solution is a dedicated classification subtype on EventLog.
      */
     ERROR_OCCURRED,
+
+    /**
+     * Logs a non-error, informational system message. The message holds the details; event is always null
+     * since there is no corresponding {@link org.pih.warehouse.core.Event}.
+     */
+    INFO_OCCURRED,
 }

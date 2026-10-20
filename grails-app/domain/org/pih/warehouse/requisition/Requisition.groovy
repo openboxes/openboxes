@@ -591,16 +591,18 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
     }
 
     /**
-     * Whether the requisition needs manual intervention: its most recent EventLog is an ERROR_OCCURRED and it
-     * hasn't since reached a terminal success state (ISSUED). In practice this rests at CREATED (allocation
-     * failed, will retry) or PICKING (issuance failed, awaiting a person) - status itself keeps reflecting
-     * lifecycle state only, so this is derived rather than stored.
+     * Whether the requisition needs manual intervention: its most recent EventLog - ignoring purely
+     * informational entries (e.g. INFO_OCCURRED audit notes like a picker reassignment), which must never mask
+     * an unresolved error just by being more recent - is an ERROR_OCCURRED. In practice this rests at CREATED
+     * (allocation failed, will retry) or PICKING (issuance failed, awaiting a person) - status itself keeps
+     * reflecting lifecycle state only, so this is derived rather than stored.
      */
     Boolean isInErrorState() {
         if (!(status in [RequisitionStatus.CREATED, RequisitionStatus.PICKING])) {
             return false
         }
-        EventLog mostRecentEventLog = eventLogs?.max { it.dateCreated }
+        EventLog mostRecentEventLog = eventLogs?.findAll { it.eventLogCode != EventLogCode.INFO_OCCURRED }
+                ?.max { it.dateCreated }
         return mostRecentEventLog?.eventLogCode == EventLogCode.ERROR_OCCURRED
     }
 

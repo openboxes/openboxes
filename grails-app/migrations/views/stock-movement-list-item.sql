@@ -45,6 +45,7 @@ CREATE OR REPLACE VIEW stock_movement_list_item AS
             FROM requisition_event_log rel
                 INNER JOIN event_log el ON el.id = rel.event_log_id
             WHERE rel.requisition_id = r.id
+                AND el.event_log_code != 'INFO_OCCURRED'
             ORDER BY el.date_created DESC, el.id DESC
             LIMIT 1
         )
