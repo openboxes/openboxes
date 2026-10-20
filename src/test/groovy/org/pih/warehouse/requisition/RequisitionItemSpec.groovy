@@ -356,4 +356,36 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
         expect:
         true == domain.isSubstituted()
     }
+
+    void "RequisitionItem.findEffectiveItems() should return #expected for #scenario"() {
+        given:
+        domain.quantity = 10
+        domain.quantityCanceled = parentCanceled
+        if (replacementType) {
+            RequisitionItem replacement = new RequisitionItem(
+                    quantity: 5,
+                    quantityCanceled: replacementCanceled,
+                    requisitionItemType: replacementType
+            )
+            if (replacementType == RequisitionItemType.SUBSTITUTION) {
+                domain.substitutionItem = replacement
+            } else {
+                domain.modificationItem = replacement
+            }
+        }
+
+        expect:
+        domain.findEffectiveItems().collect {
+            it.is(domain) ? 'original' : 'replacement'
+        } == expected
+
+        where:
+        scenario                         | parentCanceled | replacementType                     | replacementCanceled || expected
+        'an active line'                 | 0              | null                                | null                || ['original']
+        'a canceled line'                | 10             | null                                | null                || []
+        'an active quantity revision'    | 10             | RequisitionItemType.QUANTITY_CHANGE | null                || ['replacement']
+        'a canceled quantity revision'   | 10             | RequisitionItemType.QUANTITY_CHANGE | 5                   || []
+        'an active substitution'         | 10             | RequisitionItemType.SUBSTITUTION    | null                || ['replacement']
+        'a canceled substitution'        | 10             | RequisitionItemType.SUBSTITUTION    | 5                   || []
+    }
 }
