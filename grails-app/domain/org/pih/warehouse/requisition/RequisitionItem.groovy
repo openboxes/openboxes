@@ -552,6 +552,29 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return isCanceled() || isSubstituted()
     }
 
+    /**
+     * The item itself, or the items that replaced it, leaving out any that are fully canceled. An empty
+     * list means the line has no demand left. A substitution is not carried any backorder recorded
+     * against the line it replaces: the product has usually changed, and even when it has not the
+     * substitution starts from its own quantity.
+     */
+    List<RequisitionItem> findEffectiveItems() {
+        if (isSubstituted()) {
+            // isSubstituted() also covers a substitution linked only through substitutionItem, in which
+            // case the typed child collection is empty
+            Collection<RequisitionItem> substitutions = substitutionItems ?: [substitutionItem].findAll()
+            return substitutions.collectMany { it.findEffectiveItems() }
+        }
+        if (modificationItem) {
+            return modificationItem.findEffectiveItems()
+        }
+        // Cancellation is all or nothing (cancelQuantity sets quantityCanceled to the full quantity), so
+        // a canceled line has no demand left. isCanceled() cannot be used here because it reports false
+        // while a backorder is still recorded against the item, and whenever the item has been replaced.
+        boolean isFullyCanceled = (quantityCanceled ?: 0) >= (quantity ?: 0)
+        return isFullyCanceled ? [] : [this]
+    }
+
 
     /**
      * @return true if the requisition is no longer in the reviewing stage and there are no changes
