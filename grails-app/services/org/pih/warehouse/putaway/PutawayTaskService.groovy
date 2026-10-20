@@ -611,10 +611,15 @@ class PutawayTaskService {
         Integer quantityOnHand = inventoryService.getQuantityFromBinLocation(task.facility, task.container, task.inventoryItem) ?: 0
 
         // Stock in the container that belongs to other tasks currently loaded into it
-        BigDecimal quantityLoadedByOtherTasks = PutawayTask.findAllByContainerAndInventoryItemAndStatus(
-                task.container, task.inventoryItem, PutawayTaskStatus.IN_PROGRESS)
-                .findAll { it.id != task.id }
-                .sum { it.quantity ?: 0 } ?: 0
+        BigDecimal quantityLoadedByOtherTasks = PutawayTask.createCriteria().get {
+            projections {
+                sum('quantity')
+            }
+            eq('container', task.container)
+            eq('inventoryItem', task.inventoryItem)
+            eq('status', PutawayTaskStatus.IN_PROGRESS)
+            ne('id', task.id)
+        } as BigDecimal ?: 0
 
         BigDecimal quantityRemaining = [quantityOnHand - quantityLoadedByOtherTasks, task.quantity].min()
         return quantityRemaining > 0 ? quantityRemaining.intValue() : 0
