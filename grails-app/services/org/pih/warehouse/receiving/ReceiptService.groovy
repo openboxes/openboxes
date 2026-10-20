@@ -523,7 +523,7 @@ class ReceiptService {
                     reallocateBackorderedItems(shipment.id)
                 }
             } catch (Exception e) {
-                log.error("Error processing requisition ${requisitionId}", e)
+                log.error("Error receiving inbound shipment ${shipment}", e)
             }
         }
     }
