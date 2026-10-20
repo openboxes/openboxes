@@ -26,7 +26,8 @@ class BulkDataWriterConfigValidator extends ObjectValidator<BulkDataWriterConfig
             return null
         }
 
-        Set<String> indexes = []
+        // Keyed on the resolved numerical index so that indexes like "A" and "0" are treated as duplicates.
+        Set<Integer> indexes = []
         List<String> duplicates = []
         boolean usingOrdinalIndexes = false
         for (field in fields) {
@@ -36,12 +37,19 @@ class BulkDataWriterConfigValidator extends ObjectValidator<BulkDataWriterConfig
 
             String columnIndex = field.columnIndex
             if (StringUtils.isNotBlank(columnIndex)) {
-                if (indexes.contains(columnIndex)) {
+                Integer resolvedIndex
+                try {
+                    resolvedIndex = field.resolveColumnIndex()
+                } catch (IllegalArgumentException e) {
+                    return rejectField("fields", e.message)
+                }
+
+                if (indexes.contains(resolvedIndex)) {
                     duplicates.add(columnIndex)
                     continue
                 }
 
-                indexes.add(columnIndex)
+                indexes.add(resolvedIndex)
                 continue
             }
 

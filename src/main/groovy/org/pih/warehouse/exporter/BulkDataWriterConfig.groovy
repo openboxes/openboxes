@@ -10,12 +10,6 @@ import org.pih.warehouse.core.validation.ObjectValidatable
 class BulkDataWriterConfig implements ObjectValidatable<BulkDataWriterConfigValidator> {
 
     /**
-     * Will be concatenated to construct the file name of the file being output.
-     * Only needed if we are writing to a file.
-     */
-    Collection<Object> fileNameArgs = []
-
-    /**
      * True if we should create a header row (constructed using the field config)
      */
     boolean addHeaderRow = true
@@ -29,7 +23,7 @@ class BulkDataWriterConfig implements ObjectValidatable<BulkDataWriterConfigVali
      * @return The field configurations, in the column order that they should be written to.
      */
     List<BulkDataWriterFieldConfig> getFieldConfigsInOrder() {
-        return isFieldConfigOrdinal() ? fields : fields.sort { it.columnIndex }
+        return isFieldConfigOrdinal() ? fields : fields.toSorted { it.resolveColumnIndex() }
     }
 
     private boolean isFieldConfigOrdinal() {

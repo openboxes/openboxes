@@ -10,7 +10,6 @@ import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
-import org.apache.poi.ss.util.CellReference
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
@@ -45,7 +44,7 @@ class ExcelReader extends BulkDataReader<ExcelReaderConfig> {
             // Required to be able to resolve any cells that contain a formula
             FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator()
 
-            Map<String, String> columnMapping = config.columnMapping
+            Map<Integer, String> columnMapping = BulkDataColumnIndex.toIntKeys(config.columnMapping)
             List<Map<String, BulkDataCell>> readRows = []
             for (Row row : sheet) {
                 if (row.rowNum < config.linesToSkip) {  // rowNum is zero-index based
@@ -55,7 +54,7 @@ class ExcelReader extends BulkDataReader<ExcelReaderConfig> {
                 Map<String, BulkDataCell> readRow = [:]
                 for (Cell cell : row) {
                     // Only bother importing cells whose columns are specified in the config
-                    String fieldName = getFieldName(cell, columnMapping)
+                    String fieldName = columnMapping.get(cell.columnIndex)
                     if (StringUtils.isBlank(fieldName)) {
                         continue
                     }
@@ -83,23 +82,14 @@ class ExcelReader extends BulkDataReader<ExcelReaderConfig> {
         }
     }
 
-    /**
-     * Extract the field name from the column mapping config for the given cell.
-     *
-     * We allow our columns in our mapping config to be represented as either zero-indexed numerical keys,
-     * or as letters (as they appear in Excel). Ex: The first column can be represented as "0" or "A".
-     */
-    private String getFieldName(Cell cell, Map<String, String> columnMapping) {
-        return columnMapping.get(cell.columnIndex) ?: columnMapping.get(getCellLetterIndex(cell))
-    }
-
     private Sheet getSheet(Workbook workbook, String sheetName) {
         if (workbook.numberOfSheets == 1) {
             return workbook.getSheetAt(0)
         }
 
         if (StringUtils.isBlank(sheetName)) {
-            throw new IllegalArgumentException("Excel file has multiple sheets. You must specify which sheet to use.")
+            throw new IllegalArgumentException(
+                    "Excel file has multiple sheets. You must specify which sheet to use or delete excess sheets.")
         }
 
         Sheet sheet = workbook.getSheet(sheetName)
@@ -107,10 +97,6 @@ class ExcelReader extends BulkDataReader<ExcelReaderConfig> {
             throw new IllegalArgumentException("Excel file does not contain a sheet with name ${sheetName}")
         }
         return sheet
-    }
-
-    private String getCellLetterIndex(Cell cell) {
-        return CellReference.convertNumToColString(cell.columnIndex)
     }
 
     private def getCellValue(Cell cell, FormulaEvaluator evaluator) {

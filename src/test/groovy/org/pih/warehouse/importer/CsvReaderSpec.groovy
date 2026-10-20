@@ -265,6 +265,90 @@ class CsvReaderSpec extends Specification {
         assert errors[0].localizedMessage == "import.reader.unexpectedNumberCells"
     }
 
+    void "read should error when a row is missing a mapped column"() {
+        given:
+        StringSource csvString = initStringSource(
+                "ABC,DEF\n" +
+                "GHI,JKL,MNO")
+
+        and: "a mapping with only two fields, but with a gap in the column indexes"
+        CsvReaderConfig config = new CsvReaderConfig(
+                delimiter: ",",
+                linesToSkip: 0,
+                columnMapping: [
+                        "0": "field1",
+                        "2": "field3",
+                ],
+        )
+
+        when:
+        BulkDataReaderResult result = reader.read(csvString, config)
+
+        then: "The rows should still be parsed successfully"
+        List<Map<String, BulkDataCell>> rows = result.rows
+        assert rows[0]["field1"].value == "ABC"
+        assert rows[0]["field3"] == null
+        assert rows[1]["field1"].value == "GHI"
+        assert rows[1]["field3"].value == "MNO"
+
+        and: "The first row errors because it is missing a column at index 2"
+        List<BulkDataError> errors = result.readErrors
+        assert errors.size() == 1
+        assert errors[0].row == 0
+        assert errors[0].localizedMessage == "import.reader.unexpectedNumberCells"
+    }
+
+    void "read should map columns using columnMapping keys #key1 and #key2"() {
+        given:
+        StringSource csvString = initStringSource("ABC,DEF")
+
+        and:
+        CsvReaderConfig config = new CsvReaderConfig(
+                delimiter: ",",
+                linesToSkip: 0,
+                columnMapping: [(key1): "field1", (key2): "field2"],
+        )
+
+        when:
+        BulkDataReaderResult result = reader.read(csvString, config)
+
+        then:
+        assert result.readErrors.empty
+        assert result.rows[0]["field1"].value == "ABC"
+        assert result.rows[0]["field2"].value == "DEF"
+
+        where:
+        key1 | key2
+        "0"  | "1"
+        "A"  | "B"
+        "a"  | "b"
+        "A"  | "1"
+    }
+
+    void "read should fail when columnMapping keys #key1 and #key2 refer to the same column"() {
+        given:
+        StringSource csvString = initStringSource("ABC,DEF")
+
+        and:
+        CsvReaderConfig config = new CsvReaderConfig(
+                delimiter: ",",
+                linesToSkip: 0,
+                columnMapping: [(key1): "field1", (key2): "field2"],
+        )
+
+        when:
+        reader.read(csvString, config)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        where:
+        key1 | key2
+        "A"  | "a"
+        "A"  | "0"
+        "b"  | "1"
+    }
+
     void "read should successfully work with delimiter: #delimiter"() {
         given:
         StringSource csvString = initStringSource("ABC${delimiter}DEF\nGHI${delimiter}JKL")
