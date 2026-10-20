@@ -3654,6 +3654,8 @@ class StockMovementService {
             throw new IllegalStateException("There are no shipments associated with stock movement ${requisition.requestNumber}")
         }
 
+        createMissingShipmentItems(requisition, shipment)
+
         // If synchronizeDateShipped is true, use the current date instead of the dateShipped from stockMovement,
         // which is expectedShippingDate from the past. Useful for setting the actual (current) issue date.
         Date dateShipped = stockMovement.dateShipped && !synchronizeDateShipped ? stockMovement.dateShipped : new Date()
