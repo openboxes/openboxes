@@ -8,7 +8,9 @@ import useReceivingForm from 'hooks/receiving/v2/useReceivingForm';
 
 import 'components/receivingV2/receiving.scss';
 
-const ReceivingStep = ({ flushRef, validateBeforeNextRef, setNextDisabled }) => {
+const ReceivingStep = ({
+  flushRef, validateBeforeNextRef, setNextDisabled, setNextValidationErrorsTooltip,
+}) => {
   const {
     view,
     setView,
@@ -18,7 +20,7 @@ const ReceivingStep = ({ flushRef, validateBeforeNextRef, setNextDisabled }) => 
     table: {
       lineItemsState, columns, sort, order, lineItemErrors,
     },
-    next: { isNextDisabled, validateBeforeNext },
+    next: { isNextDisabled, nextValidationErrorsTooltip, validateBeforeNext },
     actions: {
       loading,
       receiptId,
@@ -49,6 +51,10 @@ const ReceivingStep = ({ flushRef, validateBeforeNextRef, setNextDisabled }) => 
   useEffect(() => {
     setNextDisabled(isNextDisabled);
   }, [isNextDisabled]);
+
+  useEffect(() => {
+    setNextValidationErrorsTooltip(nextValidationErrorsTooltip);
+  }, [nextValidationErrorsTooltip]);
 
   return (
     <div className="receiving-container receiving-step" data-testid="receiving-step">
@@ -91,6 +97,8 @@ ReceivingStep.propTypes = {
   validateBeforeNextRef: PropTypes.shape({ current: PropTypes.func }).isRequired,
   // Reports to the wizard whether its Next button should be disabled.
   setNextDisabled: PropTypes.func.isRequired,
+  // Reports to the wizard the validation errors message for its disabled Next button
+  setNextValidationErrorsTooltip: PropTypes.func.isRequired,
 };
 
 export default ReceivingStep;

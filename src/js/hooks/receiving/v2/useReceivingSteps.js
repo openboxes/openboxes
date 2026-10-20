@@ -25,6 +25,8 @@ const ReceivingStepKey = {
  *   validateBeforeNextRef: Object,
  *   setNextDisabled: Function,
  *   isNextDisabled: boolean,
+ *   setNextValidationErrorsTooltip: Function,
+ *   nextValidationErrorsTooltip: string|null,
  *   completeReceiptRef: Object,
  *   isCheckStep: boolean,
  *   previous: Function,
@@ -37,6 +39,9 @@ const ReceivingStepKey = {
  *     the transition.
  *   `setNextDisabled` - lets the current step disable the Next button.
  *   `isNextDisabled` - whether the Next button is disabled.
+ *   `setNextValidationErrorsTooltip` - lets the current step explain its validation errors
+ *     on the disabled Next button.
+ *   `nextValidationErrorsTooltip` - the validation errors message, null when there are none.
  *   `completeReceiptRef` - filled by the check step with its complete receipt handler.
  *   `isCheckStep` - true on the check (last) step.
  *   `previous` - goes back to the receiving step.
@@ -50,6 +55,7 @@ const useReceivingSteps = () => {
   const validateBeforeNextRef = useRef(null);
   const completeReceiptRef = useRef(null);
   const [isNextDisabled, setNextDisabled] = useState(false);
+  const [nextValidationErrorsTooltip, setNextValidationErrorsTooltip] = useState(null);
 
   const steps = useMemo(() => [
     {
@@ -103,6 +109,8 @@ const useReceivingSteps = () => {
     validateBeforeNextRef,
     setNextDisabled,
     isNextDisabled,
+    setNextValidationErrorsTooltip,
+    nextValidationErrorsTooltip,
     completeReceiptRef,
     isCheckStep: is(ReceivingStepKey.CHECK),
     previous,
