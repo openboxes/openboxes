@@ -3,6 +3,7 @@ package org.pih.warehouse.receiving
 import org.springframework.stereotype.Component
 import org.springframework.validation.ObjectError
 
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.core.validation.ObjectValidator
@@ -13,13 +14,30 @@ class ReceiptItemsBatchRequestValidator extends ObjectValidator<ReceiptItemsBatc
     @Override
     protected ObjectValidationResult doValidate(ReceiptItemsBatchRequest request) {
         return new ObjectValidationResult(
+                validateCurrentLocationIsDestination(request),
                 validateReceiptIsPending(request),
                 validateItemsToSaveAreValid(request),
                 validateNoDuplicateItemsToSave(request),
                 validateBinLocationIsNotRemoved(request),
+                validateBinLocationsAtDestination(request),
                 validateItemsAreNotBothSavedAndDeleted(request),
                 validateItemsToDeleteAreNotOriginalItems(request),
         )
+    }
+
+    /**
+     * The receipt can only be edited by a user logged in at the destination of its shipment.
+     */
+    private ObjectError validateCurrentLocationIsDestination(ReceiptItemsBatchRequest request) {
+        if (!request.receipt) {
+            return null
+        }
+
+        if (request.receipt.shipment?.destination?.id == AuthService.currentLocation?.id) {
+            return null
+        }
+
+        return rejectField("receipt", request.receipt, "receiptItemsBatchRequest.receipt.isDifferentLocation")
     }
 
     /**
@@ -96,6 +114,28 @@ class ReceiptItemsBatchRequestValidator extends ObjectValidator<ReceiptItemsBatc
                 rejectField("itemsToSave", request.itemsToSave,
                         "receiptItemsBatchRequest.itemsToSave.binLocationRemoved", [itemIds.toString()]) :
                 null
+    }
+
+    /**
+     * Every bin location the receipt items are saved with must be a bin of the destination of the shipment, reported
+     * once per bin location.
+     */
+    private List<ObjectError> validateBinLocationsAtDestination(ReceiptItemsBatchRequest request) {
+        Location destination = request.receipt?.shipment?.destination
+        if (!destination) {
+            return null
+        }
+
+        return request.itemsToSave
+                .collect { ReceiptItemUpsertRequest item -> item.binLocation }
+                .findAll { Location binLocation ->
+                    binLocation != null && binLocation.parentLocation?.id != destination.id
+                }
+                .unique { Location binLocation -> binLocation.id }
+                .collect { Location binLocation ->
+                    rejectField("itemsToSave", request.itemsToSave,
+                            "receiptItemsBatchRequest.itemsToSave.binLocationNotAtDestination", [binLocation.name])
+                }
     }
 
     /**

@@ -133,6 +133,8 @@ class ReceiptV2Service {
             throw new ObjectNotFoundException(shipmentId, Shipment.toString())
         }
 
+        shipmentForReceiptValidator.validateForReceiptSync(shipment)
+
         Receipt receiptToSync = findPendingReceipt(shipment)
         if (!receiptToSync) {
             throw new ObjectNotFoundException(shipmentId, Receipt.toString())
