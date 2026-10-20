@@ -53,7 +53,7 @@ const matchesReceiptStatus = ({ shipmentItemRows, statusCodes }) => {
       case ShipmentItemReceiptStatus.RECEIVED_LESS_THAN_SHIPPED:
         // Some quantity entered but less than available to receive
         return quantityRemaining > 0
-          && currentRows.some((row) => row.quantityReceiving != null);
+          && currentRows.some((row) => row.quantityReceiving !== null);
       case ShipmentItemReceiptStatus.NO_QUANTITY_ENTERED:
         // Nothing entered is an empty quantity, not a zero one - a deliberate 0 counts as
         // entered, the same rule the quantity autofill skips such rows by.
