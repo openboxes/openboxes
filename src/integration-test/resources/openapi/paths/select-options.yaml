@@ -246,6 +246,21 @@
         $ref: ../components/responses.yaml#/Forbidden
       default:
         $ref: ../components/responses.yaml#/Error
+/api/priorityLevelOptions:
+  get:
+    operationId: selectOptionsApi_priorityLevelOptions
+    summary: selectOptionsApi.priorityLevelOptions
+    tags:
+    - Select Options
+    x-doc-status: stub
+    x-openboxes-controller: selectOptionsApi
+    x-openboxes-action: priorityLevelOptions
+    x-openboxes-source: explicit
+    responses:
+      '200':
+        $ref: ../components/responses.yaml#/StubSuccess
+      default:
+        $ref: ../components/responses.yaml#/Error
 /api/productGroupOptions:
   get:
     operationId: selectOptionsApi_productGroupOptions
