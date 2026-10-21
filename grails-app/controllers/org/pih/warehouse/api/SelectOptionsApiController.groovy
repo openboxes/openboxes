@@ -159,8 +159,12 @@ class SelectOptionsApiController {
 
     def priorityLevelOptions() {
         List priorityLevels = PriorityLevel.values().collect {
-            String label = g.message(code: "enum.PriorityLevel.${it.name()}", default: it.name())
-            [id: it.name(), value: it.name(), label: "${label} (${it.rangeLabel})"]
+            String label = g.message(
+                    code: "enum.PriorityLevel.${it.name()}.option",
+                    args: [it.minValue, it.maxValue],
+                    default: it.name()
+            )
+            [id: it.name(), value: it.name(), label: label]
         }
         render([data: priorityLevels] as JSON)
     }
