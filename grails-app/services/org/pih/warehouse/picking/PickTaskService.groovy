@@ -14,6 +14,9 @@ import org.pih.warehouse.core.history.EventLogCode
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RequisitionEvent
+import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.WebhookPublisherService
@@ -44,6 +47,7 @@ class PickTaskService {
     StockMovementService stockMovementService
     WebhookPublisherService webhookPublisherService
     RequisitionService requisitionService
+    UserService userService
 
     @Transactional(readOnly = true)
     List<PickTask> search(SearchPickTaskCommand command, Map params = [:]) {
@@ -193,26 +197,42 @@ class PickTaskService {
         return PickTask.get(id)
     }
 
-    PickTask patch(String id, Map data = [:]) {
+    /**
+     * The pick task, if it belongs to the facility (the facility in the request URL); null otherwise.
+     */
+    @Transactional(readOnly = true)
+    PickTask get(String id, Location facility) {
         PickTask task = get(id)
+        return task && facility && task.facility?.id == facility.id ? task : null
+    }
+
+    /**
+     * Applies an action to a pick task. When a facility is given (the facility in the request URL), a task of
+     * another facility is not found. The signed-in user is recorded as the picker; the assignee is the signed-in
+     * user unless assigneeId names someone else, which needs the admin role at the task's facility.
+     */
+    PickTask patch(String id, Map data = [:], Location facility = null) {
+        PickTask task = facility ? get(id, facility) : get(id)
 
         if (!task) {
             throw new ObjectNotFoundException(id, "Pick task ${id} was not found")
         }
 
+        String currentUserId = AuthService.currentUser?.id
+
         switch (data?.action) {
 
             case 'start':
-                start(task, data.assigneeId as String)
+                start(task, assigneeFor(task, data.assigneeId as String))
                 break
 
             case 'pick':
-                pick(task, data.outboundContainerId as String, data.pickedById as String)
+                pick(task, data.outboundContainerId as String, currentUserId)
                 break
 
             case 'short-pick':
                 shortPick(task, data.outboundContainerId as String, data.quantityPicked as Integer,
-                        data.pickedById as String, data.reasonCode as String)
+                        currentUserId, data.reasonCode as String)
                 break
 
             default:
@@ -224,6 +244,28 @@ class PickTaskService {
         }
 
         return task
+    }
+
+    /**
+     * The user to assign the task to: the signed-in user, unless the request names another user, which needs the
+     * admin role at the task's facility (the same role that reassigns the picker of an order).
+     */
+    private String assigneeFor(PickTask task, String requestedAssigneeId) {
+        User currentUser = AuthService.currentUser
+        if (!requestedAssigneeId || requestedAssigneeId == currentUser?.id) {
+            return currentUser?.id
+        }
+        String message = null
+        if (!userService.isUserInRoleAtLocation(currentUser, task.facility, RoleType.ROLE_ADMIN)) {
+            message = "Only an administrator can assign pick task ${task.id} to another user"
+        } else if (!User.get(requestedAssigneeId)) {
+            message = "User ${requestedAssigneeId} was not found"
+        }
+        if (message) {
+            task.errors.reject("assignee", message)
+            throw new ValidationException(message, task.errors)
+        }
+        return requestedAssigneeId
     }
 
     void start(PickTask task, String assigneeId) {
@@ -244,7 +286,7 @@ class PickTaskService {
     }
 
     void pick(PickTask task, String outboundContainerId, String pickedById) {
-        Location outboundContainer = Location.findByLocationNumberOrId(outboundContainerId, outboundContainerId)
+        Location outboundContainer = findInFacility(outboundContainerId, task.facility)
         validateOutboundContainer(outboundContainer, task)
 
         transferToContainer(task, outboundContainer, task.quantityRequired.toInteger())
@@ -262,7 +304,7 @@ class PickTaskService {
     void shortPick(PickTask task, String outboundContainerId, Integer quantityPicked, String pickedById, String reasonCode) {
         Location outboundContainer = null
         if (outboundContainerId != null) {
-            outboundContainer = Location.findByLocationNumberOrId(outboundContainerId, outboundContainerId)
+            outboundContainer = findInFacility(outboundContainerId, task.facility)
             validateOutboundContainer(outboundContainer, task)
         }
 
@@ -308,6 +350,13 @@ class PickTaskService {
             throw new IllegalStateException("Pick task ${task.id} has no associated requisition item")
         }
 
+        // The new bins must exist at the task's facility; check them all before anything is deleted
+        picklistItems.each { item ->
+            if (item.binLocation?.id && !findInFacility(item.binLocation.id as String, task.facility)) {
+                throw new IllegalArgumentException("Bin location ${item.binLocation.id} is not a location of facility ${task.facility?.name}")
+            }
+        }
+
         // Delete only the specific picklist item being reallocated (task.id === picklistItem.id)
         String locationId = null
         String productId = requisitionItem?.product?.id
@@ -335,7 +384,7 @@ class PickTaskService {
                     InventoryItem.get(item.inventoryItem.id) : null
 
             Location binLocation = item.binLocation?.id ?
-                    Location.get(item.binLocation.id) : null
+                    findInFacility(item.binLocation.id as String, task.facility) : null
 
             Integer quantityToPick = item.quantity ? new Integer(item.quantity) : null
 
@@ -361,11 +410,17 @@ class PickTaskService {
         if (!outboundContainer) {
             throw new IllegalArgumentException("Outbound container with identifier ${outboundContainerId} does not exist")
         }
+        return drop(outboundContainer, data)
+    }
 
+    /**
+     * Applies an action to an outbound container. The signed-in user is recorded as the user who staged it.
+     */
+    def drop(Location outboundContainer, Map data = [:]) {
         switch (data?.action) {
 
             case 'drop':
-                dropToStaging(outboundContainer, data.stagingLocationId as String, data.stagedById as String)
+                dropToStaging(outboundContainer, data.stagingLocationId as String, AuthService.currentUser?.id)
                 break
 
             default:
@@ -425,7 +480,7 @@ class PickTaskService {
     }
 
     void dropToStaging(Location outboundContainer, String stagingLocationId, String stagedById) {
-        Location stagingLocation = Location.findByLocationNumberOrId(stagingLocationId, stagingLocationId)
+        Location stagingLocation = findInFacility(stagingLocationId, outboundContainer.parentLocation)
         validateStagingLocation(stagingLocation)
 
         List<AvailableItem> itemsToMove = productAvailabilityService.getAvailableItems(outboundContainer)
@@ -620,6 +675,28 @@ class PickTaskService {
         if (requisition.status >= RequisitionStatus.ISSUED) {
             throw new IllegalStateException("Cannot change picker assignment for requisition with status: ${requisition.status}")
         }
+    }
+
+    /**
+     * The outbound container of the facility with this id or location number, or null.
+     */
+    @Transactional(readOnly = true)
+    Location findOutboundContainer(String outboundContainerId, Location facility) {
+        return findInFacility(outboundContainerId, facility)
+    }
+
+    /**
+     * The internal location of the facility with this id or location number, or null.
+     */
+    private Location findInFacility(String idOrNumber, Location facility) {
+        if (!idOrNumber || !facility) {
+            return null
+        }
+        Location location = Location.get(idOrNumber)
+        if (location?.parentLocation?.id == facility.id) {
+            return location
+        }
+        return Location.findByLocationNumberAndParentLocation(idOrNumber, facility)
     }
 
     private List<String> findRequisitionIdsForPicking(SearchPickTaskCommand command) {

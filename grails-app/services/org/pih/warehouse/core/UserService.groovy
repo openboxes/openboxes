@@ -416,6 +416,18 @@ class UserService {
         }
     }
 
+    /**
+     * Whether the user holds the given role, or a higher one, at the location: as a global role or as a role at
+     * that location. Unlike isUserInRole, it does not depend on the location the session is logged into.
+     */
+    boolean isUserInRoleAtLocation(User user, Location location, RoleType roleType) {
+        if (!user?.id || !location || !roleType) {
+            return false
+        }
+        Collection acceptedRoleTypes = RoleType.expand(roleType)
+        return getEffectiveRoles(User.get(user.id), location).any { Role role -> acceptedRoleTypes.contains(role.roleType) }
+    }
+
     boolean hasRoleFinance() {
         User user = authService.currentUser
         return hasRoleFinance(user)

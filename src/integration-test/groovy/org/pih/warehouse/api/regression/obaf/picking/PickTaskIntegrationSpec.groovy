@@ -83,10 +83,10 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         when: 'the first of two tasks is picked'
         Throwable e1 = pickPatch(o.taskIds[0], [action: 'pick', outboundContainerId: s.tote, pickedById: picker])
 
-        then:
+        then: 'the signed-in user is recorded as the picker, whatever pickedById says'
         e1 == null
         pickTask(o.taskIds[0]).subMap(['status', 'quantityPicked', 'outboundContainer', 'pickedBy']) ==
-                [status: 'PICKED', quantityPicked: 3, outboundContainer: 'TOTE', pickedBy: picker]
+                [status: 'PICKED', quantityPicked: 3, outboundContainer: 'TOTE', pickedBy: adminId()]
         onHand(s.dc, s.product) == [BIN: 17, ALT: 20, TOTE: 3]
         status(o.requisitionId) == RequisitionStatus.PICKING
 
@@ -100,7 +100,7 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         status(o.requisitionId) == RequisitionStatus.PICKED
     }
 
-    void 'pick: an unknown tote, or one that is not an outbound container, holds no stock or serves another delivery type, is refused'() {
+    void 'pick: an unknown tote, a tote of another facility, or one that is not an outbound container, holds no stock or serves another delivery type, is refused'() {
         given:
         PickSite s = pickSite('PT-PKW')
         PickOrder o = pickOrder(s, [2])
@@ -109,12 +109,13 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
                                                   org.pih.warehouse.core.ActivityCode.DELIVERY_TYPE_PICKUP], false)
         String noHold = bin(s.dc, 'TOTE-NH', [org.pih.warehouse.core.ActivityCode.OUTBOUND_CONTAINER,
                                                org.pih.warehouse.core.ActivityCode.DELIVERY_TYPE_LOCAL_DELIVERY], false)
+        String otherTote = pickSite('PT-PKW2').tote
 
         expect:
         pickPatch(o.taskIds[0], [action: 'pick', outboundContainerId: 'no-such-tote']).message.contains('does not exist')
-        // no container: findByLocationNumberOrId(null, null) matches some location without a number
-        // (Main Warehouse in the test data), refused only because it is not an outbound container
-        pickPatch(o.taskIds[0], [action: 'pick']).message.contains('does not support OUTBOUND_CONTAINER')
+        // no container, or a tote of another facility: there is no such tote at the task's facility
+        pickPatch(o.taskIds[0], [action: 'pick']).message.contains('does not exist')
+        pickPatch(o.taskIds[0], [action: 'pick', outboundContainerId: otherTote]).message.contains('does not exist')
         pickPatch(o.taskIds[0], [action: 'pick', outboundContainerId: s.alt]).message.contains('OUTBOUND_CONTAINER')
         pickPatch(o.taskIds[0], [action: 'pick', outboundContainerId: noHold]).message.contains('HOLD_STOCK')
         pickPatch(o.taskIds[0], [action: 'pick', outboundContainerId: wrongLane]).message.contains('DELIVERY_TYPE_LOCAL_DELIVERY')
@@ -400,9 +401,9 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         when:
         tx { pickTaskService.drop(s.tote, [action: 'drop', stagingLocationId: s.staging, stagedById: picker]) }
 
-        then:
+        then: 'the signed-in user is recorded as the user who staged them, whatever stagedById says'
         o.taskIds.collect { pickTask(it).subMap(['status', 'stagedBy']) } ==
-                [[status: 'STAGED', stagedBy: picker], [status: 'STAGED', stagedBy: picker]]
+                [[status: 'STAGED', stagedBy: adminId()], [status: 'STAGED', stagedBy: adminId()]]
         tx { PicklistItem.get(o.taskIds[0]).stagingLocation?.id } == s.staging
         onHand(s.dc, s.product) == [BIN: 13, ALT: 20, STAGE: 7]
         status(o.requisitionId) == RequisitionStatus.STAGED
