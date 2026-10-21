@@ -20,12 +20,24 @@ import org.springframework.web.filter.OncePerRequestFilter
  * reach the database before the commit - which shows up as intermittent "foreign key constraint fails" and
  * "unsaved transient instance" errors on entities created by the immediately preceding request.
  *
+ * The same happens without any writer: render(status: 204) with no body ends with response.flushBuffer(), which
+ * commits the headers, and a 204 (like a 205 or 304) has no body, so the client has the complete response the
+ * moment the headers arrive - before the transaction has committed. (A status-only 200 is sent chunked and the client
+ * waits for the terminal chunk; a status of 300 or more goes through sendError, which does not flush.)
+ *
  * What it does: the response is wrapped so that close() on the response writer (called by the converters) or on
  * the output stream (called by download actions) flushes what has been written and then discards any further
  * output, which is what the container does after a real close - but the container's own writer/stream is never
  * closed by application code. The container closes it itself when the request finishes, which is after the
  * controller action has returned and its transaction has completed. Status, headers and body bytes are still sent
  * when the action flushes them; only the end of the response moves.
+ *
+ * flushBuffer() on the response is ignored for the same reason: what it would send early (the headers of a response
+ * without a body) the container sends when the request finishes. Grails' respond() also calls flushBuffer() after its
+ * renderer has written and flushed the body, so ignoring it there changes nothing. A side effect that is intended:
+ * isCommitted() stays false until the request unwinds, so a commit that fails after a status-only render reaches the
+ * client as the error response instead of a status that was never true. A body that outgrows the response buffer is
+ * still sent (and the response committed) by the container as before.
  *
  * This class is not component-scanned (no stereotype annotation, and IntegrationSpecConfig only scans the api,
  * slice and smoke packages); IntegrationSpecConfig constructs it in a @Bean method. It lives in the integration
@@ -62,6 +74,15 @@ class DeferResponseCloseFilter extends OncePerRequestFilter {
                 outputStream = new DeferredCloseServletOutputStream(super.getOutputStream())
             }
             return outputStream
+        }
+
+        /**
+         * Deliberately does nothing: committing the response here would complete a bodiless response (a 204) for the
+         * client while the action's transaction is still open. The container flushes the buffer when the request
+         * finishes. See the class comment.
+         */
+        @Override
+        void flushBuffer() throws IOException {
         }
 
         /**
