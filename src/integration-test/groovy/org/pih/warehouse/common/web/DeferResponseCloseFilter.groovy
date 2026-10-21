@@ -32,12 +32,12 @@ import org.springframework.web.filter.OncePerRequestFilter
  * controller action has returned and its transaction has completed. Status, headers and body bytes are still sent
  * when the action flushes them; only the end of the response moves.
  *
- * flushBuffer() on the response is ignored for the same reason as long as the response has no body (neither
- * getWriter() nor getOutputStream() has been called): what it would send early, the headers of a bodiless response,
- * the container sends when the request finishes. Once a body has been started, flushBuffer() is passed on as before
- * (Grails' respond() calls it after its renderer has written the body). A side effect that is intended: a status-only
- * render leaves the response uncommitted until the request unwinds, so a commit that fails after it reaches the
- * client as the error response instead of a status that was never true.
+ * flushBuffer() on the response is ignored while the status is one the container sends without a body
+ * (204, 205, 304): what it would send early, the complete bodiless response, the container sends when the request
+ * finishes. For any other status flushBuffer() is passed on as before (Grails' respond() calls it after its renderer
+ * has written the body). A side effect that is intended: a bodiless status-only render leaves the response
+ * uncommitted until the request unwinds, so a commit that fails after it reaches the client as the error response
+ * instead of a status that was never true.
  *
  * This class is not component-scanned (no stereotype annotation, and IntegrationSpecConfig only scans the api,
  * slice and smoke packages); IntegrationSpecConfig constructs it in a @Bean method. It lives in the integration
@@ -52,6 +52,10 @@ class DeferResponseCloseFilter extends OncePerRequestFilter {
     }
 
     static class DeferredCloseResponse extends HttpServletResponseWrapper {
+
+        // The statuses Tomcat sends without a body (Http11Processor.prepareResponse); a response with one of them is
+        // complete for the client as soon as its headers are out.
+        private static final Set<Integer> BODILESS_STATUSES = [204, 205, 304] as Set<Integer>
 
         private DeferredClosePrintWriter writer
         private DeferredCloseServletOutputStream outputStream
@@ -77,13 +81,13 @@ class DeferResponseCloseFilter extends OncePerRequestFilter {
         }
 
         /**
-         * Does nothing while the response has no body: committing it here would complete a bodiless response (a 204)
-         * for the client while the action's transaction is still open. The container flushes the buffer when the
+         * Does nothing for a status the container sends without a body: committing the response here would complete
+         * it for the client while the action's transaction is still open. The container flushes the buffer when the
          * request finishes. See the class comment.
          */
         @Override
         void flushBuffer() throws IOException {
-            if (writer != null || outputStream != null) {
+            if (!(getStatus() in BODILESS_STATUSES)) {
                 super.flushBuffer()
             }
         }
