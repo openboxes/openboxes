@@ -32,12 +32,12 @@ import org.springframework.web.filter.OncePerRequestFilter
  * controller action has returned and its transaction has completed. Status, headers and body bytes are still sent
  * when the action flushes them; only the end of the response moves.
  *
- * flushBuffer() on the response is ignored for the same reason: what it would send early (the headers of a response
- * without a body) the container sends when the request finishes. Grails' respond() also calls flushBuffer() after its
- * renderer has written and flushed the body, so ignoring it there changes nothing. A side effect that is intended:
- * isCommitted() stays false until the request unwinds, so a commit that fails after a status-only render reaches the
- * client as the error response instead of a status that was never true. A body that outgrows the response buffer is
- * still sent (and the response committed) by the container as before.
+ * flushBuffer() on the response is ignored for the same reason as long as the response has no body (neither
+ * getWriter() nor getOutputStream() has been called): what it would send early, the headers of a bodiless response,
+ * the container sends when the request finishes. Once a body has been started, flushBuffer() is passed on as before
+ * (Grails' respond() calls it after its renderer has written the body). A side effect that is intended: a status-only
+ * render leaves the response uncommitted until the request unwinds, so a commit that fails after it reaches the
+ * client as the error response instead of a status that was never true.
  *
  * This class is not component-scanned (no stereotype annotation, and IntegrationSpecConfig only scans the api,
  * slice and smoke packages); IntegrationSpecConfig constructs it in a @Bean method. It lives in the integration
@@ -77,12 +77,15 @@ class DeferResponseCloseFilter extends OncePerRequestFilter {
         }
 
         /**
-         * Deliberately does nothing: committing the response here would complete a bodiless response (a 204) for the
-         * client while the action's transaction is still open. The container flushes the buffer when the request
-         * finishes. See the class comment.
+         * Does nothing while the response has no body: committing it here would complete a bodiless response (a 204)
+         * for the client while the action's transaction is still open. The container flushes the buffer when the
+         * request finishes. See the class comment.
          */
         @Override
         void flushBuffer() throws IOException {
+            if (writer != null || outputStream != null) {
+                super.flushBuffer()
+            }
         }
 
         /**

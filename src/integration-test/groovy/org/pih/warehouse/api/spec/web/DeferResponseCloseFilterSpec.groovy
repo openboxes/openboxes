@@ -153,7 +153,9 @@ class DeferResponseCloseFilterSpec extends ApiSpec {
         deleteListener.arm(category.name, BlockingCategoryDeleteListener.Mode.FAIL)
 
         when: 'the category is deleted through the API (the action ends with render status: 204, then the commit fails)'
-        Response response = categoryApiWrapper.api.delete(category.id, new ResponseSpecBuilder().build())
+        Response response = executor.submit({
+            categoryApiWrapper.api.delete(category.id, new ResponseSpecBuilder().build())
+        } as java.util.concurrent.Callable<Response>).get(10, TimeUnit.SECONDS)
 
         then: 'the commit was attempted after the render'
         assert deleteListener.committing.count == 0
