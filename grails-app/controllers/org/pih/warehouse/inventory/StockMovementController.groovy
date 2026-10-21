@@ -743,7 +743,7 @@ class StockMovementController {
 
             List<AllocationSourceStrategy> strategyList = [AllocationSourceStrategy.STORAGE_FIRST]
             def result = allocationService.allocate(requisition, AllocationMode.AUTO, strategyList)
-            allocationService.completeAllocation(requisition, result?.any { it.suggestedItems })
+            allocationService.completeAllocation(requisition, result?.any { it.suggestedItems || it.prepickItems })
 
             flash.message = "Successfully allocated stock movement"
             redirect(action: "show", id: params.id)

@@ -24,7 +24,7 @@ class AllocationApiController {
             List<AllocationSourceStrategy> strategies = parseStrategies(jsonBody.strategies)
 
             List<AllocationResult> results = allocationService.allocate(requisition, mode, strategies)
-            allocationService.completeAllocation(requisition, results.any { it.suggestedItems })
+            allocationService.completeAllocation(requisition, results.any { it.suggestedItems || it.prepickItems })
 
             render([data: results] as JSON)
         } catch (Exception e) {

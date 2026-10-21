@@ -13,6 +13,7 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SuggestedItem
@@ -21,6 +22,8 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.RequisitionEvent
+import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.inventory.CycleCountService
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
@@ -32,6 +35,7 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionService
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.shipping.Shipment
 
 @Transactional
 class AllocationService {
@@ -284,7 +288,7 @@ class AllocationService {
 
                 log.info("Automatic allocation for requisition ${requisition.requestNumber} (${requisition.id}) ...")
                 List<AllocationResult> results = allocate(requisition, AllocationMode.AUTO, [])
-                completeAllocation(requisition, results.any { it.suggestedItems })
+                completeAllocation(requisition, results.any { it.suggestedItems || it.prepickItems })
             }
         } catch (Exception e) {
             log.error("Error processing requisition ${requisitionId}", e)
@@ -309,9 +313,28 @@ class AllocationService {
                 requisitionService.logRequisitionEvent(requisition.id, "${Constants.ISSUANCE_FAILED} ${e.message ?: 'Unknown error'}")
                 throw e
             }
+        } else if (allocationResultNotEmpty && isFullyPrepicked(requisition)) {
+            stageRequisition(requisition)
         } else if (allocationResultNotEmpty) {
             stockMovementService.updateRequisitionStatus(requisition.id, RequisitionStatus.PICKING)
         }
+    }
+
+    private boolean isFullyPrepicked(Requisition requisition) {
+        def picklistItems = requisition.picklist?.picklistItems
+        return picklistItems &&
+                picklistItems.every { it.status == PickTaskStatus.STAGED.name() } &&
+                requisition.requisitionItems.every { it.calculateQuantityRequired() == 0 || it.isAllocated() }
+    }
+
+    private void stageRequisition(Requisition requisition) {
+        requisition.status = RequisitionStatus.STAGED
+        if (!requisition.shipment) {
+            Shipment shipment = stockMovementService.createShipment(requisition)
+            stockMovementService.createMissingShipmentItems(requisition, shipment)
+        }
+        requisition.save(failOnError: true)
+        grailsApplication.mainContext.publishEvent(new RequisitionEvent(requisition.id, WebhookEventType.REQUISITION_STAGED))
     }
 
     /**

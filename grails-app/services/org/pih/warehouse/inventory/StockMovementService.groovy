@@ -2267,9 +2267,11 @@ class StockMovementService {
         List<AvailableItem> availableItems =
                 productAvailabilityService.getAllAvailableBinLocations(location, requisitionItem.product?.id)
 
-        availableItems = availableItems.findAll {
-            it.quantityOnHand > 0 && it.binLocation?.supports(ActivityCode.PREPICK_STOCK)
+        availableItems = availableItems.findAll { it.binLocation?.supports(ActivityCode.PREPICK_STOCK) }
+        availableItems.each {
+            it.quantityOnHand = inventoryService.getQuantityFromBinLocation(location, it.binLocation, it.inventoryItem) ?: 0
         }
+        availableItems = availableItems.findAll { it.quantityOnHand > 0 }
 
         return productAvailabilityService.sortAvailableItems(availableItems)
     }
@@ -2399,6 +2401,9 @@ class StockMovementService {
             throw new ValidationException("Unable to move pre-picked stock to staging: ${errorMessage}",
                     transaction.errors)
         }
+
+        productAvailabilityService.refreshProductsAvailability(facility.id, [suggestedItem.inventoryItem?.product?.id],
+                [suggestedItem.binLocation?.id, stagingLocation.id], false)
     }
 
     List<AvailableItem> calculateQuantityAvailableToPromise(List<AvailableItem> availableItems, def picklistItems) {

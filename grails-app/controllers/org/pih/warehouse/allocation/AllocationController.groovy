@@ -22,7 +22,7 @@ class AllocationController {
                 }.findAll { it != null }
             }
             def result = allocationService.allocate(requisition, mode ?: AllocationMode.AUTO, strategies)
-            allocationService.completeAllocation(requisition, result?.any { it.suggestedItems })
+            allocationService.completeAllocation(requisition, result?.any { it.suggestedItems || it.prepickItems })
             redirect(controller: "stockMovement", action: "show", id: params.id)
         } catch (Exception e) {
             render(status: 500, [errorCode: 500, errorMessage: e.message] as JSON)
