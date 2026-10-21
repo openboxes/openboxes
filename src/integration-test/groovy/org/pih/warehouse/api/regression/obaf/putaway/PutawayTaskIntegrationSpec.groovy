@@ -67,7 +67,6 @@ class PutawayTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         putawayPatch(task, [action: 'assign', container: s.cart]).error instanceof IllegalStateException
     }
 
-    @PendingFeature(reason = 'PutawayTaskService.groovy:270 assign() dereferences container.parentLocation before checking the container exists: an assign with only an assignee (the code then guards `if (container)`) throws NullPointerException (HTTP 500)')
     void 'assign with only an assignee sets the assignee and keeps the task'() {
         given:
         PutawaySite s = putawaySite('PA-ASN')

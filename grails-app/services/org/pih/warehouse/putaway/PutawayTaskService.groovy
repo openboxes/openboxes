@@ -16,6 +16,9 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.PutawayTypeCode
 import org.pih.warehouse.core.ReasonCode
+import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
@@ -34,6 +37,7 @@ class PutawayTaskService {
     def inboundSortationService
     InventoryService inventoryService
     PutawayService putawayService
+    UserService userService
     def sessionFactory
 
 
@@ -150,12 +154,26 @@ class PutawayTaskService {
     }
 
     /**
+     * The putaway task, if it belongs to the facility (the facility in the request URL); null otherwise.
+     */
+    PutawayTask read(String id, Location facility) {
+        PutawayTask task = read(id)
+        return task && facility && task.facility?.id == facility.id ? task : null
+    }
+
+    /**
      * Action router for state transitions and side-effects (transaction).
      * Supported actions include: start, scanToContainer, complete, cancel, rollback
+     * When a facility is given (the facility in the request URL), a task of another facility is not found.
+     * The signed-in user is recorded as the user who completed the task.
      * FIXME - this will eventually be replaced with a Spring Statemachine implementation.
      */
-    PutawayTask patch(String id, Map data = [:]) {
+    PutawayTask patch(String id, Map data = [:], Location facility = null) {
         PutawayTask task = get(id)
+        if (task && facility && task.facility?.id != facility.id) {
+            task.discard()
+            task = null
+        }
 
         if (!task) {
             throw new ObjectNotFoundException(id, "Putaway task ${id} was not found")
@@ -180,7 +198,7 @@ class PutawayTaskService {
                 break
 
             case 'complete':
-                complete(task, data.destination as String, data.completedBy as String, data.isCancelRemaining as Boolean,
+                complete(task, data.destination as String, AuthService.currentUser?.id, data.isCancelRemaining as Boolean,
                         data.reasonCode as ReasonCode, data.isDirectPutaway as Boolean)
                 break
 
@@ -256,7 +274,8 @@ class PutawayTaskService {
 
 
     /**
-     * Assign task to a putaway container (if one hasn't already been assigned)
+     * Assign task to a putaway container (if one hasn't already been assigned) and, optionally, to a user.
+     * Assigning the task to a user other than the signed-in user needs the admin role at the task's facility.
      *
      * @param task
      * @param containerId
@@ -267,21 +286,37 @@ class PutawayTaskService {
             throw new IllegalStateException("Putaway container can only be assigned when the task is PENDING (current status: ${task.status}).")
         }
         Location container = containerId ? Location.get(containerId) : null
-        if (task.facility != container.parentLocation || !container.internalLocation) {
+        if (containerId && !container) {
+            throw new IllegalArgumentException("Putaway container ${containerId} was not found")
+        }
+        if (container && (task.facility != container.parentLocation || !container.internalLocation)) {
             throw new IllegalArgumentException("Putaway container ${container?.name} must be an internal location within facility ${task?.facility?.name}")
         }
 
-        if (task.container && container != task.container && !override) {
+        User currentUser = AuthService.currentUser
+        if (assigneeId && assigneeId != currentUser?.id &&
+                !userService.isUserInRoleAtLocation(currentUser, task.facility, RoleType.ROLE_ADMIN)) {
+            String message = "Only an administrator can assign putaway task ${task.identifier} to another user"
+            task.errors.reject("assignee", message)
+            throw new ValidationException(message, task.errors)
+        }
+        Person assignee = assigneeId ? Person.get(assigneeId) : null
+        if (assigneeId && !assignee) {
+            String message = "User ${assigneeId} was not found"
+            task.errors.reject("assignee", message)
+            throw new ValidationException(message, task.errors)
+        }
+
+        if (container && task.container && container != task.container && !override) {
             throw new IllegalArgumentException("Putaway container is already assigned: ${task?.container?.name}. Must override to re-assign it to putaway constainer ${container?.name}")
         }
-        if (task.container == container) {
+        if (container && task.container == container) {
             log.warn "Putaway container for task ${task.identifier} has already been set to ${container}"
         }
 
         if (container) task.container = container
 
         // Set the assignee if one is provided
-        Person assignee = assigneeId ? Person.get(assigneeId) : null
         if (assignee) task.assignee = assignee
         save(task)
     }
@@ -323,7 +358,10 @@ class PutawayTaskService {
         }
 
         // Validate the container location exists
-        Location container = Location.findByLocationNumberOrId(containerNumberOrId, containerNumberOrId)
+        Location container = containerNumberOrId ? Location.findByLocationNumberOrId(containerNumberOrId, containerNumberOrId) : null
+        if (container && container.parentLocation?.id != task.facility?.id) {
+            container = Location.findByLocationNumberAndParentLocation(containerNumberOrId, task.facility)
+        }
         if (!container) {
             throw new IllegalStateException("Container does not exist")
         }
@@ -423,6 +461,7 @@ class PutawayTaskService {
         if (!destination) {
             task.errors.reject("destination", "Destination is required")
         }
+        validateInFacility(destination, task)
 
         if (task.hasErrors() || !task.validate()) {
             throw new ValidationException("Validation errors occurred during complete action", task.errors)
@@ -473,6 +512,7 @@ class PutawayTaskService {
         }
 
         Location alternativeDestination = Location.get(destinationId)
+        validateInFacility(alternativeDestination, task)
         if (!alternativeDestination) {
             def discrepancyLocation = findDiscrepancyLocation(task)
             if (!discrepancyLocation) {
@@ -649,6 +689,15 @@ class PutawayTaskService {
                 receiptItem: task.putawayOrderItem?.receiptItem,
                 receipt: task.putawayOrderItem?.receipt
         )
+    }
+
+    /**
+     * A destination named in a request must be a location of the task's facility.
+     */
+    private static void validateInFacility(Location location, PutawayTask task) {
+        if (location && location.parentLocation?.id != task.facility?.id) {
+            throw new IllegalArgumentException("Location ${location.name} is not a location of facility ${task.facility?.name}")
+        }
     }
 
     private Location findDiscrepancyLocation(PutawayTask task) {

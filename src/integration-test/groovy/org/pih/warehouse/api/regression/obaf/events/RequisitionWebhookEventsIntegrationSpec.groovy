@@ -144,11 +144,11 @@ class RequisitionWebhookEventsIntegrationSpec extends ObafEventsIntegrationSpec 
         settle()
         payloads(r, o.requestNumber)*.eventType == ['requisition.created', 'pick.started', 'pick.started', 'requisition.staged']
 
-        and: 'the staged payload shows the staging lane and who staged each line'
+        and: 'the staged payload shows the staging lane and who staged each line (the signed-in user)'
         Map staged = events(r, 'requisition.staged', o.requestNumber)[0]
         staged.lines[0].quantityPicked == 5
         staged.lines[0].stagingLocations*.id == [s.staging]
-        staged.lines[0].stagedBy*.id == [picker]
+        staged.lines[0].stagedBy*.id == [adminId()]
         staged.lines[0].outboundContainers*.id == [s.tote]
 
         and: 'nothing ever sends pick.completed (no emitter), even though every task was picked'
