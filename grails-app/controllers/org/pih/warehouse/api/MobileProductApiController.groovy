@@ -60,15 +60,11 @@ class MobileProductApiController extends BaseDomainApiController {
 
         data.defaultBarcodeLabelUrl = documentService.getProductBarcodeLabel(product)
 
-        data.images = product?.images?.collect {
-            return [ id: it.id, name: it.filename, contentType: it.contentType, uri: it.fileUri?:it?.link ]
-        }
+        data.images = documentLinks(product?.images)
 
         data.defaultImageUrl = data.images ? data.images[0].uri : null
 
-        data.documents = product?.documents?.collect {
-            return [ id: it.id, name: it.filename, contentType: it.contentType, uri: it.fileUri?:it?.link ]
-        }
+        data.documents = documentLinks(product?.documents)
 
         data.attributes = product.attributes.collect { ProductAttribute productAttribute ->
             return [ id: productAttribute.id,
@@ -85,6 +81,27 @@ class MobileProductApiController extends BaseDomainApiController {
         data.productType = product.productType
 
         render([data: data] as JSON)
+    }
+
+    /**
+     * The documents as links for the app. A document whose link is not an http or https URL is left out.
+     */
+    static List<Map> documentLinks(Collection<Document> documents) {
+        return documents?.collect { Document document ->
+            [id: document.id, name: document.filename, contentType: document.contentType, uri: document.fileUri ?: document.link]
+        }?.findAll { Map link -> isWebUrl(link.uri as String) }
+    }
+
+    static boolean isWebUrl(String url) {
+        if (!url) {
+            return false
+        }
+        try {
+            URI uri = new URI(url)
+            return uri.scheme?.toLowerCase() in ['http', 'https'] && util.RedirectUtil.hostOf(uri)
+        } catch (URISyntaxException ignored) {
+            return false
+        }
     }
 
     def renderLabel() {

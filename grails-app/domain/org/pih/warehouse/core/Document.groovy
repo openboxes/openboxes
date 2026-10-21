@@ -13,6 +13,7 @@ import grails.util.Holders
 import groovy.util.logging.Slf4j
 
 import org.pih.warehouse.core.http.ContentType
+import org.springframework.web.multipart.MultipartFile
 
 import util.FileUtil
 
@@ -79,6 +80,13 @@ class Document implements Serializable {
             }
         }
         return true
+    }
+
+    /**
+     * isAllowedFile for an uploaded file: its original filename, media type and content.
+     */
+    static boolean isAllowedUpload(MultipartFile file) {
+        return file != null && isAllowedFile(file.originalFilename, file.contentType, file.inputStream)
     }
 
     static Set<String> allowedExtensions() {

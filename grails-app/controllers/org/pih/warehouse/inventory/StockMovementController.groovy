@@ -527,6 +527,10 @@ class StockMovementController {
     def uploadDocument(DocumentCommand command) {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
+        if (!command.fileContents || command.fileContents.empty || !Document.isAllowedUpload(command.fileContents)) {
+            renderUploadNotAllowed()
+            return
+        }
         stockMovementService.saveDocument(command.fileContents, stockMovement)
 
         render([data: "Document was uploaded successfully"] as JSON)
@@ -535,9 +539,20 @@ class StockMovementController {
     def uploadDocuments(BulkDocumentCommand command) {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
+        // Nothing is stored when any of the files is refused
+        if (!command.filesContents || command.filesContents.any { !it || it.empty || !Document.isAllowedUpload(it) }) {
+            renderUploadNotAllowed()
+            return
+        }
         stockMovementService.saveDocuments(command.filesContents, stockMovement)
 
         render([data: "Documents were uploaded successfully"] as JSON)
+    }
+
+    private void renderUploadNotAllowed() {
+        String message = g.message(code: 'document.uploadNotAllowed.message', args: [Document.allowedExtensions().join(', ')])
+        response.status = 400
+        render([errorCode: 400, errorMessage: message] as JSON)
     }
 
     def addDocument() {
