@@ -91,6 +91,27 @@ describe('useReceivingNextValidation', () => {
     });
   });
 
+  describe('nextValidationErrorsTooltip', () => {
+    it('should be null when every line is valid', () => {
+      const { result } = renderValidation([buildRow('row-1', { quantityReceiving: 5 })]);
+
+      expect(result.current.nextValidationErrorsTooltip).toBeNull();
+    });
+
+    it('should count the invalid lines and list their product codes once', () => {
+      const { result } = renderValidation([
+        buildRow('row-1', { productCode: '10001', quantityReceiving: -1.5 }),
+        buildRow('row-2', { productCode: '10001', quantityReceiving: -1 }),
+        buildRow('row-3', { productCode: '10002', quantityReceiving: -2 }),
+        buildRow('row-4', { productCode: '10003', quantityReceiving: 5 }),
+      ]);
+
+      expect(result.current.nextValidationErrorsTooltip).toBe(
+        '3 validation errors on page. Review fields marked in red on product 10001, 10002.',
+      );
+    });
+  });
+
   describe('validateBeforeNext', () => {
     it('should not ask anything at a location with partial receiving', async () => {
       const { result } = renderValidation(

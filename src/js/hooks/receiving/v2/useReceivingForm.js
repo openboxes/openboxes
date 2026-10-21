@@ -67,6 +67,7 @@ const useReceivingForm = () => {
 
   const {
     isNextDisabled,
+    nextValidationErrorsTooltip,
     validateBeforeNext,
     lineItemErrors,
   } = useReceivingNextValidation({ lineItemsState });
@@ -129,6 +130,7 @@ const useReceivingForm = () => {
       // Nothing is known about the lines until the receipt is loaded, so the transition waits
       // for it - otherwise the validation would run on an empty table.
       isNextDisabled: loading || isNextDisabled,
+      nextValidationErrorsTooltip,
       validateBeforeNext,
     },
     actions: {

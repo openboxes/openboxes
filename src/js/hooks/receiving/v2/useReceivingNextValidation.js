@@ -20,8 +20,16 @@ import getRowsMissingBinLocation from 'utils/receiving/getRowsMissingBinLocation
  * looks at the full line items state, not at the rows the filter shows, so a filtered out line
  * cannot slip through unvalidated.
  *
- * @returns {{ isNextDisabled: boolean, validateBeforeNext: Function, lineItemErrors: Object }}
+ * @returns {{
+ *   isNextDisabled: boolean,
+ *   nextValidationErrorsTooltip: string|null,
+ *   validateBeforeNext: Function,
+ *   lineItemErrors: Object,
+ * }}
  *   `isNextDisabled` - true while no line carries a quantity, or any line fails validation.
+ *   `nextValidationErrorsTooltip` - tooltip of the disabled Next button with the count and
+ *                                   product codes of the invalid lines, null when every line
+ *                                   is valid.
  *   `validateBeforeNext` - resolves to false when the user decides to stay on the step.
  *   `lineItemErrors` - error messages of the invalid lines, keyed by row id and then by field,
  *                      e.g. { 'row-2': { quantityReceiving: 'Value cannot be a decimal number' } }.
@@ -47,8 +55,25 @@ const useReceivingNextValidation = ({ lineItemsState }) => {
     return errors;
   }, [lineItemsState, translate]);
 
-  const isNextDisabled = Object.keys(lineItemErrors).length > 0 || (editableRows.length > 0
+  const invalidRowIds = useMemo(() => Object.keys(lineItemErrors), [lineItemErrors]);
+  const isNextDisabled = invalidRowIds.length > 0 || (editableRows.length > 0
     && editableRows.every((row) => row.quantityReceiving === null));
+
+  // Tooltip of the disabled Next button with the count and product codes of the invalid lines.
+  // It helps the user identify them when they are scrolled or filtered out of view
+  const nextValidationErrorsTooltip = useMemo(() => {
+    if (!invalidRowIds.length) {
+      return null;
+    }
+    const invalidProductCodes = _.uniq(
+      invalidRowIds.map((rowId) => lineItemsState.entities[rowId].productCode),
+    ).join(', ');
+    return translate(
+      'react.receiving.validationErrors.tooltip.label',
+      `${invalidRowIds.length} validation errors on page. Review fields marked in red on product ${invalidProductCodes}.`,
+      [invalidRowIds.length, invalidProductCodes],
+    );
+  }, [invalidRowIds, translate]);
 
   const validateBeforeNext = useCallback(async () => {
     // An edge case if creating a receiving bin is disabled in the config,
@@ -74,7 +99,12 @@ const useReceivingNextValidation = ({ lineItemsState }) => {
     return confirmBlankLinesAsZero({ blankRows, translate, localeKey });
   }, [lineItemsState, hasPartialReceivingSupport, hasBinLocationSupport, translate, localeKey]);
 
-  return { isNextDisabled, validateBeforeNext, lineItemErrors };
+  return {
+    isNextDisabled,
+    nextValidationErrorsTooltip,
+    validateBeforeNext,
+    lineItemErrors,
+  };
 };
 
 export default useReceivingNextValidation;
