@@ -15,8 +15,6 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.gorm.PagedResultList
 import grails.validation.Validateable
-import org.apache.http.client.fluent.Request
-import org.apache.http.entity.ContentType
 import org.grails.gsp.GroovyPagesTemplateEngine
 import org.hibernate.SessionFactory
 import org.hibernate.ObjectNotFoundException
@@ -632,13 +630,15 @@ class DocumentController {
             return
         }
 
+        InputStream image
+        try {
+            image = zebraService.renderPreview(body)
+        } catch (LabelPreviewDisabledException e) {
+            renderLabelPreviewDisabled(e)
+            return
+        }
         response.contentType = 'image/png'
-        // TODO Move labelary URL to application.yml
-        response.outputStream << Request.Post('https://api.labelary.com/v1/printers/8dpmm/labels/3x2/0/')
-            .bodyString(body, ContentType.APPLICATION_FORM_URLENCODED)
-            .execute()
-            .returnContent()
-            .asStream()
+        response.outputStream << image
     }
 
 
@@ -656,8 +656,13 @@ class DocumentController {
             renderLabelTemplateError(e)
             return
         }
-        // TODO Move labelary URL to application.yml
-        String url = "https://labelary.com/viewer.html?zpl=" + renderedContent
+        String url
+        try {
+            url = zebraService.getViewerUrl(renderedContent)
+        } catch (LabelPreviewDisabledException e) {
+            renderLabelPreviewDisabled(e)
+            return
+        }
         redirect(url: url)
     }
 
@@ -672,6 +677,11 @@ class DocumentController {
     private void renderLabelTemplateError(LabelTemplateException e) {
         log.warn(e.message)
         response.status = 400
+        render(contentType: "text/plain", text: e.message, encoding: "UTF-8")
+    }
+
+    private void renderLabelPreviewDisabled(LabelPreviewDisabledException e) {
+        response.status = 503
         render(contentType: "text/plain", text: e.message, encoding: "UTF-8")
     }
 

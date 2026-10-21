@@ -471,8 +471,16 @@ openboxes:
             #  Print barcode labels via RAW
             ipAddress: "127.0.0.1"
             port: 9100
+        # Label previews are rendered by Labelary (https://labelary.com), which receives the label's ZPL.
+        # Set enabled to false to turn label previews off (printing is not affected).
         labelaryApi:
+            enabled: true
+            # Container, bin location and product label images (the label API endpoints)
             url: "https://api.labelary.com/v1/printers/12dpmm/labels/2x1/0/"
+            # Label preview on product, bin location and stock pages
+            documentPreviewUrl: "https://api.labelary.com/v1/printers/8dpmm/labels/3x2/0/"
+            # The Labelary viewer the label export opens (the ZPL is passed as the zpl parameter)
+            viewerUrl: "https://labelary.com/viewer.html"
 
     # Default delay and min length for typeahead components
     typeahead:

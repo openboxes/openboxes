@@ -19,6 +19,7 @@ import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.DocumentController
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.DocumentType
+import org.pih.warehouse.core.LabelPreviewDisabledException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.ZebraService
 import org.pih.warehouse.product.Product
@@ -30,7 +31,8 @@ import org.pih.warehouse.shipping.ContainerApiController
  * templates rendered by BeanPropertyTemplateService with real models (golden files under
  * src/integration-test/resources/regression-labels/), ZebraService.renderDocument against a
  * loopback labelary, printDocument against a loopback printer socket (written, refused,
- * unresponsive), the three printLabel actions when printing fails, and DocumentService's label
+ * unresponsive), the three printLabel actions when printing fails, the document label preview
+ * and viewer link (DocumentController), label previews turned off, and DocumentService's label
  * lookups. Labelary and the printer only ever point at 127.0.0.1.
  */
 class ZebraLabelIntegrationSpec extends ObafIntegrationSpec {
@@ -46,7 +48,10 @@ class ZebraLabelIntegrationSpec extends ObafIntegrationSpec {
     @Autowired
     DocumentService documentService
 
+    static final List<String> LABELARY_OPTIONS = ['enabled', 'documentPreviewUrl', 'viewerUrl']
+
     Map savedBarcodeConfig
+    Map savedLabelaryConfig
     List<String> createdDocuments = []
     List<Closeable> closeables = []
 
@@ -54,11 +59,16 @@ class ZebraLabelIntegrationSpec extends ObafIntegrationSpec {
         savedBarcodeConfig = [ip  : grailsApplication.config.getProperty('openboxes.barcode.printer.ipAddress', String),
                               port: grailsApplication.config.getProperty('openboxes.barcode.printer.port', Integer),
                               url : grailsApplication.config.getProperty('openboxes.barcode.labelaryApi.url', String)]
+        savedLabelaryConfig = LABELARY_OPTIONS.collectEntries { [(it): grailsApplication.config.getProperty("openboxes.barcode.labelaryApi.${it}", Object)] }
+        // the document preview and the viewer only ever point at 127.0.0.1 here
+        LabelStubs.setLabelary(grailsApplication, 'documentPreviewUrl', 'http://127.0.0.1:9/test-unused/')
+        LabelStubs.setLabelary(grailsApplication, 'viewerUrl', 'http://127.0.0.1:9/test-unused/viewer.html')
     }
 
     void cleanup() {
         closeables.reverseEach { try { it.close() } catch (Exception ignored) { } }
         LabelStubs.set(grailsApplication, savedBarcodeConfig.ip as String, savedBarcodeConfig.port as Integer, savedBarcodeConfig.url as String)
+        savedLabelaryConfig.each { String name, Object value -> LabelStubs.setLabelary(grailsApplication, name, value) }
         if (createdDocuments) {
             tx { createdDocuments.each { Document.get(it)?.delete(flush: true) } }
             createdDocuments.clear()
@@ -174,7 +184,7 @@ class ZebraLabelIntegrationSpec extends ObafIntegrationSpec {
         answer == 'PNG-BYTES'
     }
 
-    @PendingFeature(reason = 'ZebraService.groovy:30-38 returns labelary\'s response body whatever the status: an invalid label (labelary 400 "ERROR: ...") or a labelary outage (5xx) is streamed to the app as the label image with content type image/png')
+    @PendingFeature(reason = 'ZebraService.renderDocument (postData) returns labelary\'s response body whatever the status: an invalid label (labelary 400 "ERROR: ...") or a labelary outage (5xx) is streamed to the app as the label image with content type image/png')
     void 'renderDocument refuses a labelary error answer instead of passing it on as the image'() {
         given:
         LoopbackReceiver labelary = new LoopbackReceiver()
@@ -239,7 +249,8 @@ class ZebraLabelIntegrationSpec extends ObafIntegrationSpec {
                 web.session.setAttribute('user', org.pih.warehouse.core.User.findByUsername('admin'))
                 action.call(controller)
             }
-            return [status: web.currentResponse.status, body: web.currentResponse.contentAsString]
+            return [status: web.currentResponse.status, body: web.currentResponse.contentAsString,
+                    location: web.currentResponse.redirectedUrl ?: web.currentResponse.getHeader('Location')]
         } finally {
             RequestContextHolder.resetRequestAttributes()
         }
@@ -280,6 +291,106 @@ class ZebraLabelIntegrationSpec extends ObafIntegrationSpec {
         then:
         answer.status == 200
         answer.body == '^XA^FDTEST-LBL-0001^FS^FD^FS^XZ'
+    }
+
+    // ------------------------------------------------------------------ label previews turned off, document preview
+
+    void 'renderDocument makes no labelary request when label previews are turned off'() {
+        given:
+        LoopbackReceiver labelary = new LoopbackReceiver()
+        closeables << labelary
+        LabelStubs.set(grailsApplication, '127.0.0.1', 9, labelary.url)
+        LabelStubs.setLabelary(grailsApplication, 'enabled', false)
+        String doc = zebraDocument("test-render-off-${uid()}", '^XA^FDOFF^FS^XZ')
+
+        when:
+        tx { zebraService.renderDocument(Document.get(doc), [:]) }
+
+        then:
+        thrown(LabelPreviewDisabledException)
+        labelary.hits.isEmpty()
+    }
+
+    void 'the three renderLabel actions answer 503 and make no labelary request when label previews are turned off'() {
+        given:
+        LoopbackReceiver labelary = new LoopbackReceiver()
+        closeables << labelary
+        LabelStubs.set(grailsApplication, '127.0.0.1', 9, labelary.url)
+        LabelStubs.setLabelary(grailsApplication, 'enabled', false)
+        String dc = depot('LBL-OFF')
+        String binId = bin(dc, 'LBLOFF')
+        String p = labelProduct('TEST-LBL-0001')
+        String doc = zebraDocument("test-render-label-off-${uid()}", '^XA^FDOFF^FS^XZ')
+        def ctx = grails.util.Holders.applicationContext
+
+        when:
+        List<Map> answers = [
+                callController(ctx.getBean(MobileProductApiController), [id: p, documentId: doc, facility: dc]) { it.renderLabel() },
+                callController(ctx.getBean(ContainerApiController), [id: 'no-such-container', documentId: doc, facility: dc]) { it.renderLabel() },
+                callController(ctx.getBean(InternalLocationApiController), [id: binId, documentId: doc, facility: dc]) { it.renderLabel() },
+        ]
+
+        then:
+        answers.every { it.status == 503 }
+        answers.every { it.body.contains('"errorCode":503') && it.body.contains('Label previews are turned off') }
+        labelary.hits.isEmpty()
+    }
+
+    void 'renderZebraTemplate POSTs the rendered ZPL to the configured document preview URL and returns its answer'() {
+        given:
+        LoopbackReceiver labelary = new LoopbackReceiver()
+        closeables << labelary
+        labelary.contentType = 'image/png'
+        labelary.responseBody = 'PNG-BYTES'
+        LabelStubs.setLabelary(grailsApplication, 'documentPreviewUrl', labelary.url)
+        String dc = depot('LBL-PV')
+        String doc = zebraDocument("test-preview-${uid()}", '^XA^FDPREVIEW^FS^XZ')
+
+        when:
+        Map answer = callController(grails.util.Holders.applicationContext.getBean(DocumentController), [id: doc, facility: dc]) { it.renderZebraTemplate() }
+
+        then:
+        labelary.hits.size() == 1
+        labelary.hits[0].method == 'POST'
+        labelary.hits[0].headers['content-type'].startsWith('application/x-www-form-urlencoded')
+        labelary.hits[0].body == '^XA^FDPREVIEW^FS^XZ'
+        answer.status == 200
+        answer.body == 'PNG-BYTES'
+    }
+
+    void 'exportZebraTemplate redirects to the configured viewer URL with the ZPL URL-encoded'() {
+        given:
+        LabelStubs.setLabelary(grailsApplication, 'viewerUrl', 'http://127.0.0.1:9/viewer.html')
+        String dc = depot('LBL-PV')
+        String doc = zebraDocument("test-viewer-${uid()}", '^XA^FDA&B 1+2^FS^XZ')
+
+        when:
+        Map answer = callController(grails.util.Holders.applicationContext.getBean(DocumentController), [id: doc, facility: dc]) { it.exportZebraTemplate() }
+
+        then:
+        answer.status == 302
+        answer.location == 'http://127.0.0.1:9/viewer.html?zpl=%5EXA%5EFDA%26B%201%2B2%5EFS%5EXZ'
+    }
+
+    void 'renderZebraTemplate and exportZebraTemplate answer 503 and make no labelary request when label previews are turned off'() {
+        given:
+        LoopbackReceiver labelary = new LoopbackReceiver()
+        closeables << labelary
+        LabelStubs.setLabelary(grailsApplication, 'documentPreviewUrl', labelary.url)
+        LabelStubs.setLabelary(grailsApplication, 'viewerUrl', labelary.url)
+        LabelStubs.setLabelary(grailsApplication, 'enabled', false)
+        String dc = depot('LBL-PV')
+        String doc = zebraDocument("test-preview-off-${uid()}", '^XA^FDOFF^FS^XZ')
+        DocumentController documentController = grails.util.Holders.applicationContext.getBean(DocumentController)
+
+        when:
+        Map preview = callController(documentController, [id: doc, facility: dc]) { it.renderZebraTemplate() }
+        Map export = callController(documentController, [id: doc, facility: dc]) { it.exportZebraTemplate() }
+
+        then:
+        [preview, export].every { it.status == 503 && it.body.contains('Label previews are turned off') }
+        !export.location
+        labelary.hits.isEmpty()
     }
 
     // ------------------------------------------------------------------ DocumentService label lookups

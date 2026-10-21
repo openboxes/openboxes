@@ -13,7 +13,9 @@ import java.util.concurrent.CopyOnWriteArrayList
  * openboxes.barcode.labelaryApi.url (default https://api.labelary.com/...).
  * Both are pointed at in-JVM stubs on ephemeral loopback ports: a TCP sink that
  * records what the "printer" received, and an HTTP server that answers a 1x1
- * PNG for the "labelary" render. No dependency is added (JDK classes only).
+ * PNG for the "labelary" render. The document label preview and viewer URLs
+ * (openboxes.barcode.labelaryApi.documentPreviewUrl and viewerUrl) point at the
+ * same HTTP stub. No dependency is added (JDK classes only).
  */
 class LabelStubs {
 
@@ -56,11 +58,15 @@ class LabelStubs {
     /** Points the running app's config at the stubs; returns the previous values for restore(). */
     Map apply(GrailsApplication app) {
         Map before = [
-                ip  : app.config.getProperty('openboxes.barcode.printer.ipAddress'),
-                port: app.config.getProperty('openboxes.barcode.printer.port', Integer),
-                url : app.config.getProperty('openboxes.barcode.labelaryApi.url'),
+                ip                : app.config.getProperty('openboxes.barcode.printer.ipAddress'),
+                port              : app.config.getProperty('openboxes.barcode.printer.port', Integer),
+                url               : app.config.getProperty('openboxes.barcode.labelaryApi.url'),
+                documentPreviewUrl: app.config.getProperty('openboxes.barcode.labelaryApi.documentPreviewUrl'),
+                viewerUrl         : app.config.getProperty('openboxes.barcode.labelaryApi.viewerUrl'),
         ]
         set(app, '127.0.0.1', printer.localPort, labelaryUrl)
+        setLabelary(app, 'documentPreviewUrl', "http://127.0.0.1:${labelary.address.port}/v1/printers/8dpmm/labels/3x2/0/".toString())
+        setLabelary(app, 'viewerUrl', "http://127.0.0.1:${labelary.address.port}/viewer.html".toString())
         // what ZebraService will actually read (navigable map access)
         assert app.config.openboxes.barcode.printer.port == printer.localPort
         assert app.config.openboxes.barcode.labelaryApi.url == labelaryUrl
@@ -69,6 +75,8 @@ class LabelStubs {
 
     void restore(GrailsApplication app, Map before) {
         set(app, before.ip as String, before.port as Integer, before.url as String)
+        setLabelary(app, 'documentPreviewUrl', before.documentPreviewUrl)
+        setLabelary(app, 'viewerUrl', before.viewerUrl)
     }
 
     /** Both views of the config: getProperty (flat keys) and the navigable map ZebraService reads. */
@@ -79,6 +87,18 @@ class LabelStubs {
         app.config.openboxes.barcode.printer.ipAddress = ip
         app.config.openboxes.barcode.printer.port = port
         app.config.openboxes.barcode.labelaryApi.url = url
+    }
+
+    /** One openboxes.barcode.labelaryApi option, in both views of the config (null removes it). */
+    static void setLabelary(GrailsApplication app, String name, Object value) {
+        String key = "openboxes.barcode.labelaryApi.${name}".toString()
+        if (value == null) {
+            app.config.remove(key)
+            app.config.openboxes.barcode.labelaryApi.remove(name)
+            return
+        }
+        app.config.put(key, value)
+        app.config.openboxes.barcode.labelaryApi."${name}" = value
     }
 
     void stop() {
