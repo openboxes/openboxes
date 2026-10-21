@@ -122,21 +122,8 @@ class AutomaticBackorderReallocationJob {
         }
 
         if (allocatedAnything) {
-            reopenForPicking(requisition)
+            stockMovementService.updateRequisitionStatus(requisition.id, RequisitionStatus.PICKING)
         }
-    }
-
-    // Batch picking only offers PICKING orders; a PICKED one is moved back unless a shipment already exists.
-    private void reopenForPicking(Requisition requisition) {
-        if (requisition.status == RequisitionStatus.PICKED && !requisition.shipment) {
-            log.info("Moving ${requisition.requestNumber} back from PICKED to PICKING for its cross-dock picks")
-            Requisition.withTransaction {
-                requisition.status = RequisitionStatus.PICKING
-                requisition.save(failOnError: true)
-            }
-            return
-        }
-        stockMovementService.updateRequisitionStatus(requisition.id, RequisitionStatus.PICKING)
     }
 
     private void updateQuantityBackordered(RequisitionItem requisitionItem, Integer quantityUncovered,

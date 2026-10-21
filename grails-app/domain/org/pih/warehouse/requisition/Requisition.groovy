@@ -528,7 +528,6 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
         return status < RequisitionStatus.PICKING
     }
 
-    // A partially allocated order still waiting for backordered stock must not move past PICKING yet.
     boolean isAwaitingBackorder() {
         return partialAllocationAllowed && requisitionItems?.any { it.isBackordered() }
     }

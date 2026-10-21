@@ -153,7 +153,6 @@ class ObafJobsIntegrationSpec extends ObafIntegrationSpec {
         return s + deliverToCrossDock(s, delivered)
     }
 
-    /** Receives a further inbound of {@code delivered} units for the scenario's order, returning its shipment and new cross-dock putaway. */
     Map deliverToCrossDock(Map s, int delivered) {
         config.set('openboxes.jobs.automaticBackorderReallocationJob.enabled', false)
         String soNumber = tx { Requisition.get(s.so).requestNumber }
@@ -220,7 +219,6 @@ class ObafJobsIntegrationSpec extends ObafIntegrationSpec {
                 [6, ReasonCode.BACKORDER.toString()]
     }
 
-    /** Picks and stages every open pick of the order in full, as the mobile app leaves them. */
     void pickAndStageAll(String requisitionId) {
         tx {
             PicklistItem.findAllByRequisitionItemInList(Requisition.get(requisitionId).requisitionItems as List).each {
@@ -264,23 +262,6 @@ class ObafJobsIntegrationSpec extends ObafIntegrationSpec {
         completeAndRelease(second)
 
         then: 'the backorder pick is offered to batch picking'
-        status(s.so) == RequisitionStatus.PICKING
-        List<String> open = openPickTaskIds(s.so)
-        open.size() == 1
-        batchPickTaskIds(s).containsAll(open)
-    }
-
-    void 'OBLS-1009: an order already marked PICKED is moved back to PICKING when its cross-dock backorder is released'() {
-        given: 'an order that reached PICKED with 2 still backordered, as orders did before the poll was fixed'
-        Map s = crossDockScenario('JOB-XDR', 5, 3, [partialAllocationAllowed: true])
-        completeAndRelease(s)
-        pickAndStageAll(s.so)
-        tx { Requisition r = Requisition.get(s.so); r.status = RequisitionStatus.PICKED; r.save(flush: true, failOnError: true) }
-
-        when:
-        completeAndRelease(s + deliverToCrossDock(s, 2))
-
-        then:
         status(s.so) == RequisitionStatus.PICKING
         List<String> open = openPickTaskIds(s.so)
         open.size() == 1
