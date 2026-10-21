@@ -13,8 +13,15 @@ import org.pih.warehouse.shipping.ShipmentItem
 @Transactional(readOnly = true)
 class GoodsReceiptNoteService {
 
-    GoodsReceiptNoteDto buildGoodsReceiptNote(Shipment shipment) {
-        List<Receipt> receipts = (shipment.receipts ?: []).findAll { Receipt receipt ->
+    ShipmentReceivingCalculator shipmentReceivingCalculator
+
+    GoodsReceiptNoteDto buildGoodsReceiptNote(String shipmentId) {
+        Shipment shipment = Shipment.get(shipmentId)
+        if (!shipment) {
+            throw new IllegalStateException("Unable to locate shipment ${shipmentId}")
+        }
+
+        List<Receipt> receivedReceipts = (shipment.receipts ?: []).findAll { Receipt receipt ->
             receipt.receiptStatusCode == ReceiptStatusCode.RECEIVED
         } as List<Receipt>
 
@@ -25,28 +32,29 @@ class GoodsReceiptNoteService {
                 originName: shipment.origin?.name,
                 destinationName: shipment.destination?.name,
                 dateShipped: shipment.actualShippingDate,
-                lastReceiptDate: receipts*.actualDeliveryDate.max(),
-                receipts: receipts.collect { Receipt receipt -> GoodsReceiptNoteReceiptDto.from(receipt) },
+                lastReceiptDate: receivedReceipts*.actualDeliveryDate.max(),
+                receipts: receivedReceipts.collect { Receipt receipt -> GoodsReceiptNoteReceiptDto.from(receipt) },
+                // Starts at 1 since the index is printed as the line number ("#" column) of the note.
                 items: shipment.sortShipmentItemsBySortOrder().indexed(1).collect { Integer index, ShipmentItem shipmentItem ->
-                    buildOriginalItem(shipmentItem, index, receipts)
+                    buildOriginalItem(shipmentItem, index, receivedReceipts)
                 },
         )
     }
 
-    private static GoodsReceiptNoteOriginalItemDto buildOriginalItem(ShipmentItem shipmentItem, Integer index, List<Receipt> receipts) {
-        List<ReceiptItem> receiptItems = findReceivedReceiptItems(shipmentItem, receipts)
-        List<List<ReceiptItem>> receivedGroups = groupByProductAndLot(receiptItems)
+    private GoodsReceiptNoteOriginalItemDto buildOriginalItem(ShipmentItem shipmentItem, Integer index, List<Receipt> receivedReceipts) {
+        List<ReceiptItem> receivedReceiptItems = findReceivedReceiptItems(shipmentItem)
+        List<List<ReceiptItem>> productLotGroups = groupByProductAndLot(receivedReceiptItems)
 
-        boolean productCrossedOut = receivedGroups.any { List<ReceiptItem> group ->
-            group.first().product != shipmentItem.product
+        boolean productCrossedOut = productLotGroups.any { List<ReceiptItem> productLotGroup ->
+            productLotGroup.first().product != shipmentItem.product
         }
-        boolean lotCrossedOut = productCrossedOut || receivedGroups.any { List<ReceiptItem> group ->
-            getLotNumber(group.first()) != getLotNumber(shipmentItem)
+        boolean lotCrossedOut = productCrossedOut || productLotGroups.any { List<ReceiptItem> productLotGroup ->
+            getLotNumber(productLotGroup.first()) != getLotNumber(shipmentItem)
         }
 
-        int totalQuantityReceived = sumQuantityReceived(receiptItems)
-        int quantityCanceled = sumQuantityCanceled(receiptItems)
-        int quantityRemaining = (shipmentItem.quantity ?: 0) - totalQuantityReceived - quantityCanceled
+        int totalQuantityReceived = sumQuantityReceived(receivedReceiptItems)
+        int quantityCanceled = sumQuantityCanceled(receivedReceiptItems)
+        int quantityRemaining = shipmentReceivingCalculator.getShipmentItemQuantityRemaining(shipmentItem)
 
         return new GoodsReceiptNoteOriginalItemDto(
                 index: index,
@@ -56,45 +64,45 @@ class GoodsReceiptNoteService {
                 lotNumber: getLotNumber(shipmentItem),
                 expirationDate: shipmentItem.inventoryItem?.expirationDate ?: shipmentItem.expirationDate,
                 quantityShipped: shipmentItem.quantity,
-                quantityReceivedByReceiptId: sumQuantityReceivedByReceiptId(receiptItems, receipts),
+                quantityReceivedByReceiptId: sumQuantityReceivedByReceiptId(receivedReceiptItems, receivedReceipts),
                 totalQuantityReceived: totalQuantityReceived,
                 quantityCanceled: quantityCanceled,
                 quantityRemaining: quantityRemaining,
-                status: GoodsReceiptNoteItemStatus.of(quantityRemaining, quantityCanceled),
-                comments: receiptItems*.comment.findAll().unique(),
+                status: resolveStatus(quantityRemaining, quantityCanceled),
+                comments: receivedReceiptItems*.comment.findAll().unique(),
                 productCrossedOut: productCrossedOut,
                 lotCrossedOut: lotCrossedOut,
                 splitItems: lotCrossedOut
-                        ? receivedGroups.collect { List<ReceiptItem> group -> buildSplitItem(group, receipts, productCrossedOut) }
+                        ? productLotGroups.collect { List<ReceiptItem> productLotGroup -> buildSplitItem(productLotGroup, receivedReceipts, productCrossedOut) }
                         : [],
         )
     }
 
-    private static GoodsReceiptNoteSplitItemDto buildSplitItem(List<ReceiptItem> group, List<Receipt> receipts, boolean productDisplayed) {
-        ReceiptItem receiptItem = group.first()
-        Product product = receiptItem.product
+    private GoodsReceiptNoteSplitItemDto buildSplitItem(List<ReceiptItem> productLotGroup, List<Receipt> receivedReceipts, boolean productDisplayed) {
+        ReceiptItem firstReceiptItem = productLotGroup.first()
+        Product product = firstReceiptItem.product
         return new GoodsReceiptNoteSplitItemDto(
                 productCode: product?.productCode,
                 productName: product?.displayNameOrDefaultName,
                 unitOfMeasure: product?.unitOfMeasure,
                 productDisplayed: productDisplayed,
-                lotNumber: getLotNumber(receiptItem),
-                expirationDate: receiptItem.inventoryItem?.expirationDate ?: receiptItem.expirationDate,
-                quantityReceivedByReceiptId: sumQuantityReceivedByReceiptId(group, receipts),
-                totalQuantityReceived: sumQuantityReceived(group),
+                lotNumber: getLotNumber(firstReceiptItem),
+                expirationDate: firstReceiptItem.inventoryItem?.expirationDate ?: firstReceiptItem.expirationDate,
+                quantityReceivedByReceiptId: sumQuantityReceivedByReceiptId(productLotGroup, receivedReceipts),
+                totalQuantityReceived: sumQuantityReceived(productLotGroup),
         )
     }
 
     /**
-     * The receipt items of completed receipts, in receipt order with the original line of each receipt first, so that
-     * the rolled up lines and comments come out in the order they were received.
+     * The receipt items of completed receipts, in receipt order (the same order as the receipt columns, see
+     * {@link Receipt#compareTo}) with the original line of each receipt first, so that the rolled up lines and comments
+     * come out in the order they were received.
      */
-    private static List<ReceiptItem> findReceivedReceiptItems(ShipmentItem shipmentItem, List<Receipt> receipts) {
-        List<String> receiptIds = receipts*.id
+    private List<ReceiptItem> findReceivedReceiptItems(ShipmentItem shipmentItem) {
         return (shipmentItem.receiptItems ?: [])
-                .findAll { ReceiptItem receiptItem -> receiptItem.receipt?.id in receiptIds }
+                .findAll { ReceiptItem receiptItem -> receiptItem.receipt?.receiptStatusCode == ReceiptStatusCode.RECEIVED }
                 .sort { ReceiptItem a, ReceiptItem b ->
-                    receiptIds.indexOf(a.receipt.id) <=> receiptIds.indexOf(b.receipt.id) ?:
+                    a.receipt <=> b.receipt ?:
                             b.isOriginalLine() <=> a.isOriginalLine() ?:
                                     (a.sortOrder ?: 0) <=> (b.sortOrder ?: 0)
                 }
@@ -102,34 +110,49 @@ class GoodsReceiptNoteService {
 
     /**
      * Rolls the receipt items up by product and lot, leaving out the combinations where nothing was received.
+     * All receipt items of a group share the product and inventory item, so any of them (we take the first) can be
+     * used to read those for the whole group.
      */
-    private static List<List<ReceiptItem>> groupByProductAndLot(List<ReceiptItem> receiptItems) {
+    private List<List<ReceiptItem>> groupByProductAndLot(List<ReceiptItem> receiptItems) {
         return receiptItems
                 .groupBy { ReceiptItem receiptItem -> [receiptItem.product?.id, receiptItem.inventoryItem?.id] }
                 .values()
-                .findAll { List<ReceiptItem> group -> sumQuantityReceived(group) > 0 } as List<List<ReceiptItem>>
+                .findAll { List<ReceiptItem> productLotGroup -> sumQuantityReceived(productLotGroup) > 0 } as List<List<ReceiptItem>>
     }
 
-    private static String getLotNumber(ShipmentItem shipmentItem) {
+    private String getLotNumber(ShipmentItem shipmentItem) {
         return shipmentItem.inventoryItem?.lotNumber ?: shipmentItem.lotNumber ?: null
     }
 
-    private static String getLotNumber(ReceiptItem receiptItem) {
+    private String getLotNumber(ReceiptItem receiptItem) {
         return receiptItem.inventoryItem?.lotNumber ?: receiptItem.lotNumber ?: null
     }
 
-    private static int sumQuantityReceived(List<ReceiptItem> receiptItems) {
+    private int sumQuantityReceived(List<ReceiptItem> receiptItems) {
         return receiptItems.sum(0) { ReceiptItem receiptItem -> receiptItem.quantityReceived ?: 0 } as int
     }
 
-    private static int sumQuantityCanceled(List<ReceiptItem> receiptItems) {
+    private int sumQuantityCanceled(List<ReceiptItem> receiptItems) {
         return receiptItems.sum(0) { ReceiptItem receiptItem -> receiptItem.quantityCanceled ?: 0 } as int
     }
 
-    private static Map<String, Integer> sumQuantityReceivedByReceiptId(List<ReceiptItem> receiptItems, List<Receipt> receipts) {
+    private Map<String, Integer> sumQuantityReceivedByReceiptId(List<ReceiptItem> receiptItems, List<Receipt> receivedReceipts) {
         Map<String, List<ReceiptItem>> receiptItemsByReceiptId = receiptItems.groupBy { ReceiptItem receiptItem -> receiptItem.receipt.id }
-        return receipts.collectEntries { Receipt receipt ->
+        return receivedReceipts.collectEntries { Receipt receipt ->
             [(receipt.id): sumQuantityReceived(receiptItemsByReceiptId[receipt.id] ?: [])]
         }
+    }
+
+    /**
+     * The same precedence as the receiving workflow: a canceled remainder wins, then complete, then over/remaining.
+     */
+    private GoodsReceiptNoteItemStatus resolveStatus(int quantityRemaining, int quantityCanceled) {
+        if (quantityCanceled > 0) {
+            return GoodsReceiptNoteItemStatus.CANCELED
+        }
+        if (quantityRemaining == 0) {
+            return GoodsReceiptNoteItemStatus.COMPLETE
+        }
+        return quantityRemaining < 0 ? GoodsReceiptNoteItemStatus.OVER : GoodsReceiptNoteItemStatus.REMAINING
     }
 }

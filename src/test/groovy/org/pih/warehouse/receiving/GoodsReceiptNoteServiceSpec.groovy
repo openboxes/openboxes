@@ -24,6 +24,8 @@ class GoodsReceiptNoteServiceSpec extends Specification implements ServiceUnitTe
     }
 
     void setup() {
+        service.shipmentReceivingCalculator = new ShipmentReceivingCalculator()
+
         // Product display names are localized through a bean looked up statically, which the DataTest context lacks.
         LocalizationService localizationServiceStub = Stub(LocalizationService) {
             getCurrentLocale() >> Locale.ENGLISH
@@ -34,7 +36,10 @@ class GoodsReceiptNoteServiceSpec extends Specification implements ServiceUnitTe
 
         shipment = new Shipment(shipmentNumber: "257TSG", description: "Drugs", origin: new Location(name: "Origin"),
                 destination: new Location(name: "Destination"))
+        shipment.id = "s1"
         shipment.events = new TreeSet()
+        GroovySpy(Shipment, global: true)
+        Shipment.get("s1") >> shipment
         shipment.receipts = new TreeSet()
         shipment.shipmentItems = [] as Set
         amlodipine = buildProduct("p1", "12660")
@@ -51,7 +56,7 @@ class GoodsReceiptNoteServiceSpec extends Specification implements ServiceUnitTe
         buildReceiptItem(pending, shipmentItem, amlodipine, shipmentItem.inventoryItem, null)
 
         when:
-        GoodsReceiptNoteDto document = service.buildGoodsReceiptNote(shipment)
+        GoodsReceiptNoteDto document = service.buildGoodsReceiptNote("s1")
 
         then:
         assert document.receipts*.id == ["r1"]
@@ -68,7 +73,7 @@ class GoodsReceiptNoteServiceSpec extends Specification implements ServiceUnitTe
         buildShipmentItem(1, amlodipine, null, 50)
 
         when:
-        GoodsReceiptNoteOriginalItemDto item = service.buildGoodsReceiptNote(shipment).items[0]
+        GoodsReceiptNoteOriginalItemDto item = service.buildGoodsReceiptNote("s1").items[0]
 
         then:
         assert item.index == 1
@@ -89,7 +94,7 @@ class GoodsReceiptNoteServiceSpec extends Specification implements ServiceUnitTe
         buildReceiptItem(second, shipmentItem, amlodipine, shipmentItem.inventoryItem, 150, [comment: "Damaged box"])
 
         when:
-        GoodsReceiptNoteDto document = service.buildGoodsReceiptNote(shipment)
+        GoodsReceiptNoteDto document = service.buildGoodsReceiptNote("s1")
         GoodsReceiptNoteOriginalItemDto item = document.items[0]
 
         then:
@@ -112,7 +117,7 @@ class GoodsReceiptNoteServiceSpec extends Specification implements ServiceUnitTe
         buildReceiptItem(receipt, shipmentItem, amlodipine, buildLot("i2", amlodipine, "Lot2"), 150, [isSplitItem: true])
 
         when:
-        GoodsReceiptNoteOriginalItemDto item = service.buildGoodsReceiptNote(shipment).items[0]
+        GoodsReceiptNoteOriginalItemDto item = service.buildGoodsReceiptNote("s1").items[0]
 
         then: 'the empty original line is left out'
         assert item.lotCrossedOut
@@ -133,7 +138,7 @@ class GoodsReceiptNoteServiceSpec extends Specification implements ServiceUnitTe
         buildReceiptItem(receipt, shipmentItem, atenolol100, buildLot("i3", atenolol100, "32435"), 150, [isSplitItem: true])
 
         when:
-        GoodsReceiptNoteOriginalItemDto item = service.buildGoodsReceiptNote(shipment).items[0]
+        GoodsReceiptNoteOriginalItemDto item = service.buildGoodsReceiptNote("s1").items[0]
 
         then:
         assert item.productCrossedOut
@@ -145,13 +150,22 @@ class GoodsReceiptNoteServiceSpec extends Specification implements ServiceUnitTe
         assert item.quantityCanceled == 50
     }
 
+    void 'should fail when the shipment does not exist'() {
+        when:
+        service.buildGoodsReceiptNote("missing")
+
+        then:
+        IllegalStateException exception = thrown()
+        assert exception.message == "Unable to locate shipment missing"
+    }
+
     void 'should keep shipment order and number every shipment item'() {
         given:
         buildShipmentItem(2, atenolol50, null, 10)
         buildShipmentItem(1, amlodipine, null, 20)
 
         when:
-        List<GoodsReceiptNoteOriginalItemDto> items = service.buildGoodsReceiptNote(shipment).items
+        List<GoodsReceiptNoteOriginalItemDto> items = service.buildGoodsReceiptNote("s1").items
 
         then:
         assert items*.index == [1, 2]

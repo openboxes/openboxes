@@ -11,7 +11,6 @@ package org.pih.warehouse.reporting
 
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.receiving.GoodsReceiptNoteService
-import org.pih.warehouse.shipping.Shipment
 
 @Transactional
 class GoodsReceiptNoteController {
@@ -19,12 +18,7 @@ class GoodsReceiptNoteController {
     GoodsReceiptNoteService goodsReceiptNoteService
 
     def print() {
-        Shipment shipment = Shipment.get(params.id)
-        if (!shipment) {
-            throw new IllegalStateException("Unable to locate a shipment associated with stock movement ${params.id}")
-        }
-
-        [goodsReceiptNote: goodsReceiptNoteService.buildGoodsReceiptNote(shipment)]
+        [goodsReceiptNote: goodsReceiptNoteService.buildGoodsReceiptNote(params.id as String)]
     }
 
 }

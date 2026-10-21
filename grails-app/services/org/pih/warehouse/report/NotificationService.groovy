@@ -208,7 +208,7 @@ class NotificationService {
 
     private void sendReceiptNotificationEmails(Shipment shipment, Person receivedBy, Map<Person, List> recipientItems) {
         EmailValidator emailValidator = EmailValidator.getInstance()
-        GoodsReceiptNoteDto goodsReceiptNote = goodsReceiptNoteService.buildGoodsReceiptNote(shipment)
+        GoodsReceiptNoteDto goodsReceiptNote = goodsReceiptNoteService.buildGoodsReceiptNote(shipment.id)
         recipientItems.each { Person recipient, List items ->
             if (emailValidator.isValid(recipient?.email)) {
                 String subject = messageLocalizer.localize("email.yourItemReceived.message", shipment.destination.name, shipment.shipmentNumber)
