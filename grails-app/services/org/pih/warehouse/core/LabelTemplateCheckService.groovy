@@ -18,7 +18,7 @@ class LabelTemplateCheckService implements ApplicationListener<ApplicationReadyE
     // ${...} not preceded by the $$ escape (StringSubstitutor syntax)
     private static final String EXPRESSION = /(?<!\$)\$\{([^}]*)\}/
     // a property path such as product.productCode or product.tags[0].name
-    private static final String PROPERTY_PATH = /[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*(\[[0-9]+\])?)*/
+    private static final String PROPERTY_PATH = BeanPropertyTemplateService.PROPERTY_PATH
     // StringSubstitutor's default value separator: ${name.property:-default}
     private static final String DEFAULT_VALUE_SEPARATOR = ":-"
     // the property names BeanPropertyTemplateService refuses to read

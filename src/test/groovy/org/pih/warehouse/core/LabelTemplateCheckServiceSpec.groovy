@@ -121,6 +121,34 @@ class LabelTemplateCheckServiceSpec extends Specification implements ServiceUnit
         ]
     }
 
+    @Unroll
+    void "findProblems and BeanPropertyTemplateService on #template with #reason (they agree except where the check cannot know the values)"() {
+        given:
+        boolean renders
+        String rendered = null
+        try {
+            rendered = new BeanPropertyTemplateService().renderTemplateContents(template, "label", model)
+            renders = true
+        } catch (IllegalArgumentException | BeansException ignored) {
+            renders = false
+        }
+
+        expect:
+        service.findProblems(template).isEmpty() == checkAccepts
+        renders == rendersExpected
+        rendered == expected
+
+        where:
+        reason                          | template                       | model                                              || checkAccepts | rendersExpected | expected
+        "no bin passed"                 | '${location.name:-no bin}'     | [location: null]                                   || true         | true            | 'no bin'
+        "a product without a category"  | '${product.category.name:-}'   | [product: new Product(productCode: "AB123")]       || true         | true            | ''
+        "a name that is not allowed"    | '${shipment.name:-x}'          | [product: new Product(productCode: "AB123")]       || false        | false           | null
+        "an index that is not a number" | '${product.tags[x]:-}'         | [product: new Product(productCode: "AB123")]       || false        | false           | null
+        // known difference: the check cannot know which values a print request provides,
+        // so a template reading a value the page does not pass fails only when printed
+        "no container passed"           | '${container.name:-}'          | [product: new Product(productCode: "AB123")]       || true         | false           | null
+    }
+
     void "the startup listener should never throw"() {
         given:
         LabelTemplateCheckService failing = Spy(LabelTemplateCheckService) {
