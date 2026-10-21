@@ -5,11 +5,6 @@ import grails.validation.ValidationException
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
-import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionItem
-import org.pih.warehouse.requisition.RequisitionItemStatus
-import org.pih.warehouse.requisition.RequisitionItemType
-import org.pih.warehouse.requisition.RequisitionStatus
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -375,7 +370,7 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
         }
 
         expect:
-        domain.findEffectiveItems().collect {
+        domain.getEffectiveItems().collect {
             it.is(domain) ? 'original' : 'replacement'
         } == expected
 

@@ -558,15 +558,15 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      * against the line it replaces: the product has usually changed, and even when it has not the
      * substitution starts from its own quantity.
      */
-    List<RequisitionItem> findEffectiveItems() {
+    List<RequisitionItem> getEffectiveItems() {
         if (isSubstituted()) {
             // isSubstituted() also covers a substitution linked only through substitutionItem, in which
             // case the typed child collection is empty
             Collection<RequisitionItem> substitutions = substitutionItems ?: [substitutionItem].findAll()
-            return substitutions.collectMany { it.findEffectiveItems() }
+            return substitutions.collectMany { it.getEffectiveItems() }
         }
         if (modificationItem) {
-            return modificationItem.findEffectiveItems()
+            return modificationItem.getEffectiveItems()
         }
         // Cancellation is all or nothing (cancelQuantity sets quantityCanceled to the full quantity), so
         // a canceled line has no demand left. isCanceled() cannot be used here because it reports false

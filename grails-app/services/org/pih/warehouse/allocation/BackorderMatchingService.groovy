@@ -121,7 +121,7 @@ class BackorderMatchingService {
      */
     private static List<RequisitionItem> demandItems(Requisition backorder) {
         return backorder.initialRequisitionItems.collectMany { RequisitionItem item ->
-            item.findEffectiveItems()
+            item.getEffectiveItems()
         }
     }
 }
