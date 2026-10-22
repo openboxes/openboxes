@@ -3,6 +3,7 @@ package org.pih.warehouse
 import grails.validation.ValidationException
 import org.apache.http.auth.AuthenticationException
 import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.picking.StagingLocationMismatchException
 import org.pih.warehouse.requisition.RequisitionSourceType
 
 import java.sql.SQLIntegrityConstraintViolationException
@@ -1297,6 +1298,10 @@ class UrlMappings {
         "500"(controller: "errors", action: "handleException")
         "500"(controller: "errors", action: "handleNotFound", exception: ObjectNotFoundException)
         "500"(controller: "errors", action: "handleValidationErrors", exception: ValidationException)
+        // Must stay below the ValidationException mapping above: Grails dispatches on the
+        // reverse of file-declaration order and returns the first exception.isInstance() match,
+        // so a subclass mapping declared earlier in the file would never be reached.
+        "500"(controller: "errors", action: "handleStagingLocationMismatch", exception: StagingLocationMismatchException)
         "500"(controller: "errors", action: "handleUnauthorized", exception: AuthenticationException)
         "500"(controller: "errors", action: "handleConstraintViolation", exception: SQLIntegrityConstraintViolationException)
         "/"(controller: "dashboard", action: "index")

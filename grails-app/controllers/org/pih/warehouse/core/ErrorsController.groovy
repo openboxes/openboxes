@@ -116,6 +116,23 @@ class ErrorsController {
         render(view: "/error")
     }
 
+    // Handles org.pih.warehouse.picking.StagingLocationMismatchException (see UrlMappings).
+    // allowOverride tells the client this specific failure can be bypassed by resubmitting
+    // the request with an override flag, unlike any other validation/server error.
+    def handleStagingLocationMismatch() {
+        if (RequestUtil.isAjax(request)) {
+            response.status = 500
+            Throwable exception = request.getAttribute('exception')
+            def root = ExceptionUtils.getRootCause(exception)
+            render([errorCode    : 500,
+                    allowOverride: true,
+                    errorMessage : root.message
+            ] as JSON)
+            return
+        }
+        render(view: "/error")
+    }
+
     def handleConstraintViolation() {
         if (RequestUtil.isAjax(request)) {
             if (request?.method == HttpMethod.DELETE.name()) {
