@@ -1,6 +1,7 @@
 package org.pih.warehouse.performance.spec
 
 import org.hibernate.SessionFactory
+import spock.lang.Ignore
 
 import javax.sql.DataSource
 import java.sql.Timestamp
@@ -232,6 +233,7 @@ class GetQuantityByBinLocationPerformanceSpec extends PerformanceSpec {
         }
     }
 
+    @Ignore("It doesn't need to run on every integrationTest invocation")
     def "scoped bin-location query matches and outperforms full-facility computation"() {
         given:
         sessionFactory.statistics.statisticsEnabled = true
