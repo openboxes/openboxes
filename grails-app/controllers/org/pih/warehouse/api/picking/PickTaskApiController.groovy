@@ -130,14 +130,7 @@ class PickTaskApiController extends RestfulController<PickTask> {
                     [errorCode: 404, errorMessage: "Outbound container ${outboundContainerId} not found"] as JSON)
             return
         }
-        try {
-            pickTaskService.drop(outboundContainer, jsonBody)
-        } catch (Exception e) {
-            response.status = 500
-            render([errorCode: 500, errorMessage: e?.message ?: "Error occurred"] as JSON)
-            return
-        }
-
+        pickTaskService.drop(outboundContainer, jsonBody)
         render status: 200
     }
 
