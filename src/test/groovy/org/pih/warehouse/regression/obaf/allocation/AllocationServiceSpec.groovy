@@ -886,7 +886,6 @@ class AllocationServiceSpec extends Specification implements ServiceUnitTest<All
         0 * requisitionService.logRequisitionEvent(*_)
     }
 
-    @PendingFeature(reason = 'AllocationService.groovy:287 completeAllocation gets results.any { it.suggestedItems }, ignoring prepickItems, so an order covered entirely by pre-picked stock stays CREATED and is re-allocated by the next job run')
     void 'allocateRequisition moves an order covered entirely by pre-picked stock to PICKING'() {
         given:
         Location prepickBin = bin(facility, 'PREPICK', [ActivityCode.PREPICK_STOCK, ActivityCode.HOLD_STOCK])
