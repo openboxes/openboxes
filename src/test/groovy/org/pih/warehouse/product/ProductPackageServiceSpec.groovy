@@ -15,6 +15,9 @@ class ProductPackageServiceSpec extends Specification implements ServiceUnitTest
     @Shared
     Date validUntil = new Date()
 
+    @Shared
+    Date expiredValidUntil = new Date() - 30
+
     UnitOfMeasure boxUom
 
     void setupSpec() {
@@ -71,6 +74,27 @@ class ProductPackageServiceSpec extends Specification implements ServiceUnitTest
         assert savedProductSupplier.productPackages == [existingPackage] as Set
     }
 
+    void 'save should create new product package when product supplier has package with same uom but different quantity'() {
+        given:
+        ProductSupplier productSupplier = new ProductSupplier()
+        ProductPackage existingPackage = new ProductPackage(uom: boxUom, quantity: 20)
+        productSupplier.addToProductPackages(existingPackage)
+        ProductPackageCommand command = new ProductPackageCommand(
+                productSupplier: productSupplier,
+                uom: boxUom,
+                productPackageQuantity: 10,
+        )
+
+        when:
+        ProductSupplier savedProductSupplier = service.save(command)
+
+        then:
+        ProductPackage defaultProductPackage = savedProductSupplier.defaultProductPackage
+        assert defaultProductPackage != existingPackage
+        assert defaultProductPackage.quantity == 10
+        assert savedProductSupplier.productPackages == [existingPackage, defaultProductPackage] as Set
+    }
+
     void 'save should set package price to #expectedPrice when existing price is #existingPrice and given price is #givenPrice'() {
         given:
         ProductSupplier productSupplier = new ProductSupplier()
@@ -122,12 +146,13 @@ class ProductPackageServiceSpec extends Specification implements ServiceUnitTest
         assert savedProductSupplier.contractPrice?.toDate == givenValidUntil
 
         where:
-        existingPrice | givenPrice | givenValidUntil || expectedPrice
-        null          | null       | null            || null
-        3.0           | null       | null            || null
-        null          | 10.0       | null            || 10.0
-        null          | null       | validUntil      || null
-        3.0           | 10.0       | validUntil      || 10.0
+        existingPrice | givenPrice | givenValidUntil   || expectedPrice
+        null          | null       | null              || null
+        3.0           | null       | null              || null
+        null          | 10.0       | null              || 10.0
+        null          | null       | validUntil        || null
+        3.0           | 10.0       | validUntil        || 10.0
+        null          | 10.0       | expiredValidUntil || 10.0
     }
 
     void 'delete should delete product package by id using data service'() {

@@ -63,6 +63,7 @@ class ProductPackageApiSpec extends ApiSpec {
         assert createdPackage.uom.id == packageUom.id
         assert createdPackage.quantity == 10
         assert createdPackage.productPrice.price == 25.0
+        assert ProductPackage.withNewTransaction { ProductPackage.get(createdPackage.id).productSupplier.id } == productSupplier.id
     }
 
     void 'create product package should fail when package quantity is negative'() {
