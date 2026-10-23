@@ -11,7 +11,6 @@ package org.pih.warehouse.integration
 
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.api.StockMovement
-
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.requisition.Requisition
