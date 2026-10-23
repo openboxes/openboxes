@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import { fetchAvailableApprovers, fetchRequisitionStatusCodes, fetchShipmentTypes } from 'actions';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import useOutboundFilters from 'hooks/list-pages/outbound/useOutboundFilters';
-import { fetchLocationById, fetchUserById } from 'utils/option-utils';
+import { fetchLocationById, fetchPriorityLevels, fetchUserById } from 'utils/option-utils';
 
 jest.mock('react-redux', () => ({
   ...jest.requireActual('react-redux'),
@@ -25,6 +25,7 @@ jest.mock('actions', () => ({
 jest.mock('utils/option-utils', () => ({
   ...jest.requireActual('utils/option-utils'),
   fetchLocationById: jest.fn(),
+  fetchPriorityLevels: jest.fn(),
   fetchUserById: jest.fn(),
 }));
 
@@ -44,6 +45,7 @@ const EMPTY_FILTERS = {
   createdBy: '',
   updatedBy: '',
   requestType: '',
+  priorityLevel: '',
   createdAfter: '',
   createdBefore: '',
 };
@@ -57,6 +59,11 @@ describe('useOutboundFilters', () => {
   const originOption = {
     id: 'loc-1', value: 'loc-1', name: 'Main Depot', label: 'Main Depot',
   };
+  const priorityLevelOptions = [
+    { id: 'NORMAL', value: 'NORMAL', label: 'Normal (0)' },
+    { id: 'HIGH', value: 'HIGH', label: 'High (50-99)' },
+    { id: 'CRITICAL', value: 'CRITICAL', label: 'Critical (100+)' },
+  ];
 
   const renderFilters = (sourceType) => renderHook((type) => useOutboundFilters(type), {
     initialProps: sourceType,
@@ -84,6 +91,7 @@ describe('useOutboundFilters', () => {
     useHistory.mockReturnValue(history);
     fetchLocationById.mockResolvedValue({ id: 'dest-1', name: 'Clinic' });
     fetchUserById.mockImplementation(async (id) => ({ id, name: `User ${id}` }));
+    fetchPriorityLevels.mockResolvedValue(priorityLevelOptions);
   });
 
   it('fetches shipment types, requisition statuses for the source type and approvers on mount', () => {
@@ -109,6 +117,14 @@ describe('useOutboundFilters', () => {
     expect(fetchLocationById).not.toHaveBeenCalled();
   });
 
+  it('exposes the fetched priority levels as filter options', async () => {
+    const { result } = renderFilters(undefined);
+    await flushPromises();
+
+    expect(fetchPriorityLevels).toHaveBeenCalledTimes(1);
+    expect(result.current.priorityLevels).toEqual(priorityLevelOptions);
+  });
+
   it('builds the default values from every supported query parameter', async () => {
     history.location.search = [
       'requisitionStatusCode=PENDING',
@@ -121,6 +137,9 @@ describe('useOutboundFilters', () => {
       'createdAfter=01/01/2026',
       'createdBefore=02/01/2026',
       'shipmentType=sea',
+      'priorityLevel=HIGH',
+      'priorityLevel=CRITICAL',
+      'priorityLevel=UNKNOWN',
       'approver=appr-2',
       'approver=null',
     ].join('&');
@@ -142,6 +161,7 @@ describe('useOutboundFilters', () => {
       createdAfter: '01/01/2026',
       createdBefore: '02/01/2026',
       shipmentType: [{ id: 'sea' }],
+      priorityLevel: [priorityLevelOptions[1], priorityLevelOptions[2]],
     });
     expect(fetchLocationById).toHaveBeenCalledWith('dest-1');
     expect(fetchUserById).toHaveBeenCalledTimes(2);
@@ -169,6 +189,7 @@ describe('useOutboundFilters', () => {
       createdAfter: '01/01/2026',
       ignored: 'value',
       shipmentType: [],
+      priorityLevel: [{ id: 'HIGH' }, { id: 'CRITICAL' }],
     };
 
     act(() => result.current.setFilterValues(values));
@@ -176,6 +197,7 @@ describe('useOutboundFilters', () => {
     expect(history.push).toHaveBeenCalledWith({
       pathname: '/stockMovement/list',
       search: 'createdAfter=01%2F01%2F2026&destination=dest-1&direction=OUTBOUND'
+        + '&priorityLevel=HIGH&priorityLevel=CRITICAL'
         + '&requisitionStatusCode=PENDING&requisitionStatusCode=ISSUED&sourceType=ELECTRONIC',
     });
     expect(result.current.filterParams).toBe(values);

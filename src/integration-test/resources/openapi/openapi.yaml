@@ -410,6 +410,8 @@ paths:
     $ref: 'paths/prepayment-invoice-item.yaml#/~1api~1prepaymentInvoiceItems~1{id}'
   '/api/prepaymentInvoices/{id}/invoiceItems':
     $ref: 'paths/prepayment-invoice.yaml#/~1api~1prepaymentInvoices~1{id}~1invoiceItems'
+  '/api/priorityLevelOptions':
+    $ref: 'paths/select-options.yaml#/~1api~1priorityLevelOptions'
   '/api/productClassifications':
     $ref: 'paths/product-classification.yaml#/~1api~1productClassifications'
   '/api/productGroupOptions':
