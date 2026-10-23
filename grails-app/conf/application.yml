@@ -584,9 +584,10 @@ openboxes:
 
         # Generate replenishment lists for bins below minimum (triggered after picking completes)
         automaticReplenishmentJob:
-            enabled: true
+            enabled: false
             cronExpression: "0 */30 * * * ?"    # every thirty minutes
             delayInMilliseconds: 5000           # added on top of the product availability refresh delay
+            targetActivityCodes: []
 
         automaticAllocationJob:
             enabled: true

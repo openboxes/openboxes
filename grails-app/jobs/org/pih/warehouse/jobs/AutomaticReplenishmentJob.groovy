@@ -23,10 +23,6 @@ import org.quartz.JobExecutionContext
  * completes, and on a cron schedule as a safety net that sweeps all depots.
  */
 class AutomaticReplenishmentJob {
-
-    // Locations replenished by the scheduled sweep
-    static final List<ActivityCode> SCHEDULED_TARGET_ACTIVITY_CODES = [ActivityCode.DISPLAY_STOCK]
-
     ReplenishmentService replenishmentService
     LocationService locationService
     AuthService authService
@@ -50,19 +46,23 @@ class AutomaticReplenishmentJob {
         if (facilityId) {
             List<String> activityCodes = context.mergedJobDataMap.get('targetActivityCodes') as List<String>
             generateReplenishment(facilityId, activityCodes?.collect { ActivityCode.valueOf(it) })
+            // The AutomaticReplenishmentJob works in twofolds. One time it works with PICK_COMPLETED RequisitionEvent.
+            // In this case a specific facilityId is given. Then it returns  here. And the other time it works as a fallback
+            // mechanism where it checks everything (below).
             return
         }
 
-        List<String> depotIds = authService.withSystemUser {
+        List<ActivityCode> targetActivityCodes = replenishmentService.getTargetActivityCodes()
+        List<String> facilityIds = authService.withSystemUser {
             locationService.getDepots().findAll { Location depot ->
-                depot.active && hasTargetLocations(depot, SCHEDULED_TARGET_ACTIVITY_CODES)
+                depot.active && hasTargetLocations(depot, targetActivityCodes)
             }*.id
         } as List<String>
-        log.info "Found ${depotIds.size()} depots with locations to replenish automatically"
+        log.info "Found ${facilityIds.size()} facilities with locations to replenish automatically"
 
-        depotIds.each { String depotId ->
+        facilityIds.each { String depotId ->
             try {
-                generateReplenishment(depotId, SCHEDULED_TARGET_ACTIVITY_CODES)
+                generateReplenishment(depotId, targetActivityCodes)
             } catch (Exception e) {
                 // Don't let one failing depot stop the rest of the sweep.
                 log.error("Error generating automatic replenishment for location ${depotId}", e)

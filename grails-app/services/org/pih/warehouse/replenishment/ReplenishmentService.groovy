@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.replenishment
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.Replenishment
@@ -16,21 +17,26 @@ import org.pih.warehouse.api.ReplenishmentItem
 import org.pih.warehouse.api.ReplenishmentPickPageItem
 import org.pih.warehouse.api.ReplenishmentStatus
 import org.pih.warehouse.api.SuggestedItem
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.identification.IdentifierGeneratorContext
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryLevelStatus
+import org.pih.warehouse.inventory.InventoryService
+import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.Requirement
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderIdentifierService
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.picklist.PicklistService
 import org.pih.warehouse.product.Product
 
 import javax.xml.bind.ValidationException
@@ -38,13 +44,12 @@ import javax.xml.bind.ValidationException
 @Transactional
 class ReplenishmentService {
 
-    def grailsApplication
-    def authService
-    def locationService
-    def inventoryService
-    def productAvailabilityService
-    def picklistService
-    def orderIdentifierService
+    GrailsApplication grailsApplication
+    AuthService authService
+    InventoryService inventoryService
+    ProductAvailabilityService productAvailabilityService
+    PicklistService picklistService
+    OrderIdentifierService orderIdentifierService
 
     def getRequirements(Location location, InventoryLevelStatus inventoryLevelStatus) {
         def requirements = Requirement.createCriteria().list() {
@@ -376,5 +381,17 @@ class ReplenishmentService {
         pickPageItem.suggestedItems = suggestedItems
 
         return pickPageItem
+    }
+
+    List<ActivityCode> getTargetActivityCodes() {
+        return grailsApplication.config.getProperty(
+                "openboxes.jobs.automaticReplenishmentJob.targetActivityCodes", List, [])
+                .findResults { String activityCode ->
+                    try {
+                        return ActivityCode.valueOf(activityCode)
+                    } catch (IllegalArgumentException e) {
+                        log.warn("Unrecognized target activity code for automaticReplenishmentJob '${activityCode}'. Ignoring.")
+                    }
+                }
     }
 }
