@@ -48,9 +48,7 @@ class RequisitionEventService {
                 "openboxes.jobs.automaticReplenishmentJob.delayInMilliseconds", Integer, 0)
         Date runAt = new Date(System.currentTimeMillis() + refreshDelayInMilliseconds + delayInMilliseconds)
         log.info "Triggering automaticReplenishmentJob for ${requisition.origin} with ${refreshDelayInMilliseconds + delayInMilliseconds} ms delay"
-        AutomaticReplenishmentJob.schedule(runAt, [
-                facilityId         : requisition.origin.id,
-                targetActivityCodes: [ActivityCode.DISPLAY_STOCK.name()],
-        ])
+        // No target activity codes: the job uses the configured ones
+        AutomaticReplenishmentJob.schedule(runAt, [facilityId: requisition.origin.id])
     }
 }

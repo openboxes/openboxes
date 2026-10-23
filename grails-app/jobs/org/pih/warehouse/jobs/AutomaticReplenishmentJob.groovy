@@ -19,8 +19,10 @@ import org.quartz.JobExecutionContext
 /**
  * Generates replenishment lists for bins that have fallen below their minimum level.
  *
- * Triggered ad hoc for a single facility (job data "facilityId" and "targetActivityCodes") after picking
- * completes, and on a cron schedule as a safety net that sweeps all depots.
+ * Triggered ad hoc for a single facility (job data "facilityId") after picking completes, and on a cron schedule
+ * as a safety net that sweeps all depots. Both replenish the locations supporting the configured
+ * openboxes.jobs.automaticReplenishmentJob.targetActivityCodes (job data "targetActivityCodes" overrides them
+ * for an ad hoc run), and do nothing when there are none.
  */
 class AutomaticReplenishmentJob {
     ReplenishmentService replenishmentService
@@ -44,8 +46,18 @@ class AutomaticReplenishmentJob {
 
         String facilityId = context.mergedJobDataMap.get('facilityId')
         if (facilityId) {
-            List<String> activityCodes = context.mergedJobDataMap.get('targetActivityCodes') as List<String>
-            generateReplenishment(facilityId, activityCodes?.collect { ActivityCode.valueOf(it) })
+            // Codes given in the job data override the configured ones
+            List<ActivityCode> targetActivityCodes = replenishmentService.parseActivityCodes(
+                    context.mergedJobDataMap.get('targetActivityCodes') as List<String>, "job data")
+            if (!targetActivityCodes) {
+                targetActivityCodes = replenishmentService.getTargetActivityCodes()
+            }
+            if (!targetActivityCodes) {
+                log.info "No target activity codes given or configured (openboxes.jobs.automaticReplenishmentJob.targetActivityCodes), " +
+                        "skipping automatic replenishment for location ${facilityId}"
+                return
+            }
+            generateReplenishment(facilityId, targetActivityCodes)
             // The AutomaticReplenishmentJob works in twofolds. One time it works with PICK_COMPLETED RequisitionEvent.
             // In this case a specific facilityId is given. Then it returns  here. And the other time it works as a fallback
             // mechanism where it checks everything (below).
@@ -53,6 +65,11 @@ class AutomaticReplenishmentJob {
         }
 
         List<ActivityCode> targetActivityCodes = replenishmentService.getTargetActivityCodes()
+        if (!targetActivityCodes) {
+            log.info "No target activity codes configured (openboxes.jobs.automaticReplenishmentJob.targetActivityCodes), " +
+                    "skipping automatic replenishment"
+            return
+        }
         List<String> facilityIds = authService.withSystemUser {
             locationService.getDepots().findAll { Location depot ->
                 depot.active && hasTargetLocations(depot, targetActivityCodes)

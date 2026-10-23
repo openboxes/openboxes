@@ -461,14 +461,20 @@ class ReplenishmentService {
     }
 
     List<ActivityCode> getTargetActivityCodes() {
-        return grailsApplication.config.getProperty(
-                "openboxes.jobs.automaticReplenishmentJob.targetActivityCodes", List, [])
-                .findResults { String activityCode ->
-                    try {
-                        return ActivityCode.valueOf(activityCode)
-                    } catch (IllegalArgumentException e) {
-                        log.warn("Unrecognized target activity code for automaticReplenishmentJob '${activityCode}'. Ignoring.")
-                    }
-                }
+        return parseActivityCodes(grailsApplication.config.getProperty(
+                "openboxes.jobs.automaticReplenishmentJob.targetActivityCodes", List, []), "configuration")
+    }
+
+    /**
+     * Converts the given activity code names, skipping (with a warning) the ones that are not recognized.
+     */
+    List<ActivityCode> parseActivityCodes(List<String> activityCodes, String source) {
+        return (activityCodes ?: []).findResults { String activityCode ->
+            try {
+                return ActivityCode.valueOf(activityCode)
+            } catch (IllegalArgumentException e) {
+                log.warn("Unrecognized target activity code for automaticReplenishmentJob '${activityCode}' in ${source}. Ignoring.")
+            }
+        }
     }
 }
