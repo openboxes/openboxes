@@ -1450,6 +1450,32 @@ class CycleCountServiceSpec extends Specification implements DataTest {
         assert rows[0]["Date Counted"] == ""
     }
 
+    void 'getCountFormXls should keep the rows in the order of the count items'() {
+        given: 'regular and custom items ordered by bin, so a custom item comes before the regular ones'
+        Location facility = createFacility()
+        Product product = createProduct("AB12")
+        InventoryItem lot = createInventoryItem(product, "LOT-1")
+        CycleCount cycleCount = new CycleCount(facility: facility, status: CycleCountStatus.COUNTING)
+        List<Map> items = [
+                [id: "0004", custom: true, binName: "A0"],
+                [id: "0001", custom: false, binName: "A1"],
+                [id: "0002", custom: false, binName: "B1"],
+                [id: "0003", custom: true, binName: "C1"],
+        ]
+        items.each { Map args ->
+            CycleCountItem item = buildItem(facility: facility, inventoryItem: lot,
+                    binLocation: new Location(name: args.binName), custom: args.custom)
+            item.id = args.id
+            cycleCount.addToCycleCountItems(item)
+        }
+
+        when:
+        List<Map> rows = cycleCountService.getCountFormXls([CycleCountDto.toDto(cycleCount)])
+
+        then: 'the rows follow the order of the count items, like the count page'
+        assert rows*."Bin Location" == ["A1", "B1", "C1", "A0"]
+    }
+
     // ---------------------------------------------------------------------------------------------
     // Export: recount form XLS
     // ---------------------------------------------------------------------------------------------
@@ -1510,6 +1536,36 @@ class CycleCountServiceSpec extends Specification implements DataTest {
         then:
         assert rows[0]["Quantity Counted"] == 5
         assert rows[0]["Difference"] == ""
+    }
+
+    void 'getRecountFormXls should keep the rows in the order of the count items'() {
+        given: 'a count with items created out of bin order and a recount item for each of them'
+        Location facility = createFacility()
+        Product product = createProduct("AB12")
+        InventoryItem lot = createInventoryItem(product, "LOT-1")
+        CycleCount cycleCount = new CycleCount(facility: facility, status: CycleCountStatus.INVESTIGATING)
+        List<Map> items = [
+                [id: "0001", countIndex: 0, binName: "C1"],
+                [id: "0002", countIndex: 0, binName: "A1"],
+                [id: "0003", countIndex: 0, binName: "B1"],
+                [id: "0004", countIndex: 0, binName: "D1"],
+                [id: "0005", countIndex: 1, binName: "A1"],
+                [id: "0006", countIndex: 1, binName: "B1"],
+                [id: "0007", countIndex: 1, binName: "C1"],
+                [id: "0008", countIndex: 1, binName: "D1"],
+        ]
+        items.each { Map args ->
+            CycleCountItem item = buildItem(facility: facility, inventoryItem: lot,
+                    binLocation: new Location(name: args.binName), countIndex: args.countIndex)
+            item.id = args.id
+            cycleCount.addToCycleCountItems(item)
+        }
+
+        when:
+        List<Map> rows = cycleCountService.getRecountFormXls([CycleCountDto.toDto(cycleCount)])
+
+        then: 'the rows follow the order of the count items, like the recount page'
+        assert rows*."Bin Location" == ["C1", "A1", "B1", "D1"]
     }
 
     void 'getRecountFormXls currently fails when an initial count item has no recount partner'() {

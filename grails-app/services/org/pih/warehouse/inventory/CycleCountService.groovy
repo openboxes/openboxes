@@ -3,8 +3,6 @@ package org.pih.warehouse.inventory
 import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
-import org.apache.commons.collections4.keyvalue.MultiKey
-import org.apache.commons.collections4.map.MultiKeyMap
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.datastore.mapping.query.api.Criteria
@@ -483,7 +481,7 @@ class CycleCountService {
 
         // Build a map to make it easier to group the count and recount items into one row in the XLS.
         // The outer map is keyed on [product code + lot + bin]. The inner map is keyed on count index.
-        MultiKeyMap<String, Map<Integer, CycleCountItemDto>> countItemsMap = [:]
+        Map<List<String>, Map<Integer, CycleCountItemDto>> countItemsMap = [:]
         List<CycleCountItemDto> customRecountItems = []
         for (CycleCountItemDto item in cycleCount.cycleCountItems) {
             // Keep custom recount items separate because they can have duplicate keys and don't have a count item.
@@ -492,11 +490,11 @@ class CycleCountService {
                 continue
             }
 
-            MultiKey<String> key = new MultiKey(
+            List<String> key = [
                     item.product.productCode,
                     item.inventoryItem?.lotNumber,
                     item.binLocation?.name,
-            )
+            ]
             Map<Integer, CycleCountItemDto> countItemByIndex = countItemsMap.computeIfAbsent(key, { k -> [:] })
             countItemByIndex.put(item.countIndex, item)
         }
