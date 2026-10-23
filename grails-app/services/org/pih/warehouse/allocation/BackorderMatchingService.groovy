@@ -121,29 +121,7 @@ class BackorderMatchingService {
      */
     private static List<RequisitionItem> demandItems(Requisition backorder) {
         return backorder.initialRequisitionItems.collectMany { RequisitionItem item ->
-            effectiveItems(item)
+            item.findEffectiveItems()
         }
-    }
-
-    /**
-     * The item itself, or the items that replaced it. A substitution is not carried any backorder
-     * recorded against the line it replaces: the product has usually changed, and even when it has
-     * not the substitution starts from its own quantity.
-     */
-    private static List<RequisitionItem> effectiveItems(RequisitionItem item) {
-        if (item.isSubstituted()) {
-            // isSubstituted() also covers a substitution linked only through substitutionItem, in which
-            // case the typed child collection is empty
-            Collection<RequisitionItem> substitutions = item.substitutionItems ?: [item.substitutionItem].findAll()
-            return substitutions.collectMany { effectiveItems(it) }
-        }
-        if (item.modificationItem) {
-            return effectiveItems(item.modificationItem)
-        }
-        // Cancellation is all or nothing (cancelQuantity sets quantityCanceled to the full quantity), so
-        // a canceled line has no demand left. isCanceled() cannot be used here because it reports false
-        // while a backorder is still recorded against the item.
-        boolean isFullyCanceled = (item.quantityCanceled ?: 0) >= (item.quantity ?: 0)
-        return isFullyCanceled ? [] : [item]
     }
 }
