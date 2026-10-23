@@ -37,7 +37,6 @@ import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.picklist.PicklistService
-import org.pih.warehouse.product.Product
 
 import javax.xml.bind.ValidationException
 
@@ -114,21 +113,42 @@ class ReplenishmentService {
     }
 
     List<ReplenishmentItem> getAutomaticReplenishmentItems(Location facility, ActivityCode[] targetActivityCodes) {
-        List<Requirement> requirements = getRequirements(facility, InventoryLevelStatus.BELOW_MINIMUM)
         Set<String> binsOnOpenReplenishments = getBinsOnOpenReplenishments(facility)
-
-        return requirements.findAll { Requirement requirement ->
+        List<Requirement> requirements = getRequirements(facility, InventoryLevelStatus.BELOW_MINIMUM).findAll { Requirement requirement ->
             isTargetLocation(requirement.binLocation, targetActivityCodes) &&
                     !binsOnOpenReplenishments.contains(getProductBinKey(requirement.product?.id, requirement.binLocation?.id))
-        }.collect { Requirement requirement ->
-            Integer quantityPickable = getQuantityPickable(facility, requirement.product, requirement.binLocation, targetActivityCodes)
-            new ReplenishmentItem(
-                    product: requirement.product,
-                    location: facility,
-                    binLocation: requirement.binLocation,
-                    quantity: Math.min(requirement.quantityNeeded as Integer, quantityPickable),
-            )
-        }.findAll { ReplenishmentItem replenishmentItem -> replenishmentItem.quantity > 0 }
+        }
+
+        Map<String, Integer> quantityRemainingByProduct = getQuantityPickableByProduct(
+                facility, requirements.collect { it.product?.id }.unique(), targetActivityCodes)
+
+        // Bins of the same product share its reserve stock, so fill the emptiest bins first and deduct what they take
+        Integer[] quantities = new Integer[requirements.size()]
+        List<Integer> indexesByPriority = (0..<requirements.size()).sort(false) { Integer a, Integer b ->
+            getFillRatio(requirements[a]) <=> getFillRatio(requirements[b]) ?: a <=> b
+        }
+        indexesByPriority.each { Integer index ->
+            Requirement requirement = requirements[index]
+            String productId = requirement.product?.id
+            Integer quantityRemaining = quantityRemainingByProduct[productId] ?: 0
+            Integer quantity = Math.min(requirement.quantityNeeded as Integer, quantityRemaining)
+            quantityRemainingByProduct[productId] = quantityRemaining - quantity
+            quantities[index] = quantity
+        }
+
+        // Keep the zone and bin order of the requirements
+        List<ReplenishmentItem> replenishmentItems = []
+        requirements.eachWithIndex { Requirement requirement, int index ->
+            if (quantities[index] > 0) {
+                replenishmentItems << new ReplenishmentItem(
+                        product: requirement.product,
+                        location: facility,
+                        binLocation: requirement.binLocation,
+                        quantity: quantities[index],
+                )
+            }
+        }
+        return replenishmentItems
     }
 
     /**
@@ -154,18 +174,25 @@ class ReplenishmentService {
     }
 
     /**
-     * Returns the quantity that can be automatically picked to replenish the bin, excluding stock that is
-     * in the bin itself or in other target locations.
+     * Returns, by product id, the quantity that can be automatically picked to replenish target locations,
+     * excluding stock that is in target locations itself. Products with nothing to pick are left out.
      */
-    Integer getQuantityPickable(Location facility, Product product, Location binLocation, ActivityCode[] targetActivityCodes) {
-        List<AvailableItem> availableItems = productAvailabilityService.getAvailableBinLocations(facility, product?.id)
-        BigDecimal quantityPickable = availableItems.findAll { AvailableItem availableItem ->
-            availableItem.binLocation != binLocation &&
-                    availableItem.pickable &&
+    Map<String, Integer> getQuantityPickableByProduct(Location facility, List<String> productIds, ActivityCode[] targetActivityCodes) {
+        // An empty list would return the availability of every product in the facility
+        if (!productIds) {
+            return [:]
+        }
+
+        List<AvailableItem> availableItems = productAvailabilityService.getAvailableBinLocations(facility, productIds)
+        return availableItems.findAll { AvailableItem availableItem ->
+            availableItem.pickable &&
                     availableItem.quantityAvailable > 0 &&
                     !isTargetLocation(availableItem.binLocation, targetActivityCodes)
-        }.sum { AvailableItem availableItem -> availableItem.quantityAvailable } as BigDecimal
-        return quantityPickable?.intValue() ?: 0
+        }.groupBy { AvailableItem availableItem ->
+            availableItem.inventoryItem?.product?.id
+        }.collectEntries { String productId, List<AvailableItem> items ->
+            [(productId): (items.sum { AvailableItem availableItem -> availableItem.quantityAvailable } as BigDecimal).intValue()]
+        } as Map<String, Integer>
     }
 
     String generateReplenishmentNumber() {
@@ -181,6 +208,15 @@ class ReplenishmentService {
 
     private static boolean isTargetLocation(Location binLocation, ActivityCode[] targetActivityCodes) {
         return binLocation?.supportsAny(targetActivityCodes) ?: false
+    }
+
+    /**
+     * How full the bin is relative to its minimum level, lowest for the bins closest to running empty.
+     */
+    private static BigDecimal getFillRatio(Requirement requirement) {
+        Integer quantityInBin = requirement.quantityInBin ?: 0
+        Integer minQuantity = requirement.minQuantity ?: 0
+        return minQuantity > 0 ? quantityInBin / minQuantity : quantityInBin as BigDecimal
     }
 
     private static String getProductBinKey(String productId, String binLocationId) {
