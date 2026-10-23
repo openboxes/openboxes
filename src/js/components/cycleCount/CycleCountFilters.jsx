@@ -26,6 +26,7 @@ const CycleCountFilters = ({
       isLoading={isLoading}
       customSubmitButtonLabel="react.button.filter.label"
       customSubmitButtonDefaultLabel="Filter"
+      disableAutoUpdateFilterParams
     />
   </ListFilterFormWrapper>
 );
