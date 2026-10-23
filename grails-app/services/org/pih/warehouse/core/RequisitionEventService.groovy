@@ -1,15 +1,24 @@
 package org.pih.warehouse.core
 
 import grails.core.GrailsApplication
+import grails.plugins.quartz.GrailsJobClassConstants
 import org.pih.warehouse.jobs.AutomaticIssuanceJob
 import org.pih.warehouse.jobs.AutomaticReplenishmentJob
 import org.pih.warehouse.requisition.Requisition
+import org.quartz.JobDataMap
+import org.quartz.JobKey
+import org.quartz.ObjectAlreadyExistsException
+import org.quartz.Scheduler
+import org.quartz.Trigger
+import org.quartz.TriggerBuilder
+import org.quartz.TriggerKey
 import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
 
 class RequisitionEventService {
     GrailsApplication grailsApplication
     WebhookPublisherService webhookPublisherService
+    Scheduler quartzScheduler
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     void onRequisitionEvent(RequisitionEvent event) {
@@ -47,8 +56,28 @@ class RequisitionEventService {
         Integer delayInMilliseconds = grailsApplication.config.getProperty(
                 "openboxes.jobs.automaticReplenishmentJob.delayInMilliseconds", Integer, 0)
         Date runAt = new Date(System.currentTimeMillis() + refreshDelayInMilliseconds + delayInMilliseconds)
-        log.info "Triggering automaticReplenishmentJob for ${requisition.origin} with ${refreshDelayInMilliseconds + delayInMilliseconds} ms delay"
-        // No target activity codes: the job uses the configured ones
-        AutomaticReplenishmentJob.schedule(runAt, [facilityId: requisition.origin.id])
+        String facilityId = requisition.origin.id
+
+        // One trigger per facility, so that a burst of pick completions results in a single run after the last one
+        TriggerKey triggerKey = TriggerKey.triggerKey("AutomaticReplenishmentJob-${facilityId}", AutomaticReplenishmentJob.name)
+        Trigger trigger = TriggerBuilder.newTrigger()
+                .withIdentity(triggerKey)
+                .forJob(JobKey.jobKey(AutomaticReplenishmentJob.name, GrailsJobClassConstants.DEFAULT_GROUP))
+                // No target activity codes: the job uses the configured ones
+                .usingJobData(new JobDataMap([facilityId: facilityId]))
+                .startAt(runAt)
+                .build()
+
+        log.info "Triggering automaticReplenishmentJob for ${requisition.origin} with ${refreshDelayInMilliseconds + delayInMilliseconds} ms delay, " +
+                "replacing its pending run if there is one"
+        // Replace the pending run of the facility, or schedule one if there is none
+        if (!quartzScheduler.rescheduleJob(triggerKey, trigger)) {
+            try {
+                quartzScheduler.scheduleJob(trigger)
+            } catch (ObjectAlreadyExistsException e) {
+                // Scheduled by a concurrent pick completion in the meantime
+                quartzScheduler.rescheduleJob(triggerKey, trigger)
+            }
+        }
     }
 }
