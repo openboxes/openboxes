@@ -37,6 +37,8 @@ class RoleInterceptorSpec extends Specification {
         'superuser'       | 'productCatalog'        | 'create'                      || 'requires'
         'superuser'       | 'productType'           | 'edit'                        || 'requires'
         'superuser'       | 'quartz'                | 'index'                       || 'requires'
+        'superuser'       | 'report'                | 'refreshInventoryCountCandidates' || 'requires'
+        'superuser'       | 'report'                | 'showInventoryReport'         || 'does not require'
         'superuser'       | 'transactionEntry'      | 'delete'                      || 'requires'
         'superuser'       | 'user'                  | 'edit'                        || 'does not require'
         'superuser'       | 'user'                  | 'impersonate'                 || 'requires'

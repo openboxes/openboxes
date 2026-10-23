@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.data
 
+import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
 import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
@@ -71,6 +72,22 @@ class DataService {
         statementList.each { String statement ->
             executeStatement(statement, logStatements)
         }
+    }
+
+    /**
+     * Reads a SQL file from the classpath (e.g. a migration file under grails-app/migrations) and splits it
+     * into statements: comment-only lines are dropped and each statement ends with a semicolon, so the file
+     * must not contain one anywhere else (in a string literal or a trailing comment).
+     */
+    @NotTransactional
+    List<String> readStatements(String path) {
+        InputStream stream = DataService.classLoader.getResourceAsStream(path)
+        if (!stream) {
+            throw new IllegalStateException("SQL file not found on the classpath: ${path}")
+        }
+        String sql = stream.withStream { InputStream it -> it.getText('UTF-8') }
+        String withoutCommentLines = sql.readLines().findAll { !it.trim().startsWith('--') }.join('\n')
+        return withoutCommentLines.split(';').collect { it.trim() }.findAll { it }
     }
 
 
