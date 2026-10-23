@@ -1136,10 +1136,12 @@ class IndicatorDataService {
                 COUNT(DISTINCT backdated_shipment) as shipments_with_backdated_product,
                 GROUP_CONCAT(DISTINCT backdated_shipment SEPARATOR " "),
                 DATE_FORMAT(last_stock_count, "%d-%b-%Y"),
-                GROUP_CONCAT(DISTINCT backdated_shipment, ' ', shipment_id SEPARATOR ';') as shipment_ids
+                GROUP_CONCAT(DISTINCT backdated_shipment, ' ', shipment_id SEPARATOR ';') as shipment_ids,
+                product_id
             FROM (
                 SELECT 
                     p.product_code,
+                    p.id as product_id,
                     backdated_transaction.shipment_number as backdated_shipment,
                     backdated_transaction.date_created,
                     stock_count.last_stock_count,
@@ -1185,7 +1187,7 @@ class IndicatorDataService {
                 ) as stock_count ON stock_count.product_id = ii.product_id
             ) as dashboard_data
             WHERE dashboard_data.date_created > dashboard_data.last_stock_count OR dashboard_data.last_stock_count IS NULL
-            GROUP BY product_code, last_stock_count
+            GROUP BY product_code, product_id, last_stock_count
             ORDER BY shipments_with_backdated_product DESC
         '''
 
@@ -1205,7 +1207,7 @@ class IndicatorDataService {
                 number: it[0] as String,                  // Item
                 listNameData: shipmentNumbers,            // Shipments
                 value: it[3] as String ?: Constants.NONE, // Last count
-                numberLink: "${urlContextPath}/inventoryItem/showStockCard/${it[0]}",
+                numberLink: "${urlContextPath}/inventoryItem/showStockCard/${it[5]}",
                 nameLinksList: shipmentUrls,
         ) }
 
