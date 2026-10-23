@@ -108,8 +108,39 @@ class ReplenishmentService {
             !isTargetLocation(availableItem.binLocation, activityCodes)
         }
 
-        log.info "Generated automatic replenishment ${order.orderNumber} with ${replenishmentItems.size()} items in ${facility.name}"
+        // Nobody reviews the picks of an automatic replenishment, so it must only ask for stock that was allocated
+        if (!order.orderItems.any { OrderItem orderItem -> getQuantityAllocated(orderItem) > 0 }) {
+            log.warn "No stock could be allocated for automatic replenishment ${order.orderNumber} in ${facility.name}, it was not created"
+            order.delete(flush: true)
+            return null
+        }
+        removeUnallocatedQuantities(order)
+
+        log.info "Generated automatic replenishment ${order.orderNumber} with ${order.orderItems.size()} items in ${facility.name}"
         return order
+    }
+
+    /**
+     * Drops the lines that got no picks and reduces the quantity of partially allocated lines to what was allocated.
+     * PicklistService#getSuggestedItems can stop before allocating the whole quantity requested.
+     */
+    private void removeUnallocatedQuantities(Order order) {
+        order.orderItems.toList().each { OrderItem orderItem ->
+            Integer quantityAllocated = getQuantityAllocated(orderItem)
+            if (quantityAllocated == 0) {
+                log.warn "No stock could be allocated to replenish ${orderItem.product?.productCode} in ${orderItem.destinationBinLocation?.name}, " +
+                        "dropping it from automatic replenishment ${order.orderNumber}"
+                deleteReplenishmentItem(orderItem.id)
+            } else if (quantityAllocated < orderItem.quantity) {
+                log.warn "Only ${quantityAllocated} of ${orderItem.quantity} could be allocated to replenish ${orderItem.product?.productCode} " +
+                        "in ${orderItem.destinationBinLocation?.name}, reducing it in automatic replenishment ${order.orderNumber}"
+                orderItem.quantity = quantityAllocated
+            }
+        }
+    }
+
+    private static Integer getQuantityAllocated(OrderItem orderItem) {
+        return orderItem.picklistItems?.sum { PicklistItem picklistItem -> picklistItem.quantity } ?: 0
     }
 
     List<ReplenishmentItem> getAutomaticReplenishmentItems(Location facility, ActivityCode[] targetActivityCodes) {
