@@ -3,6 +3,7 @@ package org.pih.warehouse.receiving
 import org.springframework.stereotype.Component
 import org.springframework.validation.ObjectError
 
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.core.validation.ObjectValidator
@@ -13,11 +14,28 @@ class ReceiptEditReceivingInfoCommandValidator extends ObjectValidator<ReceiptEd
     @Override
     protected ObjectValidationResult doValidate(ReceiptEditReceivingInfoCommand command) {
         return new ObjectValidationResult(
+                validateCurrentLocationIsDestination(command),
                 validateReceiptIsPending(command),
                 validateItemsToSaveAreValid(command),
                 validateNoDuplicateItemsToSave(command),
                 validateBinLocationIsNotRemoved(command),
+                validateBinLocationsAtDestination(command),
         )
+    }
+
+    /**
+     * The receipt can only be edited by a user logged in at the destination of its shipment.
+     */
+    private ObjectError validateCurrentLocationIsDestination(ReceiptEditReceivingInfoCommand command) {
+        if (!command.receipt) {
+            return null
+        }
+
+        if (command.receipt.shipment?.destination?.id == AuthService.currentLocation?.id) {
+            return null
+        }
+
+        return rejectField("receipt", command.receipt, "receiptEditReceivingInfoCommand.receipt.isDifferentLocation")
     }
 
     /**
@@ -95,5 +113,28 @@ class ReceiptEditReceivingInfoCommandValidator extends ObjectValidator<ReceiptEd
                 rejectField("itemsToSave", command.itemsToSave,
                         "receiptEditReceivingInfoCommand.itemsToSave.binLocationRemoved", [itemIds.toString()]) :
                 null
+    }
+
+    /**
+     * Every bin location the receipt items are saved with must be a bin of the destination of the shipment, reported
+     * once per bin location.
+     */
+    private List<ObjectError> validateBinLocationsAtDestination(ReceiptEditReceivingInfoCommand command) {
+        Location destination = command.receipt?.shipment?.destination
+        if (!destination) {
+            return null
+        }
+
+        return command.itemsToSave
+                .collect { ReceiptItemEditReceivingInfoRequest item -> item.binLocation }
+                .findAll { Location binLocation ->
+                    binLocation != null && binLocation.parentLocation?.id != destination.id
+                }
+                .unique { Location binLocation -> binLocation.id }
+                .collect { Location binLocation ->
+                    rejectField("itemsToSave", command.itemsToSave,
+                            "receiptEditReceivingInfoCommand.itemsToSave.binLocationNotAtDestination",
+                            [binLocation.name])
+                }
     }
 }

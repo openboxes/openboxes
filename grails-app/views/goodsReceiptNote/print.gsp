@@ -18,6 +18,45 @@
             overflow-wrap: break-word;
             max-width: 350px;
         }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: bold;
+            line-height: 1.2;
+            margin-bottom: 6px;
+        }
+
+        td.name {
+            white-space: nowrap;
+        }
+
+        .print-layout > tbody > tr {
+            page-break-inside: auto;
+            break-inside: auto;
+        }
+
+        .canceled-blank {
+            display: inline-block;
+            width: 50px;
+            border-top: 1px solid lightgrey;
+            vertical-align: middle;
+        }
+        .goods-receipt-note-original-item td {
+            color: #222;
+            font-weight: 600;
+        }
+
+        .goods-receipt-note-original-item td.canceled {
+            color: #333;
+        }
+
+        .goods-receipt-note-original-item .canceled-blank {
+            border-top-color: #333;
+        }
+
+        .goods-receipt-note-split-item td {
+            color: #888;
+        }
     </style>
 
 </head>
@@ -25,7 +64,7 @@
 <body>
 
 <div id="print-header">
-    <span class="title">
+    <span class="title" data-testid="document-title">
         ${warehouse.message(code:'goodsReceiptNote.label')}
     </span>
     <div style="float: right;">
@@ -43,15 +82,15 @@
     <hr/>
 </div>
 
-<table>
+<table class="print-layout">
     <thead>
        <tr><td>
-        <g:render template="header" model="[title: warehouse.message(code:'goodsReceiptNote.label')]"/>
+        <g:render template="header" model="[goodsReceiptNote: goodsReceiptNote]"/>
        </td></tr>
     </thead>
     <tbody>
     <tr><td>
-        <g:render template="body" model="[pageBreakAfter: false]"/>
+        <g:render template="body" model="[pageBreakAfter: false, goodsReceiptNote: goodsReceiptNote]"/>
     </td></tr>
     </tbody>
     <div class="signature-page">

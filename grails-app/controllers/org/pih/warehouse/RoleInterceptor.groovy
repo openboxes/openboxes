@@ -62,6 +62,7 @@ class RoleInterceptor {
         'productCatalog'            : ['create', 'importProductCatalog'],
         'productType'               : ['edit', 'delete', 'save', 'update'],
         'transactionEntry'          : ['edit', 'delete', 'save', 'update'],
+        'partialReceiving'          : ['rollbackLastReceipt'],
         'user'                      : ['impersonate'],
         'productsConfigurationApi'  : ['downloadCategories', 'importCategories'],
         'locationType'              : ['create', 'edit', 'delete', 'update', 'save'],

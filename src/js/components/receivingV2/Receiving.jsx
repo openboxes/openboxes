@@ -18,6 +18,8 @@ const Receiving = () => {
     validateBeforeNextRef,
     setNextDisabled,
     isNextDisabled,
+    setNextValidationErrorsTooltip,
+    nextValidationErrorsTooltip,
     completeReceiptRef,
     isCheckStep,
     previous,
@@ -67,8 +69,8 @@ const Receiving = () => {
           next: {
             onClick: onNext,
             disabled: isNextDisabled,
-            tooltipLabel: 'react.receiving.moveToCheck.tooltip.label',
-            defaultTooltipLabel: 'Proceed to the review stage',
+            tooltipLabel: nextValidationErrorsTooltip ? null : 'react.receiving.moveToCheck.tooltip.label',
+            defaultTooltipLabel: nextValidationErrorsTooltip ?? 'Proceed to the review stage',
           },
         }}
     >
@@ -76,6 +78,7 @@ const Receiving = () => {
         flushRef={flushRef}
         validateBeforeNextRef={validateBeforeNextRef}
         setNextDisabled={setNextDisabled}
+        setNextValidationErrorsTooltip={setNextValidationErrorsTooltip}
         completeReceiptRef={completeReceiptRef}
       />
     </WizardPageLayout>

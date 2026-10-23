@@ -1,10 +1,14 @@
 package org.pih.warehouse.receiving
 
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+
 import grails.testing.gorm.DataTest
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.validation.ObjectValidationResult
@@ -28,6 +32,12 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
         }
     }
 
+    void cleanup() {
+        // The current location lives in a static thread-local; clear it so it does not leak into
+        // whatever spec runs next on this thread.
+        new AuthService().setCurrentLocation(null)
+    }
+
     void 'doValidate should accept a receipt that was started by the old receiving workflow'() {
         given: 'a pending receipt carrying no v2 marker'
         Receipt receipt = buildPendingReceipt()
@@ -41,6 +51,40 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
 
         then: 'the workflow the receipt was started by does not gate its completion'
         assert result.valid
+    }
+
+    void 'doValidate should reject a delivery date in the future'() {
+        given:
+        Receipt receipt = buildPendingReceipt()
+        buildReceiptItem(receipt, false)
+
+        when:
+        ObjectValidationResult result = validator.doValidate(new ReceiptCompleteRequestCommand(
+                receipt: receipt,
+                dateDelivered: Instant.now().plus(1, ChronoUnit.SECONDS),
+        ))
+
+        then:
+        assert !result.valid
+        assert result.errors*.code == ["receiptCompleteRequestCommand.dateDelivered.future"]
+    }
+
+    void 'doValidate should accept a delivery date of #dateDelivered'() {
+        given:
+        Receipt receipt = buildPendingReceipt()
+        buildReceiptItem(receipt, false)
+
+        expect:
+        assert validator.doValidate(new ReceiptCompleteRequestCommand(
+                receipt: receipt,
+                dateDelivered: dateDelivered,
+        )).valid
+
+        where:
+        dateDelivered << [
+                Instant.now().minus(1, ChronoUnit.HOURS),
+                null,
+        ]
     }
 
     void 'doValidate should reject a receipt that received nothing (quantityReceived: #quantityReceived)'() {
@@ -275,6 +319,47 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
         false      | true                | 0        | null      | null
         false      | true                | 0        | "valid"   | null
         false      | true                | 0        | null      | new Date(2025, 01, 01)
+        false      | true                | null     | null      | null
+        false      | true                | null     | "valid"   | null
+        false      | true                | null     | null      | new Date(2025, 01, 01)
+    }
+
+    void 'doValidate should reject completing a receipt when #scenario'() {
+        given: 'a pending receipt on a shipment received into a destination'
+        Location destination = saveLocation("Destination")
+        Location currentLocation = currentLocationName ? saveLocation(currentLocationName) : null
+        Receipt receipt = buildPendingReceipt()
+        buildReceiptItem(receipt, false)
+        receipt.shipment = new Shipment(destination: destination)
+
+        and:
+        new AuthService().setCurrentLocation(currentLocation)
+
+        when:
+        ObjectValidationResult result = validator.doValidate(new ReceiptCompleteRequestCommand(receipt: receipt))
+
+        then:
+        assert !result.valid
+        assert result.errors*.code == ["receiptCompleteRequestCommand.receipt.isDifferentLocation"]
+
+        where:
+        scenario                                 | currentLocationName
+        'logged in at another location'          | "Other location"
+        'no location is selected in the session' | null
+    }
+
+    void 'doValidate should accept completing a receipt when logged in at the destination of its shipment'() {
+        given:
+        Location destination = saveLocation("Destination")
+        Receipt receipt = buildPendingReceipt()
+        buildReceiptItem(receipt, false)
+        receipt.shipment = new Shipment(destination: destination)
+
+        and:
+        new AuthService().setCurrentLocation(destination)
+
+        expect:
+        assert validator.doValidate(new ReceiptCompleteRequestCommand(receipt: receipt)).valid
     }
 
     // ----------------------------------------------------------------------------------------------------------
@@ -325,5 +410,14 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
                 name: "Destination",
                 supportedActivities: [supportedActivity.id] as Set,
         ))
+    }
+
+    /**
+     * Persists a location so that it carries an id, which is what the current location is compared by.
+     */
+    private static Location saveLocation(String name) {
+        Location location = new Location(name: name)
+        location.save(validate: false, flush: true)
+        return location
     }
 }

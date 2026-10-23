@@ -20,6 +20,10 @@ import { formatDateToString } from 'utils/dateUtils';
 import getOptionalColumnsVisibility from 'utils/receiving/getOptionalColumnsVisibility';
 import hasAnyPreviousReceipt from 'utils/receiving/hasAnyPreviousReceipt';
 
+// TODO: This browser generated date can sometimes be ahead of the backend clock, which errors on
+//       submit due to the date being in the future. We currently never rely on this value since we
+//       use the dateDelivered returned by the backend on start receipt (see useReceivingActions).
+//       We should investigate what is causing this date discrepancy before relying on it again.
 const currentDateTime = () => formatDateToString({
   date: new Date(),
   dateFormat: DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS,

@@ -13,6 +13,7 @@ import org.springframework.validation.ObjectError
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.EventCode
@@ -141,6 +142,12 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         SmartMapper.mapStatic(*_) >> { return null }
     }
 
+    void cleanup() {
+        // The current location lives in a static thread-local; clear it so it does not leak into
+        // whatever spec runs next on this thread.
+        new AuthService().setCurrentLocation(null)
+    }
+
     // ----------------------------------------------------------------------------------------------------------
     // startReceipt - the pending receipt and its empty original lines, against a minimal real domain graph.
     // ----------------------------------------------------------------------------------------------------------
@@ -150,6 +157,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         ShipmentItem firstShipmentItem = buildShipmentItem(100)
         ShipmentItem secondShipmentItem = buildShipmentItem(50)
         Shipment shipment = buildReceivableShipment([firstShipmentItem, secondShipmentItem])
+        new AuthService().setCurrentLocation(shipment.destination)
 
         when:
         ReceiptDto result = service.startReceipt(shipment.id)
@@ -186,6 +194,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
     void 'startReceipt should assign the receiving bin of the shipment to every line it creates'() {
         given:
         Shipment shipment = buildReceivableShipment([buildShipmentItem(100), buildShipmentItem(50)])
+        new AuthService().setCurrentLocation(shipment.destination)
         Location receivingBin = new Location(name: "R-TEST")
 
         when:
@@ -209,6 +218,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         ReceiptItem consumedOriginal = buildReceiptItem(consumedItem, 30)
         ReceiptItem openOriginal = buildReceiptItem(openItem, 40)
         createReceipt(shipment, [consumedOriginal, openOriginal], ReceiptStatusCode.RECEIVED)
+        new AuthService().setCurrentLocation(shipment.destination)
 
         when:
         ReceiptDto result = service.startReceipt(shipment.id)
@@ -230,6 +240,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
     void 'startReceipt should mark the created receipt as a v2 receipt'() {
         given:
         Shipment shipment = buildReceivableShipment([buildShipmentItem(100)])
+        new AuthService().setCurrentLocation(shipment.destination)
 
         when:
         service.startReceipt(shipment.id)
@@ -237,6 +248,25 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         then: 'a marker row ties the pending receipt to the v2 workflow'
         assert ReceiptV2Marker.count() == 1
         assert ReceiptV2Marker.list().first().receipt == shipment.receipts.first()
+    }
+
+    void 'startReceipt should reject a shipment when not logged in at its destination'() {
+        given:
+        Shipment shipment = buildReceivableShipment([buildShipmentItem(100)])
+        Location otherLocation = new Location(name: "Other location")
+        otherLocation.save(validate: false, flush: true)
+        new AuthService().setCurrentLocation(otherLocation)
+
+        when:
+        service.startReceipt(shipment.id)
+
+        then:
+        ValidationException e = thrown(ValidationException)
+        assert e.errors.getFieldError("destination").code == "stockMovement.startReceipt.isDifferentLocation.message"
+
+        and: 'no receipt is started'
+        0 * receiptIdentifierService.generate(_)
+        0 * receiptService.createTemporaryReceivingBin(_)
     }
 
     void 'startReceipt should reject a shipment that already has a pending receipt'() {
@@ -299,6 +329,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         ReceiptItem touchedLine = buildReceiptItem(touchedItem, 40)
         Receipt receipt = createReceipt(shipment, [touchedLine], ReceiptStatusCode.PENDING)
         Location receivingBin = new Location(name: "R-TEST")
+        new AuthService().setCurrentLocation(shipment.destination)
 
         when:
         ReceiptDto result = service.syncReceiptLines(shipment.id)
@@ -332,6 +363,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         ReceiptItem originalLine = buildReceiptItem(splitItem, 60, [quantityShipped: 60])
         ReceiptItem splitLine = buildReceiptItem(splitItem, 40, [quantityShipped: 40, isSplitItem: true])
         createReceipt(shipment, [originalLine, splitLine], ReceiptStatusCode.PENDING)
+        new AuthService().setCurrentLocation(shipment.destination)
 
         when:
         service.syncReceiptLines(shipment.id)
@@ -352,6 +384,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         ShipmentItem touchedItem = buildShipmentItem(100)
         Shipment shipment = buildReceivableShipment([touchedItem, buildShipmentItem(50)])
         Receipt receipt = createReceipt(shipment, [buildReceiptItem(touchedItem, 40)], ReceiptStatusCode.PENDING)
+        new AuthService().setCurrentLocation(shipment.destination)
 
         when:
         service.syncReceiptLines(shipment.id)
@@ -372,6 +405,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
 
         and: 'nothing in its shape gives the old workflow away, and it carries no stamp'
         assert ReceiptV2Marker.count() == 0
+        new AuthService().setCurrentLocation(shipment.destination)
 
         when:
         service.syncReceiptLines(shipment.id)
@@ -401,6 +435,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         Receipt receipt = createReceipt(
                 shipment, [originalLine, splitLine, secondOriginalLine], ReceiptStatusCode.PENDING)
         markAsV2(receipt)
+        new AuthService().setCurrentLocation(shipment.destination)
 
         when:
         ReceiptDto result = service.syncReceiptLines(shipment.id)
@@ -426,6 +461,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         ShipmentItem touchedItem = buildShipmentItem(100)
         Shipment shipment = buildReceivableShipment([touchedItem, buildShipmentItem(50)])
         Receipt receipt = createReceipt(shipment, [buildReceiptItem(touchedItem, 40)], ReceiptStatusCode.PENDING)
+        new AuthService().setCurrentLocation(shipment.destination)
 
         when: 'the client calls it again on the next entry to the page'
         service.syncReceiptLines(shipment.id)
@@ -446,6 +482,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         Shipment shipment = buildReceivableShipment([consumedItem, untouchedItem])
         createReceipt(shipment, [buildReceiptItem(consumedItem, 30)], ReceiptStatusCode.RECEIVED)
         Receipt pendingReceipt = createReceipt(shipment, [], ReceiptStatusCode.PENDING)
+        new AuthService().setCurrentLocation(shipment.destination)
 
         when:
         service.syncReceiptLines(shipment.id)
@@ -462,6 +499,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         Shipment shipment = buildReceivableShipment([splitOnlyItem])
         ReceiptItem splitLine = buildReceiptItem(splitOnlyItem, 40, [quantityShipped: 40, isSplitItem: true])
         Receipt receipt = createReceipt(shipment, [splitLine], ReceiptStatusCode.PENDING)
+        new AuthService().setCurrentLocation(shipment.destination)
 
         when:
         service.syncReceiptLines(shipment.id)
@@ -483,6 +521,7 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         unflaggedLine.isSplitItem = null
         ReceiptItem splitLine = buildReceiptItem(shipmentItem, 20, [quantityShipped: 0, isSplitItem: true])
         createReceipt(shipment, [unflaggedLine, splitLine], ReceiptStatusCode.PENDING)
+        new AuthService().setCurrentLocation(shipment.destination)
 
         when:
         service.syncReceiptLines(shipment.id)
@@ -503,12 +542,35 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
         ShipmentItem shipmentItem = buildShipmentItem(100)
         Shipment shipment = buildReceivableShipment([shipmentItem])
         createReceipt(shipment, [buildReceiptItem(shipmentItem, 100)], ReceiptStatusCode.RECEIVED)
+        new AuthService().setCurrentLocation(shipment.destination)
 
         when:
         service.syncReceiptLines(shipment.id)
 
         then: 'a completed receipt is never synced'
         thrown(ObjectNotFoundException)
+    }
+
+    void 'syncReceiptLines should reject a shipment when not logged in at its destination'() {
+        given: 'an old-workflow pending receipt carrying a line only for the item the user touched'
+        ShipmentItem touchedItem = buildShipmentItem(100)
+        Shipment shipment = buildReceivableShipment([touchedItem, buildShipmentItem(50)])
+        Receipt receipt = createReceipt(shipment, [buildReceiptItem(touchedItem, 40)], ReceiptStatusCode.PENDING)
+        Location otherLocation = new Location(name: "Other location")
+        otherLocation.save(validate: false, flush: true)
+        new AuthService().setCurrentLocation(otherLocation)
+
+        when:
+        service.syncReceiptLines(shipment.id)
+
+        then:
+        ValidationException e = thrown(ValidationException)
+        assert e.errors.getFieldError("destination").code ==
+                "stockMovement.syncReceiptLines.isDifferentLocation.message"
+
+        and: 'the receipt is left as it was'
+        assert receipt.receiptItems.size() == 1
+        assert ReceiptV2Marker.count() == 0
     }
 
     void 'syncReceiptLines should reject an unknown shipment'() {

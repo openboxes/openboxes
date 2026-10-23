@@ -23,6 +23,8 @@ const EditLineItemModalFooter = ({ summaryData, onClose, isSaveDisabled }) => (
         variant="primary"
         type="submit"
         disabled={isSaveDisabled}
+        tooltipLabel={isSaveDisabled ? 'react.receiving.editModal.validationErrors.tooltip.label' : null}
+        defaultTooltipLabel={isSaveDisabled ? 'Validation errors on page. Review fields marked in red.' : ''}
       />
     </div>
   </>

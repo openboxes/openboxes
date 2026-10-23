@@ -61,6 +61,7 @@ const ConfirmReceiptInfo = ({ control, shipmentItemsState, canceledReceiptItemId
                 <DateFieldDateFns
                   {...field}
                   title={{ id: 'react.receiving.deliveredOn.label', defaultMessage: 'Delivered on' }}
+                  ariaLabel={{ id: 'react.receiving.deliveredOn.label', defaultMessage: 'Delivered on' }}
                   required
                   showTimeSelect
                   customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
