@@ -788,7 +788,7 @@ class PickTaskService {
         }
 
         ActivityCode taskDeliveryTypeActivity = pickTask.getDeliveryTypeCode().getActivityCode()
-        if (!outboundContainer.supports(taskDeliveryTypeActivity)) {
+        if (taskDeliveryTypeActivity && !outboundContainer.supports(taskDeliveryTypeActivity)) {
             throw new IllegalArgumentException("Container ${outboundContainer.name} does not support ${taskDeliveryTypeActivity} activity")
         }
     }
