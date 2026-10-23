@@ -36,8 +36,23 @@ class CycleCountDto implements DomainDto<CycleCount> {
                         deadline: cycleCountRequest?.recountDeadline
                 ),
                 status: cycleCount.status.toString(),
-                cycleCountItems: SmartMapper.mapCollectionStatic(cycleCount.cycleCountItems, CycleCountItemDto)
+                cycleCountItems: SmartMapper.mapCollectionStatic(
+                        sortItemsInEntryOrder(cycleCount.cycleCountItems), CycleCountItemDto)
         )
+    }
+
+    /**
+     * Sorts the items in the order they were created, so custom items stay in the order the user entered them.
+     * Count items go first, because the recount is merged with the count on the frontend
+     * (mergeCycleCountItems in useResolveStep.js) and takes its order from it.
+     * Within each count, custom items go to the bottom, and ids follow the order the items were created in.
+     */
+    private static List<CycleCountItem> sortItemsInEntryOrder(Collection<CycleCountItem> cycleCountItems) {
+        return cycleCountItems.toSorted { CycleCountItem a, CycleCountItem b ->
+            a.countIndex <=> b.countIndex
+                    ?: a.custom <=> b.custom
+                            ?: a.id <=> b.id
+        }
     }
 
     /**
