@@ -447,18 +447,14 @@ class PickTaskService {
             boolean allTasksPicked = allOrderTasks.every {
                 it.status == PickTaskStatus.PICKED.name()
             }
-            boolean partialAllocation = requisition.partialAllocationAllowed
-            boolean backordered = requisition.requisitionItems?.any { it.isBackordered() }
-            if (allTasksPicked && (!partialAllocation || !backordered)) {
+            if (allTasksPicked && !requisition.awaitingBackorder) {
                 requisition.status = RequisitionStatus.PICKED
             }
         } else if (task.status == PickTaskStatus.STAGED) {
             boolean allTasksStaged = allOrderTasks.every {
                 it.status == PickTaskStatus.STAGED.name()
             }
-            boolean partialAllocation = requisition.partialAllocationAllowed
-            boolean backordered = requisition.requisitionItems?.any { it.isBackordered() }
-            if (allTasksStaged && (!partialAllocation || !backordered)) {
+            if (allTasksStaged && !requisition.awaitingBackorder) {
                 requisition.status = RequisitionStatus.STAGED
 
                 if (!requisition.shipment) {

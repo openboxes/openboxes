@@ -201,6 +201,7 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
             "issuanceAttemptCount",
             "mostRecentErrorMessage",
             "inErrorState",
+            "awaitingBackorder",
     ]
     static hasOne = [picklist: Picklist]
     static hasMany = [
@@ -525,6 +526,10 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
 
     boolean isEligibleForCancellation() {
         return status < RequisitionStatus.PICKING
+    }
+
+    boolean isAwaitingBackorder() {
+        return partialAllocationAllowed && requisitionItems?.any { it.isBackordered() }
     }
 
     /**
