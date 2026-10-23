@@ -154,6 +154,10 @@ class ReplenishmentService {
     /**
      * Returns the product and destination bin pairs (see getProductBinKey) that are already on replenishments
      * of the facility that have not been completed or canceled yet.
+     *
+     * Only replenishment lists (manual or automatic) count, told apart from regular stock transfers (also
+     * TRANSFER_ORDER) by the replenishment number prefix: a pending stock transfer into a bin does not stop it
+     * from being replenished. Open replenishments numbered with a previously configured prefix are not recognized.
      */
     Set<String> getBinsOnOpenReplenishments(Location facility) {
         List<Object[]> rows = OrderItem.executeQuery("""
@@ -162,13 +166,16 @@ class ReplenishmentService {
             where oi.order.orderType.code = :orderTypeCode
             and oi.order.origin = :facility
             and oi.order.status in (:statuses)
+            and oi.order.orderNumber like :replenishmentNumberPattern
             and oi.destinationBinLocation is not null
             and (oi.orderItemStatusCode is null or oi.orderItemStatusCode <> :canceled)
         """, [
-                orderTypeCode: OrderTypeCode.TRANSFER_ORDER.name(),
-                facility     : facility,
-                statuses     : [OrderStatus.PENDING, OrderStatus.APPROVED, OrderStatus.PLACED],
-                canceled     : OrderItemStatusCode.CANCELED,
+                orderTypeCode             : OrderTypeCode.TRANSFER_ORDER.name(),
+                facility                  : facility,
+                statuses                  : [OrderStatus.PENDING, OrderStatus.APPROVED, OrderStatus.PLACED],
+                // The prefix is not escaped, it must not contain the LIKE wildcards % or _
+                replenishmentNumberPattern: replenishmentNumberPrefix + '%',
+                canceled                  : OrderItemStatusCode.CANCELED,
         ])
         return rows.collect { Object[] row -> getProductBinKey(row[0] as String, row[1] as String) } as Set<String>
     }
@@ -195,11 +202,14 @@ class ReplenishmentService {
         } as Map<String, Integer>
     }
 
-    String generateReplenishmentNumber() {
-        String prefix = grailsApplication.config.getProperty(
+    String getReplenishmentNumberPrefix() {
+        return grailsApplication.config.getProperty(
                 "openboxes.stockTransfer.binReplenishment.prefix", String, Constants.REPLENISHMENT_PREFIX)
+    }
+
+    String generateReplenishmentNumber() {
         String replenishmentNumber = orderIdentifierService.generate(null,
-                IdentifierGeneratorContext.builder().prefix(prefix).build())
+                IdentifierGeneratorContext.builder().prefix(replenishmentNumberPrefix).build())
         if (!replenishmentNumber) {
             throw new IllegalStateException("Unable to generate a unique replenishment number")
         }
