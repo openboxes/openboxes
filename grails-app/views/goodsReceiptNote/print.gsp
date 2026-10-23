@@ -30,6 +30,11 @@
             white-space: nowrap;
         }
 
+        .print-layout > tbody > tr {
+            page-break-inside: auto;
+            break-inside: auto;
+        }
+
         .canceled-blank {
             display: inline-block;
             width: 50px;
@@ -77,7 +82,7 @@
     <hr/>
 </div>
 
-<table>
+<table class="print-layout">
     <thead>
        <tr><td>
         <g:render template="header" model="[goodsReceiptNote: goodsReceiptNote]"/>
