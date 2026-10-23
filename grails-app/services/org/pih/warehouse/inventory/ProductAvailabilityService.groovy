@@ -36,7 +36,6 @@ import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
-import org.pih.warehouse.core.db.GormUtil
 import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.inventory.product.availability.InventoryByProduct
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
@@ -863,50 +862,52 @@ class ProductAvailabilityService {
         return inventoryService.getQuantityAsAvailableItems(transactionEntries).findAll{ it.quantityOnHand != 0 }
     }
 
-    List getAvailableItems(Location location, List<String> productsIds, boolean excludeNegativeQuantity = false, boolean excludeZeroQuantity = false) {
+    @Transactional(readOnly = true)
+    List getAvailableItems(Location location,
+                           List<String> productsIds,
+                           boolean excludeNegativeQuantity = false,
+                           boolean excludeZeroQuantity = false,
+                           Map paginationParams = null) {
         log.info("getQuantityOnHandByBinLocation: location=${location} product=${productsIds}")
 
         if (!location) {
-            return []
+            return paginationParams?.max != null ? new PaginatedList([], 0) : []
         }
 
-        String quantityCondition = ((excludeNegativeQuantity && excludeZeroQuantity) || excludeZeroQuantity) ? "and pa.quantityOnHand <> 0"
-                : (excludeNegativeQuantity) ? "and pa.quantityOnHand > 0" : ""
+        def results = ProductAvailability.createCriteria().list(paginationParams ?: [:]) {
+            // Pre-fetch the relationship entities to avoid N+1 issues. Without the join, they'd be Hibernate proxy
+            // objects with just an id, so accessing their fields would issue a separate database query per instance.
+            join("inventoryItem")
+            join("binLocation")
 
-        String sql = """
-                SELECT
-                    ii,
-                    pa.binLocation,
-                    pa.quantityOnHand,
-                    pa.quantityAvailableToPromise
-                FROM
-                    ProductAvailability pa
-                    LEFT OUTER JOIN pa.inventoryItem ii
-                    LEFT OUTER JOIN pa.binLocation bl
-                WHERE
-                    pa.location = :location
-                    ${quantityCondition}
-                    ${productsIds ? "AND pa.product.id IN (:products)" : ""}
-        """
-        def results = ProductAvailability.executeQuery(sql, GormUtil.sanitizeExecuteQueryArgs(sql, [
-                location: location,
-                products: productsIds,
-        ]))
+            eq("location", location)
+            if (excludeZeroQuantity) {
+                ne("quantityOnHand", 0)
+            } else if (excludeNegativeQuantity) {
+                gt("quantityOnHand", 0)
+            }
+            if (productsIds) {
+                product {
+                    inList("id", productsIds)
+                }
+            }
+            if (paginationParams?.max != null) {
+                order("id", "asc")
+            }
+        }
 
-        List<AvailableItem> data = results.collect {
-            InventoryItem inventoryItem = it[0]
-            Location binLocation = it[1]
-            Integer quantityOnHand = it[2]
-            Integer quantityAvailableToPromise = it[3]
-
+        List<AvailableItem> data = results.collect { ProductAvailability pa ->
             return new AvailableItem(
-                    inventoryItem     : inventoryItem,
-                    binLocation       : binLocation,
-                    quantityOnHand    : quantityOnHand,
-                    quantityAvailable : quantityAvailableToPromise
+                    inventoryItem     : pa.inventoryItem,
+                    binLocation       : pa.binLocation,
+                    quantityOnHand    : pa.quantityOnHand,
+                    quantityAvailable : pa.quantityAvailableToPromise
             )
         }
-        return data
+
+        return results instanceof PagedResultList ?
+                new PaginatedList(data, results.totalCount) :
+                data
     }
 
     Map<InventoryItem, Integer> getQuantityOnHandByInventoryItem(Location location, List<InventoryItem> inventoryItems = []) {
