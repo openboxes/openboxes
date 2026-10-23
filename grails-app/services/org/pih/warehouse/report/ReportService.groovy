@@ -1451,7 +1451,7 @@ class ReportService implements ApplicationContextAware {
             "Opening": data.openingBalance,
             "Credits": data.credits,
             "Debits": data.debits,
-            "Adjustments": data.adjustments,
+            "Net Change": data.netChange,
             "Closing": data.closingBalance,
         ]
     }
@@ -1534,14 +1534,14 @@ class ReportService implements ApplicationContextAware {
         }
 
         // Calculate items available at the startDate to get quantity on hand for found products
-        AvailableItemMap availableItemStartDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+        AvailableItemMap availableItemStartDateMap = productAvailabilityService.getQuantityOnHandAtDateAsMap(
                 location,
                 productsMap.keySet().toList(),
                 startDate
         )
 
         // Calculate items available at the startDate to get quantity on hand for found products
-        AvailableItemMap availableItemEndDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+        AvailableItemMap availableItemEndDateMap = productAvailabilityService.getQuantityOnHandAtDateAsMap(
                 location,
                 productsMap.keySet().toList(),
                 endDate.before(new Date()) ? endDate : new Date()
@@ -1574,12 +1574,9 @@ class ReportService implements ApplicationContextAware {
             Integer closingBalance = availableItemEndDateMap.getAllByProduct(key).quantityOnHand.sum() ?: 0
             Integer credits = getCreditTransactionEntries(value).sum { it.quantity } as Integer ?: 0
             Integer debits = getDebitTransactionEntries(value).sum { Math.abs(it.quantity) } as Integer ?: 0
-            // In the new version of the report, it's not based on the inventory snapshot.
-            // So we don't have to calculate it in the following way:
-            // closingBalance - openingBalance - credits + debits,
-            // because the data is accurate, so we can just compare
-            // the closing and opening balance
-            Integer adjustments = closingBalance - openingBalance
+            // The change in quantity on hand over the period. Note that this is not the total of the adjustments:
+            // credits and debits are already included in it.
+            Integer netChange = closingBalance - openingBalance
 
             if (includeDetails) {
                 List<TransactionEntry> backdatedTransactionEntries = value.transaction
@@ -1617,7 +1614,7 @@ class ReportService implements ApplicationContextAware {
                     openingBalance: openingBalance,
                     credits: credits,
                     debits: debits,
-                    adjustments: adjustments,
+                    netChange: netChange,
                     closingBalance: closingBalance
             )
         }
@@ -1641,18 +1638,18 @@ class ReportService implements ApplicationContextAware {
         )
 
         // Calculate items available at the startDate to get quantity on hand for found products
-        AvailableItemMap availableItemStartDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+        AvailableItemMap availableItemStartDateMap = productAvailabilityService.getQuantityOnHandAtDateAsMap(
                 location,
                 [product],
                 startDate
         )
 
         // Calculate items available at the endDate to get quantity on hand for found products
-        AvailableItemMap availableItemEndDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+        AvailableItemMap availableItemEndDateMap = productAvailabilityService.getQuantityOnHandAtDateAsMap(
                 location,
                 [product],
                 // EndDate cannot be a date in the future, because of the validation
-                // in getAvailableItemsAtDateAsMap. Current endDate value is endDate + 1,
+                // in getQuantityOnHandAtDateAsMap. Current endDate value is endDate + 1,
                 // because it's used in that way in the createCriteria (+1 is added in the controller)
                 endDate.before(new Date()) ? endDate : new Date()
         )
