@@ -32,8 +32,8 @@
                 </g:else>
             </picture>
 
-            <h3 class="display-3">Description</h3>
             <g:if test="${product.description}">
+                <h3 class="display-3"><g:message code="default.description.label" default="Description"/></h3>
                 <p>
                     ${product.description}
                 </p>

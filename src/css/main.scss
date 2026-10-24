@@ -1,4 +1,8 @@
 @import "src/css/colors";
+// Unified design, scoped under .unified-layout — a class the layouts add
+// only when openboxes.layout.unified.enabled is true, so one bundle serves
+// both states and an instance that has not opted in matches none of it.
+@import "src/css/unified-layout";
 
 @mixin
 limit-lines($lines-number) {
