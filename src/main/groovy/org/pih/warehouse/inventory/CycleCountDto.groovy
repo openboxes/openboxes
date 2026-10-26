@@ -45,7 +45,8 @@ class CycleCountDto implements DomainDto<CycleCount> {
      * Sorts the items in the order they were created, so custom items stay in the order the user entered them.
      * Count items go first, because the recount is merged with the count on the frontend
      * (mergeCycleCountItems in useResolveStep.js) and takes its order from it.
-     * Within each count, custom items go to the bottom, and ids follow the order the items were created in.
+     * Within each count, custom items go to the bottom. Then the items are sorted by dateCreated,
+     * and the id decides the order of the items saved in the same second.
      */
     private static List<CycleCountItem> sortItemsInEntryOrder(Collection<CycleCountItem> cycleCountItems) {
         return cycleCountItems.toSorted { CycleCountItem a, CycleCountItem b ->
